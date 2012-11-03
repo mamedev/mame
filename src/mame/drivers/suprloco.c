@@ -9,6 +9,14 @@ TODO:
   to make red parts of sprites blink to purple, it's not clear how this is
   implemented in hardware, there's a hack to support it.
 
+Sega PCB 834-5137
+ Sega 315-5015 (Sega custom encrypted Z80)
+ Sega 315-5011
+ Sega 315-5012
+ Z80
+ 8255
+ 8 switch Dipswitch x 2
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -81,7 +89,7 @@ static INPUT_PORTS_START( suprloco )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SWA:1,2,3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -90,7 +98,7 @@ static INPUT_PORTS_START( suprloco )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SWA:4,5,6")
 	PORT_DIPSETTING(    0x38, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 3C_1C ) )
@@ -99,34 +107,34 @@ static INPUT_PORTS_START( suprloco )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Lives ) )		PORT_DIPLOCATION("SWA:7,8")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x40, "3" )
 	PORT_DIPSETTING(    0x80, "4" )
 	PORT_DIPSETTING(    0xc0, "5" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SWB:1,2")
 	PORT_DIPSETTING(    0x00, "20000" )
 	PORT_DIPSETTING(    0x01, "30000" )
 	PORT_DIPSETTING(    0x02, "40000" )
 	PORT_DIPSETTING(    0x03, "50000" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )		PORT_DIPLOCATION("SWB:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SWB:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SWB:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x20, 0x20, "Infinite Lives (Cheat)")
+	PORT_DIPNAME( 0x20, 0x20, "Infinite Lives (Cheat)")	PORT_DIPLOCATION("SWB:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Initial Entry" )
+	PORT_DIPNAME( 0x40, 0x40, "Initial Entry" )		PORT_DIPLOCATION("SWB:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SWB:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
@@ -210,35 +218,6 @@ MACHINE_CONFIG_END
 
 ROM_START( suprloco )
 	ROM_REGION( 2*0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
-	ROM_LOAD( "ic37.bin",     0x0000, 0x4000, CRC(57f514dd) SHA1(707800b90a22547a56b01d1e11775e9ee5555d23) )	/* encrypted */
-	ROM_LOAD( "ic15.bin",     0x4000, 0x4000, CRC(5a1d2fb0) SHA1(fdb9416e5530718245fd597073a63feddb233c3c) )	/* encrypted */
-	ROM_LOAD( "epr-5228.28",     0x8000, 0x4000, CRC(a597828a) SHA1(61004d112591fd2d752c39df71c1304d9308daae) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "epr-5222.64",     0x0000, 0x2000, CRC(0aa57207) SHA1(b29b533505cb5b47c90534f2f610baeb7265d030) )
-
-	ROM_REGION( 0xe000, "gfx1", 0 )
-	ROM_LOAD( "epr-5225.63",     0x0000, 0x2000, CRC(e571fe81) SHA1(ac2b5914a445b89b7456b2c4290e4630b525f05d) )
-	ROM_LOAD( "epr-5224.62",     0x2000, 0x2000, CRC(6130f93c) SHA1(ae0657f46c10e75eec994e75359a89b5d61baf68) )
-	ROM_LOAD( "epr-5223.61",     0x4000, 0x2000, CRC(3b03004e) SHA1(805b51cb14d3ace97f2e0f306db28921b2f5e322) )
-							/* 0x6000- 0xe000 will be created by init_suprloco */
-
-	ROM_REGION( 0x8000, "gfx2", 0 )	/* 32k for sprites data used at runtime */
-	ROM_LOAD( "epr-5229.55",     0x0000, 0x4000, CRC(ee2d3ed3) SHA1(593f3cd5c4e7f20b5e31e6bac8864774442e4b75) )
-	ROM_LOAD( "epr-5230.56",     0x4000, 0x2000, CRC(f04a4b50) SHA1(80363f0c508fb2a755bf684f9a6862c1e7285495) )
-							/* 0x6000 empty */
-
-	ROM_REGION( 0x0620, "proms", 0 )
-	ROM_LOAD( "pr-5220.100",     0x0100, 0x0080, CRC(7b0c8ce5) SHA1(4e1ea5ce38198a3965dfeb609ba0c7e8211531c3) )  /* color PROM */
-	ROM_CONTINUE(                0x0000, 0x0080 )
-	ROM_CONTINUE(                0x0180, 0x0080 )
-	ROM_CONTINUE(                0x0080, 0x0080 )
-	ROM_LOAD( "pr-5219.89",      0x0200, 0x0400, CRC(1d4b02cb) SHA1(00d822f1bc4f57f2f5d5a0615241f8136246a842) )  /* 3bpp to 4bpp table */
-	ROM_LOAD( "pr-5221.7",       0x0600, 0x0020, CRC(89ba674f) SHA1(17c87840c8011968675a5a6f55966467df02364b) )	/* unknown */
-ROM_END
-
-ROM_START( suprlocoa )
-	ROM_REGION( 2*0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
 	ROM_LOAD( "epr-5226a.37",    0x0000, 0x4000, CRC(33b02368) SHA1(c6e3116ad4b52bcc3174de5770f7a7ce024790d5) )	/* encrypted */
 	ROM_LOAD( "epr-5227a.15",    0x4000, 0x4000, CRC(a5e67f50) SHA1(1dd52e4cf00ce414fe1db8259c9976cdc23513b4) )	/* encrypted */
 	ROM_LOAD( "epr-5228.28",     0x8000, 0x4000, CRC(a597828a) SHA1(61004d112591fd2d752c39df71c1304d9308daae) )
@@ -258,11 +237,40 @@ ROM_START( suprlocoa )
 							/* 0x6000 empty */
 
 	ROM_REGION( 0x0620, "proms", 0 )
-	ROM_LOAD( "pr-5220.100",     0x0100, 0x0080, CRC(7b0c8ce5) SHA1(4e1ea5ce38198a3965dfeb609ba0c7e8211531c3) )  /* color PROM */
+	ROM_LOAD( "pr-5220.100",     0x0100, 0x0080, CRC(7b0c8ce5) SHA1(4e1ea5ce38198a3965dfeb609ba0c7e8211531c3) )	/* color PROM */
 	ROM_CONTINUE(                0x0000, 0x0080 )
 	ROM_CONTINUE(                0x0180, 0x0080 )
 	ROM_CONTINUE(                0x0080, 0x0080 )
-	ROM_LOAD( "pr-5219.89",      0x0200, 0x0400, CRC(1d4b02cb) SHA1(00d822f1bc4f57f2f5d5a0615241f8136246a842) )  /* 3bpp to 4bpp table */
+	ROM_LOAD( "pr-5219.89",      0x0200, 0x0400, CRC(1d4b02cb) SHA1(00d822f1bc4f57f2f5d5a0615241f8136246a842) )	/* 3bpp to 4bpp table */
+	ROM_LOAD( "pr-5221.7",       0x0600, 0x0020, CRC(89ba674f) SHA1(17c87840c8011968675a5a6f55966467df02364b) )	/* unknown */
+ROM_END
+
+ROM_START( suprlocoo )
+	ROM_REGION( 2*0x10000, "maincpu", 0 )	/* 64k for code + 64k for decrypted opcodes */
+	ROM_LOAD( "epr-5226.37",     0x0000, 0x4000, CRC(57f514dd) SHA1(707800b90a22547a56b01d1e11775e9ee5555d23) )	/* encrypted */
+	ROM_LOAD( "epr-5227.15",     0x4000, 0x4000, CRC(5a1d2fb0) SHA1(fdb9416e5530718245fd597073a63feddb233c3c) )	/* encrypted */
+	ROM_LOAD( "epr-5228.28",     0x8000, 0x4000, CRC(a597828a) SHA1(61004d112591fd2d752c39df71c1304d9308daae) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "epr-5222.64",     0x0000, 0x2000, CRC(0aa57207) SHA1(b29b533505cb5b47c90534f2f610baeb7265d030) )
+
+	ROM_REGION( 0xe000, "gfx1", 0 )
+	ROM_LOAD( "epr-5225.63",     0x0000, 0x2000, CRC(e571fe81) SHA1(ac2b5914a445b89b7456b2c4290e4630b525f05d) )
+	ROM_LOAD( "epr-5224.62",     0x2000, 0x2000, CRC(6130f93c) SHA1(ae0657f46c10e75eec994e75359a89b5d61baf68) )
+	ROM_LOAD( "epr-5223.61",     0x4000, 0x2000, CRC(3b03004e) SHA1(805b51cb14d3ace97f2e0f306db28921b2f5e322) )
+							/* 0x6000- 0xe000 will be created by init_suprloco */
+
+	ROM_REGION( 0x8000, "gfx2", 0 )	/* 32k for sprites data used at runtime */
+	ROM_LOAD( "epr-5229.55",     0x0000, 0x4000, CRC(ee2d3ed3) SHA1(593f3cd5c4e7f20b5e31e6bac8864774442e4b75) )
+	ROM_LOAD( "epr-5230.56",     0x4000, 0x2000, CRC(f04a4b50) SHA1(80363f0c508fb2a755bf684f9a6862c1e7285495) )
+							/* 0x6000 empty */
+
+	ROM_REGION( 0x0620, "proms", 0 )
+	ROM_LOAD( "pr-5220.100",     0x0100, 0x0080, CRC(7b0c8ce5) SHA1(4e1ea5ce38198a3965dfeb609ba0c7e8211531c3) )	/* color PROM */
+	ROM_CONTINUE(                0x0000, 0x0080 )
+	ROM_CONTINUE(                0x0180, 0x0080 )
+	ROM_CONTINUE(                0x0080, 0x0080 )
+	ROM_LOAD( "pr-5219.89",      0x0200, 0x0400, CRC(1d4b02cb) SHA1(00d822f1bc4f57f2f5d5a0615241f8136246a842) )	/* 3bpp to 4bpp table */
 	ROM_LOAD( "pr-5221.7",       0x0600, 0x0020, CRC(89ba674f) SHA1(17c87840c8011968675a5a6f55966467df02364b) )	/* unknown */
 ROM_END
 
@@ -306,5 +314,5 @@ DRIVER_INIT_MEMBER(suprloco_state,suprloco)
 
 
 
-GAME( 1982, suprloco,         0, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive", 0 )
-GAME( 1982, suprlocoa, suprloco, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive (Rev.A)", 0 )
+GAME( 1982, suprloco,         0, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive (Rev.A)", 0 )
+GAME( 1982, suprlocoo, suprloco, suprloco, suprloco, suprloco_state, suprloco, ROT0, "Sega", "Super Locomotive", 0 )
