@@ -148,12 +148,12 @@ void upd765_family_device::soft_reset()
 	for(int i=0; i<4; i++) {
 		flopi[i].main_state = IDLE;
 		flopi[i].sub_state = IDLE;
-		flopi[i].irq_seek = false;
 		flopi[i].live = false;
 		flopi[i].ready = !ready_polled;
-		flopi[i].irq_polled = false;
+		flopi[i].irq = floppy_info::IRQ_NONE;
 	}
 	data_irq = false;
+	polled_irq = false;
 	internal_drq = false;
 	fifo_pos = 0;
 	command_pos = 0;
@@ -1097,9 +1097,7 @@ void upd765_family_device::start_command(int cmd)
 		main_phase = PHASE_RESULT;
 
 		int fid;
-		for(fid=0; fid<4 && !flopi[fid].irq_seek; fid++);
-		if(fid == 4)
-			for(fid=0; fid<4 && !flopi[fid].irq_polled; fid++);
+		for(fid=0; fid<4 && flopi[fid].irq == floppy_info::IRQ_NONE; fid++);
 		if(fid == 4) {
 			st0 = ST0_UNK;
 			result[0] = st0;
@@ -1109,25 +1107,28 @@ void upd765_family_device::start_command(int cmd)
 			break;
 		}
 		floppy_info &fi = flopi[fid];
-		if(fi.irq_seek)
-			fi.irq_seek = false;
-
-		else if(fi.irq_polled) {
+		if(fi.irq == floppy_info::IRQ_POLLED) {
 			// Documentation is somewhat contradictory w.r.t polling
 			// and irq.  PC bios, especially 5150, requires that only
 			// one irq happens.  That's also wait the ns82077a doc
 			// says it does.  OTOH, a number of docs says you need to
 			// call SIS 4 times, once per drive...
 			//
-			// Let's take the option that allows PC to boot.
-
-			for(int i=0; i<4; i++)
-				flopi[i].irq_polled = false;
+			// There's also the interaction with the seek irq.  The
+			// somewhat borderline tf20 code seems to think that
+			// essentially ignoring the polling irq should work.
+			//
+			// So at that point the best bet seems to drop the
+			// "polled" irq as soon as a SIS happens, and override any
+			// polled-in-waiting information when a seek irq happens
+			// for a given floppy.
 
 			st0 = ST0_ABRT | fid;
-		} else {
-			abort();
 		}
+		fi.irq = floppy_info::IRQ_NONE;
+
+		polled_irq = false;
+
 		result[0] = st0;
 		result[1] = fi.pcn;
 		logerror("%s: command sense interrupt status (fid=%d %02x %02x)\n", tag(), fid, result[0], result[1]);
@@ -1165,7 +1166,7 @@ void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 	if(data_completion)
 		data_irq = true;
 	else
-		fi.irq_seek = true;
+		fi.irq = floppy_info::IRQ_SEEK;
 	check_irq();
 }
 
@@ -1785,9 +1786,9 @@ void upd765_family_device::read_id_continue(floppy_info &fi)
 void upd765_family_device::check_irq()
 {
 	bool old_irq = cur_irq;
-	cur_irq = data_irq || internal_drq;
+	cur_irq = data_irq || polled_irq || internal_drq;
 	for(int i=0; i<4; i++)
-		cur_irq = cur_irq || flopi[i].irq_seek || flopi[i].irq_polled;
+		cur_irq = cur_irq || flopi[i].irq == floppy_info::IRQ_SEEK;
 	cur_irq = cur_irq && (dor & 4) && (dor & 8);
 	if(cur_irq != old_irq && !intrq_cb.isnull()) {
 		logerror("%s: irq = %d\n", tag(), cur_irq);
@@ -1851,8 +1852,11 @@ void upd765_family_device::run_drive_ready_polling()
 		if(ready != flopi[fid].ready) {
 			logerror("%s: polled %d : %d -> %d\n", tag(), fid, flopi[fid].ready, ready);
 			flopi[fid].ready = ready;
-			flopi[fid].irq_polled = true;
-			changed = true;
+			if(flopi[fid].irq == floppy_info::IRQ_NONE) {
+				flopi[fid].irq = floppy_info::IRQ_POLLED;
+				polled_irq = true;
+				changed = true;
+			}
 		}
 	}
 	if(changed)
