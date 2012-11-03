@@ -121,7 +121,7 @@ UINT32 m20_state::screen_update_m20(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	for(y=0; y<256; y++)
 	{
-		for(x=0; x<256; x+=16)
+		for(x=0; x<512; x+=16)
 		{
 			for (i = 0; i < 16; i++)
 			{
@@ -300,7 +300,7 @@ static ADDRESS_MAP_START(m20_mem, AS_PROGRAM, 16, m20_state)
 	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x10000)
     AM_RANGE( 0x44000, 0x4bfff ) AM_RAM
     AM_RANGE( 0x50000, 0x5bfff ) AM_RAM
-    AM_RANGE( 0x60000, 0x67fff ) AM_RAM
+    AM_RANGE( 0x60000, 0x6ffff ) AM_RAM
     AM_RANGE( 0x70000, 0x77fff ) AM_RAM
     AM_RANGE( 0x80000, 0x8ffff ) AM_RAM
     AM_RANGE( 0x90000, 0x9ffff ) AM_RAM
@@ -392,7 +392,7 @@ void m20_state::machine_reset()
 static const mc6845_interface mc6845_intf =
 {
 	"screen",	/* screen we are acting on */
-	8,			/* number of pixels per video memory address */
+	16,			/* number of pixels per video memory address */
 	NULL,		/* before pixel update callback */
 	NULL,		/* row update callback */
 	NULL,		/* after pixel update callback */
