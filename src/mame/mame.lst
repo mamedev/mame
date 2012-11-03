@@ -6252,10 +6252,12 @@ thrilld			// GX713 (c)1998 Japan JAE
 thrilldb		// GX713 (c)1998 Japan JAB
 thrilldae		// GX713 (c)1998 Europe EAA
 midnrun			// GX476 (c)1995
-windheat		// GX677 (c)1996
-windheatu		// GX677 (c)1996
-windheatj		// GX677 (c)1996
-waveshrk		// GX678 (c)1996
+windheat		// GX677 (c)1996 Europe EAA
+windheatu		// GX677 (c)1996 USA UBC
+windheatj		// GX677 (c)1996 Japan JAA
+waveshrk		// GX678 (c)1996 USA UAB
+jetwave			// GX678 (c)1996 Japan JAB
+
 
 // Konami M2 games
 polystar		// GX623 (c)1997
