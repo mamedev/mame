@@ -1,3 +1,9 @@
+/*
+
+    Parker Bros Merlin handheld computer game
+
+*/
+
 #include "emu.h"
 #include "cpu/tms0980/tms0980.h"
 #include "sound/speaker.h"
@@ -14,6 +20,8 @@ public:
 		, m_speaker(*this, "speaker")
 	{ }
 
+	virtual void machine_start();
+
 	required_device<device_t> m_speaker;
 
 	DECLARE_READ8_MEMBER(read_k);
@@ -26,8 +34,7 @@ protected:
 };
 
 
-
-#define LOG 1
+#define LOG 0
 
 
 static INPUT_PORTS_START( merlin )
@@ -164,6 +171,13 @@ WRITE16_MEMBER(merlin_state::write_r)
 	output_set_value( "led_8",  BIT( m_r,  8 ) );
 	output_set_value( "led_9",  BIT( m_r,  9 ) );
 	output_set_value( "led_10", BIT( m_r, 10 ) );
+}
+
+
+void merlin_state::machine_start()
+{
+	save_item(NAME(m_o));
+	save_item(NAME(m_r));
 }
 
 
