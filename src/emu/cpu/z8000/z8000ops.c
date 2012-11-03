@@ -5856,7 +5856,7 @@ static void ZB8_ddN0_0110_0000_rrrr_ssN0_1110(z8000_state *cpustate)
 	UINT8 xlt = RDMEM_B(cpustate, addr_from_reg(cpustate, src) + RDMEM_B(cpustate, addr_from_reg(cpustate, dst)));
 	cpustate->RB(1) = xlt;	/* load RH1 */
 	if (xlt) CLR_Z; else SET_Z;
-	addr_to_reg(cpustate, dst, addr_sub(cpustate, addr_from_reg(cpustate, dst), 1));
+	addr_to_reg(cpustate, dst, addr_add(cpustate, addr_from_reg(cpustate, dst), 1));
 	if (--cpustate->RW(cnt)) {
 	  CLR_V;
 	  if (!xlt)
