@@ -596,6 +596,48 @@ static ADDRESS_MAP_START( unkch_portmap, AS_IO, 8, goldstar_state )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( megaline_map, AS_PROGRAM, 8, goldstar_state )
+/* Reels stuff are there just as placeholder, and obviously in wrong offset */
+	AM_RANGE(0x0000, 0x9fff) AM_ROM
+
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM //AM_SHARE("nvram")
+
+	AM_RANGE(0xd840, 0xd87f) AM_RAM AM_SHARE("reel1_scroll")
+	AM_RANGE(0xd880, 0xd8bf) AM_RAM AM_SHARE("reel2_scroll")
+	AM_RANGE(0xd900, 0xd93f) AM_RAM AM_SHARE("reel3_scroll")
+	AM_RANGE(0xdfc0, 0xdfff) AM_RAM
+
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
+
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(goldstar_reel1_ram_w ) AM_SHARE("reel1_ram")
+	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(goldstar_reel2_ram_w ) AM_SHARE("reel2_ram")
+	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(goldstar_reel3_ram_w ) AM_SHARE("reel3_ram")
+	AM_RANGE(0xf600, 0xf7ff) AM_RAM
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(unkch_reel1_attrram_w ) AM_SHARE("reel1_attrram")
+	AM_RANGE(0xfa00, 0xfbff) AM_RAM_WRITE(unkch_reel2_attrram_w ) AM_SHARE("reel2_attrram")
+	AM_RANGE(0xfc00, 0xfdff) AM_RAM_WRITE(unkch_reel3_attrram_w ) AM_SHARE("reel3_attrram")
+	AM_RANGE(0xfe00, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+/* unknown I/O byte R/W
+
+  PSGs:    A0 - C0 - E0
+  AY8910?: 60 - 80
+
+   -----------------
+*/
+static ADDRESS_MAP_START( megaline_portmap, AS_IO, 8, goldstar_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE("sn1", sn76489_device, write)						/* SN76489 #1 */
+	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE("sn2", sn76489_device, write)						/* SN76489 #2 */
+	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("sn3", sn76489_device, write)						/* SN76489 #3 */
+	AM_RANGE(0x60, 0x60) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)					/* AY8910 control? */
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)		/* AY8910 Input? */
+//	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+//	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( cmv801 )
 	PORT_START("IN0")
@@ -5218,6 +5260,163 @@ static INPUT_PORTS_START( magoddsc )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( megaline )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("IN0-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("IN0-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("IN0-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("IN0-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("IN0-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("IN0-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("IN0-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("IN0-8")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("IN1-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN1-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN1-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN1-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN1-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("IN2-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN2-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN2-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN2-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN2-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN2-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN2-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN2-8")
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("IN3-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN3-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN3-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN3-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN3-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN3-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN3-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN3-8")
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("IN4-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("IN4-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("IN4-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("IN4-8")
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 characters */
@@ -5416,6 +5615,17 @@ static const gfx_layout cb3c_tiles8x32_layout =
 	32*32
 };
 
+static const gfx_layout tiles8x8x4_layout =
+{
+	8, 8,
+	RGN_FRAC(1,4),	/* 4096 tiles */
+	4,
+	{ 0, RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },	/* bitplanes are separated */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8	/* every char takes 8 consecutive bytes */
+};
+
 
 static GFXDECODE_START( goldstar )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
@@ -5487,6 +5697,11 @@ static GFXDECODE_START( cmasterb )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x5_layout, 0, 4 )
 GFXDECODE_END
 #endif
+
+static GFXDECODE_START( megaline )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4_layout,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x32x4_layout, 128,  8 )
+GFXDECODE_END
 
 
 static const gfx_layout tiles8x32_4bpp_layout =
@@ -5846,6 +6061,16 @@ static const ay8910_interface ladylinr_ay8910_config =
 //-------------------------------------------------
 
 static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+static const sn76496_config psg2_intf =
+{
+    DEVCB_NULL
+};
+
+static const sn76496_config psg3_intf =
 {
     DEVCB_NULL
 };
@@ -6776,6 +7001,57 @@ static MACHINE_CONFIG_START( pkrmast, goldstar_state )
 	MCFG_SOUND_CONFIG(cm_ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( megaline, goldstar_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(megaline_map)
+	MCFG_CPU_IO_MAP(megaline_portmap)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
+
+	/* 3x 8255 */
+//	MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
+//	MCFG_I8255A_ADD( "ppi8255_1", lucky8_ppi8255_1_intf )
+//	MCFG_I8255A_ADD( "ppi8255_2", lucky8_ppi8255_2_intf )
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(goldstar_state, screen_update_goldstar)
+	MCFG_PALETTE_INIT_OVERRIDE(goldstar_state,lucky8)
+
+	MCFG_GFXDECODE(megaline)
+	MCFG_PALETTE_LENGTH(256)
+//	MCFG_NVRAM_ADD_1FILL("nvram")
+
+	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("sn1", SN76489, PSG_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_CONFIG(psg_intf)
+
+	MCFG_SOUND_ADD("sn2", SN76489, PSG_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_CONFIG(psg2_intf)
+
+	MCFG_SOUND_ADD("sn3", SN76489, PSG_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_CONFIG(psg3_intf)
+
+	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
+	MCFG_SOUND_CONFIG(lucky8_ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+MACHINE_CONFIG_END
+
 
 /***************************************************************************
 
@@ -10076,6 +10352,76 @@ ROM_START( cmast97 )
 ROM_END
 
 
+/*
+
+  MEGA LINES
+  Fun World.
+
+  CPU:   1x Z80
+
+  Sound: 3x SN76489.
+         1x AY-3-8910.
+
+  ROMs:  1x 27C512 for program.
+         2x 27C512 for fg graphics.
+         2x 27C256 for reels graphics.
+
+  PROMs: 3x TBP24S10N
+         1x N82S123AN
+
+  Clock: 1x Xtal 12.000 MHz.
+
+
+  Other: 1x DIP-40 custom IC silkscreened '06B30P' (I/O?).
+         1x DIP-28 custom IC silkscreened '06B49P' (clock divider).
+         2x DIP-28 custom IC silkscreened '06B53P' (video).
+         1x 3.6V lithium battery.
+         4x 8 DIP switches banks.
+         1x Reset switch.
+
+  Connectors: 1x (2x36) edge connector.
+              1x (2x10) edge connector.
+
+
+  ROMS have Falcon original stickers.
+  PCB is original from WING Co.,Ltd, with Wing license seal,
+  and Eagle & Fun World stickers (serial numbers).
+
+
+  For custom IC's 06B49P, and 06B53P, see the reverse-engineering notes in lucky74.c.
+
+  ------------------------
+
+  IO mapped devices:
+
+  PSGs:   A0 - C0 - E0
+  AY8910: 60 - 80
+
+*/
+ROM_START( megaline )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "18.r1",	0x00000, 0x10000, CRC(37234cca) SHA1(f991bc55fbfc69594573608ca03a9001ccf2f73b) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "11.b1",	0x00000, 0x10000, CRC(6e7810d8) SHA1(16f1331851041b971a62f653f69b8853a2c4f868) )
+	ROM_LOAD( "12.d1",	0x10000, 0x10000, CRC(054c6ee7) SHA1(6e91223c8f6a2dc93a39a1e6453ccd9c731b8b45) )
+
+	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_LOAD( "13.j1",	0x0000, 0x8000, CRC(5676ccb3) SHA1(36794c365c0b7490a9046422c0b334a3cdc15b8e) )
+	ROM_LOAD( "14.k1",	0x8000, 0x8000, CRC(81acfc59) SHA1(b6f94ade557a2d3ba5e358d33e83016a210890e7) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "tbp24s10.f4", 0x0000, 0x0100, CRC(d864b6f1) SHA1(6edc1941fe49cf53f073bf4acc466cd28b788146) )
+	ROM_LOAD( "tbp24s10.h4", 0x0100, 0x0100, CRC(4acd5887) SHA1(dca1187a74d9f4abc53b77a1590ec726f682dd91) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "n82s123an.j4", 0x0000, 0x0020, CRC(5447e258) SHA1(04057cddb86896500954b9aa6d6508aa081b9645) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "tbp24s10.m3", 0x0000, 0x0100, CRC(7edb311b) SHA1(8e7f933313dc7a1f2a5e8803c26953ced3f798d0) )
+ROM_END
+
+
 /*********************************************************************************************************************/
 
 DRIVER_INIT_MEMBER(goldstar_state,goldstar)
@@ -10840,6 +11186,8 @@ GAME( 1999, unkch2,   unkch1,    unkch,    unkch, goldstar_state,  unkch1,    RO
 GAME( 1999, unkch3,   unkch1,    unkch,    unkch, goldstar_state,  unkch3,    ROT0, "bootleg",              "New Cherry Gold '99 (bootleg of Super Cherry Master) (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND ) // cards have been hacked to look like barrels, girl removed?
 GAME( 1999, unkch4,   unkch1,    unkch,    unkch, goldstar_state,  unkch4,    ROT0, "bootleg",              "Grand Cherry Master (bootleg of Super Cherry Master)",         GAME_NOT_WORKING|GAME_NO_SOUND ) // by 'toy system' hungary
 
+
+GAME( 1991, megaline, 0,     megaline, megaline, driver_device,  0,    ROT0, "Fun World",     "Mega Lines",       GAME_NOT_WORKING )
 
 
 /* possible stealth sets:
