@@ -1117,7 +1117,9 @@ CPUOBJS += $(CPUOBJ)/m68000/m68kcpu.o $(CPUOBJ)/m68000/m68kops.o \
 	$(CPUOBJ)/m68000/68340tmu.o \
 
 DASMOBJS += $(CPUOBJ)/m68000/m68kdasm.o
+ifndef M68KMAKE
 M68KMAKE = $(BUILDOUT)/m68kmake$(BUILD_EXE)
+endif
 endif
 
 # when we compile source files we need to include generated files from the OBJ directory
@@ -1733,7 +1735,9 @@ ifneq ($(filter TMS57002,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/tms57002
 CPUOBJS += $(CPUOBJ)/tms57002/tms57002.o $(CPUOBJ)/tms57002/tms57kdec.o
 DASMOBJS += $(CPUOBJ)/tms57002/57002dsm.o
+ifndef TMSMAKE
 TMSMAKE += $(BUILDOUT)/tmsmake$(BUILD_EXE)
+endif
 endif
 
 $(CPUOBJ)/tms57002/tms57002.o:	$(CPUSRC)/tms57002/tms57002.c \
