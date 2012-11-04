@@ -1125,7 +1125,7 @@ public:
 	template<bool _Required, class _NETClass>
 	class output_finder;
 	class optional_output;
-	template<class _C>
+	template<class C>
 	class required_output;
 	class optional_param;
 	class required_param;
@@ -1224,15 +1224,15 @@ public:
 };
 
 // required devices are similar but throw an error if they are not found
-template<class _C>
-class netlist_mame_device::required_output : public netlist_mame_device::output_finder<true, _C>
+template<class C>
+class netlist_mame_device::required_output : public netlist_mame_device::output_finder<true, C>
 {
 public:
-	required_output(device_t &base, const char *tag, const char *output) : output_finder<true, _C>(base, tag, output) { }
+	required_output(device_t &base, const char *tag, const char *output) : output_finder<true, C>(base, tag, output) { }
 
 	virtual bool OnDeviceStart()
 	{
-		this->m_target = (_C *) &(this->m_netlist->setup().find_output(this->m_output));
+		this->m_target = (C *) &(this->m_netlist->setup().find_output(this->m_output));
 		return this->report_missing(this->m_target != NULL, "output", true);
 	}
 
