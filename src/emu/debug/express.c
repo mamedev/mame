@@ -974,8 +974,8 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 		// if this is a function symbol, synthesize an execute function operator
 		if (symbol->is_function())
 		{
-			token = m_tokenlist.append(*global_alloc(parse_token(string - stringstart)));
-			token.configure_operator(TVL_EXECUTEFUNC, 0);
+			parse_token &newtoken = m_tokenlist.append(*global_alloc(parse_token(string - stringstart)));
+			newtoken.configure_operator(TVL_EXECUTEFUNC, 0);
 		}
 		return;
 	}
