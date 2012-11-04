@@ -3,6 +3,20 @@
 #ifndef ADAM_H_
 #define ADAM_H_
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m6800/m6800.h"
+#include "formats/basicdsk.h"
+#include "formats/adam_cas.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
+#include "machine/coleco.h"
+#include "machine/ram.h"
+#include "machine/wd17xx.h"
+#include "sound/sn76496.h"
+#include "video/tms9928a.h"
+
 #define Z80_TAG			"u1"
 #define SN76489A_TAG	"u20"
 #define TMS9928A_TAG	"tms9928a"

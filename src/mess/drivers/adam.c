@@ -287,42 +287,18 @@ Mark Gordon
 
     TODO:
 
+	- floppy
+	- slot interface
+    - printer
+    - SPI
+    - sound (PSG RDY -> Z80 WAIT)
+
     http://drushel.cwru.edu/atm/atm.html
     http://rich.dirocco.org/Coleco/adam/ADAM.htm
     http://users.stargate.net/~drushel/pub/coleco/twwmca/index.html
 
-    - fc75 GET_STATUS
-    - fbe7 MMR_MAC
-    - febe MMR_TR_REC
-    - ff0f MMR_TR_TCU
-
-****************************************************************************/
-
-/*
-
-    TODO:
-
-    - sound (PSG RDY -> Z80 WAIT)
-    - floppy ROM dump
-    - printer
-    - SPI
-
 */
 
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m6800/m6800.h"
-#include "formats/basicdsk.h"
-#include "formats/adam_cas.h"
-#include "imagedev/cartslot.h"
-#include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
-#include "machine/coleco.h"
-#include "machine/ram.h"
-#include "machine/wd17xx.h"
-#include "sound/sn76496.h"
-#include "video/tms9928a.h"
 #include "includes/adam.h"
 
 
@@ -1159,7 +1135,7 @@ READ8_MEMBER( adam_state::fdc6801_p1_r )
 
         bit     description
 
-        0       some kind of optic sensor
+        0       disk in place
         1
         2       FDC DRQ
         3
@@ -1170,7 +1146,7 @@ READ8_MEMBER( adam_state::fdc6801_p1_r )
 
     */
 
-	UINT8 data = 0;
+	UINT8 data = 0x01;
 
 	// floppy data request
 	data |= wd17xx_drq_r(m_fdc) << 2;
@@ -1290,7 +1266,7 @@ WRITE8_MEMBER( adam_state::fdc6801_p4_w )
 //  TIMER_DEVICE_CALLBACK_MEMBER( paddle_tick )
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK_MEMBER(adam_state::paddle_tick)
+TIMER_DEVICE_CALLBACK_MEMBER( adam_state::paddle_tick )
 {
 	// TODO: improve irq behaviour (see drivers/coleco.c)
 	if (coleco_scan_paddles(machine(), &m_joy_status0, &m_joy_status1))
@@ -1368,8 +1344,8 @@ static ADDRESS_MAP_START( adam_io, AS_IO, 8, adam_state )
 //  AM_RANGE(0x5f, 0x5f) Optional Modem Control Status
 	AM_RANGE(0x60, 0x60) AM_MIRROR(0x1f) AM_READWRITE(mioc_r, mioc_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(paddle_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_DEVREADWRITE(TMS9928A_TAG, tms9928a_device, vram_read, vram_write)
+	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_DEVREADWRITE(TMS9928A_TAG, tms9928a_device, register_read, register_write)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_WRITE(joystick_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1f) AM_DEVWRITE(SN76489A_TAG, sn76489a_device, write)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1d) AM_READ(input1_r)
@@ -1632,21 +1608,21 @@ INPUT_PORTS_END
 //  TMS9928a_interface tms9928a_interface
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(adam_state::adam_vdp_interrupt)
+WRITE_LINE_MEMBER( adam_state::adam_vdp_interrupt )
 {
 	if (state && !m_vdp_nmi)
 	{
-		machine().device(Z80_TAG)->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	m_vdp_nmi = state;
 }
 
-static TMS9928A_INTERFACE(adam_tms9928a_interface)
+static TMS9928A_INTERFACE(vcd_intf)
 {
-	"screen",
+	SCREEN_TAG,
 	0x4000,
-	DEVCB_DRIVER_LINE_MEMBER(adam_state,adam_vdp_interrupt)
+	DEVCB_DRIVER_LINE_MEMBER(adam_state, adam_vdp_interrupt)
 };
 
 //-------------------------------------------------
@@ -1723,17 +1699,15 @@ WRITE_LINE_MEMBER( adam_state::os3_w )
 {
 	if (state && !m_dma)
 	{
-		UINT8 *ram = m_ram->pointer();
-
 		if (!m_bwr)
 		{
 			//logerror("Master 6801 write to %04x data %02x\n", m_ba, m_data_in);
 
-			ram[m_ba] = m_data_in;
+			m_ram->pointer()[m_ba] = m_data_in;
 		}
 		else
 		{
-			m_data_out = ram[m_ba];
+			m_data_out = m_ram->pointer()[m_ba];
 
 			//logerror("Master 6801 read from %04x data %02x\n", m_ba, m_data_out);
 
@@ -1760,7 +1734,7 @@ static M6801_INTERFACE( master6801_intf )
 
 void adam_state::machine_start()
 {
-	// register for state saving
+	// state saving
 	save_item(NAME(m_mioc));
 	save_item(NAME(m_game));
 	save_item(NAME(m_adamnet));
@@ -1830,31 +1804,39 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	MCFG_CPU_IO_MAP(master6801_io)
 	MCFG_CPU_CONFIG(master6801_intf)
 
+	// keyboard
 	MCFG_CPU_ADD(M6801_KB_TAG, M6801, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(kb6801_mem)
 	MCFG_CPU_IO_MAP(kb6801_io)
 
+	// digital data pack
 	MCFG_CPU_ADD(M6801_DDP_TAG, M6801, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(ddp6801_mem)
 	MCFG_CPU_IO_MAP(ddp6801_io)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, adam_cassette_interface)
+	MCFG_CASSETTE_ADD(CASSETTE2_TAG, adam_cassette_interface)
 
+	// printer
 	MCFG_CPU_ADD(M6801_PRN_TAG, M6801, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(printer6801_mem)
 	MCFG_CPU_IO_MAP(printer6801_io)
 	MCFG_DEVICE_DISABLE()
 
+	// floppy
 	MCFG_CPU_ADD(M6801_FDC_TAG, M6801, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(fdc6801_mem)
 	MCFG_CPU_IO_MAP(fdc6801_io)
-	MCFG_DEVICE_DISABLE()
+	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
+	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, adam_floppy_interface)
 
+	// serial port interface
 	MCFG_CPU_ADD(M6801_SPI_TAG, M6801, XTAL_4MHz)
 	MCFG_DEVICE_DISABLE()
 
 	// video hardware
-	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, adam_tms9928a_interface )
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
+	MCFG_TMS9928A_ADD(TMS9928A_TAG, TMS9928A, vcd_intf)
+	MCFG_TMS9928A_SCREEN_ADD_NTSC(SCREEN_TAG)
+	MCFG_SCREEN_UPDATE_DEVICE(TMS9928A_TAG, tms9928a_device, screen_update)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1864,21 +1846,18 @@ static MACHINE_CONFIG_START( adam, adam_state )
 
 	// devices
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("paddles", adam_state, paddle_tick, attotime::from_msec(20))
-	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, adam_floppy_interface)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, adam_cassette_interface)
-	MCFG_CASSETTE_ADD(CASSETTE2_TAG, adam_cassette_interface)
 
 	// cartridge
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom,col,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
-    MCFG_CARTSLOT_INTERFACE("coleco_cart")
+	MCFG_CARTSLOT_INTERFACE("coleco_cart")
 
 	// ROM expansion
 	MCFG_CARTSLOT_ADD("xrom")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("adam_xrom")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1888,6 +1867,7 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("colec_cart_list", "coleco")
 	MCFG_SOFTWARE_LIST_ADD("adam_cart_list", "adam_cart")
+	//MCFG_SOFTWARE_LIST_ADD("xrom_list", "adam_xrom")
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "adam_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "adam_flop")
 MACHINE_CONFIG_END
@@ -1933,7 +1913,9 @@ ROM_START( adam )
 	ROM_LOAD( "printer.u2", 0x000, 0x800, CRC(e8db783b) SHA1(32b40679749ad0317c2c9ee9ca619fad6d850ce7) )
 
 	ROM_REGION( 0x1000, M6801_FDC_TAG, 0 )
-	ROM_LOAD( "floppy disk drive", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "320ta.u10", 0x0000, 0x1000, CRC(dcd865b3) SHA1(dde583e0d18ce4406e9ea44ab34d083e73ee30e2) ) // 320KB DSDD
+	ROM_LOAD( "pmhdfdc.u10", 0x0000, 0x1000, CRC(fed4006c) SHA1(bc8dd00dd5cde9500a4cd7dc1e4d74330184472a) ) // PowerMate High-Density
+	ROM_LOAD( "ad31_reva.u10", 0x0000, 0x1000, CRC(4b0b7143) SHA1(1cb68891c3af80e99efad7e309136ca37244f060) ) // Coleco original 160KB SSDD
 
 	ROM_REGION( 0x800, M6801_SPI_TAG, 0 )
 	ROM_LOAD( "spi.bin", 0x000, 0x800, CRC(4ba30352) SHA1(99fe5aebd505a208bea6beec5d7322b15426e9c1) )
@@ -1945,5 +1927,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME            FLAGS */
-COMP( 1982, adam,		0,			coleco,	adam,		adam, driver_device,		0,		"Coleco",		"Adam",				GAME_NOT_WORKING )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT                    COMPANY         FULLNAME            FLAGS
+COMP( 1982, adam,		0,			coleco,	adam,		adam, 		driver_device,	0,		"Coleco",		"Adam",				GAME_NOT_WORKING )
