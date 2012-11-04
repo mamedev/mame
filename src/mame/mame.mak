@@ -1874,6 +1874,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/polyplay.o $(AUDIO)/polyplay.o $(VIDEO)/polyplay.o \
 	$(DRIVERS)/poker72.o \
 	$(DRIVERS)/potgoldu.o \
+	$(DRIVERS)/pprobe.o \
 	$(DRIVERS)/proconn.o \
 	$(DRIVERS)/psattack.o \
 	$(DRIVERS)/quizo.o \

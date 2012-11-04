@@ -3166,6 +3166,7 @@ src/mame/drivers/potgoldu.c svneol=native#text/plain
 src/mame/drivers/powerbal.c svneol=native#text/plain
 src/mame/drivers/powerins.c svneol=native#text/plain
 src/mame/drivers/ppmast93.c svneol=native#text/plain
+src/mame/drivers/pprobe.c svneol=native#text/plain
 src/mame/drivers/prehisle.c svneol=native#text/plain
 src/mame/drivers/proconn.c svneol=native#text/plain
 src/mame/drivers/progolf.c svneol=native#text/plain
