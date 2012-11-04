@@ -10321,10 +10321,10 @@ void k001604_draw_back_layer( device_t *device, bitmap_rgb32 &bitmap, const rect
 
 		x  = (x + 320) * 256;
 		y  = (y + 208) * 256;
-		xx = (xx);
+//		xx = (xx);
 		xy = (-xy);
 		yx = (-yx);
-		yy = (yy);
+//		yy = (yy);
 
 		if ((k001604->reg[0x6c / 4] & (0x08 >> layer)) != 0)
 		{
