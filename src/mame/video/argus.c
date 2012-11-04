@@ -114,7 +114,7 @@ BG0 palette intensity ( $C47F, $C4FF )
 ***************************************************************************/
 
 #include "emu.h"
-#include "jalblend.h"
+#include "video/jalblend.h"
 #include "includes/argus.h"
 
 

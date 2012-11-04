@@ -1,6 +1,6 @@
 
 #include "emu.h"
-#include "naomig1.h"
+#include "machine/naomig1.h"
 
 DEVICE_ADDRESS_MAP_START(amap, 32, naomi_g1_device)
 	AM_RANGE(0x04, 0x07) AM_READWRITE(sb_gdstar_r, sb_gdstar_w)

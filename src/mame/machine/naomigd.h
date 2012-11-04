@@ -1,7 +1,7 @@
 #ifndef _NAOMIGD_H_
 #define _NAOMIGD_H_
 
-#include "naomibd.h"
+#include "machine/naomibd.h"
 
 #define MCFG_NAOMI_GDROM_BOARD_ADD(_tag, _image_tag, _pic_tag, _eeprom_tag, _maincpu_tag, _irq_cb) \
 	MCFG_NAOMI_BOARD_ADD(_tag, NAOMI_GDROM_BOARD, _eeprom_tag, _maincpu_tag, _irq_cb) \

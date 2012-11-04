@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "jalblend.h"
+#include "video/jalblend.h"
 #include "includes/psychic5.h"
 
 #define	BG_SCROLLX_LSB		0x308
