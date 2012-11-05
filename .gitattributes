@@ -4455,6 +4455,7 @@ src/mame/layout/roul.lay svneol=native#text/plain
 src/mame/layout/roundup5.lay svneol=native#text/plain
 src/mame/layout/rowamet.lay svneol=native#text/plain
 src/mame/layout/royalcrd.lay svneol=native#text/plain
+src/mame/layout/s11.lay svneol=native#text/plain
 src/mame/layout/s3.lay svneol=native#text/plain
 src/mame/layout/s4.lay svneol=native#text/plain
 src/mame/layout/s6.lay svneol=native#text/plain

@@ -478,7 +478,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( s6_state::irq)
 
 static MACHINE_CONFIG_START( s6, s6_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, 3580000) // 6802 or 6808 could be used here
+	MCFG_CPU_ADD("maincpu", M6800, 3580000) // 6802 or 6808 could be used here
 	MCFG_CPU_PROGRAM_MAP(s6_main_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s6_state, irq, attotime::from_hz(250))
 	MCFG_MACHINE_RESET_OVERRIDE(s6_state, s6)
@@ -659,11 +659,11 @@ ROM_END
 
 GAME( 1979, lzbal_l2, 0,        s6, s6, driver_device, 0, ROT0, "Williams", "Laser Ball (L-2)", GAME_MECHANICAL | GAME_NO_SOUND)
 GAME( 1980, lzbal_t2, lzbal_l2, s6, s6, driver_device, 0, ROT0, "Williams", "Laser Ball (T-2)", GAME_MECHANICAL | GAME_NO_SOUND)
-GAME( 1979, blkou_l1, 0,        s6, s6, driver_device, 0, ROT0, "Williams", "Blackout (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1979, blkou_t1, blkou_l1, s6, s6, driver_device, 0, ROT0, "Williams", "Blackout (T-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1979, blkou_f1, blkou_l1, s6, s6, driver_device, 0, ROT0, "Williams", "Blackout (L-1, French Speech)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1979, grgar_l1, 0,        s6, s6, driver_device, 0, ROT0, "Williams", "Gorgar (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
-GAME( 1979, grgar_t1, grgar_l1, s6, s6, driver_device, 0, ROT0, "Williams", "Gorgar (T-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1979, blkou_l1, 0,        s6, s6, driver_device, 0, ROT0, "Williams", "Blackout (L-1)", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME( 1979, blkou_t1, blkou_l1, s6, s6, driver_device, 0, ROT0, "Williams", "Blackout (T-1)", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME( 1979, blkou_f1, blkou_l1, s6, s6, driver_device, 0, ROT0, "Williams", "Blackout (L-1, French Speech)", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME( 1979, grgar_l1, 0,        s6, s6, driver_device, 0, ROT0, "Williams", "Gorgar (L-1)", GAME_MECHANICAL | GAME_NO_SOUND)
+GAME( 1979, grgar_t1, grgar_l1, s6, s6, driver_device, 0, ROT0, "Williams", "Gorgar (T-1)", GAME_MECHANICAL | GAME_NO_SOUND)
 GAME( 1980, frpwr_l6, 0,        s6, s6, driver_device, 0, ROT0, "Williams", "Firepower (L-6)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1980, frpwr_t6, frpwr_l6, s6, s6, driver_device, 0, ROT0, "Williams", "Firepower (T-6)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
 GAME( 1980, frpwr_l2, frpwr_l6, s6, s6, driver_device, 0, ROT0, "Williams", "Firepower (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
