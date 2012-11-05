@@ -38,6 +38,7 @@
 const device_type WD1770x = &device_creator<wd1770_t>;
 const device_type WD1772x = &device_creator<wd1772_t>;
 const device_type WD1773x = &device_creator<wd1773_t>;
+const device_type WD2793x = &device_creator<wd2793_t>;
 
 wd177x_t::wd177x_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, type, name, tag, owner, clock)
@@ -1364,8 +1365,8 @@ void wd177x_t::live_run(attotime limit)
 			if(read_one_bit(limit))
 				return;
 			if(cur_live.bit_counter != 16
-			   && cur_live.shift_reg != 0x4489
-			   && cur_live.shift_reg != 0x5224)
+				&& cur_live.shift_reg != 0x4489
+				&& cur_live.shift_reg != 0x5224)
 				break;
 
 			// Incorrect, hmmm
@@ -1774,6 +1775,20 @@ bool wd1773_t::has_motor() const
 }
 
 bool wd1773_t::has_side_check() const
+{
+	return false;
+}
+
+wd2793_t::wd2793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd177x_t(mconfig, WD2793x, "WD2793", tag, owner, clock)
+{
+}
+
+bool wd2793_t::has_motor() const
+{
+	return false;
+}
+
+bool wd2793_t::has_side_check() const
 {
 	return false;
 }

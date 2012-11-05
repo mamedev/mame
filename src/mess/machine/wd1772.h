@@ -4,14 +4,17 @@
 #include "emu.h"
 #include "imagedev/floppy.h"
 
-#define MCFG_WD1770x_ADD(_tag, _clock)	\
+#define MCFG_WD1770x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, WD1770x, _clock)
 
-#define MCFG_WD1772x_ADD(_tag, _clock)	\
+#define MCFG_WD1772x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, WD1772x, _clock)
 
-#define MCFG_WD1773x_ADD(_tag, _clock)	\
+#define MCFG_WD1773x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, WD1773x, _clock)
+
+#define MCFG_WD2793x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, WD2793x, _clock)
 
 class wd177x_t : public device_t {
 public:
@@ -26,15 +29,23 @@ public:
 
 	void cmd_w(UINT8 val);
 	UINT8 status_r();
+	DECLARE_READ8_MEMBER( status_r ) { return status_r(); }
+	DECLARE_WRITE8_MEMBER( cmd_w ) { cmd_w(data); }
 
 	void track_w(UINT8 val);
 	UINT8 track_r();
+	DECLARE_READ8_MEMBER( track_r ) { return track_r(); }
+	DECLARE_WRITE8_MEMBER( track_w ) { track_w(data); }
 
 	void sector_w(UINT8 val);
 	UINT8 sector_r();
+	DECLARE_READ8_MEMBER( sector_r ) { return sector_r(); }
+	DECLARE_WRITE8_MEMBER( sector_w ) { sector_w(data); }
 
 	void data_w(UINT8 val);
 	UINT8 data_r();
+	DECLARE_READ8_MEMBER( data_r ) { return data_r(); }
+	DECLARE_WRITE8_MEMBER( data_w ) { data_w(data); }
 
 	void gen_w(int reg, UINT8 val);
 	UINT8 gen_r(int reg);
@@ -314,8 +325,18 @@ protected:
 	virtual bool has_side_check() const;
 };
 
+class wd2793_t : public wd177x_t {
+public:
+	wd2793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual bool has_motor() const;
+	virtual bool has_side_check() const;
+};
+
 extern const device_type WD1770x;
 extern const device_type WD1772x;
 extern const device_type WD1773x;
+extern const device_type WD2793x;
 
 #endif
