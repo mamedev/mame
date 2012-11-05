@@ -675,8 +675,7 @@ static ADDRESS_MAP_START( driversnd_dsp_program_map, AS_PROGRAM, 16, harddriv_st
 ADDRESS_MAP_END
 
 
-	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
-
+/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
 static ADDRESS_MAP_START( driversnd_dsp_io_map, AS_IO, 16, harddriv_state )
 	AM_RANGE(0, 0) AM_READWRITE(hdsnddsp_rom_r, hdsnddsp_dac_w)
@@ -4231,7 +4230,6 @@ static void init_driver_sound(running_machine &machine)
 
 DRIVER_INIT_MEMBER(harddriv_state,harddriv)
 {
-
 	/* initialize the boards */
 	init_driver(machine());
 	init_adsp(machine());
@@ -4255,7 +4253,6 @@ DRIVER_INIT_MEMBER(harddriv_state,harddriv)
 
 DRIVER_INIT_MEMBER(harddriv_state,harddrivc)
 {
-
 	/* initialize the boards */
 	init_multisync(machine(), 1);
 	init_adsp(machine());
@@ -4279,7 +4276,6 @@ DRIVER_INIT_MEMBER(harddriv_state,harddrivc)
 
 DRIVER_INIT_MEMBER(harddriv_state,stunrun)
 {
-
 	/* initialize the boards */
 	init_multisync(machine(), 0);
 	init_adsp(machine());
@@ -4298,7 +4294,6 @@ DRIVER_INIT_MEMBER(harddriv_state,stunrun)
 
 DRIVER_INIT_MEMBER(harddriv_state,racedriv)
 {
-
 	/* initialize the boards */
 	init_driver(machine());
 	init_adsp(machine());
@@ -4353,9 +4348,8 @@ DRIVER_INIT_MEMBER(harddriv_state,racedrivc1) { racedrivc_init_common(machine(),
 
 DRIVER_INIT_MEMBER(harddriv_state,racedrivb1)
 {
-
-	/* this unpleasantness prevents racedrivb1 and racedrivg1 from crashing MAME during boot */
-	/* both clear the DSP32C's RAM and then release it from reset, causing it to run through */
+	/* this unpleasantness prevents racedriv1/racedrivb1/racedrivg1 from crashing MAME during boot */
+	/* they clear the DSP32C's RAM and then release it from reset, causing it to run through */
 	/* its address space recursively executing instructions */
 	m_dsp32->space(AS_PROGRAM).install_read_handler(0x002000, 0x5fffff, read32_delegate(FUNC(harddriv_state::rddsp_unmap_r),this));
 	m_dsp32->space(AS_PROGRAM).install_read_handler(0x640000, 0xfff7ff, read32_delegate(FUNC(harddriv_state::rddsp_unmap_r),this));
@@ -4408,14 +4402,24 @@ static void steeltal_init_common(running_machine &machine, offs_t ds3_transfer_p
 }
 
 
-DRIVER_INIT_MEMBER(harddriv_state,steeltal) { steeltal_init_common(machine(), 0x4fc18, 0); }
-DRIVER_INIT_MEMBER(harddriv_state,steeltal1) { steeltal_init_common(machine(), 0x4f9c6, 0); }
-DRIVER_INIT_MEMBER(harddriv_state,steeltalp) { steeltal_init_common(machine(), 0x52290, 1); }
+DRIVER_INIT_MEMBER(harddriv_state,steeltal)
+{
+	steeltal_init_common(machine(), 0x4fc18, 0);
+}
+
+DRIVER_INIT_MEMBER(harddriv_state,steeltal1)
+{
+	steeltal_init_common(machine(), 0x4f9c6, 0);
+}
+
+DRIVER_INIT_MEMBER(harddriv_state,steeltalp)
+{
+	steeltal_init_common(machine(), 0x52290, 1);
+}
 
 
 DRIVER_INIT_MEMBER(harddriv_state,strtdriv)
 {
-
 	/* initialize the boards */
 	init_multisync(machine(), 1);
 	init_ds3(machine());
@@ -4445,7 +4449,6 @@ DRIVER_INIT_MEMBER(harddriv_state,strtdriv)
 
 DRIVER_INIT_MEMBER(harddriv_state,hdrivair)
 {
-
 	/* initialize the boards */
 	init_multisync(machine(), 1);
 	init_ds3(machine());
@@ -4471,7 +4474,6 @@ DRIVER_INIT_MEMBER(harddriv_state,hdrivair)
 
 DRIVER_INIT_MEMBER(harddriv_state,hdrivairp)
 {
-
 	/* initialize the boards */
 	init_multisync(machine(), 1);
 	init_ds3(machine());
@@ -4539,7 +4541,7 @@ GAME( 1990, racedrivb4, racedriv, racedriv, racedriv, harddriv_state, racedriv, 
 GAME( 1990, racedrivg4, racedriv, racedriv, racedriv, harddriv_state, racedriv,   ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 4)", 0 )
 GAME( 1990, racedriv3,  racedriv, racedriv, racedriv, harddriv_state, racedriv,   ROT0, "Atari Games", "Race Drivin' (cockpit, rev 3)", 0 )
 GAME( 1990, racedriv2,  racedriv, racedriv, racedriv, harddriv_state, racedriv,   ROT0, "Atari Games", "Race Drivin' (cockpit, rev 2)", 0 )
-GAME( 1990, racedriv1,  racedriv, racedriv, racedriv, harddriv_state, racedriv,   ROT0, "Atari Games", "Race Drivin' (cockpit, rev 1)", 0 )
+GAME( 1990, racedriv1,  racedriv, racedriv, racedriv, harddriv_state, racedrivb1, ROT0, "Atari Games", "Race Drivin' (cockpit, rev 1)", 0 )
 GAME( 1990, racedrivb1, racedriv, racedriv, racedriv, harddriv_state, racedrivb1, ROT0, "Atari Games", "Race Drivin' (cockpit, British, rev 1)", 0 )
 GAME( 1990, racedrivg1, racedriv, racedriv, racedriv, harddriv_state, racedrivb1, ROT0, "Atari Games", "Race Drivin' (cockpit, German, rev 2)", 0 )
 
