@@ -23,12 +23,12 @@ Bottom Board chips:
 2x 2128 static ram (2kx8 ram)
 4x 93422 DRAM (256x4 dram)
 1x 6301 PROM (probably used for background ?)
-3x 82s129 Colour PROMS (connected to resistors) 
+3x 82s129 Colour PROMS (connected to resistors)
 
 Clocks measured:
 
 Main XTAL 18.432mhz
-2x z80 : 18.432 / 6 
+2x z80 : 18.432 / 6
 AY8910 : 18.432 / 12
 Vsync : 60.58hz
 
@@ -44,27 +44,67 @@ class pprobe_state : public driver_device
 {
 public:
 	pprobe_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)	
+		: driver_device(mconfig, type, tag),
+		  m_tx_vram(*this, "tx_vram")
 	{ }
 
+	required_shared_ptr<UINT8> m_tx_vram;
+
+	UINT8 m_nmi_mask;
+	DECLARE_WRITE8_MEMBER(pprobe_nmi_mask_w);
 	DECLARE_DRIVER_INIT(pprobe);
 	UINT32 screen_update_pprobe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vblank_irq);
 };
 
 
 
 UINT32 pprobe_state::screen_update_pprobe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	gfx_element *gfx = machine().gfx[2];
+	int y,x;
+	int count = 0;
+
+	for (x=0;x<64;x++)
+	{
+		for (y=0;y<32;y++)
+		{
+			UINT16 tile = m_tx_vram[count];
+			//UINT8 col;
+
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
+
+			count++;
+		}
+	}
+
 	return 0;
 }
 
 
 static ADDRESS_MAP_START( pprobe_main_map, AS_PROGRAM, 8, pprobe_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_RAM // ???
+	AM_RANGE(0x8800, 0x8fff) AM_RAM
+	AM_RANGE(0x9000, 0x93ff) AM_RAM // ???
+	AM_RANGE(0x9800, 0x9fff) AM_RAM
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM // color ram?
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("tx_vram")
+	AM_RANGE(0xe000, 0xe000) AM_WRITENOP // watchdog
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("shared_ram")
 ADDRESS_MAP_END
 
+WRITE8_MEMBER(pprobe_state::pprobe_nmi_mask_w)
+{
+	m_nmi_mask = data & 1;
+}
+
+
 static ADDRESS_MAP_START( pprobe_main_portmap, AS_IO, 8, pprobe_state )
-//	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_GLOBAL_MASK(0x07)
+	AM_RANGE(0x00, 0x00) AM_WRITE(pprobe_nmi_mask_w)
+//	0x01 flip screen
+//  0x02 sub cpu halt line
 ADDRESS_MAP_END
 
 
@@ -105,6 +145,12 @@ GFXDECODE_END
 static INPUT_PORTS_START( pprobe )
 INPUT_PORTS_END
 
+INTERRUPT_GEN_MEMBER(pprobe_state::vblank_irq)
+{
+	if(m_nmi_mask)
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
 
 static MACHINE_CONFIG_START( pprobe, pprobe_state )
 
@@ -112,6 +158,7 @@ static MACHINE_CONFIG_START( pprobe, pprobe_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pprobe_main_map)
 	MCFG_CPU_IO_MAP(pprobe_main_portmap)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pprobe_state,  vblank_irq)
 
 //	MCFG_CPU_ADD("subz80", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
 
@@ -146,7 +193,7 @@ ROM_START( pprobe )
 
 	ROM_REGION( 0x02000, "gfx1", 0 ) // bg tiles
 	ROM_LOAD( "pb6.bin",  0x0000, 0x2000, CRC(ff309239) SHA1(4e52833fafd54d4502ad09091fbfb1a8a2ff8828) )
-	
+
 	ROM_REGION( 0x02000, "gfx2", 0 ) // bg tiles
 	ROM_LOAD( "pb7.bin",  0x0000, 0x2000, BAD_DUMP CRC(1defb6fc) SHA1(f0d57cf8a92c29fef52c8437d0be6edecaf9c5c9) ) // some bad bytes
 
@@ -170,4 +217,4 @@ DRIVER_INIT_MEMBER(pprobe_state,pprobe)
 {
 }
 
-GAME( 1984, pprobe,  0,        pprobe,  pprobe, pprobe_state,   pprobe, ROT270, "Kyugo?", "Planet Probe", GAME_IS_SKELETON )
+GAME( 1984, pprobe,  0,        pprobe,  pprobe, pprobe_state,   pprobe, ROT270, "Kyugo?", "Planet Probe", GAME_NOT_WORKING | GAME_NO_SOUND )
