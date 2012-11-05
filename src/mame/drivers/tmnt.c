@@ -82,7 +82,6 @@ Updates:
 
 READ16_MEMBER(tmnt_state::k052109_word_noA12_r)
 {
-
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
@@ -91,7 +90,6 @@ READ16_MEMBER(tmnt_state::k052109_word_noA12_r)
 
 WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
 {
-
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
@@ -100,7 +98,6 @@ WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
 
 WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_w)
 {
-
 	/* it seems that a word write is supposed to affect only the MSB. The */
 	/* "ROUND 1" text in punkshtj goes lost otherwise. */
 	if (ACCESSING_BITS_8_15)
@@ -123,7 +120,6 @@ WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_noA12_w)
 /* A1, A5 and A6 don't go to the 053245. */
 READ16_MEMBER(tmnt_state::k053245_scattered_word_r)
 {
-
 	if (offset & 0x0031)
 		return m_spriteram[offset];
 	else
@@ -135,7 +131,6 @@ READ16_MEMBER(tmnt_state::k053245_scattered_word_r)
 
 WRITE16_MEMBER(tmnt_state::k053245_scattered_word_w)
 {
-
 	COMBINE_DATA(m_spriteram + offset);
 
 	if (!(offset & 0x0031))
@@ -147,7 +142,6 @@ WRITE16_MEMBER(tmnt_state::k053245_scattered_word_w)
 
 READ16_MEMBER(tmnt_state::k053244_word_noA1_r)
 {
-
 	offset &= ~1;	/* handle mirror address */
 
 	return k053244_r(m_k053245, space, offset + 1) | (k053244_r(m_k053245, space, offset) << 8);
@@ -155,7 +149,6 @@ READ16_MEMBER(tmnt_state::k053244_word_noA1_r)
 
 WRITE16_MEMBER(tmnt_state::k053244_word_noA1_w)
 {
-
 	offset &= ~1;	/* handle mirror address */
 
 	if (ACCESSING_BITS_8_15)
@@ -166,21 +159,18 @@ WRITE16_MEMBER(tmnt_state::k053244_word_noA1_w)
 
 INTERRUPT_GEN_MEMBER(tmnt_state::cuebrick_interrupt)
 {
-
 	if (m_irq5_mask)
 		device.execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(tmnt_state::punkshot_interrupt)
 {
-
 	if (k052109_is_irq_enabled(m_k052109))
 		irq4_line_hold(device);
 }
 
 INTERRUPT_GEN_MEMBER(tmnt_state::lgtnfght_interrupt)
 {
-
 	if (k052109_is_irq_enabled(m_k052109))
 		irq5_line_hold(device);
 }
@@ -245,7 +235,6 @@ READ8_MEMBER(tmnt_state::tmnt_sres_r)
 
 WRITE8_MEMBER(tmnt_state::tmnt_sres_w)
 {
-
 	/* bit 1 resets the UPD7795C sound chip */
 	upd7759_reset_w(m_upd, data & 2);
 
@@ -384,7 +373,6 @@ READ16_MEMBER(tmnt_state::ssriders_protection_r)
 
 WRITE16_MEMBER(tmnt_state::ssriders_protection_w)
 {
-
 	if (offset == 1)
 	{
 		int logical_pri, hardware_pri;
@@ -504,7 +492,6 @@ READ16_MEMBER(tmnt_state::thndrx2_eeprom_r)
 
 WRITE16_MEMBER(tmnt_state::thndrx2_eeprom_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
@@ -545,7 +532,7 @@ READ16_MEMBER(tmnt_state::cuebrick_nv_r)
 
 WRITE16_MEMBER(tmnt_state::cuebrick_nv_w)
 {
-       COMBINE_DATA(&m_cuebrick_nvram[offset + (m_cuebrick_nvram_bank * 0x400 / 2)]);
+	COMBINE_DATA(&m_cuebrick_nvram[offset + (m_cuebrick_nvram_bank * 0x400 / 2)]);
 }
 
 WRITE16_MEMBER(tmnt_state::cuebrick_nvbank_w)
@@ -2189,7 +2176,6 @@ static const k053936_interface prmrsocr_k053936_interface =
 
 MACHINE_START_MEMBER(tmnt_state,common)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k007232 = machine().device("k007232");
@@ -2217,7 +2203,6 @@ MACHINE_START_MEMBER(tmnt_state,common)
 
 MACHINE_RESET_MEMBER(tmnt_state,common)
 {
-
 	m_toggle = 0;
 	m_last = 0;
 	m_tmnt_soundlatch = 0;
@@ -2228,7 +2213,6 @@ MACHINE_RESET_MEMBER(tmnt_state,common)
 /* cuebrick, mia and tmnt */
 INTERRUPT_GEN_MEMBER(tmnt_state::tmnt_vblank_irq)
 {
-
 	if(m_irq5_mask)
 		device.execute().set_input_line(5, HOLD_LINE);
 }
@@ -2318,7 +2302,6 @@ MACHINE_CONFIG_END
 
 MACHINE_RESET_MEMBER(tmnt_state,tmnt)
 {
-
 	/* the UPD7759 control flip-flops are cleared: /ST is 1, /RESET is 0 */
 	upd7759_start_w(m_upd, 0);
 	upd7759_reset_w(m_upd, 1);
@@ -3750,6 +3733,31 @@ ROM_START( ssridersuda )
 	ROM_LOAD( "ssriders_uda.nv", 0x0000, 0x080, CRC(148c6d64) SHA1(38016ba7e29f821a4c0de67a7ddc686d307e4659) )
 ROM_END
 
+ROM_START( ssridersuab )
+	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 2*256k and 2*128k for 68000 code */
+	ROM_LOAD16_BYTE( "064uab02.8e",  0x000000, 0x40000, CRC(f1a3c548) SHA1(8977d919f1d0fc3ab6801dd89a81a79e86abca69) )
+	ROM_LOAD16_BYTE( "064uab03.8g",  0x000001, 0x40000, CRC(66a61287) SHA1(a3defe361a7528ef8c88743355fb4983e3523564) )
+	ROM_LOAD16_BYTE( "064eab04.10e", 0x080000, 0x20000, CRC(ef2315bd) SHA1(2c8b11321cb5fdb78d760fabca666c0d8cc5b298) )
+	ROM_LOAD16_BYTE( "064eab05.10g", 0x080001, 0x20000, CRC(51d6fbc4) SHA1(e80de7d155b7f263c48ef4ae2702059be3c18e76) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "064e01.2f",   0x0000, 0x10000, CRC(44b9bc52) SHA1(4654d6e14c6956c40a19cb41155accb63f0da338) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_LOAD( "064e12.16k",   0x000000, 0x080000, CRC(e2bdc619) SHA1(04449deb267b0beacfa33640b593eb16194aa0d9) )	/* tiles */
+	ROM_LOAD( "064e11.12k",   0x080000, 0x080000, CRC(2d8ca8b0) SHA1(7c882f79c2402cf75979c681071007d76e4db9ae) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* graphics (addressable by the main CPU) */
+	ROM_LOAD( "064e09.7l",    0x000000, 0x100000, CRC(4160c372) SHA1(0b36181e5ccd785c7fb89b9f41e458066a42c3b0) )	/* sprites */
+	ROM_LOAD( "064e07.3l",    0x100000, 0x100000, CRC(64dd673c) SHA1(bea4d17a71dd21c635866ee69b4892dc9d0ab455) )
+
+	ROM_REGION( 0x100000, "k053260", 0 )	/* samples for the 053260 */
+	ROM_LOAD( "064e06.1d",    0x0000, 0x100000, CRC(59810df9) SHA1(a0affc6330bdbfab1447dc0cf13c20ff708c2c71) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "ssriders_uab.nv", 0x0000, 0x080, CRC(fe08b210) SHA1(151eecde7c3200b6df660502d06e872e5c1d14b0) )
+ROM_END
+
 ROM_START( ssridersuac )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 2*256k and 2*128k for 68000 code */
 	ROM_LOAD16_BYTE( "064uac02.8e",  0x000000, 0x40000, CRC(870473b6) SHA1(2e2fd5c6df3fa8da6655699043e08a8f918ef63c) )
@@ -4252,61 +4260,62 @@ DRIVER_INIT_MEMBER(tmnt_state,cuebrick)
 	machine().device<nvram_device>("nvram")->set_base(m_cuebrick_nvram, sizeof(m_cuebrick_nvram));
 }
 
-//    YEAR, NAME,        PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1989, cuebrick,    0,        cuebrick, cuebrick, tmnt_state, cuebrick, ROT0,   "Konami", "Cue Brick (World version D)", GAME_SUPPORTS_SAVE )
+//    YEAR, NAME,        PARENT,   MACHINE,  INPUT,     INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1989, cuebrick,    0,        cuebrick, cuebrick,  tmnt_state,    cuebrick, ROT0,   "Konami", "Cue Brick (World version D)", GAME_SUPPORTS_SAVE )
 
-GAME( 1989, mia,         0,        mia,      mia, tmnt_state,      mia,      ROT0,   "Konami", "M.I.A. - Missing in Action (version T)", GAME_SUPPORTS_SAVE )
-GAME( 1989, mia2,        mia,      mia,      mia, tmnt_state,      mia,      ROT0,   "Konami", "M.I.A. - Missing in Action (version S)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mia,         0,        mia,      mia,       tmnt_state,    mia,      ROT0,   "Konami", "M.I.A. - Missing in Action (version T)", GAME_SUPPORTS_SAVE )
+GAME( 1989, mia2,        mia,      mia,      mia,       tmnt_state,    mia,      ROT0,   "Konami", "M.I.A. - Missing in Action (version S)", GAME_SUPPORTS_SAVE )
 
-GAME( 1989, tmnt,        0,        tmnt,     tmnt, tmnt_state,     tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (World 4 Players)", GAME_SUPPORTS_SAVE )
-GAME( 1989, tmntu,       tmnt,     tmnt,     tmnt, tmnt_state,     tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, tmntua,      tmnt,     tmnt,     tmnt, tmnt_state,     tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, tmht,        tmnt,     tmnt,     tmnt, tmnt_state,     tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 4 Players, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, tmhta,       tmnt,     tmnt,     tmnt, tmnt_state,     tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 4 Players, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1990, tmntj,       tmnt,     tmnt,     tmnt, tmnt_state,     tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (Japan 4 Players)", GAME_SUPPORTS_SAVE )
-GAME( 1989, tmht2p,      tmnt,     tmnt,     tmnt2p, tmnt_state,   tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 2 Players, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, tmht2pa,     tmnt,     tmnt,     tmnt2p, tmnt_state,   tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 2 Players, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1990, tmnt2pj,     tmnt,     tmnt,     tmnt2p, tmnt_state,   tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (Japan 2 Players)", GAME_SUPPORTS_SAVE )
-GAME( 1989, tmnt2po,     tmnt,     tmnt,     tmnt2p, tmnt_state,   tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (Oceania 2 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1989, tmnt,        0,        tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (World 4 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1989, tmntu,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, tmntua,      tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1989, tmht,        tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 4 Players, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, tmhta,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 4 Players, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1990, tmntj,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (Japan 4 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1989, tmht2p,      tmnt,     tmnt,     tmnt2p,    tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 2 Players, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, tmht2pa,     tmnt,     tmnt,     tmnt2p,    tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 2 Players, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1990, tmnt2pj,     tmnt,     tmnt,     tmnt2p,    tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (Japan 2 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1989, tmnt2po,     tmnt,     tmnt,     tmnt2p,    tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (Oceania 2 Players)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, punkshot,    0,        punkshot, punkshot, driver_device, 0,        ROT0,   "Konami", "Punk Shot (US 4 Players)", GAME_SUPPORTS_SAVE )
-GAME( 1990, punkshot2,   punkshot, punkshot, punksht2, driver_device, 0,        ROT0,   "Konami", "Punk Shot (US 2 Players)", GAME_SUPPORTS_SAVE )
-GAME( 1990, punkshotj,   punkshot, punkshot, punkshtj, driver_device, 0,        ROT0,   "Konami", "Punk Shot (Japan 2 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1990, punkshot,    0,        punkshot, punkshot,  driver_device, 0,        ROT0,   "Konami", "Punk Shot (US 4 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1990, punkshot2,   punkshot, punkshot, punksht2,  driver_device, 0,        ROT0,   "Konami", "Punk Shot (US 2 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1990, punkshotj,   punkshot, punkshot, punkshtj,  driver_device, 0,        ROT0,   "Konami", "Punk Shot (Japan 2 Players)", GAME_SUPPORTS_SAVE )
 
-GAME( 1990, lgtnfght,    0,        lgtnfght, lgtnfght, driver_device, 0,        ROT90,  "Konami", "Lightning Fighters (World)", GAME_SUPPORTS_SAVE )
-GAME( 1990, lgtnfghta,   lgtnfght, lgtnfght, lgtnfght, driver_device, 0,        ROT90,  "Konami", "Lightning Fighters (Asia)", GAME_SUPPORTS_SAVE )
-GAME( 1990, lgtnfghtu,   lgtnfght, lgtnfght, lgtnfght, driver_device, 0,        ROT90,  "Konami", "Lightning Fighters (US)", GAME_SUPPORTS_SAVE )
-GAME( 1990, trigon,      lgtnfght, lgtnfght, trigon, driver_device,   0,        ROT90,  "Konami", "Trigon (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1990, lgtnfght,    0,        lgtnfght, lgtnfght,  driver_device, 0,        ROT90,  "Konami", "Lightning Fighters (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, lgtnfghta,   lgtnfght, lgtnfght, lgtnfght,  driver_device, 0,        ROT90,  "Konami", "Lightning Fighters (Asia)", GAME_SUPPORTS_SAVE )
+GAME( 1990, lgtnfghtu,   lgtnfght, lgtnfght, lgtnfght,  driver_device, 0,        ROT90,  "Konami", "Lightning Fighters (US)", GAME_SUPPORTS_SAVE )
+GAME( 1990, trigon,      lgtnfght, lgtnfght, trigon,    driver_device, 0,        ROT90,  "Konami", "Trigon (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, blswhstl,    0,        blswhstl, blswhstl, driver_device, 0,        ROT90,  "Konami", "Bells & Whistles (Version L)", GAME_SUPPORTS_SAVE )
-GAME( 1991, detatwin,    blswhstl, blswhstl, blswhstl, driver_device, 0,        ROT90,  "Konami", "Detana!! Twin Bee (Japan ver. J)", GAME_SUPPORTS_SAVE )
+GAME( 1991, blswhstl,    0,        blswhstl, blswhstl,  driver_device, 0,        ROT90,  "Konami", "Bells & Whistles (Version L)", GAME_SUPPORTS_SAVE )
+GAME( 1991, detatwin,    blswhstl, blswhstl, blswhstl,  driver_device, 0,        ROT90,  "Konami", "Detana!! Twin Bee (Japan ver. J)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, glfgreat,    0,        glfgreat, glfgreat, driver_device, 0,        ROT0,   "Konami", "Golfing Greats", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, driver_device,0,        ROT0,   "Konami", "Golfing Greats (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  driver_device, 0,        ROT0,   "Konami", "Golfing Greats", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, driver_device, 0,        ROT0,   "Konami", "Golfing Greats (Japan)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 1991, tmnt2,       0,        tmnt2,    ssridr4p, driver_device, 0,        ROT0,   "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", GAME_SUPPORTS_SAVE ) // ver. UAA
-GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps, driver_device, 0,        ROT0,   "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", GAME_SUPPORTS_SAVE ) // ver. ADA
-GAME( 1991, tmht22pe,    tmnt2,    tmnt2,    ssriders, driver_device, 0,        ROT0,   "Konami", "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  GAME_SUPPORTS_SAVE ) // ver. EBA
-GAME( 1991, tmnt22pu,    tmnt2,    tmnt2,    ssriders, driver_device, 0,        ROT0,   "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", GAME_SUPPORTS_SAVE ) // ver. UDA
+GAME( 1991, tmnt2,       0,        tmnt2,    ssridr4p,  driver_device, 0,        ROT0,   "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", GAME_SUPPORTS_SAVE )
+GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps,  driver_device, 0,        ROT0,   "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", GAME_SUPPORTS_SAVE )
+GAME( 1991, tmht22pe,    tmnt2,    tmnt2,    ssriders,  driver_device, 0,        ROT0,   "Konami", "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  GAME_SUPPORTS_SAVE )
+GAME( 1991, tmnt22pu,    tmnt2,    tmnt2,    ssriders,  driver_device, 0,        ROT0,   "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", GAME_SUPPORTS_SAVE )
 
-GAME( 1993, qgakumon,    0,        tmnt2,    qgakumon, driver_device, 0,        ROT0,   "Konami", "Quiz Gakumon no Susume (Japan ver. JA2 Type L)", GAME_SUPPORTS_SAVE )
+GAME( 1993, qgakumon,    0,        tmnt2,    qgakumon,  driver_device, 0,        ROT0,   "Konami", "Quiz Gakumon no Susume (Japan ver. JA2 Type L)", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, ssriders,    0,        ssriders, ssridr4p, driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver EAC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, ssridersebd, ssriders, ssriders, ssriders, driver_device, 0,        ROT0,   "Konami", "Sunset Riders (2 Players ver EBD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, ssridersebc, ssriders, ssriders, ssriders, driver_device, 0,        ROT0,   "Konami", "Sunset Riders (2 Players ver EBC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, ssridersuda, ssriders, ssriders, ssrid4ps, driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver UDA)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, ssriderseaa, ssriders, ssriders, ssrid4ps, driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver EAA)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, ssridersuac, ssriders, ssriders, ssridr4p, driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver UAC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, ssridersubc, ssriders, ssriders, ssriders, driver_device, 0,        ROT0,   "Konami", "Sunset Riders (2 Players ver UBC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, ssridersabd, ssriders, ssriders, ssriders, driver_device, 0,        ROT0,   "Konami", "Sunset Riders (2 Players ver ABD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, ssridersadd, ssriders, ssriders, ssrid4ps, driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver ADD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, ssridersjbd, ssriders, ssriders, ssriders, driver_device, 0,        ROT0,   "Konami", "Sunset Riders (2 Players ver JBD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, ssridersb,   ssriders, sunsetbl, sunsetbl, driver_device, 0,        ROT0,   "bootleg","Sunset Riders (bootleg 4 Players ver ADD)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1991, ssriders2,   ssriders, sunsetbl, sunsetbl, driver_device, 0,        ROT0,   "bootleg","Sunset Riders 2 (bootleg 4 Players ver ADD)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssriders,    0,        ssriders, ssridr4p,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver EAC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersebd, ssriders, ssriders, ssriders,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (2 Players ver EBD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersebc, ssriders, ssriders, ssriders,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (2 Players ver EBC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersuda, ssriders, ssriders, ssrid4ps,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver UDA)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssriderseaa, ssriders, ssriders, ssrid4ps,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver EAA)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersuab, ssriders, ssriders, ssridr4p,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver UAB)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersuac, ssriders, ssriders, ssridr4p,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver UAC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersubc, ssriders, ssriders, ssriders,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (2 Players ver UBC)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersabd, ssriders, ssriders, ssriders,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (2 Players ver ABD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersadd, ssriders, ssriders, ssrid4ps,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver ADD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersjbd, ssriders, ssriders, ssriders,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (2 Players ver JBD)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssridersb,   ssriders, sunsetbl, sunsetbl,  driver_device, 0,        ROT0,   "bootleg","Sunset Riders (bootleg 4 Players ver ADD)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1991, ssriders2,   ssriders, sunsetbl, sunsetbl,  driver_device, 0,        ROT0,   "bootleg","Sunset Riders 2 (bootleg 4 Players ver ADD)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
-GAME( 1991, thndrx2,     0,        thndrx2,  thndrx2, driver_device,  0,        ROT0,   "Konami", "Thunder Cross II (World)", GAME_SUPPORTS_SAVE )
-GAME( 1991, thndrx2a,    thndrx2,  thndrx2,  thndrx2, driver_device,  0,        ROT0,   "Konami", "Thunder Cross II (Asia)", GAME_SUPPORTS_SAVE )
-GAME( 1991, thndrx2j,    thndrx2,  thndrx2,  thndrx2, driver_device,  0,        ROT0,   "Konami", "Thunder Cross II (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1991, thndrx2,     0,        thndrx2,  thndrx2,   driver_device, 0,        ROT0,   "Konami", "Thunder Cross II (World)", GAME_SUPPORTS_SAVE )
+GAME( 1991, thndrx2a,    thndrx2,  thndrx2,  thndrx2,   driver_device, 0,        ROT0,   "Konami", "Thunder Cross II (Asia)", GAME_SUPPORTS_SAVE )
+GAME( 1991, thndrx2j,    thndrx2,  thndrx2,  thndrx2,   driver_device, 0,        ROT0,   "Konami", "Thunder Cross II (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1993, prmrsocr,    0,        prmrsocr, prmrsocr, driver_device, 0,        ROT0,   "Konami", "Premier Soccer (ver EAB)", GAME_SUPPORTS_SAVE )
-GAME( 1993, prmrsocrj,   prmrsocr, prmrsocr, prmrsocr, driver_device, 0,        ROT0,   "Konami", "Premier Soccer (ver JAB)", GAME_SUPPORTS_SAVE )
+GAME( 1993, prmrsocr,    0,        prmrsocr, prmrsocr,  driver_device, 0,        ROT0,   "Konami", "Premier Soccer (ver EAB)", GAME_SUPPORTS_SAVE )
+GAME( 1993, prmrsocrj,   prmrsocr, prmrsocr, prmrsocr,  driver_device, 0,        ROT0,   "Konami", "Premier Soccer (ver JAB)", GAME_SUPPORTS_SAVE )
