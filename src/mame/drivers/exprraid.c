@@ -158,25 +158,11 @@ Stephh's notes (based on the games M6502 code and some tests) :
     for the "shoot" stages instead of 5.
   - Continue play is always available and score is NOT reset to 0.
 
-3) 'wexpressb1'
-
-  - "@ 1986 DATA EAST CORPORATION" + no code to display the Warning screen (World)
-  - This version is based on 'exprrada' so all comments also fit
-    for this set. The main difference is that reads from 0x2800
-    and 0x2801 (protection) are either discarded (jumps are noped
-    or patched) or changed to read what shall be the correct value
-    (reads from 0x2801 occur almost all the time).
-    So IMO this set looks like a World bootleg .
-
-4) 'wexpressb2'
+3) 'wexpress'
 
   - "@ 1986 DATA EAST CORPORATION" + extra code to display the Warning screen (Japan)
-  - Modified Warning screen
-  - This version is heavily based on 'exprrad' (even if I think
-    that there shall exist a "better" Japan undumped version)
+  - This version is heavily based on 'exprrad'
     so all comments also fit for this set. The main difference is
-    the way protection is bypassed (in a different way than 'wexpressb1'
-    as reads from 0x2801 only occur when a life is lost).
     The other difference is that you can NOT continue a game.
   - "Bonus lives" routine starts at 0xe4e5.
   - Coinage related stuff starts at 0xe7d8.
@@ -184,23 +170,35 @@ Stephh's notes (based on the games M6502 code and some tests) :
       * 0xe826 : COIN1 - 0xe82e : COIN2 (Mode 1)
       * 0xe836 : COIN1 - 0xe83e : COIN2 (Mode 2)
 
-5) 'wexpressb3'
+4) 'wexpressb1'
+
+  - "@ 1986 DATA EAST CORPORATION" + no code to display the Warning screen (World)
+  - This version is based on 'exprrad' so all comments also fit
+    for this set. The main difference is that reads from 0x2800
+    and 0x2801 (protection) are either discarded (jumps are noped
+    or patched) or changed to read what shall be the correct value
+    (reads from 0x2801 occur almost all the time).
+    So IMO this set looks like a World bootleg .
+
+5) 'wexpressb2'
+
+  - "@ 1986 DATA EAST CORPORATION" + extra code to display the Warning screen (Japan)
+  - Modified Warning screen
+  - This version is based on 'wexpress'
+    so all comments also fit for this set. The main difference is
+    the way protection is bypassed (in a different way than 'wexpressb1'
+    as reads from 0x2801 only occur when a life is lost).
+
+6) 'wexpressb3'
 
   - "@ 1986 DATA EAST CORPORATION" + extra code to display the Warning screen (Japan)
   - Original Warning screen
   - "CREDIT" misspelled to "CRDDIT".
-  - This version is heavily based on 'exprrad' (even if I think
-    that there shall exist a "better" Japan undumped version)
+  - This version is based on 'wexpress'
     so all comments also fit for this set. The main difference is
     the way protection is bypassed (in a different way than 'wexpressb1'
     but also in a different way than 'wexpressb2' as reads from 0x2801
     occur when you lose a life but also on "shoot" stages).
-    The other difference is that you can NOT continue a game as in 'wexpressb2'.
-  - "Bonus lives" routine starts at 0xe4e5 (same as 'wexpressb2')
-  - Coinage related stuff starts at 0xe7d8 (same as 'wexpressb2').
-  - Coinage tables (same as 'wexpressb') :
-      * 0xe826 : COIN1 - 0xe82e : COIN2 (Mode 1)
-      * 0xe836 : COIN1 - 0xe83e : COIN2 (Mode 2)
 
 
 ***************************************************************************/
