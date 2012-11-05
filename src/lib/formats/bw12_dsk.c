@@ -53,7 +53,7 @@ const char *bw12_format::name() const
 
 const char *bw12_format::description() const
 {
-	return "Bronwell 12/14 disk image";
+	return "Bondwell 12/14 disk image";
 }
 
 const char *bw12_format::extensions() const
