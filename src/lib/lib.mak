@@ -172,12 +172,13 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/tvc_cas.o		\
 	$(LIBOBJ)/formats/tzx_cas.o		\
 	$(LIBOBJ)/formats/uef_cas.o		\
-	$(LIBOBJ)/formats/upd765_dsk.o		\
+	$(LIBOBJ)/formats/upd765_dsk.o	\
 	$(LIBOBJ)/formats/vg5k_cas.o	\
 	$(LIBOBJ)/formats/vt_cas.o		\
 	$(LIBOBJ)/formats/vt_dsk.o		\
 	$(LIBOBJ)/formats/vtech1_dsk.o	\
 	$(LIBOBJ)/formats/wavfile.o		\
+	$(LIBOBJ)/formats/wd177x_dsk.o	\
 	$(LIBOBJ)/formats/x07_cas.o		\
 	$(LIBOBJ)/formats/x1_tap.o		\
 	$(LIBOBJ)/formats/xdf_dsk.o		\
