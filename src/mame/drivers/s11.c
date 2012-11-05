@@ -7,6 +7,8 @@
 
 
 ToDo:
+- Determine what drives the background sound (atm it's a guess)
+- Can coin up but not start
 
 *****************************************************************************************/
 
@@ -71,6 +73,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; // dummy to stop error log filling up
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
 	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
+	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; // dummy to stop error log filling up
 	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
@@ -99,8 +102,9 @@ private:
 	UINT8 m_sound_data;
 	UINT8 m_strobe;
 	UINT8 m_kbdrow;
+	UINT32 m_segment1;
+	UINT32 m_segment2;
 	bool m_ca1;
-	bool m_data_ok;
 };
 
 static ADDRESS_MAP_START( s11_main_map, AS_PROGRAM, 8, s11_state )
@@ -243,6 +247,7 @@ WRITE_LINE_MEMBER( s11_state::pia21_ca2_w )
 // sound ns
 	m_ca1 = state;
 	m_pias->ca1_w(m_ca1);
+	m_pia40->cb2_w(m_ca1);
 }
 
 static const pia6821_interface pia21_intf =
@@ -296,20 +301,21 @@ WRITE8_MEMBER( s11_state::dig0_w )
 {
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	data &= 0x7f;
-	m_strobe = data & 15;printf("C=%X ",m_strobe);
-	m_data_ok = true;
+	m_strobe = data & 15;
 	output_set_digit_value(60, patterns[data>>4]); // diag digit
+	m_segment1 = 0;
+	m_segment2 = 0;
 }
 
 WRITE8_MEMBER( s11_state::dig1_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
-	if (m_data_ok)
+	m_segment2 |= data;
+	m_segment2 |= 0x20000;
+	if ((m_segment2 & 0x70000) == 0x30000)
 	{
-		output_set_digit_value(m_strobe+16, patterns[data&15]);
-		output_set_digit_value(m_strobe, patterns[data>>4]);
+		output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		m_segment2 |= 0x40000;
 	}
-	m_data_ok = false;
 }
 
 static const pia6821_interface pia28_intf =
@@ -329,11 +335,25 @@ static const pia6821_interface pia28_intf =
 };
 
 WRITE8_MEMBER( s11_state::pia2c_pa_w )
-{printf("0=%X ",data);
+{
+	m_segment1 |= (data<<8);
+	m_segment1 |= 0x10000;
+	if ((m_segment1 & 0x70000) == 0x30000)
+	{
+		output_set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		m_segment1 |= 0x40000;
+	}
 }
 
 WRITE8_MEMBER( s11_state::pia2c_pb_w )
-{printf("1=%X ",data);
+{
+	m_segment1 |= data;
+	m_segment1 |= 0x20000;
+	if ((m_segment1 & 0x70000) == 0x30000)
+	{
+		output_set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		m_segment1 |= 0x40000;
+	}
 }
 
 static const pia6821_interface pia2c_intf =
@@ -375,17 +395,24 @@ static const pia6821_interface pia30_intf =
 	DEVCB_NULL,		/* port A out */
 	DEVCB_DRIVER_MEMBER(s11_state, switch_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia30_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),	/* IRQA */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
 
 WRITE8_MEMBER( s11_state::pia34_pa_w )
-{printf("2=%X ",data);
+{
+	m_segment2 |= (data<<8);
+	m_segment2 |= 0x10000;
+	if ((m_segment2 & 0x70000) == 0x30000)
+	{
+		output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
+		m_segment2 |= 0x40000;
+	}
 }
 
 WRITE8_MEMBER( s11_state::pia34_pb_w )
-{printf("3=%X ",data);
+{
 }
 
 static const pia6821_interface pia34_intf =
@@ -465,8 +492,8 @@ WRITE_LINE_MEMBER( s11_state::ym2151_irq_w)
 
 static const pia6821_interface pia40_intf =
 {
-	DEVCB_DRIVER_MEMBER(s11_state, dac_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
+	DEVCB_NULL,		/* port A in */
+	DEVCB_DRIVER_MEMBER(s11_state, dac_r),		/* port B in */
 	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca1_r),		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_LINE_VCC,		/* line CA2 in */
@@ -519,7 +546,7 @@ static MACHINE_CONFIG_START( s11, s11_state )
 	MCFG_PIA6821_ADD("pia2c", pia2c_intf)
 	MCFG_PIA6821_ADD("pia30", pia30_intf)
 	MCFG_PIA6821_ADD("pia34", pia34_intf)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* Add the soundcard */
 	MCFG_CPU_ADD("audiocpu", M6808, 3580000)
@@ -559,6 +586,7 @@ ROM_START(grand_l4)
 	ROM_LOAD("lzrd_u26.l4", 0x4000, 0x2000, CRC(5fe50db6) SHA1(7e2adfefce5c33ad605606574dbdfb2642aa0e85))
 	ROM_RELOAD( 0x6000, 0x2000)
 	ROM_LOAD("lzrd_u27.l4", 0x8000, 0x8000, CRC(6462ca55) SHA1(0ebfa998d3cefc213ada9ed815d44977120e5d6d))
+	ROM_FILL(0x6035, 1, 0) // default to English
 
 	// according to the manual these should be 32K roms just like the other games here
 	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
@@ -670,7 +698,6 @@ ROM_START(rdkng_l4)
 	ROM_LOAD("road_u4.l1", 0x8000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
 ROM_END
 
-
 /************************ From here, not pinball machines **************************************/
 
 /*--------------------
@@ -745,16 +772,16 @@ ROM_START(shfin_l1)
 	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
 ROM_END
 
-GAME( 1986, grand_l4, 0,        s11, s11,  s11_state, s11, ROT0, "Williams", "Grand Lizard (L-4)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, hs_l4,    0,        s11, s11,  s11_state, s11, ROT0, "Williams", "High Speed (L-4)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, hs_l3,    hs_l4,    s11, s11,  s11_state, s11, ROT0, "Williams", "High Speed (L-3)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, rdkng_l5, rdkng_l4, s11, s11,  s11_state, s11, ROT0, "Williams", "Road Kings (L-5)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, rdkng_l4, 0,        s11, s11,  s11_state, s11, ROT0, "Williams", "Road Kings (L-4)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, rdkng_l1, rdkng_l4, s11, s11,  s11_state, s11, ROT0, "Williams", "Road Kings (L-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, rdkng_l2, rdkng_l4, s11, s11,  s11_state, s11, ROT0, "Williams", "Road Kings (L-2)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, rdkng_l3, rdkng_l4, s11, s11,  s11_state, s11, ROT0, "Williams", "Road Kings (L-3)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, tts_l2,   0,        s11, s11,  s11_state, s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-2)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1986, tts_l1,   tts_l2,   s11, s11,  s11_state, s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, gmine_l2, 0,        s11, s11,  s11_state, s11, ROT0, "Williams", "Gold Mine (Shuffle) (L-2)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, tdawg_l1, 0,        s11, s11,  s11_state, s11, ROT0, "Williams", "Top Dawg (Shuffle) (L-1)", GAME_IS_SKELETON_MECHANICAL)
-GAME( 1987, shfin_l1, 0,        s11, s11,  s11_state, s11, ROT0, "Williams", "Shuffle Inn (Shuffle) (L-1)", GAME_IS_SKELETON_MECHANICAL)
+GAME( 1986, grand_l4, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Grand Lizard (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME( 1986, hs_l4,    0,        s11, s11, s11_state, s11, ROT0, "Williams", "High Speed (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME( 1986, hs_l3,    hs_l4,    s11, s11, s11_state, s11, ROT0, "Williams", "High Speed (L-3)", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME( 1986, rdkng_l5, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-5)", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME( 1986, rdkng_l4, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME( 1986, rdkng_l1, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME( 1986, rdkng_l2, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME( 1986, rdkng_l3, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-3)", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME( 1986, tts_l2,   0,        s11, s11, s11_state, s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1986, tts_l1,   tts_l2,   s11, s11, s11_state, s11, ROT0, "Williams", "Tic-Tac-Strike (Shuffle) (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1987, gmine_l2, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Gold Mine (Shuffle) (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME( 1987, tdawg_l1, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Top Dawg (Shuffle) (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
+GAME( 1987, shfin_l1, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Shuffle Inn (Shuffle) (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)

@@ -137,7 +137,7 @@
 			<bounds left="54" top="345" right="88" bottom="384" />
 		</bezel>
 		<bezel name="digit60" element="diag">
-			<bounds left="142" top="345" right="176" bottom="384" />
+			<bounds left="142" top="345" right="176" bottom="380" />
 		</bezel>
 		<bezel name="digit0" element="digit">
 			<bounds left="186" top="345" right="220" bottom="384" />
