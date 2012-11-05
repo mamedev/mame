@@ -17,9 +17,9 @@ Main CPU: ( DECO CPU-16 )
 1803-1803 DSW 1
 2100-2100 Sound latch write
 2800-2801 Protection
-3800-3800 VBlank ( bootleg 1 only )
+3800-3800 VBlank ( bootleg 2 only )
 4000-ffff ROM
-ffc0-ffc0 VBlank ( bootleg 2 only )
+ffc0-ffc0 VBlank ( bootleg 3 only )
 
 Sound Cpu: ( 6809 )
 0000-1fff RAM
@@ -57,7 +57,61 @@ sign is intact, however Credit is spelt incorrectly.
 
 Stephh's notes (based on the games M6502 code and some tests) :
 
-1) 'exprraid'
+1) 'exprrada'
+
+  - "@ 1986 DATA EAST CORPORATION" + no code to display the Warning screen (World)
+  - Same way to code number of enemies in "shoot" stages as in 'exprraidu'
+    (code at 5ce4) and same ingame bug :
+
+      5CF4: AD 03 18      lda  $1803
+      5CF7: 49 FF         eor  #$FF
+      5CF9: 4A            lsr  a
+      5CFA: 4A            lsr  a
+      5CFB: 4A            lsr  a
+      5CFC: 29 06         and  #$06
+
+    Correct code shall be :
+
+      5CFC: 29 03         and  #$03
+
+    You'll notice by looking at the tables that there are sometimes
+    more enemies than in 'exprraidu'.
+  - Time for each wagon on "shoot" stage is determined by the level
+    (see code at 0x6834 where location 0x0e is level number-1).
+    This time is also supposed to be determined by "Difficulty"
+    settings (DSW1 bits 3 and 4).
+    There is however an ingame bug that reads DSW1 bits 4 and 5 :
+
+      683B: AD 03 18      lda  $1803
+      683E: 49 FF         eor  #$FF
+      6840: 4A            lsr  a
+      6841: 4A            lsr  a
+      6842: 4A            lsr  a
+      6843: 4A            lsr  a
+      6844: 29 03         and  #$03
+
+    So Time is also determined by "Demo Sound" setting because of
+    extra "lsr a" instruction at 0x6843 !
+    Correct code shall be :
+
+      6843: EA            nop
+
+    Fortunately, table at 0x685f is filled with 0x30 so you'll
+    always have 30 seconds to "clear" the wagon (which is more
+    than the time you have in 'exprraid').
+    For the locomotive, time is always set to 0x20 = 20 seconds
+    (which is again more than the time you have in 'exprraid').
+  - "Bonus lives" routine starts at 0xe49b.
+  - Coinage related stuff starts at 0xe78e.
+    Coinage tables :
+      * 0xe7dc : COIN1 - 0xe7e4 : COIN2 (Mode 1)
+      * 0xe7ec : COIN1 - 0xe7f4 : COIN2 (Mode 2)
+  - At the beginning of each level, you have text in lower case
+    which doesn't give you any hints to pass the level nor advice.
+  - In this version, you always have 5 wagons for the "shoot" stages.
+  - Continue play is always available but score is reset to 0.
+
+2) 'exprraidu'
 
   - "@ 1986 DATA EAST USA, INC." (US)
   - Number of enemies on "shoot" stages is determined by the level
@@ -104,61 +158,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
     for the "shoot" stages instead of 5.
   - Continue play is always available and score is NOT reset to 0.
 
-2) 'exprrada'
-
-  - "@ 1986 DATA EAST CORPORATION" + no code to display the Warning screen (World)
-  - Same way to code number of enemies in "shoot" stages as in 'exprraid'
-    (code at 5ce4) and same ingame bug :
-
-      5CF4: AD 03 18      lda  $1803
-      5CF7: 49 FF         eor  #$FF
-      5CF9: 4A            lsr  a
-      5CFA: 4A            lsr  a
-      5CFB: 4A            lsr  a
-      5CFC: 29 06         and  #$06
-
-    Correct code shall be :
-
-      5CFC: 29 03         and  #$03
-
-    You'll notice by looking at the tables that there are sometimes
-    more enemies than in 'exprraid'.
-  - Time for each wagon on "shoot" stage is determined by the level
-    (see code at 0x6834 where location 0x0e is level number-1).
-    This time is also supposed to be determined by "Difficulty"
-    settings (DSW1 bits 3 and 4).
-    There is however an ingame bug that reads DSW1 bits 4 and 5 :
-
-      683B: AD 03 18      lda  $1803
-      683E: 49 FF         eor  #$FF
-      6840: 4A            lsr  a
-      6841: 4A            lsr  a
-      6842: 4A            lsr  a
-      6843: 4A            lsr  a
-      6844: 29 03         and  #$03
-
-    So Time is also determined by "Demo Sound" setting because of
-    extra "lsr a" instruction at 0x6843 !
-    Correct code shall be :
-
-      6843: EA            nop
-
-    Fortunately, table at 0x685f is filled with 0x30 so you'll
-    always have 30 seconds to "clear" the wagon (which is more
-    than the time you have in 'exprraid').
-    For the locomotive, time is always set to 0x20 = 20 seconds
-    (which is again more than the time you have in 'exprraid').
-  - "Bonus lives" routine starts at 0xe49b.
-  - Coinage related stuff starts at 0xe78e.
-    Coinage tables :
-      * 0xe7dc : COIN1 - 0xe7e4 : COIN2 (Mode 1)
-      * 0xe7ec : COIN1 - 0xe7f4 : COIN2 (Mode 2)
-  - At the beginning of each level, you have text in lower case
-    which doesn't give you any hints to pass the level nor advice.
-  - In this version, you always have 5 wagons for the "shoot" stages.
-  - Continue play is always available but score is reset to 0.
-
-3) 'wexpressb'
+3) 'wexpressb1'
 
   - "@ 1986 DATA EAST CORPORATION" + no code to display the Warning screen (World)
   - This version is based on 'exprrada' so all comments also fit
@@ -172,10 +172,10 @@ Stephh's notes (based on the games M6502 code and some tests) :
 
   - "@ 1986 DATA EAST CORPORATION" + extra code to display the Warning screen (Japan)
   - Modified Warning screen
-  - This version is heavily based on 'exprrada' (even if I think
+  - This version is heavily based on 'exprrad' (even if I think
     that there shall exist a "better" Japan undumped version)
     so all comments also fit for this set. The main difference is
-    the way protection is bypassed (in a different way than 'wexpress'
+    the way protection is bypassed (in a different way than 'wexpressb1'
     as reads from 0x2801 only occur when a life is lost).
     The other difference is that you can NOT continue a game.
   - "Bonus lives" routine starts at 0xe4e5.
@@ -189,15 +189,15 @@ Stephh's notes (based on the games M6502 code and some tests) :
   - "@ 1986 DATA EAST CORPORATION" + extra code to display the Warning screen (Japan)
   - Original Warning screen
   - "CREDIT" misspelled to "CRDDIT".
-  - This version is heavily based on 'exprrada' (even if I think
+  - This version is heavily based on 'exprrad' (even if I think
     that there shall exist a "better" Japan undumped version)
     so all comments also fit for this set. The main difference is
-    the way protection is bypassed (in a different way than 'wexpress'
-    but also in a different way than 'wexpressb' as reads from 0x2801
+    the way protection is bypassed (in a different way than 'wexpressb1'
+    but also in a different way than 'wexpressb2' as reads from 0x2801
     occur when you lose a life but also on "shoot" stages).
-    The other difference is that you can NOT continue a game as in 'wexpressb'.
-  - "Bonus lives" routine starts at 0xe4e5 (same as 'wexpressb')
-  - Coinage related stuff starts at 0xe7d8 (same as 'wexpressb').
+    The other difference is that you can NOT continue a game as in 'wexpressb2'.
+  - "Bonus lives" routine starts at 0xe4e5 (same as 'wexpressb2')
+  - Coinage related stuff starts at 0xe7d8 (same as 'wexpressb2').
   - Coinage tables (same as 'wexpressb') :
       * 0xe826 : COIN1 - 0xe82e : COIN2 (Mode 1)
       * 0xe836 : COIN1 - 0xe83e : COIN2 (Mode 2)
@@ -535,8 +535,8 @@ MACHINE_CONFIG_END
 
 ROM_START( exprraid )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cz01-5a.16b", 0x4000, 0x4000, CRC(dc8f9fba) SHA1(cae6af54fc0081d606b6884e8873aed356a37ba9) )
-	ROM_LOAD( "cz00-5.15a",  0x8000, 0x8000, CRC(a81290bc) SHA1(ddb0acda6124427bee691f9926c41fda27ed816e) )
+	ROM_LOAD( "cz01-2e.16b", 0x4000, 0x4000, CRC(a0ae6756) SHA1(7f7ec1efddbb62e9d201c6013bca8ab72c3f75f6) )
+	ROM_LOAD( "cz00-4e.15a", 0x8000, 0x8000, CRC(910f6ccc) SHA1(1dbf164a7add9335d90ee07b6db9a162a28e407b) )
 
 	ROM_REGION( 0x10000, "slave", 0 )	/* 64k for the sub cpu */
 	ROM_LOAD( "cz02-1.2a", 0x8000, 0x8000, CRC(552e6112) SHA1(f8412a63cab0aa47321d602f69bf534426c6aa5d) )
@@ -572,10 +572,10 @@ ROM_START( exprraid )
 	ROM_LOAD( "pal16r4a.5e", 0x0200, 0x0104, CRC(9a8766a7) SHA1(5f84ad9e633daeb14531ef527827ef3d9b269437) )
 ROM_END
 
-ROM_START( exprraida )
+ROM_START( exprraidu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cz01-2e.16b", 0x4000, 0x4000, CRC(a0ae6756) SHA1(7f7ec1efddbb62e9d201c6013bca8ab72c3f75f6) )
-	ROM_LOAD( "cz00-4e.15a", 0x8000, 0x8000, CRC(910f6ccc) SHA1(1dbf164a7add9335d90ee07b6db9a162a28e407b) )
+	ROM_LOAD( "cz01-5a.16b", 0x4000, 0x4000, CRC(dc8f9fba) SHA1(cae6af54fc0081d606b6884e8873aed356a37ba9) )
+	ROM_LOAD( "cz00-5.15a",  0x8000, 0x8000, CRC(a81290bc) SHA1(ddb0acda6124427bee691f9926c41fda27ed816e) )
 
 	ROM_REGION( 0x10000, "slave", 0 )	/* 64k for the sub cpu */
 	ROM_LOAD( "cz02-1.2a", 0x8000, 0x8000, CRC(552e6112) SHA1(f8412a63cab0aa47321d602f69bf534426c6aa5d) )
@@ -855,8 +855,8 @@ DRIVER_INIT_MEMBER(exprraid_state,wexpressb3)
 }
 
 
-GAME( 1986, exprraid,  0,        exprraid, exprraid, exprraid_state, exprraid,  ROT0, "Data East USA",         "Express Raider (US, rev 5)",      GAME_SUPPORTS_SAVE )
-GAME( 1986, exprraida, exprraid, exprraid, exprraid, exprraid_state, exprraid,  ROT0, "Data East USA",         "Express Raider (US, rev 4)",      GAME_SUPPORTS_SAVE )
+GAME( 1986, exprraid,  0,        exprraid, exprraid, exprraid_state, exprraid,  ROT0, "Data East Corporation", "Express Raider (World, Rev 4)",   GAME_SUPPORTS_SAVE )
+GAME( 1986, exprraidu, exprraid, exprraid, exprraid, exprraid_state, exprraid,  ROT0, "Data East USA",         "Express Raider (US, rev 5)",      GAME_SUPPORTS_SAVE )
 GAME( 1986, exprraidi, exprraid, exprraid, exprraid, exprraid_state, exprraid,  ROT0, "Data East Corporation", "Express Raider (Italy)",          GAME_SUPPORTS_SAVE )
 GAME( 1986, wexpress,  exprraid, exprraid, exprraid, exprraid_state, exprraid,  ROT0, "Data East Corporation", "Western Express (Japan, rev 4)",  GAME_SUPPORTS_SAVE )
 GAME( 1986, wexpressb1,exprraid, exprraid, exprraid, exprraid_state, wexpressb, ROT0, "bootleg",               "Western Express (bootleg set 1)", GAME_SUPPORTS_SAVE )
