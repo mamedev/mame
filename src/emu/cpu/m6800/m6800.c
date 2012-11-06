@@ -1491,7 +1491,7 @@ READ8_HANDLER( m6801_io_r )
 
 	case IO_CL:
 		data = cpustate->counter.b.l;
-		break;
+		// HACK there should be a break here, but Coleco Adam won't boot with it present, proper fix required to the free-running counter
 
 	case IO_OCRH:
 		if(!(cpustate->pending_tcsr&TCSR_OCF) && !space.debugger_access())
