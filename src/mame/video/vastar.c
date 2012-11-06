@@ -67,7 +67,6 @@ TILE_GET_INFO_MEMBER(vastar_state::get_bg2_tile_info)
 
 void vastar_state::video_start()
 {
-
 	m_fg_tilemap  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vastar_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,8,8,32,32);
 	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vastar_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(vastar_state::get_bg2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
@@ -191,7 +190,6 @@ UINT32 vastar_state::screen_update_vastar(screen_device &screen, bitmap_ind16 &b
 {
 	int i;
 
-
 	for (i = 0;i < 32;i++)
 	{
 		m_bg1_tilemap->set_scrolly(i,m_bg1_scroll[i]);
@@ -205,6 +203,13 @@ UINT32 vastar_state::screen_update_vastar(screen_device &screen, bitmap_ind16 &b
 		draw_sprites(machine(), bitmap,cliprect);
 		m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
 		m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+		break;
+
+	case 1: // ?? planet probe
+		m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
+		m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
+		m_fg_tilemap->draw(bitmap, cliprect, 0,0);
+		draw_sprites(machine(), bitmap,cliprect);
 		break;
 
 	case 2:

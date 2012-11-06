@@ -61,6 +61,43 @@ write:
 
 ***************************************************************************/
 
+/*
+
+Planet Probe -  unknown manufacture  -  Copyright 1985
+Game probably programmed by same people behind some Kyugo/Orca/Komax games (see hiscore table, Gyrodine pinout, clocks etc.)
+
+Upper board marked DVL/A-V
+Bottom Bord DVL/B-V
+
+The pcb seems a bootleg/prototype:
+On the upper board there are some pads for jumpers , some empty spaces left unpopulated for additional TTLs and an XTAL.
+All 5 sockets for 2732 eproms were modified to accept 2764 eproms.
+The AY8910 pin 26 (TEST 2) is grounded with a flying wire
+
+Upper board chips:
+5x 2764 eproms
+1x 2128 static ram (2k ram)
+2x z80B
+1x AY8910
+2x 8 positions dipswitches
+
+Bottom Board chips:
+5x 2764 eproms
+2x 2128 static ram (2kx8 ram)
+4x 93422 DRAM (256x4 dram)
+1x 6301 PROM (probably used for background ?)
+3x 82s129 Colour PROMS (connected to resistors)
+
+Clocks measured:
+
+Main XTAL 18.432mhz
+2x z80 : 18.432 / 6
+AY8910 : 18.432 / 12
+Vsync : 60.58hz
+
+*/
+
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
@@ -70,24 +107,14 @@ void vastar_state::machine_reset()
 {
 	/* we must start with the second CPU halted */
 	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_nmi_mask = 0;
+	m_sprite_priority[0] = 0;
 }
 
 WRITE8_MEMBER(vastar_state::vastar_hold_cpu2_w)
 {
 	/* I'm not sure that this works exactly like this */
 	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-}
-
-READ8_MEMBER(vastar_state::vastar_sharedram_r)
-{
-
-	return m_sharedram[offset];
-}
-
-WRITE8_MEMBER(vastar_state::vastar_sharedram_w)
-{
-
-	m_sharedram[offset] = data;
 }
 
 WRITE8_MEMBER(vastar_state::flip_screen_w)
@@ -97,7 +124,6 @@ WRITE8_MEMBER(vastar_state::flip_screen_w)
 
 WRITE8_MEMBER(vastar_state::nmi_mask_w)
 {
-
 	m_nmi_mask = data & 1;
 }
 
@@ -111,10 +137,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vastar_state )
 	AM_RANGE(0xc000, 0xc000) AM_WRITEONLY AM_SHARE("sprite_priority")	/* sprite/BG priority */
 	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(vastar_fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)
-	AM_RANGE(0xf000, 0xf0ff) AM_READWRITE(vastar_sharedram_r, vastar_sharedram_w) AM_SHARE("sharedram")
-	AM_RANGE(0xf100, 0xf7ff) AM_RAM
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("sharedram")
 
-	/* in hidden portions of video RAM: (fallthrough) */
+	/* in hidden portions of video RAM: (fallthrough) - todo, just make these pointers */
 	AM_RANGE(0xc400, 0xc43f) AM_WRITEONLY AM_SHARE("spriteram1")	/* actually c410-c41f and c430-c43f */
 	AM_RANGE(0xc7c0, 0xc7df) AM_WRITEONLY AM_SHARE("bg1_scroll")
 	AM_RANGE(0xc7e0, 0xc7ff) AM_WRITEONLY AM_SHARE("bg2_scroll")
@@ -132,7 +157,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, vastar_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x40ff) AM_READWRITE(vastar_sharedram_r, vastar_sharedram_w)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("P2")
 	AM_RANGE(0x8040, 0x8040) AM_READ_PORT("P1")
 	AM_RANGE(0x8080, 0x8080) AM_READ_PORT("SYSTEM")
@@ -229,6 +254,91 @@ static INPUT_PORTS_START( vastar )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( pprobe )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 
 static const gfx_layout charlayout =
 {
@@ -299,12 +409,12 @@ INTERRUPT_GEN_MEMBER(vastar_state::vblank_irq)
 static MACHINE_CONFIG_START( vastar, vastar_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz ???? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vastar_state,  vblank_irq)
 
-	MCFG_CPU_ADD("sub", Z80, 3072000)	/* 3.072 MHz ???? */
+	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_IO_MAP(cpu2_port_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(vastar_state, irq0_line_hold, 4*60)	/* ??? */
@@ -314,7 +424,7 @@ static MACHINE_CONFIG_START( vastar, vastar_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(60.58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
@@ -328,7 +438,7 @@ static MACHINE_CONFIG_START( vastar, vastar_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -369,11 +479,13 @@ ROM_START( vastar )
 	ROM_REGION( 0x2000, "gfx4", 0 )
 	ROM_LOAD( "c_s4.rom",     0x0000, 0x2000, CRC(c9fbbfc9) SHA1(7c6ace0e2eae8420a31d9054ad5dd94924273d5f) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "tbp24s10.6p",  0x0000, 0x0100, CRC(a712d73a) SHA1(a65fa5928431d8631fb04e01ad0a0d2de849bf1d) )	/* red component */
 	ROM_LOAD( "tbp24s10.6s",  0x0100, 0x0100, CRC(0a7d48ec) SHA1(400e0b271c241712e7b7502e96e4f8a609e078e1) )	/* green component */
 	ROM_LOAD( "tbp24s10.6m",  0x0200, 0x0100, CRC(4c3db907) SHA1(03bcbc4763dcf49f4a06f499042e36183aa8b762) )	/* blue component */
-	ROM_LOAD( "tbp24s10.8n",  0x0300, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )	/* ???? */
+
+	ROM_REGION( 0x0100, "unkprom", 0 )
+	ROM_LOAD( "tbp24s10.8n",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )	/* ???? */
 ROM_END
 
 ROM_START( vastar2 )
@@ -404,14 +516,48 @@ ROM_START( vastar2 )
 	ROM_REGION( 0x2000, "gfx4", 0 )
 	ROM_LOAD( "c_s4.rom",     0x0000, 0x2000, CRC(c9fbbfc9) SHA1(7c6ace0e2eae8420a31d9054ad5dd94924273d5f) )
 
-	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "tbp24s10.6p",  0x0000, 0x0100, CRC(a712d73a) SHA1(a65fa5928431d8631fb04e01ad0a0d2de849bf1d) )	/* red component */
 	ROM_LOAD( "tbp24s10.6s",  0x0100, 0x0100, CRC(0a7d48ec) SHA1(400e0b271c241712e7b7502e96e4f8a609e078e1) )	/* green component */
 	ROM_LOAD( "tbp24s10.6m",  0x0200, 0x0100, CRC(4c3db907) SHA1(03bcbc4763dcf49f4a06f499042e36183aa8b762) )	/* blue component */
-	ROM_LOAD( "tbp24s10.8n",  0x0300, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )	/* ???? */
+
+	ROM_REGION( 0x0100, "unkprom", 0 )
+	ROM_LOAD( "tbp24s10.8n",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )	/* ???? */
 ROM_END
 
+ROM_START( pprobe )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pb2.bin",   0x0000, 0x2000, CRC(a88592aa) SHA1(98e8e6233b85e678718f532708d57ec946b9fd88) )
+	ROM_LOAD( "pb3.bin",   0x2000, 0x2000, CRC(e4e20f74) SHA1(53b4d0499127cca149a3dd03af4f05de552cff57) )
+	ROM_LOAD( "pb4.bin",   0x4000, 0x2000, CRC(4e40e3fe) SHA1(ccb3c5828508efc9f0df44bf3408e807d5ef58a0) )
+	ROM_LOAD( "pb5.bin",   0x6000, 0x2000, CRC(b26ff0fd) SHA1(c64966ee91557f8982b9b7fd17306508228f1e15) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "pb1.bin",   0x0000, 0x2000, CRC(cd624df9) SHA1(0645ce8dc1b361904da4f6e7adc9b7de109b2d14) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "pb9.bin",  0x0000, 0x2000, CRC(82294dd6) SHA1(24b8eac3d476d4a4d91dd169e26bd075b0d1bf45) )
+
+	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_LOAD( "pb8.bin",  0x0000, 0x2000, CRC(8d809e45) SHA1(70f99626acdceaadbe03de49bcf778266ddff893) )
+	ROM_LOAD( "pb10.bin", 0x2000, 0x2000, CRC(895f9dd3) SHA1(919861482598aa35a9ad476da19f9efa30904cd4) )
+
+	ROM_REGION( 0x2000, "gfx3", 0 )
+	ROM_LOAD( "pb6.bin",  0x0000, 0x2000, CRC(ff309239) SHA1(4e52833fafd54d4502ad09091fbfb1a8a2ff8828) )
+
+	ROM_REGION( 0x2000, "gfx4", 0 )
+	ROM_LOAD( "pb7.bin",  0x0000, 0x2000, CRC(439978f7) SHA1(ba80dd919a9bb6f8c516d4eb794c02ae0f0dea00) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "n82s129.3",   0x0000, 0x0100, CRC(dfb6b97c) SHA1(e35eda4f3022e661b021b952c53054d96481fb49) )
+	ROM_LOAD( "n82s129.1",   0x0100, 0x0100, CRC(3cc696a2) SHA1(0a1407c19c63ee0f02c3e8b95b0c199b9aec3ce5) )
+	ROM_LOAD( "dm74s287.2",  0x0200, 0x0100, CRC(64fea033) SHA1(19bbb325f71cb17ea069958b3c246fa908f0008e) )
+
+	ROM_REGION( 0x0100, "unkprom", 0 )
+	ROM_LOAD( "mmi6301-1.bin",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )	/* ???? == vastar - tbp24s10.8n */
+ROM_END
 
 
 GAME( 1983, vastar,  0,      vastar, vastar, driver_device, 0, ROT90, "Sesame Japan", "Vastar (set 1)", 0 )
 GAME( 1983, vastar2, vastar, vastar, vastar, driver_device, 0, ROT90, "Sesame Japan", "Vastar (set 2)", 0 )
+GAME( 1983, pprobe,  0,      vastar, pprobe, driver_device, 0, ROT90, "Orca / Kyugo?", "Planet Probe (prototype?)", GAME_IMPERFECT_GRAPHICS ) // has no Copyright, probably because Orca / Kyugo didn't have a trading name at this point
