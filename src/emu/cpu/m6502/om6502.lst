@@ -273,9 +273,12 @@ brk_imp
 		PC = read_direct(0xfffa);
 		PC = set_h(PC, read_direct(0xfffb));
 		nmi_state = false;
+		standard_irq_callback(NMI_LINE);
 	} else {
 		PC = read_direct(0xfffe);
 		PC = set_h(PC, read_direct(0xffff));
+		if(irq_taken)
+			standard_irq_callback(IRQ_LINE);
 	}
 	irq_taken = false;
 	P |= F_I; // Do *not* move after the prefetch

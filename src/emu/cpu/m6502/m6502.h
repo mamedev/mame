@@ -46,7 +46,9 @@
 class m6502_device : public cpu_device {
 public:
 	enum {
-		IRQ_LINE, NMI_LINE, V_LINE
+		IRQ_LINE = INPUT_LINE_IRQ0,
+		NMI_LINE = INPUT_LINE_NMI,
+		V_LINE   = 10
 	};
 
 	m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
