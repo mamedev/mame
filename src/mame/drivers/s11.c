@@ -633,18 +633,6 @@ ROM_END
 /*-------------------------
 / Road Kings 07/86 (#542)
 /--------------------------*/
-ROM_START(rdkng_l5)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("road_u26.l5", 0x4000, 0x4000, CRC(22bcc70e) SHA1(cf46e8c5e417999150403d6d40adf8c36b1c0347))
-	ROM_LOAD("road_u27.l1", 0x8000, 0x8000, CRC(3dcad794) SHA1(6438505bb335f670e0892126764819a48eec9b88))
-
-	ROM_REGION(0x20000, "audiocpu", ROMREGION_ERASEFF)
-	ROM_LOAD("road_u21.l1", 0x18000, 0x8000, CRC(f34efbf4) SHA1(cb5ffe9818994f4681e3492a5cd46f410d2e5353))
-	ROM_LOAD("road_u22.l1", 0x10000, 0x8000, CRC(a9803804) SHA1(a400d4621c3f7a6e47546b2f33dc4920183a5a74))
-
-	ROM_REGION(0x10000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("road_u4.l1", 0x8000, 0x8000, CRC(4395b48f) SHA1(2325ce6ba7f6f92f884c302e6f053c31229dc774))
-ROM_END
 
 ROM_START(rdkng_l1)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -775,7 +763,6 @@ ROM_END
 GAME( 1986, grand_l4, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Grand Lizard (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING)
 GAME( 1986, hs_l4,    0,        s11, s11, s11_state, s11, ROT0, "Williams", "High Speed (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING)
 GAME( 1986, hs_l3,    hs_l4,    s11, s11, s11_state, s11, ROT0, "Williams", "High Speed (L-3)", GAME_MECHANICAL | GAME_NOT_WORKING)
-GAME( 1986, rdkng_l5, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-5)", GAME_MECHANICAL | GAME_NOT_WORKING)
 GAME( 1986, rdkng_l4, 0,        s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-4)", GAME_MECHANICAL | GAME_NOT_WORKING)
 GAME( 1986, rdkng_l1, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-1)", GAME_MECHANICAL | GAME_NOT_WORKING)
 GAME( 1986, rdkng_l2, rdkng_l4, s11, s11, s11_state, s11, ROT0, "Williams", "Road Kings (L-2)", GAME_MECHANICAL | GAME_NOT_WORKING)
