@@ -1136,9 +1136,9 @@ ifneq ($(CROSS_BUILD),1)
 
 BUILD += $(M6502MAKE)
 
-$(M6502MAKE): $(CPUOBJ)/m6502/m6502make.o
+$(M6502MAKE): $(CPUOBJ)/m6502/m6502make.o $(LIBOCORE)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $(OSDBGLDFLAGS) $^ -o $@
+	$(LD) $(LDFLAGS) $(OSDBGLDFLAGS) $^ $(LIBS) -o $@
 
 endif
 
