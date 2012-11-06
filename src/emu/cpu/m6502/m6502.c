@@ -1,1022 +1,688 @@
-/*****************************************************************************
- *
- *   m6502.c
- *   Portable 6502/65c02/65sc02/6510/n2a03 emulator V1.2
- *
- *   Copyright Juergen Buchmueller, all rights reserved.
- *   65sc02 core Copyright Peter Trauner.
- *   Deco16 portions Copyright Bryan McPhail.
- *
- *   - This source code is released as freeware for non-commercial purposes.
- *   - You are free to use and redistribute this code in modified or
- *     unmodified form, provided you list me in the credits.
- *   - If you modify this source code, you must add a notice to each modified
- *     source file that it has been changed.  If you're a nice person, you
- *     will clearly mark each change too.  :)
- *   - If you wish to use this for commercial purposes, please contact me at
- *     pullmoll@t-online.de
- *   - The author of this copywritten work reserves the right to change the
- *     terms of its usage and license at any time, including retroactively
- *   - This entire notice must remain in the source code.
- *
- *****************************************************************************/
-/* 2.February 2000 PeT added 65sc02 subtype */
-/* 10.March   2000 PeT added 6502 set overflow input line */
-/* 13.September 2000 PeT N2A03 jmp indirect */
+/***************************************************************************
+
+    m6502.c
+
+    Mostek 6502, original NMOS variant
+
+****************************************************************************
+
+    Copyright Olivier Galibert
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY OLIVIER GALIBERT ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+***************************************************************************/
 
 #include "emu.h"
 #include "debugger.h"
 #include "m6502.h"
-#include "ops02.h"
-#include "ill02.h"
 
+const device_type M6502 = &device_creator<m6502_device>;
 
-#define M6502_NMI_VEC	0xfffa
-#define M6502_RST_VEC	0xfffc
-#define M6502_IRQ_VEC	0xfffe
-
-#define DECO16_RST_VEC	0xfff0
-#define DECO16_IRQ_VEC	0xfff2
-#define DECO16_NMI_VEC	0xfff4
-
-#define VERBOSE 0
-
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
-
-
-
-/****************************************************************************
- * The 6502 registers.
- ****************************************************************************/
-struct m6502_Regs
+m6502_device::m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	cpu_device(mconfig, M6502, "M6502", tag, owner, clock),
+	program_config("program", ENDIANNESS_LITTLE, 8, 16)
 {
-	UINT8	subtype;		/* currently selected cpu sub type */
-	void	(*const *insn)(m6502_Regs *); /* pointer to the function pointer table */
-	PAIR	ppc;			/* previous program counter */
-	PAIR	pc; 			/* program counter */
-	PAIR	sp; 			/* stack pointer (always 100 - 1FF) */
-	PAIR	zp; 			/* zero page address */
-	PAIR	ea; 			/* effective address */
-	UINT8	a;				/* Accumulator */
-	UINT8	x;				/* X index register */
-	UINT8	y;				/* Y index register */
-	UINT8	p;				/* Processor status */
-	UINT8	pending_irq;	/* nonzero if an IRQ is pending */
-	UINT8	after_cli;		/* pending IRQ and last insn cleared I */
-	UINT8	nmi_state;
-	UINT8	irq_state;
-	UINT8   so_state;
-
-	device_irq_acknowledge_callback irq_callback;
-	legacy_cpu_device *device;
-	address_space *space;
-	direct_read_data *direct;
-	address_space *io;
-	int		int_occured;
-	int		icount;
-
-	devcb_resolved_read8 rdmem_id;					/* readmem callback for indexed instructions */
-	devcb_resolved_write8 wrmem_id;					/* writemem callback for indexed instructions */
-
-	UINT8    ddr;
-	UINT8	 port;
-	UINT8    mask;
-	UINT8	 pullup;
-	UINT8	 pulldown;
-
-	devcb_resolved_read8	in_port_func;
-	devcb_resolved_write8	out_port_func;
-};
-
-INLINE m6502_Regs *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == M6502 ||
-		   device->type() == M6504 ||
-		   device->type() == M6510 ||
-		   device->type() == M6510T ||
-		   device->type() == M7501 ||
-		   device->type() == M8502 ||
-		   device->type() == N2A03 ||
-		   device->type() == M65C02 ||
-		   device->type() == M65SC02 ||
-		   device->type() == DECO16);
-	return (m6502_Regs *)downcast<legacy_cpu_device *>(device)->token();
+	direct_disabled = false;
 }
 
-/***************************************************************
- * include the opcode macros, functions and tables
- ***************************************************************/
-#include "t6502.c"
-
-#include "t6510.c"
-
-#include "opsn2a03.h"
-
-#include "tn2a03.c"
-
-#include "opsc02.h"
-
-#include "t65c02.c"
-
-#include "t65sc02.c"
-
-#include "tdeco16.c"
-
-/*****************************************************************************
- *
- *      6502 CPU interface functions
- *
- *****************************************************************************/
-
-static void m6502_common_init(legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
+m6502_device::m6502_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+	cpu_device(mconfig, type, name, tag, owner, clock),
+	program_config("program", ENDIANNESS_LITTLE, 8, 16)
 {
-	m6502_Regs *cpustate = get_safe_token(device);
-	const m6502_interface *intf = (const m6502_interface *)device->static_config();
+	direct_disabled = false;
+}
 
-	cpustate->irq_callback = irqcallback;
-	cpustate->device = device;
-	cpustate->space = &device->space(AS_PROGRAM);
-	cpustate->direct = &cpustate->space->direct();
-	cpustate->subtype = subtype;
-	cpustate->insn = insn;
-
-	if ( intf )
-	{
-		cpustate->rdmem_id.resolve(intf->read_indexed_func, *device);
-		cpustate->wrmem_id.resolve(intf->write_indexed_func, *device);
-		cpustate->in_port_func.resolve(intf->in_port_func, *device);
-		cpustate->out_port_func.resolve(intf->out_port_func, *device);
-
-		cpustate->pullup = intf->external_port_pullup;
-		cpustate->pulldown = intf->external_port_pulldown;
-	}
+void m6502_device::device_start()
+{
+	if(direct_disabled)
+		mintf = new mi_default_nd;
 	else
-	{
-		devcb_read8 nullrcb = DEVCB_NULL;
-		devcb_write8 nullwcb = DEVCB_NULL;
+		mintf = new mi_default_normal;
 
-		cpustate->rdmem_id.resolve(nullrcb, *device);
-		cpustate->wrmem_id.resolve(nullwcb, *device);
-		cpustate->in_port_func.resolve(nullrcb, *device);
-		cpustate->out_port_func.resolve(nullwcb, *device);
-
-		cpustate->pullup = 0;
-		cpustate->pulldown = 0;
-	}
-
-	device->save_item(NAME(cpustate->pc.w.l));
-	device->save_item(NAME(cpustate->sp.w.l));
-	device->save_item(NAME(cpustate->p));
-	device->save_item(NAME(cpustate->a));
-	device->save_item(NAME(cpustate->x));
-	device->save_item(NAME(cpustate->y));
-	device->save_item(NAME(cpustate->pending_irq));
-	device->save_item(NAME(cpustate->after_cli));
-	device->save_item(NAME(cpustate->nmi_state));
-	device->save_item(NAME(cpustate->irq_state));
-	device->save_item(NAME(cpustate->so_state));
-
-	if (subtype == SUBTYPE_6510)
-	{
-		device->save_item(NAME(cpustate->port));
-		device->save_item(NAME(cpustate->mask));
-		device->save_item(NAME(cpustate->ddr));
-		device->save_item(NAME(cpustate->pullup));
-		device->save_item(NAME(cpustate->pulldown));
-	}
+	init();
 }
 
-static CPU_INIT( m6502 )
+void m6502_device::init()
 {
-	m6502_common_init(device, irqcallback, SUBTYPE_6502, insn6502, "m6502");
+	mintf->program = &space(AS_PROGRAM);
+	mintf->direct = &mintf->program->direct();
+
+	state_add(STATE_GENPC,     "GENPC",     NPC).noshow();
+	state_add(STATE_GENPCBASE, "GENPCBASE", PPC).noshow();
+	state_add(STATE_GENSP,     "GENSP",     SP).noshow();
+	state_add(STATE_GENFLAGS,  "GENFLAGS",  P).callimport().formatstr("%6s").noshow();
+	state_add(M6502_PC,        "PC",        NPC);
+	state_add(M6502_A,         "A",         A);
+	state_add(M6502_X,         "X",         X);
+	state_add(M6502_Y,         "Y",         Y);
+	state_add(M6502_P,         "P",         P).callimport();
+	state_add(M6502_S,         "SP",        SP);
+	state_add(M6502_IR,        "IR",        IR);
+
+	save_item(NAME(PC));
+	save_item(NAME(NPC));
+	save_item(NAME(A));
+	save_item(NAME(X));
+	save_item(NAME(Y));
+	save_item(NAME(P));
+	save_item(NAME(SP));
+	save_item(NAME(TMP));
+	save_item(NAME(TMP2));
+	save_item(NAME(IR));
+	save_item(NAME(nmi_state));
+	save_item(NAME(irq_state));
+	save_item(NAME(v_state));
+	save_item(NAME(inst_state));
+	save_item(NAME(inst_substate));
+	save_item(NAME(irq_taken));
+	save_item(NAME(inhibit_interrupts));
+
+	m_icountptr = &icount;
+
+	PC = 0x0000;
+	NPC = 0x0000;
+	A = 0x00;
+	X = 0x80;
+	Y = 0x00;
+	P = 0x36;
+	SP = 0x01bd;
+	TMP = 0x0000;
+	TMP2 = 0x00;
+	IR = 0x00;
+	nmi_state = false;
+	irq_state = false;
+	irq_taken = false;
+	v_state = false;
+	inst_state = STATE_RESET;
+	inst_substate = 0;
+	sync = false;
+	end_cycles = 0;
 }
 
-static CPU_RESET( m6502 )
+void m6502_device::device_reset()
 {
-	m6502_Regs *cpustate = get_safe_token(device);
-	/* wipe out the rest of the m6502 structure */
-	/* read the reset vector into PC */
-	PCL = RDMEM(M6502_RST_VEC);
-	PCH = RDMEM(M6502_RST_VEC+1);
-
-	cpustate->sp.d = 0x01ff;	/* stack pointer starts at page 1 offset FF */
-	cpustate->p = F_T|F_I|F_Z|F_B|(P&F_D);	/* set T, I and Z flags */
-	cpustate->pending_irq = 0;	/* nonzero if an IRQ is pending */
-	cpustate->after_cli = 0;	/* pending IRQ and last insn cleared I */
-	cpustate->irq_state = 0;
-	cpustate->nmi_state = 0;
+	inst_state = STATE_RESET;
+	inst_substate = 0;
+	nmi_state = false;
+	irq_state = false;
+	irq_taken = false;
+	v_state = false;
+	end_cycles = 0;
+	sync = false;
+	inhibit_interrupts = false;
 }
 
-static CPU_EXIT( m6502 )
+
+UINT32 m6502_device::execute_min_cycles() const
 {
-	/* nothing to do yet */
+	return 1;
 }
 
-INLINE void m6502_take_irq(m6502_Regs *cpustate)
+UINT32 m6502_device::execute_max_cycles() const
 {
-	if( !(P & F_I) )
-	{
-		EAD = M6502_IRQ_VEC;
-		cpustate->icount -= 2;
-		PUSH(PCH);
-		PUSH(PCL);
-		PUSH(P & ~F_B);
-		P |= F_I;		/* set I flag */
-		PCL = RDMEM(EAD);
-		PCH = RDMEM(EAD+1);
-		LOG(("M6502 '%s' takes IRQ ($%04x)\n", cpustate->device->tag(), PCD));
-		/* call back the cpuintrf to let it clear the line */
-		if (cpustate->irq_callback) (*cpustate->irq_callback)(cpustate->device, 0);
-	}
-	cpustate->pending_irq = 0;
+	return 10;
 }
 
-static CPU_EXECUTE( m6502 )
+UINT32 m6502_device::execute_input_lines() const
 {
-	m6502_Regs *cpustate = get_safe_token(device);
-
-	do
-	{
-		UINT8 op;
-		PPC = PCD;
-
-		debugger_instruction_hook(device, PCD);
-
-		/* if an irq is pending, take it now */
-		if( cpustate->pending_irq )
-			m6502_take_irq(cpustate);
-
-		op = RDOP();
-		(*cpustate->insn[op])(cpustate);
-
-		/* check if the I flag was just reset (interrupts enabled) */
-		if( cpustate->after_cli )
-		{
-			LOG(("M6502 '%s' after_cli was >0", cpustate->device->tag()));
-			cpustate->after_cli = 0;
-			if (cpustate->irq_state != CLEAR_LINE)
-			{
-				LOG((": irq line is asserted: set pending IRQ\n"));
-				cpustate->pending_irq = 1;
-			}
-			else
-			{
-				LOG((": irq line is clear\n"));
-			}
-		}
-		else {
-			if ( cpustate->pending_irq == 2 ) {
-				if ( cpustate->int_occured - cpustate->icount > 1 ) {
-					cpustate->pending_irq = 1;
-				}
-			}
-			if( cpustate->pending_irq == 1 )
-				m6502_take_irq(cpustate);
-			if ( cpustate->pending_irq == 2 ) {
-				cpustate->pending_irq = 1;
-			}
-		}
-
-	} while (cpustate->icount > 0);
+	return 3;
 }
 
-static void m6502_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
+void m6502_device::do_adc_d(UINT8 val)
 {
-	if (irqline == INPUT_LINE_NMI)
-	{
-		if (cpustate->nmi_state == state) return;
-		cpustate->nmi_state = state;
-		if( state != CLEAR_LINE )
-		{
-			LOG(( "M6502 '%s' set_nmi_line(ASSERT)\n", cpustate->device->tag()));
-			EAD = M6502_NMI_VEC;
-			cpustate->icount -= 2;
-			PUSH(PCH);
-			PUSH(PCL);
-			PUSH(P & ~F_B);
-			P |= F_I;		/* set I flag */
-			PCL = RDMEM(EAD);
-			PCH = RDMEM(EAD+1);
-			LOG(("M6502 '%s' takes NMI ($%04x)\n", cpustate->device->tag(), PCD));
-		}
-	}
+	UINT8 c = P & F_C ? 1 : 0;
+	P &= ~(F_N|F_V|F_Z|F_C);
+	UINT8 al = (A & 15) + (val & 15) + c;
+	if(al > 9)
+		al += 6;
+	UINT8 ah = (A >> 4) + (val >> 4) + (al > 15);
+	if(!UINT8(A + val + c))
+		P |= F_Z;
+	else if(ah & 8)
+		P |= F_N;
+	if(~(A^val) & (A^(ah << 4)) & 0x80)
+		P |= F_V;
+	if(ah > 9)
+		ah += 6;
+	if(ah > 15)
+		P |= F_C;
+	A = (ah << 4) | (al & 15);
+}
+
+void m6502_device::do_adc_nd(UINT8 val)
+{
+	UINT16 sum;
+	sum = A + val + (P & F_C ? 1 : 0);
+	P &= ~(F_N|F_V|F_Z|F_C);
+	if(!UINT8(sum))
+		P |= F_Z;
+	else if(INT8(sum) < 0)
+		P |= F_N;
+	if(~(A^val) & (A^sum) & 0x80)
+		P |= F_V;
+	if(sum & 0xff00)
+		P |= F_C;
+	A = sum;
+}
+
+void m6502_device::do_adc(UINT8 val)
+{
+	if(P & F_D)
+		do_adc_d(val);
 	else
-	{
-		if( irqline == M6502_SET_OVERFLOW )
-		{
-			if( cpustate->so_state && !state )
-			{
-				LOG(( "M6502 '%s' set overflow\n", cpustate->device->tag()));
-				P|=F_V;
-			}
-			cpustate->so_state=state;
-			return;
-		}
-		cpustate->irq_state = state;
-		if( state != CLEAR_LINE )
-		{
-			LOG(( "M6502 '%s' set_irq_line(ASSERT)\n", cpustate->device->tag()));
-			cpustate->pending_irq = 1;
-//          cpustate->pending_irq = 2;
-			cpustate->int_occured = cpustate->icount;
-		}
+		do_adc_nd(val);
+}
+
+void m6502_device::do_arr_nd()
+{
+	bool c = P & F_C;
+	P &= ~(F_N|F_Z|F_C|F_V);
+	A >>= 1;
+	if(c)
+		A |= 0x80;
+	if(!A)
+		P |= F_Z;
+	else if(INT8(A)<0)
+		P |= F_N;
+	if(A & 0x40)
+		P |= F_V|F_C;
+	if(A & 0x20)
+		P ^= F_V;
+}
+
+void m6502_device::do_arr_d()
+{
+	// The adc/ror interaction gives an extremely weird result
+	bool c = P & F_C;
+	P &= ~(F_N|F_Z|F_C|F_V);
+	UINT8 a = A >> 1;
+	if(c)
+		a |= 0x80;
+	if(!a)
+		P |= F_Z;
+	else if(INT8(a) < 0)
+		P |= F_N;
+	if((a ^ A) & 0x40)
+		P |= F_V;
+
+	if((A & 0x0f) >= 0x05)
+		a = ((a + 6) & 0x0f) | (a & 0xf0);
+
+	if((A & 0xf0) >= 0x50) {
+		a += 0x60;
+		P |= F_C;
 	}
+	A = a;
 }
 
-
-
-/****************************************************************************
- * 2A03 section
- ****************************************************************************/
-
-static CPU_INIT( n2a03 )
+void m6502_device::do_arr()
 {
-	m6502_common_init(device, irqcallback, SUBTYPE_2A03, insn2a03, "n2a03");
-}
-
-/* The N2A03 is integrally tied to its PSG (they're on the same die).
-   Bit 7 of address $4011 (the PSG's DPCM control register), when set,
-   causes an IRQ to be generated.  This function allows the IRQ to be called
-   from the PSG core when such an occasion arises. */
-void n2a03_irq(device_t *device)
-{
-	m6502_Regs *cpustate = get_safe_token(device);
-
-	m6502_take_irq(cpustate);
-}
-
-
-/****************************************************************************
- * 6510 section
- ****************************************************************************/
-
-static CPU_INIT( m6510 )
-{
-	m6502_common_init(device, irqcallback, SUBTYPE_6510, insn6510, "m6510");
-}
-
-static CPU_RESET( m6510 )
-{
-	m6502_Regs *cpustate = get_safe_token(device);
-
-	CPU_RESET_CALL(m6502);
-	cpustate->port = 0xff;
-	cpustate->mask = 0xff;
-	cpustate->ddr = 0x00;
-}
-
-UINT8 m6510_get_port(legacy_cpu_device *device)
-{
-	m6502_Regs *cpustate = get_safe_token(device);
-	return (cpustate->port & cpustate->ddr) | (cpustate->ddr ^ 0xff);
-}
-
-static READ8_HANDLER( m6510_read_0000 )
-{
-	m6502_Regs *cpustate = get_safe_token(&space.device());
-	UINT8 result = 0x00;
-
-	switch(offset)
-	{
-		case 0x0000:	/* DDR */
-			result = cpustate->ddr;
-			break;
-
-		case 0x0001:	/* Data Port */
-			{
-				UINT8 input = cpustate->in_port_func(0) & ~cpustate->ddr;
-				UINT8 mask = cpustate->mask & ~cpustate->ddr;
-				UINT8 output = cpustate->port & cpustate->ddr;
-				UINT8 pulldown = ~(cpustate->pulldown & ~cpustate->ddr);
-
-				result = (input | mask | output) & (input | pulldown);
-			}
-			break;
-	}
-
-	return result;
-}
-
-static WRITE8_HANDLER( m6510_write_0000 )
-{
-	m6502_Regs *cpustate = get_safe_token(&space.device());
-
-	switch(offset)
-	{
-		case 0x0000:	/* DDR */
-			if (cpustate->ddr != data)
-			{
-				cpustate->ddr = data;
-				cpustate->mask = cpustate->port;
-			}
-			break;
-
-		case 0x0001:	/* Data Port */
-			cpustate->port = data;
-			break;
-	}
-
-	UINT8 output = (cpustate->port & cpustate->ddr) | (cpustate->pullup & ~cpustate->ddr);
-
-	cpustate->out_port_func(0, output);
-
-	// TODO assert write with floating data lines
-	//WRMEM(offset, 0xff);
-}
-
-static ADDRESS_MAP_START(m6510_mem, AS_PROGRAM, 8, legacy_cpu_device)
-	AM_RANGE(0x0000, 0x0001) AM_READWRITE_LEGACY(m6510_read_0000, m6510_write_0000)
-ADDRESS_MAP_END
-
-
-
-/****************************************************************************
- * 65C02 section
- ****************************************************************************/
-
-static CPU_INIT( m65c02 )
-{
-	m6502_common_init(device, irqcallback, SUBTYPE_65C02, insn65c02, "m65c02");
-}
-
-static CPU_RESET( m65c02 )
-{
-	m6502_Regs *cpustate = get_safe_token(device);
-
-	CPU_RESET_CALL(m6502);
-	P &=~F_D;
-}
-
-INLINE void m65c02_take_irq(m6502_Regs *cpustate)
-{
-	if( !(P & F_I) )
-	{
-		EAD = M6502_IRQ_VEC;
-		cpustate->icount -= 2;
-		PUSH(PCH);
-		PUSH(PCL);
-		PUSH(P & ~F_B);
-		P = (P & ~F_D) | F_I;		/* knock out D and set I flag */
-		PCL = RDMEM(EAD);
-		PCH = RDMEM(EAD+1);
-		LOG(("M65c02 '%s' takes IRQ ($%04x)\n", cpustate->device->tag(), PCD));
-		/* call back the cpuintrf to let it clear the line */
-		if (cpustate->irq_callback) (*cpustate->irq_callback)(cpustate->device, 0);
-	}
-	cpustate->pending_irq = 0;
-}
-
-static CPU_EXECUTE( m65c02 )
-{
-	m6502_Regs *cpustate = get_safe_token(device);
-
-	do
-	{
-		UINT8 op;
-		PPC = PCD;
-
-		debugger_instruction_hook(device, PCD);
-
-		op = RDOP();
-		(*cpustate->insn[op])(cpustate);
-
-		/* if an irq is pending, take it now */
-		if( cpustate->pending_irq )
-			m65c02_take_irq(cpustate);
-
-
-		/* check if the I flag was just reset (interrupts enabled) */
-		if( cpustate->after_cli )
-		{
-			LOG(("M6502 '%s' after_cli was >0", cpustate->device->tag()));
-			cpustate->after_cli = 0;
-			if (cpustate->irq_state != CLEAR_LINE)
-			{
-				LOG((": irq line is asserted: set pending IRQ\n"));
-				cpustate->pending_irq = 1;
-			}
-			else
-			{
-				LOG((": irq line is clear\n"));
-			}
-		}
-		else
-		if( cpustate->pending_irq )
-			m65c02_take_irq(cpustate);
-
-	} while (cpustate->icount > 0);
-}
-
-static void m65c02_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
-{
-	if (irqline == INPUT_LINE_NMI)
-	{
-		if (cpustate->nmi_state == state) return;
-		cpustate->nmi_state = state;
-		if( state != CLEAR_LINE )
-		{
-			LOG(( "M6502 '%s' set_nmi_line(ASSERT)\n", cpustate->device->tag()));
-			EAD = M6502_NMI_VEC;
-			cpustate->icount -= 2;
-			PUSH(PCH);
-			PUSH(PCL);
-			PUSH(P & ~F_B);
-			P = (P & ~F_D) | F_I;		/* knock out D and set I flag */
-			PCL = RDMEM(EAD);
-			PCH = RDMEM(EAD+1);
-			LOG(("M6502 '%s' takes NMI ($%04x)\n", cpustate->device->tag(), PCD));
-		}
-	}
+	if(P & F_D)
+		do_arr_d();
 	else
-		m6502_set_irq_line(cpustate, irqline,state);
+		do_arr_nd();
 }
 
-/****************************************************************************
- * 65SC02 section
- ****************************************************************************/
-static CPU_INIT( m65sc02 )
+void m6502_device::do_cmp(UINT8 val1, UINT8 val2)
 {
-	m6502_common_init(device, irqcallback, SUBTYPE_65SC02, insn65sc02, "m65sc02");
+	P &= ~(F_N|F_Z|F_C);
+	UINT16 r = val1-val2;
+	if(!r)
+		P |= F_Z;
+	else if(INT8(r) < 0)
+		P |= F_N;
+	if(!(r & 0xff00))
+		P |= F_C;
 }
 
-/****************************************************************************
- * DECO16 section
- ****************************************************************************/
-
-static CPU_INIT( deco16 )
+void m6502_device::do_sbc_d(UINT8 val)
 {
-	m6502_Regs *cpustate = get_safe_token(device);
-	m6502_common_init(device, irqcallback, SUBTYPE_DECO16, insndeco16, "deco16");
-	cpustate->io = &device->space(AS_IO);
+	UINT8 c = P & F_C ? 0 : 1;
+	P &= ~(F_N|F_V|F_Z|F_C);
+	UINT16 diff = A - val - c;
+	UINT8 al = (A & 15) - (val & 15) - c;
+	if(INT8(al) < 0)
+		al -= 6;
+	UINT8 ah = (A >> 4) - (val >> 4) - (INT8(al) < 0);
+	if(!UINT8(diff))
+		P |= F_Z;
+	else if(diff & 0x80)
+		P |= F_N;
+	if((A^val) & (A^diff) & 0x80)
+		P |= F_V;
+	if(!(diff & 0xff00))
+		P |= F_C;
+	if(INT8(ah) < 0)
+		ah -= 6;
+	A = (ah << 4) | (al & 15);
 }
 
-
-static CPU_RESET( deco16 )
+void m6502_device::do_sbc_nd(UINT8 val)
 {
-	m6502_Regs *cpustate = get_safe_token(device);
-
-	CPU_RESET_CALL(m6502);
-	cpustate->subtype = SUBTYPE_DECO16;
-	cpustate->insn = insndeco16;
-
-    PCL = RDMEM(DECO16_RST_VEC+1);
-    PCH = RDMEM(DECO16_RST_VEC);
-
-	cpustate->sp.d = 0x01ff;	/* stack pointer starts at page 1 offset FF */
-	cpustate->p = F_T|F_I|F_Z|F_B|(P&F_D);	/* set T, I and Z flags */
-	cpustate->pending_irq = 0;	/* nonzero if an IRQ is pending */
-	cpustate->after_cli = 0;	/* pending IRQ and last insn cleared I */
+	UINT16 diff = A - val - (P & F_C ? 0 : 1);
+	P &= ~(F_N|F_V|F_Z|F_C);
+	if(!UINT8(diff))
+		P |= F_Z;
+	else if(INT8(diff) < 0)
+		P |= F_N;
+	if((A^val) & (A^diff) & 0x80)
+		P |= F_V;
+	if(!(diff & 0xff00))
+		P |= F_C;
+	A = diff;
 }
 
-INLINE void deco16_take_irq(m6502_Regs *cpustate)
+void m6502_device::do_sbc(UINT8 val)
 {
-	if( !(P & F_I) )
-	{
-		EAD = DECO16_IRQ_VEC;
-		cpustate->icount -= 2;
-		PUSH(PCH);
-		PUSH(PCL);
-		PUSH(P & ~F_B);
-		P |= F_I;		/* set I flag */
-		PCL = RDMEM(EAD+1);
-		PCH = RDMEM(EAD);
-		LOG(("M6502 '%s' takes IRQ ($%04x)\n", cpustate->device->tag(), PCD));
-		/* call back the cpuintrf to let it clear the line */
-		if (cpustate->irq_callback) (*cpustate->irq_callback)(cpustate->device, 0);
-	}
-	cpustate->pending_irq = 0;
-}
-
-static void deco16_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
-{
-	if (irqline == INPUT_LINE_NMI)
-	{
-		if (cpustate->nmi_state == state) return;
-		cpustate->nmi_state = state;
-		if( state != CLEAR_LINE )
-		{
-			LOG(( "M6502 '%s' set_nmi_line(ASSERT)\n", cpustate->device->tag()));
-			EAD = DECO16_NMI_VEC;
-			cpustate->icount -= 7;
-			PUSH(PCH);
-			PUSH(PCL);
-			PUSH(P & ~F_B);
-			P |= F_I;		/* set I flag */
-			PCL = RDMEM(EAD+1);
-			PCH = RDMEM(EAD);
-			LOG(("M6502 '%s' takes NMI ($%04x)\n", cpustate->device->tag(), PCD));
-		}
-	}
+	if(P & F_D)
+		do_sbc_d(val);
 	else
-	{
-		if( irqline == M6502_SET_OVERFLOW )
-		{
-			if( cpustate->so_state && !state )
-			{
-				LOG(( "M6502 '%s' set overflow\n", cpustate->device->tag()));
-				P|=F_V;
-			}
-			cpustate->so_state=state;
-			return;
+		do_sbc_nd(val);
+}
+
+void m6502_device::do_bit(UINT8 val)
+{
+	P &= ~(F_N|F_Z|F_V);
+	UINT8 r = A & val;
+	if(!r)
+		P |= F_Z;
+	if(val & 0x80)
+		P |= F_N;
+	if(val & 0x40)
+		P |= F_V;
+}
+
+UINT8 m6502_device::do_asl(UINT8 v)
+{
+	P &= ~(F_N|F_Z|F_C);
+	UINT8 r = v<<1;
+	if(!r)
+		P |= F_Z;
+	else if(INT8(r) < 0)
+		P |= F_N;
+	if(v & 0x80)
+		P |= F_C;
+	return r;
+}
+
+UINT8 m6502_device::do_lsr(UINT8 v)
+{
+	P &= ~(F_N|F_Z|F_C);
+	if(v & 1)
+		P |= F_C;
+	v >>= 1;
+	if(!v)
+		P |= F_Z;
+	return v;
+}
+
+UINT8 m6502_device::do_ror(UINT8 v)
+{
+	bool c = P & F_C;
+	P &= ~(F_N|F_Z|F_C);
+	if(v & 1)
+		P |= F_C;
+	v >>= 1;
+	if(c)
+		v |= 0x80;
+	if(!v)
+		P |= F_Z;
+	else if(INT8(v)<0)
+		P |= F_N;
+	return v;
+}
+
+UINT8 m6502_device::do_rol(UINT8 v)
+{
+	bool c = P & F_C;
+	P &= ~(F_N|F_Z|F_C);
+	if(v & 0x80)
+		P |= F_C;
+	v <<= 1;
+	if(c)
+		v |= 0x01;
+	if(!v)
+		P |= F_Z;
+	else if(INT8(v)<0)
+		P |= F_N;
+	return v;
+}
+
+UINT8 m6502_device::do_asr(UINT8 v)
+{
+	P &= ~(F_N|F_Z|F_C);
+	if(v & 1)
+		P |= F_C;
+	v >>= 1;
+	if(!v)
+		P |= F_Z;
+	else if(v & 0x40) {
+		P |= F_N;
+		v |= 0x80;
+	}
+	return v;
+}
+
+UINT64 m6502_device::get_cycle()
+{
+	return end_cycles == 0 || icount <= 0 ? machine().time().as_ticks(clock()) : end_cycles - icount;
+}
+
+void m6502_device::execute_run()
+{
+	end_cycles = machine().time().as_ticks(clock()) + icount;
+	if(inst_substate)
+		do_exec_partial();
+
+	while(icount > 0) {
+		if(inst_state < 0x100) {
+			PPC = NPC;
+			inst_state = IR;
+			if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+				debugger_instruction_hook(this, NPC);
 		}
-		cpustate->irq_state = state;
-		if( state != CLEAR_LINE )
-		{
-			LOG(( "M6502 '%s' set_irq_line(ASSERT)\n", cpustate->device->tag()));
-			cpustate->pending_irq = 1;
-		}
+		do_exec_full();
 	}
+	end_cycles = 0;
 }
 
-static CPU_EXECUTE( deco16 )
+void m6502_device::execute_set_input(int inputnum, int state)
 {
-	m6502_Regs *cpustate = get_safe_token(device);
-
-	do
-	{
-		UINT8 op;
-		PPC = PCD;
-
-		debugger_instruction_hook(device, PCD);
-
-		op = RDOP();
-		(*cpustate->insn[op])(cpustate);
-
-		/* if an irq is pending, take it now */
-		if( cpustate->pending_irq )
-			deco16_take_irq(cpustate);
-
-
-		/* check if the I flag was just reset (interrupts enabled) */
-		if( cpustate->after_cli )
-		{
-			LOG(("M6502 %s after_cli was >0", cpustate->device->tag()));
-			cpustate->after_cli = 0;
-			if (cpustate->irq_state != CLEAR_LINE)
-			{
-				LOG((": irq line is asserted: set pending IRQ\n"));
-				cpustate->pending_irq = 1;
-			}
-			else
-			{
-				LOG((": irq line is clear\n"));
-			}
-		}
-		else
-		if( cpustate->pending_irq )
-			deco16_take_irq(cpustate);
-
-	} while (cpustate->icount > 0);
-}
-
-
-/**************************************************************************
- * Generic set_info
- **************************************************************************/
-
-static CPU_SET_INFO( m6502 )
-{
-	m6502_Regs *cpustate = get_safe_token(device);
-
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + M6502_IRQ_LINE:		m6502_set_irq_line(cpustate, M6502_IRQ_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M6502_SET_OVERFLOW:	m6502_set_irq_line(cpustate, M6502_SET_OVERFLOW, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		m6502_set_irq_line(cpustate, INPUT_LINE_NMI, info->i); break;
-
-		case CPUINFO_INT_PC:							PCW = info->i;							break;
-		case CPUINFO_INT_REGISTER + M6502_PC:			cpustate->pc.w.l = info->i;					break;
-		case CPUINFO_INT_SP:							S = info->i;							break;
-		case CPUINFO_INT_REGISTER + M6502_S:			cpustate->sp.b.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + M6502_P:			cpustate->p = info->i;						break;
-		case CPUINFO_INT_REGISTER + M6502_A:			cpustate->a = info->i;						break;
-		case CPUINFO_INT_REGISTER + M6502_X:			cpustate->x = info->i;						break;
-		case CPUINFO_INT_REGISTER + M6502_Y:			cpustate->y = info->i;						break;
-		case CPUINFO_INT_REGISTER + M6502_EA:			cpustate->ea.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + M6502_ZP:			cpustate->zp.w.l = info->i;					break;
+	switch(inputnum) {
+	case IRQ_LINE: irq_state = state == ASSERT_LINE; break;
+	case NMI_LINE: nmi_state = nmi_state || (state == ASSERT_LINE); break;
+	case V_LINE:
+		if(!v_state && state == ASSERT_LINE)
+			P |= F_V;
+		v_state = state == ASSERT_LINE;
+		break;
 	}
 }
 
 
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
-
-CPU_GET_INFO( m6502 )
+const address_space_config *m6502_device::memory_space_config(address_spacenum spacenum) const
 {
-	m6502_Regs *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
+	return (spacenum == AS_PROGRAM) ? &program_config : NULL;
+}
 
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m6502_Regs);			break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 4;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 10;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
-
-		case CPUINFO_INT_INPUT_STATE + M6502_IRQ_LINE:		info->i = cpustate->irq_state;			break;
-		case CPUINFO_INT_INPUT_STATE + M6502_SET_OVERFLOW:	info->i = cpustate->so_state;			break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		info->i = cpustate->nmi_state;			break;
-
-		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->ppc.w.l;				break;
-
-		case CPUINFO_INT_PC:							info->i = PCD;							break;
-		case CPUINFO_INT_REGISTER + M6502_PC:			info->i = cpustate->pc.w.l;					break;
-		case CPUINFO_INT_SP:							info->i = S;							break;
-		case CPUINFO_INT_REGISTER + M6502_S:			info->i = cpustate->sp.b.l;					break;
-		case CPUINFO_INT_REGISTER + M6502_P:			info->i = cpustate->p;						break;
-		case CPUINFO_INT_REGISTER + M6502_A:			info->i = cpustate->a;						break;
-		case CPUINFO_INT_REGISTER + M6502_X:			info->i = cpustate->x;						break;
-		case CPUINFO_INT_REGISTER + M6502_Y:			info->i = cpustate->y;						break;
-		case CPUINFO_INT_REGISTER + M6502_EA:			info->i = cpustate->ea.w.l;					break;
-		case CPUINFO_INT_REGISTER + M6502_ZP:			info->i = cpustate->zp.w.l;					break;
-		case CPUINFO_INT_REGISTER + M6502_SUBTYPE:		info->i = cpustate->subtype;				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6502);			break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6502);				break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(m6502);				break;
-		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(m6502);				break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6502);			break;
-		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6502);			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M6502");				break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Mostek 6502");			break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.2");					break;
-		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
-
-		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, "%c%c%c%c%c%c%c%c",
-				cpustate->p & 0x80 ? 'N':'.',
-				cpustate->p & 0x40 ? 'V':'.',
-				cpustate->p & 0x20 ? 'R':'.',
-				cpustate->p & 0x10 ? 'B':'.',
-				cpustate->p & 0x08 ? 'D':'.',
-				cpustate->p & 0x04 ? 'I':'.',
-				cpustate->p & 0x02 ? 'Z':'.',
-				cpustate->p & 0x01 ? 'C':'.');
-			break;
-
-		case CPUINFO_STR_REGISTER + M6502_PC:			sprintf(info->s, "PC:%04X", cpustate->pc.w.l); break;
-		case CPUINFO_STR_REGISTER + M6502_S:			sprintf(info->s, "S:%02X", cpustate->sp.b.l); break;
-		case CPUINFO_STR_REGISTER + M6502_P:			sprintf(info->s, "P:%02X", cpustate->p); break;
-		case CPUINFO_STR_REGISTER + M6502_A:			sprintf(info->s, "A:%02X", cpustate->a); break;
-		case CPUINFO_STR_REGISTER + M6502_X:			sprintf(info->s, "X:%02X", cpustate->x); break;
-		case CPUINFO_STR_REGISTER + M6502_Y:			sprintf(info->s, "Y:%02X", cpustate->y); break;
-		case CPUINFO_STR_REGISTER + M6502_EA:			sprintf(info->s, "EA:%04X", cpustate->ea.w.l); break;
-		case CPUINFO_STR_REGISTER + M6502_ZP:			sprintf(info->s, "ZP:%03X", cpustate->zp.w.l); break;
+void m6502_device::state_import(const device_state_entry &entry)
+{
+	switch(entry.index()) {
+	case STATE_GENFLAGS:
+	case M6502_P:
+		P = P | (F_B|F_E);
+		break;
 	}
 }
 
-/**************************************************************************
- * CPU-specific set_info
- **************************************************************************/
-
-CPU_GET_INFO( m6504 )
+void m6502_device::state_export(const device_state_entry &entry)
 {
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M6504");				break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 13;					break;
-
-		default:										CPU_GET_INFO_CALL(m6502);			break;
-	}
 }
 
-/**************************************************************************
- * CPU-specific set_info
- **************************************************************************/
-
-CPU_GET_INFO( n2a03 )
+void m6502_device::state_string_export(const device_state_entry &entry, astring &string)
 {
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(n2a03);				break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "N2A03");				break;
-
-		default:										CPU_GET_INFO_CALL(m6502);			break;
+	switch(entry.index()) {
+	case STATE_GENFLAGS:
+	case M6502_P:
+		string.printf("%c%c%c%c%c%c",
+					  P & F_N ? 'N' : '.',
+					  P & F_V ? 'V' : '.',
+					  P & F_D ? 'D' : '.',
+					  P & F_I ? 'I' : '.',
+					  P & F_Z ? 'Z' : '.',
+					  P & F_C ? 'C' : '.');
+		break;
 	}
 }
 
 
-/**************************************************************************
- * CPU-specific set_info
- **************************************************************************/
-
-static CPU_SET_INFO( m6510 )
+UINT32 m6502_device::disasm_min_opcode_bytes() const
 {
-	switch (state)
-	{
-		default:							CPU_SET_INFO_CALL(m6502);			break;
-	}
+	return 1;
 }
 
-CPU_GET_INFO( m6510 )
+UINT32 m6502_device::disasm_max_opcode_bytes() const
 {
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6510);			break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m6510);				break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(m6510);				break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6510);			break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(m6510_mem); break;
+	return 4;
+}
 
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M6510");				break;
+offs_t m6502_device::disassemble_generic(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options, const disasm_entry *table)
+{
+	const disasm_entry &e = table[oprom[0]];
+	UINT32 flags = e.flags | DASMFLAG_SUPPORTED;
+	buffer += sprintf(buffer, "%-5s", e.opcode);
+	if(e.per_bit)
+		buffer += sprintf(buffer, "%d, ", (oprom[0] >> 4) & 7);
 
-		default:										CPU_GET_INFO_CALL(m6502);			break;
+	switch(table[oprom[0]].mode) {
+	case DASM_non:
+		flags |= 1;
+		break;
+
+	case DASM_aba:
+		sprintf(buffer, " $%02x%02x", opram[2], opram[1]);
+		flags |= 3;
+		break;
+
+	case DASM_abx:
+		sprintf(buffer, " $%02x%02x, x", opram[2], opram[1]);
+		flags |= 3;
+		break;
+
+	case DASM_aby:
+		sprintf(buffer, " $%02x%02x, y", opram[2], opram[1]);
+		flags |= 3;
+		break;
+
+	case DASM_acc:
+		sprintf(buffer, " a");
+		flags |= 1;
+		break;
+
+	case DASM_adr:
+		sprintf(buffer, " $%02x%02x", opram[2], opram[1]);
+		flags |= 3;
+		break;
+
+	case DASM_bzp:
+		sprintf(buffer, "%d $%02x", oprom[0] & 7, opram[1]);
+		flags |= 2;
+		break;
+
+	case DASM_iax:
+		sprintf(buffer, " ($%02x%02x, x)", opram[2], opram[1]);
+		flags |= 3;
+		break;
+
+	case DASM_idx:
+		sprintf(buffer, " ($%02x, x)", opram[1]);
+		flags |= 2;
+		break;
+
+	case DASM_idy:
+		sprintf(buffer, " ($%02x), y", opram[1]);
+		flags |= 2;
+		break;
+
+	case DASM_idz:
+		sprintf(buffer, " ($%02x), z", opram[1]);
+		flags |= 2;
+		break;
+
+	case DASM_imm:
+		sprintf(buffer, " #$%02x", opram[1]);
+		flags |= 2;
+		break;
+
+	case DASM_imp:
+		flags |= 1;
+		break;
+
+	case DASM_ind:
+		sprintf(buffer, " ($%02x%02x)", opram[2], opram[1]);
+		flags |= 3;
+		break;
+
+	case DASM_isy:
+		sprintf(buffer, " ($%02x, s), y", opram[1]);
+		flags |= 2;
+		break;
+
+	case DASM_iw2:
+		sprintf(buffer, " #$%02x%02x", opram[2], opram[1]);
+		flags |= 3;
+		break;
+
+	case DASM_iw3:
+		sprintf(buffer, " #$%02x%02x%02x", opram[3], opram[2], opram[1]);
+		flags |= 4;
+		break;
+
+	case DASM_rel:
+		sprintf(buffer, " $%04x", (pc & 0xf0000) | UINT16(pc + 2 + INT8(opram[1])));
+		flags |= 2;
+		break;
+
+	case DASM_rw2:
+		sprintf(buffer, " $%04x", (pc & 0xf0000) | UINT16(pc + 3 + INT16((opram[2] << 8) | opram[1])));
+		flags |= 3;
+		break;
+
+	case DASM_zpb:
+		sprintf(buffer, "%d $%02x, $%04x", oprom[0] & 7, opram[1], (pc & 0xf0000) | UINT16(pc + 3 + INT8(opram[2])));
+		flags |= 3;
+		break;
+
+	case DASM_zpg:
+		sprintf(buffer, " $%02x", opram[1]);
+		flags |= 2;
+		break;
+
+	case DASM_zpi:
+		sprintf(buffer, " ($%02x)", opram[1]);
+		flags |= 2;
+		break;
+
+	case DASM_zpx:
+		sprintf(buffer, " $%02x, x", opram[1]);
+		flags |= 2;
+		break;
+
+	case DASM_zpy:
+		sprintf(buffer, " $%02x, y", opram[1]);
+		flags |= 2;
+		break;
+
+	default:
+		fprintf(stderr, "Unhandled dasm mode %d\n", table[oprom[0]].mode);
+		abort();
 	}
+	return flags;
+}
+
+void m6502_device::prefetch()
+{
+	sync = true;
+	NPC = PC;
+	IR = mintf->read_decrypted(PC);
+	sync = false;
+
+	if((nmi_state || (irq_state && !(P & F_I))) && !inhibit_interrupts) {
+		irq_taken = true;
+		IR = 0x00;
+	} else
+		PC++;
+}
+
+void m6502_device::prefetch_noirq()
+{
+	sync = true;
+	NPC = PC;
+	IR = mintf->read_decrypted(PC);
+	sync = false;
+	PC++;
+}
+
+void m6502_device::set_nz(UINT8 v)
+{
+	P &= ~(F_Z|F_N);
+	if(v & 0x80)
+		P |= F_N;
+	if(!v)
+		P |= F_Z;
+}
+
+offs_t m6502_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+{
+	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
 }
 
 
-/**************************************************************************
- * CPU-specific set_info
- **************************************************************************/
-
-CPU_GET_INFO( m6510t )
+UINT8 m6502_device::memory_interface::read_9(UINT16 adr)
 {
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M6510T");				break;
+	return read(adr);
+}
 
-		default:										CPU_GET_INFO_CALL(m6510);			break;
-	}
+void m6502_device::memory_interface::write_9(UINT16 adr, UINT8 val)
+{
+	write(adr, val);
 }
 
 
-/**************************************************************************
- * CPU-specific set_info
- **************************************************************************/
-
-CPU_GET_INFO( m7501 )
+UINT8 m6502_device::mi_default_normal::read(UINT16 adr)
 {
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M7501");				break;
-
-		default:										CPU_GET_INFO_CALL(m6510);			break;
-	}
+	return program->read_byte(adr);
 }
 
-
-/**************************************************************************
- * CPU-specific set_info
- **************************************************************************/
-
-CPU_GET_INFO( m8502 )
+UINT8 m6502_device::mi_default_normal::read_direct(UINT16 adr)
 {
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M8502");				break;
-
-		default:										CPU_GET_INFO_CALL(m6510);			break;
-	}
+	return direct->read_raw_byte(adr);
 }
 
-
-/**************************************************************************
- * CPU-specific set_info
- **************************************************************************/
-
-static CPU_SET_INFO( m65c02 )
+UINT8 m6502_device::mi_default_normal::read_decrypted(UINT16 adr)
 {
-	m6502_Regs *cpustate = get_safe_token(device);
-
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	m65c02_set_irq_line(cpustate, INPUT_LINE_NMI, info->i); break;
-
-		default:										CPU_SET_INFO_CALL(m6502);			break;
-	}
+	return direct->read_decrypted_byte(adr);
 }
 
-CPU_GET_INFO( m65c02 )
+void m6502_device::mi_default_normal::write(UINT16 adr, UINT8 val)
 {
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m65c02);		break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m65c02);				break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(m65c02);				break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m65c02);			break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m65c02);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M65C02");				break;
-
-		default:										CPU_GET_INFO_CALL(m6502);			break;
-	}
+	program->write_byte(adr, val);
 }
 
-
-/**************************************************************************
- * CPU-specific set_info
- **************************************************************************/
-
-CPU_GET_INFO( m65sc02 )
+UINT8 m6502_device::mi_default_nd::read_direct(UINT16 adr)
 {
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(m65sc02);				break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m65sc02);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M65SC02");				break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Metal Oxid Semiconductor MOS 6502"); break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.0beta");				break;
-		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller\nCopyright Peter Trauner\nall rights reserved."); break;
-
-		default:										CPU_GET_INFO_CALL(m65c02);			break;
-	}
+	return read(adr);
 }
 
-
-/**************************************************************************
- * CPU-specific set_info
- **************************************************************************/
-
-static CPU_SET_INFO( deco16 )
+UINT8 m6502_device::mi_default_nd::read_decrypted(UINT16 adr)
 {
-	m6502_Regs *cpustate = get_safe_token(device);
-
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + M6502_IRQ_LINE:		deco16_set_irq_line(cpustate, M6502_IRQ_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M6502_SET_OVERFLOW:	deco16_set_irq_line(cpustate, M6502_SET_OVERFLOW, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		deco16_set_irq_line(cpustate, INPUT_LINE_NMI, info->i); break;
-
-		default:											CPU_SET_INFO_CALL(m6502);			break;
-	}
+	return read(adr);
 }
 
-CPU_GET_INFO( deco16 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 8;					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(deco16);		break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(deco16);				break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(deco16);				break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(deco16);			break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(deco16);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "DECO CPU16");			break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "DECO");				break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "0.1");					break;
-		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller\nCopyright Bryan McPhail\nall rights reserved."); break;
-
-		default:										CPU_GET_INFO_CALL(m6502);			break;
-	}
-}
-
-DEFINE_LEGACY_CPU_DEVICE(M6502, m6502);
-DEFINE_LEGACY_CPU_DEVICE(M6504, m6504);
-DEFINE_LEGACY_CPU_DEVICE(M6510, m6510);
-DEFINE_LEGACY_CPU_DEVICE(M6510T, m6510t);
-DEFINE_LEGACY_CPU_DEVICE(M7501, m7501);
-DEFINE_LEGACY_CPU_DEVICE(M8502, m8502);
-DEFINE_LEGACY_CPU_DEVICE(N2A03, n2a03);
-DEFINE_LEGACY_CPU_DEVICE(M65C02, m65c02);
-DEFINE_LEGACY_CPU_DEVICE(M65SC02, m65sc02);
-DEFINE_LEGACY_CPU_DEVICE(DECO16, deco16);
+#include "cpu/m6502/m6502.inc"

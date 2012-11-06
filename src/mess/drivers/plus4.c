@@ -542,26 +542,6 @@ WRITE8_MEMBER( plus4_state::cpu_w )
 	m_cassette->write(!BIT(data, 1));
 }
 
-static M6510_INTERFACE( cpu_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(plus4_state, cpu_r),
-	DEVCB_DRIVER_MEMBER(plus4_state, cpu_w),
-	0x00,
-	0xc0
-};
-
-static M6510_INTERFACE( c16_cpu_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(plus4_state, c16_cpu_r),
-	DEVCB_DRIVER_MEMBER(plus4_state, cpu_w),
-	0x00,
-	0xc0
-};
-
 //-------------------------------------------------
 //  ted7360_interface ted_intf
 //-------------------------------------------------
@@ -911,7 +891,8 @@ static MACHINE_CONFIG_START( ntsc, plus4_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(MOS7501_TAG, M7501, XTAL_14_31818MHz/16)
 	MCFG_CPU_PROGRAM_MAP(plus4_mem)
-	MCFG_CPU_CONFIG(cpu_intf)
+	MCFG_M7501_PORT_CALLBACKS(READ8(plus4_state, cpu_r), WRITE8(plus4_state, cpu_w))
+	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
 	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, plus4_state,  c16_frame_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(plus4_state, c16_raster_interrupt,  TED7360_HRETRACERATE)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -950,7 +931,8 @@ static MACHINE_CONFIG_START( pal, plus4_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(MOS7501_TAG, M7501, XTAL_17_73447MHz/20)
 	MCFG_CPU_PROGRAM_MAP(plus4_mem)
-	MCFG_CPU_CONFIG(cpu_intf)
+	MCFG_M7501_PORT_CALLBACKS(READ8(plus4_state, cpu_r), WRITE8(plus4_state, cpu_w))
+	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
 	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, plus4_state,  c16_frame_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(plus4_state, c16_raster_interrupt,  TED7360_HRETRACERATE)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -987,7 +969,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( c16n, ntsc )
 	MCFG_CPU_MODIFY(MOS7501_TAG)
-	MCFG_CPU_CONFIG(c16_cpu_intf)
+	MCFG_M7501_PORT_CALLBACKS(READ8(plus4_state, c16_cpu_r), WRITE8(plus4_state, cpu_w))
+	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
 
 	MCFG_DEVICE_REMOVE(MOS6551_TAG)
 	MCFG_DEVICE_REMOVE(MOS6529_USER_TAG)
@@ -1008,7 +991,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( c16p, pal )
 	MCFG_CPU_MODIFY(MOS7501_TAG)
-	MCFG_CPU_CONFIG(c16_cpu_intf)
+	MCFG_M7501_PORT_CALLBACKS(READ8(plus4_state, c16_cpu_r), WRITE8(plus4_state, cpu_w))
+	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
 
 	MCFG_DEVICE_REMOVE(MOS6551_TAG)
 	MCFG_DEVICE_REMOVE(MOS6529_USER_TAG)

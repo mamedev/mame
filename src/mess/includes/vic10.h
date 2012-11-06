@@ -5,6 +5,7 @@
 
 
 #include "emu.h"
+#include "cpu/m6502/m6510.h"
 #include "includes/cbm.h"
 #include "machine/cbmipt.h"
 #include "machine/mos6526.h"
@@ -44,7 +45,7 @@ public:
 		  m_exp_irq(CLEAR_LINE)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m6510_device> m_maincpu;
 	required_device<mos6566_device> m_vic;
 	required_device<sid6581_device> m_sid;
 	required_device<mos6526_device> m_cia;

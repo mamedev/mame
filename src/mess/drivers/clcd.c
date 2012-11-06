@@ -10,7 +10,7 @@
 
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65c02.h"
 #include "machine/6522via.h"
 #include "machine/6551acia.h"
 #include "rendlay.h"
@@ -253,7 +253,7 @@ static const via6522_interface via0_intf =
 	DEVCB_NULL,//DEVCB_DRIVER_LINE_MEMBER(clcd_state, via0_ca2_w), // CASS MOTOR
 	DEVCB_NULL,
 
-	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE)
+	DEVCB_CPU_INPUT_LINE("maincpu", M65C02_IRQ_LINE)
 };
 
 static const via6522_interface via1_intf =

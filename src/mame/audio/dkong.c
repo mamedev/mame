@@ -1,6 +1,6 @@
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/n2a03.h"
 #include "sound/nes_apu.h"
 #include "sound/discrete.h"
 #include "machine/latch8.h"

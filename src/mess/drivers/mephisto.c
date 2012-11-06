@@ -61,7 +61,7 @@ Mephisto 4 Turbo Kit 18mhz - (mm4tk)
 
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65c02.h"
 #include "sound/beep.h"
 //#include "mephisto.lh"
 
@@ -77,7 +77,7 @@ public:
 	m_beep(*this, BEEPER_TAG)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m65c02_device> m_maincpu;
 	required_device<device_t> m_beep;
 	DECLARE_WRITE8_MEMBER(write_lcd);
 	DECLARE_WRITE8_MEMBER(mephisto_NMI);
@@ -351,8 +351,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi_r5)
 
 TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_irq)//only mm2
 {
-	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	// That will not work
+	machine().device("maincpu")->execute().set_input_line(M65C02_IRQ_LINE, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(M65C02_IRQ_LINE, CLEAR_LINE);
 
 	beep_set_state(m_beep, m_led_status&64?1:0);
 }

@@ -6,7 +6,7 @@
 
 #include <assert.h>
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65c02.h"
 
 #include "includes/svision.h"
 #include "imagedev/cartslot.h"
@@ -61,7 +61,7 @@ void svision_irq(running_machine &machine)
 	int irq = state->m_svision.timer_shot && (state->BANK & 2);
 	irq = irq || (*state->m_dma_finished && (state->BANK & 4));
 
-	machine.device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(M65C02_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(svision_state::svision_timer)

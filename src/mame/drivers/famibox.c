@@ -59,7 +59,7 @@ Notes/ToDo:
 
 #include "emu.h"
 #include "video/ppu2c0x.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/n2a03.h"
 #include "imagedev/cartslot.h"
 #include "sound/nes_apu.h"
 #include "sound/dac.h"

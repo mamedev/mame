@@ -13,7 +13,7 @@
 #define __E01__
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65c02.h"
 #include "imagedev/flopdrv.h"
 #include "machine/6522via.h"
 #include "machine/ctronics.h"
@@ -79,7 +79,7 @@ protected:
 	// device_econet_interface overrides
 	virtual void econet_clk(int state);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m65c02_device> m_maincpu;
 	required_device<device_t> m_fdc;
 	required_device<device_t> m_adlc;
 	required_device<mc146818_device> m_rtc;

@@ -1,6 +1,6 @@
 
 #include "emu.h"
-#include "cpu/m6502/m65ce02.h"
+#include "cpu/m6502/m65c02.h"
 
 class alvg_state : public driver_device
 {

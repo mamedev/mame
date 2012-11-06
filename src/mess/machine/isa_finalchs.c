@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "isa_finalchs.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65c02.h"
 
 static UINT8 FCH_latch_data = 0;
 

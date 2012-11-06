@@ -34,6 +34,7 @@ ADDRESS_MAP_END
 /* the Apple /// does some weird tricks whereby it monitors the SYNC pin
  * on the CPU to check for indexed instructions and directs them to
  * different memory locations */
+#if 0
 static const m6502_interface apple3_m6502_interface =
 {
 	DEVCB_DRIVER_MEMBER(apple3_state, apple3_indexed_read),	/* read_indexed_func */
@@ -43,6 +44,7 @@ static const m6502_interface apple3_m6502_interface =
     0x00,
     0x00
 };
+#endif
 
 static const floppy_interface apple3_floppy_interface =
 {
@@ -70,7 +72,7 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 2000000)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple3_map)
-	MCFG_CPU_CONFIG( apple3_m6502_interface )
+//	MCFG_CPU_CONFIG( apple3_m6502_interface )
 	MCFG_CPU_PERIODIC_INT_DRIVER(apple3_state, apple3_interrupt,  192)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 

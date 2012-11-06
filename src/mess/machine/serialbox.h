@@ -14,7 +14,7 @@
 
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65c02.h"
 #include "machine/cbmiec.h"
 
 
@@ -57,7 +57,7 @@ protected:
 	void cbm_iec_reset(int state);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<m65c02_device> m_maincpu;
 };
 
 

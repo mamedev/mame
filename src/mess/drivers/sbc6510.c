@@ -49,7 +49,7 @@ ToDo:
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m6510.h"
 #include "machine/6526cia.h"
 #include "sound/ay8910.h"
 #include "machine/terminal.h"
@@ -198,16 +198,6 @@ void sbc6510_state::machine_reset()
 {
 }
 
-static M6510_INTERFACE( sbc6510_m6510_interface )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	0x00,
-	0x00
-};
-
 READ8_MEMBER( sbc6510_state::psg_a_r )
 {
 	return 0xff;
@@ -250,7 +240,7 @@ WRITE8_MEMBER( sbc6510_state::key_w )
 
 const legacy_mos6526_interface cia_intf =
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE), // irq
+	DEVCB_CPU_INPUT_LINE("maincpu", M6510_IRQ_LINE), // irq
 	DEVCB_NULL,	// pc (timer related) not connected
 	DEVCB_NULL,	// cnt (serial related) not connected
 	DEVCB_NULL,	// sp (serial related) not connected
@@ -263,7 +253,6 @@ const legacy_mos6526_interface cia_intf =
 static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6510, XTAL_1MHz)
-	MCFG_CPU_CONFIG( sbc6510_m6510_interface )
 	MCFG_CPU_PROGRAM_MAP(sbc6510_mem)
 
 

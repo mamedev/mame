@@ -102,8 +102,8 @@ static void c65_irq( running_machine &machine, int level )
 	c65_state *state = machine.driver_data<c65_state>();
 	if (level != state->m_old_level)
 	{
-		DBG_LOG(machine, 3, "mos6510", ("irq %s\n", level ? "start" : "end"));
-		machine.device("maincpu")->execute().set_input_line(M6510_IRQ_LINE, level);
+		DBG_LOG(machine, 3, "mos4510", ("irq %s\n", level ? "start" : "end"));
+		machine.device("maincpu")->execute().set_input_line(M4510_IRQ_LINE, level);
 		state->m_old_level = level;
 	}
 }
@@ -837,7 +837,7 @@ void c65_bankswitch( running_machine &machine )
 	c65_state *state = machine.driver_data<c65_state>();
 	int data, loram, hiram, charen;
 
-	data = m4510_get_port(machine.device<legacy_cpu_device>("maincpu"));
+	data = 0x00; // machine.device<m4510_device>("maincpu")->get_port();
 	if (data == state->m_old_data)
 		return;
 

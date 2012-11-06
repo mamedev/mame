@@ -10,6 +10,7 @@
 *******************************************************************************/
 
 #include "emu.h"
+#include "cpu/m6502/deco16.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/liberate.h"
 

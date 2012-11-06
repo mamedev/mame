@@ -87,7 +87,7 @@ Bit 5+6  LED 1-8 enable
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65c02.h"
 #include "cpu/arm/arm.h"
 #include "sound/beep.h"
 //#include "machine/6551acia.h"
@@ -813,9 +813,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::cause_nmi)
 
 TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::cause_M6502_irq)
 {
-	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-
+	// That will not work
+	machine().device("maincpu")->execute().set_input_line(M65C02_IRQ_LINE, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(M65C02_IRQ_LINE, CLEAR_LINE);
 }
 
 

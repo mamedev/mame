@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m6504.h"
 #include "cpu/cop400/cop400.h"
 #include "includes/lisa.h"
 #include "devices/sonydriv.h"

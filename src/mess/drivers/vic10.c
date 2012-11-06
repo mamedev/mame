@@ -409,17 +409,6 @@ WRITE8_MEMBER( vic10_state::cpu_w )
 	m_cassette->motor_w(BIT(data, 5));
 }
 
-static M6510_INTERFACE( cpu_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(vic10_state, cpu_r),
-	DEVCB_DRIVER_MEMBER(vic10_state, cpu_w),
-	0x10,
-	0x20
-};
-
-
 //-------------------------------------------------
 //  PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
 //-------------------------------------------------
@@ -505,7 +494,8 @@ static MACHINE_CONFIG_START( vic10, vic10_state )
 	// basic hardware
 	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6566_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vic10_mem)
-	MCFG_CPU_CONFIG(cpu_intf)
+	MCFG_M6510_PORT_CALLBACKS(READ8(vic10_state, cpu_r), WRITE8(vic10_state, cpu_w))
+	MCFG_M6510_PORT_PULLS(0x10, 0x20)
 	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, vic10_state,  vic10_frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 

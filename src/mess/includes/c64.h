@@ -4,6 +4,7 @@
 #define __C64__
 
 #include "emu.h"
+#include "cpu/m6502/m6510.h"
 #include "formats/cbm_snqk.h"
 #include "includes/cbm.h"
 #include "machine/c64exp.h"
@@ -63,7 +64,7 @@ public:
 		  m_iec_srq(1)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m6510_device> m_maincpu;
 	required_device<pls100_device> m_pla;
 	required_device<mos6566_device> m_vic;
 	required_device<sid6581_device> m_sid;

@@ -125,13 +125,6 @@ CPU_DISASSEMBLE( konami );
 CPU_DISASSEMBLE( lh5801 );
 CPU_DISASSEMBLE( lr35902 );
 CPU_DISASSEMBLE( m37710_generic );
-CPU_DISASSEMBLE( m6502 );
-CPU_DISASSEMBLE( m65sc02 );
-CPU_DISASSEMBLE( m65c02 );
-CPU_DISASSEMBLE( m65ce02 );
-CPU_DISASSEMBLE( m6510 );
-CPU_DISASSEMBLE( deco16 );
-CPU_DISASSEMBLE( m4510 );
 CPU_DISASSEMBLE( m6800 );
 CPU_DISASSEMBLE( m6801 );
 CPU_DISASSEMBLE( m6802 );
@@ -254,13 +247,6 @@ static const dasm_table_entry dasm_table[] =
 	{ "lh5801",     _8bit,  0, CPU_DISASSEMBLE_NAME(lh5801) },
 	{ "lr35902",    _8bit,  0, CPU_DISASSEMBLE_NAME(lr35902) },
 	{ "m37710",     _8bit,  0, CPU_DISASSEMBLE_NAME(m37710_generic) },
-	{ "m6502",      _8bit,  0, CPU_DISASSEMBLE_NAME(m6502) },
-	{ "m65sc02",    _8bit,  0, CPU_DISASSEMBLE_NAME(m65sc02) },
-	{ "m65c02",     _8bit,  0, CPU_DISASSEMBLE_NAME(m65c02) },
-	{ "m65ce02",    _8bit,  0, CPU_DISASSEMBLE_NAME(m65ce02) },
-	{ "m6510",      _8bit,  0, CPU_DISASSEMBLE_NAME(m6510) },
-	{ "deco16",     _8bit,  0, CPU_DISASSEMBLE_NAME(deco16) },
-	{ "m4510",      _8bit,  0, CPU_DISASSEMBLE_NAME(m4510) },
 	{ "m6800",      _8bit,  0, CPU_DISASSEMBLE_NAME(m6800) },
 	{ "m6801",      _8bit,  0, CPU_DISASSEMBLE_NAME(m6801) },
 	{ "m6802",      _8bit,  0, CPU_DISASSEMBLE_NAME(m6802) },

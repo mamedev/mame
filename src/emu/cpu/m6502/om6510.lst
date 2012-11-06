@@ -1,0 +1,46 @@
+# 6510 undocumented instructions in a C64 context
+anc_10_imm
+	TMP2 = read_pc();
+	A &= TMP2;
+	set_nz(A);
+	if(A & 0x80)
+		P |= F_C;
+	else
+		P &= ~F_C;
+	prefetch();
+
+ane_10_imm
+	TMP2 = read_pc();
+	A = (A | 0xee) & TMP2 & X;
+	set_nz(A);
+	prefetch();
+
+asr_10_imm
+	TMP2 = read_pc();
+	A = do_lsr(A & TMP2);
+	set_nz(A);
+	prefetch();
+
+arr_10_imm
+	TMP2 = read_pc();
+	A &= TMP2;
+	do_arr();
+	prefetch();
+
+las_10_aby
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	if(page_changing(TMP, Y)) {
+		read(set_l(TMP, TMP+Y));
+	}
+	TMP2 = read(TMP+Y);
+	A = X = TMP2 & SP;
+	SP = set_l(SP, A);
+	set_nz(A);
+	prefetch();
+
+lxa_10_imm
+	TMP2 = read_pc();
+	A = X = (A | 0xee) & TMP2;
+	set_nz(A);
+	prefetch();

@@ -713,17 +713,6 @@ WRITE8_MEMBER( c64_state::cpu_w )
 	m_cassette->motor_w(BIT(data, 5));
 }
 
-static M6510_INTERFACE( cpu_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(c64_state, cpu_r),
-	DEVCB_DRIVER_MEMBER(c64_state, cpu_w),
-	0x17,
-	0x20
-};
-
-
 //-------------------------------------------------
 //  M6510_INTERFACE( sx64_cpu_intf )
 //-------------------------------------------------
@@ -767,17 +756,6 @@ WRITE8_MEMBER( sx64_state::cpu_w )
 	m_charen = BIT(data, 2);
 }
 
-static M6510_INTERFACE( sx64_cpu_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(sx64_state, cpu_r),
-	DEVCB_DRIVER_MEMBER(sx64_state, cpu_w),
-	0x07,
-	0x00
-};
-
-
 //-------------------------------------------------
 //  M6510_INTERFACE( c64gs_cpu_intf )
 //-------------------------------------------------
@@ -820,17 +798,6 @@ WRITE8_MEMBER( c64gs_state::cpu_w )
 	m_hiram = BIT(data, 1);
 	m_charen = BIT(data, 2);
 }
-
-static M6510_INTERFACE( c64gs_cpu_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(c64gs_state, cpu_r),
-	DEVCB_DRIVER_MEMBER(c64gs_state, cpu_w),
-	0x07,
-	0x00
-};
-
 
 //-------------------------------------------------
 //  PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
@@ -1042,7 +1009,8 @@ static MACHINE_CONFIG_START( ntsc, c64_state )
 	// basic hardware
 	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6567_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
-	MCFG_CPU_CONFIG(cpu_intf)
+	MCFG_M6510_PORT_CALLBACKS(READ8(c64_state, cpu_r), WRITE8(c64_state, cpu_w))
+	MCFG_M6510_PORT_PULLS(0x17, 0xc8)
 	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, c64_state, frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
@@ -1101,7 +1069,8 @@ static MACHINE_CONFIG_START( ntsc_sx, sx64_state )
 
 	// basic hardware
 	MCFG_CPU_MODIFY(M6510_TAG)
-	MCFG_CPU_CONFIG(sx64_cpu_intf)
+	MCFG_M6510_PORT_CALLBACKS(READ8(sx64_state, cpu_r), WRITE8(sx64_state, cpu_w))
+	MCFG_M6510_PORT_PULLS(0x07, 0xc0)
 
 	// devices
 	MCFG_DEVICE_REMOVE("iec8")
@@ -1141,7 +1110,8 @@ static MACHINE_CONFIG_START( pal, c64_state )
 	// basic hardware
 	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6569_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
-	MCFG_CPU_CONFIG(cpu_intf)
+	MCFG_M6510_PORT_CALLBACKS(READ8(c64_state, cpu_r), WRITE8(c64_state, cpu_w))
+	MCFG_M6510_PORT_PULLS(0x17, 0xc8)
 	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, c64_state, frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
@@ -1191,7 +1161,8 @@ static MACHINE_CONFIG_START( pal_sx, sx64_state )
 
 	// basic hardware
 	MCFG_CPU_MODIFY(M6510_TAG)
-	MCFG_CPU_CONFIG(sx64_cpu_intf)
+	MCFG_M6510_PORT_CALLBACKS(READ8(sx64_state, cpu_r), WRITE8(sx64_state, cpu_w))
+	MCFG_M6510_PORT_PULLS(0x07, 0xc0)
 
 	// devices
 	MCFG_DEVICE_REMOVE("iec8")
@@ -1218,7 +1189,9 @@ static MACHINE_CONFIG_START( pal_gs, c64gs_state )
 	// basic hardware
 	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6569_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(c64_mem)
-	MCFG_CPU_CONFIG(c64gs_cpu_intf)
+	MCFG_M6510_PORT_CALLBACKS(READ8(c64gs_state, cpu_r), WRITE8(c64gs_state, cpu_w))
+	MCFG_M6510_PORT_PULLS(0x07, 0xc0)
+
 	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, c64_state, frame_interrupt)
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 

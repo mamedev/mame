@@ -15,6 +15,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m6504.h"
 #include "imagedev/flopdrv.h"
 #include "formats/d64_dsk.h"
 #include "formats/g64_dsk.h"
@@ -97,8 +98,8 @@ protected:
 	inline void mpi_step_motor(int unit, int stp);
 	inline void initialize(int drives);
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_fdccpu;
+	required_device<m6502_device> m_maincpu;
+	required_device<m6504_device> m_fdccpu;
 	required_device<riot6532_device> m_riot0;
 	required_device<riot6532_device> m_riot1;
 	required_device<device_t> m_miot;

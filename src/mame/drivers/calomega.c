@@ -645,6 +645,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65c02.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"

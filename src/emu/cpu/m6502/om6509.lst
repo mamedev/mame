@@ -1,0 +1,20 @@
+# 6509 opcodes
+
+lda_9_idy
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read(TMP2+1));
+	if(page_changing(TMP, Y)) {
+		read_9(set_l(TMP, TMP+Y));
+	}
+	A = read_9(TMP+Y);
+	set_nz(A);
+	prefetch();
+
+sta_9_idy
+	TMP2 = read_pc();
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read(TMP2+1));
+	read_9(set_l(TMP, TMP+Y));
+	write_9(TMP+Y, A);
+	prefetch();

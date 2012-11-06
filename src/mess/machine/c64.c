@@ -15,7 +15,7 @@
 
 #include "emu.h"
 
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m6510.h"
 #include "cpu/z80/z80.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
@@ -159,7 +159,7 @@ static void c64_bankswitch( running_machine &machine, int reset )
 	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
 	int loram, hiram, charen;
 	int ultimax_mode = 0;
-	int data = m6510_get_port(machine.device<legacy_cpu_device>("maincpu")) & 0x07;
+	int data = machine.device<m6510_device>("maincpu")->get_port() & 0x07;
 
 	/* Are we in Ultimax mode? */
 	if (!state->m_game && state->m_exrom)

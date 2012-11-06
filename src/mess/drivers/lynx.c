@@ -7,7 +7,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65sc02.h"
 #include "includes/lynx.h"
 
 #include "imagedev/snapquik.h"

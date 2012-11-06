@@ -14,7 +14,7 @@
 
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m6510t.h"
 #include "imagedev/flopdrv.h"
 #include "formats/d64_dsk.h"
 #include "formats/g64_dsk.h"
@@ -84,7 +84,7 @@ protected:
 private:
 	bool tpi1_selected(offs_t offset);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m6510t_device> m_maincpu;
 	required_device<device_t> m_tpi0;
 	required_device<device_t> m_tpi1;
 	required_device<c64h156_device> m_ga;

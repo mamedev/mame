@@ -45,7 +45,7 @@ OSC @ 72.576MHz
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65sc02.h"
 
 
 class cmmb_state : public driver_device

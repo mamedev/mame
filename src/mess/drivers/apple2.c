@@ -183,6 +183,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65c02.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/flopdrv.h"
 #include "imagedev/cassette.h"

@@ -1003,36 +1003,144 @@ $(CPUOBJ)/m37710/m7700ds.o:		$(CPUSRC)/m37710/m7700ds.c \
 
 ifneq ($(filter M6502,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/m6502
-CPUOBJS += $(CPUOBJ)/m6502/m6502.o
-CPUOBJS += $(CPUOBJ)/m6502/m6509.o
-CPUOBJS += $(CPUOBJ)/m6502/m65ce02.o
-CPUOBJS += $(CPUOBJ)/m6502/m4510.o
-DASMOBJS += $(CPUOBJ)/m6502/6502dasm.o
+CPUOBJS += $(CPUOBJ)/m6502/deco16.o \
+           $(CPUOBJ)/m6502/m4510.o \
+           $(CPUOBJ)/m6502/m6502.o \
+           $(CPUOBJ)/m6502/m65c02.o \
+           $(CPUOBJ)/m6502/m65ce02.o \
+           $(CPUOBJ)/m6502/m65sc02.o \
+           $(CPUOBJ)/m6502/m6504.o \
+           $(CPUOBJ)/m6502/m6509.o \
+           $(CPUOBJ)/m6502/m6510.o \
+           $(CPUOBJ)/m6502/m6510t.o \
+           $(CPUOBJ)/m6502/m7501.o \
+           $(CPUOBJ)/m6502/m8502.o \
+           $(CPUOBJ)/m6502/n2a03.o \
+           $(CPUOBJ)/m6502/r65c02.o
+DASMOBJS +=
+M6502MAKE += $(BUILDOUT)/m6502make$(BUILD_EXE)
 endif
 
+$(CPUOBJ)/m6502/deco16.o:	$(CPUSRC)/m6502/deco16.c \
+							$(CPUOBJ)/m6502/deco16.inc \
+							$(CPUSRC)/m6502/deco16.h \
+							$(CPUSRC)/m6502/m6502.h
+
 $(CPUOBJ)/m6502/m4510.o:	$(CPUSRC)/m6502/m4510.c \
-							$(CPUSRC)/m6502/t65ce02.c
+							$(CPUOBJ)/m6502/m4510.inc \
+							$(CPUSRC)/m6502/m4510.h \
+							$(CPUSRC)/m6502/m65ce02.h \
+							$(CPUSRC)/m6502/m65c02.h \
+							$(CPUSRC)/m6502/m6502.h
 
 $(CPUOBJ)/m6502/m6502.o:	$(CPUSRC)/m6502/m6502.c \
-							$(CPUSRC)/m6502/m6502.h \
-							$(CPUSRC)/m6502/ops02.h \
-							$(CPUSRC)/m6502/t6502.c \
-							$(CPUSRC)/m6502/t65c02.c \
-							$(CPUSRC)/m6502/t65sc02.c \
-							$(CPUSRC)/m6502/t6510.c \
-							$(CPUSRC)/m6502/tn2a03.c \
-							$(CPUSRC)/m6502/tdeco16.c
+							$(CPUOBJ)/m6502/m6502.inc \
+							$(CPUSRC)/m6502/m6502.h
+
+$(CPUOBJ)/m6502/m65c02.o:	$(CPUSRC)/m6502/m65c02.c \
+							$(CPUOBJ)/m6502/m65c02.inc \
+							$(CPUSRC)/m6502/m65c02.h \
+							$(CPUSRC)/m6502/m6502.h
 
 $(CPUOBJ)/m6502/m65ce02.o:	$(CPUSRC)/m6502/m65ce02.c \
+							$(CPUOBJ)/m6502/m65ce02.inc \
 							$(CPUSRC)/m6502/m65ce02.h \
-							$(CPUSRC)/m6502/opsce02.h \
-							$(CPUSRC)/m6502/t65ce02.c
+							$(CPUSRC)/m6502/m65c02.h \
+							$(CPUSRC)/m6502/m6502.h
+
+$(CPUOBJ)/m6502/m65sc02.o:	$(CPUSRC)/m6502/m65sc02.c \
+							$(CPUSRC)/m6502/m65sc02.h \
+							$(CPUSRC)/m6502/r65c02.h \
+							$(CPUSRC)/m6502/m65c02.h \
+							$(CPUSRC)/m6502/m6502.h
+
+$(CPUOBJ)/m6502/m6504.o:	$(CPUSRC)/m6502/m6504.c \
+							$(CPUSRC)/m6502/m6504.h \
+							$(CPUSRC)/m6502/m6502.h
 
 $(CPUOBJ)/m6502/m6509.o:	$(CPUSRC)/m6502/m6509.c \
-							$(CPUSRC)/m6502/m6509.h \
-							$(CPUSRC)/m6502/ops09.h \
-							$(CPUSRC)/m6502/t6509.c
+							$(CPUOBJ)/m6502/m6509.inc \
+							$(CPUSRC)/m6502/m6509.h
 
+$(CPUOBJ)/m6502/m6510.o:	$(CPUSRC)/m6502/m6510.c \
+							$(CPUOBJ)/m6502/m6510.inc \
+							$(CPUSRC)/m6502/m6510.h \
+							$(CPUSRC)/m6502/m6502.h
+
+$(CPUOBJ)/m6502/m6510t.o:	$(CPUSRC)/m6502/m6510t.c \
+							$(CPUSRC)/m6502/m6510t.h \
+							$(CPUSRC)/m6502/m6510.h \
+							$(CPUSRC)/m6502/m6502.h
+
+$(CPUOBJ)/m6502/m7501.o:	$(CPUSRC)/m6502/m7501.c \
+							$(CPUSRC)/m6502/m7501.h \
+							$(CPUSRC)/m6502/m6510.h \
+							$(CPUSRC)/m6502/m6502.h
+
+$(CPUOBJ)/m6502/m8502.o:	$(CPUSRC)/m6502/m8502.c \
+							$(CPUSRC)/m6502/m8502.h \
+							$(CPUSRC)/m6502/m6510.h \
+							$(CPUSRC)/m6502/m6502.h
+
+$(CPUOBJ)/m6502/n2a03.o:	$(CPUSRC)/m6502/n2a03.c \
+							$(CPUOBJ)/m6502/n2a03.inc \
+							$(CPUSRC)/m6502/n2a03.h \
+							$(CPUSRC)/m6502/m6502.h
+
+$(CPUOBJ)/m6502/r65c02.o:	$(CPUSRC)/m6502/r65c02.c \
+							$(CPUOBJ)/m6502/r65c02.inc \
+							$(CPUSRC)/m6502/r65c02.h \
+							$(CPUSRC)/m6502/m65c02.h \
+							$(CPUSRC)/m6502/m6502.h
+
+# rule to generate the C files
+$(CPUOBJ)/m6502/deco16.inc: $(M6502MAKE) $(CPUSRC)/m6502/odeco16.lst $(CPUSRC)/m6502/ddeco16.lst
+	@echo Generating DECO16 source file...
+	$(M6502MAKE) deco16_device $(CPUSRC)/m6502/odeco16.lst $(CPUSRC)/m6502/ddeco16.lst $@
+
+$(CPUOBJ)/m6502/m4510.inc: $(M6502MAKE) $(CPUSRC)/m6502/om4510.lst $(CPUSRC)/m6502/dm4510.lst
+	@echo Generating M4510 source file...
+	$(M6502MAKE) m4510_device $(CPUSRC)/m6502/om4510.lst $(CPUSRC)/m6502/dm4510.lst $@
+
+$(CPUOBJ)/m6502/m6502.inc: $(M6502MAKE) $(CPUSRC)/m6502/om6502.lst $(CPUSRC)/m6502/dm6502.lst
+	@echo Generating M6502 source file...
+	$(M6502MAKE) m6502_device $(CPUSRC)/m6502/om6502.lst $(CPUSRC)/m6502/dm6502.lst $@
+
+$(CPUOBJ)/m6502/m65c02.inc: $(M6502MAKE) $(CPUSRC)/m6502/om65c02.lst $(CPUSRC)/m6502/dm65c02.lst
+	@echo Generating M65C02 source file...
+	$(M6502MAKE) m65c02_device $(CPUSRC)/m6502/om65c02.lst $(CPUSRC)/m6502/dm65c02.lst $@
+
+$(CPUOBJ)/m6502/m65ce02.inc: $(M6502MAKE) $(CPUSRC)/m6502/om65ce02.lst $(CPUSRC)/m6502/dm65ce02.lst
+	@echo Generating M65CE02 source file...
+	$(M6502MAKE) m65ce02_device $(CPUSRC)/m6502/om65ce02.lst $(CPUSRC)/m6502/dm65ce02.lst $@
+
+$(CPUOBJ)/m6502/m6509.inc: $(M6502MAKE) $(CPUSRC)/m6502/om6509.lst $(CPUSRC)/m6502/dm6509.lst
+	@echo Generating M6509 source file...
+	$(M6502MAKE) m6509_device $(CPUSRC)/m6502/om6509.lst $(CPUSRC)/m6502/dm6509.lst $@
+
+$(CPUOBJ)/m6502/m6510.inc: $(M6502MAKE) $(CPUSRC)/m6502/om6510.lst $(CPUSRC)/m6502/dm6510.lst
+	@echo Generating M6510 source file...
+	$(M6502MAKE) m6510_device $(CPUSRC)/m6502/om6510.lst $(CPUSRC)/m6502/dm6510.lst $@
+
+$(CPUOBJ)/m6502/n2a03.inc: $(M6502MAKE) $(CPUSRC)/m6502/on2a03.lst $(CPUSRC)/m6502/dn2a03.lst
+	@echo Generating N2A03 source file...
+	$(M6502MAKE) n2a03_device $(CPUSRC)/m6502/on2a03.lst $(CPUSRC)/m6502/dn2a03.lst $@
+
+$(CPUOBJ)/m6502/r65c02.inc: $(M6502MAKE) $(CPUSRC)/m6502/dr65c02.lst
+	@echo Generating R65C02 source file...
+	$(M6502MAKE) r65c02_device - $(CPUSRC)/m6502/dr65c02.lst $@
+
+
+# rule to build the generator
+ifneq ($(CROSS_BUILD),1)
+
+BUILD += $(M6502MAKE)
+
+$(M6502MAKE): $(CPUOBJ)/m6502/m6502make.o
+	@echo Linking $@...
+	$(LD) $(LDFLAGS) $(OSDBGLDFLAGS) $^ -o $@
+
+endif
 
 
 #-------------------------------------------------
@@ -1203,7 +1311,7 @@ $(CPUOBJ)/dsp56k/tables.o:	$(CPUSRC)/dsp56k/tables.c \
 $(CPUOBJ)/dsp56k/dsp56dsm.o:	$(CPUSRC)/dsp56k/opcode.c \
 								$(CPUSRC)/dsp56k/opcode.h \
 								$(CPUSRC)/dsp56k/inst.c \
-    							$(CPUSRC)/dsp56k/inst.h \
+								$(CPUSRC)/dsp56k/inst.h \
 								$(CPUSRC)/dsp56k/pmove.c \
 								$(CPUSRC)/dsp56k/pmove.h \
 								$(CPUSRC)/dsp56k/tables.c \

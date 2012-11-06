@@ -7,7 +7,7 @@
 #include "emu.h"
 #include "includes/cbm.h"
 #include "formats/cbm_snqk.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m6510.h"
 #include "imagedev/cartslot.h"
 #include "machine/6522via.h"
 #include "machine/cbmiec.h"
@@ -48,7 +48,7 @@ public:
 		  m_color_ram(*this, "color_ram")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m6510_device> m_maincpu;
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	required_device<mos6560_device> m_vic;

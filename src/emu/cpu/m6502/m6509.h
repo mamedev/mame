@@ -1,44 +1,111 @@
-/*****************************************************************************
- *
- *   m6509.h
- *   Portable 6509 emulator V1.0beta
- *
- *   Copyright Peter Trauner, all rights reserved.
- *
- *   - This source code is released as freeware for non-commercial purposes.
- *   - You are free to use and redistribute this code in modified or
- *     unmodified form, provided you list me in the credits.
- *   - If you modify this source code, you must add a notice to each modified
- *     source file that it has been changed.  If you're a nice person, you
- *     will clearly mark each change too.  :)
- *   - If you wish to use this for commercial purposes, please contact me at
- *     pullmoll@t-online.de
- *   - The author of this copywritten work reserves the right to change the
- *     terms of its usage and license at any time, including retroactively
- *   - This entire notice must remain in the source code.
- *
- *****************************************************************************/
+/***************************************************************************
 
-#pragma once
+    m6509.h
+
+    6502 with banking and extended address bus
+
+****************************************************************************
+
+    Copyright Olivier Galibert
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY OLIVIER GALIBERT ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+***************************************************************************/
 
 #ifndef __M6509_H__
-#define _M6509_H
+#define __M6509_H__
 
 #include "m6502.h"
 
-enum
-{
-	M6509_PC=1, M6509_S, M6509_P, M6509_A, M6509_X, M6509_Y,
-	M6509_EA, M6509_ZP, M6509_NMI_STATE, M6509_IRQ_STATE, M6509_SO_STATE,
-	M6509_PC_BANK, M6509_IND_BANK
+class m6509_device : public m6502_device {
+public:
+	m6509_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	static const disasm_entry disasm_entries[0x100];
+
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+	virtual void do_exec_full();
+	virtual void do_exec_partial();
+
+protected:
+	class mi_6509_normal : public memory_interface {
+	public:
+		m6509_device *base;
+
+		mi_6509_normal(m6509_device *base);
+		virtual UINT8 read(UINT16 adr);
+		virtual UINT8 read_9(UINT16 adr);
+		virtual UINT8 read_direct(UINT16 adr);
+		virtual UINT8 read_decrypted(UINT16 adr);
+		virtual void write(UINT16 adr, UINT8 val);
+		virtual void write_9(UINT16 adr, UINT8 val);
+	};
+
+	class mi_6509_nd : public mi_6509_normal {
+	public:
+		mi_6509_nd(m6509_device *base);
+		virtual UINT8 read_direct(UINT16 adr);
+		virtual UINT8 read_decrypted(UINT16 adr);
+	};
+
+	virtual void device_start();
+	virtual void device_reset();
+
+	UINT8 bank_i, bank_y;
+
+	UINT8 bank_i_r() { return bank_i; }
+	UINT8 bank_y_r() { return bank_y; }
+	void bank_i_w(UINT8 data) { bank_i = data; }
+	void bank_y_w(UINT8 data) { bank_y = data; }
+
+	UINT32 adr_in_bank_i(UINT16 adr) { return adr | ((bank_i & 0xf) << 16); }
+	UINT32 adr_in_bank_y(UINT16 adr) { return adr | ((bank_y & 0xf) << 16); }
+
+#define O(o) void o ## _full(); void o ## _partial()
+
+	// 6509 opcodes
+	O(lda_9_idy);
+	O(sta_9_idy);
+
+#undef O
 };
 
-#define M6509_IRQ_LINE					M6502_IRQ_LINE
-/* use cpudevice->execute().set_input_line(M6509_SET_OVERFLOW, level)
-   to change level of the so input line
-   positiv edge sets overflow flag */
-#define M6509_SET_OVERFLOW 3
+enum {
+	M6509_IRQ_LINE = m6502_device::IRQ_LINE,
+	M6509_NMI_LINE = m6502_device::NMI_LINE,
+	M6509_SET_OVERFLOW = m6502_device::V_LINE,
+};
 
-DECLARE_LEGACY_CPU_DEVICE(M6509, m6509);
+enum {
+	M6509_BI = M6502_IR+1,
+	M6509_BY
+};
 
-#endif /* __M6509_H__ */
+extern const device_type M6509;
+
+#endif

@@ -138,7 +138,7 @@ Changes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/n2a03.h"
 #include "rendlay.h"
 #include "video/ppu2c0x.h"
 #include "machine/rp5h01.h"

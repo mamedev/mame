@@ -6,6 +6,8 @@
 #include "emu.h"
 #include "formats/cbm_snqk.h"
 #include "includes/cbm.h"
+#include "cpu/m6502/m8502.h"
+#include "machine/6526cia.h"
 #include "machine/c64exp.h"
 #include "machine/c64user.h"
 #include "machine/cbmiec.h"
@@ -88,7 +90,7 @@ public:
 	{ }
 
 	required_device<legacy_cpu_device> m_maincpu;
-	required_device<legacy_cpu_device> m_subcpu;
+	required_device<m8502_device> m_subcpu;
 	required_device<mos8722_device> m_mmu;
 	required_device<mos8721_device> m_pla;
 	required_device<mos8563_device> m_vdc;
