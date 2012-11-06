@@ -872,7 +872,7 @@
 		</part>
 	</software>
 
-	<software name="tdos458" clonef="tdos45">
+	<software name="tdos458" cloneof="tdos45">
 		<description>TDOS (v4.58)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1219,7 +1219,7 @@
 			</dataarea>
 		</part>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="ann122006-2.dsk" size="163840" crc="d87a18f3" sha1="62a24bac7e144cfb6af1067cabd136a01c7b59e5" offset="0" />
 			</dataarea>
