@@ -129,6 +129,7 @@
 
     - Harakiri
     - Kaseijin (app) (code snippet is empty at some point)
+    - Lamia: fails to create an user disk (after character creation) -> disk write error
     * MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
     * Mugen Senshi Valis (at Telenet logo, it also appears to have a nasty copy protection when taking a specific item (untested))
     - Mr. Pro Yakyuu
