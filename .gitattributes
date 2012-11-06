@@ -6050,6 +6050,7 @@ src/mess/drivers/tmc600.c svneol=native#text/plain
 src/mess/drivers/tricep.c svneol=native#text/plain
 src/mess/drivers/trs80.c svneol=native#text/plain
 src/mess/drivers/trs80m2.c svneol=native#text/plain
+src/mess/drivers/ts802.c svneol=native#text/plain
 src/mess/drivers/tsispch.c svneol=native#text/plain
 src/mess/drivers/tutor.c svneol=native#text/plain
 src/mess/drivers/tvc.c svneol=native#text/plain
