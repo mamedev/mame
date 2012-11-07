@@ -5,7 +5,7 @@
 
 	<software name="basic">
 		<description>PX-4 BASIC</description>
-		<year>198x</year>
+		<year>198?</year>
 		<publisher>EPSON</publisher>
 		<part name="cart" interface="px4_cart">
 			<dataarea name="rom" size="32768">
@@ -16,7 +16,7 @@
 
 	<software name="utils">
 		<description>PX-4 Utilities</description>
-		<year>198x</year>
+		<year>198?</year>
 		<publisher>EPSON</publisher>
 		<part name="cart" interface="px4_cart">
 			<dataarea name="rom" size="32768">
