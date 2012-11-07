@@ -646,18 +646,18 @@ Missing files come here
 		</part>
 	</software>
 
-	<software name="Btpscl55">
+	<software name="btpscl55">
 		<description>Borland Turbo Pascal 5.5</description>
 		<year>1989</year>
 		<publisher>Borland</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="disk1 - Install.img" size="737280" crc="83431db5" sha1="837a34064742c1c5f2667d9b797ea8b4f1b75899" offset="0" />
+				<rom name="disk1 - install.img" size="737280" crc="83431db5" sha1="837a34064742c1c5f2667d9b797ea8b4f1b75899" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
-				<rom name="disk2 - Oop Demos.img" size="737280" crc="a18c3bab" sha1="4ce0876c0943e7de4d6524c52ef4ffb6259ec4dd" offset="0" />
+				<rom name="disk2 - oop demos.img" size="737280" crc="a18c3bab" sha1="4ce0876c0943e7de4d6524c52ef4ffb6259ec4dd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -727,7 +727,7 @@ Missing files come here
 		<publisher>Microprose</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="Cyberstrike (1994) (Microprose).img" size="1474560" crc="d10eeefd" sha1="2d33e7078b9b1c83fbc223d26c7fbbc53e0406a1" offset="0" />
+				<rom name="cyberstrike (1994) (microprose).img" size="1474560" crc="d10eeefd" sha1="2d33e7078b9b1c83fbc223d26c7fbbc53e0406a1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
