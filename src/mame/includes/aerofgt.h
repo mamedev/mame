@@ -52,6 +52,9 @@ public:
 	int       m_spikes91_lookup;
 	UINT32 aerofgt_tile_callback( UINT32 code );
 
+	UINT32 aerofgt_old_tile_callback( UINT32 code );
+	UINT32 aerofgt_ol2_tile_callback( UINT32 code );
+
 	/* misc */
 	int       m_pending_command;
 

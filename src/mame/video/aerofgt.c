@@ -119,8 +119,6 @@ VIDEO_START_MEMBER(aerofgt_state,karatblz)
 
 VIDEO_START_MEMBER(aerofgt_state,spinlbrk)
 {
-	int i;
-
 	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::spinlbrk_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(aerofgt_state::karatblz_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
@@ -133,14 +131,6 @@ VIDEO_START_MEMBER(aerofgt_state,spinlbrk)
 
 	/* enemy sprites use ROM instead of RAM */
 	m_spriteram2.set_target(reinterpret_cast<UINT16 *>(memregion("gfx5")->base()), 0x20000);
-
-	/* front sprites are direct maps */
-	m_spriteram1.set_target(m_spriteram2 + m_spriteram2.bytes() / 2, 0x4000);
-
-	for (i = 0; i < m_spriteram1.bytes() / 2; i++)
-	{
-		m_spriteram1[i] = i;
-	}
 
 	aerofgt_register_state_globals(machine());
 }
@@ -159,7 +149,7 @@ VIDEO_START_MEMBER(aerofgt_state,turbofrc)
 }
 
 
-
+/* new hw type */
 UINT32 aerofgt_state::aerofgt_tile_callback( UINT32 code )
 {
 	return m_spriteram1[code&0x7fff];
@@ -167,6 +157,17 @@ UINT32 aerofgt_state::aerofgt_tile_callback( UINT32 code )
 
 
 
+
+/* old hw type */
+UINT32 aerofgt_state::aerofgt_old_tile_callback( UINT32 code )
+{
+	return m_spriteram1[code % (m_spriteram1.bytes()/2)];
+}
+
+UINT32 aerofgt_state::aerofgt_ol2_tile_callback( UINT32 code )
+{
+	return m_spriteram2[code % (m_spriteram2.bytes()/2)];
+}
 
 
 
@@ -303,8 +304,8 @@ UINT32 aerofgt_state::screen_update_pspikes(screen_device &screen, bitmap_ind16 
 	machine().priority_bitmap.fill(0, cliprect);
 
 	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_spriteram1,m_spriteram1.bytes(),m_sprite_gfx,m_spritepalettebank, machine(), bitmap, cliprect, -1);
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_spriteram1,m_spriteram1.bytes(),m_sprite_gfx,m_spritepalettebank, machine(), bitmap, cliprect, 0);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_sprite_gfx,m_spritepalettebank, machine(), bitmap, cliprect, -1);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_sprite_gfx,m_spritepalettebank, machine(), bitmap, cliprect, 0);
 	return 0;
 }
 
@@ -322,11 +323,11 @@ UINT32 aerofgt_state::screen_update_karatblz(screen_device &screen, bitmap_ind16
 	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* we use the priority buffer so sprites are drawn front to back */
-	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spriteram2,m_spriteram2.bytes(),m_sprite_gfx+1,m_spritepalettebank, machine(), bitmap, cliprect, -1);
-	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spriteram2,m_spriteram2.bytes(),m_sprite_gfx+1,m_spritepalettebank, machine(), bitmap, cliprect, 0);
+	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_sprite_gfx+1,m_spritepalettebank, machine(), bitmap, cliprect, -1);
+	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_sprite_gfx+1,m_spritepalettebank, machine(), bitmap, cliprect, 0);
 
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spriteram1,m_spriteram1.bytes(),m_sprite_gfx+0,m_spritepalettebank, machine(), bitmap, cliprect, -1);
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spriteram1,m_spriteram1.bytes(),m_sprite_gfx+0,m_spritepalettebank, machine(), bitmap, cliprect, 0);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_sprite_gfx+0,m_spritepalettebank, machine(), bitmap, cliprect, -1);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_sprite_gfx+0,m_spritepalettebank, machine(), bitmap, cliprect, 0);
 	return 0;
 }
 
@@ -348,11 +349,11 @@ UINT32 aerofgt_state::screen_update_spinlbrk(screen_device &screen, bitmap_ind16
 	m_bg2_tilemap->draw(bitmap, cliprect, 0, 1);
 
 	/* we use the priority buffer so sprites are drawn front to back */
-	m_spr_old->spinlbrk_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spriteram1,m_spriteram1.bytes(),m_sprite_gfx+0,m_spritepalettebank, machine(), bitmap, cliprect, 0);
-	m_spr_old->spinlbrk_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spriteram1,m_spriteram1.bytes(),m_sprite_gfx+0,m_spritepalettebank, machine(), bitmap, cliprect, -1);
+	m_spr_old->spinlbrk_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_sprite_gfx+0,m_spritepalettebank, machine(), bitmap, cliprect, 0);
+	m_spr_old->spinlbrk_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_sprite_gfx+0,m_spritepalettebank, machine(), bitmap, cliprect, -1);
 
-	m_spr_old2->spinlbrk_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spriteram2,m_spriteram2.bytes(),m_sprite_gfx+1,m_spritepalettebank, machine(), bitmap, cliprect, 0);
-	m_spr_old2->spinlbrk_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spriteram2,m_spriteram2.bytes(),m_sprite_gfx+1,m_spritepalettebank, machine(), bitmap, cliprect, -1);
+	m_spr_old2->spinlbrk_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_sprite_gfx+1,m_spritepalettebank, machine(), bitmap, cliprect, 0);
+	m_spr_old2->spinlbrk_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_sprite_gfx+1,m_spritepalettebank, machine(), bitmap, cliprect, -1);
 	return 0;
 }
 
@@ -375,11 +376,11 @@ UINT32 aerofgt_state::screen_update_turbofrc(screen_device &screen, bitmap_ind16
 	m_bg2_tilemap->draw(bitmap, cliprect, 0, 1);
 
 	/* we use the priority buffer so sprites are drawn front to back */
-	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spriteram2,m_spriteram2.bytes(),m_sprite_gfx+1,m_spritepalettebank, machine(), bitmap, cliprect, -1); //enemy
-	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_spriteram2,m_spriteram2.bytes(),m_sprite_gfx+1,m_spritepalettebank, machine(), bitmap, cliprect, 0); //enemy
+	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_sprite_gfx+1,m_spritepalettebank, machine(), bitmap, cliprect, -1); //enemy
+	m_spr_old2->turbofrc_draw_sprites(m_spriteram3+0x200,m_spriteram3.bytes()/2,m_sprite_gfx+1,m_spritepalettebank, machine(), bitmap, cliprect, 0); //enemy
 
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spriteram1,m_spriteram1.bytes(),m_sprite_gfx+0,m_spritepalettebank, machine(), bitmap, cliprect, -1); //ship
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_spriteram1,m_spriteram1.bytes(),m_sprite_gfx+0,m_spritepalettebank, machine(), bitmap, cliprect, 0); //intro
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_sprite_gfx+0,m_spritepalettebank, machine(), bitmap, cliprect, -1); //ship
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3+0x000,m_spriteram3.bytes()/2,m_sprite_gfx+0,m_spritepalettebank, machine(), bitmap, cliprect, 0); //intro
 	return 0;
 }
 
@@ -846,7 +847,7 @@ UINT32 aerofgt_state::screen_update_wbbc97(screen_device &screen, bitmap_rgb32 &
 		m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	}
 
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_spriteram1,m_spriteram1.bytes(),m_sprite_gfx,m_spritepalettebank, machine(), bitmap, cliprect, -1);
-	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_spriteram1,m_spriteram1.bytes(),m_sprite_gfx,m_spritepalettebank, machine(), bitmap, cliprect, 0);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_sprite_gfx,m_spritepalettebank, machine(), bitmap, cliprect, -1);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram3,m_spriteram3.bytes(),m_sprite_gfx,m_spritepalettebank, machine(), bitmap, cliprect, 0);
 	return 0;
 }

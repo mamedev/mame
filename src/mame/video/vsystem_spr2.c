@@ -25,13 +25,25 @@ const device_type VSYSTEM_SPR2 = &device_creator<vsystem_spr2_device>;
 vsystem_spr2_device::vsystem_spr2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VSYSTEM_SPR2, "vsystem_spr2_device", tag, owner, clock)
 {
+	m_newtilecb =  vsystem_tile2_indirection_delegate(FUNC(vsystem_spr2_device::tile_callback_noindirect), this);
 }
 
+void vsystem_spr2_device::set_tile_indirect_cb(device_t &device,vsystem_tile2_indirection_delegate newtilecb)
+{
+	vsystem_spr2_device &dev = downcast<vsystem_spr2_device &>(device);
+	dev.m_newtilecb = newtilecb;
+}
+
+UINT32 vsystem_spr2_device::tile_callback_noindirect(UINT32 tile)
+{
+	return tile;
+}
 
 
 void vsystem_spr2_device::device_start()
 {
-
+	// bind our handler
+	m_newtilecb.bind_relative_to(*owner());
 }
 
 void vsystem_spr2_device::device_reset()
@@ -66,10 +78,16 @@ int vsystem_spr2_device::get_sprite_attributes(UINT16* ram)
 	return 1;
 }
 
-
+void vsystem_spr2_device::handle_xsize_map_inc(void)
+{
+	if (curr_sprite.xsize == 2) curr_sprite.map += 1;
+	if (curr_sprite.xsize == 4) curr_sprite.map += 3;
+	if (curr_sprite.xsize == 5) curr_sprite.map += 2;
+	if (curr_sprite.xsize == 6) curr_sprite.map += 1;
+}
 
 template<class _BitmapClass>
-void vsystem_spr2_device::turbofrc_draw_sprites_common( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, int chip_disabled_pri )
+void vsystem_spr2_device::turbofrc_draw_sprites_common( UINT16* spriteram3,  int spriteram3_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, int chip_disabled_pri )
 {
 	int attr_start, base, first;
 	base = 0;//chip * 0x0200;
@@ -121,7 +139,7 @@ void vsystem_spr2_device::turbofrc_draw_sprites_common( UINT16* spriteram3,  int
 				else
 					sx = ((curr_sprite.ox + curr_sprite.zoomx * x / 2 + 16) & 0x1ff) - 16;
 
-				curr = spriteram1[curr_sprite.map % (spriteram1_bytes/2)];
+				curr = m_newtilecb(curr_sprite.map++);
 
 				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[sprite_gfx],
 							 curr,
@@ -130,26 +148,21 @@ void vsystem_spr2_device::turbofrc_draw_sprites_common( UINT16* spriteram3,  int
 							 sx,sy,
 							 curr_sprite.zoomx << 11, curr_sprite.zoomy << 11,
 							 machine.priority_bitmap,curr_sprite.pri ? 0 : 2,15);
-				curr_sprite.map++;
 			}
-
-			if (curr_sprite.xsize == 2) curr_sprite.map += 1;
-			if (curr_sprite.xsize == 4) curr_sprite.map += 3;
-			if (curr_sprite.xsize == 5) curr_sprite.map += 2;
-			if (curr_sprite.xsize == 6) curr_sprite.map += 1;
+			handle_xsize_map_inc();
 		}
 	}
 }
 
-void vsystem_spr2_device::turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip_disabled_pri )
-{ turbofrc_draw_sprites_common( spriteram3, spriteram3_bytes, spriteram1, spriteram1_bytes, sprite_gfx, spritepalettebank, machine, bitmap, cliprect, chip_disabled_pri ); }
+void vsystem_spr2_device::turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip_disabled_pri )
+{ turbofrc_draw_sprites_common( spriteram3, spriteram3_bytes, sprite_gfx, spritepalettebank, machine, bitmap, cliprect, chip_disabled_pri ); }
 
-void vsystem_spr2_device::turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int chip_disabled_pri )
-{ turbofrc_draw_sprites_common( spriteram3, spriteram3_bytes, spriteram1, spriteram1_bytes, sprite_gfx, spritepalettebank, machine, bitmap, cliprect, chip_disabled_pri ); }
+void vsystem_spr2_device::turbofrc_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int chip_disabled_pri )
+{ turbofrc_draw_sprites_common( spriteram3, spriteram3_bytes, sprite_gfx, spritepalettebank, machine, bitmap, cliprect, chip_disabled_pri ); }
 
 
 template<class _BitmapClass>
-void vsystem_spr2_device::spinlbrk_draw_sprites_common( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, int chip_disabled_pri )
+void vsystem_spr2_device::spinlbrk_draw_sprites_common( UINT16* spriteram3,  int spriteram3_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, _BitmapClass &bitmap, const rectangle &cliprect, int chip_disabled_pri )
 {
 	int attr_start, base, first;
 	base = 0;//chip * 0x0200;
@@ -199,7 +212,7 @@ void vsystem_spr2_device::spinlbrk_draw_sprites_common( UINT16* spriteram3,  int
 				else
 					sx = ((curr_sprite.ox + curr_sprite.zoomx * x / 2 + 16) & 0x1ff) - 16;
 
-				curr = spriteram1[curr_sprite.map % (spriteram1_bytes/2)];
+				curr = m_newtilecb(curr_sprite.map++);
 
 				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[sprite_gfx],
 							 curr,
@@ -208,26 +221,21 @@ void vsystem_spr2_device::spinlbrk_draw_sprites_common( UINT16* spriteram3,  int
 							 sx,sy,
 							 curr_sprite.zoomx << 11, curr_sprite.zoomy << 11,
 							 machine.priority_bitmap,curr_sprite.pri ? 2 : 0,15);
-				curr_sprite.map++;
 			}
-
-			if (curr_sprite.xsize == 2) curr_sprite.map += 1;
-			if (curr_sprite.xsize == 4) curr_sprite.map += 3;
-			if (curr_sprite.xsize == 5) curr_sprite.map += 2;
-			if (curr_sprite.xsize == 6) curr_sprite.map += 1;
+			handle_xsize_map_inc();
 		}
 	}
 }
 
-void vsystem_spr2_device::spinlbrk_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip_disabled_pri )
-{ spinlbrk_draw_sprites_common( spriteram3, spriteram3_bytes, spriteram1, spriteram1_bytes, sprite_gfx, spritepalettebank, machine, bitmap, cliprect, chip_disabled_pri ); }
+void vsystem_spr2_device::spinlbrk_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip_disabled_pri )
+{ spinlbrk_draw_sprites_common( spriteram3, spriteram3_bytes, sprite_gfx, spritepalettebank, machine, bitmap, cliprect, chip_disabled_pri ); }
 
-void vsystem_spr2_device::spinlbrk_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, UINT16* spriteram1, int spriteram1_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int chip_disabled_pri )
-{ spinlbrk_draw_sprites_common( spriteram3, spriteram3_bytes, spriteram1, spriteram1_bytes, sprite_gfx, spritepalettebank, machine, bitmap, cliprect, chip_disabled_pri ); }
+void vsystem_spr2_device::spinlbrk_draw_sprites( UINT16* spriteram3,  int spriteram3_bytes, int sprite_gfx, int spritepalettebank, running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int chip_disabled_pri )
+{ spinlbrk_draw_sprites_common( spriteram3, spriteram3_bytes, sprite_gfx, spritepalettebank, machine, bitmap, cliprect, chip_disabled_pri ); }
 
 
 
-// like above but no secondary indirection?
+
 void vsystem_spr2_device::welltris_draw_sprites( UINT16* spriteram, int spritepalettebank, running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	static const UINT8 zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
@@ -241,11 +249,8 @@ void vsystem_spr2_device::welltris_draw_sprites( UINT16* spriteram, int spritepa
 			continue;
 
 		curr_sprite.map&=0x1fff;
-		curr_sprite.ysize++;
-		curr_sprite.xsize++;
 		curr_sprite.color += (0x10 * spritepalettebank);
 
-		int zoomed = (curr_sprite.zoomx | curr_sprite.zoomy);
 		int xt, yt;
 
 
@@ -259,77 +264,61 @@ void vsystem_spr2_device::welltris_draw_sprites( UINT16* spriteram, int spritepa
 
 		/* normal case */
 		if (!curr_sprite.flipx && !curr_sprite.flipy) {
-			for (yt = 0; yt < curr_sprite.ysize; yt++) {
-				for (xt = 0; xt < curr_sprite.xsize; xt++, curr_sprite.map++) {
-					if (!zoomed)
-						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], curr_sprite.map, curr_sprite.color, 0, 0,
-								curr_sprite.ox + xt * 16, curr_sprite.oy + yt * 16, 15);
-					else
-						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], curr_sprite.map, curr_sprite.color, 0, 0,
-								curr_sprite.ox + xt * curr_sprite.zoomx, curr_sprite.oy + yt * curr_sprite.zoomy,
-								0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
+			for (yt = 0; yt <= curr_sprite.ysize; yt++) {
+				for (xt = 0; xt <= curr_sprite.xsize; xt++)
+				{
+					int curr = m_newtilecb(curr_sprite.map++);
+
+					drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], curr, curr_sprite.color, 0, 0,
+							curr_sprite.ox + xt * curr_sprite.zoomx, curr_sprite.oy + yt * curr_sprite.zoomy,
+							0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
 				}
-				if (curr_sprite.xsize == 3) curr_sprite.map += 1;
-				if (curr_sprite.xsize == 5) curr_sprite.map += 3;
-				if (curr_sprite.xsize == 6) curr_sprite.map += 2;
-				if (curr_sprite.xsize == 7) curr_sprite.map += 1;
+				handle_xsize_map_inc();
 			}
 		}
 
 		/* curr_sprite.flipxped case */
 		else if (curr_sprite.flipx && !curr_sprite.flipy) {
-			for (yt = 0; yt < curr_sprite.ysize; yt++) {
-				for (xt = 0; xt < curr_sprite.xsize; xt++, curr_sprite.map++) {
-					if (!zoomed)
-						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], curr_sprite.map, curr_sprite.color, 1, 0,
-								curr_sprite.ox + (curr_sprite.xsize - 1 - xt) * 16, curr_sprite.oy + yt * 16, 15);
-					else
-						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], curr_sprite.map, curr_sprite.color, 1, 0,
-								curr_sprite.ox + (curr_sprite.xsize - 1 - xt) * curr_sprite.zoomx, curr_sprite.oy + yt * curr_sprite.zoomy,
-								0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
+			for (yt = 0; yt <= curr_sprite.ysize; yt++) {
+				for (xt = 0; xt <= curr_sprite.xsize; xt++)
+				{
+					int curr = m_newtilecb(curr_sprite.map++);
+	
+					drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], curr, curr_sprite.color, 1, 0,
+							curr_sprite.ox + (curr_sprite.xsize - xt) * curr_sprite.zoomx, curr_sprite.oy + yt * curr_sprite.zoomy,
+							0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
 				}
-				if (curr_sprite.xsize == 3) curr_sprite.map += 1;
-				if (curr_sprite.xsize == 5) curr_sprite.map += 3;
-				if (curr_sprite.xsize == 6) curr_sprite.map += 2;
-				if (curr_sprite.xsize == 7) curr_sprite.map += 1;
+				handle_xsize_map_inc();
 			}
 		}
 
 		/* curr_sprite.flipyped case */
 		else if (!curr_sprite.flipx && curr_sprite.flipy) {
-			for (yt = 0; yt < curr_sprite.ysize; yt++) {
-				for (xt = 0; xt < curr_sprite.xsize; xt++, curr_sprite.map++) {
-					if (!zoomed)
-						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], curr_sprite.map, curr_sprite.color, 0, 1,
-								curr_sprite.ox + xt * 16, curr_sprite.oy + (curr_sprite.ysize - 1 - yt) * 16, 15);
-					else
-						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], curr_sprite.map, curr_sprite.color, 0, 1,
-								curr_sprite.ox + xt * curr_sprite.zoomx, curr_sprite.oy + (curr_sprite.ysize - 1 - yt) * curr_sprite.zoomy,
-								0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
+			for (yt = 0; yt <= curr_sprite.ysize; yt++) {
+				for (xt = 0; xt <= curr_sprite.xsize; xt++)
+				{
+					int curr = m_newtilecb(curr_sprite.map++);
+
+					drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], curr, curr_sprite.color, 0, 1,
+							curr_sprite.ox + xt * curr_sprite.zoomx, curr_sprite.oy + (curr_sprite.ysize - yt) * curr_sprite.zoomy,
+							0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
 				}
-				if (curr_sprite.xsize == 3) curr_sprite.map += 1;
-				if (curr_sprite.xsize == 5) curr_sprite.map += 3;
-				if (curr_sprite.xsize == 6) curr_sprite.map += 2;
-				if (curr_sprite.xsize == 7) curr_sprite.map += 1;
+				handle_xsize_map_inc();
 			}
 		}
 
 		/* x & curr_sprite.flipyped case */
 		else {
-			for (yt = 0; yt < curr_sprite.ysize; yt++) {
-				for (xt = 0; xt < curr_sprite.xsize; xt++, curr_sprite.map++) {
-					if (!zoomed)
-						drawgfx_transpen(bitmap, cliprect, machine.gfx[1], curr_sprite.map, curr_sprite.color, 1, 1,
-								curr_sprite.ox + (curr_sprite.xsize - 1 - xt) * 16, curr_sprite.oy + (curr_sprite.ysize - 1 - yt) * 16, 15);
-					else
-						drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], curr_sprite.map, curr_sprite.color, 1, 1,
-								curr_sprite.ox + (curr_sprite.xsize - 1 - xt) * curr_sprite.zoomx, curr_sprite.oy + (curr_sprite.ysize - 1 - yt) * curr_sprite.zoomy,
-								0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
+			for (yt = 0; yt <= curr_sprite.ysize; yt++) {
+				for (xt = 0; xt <= curr_sprite.xsize; xt++)
+				{
+					int curr = m_newtilecb(curr_sprite.map++);
+
+					drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[1], curr, curr_sprite.color, 1, 1,
+							curr_sprite.ox + (curr_sprite.xsize - xt) * curr_sprite.zoomx, curr_sprite.oy + (curr_sprite.ysize - yt) * curr_sprite.zoomy,
+							0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
 				}
-				if (curr_sprite.xsize == 3) curr_sprite.map += 1;
-				if (curr_sprite.xsize == 5) curr_sprite.map += 3;
-				if (curr_sprite.xsize == 6) curr_sprite.map += 2;
-				if (curr_sprite.xsize == 7) curr_sprite.map += 1;
+				handle_xsize_map_inc();
 			}
 		}
 	}
@@ -337,7 +326,7 @@ void vsystem_spr2_device::welltris_draw_sprites( UINT16* spriteram, int spritepa
 
 
 
-void vsystem_spr2_device::f1gp_draw_sprites( int gfxrgn, UINT16* sprvram, UINT16* sprcgram, int sprcgram_bytes, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask )
+void vsystem_spr2_device::f1gp_draw_sprites( int gfxrgn, UINT16* sprvram, running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask )
 {
 	int attr_start, first;
 	UINT16 *spram = sprvram;
@@ -372,7 +361,7 @@ void vsystem_spr2_device::f1gp_draw_sprites( int gfxrgn, UINT16* sprvram, UINT16
 				if (curr_sprite.flipx) sx = ((curr_sprite.ox + curr_sprite.zoomx * (curr_sprite.xsize - x) + 16) & 0x1ff) - 16;
 				else sx = ((curr_sprite.ox + curr_sprite.zoomx * x + 16) & 0x1ff) - 16;
 
-				curr = sprcgram[curr_sprite.map % (sprcgram_bytes / 2)];
+				curr = m_newtilecb(curr_sprite.map++);
 
 				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[gfxrgn],
 						curr,
@@ -383,13 +372,8 @@ void vsystem_spr2_device::f1gp_draw_sprites( int gfxrgn, UINT16* sprvram, UINT16
 						machine.priority_bitmap,
 //                      pri ? 0 : 0x2);
 						primask,15);
-				curr_sprite.map++;
 			}
-
-			if (curr_sprite.xsize == 2) curr_sprite.map += 1;
-			if (curr_sprite.xsize == 4) curr_sprite.map += 3;
-			if (curr_sprite.xsize == 5) curr_sprite.map += 2;
-			if (curr_sprite.xsize == 6) curr_sprite.map += 1;
+			handle_xsize_map_inc();
 		}
 	}
 }
@@ -414,8 +398,6 @@ void vsystem_spr2_device::draw_sprites_pipedrm( UINT8* spriteram, int spriteram_
 			if (!get_sprite_attributes((UINT16*)&spriteram[offs]))
 				continue;
 
-			curr_sprite.ysize++;
-			curr_sprite.xsize++;
 			curr_sprite.oy -= 6;
 			curr_sprite.ox -= 13;
 
@@ -424,7 +406,6 @@ void vsystem_spr2_device::draw_sprites_pipedrm( UINT8* spriteram, int spriteram_
 			int xt, yt;
 
 
-			int zoomed = (curr_sprite.zoomx | curr_sprite.zoomy);
 
 			/* compute the zoom factor -- stolen from aerofgt.c */
 			curr_sprite.zoomx = 16 - zoomtable[curr_sprite.zoomx] / 8;
@@ -448,57 +429,69 @@ void vsystem_spr2_device::draw_sprites_pipedrm( UINT8* spriteram, int spriteram_
 			/* normal case */
 			if (!curr_sprite.flipx && !curr_sprite.flipy)
 			{
-				for (yt = 0; yt < curr_sprite.ysize; yt++)
-					for (xt = 0; xt < curr_sprite.xsize; xt++, curr_sprite.map++)
-						if (!zoomed)
-							drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], curr_sprite.map, curr_sprite.color, 0, 0,
-									curr_sprite.ox + xt * 16, curr_sprite.oy + yt * 16, 15);
-						else
-							drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], curr_sprite.map, curr_sprite.color, 0, 0,
-									curr_sprite.ox + xt * curr_sprite.zoomx, curr_sprite.oy + yt * curr_sprite.zoomy,
-									0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
+				for (yt = 0; yt <= curr_sprite.ysize; yt++)
+				{
+					for (xt = 0; xt <= curr_sprite.xsize; xt++)
+					{
+						int curr = m_newtilecb(curr_sprite.map++);
+
+						drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], curr, curr_sprite.color, 0, 0,
+								curr_sprite.ox + xt * curr_sprite.zoomx, curr_sprite.oy + yt * curr_sprite.zoomy,
+								0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
+					}
+					handle_xsize_map_inc();
+				}
 			}
 
 			/* curr_sprite.flipxped case */
 			else if (curr_sprite.flipx && !curr_sprite.flipy)
 			{
-				for (yt = 0; yt < curr_sprite.ysize; yt++)
-					for (xt = 0; xt < curr_sprite.xsize; xt++, curr_sprite.map++)
-						if (!zoomed)
-							drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], curr_sprite.map, curr_sprite.color, 1, 0,
-									curr_sprite.ox + (curr_sprite.xsize - 1 - xt) * 16, curr_sprite.oy + yt * 16, 15);
-						else
-							drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], curr_sprite.map, curr_sprite.color, 1, 0,
-									curr_sprite.ox + (curr_sprite.xsize - 1 - xt) * curr_sprite.zoomx, curr_sprite.oy + yt * curr_sprite.zoomy,
-									0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
+				for (yt = 0; yt <= curr_sprite.ysize; yt++)
+				{
+					for (xt = 0; xt <= curr_sprite.xsize; xt++)
+					{
+						int curr = m_newtilecb(curr_sprite.map++);
+
+						drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], curr, curr_sprite.color, 1, 0,
+								curr_sprite.ox + (curr_sprite.xsize - xt) * curr_sprite.zoomx, curr_sprite.oy + yt * curr_sprite.zoomy,
+								0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
+					}
+					handle_xsize_map_inc();
+				}
 			}
 
 			/* curr_sprite.flipyped case */
 			else if (!curr_sprite.flipx && curr_sprite.flipy)
 			{
-				for (yt = 0; yt < curr_sprite.ysize; yt++)
-					for (xt = 0; xt < curr_sprite.xsize; xt++, curr_sprite.map++)
-						if (!zoomed)
-							drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], curr_sprite.map, curr_sprite.color, 0, 1,
-									curr_sprite.ox + xt * 16, curr_sprite.oy + (curr_sprite.ysize - 1 - yt) * 16, 15);
-						else
-							drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], curr_sprite.map, curr_sprite.color, 0, 1,
-									curr_sprite.ox + xt * curr_sprite.zoomx, curr_sprite.oy + (curr_sprite.ysize - 1 - yt) * curr_sprite.zoomy,
-									0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
+				for (yt = 0; yt <= curr_sprite.ysize; yt++)
+				{
+					for (xt = 0; xt <= curr_sprite.xsize; xt++)
+					{
+						int curr = m_newtilecb(curr_sprite.map++);
+
+						drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], curr, curr_sprite.color, 0, 1,
+								curr_sprite.ox + xt * curr_sprite.zoomx, curr_sprite.oy + (curr_sprite.ysize - yt) * curr_sprite.zoomy,
+								0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
+					}
+					handle_xsize_map_inc();
+				}
 			}
 
 			/* x & curr_sprite.flipyped case */
 			else
 			{
-				for (yt = 0; yt < curr_sprite.ysize; yt++)
-					for (xt = 0; xt < curr_sprite.xsize; xt++, curr_sprite.map++)
-						if (!zoomed)
-							drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[2], curr_sprite.map, curr_sprite.color, 1, 1,
-									curr_sprite.ox + (curr_sprite.xsize - 1 - xt) * 16, curr_sprite.oy + (curr_sprite.ysize - 1 - yt) * 16, 15);
-						else
-							drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], curr_sprite.map, curr_sprite.color, 1, 1,
-									curr_sprite.ox + (curr_sprite.xsize - 1 - xt) * curr_sprite.zoomx, curr_sprite.oy + (curr_sprite.ysize - 1 - yt) * curr_sprite.zoomy,
-									0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
+				for (yt = 0; yt <= curr_sprite.ysize; yt++)
+				{
+					for (xt = 0; xt <= curr_sprite.xsize; xt++)
+					{
+						int curr = m_newtilecb(curr_sprite.map++);
+
+						drawgfxzoom_transpen(bitmap, cliprect, screen.machine().gfx[2], curr, curr_sprite.color, 1, 1,
+								curr_sprite.ox + (curr_sprite.xsize - xt) * curr_sprite.zoomx, curr_sprite.oy + (curr_sprite.ysize - yt) * curr_sprite.zoomy,
+								0x1000 * curr_sprite.zoomx, 0x1000 * curr_sprite.zoomy, 15);
+					}
+					handle_xsize_map_inc();
+				}
 			}
 		}
 	}

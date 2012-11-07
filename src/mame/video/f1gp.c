@@ -72,10 +72,23 @@ VIDEO_START_MEMBER(f1gp_state,f1gpb)
 //  save_pointer(NAME(m_zoomdata), memregion("gfx4")->bytes());
 }
 
+/* new hw type */
 UINT32 f1gp_state::f1gp2_tile_callback( UINT32 code )
 {
 	return m_sprcgram[code&0x3fff];
 }
+
+/* old hw type */
+UINT32 f1gp_state::f1gp_old_tile_callback( UINT32 code )
+{
+	return m_spr1cgram[code % (m_spr1cgram.bytes()/2)];
+} 
+
+UINT32 f1gp_state::f1gp_ol2_tile_callback( UINT32 code )
+{
+	return m_spr2cgram[code % (m_spr2cgram.bytes()/2)];
+}
+
 
 
 VIDEO_START_MEMBER(f1gp_state,f1gp2)
@@ -186,13 +199,13 @@ UINT32 f1gp_state::screen_update_f1gp(screen_device &screen, bitmap_ind16 &bitma
 	/* quick kludge for "continue" screen priority */
 	if (m_gfxctrl == 0x00)
 	{
-		m_spr_old->f1gp_draw_sprites(1, m_spr1vram, m_spr1cgram ,m_spr1cgram.bytes(), machine(), bitmap, cliprect, 0x02);
-		m_spr_old2->f1gp_draw_sprites(2, m_spr2vram, m_spr2cgram, m_spr2cgram.bytes(), machine(), bitmap, cliprect, 0x02);
+		m_spr_old->f1gp_draw_sprites(1, m_spr1vram, machine(), bitmap, cliprect, 0x02);
+		m_spr_old2->f1gp_draw_sprites(2, m_spr2vram, machine(), bitmap, cliprect, 0x02);
 	}
 	else
 	{
-		m_spr_old->f1gp_draw_sprites(1, m_spr1vram, m_spr1cgram, m_spr1cgram.bytes(), machine(), bitmap, cliprect, 0x00);
-		m_spr_old2->f1gp_draw_sprites(2, m_spr2vram, m_spr2cgram, m_spr2cgram.bytes(), machine(), bitmap, cliprect, 0x02);
+		m_spr_old->f1gp_draw_sprites(1, m_spr1vram, machine(), bitmap, cliprect, 0x00);
+		m_spr_old2->f1gp_draw_sprites(2, m_spr2vram, machine(), bitmap, cliprect, 0x02);
 	}
 	return 0;
 }
