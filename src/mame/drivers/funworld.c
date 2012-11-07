@@ -810,7 +810,7 @@
 #define MASTER_CLOCK	XTAL_16MHz
 
 #include "emu.h"
-#include "cpu/m6502/m65c02.h"
+#include "cpu/m6502/r65c02.h"
 #include "cpu/m6502/m65sc02.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
@@ -2492,7 +2492,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fw2ndpal, fw1stpal )
 
-	MCFG_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(funworld_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 
@@ -2504,7 +2504,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( funquiz, fw1stpal )
 //  MCFG_FRAGMENT_ADD(fw2ndpal)
 
-	MCFG_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(funquiz_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 
@@ -2516,7 +2516,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( magicrd2, fw1stpal )
 
-	MCFG_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 
@@ -2529,35 +2529,35 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( royalcd1, fw1stpal )
 
-	MCFG_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* (G65SC02P in pro version) 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8)	/* (G65SC02P in pro version) 2MHz */
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( royalcd2, fw2ndpal )
 
-	MCFG_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cuoreuno, fw1stpal )
 
-	MCFG_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(cuoreuno_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( saloon, fw1stpal )
 
-	MCFG_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(saloon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( witchryl, fw1stpal )
 
-	MCFG_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MCFG_CPU_REPLACE("maincpu", R65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(witchryl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
