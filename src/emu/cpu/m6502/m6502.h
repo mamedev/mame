@@ -47,6 +47,7 @@ class m6502_device : public cpu_device {
 public:
 	enum {
 		IRQ_LINE = INPUT_LINE_IRQ0,
+		APU_IRQ_LINE = INPUT_LINE_IRQ1,
 		NMI_LINE = INPUT_LINE_NMI,
 		V_LINE   = 10
 	};
@@ -176,7 +177,7 @@ protected:
 	memory_interface *mintf;
 	int inst_state, inst_substate;
 	int icount;
-	bool nmi_state, irq_state, v_state;
+	bool nmi_state, irq_state, apu_irq_state, v_state;
 	bool irq_taken, sync, direct_disabled, inhibit_interrupts;
 	UINT64 end_cycles;
 

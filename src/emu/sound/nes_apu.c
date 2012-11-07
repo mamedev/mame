@@ -371,7 +371,7 @@ static int8 apu_dpcm(nesapu_state *info, dpcm_t *chan)
 					if (chan->regs[0] & 0x80) /* IRQ Generator */
 					{
 						chan->irq_occurred = TRUE;
-						downcast<n2a03_device &>(info->APU.dpcm.memory->device()).set_input_line(N2A03_IRQ_LINE, ASSERT_LINE);
+						downcast<n2a03_device &>(info->APU.dpcm.memory->device()).set_input_line(N2A03_APU_IRQ_LINE, ASSERT_LINE);
 					}
 					break;
 				}
@@ -521,7 +521,7 @@ INLINE void apu_regwrite(nesapu_state *info,int address, uint8 value)
 	case APU_WRE0:
 		info->APU.dpcm.regs[0] = value;
 		if (0 == (value & 0x80)) {
-			downcast<n2a03_device &>(info->APU.dpcm.memory->device()).set_input_line(N2A03_IRQ_LINE, CLEAR_LINE);
+			downcast<n2a03_device &>(info->APU.dpcm.memory->device()).set_input_line(N2A03_APU_IRQ_LINE, CLEAR_LINE);
 			info->APU.dpcm.irq_occurred = FALSE;
 		}
 		break;

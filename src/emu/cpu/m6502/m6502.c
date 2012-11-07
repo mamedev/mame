@@ -96,6 +96,7 @@ void m6502_device::init()
 	save_item(NAME(IR));
 	save_item(NAME(nmi_state));
 	save_item(NAME(irq_state));
+	save_item(NAME(apu_irq_state));
 	save_item(NAME(v_state));
 	save_item(NAME(inst_state));
 	save_item(NAME(inst_substate));
@@ -116,6 +117,7 @@ void m6502_device::init()
 	IR = 0x00;
 	nmi_state = false;
 	irq_state = false;
+	apu_irq_state = false;
 	irq_taken = false;
 	v_state = false;
 	inst_state = STATE_RESET;
@@ -131,6 +133,7 @@ void m6502_device::device_reset()
 	inst_substate = 0;
 	nmi_state = false;
 	irq_state = false;
+	apu_irq_state = false;
 	irq_taken = false;
 	v_state = false;
 	end_cycles = 0;
@@ -416,6 +419,7 @@ void m6502_device::execute_set_input(int inputnum, int state)
 {
 	switch(inputnum) {
 	case IRQ_LINE: irq_state = state == ASSERT_LINE; break;
+	case APU_IRQ_LINE: apu_irq_state = state == ASSERT_LINE; break;
 	case NMI_LINE: nmi_state = nmi_state || (state == ASSERT_LINE); break;
 	case V_LINE:
 		if(!v_state && state == ASSERT_LINE)
@@ -612,7 +616,7 @@ void m6502_device::prefetch()
 	IR = mintf->read_decrypted(PC);
 	sync = false;
 
-	if((nmi_state || (irq_state && !(P & F_I))) && !inhibit_interrupts) {
+	if((nmi_state || ((irq_state || apu_irq_state) && !(P & F_I))) && !inhibit_interrupts) {
 		irq_taken = true;
 		IR = 0x00;
 	} else

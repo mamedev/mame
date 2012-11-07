@@ -87,6 +87,7 @@ protected:
 
 enum {
 	N2A03_IRQ_LINE = m6502_device::IRQ_LINE,
+	N2A03_APU_IRQ_LINE = m6502_device::APU_IRQ_LINE,
 	N2A03_NMI_LINE = m6502_device::NMI_LINE,
 	N2A03_SET_OVERFLOW = m6502_device::V_LINE,
 };
