@@ -136,7 +136,7 @@ bbr_zpb
 	TMP2 = read(TMP);
 	TMP = read_pc();
 	read_pc_noinc();
-	if(!(TMP2 & (1 << (inst_state & 7)))) {
+	if(!(TMP2 & (1 << ((inst_state >> 4) & 7)))) {
 		PC += INT8(TMP);
 	}
 	prefetch();
@@ -147,7 +147,7 @@ bbs_zpb
 	TMP2 = read(TMP);
 	TMP = read_pc();
 	read_pc_noinc();
-	if(TMP2 & (1 << (inst_state & 7))) {
+	if(TMP2 & (1 << ((inst_state >> 4) & 7))) {
 		PC += INT8(TMP);
 	}
 	prefetch();
@@ -340,7 +340,7 @@ rmb_bzp
 	TMP = read_pc();
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
-	TMP2 &= ~(1 << (inst_state & 7));
+	TMP2 &= ~(1 << ((inst_state >> 4) & 7));
 	write(TMP, TMP2);
 	prefetch();
 
@@ -485,7 +485,7 @@ smb_bzp
 	TMP = read_pc();
 	TMP2 = read(TMP);
 	write(TMP, TMP2);
-	TMP2 |= 1 << (inst_state & 7);
+	TMP2 |= 1 << ((inst_state >> 4) & 7);
 	write(TMP, TMP2);
 	prefetch();
 

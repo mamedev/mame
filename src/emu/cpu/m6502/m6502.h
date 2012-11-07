@@ -89,7 +89,6 @@ protected:
 		const char *opcode;
 		int mode;
 		offs_t flags;
-		bool per_bit;
 	};
 
 	enum {

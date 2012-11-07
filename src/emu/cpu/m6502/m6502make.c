@@ -214,10 +214,8 @@ static void save_tables(FILE *f)
 			
 			bool step_over = opc == "jsr" || opc == "bsr";
 			bool step_out = opc == "rts" || opc == "rti" || opc == "rtn";
-			bool per_bit = opc == "bbr" || opc == "bbs" || opc == "rmb" || opc == "smb";
-			fprintf(f, "\t{ \"%s\", DASM_%s, %s, %s },\n",
-					opc.c_str(), mode.c_str(), step_over ? "DASMFLAG_STEP_OVER" : step_out ? "DASMFLAG_STEP_OUT" : "0",
-					per_bit ? "true" : "false");
+			fprintf(f, "\t{ \"%s\", DASM_%s, %s },\n",
+					opc.c_str(), mode.c_str(), step_over ? "DASMFLAG_STEP_OVER" : step_out ? "DASMFLAG_STEP_OUT" : "0");
 		} else
 			fprintf(f, "\t{ \"???\", DASM_imp, 0, false },\n");
 	fprintf(f, "};\n");

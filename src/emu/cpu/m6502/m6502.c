@@ -477,9 +477,7 @@ offs_t m6502_device::disassemble_generic(char *buffer, offs_t pc, const UINT8 *o
 {
 	const disasm_entry &e = table[oprom[0]];
 	UINT32 flags = e.flags | DASMFLAG_SUPPORTED;
-	buffer += sprintf(buffer, "%-5s", e.opcode);
-	if(e.per_bit)
-		buffer += sprintf(buffer, "%d, ", (oprom[0] >> 4) & 7);
+	buffer += sprintf(buffer, "%s", e.opcode);
 
 	switch(table[oprom[0]].mode) {
 	case DASM_non:
@@ -512,7 +510,7 @@ offs_t m6502_device::disassemble_generic(char *buffer, offs_t pc, const UINT8 *o
 		break;
 
 	case DASM_bzp:
-		sprintf(buffer, "%d $%02x", oprom[0] & 7, opram[1]);
+		sprintf(buffer, "%d $%02x", (oprom[0] >> 4) & 7, opram[1]);
 		flags |= 2;
 		break;
 
@@ -576,7 +574,7 @@ offs_t m6502_device::disassemble_generic(char *buffer, offs_t pc, const UINT8 *o
 		break;
 
 	case DASM_zpb:
-		sprintf(buffer, "%d $%02x, $%04x", oprom[0] & 7, opram[1], (pc & 0xf0000) | UINT16(pc + 3 + INT8(opram[2])));
+		sprintf(buffer, "%d $%02x, $%04x", (oprom[0] >> 4) & 7, opram[1], (pc & 0xf0000) | UINT16(pc + 3 + INT8(opram[2])));
 		flags |= 3;
 		break;
 
