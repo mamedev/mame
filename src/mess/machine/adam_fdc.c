@@ -1,0 +1,324 @@
+/**********************************************************************
+
+    Coleco Adam floppy disk controller emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
+#include "adam_fdc.h"
+
+
+
+//**************************************************************************
+//  MACROS / CONSTANTS
+//**************************************************************************
+
+#define M6801_TAG       "u6"
+#define WD2793_TAG      "u11"
+
+
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type ADAM_FDC = &device_creator<adam_fdc_device>;
+
+
+//-------------------------------------------------
+//  ROM( adam_fdc )
+//-------------------------------------------------
+
+ROM_START( adam_fdc )
+	ROM_REGION( 0x1000, M6801_TAG, 0 )
+	ROM_DEFAULT_BIOS("ssdd")
+	ROM_SYSTEM_BIOS( 0, "ssdd", "Coleco 160KB SSDD" )
+	ROMX_LOAD( "ad31_reva.u10", 0x0000, 0x1000, CRC(4b0b7143) SHA1(1cb68891c3af80e99efad7e309136ca37244f060), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "dsdd", "320KB DSDD" )
+	ROMX_LOAD( "320ta.u10", 0x0000, 0x1000, CRC(dcd865b3) SHA1(dde583e0d18ce4406e9ea44ab34d083e73ee30e2), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "pmhd", "Powermate High Density" )
+	ROMX_LOAD( "pmhdfdc.u10", 0x0000, 0x1000, CRC(fed4006c) SHA1(bc8dd00dd5cde9500a4cd7dc1e4d74330184472a), ROM_BIOS(3) )
+ROM_END
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const rom_entry *adam_fdc_device::device_rom_region() const
+{
+	return ROM_NAME( adam_fdc );
+}
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( fdc6801_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( adam_fdc_mem, AS_PROGRAM, 8, adam_fdc_device )
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
+	AM_RANGE(0x0080, 0x00ff) AM_RAM
+	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_WRITEONLY AM_SHARE("ram")
+	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0xff) AM_DEVREAD(WD2793_TAG, wd2793_t, status_r)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_READONLY AM_SHARE("ram")
+	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0xff) AM_DEVWRITE(WD2793_TAG, wd2793_t, cmd_w)
+	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0xff) AM_DEVREAD(WD2793_TAG, wd2793_t, track_r)
+	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0xff) AM_DEVWRITE(WD2793_TAG, wd2793_t, track_w)
+	AM_RANGE(0x4800, 0x4800) AM_MIRROR(0xff) AM_DEVREAD(WD2793_TAG, wd2793_t, sector_r)
+	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0xff) AM_DEVWRITE(WD2793_TAG, wd2793_t, sector_w)
+	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0xff) AM_DEVREAD(WD2793_TAG, wd2793_t, data_r)
+	AM_RANGE(0x7800, 0x7800) AM_MIRROR(0xff) AM_DEVWRITE(WD2793_TAG, wd2793_t, data_w)
+	AM_RANGE(0x8000, 0x8fff) AM_MIRROR(0x7000) AM_ROM AM_REGION(M6801_TAG, 0)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( fdc6801_io )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( adam_fdc_io, AS_IO, 8, adam_fdc_device )
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READWRITE(p1_r, p1_w)
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(p2_r, p2_w)
+	AM_RANGE(M6801_PORT3, M6801_PORT3) AM_WRITENOP
+	AM_RANGE(M6801_PORT4, M6801_PORT4) AM_WRITENOP
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  floppy_format_type floppy_formats
+//-------------------------------------------------
+
+void adam_fdc_device::fdc_intrq_w(bool state)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+const floppy_format_type adam_fdc_device::floppy_formats[] = {
+	FLOPPY_ADAM_FORMAT, FLOPPY_MFM_FORMAT, FLOPPY_MFI_FORMAT,
+	NULL
+};
+
+static SLOT_INTERFACE_START( adam_fdc_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
+
+
+//-------------------------------------------------
+//  MACHINE_DRIVER( adam_fdc )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_FRAGMENT( adam_fdc )
+	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(adam_fdc_mem)
+	MCFG_CPU_IO_MAP(adam_fdc_io)
+	MCFG_DEVICE_DISABLE() // TODO
+
+	MCFG_WD2793x_ADD(WD2793_TAG, XTAL_4MHz/4)
+
+	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", adam_fdc_floppies, "525dd", 0, adam_fdc_device::floppy_formats)
+MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor adam_fdc_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( adam_fdc );
+}
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( adam_fdc )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( adam_fdc )
+	PORT_START("SW3")
+	PORT_DIPNAME( 0x01, 0x00, "Drive Select" ) PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x00, "DS1" )
+	PORT_DIPSETTING(    0x01, "DS2" )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor adam_fdc_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( adam_fdc );
+}
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  adam_fdc_device - constructor
+//-------------------------------------------------
+
+adam_fdc_device::adam_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ADAM_FDC, "Adam FDC", tag, owner, clock),
+		device_adamnet_card_interface(mconfig, *this),
+		m_maincpu(*this, M6801_TAG),
+		m_fdc(*this, WD2793_TAG),
+		m_floppy0(*this, WD2793_TAG":0"),
+		m_ram(*this, "ram"),
+		m_image0(NULL)
+{
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void adam_fdc_device::device_start()
+{
+	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(adam_fdc_device::fdc_intrq_w), this));
+}
+
+
+//-------------------------------------------------
+//  adamnet_reset_w -
+//-------------------------------------------------
+
+void adam_fdc_device::adamnet_reset_w(int state)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
+
+	if (state == ASSERT_LINE) m_fdc->reset();
+}
+
+
+//-------------------------------------------------
+//  p1_r -
+//-------------------------------------------------
+
+READ8_MEMBER( adam_fdc_device::p1_r )
+{
+	/*
+
+	    bit     description
+
+	    0       disk in place
+	    1
+	    2       FDC DRQ
+	    3
+	    4
+	    5
+	    6
+	    7       SW3 (0=DS1, 1=DS2)
+
+	*/
+
+	UINT8 data = 0;
+
+	// disk in place
+	data |= m_floppy0->get_device()->exists();
+
+	// floppy data request
+	data |= m_fdc->drq_r() ? 0x04 : 0;
+
+	// drive select
+	data |= ioport("SW3")->read() << 7;
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  p1_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_fdc_device::p1_w )
+{
+	/*
+
+	    bit     description
+
+	    0
+	    1       FDC ENP
+	    2
+	    3       FDC _DDEN
+	    4
+	    5       DRIVE SELECT
+	    6       MOTOR ON
+	    7
+
+	*/
+
+	// write precompensation
+	//m_fdc->enp_w(BIT(data, 1));
+
+	// density select
+	m_fdc->dden_w(BIT(data, 3));
+
+	// drive select
+	m_image0 = NULL;
+
+	if (BIT(data, 5))
+	{
+		m_image0 = m_floppy0->get_device();
+	}
+
+	m_fdc->set_floppy(m_image0);
+
+	// motor enable
+	if (m_image0) m_image0->mon_w(!BIT(data, 6));
+}
+
+
+//-------------------------------------------------
+//  p2_r -
+//-------------------------------------------------
+
+READ8_MEMBER( adam_fdc_device::p2_r )
+{
+	/*
+
+	    bit     description
+
+	    0       mode bit 0
+	    1       mode bit 1
+	    2       mode bit 2
+	    3       NET RXD
+	    4
+
+	*/
+
+	UINT8 data = M6801_MODE_2;
+
+	// NET RXD
+	data |= m_bus->rxd_r(this) << 3;
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  p2_w -
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_fdc_device::p2_w )
+{
+	/*
+
+	    bit     description
+
+	    0
+	    1
+	    2
+	    3
+	    4       NET TXD
+
+	*/
+
+	m_bus->txd_w(this, BIT(data, 4));
+}

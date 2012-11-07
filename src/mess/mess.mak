@@ -970,6 +970,12 @@ $(MESSOBJ)/coleco.a:			\
 	$(MESS_DRIVERS)/coleco.o	\
 	$(MESS_MACHINE)/coleco.o	\
 	$(MESS_DRIVERS)/adam.o		\
+	$(MESS_MACHINE)/adamnet.o	\
+	$(MESS_MACHINE)/adam_ddp.o	\
+	$(MESS_MACHINE)/adam_fdc.o	\
+	$(MESS_MACHINE)/adam_kb.o	\
+	$(MESS_MACHINE)/adam_prn.o	\
+	$(MESS_MACHINE)/adam_spi.o	\
 
 $(MESSOBJ)/cromemco.a:			\
 	$(MESS_DRIVERS)/c10.o		\
