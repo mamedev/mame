@@ -40,7 +40,7 @@ public:
 
 	virtual void machine_start();
 
-    required_device<avr8_device> m_maincpu;
+	required_device<avr8_device> m_maincpu;
 
 	DECLARE_READ8_MEMBER(port_r);
 	DECLARE_WRITE8_MEMBER(port_w);
@@ -55,7 +55,7 @@ void uzebox_state::machine_start()
 
 READ8_MEMBER(uzebox_state::port_r)
 {
-    return 0;
+	return 0;
 }
 
 WRITE8_MEMBER(uzebox_state::port_w)
@@ -115,7 +115,7 @@ static MACHINE_CONFIG_START( uzebox, uzebox_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ATMEGA644, MASTER_CLOCK)
-    MCFG_CPU_AVR8_CONFIG(atmega644_config)
+	MCFG_CPU_AVR8_CONFIG(atmega644_config)
 	MCFG_CPU_PROGRAM_MAP(uzebox_prg_map)
 	MCFG_CPU_DATA_MAP(uzebox_data_map)
 	MCFG_CPU_IO_MAP(uzebox_io_map)
@@ -145,7 +145,7 @@ ROM_START( uzebox )
 	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main program store */
 	ROM_CART_LOAD("cart1", 0x0000, 0x10000, ROM_OPTIONAL)
 
-	ROM_REGION( 0x200, "eeprom", 0 )  /* on-die eeprom */
+	ROM_REGION( 0x200, "eeprom", ROMREGION_ERASE00 )  /* on-die eeprom */
 ROM_END
 
 /*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY   FULLNAME */
