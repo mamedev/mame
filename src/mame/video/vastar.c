@@ -116,6 +116,12 @@ WRITE8_MEMBER(vastar_state::vastar_bg2videoram_w)
 
 ***************************************************************************/
 
+// I wouldn't rule out the possibility of there being 2 sprite chips due to
+// "offs & 0x20" being used to select the tile bank.
+//
+// for Planet Probe more cases appear correct if we draw the list in reverse
+// order, but it's also possible we should be drawing 2 swapped lists in
+// forward order instead
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	vastar_state *state = machine.driver_data<vastar_state>();
@@ -124,7 +130,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	UINT8 *spriteram_3 = state->m_spriteram3;
 	int offs;
 
-	for (offs = 0; offs < 0x40; offs += 2)
+//	for (offs = 0; offs < 0x40; offs += 2)
+	for (offs = 0x40-2; offs >=0; offs -= 2)
 	{
 		int code, sx, sy, color, flipx, flipy;
 
