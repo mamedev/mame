@@ -8,7 +8,6 @@ To investigate:
 
 Undumped:
 - 102 Dalmatas Cachorros Al Rescate CGB-B99S-ESP
-- Army Men 2 CGB-BA2P-EUU
 - Bionic Command CGB-AV4P-AUS
 - Caterpillar Construction Zone DMG-AR4P-EUU? [unclear pic]
 - Daffy Duck - Fowl Play DMG-AD7P-UKV
@@ -21,7 +20,6 @@ Undumped:
 - Mary-Kate and Ashley - Pocket Planner DMG-BMAP-EUR
 - Mickey's Racing Adventure CGB-ARNP-EUR
 - NHL 2000 DMG-ANRP-EUR
-- Rampage 2 - Universal Tour CGB-AUTP-EUR
 - Rocket Power - Gettin' Air CGB-BRUP-EUR
 - San Francisco Rush 2049 (Euro, fr/de/nl) [small pic]
 - Sesame Street Sports (Euro) [small pic]
@@ -771,10 +769,10 @@ Undumped Pirates:
 
 	<software name="armymen2">
 		<!-- Notes: GBC only -->
-		<description>Army Men 2 (USA)</description>
+		<description>Army Men 2 (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>3DO</publisher>
-		<info name="serial" value="CGB-BA2E-USA"/>
+		<info name="serial" value="CGB-BA2E-USA, CGB-BA2P-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="1048576">
@@ -15975,10 +15973,10 @@ Undumped Pirates:
 
 	<software name="rampage2">
 		<!-- Notes: GBC only -->
-		<description>Rampage 2 - Universal Tour (USA)</description>
+		<description>Rampage 2 - Universal Tour (Euro, USA)</description>
 		<year>1999</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="CGB-AUTE-USA"/>
+		<info name="serial" value="CGB-AUTE-USA, CGB-AUTP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="1048576">

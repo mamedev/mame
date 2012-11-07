@@ -6,24 +6,116 @@ Missing files come here
 <softwarelist name="ibm5170" description="IBM PC/AT disk images">
 <!-- OS Disks -->
 
+	<software name="msdos330">
+		<description>MS-Dos 3.30</description>
+		<year>1993</year>
+		<publisher>Knowledge Dynamics Corp,</publisher>
+		<part name="flop1" interface="floppy_5_25">
+		<feature name="disk_serial" value="02042 036214.330A" />
+		<feature name="disk_label" value="Programs" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk 1.img" size="368640" crc="db07d99a" sha1="121ad3c636a69dae3a8eee96ef2ebf1152e9d00f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="disk_serial" value="02043 036214.330A" />
+		<feature name="disk_label" value="Additional Pragrams and Microsoft GW-Basic Interpreter" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk 2.img" size="368640" crc="bef8e643" sha1="97df57499e009101d04bd696d23024b4d220e297" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msdos5">
-		<description>MS-Dos 5.0</description>
+		<description>MS-Dos 5.0 (Mecer OEM)</description>
 		<year>1991</year>
 		<publisher>Microsoft</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
+		<info name="OEM" value="Mecer" />
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="disk_serial" value="0044238" />
 			<dataarea name="flop" size="737280">
-				<rom name="msds5d1.img" size="737280" crc="c54fe610" sha1="27756a10edbe33f76ff2239062af05dbfdc93979" offset="0" />
+				<rom name="operating 1.img" size="737280" crc="c54fe610" sha1="27756a10edbe33f76ff2239062af05dbfdc93979" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="disk_serial" value="0045925" />
+			<dataarea name="flop" size="737280">
+				<rom name="operating 2.img" size="737280" crc="9aa5c1a4" sha1="15cc58e267601b30a594372aea1ff3dbb73ea335" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+		<feature name="disk_serial" value="0044171" />
+			<dataarea name="flop" size="737280">
+				<rom name="operating 3.img" size="737280" crc="6248317a" sha1="c7ff3a04eb01cab3efb05b6b52ec8b8a36b9b269" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dos5" cloneof="msdos5">
+		<description>MS-Dos 5.0 (5.25 Disks, RTM)</description>
+		<year>1991</year>
+		<publisher>Microsoft</publisher>
+		<info name="OEM" value="Mecer" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk 1.img" size="368640" crc="de9e3bf6" sha1="b78aaced6bf262a5aa7af6d328caaf8370539c7c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="msds5d2.img" size="737280" crc="9aa5c1a4" sha1="15cc58e267601b30a594372aea1ff3dbb73ea335" offset="0" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk 2.img" size="368640" crc="b56623db" sha1="0424273d8b63a1d89a880c6737278bcf6003e5d5" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<dataarea name="flop" size="737280">
-				<rom name="msds5d3.img" size="737280" crc="6248317a" sha1="c7ff3a04eb01cab3efb05b6b52ec8b8a36b9b269" offset="0" />
+			<dataarea name="flop" size="368640">
+				<rom name="disk 3.img" size="368640" crc="273b0fb7" sha1="79595c7831ffa5599f3682e7a9bf43c7b7620387" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk 4.img" size="368640" crc="69e4c763" sha1="af69f1c0e897a5f19c52941bc6e4fdbe4d17db6e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk 5.img" size="368640" crc="3de11d76" sha1="b808a9b294b660454ddd84c014525052e6f9223e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dos5upg" cloneof="msdos5">
+		<description>MS-Dos 5.0 Upgrade (5.25 Disks, RTM)</description>
+		<year>1991</year>
+		<publisher>Microsoft</publisher>
+		<info name="OEM" value="Mecer" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk 1 (upgrade).img" size="368640" crc="01a3d9a2" sha1="083400723e475ed497b276c9d4f2799eff3b88b8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk 2 (upgrade).img" size="368640" crc="a8709827" sha1="9dbbbd267eb9b63447ee04641892ff0bea08cd25" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk 3 (upgrade).img" size="368640" crc="bb5bb90b" sha1="5fd3b4fe686d7459b7048ec8f1a38860755a887a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk 4 (upgrade).img" size="368640" crc="b411a21d" sha1="7623d0fa4b178415c1b85e8d14e452c5fa0a5bf0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk 5 (upgrade).img" size="368640" crc="26edd0f6" sha1="87b38570250dd12b6b4e4f232d6d3f3ab7960d6c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="disk 6 (upgrade).img" size="368640" crc="782c0c4a" sha1="aaff65c8263ed44f7af69892a4b9c926ba0ccf75" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -32,19 +124,40 @@ Missing files come here
 		<description>MS-DOS 6.22 (OEM)</description>
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
-		<part name="disk1" interface="floppy_5_25">
+		<part name="disk1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk1.img" size="1474560" crc="adbd36fe" sha1="3fb0df208670ea5fafae451661017391a381bc9d" offset="0" />
 			</dataarea>
 		</part>
-		<part name="disk2" interface="floppy_5_25">
+		<part name="disk2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk2.img" size="1474560" crc="417eb8b3" sha1="63e670bb166995a7a1124c8f2b540355eed3bbd8" offset="0" />
 			</dataarea>
 		</part>
-		<part name="disk3" interface="floppy_5_25">
+		<part name="disk3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk3.img" size="1474560" crc="6a158e98" sha1="b8493fc000f405ba7a1a89503178482328616e01" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msdos622up" cloneof="msdos622">
+		<description>MS-DOS 6.22 (Upgrade)</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1up.img" size="1474560" crc="b4df72ec" sha1="b34723a322c380121101cbdace5f5ae66a71e97c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="disk2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk2up.img" size="1474560" crc="285879b4" sha1="873945a89367499bfdc80c1284923bbf30bb010c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="disk3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk3up.img" size="1474560" crc="3004d02f" sha1="788f63944403c77ca96418372cdd68bb415c8160" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -54,22 +167,22 @@ Missing files come here
 		<description>MS-DOS 6.22 (Acer Recovery CD)</description>
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
-		<part name="disk1" interface="floppy_5_25">
+		<part name="disk1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk1a.img" size="1474560" crc="69d8cfdd" sha1="30b4b2e99b26b0e5e7dbe61b9892e45fe751a3e8" offset="0" />
 			</dataarea>
 		</part>
-		<part name="disk2" interface="floppy_5_25">
+		<part name="disk2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk2a.img" size="1474560" crc="76258952" sha1="1f268c5487f31982848461b9d628ef10b552c849" offset="0" />
 			</dataarea>
 		</part>
-		<part name="disk3" interface="floppy_5_25">
+		<part name="disk3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk3a.img" size="1474560" crc="808b208d" sha1="06de13364e906c4ed69f19627ae0e682eb419078" offset="0" />
 			</dataarea>
 		</part>
-		<part name="disk4" interface="floppy_5_25">
+		<part name="disk4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk4.img" size="1474560" crc="21b6d623" sha1="2f096a5d9cd00677de3aca30b01b52b24776c59a" offset="0" />
 			</dataarea>
@@ -82,17 +195,17 @@ Missing files come here
 		<description>MS-DOS 6.22 (Supplemental Disk)</description>
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
-		<part name="disk1" interface="floppy_5_25">
+		<part name="disk1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk 1 (1.4mb).img" size="1474560" crc="ac432292" sha1="a60876af212ffc9dd38529ee327adea4b10448f5" offset="0" status="baddump" />
 			</dataarea>
 		</part>
-		<part name="disk2" interface="floppy_5_25">
+		<part name="disk2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk 1 (720kb).img" size="737280" crc="6a73c20b" sha1="46b05c8fc4b53f2ebeaecc0deb27e5384ccefc99" offset="0" status="baddump" />
 			</dataarea>
 		</part>
-		<part name="disk3" interface="floppy_5_25">
+		<part name="disk3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk 2 (720kb).img" size="737280" crc="2626ae5b" sha1="9f80740f91d62996952ced0fa69dc83bd1521567" offset="0" status="baddump" />
 			</dataarea>
@@ -103,7 +216,7 @@ Missing files come here
 		<description>Microsoft Windows 95 (Bootdisk)</description>
 		<year>1995</year>
 		<publisher>Microsoft</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="wndws95b.img" size="1474560" crc="f2c099fa" sha1="f167b7193f0e62f4f7b27255fdc70ac7d6278c47" offset="0" />
 			</dataarea>
@@ -114,7 +227,7 @@ Missing files come here
 		<description>Microsoft Windows 98 (Bootdisk)</description>
 		<year>1998</year>
 		<publisher>Microsoft</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="wndws98b.img" size="1474560" crc="955fc373" sha1="9f5d64261c7f51de704d6d1486dced51b45cbec3" offset="0" />
 			</dataarea>
@@ -125,7 +238,7 @@ Missing files come here
 		<description>Microsoft Windows ME (Bootdisk)</description>
 		<year>2000</year>
 		<publisher>Microsoft</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="wndwsmeb.img" size="1474560" crc="5a17894f" sha1="724e02eac97046e6c92b73f7707b57707ab76f5a" offset="0" />
 			</dataarea>
@@ -138,9 +251,20 @@ Missing files come here
 		<description>Microsoft Windows XP MS-DOS startup disk</description>
 		<year>2005</year>
 		<publisher>Microsoft</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="winxpb.img" size="1474560" crc="10e3084d" sha1="3812f09e46c4bdd1c802f8540cc643366d9a1e0f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flppy101">
+		<description>floppyfw (Version 1.0.1)</description>
+		<year>2000</year>
+		<publisher>Thomas Lundquist</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="floppyfw-1.0.1.img" size="1474560" crc="c4228427" sha1="5b83ba88fa722c8f2af7058766085615da0495f3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -193,37 +317,37 @@ Missing files come here
 		<description>Microsoft Windows Version 3.1</description>
 		<year>1992</year>
 		<publisher>Microsoft</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="wndws31.img" size="1474560" crc="a7439136" sha1="b243a849227b8df3c4a180b25203e6c2bfce66c4" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="wndws31d2.img" size="1474560" crc="2cc5295d" sha1="1d2487804f8394ab56a052c2ddd8b3a64e53f948" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="wndws31d3.img" size="1474560" crc="892950b1" sha1="c4b7a19a78653e56dfe9c51c97e53fbbad686bd2" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="wndws31d4.img" size="1474560" crc="5797606e" sha1="779aaf9301b5ce765da2f9e097c33b341a794d77" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop5" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="wndws31d5.img" size="1474560" crc="502572df" sha1="491e4ded78154a09866d738be59b17f55afdbba2" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop6" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="wndws31d6.img" size="1474560" crc="c1aad0d9" sha1="c858848ed3a05e78e2b19e98bd6d0d927656f7b3" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop7" interface="floppy_5_25">
+		<part name="flop7" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="wndws31d7.img" size="1474560" crc="5ff44136" sha1="f913487b28eb35c9faab52eb46a8c14012c592f0" offset="0" />
 			</dataarea>
@@ -237,7 +361,8 @@ Missing files come here
 		<year>2004</year>
 		<publisher>KYE Systems Corp.</publisher>
 		<info name="alt_title" value="MouseMate Software Scroll Mouse for Windows XP/Me/98/2000/2003" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="disk_serial" value="12060321100-B" />
 			<dataarea name="flop" size="1474560">
 				<rom name="scroll mouse.img" size="1474560" crc="5ed59ff2" sha1="da4405fda8f12616f0fe4ab71ca0aac92933b22e" offset="0" />
 			</dataarea>
@@ -248,7 +373,7 @@ Missing files come here
 		<description>3Com 3c90x Etherlink Drivers</description>
 		<year>1999</year>
 		<publisher>3Com Corporation</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="3com 3c90x etherlink drivers.img" size="1474560" crc="dc648ec1" sha1="e3f78391fe3063d7d73eb46e47eb412ca75d5f36" offset="0" />
 			</dataarea>
@@ -259,7 +384,7 @@ Missing files come here
 		<description>3Com EtherLink III Lan PC Card (Version 5.3)</description>
 		<year>1996</year>
 		<publisher>3Com Corporation</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="3com etherlink 3 lan pc card (version 5.3).img" size="1474560" crc="cf807155" sha1="f7e6e91e5b92e4cac38117fcdb8c2992e340341d" offset="0" />
 			</dataarea>
@@ -270,7 +395,7 @@ Missing files come here
 		<description>3Com Megahertz Lan 10-100 Cardbus PC Card (Version 2.2)</description>
 		<year>1999</year>
 		<publisher>3Com Corporation</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="3com megahertz lan 10-100 cardbus pc card (version 2.2).img" size="1474560" crc="396b570b" sha1="d45108ba37ba499b89e778b30c3ad58758046b2c" offset="0" />
 			</dataarea>
@@ -281,7 +406,7 @@ Missing files come here
 		<description>3Com Modem Driver (Version 5.01)</description>
 		<year>1998</year>
 		<publisher>3Com Corporation</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="3com modem driver (version 5.01).img" size="1474560" crc="f62b42a4" sha1="08d678bbdd85ec171327f023b49ea62aebbed7d1" offset="0" />
 			</dataarea>
@@ -292,7 +417,7 @@ Missing files come here
 		<description>A4Tech iWheelWorks (version 7.0)</description>
 		<year>2000</year>
 		<publisher>A4Tech</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="a4tech iwheelworks (version 7.0).img" size="1474560" crc="d514994a" sha1="1187b8595c5118d88b9bebf2bbdb74a057852dce" offset="0" />
 			</dataarea>
@@ -303,7 +428,7 @@ Missing files come here
 		<description>Compex RL2000 PnP Series Ethernet Adapter</description>
 		<year>1997</year>
 		<publisher>PDS</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="compex rl2000(a) pnp series ethernet adapter.img" size="1474560" crc="5f9c7545" sha1="efc5983466414aa6ca9edaae9d1dd6adc25cef84" offset="0" />
 			</dataarea>
@@ -314,7 +439,7 @@ Missing files come here
 		<description>Crystal Semiconductor Corp CS4237B (Version 1.80)</description>
 		<year>1996</year>
 		<publisher>Crystal Semiconductor Corp.</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="crystal semiconductor corp cs4237b (version 1.80) (37bxx3d-141296-34).img" size="1474560" crc="adc33367" sha1="ead63de3a30fcf996a4c8cd2b9c6f914363ee7c3" offset="0" />
 			</dataarea>
@@ -325,7 +450,7 @@ Missing files come here
 		<description>CD-ROM driver ATAPI (Version 3.2)</description>
 		<year>1999</year>
 		<publisher>CD Tech?</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="cdtech cd-rom driver atapi (version 3.2).img" size="1474560" crc="d41648aa" sha1="82728df751577e77591b544d4b77d781ad1457ba" offset="0" />
 			</dataarea>
@@ -336,7 +461,7 @@ Missing files come here
 		<description>High-Speed CD-ROM Driver (Version 4.14)</description>
 		<year>199?</year>
 		<publisher>Philips</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="generic high-speed cd-rom driver (version 4.14).img" size="1474560" crc="64b819ca" sha1="f958326e367d786d268a2da8453581d8ede11585" offset="0" />
 			</dataarea>
@@ -347,7 +472,7 @@ Missing files come here
 		<description>LT Windows Modem V.90 Data+Fax Modem Version (Version 5.31)</description>
 		<year>1999</year>
 		<publisher>Lucent Technologies</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="ltdrv52c pci modem driver (version 5.20c).img" size="1474560" crc="add60d61" sha1="7f91cd99fd5993f2a317f86a920adf4a0d4d4884" offset="0" />
 			</dataarea>
@@ -358,7 +483,7 @@ Missing files come here
 		<description>HP SureStore External CD-Writer Plus Driver (Version 1.36)</description>
 		<year>1999</year>
 		<publisher>Hewlett-Packard</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="hp surestore external cd-writer plus driver (version 1.36).img" size="1474560" crc="318bff31" sha1="5516f071e089d8c1273ed360a4344ec5fd25937c" offset="0" />
 			</dataarea>
@@ -369,7 +494,7 @@ Missing files come here
 		<description>Iomega Zip-drive Tools (Version 5.1)</description>
 		<year>1996</year>
 		<publisher>Iomega</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="iomega tools software (version 5.1).img" size="1474560" crc="17330c5d" sha1="71ac936b58f52b92a7ea49f52c56b720efcaf609" offset="0" />
 			</dataarea>
@@ -380,12 +505,12 @@ Missing files come here
 		<description>Cirrus Logic Display Drivers and Utilities (Version 1.30) </description>
 		<year>1993</year>
 		<publisher>Knowledge Dynamics Corp,</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="knowledge dynamics corp, cirrus logic supervga driver pt-521 (version 1.30) (disk 1).img" size="1474560" crc="9fd43bcd" sha1="f584a06007aba730e2fa63c5c5379080a854d74e" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="knowledge dynamics corp, cirrus logic supervga driver pt-521 (version 1.30) (disk 2).img" size="1474560" crc="f7350f94" sha1="0ebe33544679b90aa0497bc03abc576cf24d08a6" offset="0" />
 			</dataarea>
@@ -396,7 +521,7 @@ Missing files come here
 		<description>NEC Atapi-IDE CD-Rom Driver (Rev D011V110.ENG019)</description>
 		<year>1995</year>
 		<publisher>NEC</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="nec atapi-ide cd-rom drive ( rev d011v110.eng019).img" size="1474560" crc="9721fa23" sha1="62569c9620e2938613c9447d39958eee6ed615d8" offset="0" />
 			</dataarea>
@@ -407,12 +532,12 @@ Missing files come here
 		<description>Oki OL 400w Printer Driver</description>
 		<year>1993</year>
 		<publisher>Okidata</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="oki ol400w win3x disk1.img" size="1474560" crc="bff55368" sha1="074ffea26c06dc49ff3f7f34003a5927db2767bc" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="oki ol400w win3x disk2.img" size="1474560" crc="5dab6f33" sha1="1a262b58b648c7a38c2422fe93970f079f760c98" offset="0" />
 			</dataarea>
@@ -423,7 +548,7 @@ Missing files come here
 		<description>Realtek RTL8139-810X Fast Ethernet Adapter (Version 5.502.1231.2001)</description>
 		<year>2002</year>
 		<publisher>Realtek</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="realtek rtl8139-810x fast ethernet adapter (version 5.502.1231.2001).img" size="1474560" crc="07953bc3" sha1="40d0945d658fbefc2aa7c46b7f5e0c834b4d57be" offset="0" />
 			</dataarea>
@@ -434,7 +559,7 @@ Missing files come here
 		<description>Realtek RTL8139C PCI Fast Ethernet Adapter (Version 1.20)</description>
 		<year>2001</year>
 		<publisher>Realtek</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="realtek rtl8139c pci fast ethernet adapter (version 1.20).img" size="1474560" crc="06fec5ff" sha1="9a00d8dbf12fe4680625983f1f79f6cfe3650a38" offset="0" />
 			</dataarea>
@@ -446,7 +571,7 @@ Missing files come here
 		<year>1999</year>
 		<publisher>D-Link Systems</publisher><!-- Not 100% sure about it, but the drivers say Realtek, Seems to be a cloned N2000 Compatible Ethernet Adapter -->
 		<info name="alt_title" value="Realtek RTL8029 Ethernet Adapter" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="sn-3200 pci ethernet adapter driver (jun 15 1998).img" size="1474560" crc="a8c75e47" sha1="8463297bb3a885813733bb2803d0472361a9d81f" offset="0" />
 			</dataarea>
@@ -457,7 +582,7 @@ Missing files come here
 		<description>Sysgration Window Mouse Driver (Version 1.01)</description>
 		<year>1996</year>
 		<publisher>Sysgration Corporation</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="sysgration window mouse driver (version 1.01).img" size="1474560" crc="0b99e05d" sha1="4a21b803f1b222abf74050049e375fc9d458019c" offset="0" />
 			</dataarea>
@@ -468,7 +593,7 @@ Missing files come here
 		<description>U.S. Robotics Fax and I-Modem Driver Disk (Version 2.0)</description>
 		<year>1996</year>
 		<publisher>U.S. Robotics, Inc.</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="usrobotics fax and i-modem driver disk (version 2.0).img" size="737280" crc="c14ba5aa" sha1="6a7a42bdf2185c9e387a20113876804b7b631f87" offset="0" />
 			</dataarea>
@@ -479,7 +604,7 @@ Missing files come here
 		<description>U.S. Robotics Fax and I-Modem Driver Disk (Version 3.7)</description>
 		<year>1997</year>
 		<publisher>U.S. Robotics, Inc.</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="usrobotics fax and i-modem driver disk (version 3.7).img" size="1474560" crc="493ecc74" sha1="66cbb0d5026edd13df1f190caea41f83a10bde84" offset="0" />
 			</dataarea>
@@ -490,7 +615,7 @@ Missing files come here
 		<description>U.S. Robotics I-modem Configuration Manager (Version 1.2.2)</description>
 		<year>1996</year>
 		<publisher>U.S. Robotics, Inc.</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="usrobotics i-modem configuration manager (version 1.2.2).img" size="1474560" crc="1c810c4f" sha1="91c2b20582a981652b33133c9a94a9051c8fe627" offset="0" />
 			</dataarea>
@@ -501,7 +626,7 @@ Missing files come here
 		<description>ViewSonic Monitor Installation Disk</description>
 		<year>1998</year>
 		<publisher>ViewSonic Corporation</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="viewsonic monitor installation disk.img" size="1474560" crc="41a256cc" sha1="a98453b28bd2dba943d3e8c64cd98b9a460cd470" offset="0" />
 			</dataarea>
@@ -514,19 +639,36 @@ Missing files come here
 		<description>IBM PC-Dos 7 (Demonstration)</description>
 		<year>1994</year>
 		<publisher>IBM</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcdos7demo.img" size="737280" crc="c3af95bd" sha1="85a593503af1542b7332044d908c121d0b2475e9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="Btpscl55">
+		<description>Borland Turbo Pascal 5.5</description>
+		<year>1989</year>
+		<publisher>Borland</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk1 - Install.img" size="737280" crc="83431db5" sha1="837a34064742c1c5f2667d9b797ea8b4f1b75899" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk2 - Oop Demos.img" size="737280" crc="a18c3bab" sha1="4ce0876c0943e7de4d6524c52ef4ffb6259ec4dd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="wdel3">
 		<description>WinDelete 3.0</description>
 		<year>1996</year>
 		<publisher>IMSI</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<info name="alt_title" value="WinDelete 3.0 For Win 3.x Version 3.0 - 16 Bit" />
+		<part name="flop1" interface="floppy_3_5">
+		<feature name="disk_serial" value="03WDXW3001" />
 			<dataarea name="flop" size="1474560">
 				<rom name="wdel3.img" size="1474560" crc="9c2e76b9" sha1="b6b6f18726ce0f4ae1aeb2c33b8e4793ca15f87a" offset="0" />
 			</dataarea>
@@ -539,7 +681,7 @@ Missing files come here
 		<description>AMD 80C287 Game and Demo</description>
 		<year>199?</year>
 		<publisher>AMD</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1270016">
 				<rom name="amd-80c287-demo.dsk" size="1270016" crc="ee65696c" sha1="1df293a2fc61fdca728f60d973b5175f0d9c4427" offset="0" />
 			</dataarea>
@@ -550,7 +692,7 @@ Missing files come here
 		<description>Bible Adventures</description>
 		<year>1992</year>
 		<publisher>Wisdom Tree, Inc.</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="bibleadv.img" size="737280" crc="9832b695" sha1="4fb12b6d73b64d76a7526740ad81748c2a4d8df7" offset="0" />
 			</dataarea>
@@ -561,7 +703,7 @@ Missing files come here
 		<description>Bible Paint and Learn</description>
 		<year>1992</year>
 		<publisher>Ark Multimedia Publishing</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="paint_learn.img" size="737280" crc="4e9572cd" sha1="9073a9858bd94ec23ca1b3cd4497e106268568ea" offset="0" />
 			</dataarea>
@@ -579,7 +721,18 @@ Missing files come here
 		</part>
 	</software>
 
-		<software name="eschell">
+	<software name="cybrstrk">
+		<description>Cyberstrike</description>
+		<year>1994</year>
+		<publisher>Microprose</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Cyberstrike (1994) (Microprose).img" size="1474560" crc="d10eeefd" sha1="2d33e7078b9b1c83fbc223d26c7fbbc53e0406a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eschell">
 		<description>Escape From Hell</description>
 		<year>1990</year>
 		<publisher>Electronic Arts, Inc.</publisher>
@@ -595,12 +748,33 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="hook">
+		<description>Hook</description>
+		<year>1992</year>
+		<publisher>Ocean Software Ltd.</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk1.img" size="737280" crc="95e41749" sha1="4a319888e029ea2ba9bd748b74163865dd560843" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk2.img" size="737280" crc="97fcb4a9" sha1="51221cd1e47a691849716e6861760ab5b37a008d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="disk3.img" size="737280" crc="d4bd135f" sha1="78c48f2551f469aedcc80883f8555810e587285f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="incrmach">
 		<description>Incredible Machine</description>
 		<year>1993</year>
 		<publisher>Dynamix/Sierra</publisher>
 		<info name="version" value="1.0" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="incredible machine.img" size="1474560" crc="64f15085" sha1="f0ed16b665ad2378c59c1d1d9370479ca2eb494e" offset="0" />
 			</dataarea>
@@ -611,19 +785,42 @@ Missing files come here
 		<description>IndyCar Racing</description>
 		<year>1993</year>
 		<publisher>Papyrus Publishing Inc.</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<info name="version" value="1.02" />
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk1.img" size="1474560" crc="c2006f5c" sha1="cf599de208d42bc6b87d1d0fa30a02a43209cef2" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk2.img" size="1474560" crc="e3498668" sha1="a19f16c825b10105a6fce21f10176eccc23af520" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk3.img" size="1474560" crc="3e6fc1d5" sha1="45ee9c088ebee47ebc6be7e7d4337962c42a5887" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msroa">
+		<description>Microsoft Return of Arcade</description>
+		<year>1993</year>
+		<publisher>Microsoft</publisher>
+		<info name="Install Notes" value="Needs Windows 95" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="disk1.img" size="1474560" crc="52469b53" sha1="70b4b69e56821ab549c80ae0ecad6cbd335d0631" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1720320">
+				<rom name="disk2.img" size="1720320" crc="2c76da98" sha1="9899f3fac0dce1aef14bf5f9327d3941879eb314" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1720320">
+				<rom name="disk3.img" size="1720320" crc="9ad15a6c" sha1="3eeb07612f20bbfccca4343ed213d3c8f1371450" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -633,17 +830,17 @@ Missing files come here
 		<year>1994</year>
 		<publisher>Apogee Software, Ltd.</publisher>
 		<info name="version" value="1.2" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk1.img" size="1474560" crc="c4a8a748" sha1="b5377abe6a142d1dc3ff7019d2e77dd009799d3f" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk2.img" size="1474560" crc="9b3b7f22" sha1="79f93a72a9c9375ce5bc21b0b84d703ccb8100cd" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk3.img" size="1474560" crc="05443ceb" sha1="3b8bd610d90677a830f9b4e297e4a89343cb86a2" offset="0" />
 			</dataarea>
@@ -654,7 +851,7 @@ Missing files come here
 		<description>Street Fighter</description>
 		<year>1988</year>
 		<publisher>Capcom Co., Ltd.</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="street fighter.img" size="737280" crc="838baa9e" sha1="ef14c9638208e04fcc819ebc7908c7611a929624" offset="0" />
 			</dataarea>
@@ -665,12 +862,12 @@ Missing files come here
 		<description>SimAnt</description>
 		<year>1991</year>
 		<publisher>Maxis</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="simant.img" size="737280" crc="a909b075" sha1="3036c42da40576e0dcdc78238f9154aad1474232" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="simantd2.img" size="737280" crc="77b35cd5" sha1="4283c141e768cc27f2b1d5d8d33a8181a23f89ce" offset="0" />
 			</dataarea>
@@ -681,12 +878,12 @@ Missing files come here
 		<description>SimCity Classic</description>
 		<year>1992</year>
 		<publisher>Maxis</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="simcityc.img" size="737280" crc="caafe010" sha1="312acedea33f2e7b8e4329092696a1313eb4d994" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="simcitycd2.img" size="737280" crc="5088846e" sha1="449a83461d24d9a8be69cae35bea61359cfe1893" offset="0" />
 			</dataarea>
@@ -697,12 +894,12 @@ Missing files come here
 		<description>SimLife</description>
 		<year>1992</year>
 		<publisher>Maxis</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="simlife.img" size="737280" crc="59898bed" sha1="346ae9fb47fe2a0324e2df8f1f77c09dd5c3d8ec" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="simlifed2.img" size="737280" crc="6e704c65" sha1="fc2e641147584f3a5675083edbd0cee355db3ba6" offset="0" />
 			</dataarea>
@@ -713,12 +910,12 @@ Missing files come here
 		<description>Sim City 2000  (Ver 1.00)</description>
 		<year>1993</year>
 		<publisher>Maxis</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="smcity2kd1.img" size="1474560" crc="934c0301" sha1="d5e68ee9a4b1d5146b93d7c08b99c099463ef37a" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="smcity2kd2.img" size="1474560" crc="a749874b" sha1="e1e0ad1b7ffa28a1da86d8b44a59d318588b0f6a" offset="0" />
 			</dataarea>
@@ -729,12 +926,12 @@ Missing files come here
 		<description>Sim City 2000 (Ver 1.01)</description>
 		<year>1993</year>
 		<publisher>Maxis</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="smcity2kd1 (a).img" size="1474560" crc="81f95788" sha1="d387dd7356bcf7ec28b356039fdcdb44575325c2" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="smcity2kd2 (b).img" size="1474560" crc="1ee7e285" sha1="6044db835d54457ac5fff092b4d29b7847524986" offset="0" />
 			</dataarea>
@@ -745,7 +942,7 @@ Missing files come here
 		<description>SimCity 2000 Scenarios Volume 1 - Great Disasters</description>
 		<year>1994</year>
 		<publisher>Maxis</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="scenario vol 1.img" size="1474560" crc="0eacae3e" sha1="398bfef77a18ac6650be433b0988b9620442d9d8" offset="0" />
 			</dataarea>
@@ -756,27 +953,27 @@ Missing files come here
 		<description>Star Wars - X-Wing - Space Combat Simulator</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk1.img" size="1474560" crc="8e8f9d0b" sha1="c98d3d8560f9d6ef9f8052f75928b4e2a93164e7" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk2.img" size="1474560" crc="adb091f3" sha1="5b6be2f738b21aea59a089c8e7d5bda852d6f5af" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk3.img" size="1474560" crc="9d516d11" sha1="c7c1cf18af49153aec0f14cbb8df32db33c150db" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk4.img" size="1474560" crc="5981f879" sha1="85dc83fecdb8b754c8d10c8579e0e644435eb7be" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop5" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk5.img" size="1474560" crc="3af204de" sha1="8984ca008b4948b1c9066c9314f6c0e80c085fe4" offset="0" />
 			</dataarea>
@@ -787,7 +984,7 @@ Missing files come here
 		<description>Star Wars - X-Wing B-Wing Expansion</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="bwing.img" size="1474560" crc="91d0f97a" sha1="edb745afa6376808314364e08c3000594edf2c3b" offset="0" />
 			</dataarea>
@@ -799,7 +996,7 @@ Missing files come here
 		<description>Star Wars - X-Wing Imperial Pursuit</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="xwing.img" size="1474560" crc="34eebdb6" sha1="fcee862c9b2460aed9cbf3b46657ad4e4eff5dcd" offset="0" status="baddump" />
 			</dataarea>
@@ -810,27 +1007,27 @@ Missing files come here
 		<description>Star Wars - TIE Fighter</description>
 		<year>1994</year>
 		<publisher>LucasArts</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="swtiefgt.img" size="1474560" crc="b850f9a2" sha1="a439a1c8a600e77fe572b10779905a59ffdfaf62" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="swtiefgtd2.img" size="1474560" crc="70ce3029" sha1="803b58d8aa94d6b5eb8e0b118e1934fefef11bce" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="swtiefgtd3.img" size="1474560" crc="e084c30d" sha1="710cff3865fe5d84c8d44cf3ef2b1ca0121d147a" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="swtiefgtd4.img" size="1474560" crc="5cc5ec97" sha1="a21fbeaab34f82db9a51381975d314f845bf2c26" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop5" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="swtiefgtd5.img" size="1474560" crc="7751ed1f" sha1="4fc14b87a62ab1db717227ef3ad9343ce3aa7193" offset="0" />
 			</dataarea>
@@ -842,19 +1039,19 @@ Missing files come here
 		<year>1992</year>
 		<publisher>MicroProse Ltd.</publisher>
 		<info name="version" value="1.2" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<feature name="Disc Code" value="4861A" />
 			<dataarea name="flop" size="1474560">
 				<rom name="diska.img" size="1474560" crc="02ced55a" sha1="0f96038f1552bff33747dea41c0ac6c0a1486ad3" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_3_5">
 			<feature name="Disc Code" value="4861B" />
 			<dataarea name="flop" size="1474560">
 				<rom name="diskb.img" size="1474560" crc="e7ff6515" sha1="6378a6d1d461015890f73d0dc5799acd412a3630" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_3_5">
 			<feature name="Disc Code" value="4861C" />
 			<dataarea name="flop" size="1474560">
 				<rom name="diskc.img" size="1474560" crc="9ad130ca" sha1="a3414cb53382402b5cb8908983a0e10dc4542e3e" offset="0" />
@@ -874,7 +1071,7 @@ Missing files come here
 		<year>1992</year>
 		<publisher>PC Games</publisher>
 		<info name="contents" value="Gobliins 2 Demo" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames11-92.img" size="737280" crc="f4d79314" sha1="2698ff66cf8d53774d9d09ec26f42514272ef9a6" offset="0" status="baddump" />
 			</dataarea>
@@ -889,7 +1086,7 @@ Missing files come here
 		<year>1993</year>
 		<publisher>PC Games</publisher>
 		<info name="contents" value="History-Line 1914-1918 Demo" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames01-93.img" size="737280" crc="7597e279" sha1="7fde2fd85e9362ae7223855e60a95508917a96a1" offset="0" status="baddump" />
 			</dataarea>
@@ -901,7 +1098,7 @@ Missing files come here
 		<year>1993</year>
 		<publisher>PC Games</publisher>
 		<info name="contents" value="Oxyd Demo" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames02-93.img" size="737280" crc="518c19d3" sha1="a071a3c78b7bc30cc04263c925c72887ed36146d" offset="0" status="baddump" />
 			</dataarea>
@@ -922,7 +1119,7 @@ Missing files come here
 		<year>1993</year>
 		<publisher>PC Games</publisher>
 		<info name="contents" value="Skat 2010 Demo" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames06-93.img" size="737280" crc="60e3fd08" sha1="01d36ceb390c85b724031a1d62c04a5681efdddf" offset="0" status="baddump" />
 			</dataarea>
@@ -934,7 +1131,7 @@ Missing files come here
 		<year>1993</year>
 		<publisher>PC Games</publisher>
 		<info name="contents" value="Syndicate Demo" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames07-93.img" size="737280" crc="d5e48d7b" sha1="cc73c5aa2d35b0e19874bff0d6cacae24fc699b4" offset="0" status="baddump" />
 			</dataarea>
@@ -946,7 +1143,7 @@ Missing files come here
 		<year>1993</year>
 		<publisher>PC Games</publisher>
 		<info name="contents" value="Pinball Dreams Demo" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames08-93.img" size="737280" crc="5c97c2dd" sha1="612dda3f5d2431fff0398f7f1aaf3a89a0d11a66" offset="0" status="baddump" />
 			</dataarea>
@@ -961,7 +1158,7 @@ Missing files come here
 		<year>1993</year>
 		<publisher>PC Games</publisher>
 		<info name="contents" value="The Lost Vikings Demo" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames10-93.img" size="737280" crc="889763d3" sha1="e50ac372d72b23e06a5a516e895a98f66987317f" offset="0" status="baddump" />
 			</dataarea>
@@ -982,7 +1179,7 @@ Missing files come here
 		<year>1993</year>
 		<publisher>PC Games</publisher>
 		<info name="contents" value="Magic Boy / Oxyd Magnum Demo" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames02-94.img" size="737280" crc="9f2d7737" sha1="65d61d1d827f9e954a6e1f21082e33f81ff1ae01" offset="0" status="baddump" />
 			</dataarea>
@@ -997,7 +1194,7 @@ Missing files come here
 		<year>1993</year>
 		<publisher>PC Games</publisher>
 		<info name="contents" value="Beneath a Steel Sky Demo" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames04-94.img" size="737280" crc="de1257c6" sha1="be2584f9181758f17e6559ebfeec62437b5a56ab" offset="0" status="baddump" />
 			</dataarea>
@@ -1009,7 +1206,7 @@ Missing files come here
 		<year>1993</year>
 		<publisher>PC Games</publisher>
 		<info name="contents" value="Mad News Demo" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames05-94.img" size="737280" crc="79596853" sha1="0baaa8f39c91b7623ae7c8b87e45afcc7e10b2a3" offset="0" status="baddump" />
 			</dataarea>
@@ -1021,7 +1218,7 @@ Missing files come here
 		<year>1993</year>
 		<publisher>PC Games</publisher>
 		<info name="contents" value="Die Siedler Demo" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames06-94.img" size="737280" crc="0062b36b" sha1="a68b9201c6f723896fe3ac44177e4daab8d8ebcd" offset="0" status="baddump" />
 			</dataarea>
@@ -1051,7 +1248,7 @@ Missing files come here
 		<year>1993</year>
 		<publisher>PC Games</publisher>
 		<info name="contents" value="Universe / Cheat it Demo" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="pcgames01-95.img" size="737280" crc="12e12534" sha1="091393557c281cc2e659b8fd089e9b98845a5dec" offset="0" status="baddump" />
 			</dataarea>
@@ -1064,22 +1261,22 @@ Missing files come here
 		<description>Air Duel - 80 Years of Dogfighting</description>
 		<year>1993</year>
 		<publisher>MicroProse Ltd.</publisher>
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="diska.img" size="1474560" crc="d8e7a342" sha1="026af5576bf2b75ef609af0774958485c50c773b" offset="0" status="baddump" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="diskb.img" size="1474560" crc="56e219e0" sha1="41afccc7f5ece6e090246e334ca1add3581f2350" offset="0" status="baddump" />
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="diskc.img" size="1474560" crc="2e3fc2c2" sha1="7470d282463fe6fc40b4ed3833ee3e52b16c7805" offset="0" status="baddump" />
 			</dataarea>
 		</part>
-		<part name="flop4" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="diskd.img" size="1474560" crc="5d84110d" sha1="0140425ccb5aea27ccbff00a320941cccd86ac7a" offset="0" status="baddump" />
 			</dataarea>
