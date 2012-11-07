@@ -61,6 +61,7 @@ protected:
 
 #define O(o) void o ## _full(); void o ## _partial()
 
+	O(brk_16_imp);
 	O(ill_non);
 	O(u0B_zpg);
 	O(u13_zpg);
@@ -73,6 +74,8 @@ protected:
 	O(uAB_zpg);
 	O(uBB_zpg);
 	O(vbl_zpg);
+
+	O(reset_16);
 
 #undef O
 };
