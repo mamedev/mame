@@ -149,7 +149,6 @@ A few notes:
 #define HCLK2            (HCLK1/2)
 #define HCLK4            (HCLK2/2)
 
-
 enum
 {
 	AUDIO_ENABLE_NONE,
@@ -157,9 +156,101 @@ enum
 	AUDIO_ENABLE_AY8910			/* via ay-8910 port A */
 };
 
+class deco_cpu7_device : public m6502_device {
+public:
+	deco_cpu7_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	class mi_decrypt : public mi_default_normal {
+	public:
+		bool had_written;
+
+		virtual UINT8 read_decrypted(UINT16 adr);
+		virtual void write(UINT16 adr, UINT8 val);
+	};
+
+	virtual void device_start();
+	virtual void device_reset();
+
+};
+
+static const device_type DECO_CPU7 = &device_creator<deco_cpu7_device>;
+
+deco_cpu7_device::deco_cpu7_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	m6502_device(mconfig, DECO_CPU7, "DECO CPU-7", tag, owner, clock)
+{
+}
+
+void deco_cpu7_device::device_start()
+{
+	mintf = new mi_decrypt;
+	init();
+}
+
+void deco_cpu7_device::device_reset()
+{
+	m6502_device::device_reset();
+	static_cast<mi_decrypt *>(mintf)->had_written = false;
+}
+
+UINT8 deco_cpu7_device::mi_decrypt::read_decrypted(UINT16 adr)
+{
+	UINT8 res = direct->read_raw_byte(adr);
+	if(had_written) {
+		had_written = false;
+		if((adr & 0x0104) == 0x0104)
+			res = BITSWAP8(res, 6,5,3,4,2,7,1,0);
+	}
+	return res;
+}
+
+void deco_cpu7_device::mi_decrypt::write(UINT16 adr, UINT8 val)
+{
+	program->write_byte(adr, val);
+	had_written = true;	
+}
 
 
-static UINT8 *decrypted; // TODO: put me in btime class
+class deco_c10707_device : public m6502_device {
+public:
+	deco_c10707_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	class mi_decrypt : public mi_default_normal {
+	public:
+		bool had_written;
+
+		virtual UINT8 read_decrypted(UINT16 adr);
+	};
+
+	virtual void device_start();
+	virtual void device_reset();
+
+};
+
+static const device_type DECO_C10707 = &device_creator<deco_c10707_device>;
+
+deco_c10707_device::deco_c10707_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	m6502_device(mconfig, DECO_C10707, "DECO CPU-7", tag, owner, clock)
+{
+}
+
+void deco_c10707_device::device_start()
+{
+	mintf = new mi_decrypt;
+	init();
+}
+
+void deco_c10707_device::device_reset()
+{
+	m6502_device::device_reset();
+	static_cast<mi_decrypt *>(mintf)->had_written = false;
+}
+
+UINT8 deco_c10707_device::mi_decrypt::read_decrypted(UINT16 adr)
+{
+	return BITSWAP8(direct->read_raw_byte(adr) ,7,5,6,4,3,2,1,0);;
+}
 
 WRITE8_MEMBER(btime_state::audio_nmi_enable_w)
 {
@@ -190,153 +281,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(btime_state::audio_nmi_gen)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
-
-INLINE UINT8 swap_bits_5_6(UINT8 data)
-{
-	return BITSWAP8(data,7,5,6,4,3,2,1,0);
-}
-
-
-static void btime_decrypt( address_space &space )
-{
-	btime_state *state = space.machine().driver_data<btime_state>();
-	UINT8 *src, *src1;
-	int addr, addr1;
-
-	/* the encryption is a simple bit rotation: 76543210 -> 65342710, but */
-	/* with a catch: it is only applied if the previous instruction did a */
-	/* memory write. Also, only opcodes at addresses with this bit pattern: */
-	/* xxxx xxx1 xxxx x1xx are encrypted. */
-
-	/* get the address of the next opcode */
-	addr = space.device().safe_pc();
-
-	/* however if the previous instruction was JSR (which caused a write to */
-	/* the stack), fetch the address of the next instruction. */
-	addr1 = space.device().safe_pcbase();
-	src1 = (addr1 < 0x9000) ? state->m_rambase : state->memregion("maincpu")->base();
-	if (decrypted[addr1] == 0x20)	/* JSR $xxxx */
-		addr = src1[addr1 + 1] + 256 * src1[addr1 + 2];
-
-	/* If the address of the next instruction is xxxx xxx1 xxxx x1xx, decode it. */
-	src = (addr < 0x9000) ? state->m_rambase : state->memregion("maincpu")->base();
-	if ((addr & 0x0104) == 0x0104)
-	{
-		/* 76543210 -> 65342710 bit rotation */
-		decrypted[addr] = BITSWAP8(src[addr],6,5,3,4,2,7,1,0);
-	}
-}
-
-WRITE8_MEMBER(btime_state::lnc_w)
-{
-	if      (offset <= 0x3bff)                       ;
-	else if (offset >= 0x3c00 && offset <= 0x3fff) { lnc_videoram_w(space, offset - 0x3c00, data); return; }
-	else if (offset >= 0x7c00 && offset <= 0x7fff) { lnc_mirrorvideoram_w(space, offset - 0x7c00, data); return; }
-	else if (offset == 0x8000)                     { return; }  /* AM_NOP */
-	else if (offset == 0x8001)                     { bnj_video_control_w(space, 0, data); return; }
-	else if (offset == 0x8003)                       ;
-	else if (offset == 0x9000)                     { return; }  /* AM_NOP */
-	else if (offset == 0x9002)                     { audio_command_w(space, 0, data); return; }
-	else if (offset >= 0xb000 && offset <= 0xb1ff)   ;
-	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space.device().tag(), space.device().safe_pc(), data, offset);
-
-	m_rambase[offset] = data;
-
-	/* Swap bits 5 & 6 for opcodes */
-	decrypted[offset] = swap_bits_5_6(data);
-}
-
-WRITE8_MEMBER(btime_state::mmonkey_w)
-{
-	if      (offset <= 0x3bff)                       ;
-	else if (offset >= 0x3c00 && offset <= 0x3fff) { lnc_videoram_w(space, offset - 0x3c00, data); return; }
-	else if (offset >= 0x7c00 && offset <= 0x7fff) { lnc_mirrorvideoram_w(space, offset - 0x7c00, data); return; }
-	else if (offset == 0x8001)                     { bnj_video_control_w(space, 0, data); return; }
-	else if (offset == 0x8003)                       ;
-	else if (offset == 0x9000)                     { return; }  /* AM_NOP */
-	else if (offset == 0x9002)                     { audio_command_w(space, 0, data); return; }
-	else if (offset >= 0xb000 && offset <= 0xbfff) { mmonkey_protection_w(space, offset - 0xb000, data); return; }
-	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space.device().tag(), space.device().safe_pc(), data, offset);
-
-	m_rambase[offset] = data;
-
-	/* Swap bits 5 & 6 for opcodes */
-	decrypted[offset] = swap_bits_5_6(data);
-}
-
-WRITE8_MEMBER(btime_state::btime_w)
-{
-	if      (offset <= 0x07ff)                     ;
-	else if (offset >= 0x0c00 && offset <= 0x0c0f) btime_paletteram_w(space, offset - 0x0c00, data);
-	else if (offset >= 0x1000 && offset <= 0x17ff) ;
-	else if (offset >= 0x1800 && offset <= 0x1bff) btime_mirrorvideoram_w(space, offset - 0x1800, data);
-	else if (offset >= 0x1c00 && offset <= 0x1fff) btime_mirrorcolorram_w(space, offset - 0x1c00, data);
-	else if (offset == 0x4002)                     btime_video_control_w(space, 0, data);
-	else if (offset == 0x4003)                     audio_command_w(space, 0, data);
-	else if (offset == 0x4004)                     bnj_scroll1_w(space, 0, data);
-	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space.device().tag(), space.device().safe_pc(), data, offset);
-
-	m_rambase[offset] = data;
-
-	btime_decrypt(space);
-}
-
-WRITE8_MEMBER(btime_state::tisland_w)
-{
-	if      (offset <= 0x07ff)                     ;
-	else if (offset >= 0x0c00 && offset <= 0x0c0f) btime_paletteram_w(space, offset - 0x0c00, data);
-	else if (offset >= 0x1000 && offset <= 0x17ff) ;
-	else if (offset >= 0x1800 && offset <= 0x1bff) btime_mirrorvideoram_w(space, offset - 0x1800, data);
-	else if (offset >= 0x1c00 && offset <= 0x1fff) btime_mirrorcolorram_w(space, offset - 0x1c00, data);
-	else if (offset == 0x4002)                     btime_video_control_w(space, 0, data);
-	else if (offset == 0x4003)                     audio_command_w(space, 0, data);
-	else if (offset == 0x4004)                     bnj_scroll1_w(space, 0, data);
-	else if (offset == 0x4005)			     bnj_scroll2_w(space, 0, data);
-//  else if (offset == 0x8000)                     btime_video_control_w(space,0,data);
-	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space.device().tag(), space.device().safe_pc(), data, offset);
-
-	m_rambase[offset] = data;
-
-	btime_decrypt(space);
-}
-
-WRITE8_MEMBER(btime_state::zoar_w)
-{
-	if      (offset <= 0x07ff)					   ;
-	else if (offset >= 0x8000 && offset <= 0x87ff) ;
-	else if (offset >= 0x8800 && offset <= 0x8bff) btime_mirrorvideoram_w(space, offset - 0x8800, data);
-	else if (offset >= 0x8c00 && offset <= 0x8fff) btime_mirrorcolorram_w(space, offset - 0x8c00, data);
-	else if (offset == 0x9000)					   zoar_video_control_w(space, 0, data);
-	else if (offset >= 0x9800 && offset <= 0x9803) ;
-	else if (offset == 0x9804)                     bnj_scroll2_w(space, 0, data);
-	else if (offset == 0x9805)                     bnj_scroll1_w(space, 0, data);
-	else if (offset == 0x9806)                     audio_command_w(space, 0, data);
-	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space.device().tag(), space.device().safe_pc(), data, offset);
-
-	m_rambase[offset] = data;
-
-	btime_decrypt(space);
-}
-
-WRITE8_MEMBER(btime_state::disco_w)
-{
-	if      (offset <= 0x04ff)                     ;
-	else if (offset >= 0x2000 && offset <= 0x7fff) deco_charram_w(space, offset - 0x2000, data);
-	else if (offset >= 0x8000 && offset <= 0x881f) ;
-	else if (offset == 0x9a00)                     audio_command_w(space, 0, data);
-	else if (offset == 0x9c00)                     disco_video_control_w(space, 0, data);
-	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n", space.device().tag(), space.device().safe_pc(), data, offset);
-
-	m_rambase[offset] = data;
-
-	btime_decrypt(space);
-}
-
-
 static ADDRESS_MAP_START( btime_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(btime_w)	/* override the following entries to */
-												/* support ROM decryption */
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x0c00, 0x0c0f) AM_WRITE(btime_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
@@ -372,8 +317,6 @@ static ADDRESS_MAP_START( cookrace_map, AS_PROGRAM, 8, btime_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tisland_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(tisland_w)	/* override the following entries to */
-													/* support ROM decryption */
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x0c00, 0x0c0f) AM_WRITE(btime_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
@@ -390,8 +333,6 @@ static ADDRESS_MAP_START( tisland_map, AS_PROGRAM, 8, btime_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zoar_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(zoar_w)	/* override the following entries to */
-												/* support ROM decryption */
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x8000, 0x83ff) AM_WRITEONLY AM_SHARE("videoram")
 	AM_RANGE(0x8400, 0x87ff) AM_WRITEONLY AM_SHARE("colorram")
@@ -410,8 +351,6 @@ static ADDRESS_MAP_START( zoar_map, AS_PROGRAM, 8, btime_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lnc_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(lnc_w)	/* override the following entries to */
-												/* support ROM decryption */
 	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(lnc_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x7800, 0x7bff) AM_WRITEONLY AM_SHARE("colorram")  /* this is just here to initialize the pointer */
@@ -427,8 +366,6 @@ static ADDRESS_MAP_START( lnc_map, AS_PROGRAM, 8, btime_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mmonkey_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(mmonkey_w)	/* override the following entries to */
-													/* support ROM decryption */
 	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(lnc_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x7800, 0x7bff) AM_WRITEONLY AM_SHARE("colorram")		/* this is just here to initialize the pointer */
@@ -462,8 +399,6 @@ static ADDRESS_MAP_START( bnj_map, AS_PROGRAM, 8, btime_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( disco_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(disco_w)	/* override the following entries to */
-												/* support ROM decryption */
 	AM_RANGE(0x0000, 0x04ff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x2000, 0x7fff) AM_RAM_WRITE(deco_charram_w) AM_SHARE("deco_charram")
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("videoram")
@@ -1457,7 +1392,7 @@ MACHINE_RESET_MEMBER(btime_state,mmonkey)
 static MACHINE_CONFIG_START( btime, btime_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, HCLK2)	/* seletable between H2/H4 via jumper */
+	MCFG_CPU_ADD("maincpu", DECO_CPU7, HCLK2)	/* seletable between H2/H4 via jumper */
 	MCFG_CPU_PROGRAM_MAP(btime_map)
 
 	MCFG_CPU_ADD("audiocpu", M6502, HCLK1/3/2)
@@ -1502,7 +1437,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( cookrace, btime )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK2)
 	MCFG_CPU_PROGRAM_MAP(cookrace_map)
 
 	MCFG_CPU_MODIFY("audiocpu")
@@ -1520,7 +1455,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( lnc, btime )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK2)
 	MCFG_CPU_PROGRAM_MAP(lnc_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,lnc)
@@ -1558,7 +1493,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( sdtennis, btime )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK4)
 	MCFG_CPU_CLOCK(HCLK4)
 	MCFG_CPU_PROGRAM_MAP(bnj_map)
 
@@ -2035,23 +1970,6 @@ ROM_START( sdtennis )
 	ROM_LOAD( "ao_04.10f",   0x1000, 0x1000, CRC(921952af) SHA1(4e9248f3493a5f4651278f27c11f507571242317) )
 ROM_END
 
-static void decrypt_C10707_cpu(running_machine &machine, const char *cputag)
-{
-	address_space &space = machine.device(cputag)->memory().space(AS_PROGRAM);
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8 *rom = machine.root_device().memregion(cputag)->base();
-	offs_t addr;
-
-	space.set_decrypted_region(0x0000, 0xffff, decrypt);
-
-	/* Swap bits 5 & 6 for opcodes */
-	for (addr = 0; addr < 0x10000; addr++)
-		decrypt[addr] = swap_bits_5_6(rom[addr]);
-
-	if (&space.device() == machine.device("maincpu"))
-		decrypted = decrypt;
-}
-
 READ8_MEMBER(btime_state::wtennis_reset_hack_r)
 {
 	UINT8 *RAM = memregion("maincpu")->base();
@@ -2065,23 +1983,8 @@ READ8_MEMBER(btime_state::wtennis_reset_hack_r)
 	return RAM[0xc15f];
 }
 
-static void init_rom1(running_machine &machine)
-{
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
-
-	decrypted = auto_alloc_array(machine, UINT8, 0x10000);
-	space.set_decrypted_region(0x0000, 0xffff, decrypted);
-
-	/* For now, just copy the RAM array over to ROM. Decryption will happen */
-	/* at run time, since the CPU applies the decryption only if the previous */
-	/* instruction did a memory write. */
-	memcpy(decrypted,rom,0x10000);
-}
-
 DRIVER_INIT_MEMBER(btime_state,btime)
 {
-	init_rom1(machine());
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
@@ -2095,7 +1998,6 @@ DRIVER_INIT_MEMBER(btime_state,zoar)
        I'm NOPing it out for now. */
 	memset(&rom[0xd50a],0xea,8);
 
-	init_rom1(machine());
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 
@@ -2104,24 +2006,21 @@ DRIVER_INIT_MEMBER(btime_state,tisland)
 	UINT8 *rom = memregion("maincpu")->base();
 
 	/* At location 0xa2b6 there's a strange RLA followed by a BPL that reads from an
-    unmapped area that causes the game to fail in several circumstances.On the Cassette
-    version the RLA (33) is in reality a BIT (24),so I'm guessing that there's something
-    wrong going on in the encryption scheme.*/
+	   unmapped area that causes the game to fail in several circumstances.On the Cassette
+	   version the RLA (33) is in reality a BIT (24),so I'm guessing that there's something
+	   wrong going on in the encryption scheme.*/
 	memset(&rom[0xa2b6],0x24,1);
 
-	init_rom1(machine());
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
 DRIVER_INIT_MEMBER(btime_state,lnc)
 {
-	decrypt_C10707_cpu(machine(), "maincpu");
 	m_audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }
 
 DRIVER_INIT_MEMBER(btime_state,bnj)
 {
-	decrypt_C10707_cpu(machine(), "maincpu");
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
@@ -2133,8 +2032,6 @@ DRIVER_INIT_MEMBER(btime_state,disco)
 
 DRIVER_INIT_MEMBER(btime_state,cookrace)
 {
-	decrypt_C10707_cpu(machine(), "maincpu");
-
 	machine().device("audiocpu")->memory().space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
 	membank("bank10")->set_base(memregion("audiocpu")->base() + 0xe200);
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
@@ -2148,8 +2045,6 @@ DRIVER_INIT_MEMBER(btime_state,protennb)
 
 DRIVER_INIT_MEMBER(btime_state,wtennis)
 {
-	decrypt_C10707_cpu(machine(), "maincpu");
-
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc15f, 0xc15f, read8_delegate(FUNC(btime_state::wtennis_reset_hack_r),this));
 
 	machine().device("audiocpu")->memory().space(AS_PROGRAM).install_read_bank(0x0200, 0x0fff, "bank10");
@@ -2159,8 +2054,6 @@ DRIVER_INIT_MEMBER(btime_state,wtennis)
 
 DRIVER_INIT_MEMBER(btime_state,sdtennis)
 {
-	decrypt_C10707_cpu(machine(), "maincpu");
-	decrypt_C10707_cpu(machine(), "audiocpu");
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
 
