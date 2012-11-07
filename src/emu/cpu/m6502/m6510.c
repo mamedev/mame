@@ -92,6 +92,7 @@ void m6510_device::device_start()
 
 void m6510_device::device_reset()
 {
+	m6502_device::device_reset();
 	dir = 0x00;
 	port = 0x00;
 	drive = 0x00;

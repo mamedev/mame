@@ -65,6 +65,7 @@ void m6509_device::device_start()
 
 void m6509_device::device_reset()
 {
+	m6502_device::device_reset();
 	bank_i = 0x0f;
 	bank_y = 0x0f;
 }

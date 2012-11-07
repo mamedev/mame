@@ -122,6 +122,7 @@ void m6502_device::init()
 	inst_substate = 0;
 	sync = false;
 	end_cycles = 0;
+	inhibit_interrupts = false;
 }
 
 void m6502_device::device_reset()
@@ -150,7 +151,7 @@ UINT32 m6502_device::execute_max_cycles() const
 
 UINT32 m6502_device::execute_input_lines() const
 {
-	return 3;
+	return NMI_LINE+1;
 }
 
 void m6502_device::do_adc_d(UINT8 val)

@@ -70,6 +70,7 @@ void m4510_device::device_start()
 
 void m4510_device::device_reset()
 {
+	m65ce02_device::device_reset();
 	map_offset[0] = map_offset[1] = 0;
 	map_enable = 0;
 	nomap = true;
