@@ -53,9 +53,7 @@ class avr8_device;
 
 struct avr8_config
 {
-	void (*m_portb_changed)(avr8_device &device, UINT8 pins, UINT8 changed);
-	void (*m_portc_changed)(avr8_device &device, UINT8 pins, UINT8 changed);
-	void (*m_portd_changed)(avr8_device &device, UINT8 pins, UINT8 changed);
+	const char *eeprom_region;
 };
 
 
@@ -79,7 +77,13 @@ public:
 		return m_elapsed_cycles;
 	}
 
+	// register handling
+	DECLARE_WRITE8_MEMBER( regs_w );
+	DECLARE_READ8_MEMBER( regs_r );
+
 protected:
+	avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const device_type type, UINT32 address_mask, address_map_constructor internal_map);
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
@@ -104,15 +108,16 @@ protected:
 
 	// address spaces
 	const address_space_config m_program_config;
+	const address_space_config m_data_config;
 	const address_space_config m_io_config;
+    UINT8 *m_eeprom;
 
 	// CPU registers
     UINT32 m_pc;
-    UINT32 m_debugger_pc;
-	UINT8 m_status;
+    UINT32 m_shifted_pc;
 	UINT8 m_r[256];
 
-	// On-chip Device Registers
+	// internal timers
     UINT8 m_timer0_top;
 	INT32 m_timer0_increment;
 	UINT16 m_timer0_prescale;
@@ -128,7 +133,22 @@ protected:
 	UINT16 m_timer2_prescale;
 	UINT16 m_timer2_prescale_count;
 
-    // internal stuff
+	// SPI
+	bool m_spi_active;
+	UINT8 m_spi_prescale;
+	UINT8 m_spi_prescale_count;
+	INT8 m_spi_prescale_countdown;
+    static const UINT8 spi_clock_divisor[8];
+	void enable_spi();
+	void disable_spi();
+	void spi_update_masterslave_select();
+	void spi_update_clock_polarity();
+	void spi_update_clock_phase();
+	void spi_update_clock_rate();
+	void change_spcr(UINT8 data);
+	void change_spsr(UINT8 data);
+
+    // internal CPU state
 	UINT32 m_addr_mask;
 	bool m_interrupt_pending;
 
@@ -160,33 +180,35 @@ protected:
 
 	// timer 0
 	void timer0_tick();
+	void changed_tccr0a(UINT8 data);
+	void changed_tccr0b(UINT8 data);
+	void update_timer0_waveform_gen_mode();
+	void update_timer0_clock_source();
+	void update_ocr0(UINT8 newval, UINT8 reg);
+	void timer0_force_output_compare(int reg);
 
 	// timer 1
 	void timer1_tick();
-	void change_timsk1(UINT8 data);
-	void update_timer1_waveform_gen_mode();
 	void changed_tccr1a(UINT8 data);
+	void changed_tccr1b(UINT8 data);
+	void update_timer1_waveform_gen_mode();
+	void update_timer1_clock_source();
 	void update_timer1_input_noise_canceler();
 	void update_timer1_input_edge_select();
-	void update_timer1_clock_source();
-	void changed_tccr1b(UINT8 data);
 	void update_ocr1(UINT16 newval, UINT8 reg);
 
 	// timer 2
 	void timer2_tick();
-	void update_timer2_waveform_gen_mode();
 	void changed_tccr2a(UINT8 data);
-	void update_timer2_clock_source();
-	void timer2_force_output_compare(int reg);
 	void changed_tccr2b(UINT8 data);
+	void update_timer2_waveform_gen_mode();
+	void update_timer2_clock_source();
 	void update_ocr2(UINT8 newval, UINT8 reg);
-
-	// register Handling
-	bool io_reg_write(UINT16 offset, UINT8 data);
-	bool io_reg_read(UINT16 offset, UINT8 *data);
+	void timer2_force_output_compare(int reg);
 
 	// address spaces
     address_space *m_program;
+    address_space *m_data;
     address_space *m_io;
 };
 
@@ -200,8 +222,7 @@ class atmega88_device : public avr8_device
 {
 public:
 	// construction/destruction
-	atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	 : avr8_device(mconfig, tag, owner, clock, ATMEGA88, 0x0fff) { }
+	atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 // ======================> atmega644_device
@@ -210,8 +231,7 @@ class atmega644_device : public avr8_device
 {
 public:
 	// construction/destruction
-	atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	 : avr8_device(mconfig, tag, owner, clock, ATMEGA644, 0xffff) { }
+	atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 /***************************************************************************
@@ -326,7 +346,10 @@ enum
 	AVR8_REGIDX_R30,
 	AVR8_REGIDX_R31,
 
-	AVR8_REGIDX_PINB = 0x23,
+	AVR8_REGIDX_PINA = 0x20,
+	AVR8_REGIDX_DDRA,
+	AVR8_REGIDX_PORTA,
+	AVR8_REGIDX_PINB,
 	AVR8_REGIDX_DDRB,
 	AVR8_REGIDX_PORTB,
 	AVR8_REGIDX_PINC,
@@ -445,6 +468,9 @@ enum
 enum
 {
 	AVR8_INTIDX_SPI,
+	AVR8_INTIDX_OCF0B,
+	AVR8_INTIDX_OCF0A,
+	AVR8_INTIDX_TOV0,
 	AVR8_INTIDX_ICF1,
 	AVR8_INTIDX_OCF1B,
 	AVR8_INTIDX_OCF1A,
@@ -457,6 +483,7 @@ enum
 };
 
 #define AVR8_EECR_EERE			0x01
+
 #define AVR8_EEARH_MASK			0x01
 
 #define AVR8_SPSR_SPIF_MASK		0x80
