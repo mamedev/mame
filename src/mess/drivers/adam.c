@@ -287,8 +287,9 @@ Mark Gordon
 
     TODO:
 
+	- fix MC6801 serial I/O
+	- sort out WP ROM select
     - floppy
-    - slot interface
     - printer
     - SPI
     - sound (PSG RDY -> Z80 WAIT)
@@ -341,73 +342,274 @@ enum
 //**************************************************************************
 
 //-------------------------------------------------
-//  bankswitch -
+//  mreq_r - memory request read
 //-------------------------------------------------
 
-void adam_state::bankswitch()
+READ8_MEMBER( adam_state::mreq_r )
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	int bmreq = 0, biorq = 1, boot_rom_cs = 1, aux_decode_1 = 1, aux_rom_cs = 1, cas1 = 1, cas2 = 1;
 
-	switch (m_mioc & 0x03)
+	UINT8 data = 0;
+
+	if (offset < 0x8000)
 	{
-	case LO_SMARTWRITER:
-		if (BIT(m_an, 1))
+		switch (m_mioc & 0x03)
 		{
-			program.unmap_readwrite(0x0000, 0x5fff);
-			program.install_rom(0x6000, 0x7fff, memregion("wp")->base() + 0x8000);
-		}
-		else
-		{
-			program.install_rom(0x0000, 0x7fff, memregion("wp")->base());
-		}
-		break;
+		case LO_SMARTWRITER:
+			boot_rom_cs = 0;
 
-	case LO_INTERNAL_RAM:
-		program.install_ram(0x0000, 0x7fff, ram);
-		break;
-
-	case LO_RAM_EXPANSION:
-		if (m_ram->size() > 64 * 1024)
-			program.install_ram(0x0000, 0x7fff, ram + 0x10000);
-		else
-			program.unmap_readwrite(0x0000, 0x7fff);
-		break;
-
-	case LO_OS7_ROM_INTERNAL_RAM:
-		program.install_rom(0x0000, 0x1fff, memregion("os7")->base());
-		program.install_ram(0x2000, 0x7fff, ram + 0x2000);
-		break;
-	}
-
-	switch ((m_mioc >> 2) & 0x03)
-	{
-	case HI_INTERNAL_RAM:
-		program.install_ram(0x8000, 0xffff, ram + 0x8000);
-		break;
-
-	case HI_ROM_EXPANSION:
-		program.install_rom(0x8000, 0xffff, memregion("xrom")->base());
-		break;
-
-	case HI_RAM_EXPANSION:
-		if (m_game)
-		{
-			program.install_rom(0x8000, 0xffff, memregion("cart")->base());
-		}
-		else
-		{
-			if (m_ram->size() > 64 * 1024)
-				program.install_ram(0x8000, 0xffff, ram + 0x18000);
+			if (BIT(m_an, 1))
+			{
+				if (offset >= 0x6000)
+				{
+					data = m_wp_rom[0x8000 + (offset & 0x1fff)];
+				}
+			}
 			else
-				program.unmap_readwrite(0x8000, 0xffff);
+			{
+				data = m_wp_rom[offset];
+			}
+			break;
+
+		case LO_INTERNAL_RAM:
+			cas1 = 0;
+			break;
+
+		case LO_RAM_EXPANSION:
+			cas2 = 0;
+			break;
+
+		case LO_OS7_ROM_INTERNAL_RAM:
+			if (offset < 0x2000)
+			{
+				aux_decode_1 = 0;
+			}
+			else
+			{
+				cas1 = 0;
+			}
+			break;
+		}
+	}
+	else
+	{
+		switch ((m_mioc >> 2) & 0x03)
+		{
+		case HI_INTERNAL_RAM:
+			cas1 = 0;
+			break;
+
+		case HI_ROM_EXPANSION:
+			aux_rom_cs = 0;
+			break;
+
+		case HI_RAM_EXPANSION:
+			if (m_game)
+			{
+				aux_decode_1 = 0;
+			}
+			else
+			{
+				cas2 = 0;
+			}
+			break;
+
+		case HI_CARTRIDGE_ROM:
+			aux_decode_1 = 0;
+			break;
+		}
+	}
+
+	if (!cas1)
+	{
+		data = m_ram->pointer()[offset];
+	}
+
+	if (!boot_rom_cs)
+	{
+		// TODO
+	}
+
+	if (!aux_decode_1)
+	{
+		switch (offset >> 13)
+		{
+		case 0: // U2
+			data = m_os7_rom[offset];
+			break;
+
+		case 1: break;
+		case 2: break;
+
+		case 4: // CS1
+		case 5: // CS2
+		case 6: // CS3
+		case 7: // CS4
+			data = m_cart_rom[offset & 0x7fff];
+			break;
+		}
+	}
+
+	data = m_slot1->bd_r(space, offset & 0xff, data, 1, biorq, 1, 1, 1);
+	data = m_slot2->bd_r(space, offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	data = m_slot3->bd_r(space, offset, data, 1, 1, 1, cas1, cas2);
+
+	return data;
+}
+
+
+//-------------------------------------------------
+// mreq_w - memory request write
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::mreq_w )
+{
+	int bmreq = 0, biorq = 1, aux_rom_cs = 1, cas1 = 1, cas2 = 1;
+
+	if (offset < 0x8000)
+	{
+		switch (m_mioc & 0x03)
+		{
+		case LO_INTERNAL_RAM:
+			cas1 = 0;
+			break;
+
+		case LO_RAM_EXPANSION:
+			cas2 = 0;
+			break;
+
+		case LO_OS7_ROM_INTERNAL_RAM:
+			if (offset >= 0x2000)
+			{
+				cas1 = 0;
+			}
+			break;
+		}
+	}
+	else
+	{
+		switch ((m_mioc >> 2) & 0x03)
+		{
+		case HI_INTERNAL_RAM:
+			cas1 = 0;
+			break;
+
+		case HI_RAM_EXPANSION:
+			if (!m_game)
+			{
+				cas2 = 0;
+			}
+			break;
+		}
+	}
+
+	if (!cas1)
+	{
+		m_ram->pointer()[offset] = data;
+	}
+
+	m_slot1->bd_w(space, offset & 0xff, data, 1, biorq, 1, 1, 1);
+	m_slot2->bd_w(space, offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	m_slot3->bd_w(space, offset, data, 1, 1, 1, cas1, cas2);
+}
+
+
+//-------------------------------------------------
+//  iorq_r - I/O request read
+//-------------------------------------------------
+
+READ8_MEMBER( adam_state::iorq_r )
+{
+	int bmreq = 1, biorq = 0, aux_rom_cs = 1, cas1 = 1, cas2 = 1;
+
+	UINT8 data = 0;
+
+	switch ((offset >> 5) & 0x07)
+	{
+	case 1:
+		data = adamnet_r(space, 0);
+		break;
+
+	case 3:
+		data = mioc_r(space, 0);
+		break;
+
+	case 5:
+		if (BIT(offset, 0))
+		{
+			data = m_vdc->register_read(space, 0);
+		}
+		else
+		{
+			data = m_vdc->vram_read(space, 0);
 		}
 		break;
 
-	case HI_CARTRIDGE_ROM:
-		program.install_rom(0x8000, 0xffff, memregion("cart")->base());
+	case 7:
+		if (BIT(offset, 1))
+		{
+			data = input2_r(space, 0);
+		}
+		else
+		{
+			data = input1_r(space, 0);
+		}
 		break;
 	}
+
+	data = m_slot1->bd_r(space, offset & 0xff, data, 1, biorq, 1, 1, 1);
+	data = m_slot2->bd_r(space, offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	data = m_slot3->bd_r(space, offset, data, 1, 1, 1, cas1, cas2);
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  iorq_w - I/O request write
+//-------------------------------------------------
+
+WRITE8_MEMBER( adam_state::iorq_w )
+{
+	int bmreq = 1, biorq = 0, aux_rom_cs = 1, cas1 = 1, cas2 = 1;
+
+	switch ((offset >> 5) & 0x07)
+	{
+	case 1:
+		adamnet_w(space, 0, data);
+		break;
+
+	case 3:
+		mioc_w(space, 0, data);
+		break;
+
+	case 4:
+		paddle_w(space, 0, data);
+		break;
+
+	case 5:
+		if (BIT(offset, 0))
+		{
+			m_vdc->register_write(space, 0, data);
+		}
+		else
+		{
+			m_vdc->vram_write(space, 0, data);
+		}
+		break;
+
+	case 6:
+		joystick_w(space, 0, data);
+		break;
+
+	case 7:
+		m_psg->write(space, 0, data);
+		break;
+	}
+
+	m_slot1->bd_w(space, offset & 0xff, data, 1, biorq, 1, 1, 1);
+	m_slot2->bd_w(space, offset, data, bmreq, biorq, aux_rom_cs, 1, cas2);
+	m_slot3->bd_w(space, offset, data, 1, 1, 1, cas1, cas2);
 }
 
 
@@ -443,8 +645,6 @@ WRITE8_MEMBER( adam_state::mioc_w )
 	*/
 
 	m_mioc = data;
-
-	bankswitch();
 }
 
 
@@ -492,8 +692,6 @@ WRITE8_MEMBER( adam_state::adamnet_w )
 	}
 
 	m_an = data;
-
-	bankswitch();
 }
 
 
@@ -720,6 +918,7 @@ READ8_MEMBER( adam_state::input2_r )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( adam_mem, AS_PROGRAM, 8, adam_state )
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mreq_r, mreq_w)
 ADDRESS_MAP_END
 
 
@@ -728,16 +927,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( adam_io, AS_IO, 8, adam_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0x1f) AM_READWRITE(adamnet_r, adamnet_w)
-	AM_RANGE(0x60, 0x60) AM_MIRROR(0x1f) AM_READWRITE(mioc_r, mioc_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x1f) AM_WRITE(paddle_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_DEVREADWRITE(TMS9928A_TAG, tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_DEVREADWRITE(TMS9928A_TAG, tms9928a_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_WRITE(joystick_w)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1f) AM_DEVWRITE(SN76489A_TAG, sn76489a_device, write)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1d) AM_READ(input1_r)
-	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x1d) AM_READ(input2_r)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(iorq_r, iorq_w)
 ADDRESS_MAP_END
 
 
@@ -833,6 +1023,36 @@ static M6801_INTERFACE( m6801_intf )
 };
 
 
+//-------------------------------------------------
+//  ADAM_EXPANSION_SLOT_INTERFACE( slot1_intf )
+//-------------------------------------------------
+
+static ADAM_EXPANSION_SLOT_INTERFACE( slot1_intf )
+{
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
+};
+
+
+//-------------------------------------------------
+//  ADAM_EXPANSION_SLOT_INTERFACE( slot2_intf )
+//-------------------------------------------------
+
+static ADAM_EXPANSION_SLOT_INTERFACE( slot2_intf )
+{
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0)
+};
+
+
+//-------------------------------------------------
+//  ADAM_EXPANSION_SLOT_INTERFACE( slot3_intf )
+//-------------------------------------------------
+
+static ADAM_EXPANSION_SLOT_INTERFACE( slot3_intf )
+{
+	DEVCB_NULL // slot 3 has no INT line
+};
+
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -844,6 +1064,11 @@ static M6801_INTERFACE( m6801_intf )
 
 void adam_state::machine_start()
 {
+	// find memory regions
+	m_wp_rom = memregion("wp")->base();
+	m_os7_rom = memregion("os7")->base();
+	m_cart_rom = memregion("cart")->base();
+
 	// state saving
 	save_item(NAME(m_mioc));
 	save_item(NAME(m_game));
@@ -883,8 +1108,6 @@ void adam_state::machine_reset()
 
 	m_an = 0;
 
-	bankswitch();
-
 	m_maincpu->reset();
 	m_netcpu->reset();
 }
@@ -923,41 +1146,37 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	MCFG_SOUND_CONFIG(psg_intf)
 
 	// devices
-	MCFG_ADAMNET_BUS_ADD()
-	MCFG_ADAMNET_SLOT_ADD("an1", adamnet_devices, "kb", NULL)
-	MCFG_ADAMNET_SLOT_ADD("an2", adamnet_devices, "prn", NULL)
-	MCFG_ADAMNET_SLOT_ADD("an3", adamnet_devices, "ddp", NULL)
-	MCFG_ADAMNET_SLOT_ADD("an4", adamnet_devices, "fdc", NULL)
-	MCFG_ADAMNET_SLOT_ADD("an5", adamnet_devices, NULL, NULL)
-	MCFG_ADAMNET_SLOT_ADD("an6", adamnet_devices, NULL, NULL)
-	MCFG_ADAMNET_SLOT_ADD("an7", adamnet_devices, NULL, NULL)
-	MCFG_ADAMNET_SLOT_ADD("an8", adamnet_devices, NULL, NULL)
-	MCFG_ADAMNET_SLOT_ADD("an9", adamnet_devices, NULL, NULL)
-	MCFG_ADAMNET_SLOT_ADD("an10", adamnet_devices, NULL, NULL)
-	MCFG_ADAMNET_SLOT_ADD("an11", adamnet_devices, NULL, NULL)
-	MCFG_ADAMNET_SLOT_ADD("an12", adamnet_devices, NULL, NULL)
-	MCFG_ADAMNET_SLOT_ADD("an13", adamnet_devices, NULL, NULL)
-	MCFG_ADAMNET_SLOT_ADD("an14", adamnet_devices, NULL, NULL)
-	MCFG_ADAMNET_SLOT_ADD("an15", adamnet_devices, NULL, NULL)
-	
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("paddles", adam_state, paddle_tick, attotime::from_msec(20))
 
-	// cartridge
+	MCFG_ADAMNET_BUS_ADD()
+	MCFG_ADAMNET_SLOT_ADD("net1", adamnet_devices, "kb", NULL)
+	MCFG_ADAMNET_SLOT_ADD("net2", adamnet_devices, "prn", NULL)
+	MCFG_ADAMNET_SLOT_ADD("net3", adamnet_devices, "ddp", NULL)
+	MCFG_ADAMNET_SLOT_ADD("net4", adamnet_devices, "fdc", NULL)
+	MCFG_ADAMNET_SLOT_ADD("net5", adamnet_devices, NULL, NULL)
+	MCFG_ADAMNET_SLOT_ADD("net6", adamnet_devices, NULL, NULL)
+	MCFG_ADAMNET_SLOT_ADD("net7", adamnet_devices, NULL, NULL)
+	MCFG_ADAMNET_SLOT_ADD("net8", adamnet_devices, NULL, NULL)
+	MCFG_ADAMNET_SLOT_ADD("net9", adamnet_devices, NULL, NULL)
+	MCFG_ADAMNET_SLOT_ADD("net10", adamnet_devices, NULL, NULL)
+	MCFG_ADAMNET_SLOT_ADD("net11", adamnet_devices, NULL, NULL)
+	MCFG_ADAMNET_SLOT_ADD("net12", adamnet_devices, NULL, NULL)
+	MCFG_ADAMNET_SLOT_ADD("net13", adamnet_devices, NULL, NULL)
+	MCFG_ADAMNET_SLOT_ADD("net14", adamnet_devices, NULL, NULL)
+	MCFG_ADAMNET_SLOT_ADD("net15", adamnet_devices, NULL, NULL)
+
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom,col,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("coleco_cart")
 
-	// ROM expansion
-	MCFG_CARTSLOT_ADD("xrom")
-	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("adam_xrom")
-
+	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_LEFT_EXPANSION_SLOT_TAG, XTAL_7_15909MHz/2, slot1_intf, adam_slot1_devices, "adamlink", NULL)
+	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_CENTER_EXPANSION_SLOT_TAG, XTAL_7_15909MHz/2, slot2_intf, adam_slot2_devices, NULL, NULL)
+	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_RIGHT_EXPANSION_SLOT_TAG, XTAL_7_15909MHz/2, slot3_intf, adam_slot3_devices, "ram", NULL)
+	
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
-	MCFG_RAM_EXTRA_OPTIONS("128K")
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("colec_cart_list", "coleco")
@@ -991,9 +1210,6 @@ ROM_START( adam )
 
 	ROM_REGION( 0x800, M6801_TAG, 0 )
 	ROM_LOAD( "master rev a 174b.u6", 0x000, 0x800, CRC(035a7a3d) SHA1(0426e6eaf18c2be9fe08066570c214ab5951ee14) )
-
-	ROM_REGION( 0x8000, "xrom", ROMREGION_ERASE00 )
-	ROM_CART_LOAD( "xrom", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL )
 
 	ROM_REGION( 0x8000, "cart", 0 )
 	ROM_CART_LOAD( "cart", 0x0000, 0x8000, ROM_NOMIRROR | ROM_OPTIONAL )
