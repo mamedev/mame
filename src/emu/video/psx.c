@@ -3710,19 +3710,13 @@ PALETTE_INIT( psx )
 	}
 }
 
-SCREEN_UPDATE_IND16( psx )
-{
-	psxgpu_device *gpu = downcast<psxgpu_device *>(screen.owner());
-	return gpu->update_screen( screen, bitmap, cliprect );
-}
-
 MACHINE_CONFIG_FRAGMENT( psxgpu )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( 60 )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC( 0 ))
 	MCFG_SCREEN_SIZE( 1024, 1024 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
-	MCFG_SCREEN_UPDATE_STATIC( psx )
+	MCFG_SCREEN_UPDATE_DEVICE( DEVICE_SELF, psxgpu_device, update_screen )
 	((screen_device *)device)->register_vblank_callback(vblank_state_delegate(FUNC(psxgpu_device::vblank), (psxgpu_device *) owner));
 
 	MCFG_PALETTE_LENGTH( 65536 )

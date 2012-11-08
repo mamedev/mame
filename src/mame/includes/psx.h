@@ -30,10 +30,5 @@ DECLARE_READ32_HANDLER( psx_com_delay_r );
 extern void psx_sio_install_handler( running_machine &, int, psx_sio_handler );
 extern void psx_sio_input( running_machine &, int, int, int );
 
-// emu/video/psx.c
-PALETTE_INIT( psx );
-SCREEN_UPDATE_IND16( psx );
-INTERRUPT_GEN( psx_vblank );
-
 #define PSX_H ( 1 )
 #endif
