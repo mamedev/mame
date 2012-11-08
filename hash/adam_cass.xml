@@ -87,9 +87,9 @@
 	</software>
 
 	<software name="expetype">
-		<description>Expertype: Smart Writer Typing Tuition Program</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>ExperType: Smart Writer Typing Tuition Program</description>
+		<year>1984</year>
+		<publisher>Coleco</publisher>
 
 		<part name="cass1" interface="adam_cass">
 			<dataarea name="cass" size="262144">
