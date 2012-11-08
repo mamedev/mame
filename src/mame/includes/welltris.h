@@ -30,8 +30,6 @@ public:
 	DECLARE_WRITE8_MEMBER(welltris_sh_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
-	DECLARE_READ16_MEMBER(welltris_spriteram_r);
-	DECLARE_WRITE16_MEMBER(welltris_spriteram_w);
 	DECLARE_WRITE16_MEMBER(welltris_palette_bank_w);
 	DECLARE_WRITE16_MEMBER(welltris_gfxbank_w);
 	DECLARE_WRITE16_MEMBER(welltris_scrollreg_w);

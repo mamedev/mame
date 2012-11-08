@@ -356,7 +356,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, welltris_state )
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_SHARE("pixelram")	/* Graph_1 & 2*/
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM								/* work */
-	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE(welltris_spriteram_w) AM_SHARE("spriteram")			/* Sprite */
+	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM AM_SHARE("spriteram")			/* Sprite */
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(welltris_charvideoram_w) AM_SHARE("charvideoram")		/* Char */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	/* Palette */
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1")					/* Bottom Controls */
@@ -744,6 +744,9 @@ static MACHINE_CONFIG_DERIVED( quiz18k, welltris )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(15, 335-1, 0, 224-1)
+
+	MCFG_DEVICE_MODIFY("vsystem_spr_old")
+	MCFG_VSYSTEM_SPR2_SET_OFFSETS(6, 1)
 MACHINE_CONFIG_END
 
 
