@@ -7938,6 +7938,7 @@ src/regtests/jedutil/jeds/pal20l8/pal20l8.jed svneol=native#text/plain
 src/regtests/jedutil/jeds/pal20r4/pal20r4.jed svneol=native#text/plain
 src/regtests/jedutil/jeds/pal20r6/pal20r6.jed svneol=native#text/plain
 src/regtests/jedutil/jeds/pal20r8/pal20r8.jed svneol=native#text/plain
+src/regtests/jedutil/jedtest.py svneol=native#text/plain
 src/regtests/jedutil/jedtest.wsf svneol=native#text/plain
 src/tools/chdman.c svneol=native#text/plain
 src/tools/jedutil.c svneol=native#text/plain
