@@ -97,7 +97,7 @@ def main():
         not os.path.exists(jedsPath) or
         not os.path.exists(baselinePath) or
         not os.path.exists(jedUtilApp)):
-        print "One of the above paths does not exist.  Aborting." % jedUtilApp
+        print "One of the above paths does not exist.  Aborting. %s" % jedUtilApp
         return 3
 
 
@@ -129,10 +129,10 @@ def main():
     success = True
     for test in tests:
         if VERBOSE:
-            print "Diffing the output from viewing the JED file: %s" % test.name
+            print "Diffing the output from viewing the JED file: %s" % os.path.basename(test.jedFile)
         if not filecmp.cmp(test.outputFile, test.baselineFile):
             success = False
-            print "Test %s failed" % test.name
+            print "Test %s failed" % os.path.basename(test.jedFile)
 
 
     # Report
