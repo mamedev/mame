@@ -41,10 +41,10 @@ def findJedTests(jedPath, baselinePath, outputPath):
             subpathName = path[len(jedPath):].strip(os.sep)
 
             test = JedTest()
-            test.name = palName
+            test.name = subpathName
             test.jedFile = jedPathFull
-            test.baselineFile = os.path.join(baselinePath, subpathName, test.name+".txt")
-            test.outputFile = os.path.join(outputPath, subpathName, test.name+".txt")
+            test.baselineFile = os.path.join(baselinePath, subpathName, palName+".txt")
+            test.outputFile = os.path.join(outputPath, subpathName, palName+".txt")
             jedTestList.append(test)
 
     return jedTestList
