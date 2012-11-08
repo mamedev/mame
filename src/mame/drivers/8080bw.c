@@ -1265,11 +1265,22 @@ MACHINE_CONFIG_END
 
 
 
-/*******************************************************/
-/*                                                     */
-/* Taito "Lupin III"                                   */
-/*                                                     */
-/*******************************************************/
+/*******************************************************************************************/
+/*                                                                                         */
+/* Taito "Lupin III"                                                                       */
+/*                                                                                         */
+/*  The rom at 5000 is optional. It contains code for colour ram, and the tune that plays  */
+/*  in the "wife vs man" scene. If you remove this rom, bits 0 and 1 of port 0 must        */
+/*  be set High. The colour will then be determined by the 2 proms instead. Bit 7          */
+/*  of port 5 will select which prom to use.                                               */
+/*                                                                                         */
+/*  Differences between the 2 sets:                                                        */
+/*  - Set 2 has a language selection switch. In the Japanese position, it looks            */
+/*    the same as set 1. Set 1 is always in Japanese.                                      */
+/*  - Set 1, bit 6 of port 3 activates when the wife is kicking the man.                   */
+/*  - The dogs and policemen are yellow in set 1, and different colours in set 2.          */
+/*                                                                                         */
+/*******************************************************************************************/
 
 static ADDRESS_MAP_START( lupin3_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
