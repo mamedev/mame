@@ -35,6 +35,7 @@
   * Pool 10 (Italian, set 2),                         C.M.C.,             1996.
   * Pool 10 (Italian, set 3),                         C.M.C.,             1996.
   * Pool 10 (Italian, set 4),                         C.M.C.,             1997.
+  * Pool 10 (Italian, encrypted),                     C.M.C.,             1997.
   * Tortuga Family (Italian),                         C.M.C.,             1997.
   * Pot Game (Italian),                               C.M.C.,             1996.
   * Bottle 10 (Italian, set 1),                       C.M.C.,             1996.
@@ -789,6 +790,10 @@
   - Added default NVRAM, needed to boot properly.
   - Rearrange the whole Magic Card 2 sets, and improved descriptions.
   - Added technical notes.
+
+  [2012/11/08]
+  - Added Pool 10 (Italian, encrypted), from a Dino 4 encrypted board.
+  - Added PCB layout and technical notes.
 
 
   *** TO DO ***
@@ -3418,6 +3423,98 @@ ROM_END
 
 
 /*
+  Pool 10...
+  Dino 4 (non working) board.
+  With the infamous mexican Rockwell R65C02.
+
+  Encrypted program & graphics ROMs.
+   ______________________________________________________________________________________________ 
+  |                                                                                              |
+  |                       ____              __________    ______________       ______________    |
+  |                      | A00|            |M74HC00B1 |  |  SN74HCT245N |     |PALCE16V8H_15 |   |
+  |                      |____|            |__________|  |______________|     |______________|   |
+  |                                                                                              |
+  |                ____________        ___________                                               |
+  |               |            |      |   DIP 1   |       ____________________________           |
+  |               |  BATTERY   |      |           |      |          R65C02P2          |          |
+  |___            |            |      |___________|      |          11450_12          |          |
+      |           |            |                         |           MEXICO           |          |
+      |           |____________|                         |        9740 S11493_2       |          |
+      |                                                  |____________________________|          |
+   ___|                   ____________________________                                           |
+  |__                    |                            |                                          |
+  |__                    |          HD46821P          |                                          |
+  |__                    |                            |   ____________________      _________    |
+  |__                    |                            |  |     03.bin         |    |74HC126B1|   |
+  |__                    |____________________________|  |                    |    |_________|   |
+  |__                                                    |                    |                  |
+  |__                     ____________________________   |               27256|                  |
+  |__                    |           MC6821P          |  |____________________|                  |
+  |__                    |         QL M9N8623         |                             _________    |
+  |__    _________       |                            |                            |74HC139E |   |
+  |__J  |ULN2003A |      |                            |                            |_________|   |
+  |__   |_________|      |____________________________|   _________________                      |
+  |__A                                                   |                 |                     |
+  |__                                                    |    JAPAN 2G3    |        _________    |
+  |__M   _________         ___________    ___________    |    HM6116LP_4   |       |SN74LS02N|   |
+  |__   |74LS04B1 |       | 411GR-001 |  | 411GR-001 |   |                 |       |_________|   |
+  |__M  |_________|       |___________|  |___________|   |_________________|                     |
+  |__                                                                                            |
+  |__A                                                                                           |
+  |__                     ____________________________    ____________________________           |
+  |__                    |            FILE            |  |           MC6845P          |          |
+  |__                    |           KV89C72          |  |           R1A 8210         |          |
+  |__                    |                            |  |                            |          |
+  |__                    |                            |  |                            |          |
+  |__    _____________   |____________________________|  |____________________________|          |
+  |__   |  74HCT373N  |                                                                          |
+  |__   |_____________|      _________   _______________   _____________           _________     |
+  |__                       |ULN2003A | |PALCE20V8H_25PC| |  SN74LS245N |         |74157 PC |    |
+  |__    _____________      |_________| |_______________| |_____________|         |_________|    |
+  |__   |   AM27S29   |                                                                          |
+  |__   |_____________|   ____________________                                     _________     |
+  |__                    |     02.bin         |            ____________________   |74157 PC |    |
+  |__    ________        |                    |           |      GOLDSTAR      |  |_________|    |
+  |__   |74LS174B|  ___  |                    |           |     GM76C88_12     |                 |
+  |___  |________| |74L| |               27256|           |     8928 KOREA     |   _________     |
+      |            |S08| |____________________| LC DINO 4 |                    |  |74157 PC |    |
+      |            |B1 |                                  |____________________|  |_________|    |
+      |  ________  |   |  ____________________                                                   |
+   ___| |74LS02N | |   | |     01.bin         |                                                  |
+  |     |________| |___| |                    |            _____________           _________     |
+  |                      |                    |           | SN74LS377N  |         |74157 PC |    |
+  |                      |               27256|           |_____________|         |_________|    |
+  |                      |____________________|                                                  |
+  |      ________                                                                                |
+  |     | X_TAL  |    _________   _______________          _____________           _________     |
+  |     |16.00Mhz|   |74LS161AN| |PALCE20V8H_25PC|        | SN74LS377N  |         |74LS174B1|    |
+  |     |________|   |_________| |_______________|        |_____________|         |_________|    |
+  |                                                                                              |
+  |______________________________________________________________________________________________|
+
+  A00 = TL7705ACE
+
+*/
+
+ROM_START( pool10e )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "3_50.u2", 0x8000, 0x8000, CRC(764394bb) SHA1(0defcedc802c468c615560e47ec4064a4f084650) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "2.u21", 0x0000, 0x8000, CRC(a0d54044) SHA1(c7be1f12f72095daee32ae41c3554d8ab4f99245) )
+	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(55c9fcc8) SHA1(224bdf63ed345b1def4852af3b33f07790fbf123) )
+
+	ROM_REGION( 0x0200, "proms", 0 )	/* Same as Pool 10, but the 1st half duplicated to cover any PLD addressing */
+	ROM_LOAD( "am27s29.u25", 0x0000, 0x0200, CRC(2c315cbf) SHA1(f3f91329f2b8388decf26a050f8fb7da38694218) )
+
+	ROM_REGION( 0x3000, "plds", 0 )
+	ROM_LOAD( "palce16v8h.u5",  0x0000, 0x0892, BAD_DUMP CRC(123d539a) SHA1(cccf0cbae3175b091a998eedf4aa44a55b679400) ) /* read protected */
+	ROM_LOAD( "palce20v8h.u22", 0x1000, 0x0a92, BAD_DUMP CRC(ba2a021f) SHA1(e9c5970f80c7446c91282d53cfe97c92353dce7d) ) /* read protected */
+	ROM_LOAD( "palce20v8h.u23", 0x2000, 0x0a92, BAD_DUMP CRC(ba2a021f) SHA1(e9c5970f80c7446c91282d53cfe97c92353dce7d) ) /* read protected */
+ROM_END
+
+
+/*
     Tortuga Family (italian) & Pot Game (italian)
     ---------------------------------------------
 
@@ -4631,32 +4728,6 @@ ROM_START( novoplay )	/* Similar to Royal Vegas Joker Card */
 	ROM_LOAD( "np1_27s29.bin", 0x0000, 0x0200, CRC(8992aa4d) SHA1(5a0649bff66e7cab1bcbadcdfc74c77a747cc58f) )
 ROM_END
 
-
-/*
-  Pool 10...
-  Dino 4 (non working) board
-  With the infamous mexican Rockwell R65C02.
-
-  Encrypted program & graphics ROMs.
-
-*/
-
-ROM_START( pool10e )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "3_50.u2", 0x8000, 0x8000, CRC(764394bb) SHA1(0defcedc802c468c615560e47ec4064a4f084650) )
-
-	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "2.u21", 0x0000, 0x8000, CRC(a0d54044) SHA1(c7be1f12f72095daee32ae41c3554d8ab4f99245) )
-	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(55c9fcc8) SHA1(224bdf63ed345b1def4852af3b33f07790fbf123) )
-
-	ROM_REGION( 0x0200, "proms", 0 )	/* Same as Pool 10, but the 1st half duplicated to cover any PLD addressing */
-	ROM_LOAD( "am27s29.u25", 0x0000, 0x0200, CRC(2c315cbf) SHA1(f3f91329f2b8388decf26a050f8fb7da38694218) )
-
-	ROM_REGION( 0x3000, "plds", 0 )
-	ROM_LOAD( "palce16v8h.u5",  0x0000, 0x0892, BAD_DUMP CRC(123d539a) SHA1(cccf0cbae3175b091a998eedf4aa44a55b679400) ) /* read protected */
-	ROM_LOAD( "palce20v8h.u22", 0x1000, 0x0a92, BAD_DUMP CRC(ba2a021f) SHA1(e9c5970f80c7446c91282d53cfe97c92353dce7d) ) /* read protected */
-	ROM_LOAD( "palce20v8h.u23", 0x2000, 0x0a92, BAD_DUMP CRC(ba2a021f) SHA1(e9c5970f80c7446c91282d53cfe97c92353dce7d) ) /* read protected */
-ROM_END
 
 
 /**************************
