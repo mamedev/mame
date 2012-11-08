@@ -1271,7 +1271,7 @@ MACHINE_CONFIG_END
 /*                                                                                         */
 /*  The rom at 5000 is optional. It contains code for colour ram, and the tune that plays  */
 /*  in the "wife vs man" scene. If you remove this rom, bits 0 and 1 of port 0 must        */
-/*  be set High. The colour will then be determined by the 2 proms instead. Bit 7          */
+/*  be set High. The colour will then be determined by the 2 proms instead. Bit 6          */
 /*  of port 5 will select which prom to use.                                               */
 /*                                                                                         */
 /*  Differences between the 2 sets:                                                        */
