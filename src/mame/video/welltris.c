@@ -125,6 +125,6 @@ UINT32 welltris_state::screen_update_welltris(screen_device &screen, bitmap_ind1
 
 	draw_background(machine(), bitmap, cliprect);
 	m_char_tilemap->draw(bitmap, cliprect, 0, 0);
-	m_spr_old->welltris_draw_sprites(m_spriteram, m_spritepalettebank, machine(), bitmap, cliprect);
+	m_spr_old->turbofrc_draw_sprites(m_spriteram, m_spriteram.bytes(), m_spritepalettebank, machine(), bitmap, cliprect, 0);
 	return 0;
 }

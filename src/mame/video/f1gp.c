@@ -199,13 +199,13 @@ UINT32 f1gp_state::screen_update_f1gp(screen_device &screen, bitmap_ind16 &bitma
 	/* quick kludge for "continue" screen priority */
 	if (m_gfxctrl == 0x00)
 	{
-		m_spr_old->f1gp_draw_sprites(1, m_spr1vram, machine(), bitmap, cliprect, 0x02);
-		m_spr_old2->f1gp_draw_sprites(2, m_spr2vram, machine(), bitmap, cliprect, 0x02);
+		m_spr_old->turbofrc_draw_sprites(m_spr1vram, m_spr1vram.bytes(),  0, machine(), bitmap, cliprect, 0x02);
+		m_spr_old2->turbofrc_draw_sprites(m_spr2vram, m_spr2vram.bytes(), 0, machine(), bitmap, cliprect, 0x02);
 	}
 	else
 	{
-		m_spr_old->f1gp_draw_sprites(1, m_spr1vram, machine(), bitmap, cliprect, 0x00);
-		m_spr_old2->f1gp_draw_sprites(2, m_spr2vram, machine(), bitmap, cliprect, 0x02);
+		m_spr_old->turbofrc_draw_sprites(m_spr1vram, m_spr1vram.bytes(), 0, machine(), bitmap, cliprect, 0x00);
+		m_spr_old2->turbofrc_draw_sprites(m_spr2vram, m_spr2vram.bytes(), 0, machine(), bitmap, cliprect, 0x02);
 	}
 	return 0;
 }

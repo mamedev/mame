@@ -697,7 +697,7 @@ DRIVER_INIT_MEMBER(welltris_state,welltris)
 
 DRIVER_INIT_MEMBER(welltris_state,quiz18k)
 {
-	;
+
 }
 
 
@@ -725,6 +725,8 @@ static MACHINE_CONFIG_START( welltris, welltris_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
+	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
+	MCFG_VSYSTEM_SPR2_SET_PRITYPE(-1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

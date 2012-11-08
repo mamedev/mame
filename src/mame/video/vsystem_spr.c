@@ -113,7 +113,7 @@ void vsystem_spr_device::set_pdraw(device_t &device, bool pdraw)
 }
 
 // static
-void vsystem_spr_device::CG10103_set_gfx_region(device_t &device, int gfx_region)
+void vsystem_spr_device::set_gfx_region(device_t &device, int gfx_region)
 {
 	vsystem_spr_device &dev = downcast<vsystem_spr_device &>(device);
 	dev.m_gfx_region = gfx_region;

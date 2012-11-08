@@ -7,7 +7,7 @@ typedef device_delegate<UINT32 (UINT32)> vsystem_tile_indirection_delegate;
 	vsystem_spr_device::set_tile_indirect_cb(*device, vsystem_tile_indirection_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0)); \
 
 #define MCFG_VSYSTEM_SPR_SET_GFXREGION( _rgn ) \
-	vsystem_spr_device::CG10103_set_gfx_region(*device, _rgn); \
+	vsystem_spr_device::set_gfx_region(*device, _rgn); \
 
 #define MCFG_VSYSTEM_SPR_SET_PALBASE( _palbase ) \
 	vsystem_spr_device::CG10103_set_pal_base(*device, _palbase); \
@@ -29,7 +29,7 @@ public:
 	static void set_offsets(device_t &device, int xoffs, int yoffs);
 	static void set_pdraw(device_t &device, bool pdraw);
 	static void set_tile_indirect_cb(device_t &device,vsystem_tile_indirection_delegate newtilecb);
-	static void CG10103_set_gfx_region(device_t &device, int gfx_region);
+	static void set_gfx_region(device_t &device, int gfx_region);
 	static void CG10103_set_pal_base(device_t &device, int pal_base);
 	static void set_pal_mask(device_t &device, int pal_mask);
 	static void CG10103_set_transpen(device_t &device, int transpen);
