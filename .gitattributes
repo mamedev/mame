@@ -4751,6 +4751,7 @@ src/mame/machine/pcecommn.h svneol=native#text/plain
 src/mame/machine/pckeybrd.c svneol=native#text/plain
 src/mame/machine/pcshare.c svneol=native#text/plain
 src/mame/machine/pgmcrypt.c svneol=native#text/plain
+src/mame/machine/pgmcrypt.h svneol=native#text/plain
 src/mame/machine/pgmprot.c svneol=native#text/plain
 src/mame/machine/pgmprot1.c svneol=native#text/plain
 src/mame/machine/pgmprot2.c svneol=native#text/plain

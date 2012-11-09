@@ -33,6 +33,63 @@
 */
 
 
+void pgm_dw3_decrypt(running_machine &machine)
+{
+
+//  int i;
+//  UINT16 *src=(UINT16 *) (OP_ROM+0x100000);
+
+	int i;
+	UINT16 *src = (UINT16 *) (machine.root_device().memregion("maincpu")->base()+0x100000);
+
+	int rom_size = 0x100000;
+
+	for(i=0; i<rom_size/2; i++) {
+		UINT16 x = src[i];
+
+		if((i & 0x005460) == 0x001400)
+			x ^= 0x0100;
+
+		if((i & 0x005450) == 0x001040)
+			x ^= 0x0100;
+
+		if((i & 0x005e00) == 0x001c00)
+			x ^= 0x40;
+
+		if((i & 0x005580) == 0x001100)
+			x ^= 0x40;
+
+
+
+		src[i] = x;
+	}
+}
+
+void pgm_killbld_decrypt(running_machine &machine)
+{
+
+//  int i;
+//  UINT16 *src=(UINT16 *) (OP_ROM+0x100000);
+
+	int i;
+	UINT16 *src = (UINT16 *) (machine.root_device().memregion("maincpu")->base()+0x100000);
+
+	int rom_size = 0x200000;
+
+	for(i=0; i<rom_size/2; i++) {
+		UINT16 x = src[i];
+
+		if((i & 0x6d00) == 0x0400 || (i & 0x6c80) == 0x0880)
+			x ^= 0x0008;
+		if((i & 0x7500) == 0x2400 || (i & 0x7600) == 0x3200)
+			x ^= 0x1000;
+
+		src[i] = x;
+	}
+}
+
+
+
 static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT16 size, UINT16 mode)
 {
 	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();

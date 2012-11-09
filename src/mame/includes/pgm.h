@@ -6,6 +6,7 @@
 #include "sound/ics2115.h"
 #include "cpu/arm7/arm7core.h"
 #include "machine/nvram.h"
+#include "machine/pgmcrypt.h"
 
 #define PGMARM7LOGERROR 0
 
@@ -333,32 +334,6 @@ ADDRESS_MAP_EXTERN( pgm_base_mem, 16 );
 
 
 
-
-/*----------- defined in machine/pgmcrypt.c -----------*/
-
-void pgm_kov_decrypt(running_machine &machine);
-void pgm_kovsh_decrypt(running_machine &machine);
-void pgm_kov2_decrypt(running_machine &machine);
-void pgm_kov2p_decrypt(running_machine &machine);
-void pgm_mm_decrypt(running_machine &machine);
-void pgm_dw2_decrypt(running_machine &machine);
-void pgm_photoy2k_decrypt(running_machine &machine);
-void pgm_py2k2_decrypt(running_machine &machine);
-void pgm_dw3_decrypt(running_machine &machine);
-void pgm_killbld_decrypt(running_machine &machine);
-void pgm_pstar_decrypt(running_machine &machine);
-void pgm_puzzli2_decrypt(running_machine &machine);
-void pgm_theglad_decrypt(running_machine &machine);
-void pgm_ddp2_decrypt(running_machine &machine);
-void pgm_dfront_decrypt(running_machine &machine);
-void pgm_oldsplus_decrypt(running_machine &machine);
-void pgm_kovshp_decrypt(running_machine &machine);
-void pgm_killbldp_decrypt(running_machine &machine);
-void pgm_svg_decrypt(running_machine &machine);
-void pgm_svgpcb_decrypt(running_machine &machine);
-void pgm_ket_decrypt(running_machine &machine);
-void pgm_espgal_decrypt(running_machine &machine);
-void pgm_happy6_decrypt(running_machine &machine);
 
 /*----------- defined in machine/pgmprot.c -----------*/
 
