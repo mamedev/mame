@@ -791,10 +791,15 @@
   - Rearrange the whole Magic Card 2 sets, and improved descriptions.
   - Added technical notes.
 
-  [2012/11/08]
-  - Added a new Pool 10 set, from a Dino 4 encrypted hardware.
+  [2012/11/08-09]
+  - New Pool 10 set, from a Dino 4 encrypted hardware.
   - Added PCB layout and technical notes.
-  - Decrypted the program data & address. GFX need to be decrypted.
+  - Decrypted the program data & address.
+  - Decrypted the graphics ROMs address.
+  - Added a default NVRAM.
+  - Added button-lamps layout.
+  - Promoted to working state.
+  - Improved the PCB layout.
   - Added some technical notes.
 
 
@@ -3426,73 +3431,75 @@ ROM_END
 
 /*
   Pool 10...
-  Dino 4 (non working) board,
+  Dino 4 (not working) board,
   with the infamous mexican Rockwell R65C02.
 
   Encrypted program & graphics ROMs.
-   ______________________________________________________________________________________________ 
+
+  PCB layout...
+  .----------------------------------------------------------------------------------------------.
   |                                                                                              |
-  |                       ____              __________    ______________       ______________    |
-  |                      | A00|            |M74HC00B1 |  |  SN74HCT245N |     |PALCE16V8H_15 |   |
-  |                      |____|            |__________|  |______________|     |______________|   |
+  |                      .----.            .----------.  .--------------.     .--------------.   |
+  |                      |A00 |            |M74HC00B1 |  | SN74HCT245N  |     |PALCE16V8H-15 |   |
+  |                      '----'            '----------'  '--------------'     '--------------'   |
   |                                                                                              |
-  |                ____________        ___________                                               |
-  |               |            |      |   DIP 1   |       ____________________________           |
+  |               .------------.      .-----------.                                              |
+  |               |            |      | DIP SW #1 |      .----------------------------.          |
   |               |  BATTERY   |      |           |      |          R65C02P2          |          |
-  |___            |            |      |___________|      |          11450_12          |          |
+  '---.           |            |      '-----------'      |          11450-12          |          |
       |           |            |                         |           MEXICO           |          |
-      |           |____________|                         |        9740 S11493_2       |          |
-      |                                                  |____________________________|          |
-   ___|                   ____________________________                                           |
-  |__                    |                            |                                          |
-  |__                    |          HD46821P          |                                          |
-  |__                    |                            |   ____________________      _________    |
-  |__                    |                            |  |     03.bin         |    |74HC126B1|   |
-  |__                    |____________________________|  |                    |    |_________|   |
-  |__                                                    |                    |                  |
-  |__                     ____________________________   |               27256|                  |
-  |__                    |           MC6821P          |  |____________________|                  |
-  |__                    |         QL M9N8623         |                             _________    |
-  |__    _________       |                            |                            |74HC139E |   |
-  |__ J |ULN2003A |      |                            |                            |_________|   |
-  |__   |_________|      |____________________________|   _________________                      |
-  |__ A                                                  |                 |                     |
-  |__                                                    |    JAPAN 2G3    |        _________    |
-  |__ M  _________         ___________    ___________    |    HM6116LP_4   |       |SN74LS02N|   |
-  |__   |74LS04B1 |       | 411GR-001 |  | 411GR-001 |   |                 |       |_________|   |
-  |__ M |_________|       |___________|  |___________|   |_________________|                     |
-  |__                                                                                            |
-  |__ A                                                                                          |
-  |__                     ____________________________    ____________________________           |
-  |__                    |            FILE            |  |           MC6845P          |          |
-  |__                    |           KV89C72          |  |           R1A 8210         |          |
-  |__                    |                            |  |                            |          |
-  |__                    |                            |  |                            |          |
-  |__    _____________   |____________________________|  |____________________________|          |
-  |__   |  74HCT373N  |                                                                          |
-  |__   |_____________|      _________   _______________   _____________           _________     |
-  |__                       |ULN2003A | |PALCE20V8H_25PC| |  SN74LS245N |         |74157 PC |    |
-  |__    _____________      |_________| |_______________| |_____________|         |_________|    |
-  |__   |   AM27S29   |                                                                          |
-  |__   |_____________|   ____________________                                     _________     |
-  |__                    |     02.bin         |            ____________________   |74157 PC |    |
-  |__    ________        |                    |           |      GOLDSTAR      |  |_________|    |
-  |__   |74LS174B|  ___  |                    |           |     GM76C88_12     |                 |
-  |___  |________| |74L| |               27256|           |     8928 KOREA     |   _________     |
-      |            |S08| |____________________| LC DINO 4 |                    |  |74157 PC |    |
-      |            |B1 |                                  |____________________|  |_________|    |
-      |  ________  |   |  ____________________                                                   |
-   ___| |74LS02N | |   | |     01.bin         |                                                  |
-  |     |________| |___| |                    |            _____________           _________     |
+      |           '------------'                         |        9740 S11493_2       |          |
+      |                                                  '----------------------------'          |
+  .---'                  .----------------------------.                                          |
+  |---                   |                            |                                          |
+  |---                   |          HD46821P          |                                          |
+  |---                   |                            |  .--------------------.    .---------.   |
+  |---                   |                            |  |     3_50.U2        |    |74HC126B1|   |
+  |---                   '----------------------------'  |                    |    '---------'   |
+  |---                                                   |                    |                  |
+  |---                   .----------------------------.  |               27256|                  |
+  |---                   |           MC6821P          |  '--------------------'                  |
+  |---                   |         QL M9N8623         |                            .---------.   |
+  |---  .---------.      |                            |                            |74HC139E |   |
+  |---J |ULN2003A |      |                            |                            '---------'   |
+  |---  '---------'      '----------------------------'  .-----------------.                     |
+  |---A                                                  |                 |                     |
+  |---                                                   |    JAPAN 2G3    |       .---------.   |
+  |---M .---------.       .-----------.  .-----------.   |    HM6116LP-4   |       |SN74LS02N|   |
+  |---  |74LS04B1 |       | 411GR-001 |  | 411GR-001 |   |                 |       '---------'   |
+  |---M '---------'       '-----------'  '-----------'   '-----------------'                     |
+  |---                                                                                           |
+  |---A                                                                                          |
+  |---                   .----------------------------.  .----------------------------.          |
+  |---                   |           FILE             |  |          MC6845P           |          |
+  |---                   |          KV89C72           |  |          R1A 8210          |          |
+  |---                   |                            |  |                            |          |
+  |---                   |                            |  |                            |          |
+  |---  .-------------.  '----------------------------'  '----------------------------'          |
+  |---  |  74HCT373N  |                                                                          |
+  |---  '-------------'     .---------. .---------------. .-------------.         .---------.    |
+  |---                      |ULN2003A | |PALCE20V8H-25PC| | SN74LS245N  |         |74157 PC |    |
+  |---  .-------------.     '---------' '---------------' '-------------'         '---------'    |
+  |---  |   AM27S29   |                                                                          |
+  |---  '-------------'  .--------------------.                                   .---------.    |
+  |---                   |      2.U21         |           .--------------------.  |74157 PC |    |
+  |---  .--------.       |                    |           |      GOLDSTAR      |  '---------'    |
+  |--   |74LS174B| .---. |                    |           |     GM76C88-12     |                 |
+  '---. '--------' |74L| |               27256|           |     8928 KOREA     |  .---------.    |
+      |            |S08| '--------------------' LC DINO 4 |                    |  |74157 PC |    |
+      |            |B1 |                                  '--------------------'  '---------'    |
+      | .--------. |   | .--------------------.                                                  |
+  .---' |74LS02N | |   | |      1.U20         |                                                  |
+  |     '--------' '---' |                    |           .-------------.         .---------.    |
   |                      |                    |           | SN74LS377N  |         |74157 PC |    |
-  |                      |               27256|           |_____________|         |_________|    |
-  |                      |____________________|                                                  |
-  |      ________                                                                                |
-  |     | X_TAL  |    _________   _______________          _____________           _________     |
-  |     |16.00Mhz|   |74LS161AN| |PALCE20V8H_25PC|        | SN74LS377N  |         |74LS174B1|    |
-  |     |________|   |_________| |_______________|        |_____________|         |_________|    |
+  |                      |               27256|           '-------------'         '---------'    |
+  |                      '--------------------'                                                  |
+  |     .--------.                                                                               |
+  |     |  XTAL  |   .---------. .---------------.        .-------------.         .---------.    |
+  |     | 16 MHz |   |74LS161AN| |PALCE20V8H-25PC|        | SN74LS377N  |         |74LS174B1|    |
+  |     '--------'   '---------' '---------------'        '-------------'         '---------'    |
   |                                                                                              |
-  |______________________________________________________________________________________________|
+  '----------------------------------------------------------------------------------------------'
 
   A00 = TL7705ACE
 
@@ -3505,6 +3512,9 @@ ROM_START( pool10e )
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "2.u21", 0x0000, 0x8000, CRC(a0d54044) SHA1(c7be1f12f72095daee32ae41c3554d8ab4f99245) )
 	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(55c9fcc8) SHA1(224bdf63ed345b1def4852af3b33f07790fbf123) )
+
+	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_LOAD( "pool10e_nvram.bin", 0x0000, 0x0800, CRC(e20f9a14) SHA1(617ca53263a971c9f835a95737a66fac5b99780f) )
 
 	ROM_REGION( 0x0200, "proms", 0 )	/* Same as Pool 10, but the 1st half duplicated to cover any PLD addressing */
 	ROM_LOAD( "am27s29.u25", 0x0000, 0x0200, CRC(2c315cbf) SHA1(f3f91329f2b8388decf26a050f8fb7da38694218) )
@@ -4773,6 +4783,7 @@ DRIVER_INIT_MEMBER(funworld_state, tabblue)
 	}
 }
 
+
 DRIVER_INIT_MEMBER(funworld_state, magicd2b)
 /*****************************************************************
 
@@ -4784,7 +4795,7 @@ DRIVER_INIT_MEMBER(funworld_state, magicd2b)
   putting value 0x34 in $0800-$0803 & $0A00-$0A03.
 
   The code use STA ($zp),y (opcode 0x91). As soon as register 'y'
-  increments, almost all writes goes out of range.
+  increments, almost all writes go out of range.
 
 ******************************************************************/
 {
@@ -4792,6 +4803,7 @@ DRIVER_INIT_MEMBER(funworld_state, magicd2b)
 
 	ROM[0xc1c6] = 0x92;
 }
+
 
 DRIVER_INIT_MEMBER(funworld_state, magicd2c)
 /*** same as blue TAB PCB, with the magicd2a patch ***/
@@ -4814,6 +4826,7 @@ DRIVER_INIT_MEMBER(funworld_state, magicd2c)
 	ROM[0xc1c6] = 0x92;
 }
 
+
 DRIVER_INIT_MEMBER(funworld_state, soccernw)
 {
 /* temporary patch to avoid hardware errors for debug purposes */
@@ -4829,6 +4842,7 @@ DRIVER_INIT_MEMBER(funworld_state, soccernw)
 //  ROM[0xa33b] = 0xea;
 //  ROM[0xa33c] = 0xea;
 }
+
 
 DRIVER_INIT_MEMBER(funworld_state, saloon)
 /*************************************************
@@ -4938,6 +4952,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 }
 
+
 DRIVER_INIT_MEMBER(funworld_state, multiwin)
 /*****************************************************
 
@@ -4967,6 +4982,7 @@ DRIVER_INIT_MEMBER(funworld_state, multiwin)
 
 	space.set_decrypted_region(0x8000, 0xffff, machine().root_device().memregion("maincpu")->base() + 0x18000);
 }
+
 
 DRIVER_INIT_MEMBER(funworld_state, royalcdc)
 {
@@ -5027,16 +5043,25 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 
   DINO 4 hardware.
 
-  Program data & address are bitswapped.
-  GFX are encrypted...
+  Program ROM data & address lines are swapped,
+  hardcoded in the board.
+
+  GFX ROMs address lines are also swapped, but they
+  are connected to 2 PLDs that handle the encryption.
 
   Color PROM is straight.
+
+  All PLD's are read protected.
 
 ******************************************************/
 {
 	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	int size = machine().root_device().memregion("maincpu")->bytes();
 	int start = 0x8000;
+
+	UINT8 *gfxrom = machine().root_device().memregion("gfx1")->base();
+	int sizeg = machine().root_device().memregion("gfx1")->bytes();
+	int startg = 0;
 
 	UINT8 *buffer;
 	int i, a;
@@ -5065,12 +5090,30 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 	}
 
 	auto_free(machine(), buffer);
+
+
+    /******************************
+    *   Graphics ROM decryption   *
+    ******************************/
+
+	buffer = auto_alloc_array(machine(), UINT8, sizeg);
+	memcpy(buffer, gfxrom, sizeg);
+
+	/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */
+
+	for (i = startg; i < sizeg; i++)
+	{
+		a = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
+		gfxrom[a] = buffer[i];
+	}
+
+	auto_free(machine(), buffer);
 }
 
 
-/*************************
-*      Game Drivers      *
-*************************/
+/**********************************************
+*                Game Drivers                 *
+**********************************************/
 
 /*     YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT      ROT    COMPANY            FULLNAME                                          FLAGS                  LAYOUT */
 
@@ -5102,7 +5145,7 @@ GAMEL( 1996, pool10,    0,        cuoreuno, pool10,    driver_device,  0,       
 GAMEL( 1996, pool10b,   pool10,   cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 2)",                        0,                       layout_jollycrd )
 GAMEL( 1996, pool10c,   pool10,   cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 3)",                        0,                       layout_jollycrd )
 GAMEL( 1997, pool10d,   pool10,   cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 4)",                        0,                       layout_jollycrd )
-GAME(  1997, pool10e,   pool10,   cuoreuno, cuoreuno,  funworld_state, dino4,    ROT0, "C.M.C.",          "Pool 10 (Italian, Dino 4 hardware, encrypted)",   GAME_NOT_WORKING )
+GAMEL( 1997, pool10e,   pool10,   cuoreuno, cuoreuno,  funworld_state, dino4,    ROT0, "C.M.C.",          "Pool 10 (Italian, Dino 4 hardware, encrypted)",   0,                       layout_jollycrd )
 GAMEL( 1997, tortufam,  0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Tortuga Family (Italian)",                        0,                       layout_jollycrd )
 GAMEL( 1996, potgame,   0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pot Game (Italian)",                              0,                       layout_jollycrd )
 GAMEL( 1996, bottle10,  0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Bottle 10 (Italian, set 1)",                      0,                       layout_jollycrd )
@@ -5142,6 +5185,7 @@ GAMEL( 198?, jolyjokra, jolyjokr, fw1stpal, jolyjokra, driver_device,  0,       
 GAMEL( 198?, jolyjokrb, jolyjokr, fw1stpal, funworld,  driver_device,  0,        ROT0, "Impera",          "Jolly Joker (40bet, Croatian hack)",              0,                       layout_jollycrd )
 
 // Encrypted games...
+// also pool10e (dino 4) and jolycdit/jolycdib (tab blue) are encrypted...
 GAME(  1992, multiwin,  0,        fw1stpal, funworld,  funworld_state, multiwin, ROT0, "Fun World",       "Multi Win (Ver.0167, encrypted)",                 GAME_NOT_WORKING )
 GAME(  1993, jokercrd,  0,        fw2ndpal, funworld,  driver_device,  0,        ROT0, "Vesely Svet",     "Joker Card (Ver.A267BC, encrypted)",              GAME_NOT_WORKING )
 GAME(  198?, saloon,    0,        saloon,   saloon,    funworld_state, saloon,   ROT0, "<unknown>",       "Saloon (French, encrypted)",                      GAME_NOT_WORKING )
