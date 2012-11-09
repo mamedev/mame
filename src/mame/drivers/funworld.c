@@ -35,7 +35,7 @@
   * Pool 10 (Italian, set 2),                         C.M.C.,             1996.
   * Pool 10 (Italian, set 3),                         C.M.C.,             1996.
   * Pool 10 (Italian, set 4),                         C.M.C.,             1997.
-  * Pool 10 (Italian, encrypted),                     C.M.C.,             1997.
+  * Pool 10 (Italian, Dino 4 hardware, encrypted),    C.M.C.,             1997.
   * Tortuga Family (Italian),                         C.M.C.,             1997.
   * Pot Game (Italian),                               C.M.C.,             1996.
   * Bottle 10 (Italian, set 1),                       C.M.C.,             1996.
@@ -792,8 +792,10 @@
   - Added technical notes.
 
   [2012/11/08]
-  - Added Pool 10 (Italian, encrypted), from a Dino 4 encrypted board.
+  - Added a new Pool 10 set, from a Dino 4 encrypted hardware.
   - Added PCB layout and technical notes.
+  - Decrypted the program data & address. GFX need to be decrypted.
+  - Added some technical notes.
 
 
   *** TO DO ***
@@ -3424,8 +3426,8 @@ ROM_END
 
 /*
   Pool 10...
-  Dino 4 (non working) board.
-  With the infamous mexican Rockwell R65C02.
+  Dino 4 (non working) board,
+  with the infamous mexican Rockwell R65C02.
 
   Encrypted program & graphics ROMs.
    ______________________________________________________________________________________________ 
@@ -3452,15 +3454,15 @@ ROM_END
   |__                    |           MC6821P          |  |____________________|                  |
   |__                    |         QL M9N8623         |                             _________    |
   |__    _________       |                            |                            |74HC139E |   |
-  |__J  |ULN2003A |      |                            |                            |_________|   |
+  |__ J |ULN2003A |      |                            |                            |_________|   |
   |__   |_________|      |____________________________|   _________________                      |
-  |__A                                                   |                 |                     |
+  |__ A                                                  |                 |                     |
   |__                                                    |    JAPAN 2G3    |        _________    |
-  |__M   _________         ___________    ___________    |    HM6116LP_4   |       |SN74LS02N|   |
+  |__ M  _________         ___________    ___________    |    HM6116LP_4   |       |SN74LS02N|   |
   |__   |74LS04B1 |       | 411GR-001 |  | 411GR-001 |   |                 |       |_________|   |
-  |__M  |_________|       |___________|  |___________|   |_________________|                     |
+  |__ M |_________|       |___________|  |___________|   |_________________|                     |
   |__                                                                                            |
-  |__A                                                                                           |
+  |__ A                                                                                          |
   |__                     ____________________________    ____________________________           |
   |__                    |            FILE            |  |           MC6845P          |          |
   |__                    |           KV89C72          |  |           R1A 8210         |          |
@@ -5020,6 +5022,52 @@ DRIVER_INIT_MEMBER(funworld_state, royalcdc)
 }
 
 
+DRIVER_INIT_MEMBER(funworld_state, dino4)
+/*****************************************************
+
+  DINO 4 hardware.
+
+  Program data & address are bitswapped.
+  GFX are encrypted...
+
+  Color PROM is straight.
+
+******************************************************/
+{
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	int size = machine().root_device().memregion("maincpu")->bytes();
+	int start = 0x8000;
+
+	UINT8 *buffer;
+	int i, a;
+
+    /*****************************
+    *   Program ROM decryption   *
+    *****************************/
+
+	/* data lines swap: 76543210 -> 76543120 */
+
+	for (i = start; i < size; i++)
+	{
+		rom[i] = BITSWAP8(rom[i], 7, 6, 5, 4, 3, 1, 2, 0);
+	}
+
+	buffer = auto_alloc_array(machine(), UINT8, size);
+	memcpy(buffer, rom, size);
+
+
+	/* address lines swap: fedcba9876543210 -> fedcba9867543210 */
+
+	for (i = start; i < size; i++)
+	{
+		a = BITSWAP16(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+		rom[a] = buffer[i];
+	}
+
+	auto_free(machine(), buffer);
+}
+
+
 /*************************
 *      Game Drivers      *
 *************************/
@@ -5054,7 +5102,7 @@ GAMEL( 1996, pool10,    0,        cuoreuno, pool10,    driver_device,  0,       
 GAMEL( 1996, pool10b,   pool10,   cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 2)",                        0,                       layout_jollycrd )
 GAMEL( 1996, pool10c,   pool10,   cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 3)",                        0,                       layout_jollycrd )
 GAMEL( 1997, pool10d,   pool10,   cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pool 10 (Italian, set 4)",                        0,                       layout_jollycrd )
-GAME(  1997, pool10e,   pool10,   cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pool 10 (Italian, encrypted)",                    GAME_NOT_WORKING )
+GAME(  1997, pool10e,   pool10,   cuoreuno, cuoreuno,  funworld_state, dino4,    ROT0, "C.M.C.",          "Pool 10 (Italian, Dino 4 hardware, encrypted)",   GAME_NOT_WORKING )
 GAMEL( 1997, tortufam,  0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Tortuga Family (Italian)",                        0,                       layout_jollycrd )
 GAMEL( 1996, potgame,   0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Pot Game (Italian)",                              0,                       layout_jollycrd )
 GAMEL( 1996, bottle10,  0,        cuoreuno, cuoreuno,  driver_device,  0,        ROT0, "C.M.C.",          "Bottle 10 (Italian, set 1)",                      0,                       layout_jollycrd )
