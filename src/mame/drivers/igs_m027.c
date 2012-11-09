@@ -67,6 +67,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tilemap_tile_info);
 	virtual void video_start();
 	UINT32 screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_fearless(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(igs_majhong_interrupt);
 };
 
@@ -204,6 +205,11 @@ UINT32 igs_m027_state::screen_update_igs_majhong(screen_device &screen, bitmap_i
 	//??????
 	m_igs_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	//fprintf(stdout,"Video UPDATE OK!\n");
+	return 0;
+}
+
+UINT32 igs_m027_state::screen_update_fearless(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
 	return 0;
 }
 
@@ -414,7 +420,7 @@ static MACHINE_CONFIG_START( fearless, igs_m027_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(igs_m027_state, screen_update_igs_majhong)
+	MCFG_SCREEN_UPDATE_DRIVER(igs_m027_state, screen_update_fearless)
 
 	MCFG_PALETTE_LENGTH(0x200)
 

@@ -288,7 +288,7 @@ static INPUT_PORTS_START( pprobe )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("DSW1:3") // unused?
+	PORT_DIPNAME( 0x04, 0x04, "Player Controls Demo (Cheat)" )		PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "Invulnerability (Cheat)" )	PORT_DIPLOCATION("DSW1:4")
