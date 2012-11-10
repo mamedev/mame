@@ -75,6 +75,9 @@ protected:
 
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void state_export(const device_state_entry &entry);
+
+	UINT32 XPC;
 
 	UINT8 bank_i, bank_y;
 

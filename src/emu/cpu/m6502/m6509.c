@@ -46,8 +46,7 @@ m6509_device::m6509_device(const machine_config &mconfig, const char *tag, devic
 	m6502_device(mconfig, M6509, "M6509", tag, owner, clock)
 {
 	program_config.m_addrbus_width = 20;
-	program_config.m_logaddr_width = 16;
-	program_config.m_page_shift = 13;
+	program_config.m_logaddr_width = 20;
 }
 
 void m6509_device::device_start()
@@ -59,6 +58,7 @@ void m6509_device::device_start()
 
 	init();
 
+	state_add(STATE_GENPC, "GENPC", XPC).callexport().noshow();
 	state_add(M6509_BI, "BI", bank_i);
 	state_add(M6509_BY, "BY", bank_y);
 }
@@ -68,6 +68,15 @@ void m6509_device::device_reset()
 	m6502_device::device_reset();
 	bank_i = 0x0f;
 	bank_y = 0x0f;
+}
+
+void m6509_device::state_export(const device_state_entry &entry)
+{
+	switch(entry.index()) {
+	case STATE_GENPC:
+		XPC = adr_in_bank_i(NPC);
+		break;
+	}
 }
 
 offs_t m6509_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
@@ -83,7 +92,7 @@ m6509_device::mi_6509_normal::mi_6509_normal(m6509_device *_base)
 
 UINT8 m6509_device::mi_6509_normal::read(UINT16 adr)
 {
-	UINT8 res = program->read_byte(adr);
+	UINT8 res = program->read_byte(base->adr_in_bank_i(adr));
 	if(adr == 0x0000)
 		res = base->bank_i_r();
 	else if(adr == 0x0001)
@@ -123,7 +132,7 @@ UINT8 m6509_device::mi_6509_normal::read_9(UINT16 adr)
 
 void m6509_device::mi_6509_normal::write(UINT16 adr, UINT8 val)
 {
-	program->write_byte(adr, val);
+	program->write_byte(base->adr_in_bank_i(adr), val);
 	if(adr == 0x0000)
 		base->bank_i_w(val);
 	else if(adr == 0x0001)
