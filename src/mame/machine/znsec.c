@@ -87,12 +87,14 @@
 const device_type ZNSEC = &device_creator<znsec_device>;
 
 znsec_device::znsec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, ZNSEC, "ZNSEC", tag, owner, clock)
+	psxsiodev_device(mconfig, ZNSEC, "ZNSEC", tag, owner, clock)
 {
 }
 
 void znsec_device::device_start()
 {
+	psxsiodev_device::device_start();
+
 	save_item(NAME(m_select));
 	save_item(NAME(m_state));
 	save_item(NAME(m_bit));
@@ -159,32 +161,41 @@ void znsec_device::init(const UINT8 *transform)
 
 void znsec_device::select(int select)
 {
-	if (m_select && !select)
+	if (m_select != select)
 	{
-		m_state = 0xfc;
-		m_bit = 0;
-	}
+		if (!select)
+		{
+			m_state = 0xfc;
+			m_bit = 0;
+		}
+		else
+		{
+			data_out(0, PSX_SIO_IN_DATA);
+		}
 	
-	m_select = select;
+		m_select = select;
+	}
 }
 
-UINT8 znsec_device::step(UINT8 input)
+void znsec_device::data_in( int data, int mask )
 {
-	UINT8 res;
 	static const UINT8 initial_sbox[8] = { 0xff, 0xfe, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x7f };
 
-	if (m_bit==0)
+	if ( !m_select && (mask & PSX_SIO_OUT_CLOCK) != 0 && (data & PSX_SIO_OUT_CLOCK) == 0)
 	{
-		// Apply the initial sbox
-		apply_sbox(initial_sbox);
+		if (m_bit==0)
+		{
+			// Apply the initial sbox
+			apply_sbox(initial_sbox);
+		}
+
+		// Compute the output and change the state
+		data_out(((m_state >> m_bit) & 1) != 0 ? PSX_SIO_IN_DATA : 0, PSX_SIO_IN_DATA);
+
+		if((data & PSX_SIO_OUT_DATA)==0)
+			apply_bit_sbox(m_bit);
+
+		m_bit++;
+		m_bit&=7;
 	}
-
-	// Compute the output and change the state
-	res = (m_state >> m_bit) & 1;
-	if((input & 1)==0)
-		apply_bit_sbox(m_bit);
-
-	m_bit++;
-	m_bit&=7;
-	return res;
 }

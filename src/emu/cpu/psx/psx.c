@@ -3167,44 +3167,6 @@ psxcpu_device *psxcpu_device::getcpu( device_t &device, const char *cputag )
 	return downcast<psxcpu_device *>( device.subdevice( cputag ) );
 }
 
-void psxcpu_device::install_sio_handler( device_t &device, const char *cputag, int n_port, psx_sio_handler p_f_sio_handler )
-{
-	psxsio_device *sio;
-
-	switch( n_port )
-	{
-	case 0:
-		sio = getcpu( device, cputag )->subdevice<psxsio_device>("sio0");
-		break;
-	case 1:
-		sio = getcpu( device, cputag )->subdevice<psxsio_device>("sio1");
-		break;
-	default:
-		return;
-	}
-
-	sio->install_handler( p_f_sio_handler );
-}
-
-void psxcpu_device::sio_input( device_t &device, const char *cputag, int n_port, int n_mask, int n_data )
-{
-	psxsio_device *sio;
-
-	switch( n_port )
-	{
-	case 0:
-		sio = getcpu( device, cputag )->subdevice<psxsio_device>("sio0");
-		break;
-	case 1:
-		sio = getcpu( device, cputag )->subdevice<psxsio_device>("sio1");
-		break;
-	default:
-		return;
-	}
-
-	sio->input( n_mask, n_data );
-}
-
 READ32_HANDLER( psxcpu_device::gpu_r )
 {
 	return m_gpu_read_handler( space, offset, mem_mask );

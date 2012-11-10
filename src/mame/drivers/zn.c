@@ -18,6 +18,7 @@
 #include "machine/nvram.h"
 #include "machine/mb3773.h"
 #include "machine/znsec.h"
+#include "machine/zndip.h"
 #include "machine/idectrl.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
@@ -35,19 +36,17 @@ public:
 	zn_state(const machine_config &mconfig, device_type type, const char *tag) :
 		psx_state(mconfig, type, tag),
 		m_gpu(*this, "gpu"),
-		m_znsec0(*this,"znsec0"),
-		m_znsec1(*this,"znsec1")
+		m_znsec0(*this,"maincpu:sio0:znsec0"),
+		m_znsec1(*this,"maincpu:sio0:znsec1"),
+		m_zndip(*this,"maincpu:sio0:zndip")
 	{
 	}
 
 	required_device<psxgpu_device> m_gpu;
 	required_device<znsec_device> m_znsec0;
 	required_device<znsec_device> m_znsec1;
+	required_device<zndip_device> m_zndip;
 	UINT32 m_n_znsecsel;
-	UINT32 m_b_znsecport;
-	int m_n_dip_bit;
-	int m_b_lastclock;
-	emu_timer *m_dip_timer;
 
 	size_t m_taitofx1_eeprom_size1;
 	UINT8 *m_taitofx1_eeprom1;
@@ -126,7 +125,6 @@ public:
 	DECLARE_MACHINE_RESET(coh1002v);
 	DECLARE_MACHINE_RESET(coh1002m);
 	INTERRUPT_GEN_MEMBER(qsound_interrupt);
-	TIMER_CALLBACK_MEMBER(dip_timer_fired);
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -319,127 +317,15 @@ READ32_MEMBER(zn_state::znsecsel_r)
 	return m_n_znsecsel;
 }
 
-static void sio_znsec0_handler( running_machine &machine, int n_data )
-{
-	zn_state *state = machine.driver_data<zn_state>();
-
-	if( ( n_data & PSX_SIO_OUT_CLOCK ) == 0 )
-	{
-		if( state->m_b_lastclock )
-		{
-			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, ( state->m_znsec0->step( ( n_data & PSX_SIO_OUT_DATA ) != 0 ) != 0 ) * PSX_SIO_IN_DATA );
-		}
-
-		state->m_b_lastclock = 0;
-	}
-	else
-	{
-		state->m_b_lastclock = 1;
-	}
-}
-
-static void sio_znsec1_handler( running_machine &machine, int n_data )
-{
-	zn_state *state = machine.driver_data<zn_state>();
-
-	if( ( n_data & PSX_SIO_OUT_CLOCK ) == 0 )
-	{
-		if( state->m_b_lastclock )
-		{
-			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, ( state->m_znsec1->step( ( n_data & PSX_SIO_OUT_DATA ) != 0 ) != 0 ) * PSX_SIO_IN_DATA );
-		}
-
-		state->m_b_lastclock = 0;
-	}
-	else
-	{
-		state->m_b_lastclock = 1;
-	}
-}
-
-static void sio_pad_handler( running_machine &machine, int n_data )
-{
-	zn_state *state = machine.driver_data<zn_state>();
-
-	if( ( n_data & PSX_SIO_OUT_DTR ) != 0 )
-	{
-		state->m_b_znsecport = 1;
-	}
-	else
-	{
-		state->m_b_znsecport = 0;
-	}
-
-	verboselog( machine, 2, "read pad %04x %04x %02x\n", state->m_n_znsecsel, state->m_b_znsecport, n_data );
-	psx_sio_input( machine, 0, PSX_SIO_IN_DATA | PSX_SIO_IN_DSR, PSX_SIO_IN_DATA | PSX_SIO_IN_DSR );
-}
-
-static void sio_dip_handler( running_machine &machine, int n_data )
-{
-	zn_state *state = machine.driver_data<zn_state>();
-
-	if( ( n_data & PSX_SIO_OUT_CLOCK ) == 0 )
-	{
-		if( state->m_b_lastclock )
-		{
-			int bit = ( ( state->ioport("DSW")->read() >> state->m_n_dip_bit ) & 1 );
-			verboselog( machine, 2, "read dip %02x -> %02x\n", n_data, bit * PSX_SIO_IN_DATA );
-			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, bit * PSX_SIO_IN_DATA );
-			state->m_n_dip_bit++;
-			state->m_n_dip_bit &= 7;
-		}
-		state->m_b_lastclock = 0;
-	}
-	else
-	{
-		state->m_b_lastclock = 1;
-	}
-}
-
 WRITE32_MEMBER(zn_state::znsecsel_w)
 {
 	COMBINE_DATA( &m_n_znsecsel );
 
 	m_znsec0->select( ( m_n_znsecsel >> 2 ) & 1 );
 	m_znsec1->select( ( m_n_znsecsel >> 3 ) & 1 );
-
-	if( ( m_n_znsecsel & 0x80 ) == 0 )
-	{
-		psx_sio_install_handler( machine(), 0, sio_pad_handler );
-		psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, 0 );
-	}
-	else if( ( m_n_znsecsel & 0x08 ) == 0 )
-	{
-		psx_sio_install_handler( machine(), 0, sio_znsec1_handler );
-		psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, 0 );
-	}
-	else if( ( m_n_znsecsel & 0x04 ) == 0 )
-	{
-		psx_sio_install_handler( machine(), 0, sio_znsec0_handler );
-		psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, 0 );
-	}
-	else
-	{
-		m_n_dip_bit = 0;
-		m_b_lastclock = 1;
-
-		psx_sio_install_handler( machine(), 0, sio_dip_handler );
-		psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, 0 );
-
-		m_dip_timer->adjust( downcast<cpu_device *>(&space.device())->cycles_to_attotime( 100 ), 1 );
-	}
+	m_zndip->select( ( m_n_znsecsel & 0x8c ) != 0x8c );
 
 	verboselog( machine(), 2, "znsecsel_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-}
-
-TIMER_CALLBACK_MEMBER(zn_state::dip_timer_fired)
-{
-	psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, param * PSX_SIO_IN_DSR );
-
-	if( param )
-	{
-		m_dip_timer->adjust( machine().device<cpu_device>( "maincpu" )->cycles_to_attotime(50 ) );
-	}
 }
 
 READ32_MEMBER(zn_state::boardconfig_r)
@@ -536,21 +422,11 @@ static void zn_driver_init( running_machine &machine )
 		{
 			state->m_znsec0->init( zn_config_table[ n_game ].p_n_mainsec );
 			state->m_znsec1->init( zn_config_table[ n_game ].p_n_gamesec );
-			psx_sio_install_handler( machine, 0, sio_pad_handler );
+//			psx_sio_install_handler( machine, 0, sio_pad_handler );
 			break;
 		}
 		n_game++;
 	}
-
-	state->m_dip_timer = machine.scheduler().timer_alloc( timer_expired_delegate(FUNC(zn_state::dip_timer_fired),state), NULL );
-}
-
-static void zn_machine_init( running_machine &machine )
-{
-	zn_state *state = machine.driver_data<zn_state>();
-
-	state->m_n_dip_bit = 0;
-	state->m_b_lastclock = 1;
 }
 
 static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
@@ -558,8 +434,10 @@ static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
 
-	MCFG_DEVICE_ADD("znsec0", ZNSEC, 0)
-	MCFG_DEVICE_ADD("znsec1", ZNSEC, 0)
+	MCFG_DEVICE_ADD("maincpu:sio0:znsec0", ZNSEC, 0)
+	MCFG_DEVICE_ADD("maincpu:sio0:znsec1", ZNSEC, 0)
+	MCFG_DEVICE_ADD("maincpu:sio0:zndip", ZNDIP, 0)
+	MCFG_ZNDIP_DATA_HANDLER(IOPORT(":DSW"))
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL_53_693175MHz )
@@ -583,8 +461,10 @@ static MACHINE_CONFIG_START( zn2, zn_state )
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
 
-	MCFG_DEVICE_ADD("znsec0", ZNSEC, 0)
-	MCFG_DEVICE_ADD("znsec1", ZNSEC, 0)
+	MCFG_DEVICE_ADD("maincpu:sio0:znsec0", ZNSEC, 0)
+	MCFG_DEVICE_ADD("maincpu:sio0:znsec1", ZNSEC, 0)
+	MCFG_DEVICE_ADD("maincpu:sio0:zndip", ZNDIP, 0)
+	MCFG_ZNDIP_DATA_HANDLER(IOPORT(":DSW"))
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
@@ -767,7 +647,6 @@ MACHINE_RESET_MEMBER(zn_state,coh1000c)
 	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* fixed game rom */
 	machine().root_device().membank( "bank2" )->set_base( machine().root_device().memregion( "user2" )->base() + 0x400000 ); /* banked game rom */
 	machine().root_device().membank( "bank3" )->set_base( machine().root_device().memregion( "user3" )->base() ); /* country rom */
-	zn_machine_init(machine());
 }
 
 static ADDRESS_MAP_START( qsound_map, AS_PROGRAM, 8, zn_state )
@@ -975,7 +854,6 @@ MACHINE_RESET_MEMBER(zn_state,coh3002c)
 	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* fixed game rom */
 	machine().root_device().membank( "bank2" )->set_base( machine().root_device().memregion( "user2" )->base() + 0x400000 ); /* banked game rom */
 	machine().root_device().membank( "bank3" )->set_base( machine().root_device().memregion( "user3" )->base() ); /* country rom */
-	zn_machine_init(machine());
 }
 
 static MACHINE_CONFIG_DERIVED( coh3002c, zn2 )
@@ -1260,7 +1138,6 @@ MACHINE_RESET_MEMBER(zn_state,coh1000ta)
 {
 	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* banked game rom */
 	membank( "bank2" )->set_base( m_taitofx1_eeprom1 );
-	zn_machine_init(machine());
 }
 
 static ADDRESS_MAP_START( fx1a_sound_map, AS_PROGRAM, 8, zn_state )
@@ -1350,11 +1227,9 @@ DRIVER_INIT_MEMBER(zn_state,coh1000tb)
 
 MACHINE_RESET_MEMBER(zn_state,coh1000tb)
 {
-
 	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* banked game rom */
 	membank( "bank2" )->set_base( m_taitofx1_eeprom1 );
 	membank( "bank3" )->set_base( m_taitofx1_eeprom2 );
-	zn_machine_init(machine());
 }
 
 static MACHINE_CONFIG_DERIVED( coh1000tb, zn1_2mb_vram )
@@ -1530,7 +1405,6 @@ DRIVER_INIT_MEMBER(zn_state,coh1000w)
 MACHINE_RESET_MEMBER(zn_state,coh1000w)
 {
 	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* fixed game rom */
-	zn_machine_init(machine());
 
 	machine().device("ide")->reset();
 }
@@ -1718,7 +1592,6 @@ DRIVER_INIT_MEMBER(zn_state,coh1002e)
 MACHINE_RESET_MEMBER(zn_state,coh1002e)
 {
 	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* banked game rom */
-	zn_machine_init(machine());
 }
 
 static ADDRESS_MAP_START( psarc_snd_map, AS_PROGRAM, 16, zn_state )
@@ -1862,8 +1735,6 @@ MACHINE_RESET_MEMBER(zn_state,bam2)
 {
 	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* fixed game rom */
 	machine().root_device().membank( "bank2" )->set_base( machine().root_device().memregion( "user2" )->base() + 0x400000 ); /* banked game rom */
-
-	zn_machine_init(machine());
 }
 
 static MACHINE_CONFIG_DERIVED( bam2, zn1_2mb_vram )
@@ -2190,7 +2061,6 @@ DRIVER_INIT_MEMBER(zn_state,coh1000a)
 MACHINE_RESET_MEMBER(zn_state,coh1000a)
 {
 	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* fixed game rom */
-	zn_machine_init(machine());
 	if( ( !strcmp( machine().system().name, "jdredd" ) ) ||
 		( !strcmp( machine().system().name, "jdreddb" ) ) )
 	{
@@ -2346,7 +2216,6 @@ DRIVER_INIT_MEMBER(zn_state,coh1001l)
 MACHINE_RESET_MEMBER(zn_state,coh1001l)
 {
 	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* banked rom */
-	zn_machine_init(machine());
 }
 
 static MACHINE_CONFIG_DERIVED( coh1001l, zn1_2mb_vram )
@@ -2390,7 +2259,6 @@ MACHINE_RESET_MEMBER(zn_state,coh1002v)
 {
 	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* fixed game rom */
 	machine().root_device().membank( "bank2" )->set_base( machine().root_device().memregion( "user3" )->base() ); /* banked rom */
-	zn_machine_init(machine());
 }
 
 static MACHINE_CONFIG_DERIVED( coh1002v, zn1_2mb_vram )
@@ -2592,7 +2460,6 @@ DRIVER_INIT_MEMBER(zn_state,coh1002m)
 MACHINE_RESET_MEMBER(zn_state,coh1002m)
 {
 	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() );
-	zn_machine_init(machine());
 }
 
 READ8_MEMBER(zn_state::cbaj_z80_latch_r)

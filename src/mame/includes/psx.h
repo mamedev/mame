@@ -27,8 +27,6 @@ public:
 extern void psx_driver_init( running_machine &machine );
 DECLARE_WRITE32_HANDLER( psx_com_delay_w );
 DECLARE_READ32_HANDLER( psx_com_delay_r );
-extern void psx_sio_install_handler( running_machine &, int, psx_sio_handler );
-extern void psx_sio_input( running_machine &, int, int, int );
 
 #define PSX_H ( 1 )
 #endif

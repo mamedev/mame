@@ -6,7 +6,6 @@
  */
 
 #include "sio.h"
-#include "includes/psx.h"
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -38,7 +37,6 @@ psxsio1_device::psxsio1_device(const machine_config &mconfig, const char *tag, d
 
 psxsio_device::psxsio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, type, "PSX SIO", tag, owner, clock),
-	m_fn_handler(NULL),
 	m_irq_handler(*this)
 {
 }
@@ -82,11 +80,20 @@ void psxsio_device::device_start()
 	save_item( NAME( m_tx_shift ) );
 	save_item( NAME( m_rx_bits ) );
 	save_item( NAME( m_tx_bits ) );
-}
 
-void psxsio_device::install_handler( psx_sio_handler p_f_sio_handler )
-{
-	m_fn_handler = p_f_sio_handler;
+	deviceCount = 0;
+
+	for( device_t *device = first_subdevice(); device != NULL; device = device->next() )
+	{
+		psxsiodev_device *psxsiodev = dynamic_cast<psxsiodev_device *>(device);
+		if( psxsiodev != NULL )
+		{
+			devices[ deviceCount++ ] = psxsiodev;
+			psxsiodev->m_psxsio = this;
+		}
+	}
+
+	input_update();
 }
 
 void psxsio_device::sio_interrupt()
@@ -140,6 +147,22 @@ void psxsio_device::sio_timer_adjust()
 	m_timer->adjust( n_time );
 }
 
+void psxsio_device::output( int data, int mask )
+{
+	int new_outputdata = ( m_outputdata & ~mask ) | ( data & mask );
+	int new_mask = m_outputdata ^ new_outputdata;
+
+	if( new_mask != 0 )
+	{
+		m_outputdata = new_outputdata;
+
+		for( int i = 0; i < deviceCount; i++ )
+		{
+			devices[ i ]->data_in( m_outputdata, new_mask );
+		}
+	}
+}
+
 void psxsio_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
 {
 	verboselog( machine(), 2, "sio tick\n" );
@@ -167,17 +190,14 @@ void psxsio_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 		m_tx_shift >>= 1;
 		m_tx_bits--;
 
-		if( m_fn_handler != NULL )
+		if( type() == PSX_SIO0 )
 		{
-			if( type() == PSX_SIO0 )
-			{
-				m_tx &= ~PSX_SIO_OUT_CLOCK;
-				(*m_fn_handler)( machine(), m_tx );
-				m_tx |= PSX_SIO_OUT_CLOCK;
-			}
-
-			(*m_fn_handler)( machine(), m_tx );
+			m_tx &= ~PSX_SIO_OUT_CLOCK;
+			output( m_tx, PSX_SIO_OUT_CLOCK | PSX_SIO_OUT_DATA );
+			m_tx |= PSX_SIO_OUT_CLOCK;
 		}
+
+		output( m_tx, PSX_SIO_OUT_CLOCK | PSX_SIO_OUT_DATA );
 
 		if( m_tx_bits == 0 &&
 			( m_control & SIO_CONTROL_TX_IENA ) != 0 )
@@ -259,13 +279,7 @@ WRITE32_MEMBER( psxsio_device::write )
 				m_tx &= ~PSX_SIO_OUT_DTR;
 			}
 
-			if( ( ( m_tx ^ m_tx_prev ) & PSX_SIO_OUT_DTR ) != 0 )
-			{
-				if( m_fn_handler != NULL )
-				{
-					(*m_fn_handler)( machine(), m_tx );
-				}
-			}
+			output( m_tx, PSX_SIO_OUT_DTR );
 
 			m_tx_prev = m_tx;
 
@@ -341,10 +355,20 @@ READ32_MEMBER( psxsio_device::read )
 	return data;
 }
 
-void psxsio_device::input( int n_mask, int n_data )
+void psxsio_device::input_update()
 {
-	verboselog( machine(), 1, "psx_sio_input( %s, %02x, %02x )\n", tag(), n_mask, n_data );
-	m_rx = ( m_rx & ~n_mask ) | ( n_data & n_mask );
+	int data = 0;
+
+	for( int i = 0; i < deviceCount; i++ )
+	{
+		data |= devices[ i ]->m_dataout;
+	}
+
+	int mask = data ^ m_rx;
+
+	verboselog( machine(), 1, "input_update( %s, %02x, %02x )\n", tag(), mask, data );
+
+	m_rx = data;
 
 	if( ( m_rx & PSX_SIO_IN_DSR ) != 0 )
 	{

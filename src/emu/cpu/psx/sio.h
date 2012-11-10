@@ -11,22 +11,13 @@
 #define __PSXSIO_H__
 
 #include "emu.h"
+#include "siodev.h"
 
 extern const device_type PSX_SIO0;
 extern const device_type PSX_SIO1;
 
-typedef void ( *psx_sio_handler )( running_machine &, int );
-
 #define MCFG_PSX_SIO_IRQ_HANDLER(_devcb) \
 	devcb = &psxsio_device::set_irq_handler(*device, DEVCB2_##_devcb); \
-
-#define PSX_SIO_OUT_DATA ( 1 )	/* COMMAND */
-#define PSX_SIO_OUT_DTR ( 2 )	/* ATT */
-#define PSX_SIO_OUT_RTS ( 4 )
-#define PSX_SIO_OUT_CLOCK ( 8 )	/* CLOCK */
-#define PSX_SIO_IN_DATA ( 1 )	/* DATA */
-#define PSX_SIO_IN_DSR ( 2 )	/* ACK */
-#define PSX_SIO_IN_CTS ( 4 )
 
 #define SIO_BUF_SIZE ( 8 )
 
@@ -53,12 +44,10 @@ public:
 	// static configuration helpers
 	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxsio_device &>(device).m_irq_handler.set_callback(object); }
 
-	void install_handler( psx_sio_handler p_f_sio_handler );
-
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
 
-	void input( int n_mask, int n_data );
+	void input_update();
 
 protected:
 	// device-level overrides
@@ -67,6 +56,7 @@ protected:
 	virtual void device_post_load();
 
 private:
+	void output( int data, int mask );
 	void sio_interrupt();
 	void sio_timer_adjust();
 
@@ -86,9 +76,14 @@ private:
 	UINT32 m_rx_bits;
 
 	emu_timer *m_timer;
-	psx_sio_handler m_fn_handler;
 
 	devcb2_write_line m_irq_handler;
+
+	psxsiodev_device *devices[ 10 ];
+	int deviceCount;
+
+	int m_outputdata;
+	int m_inputdata;
 };
 
 class psxsio0_device : public psxsio_device

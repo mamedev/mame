@@ -444,6 +444,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "sound/cdda.h"
 #include "sound/mas3507d.h"
 #include "cdrom.h"
+#include "machine/k573cass.h"
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -1390,7 +1391,6 @@ static void update_mode( running_machine &machine )
 
 DRIVER_INIT_MEMBER(ksys573_state,konami573)
 {
-
 	psx_driver_init(machine());
 	atapi_init(machine());
 
@@ -1401,13 +1401,6 @@ DRIVER_INIT_MEMBER(ksys573_state,konami573)
 
 MACHINE_RESET_MEMBER(ksys573_state,konami573)
 {
-
-	if( machine().device<device_secure_serial_flash>("install_eeprom") )
-	{
-		/* security cart */
-		psx_sio_input( machine(), 1, PSX_SIO_IN_DSR, PSX_SIO_IN_DSR );
-	}
-
 	m_flash_bank = -1;
 
 	update_mode(machine());
@@ -3146,37 +3139,45 @@ MACHINE_CONFIG_END
 // Up to two carts can be used
 
 static MACHINE_CONFIG_DERIVED( konami573x, konami573 )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_X76F041_ADD( "install_eeprom" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( konami573y, konami573 )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_X76F100_ADD( "install_eeprom" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( konami573yi, konami573 )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_X76F100_ADD( "install_eeprom" )
 	MCFG_DS2401_ADD(  "install_id" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( konami573zi, konami573 )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_ZS01_ADD(    "install_eeprom", "install_id" )
 	MCFG_DS2401_ADD(  "install_id" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( k573baitx, k573bait )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_X76F041_ADD( "install_eeprom" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( k573dx, k573d )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_X76F041_ADD( "install_eeprom" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( k573dxi, k573d )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_X76F041_ADD( "install_eeprom" )
 	MCFG_DS2401_ADD(  "install_id" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( k573dxzi, k573d )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_X76F041_ADD( "install_eeprom" )
 	MCFG_DS2401_ADD(  "install_id" )
 	MCFG_ZS01_ADD(    "game_eeprom", "game_id" )
@@ -3184,11 +3185,13 @@ static MACHINE_CONFIG_DERIVED( k573dxzi, k573d )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( k573dyi, k573d )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_X76F100_ADD( "install_eeprom" )
 	MCFG_DS2401_ADD(  "install_id" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( k573dyyi, k573d )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_X76F100_ADD( "install_eeprom" )
 	MCFG_DS2401_ADD(  "install_id" )
 	MCFG_X76F100_ADD( "game_eeprom" )
@@ -3196,25 +3199,30 @@ static MACHINE_CONFIG_DERIVED( k573dyyi, k573d )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( k573dzi, k573d )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_ZS01_ADD(    "install_eeprom", "install_id" )
 	MCFG_DS2401_ADD(  "install_id" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pccard1x, pccard1 )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_X76F041_ADD( "install_eeprom" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pccard1xi, pccard1 )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_X76F041_ADD( "install_eeprom" )
 	MCFG_DS2401_ADD(  "install_id" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pccard1yi, pccard1 )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_X76F100_ADD( "install_eeprom" )
 	MCFG_DS2401_ADD(  "install_id" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pccard1dxzi, pccard1d )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_X76F041_ADD( "install_eeprom" )
 	MCFG_DS2401_ADD(  "install_id" )
 	MCFG_ZS01_ADD(    "game_eeprom", "game_id" )
@@ -3222,11 +3230,13 @@ static MACHINE_CONFIG_DERIVED( pccard1dxzi, pccard1d )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pccard1dzi, pccard1d )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_ZS01_ADD(    "install_eeprom", "install_id" )
 	MCFG_DS2401_ADD(  "install_id" )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pccard2yyi, pccard2 )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_X76F100_ADD( "install_eeprom" )
 	MCFG_DS2401_ADD(  "install_id" )
 	MCFG_X76F100_ADD( "game_eeprom" )
@@ -3234,6 +3244,7 @@ static MACHINE_CONFIG_DERIVED( pccard2yyi, pccard2 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pccard2dxzi, pccard2d )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_X76F041_ADD( "install_eeprom" )
 	MCFG_DS2401_ADD(  "install_id" )
 	MCFG_ZS01_ADD(    "game_eeprom", "game_id" )
@@ -3241,6 +3252,7 @@ static MACHINE_CONFIG_DERIVED( pccard2dxzi, pccard2d )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pccard2dyyi, pccard2d )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_X76F100_ADD( "install_eeprom" )
 	MCFG_DS2401_ADD(  "install_id" )
 	MCFG_X76F100_ADD( "game_eeprom" )
@@ -3248,6 +3260,7 @@ static MACHINE_CONFIG_DERIVED( pccard2dyyi, pccard2d )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pccard2dzi, pccard2d )
+	MCFG_DEVICE_ADD("maincpu:sio1:k573cass", KONAMI573CASSETTE, 0)
 	MCFG_ZS01_ADD(    "install_eeprom", "install_id" )
 	MCFG_DS2401_ADD(  "install_id" )
 MACHINE_CONFIG_END

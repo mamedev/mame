@@ -931,7 +931,7 @@ $(CPUOBJ)/mips/mips3drc.o:	$(CPUSRC)/mips/mips3drc.c \
 
 ifneq ($(filter PSX,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/psx
-CPUOBJS += $(CPUOBJ)/psx/psx.o $(CPUOBJ)/psx/gte.o $(CPUOBJ)/psx/dma.o $(CPUOBJ)/psx/irq.o $(CPUOBJ)/psx/mdec.o $(CPUOBJ)/psx/rcnt.o $(CPUOBJ)/psx/sio.o
+CPUOBJS += $(CPUOBJ)/psx/psx.o $(CPUOBJ)/psx/gte.o $(CPUOBJ)/psx/dma.o $(CPUOBJ)/psx/irq.o $(CPUOBJ)/psx/mdec.o $(CPUOBJ)/psx/rcnt.o $(CPUOBJ)/psx/sio.o $(CPUOBJ)/psx/siodev.o
 DASMOBJS += $(CPUOBJ)/psx/psxdasm.o
 endif
 

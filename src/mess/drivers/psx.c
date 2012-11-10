@@ -18,18 +18,7 @@
 #include "zlib.h"
 #include "machine/psxcd.h"
 #include "machine/psxcard.h"
-
-struct pad_t
-{
-	UINT8 n_shiftin;
-	UINT8 n_shiftout;
-	int n_bits;
-	int n_state;
-	int n_byte;
-	int b_lastclock;
-	int b_ack;
-};
-
+#include "machine/psxcport.h"
 
 class psx1_state : public psx_state
 {
@@ -39,7 +28,6 @@ public:
 
 	UINT8 *m_exe_buffer;
 	int m_exe_size;
-	pad_t m_pad[ 2 ];
 	int m_cd_param_p;
 	int m_cd_result_p;
 	int m_cd_result_c;
@@ -55,7 +43,6 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(psx_setopbase);
 	DECLARE_DRIVER_INIT(psx);
 	DECLARE_MACHINE_RESET(psx);
-	TIMER_CALLBACK_MEMBER(psx_pad_ack);
 };
 
 
@@ -476,191 +463,6 @@ static QUICKLOAD_LOAD( psx_exe_load )
 	return IMAGE_INIT_PASS;
 }
 
-/* PAD emulation */
-
-#define PAD_STATE_IDLE ( 0 )
-#define PAD_STATE_LISTEN ( 1 )
-#define PAD_STATE_ACTIVE ( 2 )
-#define PAD_STATE_READ ( 3 )
-#define PAD_STATE_UNLISTEN ( 4 )
-#define PAD_STATE_MEMCARD ( 5 )
-
-#define PAD_TYPE_STANDARD ( 4 )
-#define PAD_BYTES_STANDARD ( 2 )
-
-#define PAD_CMD_START ( 0x01 )
-#define PAD_CMD_READ  ( 0x42 ) /* B */
-
-#define PAD_DATA_OK   ( 0x5a ) /* Z */
-#define PAD_DATA_IDLE ( 0xff )
-
-TIMER_CALLBACK_MEMBER(psx1_state::psx_pad_ack)
-{
-	int n_port = param;
-	pad_t *pad = &m_pad[ n_port ];
-
-	if( pad->n_state != PAD_STATE_IDLE )
-	{
-		psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, pad->b_ack * PSX_SIO_IN_DSR );
-		if( !pad->b_ack )
-		{
-			pad->b_ack = 1;
-			machine().scheduler().timer_set(attotime::from_usec( 2 ), timer_expired_delegate(FUNC(psx1_state::psx_pad_ack),this) , n_port);
-		}
-	}
-}
-
-static void psx_pad( running_machine &machine, int n_port, int n_data )
-{
-	psx1_state *state = machine.driver_data<psx1_state>();
-	pad_t *pad = &state->m_pad[ n_port ];
-	int b_sel;
-	int b_clock;
-	int b_data;
-	int b_ack;
-	int b_ready;
-	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
-	psxcard_device *psxcard = NULL;
-
-	if (n_port == 0)
-	{
-		psxcard = machine.device<psxcard_device>("card1");
-	}
-	else
-	{
-		psxcard = machine.device<psxcard_device>("card2");
-	}
-
-	b_sel = ( n_data & PSX_SIO_OUT_DTR ) / PSX_SIO_OUT_DTR;
-	b_clock = ( n_data & PSX_SIO_OUT_CLOCK ) / PSX_SIO_OUT_CLOCK;
-	b_data = ( n_data & PSX_SIO_OUT_DATA ) / PSX_SIO_OUT_DATA;
-	b_ready = 0;
-	b_ack = 0;
-
-	if( b_sel )
-	{
-		pad->n_state = PAD_STATE_IDLE;
-	}
-
-	switch( pad->n_state )
-	{
-	case PAD_STATE_LISTEN:
-	case PAD_STATE_ACTIVE:
-	case PAD_STATE_READ:
-	case PAD_STATE_MEMCARD:
-		if( pad->b_lastclock && !b_clock )
-		{
-			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, ( pad->n_shiftout & 1 ) * PSX_SIO_IN_DATA );
-			pad->n_shiftout >>= 1;
-		}
-		if( !pad->b_lastclock && b_clock )
-		{
-			pad->n_shiftin >>= 1;
-			pad->n_shiftin |= b_data << 7;
-			pad->n_bits++;
-
-			if( pad->n_bits == 8 )
-			{
-				pad->n_bits = 0;
-				b_ready = 1;
-			}
-		}
-		break;
-	}
-
-	pad->b_lastclock = b_clock;
-
-	switch( pad->n_state )
-	{
-	case PAD_STATE_IDLE:
-		if( !b_sel )
-		{
-			pad->n_state = PAD_STATE_LISTEN;
-			pad->n_shiftout = PAD_DATA_IDLE;
-			pad->n_bits = 0;
-		}
-		break;
-	case PAD_STATE_LISTEN:
-		if( b_ready )
-		{
-			if( pad->n_shiftin == PAD_CMD_START )
-			{
-				pad->n_state = PAD_STATE_ACTIVE;
-				pad->n_shiftout = ( PAD_TYPE_STANDARD << 4 ) | ( PAD_BYTES_STANDARD >> 1 );
-				b_ack = 1;
-			}
-			else if( psxcard->transfer(pad->n_shiftin, &pad->n_shiftout) )
-			{
-				pad->n_state = PAD_STATE_MEMCARD;
-				b_ack = 1;
-			}
-			else
-			{
-				pad->n_state = PAD_STATE_UNLISTEN;
-			}
-		}
-		break;
-	case PAD_STATE_MEMCARD:
-		if( b_ready )
-		{
-			if( psxcard->transfer(pad->n_shiftin, &pad->n_shiftout) )
-			{
-				b_ack = 1;
-			}
-			else
-			{
-				b_ack = 0;
-				pad->n_state = PAD_STATE_IDLE;
-			}
-		}
-		break;
-	case PAD_STATE_ACTIVE:
-		if( b_ready )
-		{
-			if( pad->n_shiftin == PAD_CMD_READ )
-			{
-				pad->n_state = PAD_STATE_READ;
-				pad->n_shiftout = PAD_DATA_OK;
-				pad->n_byte = 0;
-				b_ack = 1;
-			}
-			else
-			{
-				pad->n_state = PAD_STATE_UNLISTEN;
-			}
-		}
-		break;
-	case PAD_STATE_READ:
-		if( b_ready )
-		{
-			if( pad->n_byte < PAD_BYTES_STANDARD )
-			{
-				pad->n_shiftout = machine.root_device().ioport(portnames[pad->n_byte + ( n_port * PAD_BYTES_STANDARD )])->read();
-				pad->n_byte++;
-				b_ack = 1;
-			}
-			else
-			{
-				pad->n_state = PAD_STATE_LISTEN;
-			}
-		}
-		break;
-	}
-
-	if( b_ack )
-	{
-		pad->b_ack = 0;
-		machine.scheduler().timer_set(attotime::from_usec( 10 ), timer_expired_delegate(FUNC(psx1_state::psx_pad_ack),state), n_port);
-	}
-}
-
-static void psx_sio0( running_machine &machine, int n_data )
-{
-	/* todo: raise data & ack when nothing is driving it low */
-	psx_pad( machine, 0, n_data );
-	psx_pad( machine, 1, n_data ^ PSX_SIO_OUT_DTR );
-}
-
 /* ----------------------------------------------------------------------- */
 
 static void cd_dma_read( psxcd_device *psxcd, UINT32 n_address, INT32 n_size )
@@ -700,12 +502,6 @@ static ADDRESS_MAP_START( psx_map, AS_PROGRAM, 32, psx1_state )
 	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
 ADDRESS_MAP_END
-
-
-MACHINE_RESET_MEMBER(psx1_state,psx)
-{
-	psx_sio_install_handler( machine(), 0, psx_sio0 );
-}
 
 DRIVER_INIT_MEMBER(psx1_state,psx)
 {
@@ -765,7 +561,7 @@ static MACHINE_CONFIG_START( psxntsc, psx1_state )
 	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( psx_map )
 
-	MCFG_MACHINE_RESET_OVERRIDE(psx1_state, psx )
+	MCFG_DEVICE_ADD("maincpu:sio0:controllers", PSXCONTROLLERPORTS, 0)
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL_53_693175MHz )
@@ -795,8 +591,6 @@ static MACHINE_CONFIG_START( psxpal, psx1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", CXD8530AQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( psx_map)
-
-	MCFG_MACHINE_RESET_OVERRIDE(psx1_state, psx )
 
 	/* video hardware */
 	/* TODO: visible area and refresh rate */

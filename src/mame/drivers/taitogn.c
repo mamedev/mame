@@ -324,6 +324,7 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 #include "machine/at28c16.h"
 #include "machine/intelfsh.h"
 #include "machine/znsec.h"
+#include "machine/zndip.h"
 #include "machine/idectrl.h"
 #include "machine/mb3773.h"
 #include "sound/spu.h"
@@ -334,13 +335,15 @@ class taitogn_state : public psx_state
 public:
 	taitogn_state(const machine_config &mconfig, device_type type, const char *tag) :
 		psx_state(mconfig, type, tag),
-		m_znsec0(*this,"znsec0"),
-		m_znsec1(*this,"znsec1")
+		m_znsec0(*this,"maincpu:sio0:znsec0"),
+		m_znsec1(*this,"maincpu:sio0:znsec1"),
+		m_zndip(*this,"maincpu:sio0:zndip")
 	{
 	}
 
 	required_device<znsec_device> m_znsec0;
 	required_device<znsec_device> m_znsec1;
+	required_device<zndip_device> m_zndip;
 
 	intel_te28f160_device *m_biosflash;
 	intel_e28f400_device *m_pgmflash;
@@ -357,10 +360,6 @@ public:
 	int m_v;
 
 	UINT32 m_n_znsecsel;
-	UINT32 m_b_znsecport;
-	int m_n_dip_bit;
-	int m_b_lastclock;
-	emu_timer *m_dip_timer;
 
 	UINT32 m_coin_info;
 	UINT32 m_mux_data;
@@ -395,7 +394,6 @@ public:
 	DECLARE_DRIVER_INIT(coh3002t_mp);
 	DECLARE_DRIVER_INIT(coh3002t);
 	DECLARE_MACHINE_RESET(coh3002t);
-	TIMER_CALLBACK_MEMBER(dip_timer_fired);
 };
 
 
@@ -692,122 +690,14 @@ READ32_MEMBER(taitogn_state::znsecsel_r)
 	return m_n_znsecsel;
 }
 
-static void sio_znsec0_handler( running_machine &machine, int n_data )
-{
-	taitogn_state *state = machine.driver_data<taitogn_state>();
-
-	if( ( n_data & PSX_SIO_OUT_CLOCK ) == 0 )
-	{
-		if( state->m_b_lastclock )
-			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, ( state->m_znsec0->step( ( n_data & PSX_SIO_OUT_DATA ) != 0 ) != 0 ) * PSX_SIO_IN_DATA );
-
-		state->m_b_lastclock = 0;
-	}
-	else
-	{
-		state->m_b_lastclock = 1;
-	}
-}
-
-static void sio_znsec1_handler( running_machine &machine, int n_data )
-{
-	taitogn_state *state = machine.driver_data<taitogn_state>();
-
-	if( ( n_data & PSX_SIO_OUT_CLOCK ) == 0 )
-	{
-		if( state->m_b_lastclock )
-			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, ( state->m_znsec1->step( ( n_data & PSX_SIO_OUT_DATA ) != 0 ) != 0 ) * PSX_SIO_IN_DATA );
-
-		state->m_b_lastclock = 0;
-	}
-	else
-	{
-		state->m_b_lastclock = 1;
-	}
-}
-
-static void sio_pad_handler( running_machine &machine, int n_data )
-{
-	taitogn_state *state = machine.driver_data<taitogn_state>();
-
-	if( ( n_data & PSX_SIO_OUT_DTR ) != 0 )
-	{
-		state->m_b_znsecport = 1;
-	}
-	else
-	{
-		state->m_b_znsecport = 0;
-	}
-
-	psx_sio_input( machine, 0, PSX_SIO_IN_DATA | PSX_SIO_IN_DSR, PSX_SIO_IN_DATA | PSX_SIO_IN_DSR );
-}
-
-static void sio_dip_handler( running_machine &machine, int n_data )
-{
-	taitogn_state *state = machine.driver_data<taitogn_state>();
-
-	if( ( n_data & PSX_SIO_OUT_CLOCK ) == 0 )
-	{
-		if( state->m_b_lastclock )
-		{
-			int bit = ( ( state->ioport("DSW")->read() >> state->m_n_dip_bit ) & 1 );
-			psx_sio_input( machine, 0, PSX_SIO_IN_DATA, bit * PSX_SIO_IN_DATA );
-			state->m_n_dip_bit++;
-			state->m_n_dip_bit &= 7;
-		}
-		state->m_b_lastclock = 0;
-	}
-	else
-	{
-		state->m_b_lastclock = 1;
-	}
-}
-
 WRITE32_MEMBER(taitogn_state::znsecsel_w)
 {
 	COMBINE_DATA( &m_n_znsecsel );
 
 	m_znsec0->select( ( m_n_znsecsel >> 2 ) & 1 );
 	m_znsec1->select( ( m_n_znsecsel >> 3 ) & 1 );
-
-	if( ( m_n_znsecsel & 0x80 ) == 0 )
-	{
-		psx_sio_install_handler( machine(), 0, sio_pad_handler );
-		psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, 0 );
-	}
-	else if( ( m_n_znsecsel & 0x08 ) == 0 )
-	{
-		psx_sio_install_handler( machine(), 0, sio_znsec1_handler );
-		psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, 0 );
-	}
-	else if( ( m_n_znsecsel & 0x04 ) == 0 )
-	{
-		psx_sio_install_handler( machine(), 0, sio_znsec0_handler );
-		psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, 0 );
-	}
-	else
-	{
-		m_n_dip_bit = 0;
-		m_b_lastclock = 1;
-
-		psx_sio_install_handler( machine(), 0, sio_dip_handler );
-		psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, 0 );
-
-		m_dip_timer->adjust( downcast<cpu_device *>(&space.device())->cycles_to_attotime( 100 ), 1 );
-	}
+	m_zndip->select( ( m_n_znsecsel & 0x8c ) != 0x8c );
 }
-
-TIMER_CALLBACK_MEMBER(taitogn_state::dip_timer_fired)
-{
-
-	psx_sio_input( machine(), 0, PSX_SIO_IN_DSR, param * PSX_SIO_IN_DSR );
-
-	if( param )
-	{
-		m_dip_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(50));
-	}
-}
-
 
 READ32_MEMBER(taitogn_state::boardconfig_r)
 {
@@ -881,8 +771,6 @@ DRIVER_INIT_MEMBER(taitogn_state,coh3002t)
 	psx_driver_init(machine());
 	m_znsec0->init(tt10);
 	m_znsec1->init(tt16);
-	psx_sio_install_handler(machine(), 0, sio_pad_handler);
-	m_dip_timer = machine().scheduler().timer_alloc( timer_expired_delegate(FUNC(taitogn_state::dip_timer_fired),this), NULL );
 
 	UINT32 metalength;
 	memset(m_cis, 0xff, 512);
@@ -898,8 +786,6 @@ DRIVER_INIT_MEMBER(taitogn_state,coh3002t_mp)
 
 MACHINE_RESET_MEMBER(taitogn_state,coh3002t)
 {
-
-	m_b_lastclock = 1;
 	m_locked = 0x1ff;
 	install_handlers(machine(), 0);
 	m_control = 0;
@@ -951,8 +837,10 @@ static MACHINE_CONFIG_START( coh3002t, taitogn_state )
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
 	MCFG_CPU_PROGRAM_MAP(taitogn_map)
 
-	MCFG_DEVICE_ADD("znsec0", ZNSEC, 0)
-	MCFG_DEVICE_ADD("znsec1", ZNSEC, 0)
+	MCFG_DEVICE_ADD("maincpu:sio0:znsec0", ZNSEC, 0)
+	MCFG_DEVICE_ADD("maincpu:sio0:znsec1", ZNSEC, 0)
+	MCFG_DEVICE_ADD("maincpu:sio0:zndip", ZNDIP, 0)
+	MCFG_ZNDIP_DATA_HANDLER(IOPORT(":DSW"))
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )

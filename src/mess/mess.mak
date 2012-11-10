@@ -1668,6 +1668,7 @@ $(MESSOBJ)/snk.a:				\
 
 $(MESSOBJ)/sony.a:				\
 	$(MESS_DRIVERS)/psx.o		\
+	$(MESS_MACHINE)/psxcport.o	\
 	$(MESS_MACHINE)/psxcd.o		\
 	$(MESS_MACHINE)/psxcddrv.o	\
 	$(MESS_MACHINE)/psxcard.o	\

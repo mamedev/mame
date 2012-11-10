@@ -920,7 +920,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/konamim2.o \
 	$(DRIVERS)/kontest.o \
 	$(DRIVERS)/konendev.o \
-	$(DRIVERS)/ksys573.o $(MACHINE)/zs01.o \
+	$(DRIVERS)/ksys573.o $(MACHINE)/k573cass.o $(MACHINE)/zs01.o \
 	$(DRIVERS)/labyrunr.o $(VIDEO)/labyrunr.o \
 	$(DRIVERS)/lethal.o $(VIDEO)/lethal.o \
 	$(DRIVERS)/mainevt.o $(VIDEO)/mainevt.o \
@@ -1366,7 +1366,7 @@ $(MAMEOBJ)/snk.a: \
 	$(DRIVERS)/snk68.o $(VIDEO)/snk68.o \
 
 $(MAMEOBJ)/sony.a: \
-	$(DRIVERS)/zn.o $(MACHINE)/znsec.o \
+	$(DRIVERS)/zn.o $(MACHINE)/zndip.o $(MACHINE)/znsec.o \
 	$(MACHINE)/psx.o
 
 $(MAMEOBJ)/stern.a: \

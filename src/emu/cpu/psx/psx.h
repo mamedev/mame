@@ -143,8 +143,6 @@ public:
 	DECLARE_READ32_MEMBER( gpu_r );
 
 	static psxcpu_device *getcpu( device_t &device, const char *cputag );
-	static void install_sio_handler( device_t &device, const char *cputag, int n_port, psx_sio_handler p_f_sio_handler );
-	static void sio_input( device_t &device, const char *cputag, int n_port, int n_mask, int n_data );
 
 protected:
 	psxcpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal_map);
