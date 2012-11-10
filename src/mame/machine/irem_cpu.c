@@ -29,7 +29,7 @@
     World PK Soccer/Kick for the Goal  Irem    D8000021A1 024 9335NK701
     Ninja Baseball Batman              Irem    D8000021A1 024 9335NK700
     Perfect Soldiers                   Irem    D8000022A1
-    Dream Soccer '94                   Irem    D8000023A1 026
+    Dream Soccer '94                   Irem    D8000023A1 026 9433NK700
 
     Please let me know if you can fill in any of the blanks.
 
