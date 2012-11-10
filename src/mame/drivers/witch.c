@@ -1,5 +1,10 @@
 /*
-Pinball Champ '95 / Witch
+
+Witch / Pinball Champ '95
+
+
+Currently not dumped, the original(?) version that is (c) Excellent System 1992
+
 
 witch   : Witch
       press F1 to initialize NVRAM
@@ -11,14 +16,19 @@ pbchmp95: Pinball Champ '95. Seems to be a simple mod with the following differe
                         -Auto-initialization on NVRAM error(?)
                         -Stars keep falling at the title screen
 
+Hardware based on auction picture:
+
+ES-9104 PCB:
+       Z80A: Two Z80A CPUs frequency unknown (3MHz? 12MHz/4) (CPU2 used mainly for sound effects)
+     YM2203: frequency unknown (music + sound effects + video scrolling access)
+     ES8712: frequency unknown (samples)
+        OSC: 12.000MHz
+      other: 8-position dipswitch x 4, 3.6v battery + reset push button
+             Standard 8-liner harness connectors.
+
+
 This is so far what could be reverse-engineered from the code.
 BEWARE : these are only suppositions, not facts.
-
-Featured hardware
-
-    2xZ80 ; frequency unknown (CPU2 used mainly for sound effects)
-    2xYM2203 (or compatible?) ; frequency unknown (music + sound effects + video scrolling access)
-    1xES8712 ; frequency unknown (samples)
 
 
 GFX
@@ -793,12 +803,12 @@ INTERRUPT_GEN_MEMBER(witch_state::witch_sub_interrupt)
 
 static MACHINE_CONFIG_START( witch, witch_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)	/* 3MHz?? */
 	MCFG_CPU_PROGRAM_MAP(map_main)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", witch_state,  witch_main_interrupt)
 
 	/* 2nd z80 */
-	MCFG_CPU_ADD("sub", Z80,8000000)		 /* ? MHz */
+	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz / 4)	/* 3MHz?? */
 	MCFG_CPU_PROGRAM_MAP(map_sub)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", witch_state,  witch_sub_interrupt)
 
@@ -819,14 +829,14 @@ static MACHINE_CONFIG_START( witch, witch_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("essnd", ES8712, 8000)
+	MCFG_SOUND_ADD("essnd", ES8712, 8000) /* ?? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8)	/* 1.5MHz?? */
 	MCFG_SOUND_CONFIG(ym2203_interface_0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 1500000)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL_12MHz / 8)	/* 1.5MHz?? */
 	MCFG_SOUND_CONFIG(ym2203_interface_1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
@@ -851,8 +861,8 @@ ROM_START( witch )
 	ROM_LOAD( "rom.v10", 0x00000, 0x40000, CRC(62e42371) SHA1(5042abc2176d0c35fd6b698eca4145f93b0a3944) )
 ROM_END
 
-/* no sega logo? a bootleg? */
-ROM_START( pbchmp95 )
+
+ROM_START( pbchmp95 ) /* Licensed for Germany? */
 	ROM_REGION( 0x30000, "maincpu", 0 )
 	ROM_LOAD( "3.bin", 0x10000, 0x20000, CRC(e881aa05) SHA1(10d259396cac4b9a1b72c262c11ffa5efbdac433)  )
 	ROM_COPY( "maincpu" , 0x10000, 0x0000, 0x8000 )
@@ -879,5 +889,5 @@ DRIVER_INIT_MEMBER(witch_state,witch)
 	m_bank = -1;
 }
 
-GAME( 1992, witch,    0,     witch, witch, witch_state, witch, ROT0, "Sega / Vic Tokai", "Witch", 0 )
-GAME( 1995, pbchmp95, witch, witch, witch, witch_state, witch, ROT0, "bootleg? (Veltmeijer Automaten)", "Pinball Champ '95 (bootleg?)", 0 )
+GAME( 1992, witch,    0,     witch, witch, witch_state, witch, ROT0, "Sega / Vic Tokai",     "Witch", 0 )
+GAME( 1995, pbchmp95, witch, witch, witch, witch_state, witch, ROT0, "Veltmeijer Automaten", "Pinball Champ '95", 0 )
