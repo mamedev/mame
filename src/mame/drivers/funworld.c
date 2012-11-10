@@ -194,7 +194,7 @@
   There is another set of Cuore 1. I didn't include it because the only difference with
   the supported set is the program rom that is double sized, having identical halves.
 
-  There is at least one missing game in the family... 'Hippo Family', also from C.M.C.
+  There is at least one missing game in the family... 'Hyppo Family', also from C.M.C.
   This game should be located and dumped.
 
 
@@ -801,6 +801,7 @@
   - Promoted to working state.
   - Improved the PCB layout.
   - Added some technical notes.
+  - Added PLD dumps to bonuscrd and powercrd.
 
 
   *** TO DO ***
@@ -3065,6 +3066,9 @@ ROM_START( bonuscrd )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "n82s147an.bin",	0x0000, 0x0200, BAD_DUMP CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) ) // from power card, original fun world encrypted bonus card clone.
 	ROM_LOAD( "74s472n.bin",    0x0200, 0x0200, CRC(e56780cb) SHA1(c06b854f21b1dcee465ac9c8c9a2934b7e99565f) )			// original dump, but doesn't match the cards colors in real board.
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "bonuscrd_tibpal16l8.bin",  0x0000, 0x0104, CRC(9af1ac12) SHA1(2b9770eeca081b8c744ba1250bb99569816d7a85) )
 ROM_END
 
 
@@ -3079,6 +3083,9 @@ ROM_START( bonuscrda )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "n82s147an.bin",	0x0000, 0x0200, BAD_DUMP CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) ) // from power card, original fun world encrypted bonus card clone.
 	ROM_LOAD( "74s472n.bin",    0x0200, 0x0200, CRC(e56780cb) SHA1(c06b854f21b1dcee465ac9c8c9a2934b7e99565f) )			// original dump, but doesn't match the cards colors in real board.
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "bonuscrd_tibpal16l8.bin",  0x0000, 0x0104, CRC(9af1ac12) SHA1(2b9770eeca081b8c744ba1250bb99569816d7a85) )
 ROM_END
 
 
@@ -4372,6 +4379,9 @@ ROM_START( powercrd )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "n82s147an.bin",	0x0000, 0x0200, CRC(136245f3) SHA1(715309982fcafbce88b08237ca46acec31273938) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "powercrd_tibpal16l8.bin",  0x0000, 0x0104, CRC(b5c0a96d) SHA1(3547700e276326a27009202b2e82bc649abb33db) )
 ROM_END
 
 
