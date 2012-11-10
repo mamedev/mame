@@ -813,9 +813,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::cause_nmi)
 
 TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::cause_M6502_irq)
 {
-	// That will not work
-	machine().device("maincpu")->execute().set_input_line(M65C02_IRQ_LINE, ASSERT_LINE);
-	machine().device("maincpu")->execute().set_input_line(M65C02_IRQ_LINE, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M65C02_IRQ_LINE, HOLD_LINE);
 }
 
 
