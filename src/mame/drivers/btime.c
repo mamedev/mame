@@ -231,7 +231,7 @@ protected:
 static const device_type DECO_C10707 = &device_creator<deco_c10707_device>;
 
 deco_c10707_device::deco_c10707_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	m6502_device(mconfig, DECO_C10707, "DECO CPU-7", tag, owner, clock)
+	m6502_device(mconfig, DECO_C10707, "DECO C10707", tag, owner, clock)
 {
 }
 
