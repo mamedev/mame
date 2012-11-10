@@ -48,7 +48,7 @@ public:
 		  m_color_ram(*this, "color_ram")
 	{ }
 
-	required_device<m6510_device> m_maincpu;
+	required_device<m6502_device> m_maincpu;
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	required_device<mos6560_device> m_vic;
