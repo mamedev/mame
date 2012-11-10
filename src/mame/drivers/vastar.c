@@ -423,10 +423,9 @@ static MACHINE_CONFIG_START( vastar, vastar_state )
 	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_IO_MAP(cpu2_port_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(vastar_state, irq0_line_hold, 4*60)	/* ??? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(vastar_state, irq0_line_hold, 242)	/* 4 * vsync_freq(60.58) measured, it is not known yet how long it is asserted so we'll use HOLD_LINE for now */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - seems enough to ensure proper */
-						/* synchronization of the CPUs */
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - seems enough to ensure proper synchronization of the CPUs */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
