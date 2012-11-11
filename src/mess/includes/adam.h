@@ -80,7 +80,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( os3_w );
 
 	// memory state
-	const UINT8 *m_wp_rom;
+	const UINT8 *m_boot_rom;
 	const UINT8 *m_os7_rom;
 	const UINT8 *m_cart_rom;
 	UINT8 m_mioc;

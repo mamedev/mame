@@ -287,8 +287,7 @@ Mark Gordon
 
     TODO:
 
-	- fix MC6801 serial I/O
-	- sort out WP ROM select
+    - fix MC6801 serial I/O
     - floppy
     - printer
     - SPI
@@ -347,7 +346,7 @@ enum
 
 READ8_MEMBER( adam_state::mreq_r )
 {
-	int bmreq = 0, biorq = 1, boot_rom_cs = 1, aux_decode_1 = 1, aux_rom_cs = 1, cas1 = 1, cas2 = 1;
+	int bmreq = 0, biorq = 1, eos_enable = 1, boot_rom_cs = 1, aux_decode_1 = 1, aux_rom_cs = 1, cas1 = 1, cas2 = 1;
 
 	UINT8 data = 0;
 
@@ -357,18 +356,7 @@ READ8_MEMBER( adam_state::mreq_r )
 		{
 		case LO_SMARTWRITER:
 			boot_rom_cs = 0;
-
-			if (BIT(m_an, 1))
-			{
-				if (offset >= 0x6000)
-				{
-					data = m_wp_rom[0x8000 + (offset & 0x1fff)];
-				}
-			}
-			else
-			{
-				data = m_wp_rom[offset];
-			}
+			eos_enable = BIT(m_an, 1);
 			break;
 
 		case LO_INTERNAL_RAM:
@@ -427,7 +415,14 @@ READ8_MEMBER( adam_state::mreq_r )
 
 	if (!boot_rom_cs)
 	{
-		// TODO
+		if (offset < 0x6000)
+		{
+			data = m_boot_rom[offset];
+		}
+		else
+		{
+			data = m_boot_rom[(eos_enable << 13) + offset];
+		}
 	}
 
 	if (!aux_decode_1)
@@ -1065,7 +1060,7 @@ static ADAM_EXPANSION_SLOT_INTERFACE( slot3_intf )
 void adam_state::machine_start()
 {
 	// find memory regions
-	m_wp_rom = memregion("wp")->base();
+	m_boot_rom = memregion("boot")->base();
 	m_os7_rom = memregion("os7")->base();
 	m_cart_rom = memregion("cart")->base();
 
@@ -1181,7 +1176,6 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("colec_cart_list", "coleco")
 	MCFG_SOFTWARE_LIST_ADD("adam_cart_list", "adam_cart")
-	//MCFG_SOFTWARE_LIST_ADD("xrom_list", "adam_xrom")
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "adam_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "adam_flop")
 MACHINE_CONFIG_END
@@ -1200,7 +1194,7 @@ ROM_START( adam )
 	ROM_REGION( 0x2000, "os7", 0)
 	ROM_LOAD( "os7.u2", 0x0000, 0x2000, CRC(3aa93ef3) SHA1(45bedc4cbdeac66c7df59e9e599195c778d86a92) )
 
-	ROM_REGION( 0xa000, "wp", 0)
+	ROM_REGION( 0xa000, "boot", 0)
 	ROM_LOAD( "alf #1 rev 57 e3d5.u8",  0x0000, 0x2000, CRC(565b364a) SHA1(ebdafad6e268e7ed1674c1fb89607622748a5b36) )
 	ROM_LOAD( "alf #2 rev 57 ae6a.u20", 0x2000, 0x2000, CRC(44a1cff4) SHA1(661cdf36d9699d6c21c5f9e205ebc41c707359dd) )
 	ROM_LOAD( "alf #3 rev 57 8534.u21", 0x4000, 0x2000, CRC(77657b90) SHA1(d25d32ab6c8fafbc21b4b925b3e644fa26d111f7) )
