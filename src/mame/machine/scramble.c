@@ -621,6 +621,90 @@ DRIVER_INIT_MEMBER(scramble_state,ad2083)
 	}
 }
 
+/************************************************************
+ Harem run-time decryption
+*************************************************************/
+
+WRITE8_MEMBER(scramble_state::harem_decrypt_bit_w)
+{
+	m_harem_decrypt_bit = data;
+}
+
+WRITE8_MEMBER(scramble_state::harem_decrypt_clk_w)
+{
+	if ((data & 1) && !(m_harem_decrypt_clk & 1))
+	{
+		m_harem_decrypt_mode = ((m_harem_decrypt_mode >> 1) | ((m_harem_decrypt_bit & 1) << 3)) & 0x0f;
+		m_harem_decrypt_count++;
+
+//		logerror("%s: decrypt mode = %02x, count = %x\n", machine().describe_context(), m_harem_decrypt_mode, m_harem_decrypt_count);
+	}
+
+	m_harem_decrypt_clk = data;
+
+	if (m_harem_decrypt_count == 4)
+	{
+		int bank;
+		switch (m_harem_decrypt_mode)
+		{
+			case 0x03:	bank = 0;	break;
+			case 0x09:	bank = 1;	break;
+			case 0x0a:	bank = 2;	break;
+			default:
+				logerror("%s: warning, unknown decrypt mode = %02x\n", machine().describe_context(), m_harem_decrypt_mode);
+				bank = 0;
+		}
+			
+		membank("rombank")->set_base			(m_harem_decrypted_data		+ 0x2000 * bank);
+		membank("rombank")->set_base_decrypted	(m_harem_decrypted_opcodes	+ 0x2000 * bank);
+
+//		logerror("%s: decrypt mode = %02x (bank %x) active\n", machine().describe_context(), m_harem_decrypt_mode, bank);
+
+		m_harem_decrypt_mode = 0;
+		m_harem_decrypt_count = 0;
+	}
+}
+
+WRITE8_MEMBER(scramble_state::harem_decrypt_rst_w)
+{
+	m_harem_decrypt_mode = 0;
+	m_harem_decrypt_count = 0;
+
+//	logerror("%s: decrypt mode reset\n", machine().describe_context());
+}
+
 DRIVER_INIT_MEMBER(scramble_state,harem)
 {
+	UINT8 *ROM		=	machine().root_device().memregion("maincpu")->base() + 0x8000;
+	size_t size		=	0x2000;
+
+	UINT8 *data		=	m_harem_decrypted_data		= auto_alloc_array(machine(), UINT8, size * 3);
+	UINT8 *opcodes	=	m_harem_decrypted_opcodes	= auto_alloc_array(machine(), UINT8, size * 3);
+
+	// decryption 03
+	for (int i = 0; i < size; i++)
+	{
+		UINT8 x = ROM[i];
+		opcodes[size * 0 + i]	=	BITSWAP8(x, 7,0,5,2,3,4,1,6);
+		data   [size * 0 + i]	=	BITSWAP8(x, 7,6,5,0,3,4,1,2);
+	}
+
+	// decryption 09
+	for (int i = 0; i < size; i++)
+	{
+		UINT8 x = ROM[i];
+		opcodes[size * 1 + i]	=	BITSWAP8(x, 7,0,5,6,3,2,1,4);
+		data   [size * 1 + i]	=	BITSWAP8(x, 7,4,5,0,3,6,1,2);
+	}
+
+	// decryption 0a
+	for (int i = 0; i < size; i++)
+	{
+		UINT8 x = ROM[i];
+		opcodes[size * 2 + i]	=	BITSWAP8(x, 7,2,5,6,3,0,1,4);
+		data   [size * 2 + i]	=	BITSWAP8(x, 7,2,5,4,3,0,1,6);
+	}
+
+	membank("rombank")->set_base			(m_harem_decrypted_data);
+	membank("rombank")->set_base_decrypted	(m_harem_decrypted_opcodes);
 }

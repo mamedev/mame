@@ -19,6 +19,14 @@ public:
 	UINT8 m_security_2B_counter;
 	UINT8 m_xb;
 
+	// harem
+	UINT8 m_harem_decrypt_mode;
+	UINT8 m_harem_decrypt_bit;
+	UINT8 m_harem_decrypt_clk;
+	UINT8 m_harem_decrypt_count;
+	UINT8 *m_harem_decrypted_data;
+	UINT8 *m_harem_decrypted_opcodes;
+
 	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_custom_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ckongs_coinage_r);
 	DECLARE_READ8_MEMBER(hncholms_prot_r);
@@ -31,6 +39,10 @@ public:
 	DECLARE_WRITE8_MEMBER(frogger_filter_w);
 	DECLARE_WRITE8_MEMBER(mars_ppi8255_0_w);
 	DECLARE_WRITE8_MEMBER(mars_ppi8255_1_w);
+
+	DECLARE_WRITE8_MEMBER(harem_decrypt_bit_w);
+	DECLARE_WRITE8_MEMBER(harem_decrypt_clk_w);
+	DECLARE_WRITE8_MEMBER(harem_decrypt_rst_w);
 
 	DECLARE_DRIVER_INIT(cavelon);
 	DECLARE_DRIVER_INIT(mariner);
@@ -90,6 +102,9 @@ DECLARE_READ8_DEVICE_HANDLER( hotshock_soundlatch_r );
 
 DECLARE_WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w );
 DECLARE_WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w );
+
+DECLARE_WRITE8_DEVICE_HANDLER( harem_portA_w );
+DECLARE_WRITE8_DEVICE_HANDLER( harem_portB_w );
 
 MACHINE_CONFIG_EXTERN( ad2083_audio );
 

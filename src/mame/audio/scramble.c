@@ -170,6 +170,18 @@ void scramble_sh_init(running_machine &machine)
 }
 
 
+// Harem
+
+WRITE8_DEVICE_HANDLER( harem_portA_w )
+{
+	// Speech?
+}
+WRITE8_DEVICE_HANDLER( harem_portB_w )
+{
+	// Speech?
+}
+
+
 /***************************************************************************
     AD2083 TMS5110 implementation (still wrong!)
 

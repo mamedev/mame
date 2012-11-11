@@ -141,6 +141,7 @@ public:
 	TILE_GET_INFO_MEMBER(dambustr_get_tile_info2);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(rockclim_get_tile_info);
+	TILE_GET_INFO_MEMBER(harem_get_tile_info);
 	DECLARE_MACHINE_RESET(galaxold);
 	DECLARE_VIDEO_START(galaxold);
 	DECLARE_PALETTE_INIT(galaxold);
@@ -175,6 +176,7 @@ public:
 	DECLARE_VIDEO_START(scorpion);
 	DECLARE_VIDEO_START(ad2083);
 	DECLARE_VIDEO_START(dambustr);
+	DECLARE_VIDEO_START(harem);
 	UINT32 screen_update_galaxold(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_dambustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(hunchbks_vh_interrupt);
@@ -183,8 +185,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(galaxold_interrupt_timer);
 	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_2_q_callback);
 	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_1_callback);
-
-
 };
 
 /*----------- defined in video/galaxold.c -----------*/

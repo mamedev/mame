@@ -765,6 +765,41 @@ VIDEO_START_MEMBER(galaxold_state,racknrol)
 	m_color_mask = 0xff;
 }
 
+
+// Harem
+
+TILE_GET_INFO_MEMBER(galaxold_state::harem_get_tile_info)
+{
+	int code = m_videoram[tile_index];
+	UINT8 x = tile_index & 0x1f;
+	UINT8 color = m_attributesram[(x << 1) | 1] & 7;
+	UINT8 bank = BIT(m_racknrol_tiles_bank[0], x/4);	// 1 bit every 4 columns
+
+	code  |= bank * 0x200;
+
+	SET_TILE_INFO_MEMBER(0, code, color, 0);
+}
+
+static void harem_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
+{
+	galaxold_state *state = machine.driver_data<galaxold_state>();
+	*code |= (state->m_gfxbank[0] << 7) | 0x40;
+}
+
+VIDEO_START_MEMBER(galaxold_state,harem)
+{
+	video_start_common(machine());
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::harem_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+//	m_bg_tilemap->set_transparent_pen(0);	// opaque tilemap to get sky and sand colors
+
+	m_bg_tilemap->set_scroll_cols(32);
+
+	m_color_mask = (machine().gfx[0]->granularity() == 4) ? 7 : 3;
+
+	m_modify_spritecode = harem_modify_spritecode;
+}
+
+
 VIDEO_START_MEMBER(galaxold_state,bongo)
 {
 	VIDEO_START_CALL_MEMBER(galaxold_plain);

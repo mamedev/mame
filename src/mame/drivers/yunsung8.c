@@ -713,5 +713,5 @@ ROM_END
 GAME( 1995,  cannball,  0,        yunsung8, cannball, driver_device, 0, ROT0,   "Yun Sung / Soft Vision", "Cannon Ball (Yun Sung, horizontal)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1995,  cannballv, cannball, yunsung8, cannbalv, driver_device, 0, ROT270, "Yun Sung / T&K",         "Cannon Ball (Yun Sung, vertical)",   GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1995,  magix,     0,        yunsung8, magix,    driver_device, 0, ROT0,   "Yun Sung",               "Magix / Rock",                       GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1995,  magixb,    0,        yunsung8, magix,    driver_device, 0, ROT0,   "bootleg",                "Magix / Rock (bootleg)",             GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1995,  magixb,    magix,    yunsung8, magix,    driver_device, 0, ROT0,   "bootleg",                "Magix / Rock (bootleg)",             GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1994?, rocktris,  0,        yunsung8, rocktris, driver_device, 0, ROT0,   "Yun Sung",               "Rock Tris",                          GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
