@@ -58,6 +58,7 @@ protected:
 		m6509_device *base;
 
 		mi_6509_normal(m6509_device *base);
+		virtual ~mi_6509_normal() {}
 		virtual UINT8 read(UINT16 adr);
 		virtual UINT8 read_9(UINT16 adr);
 		virtual UINT8 read_direct(UINT16 adr);
@@ -69,6 +70,7 @@ protected:
 	class mi_6509_nd : public mi_6509_normal {
 	public:
 		mi_6509_nd(m6509_device *base);
+		virtual ~mi_6509_nd() {}
 		virtual UINT8 read_direct(UINT16 adr);
 		virtual UINT8 read_decrypted(UINT16 adr);
 	};

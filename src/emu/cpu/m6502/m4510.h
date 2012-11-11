@@ -64,6 +64,7 @@ protected:
 		m4510_device *base;
 
 		mi_4510_normal(m4510_device *base);
+		virtual ~mi_4510_normal() {}
 		virtual UINT8 read(UINT16 adr);
 		virtual UINT8 read_direct(UINT16 adr);
 		virtual UINT8 read_decrypted(UINT16 adr);
@@ -73,6 +74,7 @@ protected:
 	class mi_4510_nd : public mi_4510_normal {
 	public:
 		mi_4510_nd(m4510_device *base);
+		virtual ~mi_4510_nd() {}
 		virtual UINT8 read_direct(UINT16 adr);
 		virtual UINT8 read_decrypted(UINT16 adr);
 	};

@@ -55,6 +55,7 @@ public:
 protected:
 	class mi_2a03_normal : public memory_interface {
 	public:
+		virtual ~mi_2a03_normal() {}
 		virtual UINT8 read(UINT16 adr);
 		virtual UINT8 read_direct(UINT16 adr);
 		virtual UINT8 read_decrypted(UINT16 adr);
@@ -63,6 +64,7 @@ protected:
 
 	class mi_2a03_nd : public memory_interface {
 	public:
+		virtual ~mi_2a03_nd() {}
 		virtual UINT8 read(UINT16 adr);
 		virtual UINT8 read_direct(UINT16 adr);
 		virtual UINT8 read_decrypted(UINT16 adr);

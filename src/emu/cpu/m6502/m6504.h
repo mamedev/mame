@@ -49,6 +49,7 @@ public:
 protected:
 	class mi_6504_normal : public memory_interface {
 	public:
+		virtual ~mi_6504_normal() {}
 		virtual UINT8 read(UINT16 adr);
 		virtual UINT8 read_direct(UINT16 adr);
 		virtual UINT8 read_decrypted(UINT16 adr);
@@ -57,6 +58,7 @@ protected:
 
 	class mi_6504_nd : public mi_6504_normal {
 	public:
+		virtual ~mi_6504_nd() {}
 		virtual UINT8 read_direct(UINT16 adr);
 		virtual UINT8 read_decrypted(UINT16 adr);
 	};

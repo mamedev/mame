@@ -64,6 +64,7 @@ protected:
 		address_space *program;
 		direct_read_data *direct;
 
+		virtual ~memory_interface() {}
 		virtual UINT8 read(UINT16 adr) = 0;
 		virtual UINT8 read_9(UINT16 adr);
 		virtual UINT8 read_direct(UINT16 adr) = 0;
@@ -74,6 +75,7 @@ protected:
 
 	class mi_default_normal : public memory_interface {
 	public:
+		virtual ~mi_default_normal() {}
 		virtual UINT8 read(UINT16 adr);
 		virtual UINT8 read_direct(UINT16 adr);
 		virtual UINT8 read_decrypted(UINT16 adr);
@@ -82,6 +84,7 @@ protected:
 
 	class mi_default_nd : public mi_default_normal {
 	public:
+		virtual ~mi_default_nd() {}
 		virtual UINT8 read_direct(UINT16 adr);
 		virtual UINT8 read_decrypted(UINT16 adr);
 	};
