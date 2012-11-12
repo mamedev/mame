@@ -37,7 +37,8 @@ Year + Game                Board              CPU   Sound               Custom  
 96 Mj Dai Touyouken        NM7001004          Z80   YMZ284 YM2413 M6295 TZ-2053P
 96 Return Of Sel Jan II    NM504-2            Z80   YM2149 YM2413 M6295 TZ-2053P?
 97 Hana Kagerou                               KC80         YM2413 M6295 70C160F011
-97 Kkot Bi Nyo             9090123-2          KC80         YM2413 M6295 70C160F011
+97 Kkot Bi Nyo             9090123-2          KC80         YM2413 M6295 70C160F011                            A1010
+97 Kkot Bi Nyo Special     9090123-3          KC80         YM2413 M6295 ?
 98 Mj Chuukanejyo          D11107218L1        Z80   AY8910 YM2413 M6295 70C160F009
 98 Mj Reach Ippatsu                           KC80         YM2413 M6295 70C160F011
 99 Mj Jong-Tei             NM532-9902         Z80          YM2413 M6295 4L10FXXXX?
@@ -98,6 +99,7 @@ TODO:
 Notes:
 
 - daimyojn: In Test->Option, press "N Ron Ron N" to access more options
+- kotbinyo: To access service mode, during boot press start+button+right (start+d+e in keyboard mode)
 
 ***************************************************************************/
 
@@ -242,7 +244,6 @@ VIDEO_START_MEMBER(dynax_state,ddenlovr)
 
 VIDEO_START_MEMBER(dynax_state,mmpanic)
 {
-
 	VIDEO_START_CALL_MEMBER(ddenlovr);
 
 	m_extra_layers = 1;
@@ -250,7 +251,6 @@ VIDEO_START_MEMBER(dynax_state,mmpanic)
 
 VIDEO_START_MEMBER(dynax_state,hanakanz)
 {
-
 	VIDEO_START_CALL_MEMBER(ddenlovr);
 
 	m_ddenlovr_blit_rom_bits = 16;
@@ -259,7 +259,6 @@ VIDEO_START_MEMBER(dynax_state,hanakanz)
 
 VIDEO_START_MEMBER(dynax_state,mjflove)
 {
-
 	VIDEO_START_CALL_MEMBER(ddenlovr);
 
 	m_ddenlovr_blit_commands = mjflove_commands;
@@ -382,9 +381,11 @@ static void do_plot( running_machine &machine, int x, int y, int pen )
 
 INLINE int fetch_bit( UINT8 *src_data, int src_len, int *bit_addr )
 {
-	int baddr = *bit_addr;
+	const int baddrmask = 0x7ffffff;
 
-	*bit_addr = ((*bit_addr) + 1) & 0x7ffffff;
+	int baddr = (*bit_addr) & baddrmask;
+
+	*bit_addr = (baddr + 1) & baddrmask;
 
 	if (baddr / 8 >= src_len)
 	{
@@ -444,8 +445,8 @@ static int blit_draw( running_machine &machine, int src, int sx )
 	arg_size = fetch_word(src_data, src_len, &bit_addr, 4) + 1;
 
 #ifdef MAME_DEBUG
-	if (pen_size > 4 || arg_size > 8)
-		popmessage("warning: pen_size %d arg_size %d", pen_size, arg_size);
+//	if (pen_size > 4 || arg_size > 8)
+//		popmessage("warning: pen_size %d arg_size %d", pen_size, arg_size);
 #endif
 
 	// sryudens game bug
@@ -2499,7 +2500,7 @@ static ADDRESS_MAP_START( hkagerou_portmap, AS_IO, 8, dynax_state )
 ADDRESS_MAP_END
 
 
-// same as hkagerou, different inputs, no RTC?
+// same as hkagerou, different inputs, no RTC
 static ADDRESS_MAP_START( kotbinyo_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x2c, 0x2c) AM_READ(hanakanz_busy_r) AM_DEVWRITE_LEGACY("oki", hanakanz_oki_bank_w)
@@ -2518,6 +2519,30 @@ static ADDRESS_MAP_START( kotbinyo_portmap, AS_IO, 8, dynax_state )
 	AM_RANGE(0xb3, 0xb3) AM_WRITE(hanakanz_coincounter_w)
 //	AM_RANGE(0xb4, 0xb4) AM_WRITE(hanakanz_keyb_w)
 	AM_RANGE(0xb6, 0xb6) AM_READ(hanakanz_rand_r)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+//	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+ADDRESS_MAP_END
+
+
+// same as hkagerou, different inputs, no RTC
+static ADDRESS_MAP_START( kotbinsp_portmap, AS_IO, 8, dynax_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x2c, 0x2c) AM_READ(hanakanz_busy_r) AM_DEVWRITE_LEGACY("oki", hanakanz_oki_bank_w)
+	AM_RANGE(0x2e, 0x2e) AM_WRITE(hanakanz_blitter_reg_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE(hanakanz_rombank_w)
+	AM_RANGE(0x31, 0x31) AM_WRITE(hanakanz_dsw_w)
+	AM_RANGE(0x32, 0x32) AM_READ(hanakanz_dsw_r)
+	AM_RANGE(0x80, 0x80) AM_WRITE(hanakanz_blitter_data_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(hanakanz_palette_w)
+	AM_RANGE(0x83, 0x84) AM_READ(hanakanz_gfxrom_r)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
+//	AM_RANGE(0x91, 0x91) AM_READ(hanakanz_keyb_r)
+	AM_RANGE(0x91, 0x91) AM_READ_PORT("KEYB0")
+	AM_RANGE(0x92, 0x92) AM_READ_PORT("KEYB1")
+	AM_RANGE(0x93, 0x93) AM_WRITE(hanakanz_coincounter_w)
+//	AM_RANGE(0x94, 0x94) AM_WRITE(hanakanz_keyb_w)
+	AM_RANGE(0x96, 0x96) AM_READ(hanakanz_rand_r)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 //	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 ADDRESS_MAP_END
@@ -5039,26 +5064,26 @@ static INPUT_PORTS_START( kotbinyo )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_HANAFUDA_G )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_H )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1   ) // "b" in (disabled!?) test mode (rom bank 5, PC=a851)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1   ) // "B" in service mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 
 	PORT_START("KEYB0")
 	// Joystick:
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1         ) PORT_CONDITION("DSW1",0x40,EQUALS,0x40)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1         ) PORT_CONDITION("DSW1",0x40,EQUALS,0x40)	// * press at boot for service mode
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_CONDITION("DSW1",0x40,EQUALS,0x40)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_CONDITION("DSW1",0x40,EQUALS,0x40)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_CONDITION("DSW1",0x40,EQUALS,0x40)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CONDITION("DSW1",0x40,EQUALS,0x40)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_CONDITION("DSW1",0x40,EQUALS,0x40)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CONDITION("DSW1",0x40,EQUALS,0x40)	// * press at boot for service mode
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1        ) PORT_CONDITION("DSW1",0x40,EQUALS,0x40)	// * press at boot for service mode
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        ) PORT_CONDITION("DSW1",0x40,EQUALS,0x40)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        ) PORT_CONDITION("DSW1",0x40,EQUALS,0x40)
 	// Keyboard:
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1         ) PORT_CONDITION("DSW1",0x40,EQUALS,0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1         ) PORT_CONDITION("DSW1",0x40,EQUALS,0x00)	// * press at boot for service mode
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_A     ) PORT_CONDITION("DSW1",0x40,EQUALS,0x00)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_HANAFUDA_B     ) PORT_CONDITION("DSW1",0x40,EQUALS,0x00)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_C     ) PORT_CONDITION("DSW1",0x40,EQUALS,0x00)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_HANAFUDA_D     ) PORT_CONDITION("DSW1",0x40,EQUALS,0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_E     ) PORT_CONDITION("DSW1",0x40,EQUALS,0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_HANAFUDA_D     ) PORT_CONDITION("DSW1",0x40,EQUALS,0x00)	// * press at boot for service mode
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_E     ) PORT_CONDITION("DSW1",0x40,EQUALS,0x00)	// * press at boot for service mode
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_F     ) PORT_CONDITION("DSW1",0x40,EQUALS,0x00)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        ) PORT_CONDITION("DSW1",0x40,EQUALS,0x00)
 
@@ -5138,6 +5163,111 @@ static INPUT_PORTS_START( kotbinyo )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "Unknown 2-9" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( kotbinsp )
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1      )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
+	
+	PORT_START("KEYB0")
+	// Forced Joystick mode wrt kotbinyo:
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1         ) // * press at boot for service mode
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) // * press at boot for service mode
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1        ) // * press at boot for service mode
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+
+	PORT_START("KEYB1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN      )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN      )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN      )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_HANAFUDA_NO  )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN      )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN      )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN      )
+
+	// Swapped DSW1 & 2
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, "Unknown 2-0&1" )
+	PORT_DIPSETTING(    0x03, "0" )
+	PORT_DIPSETTING(    0x02, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPNAME( 0x04, 0x04, "Unknown 2-2" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Unknown 2-3" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Unknown 2-4" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Unknown 2-5" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown 2-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 2-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x07, "Difficulty?" )
+	PORT_DIPSETTING(    0x07, "0" )
+	PORT_DIPSETTING(    0x06, "1" )
+	PORT_DIPSETTING(    0x05, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x03, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x01, "6" )
+	PORT_DIPSETTING(    0x00, "7" )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x20, "1 Coin/50 Credits" )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown 1-6" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Unknown 1-7" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	// unused
+	PORT_START("DSW4")
+	// unused
+
+	PORT_START("DSW5")
+	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-8" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Unknown 2-9" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )		// force "Unknown 2-0&1" to 0
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -8493,7 +8623,6 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(dynax_state,ddenlovr)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_soundcpu = machine().device<cpu_device>("soundcpu");
 	m_oki = machine().device<okim6295_device>("oki");
@@ -8525,7 +8654,6 @@ MACHINE_START_MEMBER(dynax_state,ddenlovr)
 
 MACHINE_RESET_MEMBER(dynax_state,ddenlovr)
 {
-
 	m_input_sel = 0;
 	m_dsw_sel = 0;
 	m_keyb = 0;
@@ -8979,7 +9107,7 @@ static MACHINE_CONFIG_START( kotbinyo, dynax_state )
 	MCFG_CPU_IO_MAP(kotbinyo_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynax_state, hanakanz_irq)
 
-	MCFG_MACHINE_START_OVERRIDE(dynax_state,mjflove)
+	MCFG_MACHINE_START_OVERRIDE(dynax_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(dynax_state,ddenlovr)
 
 	/* video hardware */
@@ -9005,7 +9133,15 @@ static MACHINE_CONFIG_START( kotbinyo, dynax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_MSM6242_ADD("rtc", hanakanz_rtc_intf)
+//	MCFG_MSM6242_ADD("rtc", hanakanz_rtc_intf)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( kotbinsp, kotbinyo )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(kotbinsp_portmap)
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjreach1, hanakanz )
@@ -10396,6 +10532,8 @@ DIPs  - 10-Position (x2)
 HSync - 15.1015kHz
 VSync - 60.1656Hz
              
+no RTC nor battery (unpopulated)
+
 ***************************************************************************/
 
 ROM_START( kotbinyo )
@@ -10414,6 +10552,45 @@ ROM_START( kotbinyo )
 	ROM_REGION( 0x80000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "snd.1c", 0x00000, 0x40000, CRC(d3a739a7) SHA1(f21009f588202f36e4d4e1ab7566c162b5118424) )
 	ROM_RELOAD(         0x40000, 0x40000 )
+ROM_END
+
+
+/***************************************************************************
+
+Kkot Bi Nyo Special
+Dynax / Nakanihon / Shinwhajin
+1997
+
+Same hardware as kotbinyo, but:
+
+ PCB number is 9090123-3.
+ No Actel A1010 FPGA.
+ Gfx chip is scratched.
+
+***************************************************************************/
+
+ROM_START( kotbinsp )
+	ROM_REGION( 0x90000+16*0x1000, "maincpu", 0 )	/* ! KL5C80 Code ! */
+	ROM_LOAD( "prg.5c", 0x00000, 0x80000, CRC(c917f791) SHA1(78611118f7f33096364ea3e34e4cd5356c1d1cce) )
+	ROM_RELOAD(         0x10000, 0x80000 )
+
+	ROM_REGION( 0x2000000, "blitter", 0 )	/* blitter data */
+	ROM_LOAD16_BYTE( "909036.8b", 0x000000, 0x100000, CRC(c468bdda) SHA1(4942d48815af55b5a6b1bd9debc7ce0051a33a49) )
+	ROM_LOAD16_BYTE( "909035.8c", 0x000001, 0x100000, CRC(cea4dbfa) SHA1(581bbcfcb0c900667002b7b744197d039d586833) )
+	ROM_LOAD16_BYTE( "909034.6b", 0x200000, 0x080000, CRC(9f366a2a) SHA1(2199cf640b665bd1ba3eac081bde288dec521383) )
+	ROM_LOAD16_BYTE( "909033.6c", 0x200001, 0x080000, CRC(9388b85d) SHA1(a35fe0b585cba256bb5575f7b539b33dd0ca3aa0) )
+	ROM_FILL(                     0x300000, 0x100000, 0xff ) 
+	// mirror the whole address space (25 bits)
+	ROM_COPY( "blitter", 0, 0x0400000, 0x400000 )
+	ROM_COPY( "blitter", 0, 0x0800000, 0x400000 )
+	ROM_COPY( "blitter", 0, 0x0c00000, 0x400000 )
+	ROM_COPY( "blitter", 0, 0x1000000, 0x400000 )
+	ROM_COPY( "blitter", 0, 0x1400000, 0x400000 )
+	ROM_COPY( "blitter", 0, 0x1800000, 0x400000 )
+	ROM_COPY( "blitter", 0, 0x1c00000, 0x400000 )
+
+	ROM_REGION( 0x80000, "oki", 0 )	/* Samples */
+	ROM_LOAD( "909031.1c", 0x00000, 0x80000, CRC(9f20a531) SHA1(1b43edd70c4c958cbbcd6c051ea6ba5e6fb41e77) )
 ROM_END
 
 
@@ -11634,6 +11811,7 @@ GAME( 1995, ddenlovrb, ddenlovj, ddenlovr,  ddenlovr, driver_device, 0,        R
 GAME( 1996, ddenlovr,  ddenlovj, ddenlovr,  ddenlovr, driver_device, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 (Hong Kong)",                                GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1996, hanakanz,  0,        hanakanz,  hanakanz, driver_device, 0,        ROT0, "Dynax",                                       "Hana Kanzashi (Japan)",                                           GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1997, kotbinyo,  hanakanz, kotbinyo,  kotbinyo, driver_device, 0,        ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo (Korea)",                                             GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1997, kotbinsp,  0,        kotbinsp,  kotbinsp, driver_device, 0,        ROT0, "Dynax / Shinwhajin",                          "Kkot Bi Nyo Special (Korea)",                                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1996, akamaru,   0,        akamaru,   akamaru,  driver_device, 0,        ROT0, "Dynax (Nakanihon license)",                   "Panel & Variety Akamaru Q Jousyou Dont-R",                        GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1996, janshinp,  0,        janshinp,  janshinp, driver_device, 0,        ROT0, "Dynax / Sigma",                               "Mahjong Janshin Plus (Japan)",                                    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1996, dtoyoken,  0,        dtoyoken,  dtoyoken, driver_device, 0,        ROT0, "Dynax / Sigma",                               "Mahjong Dai Touyouken (Japan)",                                   GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
