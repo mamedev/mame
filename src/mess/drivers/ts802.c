@@ -71,7 +71,7 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 
 static MACHINE_CONFIG_START( ts802, ts802_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000) // more likely a 8080
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(ts802_mem)
 	MCFG_CPU_IO_MAP(ts802_io)
 
