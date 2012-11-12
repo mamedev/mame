@@ -533,6 +533,7 @@ READ8_MEMBER(bingor_state::test8_r)
 }
 
 static ADDRESS_MAP_START( pic_io_map, AS_IO, 8, bingor_state )
+	AM_RANGE(0x00, 0x00) AM_WRITENOP
 	AM_RANGE(0x02, 0x02) AM_READ(test8_r)
 	AM_RANGE(0x10, 0x10) AM_READNOP
 ADDRESS_MAP_END
