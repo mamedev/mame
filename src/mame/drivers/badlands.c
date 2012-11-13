@@ -133,7 +133,7 @@ Notes:
                17F       136074-1009 86DF
                20F       136074-1008 87FF
                24F       136074-1007 F2DE
-               27F       136074-1006 xxxx (byte checksum unreadable)
+               27F       136074-1006 98FE
                2N        136074-1013 A5A0
                2S        136074-1014 567B
                2U        136074-1017 BB88
@@ -146,12 +146,12 @@ Notes:
                14T       136074-1019 D4C4
 
       PALs   -
-               PAL1 - Lattice GAL16V8 labelled '136074-1001'
-               PAL2 - Lattice GAL16V8 labelled '136074-1005'
-               PAL3 - Lattice GAL16V8 labelled '136074-1004'
-               PAL4 - Lattice GAL16V8 labelled '136074-1003'
-               PAL5 - Lattice GAL16V8 labelled '136074-1002'
-               PAL6 - Lattice GAL16V8 labelled '136074-2000'
+               PAL1 - Lattice GAL16V8A-25LP labelled '136074-1001'
+               PAL2 - Lattice GAL16V8A-25LP labelled '136074-1005'
+               PAL3 - Lattice GAL16V8A-25LP labelled '136074-1004'
+               PAL4 - Lattice GAL16V8A-25LP labelled '136074-1003'
+               PAL5 - Lattice GAL16V8A-25LP labelled '136074-1002'
+               PAL6 - Lattice GAL16V8A-25LP labelled '136074-2000'
 
 Measurements -
               X1    - 14.31995MHz
@@ -557,11 +557,13 @@ ROM_START( badlands )
 	ROM_LOAD( "136074-1011.10r", 0x010000, 0x10000, CRC(fb0b6717) SHA1(694ab0f04d673682831a24027757d4b3c40a4e0e) )
 	ROM_LOAD( "136074-1019.14t", 0x020000, 0x10000, CRC(0e26bff6) SHA1(ee018dd37a27c7e7c16a57ea0d32aeb9cdf26bb4) )
 
-	ROM_REGION( 0x0800, "plds", 0 )
-	ROM_LOAD( "gal16v8-1001.26c",  0x0000, 0x0117, CRC(04c3be6a) SHA1(f027834e652f3ff778b09c3754294b303f9ed826) )
-	ROM_LOAD( "gal16v8-1002.21r",  0x0200, 0x0117, CRC(f68bf41d) SHA1(72edd6d0f5d55d39c0020f384149de7ac964f273) )
-	ROM_LOAD( "gal16v8-1003.16s",  0x0400, 0x0117, CRC(a288bbd0) SHA1(62f5900ac88ffb335257f58d892492f370805498) )
-	ROM_LOAD( "gal16v8-1005.12e",  0x0600, 0x0117, CRC(9df77c79) SHA1(52c1c190b80db9b9bc43ce6eefd5f37ac16e590c) )
+	ROM_REGION( 0x0C00, "plds", 0 ) /* GAL16V8A-25LP */
+	ROM_LOAD( "136074-1001.26c",  0x0000, 0x0117, CRC(04c3be6a) SHA1(f027834e652f3ff778b09c3754294b303f9ed826) )
+	ROM_LOAD( "136074-1002.21r",  0x0200, 0x0117, CRC(f68bf41d) SHA1(72edd6d0f5d55d39c0020f384149de7ac964f273) )
+	ROM_LOAD( "136074-1003.16s",  0x0400, 0x0117, CRC(a288bbd0) SHA1(62f5900ac88ffb335257f58d892492f370805498) )
+	ROM_LOAD( "136074-1004.9n",   0x0600, 0x0117, CRC(5ffbdaad) SHA1(f7f802dfb7c9b404305a36b8354f91151e61c502) )
+	ROM_LOAD( "136074-1005.12e",  0x0800, 0x0117, CRC(9df77c79) SHA1(52c1c190b80db9b9bc43ce6eefd5f37ac16e590c) )
+	ROM_LOAD( "136074-2000.26r",  0x0A00, 0x0117, CRC(fb8fb3d0) SHA1(361b8f7984695ff26156afe79eaa2d85a150a978) )
 ROM_END
 
 
