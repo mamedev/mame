@@ -52,15 +52,25 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "imagedev/flopdrv.h"
+#include "formats/mfi_dsk.h"
+#include "formats/d88_dsk.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
+#include "machine/upd765.h"
+#include "machine/msm58321.h"
 
 class pc100_state : public driver_device
 {
 public:
 	pc100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_palram(*this, "palram"){ }
+		m_rtc(*this, "rtc"),
+		m_palram(*this, "palram")
+		{ }
+
+	required_device<msm58321_device> m_rtc;
+	required_shared_ptr<UINT16> m_palram;
 
 	DECLARE_READ16_MEMBER(pc100_vram_r);
 	DECLARE_WRITE16_MEMBER(pc100_vram_w);
@@ -78,10 +88,10 @@ public:
 	DECLARE_WRITE8_MEMBER(lower_mask_w);
 	DECLARE_WRITE8_MEMBER(upper_mask_w);
 	DECLARE_WRITE8_MEMBER(crtc_bank_w);
+	DECLARE_WRITE8_MEMBER(rtc_porta_w);
 	DECLARE_WRITE_LINE_MEMBER(pc100_set_int_line);
 	UINT16 *m_kanji_rom;
 	UINT16 *m_vram;
-	required_shared_ptr<UINT16> m_palram;
 	UINT16 m_kanji_addr;
 	UINT8 m_timer_mode;
 
@@ -264,8 +274,8 @@ static ADDRESS_MAP_START(pc100_io, AS_IO, 16, pc100_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0x00ff) // i8259
 //  AM_RANGE(0x04, 0x07) i8237?
-//  AM_RANGE(0x08, 0x0b) upd765
-//  AM_RANGE(0x10, 0x17) i8255 #1
+	AM_RANGE(0x08, 0x0b) AM_DEVICE8("upd765", upd765a_device, map, 0x00ff ) // upd765
+	AM_RANGE(0x10, 0x17) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write,0x00ff) // i8255 #1
 	AM_RANGE(0x18, 0x1f) AM_DEVREADWRITE8("ppi8255_2", i8255_device, read, write,0x00ff) // i8255 #2
 	AM_RANGE(0x20, 0x23) AM_READ8(pc100_key_r,0x00ff) //i/o, keyboard, mouse
 	AM_RANGE(0x22, 0x25) AM_WRITE8(pc100_output_w,0x00ff) //i/o, keyboard, mouse
@@ -325,6 +335,31 @@ static const gfx_layout kanji_layout =
 static GFXDECODE_START( pc100 )
 	GFXDECODE_ENTRY( "kanji", 0x0000, kanji_layout, 8, 1 )
 GFXDECODE_END
+
+/* TODO: untested */
+WRITE8_MEMBER( pc100_state::rtc_porta_w )
+{
+/*
+	---- -x-- chip select
+	---- --x- read
+	---- ---x write
+*/
+
+	m_rtc->write_w(data & 1);
+	m_rtc->read_w((data & 2) >> 1);
+	m_rtc->cs1_w((data & 4) >> 2);
+}
+
+static I8255A_INTERFACE( pc100_ppi8255_interface_1 )
+{
+	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(pc100_state, rtc_porta_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_MEMBER("rtc", msm58321_device, read),
+	DEVCB_DEVICE_MEMBER("rtc", msm58321_device, write)
+};
+
 
 WRITE8_MEMBER( pc100_state::lower_mask_w )
 {
@@ -424,6 +459,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_10hz_irq)
 	}
 }
 
+static const floppy_format_type pc100_floppy_formats[] = {
+	FLOPPY_D88_FORMAT,
+	FLOPPY_MFI_FORMAT,
+	NULL
+};
+
+static SLOT_INTERFACE_START( pc100_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
+
+static MSM58321_INTERFACE( rtc_intf )
+{
+	DEVCB_NULL
+};
+
 #define MASTER_CLOCK 6988800
 
 static MACHINE_CONFIG_START( pc100, pc100_state )
@@ -433,26 +483,27 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_CPU_IO_MAP(pc100_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc100_state, pc100_vblank_irq)
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("600hz", pc100_state, pc100_600hz_irq, attotime::from_hz(MASTER_CLOCK/600))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("100hz", pc100_state, pc100_100hz_irq, attotime::from_hz(MASTER_CLOCK/100))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("50hz", pc100_state, pc100_50hz_irq, attotime::from_hz(MASTER_CLOCK/50))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("10hz", pc100_state, pc100_10hz_irq, attotime::from_hz(MASTER_CLOCK/10))
+	MCFG_I8255_ADD( "ppi8255_1", pc100_ppi8255_interface_1 )
+	MCFG_I8255_ADD( "ppi8255_2", pc100_ppi8255_interface_2 )
+	MCFG_PIC8259_ADD( "pic8259", pc100_pic8259_config )
+	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_MSM58321_ADD("rtc", XTAL_32_768kHz, rtc_intf)
+
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc100_floppies, "525hd", 0, pc100_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc100_floppies, "525hd", 0, pc100_floppy_formats)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-//	MCFG_SCREEN_REFRESH_RATE(60)
-//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-//	MCFG_SCREEN_SIZE(1024, 264*2)
-//	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
 	/* TODO: Unknown Pixel Clock and CRTC is dynamic */
 	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*4, 1024, 0, 768, 264*2, 0, 512)
 	MCFG_SCREEN_UPDATE_DRIVER(pc100_state, screen_update_pc100)
 	MCFG_GFXDECODE(pc100)
 	MCFG_PALETTE_LENGTH(16)
 //  MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("600hz", pc100_state, pc100_600hz_irq, attotime::from_hz(MASTER_CLOCK/600))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("100hz", pc100_state, pc100_100hz_irq, attotime::from_hz(MASTER_CLOCK/100))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("50hz", pc100_state, pc100_50hz_irq, attotime::from_hz(MASTER_CLOCK/50))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("10hz", pc100_state, pc100_10hz_irq, attotime::from_hz(MASTER_CLOCK/10))
-	MCFG_I8255_ADD( "ppi8255_2", pc100_ppi8255_interface_2 )
-	MCFG_PIC8259_ADD( "pic8259", pc100_pic8259_config )
 MACHINE_CONFIG_END
 
 /* ROM definition */
