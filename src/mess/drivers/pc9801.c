@@ -1114,9 +1114,13 @@ WRITE8_MEMBER(pc9801_state::pc9801_fdc_2hd_w)
 				if(((m_fdc_2hd_ctrl & 0x80) == 0) && (data & 0x80))
 					machine().device<upd765a_device>("upd765_2hd")->reset();
 
+				/* force ready */
+				if(data & 0x40)
+					machine().device<upd765a_device>("upd765_2hd")->ready_w(1);
+
 				m_fdc_2hd_ctrl = data;
-				machine().device<floppy_connector>("upd765_2hd:0")->get_device()->mon_w(!(data & 0x40));
-				machine().device<floppy_connector>("upd765_2hd:1")->get_device()->mon_w(!(data & 0x40));
+				//machine().device<floppy_connector>("upd765_2hd:0")->get_device()->mon_w(!(data & 0x40));
+				//machine().device<floppy_connector>("upd765_2hd:1")->get_device()->mon_w(!(data & 0x40));
 				break;
 		}
 	}
@@ -2443,9 +2447,8 @@ static I8255A_INTERFACE( ppi_fdd_intf )
 
 void pc9801_state::fdc_2hd_irq(bool state)
 {
-	printf("IRQ %d\n",state);
-	//if(state)
-	//  pic8259_ir3_w(machine().device("pic8259_slave"), state);
+	printf("IRQ 2HD %d\n",state);
+	pic8259_ir3_w(machine().device("pic8259_slave"), state);
 }
 
 void pc9801_state::fdc_2hd_drq(bool state)
@@ -2455,7 +2458,7 @@ void pc9801_state::fdc_2hd_drq(bool state)
 
 void pc9801_state::fdc_2dd_irq(bool state)
 {
-	printf("IRQ %d\n",state);
+	printf("IRQ 2DD %d\n",state);
 
 	if(m_fdc_2dd_ctrl & 8)
 	{
