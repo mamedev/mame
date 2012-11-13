@@ -66,6 +66,7 @@ public:
 	DECLARE_WRITE8_MEMBER(rollingc_sh_port_w);
 	DECLARE_WRITE8_MEMBER(invrvnge_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(invrvnge_sh_port_2_w);
+	DECLARE_WRITE8_MEMBER(lupin3_00_w);
 	DECLARE_WRITE8_MEMBER(lupin3_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(lupin3_sh_port_2_w);
 	DECLARE_WRITE8_MEMBER(schasercv_sh_port_1_w);
@@ -120,11 +121,13 @@ public:
 
 /*----------- defined in audio/8080bw.c -----------*/
 extern const samples_interface lrescue_samples_interface;
+extern const samples_interface lupin3_samples_interface;
 
 DISCRETE_SOUND_EXTERN( ballbomb );
 DISCRETE_SOUND_EXTERN( indianbt );
 DISCRETE_SOUND_EXTERN( polaris );
 
+extern const sn76477_interface lupin3_sn76477_interface;
 extern const sn76477_interface schaser_sn76477_interface;
 DISCRETE_SOUND_EXTERN( schaser );
 

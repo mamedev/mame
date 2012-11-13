@@ -1269,9 +1269,9 @@ MACHINE_CONFIG_END
 /*                                                                                         */
 /* Taito "Lupin III"                                                                       */
 /*                                                                                         */
-/*  The rom at 5000 is optional. It contains code for colour ram, and the tune that plays  */
-/*  in the "wife vs man" scene. If you remove this rom, bits 0 and 1 of port 0 must        */
-/*  be set High. The colour will then be determined by the 2 proms instead. Bit 6          */
+/*  The rom at 5000 is optional. It contains code for colour ram, and all tunes except     */
+/*  when the moneybag has been stolen. If you remove this rom, bits 0 and 1 of port 0      */
+/*  must be set High. The colour will then be determined by the 2 proms instead. Bit 6     */
 /*  of port 5 will select which prom to use.                                               */
 /*                                                                                         */
 /*  Differences between the 2 sets:                                                        */
@@ -1283,7 +1283,7 @@ MACHINE_CONFIG_END
 /*******************************************************************************************/
 
 static ADDRESS_MAP_START( lupin3_io_map, AS_IO, 8, _8080bw_state )
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(lupin3_00_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
 	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r) AM_WRITE(lupin3_sh_port_1_w)
@@ -1365,7 +1365,18 @@ static MACHINE_CONFIG_DERIVED_CLASS( lupin3, mw8080bw_root, _8080bw_state )
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_indianbt)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(invaders_samples_audio)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_SOUND_CONFIG(lupin3_sn76477_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+
+	MCFG_SAMPLES_ADD("samples", lupin3_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(indianbt)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( lupin3a, mw8080bw_root, _8080bw_state )
@@ -1384,7 +1395,18 @@ static MACHINE_CONFIG_DERIVED_CLASS( lupin3a, mw8080bw_root, _8080bw_state )
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_lupin3)
 
 	/* sound hardware */
-	MCFG_FRAGMENT_ADD(invaders_samples_audio)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_SOUND_CONFIG(lupin3_sn76477_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+
+	MCFG_SAMPLES_ADD("samples", lupin3_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(indianbt)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
