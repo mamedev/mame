@@ -651,7 +651,7 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, UINT
 	int gain = (input.m_gain * input.m_user_gain * output.m_gain) >> 16;
 
 	// determine the time at which the current sample begins, accounting for the
-    // latency we calculated between the input and output streams
+	// latency we calculated between the input and output streams
 	attoseconds_t basetime = m_output_sampindex * m_attoseconds_per_sample - input.m_latency_attoseconds;
 
 	// now convert that time into a sample in the input stream
@@ -665,7 +665,8 @@ stream_sample_t *sound_stream::generate_resampled_data(stream_input &input, UINT
 	assert(basesample >= input_stream.m_output_base_sampindex);
 	stream_sample_t *source = &output.m_buffer[basesample - input_stream.m_output_base_sampindex];
 
-	// determine the current fraction of a sample
+	// determine the current fraction of a sample, expressed as a fraction of FRAC_ONE
+	// (Note: this formula is valid as long as input_stream.m_attoseconds_per_sample signficantly exceeds FRAC_ONE > attoseconds = 4.2E-12 s)
 	UINT32 basefrac = (basetime - basesample * input_stream.m_attoseconds_per_sample) / ((input_stream.m_attoseconds_per_sample + FRAC_ONE - 1) >> FRAC_BITS);
 	assert(basefrac < FRAC_ONE);
 
