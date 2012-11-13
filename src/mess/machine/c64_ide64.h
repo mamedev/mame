@@ -54,7 +54,7 @@ protected:
 private:
 	required_device<atmel_29c010_device> m_flash_rom;
 	required_device<ds1302_device> m_rtc;
-	required_device<device_t> m_ide;
+	required_device<ide_controller_device> m_ide;
 
 	UINT8 m_bank;
 	UINT16 m_ide_data;

@@ -259,6 +259,7 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 SLOT_INTERFACE_START( adam_slot2_devices )
+	SLOT_INTERFACE("ide", ADAM_IDE)
 SLOT_INTERFACE_END
 
 

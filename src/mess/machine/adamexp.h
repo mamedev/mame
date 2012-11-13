@@ -140,6 +140,7 @@ extern const device_type ADAM_EXPANSION_SLOT;
 
 // slot devices
 #include "machine/adamlink.h"
+#include "machine/adam_ide.h"
 #include "machine/adam_ram.h"
 
 SLOT_INTERFACE_EXTERN( adam_slot1_devices );
