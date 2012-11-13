@@ -587,16 +587,6 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	}
 }
 
-static const floppy_format_type pc9801_floppy_formats[] = {
-	FLOPPY_D88_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
-
-static SLOT_INTERFACE_START( pc9801_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
-SLOT_INTERFACE_END
-
 static UPD7220_INTERFACE( hgdc_1_intf )
 {
 	"screen",
@@ -1115,8 +1105,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_fdc_2hd_w)
 					machine().device<upd765a_device>("upd765_2hd")->reset();
 
 				/* force ready */
-				if(data & 0x40)
-					machine().device<upd765a_device>("upd765_2hd")->ready_w(1);
+				machine().device<upd765a_device>("upd765_2hd")->ready_w(data & 0x40);
 
 				m_fdc_2hd_ctrl = data;
 				//machine().device<floppy_connector>("upd765_2hd:0")->get_device()->mon_w(!(data & 0x40));
@@ -2445,6 +2434,16 @@ static I8255A_INTERFACE( ppi_fdd_intf )
 *
 ****************************************/
 
+static const floppy_format_type pc9801_floppy_formats[] = {
+	FLOPPY_D88_FORMAT,
+	FLOPPY_MFI_FORMAT,
+	NULL
+};
+
+static SLOT_INTERFACE_START( pc9801_floppies )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+SLOT_INTERFACE_END
+
 void pc9801_state::fdc_2hd_irq(bool state)
 {
 	printf("IRQ 2HD %d\n",state);
@@ -2523,7 +2522,6 @@ static IRQ_CALLBACK(irq_callback)
 
 MACHINE_START_MEMBER(pc9801_state,pc9801)
 {
-
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 
 	m_rtc->cs_w(1);
@@ -2615,7 +2613,6 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 
 MACHINE_START_MEMBER(pc9801_state,pc9821)
 {
-
 	MACHINE_START_CALL_MEMBER(pc9801);
 	state_save_register_global_pointer(machine(), m_sdip, 24);
 }
@@ -2666,8 +2663,8 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc9801_upd1990a_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
-	MCFG_UPD765A_ADD("upd765_2hd", true, true)
-	MCFG_UPD765A_ADD("upd765_2dd", true, true)
+	MCFG_UPD765A_ADD("upd765_2hd", false, true)
+	MCFG_UPD765A_ADD("upd765_2dd", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, pc9801_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, pc9801_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2dd:0", pc9801_floppies, "525hd", 0, pc9801_floppy_formats)
@@ -2733,7 +2730,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
-	MCFG_UPD765A_ADD("upd765_2hd", true, true)
+	MCFG_UPD765A_ADD("upd765_2hd", false, true)
 	//"upd765_2dd"
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, pc9801_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, pc9801_floppy_formats)
@@ -2794,7 +2791,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
-	MCFG_UPD765A_ADD("upd765_2hd", true, true)
+	MCFG_UPD765A_ADD("upd765_2hd", false, true)
 	//"upd765_2dd"
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, pc9801_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, pc9801_floppy_formats)
