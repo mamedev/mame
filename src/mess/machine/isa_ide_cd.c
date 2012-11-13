@@ -461,4 +461,11 @@ void isa16_ide_cd_device::device_reset()
 		m_isa->install16_device(0x0370, 0x0377, 0, 0, read16_delegate(FUNC(isa16_ide_cd_device::atapi_status_r), this), write16_delegate(FUNC(isa16_ide_cd_device::atapi_cmd_w), this));
 	}
 	m_cur_drive = 0;
+	m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0x00;
+	m_atapi_regs[ATAPI_REG_ERRFEAT]   = 0x01;
+	m_atapi_regs[ATAPI_REG_INTREASON] = 0x01; // SECTOR_COUNT
+	m_atapi_regs[ATAPI_REG_SAMTAG]    = 0x01; // SECTOR_NUMBER
+	m_atapi_regs[ATAPI_REG_COUNTLOW]  = 0x14; // CYLINDER_LSB
+	m_atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb; // CYLINDER_MSB
+	m_atapi_regs[ATAPI_REG_DRIVESEL]  = 0xA0; // HEAD_NUMBER
 }

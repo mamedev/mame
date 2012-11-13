@@ -2797,6 +2797,67 @@ static void I386OP(decode_three_bytef3)(i386_state *cpustate)
 
 /*************************************************************************/
 
+static UINT8 read8_debug(i386_state *cpustate, UINT32 ea, UINT8 *data)
+{
+	UINT32 address = ea, error;
+
+	if (cpustate->cr[0] & 0x80000000)		// page translation enabled
+	{
+		if(!translate_address(cpustate,-1,&address,&error))
+			return 0;
+	}
+
+	address &= cpustate->a20_mask;
+	*data = cpustate->program->read_byte(address);
+	return 1;
+}
+
+static UINT32 i386_get_debug_desc(i386_state *cpustate, I386_SREG *seg)
+{
+	UINT32 base, limit, address;
+	union { UINT8 b[8]; UINT32 w[2]; } data;
+	UINT8 ret;
+	int entry;
+
+	if ( seg->selector & 0x4 )
+	{
+		base = cpustate->ldtr.base;
+		limit = cpustate->ldtr.limit;
+	} else {
+		base = cpustate->gdtr.base;
+		limit = cpustate->gdtr.limit;
+	}
+
+	entry = seg->selector & ~0x7;
+	if (limit == 0 || entry + 7 > limit)
+		return 0;
+	
+	address = entry + base;
+
+	// todo: bigendian
+	ret = read8_debug( cpustate, address+0, &data.b[0] );
+	ret += read8_debug( cpustate, address+1, &data.b[1] );
+	ret += read8_debug( cpustate, address+2, &data.b[2] );
+	ret += read8_debug( cpustate, address+3, &data.b[3] );
+	ret += read8_debug( cpustate, address+4, &data.b[4] );
+	ret += read8_debug( cpustate, address+5, &data.b[5] );
+	ret += read8_debug( cpustate, address+6, &data.b[6] );
+	ret += read8_debug( cpustate, address+7, &data.b[7] );
+
+	if(ret != 8)
+		return 0;
+
+	seg->flags = (data.w[1] >> 8) & 0xf0ff;
+	seg->base = (data.w[1] & 0xff000000) | ((data.w[1] & 0xff) << 16) | ((data.w[0] >> 16) & 0xffff);
+	seg->limit = (data.w[1] & 0xf0000) | (data.w[0] & 0xffff);
+	if (seg->flags & 0x8000)
+		seg->limit = (seg->limit << 12) | 0xfff;
+	seg->d = (seg->flags & 0x4000) ? 1 : 0;
+	seg->valid = (seg->selector & ~3)?(true):(false);
+
+	return seg->valid;
+}
+
 static UINT64 i386_debug_segbase(symbol_table &table, void *ref, int params, const UINT64 *param)
 {
 	legacy_cpu_device *device = (legacy_cpu_device *)ref;
@@ -2804,11 +2865,15 @@ static UINT64 i386_debug_segbase(symbol_table &table, void *ref, int params, con
 	UINT32 result;
 	I386_SREG seg;
 
-	if (PROTECTED_MODE)
+	if(param[0] > 65535)
+		return 0;
+
+	if (PROTECTED_MODE && !V8086_MODE)
 	{
 		memset(&seg, 0, sizeof(seg));
-		seg.selector = (UINT16) param[0];
-		i386_load_protected_mode_segment(cpustate,&seg,NULL);
+		seg.selector = param[0];
+		if(!i386_get_debug_desc(cpustate,&seg))
+			return 0;
 		result = seg.base;
 	}
 	else
@@ -2825,12 +2890,67 @@ static UINT64 i386_debug_seglimit(symbol_table &table, void *ref, int params, co
 	UINT32 result = 0;
 	I386_SREG seg;
 
-	if (PROTECTED_MODE)
+	if (PROTECTED_MODE && !V8086_MODE)
 	{
 		memset(&seg, 0, sizeof(seg));
-		seg.selector = (UINT16) param[0];
-		i386_load_protected_mode_segment(cpustate,&seg,NULL);
+		seg.selector = param[0];
+		if(!i386_get_debug_desc(cpustate,&seg))
+			return 0;
 		result = seg.limit;
+	}
+	return result;
+}
+
+static UINT64 i386_debug_segofftovirt(symbol_table &table, void *ref, int params, const UINT64 *param)
+{
+	legacy_cpu_device *device = (legacy_cpu_device *)ref;
+	i386_state *cpustate = get_safe_token(device);
+	UINT32 result = 0;
+	I386_SREG seg;
+
+	if(param[0] > 65535)
+		return 0;
+	
+	if (PROTECTED_MODE && !V8086_MODE)
+	{
+		memset(&seg, 0, sizeof(seg));
+		seg.selector = param[0];
+		if(!i386_get_debug_desc(cpustate,&seg))
+			return 0;
+		if((seg.flags & 0x0090) != 0x0090) // not system and present
+			return 0;
+		if((seg.flags & 0x0018) == 0x0010 && seg.flags & 0x0004) // expand down
+		{
+			if(param[1] <= seg.limit)
+				return 0;
+		}
+		else
+		{
+			if(param[1] > seg.limit)
+				return 0;
+		}
+		result = seg.base+param[1];
+	}
+	else
+	{
+		if(param[1] > 65535)
+			return 0;
+
+		result = (param[0] << 4) + param[1];
+	}
+	return result;
+}
+
+static UINT64 i386_debug_virttophys(symbol_table &table, void *ref, int params, const UINT64 *param)
+{
+	legacy_cpu_device *device = (legacy_cpu_device *)ref;
+	i386_state *cpustate = get_safe_token(device);
+	UINT32 result = param[0], error;
+
+	if (cpustate->cr[0] & 0x80000000)
+	{
+		if(!translate_address(cpustate,-1,&result,&error))
+			return 0;
 	}
 	return result;
 }
@@ -2839,6 +2959,8 @@ static CPU_DEBUG_INIT( i386 )
 {
 	device->debug()->symtable().add("segbase", (void *)device, 1, 1, i386_debug_segbase);
 	device->debug()->symtable().add("seglimit", (void *)device, 1, 1, i386_debug_seglimit);
+	device->debug()->symtable().add("segofftovirt", (void *)device, 2, 2, i386_debug_segofftovirt);
+	device->debug()->symtable().add("virttophys", (void *)device, 1, 1, i386_debug_virttophys);
 }
 
 /*************************************************************************/
