@@ -261,7 +261,7 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, A7800_NTSC_Y1/8)	/* 1.79 MHz (switches to 1.19 MHz on TIA or RIOT access) */
 	MCFG_CPU_PROGRAM_MAP(a7800_mem)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", a7800_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", a7800_state, a7800_interrupt, "screen", 0, 1)
 
 
 	/* video hardware */
@@ -270,7 +270,7 @@ static MACHINE_CONFIG_START( a7800_ntsc, a7800_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640,262)
 	MCFG_SCREEN_VISIBLE_AREA(0,319,25,45+204)
-	MCFG_SCREEN_UPDATE_STATIC(a7800)
+	MCFG_SCREEN_UPDATE_DRIVER(a7800_state, screen_update_a7800)
 
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(a7800_palette))
 
