@@ -2241,7 +2241,7 @@ WRITE_LINE_MEMBER(pc9801_state::pc9801_master_set_int_line)
 READ8_MEMBER(pc9801_state::get_slave_ack)
 {
 	if (offset==7) { // IRQ = 7
-		return	pic8259_acknowledge( machine().device( "pic8259_slave" ));
+		return pic8259_acknowledge( machine().device( "pic8259_slave" ));
 	}
 	return 0x00;
 }

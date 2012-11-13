@@ -2,17 +2,51 @@
 
     NEC PC-100
 
+	preliminary driver by Angelo Salese
+	Thanks to Carl for the i8259 tip;
+
     TODO:
-    - there's a regression with i8259, check this code:
+    - floppy support (no images available right now);
+    - i8259 works in edge triggering mode, kludged to work somehow.
+
+    Notes:
+    - First two POST checks are for the irqs, first one checks the timer irq:
     F8209: B8 FB 00                  mov     ax,0FBh
     F820C: E6 02                     out     2h,al
     F820E: B9 00 00                  mov     cx,0h
     F8211: FB                        sti
-    F8212: 0A E4                     or      ah,ah <- it's supposed to trigger an irq there!
+    F8212: 0A E4                     or      ah,ah <- irq fires here
     F8214: E1 FC                     loopz   0F8212h
     F8216: FA                        cli
     F8217: 0A E9                     or      ch,cl
     F8219: 74 15                     je      0F8230h
+	- Second one is for the vblank irq timing:
+		F8238: 8B D3                     mov     dx,bx
+		F823A: 8B D9                     mov     bx,cx
+		F823C: CF                        iret
+	F824D: E4 02                     in      al,2h
+	F824F: 8A E0                     mov     ah,al
+	F8251: B0 EF                     mov     al,0EFh
+	F8253: E6 02                     out     2h,al
+	F8255: BB 00 00                  mov     bx,0h
+	F8258: BA 00 00                  mov     dx,0h
+	F825B: B9 20 4E                  mov     cx,4E20h
+	F825E: FB                        sti
+	F825F: E2 FE                     loop    0F825Fh ;calculates the vblank here
+	F8261: FA                        cli
+	F8262: 8A C4                     mov     al,ah
+	F8264: E6 02                     out     2h,al
+	F8266: 2B D3                     sub     dx,bx
+	F8268: 81 FA 58 1B               cmp     dx,1B58h
+	F826C: 78 06                     js      0F8274h ;error if DX is smaller than 0x1b58
+	F826E: 81 FA 40 1F               cmp     dx,1F40h
+	F8272: 78 0A                     js      0F827Eh ;error if DX is greater than 0x1f40
+	F8274: B1 05                     mov     cl,5h
+	F8276: E8 CB 03                  call    0F8644h
+	F8279: E8 79 FF                  call    0F81F5h
+	F827C: EB FE                     jmp     0F827Ch
+	F827E: B0 FF                     mov     al,0FFh
+	fwiw with current timings, we get DX=0x1f09, enough for passing the test;
 
 ****************************************************************************/
 
@@ -221,6 +255,7 @@ WRITE8_MEMBER( pc100_state::pc100_crtc_addr_w )
 WRITE8_MEMBER( pc100_state::pc100_crtc_data_w )
 {
 	m_crtc.reg[m_crtc.addr] = data;
+	printf("%02x %02x\n",m_crtc.addr,data);
 }
 
 
@@ -349,35 +384,44 @@ void pc100_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(pc100_state::pc100_vblank_irq)
 {
+	pic8259_ir4_w(machine().device("pic8259"), 0);
 	pic8259_ir4_w(machine().device("pic8259"), 1);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_600hz_irq)
 {
-
 	if(m_timer_mode == 0)
+	{
+		pic8259_ir2_w(machine().device("pic8259"), 0);
 		pic8259_ir2_w(machine().device("pic8259"), 1);
+	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_100hz_irq)
 {
-
 	if(m_timer_mode == 1)
+	{
+		pic8259_ir2_w(machine().device("pic8259"), 0);
 		pic8259_ir2_w(machine().device("pic8259"), 1);
+	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_50hz_irq)
 {
-
 	if(m_timer_mode == 2)
+	{
+		pic8259_ir2_w(machine().device("pic8259"), 0);
 		pic8259_ir2_w(machine().device("pic8259"), 1);
+	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_10hz_irq)
 {
-
 	if(m_timer_mode == 3)
+	{
+		pic8259_ir2_w(machine().device("pic8259"), 0);
 		pic8259_ir2_w(machine().device("pic8259"), 1);
+	}
 }
 
 #define MASTER_CLOCK 6988800
@@ -392,10 +436,12 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1024, 1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
+//	MCFG_SCREEN_REFRESH_RATE(60)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+//	MCFG_SCREEN_SIZE(1024, 264*2)
+//	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 512-1)
+	/* TODO: Unknown Pixel Clock and CRTC is dynamic */
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*4, 1024, 0, 768, 264*2, 0, 512)
 	MCFG_SCREEN_UPDATE_DRIVER(pc100_state, screen_update_pc100)
 	MCFG_GFXDECODE(pc100)
 	MCFG_PALETTE_LENGTH(16)
