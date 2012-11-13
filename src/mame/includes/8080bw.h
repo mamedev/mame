@@ -56,6 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lrescue_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(lrescue_sh_port_2_w);
 	DECLARE_WRITE8_MEMBER(cosmo_sh_port_2_w);
+	DECLARE_WRITE8_MEMBER(ballbomb_01_w);
 	DECLARE_WRITE8_MEMBER(ballbomb_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(ballbomb_sh_port_2_w);
 	DECLARE_WRITE8_MEMBER(indianbt_sh_port_1_w);
@@ -120,6 +121,7 @@ public:
 /*----------- defined in audio/8080bw.c -----------*/
 extern const samples_interface lrescue_samples_interface;
 
+DISCRETE_SOUND_EXTERN( ballbomb );
 DISCRETE_SOUND_EXTERN( indianbt );
 DISCRETE_SOUND_EXTERN( polaris );
 

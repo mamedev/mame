@@ -181,6 +181,55 @@ WRITE8_MEMBER(_8080bw_state::cosmo_sh_port_2_w)
 /*                                                     */
 /*******************************************************/
 
+/*************************************
+ *
+ *  Discrete Sound
+ * (copied from indianbt)
+ *
+ *************************************/
+
+static const discrete_dac_r1_ladder ballbomb_music_dac =
+	{3, {0, RES_K(47), RES_K(12)}, 0, 0, 0, CAP_U(0.1)};
+
+#define BALLBOMB_MUSIC_CLK		(3993.6*2*2*2)
+
+/* Nodes - Inputs */
+#define BALLBOMB_MUSIC_DATA		NODE_01
+/* Nodes - Sounds */
+#define BALLBOMB_MUSIC			NODE_11
+
+DISCRETE_SOUND_START(ballbomb)
+
+	DISCRETE_INPUT_DATA (BALLBOMB_MUSIC_DATA)
+
+/******************************************************************************
+ *
+ * Music Generator
+ *
+ ******************************************************************************/
+	DISCRETE_NOTE(NODE_20, 1, BALLBOMB_MUSIC_CLK, BALLBOMB_MUSIC_DATA, 255, 5, DISC_CLK_IS_FREQ)
+
+	// Convert count to 7492 output
+	DISCRETE_TRANSFORM2(NODE_21, NODE_20, 2, "01>0+")
+
+	DISCRETE_DAC_R1(NODE_22, NODE_21, DEFAULT_TTL_V_LOGIC_1, &ballbomb_music_dac)
+
+/******************************************************************************
+ *
+ * Final Mixing and Output
+ *
+ ******************************************************************************/
+	DISCRETE_CRFILTER(NODE_90, NODE_22, RES_K(10), CAP_U(0.1))
+
+	DISCRETE_OUTPUT(NODE_90, 21000)
+
+DISCRETE_SOUND_END
+
+WRITE8_MEMBER( _8080bw_state::ballbomb_01_w )
+{
+	discrete_sound_w(m_discrete, space, BALLBOMB_MUSIC_DATA, data|0x80);
+}
+
 WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_1_w)
 {
 	UINT8 rising_bits = data & ~m_port_1_last_extra;
