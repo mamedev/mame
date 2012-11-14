@@ -5665,6 +5665,7 @@ src/mess/drivers/amico2k.c svneol=native#text/plain
 src/mess/drivers/amiga.c svneol=native#text/plain
 src/mess/drivers/amstr_pc.c svneol=native#text/plain
 src/mess/drivers/amstrad.c svneol=native#text/plain
+src/mess/drivers/apc.c svneol=native#text/plain
 src/mess/drivers/apexc.c svneol=native#text/plain
 src/mess/drivers/apf.c svneol=native#text/plain
 src/mess/drivers/apogee.c svneol=native#text/plain
