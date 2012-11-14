@@ -5173,7 +5173,7 @@ DRIVER_INIT_MEMBER(funworld_state, ctunk)
 	int start = 0x8000;
 
 	UINT8 *buffer;
-	int i, a;
+	int i;// a;
 
     /*****************************
     *   Program ROM decryption   *
@@ -5196,7 +5196,7 @@ DRIVER_INIT_MEMBER(funworld_state, ctunk)
 
 	int x, na, nb, nad, nbd;
 	UINT8 *src = machine().root_device().memregion( "gfx1" )->base();
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	//UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 
 	for (x=0x0000; x < 0x10000; x++)
 	{
