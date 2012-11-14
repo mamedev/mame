@@ -1358,6 +1358,7 @@ $(MESSOBJ)/ne.a:				\
 	$(MESS_MACHINE)/z80ne.o     \
 
 $(MESSOBJ)/nec.a:				\
+	$(MESS_DRIVERS)/apc.o		\
 	$(MESS_MACHINE)/pce.o		\
 	$(MESS_DRIVERS)/pce.o		\
 	$(MESS_DRIVERS)/pcfx.o		\
