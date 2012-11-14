@@ -265,7 +265,6 @@ static void srdarwin_draw_sprites( running_machine& machine, bitmap_ind16 &bitma
 
 UINT32 dec8_state::screen_update_cobracom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	flip_screen_set(m_bg_control[0] >> 7);
 
 	machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
@@ -301,7 +300,6 @@ VIDEO_START_MEMBER(dec8_state,cobracom)
 	m_game_uses_priority = 0;
 	machine().device<deco_bac06_device>("tilegen1")->set_colmask(0x3);
 	machine().device<deco_bac06_device>("tilegen2")->set_colmask(0x3);
-
 }
 
 /******************************************************************************/
@@ -371,7 +369,6 @@ VIDEO_START_MEMBER(dec8_state,oscar)
 
 	m_game_uses_priority = 1;
 	machine().device<deco_bac06_device>("tilegen1")->set_colmask(0x7);
-
 }
 
 /******************************************************************************/
@@ -413,7 +410,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_lastmisn_tile_info)
 	int tile = m_bg_data[offs + 1] + (m_bg_data[offs] << 8);
 	int color = tile >> 12;
 
-	if (color > 7 && m_game_uses_priority)
+	if (color & 8 && m_game_uses_priority)
 		tileinfo.category = 1;
 	else
 		tileinfo.category = 0;
@@ -464,7 +461,7 @@ UINT32 dec8_state::screen_update_srdarwin(screen_device &screen, bitmap_ind16 &b
 	m_bg_tilemap->set_scrollx(0, (m_scroll2[0] << 8) + m_scroll2[1]);
 
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	srdarwin_draw_sprites(machine(), bitmap, cliprect, 0); //* (srdarwin37b5gre)
+	srdarwin_draw_sprites(machine(), bitmap, cliprect, 0);
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	srdarwin_draw_sprites(machine(), bitmap, cliprect, 1);
 	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
@@ -476,10 +473,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_srdarwin_fix_tile_info)
 	int tile = m_videoram[tile_index];
 	int color = 0; /* ? */
 
-	if (color > 1)
-		tileinfo.category = 1;
-	else
-		tileinfo.category = 0;
+	tileinfo.category = 0;
 
 	SET_TILE_INFO_MEMBER(
 			0,
@@ -488,7 +482,6 @@ TILE_GET_INFO_MEMBER(dec8_state::get_srdarwin_fix_tile_info)
 			0);
 }
 
-//AT: improved priority and fixed stage 4+ crashes caused by bank overflow
 TILE_GET_INFO_MEMBER(dec8_state::get_srdarwin_tile_info)
 {
 	int tile = m_bg_data[2 * tile_index + 1] + (m_bg_data[2 * tile_index] << 8);
@@ -564,7 +557,7 @@ TILE_GET_INFO_MEMBER(dec8_state::get_gondo_tile_info)
 	int tile = m_bg_data[offs + 1] + (m_bg_data[offs] << 8);
 	int color = tile>> 12;
 
-	if (color > 7 && m_game_uses_priority)
+	if (color & 8 && m_game_uses_priority)
 		tileinfo.category = 1;
 	else
 		tileinfo.category = 0;
