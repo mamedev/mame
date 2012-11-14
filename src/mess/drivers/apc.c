@@ -77,22 +77,31 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 static ADDRESS_MAP_START( apc_map, AS_PROGRAM, 16, apc_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	AM_RANGE(0xa0000, 0xaffff) AM_ROM AM_REGION("file", 0)
+//	AM_RANGE(0xa0000, 0xaffff) AM_ROM AM_REGION("file", 0)
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
+//	AM_RANGE(0x00, 0x1f) i8237
 //	AM_RANGE(0x20, 0x23) i8259 master
 //	AM_RANGE(0x28, 0x2b) i8259 slave
-//	0x2f RTC it_mode
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd7220_chr", upd7220_device, read, write, 0x00ff)
-//  0x46 RTC CRT_IRST
-//	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE8("upd7220_btm", upd7220_device, read, write, 0x00ff)
-//	AM_RANGE(0x60, 0x??) "melody"
-//	AM_RANGE(0x68, 0x6f) i8255 (0x6a par_data 0x6e par_stat ... printer port)
-//  0x2920? RTC IT_CNT0
-//	??? serial port
+//	0x2b RTC counter port 0
+//	0x2f RTC counter mode 0 (w)
+//	0x30, 0x37 serial port 0/1 (i8251) (even/odd)
+//	0x38, 0x3f DMA extended address
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("upd7220_chr", upd7220_device, read, write, 0x00ff) // odd address UPD7220 #2!
+//  0x46 UPD7220 reset interrupt
+//	0x48, 0x4f keyboard controller
+//	0x50, 0x53 upd765
+//	0x5a  APU data (Arithmetic Processing Unit!)
+//	0x5e  APU status/command
+//	0x60 Melody Processing Unit
+//	0x61 RTC counter port 1
+//	0x67 RTC counter mode 1 (w)
+//	AM_RANGE(0x68, 0x6f) i8255 , printer port (A: status (R) B: data (W) C: command (W))
+//	AM_DEVREADWRITE8("upd7220_btm", upd7220_device, read, write, 0x00ff)
+
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( apc )
@@ -252,7 +261,7 @@ ROM_START( apc )
 	ROM_LOAD16_BYTE( "pfbu2j.bin",   0x00000, 0x001000, CRC(86970df5) SHA1(be59c5dad3bd8afc21e9f2f1404553d4371978be) )
     ROM_LOAD16_BYTE( "pfbu2l.bin",   0x00001, 0x001000, CRC(38df2e70) SHA1(a37ccaea00c2b290610d354de08b489fa897ec48) )
 
-	ROM_REGION( 0x10000, "file", ROMREGION_ERASE00 )
+//	ROM_REGION( 0x10000, "file", ROMREGION_ERASE00 )
 //	ROM_LOAD( "sioapc.o", 0, 0x10000, CRC(1) SHA1(1) )
 
 	ROM_REGION( 0x2000, "gfx", ROMREGION_ERASE00 )
