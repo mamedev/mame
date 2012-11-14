@@ -927,6 +927,7 @@ INPUT_PORTS_END
 /*******************************************************/
 /*                                                     */
 /* Nichibutsu "Rolling Crash"                          */
+/* Press left-arrow to play "Moon Base"                */
 /*                                                     */
 /*******************************************************/
 
@@ -943,8 +944,9 @@ static ADDRESS_MAP_START( rollingc_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(rollingc_sh_port_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r) AM_WRITE(invadpt2_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(invadpt2_sh_port_2_w)
 ADDRESS_MAP_END
 
 
