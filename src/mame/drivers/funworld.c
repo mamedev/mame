@@ -803,6 +803,11 @@
   - Added some technical notes.
   - Added PLD dumps to bonuscrd and powercrd.
 
+  [2012/11/14]
+  - Added a Jolly Card set from an unknown encrypted PCB
+    'alla TAB blue board. Graphics are decrypted. Program
+	needs decryption work.
+
 
   *** TO DO ***
 
@@ -4751,6 +4756,30 @@ ROM_START( novoplay )	/* Similar to Royal Vegas Joker Card */
 ROM_END
 
 
+/*
+  Jolly Card (unknown, encrypted)
+  -------------------------------
+
+  Rare unknown board with scratched chips.
+  A daughterboard with a big chip (can barely read 'mexico')
+  Other can barely read '68'
+
+  3 roms.
+
+*/
+
+ROM_START( jolycdct )	/* Encrypted program in a module. Blue TAB PCB encrypted graphics */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ct3.bin", 0x8000, 0x8000, CRC(0c9cbae6) SHA1(4f834370229797cac302a5185ed1e77ef2b7cabb) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "ct2.bin", 0x0000, 0x8000, CRC(7569e719) SHA1(f96e1e72bc13d1888f3868f8d404fd3db94db7b2) )
+	ROM_LOAD( "ct1.bin", 0x8000, 0x8000, CRC(8f438635) SHA1(3200e20f4b28173cc2a68d0f87969627570418dc) )
+
+	ROM_REGION( 0x0200, "proms", 0 )	/* Borrowed from the parent set */
+	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+ROM_END
+
 
 /**************************
 *  Driver Initialization  *
@@ -5139,6 +5168,7 @@ GAMEL( 199?, jolycdit,  jollycrd, cuoreuno, jolycdit,  funworld_state, tabblue, 
 GAMEL( 1990, jolycdib,  jollycrd, cuoreuno, jolycdib,  funworld_state, tabblue,  ROT0, "bootleg",         "Jolly Card (Italian, encrypted bootleg)",         0,                       layout_jollycrd )	// not a real TAB blue PCB
 GAMEL( 1985, sjcd2kx3,  jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "M.P.",            "Super Joly 2000 - 3x",                            0,                       layout_jollycrd )
 GAME(  1986, jolycdab,  jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "Inter Games",     "Jolly Card (Austrian, Fun World, bootleg)",       GAME_NOT_WORKING )
+GAME(  199?, jolycdct,  jollycrd, cuoreuno, jolycdit,  funworld_state, tabblue,  ROT0, "TAB Austria",     "Jolly Card (unknown, encrypted)",                 GAME_NOT_WORKING )
 
 // Bonus Card based...
 GAMEL( 1986, bonuscrd,  0,        fw2ndpal, bonuscrd,  driver_device,  0,        ROT0, "Fun World",       "Bonus Card (Austrian)",                           GAME_IMPERFECT_COLORS,   layout_bonuscrd ) // use fw1stpal machine for green background
