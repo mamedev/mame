@@ -23,6 +23,7 @@
   * Jolly Card (Italian, encrypted bootleg),          bootleg,            1990.
   * Super Joly 2000 - 3x,                             M.P.                1985.
   * Jolly Card (Austrian, Fun World, bootleg),        Inter Games,        1986.
+  * Jolly Card (Spanish, blue TAB board, encrypted),  TAB Austria,        1992.
   * Bonus Card (Austrian),                            Fun World,          1986.
   * Bonus Card (Austrian, ATG Electronic hack),       Fun World,          1986.
   * Big Deal (Hungarian, set 1),                      Fun World,          1986.
@@ -804,9 +805,12 @@
   - Added PLD dumps to bonuscrd and powercrd.
 
   [2012/11/14]
-  - Added a Jolly Card set from an unknown encrypted PCB
-    'alla TAB blue board. Graphics are decrypted. Program
-	needs decryption work.
+  - Added a Jolly Card spanish set from an unknown encrypted
+     PCB 'alla TAB blue board. Graphics are decrypted.
+  - Decrypted the program ROM.
+  - Added button-lamps layout.
+  - Added a default NVRAM.
+  - Promoted to working state.
 
 
   *** TO DO ***
@@ -4757,7 +4761,7 @@ ROM_END
 
 
 /*
-  Jolly Card (unknown, encrypted)
+  Jolly Card (spanish, encrypted)
   -------------------------------
 
   Rare unknown board with scratched chips.
@@ -4766,15 +4770,21 @@ ROM_END
 
   3 roms.
 
+  Graphics are encrypted 'alla blue TAB board.
+  Program is encrypted through scrambling data lines.
+
 */
 
-ROM_START( jolycdct )	/* Encrypted program in a module. Blue TAB PCB encrypted graphics */
+ROM_START( jolycdsp )	/* Encrypted program in a module. Blue TAB PCB encrypted graphics */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ct3.bin", 0x8000, 0x8000, CRC(0c9cbae6) SHA1(4f834370229797cac302a5185ed1e77ef2b7cabb) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "ct2.bin", 0x0000, 0x8000, CRC(7569e719) SHA1(f96e1e72bc13d1888f3868f8d404fd3db94db7b2) )
 	ROM_LOAD( "ct1.bin", 0x8000, 0x8000, CRC(8f438635) SHA1(3200e20f4b28173cc2a68d0f87969627570418dc) )
+
+	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM */
+	ROM_LOAD( "ctunk_nvram.bin", 0x0000, 0x0800, CRC(c55c6706) SHA1(a38ae926f057fb47e48ca841b2d097fc4fd06416) )
 
 	ROM_REGION( 0x0200, "proms", 0 )	/* Borrowed from the parent set */
 	ROM_LOAD( "82s147.bin",	0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
@@ -5150,6 +5160,57 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 }
 
 
+DRIVER_INIT_MEMBER(funworld_state, ctunk)
+/*********************************************************
+
+  CTUNK: Rare board with blue TAB board encryption scheme
+         plus a daughterboard for program encryption.
+		 
+*********************************************************/
+{
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	int size = machine().root_device().memregion("maincpu")->bytes();
+	int start = 0x8000;
+
+	UINT8 *buffer;
+	int i, a;
+
+    /*****************************
+    *   Program ROM decryption   *
+    *****************************/
+
+	/* data lines swap: 76543210 -> 56734012 */
+
+	for (i = start; i < size; i++)
+	{
+		rom[i] = BITSWAP8(rom[i], 5, 6, 7, 3, 4, 0, 1, 2);
+	}
+
+	buffer = auto_alloc_array(machine(), UINT8, size);
+	memcpy(buffer, rom, size);
+
+
+    /*****************************
+    *  Graphics ROMs decryption  *
+    *****************************/
+
+	int x, na, nb, nad, nbd;
+	UINT8 *src = machine().root_device().memregion( "gfx1" )->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+
+	for (x=0x0000; x < 0x10000; x++)
+	{
+		na = src[x] & 0xf0;		/* nibble A */
+		nb = src[x] << 4;		/* nibble B */
+
+			nad = (na ^ (na >> 1)) << 1;			/* nibble A decrypted */
+			nbd = ((nb ^ (nb >> 1)) >> 3) & 0x0f;	/* nibble B decrypted */
+
+		src[x] = nad + nbd;		/* decrypted byte */
+	}
+}
+
+
 /**********************************************
 *                Game Drivers                 *
 **********************************************/
@@ -5168,7 +5229,7 @@ GAMEL( 199?, jolycdit,  jollycrd, cuoreuno, jolycdit,  funworld_state, tabblue, 
 GAMEL( 1990, jolycdib,  jollycrd, cuoreuno, jolycdib,  funworld_state, tabblue,  ROT0, "bootleg",         "Jolly Card (Italian, encrypted bootleg)",         0,                       layout_jollycrd )	// not a real TAB blue PCB
 GAMEL( 1985, sjcd2kx3,  jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "M.P.",            "Super Joly 2000 - 3x",                            0,                       layout_jollycrd )
 GAME(  1986, jolycdab,  jollycrd, fw1stpal, funworld,  driver_device,  0,        ROT0, "Inter Games",     "Jolly Card (Austrian, Fun World, bootleg)",       GAME_NOT_WORKING )
-GAME(  199?, jolycdct,  jollycrd, cuoreuno, jolycdit,  funworld_state, tabblue,  ROT0, "TAB Austria",     "Jolly Card (unknown, encrypted)",                 GAME_NOT_WORKING )
+GAMEL( 1992, jolycdsp,  jollycrd, cuoreuno, jolycdit,  funworld_state, ctunk,    ROT0, "TAB Austria",     "Jolly Card (Spanish, blue TAB board, encrypted)", 0,                       layout_royalcrd )
 
 // Bonus Card based...
 GAMEL( 1986, bonuscrd,  0,        fw2ndpal, bonuscrd,  driver_device,  0,        ROT0, "Fun World",       "Bonus Card (Austrian)",                           GAME_IMPERFECT_COLORS,   layout_bonuscrd ) // use fw1stpal machine for green background
