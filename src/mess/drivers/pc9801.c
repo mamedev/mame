@@ -2201,7 +2201,7 @@ GFXDECODE_END
 ****************************************/
 
 /*
-irq assignment is:
+irq assignment:
 
 8259 master:
 ir0 PIT

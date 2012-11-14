@@ -501,7 +501,7 @@ WRITE8_MEMBER(dec8_state::ghostb_bank_w)
 	membank("bank1")->set_entry(data >> 4);
 
 	if ((data&1)==0) m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-	if (data & 2) m_nmi_enable =1; else m_nmi_enable = 0;
+	m_nmi_enable = (data & 2) >> 1;
 	flip_screen_set(data & 0x08);
 }
 
@@ -576,29 +576,6 @@ WRITE8_MEMBER(dec8_state::oscar_int_w)
 /* Used by Shackled, Last Mission, Captain Silver */
 WRITE8_MEMBER(dec8_state::shackled_int_w)
 {
-#if 0
-/* This is correct, but the cpus in Shackled need an interleave of about 5000!
-    With lower interleave CPU 0 misses an interrupt at the start of the game
-    (The last interrupt has not finished and been ack'd when the new one occurs */
-	switch (offset)
-	{
-	case 0: /* CPU 2 - IRQ acknowledge */
-		m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-		return;
-	case 1: /* CPU 1 - IRQ acknowledge */
-		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
-		return;
-	case 2: /* i8751 - FIRQ acknowledge */
-		return;
-	case 3: /* IRQ 1 */
-		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-		return;
-	case 4: /* IRQ 2 */
-		m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
-		return;
-	}
-#endif
-
 	switch (offset)
 	{
 	case 0: /* CPU 2 - IRQ acknowledge */
@@ -2069,6 +2046,15 @@ void dec8_state::machine_reset()
 }
 
 
+/* TODO: These are raw guesses, only to get ~57,41 Hz, assume to be the same as dec0 */
+#define DEC8_PIXEL_CLOCK XTAL_20MHz/4
+#define DEC8_HTOTAL 256+74
+#define DEC8_HBEND 0
+#define DEC8_HBSTART 256
+#define DEC8_VTOTAL 264
+#define DEC8_VBEND 8
+#define DEC8_VBSTART 256-8
+
 static MACHINE_CONFIG_START( lastmisn, dec8_state )
 
 	/* basic machine hardware */
@@ -2091,10 +2077,11 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(58)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_lastmisn)
 
 	MCFG_GFXDECODE(shackled)
@@ -2128,8 +2115,9 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
 	MCFG_CPU_PROGRAM_MAP(ym3526_s_map)
 								/* NMIs are caused by the main CPU */
-	MCFG_QUANTUM_TIME(attotime::from_hz(4800))
 
+//	MCFG_QUANTUM_TIME(attotime::from_hz(100000))
+	MCFG_QUANTUM_PERFECT_CPU("maincpu") // needs heavy sync, otherwise one of the two CPUs will miss an irq and makes the game to hang
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
@@ -2138,10 +2126,11 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(58)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_shackled)
 
 	MCFG_GFXDECODE(shackled)
@@ -2185,10 +2174,11 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(58)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_gondo)
 	MCFG_SCREEN_VBLANK_DRIVER(dec8_state, screen_eof_dec8)
 
@@ -2233,10 +2223,11 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(58)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_garyoret)
 	MCFG_SCREEN_VBLANK_DRIVER(dec8_state, screen_eof_dec8)
 
@@ -2284,10 +2275,11 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(58)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_ghostb)
 	MCFG_SCREEN_VBLANK_DRIVER(dec8_state, screen_eof_dec8)
 
@@ -2334,10 +2326,11 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(58)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_lastmisn)
 
 	MCFG_GFXDECODE(shackled)
@@ -2389,10 +2382,11 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 	deco_mxc06_device::set_gfx_region(*device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(58)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_oscar)
 
 	MCFG_GFXDECODE(oscar)
@@ -2430,10 +2424,11 @@ static MACHINE_CONFIG_START( srdarwin, dec8_state )
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(58)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_srdarwin)
 
 	MCFG_GFXDECODE(srdarwin)
@@ -2480,10 +2475,11 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+//	MCFG_SCREEN_REFRESH_RATE(58)
+//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
+//	MCFG_SCREEN_SIZE(32*8, 32*8)
+//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(DEC8_PIXEL_CLOCK, DEC8_HTOTAL, DEC8_HBEND, DEC8_HBSTART, DEC8_VTOTAL, DEC8_VBEND, DEC8_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(dec8_state, screen_update_cobracom)
 
 	MCFG_GFXDECODE(cobracom)
