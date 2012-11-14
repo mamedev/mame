@@ -59,6 +59,7 @@
 #include "machine/pic8259.h"
 #include "machine/upd765.h"
 #include "machine/msm58321.h"
+#include "sound/beep.h"
 
 class pc100_state : public driver_device
 {
@@ -78,6 +79,7 @@ public:
 	DECLARE_WRITE16_MEMBER(pc100_kanji_w);
 	DECLARE_READ8_MEMBER(pc100_key_r);
 	DECLARE_WRITE8_MEMBER(pc100_output_w);
+	DECLARE_WRITE8_MEMBER(pc100_tc_w);
 	DECLARE_WRITE16_MEMBER(pc100_paletteram_w);
 	DECLARE_READ8_MEMBER(pc100_shift_r);
 	DECLARE_WRITE8_MEMBER(pc100_shift_w);
@@ -212,7 +214,16 @@ READ8_MEMBER( pc100_state::pc100_key_r )
 WRITE8_MEMBER( pc100_state::pc100_output_w )
 {
 	if(offset == 0)
+	{
 		m_timer_mode = (data & 0x18) >> 3;
+		beep_set_state(machine().device(BEEPER_TAG),((data & 0x40) >> 6) ^ 1);
+		printf("%02x\n",data & 0xc0);
+	}
+}
+
+WRITE8_MEMBER( pc100_state::pc100_tc_w )
+{
+	machine().device<upd765a_device>("upd765")->tc_w(data & 0x40);
 }
 
 WRITE16_MEMBER( pc100_state::pc100_paletteram_w )
@@ -278,7 +289,8 @@ static ADDRESS_MAP_START(pc100_io, AS_IO, 16, pc100_state)
 	AM_RANGE(0x10, 0x17) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write,0x00ff) // i8255 #1
 	AM_RANGE(0x18, 0x1f) AM_DEVREADWRITE8("ppi8255_2", i8255_device, read, write,0x00ff) // i8255 #2
 	AM_RANGE(0x20, 0x23) AM_READ8(pc100_key_r,0x00ff) //i/o, keyboard, mouse
-	AM_RANGE(0x22, 0x25) AM_WRITE8(pc100_output_w,0x00ff) //i/o, keyboard, mouse
+	AM_RANGE(0x22, 0x23) AM_WRITE8(pc100_output_w,0x00ff) //i/o, keyboard, mouse
+	AM_RANGE(0x24, 0x25) AM_WRITE8(pc100_tc_w,0x00ff) //i/o, keyboard, mouse
 //  AM_RANGE(0x28, 0x2b) i8251
 	AM_RANGE(0x30, 0x31) AM_READWRITE8(pc100_shift_r,pc100_shift_w,0x00ff) // crtc shift
 	AM_RANGE(0x38, 0x39) AM_WRITE8(pc100_crtc_addr_w,0x00ff) //crtc address reg
@@ -407,7 +419,6 @@ static const struct pic8259_interface pc100_pic8259_config =
 
 void pc100_state::machine_start()
 {
-
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pc100_irq_callback);
 	m_kanji_rom = (UINT16 *)(*machine().root_device().memregion("kanji"));
 	m_vram = (UINT16 *)(*memregion("vram"));
@@ -415,6 +426,8 @@ void pc100_state::machine_start()
 
 void pc100_state::machine_reset()
 {
+	beep_set_frequency(machine().device(BEEPER_TAG),2400);
+	beep_set_state(machine().device(BEEPER_TAG),0);
 }
 
 INTERRUPT_GEN_MEMBER(pc100_state::pc100_vblank_irq)
@@ -504,6 +517,11 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_GFXDECODE(pc100)
 	MCFG_PALETTE_LENGTH(16)
 //  MCFG_PALETTE_INIT(black_and_white)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_CONFIG_END
 
 /* ROM definition */
