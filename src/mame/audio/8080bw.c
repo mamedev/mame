@@ -1228,3 +1228,29 @@ WRITE8_MEMBER(_8080bw_state::shuttlei_sh_port_2_w)
 			break;
 	}
 }
+
+WRITE8_MEMBER( _8080bw_state::darthvdr_08_w )
+{
+	UINT8 rising_bits = data & ~m_port_1_last_extra;
+
+	machine().sound().system_enable(data & 0x01);
+
+	if (rising_bits & 0x02) m_samples->start(0, 0);		/* Shoot */
+	if (rising_bits & 0x04) m_samples->start(3, 7);		/* Hit UFO */
+	if (rising_bits & 0x10) m_samples->start(5, 8);		/* Bonus */
+
+	sn76477_enable_w(m_sn, data & 0x20 ? 0:1);			/* UFO */
+
+	if (rising_bits & 0x40) m_samples->start(1, 1);		/* Death */
+	if (rising_bits & 0x80) m_samples->start(2, 2);		/* Hit */
+
+	if (rising_bits & 0x08)
+	{
+		m_samples->start(4, m_fleet_step);			/* Fleet move in 4 steps */
+		m_fleet_step++;
+		if (m_fleet_step > 6) m_fleet_step = 3;
+	}
+
+	m_port_1_last_extra = data;
+}
+

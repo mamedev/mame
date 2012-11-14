@@ -2067,6 +2067,9 @@ Another (same checksums) dump came from board labeled SI-7811M-2
 MACHINE_START_MEMBER(_8080bw_state,darthvdr)
 {
 	/* do nothing for now - different interrupt system */
+	m_fleet_step = 3;
+	m_samples = machine().device<samples_device>("samples");
+	m_sn = machine().device("snsnd");
 }
 
 
@@ -2085,7 +2088,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( darthvdr_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
-	AM_RANGE(0x00, 0x0f) AM_WRITENOP
+
+	AM_RANGE(0x00, 0x00) AM_WRITENOP
+	AM_RANGE(0x04, 0x04) AM_WRITENOP
+	AM_RANGE(0x08, 0x08) AM_WRITE(darthvdr_08_w) // sound
 ADDRESS_MAP_END
 
 
@@ -2138,6 +2144,9 @@ static MACHINE_CONFIG_DERIVED_CLASS( darthvdr, mw8080bw_root, _8080bw_state )
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,darthvdr)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state,darthvdr)
+
+	/* sound hardware */
+	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 MACHINE_CONFIG_END
 
 
@@ -3959,7 +3968,7 @@ GAMEL(1979, jspecter,   invaders, invaders,  jspecter,  driver_device, 0, ROT270
 GAMEL(1979, jspecter2,  invaders, invaders,  jspecter,  driver_device, 0, ROT270, "bootleg (Jatre)", "Jatre Specter (set 2)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, spacewr3,   invaders, spcewars,  sicv,      driver_device, 0, ROT270, "bootleg", "Space War Part 3", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_invaders ) // unrelated to Sanritsu's version?
 GAMEL(1978, invader4,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg", "Space Invaders Part Four", GAME_SUPPORTS_SAVE, layout_invaders )
-GAME( 1978, darthvdr,   invaders, darthvdr,  darthvdr,  driver_device, 0, ROT270, "bootleg", "Darth Vader (bootleg of Space Invaders)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
+GAME( 1978, darthvdr,   invaders, darthvdr,  darthvdr,  driver_device, 0, ROT270, "bootleg", "Darth Vader (bootleg of Space Invaders)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAMEL(19??, tst_invd,   invaders, invaders,  sicv,      driver_device, 0, ROT0,   "<unknown>", "Space Invaders Test ROM", GAME_SUPPORTS_SAVE, layout_invaders )
 
 // other Taito

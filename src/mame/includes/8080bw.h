@@ -31,6 +31,7 @@ public:
 	UINT8 m_c8080bw_flip_screen;
 	UINT8 m_color_map;
 	UINT8 m_screen_red;
+	UINT8 m_fleet_step;
 
 	attotime m_schaser_effect_555_time_remain;
 	INT32 m_schaser_effect_555_time_remain_savable;
@@ -56,6 +57,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lrescue_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(lrescue_sh_port_2_w);
 	DECLARE_WRITE8_MEMBER(cosmo_sh_port_2_w);
+	DECLARE_WRITE8_MEMBER(darthvdr_08_w);
 	DECLARE_WRITE8_MEMBER(ballbomb_01_w);
 	DECLARE_WRITE8_MEMBER(ballbomb_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(ballbomb_sh_port_2_w);
