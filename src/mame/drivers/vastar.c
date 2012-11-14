@@ -565,4 +565,4 @@ ROM_END
 
 GAME( 1983, vastar,  0,      vastar, vastar, driver_device, 0, ROT90, "Sesame Japan", "Vastar (set 1)", 0 )
 GAME( 1983, vastar2, vastar, vastar, vastar, driver_device, 0, ROT90, "Sesame Japan", "Vastar (set 2)", 0 )
-GAME( 1985, pprobe,  0,      vastar, pprobe, driver_device, 0, ROT90, "Orca / Kyugo?", "Planet Probe (prototype?)", 0 ) // has no Copyright, probably because Orca / Kyugo didn't have a trading name at this point
+GAME( 1985, pprobe,  0,      vastar, pprobe, driver_device, 0, ROT90, "Crux / Kyugo?", "Planet Probe (prototype?)", 0 ) // has no Copyright, probably because Crux didn't have a trading name at this point?
