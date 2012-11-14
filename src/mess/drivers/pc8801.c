@@ -1898,7 +1898,6 @@ ADDRESS_MAP_END
 
 TIMER_CALLBACK_MEMBER(pc8801_state::pc8801fd_upd765_tc_to_zero)
 {
-
 	//printf("0\n");
 	machine().device<upd765a_device>("upd765")->tc_w(false);
 }
