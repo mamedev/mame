@@ -1814,6 +1814,7 @@ src/lib/formats/hxcmfm_dsk.h svneol=native#text/plain
 src/lib/formats/imageutl.c svneol=native#text/plain
 src/lib/formats/imageutl.h svneol=native#text/plain
 src/lib/formats/imd_dsk.c svneol=native#text/plain
+src/lib/formats/imd_dsk.h svneol=native#text/plain
 src/lib/formats/ioprocs.c svneol=native#text/plain
 src/lib/formats/ioprocs.h svneol=native#text/plain
 src/lib/formats/ipf_dsk.c svneol=native#text/plain
