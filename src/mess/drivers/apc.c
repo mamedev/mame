@@ -15,8 +15,7 @@
 	i/o memory map:
 	0x00 - 0x1f DMA
 	0x20 - 0x23 i8259 master
-	0x28 - 0x2b i8259 slave
-	0x2b / 0x2f / 0x61 / 0x6f pit8253 (!)
+	0x28 - 0x2f i8259 slave (even), pit8253 (odd)
 	0x30 - 0x37 serial i8251, even #1 / odd #2
 	0x38 - 0x3f DMA segments
 	0x40 - 0x43 upd7220, even chr / odd bitmap
@@ -25,6 +24,7 @@
 	0x58        rtc
 	0x5a - 0x5e APU
 	0x60        MPU (melody)
+	0x61 - 0x67 (Mirror of pit8253?)
 	0x68 - 0x6f parallel port
 
 ***************************************************************************/
@@ -68,7 +68,6 @@ public:
 
 	DECLARE_READ8_MEMBER(apc_port_28_r);
 	DECLARE_WRITE8_MEMBER(apc_port_28_w);
-	DECLARE_WRITE8_MEMBER(apc_port_2e_w);
 	DECLARE_READ8_MEMBER(apc_port_60_r);
 	DECLARE_WRITE8_MEMBER(apc_port_60_w);
 	DECLARE_READ8_MEMBER(apc_gdc_r);
@@ -135,18 +134,16 @@ READ8_MEMBER(apc_state::apc_port_28_r)
 	UINT8 res;
 
 	if(offset & 1)
-	{
-		if(offset == 3)
-			res = pit8253_r(machine().device("pit8253"), space, 0);
-		else
-		{
-			printf("Read undefined port 0x29\n");
-			res = 0xff;
-		}
-	}
+		res = pit8253_r(machine().device("pit8253"), space, (offset & 6) >> 1);
 	else
 	{
-		res = pic8259_r(machine().device("pic8259_slave"), space, (offset & 2) >> 1);
+		if(offset & 4)
+		{
+			printf("Read undefined port %02x\n",offset+0x28);
+			res = 0xff;
+		}
+		else
+			res = pic8259_r(machine().device("pic8259_slave"), space, (offset & 2) >> 1);
 	}
 
 	return res;
@@ -155,23 +152,14 @@ READ8_MEMBER(apc_state::apc_port_28_r)
 WRITE8_MEMBER(apc_state::apc_port_28_w)
 {
 	if(offset & 1)
-	{
-		if(offset == 3)
-			pit8253_w(machine().device("pit8253"), space, 0, data);
-		else
-		{
-			printf("Write undefined port 0x29\n");
-		}
-	}
+		pit8253_w(machine().device("pit8253"), space, (offset & 6) >> 1, data);
 	else
 	{
-		pic8259_w(machine().device("pic8259_slave"), space, (offset & 2) >> 1, data);
+		if(offset & 4)
+			printf("Write undefined port %02x\n",offset+0x28);
+		else
+			pic8259_w(machine().device("pic8259_slave"), space, (offset & 2) >> 1, data);
 	}
-}
-
-WRITE8_MEMBER(apc_state::apc_port_2e_w)
-{
-	pit8253_w(machine().device("pit8253"), space, 1, data);
 }
 
 
@@ -181,13 +169,8 @@ READ8_MEMBER(apc_state::apc_port_60_r)
 
 	if(offset & 1)
 	{
-		if(offset == 1)
-			res = pit8253_r(machine().device("pit8253"), space, 2);
-		else
-		{
-			printf("Read undefined port %02x\n",offset+0x60);
-			res = 0xff;
-		}
+		printf("Read undefined port %02x\n",offset+0x60);
+		res = 0xff;
 	}
 	else
 	{
@@ -202,14 +185,7 @@ WRITE8_MEMBER(apc_state::apc_port_60_w)
 {
 	if(offset & 1)
 	{
-		if(offset == 1)
-			pit8253_w(machine().device("pit8253"), space, 2, data);
-		else if(offset == 7)
-			pit8253_w(machine().device("pit8253"), space, 3, data);
-		else
-		{
-			printf("Write undefined port %02x\n",offset+0x60);
-		}
+		printf("Write undefined port %02x\n",offset+0x60);
 	}
 	else
 	{
@@ -260,10 +236,7 @@ static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_READWRITE8(apc_dma_r, apc_dma_w, 0x00ff)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0x00ff) // i8259
-	AM_RANGE(0x28, 0x2b) AM_READWRITE8(apc_port_28_r, apc_port_28_w, 0xffff)
-	AM_RANGE(0x2e, 0x2f) AM_WRITE8(apc_port_2e_w, 0x00ff)
-//	0x2b RTC counter port 0
-//	0x2f RTC counter mode 0 (w)
+	AM_RANGE(0x28, 0x2f) AM_READWRITE8(apc_port_28_r, apc_port_28_w, 0xffff)
 //	0x30, 0x37 serial port 0/1 (i8251) (even/odd)
 //	0x38, 0x3f DMA extended address
 	AM_RANGE(0x40, 0x43) AM_READWRITE8(apc_gdc_r, apc_gdc_w, 0xffff)
@@ -274,8 +247,6 @@ static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 //	0x5e  APU status/command
 	AM_RANGE(0x60, 0x67) AM_READWRITE8(apc_port_60_r, apc_port_60_w, 0xffff)
 //	0x60 Melody Processing Unit
-//	0x61 RTC counter port 1
-//	0x67 RTC counter mode 1 (w)
 //	AM_RANGE(0x68, 0x6f) i8255 , printer port (A: status (R) B: data (W) C: command (W))
 //	AM_DEVREADWRITE8("upd7220_btm", upd7220_device, read, write, 0x00ff)
 ADDRESS_MAP_END
