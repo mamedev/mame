@@ -1190,6 +1190,17 @@ void floppy_image_format_t::mfm_w(UINT32 *buffer, int &offset, int n, UINT32 val
 	}
 }
 
+void floppy_image_format_t::fm_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size)
+{
+	int prec = offset ? bit_r(buffer, offset-1) : 0;
+	for(int i=n-1; i>=0; i--) {
+		int bit = (val >> i) & 1;
+		bit_w(buffer, offset++, true);
+		bit_w(buffer, offset++, bit, size);
+		prec = bit;
+	}
+}
+
 void floppy_image_format_t::mfm_half_w(UINT32 *buffer, int &offset, int start_bit, UINT32 val, UINT32 size)
 {
 	int prec = offset ? bit_r(buffer, offset-1) : 0;

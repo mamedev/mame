@@ -510,6 +510,8 @@ protected:
 	UINT16 calc_crc_ccitt(const UINT32 *buffer, int start, int end);
 	//! Write a series of (raw) bits and increment the offset.
 	void raw_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size = 1000);
+	//! FM-encode and write a series of bits
+	void fm_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size = 1000);
 	//! MFM-encode and write a series of bits
 	void mfm_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size = 1000);
 	//! MFM-encode every two bits and write

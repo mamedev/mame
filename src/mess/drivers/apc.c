@@ -60,6 +60,7 @@
 #include "imagedev/flopdrv.h"
 #include "formats/mfi_dsk.h"
 #include "formats/d88_dsk.h"
+#include "formats/imd_dsk.h"
 //#include "sound/ay8910.h"
 
 class apc_state : public driver_device
@@ -606,8 +607,9 @@ static I8237_INTERFACE( dma8237_config )
 
 static const floppy_format_type apc_floppy_formats[] = {
 	FLOPPY_D88_FORMAT,
+	FLOPPY_IMD_FORMAT,
 	FLOPPY_MFI_FORMAT,
-	NULL // TODO: IMD
+	NULL
 };
 
 static SLOT_INTERFACE_START( apc_floppies )
@@ -647,8 +649,8 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_UPDATE_DRIVER(apc_state, screen_update)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_SIZE(640, 494)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 640-1, 0*8, 494-1)
 
 	MCFG_GFXDECODE(apc)
 
