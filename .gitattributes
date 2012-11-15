@@ -5907,7 +5907,6 @@ src/mess/drivers/nakajies.c svneol=native#text/plain
 src/mess/drivers/nanos.c svneol=native#text/plain
 src/mess/drivers/nascom1.c svneol=native#text/plain
 src/mess/drivers/nc.c svneol=native#text/plain
-src/mess/drivers/necapc.c svneol=native#text/plain
 src/mess/drivers/nes.c svneol=native#text/plain
 src/mess/drivers/newbrain.c svneol=native#text/plain
 src/mess/drivers/next.c svneol=native#text/plain
