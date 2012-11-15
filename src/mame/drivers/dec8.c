@@ -579,16 +579,18 @@ WRITE8_MEMBER(dec8_state::shackled_int_w)
 	switch (offset)
 	{
 	case 0: /* CPU 2 - IRQ acknowledge */
+		m_subcpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 		return;
 	case 1: /* CPU 1 - IRQ acknowledge */
+		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 		return;
 	case 2: /* i8751 - FIRQ acknowledge */
 		return;
 	case 3: /* IRQ 1 */
-		m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 		return;
 	case 4: /* IRQ 2 */
-		m_subcpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
+		m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 		return;
 	}
 }
