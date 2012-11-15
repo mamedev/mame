@@ -30,7 +30,7 @@ Supported games:
     outzone     TP-O18      Out Zone
     outzonea    TP-O18      Out Zone (From board serial number 2122)
     vimana      TP-O19      Vimana (From board serial number 1547.04 [July '94])
-    vimana1     TP-O19      Vimana (Older version)
+    vimanaj     TP-O19      Vimana (Japan version)
     vimanan     TP-O19      Vimana (Nova Apparate GMBH & Co  license)
 
 
@@ -319,7 +319,7 @@ Stephh's notes (based on the games M68000 and Z80 code and some tests) :
       * ....0010 : "NOVA APPARATE GMBH & CO" / ""
     Because of this additional text, other texts, code and data are shifted after 0x019e9c.
 
-8c) 'vimana1'
+8c) 'vimanaj'
 
   - The only difference I've noticed with 'vimana' is the text at the "end" is in Japanese.
     This is why I've disabled all regions which aren't related to Japan.
@@ -1423,7 +1423,7 @@ static INPUT_PORTS_START( vimanan )
 INPUT_PORTS_END
 
 /* verified from M68000 - coinage based on "test mode" and handled by the MCU simulation */
-static INPUT_PORTS_START( vimana1 )
+static INPUT_PORTS_START( vimanaj )
 	PORT_INCLUDE( vimana )
 
 	/* DSWA : 0x440007.b */
@@ -2488,7 +2488,7 @@ ROM_START( vimanan )
 	ROM_LOAD( "tp019-10.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) )	/* ??? */
 ROM_END
 
-ROM_START( vimana1 )
+ROM_START( vimanaj )
 	ROM_REGION( 0x040000, "maincpu", 0 )	/* Main 68K code */
 	ROM_LOAD16_BYTE( "vim07.bin",  0x000000, 0x20000, CRC(1efaea84) SHA1(f9c5d2365d8948fa66dbe61d355919db15843a28) )
 	ROM_LOAD16_BYTE( "vim08.bin",  0x000001, 0x20000, CRC(e45b7def) SHA1(6b92a91d64581954da8ecdbeb5fed79bcc9c5217) )
@@ -2556,4 +2556,4 @@ GAME( 1990, outzonec,   outzone,  outzone,  outzonec, toaplan1_state,  toaplan1,
 GAME( 1990, outzoned,   outzone,  outzone,  outzonec, toaplan1_state,  toaplan1, ROT270, "Toaplan", "Out Zone (set 5)", 0 )
 GAME( 1991, vimana,     0,        vimana,   vimana, toaplan1_state,    vimana,   ROT270, "Toaplan", "Vimana (World, set 1)", GAME_NO_SOUND )
 GAME( 1991, vimanan,    vimana,   vimana,   vimanan, toaplan1_state,   vimana,   ROT270, "Toaplan", "Vimana (World, set 2)", GAME_NO_SOUND )
-GAME( 1991, vimana1,    vimana,   vimana,   vimana1, toaplan1_state,   vimana,   ROT270, "Toaplan", "Vimana (Japan)", GAME_NO_SOUND )
+GAME( 1991, vimanaj,    vimana,   vimana,   vimanaj, toaplan1_state,   vimana,   ROT270, "Toaplan", "Vimana (Japan)", GAME_NO_SOUND )
