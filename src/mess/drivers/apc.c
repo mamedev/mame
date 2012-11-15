@@ -71,7 +71,9 @@ public:
 		  m_hgdc1(*this, "upd7220_chr"),
 		  m_hgdc2(*this, "upd7220_btm"),
 		  m_i8259_m(*this, "pic8259_master"),
-		  m_i8259_s(*this, "pic8259_slave")
+		  m_i8259_s(*this, "pic8259_slave"),
+		  m_video_ram_1(*this, "video_ram_1"),
+		  m_video_ram_2(*this, "video_ram_2")
 	{ }
 
 	// devices
@@ -81,6 +83,9 @@ public:
 	required_device<pic8259_device> m_i8259_m;
 	required_device<pic8259_device> m_i8259_s;
 	UINT8 *m_char_rom;
+
+	required_shared_ptr<UINT8> m_video_ram_1;
+	required_shared_ptr<UINT8> m_video_ram_2;
 
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -108,6 +113,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 
 	DECLARE_DRIVER_INIT(apc);
+	DECLARE_PALETTE_INIT(apc);
 
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
@@ -146,7 +152,80 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
+	apc_state *state = device->machine().driver_data<apc_state>();
+	int xi,yi;
+	int x;
+	UINT8 char_size;
+//	UINT8 interlace_on;
 
+//	if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
+//		return;
+
+//	interlace_on = state->m_video_reg[2] == 0x10; /* TODO: correct? */
+	char_size = 16;
+
+	for(x=0;x<pitch;x++)
+	{
+		UINT8 tile_data;
+//		UINT8 secret,reverse,u_line,v_line;
+		UINT8 color;
+		UINT8 tile,attr,pen;
+		UINT32 tile_addr;
+
+//		tile_addr = addr+(x*(state->m_video_ff[WIDTH40_REG]+1));
+		tile_addr = addr+(x*(1));
+
+		tile = state->m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0x00ff;
+		attr = (state->m_video_ram_1[(tile_addr*2 & 0x1fff) | 0x2000] & 0x00ff);
+
+//		secret = (attr & 1) ^ 1;
+		//blink = attr & 2;
+//		reverse = attr & 4;
+//		u_line = attr & 8;
+//		v_line = attr & 0x10;
+		color = (attr & 0xe0) >> 5;
+
+		for(yi=0;yi<lr;yi++)
+		{
+			for(xi=0;xi<8;xi++)
+			{
+				int res_x,res_y;
+
+//				res_x = (x*8+xi) * (state->m_video_ff[WIDTH40_REG]+1);
+				res_x = (x*8+xi) * (1);
+				res_y = y*lr+yi;
+
+				if(res_x > 640 || res_y > char_size*25) //TODO
+					continue;
+
+//				tile_data = secret ? 0 : (state->m_char_rom[tile*char_size+interlace_on*0x800+yi]);
+				tile_data = (state->m_char_rom[tile*char_size+yi]);
+
+//				if(reverse) { tile_data^=0xff; }
+//				if(u_line && yi == 7) { tile_data = 0xff; }
+//				if(v_line)	{ tile_data|=8; }
+
+				if(cursor_on && cursor_addr == tile_addr)
+					tile_data^=0xff;
+
+				if(yi >= char_size)
+					pen = 0;
+				else
+					pen = (tile_data >> (7-xi) & 1) ? color : 0;
+
+				if(pen)
+					bitmap.pix16(res_y, res_x) = pen;
+
+//				if(state->m_video_ff[WIDTH40_REG])
+//				{
+//					if(res_x+1 > 640 || res_y > char_size*25) //TODO
+//						continue;
+
+//					bitmap.pix16(res_y, res_x+1) = pen;
+//				}
+			}
+		}
+	}
 }
 
 READ8_MEMBER(apc_state::apc_port_28_r)
@@ -533,6 +612,15 @@ static SLOT_INTERFACE_START( apc_floppies )
 	SLOT_INTERFACE( "8sd", FLOPPY_8_SSSD ) // TODO: Ok?
 SLOT_INTERFACE_END
 
+PALETTE_INIT_MEMBER(apc_state,apc)
+{
+	int i;
+
+	for(i=0;i<8;i++)
+		palette_set_color_rgb(machine(), i, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
+	for(i=8;i<machine().total_colors();i++)
+		palette_set_color_rgb(machine(), i, pal1bit(0), pal1bit(0), pal1bit(0));
+}
 
 #define MAIN_CLOCK XTAL_5MHz
 
@@ -565,7 +653,8 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_UPD7220_ADD("upd7220_chr", 5000000/2, hgdc_1_intf, upd7220_1_map)
 	MCFG_UPD7220_ADD("upd7220_btm", 5000000/2, hgdc_2_intf, upd7220_2_map)
 
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT_OVERRIDE(apc_state,apc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -589,7 +678,8 @@ ROM_START( apc )
 //	ROM_LOAD( "sioapc.o", 0, 0x10000, CRC(1) SHA1(1) )
 
 	ROM_REGION( 0x2000, "gfx", ROMREGION_ERASE00 )
-    ROM_LOAD( "pfcu1r.bin",   0x000000, 0x002000, BAD_DUMP CRC(683efa94) SHA1(43157984a1746b2e448f3236f571011af9a3aa73) )
+    ROM_LOAD("pfcu1r.bin",   0x000000, 0x002000, BAD_DUMP CRC(683efa94) SHA1(43157984a1746b2e448f3236f571011af9a3aa73) )
+   	ROM_LOAD("hn613128pac8.bin",0x00000, 0x01000, BAD_DUMP CRC(b5a15b5c) SHA1(e5f071edb72a5e9a8b8b1c23cf94a74d24cb648e) ) //fake, taken from PC-9801
 ROM_END
 
 DRIVER_INIT_MEMBER(apc_state,apc)
