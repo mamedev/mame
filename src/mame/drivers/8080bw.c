@@ -2089,7 +2089,7 @@ static ADDRESS_MAP_START( darthvdr_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
 
-	AM_RANGE(0x00, 0x00) AM_WRITENOP
+	AM_RANGE(0x00, 0x00) AM_WRITE(darthvdr_00_w) // flipscreen
 	AM_RANGE(0x04, 0x04) AM_WRITENOP
 	AM_RANGE(0x08, 0x08) AM_WRITE(darthvdr_08_w) // sound
 ADDRESS_MAP_END
@@ -3521,6 +3521,16 @@ ROM_START( invasionrza )
 	ROM_LOAD( "rz7-7.2k",   0x1c00, 0x0400, CRC(27dbea48) SHA1(f0bf5d31424dc72ac2e6fa01c528365efff838d2) )
 ROM_END
 
+ROM_START( ultrainv )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "in-01.bin",   0x0000, 0x0400, CRC(db9de599) SHA1(ccee1116ca924b520a126b63088a76d2ce8c396f) )
+	ROM_LOAD( "in-02.bin",   0x0400, 0x0400, CRC(febe6d1a) SHA1(e1c3a24b4fa5862107ada1f9d7249466e8c3f06a) )
+	ROM_LOAD( "in-03.bin",   0x0800, 0x0400, CRC(3d5c9820) SHA1(f3c83c660edf56a04148e2aa1c8e00427b86ca07) )
+	ROM_LOAD( "in-04.bin",   0x1400, 0x0400, CRC(1293b826) SHA1(165cd5d08a19eadbe954145b12807f10df9e691a) )
+	ROM_LOAD( "in-05.bin",   0x1800, 0x0400, CRC(e315a8c4) SHA1(dffec9e8bd7014fa34500b4bdac7feadac090482) )
+	ROM_LOAD( "in-06.bin",   0x1c00, 0x0400, CRC(d958478c) SHA1(9df38c400c500b45d306d52fe74cd4d5ca92c0f0) )
+ROM_END
+
 
 ROM_START( invmulti )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) // decrypted rom goes here
@@ -3970,6 +3980,7 @@ GAMEL(1978, spacewr3,   invaders, spcewars,  sicv,      driver_device, 0, ROT270
 GAMEL(1978, invader4,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg", "Space Invaders Part Four", GAME_SUPPORTS_SAVE, layout_invaders )
 GAME( 1978, darthvdr,   invaders, darthvdr,  darthvdr,  driver_device, 0, ROT270, "bootleg", "Darth Vader (bootleg of Space Invaders)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAMEL(19??, tst_invd,   invaders, invaders,  sicv,      driver_device, 0, ROT0,   "<unknown>", "Space Invaders Test ROM", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1980, ultrainv,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "Konami", "Ultra Invaders", GAME_SUPPORTS_SAVE, layout_invaders )
 
 // other Taito
 GAME( 1979, invadpt2,   0,        invadpt2,  invadpt2,  driver_device, 0, ROT270, "Taito", "Space Invaders Part II (Taito)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
