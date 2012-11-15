@@ -1785,6 +1785,39 @@ ROM_START( knockout )
 	ROM_LOAD( "tripprom.6e",  0x0000, 0x0020, CRC(624f75df) SHA1(0e9a7c48dd976af1dca1d5351236d4d5bf7a9dc8) )
 ROM_END
 
+/***************************************************************************
+Triple Punch
+(C)1982 KKI
+
+board silkscreend		PCO-008-01
+
+Empty 24 pin socket at 2E
+Empty 40 pin socket at 0A
+
+.2h	2732	stickered	TD4
+.2k	2732	stickered	TC3
+.2l	2732	stickered	TE2
+.2m	2732	stickered	TD1
+.5h	2716	stickered	TA7
+.5f	2716	stickered	TA6
+.6e	82s123	stickered	TA
+***************************************************************************/
+
+ROM_START( triplepa )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "td4.2h", 0x0000, 0x1000, CRC(15a6d46a) SHA1(a76d97876268d303bc18bf6f18f05227a6689b9d) )
+	ROM_LOAD( "tc3.2k", 0x1000, 0x1000, CRC(bc26d2c0) SHA1(b9934ddb2918f6c4123dafd07cc39ae31d7e28e9) )
+	ROM_LOAD( "te2.2l", 0x2000, 0x1000, CRC(02025c10) SHA1(16ffc7681d949172034b8c85dc72c1a528309abf) )
+	ROM_LOAD( "td1.2m", 0x3000, 0x1000, CRC(e9abc42b) SHA1(93b9c55a76e273b4709ee65870c0848a0d3db7cc) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "ta6.5f", 0x0000, 0x0800, CRC(d51cbd6f) SHA1(c3766a69a4599e54b8d7fb893e45802ec8bf6713) )
+	ROM_LOAD( "ta7.5h", 0x0800, 0x0800, CRC(f21c0059) SHA1(b1ba87f13908e3e662de8bf444f59bd5c2009720) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "ta.6e", 0x0000, 0x0020, CRC(624f75df) SHA1(0e9a7c48dd976af1dca1d5351236d4d5bf7a9dc8) )
+ROM_END
+
 ROM_START( mariner )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tp1.2h",       0x0000, 0x1000, CRC(dac1dfd0) SHA1(57b9106bb7452640544ba0ab2d2ba290cccb45f0) )
@@ -2227,7 +2260,8 @@ ROM_START( harem )
 ROM_END
 
 
-GAME( 1982, triplep,  0,        triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "K.K. International",  "Triple Punch",                   GAME_SUPPORTS_SAVE )
+GAME( 1982, triplep,  0,        triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 1)",           GAME_SUPPORTS_SAVE )
+GAME( 1982, triplepa, triplep,  triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "K.K. International",  "Triple Punch (set 2)",           GAME_SUPPORTS_SAVE )
 GAME( 1982, knockout, triplep,  triplep,  triplep,  scramble_state, scramble_ppi, ROT90, "bootleg? (KKK)",      "Knock Out!! (bootleg?)",         GAME_SUPPORTS_SAVE )
 GAME( 1981, mariner,  0,        mariner,  scramble, scramble_state, mariner,      ROT90, "Amenip",              "Mariner",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1981, 800fath,  mariner,  mariner,  800fath,  scramble_state, mariner,      ROT90, "Amenip (US Billiards Inc. license)", "800 Fathoms",     GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
