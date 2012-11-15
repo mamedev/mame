@@ -175,7 +175,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 //		tile_addr = addr+(x*(state->m_video_ff[WIDTH40_REG]+1));
 		tile_addr = addr+(x*(1));
 
-		tile = state->m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0x00ff;
+		tile = state->m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0x007f;
 		attr = (state->m_video_ram_1[(tile_addr*2 & 0x1fff) | 0x2000] & 0x00ff);
 
 //		secret = (attr & 1) ^ 1;
@@ -199,7 +199,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					continue;
 
 //				tile_data = secret ? 0 : (state->m_char_rom[tile*char_size+interlace_on*0x800+yi]);
-				tile_data = (state->m_char_rom[tile*char_size+yi]);
+				tile_data = (state->m_char_rom[tile+yi*0x80]);
 
 //				if(reverse) { tile_data^=0xff; }
 //				if(u_line && yi == 7) { tile_data = 0xff; }
@@ -211,7 +211,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(yi >= char_size)
 					pen = 0;
 				else
-					pen = (tile_data >> (7-xi) & 1) ? color : 0;
+					pen = (tile_data >> (xi) & 1) ? color : 0;
 
 				if(pen)
 					bitmap.pix16(res_y, res_x) = pen;
@@ -441,20 +441,22 @@ static UPD7220_INTERFACE( hgdc_2_intf )
 
 static const gfx_layout charset_8x16 =
 {
-	8,16,
-	256,
+	8, 16,
+	128,
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	8*16
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	{ 0*1024, 1*1024, 2*1024, 3*1024, 4*1024, 5*1024, 6*1024, 7*1024, 8*1024, 9*1024, 10*1024, 11*1024, 12*1024, 13*1024, 14*1024, 15*1024 },
+	8
 };
 
-
 static GFXDECODE_START( apc )
-	GFXDECODE_ENTRY( "ipl", 0x0000, charset_8x16, 0, 8 )
-	GFXDECODE_ENTRY( "gfx", 0x0000, charset_8x16, 0, 8 )
+	GFXDECODE_ENTRY( "gfx", 0x0000, charset_8x16, 0, 128 )
+	GFXDECODE_ENTRY( "gfx", 0x0800, charset_8x16, 0, 128 )
+	GFXDECODE_ENTRY( "gfx", 0x1000, charset_8x16, 0, 128 )
+	GFXDECODE_ENTRY( "gfx", 0x1800, charset_8x16, 0, 128 )
 GFXDECODE_END
+
 
 
 static ADDRESS_MAP_START( upd7220_1_map, AS_0, 8, apc_state)
@@ -678,8 +680,7 @@ ROM_START( apc )
 //	ROM_LOAD( "sioapc.o", 0, 0x10000, CRC(1) SHA1(1) )
 
 	ROM_REGION( 0x2000, "gfx", ROMREGION_ERASE00 )
-    ROM_LOAD("pfcu1r.bin",   0x000000, 0x002000, BAD_DUMP CRC(683efa94) SHA1(43157984a1746b2e448f3236f571011af9a3aa73) )
-   	ROM_LOAD("hn613128pac8.bin",0x00000, 0x01000, BAD_DUMP CRC(b5a15b5c) SHA1(e5f071edb72a5e9a8b8b1c23cf94a74d24cb648e) ) //fake, taken from PC-9801
+    ROM_LOAD("pfcu1r.bin",   0x000000, 0x002000, CRC(683efa94) SHA1(43157984a1746b2e448f3236f571011af9a3aa73) )
 ROM_END
 
 DRIVER_INIT_MEMBER(apc_state,apc)
