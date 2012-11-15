@@ -1,7 +1,26 @@
 /***************************************************************************
 
-	NEC APC
+	Advanced Personal Computer (c) 1982 NEC
 
+	preliminary driver by Angelo Salese
+
+	TODO:
+	- Bogus DMA check, patched out for now
+	- video emulation
+	- Floppy device and IMD support
+	- keyboard
+	- Understand interrupt sources
+	- NMI seems valid, dumps a x86 stack to vram?
+	- Unknown RTC device type;
+	- What are exactly APU and MPU devices? They sounds scary ...
+	- DMA hook-ups
+	- serial ports
+	- parallel ports
+	- Extract info regarding Hard Disk functionality
+	- Various unknown ports
+	- What kind of external ROM actually maps at 0xa****?
+
+============================================================================
 	front ^
 	      |
 	card
@@ -12,7 +31,8 @@
 	69PFB2 8086/8087   DFBU2J PFBU2L 2732
 	69SNB RAM
 
-	i/o memory map:
+----------------------------------------------------------------------------
+	i/o memory map (preliminary):
 	0x00 - 0x1f DMA
 	0x20 - 0x23 i8259 master
 	0x28 - 0x2f i8259 slave (even), pit8253 (odd)
@@ -72,8 +92,8 @@ public:
 	DECLARE_WRITE8_MEMBER(apc_port_60_w);
 	DECLARE_READ8_MEMBER(apc_gdc_r);
 	DECLARE_WRITE8_MEMBER(apc_gdc_w);
-	DECLARE_READ8_MEMBER(apc_dma_r);
-	DECLARE_WRITE8_MEMBER(apc_dma_w);
+	DECLARE_READ8_MEMBER(apc_kbd_r);
+	DECLARE_WRITE8_MEMBER(apc_kbd_w);
 
 	DECLARE_WRITE_LINE_MEMBER(apc_master_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
@@ -213,18 +233,16 @@ WRITE8_MEMBER(apc_state::apc_gdc_w)
 		m_hgdc1->write(space, (offset & 2) >> 1,data); // upd7220 character port
 }
 
-
-READ8_MEMBER(apc_state::apc_dma_r)
+READ8_MEMBER(apc_state::apc_kbd_r)
 {
-	return i8237_r(machine().device("8237dma"), space, offset & 0xf);
+	//printf("%08x\n",offset);
+	return 0;
 }
 
-WRITE8_MEMBER(apc_state::apc_dma_w)
+WRITE8_MEMBER(apc_state::apc_kbd_w)
 {
-	//printf("%08x %02x\n",m_maincpu->pc(),data);
-	i8237_w(machine().device("8237dma"), space, offset & 0xf, data);
+	printf("%08x %02x\n",offset,data);
 }
-
 
 static ADDRESS_MAP_START( apc_map, AS_PROGRAM, 16, apc_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
@@ -234,14 +252,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_READWRITE8(apc_dma_r, apc_dma_w, 0x00ff)
+	AM_RANGE(0x00, 0x1f) AM_DEVREADWRITE8_LEGACY("8237dma", i8237_r, i8237_w, 0x00ff)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0x00ff) // i8259
 	AM_RANGE(0x28, 0x2f) AM_READWRITE8(apc_port_28_r, apc_port_28_w, 0xffff)
 //	0x30, 0x37 serial port 0/1 (i8251) (even/odd)
 //	0x38, 0x3f DMA extended address
 	AM_RANGE(0x40, 0x43) AM_READWRITE8(apc_gdc_r, apc_gdc_w, 0xffff)
 //  0x46 UPD7220 reset interrupt
-//	0x48, 0x4f keyboard controller
+	AM_RANGE(0x48, 0x4f) AM_READWRITE8(apc_kbd_r, apc_kbd_w, 0x00ff)
 	AM_RANGE(0x50, 0x53) AM_DEVICE8("upd765", upd765a_device, map, 0x00ff ) // upd765
 //	0x5a  APU data (Arithmetic Processing Unit!)
 //	0x5e  APU status/command
@@ -355,6 +373,7 @@ static const gfx_layout charset_8x16 =
 
 
 static GFXDECODE_START( apc )
+	GFXDECODE_ENTRY( "ipl", 0x0000, charset_8x16, 0, 8 )
 	GFXDECODE_ENTRY( "gfx", 0x0000, charset_8x16, 0, 8 )
 GFXDECODE_END
 
@@ -393,7 +412,7 @@ ir0
 ir1
 ir2
 ir3
-ir4
+ir4 keyboard (almost trusted, check code at fe64a)
 ir5
 ir6
 ir7
@@ -402,7 +421,7 @@ ir7
 ir0
 ir1
 ir2
-ir3
+ir3 fdd irq?
 ir4
 ir5
 ir6
@@ -511,7 +530,7 @@ static const floppy_format_type apc_floppy_formats[] = {
 };
 
 static SLOT_INTERFACE_START( apc_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD ) // TODO: 8"
+	SLOT_INTERFACE( "8sd", FLOPPY_8_SSSD ) // TODO: Ok?
 SLOT_INTERFACE_END
 
 
@@ -530,8 +549,8 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_I8237_ADD("8237dma", MAIN_CLOCK, dma8237_config)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", apc_floppies, "525hd", 0, apc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", apc_floppies, "525hd", 0, apc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", apc_floppies, "8sd", 0, apc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", apc_floppies, "8sd", 0, apc_floppy_formats)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -585,4 +604,4 @@ DRIVER_INIT_MEMBER(apc_state,apc)
 
 }
 
-GAME( 198?, apc,  0,   apc,  apc, apc_state,  apc,       ROT0, "NEC",      "APC", GAME_IS_SKELETON )
+GAME( 1982, apc,  0,   apc,  apc, apc_state,  apc,       ROT0, "NEC",      "APC", GAME_NOT_WORKING | GAME_NO_SOUND )
