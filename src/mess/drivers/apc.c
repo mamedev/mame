@@ -68,13 +68,15 @@ class apc_state : public driver_device
 public:
 	apc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_hgdc1(*this, "upd7220_chr"),
-		  m_hgdc2(*this, "upd7220_btm"),
-		  m_i8259_m(*this, "pic8259_master"),
-		  m_i8259_s(*this, "pic8259_slave"),
-		  m_video_ram_1(*this, "video_ram_1"),
-		  m_video_ram_2(*this, "video_ram_2")
+		m_maincpu(*this, "maincpu"),
+		m_hgdc1(*this, "upd7220_chr"),
+		m_hgdc2(*this, "upd7220_btm"),
+		m_i8259_m(*this, "pic8259_master"),
+		m_i8259_s(*this, "pic8259_slave"),
+		m_fdc(*this, "upd765"),
+		m_dma(*this, "8237dma"),
+		m_video_ram_1(*this, "video_ram_1"),
+		m_video_ram_2(*this, "video_ram_2")
 	{ }
 
 	// devices
@@ -83,6 +85,8 @@ public:
 	required_device<upd7220_device> m_hgdc2;
 	required_device<pic8259_device> m_i8259_m;
 	required_device<pic8259_device> m_i8259_s;
+	required_device<upd765a_device> m_fdc;
+	required_device<i8237_device> m_dma;
 	UINT8 *m_char_rom;
 
 	required_shared_ptr<UINT8> m_video_ram_1;
@@ -101,18 +105,26 @@ public:
 	DECLARE_READ8_MEMBER(apc_kbd_r);
 	DECLARE_WRITE8_MEMBER(apc_kbd_w);
 	DECLARE_WRITE8_MEMBER(apc_dma_segments_w);
+	DECLARE_READ8_MEMBER(apc_dma_r);
+	DECLARE_WRITE8_MEMBER(apc_dma_w);
 
 	DECLARE_WRITE_LINE_MEMBER(apc_master_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
+	DECLARE_WRITE_LINE_MEMBER(apc_dma_hrq_changed);
+	DECLARE_WRITE_LINE_MEMBER(apc_tc_w);
+	DECLARE_WRITE_LINE_MEMBER(apc_dack0_w);
+	DECLARE_WRITE_LINE_MEMBER(apc_dack1_w);
+	DECLARE_WRITE_LINE_MEMBER(apc_dack2_w);
+	DECLARE_WRITE_LINE_MEMBER(apc_dack3_w);
 	DECLARE_READ8_MEMBER(test_r);
 	DECLARE_WRITE8_MEMBER(test_w);
-	DECLARE_READ8_MEMBER(pc_dma_read_byte);
-	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
+	DECLARE_READ8_MEMBER(apc_dma_read_byte);
+	DECLARE_WRITE8_MEMBER(apc_dma_write_byte);
+
+	void fdc_irq(bool state);
+	void fdc_drq(bool state);
+	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
 
 	DECLARE_DRIVER_INIT(apc);
 	DECLARE_PALETTE_INIT(apc);
@@ -330,6 +342,47 @@ WRITE8_MEMBER(apc_state::apc_dma_segments_w)
 	m_dma_offset[0][offset & 3] = data & 0x0f;
 }
 
+/*
+NEC APC i8237 hook-up looks pretty weird ...
+
+                NEC APC (shift 1) IBM PC
+CH0_ADR ==      0X01     0x00       0x00  ; CH-0 address (RW)
+CH1_ADR ==      0X03     0x01       0x02  ; CH-1 address (RW)
+CH2_ADR ==      0X05     0x02       0x04  ; CH-2 address (RW)
+CH3_ADR ==      0X07     0x03       0x06  ; CH-3 address (RW)
+DMA_ST  ==      0X09     0x04       0x08  ; status register (R)
+DMA_CMD ==      0X09     0x04       0x08  ; command register (W)
+DMA_WSM ==      0X0B     0x05       0x0a  ; write single mask (W)
+DMA_CFF ==      0X0D     0x06       0x0c  ; clear flip flop (W)
+
+CH0_TC  ==      0X11     0x08       0x01  ; CH-0 terminal count (RW)
+CH1_TC  ==      0X13     0x09       0x03  ; CH-1 terminal count (RW)
+CH2_TC  ==      0X15     0x0a       0x05  ; CH-2 terminal count (RW)
+CH3_TC  ==      0X17     0x0b       0x07  ; CH-3 terminal count (RW)
+DMA_WRR ==      0X19     0x0c       0x09  ; write request register (W)
+DMA_MODE==      0X1B     0x0d       0x0b  ; write mode (W)
+DMA_RTR ==      0X1D     0x0e       0x0d? ; read temp register (R)
+DMA_MC  ==      0X1D     0x0e       0x0d  ; master clear (W)
+DMA_WAM ==      0X1F     0x0f       0x0f? ; write all mask (W)
+CH0_EXA ==      0X38                      ; CH-0 extended address (W)
+CH1_EXA ==      0X3A                      ; CH-1 extended address (W)
+CH2_EXA ==      0X3C                      ; CH-2 extended address (W)
+CH3_EXA ==      0X3E                      ; CH-3 extended address (W)
+
+... apparently, they rotated right the offset, compared to normal hook-up.
+*/
+
+READ8_MEMBER(apc_state::apc_dma_r)
+{
+	return i8237_r(m_dma, space, BITSWAP8(offset,7,6,5,4,2,1,0,3));
+}
+
+WRITE8_MEMBER(apc_state::apc_dma_w)
+{
+	i8237_w(m_dma, space, BITSWAP8(offset,7,6,5,4,2,1,0,3), data);
+}
+
+
 static ADDRESS_MAP_START( apc_map, AS_PROGRAM, 16, apc_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 //	AM_RANGE(0xa0000, 0xaffff) space for an external ROM
@@ -338,7 +391,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_DEVREADWRITE8_LEGACY("8237dma", i8237_r, i8237_w, 0x00ff)
+	AM_RANGE(0x00, 0x1f) AM_READWRITE8(apc_dma_r, apc_dma_w,0xff00)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0x00ff) // i8259
 	AM_RANGE(0x28, 0x2f) AM_READWRITE8(apc_port_28_r, apc_port_28_w, 0xffff)
 //	0x30, 0x37 serial port 0/1 (i8251) (even/odd)
@@ -411,9 +464,22 @@ static INPUT_PORTS_START( apc )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+void apc_state::fdc_drq(bool state)
+{
+	printf("%02x DRQ\n",state);
+	i8237_dreq0_w(m_dma, state);
+}
+
+void apc_state::fdc_irq(bool state)
+{
+	printf("IRQ %d\n",state);
+	pic8259_ir3_w(machine().device("pic8259_slave"), state);
+}
 
 void apc_state::machine_start()
 {
+	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(apc_state::fdc_irq), this));
+	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(apc_state::fdc_drq), this));
 }
 
 void apc_state::machine_reset()
@@ -423,6 +489,7 @@ void apc_state::machine_reset()
 
 void apc_state::palette_init()
 {
+
 }
 
 static UPD7220_INTERFACE( hgdc_1_intf )
@@ -551,16 +618,24 @@ static const struct pic8259_interface pic8259_slave_config =
 *
 ****************************************/
 
-WRITE_LINE_MEMBER(apc_state::pc_dma_hrq_changed)
+WRITE_LINE_MEMBER(apc_state::apc_dma_hrq_changed)
 {
 	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+
+	printf("%02x HLDA\n",state);
 
 	/* Assert HLDA */
 	i8237_hlda_w( machine().device("dma8237"), state );
 }
 
+WRITE_LINE_MEMBER( apc_state::apc_tc_w )
+{
+	/* floppy terminal count */
+//	m_fdc->tc_w(!state);
+	printf("TC %02x\n",state);
+}
 
-READ8_MEMBER(apc_state::pc_dma_read_byte)
+READ8_MEMBER(apc_state::apc_dma_read_byte)
 {
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0xFF0000;
@@ -569,7 +644,7 @@ READ8_MEMBER(apc_state::pc_dma_read_byte)
 }
 
 
-WRITE8_MEMBER(apc_state::pc_dma_write_byte)
+WRITE8_MEMBER(apc_state::apc_dma_write_byte)
 {
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0xFF0000;
@@ -583,32 +658,32 @@ static void set_dma_channel(running_machine &machine, int channel, int state)
 	if (!state) drvstate->m_dma_channel = channel;
 }
 
-WRITE_LINE_MEMBER(apc_state::pc_dack0_w){ /*printf("%02x 0\n",state);*/ set_dma_channel(machine(), 0, state); }
-WRITE_LINE_MEMBER(apc_state::pc_dack1_w){ /*printf("%02x 1\n",state);*/ set_dma_channel(machine(), 1, state); }
-WRITE_LINE_MEMBER(apc_state::pc_dack2_w){ /*printf("%02x 2\n",state);*/ set_dma_channel(machine(), 2, state); }
-WRITE_LINE_MEMBER(apc_state::pc_dack3_w){ /*printf("%02x 3\n",state);*/ set_dma_channel(machine(), 3, state); }
+WRITE_LINE_MEMBER(apc_state::apc_dack0_w){ printf("%02x 0\n",state); set_dma_channel(machine(), 0, state); }
+WRITE_LINE_MEMBER(apc_state::apc_dack1_w){ printf("%02x 1\n",state); set_dma_channel(machine(), 1, state); }
+WRITE_LINE_MEMBER(apc_state::apc_dack2_w){ printf("%02x 2\n",state); set_dma_channel(machine(), 2, state); }
+WRITE_LINE_MEMBER(apc_state::apc_dack3_w){ printf("%02x 3\n",state); set_dma_channel(machine(), 3, state); }
 
 READ8_MEMBER(apc_state::test_r)
 {
-//	printf("2dd DACK R\n");
+	printf("2dd DACK R\n");
 
 	return 0xff;
 }
 
 WRITE8_MEMBER(apc_state::test_w)
 {
-//	printf("2dd DACK W\n");
+	printf("2dd DACK W\n");
 }
 
 static I8237_INTERFACE( dma8237_config )
 {
-	DEVCB_DRIVER_LINE_MEMBER(apc_state, pc_dma_hrq_changed),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(apc_state, pc_dma_read_byte),
-	DEVCB_DRIVER_MEMBER(apc_state, pc_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(apc_state,test_r) },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(apc_state,test_w) },
-	{ DEVCB_DRIVER_LINE_MEMBER(apc_state, pc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(apc_state, pc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(apc_state, pc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(apc_state, pc_dack3_w) }
+	DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dma_hrq_changed),
+	DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_tc_w),
+	DEVCB_DRIVER_MEMBER(apc_state, apc_dma_read_byte),
+	DEVCB_DRIVER_MEMBER(apc_state, apc_dma_write_byte),
+	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(apc_state,test_r), DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(apc_state,test_w), DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack3_w) }
 };
 
 static const floppy_format_type apc_floppy_formats[] = {
@@ -693,14 +768,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(apc_state,apc)
 {
-	UINT8 *ROM = memregion("ipl")->base();
-
-	/* patch DMA check */
-	ROM[0xff334 & 0x1fff] = 0x90;
-	ROM[0xff335 & 0x1fff] = 0x90;
-	ROM[0xff339 & 0x1fff] = 0x90;
-	ROM[0xff33a & 0x1fff] = 0x90;
-
+	// ...
 }
 
 GAME( 1982, apc,  0,   apc,  apc, apc_state,  apc,       ROT0, "NEC",      "APC", GAME_NOT_WORKING | GAME_NO_SOUND )
