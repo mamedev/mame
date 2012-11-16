@@ -16,6 +16,9 @@
 #define MCFG_WD2793x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, WD2793x, _clock)
 
+#define MCFG_WD2797x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, WD2797x, _clock)
+
 class wd177x_t : public device_t {
 public:
 	typedef delegate<void (bool state)> line_cb;
@@ -63,6 +66,7 @@ protected:
 
 	virtual bool has_motor() const = 0;
 	virtual bool has_side_check() const;
+	virtual bool has_side_select() const;
 	virtual int step_time(int mode) const;
 	virtual int settle_time() const;
 
@@ -334,9 +338,20 @@ protected:
 	virtual bool has_side_check() const;
 };
 
+class wd2797_t : public wd177x_t {
+public:
+	wd2797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual bool has_motor() const;
+	virtual bool has_side_check() const;
+	virtual bool has_side_select() const;
+};
+
 extern const device_type WD1770x;
 extern const device_type WD1772x;
 extern const device_type WD1773x;
 extern const device_type WD2793x;
+extern const device_type WD2797x;
 
 #endif

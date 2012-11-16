@@ -39,6 +39,7 @@ const device_type WD1770x = &device_creator<wd1770_t>;
 const device_type WD1772x = &device_creator<wd1772_t>;
 const device_type WD1773x = &device_creator<wd1773_t>;
 const device_type WD2793x = &device_creator<wd2793_t>;
+const device_type WD2797x = &device_creator<wd2797_t>;
 
 wd177x_t::wd177x_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, type, name, tag, owner, clock)
@@ -307,6 +308,8 @@ void wd177x_t::read_sector_start()
 	main_state = READ_SECTOR;
 	status = (status & ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM)) | S_BUSY;
 	drop_drq();
+	if (has_side_select() && floppy)
+		floppy->ss_w(BIT(command, 1));
 	sub_state = has_motor() ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	read_sector_continue();
@@ -391,6 +394,8 @@ void wd177x_t::read_track_start()
 	main_state = READ_TRACK;
 	status = (status & ~(S_LOST|S_RNF)) | S_BUSY;
 	drop_drq();
+	if (has_side_select() && floppy)
+		floppy->ss_w(BIT(command, 1));
 	sub_state = has_motor() ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	read_track_continue();
@@ -453,6 +458,8 @@ void wd177x_t::read_id_start()
 	main_state = READ_ID;
 	status = (status & ~(S_WP|S_DDM|S_LOST|S_RNF)) | S_BUSY;
 	drop_drq();
+	if (has_side_select() && floppy)
+		floppy->ss_w(BIT(command, 1));
 	sub_state = has_motor() ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	read_id_continue();
@@ -513,6 +520,8 @@ void wd177x_t::write_track_start()
 	main_state = WRITE_TRACK;
 	status = (status & ~(S_WP|S_DDM|S_LOST|S_RNF)) | S_BUSY;
 	drop_drq();
+	if (has_side_select() && floppy)
+		floppy->ss_w(BIT(command, 1));
 	sub_state = has_motor() ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	write_track_continue();
@@ -590,6 +599,8 @@ void wd177x_t::write_sector_start()
 	main_state = WRITE_SECTOR;
 	status = (status & ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM)) | S_BUSY;
 	drop_drq();
+	if (has_side_select() && floppy)
+		floppy->ss_w(BIT(command, 1));
 	sub_state = has_motor() ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	write_sector_continue();
@@ -675,7 +686,12 @@ void wd177x_t::interrupt_start()
 		drop_drq();
 		motor_timeout = 0;
 	}
-	if(command & 0x0f) {
+	if(command & 0x08) {
+		intrq = true;
+		if(!intrq_cb.isnull())
+			intrq_cb(intrq);
+	}
+	if(command & 0x07) {
 		logerror("%s: unhandled interrupt generation (%02x)\n", ttsn().cstr(), command);
 	}
 }
@@ -1736,6 +1752,11 @@ bool wd177x_t::has_side_check() const
 	return false;
 }
 
+bool wd177x_t::has_side_select() const
+{
+	return false;
+}
+
 wd1770_t::wd1770_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd177x_t(mconfig, WD1770x, "WD1770", tag, owner, clock)
 {
 }
@@ -1790,5 +1811,24 @@ bool wd2793_t::has_motor() const
 
 bool wd2793_t::has_side_check() const
 {
+	return true;
+}
+
+wd2797_t::wd2797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd177x_t(mconfig, WD2797x, "WD2797", tag, owner, clock)
+{
+}
+
+bool wd2797_t::has_motor() const
+{
 	return false;
+}
+
+bool wd2797_t::has_side_check() const
+{
+	return false;
+}
+
+bool wd2797_t::has_side_select() const
+{
+	return true;
 }
