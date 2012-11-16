@@ -185,6 +185,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(galaxold_interrupt_timer);
 	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_2_q_callback);
 	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_1_callback);
+	DECLARE_VIDEO_START(bagmanmc);
 };
 
 /*----------- defined in video/galaxold.c -----------*/

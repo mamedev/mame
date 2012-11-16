@@ -1860,3 +1860,22 @@ UINT32 galaxold_state::screen_update_dambustr(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
+static void bagmanmc_modify_charcode(running_machine &machine, UINT16 *code, UINT8 x)
+{
+	galaxold_state *state = machine.driver_data<galaxold_state>();
+	*code |= (state->m_gfxbank[0] << 9);
+}
+
+static void bagmanmc_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
+{
+	galaxold_state *state = machine.driver_data<galaxold_state>();
+	*code |= (state->m_gfxbank[0] << 7) | 0x40;
+}
+
+VIDEO_START_MEMBER(galaxold_state,bagmanmc)
+{
+	VIDEO_START_CALL_MEMBER(galaxold);
+
+	m_modify_charcode = bagmanmc_modify_charcode;
+	m_modify_spritecode = bagmanmc_modify_spritecode;
+}

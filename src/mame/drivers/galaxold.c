@@ -655,6 +655,7 @@ static ADDRESS_MAP_START( bagmanmc_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0xa803, 0xa803) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_noise_enable_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(galaxold_nmi_enable_w)
+	AM_RANGE(0xb002, 0xb002) AM_WRITE(galaxold_gfxbank_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
@@ -1970,17 +1971,6 @@ static const gfx_layout pacmanbl_spritelayout =
 	32*8
 };
 
-static const gfx_layout bagmanmc_charlayout =
-{
-	8,8,
-	512,
-	2,
-	{ 0, 512*8*8 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static const gfx_layout _4in1_charlayout =
 {
 	8,8,
@@ -2032,12 +2022,6 @@ GFXDECODE_END
 static GFXDECODE_START( gmgalax )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_spritelayout, 0, 16 )
-GFXDECODE_END
-
-/* separate character and sprite ROMs */
-static GFXDECODE_START( bagmanmc )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, bagmanmc_charlayout,    0, 8 )
-	GFXDECODE_ENTRY( "gfx1", 0x2000, pacmanbl_spritelayout, 0, 8 )
 GFXDECODE_END
 
 static GFXDECODE_START( _4in1 )
@@ -2182,9 +2166,7 @@ static MACHINE_CONFIG_DERIVED( bagmanmc, galaxian )
 	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state, devilfsg )
 
 	/* video hardware */
-	MCFG_GFXDECODE(bagmanmc)
-
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,pisces)
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state, bagmanmc)
 MACHINE_CONFIG_END
 
 
@@ -2630,16 +2612,30 @@ ROM_START( bagmanmc )
 	ROM_LOAD( "b5.bin",       0x4000, 0x1000, CRC(0fe24b8c) SHA1(205a36fd346d49d2dda6911198295e202caae81f) )
 	ROM_LOAD( "b6.bin",       0x5000, 0x1000, CRC(f50390e7) SHA1(b4ebe647458c26e52461750d63856aea4262f110) )
 
-	ROM_REGION( 0x3000, "gfx1", 0 )
-	ROM_LOAD( "g1-u.bin",     0x0000, 0x0800, CRC(b63cfae4) SHA1(3e0cb3dbeec8ad790bc482176ca599721bac31ee) )
-	ROM_CONTINUE(             0x2000, 0x0800 )
-	ROM_LOAD( "g2-u.bin",     0x1000, 0x0800, CRC(a2790089) SHA1(7eb8634f26f6af52fb79bf90ec90b4e258c7c79f) )
-	ROM_CONTINUE(             0x2800, 0x0800 )
-	ROM_LOAD( "g1-l.bin",     0x0800, 0x0800, CRC(2ae6b5ab) SHA1(59bdebf75d28a247293440ec2ad83eaf30e3de00) )
-	ROM_LOAD( "g2-l.bin",     0x1800, 0x0800, CRC(98b37397) SHA1(29914435a10cebbbce04382c45e13a64a0cd18cb) )
+	ROM_REGION( 0x4000, "gfx1", 0 ) // if the gfx roms from bagmanm2 are used, then it works fine
+	ROM_LOAD( "g1-l.bin",     0x0000, 0x0800, BAD_DUMP CRC(2ae6b5ab) SHA1(59bdebf75d28a247293440ec2ad83eaf30e3de00) )
+	ROM_LOAD( "g2-u.bin",     0x1000, 0x1000, CRC(a2790089) SHA1(7eb8634f26f6af52fb79bf90ec90b4e258c7c79f) )
+	ROM_LOAD( "g2-l.bin",     0x2000, 0x0800, BAD_DUMP CRC(98b37397) SHA1(29914435a10cebbbce04382c45e13a64a0cd18cb) )
+	ROM_LOAD( "g1-u.bin",     0x3000, 0x1000, CRC(b63cfae4) SHA1(3e0cb3dbeec8ad790bc482176ca599721bac31ee) )
+	ROM_COPY("gfx1",0x3800,0x2800,0x0800)
+	ROM_COPY("gfx1",0x1800,0x0800,0x0800)
 
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "bagmanmc.clr", 0x0000, 0x0020, NO_DUMP )	// missing
+	ROM_REGION( 0x0020, "proms", 0 ) // not dumped, but the standard moon cresta prom works
+	ROM_LOAD( "bagmanmc.clr", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
+ROM_START( bagmanm2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bagmanm2.1",   0x0000, 0x2000, CRC(53769ebe) SHA1(af5bf808a009a1cf94d0b73d23f7595bf72ba295) )
+	ROM_LOAD( "bagmanm2.2",   0x2000, 0x2000, CRC(9435bb87) SHA1(97fa2dee3cb715ecd418873bc7bb007c3ab72195) )
+	ROM_LOAD( "bagmanm2.3",   0x4000, 0x2000, CRC(f37ba7f6) SHA1(612ae21fbb94afa28dee096094a66a453a398fb2) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "bagmanm2.9",   0x0000, 0x2000, CRC(f1e70d9e) SHA1(b804727bba582e2b938811ba32106241b0606f5c) )
+	ROM_LOAD( "bagmanm2.7",   0x2000, 0x2000, CRC(777e48c4) SHA1(7fee7f999bbc6fea3faf8745bf89417626bcca91) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // not dumped, but the standard moon cresta prom works
+	ROM_LOAD( "bagmanmc.clr", 0x0000, 0x0020, BAD_DUMP CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( dkongjrm )
@@ -3071,7 +3067,8 @@ GAME( 1981, ckongmc,  ckong,    ckongmc,  ckongmc, driver_device,  0,        ROT
 GAME( 1981, scramblb, scramble, scramblb, scramblb, driver_device, 0,        ROT90,  "bootleg", "Scramble (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1981, scramb2,  scramble, scramb2,  scramb2, driver_device,  0,        ROT90,  "bootleg", "Scramble (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1981, 4in1,     0,        4in1,     4in1, galaxold_state,     4in1,     ROT90,  "Armenia / Food and Fun", "4 Fun in 1", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1982, bagmanmc, bagman,   bagmanmc, bagmanmc, driver_device, 0,        ROT90,  "bootleg", "Bagman (bootleg on Moon Cresta hardware)", GAME_WRONG_COLORS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1982, bagmanmc, bagman,   bagmanmc, bagmanmc, driver_device, 0,        ROT90,  "Valadon Automation", "Bagman (bootleg on Moon Cresta hardware)", GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1984, bagmanm2, bagman,   bagmanmc, bagmanmc, driver_device, 0,        ROT90,  "Valadon Automation / GIB", "Bagman (Moon Cresta hardware)", GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1982, dkongjrm, dkongjr,  dkongjrm, dkongjrm, driver_device, 0,        ROT90,  "bootleg", "Donkey Kong Jr. (bootleg on Moon Cresta hardware)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1982, porter,   dockman,  mooncrst, porter, driver_device,   0,        ROT90,  "bootleg", "Port Man (bootleg on Moon Cresta hardware)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL ) // missing GFX bank switch!
 GAME( 1982, tazzmang, tazmania,	tazzmang, tazzmang, driver_device, 0,        ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
