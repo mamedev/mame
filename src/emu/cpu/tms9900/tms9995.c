@@ -94,15 +94,15 @@
 /* tms9995 ST register bits. */
 enum
 {
-	ST_LH = 0x8000,		// Logical higher (unsigned comparison)
-	ST_AGT = 0x4000,	// Arithmetical greater than (signed comparison)
-	ST_EQ = 0x2000,		// Equal
-	ST_C = 0x1000,		// Carry
-	ST_OV = 0x0800,		// Overflow (when using signed operations)
-	ST_OP = 0x0400,		// Odd parity (used with byte operations)
-	ST_X = 0x0200,		// XOP
-	ST_OE = 0x0020,		// Overflow interrupt enabled
-	ST_IM = 0x000f		// Interrupt mask
+	ST_LH = 0x8000,     // Logical higher (unsigned comparison)
+	ST_AGT = 0x4000,    // Arithmetical greater than (signed comparison)
+	ST_EQ = 0x2000,     // Equal
+	ST_C = 0x1000,      // Carry
+	ST_OV = 0x0800,     // Overflow (when using signed operations)
+	ST_OP = 0x0400,     // Odd parity (used with byte operations)
+	ST_X = 0x0200,      // XOP
+	ST_OE = 0x0020,     // Overflow interrupt enabled
+	ST_IM = 0x000f      // Interrupt mask
 };
 
 enum
@@ -124,10 +124,10 @@ enum
 
 tms9995_device::tms9995_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, TMS9995, "TMS9995", tag, owner, clock),
-	  m_program_config("program", ENDIANNESS_BIG, 8, 16),
-	  m_io_config("cru", ENDIANNESS_BIG, 8, 16),
-	  m_prgspace(NULL),
-	  m_cru(NULL)
+		m_program_config("program", ENDIANNESS_BIG, 8, 16),
+		m_io_config("cru", ENDIANNESS_BIG, 8, 16),
+		m_prgspace(NULL),
+		m_cru(NULL)
 {
 }
 
@@ -148,7 +148,7 @@ void tms9995_device::device_start()
 
 	// TODO: Restore save state suport
 
-	m_prgspace = &space(AS_PROGRAM);						// dimemory.h
+	m_prgspace = &space(AS_PROGRAM);                        // dimemory.h
 	m_cru = &space(AS_IO);
 
 	// Resolve our external connections
@@ -207,7 +207,7 @@ void tms9995_device::device_stop()
 */
 void tms9995_device::device_reset()
 {
-	m_reset = true;		// for the main loop
+	m_reset = true;     // for the main loop
 }
 
 const char* tms9995_device::s_statename[20] =
@@ -402,60 +402,60 @@ enum
 
 MICROPROGRAM(operand_address_derivation)
 {
-	RETADDR, 0, 0, 0,							// Register direct                  0
-	WORD_READ, RETADDR, 0, 0,					// Register indirect                1 (1)
-	WORD_READ, RETADDR, 0, 0,					// Symbolic                         1 (1)
-	WORD_READ, INCREG, WORD_WRITE, RETADDR1,	// Reg indirect auto-increment      3 (1) (1)
-	WORD_READ, INDX, WORD_READ, RETADDR			// Indexed                          3 (1) (1)
+	RETADDR, 0, 0, 0,                           // Register direct                  0
+	WORD_READ, RETADDR, 0, 0,                   // Register indirect                1 (1)
+	WORD_READ, RETADDR, 0, 0,                   // Symbolic                         1 (1)
+	WORD_READ, INCREG, WORD_WRITE, RETADDR1,    // Reg indirect auto-increment      3 (1) (1)
+	WORD_READ, INDX, WORD_READ, RETADDR         // Indexed                          3 (1) (1)
 };
 
 MICROPROGRAM(add_s_sxc_mp)
 {
-	OPERAND_ADDR,			// x
-	MEMORY_READ,			// 1 (1)
-	OPERAND_ADDR,			// y
-	MEMORY_READ,			// 1 (1)
-	ALU_ADD_S_SXC,			// 0
-	PREFETCH,				// 1 (1)
-	MEMORY_WRITE,			// 1 (1)
+	OPERAND_ADDR,           // x
+	MEMORY_READ,            // 1 (1)
+	OPERAND_ADDR,           // y
+	MEMORY_READ,            // 1 (1)
+	ALU_ADD_S_SXC,          // 0
+	PREFETCH,               // 1 (1)
+	MEMORY_WRITE,           // 1 (1)
 	END
 };
 
 MICROPROGRAM(b_mp)
 {
 	OPERAND_ADDR,
-	ALU_NOP,				// Don't read, just use the address
+	ALU_NOP,                // Don't read, just use the address
 	ALU_B,
 	PREFETCH,
-	ALU_NOP,				// Don't save the return address
+	ALU_NOP,                // Don't save the return address
 	END
 };
 
 MICROPROGRAM(bl_mp)
 {
 	OPERAND_ADDR,
-	ALU_NOP,				// Don't read, just use the address
-	ALU_B,					// Re-use the alu operation from B
+	ALU_NOP,                // Don't read, just use the address
+	ALU_B,                  // Re-use the alu operation from B
 	PREFETCH,
 	ALU_NOP,
-	MEMORY_WRITE,			// Write R11
+	MEMORY_WRITE,           // Write R11
 	ALU_NOP,
 	END
 };
 
 MICROPROGRAM(blwp_mp)
 {
-	OPERAND_ADDR,			// Determine source address
+	OPERAND_ADDR,           // Determine source address
 	MEMORY_READ,
-	ALU_BLWP,				// Got new WP, save it; increase address, save
-	MEMORY_WRITE,			// save old ST to new R15
+	ALU_BLWP,               // Got new WP, save it; increase address, save
+	MEMORY_WRITE,           // save old ST to new R15
 	ALU_BLWP,
-	MEMORY_WRITE,			// save old PC to new R14
+	MEMORY_WRITE,           // save old PC to new R14
 	ALU_BLWP,
-	MEMORY_WRITE,			// save old WP to new R13
-	ALU_BLWP,				// retrieve address
-	MEMORY_READ,			// Read new PC
-	ALU_BLWP,				// Set new PC
+	MEMORY_WRITE,           // save old WP to new R13
+	ALU_BLWP,               // retrieve address
+	MEMORY_READ,            // Read new PC
+	ALU_BLWP,               // Set new PC
 	PREFETCH,
 	ALU_NOP,
 	END
@@ -463,24 +463,24 @@ MICROPROGRAM(blwp_mp)
 
 MICROPROGRAM(c_mp)
 {
-	OPERAND_ADDR,			// x
-	MEMORY_READ,			// 1 (1)
-	OPERAND_ADDR,			// y
-	MEMORY_READ,			// 1 (1)
-	ALU_C,					// 0
-	PREFETCH,				// 1 (1)
-	ALU_NOP,				// 1
+	OPERAND_ADDR,           // x
+	MEMORY_READ,            // 1 (1)
+	OPERAND_ADDR,           // y
+	MEMORY_READ,            // 1 (1)
+	ALU_C,                  // 0
+	PREFETCH,               // 1 (1)
+	ALU_NOP,                // 1
 	END
 };
 
 MICROPROGRAM(ci_mp)
 {
-	MEMORY_READ,			// 1 (reg)
-	SET_IMM,				// 0
-	MEMORY_READ,			// 1 (imm)
-	ALU_CI,					// (1) set status
-	PREFETCH,				// 1
-	ALU_NOP,				// 1
+	MEMORY_READ,            // 1 (reg)
+	SET_IMM,                // 0
+	MEMORY_READ,            // 1 (imm)
+	ALU_CI,                 // (1) set status
+	PREFETCH,               // 1
+	ALU_NOP,                // 1
 	END
 };
 
@@ -500,44 +500,44 @@ MICROPROGRAM(clr_seto_mp)
 {
 	OPERAND_ADDR,
 	ALU_NOP,
-	ALU_CLR_SETO,			// (1)
-	PREFETCH,				// 1
-	MEMORY_WRITE,			// 1
+	ALU_CLR_SETO,           // (1)
+	PREFETCH,               // 1
+	MEMORY_WRITE,           // 1
 	END
 };
 
 MICROPROGRAM(divide_mp)
 {
-	OPERAND_ADDR,			// Address of divisor S in Q=W1W2/S
-	MEMORY_READ,			// Get S
+	OPERAND_ADDR,           // Address of divisor S in Q=W1W2/S
+	MEMORY_READ,            // Get S
 	ALU_DIV,
-	MEMORY_READ,			// Get W1
-	ALU_DIV,				// Check for overflow; skip next instruction if not
+	MEMORY_READ,            // Get W1
+	ALU_DIV,                // Check for overflow; skip next instruction if not
 	ABORT,
-	MEMORY_READ,			// Get W2
-	ALU_DIV,				// Calculate quotient
-	MEMORY_WRITE,			// Write quotient to &W1
+	MEMORY_READ,            // Get W2
+	ALU_DIV,                // Calculate quotient
+	MEMORY_WRITE,           // Write quotient to &W1
 	ALU_DIV,
 	PREFETCH,
-	MEMORY_WRITE,			// Write remainder to &W2
+	MEMORY_WRITE,           // Write remainder to &W2
 	END
 };
 
 MICROPROGRAM(divide_signed_mp)
 {
-	OPERAND_ADDR,			// Address of divisor S in Q=W1W2/S
-	MEMORY_READ,			// Get S
+	OPERAND_ADDR,           // Address of divisor S in Q=W1W2/S
+	MEMORY_READ,            // Get S
 	ALU_DIV,
-	MEMORY_READ,			// Get W1
-	ALU_DIV,				//
-	MEMORY_READ,			// Get W2
-	ALU_DIV,				// Check for overflow, skip next instruction if not
+	MEMORY_READ,            // Get W1
+	ALU_DIV,                //
+	MEMORY_READ,            // Get W2
+	ALU_DIV,                // Check for overflow, skip next instruction if not
 	ABORT,
-	ALU_DIV,				// Calculate quotient
-	MEMORY_WRITE,			// Write quotient to &W1
+	ALU_DIV,                // Calculate quotient
+	MEMORY_WRITE,           // Write quotient to &W1
 	ALU_DIV,
 	PREFETCH,
-	MEMORY_WRITE,			// Write remainder to &W2
+	MEMORY_WRITE,           // Write remainder to &W2
 	END
 };
 
@@ -557,10 +557,10 @@ MICROPROGRAM(external_mp)
 MICROPROGRAM(imm_arithm_mp)
 {
 	MEMORY_READ,
-	SET_IMM,				// 0
-	MEMORY_READ,			// 1 (1)
-	ALU_IMM_ARITHM,			// 0
-	PREFETCH,				// 1 (1)
+	SET_IMM,                // 0
+	MEMORY_READ,            // 1 (1)
+	ALU_IMM_ARITHM,         // 0
+	PREFETCH,               // 1 (1)
 	MEMORY_WRITE,
 	END
 };
@@ -577,10 +577,10 @@ MICROPROGRAM(ldcr_mp)
 {
 	ALU_LDCR,
 	OPERAND_ADDR,
-	MEMORY_READ,			// Get source data
-	ALU_LDCR,				// Save it, point to R12
-	WORD_READ,				// Get R12
-	ALU_LDCR,				// Prepare CRU operation
+	MEMORY_READ,            // Get source data
+	ALU_LDCR,               // Save it, point to R12
+	WORD_READ,              // Get R12
+	ALU_LDCR,               // Prepare CRU operation
 	CRU_OUTPUT,
 	ALU_NOP,
 	PREFETCH,
@@ -590,22 +590,22 @@ MICROPROGRAM(ldcr_mp)
 
 MICROPROGRAM(li_mp)
 {
-	SET_IMM,				// 0
-	MEMORY_READ,			// 1 (1)
-	ALU_LI,					// 0
-	PREFETCH,				// 1 (1)
+	SET_IMM,                // 0
+	MEMORY_READ,            // 1 (1)
+	ALU_LI,                 // 0
+	PREFETCH,               // 1 (1)
 	MEMORY_WRITE,
 	END
 };
 
 MICROPROGRAM(limi_lwpi_mp)
 {
-	SET_IMM,				// 0
-	MEMORY_READ,			// 1 (1)
-	ALU_NOP,				// 1
-	ALU_LIMIWP,				// (1)
-	PREFETCH,				// 1
-	ALU_NOP,				// 1
+	SET_IMM,                // 0
+	MEMORY_READ,            // 1 (1)
+	ALU_NOP,                // 1
+	ALU_LIMIWP,             // (1)
+	PREFETCH,               // 1
+	ALU_NOP,                // 1
 	END
 };
 
@@ -621,12 +621,12 @@ MICROPROGRAM(lst_lwp_mp)
 
 MICROPROGRAM(mov_mp)
 {
-	OPERAND_ADDR,			// 0
-	MEMORY_READ,			// 1 (1)
-	OPERAND_ADDR,			// 0
-	ALU_MOV,				// 1
+	OPERAND_ADDR,           // 0
+	MEMORY_READ,            // 1 (1)
+	OPERAND_ADDR,           // 0
+	ALU_MOV,                // 1
 	PREFETCH,
-	MEMORY_WRITE,			// 1 (1)
+	MEMORY_WRITE,           // 1 (1)
 	END
 };
 
@@ -660,10 +660,10 @@ MICROPROGRAM(rtwp_mp)
 
 MICROPROGRAM(sbo_sbz_mp)
 {
-	ALU_SBO_SBZ,			// Set address = &R12
-	WORD_READ,				// Read R12
-	ALU_SBO_SBZ,			// Add offset
-	CRU_OUTPUT,				// output via CRU
+	ALU_SBO_SBZ,            // Set address = &R12
+	WORD_READ,              // Read R12
+	ALU_SBO_SBZ,            // Add offset
+	CRU_OUTPUT,             // output via CRU
 	ALU_NOP,
 	PREFETCH,
 	ALU_NOP,
@@ -673,9 +673,9 @@ MICROPROGRAM(sbo_sbz_mp)
 MICROPROGRAM(shift_mp)
 {
 	MEMORY_READ,
-	ALU_SHIFT,				// skip next operation if count != 0
-	MEMORY_READ,			// if count=0 we must read R0
-	ALU_SHIFT,				// do the shift
+	ALU_SHIFT,              // skip next operation if count != 0
+	MEMORY_READ,            // if count=0 we must read R0
+	ALU_SHIFT,              // do the shift
 	PREFETCH,
 	MEMORY_WRITE,
 	END
@@ -684,7 +684,7 @@ MICROPROGRAM(shift_mp)
 MICROPROGRAM(single_arithm_mp)
 {
 	OPERAND_ADDR,
-	MEMORY_READ,			// This one is not done for CLR/SETO
+	MEMORY_READ,            // This one is not done for CLR/SETO
 	ALU_SINGLE_ARITHM,
 	PREFETCH,
 	MEMORY_WRITE,
@@ -693,10 +693,10 @@ MICROPROGRAM(single_arithm_mp)
 
 MICROPROGRAM(stcr_mp)
 {
-	ALU_STCR,				// Check for byte operation
-	OPERAND_ADDR,			// Source operand
-	ALU_STCR,				// Save, set R12
-	WORD_READ,				// Read R12
+	ALU_STCR,               // Check for byte operation
+	OPERAND_ADDR,           // Source operand
+	ALU_STCR,               // Save, set R12
+	WORD_READ,              // Read R12
 	ALU_STCR,
 	CRU_INPUT,
 	ALU_STCR,
@@ -731,25 +731,25 @@ MICROPROGRAM(x_mp)
 	OPERAND_ADDR,
 	MEMORY_READ,
 	ALU_X,
-	END						// should not be reached
+	END                     // should not be reached
 };
 
 MICROPROGRAM(xop_mp)
 {
-	OPERAND_ADDR,			// Determine source address
-	ALU_XOP,				// Save it; determine XOP number
-	MEMORY_READ,			// Read new WP
-	ALU_XOP,				//
-	MEMORY_WRITE,			// save source address to new R11
+	OPERAND_ADDR,           // Determine source address
+	ALU_XOP,                // Save it; determine XOP number
+	MEMORY_READ,            // Read new WP
+	ALU_XOP,                //
+	MEMORY_WRITE,           // save source address to new R11
 	ALU_XOP,
-	MEMORY_WRITE,			// save old ST to new R15
+	MEMORY_WRITE,           // save old ST to new R15
 	ALU_XOP,
-	MEMORY_WRITE,			// save old PC to new R14
+	MEMORY_WRITE,           // save old PC to new R14
 	ALU_XOP,
-	MEMORY_WRITE,			// save old WP to new R13
+	MEMORY_WRITE,           // save old WP to new R13
 	ALU_XOP,
-	MEMORY_READ,			// Read new PC
-	ALU_XOP,				// set new PC, set X flag
+	MEMORY_READ,            // Read new PC
+	ALU_XOP,                // set new PC, set X flag
 	PREFETCH,
 	ALU_NOP,
 	END
@@ -769,20 +769,20 @@ MICROPROGRAM(xor_mp)
 
 MICROPROGRAM(int_mp)
 {
-	ALU_INT,				// 1
-	MEMORY_READ,			// 1 (1)
-	ALU_INT,				// 2
-	MEMORY_WRITE,			// 1 (1)
-	ALU_INT,				// 1
-	MEMORY_WRITE,			// 1 (1)
-	ALU_INT,				// 1
-	MEMORY_WRITE,			// 1 (1)
-	ALU_INT,				// 1
-	MEMORY_READ,			// 1 (1)
-	ALU_INT,				// 0
-	PREFETCH_NO_INT,		// 1 (1)  (prefetch happens in parallel to the previous operation)
-	ALU_NOP,				// 1 (+decode in parallel; actually performed right after prefetch)
-	ALU_NOP,				// 1
+	ALU_INT,                // 1
+	MEMORY_READ,            // 1 (1)
+	ALU_INT,                // 2
+	MEMORY_WRITE,           // 1 (1)
+	ALU_INT,                // 1
+	MEMORY_WRITE,           // 1 (1)
+	ALU_INT,                // 1
+	MEMORY_WRITE,           // 1 (1)
+	ALU_INT,                // 1
+	MEMORY_READ,            // 1 (1)
+	ALU_INT,                // 0
+	PREFETCH_NO_INT,        // 1 (1)  (prefetch happens in parallel to the previous operation)
+	ALU_NOP,                // 1 (+decode in parallel; actually performed right after prefetch)
+	ALU_NOP,                // 1
 	END
 };
 
@@ -860,12 +860,12 @@ enum
 
 static const char opname[][5] =
 {   "MID ", "A   ", "AB  ", "ABS ", "AI  ", "ANDI", "B   ", "BL  ", "BLWP", "C   ",
-	"CB  ", "CI  ",	"CKOF", "CKON", "CLR ", "COC ", "CZC ", "DEC ", "DECT", "DIV ",
+	"CB  ", "CI  ", "CKOF", "CKON", "CLR ", "COC ", "CZC ", "DEC ", "DECT", "DIV ",
 	"DIVS", "IDLE", "INC ", "INCT", "INV ", "JEQ ", "JGT ", "JH  ", "JHE ", "JL  ",
 	"JLE ", "JLT ", "JMP ", "JNC ", "JNE ", "JNO ", "JOC ", "JOP ", "LDCR", "LI  ",
 	"LIMI", "LREX", "LST ", "LWP ", "LWPI", "MOV ", "MOVB", "MPY ", "MPYS", "NEG ",
-	"ORI ", "RSET",	"RTWP", "S   ", "SB  ", "SBO ", "SBZ ", "SETO", "SLA ", "SOC ",
-	"SOCB", "SRA ", "SRC ", "SRL ",	"STCR", "STST", "STWP", "SWPB", "SZC ", "SZCB",
+	"ORI ", "RSET", "RTWP", "S   ", "SB  ", "SBO ", "SBZ ", "SETO", "SLA ", "SOC ",
+	"SOCB", "SRA ", "SRC ", "SRL ", "STCR", "STST", "STWP", "SWPB", "SZC ", "SZCB",
 	"TB  ", "X   ", "XOP ", "XOR ", "*int"
 };
 
@@ -1187,7 +1187,7 @@ inline void tms9995_device::pulse_clock(int count)
 	{
 		m_clock_out_line(ASSERT_LINE);
 		m_clock_out_line(CLEAR_LINE);
-		m_icount--;							// This is the only location where we count down the cycles.
+		m_icount--;                         // This is the only location where we count down the cycles.
 		if (VERBOSE>7) LOG("tms9995: pulse_clock\n");
 		if (m_flag[0] == false && m_flag[1] == true) trigger_decrementer();
 	}
@@ -1309,7 +1309,7 @@ void tms9995_device::int_prefetch_and_decode()
 		if (VERBOSE>7) LOG("tms9995: Checking interrupts ... NMI active\n");
 		m_int_pending |= PENDING_NMI;
 		m_idle_state = false;
-		PC = (PC + 2) & 0xfffe;		// we have not prefetched the next instruction
+		PC = (PC + 2) & 0xfffe;     // we have not prefetched the next instruction
 	}
 	else
 	{
@@ -1327,7 +1327,7 @@ void tms9995_device::int_prefetch_and_decode()
 				m_idle_state = false;
 				if (VERBOSE>7) LOG("tms9995: Interrupt occured, terminate IDLE state\n");
 			}
-			PC = PC + 2;		// PC must be advanced (see flow chart), but no prefetch
+			PC = PC + 2;        // PC must be advanced (see flow chart), but no prefetch
 			if (VERBOSE>7) LOG("tms9995: Interrupts pending; no prefetch; advance PC to %04x\n", PC);
 		}
 		else
@@ -1362,10 +1362,10 @@ void tms9995_device::prefetch_and_decode()
 		// Second pass for getting the instruction
 		if (VERBOSE>6) LOG("tms9995: Prefetch memory access (second pass)\n");
 		word_read();
-		decode(m_current_value);			// This is for free; in reality it is in parallel with the next memory operation
-		m_address = m_address_copy;		// restore m_address
-		m_current_value = m_value_copy;	// restore m_current_value
-		PC = (PC + 2) & 0xfffe;		// advance PC
+		decode(m_current_value);            // This is for free; in reality it is in parallel with the next memory operation
+		m_address = m_address_copy;     // restore m_address
+		m_current_value = m_value_copy; // restore m_current_value
+		PC = (PC + 2) & 0xfffe;     // advance PC
 		m_iaq_line(CLEAR_LINE);
 		if (VERBOSE>5) LOG("tms9995: ++++ Prefetch done ++++\n");
 		m_lowbyte = false;
@@ -1383,17 +1383,17 @@ void tms9995_device::prefetch_and_decode()
 
 		if (VERBOSE>5) LOG("tms9995: **** Prefetching new instruction at %04x ****\n", PC);
 
-		m_lowbyte = false;	// for mem_read
-		word_read();			// this is where the clock pulses occur
+		m_lowbyte = false;  // for mem_read
+		word_read();            // this is where the clock pulses occur
 
 		if (!m_lowbyte)
 		{
 			// Only if we got the word in one pass
-			decode(m_current_value);	// This is for free; in reality it is in parallel with the next memory operation
+			decode(m_current_value);    // This is for free; in reality it is in parallel with the next memory operation
 
-			m_address = m_address_copy;			// restore m_address
-			m_current_value = m_value_copy;		// restore m_current_value
-			PC = (PC + 2) & 0xfffe;		// advance PC
+			m_address = m_address_copy;         // restore m_address
+			m_current_value = m_value_copy;     // restore m_current_value
+			PC = (PC + 2) & 0xfffe;     // advance PC
 
 			m_iaq_line(CLEAR_LINE);
 		}
@@ -1470,7 +1470,7 @@ void tms9995_device::service_interrupt()
 	if (m_reset)
 	{
 		vectorpos = 0;
-		m_intmask = 0;	// clear interrupt mask
+		m_intmask = 0;  // clear interrupt mask
 
 		m_nmi_state = false;
 		m_hold_state = false;
@@ -1565,7 +1565,7 @@ void tms9995_device::service_interrupt()
 	}
 	MPC = 0;
 	m_first_cycle = m_icount;
-	m_check_ready = false;		// set to default
+	m_check_ready = false;      // set to default
 }
 
 /*
@@ -2036,10 +2036,10 @@ void tms9995_device::operand_address_subprogram()
 	m_regnumber = (ircopy & 0x000f);
 	m_address = (WP + (m_regnumber<<1)) & 0xffff;
 
-	m_source_value = m_current_value;	// will be overwritten when reading the destination
-	m_current_value = m_address;		// needed for first case
+	m_source_value = m_current_value;   // will be overwritten when reading the destination
+	m_current_value = m_address;        // needed for first case
 
-	if (MPC==8)	// Symbolic
+	if (MPC==8) // Symbolic
 	{
 		if (m_regnumber != 0)
 		{
@@ -2057,7 +2057,7 @@ void tms9995_device::operand_address_subprogram()
 	m_get_destination = true;
 	m_lowbyte = false;
 	m_address_add = 0;
-	MPC--;		// will be increased in the mail loop
+	MPC--;      // will be increased in the mail loop
 	if (VERBOSE>8) LOG("tms9995: *** Operand address derivation; address=%04x; index=%d\n", m_address, MPC+1);
 }
 
@@ -2067,7 +2067,7 @@ void tms9995_device::operand_address_subprogram()
 */
 void tms9995_device::increment_register()
 {
-	m_address_saved = m_current_value;	// need a special return so we do not lose the value
+	m_address_saved = m_current_value;  // need a special return so we do not lose the value
 	m_current_value += m_instruction->byteop? 1 : 2;
 	m_address = (WP + (m_regnumber<<1)) & 0xffff;
 	m_lowbyte = false;
@@ -2093,7 +2093,7 @@ void tms9995_device::set_immediate()
 	// Need to determine the register address
 	m_address_saved = WP + ((m_instruction->IR & 0x000f)<<1);
 	m_address = PC;
-	m_source_value = m_current_value;		// needed for AI, ANDI, ORI
+	m_source_value = m_current_value;       // needed for AI, ANDI, ORI
 	PC = (PC + 2) & 0xfffe;
 	m_lowbyte = false;
 }
@@ -2238,7 +2238,7 @@ void tms9995_device::alu_blwp()
 		m_address = m_address - 2;
 		break;
 	case 2:
-		m_current_value = m_value_copy;		// old WP
+		m_current_value = m_value_copy;     // old WP
 		m_address = m_address - 2;
 		break;
 	case 3:
@@ -2323,13 +2323,13 @@ void tms9995_device::alu_divide()
 		// or equivalently, dividend / 0x10000 >= divisor
 
 		// Check overflow for unsigned DIV
-		if (m_current_value < m_source_value)	// also if source=0
+		if (m_current_value < m_source_value)   // also if source=0
 		{
-			MPC++;	// skip the abort
+			MPC++;  // skip the abort
 			overflow = false;
 		}
 		set_status_bit(ST_OV, overflow);
-		m_value_copy = m_current_value;			// Save the high word
+		m_value_copy = m_current_value;         // Save the high word
 		m_address = m_address + 2;
 		break;
 	case 2:
@@ -2412,65 +2412,65 @@ void tms9995_device::alu_divide_signed()
 		// requires much less cycles when there is an overflow, so it seems as
 		// if this is tested before the algorithm starts.
 
-		if ((w1 & 0x8000)==0)		// positive dividend
+		if ((w1 & 0x8000)==0)       // positive dividend
 		{
-			if ((d & 0x8000)==0)	// positive divisor
+			if ((d & 0x8000)==0)    // positive divisor
 			{
-				if ((d & 1)==0)		// even divisor
+				if ((d & 1)==0)     // even divisor
 				{
 					if (w1 < d/2) overflow = false;
 				}
-				else				// odd divisor
+				else                // odd divisor
 				{
 					if ((w1 < (d-1)/2) || (w1 == (d-1)/2 && w2 < 0x8000)) overflow = false;
 				}
 			}
-			else					// negative divisor
+			else                    // negative divisor
 			{
 				d = -d;
-				if ((d & 1)==0)		// even divisor
+				if ((d & 1)==0)     // even divisor
 				{
 					if ((w1 < d/2) || (w1 == d/2 && w2 < d)) overflow = false;
 				}
-				else				// odd divisor
+				else                // odd divisor
 				{
 					if ((w1 < (d+1)/2) || (w1 == (d+1)/2 && w2 < 0x8000+d)) overflow = false;
 				}
 			}
 		}
-		else						// negative dividend
+		else                        // negative dividend
 		{
 			w1 = -w1;
-			if ((d & 0x8000)==0)	// positive divisor
+			if ((d & 0x8000)==0)    // positive divisor
 			{
-				if ((d & 1)==0)		// even divisor
+				if ((d & 1)==0)     // even divisor
 				{
 					if ((w1 < d/2+1) || (w1 == d/2+1 && w2 > (-d))) overflow = false;
 				}
-				else				// odd divisor
+				else                // odd divisor
 				{
 					if ((w1 < (d+1)/2) || (w1 == (d+1)/2 && w2 > 0x8000-d)) overflow = false;
 				}
 			}
-			else					// negative divisor
+			else                    // negative divisor
 			{
 				d = -d;
-				if ((d & 1)==0)		// even divisor
+				if ((d & 1)==0)     // even divisor
 				{
 					if ((w1 < d/2) || (w1 == d/2 && w2 > 0)) overflow = false;
 				}
-				else				// odd divisor
+				else                // odd divisor
 				{
 					if ((w1 < (d+1)/2) || (w1 == (d+1)/2 && w2 > 0x8000)) overflow = false;
 				}
 			}
 		}
 		set_status_bit(ST_OV, overflow);
-		if (!overflow) MPC++;		// Skip the next microinstruction when there is no overflow
+		if (!overflow) MPC++;       // Skip the next microinstruction when there is no overflow
 		break;
 	case 3:
 		// We are here because there was no overflow
-		w = (m_value_copy << 16) |	m_current_value;
+		w = (m_value_copy << 16) |  m_current_value;
 		// Do the calculation
 		m_current_value =  (UINT16)(w / (INT16)m_source_value);
 		m_value_copy = (UINT16)(w % (INT16)m_source_value);
@@ -2627,37 +2627,37 @@ void tms9995_device::alu_jump()
 	case JLT:   // LAECOP == x00xxx
 		cond = ((ST & (ST_AGT | ST_EQ))==0);
 		break;
-	case JLE:	// LAECOP == 0xxxxx
+	case JLE:   // LAECOP == 0xxxxx
 		cond = ((ST & ST_LH)==0);
 		break;
-	case JEQ:	// LAECOP == xx1xxx
+	case JEQ:   // LAECOP == xx1xxx
 		cond = ((ST & ST_EQ)!=0);
 		break;
-	case JHE:	// LAECOP == 1x0xxx, 0x1xxx
+	case JHE:   // LAECOP == 1x0xxx, 0x1xxx
 		cond = ((ST & (ST_LH | ST_EQ)) != 0);
 		break;
-	case JGT:	// LAECOP == x1xxxx
+	case JGT:   // LAECOP == x1xxxx
 		cond = ((ST & ST_AGT)!=0);
 		break;
-	case JNE:	// LAECOP == xx0xxx
+	case JNE:   // LAECOP == xx0xxx
 		cond = ((ST & ST_EQ)==0);
 		break;
-	case JNC:	// LAECOP == xxx0xx
+	case JNC:   // LAECOP == xxx0xx
 		cond = ((ST & ST_C)==0);
 		break;
-	case JOC:	// LAECOP == xxx1xx
+	case JOC:   // LAECOP == xxx1xx
 		cond = ((ST & ST_C)!=0);
 		break;
-	case JNO:	// LAECOP == xxxx0x
+	case JNO:   // LAECOP == xxxx0x
 		cond = ((ST & ST_OV)==0);
 		break;
-	case JL:	// LAECOP == 0x0xxx
+	case JL:    // LAECOP == 0x0xxx
 		cond = ((ST & (ST_LH | ST_EQ)) == 0);
 		break;
-	case JH:	// LAECOP == 1xxxxx
+	case JH:    // LAECOP == 1xxxxx
 		cond = ((ST & ST_LH)!=0);
 		break;
-	case JOP:	// LAECOP == xxxxx1
+	case JOP:   // LAECOP == xxxxx1
 		cond = ((ST & ST_OP)!=0);
 		break;
 	}
@@ -2728,7 +2728,7 @@ void tms9995_device::alu_limi_lwpi()
 	{
 		ST = (ST & 0xfff0) | (m_current_value & 0x000f);
 		if (VERBOSE>7) LOG("tms9995: ST = %04x\n", ST);
-		pulse_clock(1);		// needs one more than LWPI
+		pulse_clock(1);     // needs one more than LWPI
 	}
 	else
 	{
@@ -2847,15 +2847,15 @@ void tms9995_device::alu_rtwp()
 	switch (m_instruction->state)
 	{
 	case 0:
-		m_address = WP + 30;		// R15
+		m_address = WP + 30;        // R15
 		break;
 	case 1:
 		ST = m_current_value;
-		m_address -= 2;				// R14
+		m_address -= 2;             // R14
 		break;
 	case 2:
 		PC = m_current_value;
-		m_address -= 2;				// R13
+		m_address -= 2;             // R13
 		break;
 	case 3:
 		WP = m_current_value;
@@ -2956,7 +2956,7 @@ void tms9995_device::alu_shift()
 		set_status_bit(ST_C, carry);
 		set_status_bit(ST_OV, overflow);
 		compare_and_set_lae(m_current_value, 0);
-		m_address = m_address_saved;		// Register address
+		m_address = m_address_saved;        // Register address
 		if (VERBOSE>7) LOG("tms9995: ST = %04x (val=%04x)\n", ST, m_current_value);
 		break;
 	}
@@ -3049,7 +3049,7 @@ void tms9995_device::alu_single_arithm()
 		return;
 	}
 
-	if (check_ov) set_status_bit(ST_OV, ((src_val & 0x8000)!=sign) && ((dest_new & 0x8000)==sign));
+	if (check_ov) set_status_bit(ST_OV, ((src_val & 0x8000)==sign) && ((dest_new & 0x8000)!=sign));
 	set_status_bit(ST_C, (dest_new & 0x10000) != 0);
 	m_current_value = dest_new & 0xffff;
 	compare_and_set_lae(m_current_value, 0);
@@ -3169,7 +3169,7 @@ void tms9995_device::alu_xop()
 		break;
 	case 1:
 		// m_current_value is new WP
-		m_value_copy = WP;	// store this for later
+		m_value_copy = WP;  // store this for later
 		WP = m_current_value;
 		m_address = WP + 0x0016; // Address of new R11
 		m_current_value = m_address_saved;
@@ -3215,9 +3215,9 @@ void tms9995_device::alu_int()
 		if (VERBOSE>7) LOG("tms9995: interrupt service (0): Prepare to read vector\n");
 		break;
 	case 1:
-		pulse = 2;					// two cycles (with the one at the end)
-		m_source_value = WP;		// old WP
-		WP = m_current_value;		// new WP
+		pulse = 2;                  // two cycles (with the one at the end)
+		m_source_value = WP;        // old WP
+		WP = m_current_value;       // new WP
 		m_current_value = ST;
 		m_address = (WP + 30)&0xfffe;
 		if (VERBOSE>7) LOG("tms9995: interrupt service (1): Read new WP = %04x, save ST to %04x\n", WP, m_address);
@@ -3229,7 +3229,7 @@ void tms9995_device::alu_int()
 		break;
 	case 3:
 		m_address = (WP + 26)&0xfffe;
-		m_current_value = m_source_value;	// old WP
+		m_current_value = m_source_value;   // old WP
 		if (VERBOSE>7) LOG("tms9995: interrupt service (3): Save WP to %04x\n", m_address);
 		break;
 	case 4:
@@ -3247,7 +3247,7 @@ void tms9995_device::alu_int()
 			m_int_pending &= ~PENDING_MID;
 			m_address = 0xfffc;
 			m_intmask = 0;
-			MPC = 0;	// redo the interrupt service for the NMI
+			MPC = 0;    // redo the interrupt service for the NMI
 		}
 		else
 		{

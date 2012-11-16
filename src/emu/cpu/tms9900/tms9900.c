@@ -107,14 +107,14 @@
 /* tms9900 ST register bits. */
 enum
 {
-	ST_LH = 0x8000,		// Logical higher (unsigned comparison)
-	ST_AGT = 0x4000,	// Arithmetical greater than (signed comparison)
-	ST_EQ = 0x2000,		// Equal
-	ST_C = 0x1000,		// Carry
-	ST_OV = 0x0800,		// Overflow (when using signed operations)
-	ST_OP = 0x0400,		// Odd parity (used with byte operations)
-	ST_X = 0x0200,		// XOP
-	ST_IM = 0x000f		// Interrupt mask
+	ST_LH = 0x8000,     // Logical higher (unsigned comparison)
+	ST_AGT = 0x4000,    // Arithmetical greater than (signed comparison)
+	ST_EQ = 0x2000,     // Equal
+	ST_C = 0x1000,      // Carry
+	ST_OV = 0x0800,     // Overflow (when using signed operations)
+	ST_OP = 0x0400,     // Odd parity (used with byte operations)
+	ST_X = 0x0200,      // XOP
+	ST_IM = 0x000f      // Interrupt mask
 };
 
 #define LOG logerror
@@ -128,12 +128,12 @@ enum
 
 tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type,  const char *name, const char *tag, int databus_width, int prg_addr_bits, int cru_addr_bits, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, type, name, tag, owner, clock),
-	  m_program_config("program", ENDIANNESS_BIG, databus_width, prg_addr_bits),
-	  m_io_config("cru", ENDIANNESS_BIG, 8, cru_addr_bits),
-	  m_prgspace(NULL),
-	  m_cru(NULL),
-	  m_prgaddr_mask((1<<prg_addr_bits)-1),
-	  m_cruaddr_mask((1<<cru_addr_bits)-1)
+		m_program_config("program", ENDIANNESS_BIG, databus_width, prg_addr_bits),
+		m_io_config("cru", ENDIANNESS_BIG, 8, cru_addr_bits),
+		m_prgspace(NULL),
+		m_cru(NULL),
+		m_prgaddr_mask((1<<prg_addr_bits)-1),
+		m_cruaddr_mask((1<<cru_addr_bits)-1)
 {
 }
 
@@ -167,7 +167,7 @@ void tms99xx_device::device_start()
 
 	// TODO: Restore state save feature
 
-	m_prgspace = &space(AS_PROGRAM);						// dimemory.h
+	m_prgspace = &space(AS_PROGRAM);                        // dimemory.h
 	m_cru = &space(AS_IO);
 
 	// Resolve our external connections
@@ -417,21 +417,21 @@ enum
 */
 MICROPROGRAM(data_derivation)
 {
-	REG_READ, RET, 0, 0, 0, 0, 0, 0,												// Rx           (00)
+	REG_READ, RET, 0, 0, 0, 0, 0, 0,                                                // Rx           (00)
 	0, 0, 0, 0, 0, 0, 0, 0,
-	REG_READ, ALU_SETADDR, MEMORY_READ, RET, 0, 0, 0, 0,							// *Rx          (01)
+	REG_READ, ALU_SETADDR, MEMORY_READ, RET, 0, 0, 0, 0,                            // *Rx          (01)
 	0, 0, 0, 0, 0, 0, 0, 0,
-	ALU_CLR, ALU_PCADDR_ADVANCE, MEMORY_READ, ALU_ADDREG, MEMORY_READ, RET, 0, 0,	// @sym         (10)
-	REG_READ, ALU_PCADDR_ADVANCE, MEMORY_READ, ALU_ADDREG, MEMORY_READ, RET, 0, 0,	// @sym(Rx)     (10)
-	REG_READ, ALU_SETADDR_ADDONE, ALU_ADDONE, REG_WRITE, MEMORY_READ, RET, 0, 0,	// *Rx+ (word)  (11)
-	REG_READ, ALU_SETADDR_ADDONE, REG_WRITE, MEMORY_READ, RET, 0, 0, 0				// *Rx+ (byte)  (11)
+	ALU_CLR, ALU_PCADDR_ADVANCE, MEMORY_READ, ALU_ADDREG, MEMORY_READ, RET, 0, 0,   // @sym         (10)
+	REG_READ, ALU_PCADDR_ADVANCE, MEMORY_READ, ALU_ADDREG, MEMORY_READ, RET, 0, 0,  // @sym(Rx)     (10)
+	REG_READ, ALU_SETADDR_ADDONE, ALU_ADDONE, REG_WRITE, MEMORY_READ, RET, 0, 0,    // *Rx+ (word)  (11)
+	REG_READ, ALU_SETADDR_ADDONE, REG_WRITE, MEMORY_READ, RET, 0, 0, 0              // *Rx+ (byte)  (11)
 };
 
 MICROPROGRAM(f1_mp)
 {
 	ALU_NOP,
 	DATA_DERIVE,
-	ALU_SOURCE,			// Store the word
+	ALU_SOURCE,         // Store the word
 	DATA_DERIVE,
 	ALU_F1,
 	MEMORY_WRITE,
@@ -445,7 +445,7 @@ MICROPROGRAM(comp_mp)
 	ALU_SOURCE,
 	DATA_DERIVE,
 	ALU_COMP,
-	ALU_NOP,		// Compare operations do not write back any data
+	ALU_NOP,        // Compare operations do not write back any data
 	END
 };
 
@@ -454,9 +454,9 @@ MICROPROGRAM(f3_mp)
 	ALU_NOP,
 	DATA_DERIVE,
 	ALU_F3,
-	MEMORY_READ,	// We have to distinguish this from the C/CB microprogram above
+	MEMORY_READ,    // We have to distinguish this from the C/CB microprogram above
 	ALU_F3,
-	ALU_NOP,		// Compare operations do not write back any data
+	ALU_NOP,        // Compare operations do not write back any data
 	END
 };
 
@@ -467,7 +467,7 @@ MICROPROGRAM(xor_mp)
 	ALU_F3,
 	MEMORY_READ,
 	ALU_F3,
-	MEMORY_WRITE,	// XOR again must write back data, cannot reuse f3_mp
+	MEMORY_WRITE,   // XOR again must write back data, cannot reuse f3_mp
 	END
 };
 
@@ -475,11 +475,11 @@ MICROPROGRAM(mult_mp)
 {
 	ALU_NOP,
 	DATA_DERIVE,
-	ALU_MPY,		// Save the value; put register number in m_regnumber
+	ALU_MPY,        // Save the value; put register number in m_regnumber
 	MEMORY_READ,
-	ALU_MPY,		// 18 cycles for multiplication
-	MEMORY_WRITE,		// Write the high word
-	ALU_MPY,		// Get low word, increase m_address
+	ALU_MPY,        // 18 cycles for multiplication
+	MEMORY_WRITE,       // Write the high word
+	ALU_MPY,        // Get low word, increase m_address
 	MEMORY_WRITE,
 	END
 };
@@ -487,36 +487,36 @@ MICROPROGRAM(mult_mp)
 MICROPROGRAM(div_mp)
 {
 	ALU_NOP,
-	DATA_DERIVE,	// Get divisor
-	ALU_DIV,		// 0 Store divisor and get register number
-	MEMORY_READ,	// Read register
-	ALU_DIV,		// 1 Check overflow, increase address (or abort here)
+	DATA_DERIVE,    // Get divisor
+	ALU_DIV,        // 0 Store divisor and get register number
+	MEMORY_READ,    // Read register
+	ALU_DIV,        // 1 Check overflow, increase address (or abort here)
 	ABORT,
-	MEMORY_READ,	// Read subsequent word (if reg=15 this is behind the workspace)
-	ALU_DIV,		// 2 Calculate quotient (takes variable amount of cycles; at least 32 machine cycles), set register number
-	MEMORY_WRITE,	// Write quotient into register
-	ALU_DIV,		// 3 Get remainder
-	MEMORY_WRITE,	// Write remainder
+	MEMORY_READ,    // Read subsequent word (if reg=15 this is behind the workspace)
+	ALU_DIV,        // 2 Calculate quotient (takes variable amount of cycles; at least 32 machine cycles), set register number
+	MEMORY_WRITE,   // Write quotient into register
+	ALU_DIV,        // 3 Get remainder
+	MEMORY_WRITE,   // Write remainder
 	END
 };
 
 MICROPROGRAM(xop_mp)
 {
 	ALU_NOP,
-	DATA_DERIVE,	// Get argument
-	ALU_XOP,		// 0 Save the address of the source operand, set address = 0x0040 + xopNr*4
-	MEMORY_READ,	// Read the new WP
-	ALU_XOP,		// 1 Save old WP, set new WP, get the source operand address
-	MEMORY_WRITE,	// Write the address of the source operand into the new R11
-	ALU_XOP,		// 2
-	MEMORY_WRITE,	// Write the ST into the new R15
-	ALU_XOP,		// 3
-	MEMORY_WRITE,	// Write the PC into the new R14
-	ALU_XOP,		// 4
-	MEMORY_WRITE,	// Write the WP into the new R13
-	ALU_XOP,		// 5 Set the X bit in the ST
-	MEMORY_READ,	// Read the new PC
-	ALU_XOP,		// 6 Set the new PC
+	DATA_DERIVE,    // Get argument
+	ALU_XOP,        // 0 Save the address of the source operand, set address = 0x0040 + xopNr*4
+	MEMORY_READ,    // Read the new WP
+	ALU_XOP,        // 1 Save old WP, set new WP, get the source operand address
+	MEMORY_WRITE,   // Write the address of the source operand into the new R11
+	ALU_XOP,        // 2
+	MEMORY_WRITE,   // Write the ST into the new R15
+	ALU_XOP,        // 3
+	MEMORY_WRITE,   // Write the PC into the new R14
+	ALU_XOP,        // 4
+	MEMORY_WRITE,   // Write the WP into the new R13
+	ALU_XOP,        // 5 Set the X bit in the ST
+	MEMORY_READ,    // Read the new PC
+	ALU_XOP,        // 6 Set the new PC
 	ALU_NOP,
 	END
 };
@@ -534,8 +534,8 @@ MICROPROGRAM(abs_mp)
 {
 	ALU_NOP,
 	DATA_DERIVE,
-	ALU_ABS,		// two cycles
-	MEMORY_WRITE,	// skipped when ABS is not performed
+	ALU_ABS,        // two cycles
+	MEMORY_WRITE,   // skipped when ABS is not performed
 	ALU_NOP,
 	END
 };
@@ -548,7 +548,7 @@ MICROPROGRAM(x_mp)
 	END
 };
 
-MICROPROGRAM(b_mp)		// Branch
+MICROPROGRAM(b_mp)      // Branch
 {
 	ALU_NOP,
 	DATA_DERIVE,
@@ -556,7 +556,7 @@ MICROPROGRAM(b_mp)		// Branch
 	END
 };
 
-MICROPROGRAM(bl_mp)		// Branch and Link
+MICROPROGRAM(bl_mp)     // Branch and Link
 {
 	ALU_NOP,
 	DATA_DERIVE,
@@ -566,19 +566,19 @@ MICROPROGRAM(bl_mp)		// Branch and Link
 	END
 };
 
-MICROPROGRAM(blwp_mp)		// Branch and Load WP
+MICROPROGRAM(blwp_mp)       // Branch and Load WP
 {
 	ALU_NOP,
-	DATA_DERIVE,			// Get argument
-	ALU_BLWP,				// 0 Save old WP, set new WP, save position
-	MEMORY_WRITE,			// write ST to R15
-	ALU_BLWP,				// 1
-	MEMORY_WRITE,			// write PC to R14
-	ALU_BLWP,				// 2
-	MEMORY_WRITE,			// write WP to R13
-	ALU_BLWP,				// 3 Get saved position
-	MEMORY_READ,			// Read new PC
-	ALU_BLWP,				// 4 Set new PC
+	DATA_DERIVE,            // Get argument
+	ALU_BLWP,               // 0 Save old WP, set new WP, save position
+	MEMORY_WRITE,           // write ST to R15
+	ALU_BLWP,               // 1
+	MEMORY_WRITE,           // write PC to R14
+	ALU_BLWP,               // 2
+	MEMORY_WRITE,           // write WP to R13
+	ALU_BLWP,               // 3 Get saved position
+	MEMORY_READ,            // Read new PC
+	ALU_BLWP,               // 4 Set new PC
 	END
 };
 
@@ -600,12 +600,12 @@ MICROPROGRAM(stcr_mp)
 {
 	ALU_NOP,
 	DATA_DERIVE,
-	ALU_SOURCE,			// Store address and value
-	ALU_STCR,			// 0 Set register_number = 12
+	ALU_SOURCE,         // Store address and value
+	ALU_STCR,           // 0 Set register_number = 12
 	MEMORY_READ,
-	ALU_STCR,			// 1 Prepare CRU access
+	ALU_STCR,           // 1 Prepare CRU access
 	CRU_INPUT,
-	ALU_STCR,			// 2 Create result; Cycles = 5 + (8-#C-1) or + (16-#C)
+	ALU_STCR,           // 2 Create result; Cycles = 5 + (8-#C-1) or + (16-#C)
 	MEMORY_WRITE,
 	END
 };
@@ -675,8 +675,8 @@ MICROPROGRAM(li_mp)
 {
 	ALU_IMM,
 	MEMORY_READ,
-	ALU_LI,				// sets status bits
-	ALU_REG,			// set register number
+	ALU_LI,             // sets status bits
+	ALU_REG,            // set register number
 	MEMORY_WRITE,
 	END
 };
@@ -686,7 +686,7 @@ MICROPROGRAM(lwpi_mp)
 	ALU_IMM,
 	MEMORY_READ,
 	ALU_NOP,
-	ALU_LWPI,				// sets WP
+	ALU_LWPI,               // sets WP
 	END
 };
 
@@ -695,7 +695,7 @@ MICROPROGRAM(limi_mp)
 	ALU_IMM,
 	MEMORY_READ,
 	ALU_NOP,
-	ALU_LIMI,				// sets interrupt mask in ST
+	ALU_LIMI,               // sets interrupt mask in ST
 	ALU_NOP,
 	ALU_NOP,
 	END
@@ -715,7 +715,7 @@ MICROPROGRAM(external_mp)
 	END
 };
 
-MICROPROGRAM(rtwp_mp)		// Problem: This makes RTWP use 8 instead of 7 machine cycles.
+MICROPROGRAM(rtwp_mp)       // Problem: This makes RTWP use 8 instead of 7 machine cycles.
 {
 	ALU_RTWP,
 	MEMORY_READ,
@@ -730,17 +730,17 @@ MICROPROGRAM(rtwp_mp)		// Problem: This makes RTWP use 8 instead of 7 machine cy
 MICROPROGRAM(int_mp)
 {
 	ALU_NOP,
-	ALU_INT,				// 0 Set address = 0
+	ALU_INT,                // 0 Set address = 0
 	MEMORY_READ,
-	ALU_INT,				// 1 Save old WP, set new WP, save position
-	MEMORY_WRITE,			// write ST to R15
-	ALU_INT,				// 2
-	MEMORY_WRITE,			// write PC to R14
-	ALU_INT,				// 3
-	MEMORY_WRITE,			// write WP to R13
-	ALU_INT,				// 4 Get saved position
-	MEMORY_READ,			// Read new PC
-	ALU_INT,				// 5 Set new PC
+	ALU_INT,                // 1 Save old WP, set new WP, save position
+	MEMORY_WRITE,           // write ST to R15
+	ALU_INT,                // 2
+	MEMORY_WRITE,           // write PC to R14
+	ALU_INT,                // 3
+	MEMORY_WRITE,           // write WP to R13
+	ALU_INT,                // 4 Get saved position
+	MEMORY_READ,            // Read new PC
+	ALU_INT,                // 5 Set new PC
 	END
 };
 
@@ -1246,7 +1246,7 @@ void tms99xx_device::pulse_clock(int count)
 	{
 		m_clock_out_line(ASSERT_LINE);
 		m_clock_out_line(CLEAR_LINE);
-		m_icount--;							// This is the only location where we count down the cycles.
+		m_icount--;                         // This is the only location where we count down the cycles.
 		if (VERBOSE>7) LOG("tms99xx: pulse_clock\n");
 	}
 }
@@ -1455,14 +1455,14 @@ void tms99xx_device::cru_input_operation()
 	// Read 8 bits (containing the desired bits)
 	value = m_cru->read_byte(location);
 
-	if ((offset + m_count) > 8)	// spans two 8 bit cluster
+	if ((offset + m_count) > 8) // spans two 8 bit cluster
 	{
 		// Read next 8 bits
 		location = (location + 1) & (m_cruaddr_mask>>3);
 		value1 = m_cru->read_byte(location);
 		value |= (value1 << 8);
 
-		if ((offset + m_count) > 16)	// spans three 8 bit cluster
+		if ((offset + m_count) > 16)    // spans three 8 bit cluster
 		{
 			// Read next 8 bits
 			location = (location + 1) & (m_cruaddr_mask>>3);
@@ -1543,12 +1543,12 @@ void tms99xx_device::data_derivation_subprogram()
 	m_program = (UINT8*)data_derivation;
 	MPC = ircopy & 0x0030;
 
-	if (((MPC == 0x0020) && (m_regnumber != 0))			// indexed
-		|| ((MPC == 0x0030) && m_byteop))		// byte operation
+	if (((MPC == 0x0020) && (m_regnumber != 0))         // indexed
+		|| ((MPC == 0x0030) && m_byteop))       // byte operation
 	{
-		MPC += 8;	// the second option
+		MPC += 8;   // the second option
 	}
-	m_get_destination = true;	// when we call this the second time before END it's the destination
+	m_get_destination = true;   // when we call this the second time before END it's the destination
 	m_pass = 2;
 }
 
@@ -1668,7 +1668,7 @@ void tms99xx_device::alu_f1()
 	// Save the destination value
 	UINT16 prev_dest_value = m_current_value;
 
-	m_destination_even = ((m_address & 1)==0);	// this is the destination address; the source address has already been saved
+	m_destination_even = ((m_address & 1)==0);  // this is the destination address; the source address has already been saved
 	bool byteop = byte_operation();
 
 	if (byteop)
@@ -1775,7 +1775,7 @@ void tms99xx_device::alu_f1()
 
 void tms99xx_device::alu_comp()
 {
-	m_destination_even = ((m_address & 1)==0);	// this is the destination address; the source address has already been saved
+	m_destination_even = ((m_address & 1)==0);  // this is the destination address; the source address has already been saved
 	if (byte_operation())
 	{
 		if (!m_destination_even) m_current_value <<= 8;
@@ -1840,10 +1840,10 @@ void tms99xx_device::alu_multiply()
 		result = (m_source_value & 0x0000ffff) * (m_current_value & 0x0000ffff);
 		m_current_value = (result >> 16) & 0xffff;
 		m_value_copy = result & 0xffff;
-		pulse_clock(34);								// add 36 clock cycles (18 machine cycles); last one in main loop
+		pulse_clock(34);                                // add 36 clock cycles (18 machine cycles); last one in main loop
 		break;
 	case 2: // After writing the high word to the destination register
-		m_current_value = m_value_copy;						// Prepare to save low word
+		m_current_value = m_value_copy;                     // Prepare to save low word
 		m_address = (m_address + 2) & m_prgaddr_mask;
 		break;
 	}
@@ -1861,7 +1861,7 @@ void tms99xx_device::alu_divide()
 	switch (m_state)
 	{
 	case 0:
-		m_source_value = m_current_value;	// store divisor
+		m_source_value = m_current_value;   // store divisor
 		// Set address of register
 		m_address = WP + ((IR >> 5) & 0x001e);
 		m_address_copy = m_address;
@@ -1871,14 +1871,14 @@ void tms99xx_device::alu_divide()
 		// This is the case when the dividend / divisor >= 0x10000,
 		// or equivalently, dividend / 0x10000 >= divisor
 
-		if (m_current_value < m_source_value)	// also if source=0
+		if (m_current_value < m_source_value)   // also if source=0
 		{
-			MPC++;	// skip the abort
+			MPC++;  // skip the abort
 			overflow = false;
 		}
 		set_status_bit(ST_OV, overflow);
-		m_value_copy = m_current_value;			// Save the high word
-		m_address = (m_address + 2) & m_prgaddr_mask;		// Read next word
+		m_value_copy = m_current_value;         // Save the high word
+		m_address = (m_address + 2) & m_prgaddr_mask;       // Read next word
 		break;
 	case 2:
 		// W2 is in m_current_value
@@ -1901,7 +1901,7 @@ void tms99xx_device::alu_divide()
 		// we need as many cycles as it takes to
 		// shift away the dividend. Thus, bigger dividends need more cycles.
 
-		pulse_clock(62);	// one pulse is at the start, one at the end
+		pulse_clock(62);    // one pulse is at the start, one at the end
 		value1 = m_value_copy & 0xffff;
 
 		while (value1 != 0)
@@ -1935,10 +1935,10 @@ void tms99xx_device::alu_xop()
 		m_address = 0x0040 + ((IR >> 4) & 0x003c);
 		break;
 	case 1:
-		m_value_copy = WP;						// save the old WP
-		WP = m_current_value & m_prgaddr_mask;	// the new WP has been read in the previous microoperation
-		m_current_value = m_address_saved;		// we saved the address of the source operand; retrieve it
-		m_address = WP + 0x0016;				// Next register is R11
+		m_value_copy = WP;                      // save the old WP
+		WP = m_current_value & m_prgaddr_mask;  // the new WP has been read in the previous microoperation
+		m_current_value = m_address_saved;      // we saved the address of the source operand; retrieve it
+		m_address = WP + 0x0016;                // Next register is R11
 		break;
 	case 2:
 		m_address = WP + 0x001e;
@@ -1950,10 +1950,10 @@ void tms99xx_device::alu_xop()
 		break;
 	case 4:
 		m_address = WP + 0x001a;
-		m_current_value = m_value_copy;			// old WP into new R13
+		m_current_value = m_value_copy;         // old WP into new R13
 		break;
 	case 5:
-		m_address =  0x0042 + ((IR >> 4) & 0x003c);		// location of new PC
+		m_address =  0x0042 + ((IR >> 4) & 0x003c);     // location of new PC
 		set_status_bit(ST_X, true);
 		break;
 	case 6:
@@ -2030,7 +2030,7 @@ void tms99xx_device::alu_clr_swpb()
 
 	if (setstatus)
 	{
-		if (check_ov) set_status_bit(ST_OV, ((src_val & 0x8000)!=sign) && ((dest_new & 0x8000)==sign));
+		if (check_ov) set_status_bit(ST_OV, ((src_val & 0x8000)==sign) && ((dest_new & 0x8000)!=sign));
 		set_status_bit(ST_C, (dest_new & 0x10000) != 0);
 		m_current_value = dest_new & 0xffff;
 		compare_and_set_lae(m_current_value, 0);
@@ -2052,7 +2052,7 @@ void tms99xx_device::alu_abs()
 	if ((m_current_value & 0x8000)!=0)
 	{
 		m_current_value = (((~m_current_value) & 0x0000ffff) + 1) & 0xffff;
-		pulse_clock(2);		// If ABS is performed it takes one machine cycle more
+		pulse_clock(2);     // If ABS is performed it takes one machine cycle more
 	}
 	else
 	{
@@ -2093,21 +2093,21 @@ void tms99xx_device::alu_blwp()
 	{
 	case 0:
 		m_value_copy = WP;
-		WP = m_current_value & m_prgaddr_mask;				// set new WP (*m_destination)
-		m_address_saved = (m_address + 2) & m_prgaddr_mask;	// Save the location of the WP
+		WP = m_current_value & m_prgaddr_mask;              // set new WP (*m_destination)
+		m_address_saved = (m_address + 2) & m_prgaddr_mask; // Save the location of the WP
 		m_address = WP + 30;
-		m_current_value = ST;							// get status register
+		m_current_value = ST;                           // get status register
 		break;
 	case 1:
-		m_current_value = PC;							// get program counter
+		m_current_value = PC;                           // get program counter
 		m_address = m_address - 2;
 		break;
 	case 2:
-		m_current_value = m_value_copy;					// retrieve the old WP
+		m_current_value = m_value_copy;                 // retrieve the old WP
 		m_address = m_address - 2;
 		break;
 	case 3:
-		m_address = m_address_saved;					// point to PC component of branch vector
+		m_address = m_address_saved;                    // point to PC component of branch vector
 		break;
 	case 4:
 		PC = m_current_value & m_prgaddr_mask;
@@ -2138,7 +2138,7 @@ void tms99xx_device::alu_ldcr()
 	}
 	else
 	{
-		value = m_source_value;	// copied by ALU_SOURCE
+		value = m_source_value; // copied by ALU_SOURCE
 		m_count = (IR >> 6) & 0x000f;
 		if (m_count == 0) m_count = 16;
 		if (m_count <= 8)
@@ -2264,37 +2264,37 @@ void tms99xx_device::alu_jmp()
 		case JLT:   // LAECOP == x00xxx
 			cond = ((ST & (ST_AGT | ST_EQ))==0);
 			break;
-		case JLE:	// LAECOP == 0xxxxx
+		case JLE:   // LAECOP == 0xxxxx
 			cond = ((ST & ST_LH)==0);
 			break;
-		case JEQ:	// LAECOP == xx1xxx
+		case JEQ:   // LAECOP == xx1xxx
 			cond = ((ST & ST_EQ)!=0);
 			break;
-		case JHE:	// LAECOP == 1x0xxx, 0x1xxx
+		case JHE:   // LAECOP == 1x0xxx, 0x1xxx
 			cond = ((ST & (ST_LH | ST_EQ)) != 0);
 			break;
-		case JGT:	// LAECOP == x1xxxx
+		case JGT:   // LAECOP == x1xxxx
 			cond = ((ST & ST_AGT)!=0);
 			break;
-		case JNE:	// LAECOP == xx0xxx
+		case JNE:   // LAECOP == xx0xxx
 			cond = ((ST & ST_EQ)==0);
 			break;
-		case JNC:	// LAECOP == xxx0xx
+		case JNC:   // LAECOP == xxx0xx
 			cond = ((ST & ST_C)==0);
 			break;
-		case JOC:	// LAECOP == xxx1xx
+		case JOC:   // LAECOP == xxx1xx
 			cond = ((ST & ST_C)!=0);
 			break;
-		case JNO:	// LAECOP == xxxx0x
+		case JNO:   // LAECOP == xxxx0x
 			cond = ((ST & ST_OV)==0);
 			break;
-		case JL:	// LAECOP == 0x0xxx
+		case JL:    // LAECOP == 0x0xxx
 			cond = ((ST & (ST_LH | ST_EQ)) == 0);
 			break;
-		case JH:	// LAECOP == 1xxxxx
+		case JH:    // LAECOP == 1xxxxx
 			cond = ((ST & ST_LH)!=0);
 			break;
-		case JOP:	// LAECOP == xxxxx1
+		case JOP:   // LAECOP == xxxxx1
 			cond = ((ST & ST_OP)!=0);
 			break;
 		}
@@ -2302,7 +2302,7 @@ void tms99xx_device::alu_jmp()
 		if (!cond)
 		{
 			if (VERBOSE>7) LOG("tms99xx: Jump condition false\n");
-			MPC+=1;	// skip next ALU call
+			MPC+=1; // skip next ALU call
 		}
 		else
 			if (VERBOSE>7) LOG("tms99xx: Jump condition true\n");
@@ -2385,7 +2385,7 @@ void tms99xx_device::alu_shift()
 		set_status_bit(ST_C, carry);
 		set_status_bit(ST_OV, overflow);
 		compare_and_set_lae(m_current_value, 0);
-		m_address = m_address_saved;		// Register address
+		m_address = m_address_saved;        // Register address
 		if (VERBOSE>7) LOG("tms99xx: ST = %04x (val=%04x)\n", ST, m_current_value);
 		break;
 	}
@@ -2473,15 +2473,15 @@ void tms99xx_device::alu_rtwp()
 	switch (m_state)
 	{
 	case 0:
-		m_address = WP + 30;		// R15
+		m_address = WP + 30;        // R15
 		break;
 	case 1:
 		ST = m_current_value;
-		m_address -= 2;				// R14
+		m_address -= 2;             // R14
 		break;
 	case 2:
 		PC = m_current_value & m_prgaddr_mask;
-		m_address -= 2;				// R13
+		m_address -= 2;             // R13
 		break;
 	case 3:
 		WP = m_current_value & m_prgaddr_mask;
@@ -2514,8 +2514,8 @@ void tms99xx_device::alu_int()
 		break;
 	case 1:
 		m_address_copy = m_address;
-		m_value_copy = WP;							// old WP
-		WP = m_current_value & m_prgaddr_mask;		// new WP
+		m_value_copy = WP;                          // old WP
+		WP = m_current_value & m_prgaddr_mask;      // new WP
 		m_current_value = ST;
 		m_address = (WP + 30) & m_prgaddr_mask;
 		break;
@@ -2524,7 +2524,7 @@ void tms99xx_device::alu_int()
 		m_address = (WP + 28) & m_prgaddr_mask;
 		break;
 	case 3:
-		m_current_value = m_value_copy;	// old WP
+		m_current_value = m_value_copy; // old WP
 		m_address = (WP + 26) & m_prgaddr_mask;
 		break;
 	case 4:
