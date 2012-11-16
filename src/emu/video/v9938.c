@@ -82,7 +82,6 @@ v99x8_device::v99x8_device(const machine_config &mconfig, device_type type, cons
 	m_scanline(0),
 	m_blink(0),
 	m_blink_count(0),
-	m_sprite_limit(0),
 	m_size(0),
 	m_size_old(0),
 	m_size_auto(0),
@@ -1662,7 +1661,7 @@ void v99x8_device::sprite_mode1 (int line, UINT8 *col)
 				if ( !(m_stat_reg[0] & 0x40) )
 					m_stat_reg[0] = (m_stat_reg[0] & 0xa0) | 0x40 | p;
 
-				if (m_sprite_limit) break;
+				break;
 			}
 			// get x
 			x = m_vram_space->read_byte(attrtbl_addr + 1);
@@ -1785,7 +1784,7 @@ void v99x8_device::sprite_mode2 (int line, UINT8 *col)
 				if ( !(m_stat_reg[0] & 0x40) )
 					m_stat_reg[0] = (m_stat_reg[0] & 0xa0) | 0x40 | p;
 
-				if (m_sprite_limit) break;
+				break;
 			}
 
 			n = line - y; if (m_cont_reg[1] & 1) n /= 2;

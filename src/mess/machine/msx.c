@@ -524,7 +524,6 @@ DRIVER_INIT_MEMBER(msx_state,msx)
 
 TIMER_DEVICE_CALLBACK_MEMBER(msx_state::msx2_interrupt)
 {
-	m_v9938->set_sprite_limit(machine().root_device().ioport("DSW")->read() & 0x20);
 	m_v9938->set_resolution(machine().root_device().ioport("DSW")->read() & 0x03);
 	m_v9938->interrupt();
 }

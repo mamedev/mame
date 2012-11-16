@@ -74,7 +74,6 @@ protected:
 
 public:
 	int interrupt ();
-	void set_sprite_limit (int i) { m_sprite_limit = i; }
 	void set_resolution (int);
 	int get_transpen();
 	bitmap_ind16 &get_bitmap() { return m_bitmap; }
@@ -204,8 +203,6 @@ private:
 	int m_scanline;
     // blinking
     int m_blink, m_blink_count;
-    // sprites
-    int m_sprite_limit;
 	// size
 	int m_size, m_size_old, m_size_auto, m_size_now;
 	// mouse

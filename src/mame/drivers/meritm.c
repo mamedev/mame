@@ -431,11 +431,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::meritm_interrupt)
 
 	if((scanline % 2) == 0)
 	{
-		m_v9938_0->set_sprite_limit(0);
 		m_v9938_0->set_resolution(RENDER_HIGH);
 		m_v9938_0->interrupt();
 
-		m_v9938_1->set_sprite_limit(0);
 		m_v9938_1->set_resolution(RENDER_HIGH);
 		m_v9938_1->interrupt();
 	}
