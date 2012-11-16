@@ -1410,7 +1410,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 					fi.sub_state = COMMAND_DONE;
 					break;
 				}
-				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+				live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM);
 				return;
 			}
 			logerror("%s: reading sector %02x %02x %02x %02x\n",
