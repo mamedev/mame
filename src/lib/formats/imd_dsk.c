@@ -451,7 +451,7 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 		// Compute the available and expected size for gap3
 		int gap3 = form_factor == floppy_image::FF_8 ? 25 :
-			ssize < 512 ?
+			size < 512 ?
 			(form_factor == floppy_image::FF_35 ? 54 : 50) :
 			(form_factor == floppy_image::FF_35 ? 84 : 80);
 
