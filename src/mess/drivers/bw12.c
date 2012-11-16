@@ -23,20 +23,6 @@
 
 ****************************************************************************/
 
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/ram.h"
-#include "formats/mfi_dsk.h"
-#include "machine/6821pia.h"
-#include "machine/ctronics.h"
-#include "machine/upd765.h"
-#include "machine/pit8253.h"
-#include "machine/rescap.h"
-#include "machine/z80dart.h"
-#include "machine/kb3600.h"
-#include "video/mc6845.h"
-#include "sound/dac.h"
 #include "includes/bw12.h"
 
 /*
@@ -81,8 +67,8 @@ void bw12_state::bankswitch()
 
 void bw12_state::floppy_motor_off()
 {
-	m_floppy0->mon_w(true);
-	m_floppy1->mon_w(true);
+	m_floppy0->mon_w(1);
+	m_floppy1->mon_w(1);
 
 	m_motor_on = 0;
 }
@@ -97,7 +83,7 @@ void bw12_state::set_floppy_motor_off_timer()
 	if (m_motor0 || m_motor1)
 	{
 		m_motor_on = 1;
-		m_floppy_timer->enable(0);
+		m_floppy_timer->enable(false);
 	}
 	else
 	{
@@ -142,7 +128,7 @@ void bw12_state::ls259_w(int address, int data)
 
 		if (data)
 		{
-			m_floppy0->mon_w(false);
+			m_floppy0->mon_w(0);
 		}
 
 		set_floppy_motor_off_timer();
@@ -153,7 +139,7 @@ void bw12_state::ls259_w(int address, int data)
 
 		if (data)
 		{
-			m_floppy1->mon_w(false);
+			m_floppy1->mon_w(0);
 		}
 
 		set_floppy_motor_off_timer();
@@ -352,7 +338,6 @@ INPUT_PORTS_END
 static MC6845_UPDATE_ROW( bw12_update_row )
 {
 	bw12_state *state = device->machine().driver_data<bw12_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
 	int column, bit;
 
@@ -372,7 +357,7 @@ static MC6845_UPDATE_ROW( bw12_update_row )
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7);
 
-			bitmap.pix32(y, x) = palette[color];
+			bitmap.pix32(y, x) = RGB_MONOCHROME_AMBER[color];
 
 			data <<= 1;
 		}
@@ -525,7 +510,7 @@ static const struct pit8253_config pit_intf =
 		{
 			XTAL_1_8432MHz,
 			DEVCB_NULL,
-			DEVCB_DRIVER_LINE_MEMBER(bw12_state,pit_out0_w)
+			DEVCB_DRIVER_LINE_MEMBER(bw12_state, pit_out0_w)
 		},
 		{
 			XTAL_1_8432MHz,
@@ -618,29 +603,33 @@ void bw12_state::machine_start()
 
 void bw12_state::machine_reset()
 {
-	int i;
-
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		ls259_w(i, 0);
 	}
 }
 
 static SLOT_INTERFACE_START( bw12_floppies )
-	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_SSDD )
 SLOT_INTERFACE_END
 
 static const floppy_format_type bw12_floppy_formats[] = {
+	FLOPPY_BW12_FORMAT,
+	FLOPPY_IMD_FORMAT,
 	FLOPPY_MFI_FORMAT,
+	FLOPPY_MFM_FORMAT,
 	NULL
 };
 
 static SLOT_INTERFACE_START( bw14_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
 static const floppy_format_type bw14_floppy_formats[] = {
+	FLOPPY_BW12_FORMAT,
+	FLOPPY_IMD_FORMAT,
 	FLOPPY_MFI_FORMAT,
+	FLOPPY_MFM_FORMAT,
 	NULL
 };
 
@@ -679,8 +668,6 @@ static MACHINE_CONFIG_START( common, bw12_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 
 	MCFG_GFXDECODE(bw12)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(monochrome_amber)
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_16MHz/8, bw12_mc6845_interface)
 
@@ -704,8 +691,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bw12, common )
 	/* floppy drives */
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", bw12_floppies, "525ssdd", 0, bw12_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw12_floppies, "525ssdd", 0, bw12_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", bw12_floppies, "525dd", 0, bw12_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw12_floppies, "525dd", 0, bw12_floppy_formats)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "bw12")
@@ -717,8 +704,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bw14, common )
 	/* floppy drives */
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", bw14_floppies, "525hd", 0, bw14_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw14_floppies, "525hd", 0, bw14_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", bw14_floppies, "525dd", 0, bw14_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw14_floppies, "525dd", 0, bw14_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

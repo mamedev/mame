@@ -1,7 +1,23 @@
 #ifndef __BW12__
 #define __BW12__
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
 #include "machine/ram.h"
+#include "formats/bw12_dsk.h"
+#include "formats/hxcmfm_dsk.h"
+#include "formats/imd_dsk.h"
+#include "formats/mfi_dsk.h"
+#include "machine/6821pia.h"
+#include "machine/ctronics.h"
+#include "machine/kb3600.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/rescap.h"
+#include "machine/upd765.h"
+#include "machine/z80dart.h"
+#include "video/mc6845.h"
+#include "sound/dac.h"
 
 #define SCREEN_TAG			"screen"
 #define Z80_TAG				"ic35"
@@ -31,11 +47,11 @@ public:
 		  m_crtc(*this, MC6845_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, UPD765_TAG ":0:525ssdd"),
-		  m_floppy1(*this, UPD765_TAG ":1:525ssdd"),
-		  m_floppy_timer(*this, FLOPPY_TIMER_TAG)
-	,
-		m_video_ram(*this, "video_ram"){ }
+		  m_floppy0(*this, UPD765_TAG ":0:525dd"),
+		  m_floppy1(*this, UPD765_TAG ":1:525dd"),
+		  m_floppy_timer(*this, FLOPPY_TIMER_TAG),
+		  m_video_ram(*this, "video_ram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
