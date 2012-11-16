@@ -475,9 +475,9 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				int cpos;
 				UINT16 crc;
 				// sync and IDAM and gap 2
-				for(int j=0; j< 6; j++) fm_w(track_data, tpos, 8, 0xff);
+				for(int j=0; j< 6; j++) fm_w(track_data, tpos, 8, 0x00);
 				cpos = tpos;
-				raw_w(track_data, tpos, 8, 0xf57e);
+				raw_w(track_data, tpos, 16, 0xf57e);
 				fm_w (track_data, tpos, 8, tnum ? tnum[i] : track);
 				fm_w (track_data, tpos, 8, hnum ? hnum[i] : head);
 				fm_w (track_data, tpos, 8, snum[i]);
@@ -491,9 +491,9 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 				else {
 					// sync, DAM, data and gap 3
-					for(int j=0; j< 6; j++) fm_w(track_data, tpos, 8, 0xff);
+					for(int j=0; j< 6; j++) fm_w(track_data, tpos, 8, 0x00);
 					cpos = tpos;
-					raw_w(track_data, tpos, 8, stype == 3 || stype == 4 || stype == 7 || stype == 8 ? 0xf56a : 0xf56f);
+					raw_w(track_data, tpos, 16, stype == 3 || stype == 4 || stype == 7 || stype == 8 ? 0xf56a : 0xf56f);
 					if(stype == 2 || stype == 4 || stype == 6 || stype == 8) {
 						for(int j=0; j<size; j++) fm_w(track_data, tpos, 8, img[pos]);
 						pos++;

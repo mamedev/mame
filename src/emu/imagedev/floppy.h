@@ -110,6 +110,7 @@ protected:
 	int tracks; /* addressable tracks */
 	int sides;  /* number of heads */
 	UINT32 form_factor; /* 3"5, 5"25, etc */
+	bool motor_always_on;
 
 	/* state of input lines */
 	int dir;  /* direction */
@@ -282,6 +283,17 @@ protected:
 	virtual void setup_characteristics();
 };
 
+class floppy_8_dsdd : public floppy_image_device {
+public:
+	floppy_8_dsdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~floppy_8_dsdd();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
+	virtual void device_config_complete() { m_shortname = "floppy_8_dsdd"; }
+	virtual const char *image_interface() const { return "floppy_8"; }
+protected:
+	virtual void setup_characteristics();
+};
+
 class floppy_connector: public device_t,
 						public device_slot_interface
 {
@@ -314,5 +326,6 @@ extern const device_type FLOPPY_525_DD;
 extern const device_type FLOPPY_525_QD;
 extern const device_type FLOPPY_525_HD;
 extern const device_type FLOPPY_8_SSSD;
+extern const device_type FLOPPY_8_DSDD;
 
 #endif /* FLOPPY_H */

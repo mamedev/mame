@@ -613,7 +613,7 @@ static const floppy_format_type apc_floppy_formats[] = {
 };
 
 static SLOT_INTERFACE_START( apc_floppies )
-	SLOT_INTERFACE( "8sd", FLOPPY_8_SSSD ) // TODO: Ok?
+	SLOT_INTERFACE( "8", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
 PALETTE_INIT_MEMBER(apc_state,apc)
@@ -641,8 +641,8 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_I8237_ADD("8237dma", MAIN_CLOCK, dma8237_config)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", apc_floppies, "8sd", 0, apc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", apc_floppies, "8sd", 0, apc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", apc_floppies, "8", 0, apc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", apc_floppies, "8", 0, apc_floppy_formats)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

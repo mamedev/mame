@@ -195,7 +195,7 @@ void upd765_family_device::ready_w(bool _ready)
 bool upd765_family_device::get_ready(int fid)
 {
 	if(ready_connected)
-		return flopi[fid].dev ? flopi[fid].dev->ready_r() : false;
+		return flopi[fid].dev ? !flopi[fid].dev->ready_r() : false;
 	return external_ready;
 }
 
@@ -438,8 +438,11 @@ void upd765_family_device::disable_transfer()
 void upd765_family_device::fifo_push(UINT8 data, bool internal)
 {
 	if(fifo_pos == 16) {
-		if(internal)
+		if(internal) {
+			if(!(st1 & ST1_OR))
+				logerror("%s: Fifo overrun\n", tag());
 			st1 |= ST1_OR;
+		}
 		return;
 	}
 	fifo[fifo_pos++] = data;
@@ -456,8 +459,11 @@ void upd765_family_device::fifo_push(UINT8 data, bool internal)
 UINT8 upd765_family_device::fifo_pop(bool internal)
 {
 	if(!fifo_pos) {
-		if(internal)
+		if(internal) {
+			if(!(st1 & ST1_OR))
+				logerror("%s: Fifo underrun\n", tag());
 			st1 |= ST1_OR;
+		}
 		return 0;
 	}
 	UINT8 r = fifo[0];
@@ -668,6 +674,30 @@ void upd765_family_device::live_run(attotime limit)
 			break;
 		}
 
+		case SEARCH_ADDRESS_MARK_HEADER_FM:
+			if(read_one_bit(limit))
+				return;
+#if 0
+			fprintf(stderr, "%s: shift = %04x data=%02x c=%d\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
+					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
+					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
+					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
+					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
+					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
+					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
+					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
+					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
+					cur_live.bit_counter);
+#endif
+
+			if(cur_live.shift_reg == 0xf57e) {
+				cur_live.crc = 0xef21;
+				cur_live.data_separator_phase = false;
+				cur_live.bit_counter = 0;
+				cur_live.state = READ_ID_BLOCK;
+			}
+			break;
+
 		case READ_ID_BLOCK: {
 			if(read_one_bit(limit))
 				return;
@@ -756,6 +786,34 @@ void upd765_family_device::live_run(attotime limit)
 			st2 |= ST2_MD;
 			cur_live.state = IDLE;
 			return;
+
+		case SEARCH_ADDRESS_MARK_DATA_FM:
+			if(read_one_bit(limit))
+				return;
+#if 0
+			fprintf(stderr, "%s: shift = %04x data=%02x c=%d.%x\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
+					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
+					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
+					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
+					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
+					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
+					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
+					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
+					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
+					cur_live.bit_counter >> 4, cur_live.bit_counter & 15);
+#endif
+			if(cur_live.bit_counter > 23*16) {
+				live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
+				return;
+			}
+
+			if(cur_live.bit_counter >= 11*16 && (cur_live.shift_reg == 0xf56a || cur_live.shift_reg == 0xf56f)) {
+				cur_live.crc = cur_live.shift_reg == 0xf56a ? 0x8fe7 : 0xbf84;
+				cur_live.data_separator_phase = false;
+				cur_live.bit_counter = 0;
+				cur_live.state = READ_SECTOR_DATA;
+			}
+			break;
 
 		case READ_SECTOR_DATA: {
 			if(read_one_bit(limit))
@@ -1331,7 +1389,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 		case SEEK_DONE:
 			fi.counter = 0;
 			fi.sub_state = SCAN_ID;
-			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+			live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM);
 			return;
 
 		case SCAN_ID:
@@ -1364,7 +1422,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			sector_size = calc_sector_size(cur_live.idbuf[3]);
 			fifo_expect(sector_size, false);
 			fi.sub_state = SECTOR_READ;
-			live_start(fi, SEARCH_ADDRESS_MARK_DATA);
+			live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_DATA : SEARCH_ADDRESS_MARK_DATA_FM);
 			return;
 
 		case SCAN_ID_FAILED:
@@ -2017,6 +2075,23 @@ void upd765_family_device::live_write_mfm(UINT8 mfm)
 	cur_live.shift_reg = raw;
 	cur_live.data_bit_context = context;
 	//  logerror("write %02x   %04x %04x\n", mfm, cur_live.crc, raw);
+}
+
+void upd765_family_device::live_write_fm(UINT8 fm)
+{
+	bool context = cur_live.data_bit_context;
+	UINT16 raw = 0;
+	for(int i=0; i<8; i++) {
+		bool bit = fm & (0x80 >> i);
+		raw |= 0x8000 >> (2*i);
+		if(bit)
+			raw |= 0x4000 >> (2*i);
+		context = bit;
+	}
+	cur_live.data_reg = fm;
+	cur_live.shift_reg = raw;
+	cur_live.data_bit_context = context;
+	//  logerror("write %02x   %04x %04x\n", fm, cur_live.crc, raw);
 }
 
 bool upd765_family_device::sector_matches() const

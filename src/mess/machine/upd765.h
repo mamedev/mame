@@ -208,10 +208,12 @@ protected:
 
 		// Live states
 		SEARCH_ADDRESS_MARK_HEADER,
+		SEARCH_ADDRESS_MARK_HEADER_FM,
 		READ_HEADER_BLOCK_HEADER,
 		READ_DATA_BLOCK_HEADER,
 		READ_ID_BLOCK,
 		SEARCH_ADDRESS_MARK_DATA,
+		SEARCH_ADDRESS_MARK_DATA_FM,
 		SEARCH_ADDRESS_MARK_DATA_FAILED,
 		READ_SECTOR_DATA,
 		READ_SECTOR_DATA_BYTE,
@@ -374,6 +376,7 @@ protected:
 	void live_sync();
 	void live_run(attotime limit = attotime::never);
 	void live_write_raw(UINT16 raw);
+	void live_write_fm(UINT8 fm);
 	void live_write_mfm(UINT8 mfm);
 
 	bool read_one_bit(attotime limit);
