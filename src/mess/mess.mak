@@ -778,6 +778,8 @@ $(MESSOBJ)/bnpo.a:				\
 
 $(MESSOBJ)/bondwell.a:			\
 	$(MESS_DRIVERS)/bw2.o		\
+	$(MESS_MACHINE)/bw2exp.o	\
+	$(MESS_MACHINE)/bw2_ramcard.o	\
 	$(MESS_DRIVERS)/bw12.o		\
 
 $(MESSOBJ)/booth.a:				\
