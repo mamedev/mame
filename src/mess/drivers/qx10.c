@@ -42,6 +42,8 @@
 #include "machine/upd765.h"
 #include "machine/ram.h"
 #include "formats/mfi_dsk.h"
+#include "formats/d88_dsk.h"
+#include "formats/imd_dsk.h"
 
 #define MAIN_CLK	15974400
 
@@ -304,8 +306,10 @@ WRITE8_MEMBER( qx10_state::cmos_sel_w )
 */
 
 static const floppy_format_type qx10_floppy_formats[] = {
+	FLOPPY_D88_FORMAT,
+	FLOPPY_IMD_FORMAT,
 	FLOPPY_MFI_FORMAT,
-	NULL
+	NULL // TODO: TD0 format
 };
 
 static SLOT_INTERFACE_START( qx10_floppies )
