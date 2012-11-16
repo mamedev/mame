@@ -5,9 +5,8 @@
 	preliminary driver by Angelo Salese
 
 	TODO:
-	- Bogus DMA check, patched out for now
 	- video emulation
-	- Floppy device and IMD support
+	- Floppy device
 	- keyboard
 	- Understand interrupt sources
 	- NMI seems valid, dumps a x86 stack to vram?
@@ -47,6 +46,10 @@
 	0x61 - 0x67 (Mirror of pit8253?)
 	0x68 - 0x6f parallel port
 
+----------------------------------------------------------------------------
+0xfe3c2: checks if the floppy has a valid string for booting (either "CP/M-86"
+         or "MS-DOS"), if not, branches with the successive jne.
+
 ***************************************************************************/
 
 
@@ -54,7 +57,7 @@
 #include "cpu/i86/i86.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 #include "machine/upd765.h"
 #include "video/upd7220.h"
 #include "imagedev/flopdrv.h"
@@ -74,7 +77,7 @@ public:
 		m_i8259_m(*this, "pic8259_master"),
 		m_i8259_s(*this, "pic8259_slave"),
 		m_fdc(*this, "upd765"),
-		m_dma(*this, "8237dma"),
+		m_dmac(*this, "i8237"),
 		m_video_ram_1(*this, "video_ram_1"),
 		m_video_ram_2(*this, "video_ram_2")
 	{ }
@@ -86,7 +89,7 @@ public:
 	required_device<pic8259_device> m_i8259_m;
 	required_device<pic8259_device> m_i8259_s;
 	required_device<upd765a_device> m_fdc;
-	required_device<i8237_device> m_dma;
+	required_device<am9517a_device> m_dmac;
 	UINT8 *m_char_rom;
 
 	required_shared_ptr<UINT8> m_video_ram_1;
@@ -129,9 +132,8 @@ public:
 	DECLARE_DRIVER_INIT(apc);
 	DECLARE_PALETTE_INIT(apc);
 
-	int m_dma_channel;
-	UINT8 m_dma_offset[2][4];
-	UINT8 m_at_pages[0x10];
+	int m_dack;
+	UINT8 m_dma_offset[4];
 
 protected:
 	// driver_device overrides
@@ -339,7 +341,7 @@ WRITE8_MEMBER(apc_state::apc_kbd_w)
 
 WRITE8_MEMBER(apc_state::apc_dma_segments_w)
 {
-	m_dma_offset[0][offset & 3] = data & 0x0f;
+	m_dma_offset[offset & 3] = data & 0x0f;
 }
 
 /*
@@ -374,17 +376,17 @@ CH3_EXA ==      0X3E                      ; CH-3 extended address (W)
 
 READ8_MEMBER(apc_state::apc_dma_r)
 {
-	return i8237_r(m_dma, space, BITSWAP8(offset,7,6,5,4,2,1,0,3));
+	return machine().device<am9517a_device>("i8237")->read(space, BITSWAP8(offset,7,6,5,4,2,1,0,3), 0xff);
 }
 
 WRITE8_MEMBER(apc_state::apc_dma_w)
 {
-	i8237_w(m_dma, space, BITSWAP8(offset,7,6,5,4,2,1,0,3), data);
+	machine().device<am9517a_device>("i8237")->write(space, BITSWAP8(offset,7,6,5,4,2,1,0,3), data, 0xff);
 }
 
 
 static ADDRESS_MAP_START( apc_map, AS_PROGRAM, 16, apc_state )
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM
+	AM_RANGE(0x00000, 0x9ffff) AM_RAM
 //	AM_RANGE(0xa0000, 0xaffff) space for an external ROM
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
@@ -466,13 +468,15 @@ INPUT_PORTS_END
 
 void apc_state::fdc_drq(bool state)
 {
-	printf("%02x DRQ\n",state);
-	i8237_dreq0_w(m_dma, state);
+//	printf("%02x DRQ\n",state);
+//	i8237_dreq0_w(m_dma, state);
+	m_dmac->dreq1_w(state);
+
 }
 
 void apc_state::fdc_irq(bool state)
 {
-	printf("IRQ %d\n",state);
+//	printf("IRQ %d\n",state);
 	pic8259_ir3_w(machine().device("pic8259_slave"), state);
 }
 
@@ -620,54 +624,58 @@ static const struct pic8259_interface pic8259_slave_config =
 
 WRITE_LINE_MEMBER(apc_state::apc_dma_hrq_changed)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
-	printf("%02x HLDA\n",state);
+	m_dmac->hack_w(state);
 
-	/* Assert HLDA */
-	i8237_hlda_w( machine().device("dma8237"), state );
+//	printf("%02x HLDA\n",state);
 }
 
 WRITE_LINE_MEMBER( apc_state::apc_tc_w )
 {
 	/* floppy terminal count */
-//	m_fdc->tc_w(!state);
+	m_fdc->tc_w(state);
+
 	printf("TC %02x\n",state);
 }
 
 READ8_MEMBER(apc_state::apc_dma_read_byte)
 {
-	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
-		& 0xFF0000;
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
 
-	return space.read_byte(page_offset + offset);
+	printf("%08x\n",addr);
+
+	return program.read_byte(addr);
 }
 
 
 WRITE8_MEMBER(apc_state::apc_dma_write_byte)
 {
-	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
-		& 0xFF0000;
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
 
-	space.write_byte(page_offset + offset, data);
+//	printf("%08x %02x\n",addr,data);
+
+	program.write_byte(addr, data);
 }
 
 static void set_dma_channel(running_machine &machine, int channel, int state)
 {
 	apc_state *drvstate = machine.driver_data<apc_state>();
-	if (!state) drvstate->m_dma_channel = channel;
+	if (!state) drvstate->m_dack = channel;
 }
 
-WRITE_LINE_MEMBER(apc_state::apc_dack0_w){ printf("%02x 0\n",state); set_dma_channel(machine(), 0, state); }
-WRITE_LINE_MEMBER(apc_state::apc_dack1_w){ printf("%02x 1\n",state); set_dma_channel(machine(), 1, state); }
-WRITE_LINE_MEMBER(apc_state::apc_dack2_w){ printf("%02x 2\n",state); set_dma_channel(machine(), 2, state); }
-WRITE_LINE_MEMBER(apc_state::apc_dack3_w){ printf("%02x 3\n",state); set_dma_channel(machine(), 3, state); }
+WRITE_LINE_MEMBER(apc_state::apc_dack0_w){ /*printf("%02x 0\n",state);*/ set_dma_channel(machine(), 0, state); }
+WRITE_LINE_MEMBER(apc_state::apc_dack1_w){ /*printf("%02x 1\n",state);*/ set_dma_channel(machine(), 1, state); }
+WRITE_LINE_MEMBER(apc_state::apc_dack2_w){ /*printf("%02x 2\n",state);*/ set_dma_channel(machine(), 2, state); }
+WRITE_LINE_MEMBER(apc_state::apc_dack3_w){ /*printf("%02x 3\n",state);*/ set_dma_channel(machine(), 3, state); }
 
 READ8_MEMBER(apc_state::test_r)
 {
-	printf("2dd DACK R\n");
+//	printf("2dd DACK R\n");
 
-	return 0xff;
+	return m_fdc->dma_r();
 }
 
 WRITE8_MEMBER(apc_state::test_w)
@@ -675,7 +683,7 @@ WRITE8_MEMBER(apc_state::test_w)
 	printf("2dd DACK W\n");
 }
 
-static I8237_INTERFACE( dma8237_config )
+static I8237_INTERFACE( dmac_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dma_hrq_changed),
 	DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_tc_w),
@@ -719,7 +727,7 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_PIT8253_ADD( "pit8253", pit8253_config )
 	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
-	MCFG_I8237_ADD("8237dma", MAIN_CLOCK, dma8237_config)
+	MCFG_I8237_ADD("i8237", MAIN_CLOCK, dmac_intf)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", apc_floppies, "8", 0, apc_floppy_formats)
