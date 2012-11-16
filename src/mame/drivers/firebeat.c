@@ -1132,8 +1132,17 @@ static void atapi_command_reg_w(running_machine &machine, int reg, UINT16 data)
 				}
 
 				// perform special ATAPI processing of certain commands
+				//if (state->m_atapi_drivesel==1) logerror("!!!ATAPI COMMAND %x\n", state->m_atapi_data[0]&0xff);
 				switch (state->m_atapi_data[0]&0xff)
 				{
+                       
+                    case 0x55:	// MODE SELECT
+						state->m_atapi_cdata_wait = state->m_atapi_data[4]/2;
+						state->m_atapi_data_ptr = 0;
+						logerror("ATAPI: Waiting for %x bytes of MODE SELECT data\n", state->m_atapi_cdata_wait);
+						break;
+
+                    
 					case 0xa8:	// READ (12)
 						// indicate data ready: set DRQ and DMA ready, and IO in INTREASON
 						state->m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
@@ -1145,8 +1154,8 @@ static void atapi_command_reg_w(running_machine &machine, int reg, UINT16 data)
 					case 0x00: // BUS RESET / TEST UNIT READY
 					case 0xbb: // SET CD SPEED
 					case 0xa5: // PLAY AUDIO
-					case 0x1b:
-					case 0x4e:
+					case 0x1b: // START_STOP_UNIT 
+					case 0x4e: // STOPPLAY_SCAN 
 						state->m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 						break;
 				}
@@ -2315,6 +2324,22 @@ ROM_START( ppp )
 	// TODO: the audio CD is not dumped
 ROM_END
 
+ROM_START( ppp1mp )
+	ROM_REGION32_BE(0x80000, "user1", 0)
+	ROM_LOAD16_WORD_SWAP("977jaa03.21e", 0x00000, 0x80000, CRC(7b83362a) SHA1(2857a93be58636c10a8d180dbccf2caeeaaff0e2))
+
+	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
+
+	ROM_REGION(0xc0, "user2", 0)	// Security dongle
+	ROM_LOAD( "gqa11-ja",     0x000000, 0x0000c0, CRC(2ed8e2ae) SHA1(b8c3410dab643111b2d2027068175ba018a0a67e) ) 
+
+	DISK_REGION( "scsi0" )
+	DISK_IMAGE_READONLY( "a11jaa01", 0, SHA1(539ec6f1c1d198b0d6ce5543eadcbb4d9917fa42) )
+
+	DISK_REGION( "scsi1" )
+	DISK_IMAGE_READONLY( "a11jaa02", 0, SHA1(575069570cb4a2b58b199a1329d45b189a20fcc9) )
+ROM_END
+
 ROM_START( kbm )
 	ROM_REGION32_BE(0x80000, "user1", 0)
 	ROM_LOAD16_WORD_SWAP("974a03.21e", 0x00000, 0x80000, CRC(ef9a932d) SHA1(6299d3b9823605e519dbf1f105b59a09197df72f))
@@ -2437,6 +2462,7 @@ ROM_END
 GAME( 2000, ppp,      0,       firebeat,      ppp, firebeat_state,    ppp,      ROT0,   "Konami",  "ParaParaParadise", GAME_NOT_WORKING)
 GAME( 2000, ppd,      0,       firebeat,      ppp, firebeat_state,    ppd,      ROT0,   "Konami",  "ParaParaDancing", GAME_NOT_WORKING)
 GAME( 2000, ppp11,    0,       firebeat,      ppp, firebeat_state,    ppp,      ROT0,   "Konami",  "ParaParaParadise v1.1", GAME_NOT_WORKING)
+GAME( 2000, ppp1mp,   ppp,     firebeat,      ppp, firebeat_state,    ppp,      ROT0,   "Konami",  "ParaParaParadise 1st Mix Plus", GAME_NOT_WORKING)
 GAMEL(2000, kbm,      0,       firebeat2,     kbm, firebeat_state,    kbm,    ROT270,   "Konami",  "Keyboardmania", GAME_NOT_WORKING, layout_firebeat)
 GAMEL(2000, kbm2nd,   0,       firebeat2,     kbm, firebeat_state,    kbm,    ROT270,   "Konami",  "Keyboardmania 2nd Mix", GAME_NOT_WORKING, layout_firebeat)
 GAMEL(2001, kbm3rd,   0,       firebeat2,     kbm, firebeat_state,    kbm,    ROT270,   "Konami",  "Keyboardmania 3rd Mix", GAME_NOT_WORKING, layout_firebeat)

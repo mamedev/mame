@@ -272,6 +272,19 @@ void scsicd_device::ExecCommand( int *transferLength )
 			SetPhase( SCSI_PHASE_STATUS );
 			*transferLength = 0;
 			break;
+			
+ 		case 0x4e: // STOP
+			if (cdrom)
+			{
+				cdda = cdda_from_cdrom(machine(), cdrom);
+				if (cdda != NULL)
+					cdda_stop_audio(cdda);
+			}
+
+			logerror("SCSICD: STOP_PLAY_SCAN\n");
+			SetPhase( SCSI_PHASE_STATUS );
+			*transferLength = 0;
+			break;
 
 		case 0x55: // MODE SELECT(10)
 			logerror("SCSICD: MODE SELECT length %x control %x\n", command[7]<<8 | command[8], command[1]);
