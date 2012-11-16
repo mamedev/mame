@@ -25,54 +25,54 @@
 /*
     Definition of bits in the status register
 */
-#define ST_INTPEND	0x80		/* interrupt pending */
-#define ST_DMAREQ	0x40		/* DMA request */
-#define ST_DONE		0x20		/* command done */
-#define ST_TERMCOD	0x18		/* termination code (see below) */
-#define ST_RDYCHNG	0x04		/* ready change */
-#define ST_OVRUN	0x02		/* overrun/underrun */
-#define ST_BADSECT	0x01		/* bad sector */
+#define ST_INTPEND  0x80        /* interrupt pending */
+#define ST_DMAREQ   0x40        /* DMA request */
+#define ST_DONE     0x20        /* command done */
+#define ST_TERMCOD  0x18        /* termination code (see below) */
+#define ST_RDYCHNG  0x04        /* ready change */
+#define ST_OVRUN    0x02        /* overrun/underrun */
+#define ST_BADSECT  0x01        /* bad sector */
 
 /*
     Definition of the termination codes (INT_STATUS)
 */
-#define ST_TC_SUCCESS	0x00	/* Successful completion */
-#define ST_TC_RDIDERR	0x08	/* Error in READ-ID sequence */
-#define ST_TC_SEEKERR	0x10	/* Error in SEEK sequence */
-#define ST_TC_DATAERR	0x18	/* Error in DATA-TRANSFER seq. */
+#define ST_TC_SUCCESS   0x00    /* Successful completion */
+#define ST_TC_RDIDERR   0x08    /* Error in READ-ID sequence */
+#define ST_TC_SEEKERR   0x10    /* Error in SEEK sequence */
+#define ST_TC_DATAERR   0x18    /* Error in DATA-TRANSFER seq. */
 
 
 /*
     Definition of bits in the Termination-Conditions register
 */
-#define TC_CRCPRE	0x80		/* CRC register preset, must be 1 */
-#define TC_UNUSED	0x40		/* bit 6 is not used and must be 0 */
-#define TC_INTDONE	0x20		/* interrupt on done */
-#define TC_TDELDAT	0x10		/* terminate on deleted data */
-#define TC_TDSTAT3	0x08		/* terminate on drive status 3 change */
-#define TC_TWPROT	0x04		/* terminate on write-protect (FDD only) */
-#define TC_INTRDCH	0x02		/* interrupt on ready change (FDD only) */
-#define TC_TWRFLT	0x01		/* interrupt on write-fault (HDD only) */
+#define TC_CRCPRE   0x80        /* CRC register preset, must be 1 */
+#define TC_UNUSED   0x40        /* bit 6 is not used and must be 0 */
+#define TC_INTDONE  0x20        /* interrupt on done */
+#define TC_TDELDAT  0x10        /* terminate on deleted data */
+#define TC_TDSTAT3  0x08        /* terminate on drive status 3 change */
+#define TC_TWPROT   0x04        /* terminate on write-protect (FDD only) */
+#define TC_INTRDCH  0x02        /* interrupt on ready change (FDD only) */
+#define TC_TWRFLT   0x01        /* interrupt on write-fault (HDD only) */
 
 /*
     Definition of bits in the Chip-Status register
 */
-#define CS_RETREQ	0x80		/* retry required */
-#define CS_ECCATT	0x40		/* ECC correction attempted */
-#define CS_CRCERR	0x20		/* ECC/CRC error */
-#define CS_DELDATA	0x10		/* deleted data mark */
-#define CS_SYNCERR	0x08		/* synchronization error */
-#define CS_COMPERR	0x04		/* compare error */
-#define CS_PRESDRV	0x03		/* present drive selected */
+#define CS_RETREQ   0x80        /* retry required */
+#define CS_ECCATT   0x40        /* ECC correction attempted */
+#define CS_CRCERR   0x20        /* ECC/CRC error */
+#define CS_DELDATA  0x10        /* deleted data mark */
+#define CS_SYNCERR  0x08        /* synchronization error */
+#define CS_COMPERR  0x04        /* compare error */
+#define CS_PRESDRV  0x03        /* present drive selected */
 
 /*
     Definition of bits in the Mode register
 */
-#define MO_TYPE		0x80		/* Hard disk (1) or floppy (0) */
-#define MO_CRCECC	0x60		/* Values for CRC/ECC handling */
-#define MO_DENSITY	0x10		/* FM = 1; MFM = 0 */
-#define MO_UNUSED	0x08		/* Unused, 0 */
-#define MO_STEPRATE	0x07		/* Step rates */
+#define MO_TYPE     0x80        /* Hard disk (1) or floppy (0) */
+#define MO_CRCECC   0x60        /* Values for CRC/ECC handling */
+#define MO_DENSITY  0x10        /* FM = 1; MFM = 0 */
+#define MO_UNUSED   0x08        /* Unused, 0 */
+#define MO_STEPRATE 0x07        /* Step rates */
 
 /*
     hfdc state structure
@@ -108,33 +108,33 @@
     ab0     desired head 0
 */
 
-#define OUT1_DRVSEL3	0x80
-#define OUT1_DRVSEL2	0x40
-#define OUT1_DRVSEL1	0x20
-#define OUT1_DRVSEL0	0x10
-#define OUT2_DRVSEL3_	0x80
-#define OUT2_REDWRT	0x40
-#define OUT2_STEPDIR	0x20
-#define OUT2_STEPPULSE	0x10
-#define OUT2_HEADSEL3	0x08
-#define OUT2_HEADSEL2	0x04
-#define OUT2_HEADSEL1	0x02
-#define OUT2_HEADSEL0	0x01
+#define OUT1_DRVSEL3    0x80
+#define OUT1_DRVSEL2    0x40
+#define OUT1_DRVSEL1    0x20
+#define OUT1_DRVSEL0    0x10
+#define OUT2_DRVSEL3_   0x80
+#define OUT2_REDWRT 0x40
+#define OUT2_STEPDIR    0x20
+#define OUT2_STEPPULSE  0x10
+#define OUT2_HEADSEL3   0x08
+#define OUT2_HEADSEL2   0x04
+#define OUT2_HEADSEL1   0x02
+#define OUT2_HEADSEL0   0x01
 
-#define DRIVE_TYPE	0x03
-#define TYPE_AT 	0x00
-#define TYPE_FLOPPY 	0x02  /* for testing on any floppy type */
-#define TYPE_FLOPPY8	0x02
-#define TYPE_FLOPPY5	0x03
+#define DRIVE_TYPE  0x03
+#define TYPE_AT     0x00
+#define TYPE_FLOPPY     0x02  /* for testing on any floppy type */
+#define TYPE_FLOPPY8    0x02
+#define TYPE_FLOPPY5    0x03
 
 #define MAX_SECTOR_LEN 256
 
 #define FORMAT_LONG false
 
-#define ERROR	0
-#define DONE	1
-#define AGAIN	2
-#define UNDEF	3
+#define ERROR   0
+#define DONE    1
+#define AGAIN   2
+#define UNDEF   3
 
 enum
 {
@@ -149,9 +149,9 @@ enum
     Step rates in microseconds for MFM. This is set in the mode register,
     bits 0-2. Single density doubles all values.
 */
-static const int step_hd[]	= { 22, 50, 100, 200, 400, 800, 1600, 3200 };
-static const int step_flop8[]	= { 218, 500, 1000, 2000, 4000, 8000, 16000, 32000 };
-static const int step_flop5[]	= { 436, 1000, 2000, 4000, 8000, 16000, 32000, 64000 };
+static const int step_hd[]  = { 22, 50, 100, 200, 400, 800, 1600, 3200 };
+static const int step_flop8[]   = { 218, 500, 1000, 2000, 4000, 8000, 16000, 32000 };
+static const int step_flop5[]   = { 436, 1000, 2000, 4000, 8000, 16000, 32000, 64000 };
 
 /*
     0.2 seconds for a revolution (300 rpm), +50% average waiting for index
@@ -171,18 +171,18 @@ enum
 	DMA15_8=1,
 	DMA23_16=2,
 	DESIRED_SECTOR=3,
-	DESIRED_HEAD=4, 	CURRENT_HEAD=4,
-	DESIRED_CYLINDER=5, 	CURRENT_CYLINDER=5,
-	SECTOR_COUNT=6, 	CURRENT_IDENT=6,
-	RETRY_COUNT=7,		TEMP_STORAGE2=7,
-	MODE=8, 		CHIP_STATUS=8,
-	INT_COMM_TERM=9,	DRIVE_STATUS=9,
-	DATA_DELAY=10,		DATA=10,
-	COMMAND=11, 		INT_STATUS=11
+	DESIRED_HEAD=4,     CURRENT_HEAD=4,
+	DESIRED_CYLINDER=5,     CURRENT_CYLINDER=5,
+	SECTOR_COUNT=6,     CURRENT_IDENT=6,
+	RETRY_COUNT=7,      TEMP_STORAGE2=7,
+	MODE=8,         CHIP_STATUS=8,
+	INT_COMM_TERM=9,    DRIVE_STATUS=9,
+	DATA_DELAY=10,      DATA=10,
+	COMMAND=11,         INT_STATUS=11
 };
 
-#define TRKSIZE_DD		6144
-#define TRKSIZE_SD		3172
+#define TRKSIZE_DD      6144
+#define TRKSIZE_SD      3172
 
 #define VERBOSE 1
 #define LOG logerror
@@ -444,7 +444,11 @@ void smc92x4_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		sync_status_in();
 		break;
 	case WRITE_TIMER:
-		deldata = m_command & 0x10;
+		// The specification is contraditory here :-(
+		// For formatting, bit 0x10 = 1 means normal, 0 means deleted
+		// while for writing sectors it is the opposite?!
+		// We believe the existing drivers which all set the bit for normal writing.
+		deldata = 0x10 - (m_command & 0x10);
 		redcur =  m_command & 0x08;
 		precomp = m_command & 0x07;
 		write_long = ((m_register_w[MODE]& MO_CRCECC)==0x40);
@@ -866,6 +870,7 @@ void smc92x4_device::data_transfer_write(chrn_id_hd id, int deldata, int redcur,
 
 	if (m_selected_drive_type & TYPE_FLOPPY)
 	{
+		if (VERBOSE>4) LOG("smc92x4 info: write sector CHS=(%d,%d,%d)\n", id.C, id.H, id.R);
 		floppy_drive_write_sector_data(m_drive, id.H, sector_data_id, (char *) buf, sector_len, false);
 	}
 	else
@@ -892,7 +897,7 @@ void smc92x4_device::data_transfer_write(chrn_id_hd id, int deldata, int redcur,
 	if (m_register_w[SECTOR_COUNT] == 0) return;
 
 	/* Else this is a multi-sector operation. */
-	m_register_w[DESIRED_SECTOR] =	m_register_r[DESIRED_SECTOR] = (m_register_w[DESIRED_SECTOR]+1) & 0xff;
+	m_register_w[DESIRED_SECTOR] =  m_register_r[DESIRED_SECTOR] = (m_register_w[DESIRED_SECTOR]+1) & 0xff;
 
 	/* Reinitialize retry count. */
 	m_register_w[RETRY_COUNT] = retry;
@@ -1948,7 +1953,7 @@ WRITE8_MEMBER( smc92x4_device::write )
 			m_register_pointer++;
 	}
 	else
-		process_command(data);	// command register
+		process_command(data);  // command register
 }
 
 
