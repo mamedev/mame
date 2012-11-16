@@ -100,6 +100,7 @@ public:
 	DECLARE_WRITE8_MEMBER(apc_gdc_w);
 	DECLARE_READ8_MEMBER(apc_kbd_r);
 	DECLARE_WRITE8_MEMBER(apc_kbd_w);
+	DECLARE_WRITE8_MEMBER(apc_dma_segments_w);
 
 	DECLARE_WRITE_LINE_MEMBER(apc_master_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
@@ -324,6 +325,11 @@ WRITE8_MEMBER(apc_state::apc_kbd_w)
 	printf("%08x %02x\n",offset,data);
 }
 
+WRITE8_MEMBER(apc_state::apc_dma_segments_w)
+{
+	m_dma_offset[0][offset & 3] = data & 0x0f;
+}
+
 static ADDRESS_MAP_START( apc_map, AS_PROGRAM, 16, apc_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 //	AM_RANGE(0xa0000, 0xaffff) space for an external ROM
@@ -336,7 +342,7 @@ static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0x00ff) // i8259
 	AM_RANGE(0x28, 0x2f) AM_READWRITE8(apc_port_28_r, apc_port_28_w, 0xffff)
 //	0x30, 0x37 serial port 0/1 (i8251) (even/odd)
-//	0x38, 0x3f DMA extended address
+	AM_RANGE(0x38, 0x3f) AM_WRITE8(apc_dma_segments_w,0x00ff)
 	AM_RANGE(0x40, 0x43) AM_READWRITE8(apc_gdc_r, apc_gdc_w, 0xffff)
 //  0x46 UPD7220 reset interrupt
 	AM_RANGE(0x48, 0x4f) AM_READWRITE8(apc_kbd_r, apc_kbd_w, 0x00ff)

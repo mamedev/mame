@@ -104,7 +104,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		{
 			tile_data = state->m_char_rom[(tile*8+yi) & 0x7ff];
 
-			if(cursor_on && cursor_addr == addr+x) //TODO
+			if(cursor_on && cursor_addr == addr+x && device->machine().primary_screen->frame_number() & 0x10)
 				tile_data^=0xff;
 
 			for( xi = 0; xi < 8; xi++)

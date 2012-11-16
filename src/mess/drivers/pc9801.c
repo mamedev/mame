@@ -564,7 +564,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(u_line && yi == 7) { tile_data = 0xff; }
 				if(v_line)	{ tile_data|=8; }
 
-				if(cursor_on && cursor_addr == tile_addr)
+				if(cursor_on && cursor_addr == tile_addr && device->machine().primary_screen->frame_number() & 0x10)
 					tile_data^=0xff;
 
 				if(yi >= char_size)
