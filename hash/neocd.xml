@@ -15,7 +15,129 @@
 		  </diskarea>
 	  </part>
   </software>
-    
+
+  <software name="lbowling">
+    <description>League Bowling (1994)(SNK)(JP-US)[!]</description>
+    <year>199?</year>
+    <publisher>SNK</publisher>
+    <part name="cdrom" interface="neocd_cdrom">
+      <diskarea name="cdrom">
+        <disk name="league bowling (1994)(snk)(jp-us)[!]" sha1="ca657fa76e16ae70745a6938770677c523daa041"/>
+      </diskarea>
+    </part>
+  </software>
+
+  <software name="crsword2">
+    <description>Crossed Swords II (1995)(ADK)(JP)[!]</description>
+    <year>199?</year>
+    <publisher>SNK</publisher>
+    <part name="cdrom" interface="neocd_cdrom">
+      <diskarea name="cdrom">
+        <disk name="crossed swords ii (1995)(adk)(jp)[!]" sha1="dc65e9a937bfc912c3fdaff0b8200bfd4df4c34c"/>
+      </diskarea>
+    </part>
+  </software>
+
+  <software name="zintrick">
+    <description>Oshidashi Zintrick (1996)(ADK)(JP)[!][Zintrick]</description>
+    <year>199?</year>
+    <publisher>SNK</publisher>
+    <part name="cdrom" interface="neocd_cdrom">
+      <diskarea name="cdrom">
+        <disk name="oshidashi zintrick (1996)(adk)(jp)[!][zintrick]" sha1="46ab081316ffc6d5cca76fee679e80270fe1a8ab"/>
+      </diskarea>
+    </part>
+  </software>
+
+  <software name="fromanc2">
+    <description>Idol Mahjong Final Romance 2 (1995)(Video System)(JP)[!]</description>
+    <year>199?</year>
+    <publisher>SNK</publisher>
+    <part name="cdrom" interface="neocd_cdrom">
+      <diskarea name="cdrom">
+        <disk name="idol mahjong final romance 2 (1995)(video system)(jp)[!]" sha1="63c2b6c8cccfbcba9c41efb61954db9885ff9869"/>
+      </diskarea>
+    </part>
+  </software>
+
+  <software name="lasthope">
+    <description>Last Hope (DE) [NGDT CD-300J] [N.A.]</description>
+    <year>199?</year>
+    <publisher>SNK</publisher>
+    <part name="cdrom" interface="neocd_cdrom">
+      <diskarea name="cdrom">
+        <disk name="cd-rom [ngdt cd-300j] [v2007-10-03] [!-]" sha1="4cf60613098531b49c447a2b223aeb49a6395fd2"/>
+      </diskarea>
+    </part>
+  </software>
+
+  <software name="ironclad">
+    <description>Choutetsu Brikin'ger (1996)(Saurus)(JP)[!][Ironclad]</description>
+    <year>199?</year>
+    <publisher>SNK</publisher>
+    <part name="cdrom" interface="neocd_cdrom">
+      <diskarea name="cdrom">
+        <disk name="choutetsu brikin'ger (1996)(saurus)(jp)[!][ironclad]" sha1="4d518370686853c727eb300a91c0f070c3333225"/>
+      </diskarea>
+    </part>
+  </software>
+
+  <software name="ncdspec">
+    <description>Neo Geo CD Special (1996)(SNK)(JP)[!]</description>
+    <year>199?</year>
+    <publisher>SNK</publisher>
+    <part name="cdrom" interface="neocd_cdrom">
+      <diskarea name="cdrom">
+        <disk name="neo geo cd special (1996)(snk)(jp)[!]" sha1="20ceb3e2cb21c6ccad99e0e21dc990affb4ecc39"/>
+      </diskarea>
+    </part>
+  </software>
+
+
+  <software name="kof96col">
+    <description>King of Fighters '96 NEOGEO Collection, The (1997)(SNK)(JP)[!][NGCD-229 MT B07]</description>
+    <year>199?</year>
+    <publisher>SNK</publisher>
+    <part name="cdrom" interface="neocd_cdrom">
+      <diskarea name="cdrom">
+        <disk name="king of fighters '96 neogeo collection, the (1997)(snk)(jp)[!][ngcd-229 mt b07]" sha1="4f0fa12fc1e6b77e08fbbfa84366dbb04ca09f32"/>
+      </diskarea>
+    </part>
+  </software>
+
+  <software name="trally">
+    <description>Rally Chase (1994)(ADK)(JP)[!]</description>
+    <year>199?</year>
+    <publisher>SNK</publisher>
+    <part name="cdrom" interface="neocd_cdrom">
+      <diskarea name="cdrom">
+        <disk name="rally chase (1994)(adk)(jp)[!]" sha1="07a394aaf9937206f4bd61e2c9f46afe1a43aecb"/>
+      </diskarea>
+    </part>
+  </software>
+
+  <software name="adkworld">
+    <description>ADK World (1995)(ADK)(JP)[!]</description>
+    <year>199?</year>
+    <publisher>SNK</publisher>
+    <part name="cdrom" interface="neocd_cdrom">
+      <diskarea name="cdrom">
+        <disk name="adk world (1995)(adk)(jp)[!]" sha1="c99032d62ce5bf6be9b1dc37c70ef45a4dc37180"/>
+      </diskarea>
+    </part>
+  </software>
+
+  <software name="samsrpg">
+    <description>Shinsetsu Samurai Spirits - Bushidohretsuden (1997)(SNK)(JP)[!][NGCD-0850 MT A01]</description>
+    <year>199?</year>
+    <publisher>SNK</publisher>
+    <part name="cdrom" interface="neocd_cdrom">
+      <diskarea name="cdrom">
+        <disk name="shinsetsu samurai spirits - bushidohretsuden (1997)(snk)(jp)[!][ngcd-0850 mt a01]" sha1="5df33f9533c2bc55c3354790bcafb1350039b438"/>
+      </diskarea>
+    </part>
+  </software>
+
   <!-- disable most things for now, until I actually get it working -->
   <!--
   <software name="2020bb">
@@ -36,17 +158,6 @@
 	  <part name="cdrom" interface="neocd_cdrom">
 		  <diskarea name="cdrom">
 			  <disk name="3 count bout (1995)(snk)(jp-us)[!][fire suplex]" sha1="d31d934452ed3d90c73a5f7ec2f13b502293287b"/>
-		  </diskarea>
-	  </part>
-  </software>
-
-  <software name="adkworld">
-	  <description>ADK World (1995)(ADK)(JP)[!]</description>
-	  <year>199?</year>
-	  <publisher>SNK</publisher>
-	  <part name="cdrom" interface="neocd_cdrom">
-		  <diskarea name="cdrom">
-			  <disk name="adk world (1995)(adk)(jp)[!]" sha1="c99032d62ce5bf6be9b1dc37c70ef45a4dc37180"/>
 		  </diskarea>
 	  </part>
   </software>
@@ -200,32 +311,12 @@
 	  <publisher>SNK</publisher>
 	  <part name="cdrom" interface="neocd_cdrom">
 		  <diskarea name="cdrom">
-			  <disk name="cd-rom [ngcd-500] [v2011-12-22] [!-].chd" sha1="95c9e0b42410ac4e384529b3c067cb55e9b0e537"/>
+			  <disk name="cd-rom [ngcd-500] [v2011-12-22] [!-]" sha1="95c9e0b42410ac4e384529b3c067cb55e9b0e537"/>
 		  </diskarea>
 	  </part>
   </software>
 
-  <software name="lasthope">
-	  <description>Last Hope (DE) [NGDT CD-300J] [N.A.]</description>
-	  <year>199?</year>
-	  <publisher>SNK</publisher>
-	  <part name="cdrom" interface="neocd_cdrom">
-		  <diskarea name="cdrom">
-			  <disk name="cd-rom [ngdt cd-300j] [v2007-10-03] [!-].chd" sha1="4cf60613098531b49c447a2b223aeb49a6395fd2"/>
-		  </diskarea>
-	  </part>
-  </software>
 
-  <software name="ironclad">
-	  <description>Choutetsu Brikin'ger (1996)(Saurus)(JP)[!][Ironclad]</description>
-	  <year>199?</year>
-	  <publisher>SNK</publisher>
-	  <part name="cdrom" interface="neocd_cdrom">
-		  <diskarea name="cdrom">
-			  <disk name="choutetsu brikin'ger (1996)(saurus)(jp)[!][ironclad]" sha1="4d518370686853c727eb300a91c0f070c3333225"/>
-		  </diskarea>
-	  </part>
-  </software>
 
   <software name="crsword">
 	  <description>Crossed Swords (1994)(ADK)(JP)[!]</description>
@@ -238,16 +329,7 @@
 	  </part>
   </software>
 
-  <software name="crsword2">
-	  <description>Crossed Swords II (1995)(ADK)(JP)[!]</description>
-	  <year>199?</year>
-	  <publisher>SNK</publisher>
-	  <part name="cdrom" interface="neocd_cdrom">
-		  <diskarea name="cdrom">
-			  <disk name="crossed swords ii (1995)(adk)(jp)[!]" sha1="dc65e9a937bfc912c3fdaff0b8200bfd4df4c34c"/>
-		  </diskarea>
-	  </part>
-  </software>
+
 
   <software name="cyberlip">
 	  <description>Cyber-Lip (1995)(SNK)(JP-US)[!]</description>
@@ -370,16 +452,6 @@
 	  </part>
   </software>
 
-  <software name="fromanc2">
-	  <description>Idol Mahjong Final Romance 2 (1995)(Video System)(JP)[!]</description>
-	  <year>199?</year>
-	  <publisher>SNK</publisher>
-	  <part name="cdrom" interface="neocd_cdrom">
-		  <diskarea name="cdrom">
-			  <disk name="idol mahjong final romance 2 (1995)(video system)(jp)[!]" sha1="63c2b6c8cccfbcba9c41efb61954db9885ff9869"/>
-		  </diskarea>
-	  </part>
-  </software>
 
   <software name="janshin">
 	  <description>Janshin Densetsu - Quest of the Jongmaster (1995)(SNK)(JP)[!]</description>
@@ -443,17 +515,6 @@
 	  <part name="cdrom" interface="neocd_cdrom">
 		  <diskarea name="cdrom">
 			  <disk name="king of fighters '95, the (1995)(snk)(jp-us)[!][ngcd-084 mt b10, ngcd-084e mt b03]" sha1="67f0ce0da3585043b3813be2fc0b7664b60c32d3"/>
-		  </diskarea>
-	  </part>
-  </software>
-
-  <software name="kof96col">
-	  <description>King of Fighters '96 NEOGEO Collection, The (1997)(SNK)(JP)[!][NGCD-229 MT B07]</description>
-	  <year>199?</year>
-	  <publisher>SNK</publisher>
-	  <part name="cdrom" interface="neocd_cdrom">
-		  <diskarea name="cdrom">
-			  <disk name="king of fighters '96 neogeo collection, the (1997)(snk)(jp)[!][ngcd-229 mt b07]" sha1="4f0fa12fc1e6b77e08fbbfa84366dbb04ca09f32"/>
 		  </diskarea>
 	  </part>
   </software>
@@ -546,17 +607,6 @@
 	  </part>
   </software>
 
-  <software name="lbowling">
-	  <description>League Bowling (1994)(SNK)(JP-US)[!]</description>
-	  <year>199?</year>
-	  <publisher>SNK</publisher>
-	  <part name="cdrom" interface="neocd_cdrom">
-		  <diskarea name="cdrom">
-			  <disk name="league bowling (1994)(snk)(jp-us)[!]" sha1="ca657fa76e16ae70745a6938770677c523daa041"/>
-		  </diskarea>
-	  </part>
-  </software>
-
   <software name="magdrop2">
 	  <description>Magical Drop 2 (1996)(Data East)(JP)[!]</description>
 	  <year>199?</year>
@@ -645,16 +695,7 @@
 	  </part>
   </software>
 
-  <software name="ncdspec">
-	  <description>Neo Geo CD Special (1996)(SNK)(JP)[!]</description>
-	  <year>199?</year>
-	  <publisher>SNK</publisher>
-	  <part name="cdrom" interface="neocd_cdrom">
-		  <diskarea name="cdrom">
-			  <disk name="neo geo cd special (1996)(snk)(jp)[!]" sha1="20ceb3e2cb21c6ccad99e0e21dc990affb4ecc39"/>
-		  </diskarea>
-	  </part>
-  </software>
+
 
   <software name="turfmast">
 	  <description>Neo Turf Masters (1996)(SNK)(JP)[!][Big Tournament Golf]</description>
@@ -700,16 +741,6 @@
 	  </part>
   </software>
 
-  <software name="zintrick">
-	  <description>Oshidashi Zintrick (1996)(ADK)(JP)[!][Zintrick]</description>
-	  <year>199?</year>
-	  <publisher>SNK</publisher>
-	  <part name="cdrom" interface="neocd_cdrom">
-		  <diskarea name="cdrom">
-			  <disk name="oshidashi zintrick (1996)(adk)(jp)[!][zintrick]" sha1="46ab081316ffc6d5cca76fee679e80270fe1a8ab"/>
-		  </diskarea>
-	  </part>
-  </software>
 
   <software name="overtop">
 	  <description>OverTop (1996)(ADK)(JP)[!]</description>
@@ -773,17 +804,6 @@
 	  <part name="cdrom" interface="neocd_cdrom">
 		  <diskarea name="cdrom">
 			  <disk name="raguy (1994)(adk)(jp)[!][blue's journey]" sha1="b1063594b9e214765b95e0446c041c2a5663ae20"/>
-		  </diskarea>
-	  </part>
-  </software>
-
-  <software name="trally">
-	  <description>Rally Chase (1994)(ADK)(JP)[!]</description>
-	  <year>199?</year>
-	  <publisher>SNK</publisher>
-	  <part name="cdrom" interface="neocd_cdrom">
-		  <diskarea name="cdrom">
-			  <disk name="rally chase (1994)(adk)(jp)[!]" sha1="07a394aaf9937206f4bd61e2c9f46afe1a43aecb"/>
 		  </diskarea>
 	  </part>
   </software>
@@ -927,17 +947,6 @@
 	  <part name="cdrom" interface="neocd_cdrom">
 		  <diskarea name="cdrom">
 			  <disk name="shinouken (1996)(saurus)(jp)[!][ragnagard]" sha1="ae219a7382645c648a78a2126f3cd1dfc01cd708"/>
-		  </diskarea>
-	  </part>
-  </software>
-
-  <software name="samsrpg">
-	  <description>Shinsetsu Samurai Spirits - Bushidohretsuden (1997)(SNK)(JP)[!][NGCD-0850 MT A01]</description>
-	  <year>199?</year>
-	  <publisher>SNK</publisher>
-	  <part name="cdrom" interface="neocd_cdrom">
-		  <diskarea name="cdrom">
-			  <disk name="shinsetsu samurai spirits - bushidohretsuden (1997)(snk)(jp)[!][ngcd-0850 mt a01]" sha1="5df33f9533c2bc55c3354790bcafb1350039b438"/>
 		  </diskarea>
 	  </part>
   </software>
