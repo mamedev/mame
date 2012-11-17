@@ -259,15 +259,6 @@ static void NeoSetTextSlot(INT32 nSlot)
 }
 
 
-static void neogeoSynchroniseZ80(INT32 nExtraCycles)
-{
-
-}
-
-static void ZetSetBUSREQLine(INT32 nStatus)
-{
-
-}
 
 
 
@@ -1398,8 +1389,9 @@ void ng_aes_state::neogeoWriteByteCDROM(UINT32 sekAddress, UINT8 byteValue)
 			break;
 		case 0x0127:
 //			bprintf(PRINT_NORMAL, _T("  - NGCD Z80 BUSREQ -> 1 (PC: 0x%06X)\n"), SekGetPC(-1));
-			neogeoSynchroniseZ80(0);
-			ZetSetBUSREQLine(1);
+			curr_space->machine().scheduler().synchronize();
+			curr_space->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
 			break;
 		case 0x0129:
 //			bprintf(PRINT_NORMAL, _T("  - NGCD FIX BUSREQ -> 1 (PC: 0x%06X)\n"), SekGetPC(-1));
@@ -1409,34 +1401,18 @@ void ng_aes_state::neogeoWriteByteCDROM(UINT32 sekAddress, UINT8 byteValue)
 		case 0x0141:
 //			bprintf(PRINT_NORMAL, _T("  - NGCD OBJ BUSREQ -> 0 (PC: 0x%06X)\n"), SekGetPC(-1));	
 			video_reset();
-			/* NO MAME
-			NeoSetSpriteSlot(0);
-			for (INT32 i = 0; i < 4; i++) {
-				if (NeoCDOBJBankUpdate[i]) {
-					NeoDecodeSpritesCD(NeoSpriteRAM + (i << 20), NeoSpriteROM[0] + (i << 20), 0x100000);
-					NeoUpdateSprites((i << 20), 0x100000);
-				}
-			}
-			*/
-
 			break;
 		case 0x0143:
 //			bprintf(PRINT_NORMAL, _T("  - NGCD PCM BUSREQ -> 0 (PC: 0x%06X)\n"), SekGetPC(-1));
 			break;
 		case 0x0147:
 //			bprintf(PRINT_NORMAL, _T("  - NGCD Z80 BUSREQ -> 0 (PC: 0x%06X)\n"), SekGetPC(-1));
-			neogeoSynchroniseZ80(0);
-			ZetSetBUSREQLine(0);
+			curr_space->machine().scheduler().synchronize();
+			curr_space->machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 			break;
 		case 0x0149:
 //			bprintf(PRINT_NORMAL, _T("  - NGCD FIX BUSREQ -> 0 (PC: 0x%06X)\n"), SekGetPC(-1));
 			video_reset();
-			
-			/* NO MAME
-
-				NeoSetTextSlot(0);
-				NeoUpdateText(0, 0x020000, NeoTextRAM, NeoTextROM[0]);
-			*/
 			break;
 
 		// CD mechanism communication
@@ -2599,8 +2575,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( neocd_main_map, AS_PROGRAM, 16, ng_aes_state )
 	AM_RANGE(0x000000, 0x00007f) AM_RAMBANK(NEOGEO_BANK_VECTORS)
-	AM_RANGE(0x000080, 0x0fffff) AM_RAM
-	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x0f0000) AM_RAM AM_SHARE("neocd_work_ram")
+	AM_RANGE(0x000080, 0x1fffff) AM_RAM AM_SHARE("neocd_work_ram")
 	/* some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too */
 	AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK(NEOGEO_BANK_CARTRIDGE)
 	AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
@@ -2663,6 +2638,31 @@ static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, ng_aes_state )
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) /* write - NMI disable? (the data written doesn't matter) */
 ADDRESS_MAP_END
 
+
+
+// does the Z80 actually see all of this as RAM on the NeoCD, or is it only actually writable via the transfer areas?
+static ADDRESS_MAP_START( neocd_audio_map, AS_PROGRAM, 8, ng_aes_state )
+	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK)
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK3)
+	AM_RANGE(0xc000, 0xdfff) AM_RAMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK2)
+	AM_RANGE(0xe000, 0xefff) AM_RAMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK1)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK0)
+	AM_RANGE(0xf800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( neocd_audio_io_map, AS_IO, 8, ng_aes_state )
+  /*AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, audio_cpu_clear_nmi_w);*/  /* may not and NMI clear */
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r)
+	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) /* write - NMI enable / acknowledge? (the data written doesn't matter) */
+//	AM_RANGE(0x08, 0x08) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_f000_f7ff_r)
+//	AM_RANGE(0x09, 0x09) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_e000_efff_r)
+//	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_c000_dfff_r)
+//	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_8000_bfff_r)
+	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_WRITE(audio_result_w)
+	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) /* write - NMI disable? (the data written doesn't matter) */
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -3068,6 +3068,11 @@ static MACHINE_CONFIG_DERIVED( neocd, neogeo )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(neocd_main_map)
+
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(neocd_audio_map)
+	MCFG_CPU_IO_MAP(neocd_audio_io_map)
+
 
 	MCFG_MACHINE_START_OVERRIDE(ng_aes_state,neocd)
 
