@@ -482,7 +482,7 @@ static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, 
 		while (samples)
 		{
 			/* fetch the current value */
-			val = (INT16)((ymz280b_read_memory(base, size, position / 2 + 0) << 8) + ymz280b_read_memory(base, size, position / 2 + 1));
+			val = (INT16)((ymz280b_read_memory(base, size, position / 2 + 1) << 8) + ymz280b_read_memory(base, size, position / 2 + 0));
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = val;
@@ -507,7 +507,7 @@ static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, 
 		while (samples)
 		{
 			/* fetch the current value */
-			val = (INT16)((ymz280b_read_memory(base, size, position / 2 + 0) << 8) + ymz280b_read_memory(base, size, position / 2 + 1));
+			val = (INT16)((ymz280b_read_memory(base, size, position / 2 + 1) << 8) + ymz280b_read_memory(base, size, position / 2 + 0));
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = val;
