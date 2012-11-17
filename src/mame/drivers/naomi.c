@@ -5508,6 +5508,31 @@ ROM_START( gunsur2 )
 	ROM_LOAD( "bhf1ma15.6l",  0xf000000, 0x1000000, CRC(db3c396b) SHA1(da0e125d627ce890906ca100081ab0685e11c0ef) )
 ROM_END
 
+ROM_START( gunsur2e )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x10000000, "rom_board", ROMREGION_ERASEFF)
+    ROM_LOAD( "bhf2_fl0.2f",  0x0000000, 0x0800000, CRC(756e0de6) SHA1(3eb325613b5095d36aae791a6b1f241e80736ddd) )
+	ROM_LOAD( "bhf1ma2.4m",   0x2000000, 0x1000000, CRC(8073dec7) SHA1(2d4173ff0de37b95a8cb02e1b572a9cdeb448c24) )
+	ROM_LOAD( "bhf1ma3.4l",   0x3000000, 0x1000000, CRC(43cd16a4) SHA1(86258df34b652a614129efd4c825c62ff1382318) )
+	ROM_LOAD( "bhf1ma4.4k",   0x4000000, 0x1000000, CRC(f6aebed8) SHA1(687057aacb45ebffe3b5cf2b8dd52d24039392f1) )
+	ROM_LOAD( "bhf1ma5.4j",   0x5000000, 0x1000000, CRC(b5e1b582) SHA1(47763113e6917bbf48840292c08d4f63c3ce085a) )
+	ROM_LOAD( "bhf1ma6.4h",   0x6000000, 0x1000000, CRC(345fd824) SHA1(61ebc12c7cd7f2e2c5173cc0f57240855ec99c6f) )
+	ROM_LOAD( "bhf1ma7.4f",   0x7000000, 0x1000000, CRC(465ecff1) SHA1(f9eabc77ed8135fa77c8e40335e6b3df1a64042c) )
+	ROM_LOAD( "bhf1ma8.4d",   0x8000000, 0x1000000, CRC(76c92354) SHA1(0049b10144d65f574d14d9ad9d1d5380bf154532) )
+	ROM_LOAD( "bhf1ma9.4e",   0x9000000, 0x1000000, CRC(d45a46ee) SHA1(c12764f5ba17f10fb309e47450bb89fbef51e252) )
+	ROM_LOAD( "bhf1ma10.4c",  0xa000000, 0x1000000, CRC(8c38d1f7) SHA1(3fbc280590c49fa094c1fc1e23d6c9d0031298c5) )
+	ROM_LOAD( "bhf1ma11.4b",  0xb000000, 0x1000000, CRC(f49153c4) SHA1(85d5583cac492317ba52dc7a31a443f5f26a67c9) )
+	ROM_LOAD( "bhf1ma12.6p",  0xc000000, 0x1000000, CRC(0e2bdd9a) SHA1(e2f82d2c9e33da1a297d79a0324558d0ff614172) )
+	ROM_LOAD( "bhf1ma13.6n",  0xd000000, 0x1000000, CRC(055718ad) SHA1(355c4780231a4361aa6237dd34819b60d9df0fc7) )
+	ROM_LOAD( "bhf1ma14.6m",  0xe000000, 0x1000000, CRC(d06c9bd7) SHA1(54668a2fd31059976890da92709c18f308634887) )
+	ROM_LOAD( "bhf1ma15.6l",  0xf000000, 0x1000000, CRC(db3c396b) SHA1(da0e125d627ce890906ca100081ab0685e11c0ef) )
+
+	ROM_REGION( 4, "rom_key", 0 )
+    ROM_LOAD( "bhf2-key.bin", 0x0000000, 0x0000004, CRC(9899e931) SHA1(c0837262b9069b33d0e72b418e80b5f0da8b9251) )
+ROM_END
+
 ROM_START( wldkicks )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -6390,6 +6415,21 @@ ROM_START( radirgy )
 	ROM_LOAD("317-5110-jpn.pic", 0x00, 0x4000, CRC(829d06e2) SHA1(c53d791e82cc75f2bcd49575185c89d448fed672) )
 ROM_END
 
+ROM_START( radirgya )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x80, "mie_eeprom", 0 )
+	ROM_LOAD("radirgy-default-eeprom.bin", 0, 0x80, CRC(8d60a282) SHA1(6d81dec88a1ade45e1edf2bdb3683c6cd0651eeb))
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0032a", 0, SHA1(c7873c8b2281e3b5123d3dff360d471415f8fc48) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-5110-JPN)
+	//(sticker 253-5509-5110J)
+	ROM_LOAD("317-5110-jpn.pic", 0x00, 0x4000, CRC(829d06e2) SHA1(c53d791e82cc75f2bcd49575185c89d448fed672) )
+ROM_END
 
 ROM_START( ggxxsla )
 	NAOMIGD_BIOS
@@ -8020,6 +8060,7 @@ ROM_END
 /* 25469801 */ GAME( 2000, ninjaslt, naomi, naomim2, naomi, dc_state,    naomi,    ROT0, "Capcom / Namco", "Ninja Assault (NJA3 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 // 25469801 Ninja Assault (NJA4 Ver. A)
 /* 25709801 */ GAME( 2001, gunsur2,  naomi, naomi,   naomi, dc_state,    naomi,    ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (BHF1)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+/* 25709801 */ GAME( 2001, gunsur2e, gunsur2,naomim2,naomi, dc_state,    naomi,    ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (BHF2 Ver. E)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 25869812 */ GAME( 2002, mazan,    naomi, naomim2, naomi, dc_state,    naomi,    ROT0, "Capcom / Namco", "Mazan: Flash of the Blade (MAZ2 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 
 /* GDS-xxxx (Sega GD-ROM games) */
@@ -8143,7 +8184,7 @@ ROM_END
 /* 0031  */ GAME( 2005, ss2005,    naomigd,  naomigd, naomi, dc_state,    naomigd,  ROT0,   "Starfish",     "Super Shanghai 2005 (GDL-0031)", GAME_FLAGS )
 /* 0031A */ GAME( 2005, ss2005a,   ss2005,   naomigd, naomi, dc_state,    naomigd,  ROT0,   "Starfish",     "Super Shanghai 2005 (Rev A) (GDL-0031A)", GAME_FLAGS )
 /* 0032  */ GAME( 2005, radirgy,   naomigd,  naomigd, naomi, dc_state,    naomigd,  ROT270, "Milestone",    "Radirgy (GDL-0032)", GAME_FLAGS )
-// 0032A Radirgy (Rev A)
+/* 0032A */ GAME( 2005, radirgya,  radirgy,  naomigd, naomi, dc_state,    naomigd,  ROT270, "Milestone",    "Radirgy (Rev A) (GDL-0032A)", GAME_FLAGS )
 // 0033  Guilty Gear XX Slash
 /* 0033A */ GAME( 2005, ggxxsla,   naomigd,  naomigd, naomi, dc_state,    ggxxsla,  ROT0,"Arc System Works","Guilty Gear XX Slash (Rev A) (GDL-0033A)", GAME_FLAGS )
 /* 0034  */ GAME( 2006, kurucham,  naomigd,  naomigd, naomi, dc_state,    naomigd,  ROT0,   "Able",         "Kurukuru Chameleon (GDL-0034)", GAME_FLAGS )
