@@ -106,7 +106,27 @@
           The display list objects seem to be there, but the address is wrong (0x14c400, instead of the correct address)
 
         - The external Yamaha MIDI sound board is not emulated (no keyboard sounds).
-*/
+ 
+ 
+    	- Notes on how the video is supposed to work from Ville / Ian Patterson:
+ 
+    	There are four "display contexts" that are set up via registers 20-4E. They are
+    	basically just raw framebuffers. 40-4E sets the base framebuffer pointer, 30-3E
+    	sets the size, 20-2E may set the minimum x and y coordinates but I haven't seen
+    	them set to something other than 0 yet. One context is set as the one the RAMDAC
+    	outputs to the monitor (not sure how this is selected yet, probably the lower
+    	bits of register 12). Thestartup test in the popn BIOS checks all of VRAM, so
+    	it moves the currentdisplay address around so you don't see crazy colors, which
+		is very helpful in figuring out how this part works.
+
+    	The other new part is that there are two VRAM write ports, managed by registers
+    	60+68+70 and 64+6A+74, with status read from the lower bits of reg 7A. Each context
+    	can either write to VRAM as currently emulated, or the port can be switched in to
+    	"immediate mode" via registers 68/6A. Immedate mode can be used to run GCU commands
+    	at any point during the frame. It's mainly used to call display lists, which is where
+    	the display list addresses come from. Some games use it to send other commands, so
+		it appears to be a 4-dword FIFO or something along those lines.
+*/ 
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
