@@ -1811,6 +1811,12 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(firebeat_state::soundram_r)
 {
+	// firebeat expects first read after setting the address to be dummy.  fixes "YMZ test".
+	if (offset > 0)
+	{
+		offset--;
+	}
+
 	if (offset < 0x200000)
 	{
 		return m_flash[1]->read(offset & 0x1fffff);
