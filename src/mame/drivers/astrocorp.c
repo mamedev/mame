@@ -12,20 +12,22 @@ OTHER:  EEPROM, Battery
  512 sprites, each made of N x M tiles. Tiles are 16x16x8
 
 -------------------------------------------------------------------------------------------------------------------
-Year + Game          PCB ID         CPU                Video      Chips                                   Notes
+Year + Game          PCB ID         CPU                Video        Chips                                   Notes
 -------------------------------------------------------------------------------------------------------------------
-00  Show Hand        CHE-B50-4002A  68000              ASTRO V01  ASTRO 0001B   (28 pins), pLSI1016-60LJ
-00  Wang Pai Dui J.  CHE-B50-4002A  68000              ASTRO V01  MDT2020AP MCU (28 pins), pLSI1016
-02  Skill Drop GA    None           JX-1689F1028N      ASTRO V02  pLSI1016-60LJ
-03  Speed Drop       None           JX-1689HP          ASTRO V05  pLSI1016-60LJ
-05? Zoo              M1.1           ASTRO V102PX-005?  ASTRO V06  ASTRO F02 2005-02-18                    Encrypted
-05? Win Win Bingo    M1.2           ASTRO V102PX-006?  ASTRO V06  ASTRO F02 2005-09-17                    Encrypted
-07? Western Venture  CS350P032      ASTRO V102?        ASTRO V07  ASTRO F01 2007-06-03                    Encrypted
+00  Show Hand        CHE-B50-4002A  68000              ASTRO V01    pLSI1016-60LJ, ASTRO 0001B   (28 pins)
+00  Wang Pai Dui J.  CHE-B50-4002A  68000              ASTRO V01    pLSI1016,      MDT2020AP MCU (28 pins)
+02  Skill Drop GA    None           JX-1689F1028N      ASTRO V02    pLSI1016-60LJ
+03  Speed Drop       None           JX-1689HP          ASTRO V05    pLSI1016-60LJ
+04? Stone Age        L1             ASTRO V102PX-012?  ASTRO V05x2  ASTRO F02 2004-09-04                    Encrypted
+05? Zoo              M1.1           ASTRO V102PX-005?  ASTRO V06    ASTRO F02 2005-02-18                    Encrypted
+05? Win Win Bingo    M1.2           ASTRO V102PX-006?  ASTRO V06    ASTRO F02 2005-09-17                    Encrypted
+07? Western Venture  CS350P032      ASTRO V102?        ASTRO V07    ASTRO F01 2007-06-03                    Encrypted
 -------------------------------------------------------------------------------------------------------------------
 
 To do:
 
 - Find source of level 2 interrupt
+- Decrypt newer games
 
 *************************************************************************************************************/
 
@@ -1010,6 +1012,73 @@ ROM_START( zoo )
 	ROM_LOAD( "zoo_93c46", 0x00, 0x80, CRC(0053fcc4) SHA1(e67a495f9586dd3946f79d50506fba1ae913f6ec) )
 ROM_END
 
+/***************************************************************************
+
+Stone Age
+(c) ASTRO
+
+PCB ID  CPU                Video        Chips
+L1      ASTRO V102PX-012?  ASTRO V05x2  ASTRO F02 2004-09-04
+
+      +---------+   +----------------------------+ +-------------+
+  +---+Connector+---+   28 Pin Edge  Connector   +-+             |
+  |                                                   VR1        |
+  |   93c46                                                      |
++-+          +-------+                          +----+ +-------+ |
+|            | Astro |   HM62C64P               |6295| |ROM #7 | |
+|            |  F2   | +----------+             +----+ +-------+ |
+|8           |       | |ROM#2  U19|                              |
+|   ULN2003A +-------+ +----------+      +--+ +--+ +--+ +--+     |
+|L                                       | R| | R| | R| | R|     |
+|i  ULN2003A +------+                    | o| | o| | o| | o|     |
+|n           |Astro |      ROM#8*        | m| | m| | m| | m|     |
+|e           |V102PX|                    | #| | #| | #| | #|     |
+|r           +------+                    | 3| | 4| | 5| | 6|     |
+|                                        +--+ +--+ +--+ +--+     |
+|                                                                |
+|                                      +----------+  +----------+|
+|C                     +----------+    |          |  |          ||
+|o                     |ROM#1  U21|    |  Astro   |  |  Astro   ||
+|n                     +----------+    |  V05     |  |  V05     ||
+|n                                     |  0424    |  |  0424    ||
+|e                                     +----------+  +----------+|
+|c                       HM62C64P                                |
+|t                                                               |
+|o        ASTRO0312     ASTRO  120Mhz                            |
+|r                                    6116                       |
+|                  6116      6116     6116   RAM1       RAM1     |
+|                                                                |
++-+ BAT1 PC1  VGA  6116      6116              RAM1     RAM1     |
+  +--------------------------------------------------------------+
+
+ROM#7 at U16 is an unpopulated 40pin socket
+ROM#1 & ROM#2 are MX 26c10000VPC-10
+ROM#3,4,5,6 are a 29F1610ML flash rom
+ROM#7 is a MX 27C4000PC-12
+
+RAM1 are SEC KM681000BLG-7 RAM chips
+PC1 is reset
+Video output only on VGA connector, video signals ARE VGA
+
+***************************************************************************/
+
+ROM_START( astoneag )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1-s-a-eng-03-a.rom1", 0x00000, 0x20000, CRC(5e600713) SHA1(48ac0a52f90b972b77064e9e59711082aa95c654) )
+	ROM_LOAD16_BYTE( "2-s-a-eng-03-a.rom2", 0x00001, 0x20000, CRC(488e355e) SHA1(6550292cae7eda95a24e1982e869540464b1fcdd) )
+
+	ROM_REGION( 0x800000, "sprites", 0 )
+	ROM_LOAD( "29f1610.rom3", 0x000000, 0x200000, CRC(8d4e66f0) SHA1(744f83b35684aa6653b0d93b303f2914cd0250ba) )
+	ROM_LOAD( "29f1610.rom4", 0x200000, 0x200000, CRC(1affd8db) SHA1(2523f156933c61d36b6646944b5da874f8424864) )
+	ROM_LOAD( "29f1610.rom5", 0x400000, 0x200000, CRC(2b77d827) SHA1(b082254e1c8a7945e2a406b1b937a763b30cb496) )
+	ROM_LOAD( "29f1610.rom6", 0x600000, 0x200000, CRC(eb8ee0e7) SHA1(c6c973460ca96b54151f7523f6afc0184b8fbd40) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5-s-a-eng-03-a.rom7", 0x00000, 0x80000, CRC(1b13b0c2) SHA1(d6d8c8070ba146b444958fa0b896cebc12b32f5c) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.ic99", 0x0000, 0x0080, CRC(2fd85a9b) SHA1(3240e40debf5af15f08072b76d6910808d3d282f) )
+ROM_END
 
 
 DRIVER_INIT_MEMBER(astrocorp_state,showhand)
@@ -1041,11 +1110,14 @@ DRIVER_INIT_MEMBER(astrocorp_state,showhanc)
 #endif
 }
 
-GAME( 2000,  showhand,  0,        showhand, showhand, astrocorp_state, showhand, ROT0, "Astro Corp.", "Show Hand (Italy)",               GAME_SUPPORTS_SAVE )
-GAME( 2000,  showhanc,  showhand, showhanc, showhanc, astrocorp_state, showhanc, ROT0, "Astro Corp.", "Wang Pai Dui Jue (China)",        GAME_SUPPORTS_SAVE )
-GAME( 2002,  skilldrp,  0,        skilldrp, skilldrp, driver_device, 0,        ROT0, "Astro Corp.", "Skill Drop Georgia (Ver. G1.0S)", GAME_SUPPORTS_SAVE )
-GAME( 2003,  speeddrp,  0,        speeddrp, skilldrp, driver_device, 0,        ROT0, "Astro Corp.", "Speed Drop (Ver. 1.06)",          GAME_SUPPORTS_SAVE )
-GAME( 2005?, winbingo,  0,        showhand, showhand, driver_device, 0,        ROT0, "Astro Corp.", "Win Win Bingo (set 1)",           GAME_NOT_WORKING )
-GAME( 2005?, winbingoa, winbingo, showhand, showhand, driver_device, 0,        ROT0, "Astro Corp.", "Win Win Bingo (set 2)",           GAME_NOT_WORKING )
-GAME( 2005?, zoo,       0,        showhand, showhand, driver_device, 0,        ROT0, "Astro Corp.", "Zoo (Ver. ZO.02.D)",              GAME_NOT_WORKING )
-GAME( 2007?, westvent,  0,        showhand, showhand, driver_device, 0,        ROT0, "Astro Corp.", "Western Venture (Ver. AA.02.D)",  GAME_NOT_WORKING )
+GAME( 2000,  showhand,  0,        showhand, showhand, astrocorp_state, showhand, ROT0, "Astro Corp.", "Show Hand (Italy)",                GAME_SUPPORTS_SAVE )
+GAME( 2000,  showhanc,  showhand, showhanc, showhanc, astrocorp_state, showhanc, ROT0, "Astro Corp.", "Wang Pai Dui Jue (China)",         GAME_SUPPORTS_SAVE )
+GAME( 2002,  skilldrp,  0,        skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.", "Skill Drop Georgia (Ver. G1.0S)",  GAME_SUPPORTS_SAVE )
+GAME( 2003,  speeddrp,  0,        speeddrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.", "Speed Drop (Ver. 1.06)",           GAME_SUPPORTS_SAVE )
+
+// Encrypted games (not working):
+GAME( 2004?, astoneag,  0,        skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.", "Stone Age (Astro, Ver. ENG.03.A)", GAME_NOT_WORKING )
+GAME( 2005?, winbingo,  0,        skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.", "Win Win Bingo (set 1)",            GAME_NOT_WORKING )
+GAME( 2005?, winbingoa, winbingo, skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.", "Win Win Bingo (set 2)",            GAME_NOT_WORKING )
+GAME( 2005?, zoo,       0,        showhand, showhand, driver_device,   0,        ROT0, "Astro Corp.", "Zoo (Ver. ZO.02.D)",               GAME_NOT_WORKING )
+GAME( 2007?, westvent,  0,        skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.", "Western Venture (Ver. AA.02.D)",   GAME_NOT_WORKING )
