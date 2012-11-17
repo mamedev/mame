@@ -12,6 +12,12 @@
  * without track data. The first sector of the disk is located at the start of
  * the image, while the last sector is at its end.
  *
+ * There is also a variant of the SDF which adds three sectors at the end
+ * containing a map of bad sectors. This was introduced by a tool to read
+ * real TI floppy disks on a PC. As other emulators tolerate this additional
+ * bad sector map, we just check whether there are 3 more sectors and ignore
+ * them.
+ *
  * The Track Dump Format is also known as pc99 (again, named after the first
  * TI emulator to use this format). It is a contiguous sequence of track
  * contents, containing all information including address marks and CRC, but it
@@ -118,7 +124,7 @@ void ti99_set_80_track_drives(int use80)
 	use_80_track_drives = use80;
 }
 
-#define TI99_DSK_TAG	"ti99dsktag"
+#define TI99_DSK_TAG    "ti99dsktag"
 #define TI99DSK_BLOCKNOTFOUND -1
 
 /*
@@ -276,17 +282,17 @@ static int ti99_sdf_guess_geometry(floppy_image_legacy *floppy, UINT64 size,
 	int totsecs;
 	typedef struct ti99_vib
 	{
-		char	name[10];		// volume name (10 characters, pad with spaces)
-		UINT8	totsecsMSB;		// disk length in sectors (big-endian) (usually 360, 720 or 1440)
-		UINT8	totsecsLSB;
-		UINT8	secspertrack;	// sectors per track (usually 9 (FM) or 18 (MFM))
-		UINT8	id[3];			// String "DSK"
-		UINT8	protection;		// 'P' if disk is protected, ' ' otherwise.
-		UINT8	tracksperside;	// tracks per side (usually 40)
-		UINT8	sides;			// sides (1 or 2)
-		UINT8	density;		// 0,1 (FM) or 2,3,4 (MFM)
-		UINT8	res[36];		// Empty for traditional disks, or up to 3 directory pointers
-		UINT8	abm[200];		// allocation bitmap: a 1 for each sector in use (sector 0 is LSBit of byte 0,
+		char    name[10];       // volume name (10 characters, pad with spaces)
+		UINT8   totsecsMSB;     // disk length in sectors (big-endian) (usually 360, 720 or 1440)
+		UINT8   totsecsLSB;
+		UINT8   secspertrack;   // sectors per track (usually 9 (FM) or 18 (MFM))
+		UINT8   id[3];          // String "DSK"
+		UINT8   protection;     // 'P' if disk is protected, ' ' otherwise.
+		UINT8   tracksperside;  // tracks per side (usually 40)
+		UINT8   sides;          // sides (1 or 2)
+		UINT8   density;        // 0,1 (FM) or 2,3,4 (MFM)
+		UINT8   res[36];        // Empty for traditional disks, or up to 3 directory pointers
+		UINT8   abm[200];       // allocation bitmap: a 1 for each sector in use (sector 0 is LSBit of byte 0,
 								// sector 7 is MSBit of byte 0, sector 8 is LSBit of byte 1, etc.)
 	} ti99_vib;
 
@@ -338,6 +344,14 @@ static int ti99_sdf_guess_geometry(floppy_image_legacy *floppy, UINT64 size,
 	// So that was not consistent. We guess the size from the file size
 	// and assume that the VIB did not contain reliable data. For the
 	// ambiguous case we choose the most common format.
+
+	// Adding support for another sector image format which adds 768 bytes
+	// as a bad sector map
+	if ((file_size / 256) % 10 == 3)
+	{
+		LOG_FORMATS("Stripping map of bad sectors at image end\n");
+		file_size -= 768;
+	}
 
 	switch (file_size)
 	{
@@ -809,7 +823,7 @@ static floperr_t ti99_sdf_get_offset(floppy_image_legacy *floppy, int head, int 
 	{
 		*offset = (imgtrack * tag->sectors + sector) * SECTOR_SIZE;
 	}
-	else		/* track numbers increasing towards outer track */
+	else        /* track numbers increasing towards outer track */
 	{
 		*offset = (((2*tag->tracks)-1-imgtrack) * tag->sectors + sector) * SECTOR_SIZE;
 	}
@@ -941,9 +955,9 @@ static FLOPPY_CONSTRUCT(ti99_sdf_construct)
 	{
 		/* create */
 		memset(&geometry, 0, sizeof(geometry));
-		geometry.sides				= option_resolution_lookup_int(params, PARAM_HEADS);
-		geometry.tracksperside			= option_resolution_lookup_int(params, PARAM_TRACKS);
-		geometry.secspertrack			= option_resolution_lookup_int(params, PARAM_SECTORS);
+		geometry.sides              = option_resolution_lookup_int(params, PARAM_HEADS);
+		geometry.tracksperside          = option_resolution_lookup_int(params, PARAM_TRACKS);
+		geometry.secspertrack           = option_resolution_lookup_int(params, PARAM_SECTORS);
 
 		/* We don't have headers for geometry */
 		/* check for usage in imgtool - we want to be able to create useful disks */
@@ -2022,13 +2036,13 @@ static FLOPPY_CONSTRUCT(ti99_tdf_construct)
 /* ----------------------------------------------------------------------- */
 
 LEGACY_FLOPPY_OPTIONS_START( ti99 )
-	LEGACY_FLOPPY_OPTION( ti99_sdf, "dsk",			"TI99 sector dump (v9t9)",	ti99_sdf_identify,	ti99_sdf_construct, NULL,
+	LEGACY_FLOPPY_OPTION( ti99_sdf, "dsk",          "TI99 sector dump (v9t9)",  ti99_sdf_identify,  ti99_sdf_construct, NULL,
 		HEADS([1]-2)
 		TRACKS(35-[40]-80)
 		SECTORS(8/9/16/[18]/36)
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID(0))
-	LEGACY_FLOPPY_OPTION( ti99_tdf, "dsk,dtk",			"TI99 track dump (pc99)",	ti99_tdf_identify,	ti99_tdf_construct, NULL,
+	LEGACY_FLOPPY_OPTION( ti99_tdf, "dsk,dtk",          "TI99 track dump (pc99)",   ti99_tdf_identify,  ti99_tdf_construct, NULL,
 		TRACKS(35-[40]-80)
 		SECTORS(8/9/16/[18]/36)
 		SECTOR_LENGTH([256])
