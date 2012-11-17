@@ -13,6 +13,7 @@
     * Support DSE mode?
 
     Raphael Nabet, 2003-2004
+    R. Belmont, 2012
 */
 
 #include "emu.h"
@@ -161,6 +162,8 @@ void rtc65271_device::nvram_default()
 {
 	memset(m_regs,0, sizeof(m_regs));
 	memset(m_xram,0, sizeof(m_xram));
+
+	m_regs[reg_B] |= reg_B_DM;	// Firebeat assumes the chip factory defaults to non-BCD mode (or maybe Konami programs it that way?)
 }
 
 //-------------------------------------------------
@@ -225,8 +228,12 @@ void rtc65271_device::nvram_read(emu_file &file)
 				systime.local_time.hour -= 12;
 			}
 			else
+			{
 				m_regs[reg_hour] = 0;
-			m_regs[reg_hour] |= systime.local_time.hour ? systime.local_time.hour : 12;
+			}
+
+			// Firebeat indicates non-BCD 12-hour mode has 0-based hour, so 12 AM is 0x00 and 12 PM is 0x80
+			m_regs[reg_hour] |= systime.local_time.hour; // ? systime.local_time.hour : 12;
 		}
 		m_regs[reg_weekday] = systime.local_time.weekday + 1;
 		m_regs[reg_monthday] = systime.local_time.mday;
@@ -310,6 +317,11 @@ UINT8 rtc65271_device::read(int xramsel, offs_t offset)
 			/* data register */
 			switch (m_cur_reg)
 			{
+			case reg_A:
+				reply = m_regs[m_cur_reg] & ~reg_A_DV;
+				reply |= 0x20;	// indicate normal RTC operation
+				break;
+
 			case reg_C:
 				reply = m_regs[m_cur_reg];
 				m_regs[m_cur_reg] = 0;
