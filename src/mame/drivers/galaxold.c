@@ -404,7 +404,7 @@ READ8_MEMBER(galaxold_state::drivfrcg_port0_r)
 			return 0x01;
 	}
 
-    return 0;
+	return 0;
 }
 
 static ADDRESS_MAP_START( galaxold_map, AS_PROGRAM, 8, galaxold_state )
@@ -447,6 +447,7 @@ static ADDRESS_MAP_START( mooncrst_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x9860, 0x987f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x9880, 0x98ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
+	AM_RANGE(0xa002, 0xa002) AM_WRITE(galaxold_gfxbank_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(galaxold_coin_counter_w)
 	AM_RANGE(0xa004, 0xa007) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_lfo_freq_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
@@ -792,6 +793,7 @@ ADDRESS_MAP_END
 
 /* the nmi line seems to be inverted on the cpu plugin board */
 READ8_MEMBER(galaxold_state::ttl7474_trampoline){ device_t *device = machine().device("7474_9m_1"); return downcast<ttl7474_device *>(device)->output_comp_r(); }
+
 static ADDRESS_MAP_START( hunchbkg_io, AS_IO, 8, galaxold_state )
 	AM_RANGE(S2650_DATA_PORT,  S2650_DATA_PORT) AM_READNOP // not used
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(ttl7474_trampoline)
@@ -866,7 +868,7 @@ READ8_MEMBER(galaxold_state::hexpoola_data_port_r)
 			return 1;
 	}
 
-    return 0;
+	return 0;
 }
 
 static ADDRESS_MAP_START( hexpoola_io, AS_IO, 8, galaxold_state )
@@ -894,7 +896,7 @@ READ8_MEMBER(galaxold_state::bullsdrtg_data_port_r)
 			break;
 	}
 
-    return 0;
+	return 0;
 }
 
 static ADDRESS_MAP_START( bullsdrtg_io_map, AS_IO, 8, galaxold_state )
@@ -2011,9 +2013,6 @@ static GFXDECODE_START( rockclim )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, rockclim_charlayout, 0, 1 )
 GFXDECODE_END
 
-
-
-
 static GFXDECODE_START( galaxian )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_charlayout,   0, 8 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, galaxold_spritelayout, 0, 8 )
@@ -2043,7 +2042,7 @@ GFXDECODE_END
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -2113,6 +2112,12 @@ static MACHINE_CONFIG_DERIVED( mooncrst, galaxian )
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,mooncrst)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( porter, mooncrst )
+
+	/* video hardware */
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state, pisces)
 MACHINE_CONFIG_END
 
 
@@ -2600,7 +2605,7 @@ ROM_START( 4in1 )
 	ROM_CONTINUE(             0x3800, 0x0800 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-    ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
 ROM_START( bagmanmc )
@@ -3060,30 +3065,30 @@ ROM_START( bullsdrtg )
 ROM_END
 
 /* Z80 games */
-GAME( 1981, vpool,    hustler,  mooncrst, vpool, driver_device,    0,        ROT90,  "bootleg", "Video Pool (bootleg on Moon Cresta hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1981, rockclim, 0,        rockclim, rockclim, driver_device, 0,	      ROT180, "Taito", "Rock Climber", GAME_SUPPORTS_SAVE )
-GAME( 1981, ckongg,   ckong,    ckongg,   ckongg, driver_device,   0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1981, ckongmc,  ckong,    ckongmc,  ckongmc, driver_device,  0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Moon Cresta hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // set was marked as 'King Kong on Galaxian'
-GAME( 1981, scramblb, scramble, scramblb, scramblb, driver_device, 0,        ROT90,  "bootleg", "Scramble (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1981, scramb2,  scramble, scramb2,  scramb2, driver_device,  0,        ROT90,  "bootleg", "Scramble (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1981, 4in1,     0,        4in1,     4in1, galaxold_state,     4in1,     ROT90,  "Armenia / Food and Fun", "4 Fun in 1", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1982, bagmanmc, bagman,   bagmanmc, bagmanmc, driver_device, 0,        ROT90,  "Valadon Automation", "Bagman (bootleg on Moon Cresta hardware)", GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1984, bagmanm2, bagman,   bagmanmc, bagmanmc, driver_device, 0,        ROT90,  "Valadon Automation / GIB", "Bagman (Moon Cresta hardware)", GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1982, dkongjrm, dkongjr,  dkongjrm, dkongjrm, driver_device, 0,        ROT90,  "bootleg", "Donkey Kong Jr. (bootleg on Moon Cresta hardware)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1982, porter,   dockman,  mooncrst, porter, driver_device,   0,        ROT90,  "bootleg", "Port Man (bootleg on Moon Cresta hardware)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL ) // missing GFX bank switch!
-GAME( 1982, tazzmang, tazmania,	tazzmang, tazzmang, driver_device, 0,        ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1983, bongo,    0,        bongo,    bongo, driver_device,    0,	      ROT90,  "Jetsoft", "Bongo", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1983, ozon1,    0,        ozon1,    ozon1, driver_device,    0,	      ROT90,  "Proma", "Ozon I", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1981, vpool,    hustler,  mooncrst, vpool,    driver_device,  0,        ROT90,  "bootleg", "Video Pool (bootleg on Moon Cresta hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1981, rockclim, 0,        rockclim, rockclim, driver_device,  0,        ROT180, "Taito", "Rock Climber", GAME_SUPPORTS_SAVE )
+GAME( 1981, ckongg,   ckong,    ckongg,   ckongg,   driver_device,  0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1981, ckongmc,  ckong,    ckongmc,  ckongmc,  driver_device,  0,        ROT90,  "bootleg", "Crazy Kong (bootleg on Moon Cresta hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // set was marked as 'King Kong on Galaxian'
+GAME( 1981, scramblb, scramble, scramblb, scramblb, driver_device,  0,        ROT90,  "bootleg", "Scramble (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1981, scramb2,  scramble, scramb2,  scramb2,  driver_device,  0,        ROT90,  "bootleg", "Scramble (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1981, 4in1,     0,        4in1,     4in1,     galaxold_state, 4in1,     ROT90,  "Armenia / Food and Fun", "4 Fun in 1", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, bagmanmc, bagman,   bagmanmc, bagmanmc, driver_device,  0,        ROT90,  "Valadon Automation", "Bagman (bootleg on Moon Cresta hardware)", GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1984, bagmanm2, bagman,   bagmanmc, bagmanmc, driver_device,  0,        ROT90,  "Valadon Automation / GIB", "Bagman (Moon Cresta hardware)", GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1982, dkongjrm, dkongjr,  dkongjrm, dkongjrm, driver_device,  0,        ROT90,  "bootleg", "Donkey Kong Jr. (bootleg on Moon Cresta hardware)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1982, porter,   dockman,  porter,   porter,   driver_device,  0,        ROT90,  "bootleg", "Port Man (bootleg on Moon Cresta hardware)", GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL )
+GAME( 1982, tazzmang, tazmania, tazzmang, tazzmang, driver_device,  0,        ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1983, bongo,    0,        bongo,    bongo,    driver_device,  0,        ROT90,  "Jetsoft", "Bongo", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1983, ozon1,    0,        ozon1,    ozon1,    driver_device,  0,        ROT90,  "Proma", "Ozon I", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1983, ladybugg, ladybug,  batman2,  ladybugg, galaxold_state, ladybugg, ROT270, "bootleg", "Lady Bug (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1982, vstars,   0,        mooncrst, porter, driver_device,   0,        ROT90,  "Competitive Video?", "Video Stars", GAME_NOT_WORKING )
+GAME( 1982, vstars,   0,        mooncrst, porter,   driver_device,  0,        ROT90,  "Competitive Video?", "Video Stars", GAME_NOT_WORKING )
 
 /* S2650 games */
-GAME( 1983, hunchbkg, hunchbak,	hunchbkg, hunchbkg, driver_device, 0,        ROT90,  "Century Electronics", "Hunchback (Galaxian hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1984, drivfrcg, drivfrcp, drivfrcg, drivfrcg, driver_device, 0,        ROT90,  "Shinkai Inc. (Magic Electronics USA license)", "Driving Force (Galaxian conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1984, drivfrct, drivfrcp, drivfrcg, drivfrcg, driver_device, 0,        ROT90,  "bootleg (EMT Germany)", "Top Racer (bootleg of Driving Force)", GAME_SUPPORTS_SAVE ) // Video Klein PCB
-GAME( 1985, drivfrcb, drivfrcp, drivfrcg, drivfrcg, driver_device, 0,        ROT90,  "bootleg (Elsys Software)", "Driving Force (Galaxian conversion bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1986, racknrol, 0,        racknrol, racknrol, driver_device, 0,	      ROT0,   "Senko Industries (Status license from Shinkai Inc.)", "Rack + Roll", GAME_SUPPORTS_SAVE )
-GAME( 1986, hexpool,  racknrol, racknrol, racknrol, driver_device, 0,	      ROT90,  "Senko Industries (Shinkai Inc. license)", "Hex Pool (Shinkai)", GAME_SUPPORTS_SAVE ) // still has Senko logo in gfx rom
-GAME( 1985, hexpoola, racknrol, hexpoola, racknrol, driver_device, 0,	      ROT90,  "Senko Industries", "Hex Pool (Senko)", GAME_SUPPORTS_SAVE )
-GAME( 1985, trvchlng, 0,        racknrol, trvchlng, driver_device, 0,	      ROT90,  "Joyland (Senko license)", "Trivia Challenge", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1983, hunchbkg, hunchbak, hunchbkg, hunchbkg, driver_device,  0,        ROT90,  "Century Electronics", "Hunchback (Galaxian hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1984, drivfrcg, drivfrcp, drivfrcg, drivfrcg, driver_device,  0,        ROT90,  "Shinkai Inc. (Magic Electronics USA license)", "Driving Force (Galaxian conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1984, drivfrct, drivfrcp, drivfrcg, drivfrcg, driver_device,  0,        ROT90,  "bootleg (EMT Germany)", "Top Racer (bootleg of Driving Force)", GAME_SUPPORTS_SAVE ) // Video Klein PCB
+GAME( 1985, drivfrcb, drivfrcp, drivfrcg, drivfrcg, driver_device,  0,        ROT90,  "bootleg (Elsys Software)", "Driving Force (Galaxian conversion bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, racknrol, 0,        racknrol, racknrol, driver_device,  0,        ROT0,   "Senko Industries (Status license from Shinkai Inc.)", "Rack + Roll", GAME_SUPPORTS_SAVE )
+GAME( 1986, hexpool,  racknrol, racknrol, racknrol, driver_device,  0,        ROT90,  "Senko Industries (Shinkai Inc. license)", "Hex Pool (Shinkai)", GAME_SUPPORTS_SAVE ) // still has Senko logo in gfx rom
+GAME( 1985, hexpoola, racknrol, hexpoola, racknrol, driver_device,  0,        ROT90,  "Senko Industries", "Hex Pool (Senko)", GAME_SUPPORTS_SAVE )
+GAME( 1985, trvchlng, 0,        racknrol, trvchlng, driver_device,  0,        ROT90,  "Joyland (Senko license)", "Trivia Challenge", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1985, bullsdrtg,bullsdrt, bullsdrtg,racknrol, galaxold_state, bullsdrtg,ROT90,  "Senko Industries", "Bulls Eye Darts (Galaxian conversion)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
