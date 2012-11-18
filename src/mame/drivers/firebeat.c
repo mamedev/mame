@@ -126,7 +126,7 @@
     	at any point during the frame. It's mainly used to call display lists, which is where
     	the display list addresses come from. Some games use it to send other commands, so
 		it appears to be a 4-dword FIFO or something along those lines.
-*/ 
+*/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -729,7 +729,29 @@ static void GCU_w(running_machine &machine, int chip, UINT32 offset, UINT32 data
 			break;
 		}
 
-		case 0x40:		/* ??? */
+		case 0x40:		/* framebuffer config */
+			// HACK: switch display lists at the right times for the ParaParaParadise games until we 
+			// do the video emulation properly
+			if (mame_strnicmp(machine.system().name, "pp", 2) == 0)
+			{
+				switch (data)
+				{
+					case 0x00080000:	// post
+						state->m_layer = 0;
+						break;
+
+					case 0x00008400:	// startup tests
+						if (state->m_layer != 2)
+						{
+							state->m_layer = 1;
+						}
+						break;
+
+					case 0x00068400:	// game & svc menu
+						state->m_layer = 2;
+						break;
+				}
+			}
 			break;
 
 		//case 0x44:    /* ??? */
@@ -2014,6 +2036,8 @@ MACHINE_RESET_MEMBER(firebeat_state,firebeat)
 		sound[i] = m_flash[1]->read(i);
 		sound[i+0x200000] = m_flash[2]->read(i);
 	}
+
+	m_layer = 0;
 }
 
 const rtc65271_interface firebeat_rtc =
