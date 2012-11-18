@@ -2786,13 +2786,19 @@ www.andys-arcade.com
 
 */
 
-/* this rom mapping probably isn't quite right */
+/* this rom mapping probably isn't quite right
+2012-11-18 - swapped 0100-03FF with 0500-07FF
+           - rom at 51xx seems to be missing.
+           - needs its own memory map
+           - somehow execution needs to get to 0294 which sets SP and memory */
 ROM_START( vstars )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "c-k2.bin",       0x0000, 0x0400, CRC(b0fcf6c1) SHA1(7dc8a7b99977ea9582c1ed36fa9f1fa502a70c6e) )
+	ROM_LOAD( "c-k2.bin",       0x0000, 0x0100, CRC(b0fcf6c1) SHA1(7dc8a7b99977ea9582c1ed36fa9f1fa502a70c6e) )
+	ROM_CONTINUE(               0x0500, 0x0300)
 	ROM_CONTINUE(               0x0800, 0x0400)
 	ROM_LOAD( "c-k1.bin",       0x0c00, 0x0400, CRC(ea9603b2) SHA1(f72202f17f862c7ea81e556690f8fcb9ee926e7f) )
-	ROM_CONTINUE(               0x0400, 0x0400)
+	ROM_CONTINUE(               0x0400, 0x0100)
+	ROM_CONTINUE(               0x0100, 0x0300)
 	ROM_LOAD( "c-k4.bin",       0x1c00, 0x0400, CRC(f5743990) SHA1(defd1577b935e3597eba74344dca5626ec2993dd) )
 	ROM_CONTINUE(               0x1000, 0x0400)
 	ROM_LOAD( "c-k3.bin",       0x1400, 0x0400, CRC(c4338a77) SHA1(b1ca2d43340b671ef33f3a96ce8e1c286a3e6d80) )
@@ -2801,16 +2807,14 @@ ROM_START( vstars )
 	ROM_CONTINUE(               0x2000, 0x0400)
 	ROM_CONTINUE(               0x2400, 0x0400)
 	ROM_CONTINUE(               0x2800, 0x0400)
-	ROM_LOAD( "c-k7.bin",       0x4c00, 0x0400, CRC(9ddcc06f) SHA1(63bc77d8b3273681ca4e681105a117d19a0f23a5) )
-	ROM_CONTINUE(               0x4000, 0x0400)
-	ROM_CONTINUE(               0x4400, 0x0400)
-	ROM_CONTINUE(               0x4800, 0x0400)
-
-	/* seems to be data, can't rearrange based on the jumps */
 	ROM_LOAD( "c-k5.bin",       0x3c00, 0x0400, CRC(d8df2ec4) SHA1(bef1d4b404cddb8a5f9d4e3f30ee09915c602f56) )
 	ROM_CONTINUE(               0x3000, 0x0400)
 	ROM_CONTINUE(               0x3400, 0x0400)
 	ROM_CONTINUE(               0x3800, 0x0400)
+	ROM_LOAD( "c-k7.bin",       0x4c00, 0x0400, CRC(9ddcc06f) SHA1(63bc77d8b3273681ca4e681105a117d19a0f23a5) )
+	ROM_CONTINUE(               0x4000, 0x0400)
+	ROM_CONTINUE(               0x4400, 0x0400)
+	ROM_CONTINUE(               0x4800, 0x0400)
 
 	/* Crazy Kong gfx?! */
 	ROM_REGION( 0x2000, "gfx1", 0 )
