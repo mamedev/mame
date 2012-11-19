@@ -2037,3 +2037,16 @@ endif
 
 $(CPUOBJ)/hd61700/hd61700.o:	$(CPUSRC)/hd61700/hd61700.c \
 								$(CPUSRC)/hd61700/hd61700.h
+
+#-------------------------------------------------
+# Sanyo LC8670
+#-------------------------------------------------
+
+ifneq ($(filter LC8670,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/lc8670
+CPUOBJS += $(CPUOBJ)/lc8670/lc8670.o
+DASMOBJS += $(CPUOBJ)/lc8670/lc8670dsm.o
+endif
+
+$(CPUOBJ)/lc8670/lc8670.o:	$(CPUSRC)/lc8670/lc8670.c \
+							$(CPUSRC)/lc8670/lc8670.h
