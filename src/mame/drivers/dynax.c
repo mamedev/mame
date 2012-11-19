@@ -12,6 +12,7 @@ Custom: TC17G032AP-0246 (blitter)
 ---------------------------------------------------------------------------------------------------------------------
 Year + Game                Main Board   Sub Board    CPU   Sound                      Clock Color Notes
 ---------------------------------------------------------------------------------------------------------------------
+88 Jong Yu Ki              D1505178-A   D1505178-B   Z80*2 AY8912 YM2203        M5205       PROM? 2 x TC17G032AP-0246
 88 Hana no Mai             D1610088L1                Z80   AY8912 YM2203        M5205       PROM
 88 Hana Kochou             D201901L2    D201901L1-0  Z80   AY8912 YM2203        M5205       PROM
 89 Hana Oriduru            D2304268L                 Z80   AY8912        YM2413 M5205       RAM
@@ -366,7 +367,6 @@ WRITE8_MEMBER(dynax_state::yarunara_palette_w)
 
 WRITE8_MEMBER(dynax_state::nanajign_palette_w)
 {
-
 	switch (m_hnoridur_bank)
 	{
 		case 0x10:
@@ -502,8 +502,8 @@ static ADDRESS_MAP_START( jantouki_mem_map, AS_PROGRAM, 8, dynax_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jantouki_sound_mem_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM
+	AM_RANGE( 0x0000, 0x77ff ) AM_ROM
+	AM_RANGE( 0x7800, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
@@ -950,7 +950,6 @@ READ8_MEMBER(dynax_state::jantouki_soundlatch_ack_r)
 
 WRITE8_MEMBER(dynax_state::jantouki_soundlatch_w)
 {
-
 	m_soundlatch_ack = 1;
 	m_soundlatch_full = 1;
 	m_soundlatch_irq = 1;
@@ -3041,6 +3040,109 @@ static INPUT_PORTS_START( nanajign )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( janyuki )
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+//	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	//*
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	//*
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x03, "0" )
+	PORT_DIPSETTING(    0x02, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	//*
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	//*
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	//*
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )	// Analyzer / Hardware Test
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE3 )	// Memory Reset
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
+
+	PORT_START("KEY0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("KEY1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( jantouki )
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Unknown ) )
@@ -4151,7 +4253,6 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(dynax_state,dynax)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_soundcpu = machine().device<cpu_device>("soundcpu");
 	m_rtc = machine().device("rtc");
@@ -4190,7 +4291,6 @@ MACHINE_START_MEMBER(dynax_state,dynax)
 
 MACHINE_RESET_MEMBER(dynax_state,dynax)
 {
-
 	if (machine().device("msm") != NULL)
 		MACHINE_RESET_CALL_MEMBER(adpcm);
 
@@ -4695,7 +4795,6 @@ static MACHINE_CONFIG_START( jantouki, dynax_state )
 	/* devices */
 	MCFG_MSM6242_ADD("rtc", jantouki_rtc_intf)
 MACHINE_CONFIG_END
-
 
 /***************************************************************************
                             Mahjong Electron Base
@@ -5834,6 +5933,94 @@ ROM_END
 
 /***************************************************************************
 
+Jong Yu Ki
+(c)1988 Dynax
+
+D1505178-A (main board)
+D1505178-B (ROM board)
+
+CPU:    Z80-B
+Sound:  Z80-B
+        AY-3-8912A
+        YM2203C
+        M5205
+OSC:    22.000MHz
+VDP:    HD46505SP
+Custom: (TC17G032AP-0246) x2
+
+
+c0.bin   MROM1  main prg.
+c1.bin   MROM2
+
+d0.bin   SROM1  sound prg.
+d1.bin   SROM2  sound data
+d2.bin   SROM3
+
+b0.bin   BROM1  bottom monitor chr.
+b1.bin   BROM2
+b2.bin   BROM3
+b3.bin   BROM4
+
+a0.bin   AROM1  top monitor chr.
+a1.bin   AROM2
+a2.bin   AROM3
+a3.bin   AROM4
+a4.bin   AROM5
+a5.bin   AROM6
+a6.bin   AROM7
+a7.bin   AROM8
+a8.bin   AROM9
+a9.bin   AROM10
+a10.bin  AROM11
+a11.bin  AROM12
+a12.bin  AROM13
+a13.bin  AROM14
+
+***************************************************************************/
+
+ROM_START( janyuki )
+	ROM_REGION( 0x20000, "maincpu", 0 )	// Z80 Code
+	ROM_LOAD( "c0.bin",  0x000000, 0x10000, CRC(b91dde00) SHA1(75117428b9ffadf7513243799504b2b9f9c0e90c) )
+	ROM_LOAD( "c1.bin",  0x010000, 0x10000, CRC(a32108bb) SHA1(c226cbefa673068a8d25dc76b3a7132d46ba41da) )
+
+	ROM_REGION( 0x68000, "soundcpu", 0 )	// Z80 Code
+	ROM_LOAD( "d0.bin",  0x000000, 0x10000, CRC(849cee82) SHA1(71aa76845ac80305dbaee203a1d21e8ca160e7e3) )
+	// banks 4-b:
+	ROM_LOAD( "d1.bin",  0x028000, 0x20000, CRC(2b6ea286) SHA1(11f5c6fd4611a5b34d7171ce1cb3870cc6c0438a) )
+	ROM_LOAD( "d2.bin",  0x048000, 0x20000, CRC(31d7c298) SHA1(c51489c73b319153f2d6a47c6cd0b4b90fdc2011) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )	// blitter 2 data
+	ROM_LOAD( "b0.bin",  0x000000, 0x20000, CRC(d05ca62e) SHA1(4d29c7a6b81227b2dc6a922d9cbadd23f6fbc26e) )
+	ROM_LOAD( "b1.bin",  0x020000, 0x20000, CRC(4cb131fb) SHA1(239c58c4662a7d2db08331d5fb9cd2c96e24190b) )
+	ROM_LOAD( "b2.bin",  0x040000, 0x20000, CRC(a8b46c90) SHA1(b4b49ee68524fad741c0a93a2a912550bec592a8) )
+	ROM_LOAD( "b3.bin",  0x060000, 0x20000, CRC(ef460f4b) SHA1(dcbe88dd5cf21529a846cb17aec16c6279d296b5) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )	// blitter data
+	ROM_LOAD( "a0.bin",  0x000000, 0x20000, CRC(23501699) SHA1(c1a9c1ef483bcf7d93aa84c7207791128f773294) )
+	ROM_LOAD( "a1.bin",  0x020000, 0x20000, CRC(3d58063b) SHA1(059ff975d084cc121d24549cd4e3799032261d4d) )
+	ROM_LOAD( "a2.bin",  0x040000, 0x20000, CRC(7064752b) SHA1(3885bec0e28ba0c9052e76e26a3702f68a612216) )
+	ROM_LOAD( "a3.bin",  0x060000, 0x20000, CRC(51d987c9) SHA1(4f41a64837e7b14ebce898315ef81b9804dcc1c8) )
+	ROM_LOAD( "a4.bin",  0x080000, 0x20000, CRC(f0a877d6) SHA1(71e6a836b73282f8006b32ff971cc1c0533ef800) )
+	ROM_LOAD( "a5.bin",  0x0a0000, 0x20000, CRC(c39c4e68) SHA1(79c1393c882d1cc7dc05b7164a2a572cec559c72) )
+	ROM_LOAD( "a6.bin",  0x0c0000, 0x20000, CRC(8fea07cd) SHA1(dee1d162cb1c032167e037b760f2330617933656) )
+	ROM_LOAD( "a7.bin",  0x0e0000, 0x20000, CRC(49ddf196) SHA1(2837f0ca1969c78a81284b2b7887c2450c6448f2) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 )	// blitter 2 data
+	ROM_LOAD( "a8.bin",  0x000000, 0x20000, CRC(a608c3f3) SHA1(8564571511938c6ffc9503a863f315a083bb6f95) )
+	ROM_LOAD( "a9.bin",  0x020000, 0x20000, CRC(05937b3f) SHA1(5f5a1743423903a6e79986f42737ee5f8298073c) )
+	ROM_LOAD( "a10.bin", 0x040000, 0x20000, CRC(37f9bbc7) SHA1(c38fc271bc9762235b5d377f017f078faff02a44) )
+	ROM_LOAD( "a11.bin", 0x060000, 0x20000, CRC(f48f0413) SHA1(88b18c2d4729babb7b6b44bcbeec8c14e4a434f8) )
+	ROM_LOAD( "a12.bin", 0x080000, 0x20000, CRC(13e82b8f) SHA1(426dac512f0e62460fc4b095b20227824ac9213b) )
+	ROM_LOAD( "a13.bin", 0x0a0000, 0x20000, CRC(414370a4) SHA1(af2377b243939d60bdc69d6894a37ef5a86e4441) )
+
+	ROM_REGION( 0x400, "proms_missing", 0 )	// Color PROMs
+	ROM_LOAD( "clr2.bin", 0x000000, 0x000200, NO_DUMP )
+	ROM_LOAD( "clr1.bin", 0x000200, 0x000200, NO_DUMP )
+ROM_END
+
+
+/***************************************************************************
+
 Jantouki
 (c)1989 Dynax
 
@@ -5878,6 +6065,7 @@ Custom: (TC17G032AP-0246) x2
 
 27-1_19H.18G    color
 27-2.20H.19G
+
 ***************************************************************************/
 
 ROM_START( jantouki )
@@ -7172,20 +7360,21 @@ ROM_END
 
 ***************************************************************************/
 
+GAME( 1988, janyuki,  0,        jantouki, janyuki,  driver_device, 0,        ROT0,   "Dynax",                    "Jong Yu Ki (Japan)",                                            GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS )
 GAME( 1989, hnkochou, 0,        hanamai,  hnkochou, driver_device, 0,        ROT180, "Dynax",                    "Hana Kochou (Japan, Bet)",                                      GAME_SUPPORTS_SAVE )
-GAME( 1988, hanamai,  hnkochou, hanamai,  hanamai, driver_device,  0,        ROT180, "Dynax",                    "Hana no Mai (Japan)",                                           GAME_SUPPORTS_SAVE )
-GAME( 1990, hjingi,   0,        hjingi,   hjingi, driver_device,   0,        ROT180, "Dynax",                    "Hana Jingi (Japan, Bet)",                                       GAME_SUPPORTS_SAVE )
+GAME( 1988, hanamai,  hnkochou, hanamai,  hanamai,  driver_device, 0,        ROT180, "Dynax",                    "Hana no Mai (Japan)",                                           GAME_SUPPORTS_SAVE )
+GAME( 1990, hjingi,   0,        hjingi,   hjingi,   driver_device, 0,        ROT180, "Dynax",                    "Hana Jingi (Japan, Bet)",                                       GAME_SUPPORTS_SAVE )
 GAME( 1989, hnoridur, hjingi,   hnoridur, hnoridur, driver_device, 0,        ROT180, "Dynax",                    "Hana Oriduru (Japan)",                                          GAME_SUPPORTS_SAVE )
 GAME( 1989, drgpunch, 0,        sprtmtch, drgpunch, driver_device, 0,        ROT0,   "Dynax",                    "Dragon Punch (Japan)",                                          GAME_SUPPORTS_SAVE )
 GAME( 1989, sprtmtch, drgpunch, sprtmtch, sprtmtch, driver_device, 0,        ROT0,   "Dynax (Fabtek license)",   "Sports Match",                                                  GAME_SUPPORTS_SAVE )
 /* these 4 are Korean hacks / bootlegs of Dragon Punch / Sports Match */
-GAME( 1994, maya,     0,        sprtmtch, drgpunch, dynax_state, maya,     ROT0,   "Promat",                   "Maya (set 1)",                                                  GAME_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
-GAME( 1994, mayaa,    maya,     sprtmtch, drgpunch, dynax_state, maya,     ROT0,   "Promat",                   "Maya (set 2)",                                                  GAME_SUPPORTS_SAVE )
-GAME( 199?, inca,     0,        sprtmtch, drgpunch, dynax_state, maya,     ROT0,   "<unknown>",                "Inca",                                                          GAME_SUPPORTS_SAVE )
-GAME( 199?, blktouch, 0,        sprtmtch, drgpunch, dynax_state, blktouch, ROT0,   "Yang Gi Co Ltd.",          "Black Touch (Korea)",                                           GAME_SUPPORTS_SAVE )
+GAME( 1994, maya,     0,        sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "Promat",                   "Maya (set 1)",                                                  GAME_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
+GAME( 1994, mayaa,    maya,     sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "Promat",                   "Maya (set 2)",                                                  GAME_SUPPORTS_SAVE )
+GAME( 199?, inca,     0,        sprtmtch, drgpunch, dynax_state,   maya,     ROT0,   "<unknown>",                "Inca",                                                          GAME_SUPPORTS_SAVE )
+GAME( 199?, blktouch, 0,        sprtmtch, drgpunch, dynax_state,   blktouch, ROT0,   "Yang Gi Co Ltd.",          "Black Touch (Korea)",                                           GAME_SUPPORTS_SAVE )
 
 GAME( 1989, mjfriday, 0,        mjfriday, mjfriday, driver_device, 0,        ROT180, "Dynax",                    "Mahjong Friday (Japan)",                                        GAME_SUPPORTS_SAVE )
-GAME( 1989, gekisha,  0,        gekisha,  gekisha, driver_device,  0,        ROT180, "Dynax",                    "Mahjong Gekisha",                                               GAME_SUPPORTS_SAVE )
+GAME( 1989, gekisha,  0,        gekisha,  gekisha,  driver_device, 0,        ROT180, "Dynax",                    "Mahjong Gekisha",                                               GAME_SUPPORTS_SAVE )
 GAME( 1990, mcnpshnt, 0,        mcnpshnt, mcnpshnt, driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Campus Hunting (Japan)",                                GAME_SUPPORTS_SAVE )
 GAME( 1990, 7jigen,   0,        nanajign, nanajign, driver_device, 0,        ROT180, "Dynax",                    "7jigen no Youseitachi - Mahjong 7 Dimensions (Japan)",          GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1990, jantouki, 0,        jantouki, jantouki, driver_device, 0,        ROT0,   "Dynax",                    "Jong Tou Ki (Japan)",                                           GAME_SUPPORTS_SAVE )
@@ -7193,22 +7382,22 @@ GAME( 1991, mjdialq2, 0,        mjdialq2, mjdialq2, driver_device, 0,        ROT
 GAME( 1991, yarunara, 0,        yarunara, yarunara, driver_device, 0,        ROT180, "Dynax",                    "Mahjong Yarunara (Japan)",                                      GAME_SUPPORTS_SAVE )
 GAME( 1991, mjangels, 0,        yarunara, yarunara, driver_device, 0,        ROT180, "Dynax",                    "Mahjong Angels - Comic Theater Vol.2 (Japan)",                  GAME_SUPPORTS_SAVE )
 GAME( 1992, quiztvqq, 0,        yarunara, quiztvqq, driver_device, 0,        ROT180, "Dynax",                    "Quiz TV Gassyuukoku Q&Q (Japan)",                               GAME_SUPPORTS_SAVE )
-GAME( 1993, mjelctrn, 0,        mjelctrn, mjelctrn, dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 4, Japan)",                    GAME_SUPPORTS_SAVE )
-GAME( 1990, mjelct3,  mjelctrn, mjelctrn, mjelct3, dynax_state,  mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, Japan)",                    GAME_SUPPORTS_SAVE )
-GAME( 1990, mjelct3a, mjelctrn, mjelctrn, mjelct3, dynax_state,  mjelct3a, ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, alt., Japan)",              GAME_SUPPORTS_SAVE )
-GAME( 1993, mjelctrb, mjelctrn, mjelctrn, mjelct3, dynax_state,  mjelct3,  ROT180, "bootleg",                  "Mahjong Electron Base (parts 2 & 4, Japan, bootleg)",           GAME_SUPPORTS_SAVE )
-GAME( 1990, majxtal7, 0,        majxtal7, majxtal7, dynax_state, mjelct3,  ROT180, "Dynax",                    "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1990, neruton,  0,        neruton,  neruton, dynax_state,  mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. B?)",                 GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1990, nerutona, neruton,  neruton,  neruton, dynax_state,  mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. A?)",                 GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1993, mjelctrn, 0,        mjelctrn, mjelctrn, dynax_state,   mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 4, Japan)",                    GAME_SUPPORTS_SAVE )
+GAME( 1990, mjelct3,  mjelctrn, mjelctrn, mjelct3,  dynax_state,   mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, Japan)",                    GAME_SUPPORTS_SAVE )
+GAME( 1990, mjelct3a, mjelctrn, mjelctrn, mjelct3,  dynax_state,   mjelct3a, ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, alt., Japan)",              GAME_SUPPORTS_SAVE )
+GAME( 1993, mjelctrb, mjelctrn, mjelctrn, mjelct3,  dynax_state,   mjelct3,  ROT180, "bootleg",                  "Mahjong Electron Base (parts 2 & 4, Japan, bootleg)",           GAME_SUPPORTS_SAVE )
+GAME( 1990, majxtal7, 0,        majxtal7, majxtal7, dynax_state,   mjelct3,  ROT180, "Dynax",                    "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1990, neruton,  0,        neruton,  neruton,  dynax_state,   mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. B?)",                 GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1990, nerutona, neruton,  neruton,  neruton,  dynax_state,   mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. A?)",                 GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1991, hanayara, 0,        yarunara, hanayara, driver_device, 0,        ROT180, "Dynax",                    "Hana wo Yaraneba! (Japan)",                                     GAME_SUPPORTS_SAVE )
 GAME( 1991, mjcomv1,  0,        yarunara, yarunara, driver_device, 0,        ROT180, "Dynax",                    "Mahjong Comic Gekijou Vol.1 (Japan)",                           GAME_SUPPORTS_SAVE )
-GAME( 1991, tenkai,   0,        tenkai,   tenkai, driver_device,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen",                                             GAME_SUPPORTS_SAVE )
-GAME( 1991, tenkai2b, tenkai,   tenkai,   tenkai, driver_device,   0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen Part 2 (bootleg)",                            GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai, driver_device,   0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg b)",                                 GAME_SUPPORTS_SAVE )
-GAME( 1991, tenkaicb, tenkai,   tenkai,   tenkai, driver_device,   0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg c)",                                 GAME_SUPPORTS_SAVE )
-GAME( 1991, tenkaid,  tenkai,   tenkai,   tenkai, driver_device,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 1)",                                     GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai, driver_device,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 2)",                                     GAME_SUPPORTS_SAVE )
+GAME( 1991, tenkai,   0,        tenkai,   tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen",                                             GAME_SUPPORTS_SAVE )
+GAME( 1991, tenkai2b, tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen Part 2 (bootleg)",                            GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg b)",                                 GAME_SUPPORTS_SAVE )
+GAME( 1991, tenkaicb, tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg c)",                                 GAME_SUPPORTS_SAVE )
+GAME( 1991, tenkaid,  tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 1)",                                     GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 2)",                                     GAME_SUPPORTS_SAVE )
 GAME( 1992, htengoku, 0,        htengoku, htengoku, driver_device, 0,        ROT180, "Dynax",                    "Hanafuda Hana Tengoku (Japan)",                                 GAME_SUPPORTS_SAVE )
-GAME( 1994, mjreach,  0,        tenkai,   mjreach, dynax_state,  mjreach,  ROT0,   "bootleg / Dynax",          "Mahjong Reach (bootleg)",                                       GAME_SUPPORTS_SAVE )
+GAME( 1994, mjreach,  0,        tenkai,   mjreach,  dynax_state,   mjreach,  ROT0,   "bootleg / Dynax",          "Mahjong Reach (bootleg)",                                       GAME_SUPPORTS_SAVE )
 GAME( 1995, shpeng,   0,        sprtmtch, drgpunch, driver_device, 0,        ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            GAME_NO_COCKTAIL | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) // not a dynax board. proms?
-GAME( 1996, majrjhdx, 0,        majrjhdx, tenkai, driver_device,   0,        ROT0,   "Dynax",                    "Mahjong Raijinhai DX",                                          GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1996, majrjhdx, 0,        majrjhdx, tenkai,   driver_device, 0,        ROT0,   "Dynax",                    "Mahjong Raijinhai DX",                                          GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

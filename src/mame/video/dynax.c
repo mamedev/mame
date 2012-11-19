@@ -29,9 +29,10 @@
 PALETTE_INIT_MEMBER(dynax_state,sprtmtch)
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
-	int i;
+	if (!color_prom)
+		return;
 
-	for (i = 0; i < machine().total_colors(); i++)
+	for (int i = 0; i < machine().total_colors(); i++)
 	{
 		int x = (color_prom[i] << 8) + color_prom[0x200 + i];
 		/* The bits are in reverse order! */
