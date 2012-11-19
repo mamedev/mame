@@ -215,18 +215,18 @@ READ8_MEMBER( adam_fdc_device::p1_r )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    0       disk in place
-	    1
-	    2       FDC DRQ
-	    3
-	    4
-	    5
-	    6
-	    7       SW3 (0=DS1, 1=DS2)
+        0       disk in place
+        1
+        2       FDC DRQ
+        3
+        4
+        5
+        6
+        7       SW3 (0=DS1, 1=DS2)
 
-	*/
+    */
 
 	UINT8 data = 0;
 
@@ -251,18 +251,18 @@ WRITE8_MEMBER( adam_fdc_device::p1_w )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    0
-	    1       FDC ENP
-	    2
-	    3       FDC _DDEN
-	    4
-	    5       DRIVE SELECT
-	    6       MOTOR ON
-	    7
+        0
+        1       FDC ENP
+        2
+        3       FDC _DDEN
+        4
+        5       DRIVE SELECT
+        6       MOTOR ON
+        7
 
-	*/
+    */
 
 	// write precompensation
 	//m_fdc->enp_w(BIT(data, 1));
@@ -293,15 +293,15 @@ READ8_MEMBER( adam_fdc_device::p2_r )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    0       mode bit 0
-	    1       mode bit 1
-	    2       mode bit 2
-	    3       NET RXD
-	    4
+        0       mode bit 0
+        1       mode bit 1
+        2       mode bit 2
+        3       NET RXD
+        4
 
-	*/
+    */
 
 	UINT8 data = M6801_MODE_2;
 
@@ -320,15 +320,15 @@ WRITE8_MEMBER( adam_fdc_device::p2_w )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    0
-	    1
-	    2
-	    3
-	    4       NET TXD
+        0
+        1
+        2
+        3
+        4       NET TXD
 
-	*/
+    */
 
 	m_bus->txd_w(this, BIT(data, 4));
 }

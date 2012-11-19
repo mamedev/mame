@@ -1813,18 +1813,18 @@ INPUT_PORTS_END
 
 /* To-Do sf2amf dipswitch SW(B):4 + SW(B):5 + SW(B):6
 static INPUT_PORTS_START( sf2amf )
-	PORT_INCLUDE(  )
+    PORT_INCLUDE(  )
 
-	PORT_MODIFY("DSWB")
-	PORT_DIPNAME( 0x08, 0x00, "Turbo Switch 1 of 3" )	PORT_DIPLOCATION("SW(B):4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Turbo Switch 2 of 3" )	PORT_DIPLOCATION("SW(B):5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Turbo Switch 3 of 3" )	PORT_DIPLOCATION("SW(B):6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_MODIFY("DSWB")
+    PORT_DIPNAME( 0x08, 0x00, "Turbo Switch 1 of 3" )   PORT_DIPLOCATION("SW(B):4")
+    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x10, 0x00, "Turbo Switch 2 of 3" )   PORT_DIPLOCATION("SW(B):5")
+    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x20, 0x00, "Turbo Switch 3 of 3" )   PORT_DIPLOCATION("SW(B):6")
+    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 */
 
@@ -6576,13 +6576,13 @@ ROM_END
 ROM_START( sf2stt )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	/* do not comment this out, this is only for testing purpose
-	ROM_LOAD16_BYTE( "12.bin",   0x00000, 0x40000, CRC(a258b4d5) SHA1(3433b6493794c98bb35c1b27cc65bb5f13d52e9b) )
-	ROM_LOAD16_BYTE( "09.bin",   0x00001, 0x40000, CRC(59ccd474) SHA1(7bb28c28ee722435fdbb18eb73e52bd65b419103) )
-	*/
+    ROM_LOAD16_BYTE( "12.bin",   0x00000, 0x40000, CRC(a258b4d5) SHA1(3433b6493794c98bb35c1b27cc65bb5f13d52e9b) )
+    ROM_LOAD16_BYTE( "09.bin",   0x00001, 0x40000, CRC(59ccd474) SHA1(7bb28c28ee722435fdbb18eb73e52bd65b419103) )
+    */
 	ROM_LOAD16_BYTE( "prg part 1.stt", 0x00000, 0x40000, NO_DUMP )
 	ROM_LOAD16_BYTE( "prg part 2.stt", 0x00001, 0x40000, NO_DUMP )
 	/* there are two empty sockets next to the two following program roms,
-	   these roms may be missing and this PCB is not working on real hardware */
+       these roms may be missing and this PCB is not working on real hardware */
 	ROM_LOAD16_BYTE( "ce91e-b",        0x80000, 0x40000, CRC(0862386e) SHA1(9fcfbcbbc17529de75d5419018e7b1dd90b397c0) )
 	ROM_LOAD16_BYTE( "ce91e-a",        0x80001, 0x40000, CRC(0c83844d) SHA1(4c25ba4a50d62c62789d026e3d304ed1dfb3c248) )
 
@@ -6625,15 +6625,15 @@ ROM_END
 ROM_START( sf2unkb )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	/* do not comment this out, this is only for testing purpose
-	ROM_LOAD16_BYTE( "12.bin",             0x000000, 0x40000, CRC(a258b4d5) SHA1(3433b6493794c98bb35c1b27cc65bb5f13d52e9b) )
-	ROM_LOAD16_BYTE( "09.bin",             0x000001, 0x40000, CRC(59ccd474) SHA1(7bb28c28ee722435fdbb18eb73e52bd65b419103) )
-	ROM_LOAD16_BYTE( "11.bin",             0x080000, 0x40000, CRC(82097d63) SHA1(881e7ffb78197f6794b5d41f5c2c87da35e8cb15) )
-	ROM_LOAD16_BYTE( "10.bin",             0x080001, 0x40000, CRC(0c83844d) SHA1(4c25ba4a50d62c62789d026e3d304ed1dfb3c248) )
-	*/
+    ROM_LOAD16_BYTE( "12.bin",             0x000000, 0x40000, CRC(a258b4d5) SHA1(3433b6493794c98bb35c1b27cc65bb5f13d52e9b) )
+    ROM_LOAD16_BYTE( "09.bin",             0x000001, 0x40000, CRC(59ccd474) SHA1(7bb28c28ee722435fdbb18eb73e52bd65b419103) )
+    ROM_LOAD16_BYTE( "11.bin",             0x080000, 0x40000, CRC(82097d63) SHA1(881e7ffb78197f6794b5d41f5c2c87da35e8cb15) )
+    ROM_LOAD16_BYTE( "10.bin",             0x080001, 0x40000, CRC(0c83844d) SHA1(4c25ba4a50d62c62789d026e3d304ed1dfb3c248) )
+    */
 	ROM_LOAD16_BYTE( "prg part 1.sf2unkb", 0x00000, 0x80000, NO_DUMP )
 	ROM_LOAD16_BYTE( "prg part 2.sf2unkb", 0x00001, 0x80000, NO_DUMP )
 	/* there are two empty sockets next to the two following program roms,
-	   these roms may be missing and this PCB is not working on real hardware */
+       these roms may be missing and this PCB is not working on real hardware */
 	ROM_LOAD16_BYTE( "w-6",                0x100000, 0x20000, CRC(bb4af315) SHA1(75f0827f4f7e9f292add46467f8d4fe19b2514c9) )
 	ROM_LOAD16_BYTE( "w-5",                0x100001, 0x20000, CRC(c02a13eb) SHA1(b807cc495bff3f95d03b061fc629c95f965cb6d8) )
 
@@ -6671,8 +6671,8 @@ ROM_START( sf2unkb )
 	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "sample part 1.unkb", 0x20000, 0x20000, NO_DUMP )
 	/* do not comment this out, this is only for testing purpose
-	ROM_LOAD( "sf2_18.11c",         0x00000, 0x20000, CRC(7f162009) SHA1(346bf42992b4c36c593e21901e22c87ae4a7d86d) )
-	*/
+    ROM_LOAD( "sf2_18.11c",         0x00000, 0x20000, CRC(7f162009) SHA1(346bf42992b4c36c593e21901e22c87ae4a7d86d) )
+    */
 	ROM_LOAD( "w-7",                0x20000, 0x20000, CRC(beade53f) SHA1(277c397dc12752719ec6b47d2224750bd1c07f79) )
 ROM_END
 
@@ -8323,14 +8323,14 @@ ROM_START( sf2amf )
 	ROM_LOAD16_BYTE( "5.amf",     0x000000, 0x80000, CRC(03991fba) SHA1(6c42bf15248640fdb3e98fb01b0a870649deb410) )
 	ROM_LOAD16_BYTE( "4.amf",     0x000001, 0x80000, CRC(39f15a1e) SHA1(901c4fea76bf5bff7330ed07ffde54cdccdaa680) )
 	/* there are two empty sockets next to the two former program roms,
-	   these roms may be missing and this PCB is not working on real hardware */
+       these roms may be missing and this PCB is not working on real hardware */
 	ROM_LOAD16_BYTE( "prg part 3.amf", 0x100000, 0x40000, NO_DUMP )
 	ROM_LOAD16_BYTE( "prg part 4.amf", 0x100001, 0x40000, NO_DUMP )
 	/* do not comment this out, this is only for testing purpose
-	ROM_LOAD16_BYTE( "u221.rom",   0x100000, 0x20000, CRC(64e6e091) SHA1(32ec05db955e538d4ada26d19ee50926f74b684f) )
-	ROM_LOAD16_BYTE( "u195.rom",   0x100001, 0x20000, CRC(c95e4443) SHA1(28417dee9ccdfa65b0f4a92aa29b90279fe8cd85) )
-	*/
-	
+    ROM_LOAD16_BYTE( "u221.rom",   0x100000, 0x20000, CRC(64e6e091) SHA1(32ec05db955e538d4ada26d19ee50926f74b684f) )
+    ROM_LOAD16_BYTE( "u195.rom",   0x100001, 0x20000, CRC(c95e4443) SHA1(28417dee9ccdfa65b0f4a92aa29b90279fe8cd85) )
+    */
+
 	ROM_REGION( 0x600000, "gfx", 0 )
 	ROMX_LOAD( "y.c.e.c m.k.r-001", 0x000000, 0x80000, CRC(a258de13) SHA1(2e477948c4c8a2fb7cfdc4a739766bc4a4e01c49), ROM_GROUPWORD | ROM_SKIP(6) )
 	ROM_CONTINUE(                       0x000002, 0x80000)

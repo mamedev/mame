@@ -9,11 +9,11 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- parallel status port
-	- memory bank switching port
-	- boot ROM
+    - parallel status port
+    - memory bank switching port
+    - boot ROM
 
 */
 
@@ -126,35 +126,35 @@ UINT8 powermate_ide_device::adam_bd_r(address_space &space, offs_t offset, UINT8
 
 		case 0x40: // Printer status
 			/*
-			
-			    bit     description
-			
-			    0       
-			    1       
-			    2       
-			    3       
-			    4       
-			    5       
-			    6       
-			    7       
-			
-			*/
+
+                bit     description
+
+                0
+                1
+                2
+                3
+                4
+                5
+                6
+                7
+
+            */
 			break;
-			
+
 		case 0x58:
 			m_ide_data = ide_bus_r(m_ide, 0, 0);
 
 			data = m_ide_data & 0xff;
 			break;
-			
+
 		case 0x59:
 			data = m_ide_data >> 8;
 			break;
-			
+
 		case 0x5a:
 			data = ide_bus_r(m_ide, 1, 6) & 0xff;
 			break;
-			
+
 		case 0x5b: // Digital Input Register
 			data = 0xff;
 			break;
@@ -190,16 +190,16 @@ void powermate_ide_device::adam_bd_w(address_space &space, offs_t offset, UINT8 
 
 		case 0x42: // Bank Number
 			break;
-			
+
 		case 0x58:
 			m_ide_data |= data;
 			ide_bus_w(m_ide, 0, 0, m_ide_data);
 			break;
-			
+
 		case 0x59:
 			m_ide_data = data << 8;
 			break;
-			
+
 		case 0x5a: // Fixed Disk Control Register
 			break;
 		}

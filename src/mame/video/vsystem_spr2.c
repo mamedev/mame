@@ -16,7 +16,7 @@
 // Pipe Dream
 
 // there were lots of comments saying drivers using the
-// 	static const UINT8 zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
+//  static const UINT8 zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 // table for zooming needed upgrading, are we sure this isn't one of the
 // differences between this sprite chip and the one in vsystem_spr.c, pspikes zooming is very rough
 
@@ -159,7 +159,7 @@ void vsystem_spr2_device::turbofrc_draw_sprites_common( UINT16* spriteram3,  int
 				continue;
 		}
 
-		
+
 		if (m_pritype == 0) // turbo force etc.
 		{
 			usepri = curr_sprite.pri ? 0 : 2;

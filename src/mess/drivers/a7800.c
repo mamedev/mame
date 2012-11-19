@@ -9,14 +9,14 @@
     2002/05/13 kubecj   added more banks for bankswitching
                             added PAL machine description
                             changed clock to be precise
-    
-    2012/10/25 Robert Tuccitto	NTSC Color Generator utilized for
-				color palette with hue shift/start 
-				based on observation of several 
-				systems across multiple displays
+
+    2012/10/25 Robert Tuccitto  NTSC Color Generator utilized for
+                color palette with hue shift/start
+                based on observation of several
+                systems across multiple displays
 
     2012/11/09 Robert Tuccitto  Fixed 3 degree hue begin point
-				miscalculation of color palette
+                miscalculation of color palette
 
 ***************************************************************************/
 

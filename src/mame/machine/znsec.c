@@ -172,7 +172,7 @@ void znsec_device::select(int select)
 		{
 			data_out(0, PSX_SIO_IN_DATA);
 		}
-	
+
 		m_select = select;
 	}
 }

@@ -9,7 +9,7 @@
     - proper 8251 uart hook-up on keyboard
     - boot is too slow right now, might be due of the floppy / HDD devices
     - investigate on POR bit
-	- Write a PC80S31K device (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
+    - Write a PC80S31K device (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
 
     TODO (PC-9801RS):
     - floppy disk hook-up;

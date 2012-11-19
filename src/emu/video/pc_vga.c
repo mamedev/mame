@@ -2994,19 +2994,19 @@ bit    0  Horizontal Total bit 8. Bit 8 of the Horizontal Total register (3d4h
 /*
 3d4h index 5Eh (R/W):  Extended Vertical Overflow Register             (80x +)
 bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
-		  index 6). Bits 8 and 9 are in 3d4h index 7 bit 0 and 5.
-	   1  Vertical Display End bit 10. Bit 10 of the Vertical Display End
-		  register (3d4h index 12h). Bits 8 and 9 are in 3d4h index 7 bit 1
-		  and 6
-	   2  Start Vertical Blank bit 10. Bit 10 of the Vertical Start Blanking
-		  register (3d4h index 15h). Bit 8 is in 3d4h index 7 bit 3 and bit 9
-		  in 3d4h index 9 bit 5
-	   4  Vertical Retrace Start bit 10. Bit 10 of the Vertical Start Retrace
-		  register (3d4h index 10h). Bits 8 and 9 are in 3d4h index 7 bit 2
-		  and 7.
-	   6  Line Compare Position bit 10. Bit 10 of the Line Compare register
-		  (3d4h index 18h). Bit 8 is in 3d4h index 7 bit 4 and bit 9 in 3d4h
-		  index 9 bit 6.
+          index 6). Bits 8 and 9 are in 3d4h index 7 bit 0 and 5.
+       1  Vertical Display End bit 10. Bit 10 of the Vertical Display End
+          register (3d4h index 12h). Bits 8 and 9 are in 3d4h index 7 bit 1
+          and 6
+       2  Start Vertical Blank bit 10. Bit 10 of the Vertical Start Blanking
+          register (3d4h index 15h). Bit 8 is in 3d4h index 7 bit 3 and bit 9
+          in 3d4h index 9 bit 5
+       4  Vertical Retrace Start bit 10. Bit 10 of the Vertical Start Retrace
+          register (3d4h index 10h). Bits 8 and 9 are in 3d4h index 7 bit 2
+          and 7.
+       6  Line Compare Position bit 10. Bit 10 of the Line Compare register
+          (3d4h index 18h). Bit 8 is in 3d4h index 7 bit 4 and bit 9 in 3d4h
+          index 9 bit 6.
  */
 			case 0x5e:
 				vga.crtc.vert_total = (vga.crtc.vert_total & 0xfbff) | ((data & 0x01) << 10);

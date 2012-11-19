@@ -161,14 +161,14 @@ void pgm_kovsh_decrypt(running_machine &machine)
 	for(i=0; i<rom_size/2; i++) {
 		UINT16 x = src[i];
 
-		IGS27_CRYPT1_ALT 
+		IGS27_CRYPT1_ALT
 		IGS27_CRYPT2_ALT2
-		IGS27_CRYPT3_ALT2 
-		IGS27_CRYPT4 
-		IGS27_CRYPT5 
-		IGS27_CRYPT6 
-		IGS27_CRYPT7 
-		IGS27_CRYPT8_ALT 
+		IGS27_CRYPT3_ALT2
+		IGS27_CRYPT4
+		IGS27_CRYPT5
+		IGS27_CRYPT6
+		IGS27_CRYPT7
+		IGS27_CRYPT8_ALT
 
 		x ^= kovsh_tab[i & 0xff] << 8;
 
@@ -209,12 +209,12 @@ void pgm_photoy2k_decrypt(running_machine &machine)
 
 	    IGS27_CRYPT1_ALT
 		IGS27_CRYPT2_ALT3
-	    IGS27_CRYPT3_ALT2 
-	    IGS27_CRYPT4 
+	    IGS27_CRYPT3_ALT2
+	    IGS27_CRYPT4
 		IGS27_CRYPT5_ALT
-	    IGS27_CRYPT6 
+	    IGS27_CRYPT6
 		IGS27_CRYPT7_ALT
-	    IGS27_CRYPT8 
+	    IGS27_CRYPT8
 
 	    x ^= photoy2k_tab[i & 0xff] << 8;
 
@@ -252,13 +252,13 @@ void pgm_pstar_decrypt(running_machine &machine)
 	for(i=0; i<rom_size/2; i++) {
 		UINT16 x = src[i];
 
-		IGS27_CRYPT1 
-		IGS27_CRYPT3_ALT2 
-		IGS27_CRYPT4 
-		IGS27_CRYPT5 
-		IGS27_CRYPT6_ALT 
-		IGS27_CRYPT7 
-		IGS27_CRYPT8 
+		IGS27_CRYPT1
+		IGS27_CRYPT3_ALT2
+		IGS27_CRYPT4
+		IGS27_CRYPT5
+		IGS27_CRYPT6_ALT
+		IGS27_CRYPT7
+		IGS27_CRYPT8
 
 		x = x ^ pstar[(i & 255)] << 8;
 		src[i] = x ;
@@ -294,14 +294,14 @@ void pgm_dfront_decrypt(running_machine &machine)
 	for(i=0; i<rom_size/2; i++) {
     	UINT16 x = src[i];
 
-		IGS27_CRYPT1_ALT 
-		IGS27_CRYPT2 
-		IGS27_CRYPT3 
+		IGS27_CRYPT1_ALT
+		IGS27_CRYPT2
+		IGS27_CRYPT3
 		IGS27_CRYPT4_ALT
-		IGS27_CRYPT5 
-		IGS27_CRYPT6 
-		IGS27_CRYPT7 
-		IGS27_CRYPT8 
+		IGS27_CRYPT5
+		IGS27_CRYPT6
+		IGS27_CRYPT7
+		IGS27_CRYPT8
 
 		x ^= dfront_tab[(i>> 1) & 0xff] << 8;
 
@@ -343,10 +343,10 @@ void pgm_ddp2_decrypt(running_machine &machine)
 		// NO CRYPT2
 		// NO CRYPT3
 		IGS27_CRYPT4_ALT
-		IGS27_CRYPT5 
-		IGS27_CRYPT6 
-		IGS27_CRYPT7_ALT 
-		IGS27_CRYPT8_ALT 
+		IGS27_CRYPT5
+		IGS27_CRYPT6
+		IGS27_CRYPT7_ALT
+		IGS27_CRYPT8_ALT
 
 		x ^= ddp2_tab[(i>> 1) & 0xff] << 8;
 
@@ -384,14 +384,14 @@ void pgm_mm_decrypt(running_machine &machine) // and dw2001
 	for(i=0; i<rom_size/2; i++) {
     	UINT16 x = src[i];
 
-		IGS27_CRYPT1 
-		IGS27_CRYPT2_ALT 
-		IGS27_CRYPT3_ALT2 
-		IGS27_CRYPT4 
-		IGS27_CRYPT5 
-		IGS27_CRYPT6_ALT 
-		IGS27_CRYPT7 
-		IGS27_CRYPT8_ALT 
+		IGS27_CRYPT1
+		IGS27_CRYPT2_ALT
+		IGS27_CRYPT3_ALT2
+		IGS27_CRYPT4
+		IGS27_CRYPT5
+		IGS27_CRYPT6_ALT
+		IGS27_CRYPT7
+		IGS27_CRYPT8_ALT
 
 		x ^= mm_tab[(i>> 1) & 0xff] << 8;
 
@@ -428,13 +428,13 @@ void pgm_kov2_decrypt(running_machine &machine)
 	for(i=0; i<rom_size/2; i++) {
     	UINT16 x = src[i];
 
-    	IGS27_CRYPT1_ALT 
+    	IGS27_CRYPT1_ALT
 		// NO CRYPT2
-    	IGS27_CRYPT3 
+    	IGS27_CRYPT3
 		IGS27_CRYPT4_ALT
 		IGS27_CRYPT5_ALT
 		IGS27_CRYPT6_ALT
-		IGS27_CRYPT7_ALT 
+		IGS27_CRYPT7_ALT
 		IGS27_CRYPT8_ALT
 
     	x ^= kov2_tab[(i >> 1) & 0xff] << 8;
@@ -472,14 +472,14 @@ void pgm_kov2p_decrypt(running_machine &machine)
 	for(i=0; i<rom_size/2; i++) {
     	UINT16 x = src[i];
 
-    	IGS27_CRYPT1_ALT 
-    	IGS27_CRYPT2_ALT 
-    	IGS27_CRYPT3 
-    	IGS27_CRYPT4 
-    	IGS27_CRYPT5 
-    	IGS27_CRYPT6 
-    	IGS27_CRYPT7 
-    	IGS27_CRYPT8_ALT 
+    	IGS27_CRYPT1_ALT
+    	IGS27_CRYPT2_ALT
+    	IGS27_CRYPT3
+    	IGS27_CRYPT4
+    	IGS27_CRYPT5
+    	IGS27_CRYPT6
+    	IGS27_CRYPT7
+    	IGS27_CRYPT8_ALT
 
     	x ^= kov2p_tab[(i >> 1) & 0xff] << 8;
 
@@ -516,14 +516,14 @@ void pgm_puzzli2_decrypt(running_machine &machine)
 	for(i=0; i<rom_size/2; i++) {
 		UINT16 x = src[i];
 
-    	IGS27_CRYPT1_ALT 
-    	IGS27_CRYPT2_ALT 
-    	IGS27_CRYPT3_ALT2 
-    	IGS27_CRYPT4 
-    	IGS27_CRYPT5 
-    	IGS27_CRYPT6_ALT 
-    	IGS27_CRYPT7 
-    	IGS27_CRYPT8 
+    	IGS27_CRYPT1_ALT
+    	IGS27_CRYPT2_ALT
+    	IGS27_CRYPT3_ALT2
+    	IGS27_CRYPT4
+    	IGS27_CRYPT5
+    	IGS27_CRYPT6_ALT
+    	IGS27_CRYPT7
+    	IGS27_CRYPT8
 
     	x ^= puzzli2_tab[i & 0xff] << 8;
     	src[i] = x;
@@ -560,14 +560,14 @@ void pgm_theglad_decrypt(running_machine &machine)
 	for(i=0; i<rom_size/2; i++) {
 		UINT16 x = src[i];
 
-		IGS27_CRYPT1_ALT 
-		IGS27_CRYPT2 
-		IGS27_CRYPT3 
-		IGS27_CRYPT4_ALT 
-		IGS27_CRYPT5 
-		IGS27_CRYPT6_ALT 
-		IGS27_CRYPT7 
-		IGS27_CRYPT8_ALT 
+		IGS27_CRYPT1_ALT
+		IGS27_CRYPT2
+		IGS27_CRYPT3
+		IGS27_CRYPT4_ALT
+		IGS27_CRYPT5
+		IGS27_CRYPT6_ALT
+		IGS27_CRYPT7
+		IGS27_CRYPT8_ALT
 
 		x ^= theglad_tab[(i >> 1) & 0xff] << 8;
 
@@ -605,14 +605,14 @@ void pgm_oldsplus_decrypt(running_machine &machine)
 	for(i=0; i<rom_size/2; i++) {
 		unsigned short x = src[i];
 
-		IGS27_CRYPT1 
-		IGS27_CRYPT2_ALT 
-		IGS27_CRYPT3_ALT2 
-		IGS27_CRYPT4 
-		IGS27_CRYPT5_ALT 
-		IGS27_CRYPT6 
-		IGS27_CRYPT7 
-		IGS27_CRYPT8_ALT 
+		IGS27_CRYPT1
+		IGS27_CRYPT2_ALT
+		IGS27_CRYPT3_ALT2
+		IGS27_CRYPT4
+		IGS27_CRYPT5_ALT
+		IGS27_CRYPT6
+		IGS27_CRYPT7
+		IGS27_CRYPT8_ALT
 
 		x ^= oldsplus_tab[i & 0xff] << 8;
 
@@ -650,14 +650,14 @@ void pgm_kovshp_decrypt(running_machine &machine)
 	for(i=0; i<rom_size/2; i++) {
 		unsigned short x = src[i];
 
-		IGS27_CRYPT1_ALT 
-		IGS27_CRYPT2_ALT2 
-		IGS27_CRYPT3_ALT2 
-		IGS27_CRYPT4_ALT 
-		IGS27_CRYPT5 
-		IGS27_CRYPT6_ALT 
-		IGS27_CRYPT7 
-		IGS27_CRYPT8_ALT 
+		IGS27_CRYPT1_ALT
+		IGS27_CRYPT2_ALT2
+		IGS27_CRYPT3_ALT2
+		IGS27_CRYPT4_ALT
+		IGS27_CRYPT5
+		IGS27_CRYPT6_ALT
+		IGS27_CRYPT7
+		IGS27_CRYPT8_ALT
 
 		x ^= kovshp_tab[i & 0xff] << 8;
 
@@ -695,14 +695,14 @@ void pgm_killbldp_decrypt(running_machine &machine)
 	for(i=0; i<rom_size/2; i++) {
 		UINT16 x = src[i];
 
-		IGS27_CRYPT1 
-		IGS27_CRYPT2 
-		IGS27_CRYPT3 
-		IGS27_CRYPT4 
-		IGS27_CRYPT5 
-		IGS27_CRYPT6 
-		IGS27_CRYPT7 
-		IGS27_CRYPT8_ALT 
+		IGS27_CRYPT1
+		IGS27_CRYPT2
+		IGS27_CRYPT3
+		IGS27_CRYPT4
+		IGS27_CRYPT5
+		IGS27_CRYPT6
+		IGS27_CRYPT7
+		IGS27_CRYPT8_ALT
 
 		x ^= killbldp_tab[(i >> 1) & 0xff] << 8;
 
@@ -721,14 +721,14 @@ void pgm_svg_decrypt(running_machine &machine)
 	for(i=0; i<rom_size/2; i++) {
 		UINT16 x = src[i];
 
-		IGS27_CRYPT1_ALT 
-		IGS27_CRYPT2_ALT 
-		IGS27_CRYPT3 
-		IGS27_CRYPT4_ALT 
-		IGS27_CRYPT5_ALT 
-		IGS27_CRYPT6 
-		IGS27_CRYPT7 
-		IGS27_CRYPT8_ALT 
+		IGS27_CRYPT1_ALT
+		IGS27_CRYPT2_ALT
+		IGS27_CRYPT3
+		IGS27_CRYPT4_ALT
+		IGS27_CRYPT5_ALT
+		IGS27_CRYPT6
+		IGS27_CRYPT7
+		IGS27_CRYPT8_ALT
 
 		src[i] = x;
 	}
@@ -765,13 +765,13 @@ void pgm_svgpcb_decrypt(running_machine &machine)
 
 		// preliminary!
 		IGS27_CRYPT1_ALT; // ok?
-		IGS27_CRYPT2_ALT3 
+		IGS27_CRYPT2_ALT3
 		IGS27_CRYPT3
 		IGS27_CRYPT4 // ok?
 		IGS27_CRYPT5_ALT  //
 		IGS27_CRYPT6_ALT // ok?
 		IGS27_CRYPT7
-		IGS27_CRYPT8_ALT 
+		IGS27_CRYPT8_ALT
 
 		x ^= svgpcb_tab[(i >> 1) & 0xff] << 8;
 
@@ -811,9 +811,9 @@ void pgm_py2k2_decrypt(running_machine &machine) // and ddpdoj/ddpdojbl
 		UINT16 x = src[i];
 
 		IGS27_CRYPT1
-		IGS27_CRYPT2_ALT3 
-		IGS27_CRYPT3_ALT 
-		IGS27_CRYPT4_ALT 
+		IGS27_CRYPT2_ALT3
+		IGS27_CRYPT3_ALT
+		IGS27_CRYPT4_ALT
 		IGS27_CRYPT5
 		IGS27_CRYPT6_ALT
 		IGS27_CRYPT7
@@ -859,11 +859,11 @@ void pgm_ket_decrypt(running_machine &machine)
 		IGS27_CRYPT1
 		IGS27_CRYPT2_ALT
 		IGS27_CRYPT3_ALT3
-		IGS27_CRYPT4_ALT 
+		IGS27_CRYPT4_ALT
 		IGS27_CRYPT5
 		IGS27_CRYPT6
 		IGS27_CRYPT7
-		IGS27_CRYPT8_ALT 
+		IGS27_CRYPT8_ALT
 
 
 		x ^= ket_tab[i & 0xff] << 8;
@@ -903,13 +903,13 @@ void pgm_espgal_decrypt(running_machine &machine)
 		UINT16 x = src[i];
 
 		IGS27_CRYPT1
-		IGS27_CRYPT2_ALT3 
-		IGS27_CRYPT3_ALT2 
-		IGS27_CRYPT4_ALT 
-		IGS27_CRYPT5_ALT 
+		IGS27_CRYPT2_ALT3
+		IGS27_CRYPT3_ALT2
+		IGS27_CRYPT4_ALT
+		IGS27_CRYPT5_ALT
 		IGS27_CRYPT6_ALT
 		IGS27_CRYPT7
-		IGS27_CRYPT8_ALT 
+		IGS27_CRYPT8_ALT
 
 		x ^= espgal_tab[i & 0xff] << 8;
 
@@ -953,10 +953,10 @@ void pgm_happy6_decrypt(running_machine &machine)
 		IGS27_CRYPT2
 		IGS27_CRYPT3
 		IGS27_CRYPT4
-		IGS27_CRYPT5_ALT 
+		IGS27_CRYPT5_ALT
 		IGS27_CRYPT6
 		IGS27_CRYPT7
-		IGS27_CRYPT8_ALT 
+		IGS27_CRYPT8_ALT
 
 		x ^= happy6in1_tab[(i >> 1) & 0xff] << 8;
 
@@ -997,14 +997,14 @@ void sdwx_decrypt(running_machine &machine)
 	{
 		UINT16 x = src[i];
 
-		IGS27_CRYPT1_ALT2 
-		IGS27_CRYPT2_ALT 
-		IGS27_CRYPT3_ALT2 
-		IGS27_CRYPT4 
-		IGS27_CRYPT5 
-		IGS27_CRYPT6_ALT 
-		IGS27_CRYPT7 
-		IGS27_CRYPT8 
+		IGS27_CRYPT1_ALT2
+		IGS27_CRYPT2_ALT
+		IGS27_CRYPT3_ALT2
+		IGS27_CRYPT4
+		IGS27_CRYPT5
+		IGS27_CRYPT6_ALT
+		IGS27_CRYPT7
+		IGS27_CRYPT8
 
 		x ^= sdwx_tab[(i >> 1) & 0xff] << 8;
 
@@ -1045,10 +1045,10 @@ void hauntedh_decrypt(running_machine &machine)
 		IGS27_CRYPT1
 	//  IGS27_CRYPT2
 	//  IGS27_CRYPT3
-		IGS27_CRYPT4_ALT 
+		IGS27_CRYPT4_ALT
 	//  IGS27_CRYPT5
 		IGS27_CRYPT6
-		IGS27_CRYPT7_ALT 
+		IGS27_CRYPT7_ALT
 		IGS27_CRYPT8
 
 		x ^= hauntedh_tab[(i>> 1) & 0xff] << 8;
@@ -1399,11 +1399,11 @@ void lhzb4_decrypt(running_machine &machine)
 		IGS27_CRYPT1
 	//  IGS27_CRYPT2
 	//  IGS27_CRYPT3
-		IGS27_CRYPT4_ALT 
+		IGS27_CRYPT4_ALT
 	//  IGS27_CRYPT5
 		IGS27_CRYPT6_ALT
 		IGS27_CRYPT7
-		IGS27_CRYPT8_ALT 
+		IGS27_CRYPT8_ALT
 
 		x ^= lhzb4_tab[(i>> 1) & 0xff] << 8;
 
@@ -1443,14 +1443,14 @@ void fearless_decrypt(running_machine &machine)
 		UINT16 x = src[i];
 
 		// might not be 100% correct...
-		IGS27_CRYPT1 
+		IGS27_CRYPT1
 		// IGS27_CRYPT2
-		IGS27_CRYPT3_ALT2 
-		IGS27_CRYPT4 
+		IGS27_CRYPT3_ALT2
+		IGS27_CRYPT4
 		// IGS27_CRYPT5
-		IGS27_CRYPT6_ALT 
-		IGS27_CRYPT7 
-		IGS27_CRYPT8 
+		IGS27_CRYPT6_ALT
+		IGS27_CRYPT7
+		IGS27_CRYPT8
 
 		x ^= fearless_tab[(i>> 1) & 0xff] << 8;
 

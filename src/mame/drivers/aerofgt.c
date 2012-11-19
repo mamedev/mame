@@ -1634,7 +1634,7 @@ static MACHINE_CONFIG_START( aerofgtb, aerofgt_state )
 	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_ol2_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
-	
+
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */

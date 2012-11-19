@@ -1962,4 +1962,4 @@ kil_non
 	read(0xfffe);
 	for(;;) {
 		read(0xffff);
-	}	
+	}

@@ -205,7 +205,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER( io_write );
 	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void change_resolution(UINT8 mode);
-	
+
 	UINT8 m_bank_offset;
 	UINT8 m_bank_base;
 	UINT8 m_control;

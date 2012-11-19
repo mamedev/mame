@@ -445,8 +445,8 @@ static int blit_draw( running_machine &machine, int src, int sx )
 	arg_size = fetch_word(src_data, src_len, &bit_addr, 4) + 1;
 
 #ifdef MAME_DEBUG
-//	if (pen_size > 4 || arg_size > 8)
-//		popmessage("warning: pen_size %d arg_size %d", pen_size, arg_size);
+//  if (pen_size > 4 || arg_size > 8)
+//      popmessage("warning: pen_size %d arg_size %d", pen_size, arg_size);
 #endif
 
 	// sryudens game bug
@@ -2513,14 +2513,14 @@ static ADDRESS_MAP_START( kotbinyo_portmap, AS_IO, 8, dynax_state )
 	AM_RANGE(0x83, 0x84) AM_READ(hanakanz_gfxrom_r)
 	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
 	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("SYSTEM")
-//	AM_RANGE(0xb1, 0xb2) AM_READ(hanakanz_keyb_r)
+//  AM_RANGE(0xb1, 0xb2) AM_READ(hanakanz_keyb_r)
 	AM_RANGE(0xb1, 0xb1) AM_READ_PORT("KEYB0")
 	AM_RANGE(0xb2, 0xb2) AM_READ_PORT("KEYB1")
 	AM_RANGE(0xb3, 0xb3) AM_WRITE(hanakanz_coincounter_w)
-//	AM_RANGE(0xb4, 0xb4) AM_WRITE(hanakanz_keyb_w)
+//  AM_RANGE(0xb4, 0xb4) AM_WRITE(hanakanz_keyb_w)
 	AM_RANGE(0xb6, 0xb6) AM_READ(hanakanz_rand_r)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-//	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+//  AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -2537,14 +2537,14 @@ static ADDRESS_MAP_START( kotbinsp_portmap, AS_IO, 8, dynax_state )
 	AM_RANGE(0x83, 0x84) AM_READ(hanakanz_gfxrom_r)
 	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
-//	AM_RANGE(0x91, 0x91) AM_READ(hanakanz_keyb_r)
+//  AM_RANGE(0x91, 0x91) AM_READ(hanakanz_keyb_r)
 	AM_RANGE(0x91, 0x91) AM_READ_PORT("KEYB0")
 	AM_RANGE(0x92, 0x92) AM_READ_PORT("KEYB1")
 	AM_RANGE(0x93, 0x93) AM_WRITE(hanakanz_coincounter_w)
-//	AM_RANGE(0x94, 0x94) AM_WRITE(hanakanz_keyb_w)
+//  AM_RANGE(0x94, 0x94) AM_WRITE(hanakanz_keyb_w)
 	AM_RANGE(0x96, 0x96) AM_READ(hanakanz_rand_r)
 	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-//	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+//  AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -5178,7 +5178,7 @@ static INPUT_PORTS_START( kotbinsp )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN    )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN    )
-	
+
 	PORT_START("KEYB0")
 	// Forced Joystick mode wrt kotbinyo:
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1         ) // * press at boot for service mode
@@ -9133,7 +9133,7 @@ static MACHINE_CONFIG_START( kotbinyo, dynax_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-//	MCFG_MSM6242_ADD("rtc", hanakanz_rtc_intf)
+//  MCFG_MSM6242_ADD("rtc", hanakanz_rtc_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( kotbinsp, kotbinyo )
@@ -10531,7 +10531,7 @@ Other - ACTEL A1010B
 DIPs  - 10-Position (x2)
 HSync - 15.1015kHz
 VSync - 60.1656Hz
-             
+
 no RTC nor battery (unpopulated)
 
 ***************************************************************************/
@@ -10579,7 +10579,7 @@ ROM_START( kotbinsp )
 	ROM_LOAD16_BYTE( "909035.8c", 0x000001, 0x100000, CRC(cea4dbfa) SHA1(581bbcfcb0c900667002b7b744197d039d586833) )
 	ROM_LOAD16_BYTE( "909034.6b", 0x200000, 0x080000, CRC(9f366a2a) SHA1(2199cf640b665bd1ba3eac081bde288dec521383) )
 	ROM_LOAD16_BYTE( "909033.6c", 0x200001, 0x080000, CRC(9388b85d) SHA1(a35fe0b585cba256bb5575f7b539b33dd0ca3aa0) )
-	ROM_FILL(                     0x300000, 0x100000, 0xff ) 
+	ROM_FILL(                     0x300000, 0x100000, 0xff )
 	// mirror the whole address space (25 bits)
 	ROM_COPY( "blitter", 0, 0x0400000, 0x400000 )
 	ROM_COPY( "blitter", 0, 0x0800000, 0x400000 )

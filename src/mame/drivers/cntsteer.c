@@ -887,7 +887,7 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 
 	MCFG_CPU_ADD("subcpu", M6809, 2000000)		 /* ? */
 	MCFG_CPU_PROGRAM_MAP(cntsteer_cpu2_map)
-//	MCFG_DEVICE_DISABLE()
+//  MCFG_DEVICE_DISABLE()
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cntsteer_state,  nmi_line_pulse) /* ? */
 
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000)        /* ? */

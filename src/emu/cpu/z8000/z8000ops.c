@@ -5829,8 +5829,8 @@ static void ZB7_ssss_dddd(z8000_state *cpustate)
 }
 
 /******************************************
- trtib	 @rd,@rs,rr
- flags:	 -ZSV--
+ trtib   @rd,@rs,rr
+ flags:  -ZSV--
  ******************************************/
 static void ZB8_ddN0_0010_0000_rrrr_ssN0_0000(z8000_state *cpustate)
 {
@@ -5845,8 +5845,8 @@ static void ZB8_ddN0_0010_0000_rrrr_ssN0_0000(z8000_state *cpustate)
 }
 
 /******************************************
- trtirb	 @rd,@rs,rbr
- flags:	 -ZSV--
+ trtirb  @rd,@rs,rbr
+ flags:  -ZSV--
  ******************************************/
 static void ZB8_ddN0_0110_0000_rrrr_ssN0_1110(z8000_state *cpustate)
 {
@@ -5866,8 +5866,8 @@ static void ZB8_ddN0_0110_0000_rrrr_ssN0_1110(z8000_state *cpustate)
 }
 
 /******************************************
- trtdb	 @rd,@rs,rbr
- flags:	 -ZSV--
+ trtdb   @rd,@rs,rbr
+ flags:  -ZSV--
  ******************************************/
 static void ZB8_ddN0_1010_0000_rrrr_ssN0_0000(z8000_state *cpustate)
 {
@@ -5882,8 +5882,8 @@ static void ZB8_ddN0_1010_0000_rrrr_ssN0_0000(z8000_state *cpustate)
 }
 
 /******************************************
- trtdrb	 @rd,@rs,rbr
- flags:	 -ZSV--
+ trtdrb  @rd,@rs,rbr
+ flags:  -ZSV--
  ******************************************/
 static void ZB8_ddN0_1110_0000_rrrr_ssN0_1110(z8000_state *cpustate)
 {
@@ -5903,8 +5903,8 @@ static void ZB8_ddN0_1110_0000_rrrr_ssN0_1110(z8000_state *cpustate)
 }
 
 /******************************************
- trib	 @rd,@rs,rbr
- flags:	 -ZSV--
+ trib    @rd,@rs,rbr
+ flags:  -ZSV--
  ******************************************/
 static void ZB8_ddN0_0000_0000_rrrr_ssN0_0000(z8000_state *cpustate)
 {
@@ -5919,8 +5919,8 @@ static void ZB8_ddN0_0000_0000_rrrr_ssN0_0000(z8000_state *cpustate)
 }
 
 /******************************************
- trirb	 @rd,@rs,rbr
- flags:	 -ZSV--
+ trirb   @rd,@rs,rbr
+ flags:  -ZSV--
  ******************************************/
 static void ZB8_ddN0_0100_0000_rrrr_ssN0_0000(z8000_state *cpustate)
 {
@@ -5935,8 +5935,8 @@ static void ZB8_ddN0_0100_0000_rrrr_ssN0_0000(z8000_state *cpustate)
 }
 
 /******************************************
- trdb	 @rd,@rs,rbr
- flags:	 -ZSV--
+ trdb    @rd,@rs,rbr
+ flags:  -ZSV--
  ******************************************/
 static void ZB8_ddN0_1000_0000_rrrr_ssN0_0000(z8000_state *cpustate)
 {
@@ -5951,8 +5951,8 @@ static void ZB8_ddN0_1000_0000_rrrr_ssN0_0000(z8000_state *cpustate)
 }
 
 /******************************************
- trdrb	 @rd,@rs,rbr
- flags:	 -ZSV--
+ trdrb   @rd,@rs,rbr
+ flags:  -ZSV--
  ******************************************/
 static void ZB8_ddN0_1100_0000_rrrr_ssN0_0000(z8000_state *cpustate)
 {

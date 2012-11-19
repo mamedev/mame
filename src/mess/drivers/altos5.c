@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	Altos 5-15
+    Altos 5-15
 
 ****************************************************************************/
 
@@ -19,7 +19,7 @@ public:
 
 	DECLARE_READ8_MEMBER(altos_2f_r);
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	UINT8 m_term_data;	
+	UINT8 m_term_data;
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset();
 };
@@ -48,7 +48,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(altos5_io, AS_IO, 8, altos5_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x2e, 0x2e) AM_DEVWRITE(TERMINAL_TAG, generic_terminal_device, write)
-	AM_RANGE(0x2f, 0x2f) AM_READ(altos_2f_r) 
+	AM_RANGE(0x2f, 0x2f) AM_READ(altos_2f_r)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -67,9 +67,9 @@ static MACHINE_CONFIG_START( altos5, altos5_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(altos5_mem)
 	MCFG_CPU_IO_MAP(altos5_io)
-	
+
 	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)	
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 MACHINE_CONFIG_END
 
 

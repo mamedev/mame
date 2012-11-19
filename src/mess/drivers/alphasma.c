@@ -4,10 +4,10 @@
 
         08/28/2012 Skeleton driver
 
-	TODO:
-	- define video HW capabilities
-	- "Addr. Bus RAM error" string read, presumably memory mapped RAM at 0x8000
-	  is actually a r/w bank register.
+    TODO:
+    - define video HW capabilities
+    - "Addr. Bus RAM error" string read, presumably memory mapped RAM at 0x8000
+      is actually a r/w bank register.
 
 ****************************************************************************/
 
@@ -30,7 +30,7 @@ public:
 
 	virtual void machine_start();
 	virtual void palette_init();
-//	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+//  virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -41,8 +41,8 @@ static ADDRESS_MAP_START(alphasmart_mem, AS_PROGRAM, 8, alphasmart_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(alphasmart_io, AS_IO, 8, alphasmart_state)
-//	AM_RANGE(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA) AM_DEVREADWRITE("hd44780", hd44780_device, control_read, control_write)
-//	AM_RANGE(MC68HC11_IO_PORTD, MC68HC11_IO_PORTD) AM_DEVREADWRITE("hd44780", hd44780_device, data_read, data_write)
+//  AM_RANGE(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA) AM_DEVREADWRITE("hd44780", hd44780_device, control_read, control_write)
+//  AM_RANGE(MC68HC11_IO_PORTD, MC68HC11_IO_PORTD) AM_DEVREADWRITE("hd44780", hd44780_device, data_read, data_write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -79,7 +79,7 @@ static MACHINE_CONFIG_START( alphasmart, alphasmart_state )
 	MCFG_CPU_PROGRAM_MAP(alphasmart_mem)
 	MCFG_CPU_IO_MAP(alphasmart_io)
 	MCFG_CPU_CONFIG(alphasmart_hc11_config)
-//	MCFG_CPU_PERIODIC_INT_DRIVER(alphasmart_state, irq0_line_hold,  50)
+//  MCFG_CPU_PERIODIC_INT_DRIVER(alphasmart_state, irq0_line_hold,  50)
 
 	MCFG_HD44780_ADD("hd44780", alphasmart_4line_display)
 

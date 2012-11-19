@@ -1459,7 +1459,7 @@ trb_ce_aba
 	if(A & TMP2)
 		P &= ~F_Z;
 	else
-		P |= F_Z;	
+		P |= F_Z;
 	TMP2 &= ~A;
 	write(TMP, TMP2);
 	prefetch();
@@ -1470,7 +1470,7 @@ trb_ce_zpg
 	if(A & TMP2)
 		P &= ~F_Z;
 	else
-		P |= F_Z;	
+		P |= F_Z;
 	TMP2 &= ~A;
 	write(TMP, TMP2);
 	prefetch();
@@ -1482,7 +1482,7 @@ tsb_ce_aba
 	if(A & TMP2)
 		P &= ~F_Z;
 	else
-		P |= F_Z;	
+		P |= F_Z;
 	TMP2 |= A;
 	write(TMP, TMP2);
 	prefetch();
@@ -1493,7 +1493,7 @@ tsb_ce_zpg
 	if(A & TMP2)
 		P &= ~F_Z;
 	else
-		P |= F_Z;	
+		P |= F_Z;
 	TMP2 |= A;
 	write(TMP, TMP2);
 	prefetch();

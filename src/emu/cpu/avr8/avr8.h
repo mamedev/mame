@@ -9,25 +9,25 @@
       the existing opcodes has been shown to wildly corrupt the video output in Craft, so one can assume that the
       existing timing is 100% correct.
 
-	  Unimplemented opcodes: CPSR, LD Z+, ST Z+, ST -Z/-Y/-X, ELPM, SPM, SPM Z+, EIJMP, SLEEP, BREAK, WDR, ICALL,
-	                         EICALL, JMP, CALL, SBIW
+      Unimplemented opcodes: CPSR, LD Z+, ST Z+, ST -Z/-Y/-X, ELPM, SPM, SPM Z+, EIJMP, SLEEP, BREAK, WDR, ICALL,
+                             EICALL, JMP, CALL, SBIW
 
-	- Changelist -
-	  30 Oct. 2012
-	  - Added FMUL, FMULS, FMULSU opcodes [MooglyGuy]
-	  - Fixed incorrect flag calculation in ROR opcode [MooglyGuy]
-	  - Fixed incorrect bit testing in SBIC/SBIS opcodes [MooglyGuy]
+    - Changelist -
+      30 Oct. 2012
+      - Added FMUL, FMULS, FMULSU opcodes [MooglyGuy]
+      - Fixed incorrect flag calculation in ROR opcode [MooglyGuy]
+      - Fixed incorrect bit testing in SBIC/SBIS opcodes [MooglyGuy]
 
-	  25 Oct. 2012
-	  - Added MULS, ANDI, STI Z+, LD -Z, LD -Y, LD -X, LD Y+q, LD Z+q, SWAP, ASR, ROR and SBIS opcodes [MooglyGuy]
-	  - Corrected cycle counts for LD and ST opcodes [MooglyGuy]
-	  - Moved opcycles init into inner while loop, fixes 2-cycle and 3-cycle opcodes effectively forcing
-	    all subsequent 1-cycle opcodes to be 2 or 3 cycles [MooglyGuy]
-	  - Fixed register behavior in MULSU, LD -Z, and LD -Y opcodes [MooglyGuy]
+      25 Oct. 2012
+      - Added MULS, ANDI, STI Z+, LD -Z, LD -Y, LD -X, LD Y+q, LD Z+q, SWAP, ASR, ROR and SBIS opcodes [MooglyGuy]
+      - Corrected cycle counts for LD and ST opcodes [MooglyGuy]
+      - Moved opcycles init into inner while loop, fixes 2-cycle and 3-cycle opcodes effectively forcing
+        all subsequent 1-cycle opcodes to be 2 or 3 cycles [MooglyGuy]
+      - Fixed register behavior in MULSU, LD -Z, and LD -Y opcodes [MooglyGuy]
 
-	  18 Oct. 2012
-	  - Added OR, SBCI, ORI, ST Y+, ADIQ opcodes [MooglyGuy]
-	  - Fixed COM, NEG, LSR opcodes [MooglyGuy]
+      18 Oct. 2012
+      - Added OR, SBCI, ORI, ST Y+, ADIQ opcodes [MooglyGuy]
+      - Fixed COM, NEG, LSR opcodes [MooglyGuy]
 
 */
 

@@ -9,25 +9,25 @@
       the existing opcodes has been shown to wildly corrupt the video output in Craft, so one can assume that the
       existing timing is 100% correct.
 
-	  Unimplemented opcodes: CPSR, LD Z+, ST -Z/-Y/-X, ELPM, SPM, SPM Z+, EIJMP, SLEEP, BREAK, WDR, ICALL, EICALL,
-	                         JMP, CALL
+      Unimplemented opcodes: CPSR, LD Z+, ST -Z/-Y/-X, ELPM, SPM, SPM Z+, EIJMP, SLEEP, BREAK, WDR, ICALL, EICALL,
+                             JMP, CALL
 
-	- Changelist -
-	  30 Oct. 2012
-	  - Added FMUL, FMULS, FMULSU opcodes [MooglyGuy]
-	  - Fixed incorrect flag calculation in ROR opcode [MooglyGuy]
-	  - Fixed incorrect bit testing in SBIC/SBIS opcodes [MooglyGuy]
+    - Changelist -
+      30 Oct. 2012
+      - Added FMUL, FMULS, FMULSU opcodes [MooglyGuy]
+      - Fixed incorrect flag calculation in ROR opcode [MooglyGuy]
+      - Fixed incorrect bit testing in SBIC/SBIS opcodes [MooglyGuy]
 
-	  25 Oct. 2012
-	  - Added MULS, ANDI, STI Z+, LD -Z, LD -Y, LD -X, LD Y+q, LD Z+q, SWAP, ASR, ROR and SBIS opcodes [MooglyGuy]
-	  - Corrected cycle counts for LD and ST opcodes [MooglyGuy]
-	  - Moved opcycles init into inner while loop, fixes 2-cycle and 3-cycle opcodes effectively forcing
-	    all subsequent 1-cycle opcodes to be 2 or 3 cycles [MooglyGuy]
-	  - Fixed register behavior in MULSU, LD -Z, and LD -Y opcodes [MooglyGuy]
+      25 Oct. 2012
+      - Added MULS, ANDI, STI Z+, LD -Z, LD -Y, LD -X, LD Y+q, LD Z+q, SWAP, ASR, ROR and SBIS opcodes [MooglyGuy]
+      - Corrected cycle counts for LD and ST opcodes [MooglyGuy]
+      - Moved opcycles init into inner while loop, fixes 2-cycle and 3-cycle opcodes effectively forcing
+        all subsequent 1-cycle opcodes to be 2 or 3 cycles [MooglyGuy]
+      - Fixed register behavior in MULSU, LD -Z, and LD -Y opcodes [MooglyGuy]
 
-	  18 Oct. 2012
-	  - Added OR, SBCI, ORI, ST Y+, ADIQ opcodes [MooglyGuy]
-	  - Fixed COM, NEG, LSR opcodes [MooglyGuy]
+      18 Oct. 2012
+      - Added OR, SBCI, ORI, ST Y+, ADIQ opcodes [MooglyGuy]
+      - Fixed COM, NEG, LSR opcodes [MooglyGuy]
 
 */
 
@@ -783,7 +783,7 @@ void avr8_device::timer0_tick()
     //UINT8 compare_mode[2] = { (m_r[AVR8_REGIDX_TCCR0A] & AVR8_TCCR0A_COM0A_MASK) >> AVR8_TCCR0A_COM0A_SHIFT,
                               //(m_r[AVR8_REGIDX_TCCR0A] & AVR8_TCCR0A_COM0B_MASK) >> AVR8_TCCR0A_COM0B_SHIFT };
     UINT8 ocr0[2] = { m_r[AVR8_REGIDX_OCR0A], m_r[AVR8_REGIDX_OCR0B] };
-	UINT8 ocf0[2] = { (1 << AVR8_TIFR0_OCF0A_SHIFT), (1 << AVR8_TIFR0_OCF0B_SHIFT) };
+    UINT8 ocf0[2] = { (1 << AVR8_TIFR0_OCF0A_SHIFT), (1 << AVR8_TIFR0_OCF0B_SHIFT) };
     INT32 increment = m_timer0_increment;
 
     for(INT32 reg = AVR8_REG_A; reg <= AVR8_REG_B; reg++)
@@ -854,9 +854,9 @@ void avr8_device::timer0_tick()
 
     m_r[AVR8_REGIDX_TCNT0] = count + increment;
 
-	update_interrupt(AVR8_INTIDX_OCF0A);
-	update_interrupt(AVR8_INTIDX_OCF0B);
-	update_interrupt(AVR8_INTIDX_TOV0);
+    update_interrupt(AVR8_INTIDX_OCF0A);
+    update_interrupt(AVR8_INTIDX_OCF0B);
+    update_interrupt(AVR8_INTIDX_TOV0);
         */
 }
 
@@ -1054,7 +1054,7 @@ void avr8_device::timer1_tick()
                 break;
 
             default:
-               	verboselog(m_pc, 0, "update_timer1_compare_mode: Unknown waveform generation mode: %02x\n", wgm1);
+            	verboselog(m_pc, 0, "update_timer1_compare_mode: Unknown waveform generation mode: %02x\n", wgm1);
                 break;
         }
         /*

@@ -634,8 +634,8 @@ static ADDRESS_MAP_START( megaline_portmap, AS_IO, 8, goldstar_state )
 	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("sn3", sn76489_device, write)						/* SN76489 #3 */
 	AM_RANGE(0x60, 0x60) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)					/* AY8910 control? */
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)		/* AY8910 Input? */
-//	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-//	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+//  AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+//  AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 
@@ -7012,9 +7012,9 @@ static MACHINE_CONFIG_START( megaline, goldstar_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
 
 	/* 3x 8255 */
-//	MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
-//	MCFG_I8255A_ADD( "ppi8255_1", lucky8_ppi8255_1_intf )
-//	MCFG_I8255A_ADD( "ppi8255_2", lucky8_ppi8255_2_intf )
+//  MCFG_I8255A_ADD( "ppi8255_0", lucky8_ppi8255_0_intf )
+//  MCFG_I8255A_ADD( "ppi8255_1", lucky8_ppi8255_1_intf )
+//  MCFG_I8255A_ADD( "ppi8255_2", lucky8_ppi8255_2_intf )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -7027,7 +7027,7 @@ static MACHINE_CONFIG_START( megaline, goldstar_state )
 
 	MCFG_GFXDECODE(megaline)
 	MCFG_PALETTE_LENGTH(256)
-//	MCFG_NVRAM_ADD_1FILL("nvram")
+//  MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
 
@@ -10499,7 +10499,7 @@ ROM_END
 
 
   ==========================
-  Custom 06B53P 9G1 - DIP 28   
+  Custom 06B53P 9G1 - DIP 28
   ==========================
   Pinout
   ======
@@ -10555,7 +10555,7 @@ ROM_END
   08 -> M2(16)
   09 -> M2(15)
   10 -> M2(12)
-  11 -> N2(19) -> 10k -> +5V 
+  11 -> N2(19) -> 10k -> +5V
   12 -> GND
   13 -> GND
   14 -> M2(06)
@@ -10632,7 +10632,7 @@ ROM_END
   ========
    BPROMS:
   ========
-                       
+
             GND-------------+ +----------N3(10)
             GND-----------+ | | +--------N3(06)
             K5(06)------+ | | | | +------(N/C)
@@ -10643,7 +10643,7 @@ ROM_END
                     |>## 24S10 @M3 ###|
                     |#################|
                     +-+-+-+-+-+-+-+-+-+
-                      | | | | | | | | 
+                      | | | | | | | |
             K5(15)----+ | | | | | | +----GND
             K3(12)------+ | | | | +------D3(03)
             K3(14)--------+ | | +--------D3(11)
@@ -10654,7 +10654,7 @@ ROM_END
                    J3(10)---+ +----J3(11)
                  K5(05)---+ | | +----J3(12)
               H3(05)----+ | | | | +-----J3(13)
-            +5V-------+ | | | | | | 
+            +5V-------+ | | | | | |
                       | | | | | | | +-------------------+
                       | | | | | | | |                   |
                     +-----------------+                 |
@@ -10778,7 +10778,7 @@ ROM_END
             |                     | | | | | +--------------|-|-+
             |                     | | | | | | +------------|-+
             |                     | | | | | | | +----------+
-            |                     | | | | | | | |    
+            |                     | | | | | | | |
             |                 +---+-+-+-+-+-+-+-+---+
             |                 | 1+---------------+8 |
             |                 |  | | | | | | | | |  |

@@ -211,7 +211,7 @@ static void save_tables(FILE *f)
 			opc = string(opcode.begin(), k);
 			fullopc = string(opcode.begin(), ke-1);
 			mode = string(ke, opcode.end());
-			
+
 			bool step_over = opc == "jsr" || opc == "bsr";
 			bool step_out = opc == "rts" || opc == "rti" || opc == "rtn";
 			fprintf(f, "\t{ \"%s\", DASM_%s, %s },\n",

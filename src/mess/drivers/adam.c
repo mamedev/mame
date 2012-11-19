@@ -626,18 +626,18 @@ WRITE8_MEMBER( adam_state::mioc_w )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    0       Lower memory option 0
-	    1       Lower memory option 1
-	    2       Upper memory option 0
-	    3       Upper memory option 1
-	    4
-	    5
-	    6
-	    7
+        0       Lower memory option 0
+        1       Lower memory option 1
+        2       Upper memory option 0
+        3       Upper memory option 1
+        4
+        5
+        6
+        7
 
-	*/
+    */
 
 	m_mioc = data;
 }
@@ -666,18 +666,18 @@ WRITE8_MEMBER( adam_state::adamnet_w )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    0       Network reset
-	    1       EOS enable
-	    2
-	    3
-	    4
-	    5
-	    6
-	    7
+        0       Network reset
+        1       EOS enable
+        2
+        3
+        4
+        5
+        6
+        7
 
-	*/
+    */
 
 	if (BIT(m_an, 0) && !BIT(data, 0))
 	{
@@ -698,18 +698,18 @@ WRITE8_MEMBER( adam_state::m6801_p1_w )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    0       BA8
-	    1       BA9
-	    2       BA10
-	    3       BA11
-	    4       BA12
-	    5       BA13
-	    6       BA14
-	    7       BA15
+        0       BA8
+        1       BA9
+        2       BA10
+        3       BA11
+        4       BA12
+        5       BA13
+        6       BA14
+        7       BA15
 
-	*/
+    */
 
 	m_ba = (data << 8) | (m_ba & 0xff);
 }
@@ -723,15 +723,15 @@ READ8_MEMBER( adam_state::m6801_p2_r )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    0       M6801 mode bit 0
-	    1       M6801 mode bit 1
-	    2       M6801 mode bit 2
-	    3       NET RXD
-	    4
+        0       M6801 mode bit 0
+        1       M6801 mode bit 1
+        2       M6801 mode bit 2
+        3       NET RXD
+        4
 
-	*/
+    */
 
 	UINT8 data = M6801_MODE_7;
 
@@ -750,15 +750,15 @@ WRITE8_MEMBER( adam_state::m6801_p2_w )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    0       _DMA
-	    1
-	    2       _BWR
-	    3
-	    4       NET TXD
+        0       _DMA
+        1
+        2       _BWR
+        3
+        4       NET TXD
 
-	*/
+    */
 
 	// DMA
 	m_dma = BIT(data, 0);
@@ -779,18 +779,18 @@ READ8_MEMBER( adam_state::m6801_p3_r )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    0       BD0
-	    1       BD1
-	    2       BD2
-	    3       BD3
-	    4       BD4
-	    5       BD5
-	    6       BD6
-	    7       BD7
+        0       BD0
+        1       BD1
+        2       BD2
+        3       BD3
+        4       BD4
+        5       BD5
+        6       BD6
+        7       BD7
 
-	*/
+    */
 
 	return m_data_out;
 }
@@ -804,18 +804,18 @@ WRITE8_MEMBER( adam_state::m6801_p3_w )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    0       BD0
-	    1       BD1
-	    2       BD2
-	    3       BD3
-	    4       BD4
-	    5       BD5
-	    6       BD6
-	    7       BD7
+        0       BD0
+        1       BD1
+        2       BD2
+        3       BD3
+        4       BD4
+        5       BD5
+        6       BD6
+        7       BD7
 
-	*/
+    */
 
 	m_data_in = data;
 }
@@ -829,18 +829,18 @@ WRITE8_MEMBER( adam_state::m6801_p4_w )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    0       BA0
-	    1       BA1
-	    2       BA2
-	    3       BA3
-	    4       BA4
-	    5       BA5
-	    6       BA6
-	    7       BA7
+        0       BA0
+        1       BA1
+        2       BA2
+        3       BA3
+        4       BA4
+        5       BA5
+        6       BA6
+        7       BA7
 
-	*/
+    */
 
 	m_ba = (m_ba & 0xff00) | data;
 }
@@ -1168,7 +1168,7 @@ static MACHINE_CONFIG_START( adam, adam_state )
 	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_LEFT_EXPANSION_SLOT_TAG, XTAL_7_15909MHz/2, slot1_intf, adam_slot1_devices, "adamlink", NULL)
 	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_CENTER_EXPANSION_SLOT_TAG, XTAL_7_15909MHz/2, slot2_intf, adam_slot2_devices, NULL, NULL)
 	MCFG_ADAM_EXPANSION_SLOT_ADD(ADAM_RIGHT_EXPANSION_SLOT_TAG, XTAL_7_15909MHz/2, slot3_intf, adam_slot3_devices, "ram", NULL)
-	
+
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")

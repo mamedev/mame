@@ -1107,9 +1107,9 @@ WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_2_w)
 	UINT8 rising_bits = data & ~m_port_2_last_extra;
 
 	if (rising_bits & 0x01) m_samples->start(0, 6);		/* Lands on top of building, wife kicks man */
-	//if (rising_bits & 0x02) m_samples->start(3, 7);		/* deposit money, start intermission, end game */
-	//if (rising_bits & 0x04) m_samples->start(4, 7);		/* deposit money, start intermission, Slides down rope */
-	//if (rising_bits & 0x08) m_samples->start(5, 7);		/* start intermission, end game */
+	//if (rising_bits & 0x02) m_samples->start(3, 7);       /* deposit money, start intermission, end game */
+	//if (rising_bits & 0x04) m_samples->start(4, 7);       /* deposit money, start intermission, Slides down rope */
+	//if (rising_bits & 0x08) m_samples->start(5, 7);       /* start intermission, end game */
 	if (rising_bits & 0x10) m_samples->start(3, 1);        /* Dog barking */
 
 	m_color_map = data & 0x40;

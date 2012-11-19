@@ -76,7 +76,7 @@ void m6510_device::device_start()
 	read_port.resolve_safe(0);
 	write_port.resolve_safe();
 
- 	if(direct_disabled)
+	if(direct_disabled)
 		mintf = new mi_6510_nd(this);
 	else
 		mintf = new mi_6510_normal(this);

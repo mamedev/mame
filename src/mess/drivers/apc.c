@@ -1,50 +1,50 @@
 /***************************************************************************
 
-	Advanced Personal Computer (c) 1982 NEC
+    Advanced Personal Computer (c) 1982 NEC
 
-	preliminary driver by Angelo Salese
+    preliminary driver by Angelo Salese
 
-	TODO:
-	- video emulation
-	- Floppy device
-	- keyboard
-	- Understand interrupt sources
-	- NMI seems valid, dumps a x86 stack to vram?
-	- Unknown RTC device type;
-	- What are exactly APU and MPU devices? They sounds scary ...
-	- DMA hook-ups
-	- serial ports
-	- parallel ports
-	- Extract info regarding Hard Disk functionality
-	- Various unknown ports
-	- What kind of external ROM actually maps at 0xa****?
+    TODO:
+    - video emulation
+    - Floppy device
+    - keyboard
+    - Understand interrupt sources
+    - NMI seems valid, dumps a x86 stack to vram?
+    - Unknown RTC device type;
+    - What are exactly APU and MPU devices? They sounds scary ...
+    - DMA hook-ups
+    - serial ports
+    - parallel ports
+    - Extract info regarding Hard Disk functionality
+    - Various unknown ports
+    - What kind of external ROM actually maps at 0xa****?
 
 ============================================================================
-	front ^
-	      |
-	card
-	----
-	69PFCU 7220               PFCU1R 2764
-	69PTS  7220
-	-
-	69PFB2 8086/8087   DFBU2J PFBU2L 2732
-	69SNB RAM
+    front ^
+          |
+    card
+    ----
+    69PFCU 7220               PFCU1R 2764
+    69PTS  7220
+    -
+    69PFB2 8086/8087   DFBU2J PFBU2L 2732
+    69SNB RAM
 
 ----------------------------------------------------------------------------
-	i/o memory map (preliminary):
-	0x00 - 0x1f DMA
-	0x20 - 0x23 i8259 master
-	0x28 - 0x2f i8259 slave (even), pit8253 (odd)
-	0x30 - 0x37 serial i8251, even #1 / odd #2
-	0x38 - 0x3f DMA segments
-	0x40 - 0x43 upd7220, even chr / odd bitmap
-	0x48 - 0x4f keyboard
-	0x50 - 0x53 upd765
-	0x58        rtc
-	0x5a - 0x5e APU
-	0x60        MPU (melody)
-	0x61 - 0x67 (Mirror of pit8253?)
-	0x68 - 0x6f parallel port
+    i/o memory map (preliminary):
+    0x00 - 0x1f DMA
+    0x20 - 0x23 i8259 master
+    0x28 - 0x2f i8259 slave (even), pit8253 (odd)
+    0x30 - 0x37 serial i8251, even #1 / odd #2
+    0x38 - 0x3f DMA segments
+    0x40 - 0x43 upd7220, even chr / odd bitmap
+    0x48 - 0x4f keyboard
+    0x50 - 0x53 upd765
+    0x58        rtc
+    0x5a - 0x5e APU
+    0x60        MPU (melody)
+    0x61 - 0x67 (Mirror of pit8253?)
+    0x68 - 0x6f parallel port
 
 ----------------------------------------------------------------------------
 0xfe3c2: checks if the floppy has a valid string for booting (either "CP/M-86"
@@ -172,33 +172,33 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	int xi,yi;
 	int x;
 	UINT8 char_size;
-//	UINT8 interlace_on;
+//  UINT8 interlace_on;
 
-//	if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
-//		return;
+//  if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
+//      return;
 
-//	interlace_on = state->m_video_reg[2] == 0x10; /* TODO: correct? */
+//  interlace_on = state->m_video_reg[2] == 0x10; /* TODO: correct? */
 	char_size = 16;
 
 	for(x=0;x<pitch;x++)
 	{
 		UINT8 tile_data;
-//		UINT8 secret,reverse,u_line,v_line;
+//      UINT8 secret,reverse,u_line,v_line;
 		UINT8 color;
 		UINT8 tile,attr,pen;
 		UINT32 tile_addr;
 
-//		tile_addr = addr+(x*(state->m_video_ff[WIDTH40_REG]+1));
+//      tile_addr = addr+(x*(state->m_video_ff[WIDTH40_REG]+1));
 		tile_addr = addr+(x*(1));
 
 		tile = state->m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0x007f;
 		attr = (state->m_video_ram_1[(tile_addr*2 & 0x1fff) | 0x2000] & 0x00ff);
 
-//		secret = (attr & 1) ^ 1;
+//      secret = (attr & 1) ^ 1;
 		//blink = attr & 2;
-//		reverse = attr & 4;
-//		u_line = attr & 8;
-//		v_line = attr & 0x10;
+//      reverse = attr & 4;
+//      u_line = attr & 8;
+//      v_line = attr & 0x10;
 		color = (attr & 0xe0) >> 5;
 
 		for(yi=0;yi<lr;yi++)
@@ -207,19 +207,19 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 			{
 				int res_x,res_y;
 
-//				res_x = (x*8+xi) * (state->m_video_ff[WIDTH40_REG]+1);
+//              res_x = (x*8+xi) * (state->m_video_ff[WIDTH40_REG]+1);
 				res_x = (x*8+xi) * (1);
 				res_y = y*lr+yi;
 
 				if(res_x > 640 || res_y > char_size*25) //TODO
 					continue;
 
-//				tile_data = secret ? 0 : (state->m_char_rom[tile*char_size+interlace_on*0x800+yi]);
+//              tile_data = secret ? 0 : (state->m_char_rom[tile*char_size+interlace_on*0x800+yi]);
 				tile_data = (state->m_char_rom[tile+yi*0x80]);
 
-//				if(reverse) { tile_data^=0xff; }
-//				if(u_line && yi == 7) { tile_data = 0xff; }
-//				if(v_line)	{ tile_data|=8; }
+//              if(reverse) { tile_data^=0xff; }
+//              if(u_line && yi == 7) { tile_data = 0xff; }
+//              if(v_line)  { tile_data|=8; }
 
 				if(cursor_on && cursor_addr == tile_addr)
 					tile_data^=0xff;
@@ -232,13 +232,13 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(pen)
 					bitmap.pix16(res_y, res_x) = pen;
 
-//				if(state->m_video_ff[WIDTH40_REG])
-//				{
-//					if(res_x+1 > 640 || res_y > char_size*25) //TODO
-//						continue;
+//              if(state->m_video_ff[WIDTH40_REG])
+//              {
+//                  if(res_x+1 > 640 || res_y > char_size*25) //TODO
+//                      continue;
 
-//					bitmap.pix16(res_y, res_x+1) = pen;
-//				}
+//                  bitmap.pix16(res_y, res_x+1) = pen;
+//              }
 			}
 		}
 	}
@@ -387,7 +387,7 @@ WRITE8_MEMBER(apc_state::apc_dma_w)
 
 static ADDRESS_MAP_START( apc_map, AS_PROGRAM, 16, apc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
-//	AM_RANGE(0xa0000, 0xaffff) space for an external ROM
+//  AM_RANGE(0xa0000, 0xaffff) space for an external ROM
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
@@ -396,18 +396,18 @@ static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 	AM_RANGE(0x00, 0x1f) AM_READWRITE8(apc_dma_r, apc_dma_w,0xff00)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0x00ff) // i8259
 	AM_RANGE(0x28, 0x2f) AM_READWRITE8(apc_port_28_r, apc_port_28_w, 0xffff)
-//	0x30, 0x37 serial port 0/1 (i8251) (even/odd)
+//  0x30, 0x37 serial port 0/1 (i8251) (even/odd)
 	AM_RANGE(0x38, 0x3f) AM_WRITE8(apc_dma_segments_w,0x00ff)
 	AM_RANGE(0x40, 0x43) AM_READWRITE8(apc_gdc_r, apc_gdc_w, 0xffff)
 //  0x46 UPD7220 reset interrupt
 	AM_RANGE(0x48, 0x4f) AM_READWRITE8(apc_kbd_r, apc_kbd_w, 0x00ff)
 	AM_RANGE(0x50, 0x53) AM_DEVICE8("upd765", upd765a_device, map, 0x00ff ) // upd765
-//	0x5a  APU data (Arithmetic Processing Unit!)
-//	0x5e  APU status/command
+//  0x5a  APU data (Arithmetic Processing Unit!)
+//  0x5e  APU status/command
 	AM_RANGE(0x60, 0x67) AM_READWRITE8(apc_port_60_r, apc_port_60_w, 0xffff)
-//	0x60 Melody Processing Unit
-//	AM_RANGE(0x68, 0x6f) i8255 , printer port (A: status (R) B: data (W) C: command (W))
-//	AM_DEVREADWRITE8("upd7220_btm", upd7220_device, read, write, 0x00ff)
+//  0x60 Melody Processing Unit
+//  AM_RANGE(0x68, 0x6f) i8255 , printer port (A: status (R) B: data (W) C: command (W))
+//  AM_DEVREADWRITE8("upd7220_btm", upd7220_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( apc )
@@ -468,15 +468,15 @@ INPUT_PORTS_END
 
 void apc_state::fdc_drq(bool state)
 {
-//	printf("%02x DRQ\n",state);
-//	i8237_dreq0_w(m_dma, state);
+//  printf("%02x DRQ\n",state);
+//  i8237_dreq0_w(m_dma, state);
 	m_dmac->dreq1_w(state);
 
 }
 
 void apc_state::fdc_irq(bool state)
 {
-//	printf("IRQ %d\n",state);
+//  printf("IRQ %d\n",state);
 	pic8259_ir3_w(machine().device("pic8259_slave"), state);
 }
 
@@ -628,7 +628,7 @@ WRITE_LINE_MEMBER(apc_state::apc_dma_hrq_changed)
 
 	m_dmac->hack_w(state);
 
-//	printf("%02x HLDA\n",state);
+//  printf("%02x HLDA\n",state);
 }
 
 WRITE_LINE_MEMBER( apc_state::apc_tc_w )
@@ -655,7 +655,7 @@ WRITE8_MEMBER(apc_state::apc_dma_write_byte)
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
 
-//	printf("%08x %02x\n",addr,data);
+//  printf("%08x %02x\n",addr,data);
 
 	program.write_byte(addr, data);
 }
@@ -673,7 +673,7 @@ WRITE_LINE_MEMBER(apc_state::apc_dack3_w){ /*printf("%02x 3\n",state);*/ set_dma
 
 READ8_MEMBER(apc_state::test_r)
 {
-//	printf("2dd DACK R\n");
+//  printf("2dd DACK R\n");
 
 	return m_fdc->dma_r();
 }
@@ -767,8 +767,8 @@ ROM_START( apc )
 	ROM_LOAD16_BYTE( "pfbu2j.bin",   0x00000, 0x001000, CRC(86970df5) SHA1(be59c5dad3bd8afc21e9f2f1404553d4371978be) )
     ROM_LOAD16_BYTE( "pfbu2l.bin",   0x00001, 0x001000, CRC(38df2e70) SHA1(a37ccaea00c2b290610d354de08b489fa897ec48) )
 
-//	ROM_REGION( 0x10000, "file", ROMREGION_ERASE00 )
-//	ROM_LOAD( "sioapc.o", 0, 0x10000, CRC(1) SHA1(1) )
+//  ROM_REGION( 0x10000, "file", ROMREGION_ERASE00 )
+//  ROM_LOAD( "sioapc.o", 0, 0x10000, CRC(1) SHA1(1) )
 
 	ROM_REGION( 0x2000, "gfx", ROMREGION_ERASE00 )
     ROM_LOAD("pfcu1r.bin",   0x000000, 0x002000, CRC(683efa94) SHA1(43157984a1746b2e448f3236f571011af9a3aa73) )

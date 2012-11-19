@@ -106,26 +106,26 @@
           The display list objects seem to be there, but the address is wrong (0x14c400, instead of the correct address)
 
         - The external Yamaha MIDI sound board is not emulated (no keyboard sounds).
- 
- 
-    	- Notes on how the video is supposed to work from Ville / Ian Patterson:
- 
-    	There are four "display contexts" that are set up via registers 20-4E. They are
-    	basically just raw framebuffers. 40-4E sets the base framebuffer pointer, 30-3E
-    	sets the size, 20-2E may set the minimum x and y coordinates but I haven't seen
-    	them set to something other than 0 yet. One context is set as the one the RAMDAC
-    	outputs to the monitor (not sure how this is selected yet, probably the lower
-    	bits of register 12). Thestartup test in the popn BIOS checks all of VRAM, so
-    	it moves the currentdisplay address around so you don't see crazy colors, which
-		is very helpful in figuring out how this part works.
 
-    	The other new part is that there are two VRAM write ports, managed by registers
-    	60+68+70 and 64+6A+74, with status read from the lower bits of reg 7A. Each context
-    	can either write to VRAM as currently emulated, or the port can be switched in to
-    	"immediate mode" via registers 68/6A. Immedate mode can be used to run GCU commands
-    	at any point during the frame. It's mainly used to call display lists, which is where
-    	the display list addresses come from. Some games use it to send other commands, so
-		it appears to be a 4-dword FIFO or something along those lines.
+
+        - Notes on how the video is supposed to work from Ville / Ian Patterson:
+
+        There are four "display contexts" that are set up via registers 20-4E. They are
+        basically just raw framebuffers. 40-4E sets the base framebuffer pointer, 30-3E
+        sets the size, 20-2E may set the minimum x and y coordinates but I haven't seen
+        them set to something other than 0 yet. One context is set as the one the RAMDAC
+        outputs to the monitor (not sure how this is selected yet, probably the lower
+        bits of register 12). Thestartup test in the popn BIOS checks all of VRAM, so
+        it moves the currentdisplay address around so you don't see crazy colors, which
+        is very helpful in figuring out how this part works.
+
+        The other new part is that there are two VRAM write ports, managed by registers
+        60+68+70 and 64+6A+74, with status read from the lower bits of reg 7A. Each context
+        can either write to VRAM as currently emulated, or the port can be switched in to
+        "immediate mode" via registers 68/6A. Immedate mode can be used to run GCU commands
+        at any point during the frame. It's mainly used to call display lists, which is where
+        the display list addresses come from. Some games use it to send other commands, so
+        it appears to be a 4-dword FIFO or something along those lines.
 */
 
 #include "emu.h"
@@ -730,7 +730,7 @@ static void GCU_w(running_machine &machine, int chip, UINT32 offset, UINT32 data
 		}
 
 		case 0x40:		/* framebuffer config */
-			// HACK: switch display lists at the right times for the ParaParaParadise games until we 
+			// HACK: switch display lists at the right times for the ParaParaParadise games until we
 			// do the video emulation properly
 			if (mame_strnicmp(machine.system().name, "pp", 2) == 0)
 			{
@@ -1190,14 +1190,14 @@ static void atapi_command_reg_w(running_machine &machine, int reg, UINT16 data)
 				//if (state->m_atapi_drivesel==1) logerror("!!!ATAPI COMMAND %x\n", state->m_atapi_data[0]&0xff);
 				switch (state->m_atapi_data[0]&0xff)
 				{
-                       
+
                     case 0x55:	// MODE SELECT
 						state->m_atapi_cdata_wait = state->m_atapi_data[4]/2;
 						state->m_atapi_data_ptr = 0;
 						logerror("ATAPI: Waiting for %x bytes of MODE SELECT data\n", state->m_atapi_cdata_wait);
 						break;
 
-                    
+
 					case 0xa8:	// READ (12)
 						// indicate data ready: set DRQ and DMA ready, and IO in INTREASON
 						state->m_atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
@@ -1209,8 +1209,8 @@ static void atapi_command_reg_w(running_machine &machine, int reg, UINT16 data)
 					case 0x00: // BUS RESET / TEST UNIT READY
 					case 0xbb: // SET CD SPEED
 					case 0xa5: // PLAY AUDIO
-					case 0x1b: // START_STOP_UNIT 
-					case 0x4e: // STOPPLAY_SCAN 
+					case 0x1b: // START_STOP_UNIT
+					case 0x4e: // STOPPLAY_SCAN
 						state->m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 						break;
 				}
@@ -2394,7 +2394,7 @@ ROM_START( ppp1mp )
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
 	ROM_REGION(0xc0, "user2", 0)	// Security dongle
-	ROM_LOAD( "gqa11-ja",     0x000000, 0x0000c0, CRC(2ed8e2ae) SHA1(b8c3410dab643111b2d2027068175ba018a0a67e) ) 
+	ROM_LOAD( "gqa11-ja",     0x000000, 0x0000c0, CRC(2ed8e2ae) SHA1(b8c3410dab643111b2d2027068175ba018a0a67e) )
 
 	DISK_REGION( "scsi0" )
 	DISK_IMAGE_READONLY( "a11jaa01", 0, SHA1(539ec6f1c1d198b0d6ce5543eadcbb4d9917fa42) )

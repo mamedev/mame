@@ -2831,7 +2831,7 @@ static UINT32 i386_get_debug_desc(i386_state *cpustate, I386_SREG *seg)
 	entry = seg->selector & ~0x7;
 	if (limit == 0 || entry + 7 > limit)
 		return 0;
-	
+
 	address = entry + base;
 
 	// todo: bigendian
@@ -2910,7 +2910,7 @@ static UINT64 i386_debug_segofftovirt(symbol_table &table, void *ref, int params
 
 	if(param[0] > 65535)
 		return 0;
-	
+
 	if (PROTECTED_MODE && !V8086_MODE)
 	{
 		memset(&seg, 0, sizeof(seg));

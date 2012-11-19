@@ -77,7 +77,7 @@ void adamlink_device::adam_bd_w(address_space &space, offs_t offset, UINT8 data,
 		{
 		case 0x5e:
 			break;
-			
+
 		case 0x5f:
 			break;
 		}

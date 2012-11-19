@@ -261,8 +261,8 @@ INPUT_CHANGED_MEMBER( s6a_state::audio_nmi )
 
 WRITE8_MEMBER( s6a_state::sol0_w )
 {
-//	if (BIT(data, 4))
-//		m_samples->start(2, 5); // outhole
+//  if (BIT(data, 4))
+//      m_samples->start(2, 5); // outhole
 }
 
 WRITE8_MEMBER( s6a_state::sol1_w )
@@ -287,8 +287,8 @@ WRITE8_MEMBER( s6a_state::sol1_w )
 
 	m_pias->cb1_w(m_cb1);
 
-//	if (BIT(data, 5))
-//		m_samples->start(0, 6); // knocker
+//  if (BIT(data, 5))
+//      m_samples->start(0, 6); // knocker
 }
 
 static const pia6821_interface pia22_intf =

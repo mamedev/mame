@@ -367,16 +367,16 @@ WRITE8_MEMBER( bw2_state::ppi_pa_w )
 {
 	/*
 
-	    PA0     KB0 Keyboard line select 0
-	    PA1     KB1 Keyboard line select 1
-	    PA2     KB2 Keyboard line select 2
-	    PA3     KB3 Keyboard line select 3
-	    PA4     /DS0 Drive select 0
-	    PA5     /DS1 Drive select 1
-	    PA6     Select RS232 connector
-	    PA7     /STROBE to centronics printer
+        PA0     KB0 Keyboard line select 0
+        PA1     KB1 Keyboard line select 1
+        PA2     KB2 Keyboard line select 2
+        PA3     KB3 Keyboard line select 3
+        PA4     /DS0 Drive select 0
+        PA5     /DS1 Drive select 1
+        PA6     Select RS232 connector
+        PA7     /STROBE to centronics printer
 
-	*/
+    */
 
 	// keyboard
 	m_kb = data & 0x0f;
@@ -398,16 +398,16 @@ READ8_MEMBER( bw2_state::ppi_pb_r )
 {
 	/*
 
-	    PB0     Keyboard column status of selected line
-	    PB1     Keyboard column status of selected line
-	    PB2     Keyboard column status of selected line
-	    PB3     Keyboard column status of selected line
-	    PB4     Keyboard column status of selected line
-	    PB5     Keyboard column status of selected line
-	    PB6     Keyboard column status of selected line
-	    PB7     Keyboard column status of selected line
+        PB0     Keyboard column status of selected line
+        PB1     Keyboard column status of selected line
+        PB2     Keyboard column status of selected line
+        PB3     Keyboard column status of selected line
+        PB4     Keyboard column status of selected line
+        PB5     Keyboard column status of selected line
+        PB6     Keyboard column status of selected line
+        PB7     Keyboard column status of selected line
 
-	*/
+    */
 
 	static const char *const rownames[] = { "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9" };
 
@@ -425,12 +425,12 @@ WRITE8_MEMBER( bw2_state::ppi_pc_w )
 {
 	/*
 
-	    PC0     Memory bank select
-	    PC1     Memory bank select
-	    PC2     Memory bank select
-	    PC3     Not connected
+        PC0     Memory bank select
+        PC1     Memory bank select
+        PC2     Memory bank select
+        PC3     Not connected
 
-	*/
+    */
 
 	m_bank = data & 0x07;
 }
@@ -439,12 +439,12 @@ READ8_MEMBER( bw2_state::ppi_pc_r )
 {
 	/*
 
-	    PC4     BUSY from centronics printer
-	    PC5     M/FDBK motor feedback
-	    PC6     RLSD Carrier detect from RS232
-	    PC7     /PROT Write protected disk
+        PC4     BUSY from centronics printer
+        PC5     M/FDBK motor feedback
+        PC6     RLSD Carrier detect from RS232
+        PC7     /PROT Write protected disk
 
-	*/
+    */
 
 	UINT8 data = 0;
 

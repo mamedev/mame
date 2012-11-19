@@ -82,7 +82,7 @@ UINT32 f1gp_state::f1gp2_tile_callback( UINT32 code )
 UINT32 f1gp_state::f1gp_old_tile_callback( UINT32 code )
 {
 	return m_spr1cgram[code % (m_spr1cgram.bytes()/2)];
-} 
+}
 
 UINT32 f1gp_state::f1gp_ol2_tile_callback( UINT32 code )
 {

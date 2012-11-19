@@ -790,7 +790,7 @@ VIDEO_START_MEMBER(galaxold_state,harem)
 {
 	video_start_common(machine());
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::harem_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
-//	m_bg_tilemap->set_transparent_pen(0);	// opaque tilemap to get sky and sand colors
+//  m_bg_tilemap->set_transparent_pen(0);   // opaque tilemap to get sky and sand colors
 
 	m_bg_tilemap->set_scroll_cols(32);
 

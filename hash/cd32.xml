@@ -4,8 +4,8 @@
 
 	<!--- Preliminary List -->
 
-  
- 	<!-- playable but there's a scrolling glitch every few frames -->
+
+	<!-- playable but there's a scrolling glitch every few frames -->
   <software name="morph" supported="partial">
 		<description>Morph</description>
 		<year>1993</year>
@@ -137,7 +137,7 @@
       </diskarea>
     </part>
   </software>
-  
-  
+
+
 
 </softwarelist>

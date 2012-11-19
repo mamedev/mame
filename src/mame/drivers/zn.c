@@ -422,7 +422,7 @@ static void zn_driver_init( running_machine &machine )
 		{
 			state->m_znsec0->init( zn_config_table[ n_game ].p_n_mainsec );
 			state->m_znsec1->init( zn_config_table[ n_game ].p_n_gamesec );
-//			psx_sio_install_handler( machine, 0, sio_pad_handler );
+//          psx_sio_install_handler( machine, 0, sio_pad_handler );
 			break;
 		}
 		n_game++;

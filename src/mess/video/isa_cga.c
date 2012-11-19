@@ -2044,14 +2044,14 @@ void isa8_wyse700_device::change_resolution(UINT8 mode)
 		machine().root_device().membank("bank_wy1")->set_base(m_vram);
 	}
 	if ((m_control & 0xf0) == (mode & 0xf0)) return;
-	
+
 	switch(mode & 0xf0) {
 		case 0xc0: width = 1280; height = 800; break;
 		case 0xa0: width = 1280; height = 400; break;
 		case 0x80: width = 640; height = 400; break;
 		case 0x00: width = 640; height = 400; break; // unhandled
 	}
-	rectangle visarea(0, width-1, 0, height-1);			
+	rectangle visarea(0, width-1, 0, height-1);
 	subdevice<screen_device>(CGA_SCREEN_NAME)->configure(width, height, visarea, HZ_TO_ATTOSECONDS(60));
 
 }
@@ -2115,7 +2115,7 @@ isa8_wyse700_device::isa8_wyse700_device(const machine_config &mconfig, const ch
 		isa8_cga_device( mconfig, ISA8_WYSE700, "Wyse 700", tag, owner, clock )
 {
 	m_vram_size = 0x20000;
-	m_start_offset = 0x18000;	
+	m_start_offset = 0x18000;
 }
 
 

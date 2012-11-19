@@ -5165,7 +5165,7 @@ DRIVER_INIT_MEMBER(funworld_state, ctunk)
 
   CTUNK: Rare board with blue TAB board encryption scheme
          plus a daughterboard for program encryption.
-		 
+
 *********************************************************/
 {
 	UINT8 *rom = machine().root_device().memregion("maincpu")->base();

@@ -637,7 +637,7 @@ WRITE8_MEMBER(scramble_state::harem_decrypt_clk_w)
 		m_harem_decrypt_mode = ((m_harem_decrypt_mode >> 1) | ((m_harem_decrypt_bit & 1) << 3)) & 0x0f;
 		m_harem_decrypt_count++;
 
-//		logerror("%s: decrypt mode = %02x, count = %x\n", machine().describe_context(), m_harem_decrypt_mode, m_harem_decrypt_count);
+//      logerror("%s: decrypt mode = %02x, count = %x\n", machine().describe_context(), m_harem_decrypt_mode, m_harem_decrypt_count);
 	}
 
 	m_harem_decrypt_clk = data;
@@ -654,11 +654,11 @@ WRITE8_MEMBER(scramble_state::harem_decrypt_clk_w)
 				logerror("%s: warning, unknown decrypt mode = %02x\n", machine().describe_context(), m_harem_decrypt_mode);
 				bank = 0;
 		}
-			
+
 		membank("rombank")->set_base			(m_harem_decrypted_data		+ 0x2000 * bank);
 		membank("rombank")->set_base_decrypted	(m_harem_decrypted_opcodes	+ 0x2000 * bank);
 
-//		logerror("%s: decrypt mode = %02x (bank %x) active\n", machine().describe_context(), m_harem_decrypt_mode, bank);
+//      logerror("%s: decrypt mode = %02x (bank %x) active\n", machine().describe_context(), m_harem_decrypt_mode, bank);
 
 		m_harem_decrypt_mode = 0;
 		m_harem_decrypt_count = 0;
@@ -670,7 +670,7 @@ WRITE8_MEMBER(scramble_state::harem_decrypt_rst_w)
 	m_harem_decrypt_mode = 0;
 	m_harem_decrypt_count = 0;
 
-//	logerror("%s: decrypt mode reset\n", machine().describe_context());
+//  logerror("%s: decrypt mode reset\n", machine().describe_context());
 }
 
 DRIVER_INIT_MEMBER(scramble_state,harem)

@@ -208,7 +208,7 @@ UINT8 deco_cpu7_device::mi_decrypt::read_decrypted(UINT16 adr)
 void deco_cpu7_device::mi_decrypt::write(UINT16 adr, UINT8 val)
 {
 	program->write_byte(adr, val);
-	had_written = true;	
+	had_written = true;
 }
 
 
@@ -2008,9 +2008,9 @@ DRIVER_INIT_MEMBER(btime_state,tisland)
 	UINT8 *rom = memregion("maincpu")->base();
 
 	/* At location 0xa2b6 there's a strange RLA followed by a BPL that reads from an
-	   unmapped area that causes the game to fail in several circumstances.On the Cassette
-	   version the RLA (33) is in reality a BIT (24),so I'm guessing that there's something
-	   wrong going on in the encryption scheme.*/
+       unmapped area that causes the game to fail in several circumstances.On the Cassette
+       version the RLA (33) is in reality a BIT (24),so I'm guessing that there's something
+       wrong going on in the encryption scheme.*/
 	memset(&rom[0xa2b6],0x24,1);
 
 	m_audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;

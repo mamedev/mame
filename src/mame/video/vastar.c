@@ -130,7 +130,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	UINT8 *spriteram_3 = state->m_spriteram3;
 	int offs;
 
-//	for (offs = 0; offs < 0x40; offs += 2)
+//  for (offs = 0; offs < 0x40; offs += 2)
 	for (offs = 0x40-2; offs >=0; offs -= 2)
 	{
 		int code, sx, sy, color, flipx, flipy;

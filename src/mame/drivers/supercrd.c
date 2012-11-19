@@ -34,7 +34,7 @@
 
   ROMs:  PRG: 2x 27C512 (IC37, IC51)
          GFX: 2x 27C512 (IC10, IC11)
-		 BP:  1x N82S147N
+         BP:  1x N82S147N
 
   1x Xtal 16 MHz.
   1x 8 DIP switches bank.
@@ -276,9 +276,9 @@ static ADDRESS_MAP_START( supercrd_map, AS_PROGRAM, 8, supercrd_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(supercrd_videoram_w) AM_SHARE("videoram")	// wrong
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(supercrd_colorram_w) AM_SHARE("colorram")	// wrong
-//	AM_RANGE(0x0000, 0x0000) AM_RAM AM_SHARE("nvram")
-//	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
-//	AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+//  AM_RANGE(0x0000, 0x0000) AM_RAM AM_SHARE("nvram")
+//  AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
+//  AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 ADDRESS_MAP_END
 
 
@@ -401,16 +401,16 @@ GFXDECODE_END
 
 //static const mc6845_interface mc6845_intf =
 //{
-//	"screen",	/* screen we are acting on */
-//	4,			/* number of pixels per video memory address */
-//	NULL,		/* before pixel update callback */
-//	NULL,		/* row update callback */
-//	NULL,		/* after pixel update callback */
-//	DEVCB_NULL,	/* callback for display state changes */
-//	DEVCB_NULL,	/* callback for cursor state changes */
-//	DEVCB_NULL,	/* HSYNC callback */
-//	DEVCB_NULL,	/* VSYNC callback */
-//	NULL		/* update address callback */
+//  "screen",   /* screen we are acting on */
+//  4,          /* number of pixels per video memory address */
+//  NULL,       /* before pixel update callback */
+//  NULL,       /* row update callback */
+//  NULL,       /* after pixel update callback */
+//  DEVCB_NULL, /* callback for display state changes */
+//  DEVCB_NULL, /* callback for cursor state changes */
+//  DEVCB_NULL, /* HSYNC callback */
+//  DEVCB_NULL, /* VSYNC callback */
+//  NULL        /* update address callback */
 //};
 
 
@@ -420,24 +420,24 @@ GFXDECODE_END
 
 //static I8255_INTERFACE (ppi8255_intf_0)
 //{
-//	/* (port) Mode X - description */
-//	DEVCB_UNMAPPED,		/* Port A read */
-//	DEVCB_UNMAPPED,		/* Port A write */
-//	DEVCB_UNMAPPED,		/* Port B read */
-//	DEVCB_UNMAPPED,		/* Port B write */
-//	DEVCB_UNMAPPED,		/* Port C read */
-//	DEVCB_UNMAPPED		/* Port C write */
+//  /* (port) Mode X - description */
+//  DEVCB_UNMAPPED,     /* Port A read */
+//  DEVCB_UNMAPPED,     /* Port A write */
+//  DEVCB_UNMAPPED,     /* Port B read */
+//  DEVCB_UNMAPPED,     /* Port B write */
+//  DEVCB_UNMAPPED,     /* Port C read */
+//  DEVCB_UNMAPPED      /* Port C write */
 //};
 
 //static I8255_INTERFACE (ppi8255_intf_1)
 //{
-//	/* (port) Mode X - description */
-//	DEVCB_UNMAPPED,		/* Port A read */
-//	DEVCB_UNMAPPED,		/* Port A write */
-//	DEVCB_UNMAPPED,		/* Port B read */
-//	DEVCB_UNMAPPED,		/* Port B write */
-//	DEVCB_UNMAPPED,		/* Port C read */
-//	DEVCB_UNMAPPED		/* Port C write */
+//  /* (port) Mode X - description */
+//  DEVCB_UNMAPPED,     /* Port A read */
+//  DEVCB_UNMAPPED,     /* Port A write */
+//  DEVCB_UNMAPPED,     /* Port B read */
+//  DEVCB_UNMAPPED,     /* Port B write */
+//  DEVCB_UNMAPPED,     /* Port C read */
+//  DEVCB_UNMAPPED      /* Port C write */
 //};
 
 /**************************
@@ -449,10 +449,10 @@ static MACHINE_CONFIG_START( supercrd, supercrd_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)	/* 2MHz, guess */
 	MCFG_CPU_PROGRAM_MAP(supercrd_map)
 
-//	MCFG_NVRAM_ADD_0FILL("nvram")
+//  MCFG_NVRAM_ADD_0FILL("nvram")
 
-//	MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
-//	MCFG_I8255_ADD( "ppi8255_1", ppi8255_intf_1 )
+//  MCFG_I8255_ADD( "ppi8255_0", ppi8255_intf_0 )
+//  MCFG_I8255_ADD( "ppi8255_1", ppi8255_intf_1 )
 
     /* video hardware */
 
@@ -469,12 +469,12 @@ static MACHINE_CONFIG_START( supercrd, supercrd_state )
 	MCFG_PALETTE_INIT_OVERRIDE(supercrd_state, supercrd)
 	MCFG_VIDEO_START_OVERRIDE(supercrd_state, supercrd)
 
-//	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/8, mc6845_intf)
+//  MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/8, mc6845_intf)
 
     /* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
@@ -488,10 +488,10 @@ ROM_START( supercrd )
 	ROM_LOAD( "supca_417_ce2.ic51", 0x10000, 0x08000, CRC(36415f73) SHA1(9881b88991f034d79260502289432a7318aa1647) )	// wrong
 	ROM_IGNORE(                     0x8000)
 
-//	ROM_LOAD( "supca_417_ce1.ic37", 0x0000, 0x8000, CRC(b67f7d38) SHA1(eaf8f24d476185d4744858afcbf0005362f49cab) )
-//	ROM_CONTINUE(                   0x0000, 0x8000)
-//	ROM_LOAD( "supca_417_ce2.ic51", 0x8000, 0x8000, CRC(36415f73) SHA1(9881b88991f034d79260502289432a7318aa1647) )
-//	ROM_IGNORE(                     0x8000)
+//  ROM_LOAD( "supca_417_ce1.ic37", 0x0000, 0x8000, CRC(b67f7d38) SHA1(eaf8f24d476185d4744858afcbf0005362f49cab) )
+//  ROM_CONTINUE(                   0x0000, 0x8000)
+//  ROM_LOAD( "supca_417_ce2.ic51", 0x8000, 0x8000, CRC(36415f73) SHA1(9881b88991f034d79260502289432a7318aa1647) )
+//  ROM_IGNORE(                     0x8000)
 
 	ROM_REGION( 0x20000, "gfxtemp", 0 )
 	ROM_LOAD( "supca_410_zg2.ic11", 0x00000, 0x10000, CRC(a4646dc6) SHA1(638ad334bb4f1430381474ddfaa1029cb4d13916) )

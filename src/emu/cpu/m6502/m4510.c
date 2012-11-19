@@ -57,7 +57,7 @@ offs_t m4510_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
 
 void m4510_device::device_start()
 {
- 	if(direct_disabled)
+	if(direct_disabled)
 		mintf = new mi_4510_nd(this);
 	else
 		mintf = new mi_4510_normal(this);

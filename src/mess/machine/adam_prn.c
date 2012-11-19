@@ -136,18 +136,18 @@ WRITE8_MEMBER( adam_printer_device::p1_w )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    0       M2 phase D
-	    1       M2 phase B
-	    2       M2 phase C
-	    3       M2 phase A
-	    4       M3 phase B
-	    5       M3 phase D
-	    6       M3 phase A
-	    7       M3 phase C
+        0       M2 phase D
+        1       M2 phase B
+        2       M2 phase C
+        3       M2 phase A
+        4       M3 phase B
+        5       M3 phase D
+        6       M3 phase A
+        7       M3 phase C
 
-	*/
+    */
 }
 
 
@@ -159,15 +159,15 @@ READ8_MEMBER( adam_printer_device::p2_r )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    0       mode bit 0
-	    1       mode bit 1
-	    2       mode bit 2
-	    3       NET RXD
-	    4       NET TXD
+        0       mode bit 0
+        1       mode bit 1
+        2       mode bit 2
+        3       NET RXD
+        4       NET TXD
 
-	*/
+    */
 
 	UINT8 data = M6801_MODE_7;
 
@@ -186,15 +186,15 @@ WRITE8_MEMBER( adam_printer_device::p2_w )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    0       mode bit 0
-	    1       mode bit 1
-	    2       mode bit 2
-	    3       NET RXD
-	    4       NET TXD
+        0       mode bit 0
+        1       mode bit 1
+        2       mode bit 2
+        3       NET RXD
+        4       NET TXD
 
-	*/
+    */
 
 	m_bus->txd_w(this, BIT(data, 4));
 }
@@ -218,18 +218,18 @@ READ8_MEMBER( adam_printer_device::p4_r )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    0
-	    1
-	    2
-	    3
-	    4       left margin
-	    5       platen detent
-	    6       wheel home
-	    7       self-test
+        0
+        1
+        2
+        3
+        4       left margin
+        5       platen detent
+        6       wheel home
+        7       self-test
 
-	*/
+    */
 
 	return 0x80;
 }
@@ -243,16 +243,16 @@ WRITE8_MEMBER( adam_printer_device::p4_w )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    0       print hammer solenoid
-	    1       ribbon advance solenoid
-	    2       platen motor advance
-	    3       platen motor break
-	    4
-	    5
-	    6
-	    7
+        0       print hammer solenoid
+        1       ribbon advance solenoid
+        2       platen motor advance
+        3       platen motor break
+        4
+        5
+        6
+        7
 
-	*/
+    */
 }

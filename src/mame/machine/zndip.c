@@ -30,7 +30,7 @@ void zndip_device::select(int select)
 		{
 			data_out(0, PSX_SIO_IN_DATA | PSX_SIO_IN_DSR);
 		}
-	
+
 		m_select = select;
 	}
 }
@@ -41,7 +41,7 @@ void zndip_device::data_in( int data, int mask )
 	{
 		int dip = m_data_handler();
 		int bit = ( ( dip >> m_bit ) & 1 );
-//		verboselog( machine, 2, "read dip %02x -> %02x\n", n_data, bit * PSX_SIO_IN_DATA );
+//      verboselog( machine, 2, "read dip %02x -> %02x\n", n_data, bit * PSX_SIO_IN_DATA );
 		data_out( bit * PSX_SIO_IN_DATA, PSX_SIO_IN_DATA );
 		m_bit++;
 		m_bit &= 7;

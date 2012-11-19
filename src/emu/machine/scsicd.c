@@ -272,8 +272,8 @@ void scsicd_device::ExecCommand( int *transferLength )
 			SetPhase( SCSI_PHASE_STATUS );
 			*transferLength = 0;
 			break;
-			
- 		case 0x4e: // STOP
+
+		case 0x4e: // STOP
 			if (cdrom)
 			{
 				cdda = cdda_from_cdrom(machine(), cdrom);

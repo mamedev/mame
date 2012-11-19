@@ -1789,18 +1789,18 @@ ROM_END
 Triple Punch
 (C)1982 KKI
 
-board silkscreend		PCO-008-01
+board silkscreend       PCO-008-01
 
 Empty 24 pin socket at 2E
 Empty 40 pin socket at 0A
 
-.2h	2732	stickered	TD4
-.2k	2732	stickered	TC3
-.2l	2732	stickered	TE2
-.2m	2732	stickered	TD1
-.5h	2716	stickered	TA7
-.5f	2716	stickered	TA6
-.6e	82s123	stickered	TA
+.2h 2732    stickered   TD4
+.2k 2732    stickered   TC3
+.2l 2732    stickered   TE2
+.2m 2732    stickered   TD1
+.5h 2716    stickered   TA7
+.5f 2716    stickered   TA6
+.6e 82s123  stickered   TA
 ***************************************************************************/
 
 ROM_START( triplepa )

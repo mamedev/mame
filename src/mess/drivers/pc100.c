@@ -2,8 +2,8 @@
 
     NEC PC-100
 
-	preliminary driver by Angelo Salese
-	Thanks to Carl for the i8259 tip;
+    preliminary driver by Angelo Salese
+    Thanks to Carl for the i8259 tip;
 
     TODO:
     - floppy support (no images available right now);
@@ -20,33 +20,33 @@
     F8216: FA                        cli
     F8217: 0A E9                     or      ch,cl
     F8219: 74 15                     je      0F8230h
-	- Second one is for the vblank irq timing:
-		F8238: 8B D3                     mov     dx,bx
-		F823A: 8B D9                     mov     bx,cx
-		F823C: CF                        iret
-	F824D: E4 02                     in      al,2h
-	F824F: 8A E0                     mov     ah,al
-	F8251: B0 EF                     mov     al,0EFh
-	F8253: E6 02                     out     2h,al
-	F8255: BB 00 00                  mov     bx,0h
-	F8258: BA 00 00                  mov     dx,0h
-	F825B: B9 20 4E                  mov     cx,4E20h
-	F825E: FB                        sti
-	F825F: E2 FE                     loop    0F825Fh ;calculates the vblank here
-	F8261: FA                        cli
-	F8262: 8A C4                     mov     al,ah
-	F8264: E6 02                     out     2h,al
-	F8266: 2B D3                     sub     dx,bx
-	F8268: 81 FA 58 1B               cmp     dx,1B58h
-	F826C: 78 06                     js      0F8274h ;error if DX is smaller than 0x1b58
-	F826E: 81 FA 40 1F               cmp     dx,1F40h
-	F8272: 78 0A                     js      0F827Eh ;error if DX is greater than 0x1f40
-	F8274: B1 05                     mov     cl,5h
-	F8276: E8 CB 03                  call    0F8644h
-	F8279: E8 79 FF                  call    0F81F5h
-	F827C: EB FE                     jmp     0F827Ch
-	F827E: B0 FF                     mov     al,0FFh
-	fwiw with current timings, we get DX=0x1f09, enough for passing the test;
+    - Second one is for the vblank irq timing:
+        F8238: 8B D3                     mov     dx,bx
+        F823A: 8B D9                     mov     bx,cx
+        F823C: CF                        iret
+    F824D: E4 02                     in      al,2h
+    F824F: 8A E0                     mov     ah,al
+    F8251: B0 EF                     mov     al,0EFh
+    F8253: E6 02                     out     2h,al
+    F8255: BB 00 00                  mov     bx,0h
+    F8258: BA 00 00                  mov     dx,0h
+    F825B: B9 20 4E                  mov     cx,4E20h
+    F825E: FB                        sti
+    F825F: E2 FE                     loop    0F825Fh ;calculates the vblank here
+    F8261: FA                        cli
+    F8262: 8A C4                     mov     al,ah
+    F8264: E6 02                     out     2h,al
+    F8266: 2B D3                     sub     dx,bx
+    F8268: 81 FA 58 1B               cmp     dx,1B58h
+    F826C: 78 06                     js      0F8274h ;error if DX is smaller than 0x1b58
+    F826E: 81 FA 40 1F               cmp     dx,1F40h
+    F8272: 78 0A                     js      0F827Eh ;error if DX is greater than 0x1f40
+    F8274: B1 05                     mov     cl,5h
+    F8276: E8 CB 03                  call    0F8644h
+    F8279: E8 79 FF                  call    0F81F5h
+    F827C: EB FE                     jmp     0F827Ch
+    F827E: B0 FF                     mov     al,0FFh
+    fwiw with current timings, we get DX=0x1f09, enough for passing the test;
 
 ****************************************************************************/
 
@@ -352,9 +352,9 @@ GFXDECODE_END
 WRITE8_MEMBER( pc100_state::rtc_porta_w )
 {
 /*
-	---- -x-- chip select
-	---- --x- read
-	---- ---x write
+    ---- -x-- chip select
+    ---- --x- read
+    ---- ---x write
 */
 
 	m_rtc->write_w(data & 1);
