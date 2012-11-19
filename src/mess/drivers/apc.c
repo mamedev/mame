@@ -119,8 +119,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(apc_dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(apc_dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(apc_dack3_w);
-	DECLARE_READ8_MEMBER(test_r);
-	DECLARE_WRITE8_MEMBER(test_w);
+	DECLARE_READ8_MEMBER(fdc_r);
+	DECLARE_WRITE8_MEMBER(fdc_w);
 	DECLARE_READ8_MEMBER(apc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(apc_dma_write_byte);
 
@@ -221,7 +221,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 //              if(u_line && yi == 7) { tile_data = 0xff; }
 //              if(v_line)  { tile_data|=8; }
 
-				if(cursor_on && cursor_addr == tile_addr)
+				if(cursor_on && cursor_addr == tile_addr && device->machine().primary_screen->frame_number() & 0x10)
 					tile_data^=0xff;
 
 				if(yi >= char_size)
@@ -304,7 +304,7 @@ WRITE8_MEMBER(apc_state::apc_port_60_w)
 	}
 	else
 	{
-		printf("Write melody port %02x\n",offset+0x60);
+		printf("Write melody port %02x %02x\n",offset+0x60,data);
 	}
 }
 
@@ -637,7 +637,7 @@ WRITE_LINE_MEMBER( apc_state::apc_tc_w )
 	/* floppy terminal count */
 	m_fdc->tc_w(state);
 
-	printf("TC %02x\n",state);
+//	printf("TC %02x\n",state);
 }
 
 READ8_MEMBER(apc_state::apc_dma_read_byte)
@@ -645,7 +645,7 @@ READ8_MEMBER(apc_state::apc_dma_read_byte)
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
 
-	printf("%08x\n",addr);
+//	printf("%08x\n",addr);
 
 	return program.read_byte(addr);
 }
@@ -672,14 +672,14 @@ WRITE_LINE_MEMBER(apc_state::apc_dack1_w){ /*printf("%02x 1\n",state);*/ set_dma
 WRITE_LINE_MEMBER(apc_state::apc_dack2_w){ /*printf("%02x 2\n",state);*/ set_dma_channel(machine(), 2, state); }
 WRITE_LINE_MEMBER(apc_state::apc_dack3_w){ /*printf("%02x 3\n",state);*/ set_dma_channel(machine(), 3, state); }
 
-READ8_MEMBER(apc_state::test_r)
+READ8_MEMBER(apc_state::fdc_r)
 {
 //  printf("2dd DACK R\n");
 
 	return m_fdc->dma_r();
 }
 
-WRITE8_MEMBER(apc_state::test_w)
+WRITE8_MEMBER(apc_state::fdc_w)
 {
 	//	printf("2dd DACK W\n");
 	m_fdc->dma_w(data);
@@ -691,8 +691,8 @@ static I8237_INTERFACE( dmac_intf )
 	DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_tc_w),
 	DEVCB_DRIVER_MEMBER(apc_state, apc_dma_read_byte),
 	DEVCB_DRIVER_MEMBER(apc_state, apc_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(apc_state,test_r), DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(apc_state,test_w), DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(apc_state,fdc_r), DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(apc_state,fdc_w), DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack3_w) }
 };
 
