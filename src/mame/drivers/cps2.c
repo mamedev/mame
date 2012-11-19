@@ -4433,6 +4433,33 @@ ROM_START( mvscjr1 )
 	ROM_LOAD16_WORD_SWAP( "mvc.12m",   0x400000, 0x400000, CRC(7ccb1896) SHA1(74caadf3282fcc6acffb1bbe3734106f81124121) )
 ROM_END
 
+/* This is the Single PCB release of Marvel VS. Capcom, it comes in a black case and has the Program ROM stored on
+   SIMMs similar to CPS3.  All ROM data (including the code) is *identical* to the regular Japan set (mvscj) just
+   in different sized ROMs
+
+   The original PCB is said to show the volume / sound test in a slightly different way, but this must be down to
+   some software configuration or an unemulated hardware register, not the code */
+
+ROM_START( mvscjsing )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "mvc_ja.simm1", 0x000000, 0x200000, CRC(6a2ef7c2) SHA1(625530b92217375014db4694196e6ab2a4684db6) )
+	ROM_LOAD16_BYTE( "mvc_ja.simm3", 0x000001, 0x200000, CRC(699d09ad) SHA1(67f6587808f55f10f58e067512f8db3f67dda770) )
+
+	ROM_REGION( 0x2000000, "gfx", 0 )
+	ROMX_LOAD( "mvc64-13m.13",   0x0000000, 0x800000, CRC(8428ce69) SHA1(65b1cdb40e5bd0c9afc21d267d02d118f8c9a44a) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "mvc64-15m.15",   0x0000002, 0x800000, CRC(2e0028f4) SHA1(be21622c5e3ba9a0a799d943fc6cc2bf7ec9582f) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "mvc64-17m.17",   0x0000004, 0x800000, CRC(308ca826) SHA1(2ef1fb4999e7e25e7f605c788f61a85da6715475) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "mvc64-19m.19",   0x0000006, 0x800000, CRC(10699fe1) SHA1(4bb65999c2a73c46cd0c7b6ea26ffb0d8ab24602) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "mvc.01",   0x00000, 0x08000, CRC(41629e95) SHA1(36925c05b5fdcbe43283a882d021e5360c947061) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+	ROM_LOAD( "mvc.02",   0x28000, 0x20000, CRC(963abf6b) SHA1(6b784870e338701cefabbbe4669984b5c4e8a9a5) )
+
+	ROM_REGION( 0x800000, "qsound", 0 ) /* QSound samples */
+	ROM_LOAD16_WORD_SWAP( "mvc64-11m.11",   0x000000, 0x800000, CRC(5d8819e0) SHA1(afe2ec7fa4786e6d9a9a0ffa5787862ad69b0010) )
+ROM_END
+
 ROM_START( mvsca )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "mvca.03a", 0x000000, 0x80000, CRC(2ff4ae25) SHA1(74cc3656a265f912c72cc6e591de14791fa9a50d) )
@@ -8388,6 +8415,7 @@ GAME( 1998, mvscu,      mvsc,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   
 GAME( 1998, mvscur1,    mvsc,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (USA 971222)", GAME_SUPPORTS_SAVE )
 GAME( 1998, mvscj,      mvsc,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Japan 980123)", GAME_SUPPORTS_SAVE )
 GAME( 1998, mvscjr1,    mvsc,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Japan 980112)", GAME_SUPPORTS_SAVE )
+GAME( 1998, mvscjsing,  mvsc,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Japan 980123) (Single PCB)", GAME_SUPPORTS_SAVE )
 GAME( 1998, mvsca,      mvsc,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Asia 980123)", GAME_SUPPORTS_SAVE )
 GAME( 1998, mvscar1,    mvsc,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Asia 980112)", GAME_SUPPORTS_SAVE )
 GAME( 1998, mvsch,      mvsc,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Hispanic 980123)", GAME_SUPPORTS_SAVE )
