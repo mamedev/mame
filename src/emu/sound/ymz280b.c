@@ -85,9 +85,12 @@ struct ymz280b_state
 	UINT8 irq_mask;					/* current IRQ mask */
 	UINT8 irq_enable;				/* current IRQ enable */
 	UINT8 keyon_enable;				/* key on enable */
+	UINT8 ext_mem_enable;			/* external memory enable */
 	double master_clock;			/* master clock frequency */
 	void (*irq_callback)(device_t *, int);	/* IRQ callback */
 	struct YMZ280BVoice	voice[8];	/* the 8 voices */
+	UINT32 rom_addr_hi;
+	UINT32 rom_addr_mid;
 	UINT32 rom_readback_addr;		/* where the CPU can read the ROM */
 	devcb_resolved_read8 ext_ram_read;		/* external RAM read handler */
 	devcb_resolved_write8 ext_ram_write;	/* external RAM write handler */
@@ -711,7 +714,10 @@ static DEVICE_START( ymz280b )
 		device->save_item(NAME(chip->irq_mask));
 		device->save_item(NAME(chip->irq_enable));
 		device->save_item(NAME(chip->keyon_enable));
+		device->save_item(NAME(chip->ext_mem_enable));
 		device->save_item(NAME(chip->rom_readback_addr));
+		device->save_item(NAME(chip->rom_addr_hi));
+		device->save_item(NAME(chip->rom_addr_mid));
 		for (j = 0; j < 8; j++)
 		{
 			device->save_item(NAME(chip->voice[j].playing), j);
@@ -761,6 +767,7 @@ static DEVICE_RESET( ymz280b )
 
 	chip->current_register = 0;
 	chip->status_register = 0;
+	chip->rom_readback_addr = 0;
 
 	/* clear other voice parameters */
 	for (i = 0; i < 8; i++)
@@ -903,26 +910,26 @@ static void write_to_register(ymz280b_state *chip, int data)
 				break;
 
 			case 0x84:		/* ROM readback / RAM write (high) */
-				chip->rom_readback_addr &= 0xffff;
-				chip->rom_readback_addr |= (data<<16);
+				chip->rom_addr_hi = data << 16;
 				break;
 
-			case 0x85:		/* ROM readback / RAM write (med) */
-				chip->rom_readback_addr &= 0xff00ff;
-				chip->rom_readback_addr |= (data<<8);
+			case 0x85:		/* ROM readback / RAM write (middle) */
+				chip->rom_addr_mid = data << 8;
 				break;
 
-			case 0x86:		/* ROM readback / RAM write (low) */
-				chip->rom_readback_addr &= 0xffff00;
-				chip->rom_readback_addr |= data;
+			case 0x86:		/* ROM readback / RAM write (low) -> update latch */
+				chip->rom_readback_addr = chip->rom_addr_hi | chip->rom_addr_mid | data;
 				break;
 
 			case 0x87:		/* RAM write */
-				if (!chip->ext_ram_write.isnull())
-					chip->ext_ram_write(chip->rom_readback_addr, data);
-				else
-					logerror("YMZ280B attempted RAM write to %X\n", chip->rom_readback_addr);
-				chip->rom_readback_addr = (chip->rom_readback_addr + 1) & 0xffffff;
+				if (chip->ext_mem_enable)
+				{
+					if (!chip->ext_ram_write.isnull())
+						chip->ext_ram_write(chip->rom_readback_addr, data);
+					else
+						logerror("YMZ280B attempted RAM write to %X\n", chip->rom_readback_addr);
+					chip->rom_readback_addr = (chip->rom_readback_addr + 1) & 0xffffff;
+				}
 				break;
 
 			case 0xfe:		/* IRQ mask */
@@ -931,6 +938,7 @@ static void write_to_register(ymz280b_state *chip, int data)
 				break;
 
 			case 0xff:		/* IRQ enable, test, etc */
+				chip->ext_mem_enable = (data & 0x40) >> 6;
 				chip->irq_enable = (data & 0x10) >> 4;
 				update_irq_state(chip);
 
@@ -974,14 +982,6 @@ static int compute_status(ymz280b_state *chip)
 {
 	UINT8 result;
 
-	/* ROM/RAM readback? */
-	if (chip->current_register == 0x86)
-	{
-		result = ymz280b_read_memory(chip->region_base, chip->region_size, chip->rom_readback_addr);
-		chip->rom_readback_addr = (chip->rom_readback_addr + 1) & 0xffffff;
-		return result;
-	}
-
 	/* force an update */
 	chip->stream->update();
 
@@ -1008,6 +1008,9 @@ READ8_DEVICE_HANDLER( ymz280b_r )
 
 	if ((offset & 1) == 0)
 	{
+		if (!chip->ext_mem_enable)
+			return 0xff;
+
 		/* read from external memory */
 		UINT8 result;
 		if (!chip->ext_ram_read.isnull())
