@@ -1536,10 +1536,12 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 				return;
 			}
 			if(cur_live.crc) {
-				fprintf(stderr, "Header CRC error\n");
-				live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM, command[0] & 0x40);
-				return;
+				st0 |= ST0_FAIL;
+				st1 |= ST1_DE|ST1_ND;
+				fi.sub_state = COMMAND_DONE;
+				break;
 			}
+			st1 &= ~ST1_MA;
 			sector_size = calc_sector_size(cur_live.idbuf[3]);
 			fifo_expect(sector_size, true);
 			fi.sub_state = SECTOR_WRITTEN;
