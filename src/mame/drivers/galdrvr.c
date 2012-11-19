@@ -6503,7 +6503,7 @@ GAME( 1980, mooncrstg,  mooncrst, mooncrst, mooncrsg, galaxian_state, mooncrsu, 
 GAME( 1980, mooncrsb, mooncrst, mooncrst, mooncrsa, galaxian_state, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrs2, mooncrst, mooncrst, mooncrsa, galaxian_state, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrs3, mooncrst, mooncrst, mooncrst, galaxian_state, mooncrsu, ROT90,  "bootleg (Jeutel)", "Moon Cresta (bootleg set 3)", GAME_SUPPORTS_SAVE ) /* Jeutel bootleg, similar to bootleg set 2 */
-GAME( 1980, mooncrs4, mooncrst, mooncrst, mooncrst, galaxian_state, mooncrsu, ROT90,  "SG-Florence", "Moon Crest", GAME_SUPPORTS_SAVE )
+GAME( 1980, mooncrs4, mooncrst, mooncrst, mooncrst, galaxian_state, mooncrsu, ROT90,  "bootleg (SG-Florence)", "Moon Crest (Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, fantazia, mooncrst, mooncrst, fantazia, galaxian_state, mooncrsu, ROT90,  "bootleg? (Subelectro)", "Fantazia (bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 1980, eagle,    mooncrst, mooncrst, mooncrsa, galaxian_state, mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 1)", GAME_SUPPORTS_SAVE ) // or bootleg?
 GAME( 1980, eagle2,   mooncrst, mooncrst, eagle2, galaxian_state,   mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 2)", GAME_SUPPORTS_SAVE ) // "
