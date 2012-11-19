@@ -181,7 +181,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 //      return;
 
 //  interlace_on = state->m_video_reg[2] == 0x10; /* TODO: correct? */
-	char_size = 16;
+	char_size = 19;
 
 	for(x=0;x<pitch;x++)
 	{
@@ -194,7 +194,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 //      tile_addr = addr+(x*(state->m_video_ff[WIDTH40_REG]+1));
 		tile_addr = addr+(x*(1));
 
-		tile = state->m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0x007f;
+		tile = state->m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0x00ff;
 		attr = (state->m_video_ram_1[(tile_addr*2 & 0x1fff) | 0x2000] & 0x00ff);
 
 //      secret = (attr & 1) ^ 1;
@@ -218,7 +218,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					continue;
 
 //              tile_data = secret ? 0 : (state->m_char_rom[tile*char_size+interlace_on*0x800+yi]);
-				tile_data = (state->m_char_rom[tile+yi*0x80]);
+				tile_data = (state->m_char_rom[(tile & 0x7f)+((tile & 0x80)<<4)+((yi & 0xf)*0x80)+((yi & 0x10)<<8)]);
 
 //              if(reverse) { tile_data^=0xff; }
 //              if(u_line && yi == 7) { tile_data = 0xff; }
@@ -232,7 +232,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				else
 					pen = (tile_data >> (xi) & 1) ? color : 0;
 
-				if(pen)
+				//if(pen)
 					bitmap.pix16(res_y, res_x) = pen;
 
 //              if(state->m_video_ff[WIDTH40_REG])
