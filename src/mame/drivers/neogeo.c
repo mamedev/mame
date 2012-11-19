@@ -243,12 +243,12 @@ void neogeo_set_display_counter_lsb( address_space &space, UINT16 data )
 }
 
 
-static void update_interrupts( running_machine &machine )
+void neogeo_state::update_interrupts( running_machine &machine )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
 
-	machine.device("maincpu")->execute().set_input_line(1, state->m_vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
-	machine.device("maincpu")->execute().set_input_line(2, state->m_display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(state->m_vblank_level, state->m_vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+	machine.device("maincpu")->execute().set_input_line(state->m_raster_level, state->m_display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
 	machine.device("maincpu")->execute().set_input_line(3, state->m_irq3_pending ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -264,7 +264,7 @@ void neogeo_acknowledge_interrupt( running_machine &machine, UINT16 data )
 	if (data & 0x04)
 		state->m_vblank_interrupt_pending = 0;
 
-	update_interrupts(machine);
+	state->update_interrupts(machine);
 }
 
 
@@ -320,7 +320,7 @@ TIMER_CALLBACK_MEMBER(neogeo_state::vblank_interrupt_callback)
 }
 
 
-static void create_interrupt_timers( running_machine &machine )
+void neogeo_state::create_interrupt_timers( running_machine &machine )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
 	state->m_display_position_interrupt_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(neogeo_state::display_position_interrupt_callback),state));
@@ -329,7 +329,7 @@ static void create_interrupt_timers( running_machine &machine )
 }
 
 
-static void start_interrupt_timers( running_machine &machine )
+void neogeo_state::start_interrupt_timers( running_machine &machine )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
 	state->m_vblank_interrupt_timer->adjust(machine.primary_screen->time_until_pos(NEOGEO_VBSTART));
@@ -1002,6 +1002,10 @@ void neogeo_state::machine_start()
 
 	/* initialize the memcard data structure */
 	memcard_data = auto_alloc_array_clear(machine(), UINT8, MEMCARD_SIZE);
+
+	/* irq levels for MVS / AES */
+	m_vblank_level = 1;
+	m_raster_level = 2;
 
 	/* start with an IRQ3 - but NOT on a reset */
 	m_irq3_pending = 1;

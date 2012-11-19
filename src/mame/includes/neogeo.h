@@ -103,6 +103,9 @@ public:
 	UINT8      m_led2_value;
 	UINT8      m_recurse;
 
+	UINT8	   m_vblank_level;
+	UINT8      m_raster_level;
+
 	/* protection */
 	UINT32     m_fatfury2_prot_data;
 	UINT16     m_neogeo_rng;
@@ -211,6 +214,9 @@ public:
 	virtual void video_start();
 	virtual void video_reset();
 	UINT32 screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void update_interrupts( running_machine &machine );
+	void create_interrupt_timers( running_machine &machine );
+	void start_interrupt_timers( running_machine &machine );
 	TIMER_CALLBACK_MEMBER(display_position_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(display_position_vblank_callback);
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
