@@ -505,7 +505,7 @@ void upd765_family_device::dma_w(UINT8 data)
 	fifo_push(data, false);
 }
 
-void upd765_family_device::live_start(floppy_info &fi, int state)
+void upd765_family_device::live_start(floppy_info &fi, int state, bool mfm)
 {
 	cur_live.tm = machine().time();
 	cur_live.state = state;
@@ -520,7 +520,7 @@ void upd765_family_device::live_start(floppy_info &fi, int state)
 	cur_live.data_bit_context = false;
 	cur_live.byte_counter = 0;
 	cur_live.pll.reset(cur_live.tm);
-	cur_live.pll.set_clock(attotime::from_hz(cur_rate*2));
+	cur_live.pll.set_clock(attotime::from_hz(mfm ? 2*cur_rate : cur_rate));
 	checkpoint_live = cur_live;
 	fi.live = true;
 
@@ -1389,7 +1389,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 		case SEEK_DONE:
 			fi.counter = 0;
 			fi.sub_state = SCAN_ID;
-			live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM);
+			live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM, command[0] & 0x40);
 			return;
 
 		case SCAN_ID:
@@ -1410,7 +1410,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 					fi.sub_state = COMMAND_DONE;
 					break;
 				}
-				live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM);
+				live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM, command[0] & 0x40);
 				return;
 			}
 			logerror("%s: reading sector %02x %02x %02x %02x\n",
@@ -1422,7 +1422,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			sector_size = calc_sector_size(cur_live.idbuf[3]);
 			fifo_expect(sector_size, false);
 			fi.sub_state = SECTOR_READ;
-			live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_DATA : SEARCH_ADDRESS_MARK_DATA_FM);
+			live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_DATA : SEARCH_ADDRESS_MARK_DATA_FM, command[0] & 0x40);
 			return;
 
 		case SCAN_ID_FAILED:
@@ -1527,23 +1527,23 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 		case HEAD_LOAD_DONE:
 			fi.counter = 0;
 			fi.sub_state = SCAN_ID;
-			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+			live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM, command[0] & 0x40);
 			return;
 
 		case SCAN_ID:
 			if(!sector_matches()) {
-				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+				live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM, command[0] & 0x40);
 				return;
 			}
 			if(cur_live.crc) {
 				fprintf(stderr, "Header CRC error\n");
-				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+				live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM, command[0] & 0x40);
 				return;
 			}
 			sector_size = calc_sector_size(cur_live.idbuf[3]);
 			fifo_expect(sector_size, true);
 			fi.sub_state = SECTOR_WRITTEN;
-			live_start(fi, WRITE_SECTOR_SKIP_GAP2);
+			live_start(fi, WRITE_SECTOR_SKIP_GAP2, command[0] & 0x40);
 			return;
 
 		case SCAN_ID_FAILED:
@@ -1665,19 +1665,19 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 		case SEEK_DONE:
 			fi.counter = 0;
 			fi.sub_state = SCAN_ID;
-			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+			live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM, command[0] & 0x40);
 			return;
 
 		case SCAN_ID:
 			if(cur_live.crc) {
 				fprintf(stderr, "Header CRC error\n");
-				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+				live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM, command[0] & 0x40);
 				return;
 			}
 			sector_size = calc_sector_size(cur_live.idbuf[3]);
 			fifo_expect(sector_size, false);
 			fi.sub_state = SECTOR_READ;
-			live_start(fi, SEARCH_ADDRESS_MARK_DATA);
+			live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_DATA : SEARCH_ADDRESS_MARK_DATA_FM, command[0] & 0x40);
 			return;
 
 		case SCAN_ID_FAILED:
@@ -1751,7 +1751,7 @@ void upd765_family_device::format_track_continue(floppy_info &fi)
 			logerror("%s: index found, writing track\n", tag());
 			fi.sub_state = TRACK_DONE;
 			cur_live.pll.start_writing(machine().time());
-			live_start(fi, WRITE_TRACK_PRE_SECTORS);
+			live_start(fi, WRITE_TRACK_PRE_SECTORS, command[0] & 0x40);
 			return;
 
 		case TRACK_DONE:
@@ -1804,7 +1804,7 @@ void upd765_family_device::read_id_continue(floppy_info &fi)
 		case HEAD_LOAD_DONE:
 			fi.counter = 0;
 			fi.sub_state = SCAN_ID;
-			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
+			live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM, command[0] & 0x40);
 			return;
 
 		case SCAN_ID:

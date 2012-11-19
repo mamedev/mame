@@ -368,7 +368,7 @@ protected:
 	void index_callback(floppy_image_device *floppy, int state);
 	bool sector_matches() const;
 
-	void live_start(floppy_info &fi, int live_state);
+	void live_start(floppy_info &fi, int live_state, bool mfm);
 	void live_abort();
 	void checkpoint();
 	void rollback();

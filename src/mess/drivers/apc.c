@@ -482,6 +482,7 @@ void apc_state::fdc_irq(bool state)
 
 void apc_state::machine_start()
 {
+	m_fdc->set_rate(500000);
 	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(apc_state::fdc_irq), this));
 	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(apc_state::fdc_drq), this));
 }
