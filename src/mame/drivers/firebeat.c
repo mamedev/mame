@@ -1866,7 +1866,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(firebeat_state::soundram_r)
 {
-	// firebeat expects first read after setting the address to be dummy.  fixes "YMZ test".
+	// HACK: firebeat expects first read after setting the address to be dummy.  fixes "YMZ test".
 	if (offset > 0)
 	{
 		offset--;
@@ -2041,15 +2041,6 @@ INTERRUPT_GEN_MEMBER(firebeat_state::firebeat_interrupt)
 
 MACHINE_RESET_MEMBER(firebeat_state,firebeat)
 {
-	int i;
-	UINT8 *sound = memregion("ymz")->base();
-
-	for (i=0; i < 0x200000; i++)
-	{
-		sound[i] = m_flash[1]->read(i);
-		sound[i+0x200000] = m_flash[2]->read(i);
-	}
-
 	m_layer = 0;
 }
 

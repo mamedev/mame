@@ -143,17 +143,22 @@ INLINE ymz280b_state *get_safe_token(device_t *device)
 }
 
 
-INLINE UINT8 ymz280b_read_memory(UINT8 *base, UINT32 size, UINT32 offset)
+INLINE UINT8 ymz280b_read_memory(ymz280b_state *chip, UINT32 offset)
 {
-	if (offset < size)
-		return base[offset];
+	if (chip->ext_ram_read.isnull())
+	{
+		if (offset < chip->region_size)
+			return chip->region_base[offset];
 
-	/* 16MB chip limit (shouldn't happen) */
-	else if (offset > 0xffffff)
-		return base[offset & 0xffffff];
+		/* 16MB chip limit (shouldn't happen) */
+		else if (offset > 0xffffff)
+			return chip->region_base[offset & 0xffffff];
 
+		else
+			return 0;
+	}
 	else
-		return 0;
+		return chip->ext_ram_read(offset);
 }
 
 
@@ -277,7 +282,7 @@ static void compute_tables(void)
 
 ***********************************************************************************************/
 
-static int generate_adpcm(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, INT16 *buffer, int samples)
+static int generate_adpcm(ymz280b_state *chip, struct YMZ280BVoice *voice, INT16 *buffer, int samples)
 {
 	int position = voice->position;
 	int signal = voice->signal;
@@ -291,7 +296,7 @@ static int generate_adpcm(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, 
 		while (samples)
 		{
 			/* compute the new amplitude and update the current step */
-			val = ymz280b_read_memory(base, size, position / 2) >> ((~position & 1) << 2);
+			val = ymz280b_read_memory(chip, position / 2) >> ((~position & 1) << 2);
 			signal += (step * diff_lookup[val & 15]) / 8;
 
 			/* clamp to the maximum */
@@ -330,7 +335,7 @@ static int generate_adpcm(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, 
 		while (samples)
 		{
 			/* compute the new amplitude and update the current step */
-			val = ymz280b_read_memory(base, size, position / 2) >> ((~position & 1) << 2);
+			val = ymz280b_read_memory(chip, position / 2) >> ((~position & 1) << 2);
 			signal += (step * diff_lookup[val & 15]) / 8;
 
 			/* clamp to the maximum */
@@ -393,7 +398,7 @@ static int generate_adpcm(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, 
 
 ***********************************************************************************************/
 
-static int generate_pcm8(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, INT16 *buffer, int samples)
+static int generate_pcm8(ymz280b_state *chip, struct YMZ280BVoice *voice, INT16 *buffer, int samples)
 {
 	int position = voice->position;
 	int val;
@@ -405,7 +410,7 @@ static int generate_pcm8(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, I
 		while (samples)
 		{
 			/* fetch the current value */
-			val = ymz280b_read_memory(base, size, position / 2);
+			val = ymz280b_read_memory(chip, position / 2);
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = (INT8)val * 256;
@@ -430,7 +435,7 @@ static int generate_pcm8(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, I
 		while (samples)
 		{
 			/* fetch the current value */
-			val = ymz280b_read_memory(base, size, position / 2);
+			val = ymz280b_read_memory(chip, position / 2);
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = (INT8)val * 256;
@@ -467,7 +472,7 @@ static int generate_pcm8(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, I
 
 ***********************************************************************************************/
 
-static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, INT16 *buffer, int samples)
+static int generate_pcm16(ymz280b_state *chip, struct YMZ280BVoice *voice, INT16 *buffer, int samples)
 {
 	int position = voice->position;
 	int val;
@@ -479,7 +484,7 @@ static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, 
 		while (samples)
 		{
 			/* fetch the current value */
-			val = (INT16)((ymz280b_read_memory(base, size, position / 2 + 1) << 8) + ymz280b_read_memory(base, size, position / 2 + 0));
+			val = (INT16)((ymz280b_read_memory(chip, position / 2 + 0) << 8) + ymz280b_read_memory(chip, position / 2 + 1));
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = val;
@@ -504,7 +509,7 @@ static int generate_pcm16(struct YMZ280BVoice *voice, UINT8 *base, UINT32 size, 
 		while (samples)
 		{
 			/* fetch the current value */
-			val = (INT16)((ymz280b_read_memory(base, size, position / 2 + 1) << 8) + ymz280b_read_memory(base, size, position / 2 + 0));
+			val = (INT16)((ymz280b_read_memory(chip, position / 2 + 0) << 8) + ymz280b_read_memory(chip, position / 2 + 1));
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = val;
@@ -603,10 +608,10 @@ static STREAM_UPDATE( ymz280b_update )
 		/* generate them into our buffer */
 		switch (voice->playing << 7 | voice->mode)
 		{
-			case 0x81:	samples_left = generate_adpcm(voice, chip->region_base, chip->region_size, chip->scratch, new_samples);		break;
-			case 0x82:	samples_left = generate_pcm8(voice, chip->region_base, chip->region_size, chip->scratch, new_samples);		break;
-			case 0x83:	samples_left = generate_pcm16(voice, chip->region_base, chip->region_size, chip->scratch, new_samples);		break;
-			default:	samples_left = 0; memset(chip->scratch, 0, new_samples * sizeof(chip->scratch[0]));							break;
+			case 0x81:	samples_left = generate_adpcm(chip, voice, chip->scratch, new_samples); break;
+			case 0x82:	samples_left = generate_pcm8(chip, voice, chip->scratch, new_samples); break;
+			case 0x83:	samples_left = generate_pcm16(chip, voice, chip->scratch, new_samples); break;
+			default:	samples_left = 0; memset(chip->scratch, 0, new_samples * sizeof(chip->scratch[0])); break;
 		}
 
 		/* if there are leftovers, ramp back to 0 */
@@ -1012,12 +1017,7 @@ READ8_DEVICE_HANDLER( ymz280b_r )
 			return 0xff;
 
 		/* read from external memory */
-		UINT8 result;
-		if (!chip->ext_ram_read.isnull())
-			result = chip->ext_ram_read(chip->rom_readback_addr);
-		else
-			result = ymz280b_read_memory(chip->region_base, chip->region_size, chip->rom_readback_addr);
-
+		UINT8 result = ymz280b_read_memory(chip, chip->rom_readback_addr);
 		chip->rom_readback_addr = (chip->rom_readback_addr + 1) & 0xffffff;
 		return result;
 	}
