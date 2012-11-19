@@ -407,6 +407,7 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 					if (LOG_OCW)
 						logerror("pic8259_w(): OCW1; data=0x%02X\n", data);
 
+					//printf("%s %02x\n",pic8259->master ? "master pic8259 mask" : "slave pic8259 mask",data);
 					pic8259->imr = data;
 					break;
 			}

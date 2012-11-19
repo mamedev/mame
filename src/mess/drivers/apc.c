@@ -111,6 +111,9 @@ public:
 	DECLARE_READ8_MEMBER(apc_dma_r);
 	DECLARE_WRITE8_MEMBER(apc_dma_w);
 
+	UINT8 m_keyb_press, m_keyb_status;
+	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+
 	DECLARE_WRITE_LINE_MEMBER(apc_master_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(apc_dma_hrq_changed);
@@ -330,13 +333,24 @@ WRITE8_MEMBER(apc_state::apc_gdc_w)
 
 READ8_MEMBER(apc_state::apc_kbd_r)
 {
-	//printf("%08x\n",offset);
-	return 0;
+	UINT8 res;
+
+	switch(offset)
+	{
+		case 0: res = m_keyb_press; break;
+		case 1: res = m_keyb_status; break;
+		default:
+			res = 0;
+			//printf("KEYB %08x\n",offset);
+			break;
+	}
+
+	return res;
 }
 
 WRITE8_MEMBER(apc_state::apc_kbd_w)
 {
-	printf("%08x %02x\n",offset,data);
+	printf("KEYB %08x %02x\n",offset,data);
 }
 
 WRITE8_MEMBER(apc_state::apc_dma_segments_w)
@@ -395,7 +409,7 @@ static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_READWRITE8(apc_dma_r, apc_dma_w,0xff00)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0x00ff) // i8259
-	AM_RANGE(0x28, 0x2f) AM_READWRITE8(apc_port_28_r, apc_port_28_w, 0xffff)
+	AM_RANGE(0x28, 0x2f) AM_READWRITE8(apc_port_28_r, apc_port_28_w, 0xffff) // i8259 (even) / pit8253 (odd)
 //  0x30, 0x37 serial port 0/1 (i8251) (even/odd)
 	AM_RANGE(0x38, 0x3f) AM_WRITE8(apc_dma_segments_w,0x00ff)
 	AM_RANGE(0x40, 0x43) AM_READWRITE8(apc_gdc_r, apc_gdc_w, 0xffff)
@@ -410,7 +424,40 @@ static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 //  AM_DEVREADWRITE8("upd7220_btm", upd7220_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
+/* TODO: key repeat, remove port impulse! */
+INPUT_CHANGED_MEMBER(apc_state::key_stroke)
+{
+	if(newval && !oldval)
+	{
+		m_keyb_press = (UINT8)(FPTR)(param) & 0xff;
+		//m_keyb_status |= 1; //TODO: what this really signals? busy?
+		pic8259_ir4_w(machine().device("pic8259_master"), 1);
+	}
+
+	if(oldval && !newval)
+	{
+		m_keyb_press = 0;
+		m_keyb_status &= ~1;
+		pic8259_ir4_w(machine().device("pic8259_master"), 0);
+	}
+}
+
+
 static INPUT_PORTS_START( apc )
+	PORT_START("KEY0")
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_UNUSED)
+	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x31)
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x32)
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x33)
+	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x34)
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x35)
+	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x36)
+	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x37)
+
+	PORT_START("KEY1")
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_ESC) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x96)
+
+
 	/* dummy active high structure */
 	PORT_START("SYSA")
 	PORT_DIPNAME( 0x01, 0x00, "SYSA" )
@@ -480,8 +527,15 @@ void apc_state::fdc_irq(bool state)
 	pic8259_ir3_w(machine().device("pic8259_slave"), state);
 }
 
+static IRQ_CALLBACK(irq_callback)
+{
+	return pic8259_acknowledge( device->machine().device( "pic8259_master" ));
+}
+
 void apc_state::machine_start()
 {
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+
 	m_fdc->set_rate(500000);
 	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(apc_state::fdc_irq), this));
 	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(apc_state::fdc_drq), this));
@@ -489,6 +543,7 @@ void apc_state::machine_start()
 
 void apc_state::machine_reset()
 {
+	m_keyb_status = m_keyb_press = 0;
 }
 
 
@@ -568,10 +623,10 @@ static const struct pit8253_config pit8253_config =
 irq assignment:
 
 8259 master:
-ir0
+ir0 (enabled at POST, unknown purpose)
 ir1
 ir2
-ir3
+ir3 (enabled after CP/M loading, serial?)
 ir4 keyboard (almost trusted, check code at fe64a)
 ir5
 ir6
@@ -588,10 +643,10 @@ ir6
 ir7
 */
 
-
 WRITE_LINE_MEMBER(apc_state::apc_master_set_int_line)
 {
 	//printf("%02x\n",interrupt);
+//	printf("irq %d\n",state);
 	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
