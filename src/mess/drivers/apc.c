@@ -111,7 +111,12 @@ public:
 	DECLARE_READ8_MEMBER(apc_dma_r);
 	DECLARE_WRITE8_MEMBER(apc_dma_w);
 
-	UINT8 m_keyb_press, m_keyb_status;
+	struct {
+		UINT8 status; //status
+		UINT8 data; //key data
+		UINT8 sig; //switch signal port
+		UINT8 sh; //shift switches
+	}m_keyb;
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 	DECLARE_WRITE_LINE_MEMBER(apc_master_set_int_line);
@@ -335,14 +340,12 @@ READ8_MEMBER(apc_state::apc_kbd_r)
 {
 	UINT8 res;
 
-	switch(offset)
+	switch(offset & 3)
 	{
-		case 0: res = m_keyb_press; break;
-		case 1: res = m_keyb_status; break;
-		default:
-			res = 0;
-			//printf("KEYB %08x\n",offset);
-			break;
+		case 0: res = m_keyb.data; pic8259_ir4_w(machine().device("pic8259_master"), 0); break; // according to the source, reading there acks the irq
+		case 1: res = m_keyb.status; break;
+		case 2: res = m_keyb.sig; break; // bit 0: CTRL bit 1: function key (or reversed)
+		case 3: res = machine().root_device().ioport("KEY_MOD")->read() & 0xff; break; // sh
 	}
 
 	return res;
@@ -430,16 +433,15 @@ INPUT_CHANGED_MEMBER(apc_state::key_stroke)
 {
 	if(newval && !oldval)
 	{
-		m_keyb_press = (UINT8)(FPTR)(param) & 0xff;
-		//m_keyb_status |= 1; //TODO: what this really signals? busy?
+		m_keyb.data = (UINT8)(FPTR)(param) & 0xff;
+		//m_keyb.status &= ~1;
 		pic8259_ir4_w(machine().device("pic8259_master"), 1);
 	}
 
 	if(oldval && !newval)
 	{
-		m_keyb_press = 0xff;
-		m_keyb_status &= ~1;
-		pic8259_ir4_w(machine().device("pic8259_master"), 0);
+		m_keyb.data = 0xff;
+		//m_keyb.status |= 1;
 	}
 }
 
@@ -495,6 +497,10 @@ static INPUT_PORTS_START( apc )
 
 	PORT_START("KEY6")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x20)
+	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("; / :") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x3a)
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("= / +") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x2d)
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("' / ~") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x40)
+	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("' / \"") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x3b)
 
 /*
 ;
@@ -619,59 +625,10 @@ CASETBL:
 	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("DEL") PORT_CHAR(0x7f) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0xfc)
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ENTER (PAD)") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(0x0d) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0xfd)
 
-	/* dummy active high structure */
-	PORT_START("SYSA")
-	PORT_DIPNAME( 0x01, 0x00, "SYSA" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_START("KEY_MOD")
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 
-	/* dummy active low structure */
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 void apc_state::fdc_drq(bool state)
@@ -704,7 +661,9 @@ void apc_state::machine_start()
 
 void apc_state::machine_reset()
 {
-	m_keyb_status = m_keyb_press = 0;
+	m_keyb.status = 0;
+	m_keyb.data = 0;
+	m_keyb.sig = 0;
 }
 
 
