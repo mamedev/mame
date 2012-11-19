@@ -2118,10 +2118,28 @@ isa8_wyse700_device::isa8_wyse700_device(const machine_config &mconfig, const ch
 	m_start_offset = 0x18000;
 }
 
+/*
+Character ROMs:
+
+250211-03.e5: Character ROM  Label: "(C) WYSE TECH / REV.A / 250211-03"
+250212-03.f5: Character ROM  Label: "(C) WYSE TECH / REV.A / 250212-03"
+
+Not dumped:
+
+250026-03.2d: MC68705 MCU  Label: "(C) WYSE TECH / REV.1 / 250026-03"
+250270-01.8b: PAL?         Label: "250270-01"
+250024-01.8g: PAL?         Label: "250024-01"
+250210-01.c2: PAL?         Label: "250210-01"
+*/
+ROM_START( wyse700 )
+	ROM_REGION(0x4000,"gfx1", 0)
+	ROM_LOAD( "250211-03.e5", 0x0000, 0x2000, CRC(58b61f63) SHA1(29ecb7cf7d07d692f0fc54e2dea8389f17a65f1a))
+	ROM_LOAD( "250212-03.f5", 0x2000, 0x2000, CRC(6930d741) SHA1(1beeb133c5e39eee9914bdc5924039d70b5edcad))
+ROM_END
 
 const rom_entry *isa8_wyse700_device::device_rom_region() const
 {
-	return ROM_NAME( cga );
+	return ROM_NAME( wyse700 );
 }
 
 //-------------------------------------------------
