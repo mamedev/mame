@@ -268,7 +268,7 @@ public:
 	DECLARE_WRITE8_MEMBER(jantouki_blitter2_rev2_w);
 	DECLARE_WRITE8_MEMBER(hanamai_priority_w);
 	DECLARE_WRITE8_MEMBER(tenkai_priority_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovr_special_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovr_blitter_irq_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovj_blitter_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(nettoqc_special_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(mjflove_blitter_r);
@@ -322,8 +322,10 @@ public:
 	DECLARE_READ16_MEMBER(ddenlovrk_protection2_r);
 	DECLARE_WRITE16_MEMBER(ddenlovrk_protection2_w);
 	DECLARE_READ16_MEMBER(nettoqc_input_r);
-	DECLARE_READ16_MEMBER(nettoqc_protection_r);
+	DECLARE_READ16_MEMBER(nettoqc_protection1_r);
 	DECLARE_WRITE16_MEMBER(nettoqc_coincounter_w);
+	DECLARE_READ16_MEMBER(ultrchmp_protection2_r);
+	DECLARE_WRITE16_MEMBER(ultrchmp_protection2_w);
 	DECLARE_READ8_MEMBER(rongrong_input_r);
 	DECLARE_WRITE8_MEMBER(rongrong_select_w);
 	DECLARE_READ8_MEMBER(magic_r);

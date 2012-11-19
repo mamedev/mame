@@ -9,42 +9,43 @@ CPU: Z80 or 68000
 Sound: (AY-3-8910) + YM2413 + MSM6295
 Other: Real Time Clock (Oki MSM6242B or 72421B)
 
--------------------------------------------------------------------------------------------------------------------
-Year + Game                Board              CPU   Sound               Custom                                Other
--------------------------------------------------------------------------------------------------------------------
-92 Monkey Mole Panic                          2xZ80 AY8910 YM2413 M6295 NL-001 1108(x2)   1427(x2)            8251
-93 Animalandia Jr.                            2xZ80 AY8910 YM2413 M6295 NL-001 NL-003(x2) NL-004(x2)          8251
-93 Quiz Channel Question   N7311208L1-2       Z80          YM2413 M6295 NL-002 1108F0405  1427F0071
-93 First Funky Fighter     N7403208L-2        2xZ80 YM2149 YM2413 M6295 NL-001 NL-002     NL-005
-94 Mj Mysterious World     D7107058L1-1       Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071 4L02?
-94 Mj Mysterious Universe  D7107058L1-1       Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071
-94 Mj Mysterious Orient    D7107058L1-1       Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071
-94 Quiz 365                                   68000 AY8910 YM2413 M6295
-94 Rong Rong (J)           N8010178L1         Z80          YM2413 M6295 NL-002 1108F0405  1427F0071 4L02F2637
-94 Hf Hana Ginga           D8102048L1         Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071 4L02?
-94 Super Hana Paradise     N8010178L1+N73RSUB Z80          YM2413 M6295 NL-002 1108F0406  1427F0071 4L02F2637
-95 Mj Dai Chuuka Ken       D11107218L1        Z80   AY8910 YM2413 M6295 70C160F009
-95 Hf Hana Gokou           N83061581L1        Z80   AY8910 YM2413 M6295 NL-002 1108?      1427?     4L02?
-95 Hf Hana Gokou Bangaihen N10805078L1        Z80   AY8910 YM2413 M6295 NL-002 1108?      1427?     4L02?
-95 Nettoh Quiz Champion                       68000 AY8910 YM2413 M6295
-95 Don Den Lover (J)       D1120901L8         68000 YMZ284 YM2413 M6295 NL-005
-96 Don Den Lover (HK)      D11309208L1        68000 YMZ284 YM2413 M6295 NL-005
-96 Panel&Variety Akamaru                      68000 YMZ284 YM2413 M6295 NL-005
-96 Mj Fantasic Love        NS5000101+?        Z80   YMZ284 YM2413 M6295 NL-005
-96 Hana Kanzashi                              Z80          YM2413 M6295 70C160F011?
-96 Mj Seiryu Densetsu      NM5020403          Z80   YMZ284 YM2413 M6295 70C160F011?
-96 Mj Janshin Plus         NM7001004          Z80   YMZ284 YM2413 M6295 TZ-2053P
-96 Mj Dai Touyouken        NM7001004          Z80   YMZ284 YM2413 M6295 TZ-2053P
-96 Return Of Sel Jan II    NM504-2            Z80   YM2149 YM2413 M6295 TZ-2053P?
-97 Hana Kagerou                               KC80         YM2413 M6295 70C160F011
-97 Kkot Bi Nyo             9090123-2          KC80         YM2413 M6295 70C160F011                            A1010
-97 Kkot Bi Nyo Special     9090123-3          KC80         YM2413 M6295 ?
-98 Mj Chuukanejyo          D11107218L1        Z80   AY8910 YM2413 M6295 70C160F009
-98 Mj Reach Ippatsu                           KC80         YM2413 M6295 70C160F011
-99 Mj Jong-Tei             NM532-9902         Z80          YM2413 M6295 4L10FXXXX?
-02 Mj Daimyojin            TSM015-0111        Z80          YM2413 M6295 70C160F011
-04 Mj Momotarou            TSM015-0111?       Z80          YM2413 M6295 70C160F011?
--------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------
+Year + Game                Board               CPU   Sound               Custom                                Other
+--------------------------------------------------------------------------------------------------------------------
+92 Monkey Mole Panic                           2xZ80 AY8910 YM2413 M6295 NL-001 1108(x2)   1427(x2)            8251
+93 Animalandia Jr.                             2xZ80 AY8910 YM2413 M6295 NL-001 NL-003(x2) NL-004(x2)          8251
+93 Quiz Channel Question   N7311208L1-2        Z80          YM2413 M6295 NL-002 1108F0405  1427F0071
+93 First Funky Fighter     N7403208L-2         2xZ80 YM2149 YM2413 M6295 NL-001 NL-002     NL-005
+94 Mj Mysterious World     D7107058L1-1        Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071 4L02?
+94 Mj Mysterious Universe  D7107058L1-1        Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071
+94 Mj Mysterious Orient    D7107058L1-1        Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071
+94 Quiz 365                                    68000 AY8910 YM2413 M6295
+94 Rong Rong (J)           N8010178L1          Z80          YM2413 M6295 NL-002 1108F0405  1427F0071 4L02F2637
+94 Hf Hana Ginga           D8102048L1          Z80   YM2149 YM2413 M6295 NL-002 1108F0405  1427F0071 4L02?
+94 Super Hana Paradise     N8010178L1+N73RSUB  Z80          YM2413 M6295 NL-002 1108F0406  1427F0071 4L02F2637
+95 Mj Dai Chuuka Ken       D11107218L1         Z80   AY8910 YM2413 M6295 70C160F009
+95 Hf Hana Gokou           N83061581L1         Z80   AY8910 YM2413 M6295 NL-002 1108?      1427?     4L02?
+95 Hf Hana Gokou Bangaihen N10805078L1         Z80   AY8910 YM2413 M6295 NL-002 1108?      1427?     4L02?
+95 Nettoh Quiz Champion                        68000 AY8910 YM2413 M6295
+95 Ultra Champion (K)      N11309208L1+N114SUB 68000 AY8910 YM2413 M6295 NL-005
+95 Don Den Lover (J)       D1120901L8          68000 YMZ284 YM2413 M6295 NL-005
+96 Don Den Lover (HK)      D11309208L1         68000 YMZ284 YM2413 M6295 NL-005
+96 Panel&Variety Akamaru                       68000 YMZ284 YM2413 M6295 NL-005
+96 Mj Fantasic Love        NS5000101+?         Z80   YMZ284 YM2413 M6295 NL-005
+96 Hana Kanzashi                               Z80          YM2413 M6295 70C160F011?
+96 Mj Seiryu Densetsu      NM5020403           Z80   YMZ284 YM2413 M6295 70C160F011?
+96 Mj Janshin Plus         NM7001004           Z80   YMZ284 YM2413 M6295 TZ-2053P
+96 Mj Dai Touyouken        NM7001004           Z80   YMZ284 YM2413 M6295 TZ-2053P
+96 Return Of Sel Jan II    NM504-2             Z80   YM2149 YM2413 M6295 TZ-2053P?
+97 Hana Kagerou                                KC80         YM2413 M6295 70C160F011
+97 Kkot Bi Nyo             9090123-2           KC80         YM2413 M6295 70C160F011                            A1010
+97 Kkot Bi Nyo Special     9090123-3           KC80         YM2413 M6295 ?
+98 Mj Chuukanejyo          D11107218L1         Z80   AY8910 YM2413 M6295 70C160F009
+98 Mj Reach Ippatsu                            KC80         YM2413 M6295 70C160F011
+99 Mj Jong-Tei             NM532-9902          Z80          YM2413 M6295 4L10FXXXX?
+02 Mj Daimyojin            TSM015-0111         Z80          YM2413 M6295 70C160F011
+04 Mj Momotarou            TSM015-0111?        Z80          YM2413 M6295 70C160F011?
+--------------------------------------------------------------------------------------------------------------------
 
 TODO:
 
@@ -88,7 +89,7 @@ TODO:
 
 - quiz365 protection
 
-- ddenlovj, akamaru: the elapsed time text in the "game information" screen
+- ddenlovj, akamaru, ultrchmp: the elapsed time text in the "game information" screen
   is all wrong (RTC/interrupts related).
 
 - sryudens: Transparency problems (Test->Option->Gal, Bonus Game during Demo mode).
@@ -110,6 +111,7 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
 #include "machine/msm6242.h"
+#include "machine/nvram.h"
 #include "includes/dynax.h"
 
 
@@ -1397,7 +1399,7 @@ UINT32 dynax_state::screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(dynax_state::ddenlovr_special_r)
+CUSTOM_INPUT_MEMBER(dynax_state::ddenlovr_blitter_irq_r)
 {
 	return m_ddenlovr_blitter_irq_flag;
 }
@@ -1888,9 +1890,9 @@ READ16_MEMBER(dynax_state::nettoqc_input_r)
     Writes 67 4c 3a to 200e0b then 19 to 200e0d. Expects to read 51 from 200c03
 */
 
-READ16_MEMBER(dynax_state::nettoqc_protection_r)
+READ16_MEMBER(dynax_state::nettoqc_protection1_r)
 {
-	switch (m_protection1[0] & 0xff)
+	switch (*m_protection1 & 0xff)
 	{
 		case 0x3a:	return 0x0051;
 		default:	return 0x0088;
@@ -1920,9 +1922,9 @@ static ADDRESS_MAP_START( nettoqc_map, AS_PROGRAM, 16, dynax_state )
 	AM_RANGE(0x000000, 0x17ffff) AM_ROM														// ROM
 
 	AM_RANGE(0x200000, 0x2003ff) AM_WRITE(ddenlovr_palette_w)								// Palette
-	AM_RANGE(0x200c02, 0x200c03) AM_READ(nettoqc_protection_r)								//
-	AM_RANGE(0x200e0a, 0x200e0d) AM_WRITEONLY AM_SHARE("protection1")			//
-	AM_RANGE(0x201000, 0x2017ff) AM_WRITEONLY											// ?
+	AM_RANGE(0x200c02, 0x200c03) AM_READ(nettoqc_protection1_r)								// Protection 1
+	AM_RANGE(0x200e0a, 0x200e0d) AM_WRITEONLY AM_SHARE("protection1")						// ""
+	AM_RANGE(0x201000, 0x2017ff) AM_WRITEONLY												// ?
 
 	AM_RANGE(0x300040, 0x300047) AM_WRITE(ddenlovr16_palette_base_w)
 	AM_RANGE(0x300048, 0x30004f) AM_WRITE(ddenlovr16_palette_mask_w)
@@ -1947,6 +1949,62 @@ static ADDRESS_MAP_START( nettoqc_map, AS_PROGRAM, 16, dynax_state )
 	AM_RANGE(0x3001ca, 0x3001cb) AM_WRITE(ddenlovr_blitter_irq_ack_w)						// Blitter irq acknowledge
 	AM_RANGE(0x300240, 0x300241) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)	// Sound
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM														// RAM
+ADDRESS_MAP_END
+
+
+READ16_MEMBER(dynax_state::ultrchmp_protection2_r)
+{
+	switch (*m_protection2)
+	{
+		case 0x0005:	return 0x0f;
+		case 0x000a:	return 0x07;
+	}
+	return *m_protection2;
+}
+WRITE16_MEMBER(dynax_state::ultrchmp_protection2_w)
+{
+//	COMBINE_DATA(m_protection2);
+	m_oki->set_bank_base((data & 0xf) * 0x40000);
+}
+
+static ADDRESS_MAP_START( ultrchmp_map, AS_PROGRAM, 16, dynax_state )
+	AM_RANGE(0x000000, 0x17ffff) AM_ROM														// ROM
+
+	AM_RANGE(0x224680, 0x224681) AM_RAM_READ(ultrchmp_protection2_r) AM_SHARE("protection2")	// Protection 2
+	AM_RANGE(0x313570, 0x313571) AM_WRITE(ultrchmp_protection2_w)								// "" + OKI bank
+
+	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w)								// Palette
+
+	AM_RANGE(0xd00c02, 0xd00c03) AM_READ(nettoqc_protection1_r)								// Protection 1
+	AM_RANGE(0xd00e0a, 0xd00e0d) AM_WRITEONLY AM_SHARE("protection1")						// ""
+
+	AM_RANGE(0xd01000, 0xd017ff) AM_WRITEONLY												// ?
+
+	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr16_palette_base_w)
+	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr16_palette_mask_w)
+	AM_RANGE(0xe00050, 0xe00057) AM_WRITE(ddenlovr16_transparency_pen_w)
+	AM_RANGE(0xe00058, 0xe0005f) AM_WRITE(ddenlovr16_transparency_mask_w)
+	AM_RANGE(0xe00068, 0xe00069) AM_WRITE(ddenlovr16_bgcolor_w)
+	AM_RANGE(0xe0006a, 0xe0006b) AM_WRITE(ddenlovr16_priority_w)
+	AM_RANGE(0xe0006c, 0xe0006d) AM_WRITE(ddenlovr16_layer_enable_w)
+	AM_RANGE(0xe00070, 0xe00071) AM_READNOP
+	AM_RANGE(0xe00080, 0xe00083) AM_WRITE(ddenlovr_blitter_w)
+	AM_RANGE(0xe00086, 0xe00087) AM_READ(ddenlovr_gfxrom_r)									// Video Chip
+
+	AM_RANGE(0xe00100, 0xe00101) AM_READ_PORT("P1")
+	AM_RANGE(0xe00102, 0xe00103) AM_READ_PORT("P2")
+	AM_RANGE(0xe00104, 0xe00105) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xe00200, 0xe00201) AM_READ_PORT("DSW")
+	AM_RANGE(0xe00302, 0xe00303) AM_WRITE(ddenlovr_blitter_irq_ack_w)						// Blitter irq acknowledge
+	AM_RANGE(0xe00308, 0xe00309) AM_WRITE(ddenlovr_coincounter_0_w)							// Coin Counters
+	AM_RANGE(0xe0030c, 0xe0030d) AM_WRITE(ddenlovr_coincounter_1_w)							//
+
+	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
+	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
+	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
+	AM_RANGE(0xe00700, 0xe00701) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)	// Sound
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram")										// RAM (Battey-backed)
 ADDRESS_MAP_END
 
 
@@ -4011,7 +4069,7 @@ static INPUT_PORTS_START( ddenlovr )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)	/* Test */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL )	// ? quiz365
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dynax_state,ddenlovr_special_r, NULL)	// blitter irq flag
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dynax_state,ddenlovr_blitter_irq_r, NULL)	// blitter irq flag
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	// blitter busy flag
 
 	PORT_START("DSW")
@@ -4136,6 +4194,49 @@ static INPUT_PORTS_START( nettoqc )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( ultrchmp )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)	/* Test */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dynax_state,ddenlovr_blitter_irq_r, NULL)	// blitter irq flag
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	// blitter busy flag
+
+	PORT_START("DSW")
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( quiz365 )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -4164,7 +4265,7 @@ static INPUT_PORTS_START( quiz365 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)	/* Test */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL )	// ? quiz365
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dynax_state,ddenlovr_special_r, NULL)	// blitter irq flag
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dynax_state,ddenlovr_blitter_irq_r, NULL)	// blitter irq flag
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	// blitter busy flag
 
 	PORT_START("DSW1")
@@ -8760,7 +8861,6 @@ static MSM6242_INTERFACE( ddenlovr_rtc_intf )
 	DEVCB_NULL
 };
 
-
 static MACHINE_CONFIG_START( ddenlovr, dynax_state )
 
 	/* basic machine hardware */
@@ -8839,12 +8939,22 @@ static MACHINE_CONFIG_DERIVED( quiz365, ddenlovr )
 	MCFG_SOUND_CONFIG(quiz365_ay8910_interface)
 MACHINE_CONFIG_END
 
-
 static MACHINE_CONFIG_DERIVED( nettoqc, ddenlovr )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nettoqc_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( ultrchmp, nettoqc )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(ultrchmp_map)
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_VIDEO_START_OVERRIDE(dynax_state,mjflove)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -8966,7 +9076,6 @@ static MSM6242_INTERFACE( mmpanic_rtc_intf )
 {
 	DEVCB_LINE(mmpanic_rtc_irq)
 };
-
 
 static MACHINE_CONFIG_START( mmpanic, dynax_state )
 
@@ -9190,7 +9299,6 @@ static MSM6242_INTERFACE( mjchuuka_rtc_intf )
 	DEVCB_LINE(mjchuuka_rtc_irq)
 };
 
-
 static MACHINE_CONFIG_DERIVED( mjchuuka, hanakanz )
 
 	/* basic machine hardware */
@@ -9355,7 +9463,6 @@ static MSM6242_INTERFACE( hginga_rtc_intf )
 {
 	DEVCB_LINE(hginga_rtc_irq)
 };
-
 
 static MACHINE_CONFIG_DERIVED( hginga, quizchq )
 
@@ -10210,6 +10317,53 @@ ROM_START( nettoqc )
 	ROM_LOAD( "10302.rom", 0x080000, 0x080000, CRC(6e2d4660) SHA1(d7924af8807f7238a7885b204a8c352ff75298b7) )
 ROM_END
 
+/***************************************************************************
+Se Gye Hweng Dan Ultra Champion (Korea)
+(C)1995 Nakanihon
+
+Korean version of nettoqc.
+Hardware similar to Don Den Lover, Nettoh Quiz Champion etc.
+
+Main Board
+----------
+PCB - N11309208L1
+CPU - 68000 @12MHz [24/2]
+RAM - 62256 x2, M514262 (x5), 37C7256 (x1)
+GFX - Nakanihon NL-005
+SND - AY-3-8910 (marked 95101)
+      M6295 (marked M28)
+      YM2413
+OSC - 28.63636MHz, 24.000MHz
+MISC- 72421 RTC, 8-position DIPSW, 3V Coin Battery
+
+Top Board
+---------
+PCB  - N114SUB
+ROMs - TC5316200 (x3)
+       27C010 (x1)
+       27C020 (x2)
+       27C040 (x2)
+MISC - PAL16V8 (x2), 74LS138 (x1)
+
+***************************************************************************/
+
+ROM_START( ultrchmp )
+	ROM_REGION( 0x180000, "maincpu", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "5.1a", 0x000000, 0x80000, CRC(23afa373) SHA1(5cada2ee1f9b5c17c0db051a8cc656ff3ab1aaae) )
+	ROM_LOAD16_BYTE( "3.1c", 0x000001, 0x80000, CRC(073e1959) SHA1(d2b263e5a1226528acbbe75bc62309b67cee669d) )
+	ROM_LOAD16_BYTE( "4.1b", 0x100000, 0x40000, CRC(e99ad8b6) SHA1(bdfaa12bd9c48359be1695aaa821857c6cb75d6c) )
+	ROM_LOAD16_BYTE( "2.1d", 0x100001, 0x40000, CRC(90e3ee61) SHA1(87d7795400c7b6c088f5248ecac13a2ea9eb779f) )
+
+	ROM_REGION( 0x440000, "blitter", 0 )	/* blitter data */
+	ROM_LOAD( "10402.2b", 0x000000, 0x200000, CRC(6414d46f) SHA1(a87f06f955c3c052670c3ac7416919de2b4a5d6e) )
+	ROM_LOAD( "10403.2a", 0x200000, 0x200000, CRC(b646fa00) SHA1(e4d57b159e992eed6b3e1d3a573003fdcee5dc91) )
+	ROM_LOAD( "6.2c",     0x400000, 0x040000, CRC(28171d0f) SHA1(fa0d9b68022b999c6ba560047c211f3efbeb5f64) )
+
+	ROM_REGION( 0x400000, "oki", 0 )	/* Samples */
+	ROM_LOAD( "10401.2h", 0x000000, 0x200000, CRC(7ea88e86) SHA1(343fbb79c8f388561660f690f54a830819a66c87) )
+	ROM_RELOAD(           0x200000, 0x200000 )
+	ROM_LOAD( "1.1h",     0x200000, 0x020000, CRC(65f3df4c) SHA1(564a668d3345074901a8e69bfd6b6d151883cfff) )
+ROM_END
 
 /***************************************************************************
 
@@ -11805,6 +11959,7 @@ GAME( 1995, hgokou,    0,        hgokou,    hgokou,   driver_device, 0,        R
 GAME( 1995, hgokbang,  hgokou,   hgokbang,  hgokou,   driver_device, 0,        ROT0, "Dynax",                                       "Hanafuda Hana Gokou Bangaihen (Japan)",                           GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1995, mjdchuka,  0,        mjchuuka,  mjchuuka, driver_device, 0,        ROT0, "Dynax",                                       "Mahjong The Dai Chuuka Ken (China, v. D111)",                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1995, nettoqc,   0,        nettoqc,   nettoqc,  driver_device, 0,        ROT0, "Nakanihon",                                   "Nettoh Quiz Champion (Japan)",                                    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
+GAME( 1995, ultrchmp,  0,        ultrchmp,  ultrchmp, driver_device, 0,        ROT0, "Nakanihon",                                   "Se Gye Hweng Dan Ultra Champion (Korea)",                         GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
 GAME( 1995, ddenlovj,  0,        ddenlovj,  ddenlovj, driver_device, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Shiro Kuro Tsukeyo! (Japan)",              GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1995, ddenlovrk, ddenlovj, ddenlovrk, ddenlovr, driver_device, 0,        ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea)",          GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1995, ddenlovrb, ddenlovj, ddenlovr,  ddenlovr, driver_device, 0,        ROT0, "bootleg",                                     "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea, bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
