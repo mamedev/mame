@@ -214,7 +214,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				res_x = (x*8+xi) * (1);
 				res_y = y*lr+yi;
 
-				if(res_x > 640 || res_y > char_size*25) //TODO
+				if(res_x > 640 || res_y > 494) //TODO
 					continue;
 
 //              tile_data = secret ? 0 : (state->m_char_rom[tile*char_size+interlace_on*0x800+yi]);
@@ -422,6 +422,7 @@ static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 //  0x60 Melody Processing Unit
 //  AM_RANGE(0x68, 0x6f) i8255 , printer port (A: status (R) B: data (W) C: command (W))
 //  AM_DEVREADWRITE8("upd7220_btm", upd7220_device, read, write, 0x00ff)
+//	0x92, 0x9a, 0xa2, 0xaa is for a Hard Disk (unknown type)
 ADDRESS_MAP_END
 
 /* TODO: key repeat, remove port impulse! */
@@ -492,6 +493,8 @@ static INPUT_PORTS_START( apc )
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y') PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x59)
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x5a)
 
+	PORT_START("KEY6")
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x20)
 
 /*
 ;
