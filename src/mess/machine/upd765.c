@@ -771,7 +771,7 @@ void upd765_family_device::live_run(attotime limit)
 				}
 				break;
 			}
-			if(cur_live.data_reg != 0xfb && cur_live.data_reg != 0xfd) {
+			if(cur_live.data_reg != 0xfb && cur_live.data_reg != 0xf8) {
 				live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
 				return;
 			}
@@ -2096,6 +2096,10 @@ void upd765_family_device::live_write_fm(UINT8 fm)
 
 bool upd765_family_device::sector_matches() const
 {
+	if(0)
+		logerror("%s: matching %02x %02x %02x %02x - %02x %02x %02x %02x\n", tag(),
+				 cur_live.idbuf[0], cur_live.idbuf[1], cur_live.idbuf[2], cur_live.idbuf[3],
+				 command[2], command[3], command[4], command[5]);
 	return
 		cur_live.idbuf[0] == command[2] &&
 		cur_live.idbuf[1] == command[3] &&
