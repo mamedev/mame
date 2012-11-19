@@ -457,9 +457,9 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 		int etpos = tpos;
 		if(fm)
-			etpos += sector_count*(6+5+2+11+6+1+ssize+2)*16;
+			etpos += sector_count*(6+5+2+11+6+1+size+2)*16;
 		else
-			etpos += sector_count*(12+3+5+2+22+12+3+1+ssize+2)*16;
+			etpos += sector_count*(12+3+5+2+22+12+3+1+size+2)*16;
 
 		if(etpos > cell_count)
 			throw emu_fatalerror("imd_format: Incorrect layout on track %d head %d, expected_size=%d, current_size=%d", track, head, cell_count, etpos);
