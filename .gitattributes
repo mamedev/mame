@@ -6054,6 +6054,7 @@ src/mess/drivers/supercon.c svneol=native#text/plain
 src/mess/drivers/supracan.c svneol=native#text/plain
 src/mess/drivers/svi318.c svneol=native#text/plain
 src/mess/drivers/svision.c svneol=native#text/plain
+src/mess/drivers/svmu.c svneol=native#text/plain
 src/mess/drivers/swtpc.c svneol=native#text/plain
 src/mess/drivers/sym1.c svneol=native#text/plain
 src/mess/drivers/sys2900.c svneol=native#text/plain

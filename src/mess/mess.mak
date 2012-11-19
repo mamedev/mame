@@ -120,6 +120,7 @@ CPUS += HCD62121
 CPUS += PPS4
 CPUS += UPD7725
 CPUS += HD61700
+CPUS += LC8670
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
@@ -1596,6 +1597,7 @@ $(MESSOBJ)/sega.a:				\
 	$(MESS_MACHINE)/dccons.o	\
 	$(MESS_MACHINE)/sms.o	\
 	$(MESS_DRIVERS)/sms.o	\
+	$(MESS_DRIVERS)/svmu.o		\
 
 $(MESSOBJ)/sgi.a:				\
 	$(MESS_MACHINE)/sgi.o		\
