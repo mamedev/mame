@@ -2158,11 +2158,11 @@ int upd765_family_device::pll_t::get_next_bit(attotime &tm, floppy_image_device 
 		return -1;
 
 	ctime = next;
+	tm = next;
 
 	if(edge.is_never() || edge >= next) {
 		// No transition in the window means 0 and pll in free run mode
 		phase_adjust = attotime::zero;
-		tm = next;
 		return 0;
 	}
 
