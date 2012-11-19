@@ -290,7 +290,7 @@ READ8_MEMBER(apc_state::apc_port_60_r)
 	else
 	{
 		printf("Read melody port %02x\n",offset+0x60);
-		res = 0xff;
+		res = 0x80;
 	}
 
 	return res;
@@ -681,7 +681,8 @@ READ8_MEMBER(apc_state::test_r)
 
 WRITE8_MEMBER(apc_state::test_w)
 {
-	printf("2dd DACK W\n");
+	//	printf("2dd DACK W\n");
+	m_fdc->dma_w(data);
 }
 
 static I8237_INTERFACE( dmac_intf )
