@@ -752,6 +752,19 @@ static void GCU_w(running_machine &machine, int chip, UINT32 offset, UINT32 data
 						break;
 				}
 			}
+			else if (mame_strnicmp(machine.system().name, "kbm", 3) == 0)
+			{
+				switch (data)
+				{
+					case 0x00080000:	// post
+						state->m_layer = 0;
+						break;
+
+					case 0x0000c400:	// game & svn menu
+						state->m_layer = 2;
+						break;
+				}
+			}
 			break;
 
 		//case 0x44:    /* ??? */
