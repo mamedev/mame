@@ -4382,6 +4382,29 @@ ROM_START( mooncrs3 ) /* Bootleg by Jeutel, very similar to Moon Cresta (bootleg
 	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
 ROM_END
 
+ROM_START( mooncrs4 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mooncrs4.7k", 0x0000, 0x1000, CRC(5e201041) SHA1(2ab29e69b1cf9464e6a6a3574a3097cc2bd38432) )
+	ROM_LOAD( "mooncrs4.7j", 0x1000, 0x1000, CRC(8de07c8e) SHA1(7f520a57acb8acedd7b4e29d8367fe2b190efa37) )
+	ROM_LOAD( "mooncrs4.7h", 0x2000, 0x1000, CRC(888c6d61) SHA1(07404ac714aa1ff9e6bbffffa8afa76a5899ad75) )
+	ROM_LOAD( "mooncrs4.7f", 0x3000, 0x1000, CRC(492f9b01) SHA1(a301ef05411e7f2cc2c2433faf0933299c43c49a) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "mooncrs4.1h", 0x0800, 0x0200, CRC(f508a7a5) SHA1(0867ef190a0543411fe8e394c8f99669f4050433) )
+	ROM_CONTINUE(            0x0c00, 0x0200 )
+	ROM_CONTINUE(            0x0a00, 0x0200 )
+	ROM_CONTINUE(            0x0e00, 0x0200 )
+	ROM_CONTINUE(            0x0000, 0x0800 )
+	ROM_LOAD( "mooncrs4.1k", 0x1800, 0x0200, CRC(9b549313) SHA1(7f161b4de86bc64ada4bad84beab3585dde14944) )
+	ROM_CONTINUE(            0x1c00, 0x0200 )
+	ROM_CONTINUE(            0x1a00, 0x0200 )
+	ROM_CONTINUE(            0x1e00, 0x0200 )
+	ROM_CONTINUE(            0x1000, 0x0800 )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom.6l",     0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
 ROM_START( fantazia )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "f01.bin",      0x0000, 0x0800, CRC(d3e23863) SHA1(f0a6f7491fdf8aae214f40078b29b7aecdcf2f1e) )
@@ -4545,9 +4568,15 @@ ROM_START( sstarcrs )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "ss10",         0x0000, 0x0800, CRC(2a95b8ea) SHA1(b2f7f2d4aca55b8cbbb907c990b27c06b7b2d77b) )
-	ROM_LOAD( "ss12",         0x0800, 0x0800, CRC(b92c4c30) SHA1(4abc4c759e401be4edcce4f3f2d7b2b3f1827a99) )
+	ROM_LOAD( "ss12",         0x0800, 0x0200, CRC(b92c4c30) SHA1(4abc4c759e401be4edcce4f3f2d7b2b3f1827a99) )
+	ROM_CONTINUE(             0x0c00, 0x0200 )
+	ROM_CONTINUE(             0x0a00, 0x0200 )
+	ROM_CONTINUE(             0x0e00, 0x0200 )
 	ROM_LOAD( "ss9",          0x1000, 0x0800, CRC(3661e084) SHA1(bb5b8b7c9c61a0379a3f1eec02d61bbb385cd3e9) )
-	ROM_LOAD( "ss11",         0x1800, 0x0800, CRC(95613048) SHA1(b9ba1ca11ef3154a800a90adaa8c491bb944a3a2) )
+	ROM_LOAD( "ss11",         0x1800, 0x0200, CRC(95613048) SHA1(b9ba1ca11ef3154a800a90adaa8c491bb944a3a2) )
+	ROM_CONTINUE(             0x1c00, 0x0200 )
+	ROM_CONTINUE(             0x1a00, 0x0200 )
+	ROM_CONTINUE(             0x1e00, 0x0200 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	// not present in this set
@@ -4610,15 +4639,15 @@ ROM_START( mooncmw )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "68.1h",      0x0000, 0x0800, CRC(78663d86) SHA1(8648a3e60259404a05ad58b1641190e5b33a24eb) )
-	ROM_CONTINUE(			0x0800, 0x0200 )
-	ROM_CONTINUE(			0x0c00, 0x0200 )
-	ROM_CONTINUE(			0x0a00, 0x0200 )
-	ROM_CONTINUE(			0x0e00, 0x0200 )
+	ROM_CONTINUE(           0x0800, 0x0200 )
+	ROM_CONTINUE(           0x0c00, 0x0200 )
+	ROM_CONTINUE(           0x0a00, 0x0200 )
+	ROM_CONTINUE(           0x0e00, 0x0200 )
 	ROM_LOAD( "69.1k",      0x1000, 0x0800, CRC(162c50d3) SHA1(67d9c87782cf29c443590d7ad687fbeaa6218346) )
-	ROM_CONTINUE(			0x1800, 0x0200 )
-	ROM_CONTINUE(			0x1c00, 0x0200 )
-	ROM_CONTINUE(			0x1a00, 0x0200 )
-	ROM_CONTINUE(			0x1e00, 0x0200 )
+	ROM_CONTINUE(           0x1800, 0x0200 )
+	ROM_CONTINUE(           0x1c00, 0x0200 )
+	ROM_CONTINUE(           0x1a00, 0x0200 )
+	ROM_CONTINUE(           0x1e00, 0x0200 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "prom-sn74s288n-71.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
@@ -6474,6 +6503,7 @@ GAME( 1980, mooncrstg,  mooncrst, mooncrst, mooncrsg, galaxian_state, mooncrsu, 
 GAME( 1980, mooncrsb, mooncrst, mooncrst, mooncrsa, galaxian_state, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrs2, mooncrst, mooncrst, mooncrsa, galaxian_state, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrs3, mooncrst, mooncrst, mooncrst, galaxian_state, mooncrsu, ROT90,  "bootleg (Jeutel)", "Moon Cresta (bootleg set 3)", GAME_SUPPORTS_SAVE ) /* Jeutel bootleg, similar to bootleg set 2 */
+GAME( 1980, mooncrs4, mooncrst, mooncrst, mooncrst, galaxian_state, mooncrsu, ROT90,  "SG-Florence", "Moon Crest", GAME_SUPPORTS_SAVE )
 GAME( 1980, fantazia, mooncrst, mooncrst, fantazia, galaxian_state, mooncrsu, ROT90,  "bootleg? (Subelectro)", "Fantazia (bootleg?)", GAME_SUPPORTS_SAVE )
 GAME( 1980, eagle,    mooncrst, mooncrst, mooncrsa, galaxian_state, mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 1)", GAME_SUPPORTS_SAVE ) // or bootleg?
 GAME( 1980, eagle2,   mooncrst, mooncrst, eagle2, galaxian_state,   mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 2)", GAME_SUPPORTS_SAVE ) // "
