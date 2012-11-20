@@ -25,7 +25,7 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
-/* 0 B01234 G01234 R01234 */
+/* x B01234 G01234 R01234 */
 PALETTE_INIT_MEMBER(dynax_state,sprtmtch)
 {
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
@@ -40,6 +40,24 @@ PALETTE_INIT_MEMBER(dynax_state,sprtmtch)
 		int g = BITSWAP8((x >>  5) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
 		int b = BITSWAP8((x >> 10) & 0x1f, 7, 6, 5, 0, 1, 2, 3, 4);
 		palette_set_color_rgb(machine(), i, pal5bit(r), pal5bit(g), pal5bit(b));
+	}
+}
+
+/* x xB0123 xG0123 xR0123 */
+PALETTE_INIT_MEMBER(dynax_state,janyuki)
+{
+	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	if (!color_prom)
+		return;
+
+	for (int i = 0; i < machine().total_colors(); i++)
+	{
+		int x = (color_prom[i] << 8) + color_prom[0x200 + i];
+		/* The bits are in reverse order! */
+		int r = BITSWAP8((x >>  0) & 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
+		int g = BITSWAP8((x >>  5) & 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
+		int b = BITSWAP8((x >> 10) & 0x0f, 7, 6, 5, 4, 0, 1, 2, 3);
+		palette_set_color_rgb(machine(), i, pal4bit(r), pal4bit(g), pal4bit(b));
 	}
 }
 
@@ -440,7 +458,8 @@ static int blitter_drawgfx( running_machine &machine, int layer, int mask, const
 	{
 		if (src >= ROM_size)
 		{
-			popmessage("GFXROM OVER %08x",src);
+			popmessage("GFXROM %s OVER %08x",gfx,src);
+			LOG(("\nGFXROM %s OVER %08x",gfx,src));
 			return src;
 		}
 
@@ -467,7 +486,8 @@ static int blitter_drawgfx( running_machine &machine, int layer, int mask, const
 		case 0xd:	// Skip X pixels
 			if (src >= ROM_size)
 			{
-				popmessage("GFXROM OVER %08x",src);
+				popmessage("GFXROM %s OVER %08x",gfx,src);
+				LOG(("\nGFXROM %s OVER %08x",gfx,src));
 				return src;
 			}
 			x = sx + ROM[src++];
@@ -477,7 +497,8 @@ static int blitter_drawgfx( running_machine &machine, int layer, int mask, const
 		case 0xc:	// Draw N pixels
 			if (src >= ROM_size)
 			{
-				popmessage("GFXROM OVER %08x", src);
+				popmessage("GFXROM %s OVER %08x",gfx,src);
+				LOG(("\nGFXROM %s OVER %08x",gfx,src));
 				return src;
 			}
 			cmd = ROM[src++];
