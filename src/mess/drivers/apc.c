@@ -167,7 +167,7 @@ void apc_state::video_start()
 
 UINT32 apc_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	bitmap.fill(0, cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	/* graphics */
 	m_hgdc2->screen_update(screen, bitmap, cliprect);
@@ -248,7 +248,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				else
 					pen = (tile_data >> (xi) & 1) ? color : 0;
 
-				//if(pen)
+				if(pen)
 					bitmap.pix16(res_y, res_x) = pen;
 
 //              if(state->m_video_ff[WIDTH40_REG])

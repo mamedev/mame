@@ -67,8 +67,8 @@ public:
 	m_fdc(*this, "upd765"),
 	m_hgdc(*this, "upd7220"),
 	m_rtc(*this, "rtc"),
-	m_vram_bank(0),
-	m_video_ram(*this, "video_ram"){ }
+	m_vram_bank(0)
+	{ }
 
 	required_device<device_t> m_pit_1;
 	required_device<device_t> m_pit_2;
@@ -82,7 +82,10 @@ public:
 	required_device<upd7220_device> m_hgdc;
 	required_device<mc146818_device> m_rtc;
 	UINT8 m_vram_bank;
-	required_shared_ptr<UINT8> m_video_ram;
+	//required_shared_ptr<UINT8> m_video_ram;
+	UINT8 *m_video_ram;
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -156,9 +159,9 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 
 	if(state->m_color_mode)
 	{
-		gfx[0] = state->m_video_ram[(address * 2) + 0x00000];
-		gfx[1] = state->m_video_ram[(address * 2) + 0x20000];
-		gfx[2] = state->m_video_ram[(address * 2) + 0x40000];
+		gfx[0] = state->m_video_ram[(address) + 0x00000];
+		gfx[1] = state->m_video_ram[(address) + 0x20000];
+		gfx[2] = state->m_video_ram[(address) + 0x40000];
 	}
 	else
 	{
@@ -228,6 +231,15 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 			}
 		}
 	}
+}
+
+UINT32 qx10_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	bitmap.fill(get_black_pen(machine()), cliprect);
+
+	m_hgdc->screen_update(screen, bitmap, cliprect);
+
+	return 0;
 }
 
 /*
@@ -963,7 +975,7 @@ GFXDECODE_END
 void qx10_state::video_start()
 {
 	// allocate memory
-	//m_video_ram = auto_alloc_array_clear(machine(), UINT8, 0x60000);
+	m_video_ram = auto_alloc_array_clear(machine(), UINT8, 0x60000);
 
 	// find memory regions
 	m_char_rom = memregion("chargen")->base();
@@ -1007,8 +1019,7 @@ WRITE8_MEMBER( qx10_state::vram_w )
 }
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, qx10_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_SHARE("video_ram")
+	AM_RANGE(0x00000, 0x5ffff) AM_READWRITE(vram_r,vram_w)
 ADDRESS_MAP_END
 
 
@@ -1022,7 +1033,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
+	MCFG_SCREEN_UPDATE_DRIVER(qx10_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_GFXDECODE(qx10)
