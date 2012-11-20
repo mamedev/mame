@@ -57,7 +57,6 @@ starfira has one less rom in total than starfire but everything passes as
 
 WRITE8_MEMBER(starfire_state::starfire_scratch_w)
 {
-
     /* A12 and A3 select video control registers */
 	if ((offset & 0x1008) == 0x1000)
 	{
@@ -69,6 +68,7 @@ WRITE8_MEMBER(starfire_state::starfire_scratch_w)
 				/* Sounds */
 				m_fireone_select = (data & 0x8) ? 0 : 1;
 				break;
+			default: break;
 		}
 	}
 
@@ -80,7 +80,6 @@ WRITE8_MEMBER(starfire_state::starfire_scratch_w)
 
 READ8_MEMBER(starfire_state::starfire_scratch_r)
 {
-
     /* A11 selects input ports */
 	if (offset & 0x800)
 		return m_input_read(space, offset, 0xff);
@@ -204,6 +203,11 @@ static INPUT_PORTS_START( starfire )
 
 	PORT_START("STICKZ")	/* IN4 */ /* throttle */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE
+
+	PORT_START("NMI")
+	PORT_CONFNAME( 0x01, 0x01, "Jumper J6/4G: Enable NMI" )
+	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 
@@ -258,18 +262,24 @@ INPUT_PORTS_END
  *
  *************************************/
 
+INTERRUPT_GEN_MEMBER(starfire_state::vblank_int)
+{
+	// starfire has a jumper for disabling NMI, used to do a complete RAM test
+	if (ioport("NMI")->read_safe(0x01))
+		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static MACHINE_CONFIG_START( starfire, starfire_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, STARFIRE_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", starfire_state,  nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", starfire_state, vblank_int)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(STARFIRE_PIXEL_CLOCK, STARFIRE_HTOTAL, STARFIRE_HBEND, STARFIRE_HBSTART, STARFIRE_VTOTAL, STARFIRE_VBEND, STARFIRE_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(starfire_state, screen_update_starfire)
-
 
 	/* audio hardware */
 MACHINE_CONFIG_END
@@ -371,13 +381,11 @@ ROM_END
 
 DRIVER_INIT_MEMBER(starfire_state,starfire)
 {
-
 	m_input_read = read8_delegate(FUNC(starfire_state::starfire_input_r),this);
 }
 
 DRIVER_INIT_MEMBER(starfire_state,fireone)
 {
-
 	m_input_read = read8_delegate(FUNC(starfire_state::fireone_input_r),this);
 
 	/* register for state saving */
@@ -394,5 +402,5 @@ DRIVER_INIT_MEMBER(starfire_state,fireone)
 
 GAME( 1979, starfire, 0,        starfire, starfire, starfire_state, starfire, ROT0, "Exidy", "Star Fire (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1979, starfirea,starfire, starfire, starfire, starfire_state, starfire, ROT0, "Exidy", "Star Fire (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1979, fireone,  0,        starfire, fireone, starfire_state,  fireone,  ROT0, "Exidy", "Fire One", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, fireone,  0,        starfire, fireone,  starfire_state, fireone,  ROT0, "Exidy", "Fire One", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1979, starfir2, 0,        starfire, starfire, starfire_state, starfire, ROT0, "Exidy", "Star Fire 2", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

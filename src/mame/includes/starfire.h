@@ -1,3 +1,8 @@
+/***************************************************************************
+
+    Star Fire/Fire One system
+
+***************************************************************************/
 
 #define STARFIRE_MASTER_CLOCK	(20000000)
 #define STARFIRE_CPU_CLOCK		(STARFIRE_MASTER_CLOCK / 8)
@@ -14,9 +19,10 @@ class starfire_state : public driver_device
 {
 public:
 	starfire_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
 		m_starfire_colorram(*this, "colorram"),
-		m_starfire_videoram(*this, "videoram"){ }
+		m_starfire_videoram(*this, "videoram")
+	{ }
 
     read8_delegate m_input_read;
 
@@ -45,4 +51,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_starfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(starfire_scanline_callback);
+	INTERRUPT_GEN_MEMBER(vblank_int);
 };
