@@ -57,11 +57,13 @@
 #include "machine/pit8253.h"
 #include "machine/am9517a.h"
 #include "machine/upd765.h"
+#include "machine/nvram.h"
 #include "video/upd7220.h"
 #include "imagedev/flopdrv.h"
 #include "formats/mfi_dsk.h"
 #include "formats/d88_dsk.h"
 #include "formats/imd_dsk.h"
+
 //#include "sound/ay8910.h"
 
 class apc_state : public driver_device
@@ -227,8 +229,8 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(reverse) { tile_data^=0xff; }
 				if(u_line && yi == lr-1) { tile_data = 0xff; }
 				if(o_line && yi == 0) { tile_data = 0xff; }
-				if(v_line)  { tile_data|=8; }
-				if(blink && device->machine().primary_screen->frame_number() & 0x10) { tile_data = 0; } // TODO: rate & correct behaviour
+				if(v_line)  { tile_data|=1; }
+				if(blink && device->machine().primary_screen->frame_number() & 0x20) { tile_data = 0; } // TODO: rate & correct behaviour
 
 				if(cursor_on && cursor_addr == tile_addr && device->machine().primary_screen->frame_number() & 0x10)
 					tile_data^=0xff;
@@ -405,9 +407,9 @@ WRITE8_MEMBER(apc_state::apc_dma_w)
 
 static ADDRESS_MAP_START( apc_map, AS_PROGRAM, 16, apc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
-//  AM_RANGE(0xa0000, 0xa0fff) CMOS
+	AM_RANGE(0xa0000, 0xa0fff) AM_RAM AM_SHARE("cmos")
 //	AM_RANGE(0xc0000, 0xcffff) standard character ROM
-//	AM_RANGE(0xde000, 0xdffff) AUX character RAM
+	AM_RANGE(0xd8000, 0xdffff) AM_RAM // AUX character RAM
 //	AM_RANGE(0xe0000, 0xeffff) Special Character RAM
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
@@ -909,6 +911,8 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
 	MCFG_I8237_ADD("i8237", MAIN_CLOCK, dmac_intf)
+
+	MCFG_NVRAM_ADD_1FILL("cmos")
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", apc_floppies, "8", 0, apc_floppy_formats)
