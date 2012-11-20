@@ -536,9 +536,12 @@ bool d88_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 				if(size) {
 					sects[i].data    = sect_data + sdatapos;
-					io_generic_read(io, sects[i].data, pos+16, size);
+					io_generic_read(io, sects[i].data, pos, size);
 					pos += size;
-				}
+					sdatapos += size;
+
+				} else
+					sects[i].data    = NULL;
 			}
 
 			build_pc_track_mfm(track, head, image, cell_count, sector_count, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
