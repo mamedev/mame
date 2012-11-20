@@ -1,13 +1,5 @@
 /*
 
-    ADC Super Six SBC
-
-    Skeleton driver
-
-*/
-
-/*
-
     TODO:
 
     - floppy (cannot be implemented currently since this is another case of halting the cpu mid-instruction)
@@ -199,7 +191,7 @@ READ8_MEMBER( super6_state::fdc_r )
 
 	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 
-	return !wd17xx_intrq_r(m_fdc) << 7;
+	return !m_fdc->intrq_r() << 7;
 }
 
 
@@ -225,15 +217,19 @@ WRITE8_MEMBER( super6_state::fdc_w )
     */
 
 	// disk drive select
-	wd17xx_set_drive(m_fdc, data & 0x03);
-	floppy_mon_w(m_floppy0, 0);
-	floppy_mon_w(m_floppy1, 0);
+	floppy_image_device *m_floppy = NULL;
+
+	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();
+
+	m_fdc->set_floppy(m_floppy);
+	if (m_floppy) m_floppy->mon_w(0);
 
 	// head select
-	wd17xx_set_side(m_fdc, BIT(data, 2));
+	if (m_floppy) m_floppy->ss_w(BIT(data, 2));
 
 	// disk density
-	wd17xx_dden_w(m_fdc, !BIT(data, 3));
+	m_fdc->dden_w(!BIT(data, 3));
 }
 
 
@@ -285,7 +281,7 @@ static ADDRESS_MAP_START( super6_io, AS_IO, 8, super6_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY(WD2793_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(WD2793_TAG, wd2793_t, read, write)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
 	AM_RANGE(0x14, 0x14) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x15, 0x15) AM_READ_PORT("J7") AM_WRITE(s100_w)
@@ -349,7 +345,7 @@ INPUT_PORTS_END
 //  Z80CTC_INTERFACE( ctc_intf )
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK_MEMBER(super6_state::ctc_tick)
+TIMER_DEVICE_CALLBACK_MEMBER( super6_state::ctc_tick )
 {
 	m_ctc->trg0(1);
 	m_ctc->trg0(0);
@@ -448,48 +444,33 @@ static COM8116_INTERFACE( brg_intf )
 
 
 //-------------------------------------------------
-//  floppy_interface super6_floppy_interface
+//  floppy_format_type floppy_formats
 //-------------------------------------------------
 
-static const floppy_interface super6_floppy_interface =
-{
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    FLOPPY_STANDARD_5_25_DSHD,
-    LEGACY_FLOPPY_OPTIONS_NAME(default),
-    "floppy_5_25",
+const floppy_format_type super6_state::floppy_formats[] = {
+	FLOPPY_IMD_FORMAT,
+	FLOPPY_MFM_FORMAT,
+	FLOPPY_MFI_FORMAT,
 	NULL
 };
 
+static SLOT_INTERFACE_START( super6_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
 
-//-------------------------------------------------
-//  wd17xx_interface fdc_intf
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( super6_state::intrq_w )
+void super6_state::fdc_intrq_w(bool state)
 {
 	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 
 	m_ctc->trg3(!state);
 }
 
-WRITE_LINE_MEMBER( super6_state::drq_w )
+void super6_state::fdc_drq_w(bool state)
 {
 	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 
 	m_dma->rdy_w(state);
 }
-
-static const wd17xx_interface fdc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(super6_state, intrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(super6_state, drq_w),
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
 
 
 //-------------------------------------------------
@@ -509,14 +490,14 @@ static const z80_daisy_config super6_daisy_chain[] =
 //  GENERIC_TERMINAL_INTERFACE( terminal_intf )
 //-------------------------------------------------
 
-WRITE8_MEMBER(super6_state::dummy_w)
+WRITE8_MEMBER( super6_state::dummy_w )
 {
 	// handled in Z80DART_INTERFACE
 }
 
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 {
-	DEVCB_DRIVER_MEMBER(super6_state,dummy_w)
+	DEVCB_DRIVER_MEMBER(super6_state, dummy_w)
 };
 
 
@@ -531,6 +512,10 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 
 void super6_state::machine_start()
 {
+	// floppy callbacks
+	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(super6_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(super6_state::fdc_drq_w), this));
+
 	// state saving
 	save_item(NAME(m_s100));
 	save_item(NAME(m_bank0));
@@ -572,9 +557,10 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_24MHz/4, dart_intf)
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_24MHz/6, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_24MHz/4, pio_intf)
-	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
+	MCFG_WD2793x_ADD(WD2793_TAG, 1000000)
 	MCFG_COM8116_ADD(BR1945_TAG, XTAL_5_0688MHz, brg_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(super6_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", super6_floppies, "525dd", NULL, super6_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", super6_floppies, NULL,   NULL, super6_state::floppy_formats)
 	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 4800)
 
 	// internal ram
@@ -597,7 +583,11 @@ MACHINE_CONFIG_END
 
 ROM_START( super6 )
 	ROM_REGION( 0x800, Z80_TAG, 0 )
-	ROM_LOAD( "digitex monitor 1.2a 6oct1983.u29", 0x000, 0x800, CRC(a4c33ce4) SHA1(46dde43ea51d295f2b3202c2d0e1883bde1a8da7) )
+	ROM_DEFAULT_BIOS( "v36" )
+	ROM_SYSTEM_BIOS( 0, "v36", "ADC S6 v3.6" )
+	ROMX_LOAD( "adcs6_v3.6.u29", 0x000, 0x800, CRC(386fd22a) SHA1(9c177990aa180ab93be9c4641e92ae934627e661), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v12", "Digitex Monitor v1.2a" )
+	ROMX_LOAD( "digitex monitor 1.2a 6oct1983.u29", 0x000, 0x800, CRC(a4c33ce4) SHA1(46dde43ea51d295f2b3202c2d0e1883bde1a8da7), ROM_BIOS(2) )
 
 	ROM_REGION( 0x800, "plds", 0 )
 	ROM_LOAD( "pal16l8.u16", 0x000, 0x800, NO_DUMP )

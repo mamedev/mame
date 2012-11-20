@@ -3,11 +3,12 @@
 #ifndef __SUPER6__
 #define __SUPER6__
 
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "formats/basicdsk.h"
+#include "formats/hxcmfm_dsk.h"
+#include "formats/imd_dsk.h"
+#include "formats/mfi_dsk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/com8116.h"
 #include "machine/z80ctc.h"
@@ -16,7 +17,7 @@
 #include "machine/z80pio.h"
 #include "machine/ram.h"
 #include "machine/terminal.h"
-#include "machine/wd17xx.h"
+#include "machine/wd1772.h"
 
 #define Z80_TAG			"u30"
 #define Z80CTC_TAG		"u20"
@@ -41,8 +42,8 @@ public:
 		  m_fdc(*this, WD2793_TAG),
 		  m_brg(*this, BR1945_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1),
+		  m_floppy0(*this, WD2793_TAG":0"),
+		  m_floppy1(*this, WD2793_TAG":1"),
 		  m_terminal(*this, TERMINAL_TAG)
 	{ }
 
@@ -51,11 +52,11 @@ public:
 	required_device<z80dart_device> m_dart;
 	required_device<z80dma_device> m_dma;
 	required_device<z80pio_device> m_pio;
-	required_device<device_t> m_fdc;
+	required_device<wd2793_t> m_fdc;
 	required_device<com8116_device> m_brg;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_floppy0;
-	required_device<device_t> m_floppy1;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 	required_device<serial_terminal_device> m_terminal;
 
 	virtual void machine_start();
@@ -68,8 +69,9 @@ public:
 	DECLARE_WRITE8_MEMBER( bank1_w );
 	DECLARE_WRITE8_MEMBER( baud_w );
 	DECLARE_WRITE_LINE_MEMBER( fr_w );
-	DECLARE_WRITE_LINE_MEMBER( intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
+	void fdc_intrq_w(bool state);
+	void fdc_drq_w(bool state);
+	static const floppy_format_type floppy_formats[];
 
 	void bankswitch();
 
