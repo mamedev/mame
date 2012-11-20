@@ -185,7 +185,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
 	apc_state *state = device->machine().driver_data<apc_state>();
-	int xi,yi;
+	int xi,yi,yi_trans;
 	int x;
 	UINT8 char_size;
 //  UINT8 interlace_on;
@@ -220,6 +220,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 		for(yi=0;yi<lr;yi++)
 		{
+			yi_trans = (yi==0)?lr-1:yi-1;
 			for(xi=0;xi<8;xi++)
 			{
 				int res_x,res_y;
@@ -232,7 +233,23 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					continue;
 
 //              tile_data = secret ? 0 : (state->m_char_rom[tile*char_size+interlace_on*0x800+yi]);
-				tile_data = (state->m_char_rom[(tile & 0x7f)+((tile & 0x80)<<4)+((yi & 0xf)*0x80)+((yi & 0x10)<<8)]);
+				/*
+				 Addr bus:   C BA98 7654 3210
+				             | |||| |\\\ \\\\- character number bits 0-6
+				             | |||| \--------- y' bit 0
+				             | |||\----------- y' bit 1
+				             | ||\------------ y' bit 2
+				             | |\------------- y' bit 3
+				             | \-------------- character number bit 7
+				             \---------------- y' bit 4
+
+				y to y' (assumed; this needs hardware tests since there could be one more 'blank' line between all char rows):
+				y  =  0 1 2 3 ... 16 17 18
+				y' = 18 0 1 2 ... 15 16 17
+
+				 Data bus: 76543210 = pixels, in left->01234567->right order
+				 */
+				tile_data = (state->m_char_rom[(tile & 0x7f)+((tile & 0x80)<<4)+((yi_trans & 0xf)*0x80)+((yi_trans & 0x10)<<8)]);
 
 				if(reverse) { tile_data^=0xff; }
 				if(u_line && yi == lr-1) { tile_data = 0xff; }
