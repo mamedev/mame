@@ -1700,7 +1700,6 @@ WRITE8_MEMBER(pc8801_state::pc8801_baudrate_w)
 
 WRITE8_MEMBER(pc8801_state::pc8801_rtc_w)
 {
-
 	m_rtc->c0_w((data & 1) >> 0);
 	m_rtc->c1_w((data & 2) >> 1);
 	m_rtc->c2_w((data & 4) >> 2);

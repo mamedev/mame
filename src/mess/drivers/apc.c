@@ -57,6 +57,7 @@
 #include "machine/pit8253.h"
 #include "machine/am9517a.h"
 #include "machine/upd765.h"
+#include "machine/upd1990a.h"
 #include "machine/nvram.h"
 #include "video/upd7220.h"
 #include "imagedev/flopdrv.h"
@@ -66,6 +67,8 @@
 
 //#include "sound/ay8910.h"
 
+#define MAIN_CLOCK XTAL_5MHz
+
 class apc_state : public driver_device
 {
 public:
@@ -74,6 +77,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_hgdc1(*this, "upd7220_chr"),
 		m_hgdc2(*this, "upd7220_btm"),
+		m_rtc(*this, "upd1990a"),
 		m_i8259_m(*this, "pic8259_master"),
 		m_i8259_s(*this, "pic8259_slave"),
 		m_fdc(*this, "upd765"),
@@ -86,6 +90,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7220_device> m_hgdc1;
 	required_device<upd7220_device> m_hgdc2;
+	required_device<upd1990a_device> m_rtc;
 	required_device<pic8259_device> m_i8259_m;
 	required_device<pic8259_device> m_i8259_s;
 	required_device<upd765a_device> m_fdc;
@@ -110,6 +115,9 @@ public:
 	DECLARE_WRITE8_MEMBER(apc_dma_segments_w);
 	DECLARE_READ8_MEMBER(apc_dma_r);
 	DECLARE_WRITE8_MEMBER(apc_dma_w);
+	DECLARE_WRITE8_MEMBER(apc_irq_ack_w);
+	DECLARE_READ8_MEMBER(apc_rtc_r);
+	DECLARE_WRITE8_MEMBER(apc_rtc_w);
 
 	struct {
 		UINT8 status; //status
@@ -404,12 +412,37 @@ WRITE8_MEMBER(apc_state::apc_dma_w)
 	machine().device<am9517a_device>("i8237")->write(space, BITSWAP8(offset,7,6,5,4,2,1,0,3), data, 0xff);
 }
 
+WRITE8_MEMBER(apc_state::apc_irq_ack_w)
+{
+	if(data & 4)
+		pic8259_ir3_w(machine().device("pic8259_master"), 0);
+
+	if(data & ~4)
+		logerror("IRQ ACK %02x\n",data);
+}
+
+/* TODO: bit arrangement is completely wrong */
+READ8_MEMBER(apc_state::apc_rtc_r)
+{
+	return m_rtc->data_out_r();
+}
+
+WRITE8_MEMBER(apc_state::apc_rtc_w)
+{
+	m_rtc->data_in_w(BIT(data, 0));
+	m_rtc->stb_w(BIT(data, 1));
+	m_rtc->clk_w(BIT(data, 2));
+	m_rtc->oe_w(BIT(data, 3));
+	m_rtc->c0_w(BIT(data, 3));
+	m_rtc->c1_w(BIT(data, 4));
+	m_rtc->c2_w(BIT(data, 5));
+}
 
 static ADDRESS_MAP_START( apc_map, AS_PROGRAM, 16, apc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
 	AM_RANGE(0xa0000, 0xa0fff) AM_RAM AM_SHARE("cmos")
 //	AM_RANGE(0xc0000, 0xcffff) standard character ROM
-//	AM_RANGE(0xd8000, 0xdffff) AM_RAM // AUX character RAM
+	AM_RANGE(0xd8000, 0xdffff) AM_RAM // AUX character RAM
 //	AM_RANGE(0xe0000, 0xeffff) Special Character RAM
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
@@ -422,9 +455,10 @@ static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 //  0x30, 0x37 serial port 0/1 (i8251) (even/odd)
 	AM_RANGE(0x38, 0x3f) AM_WRITE8(apc_dma_segments_w,0x00ff)
 	AM_RANGE(0x40, 0x43) AM_READWRITE8(apc_gdc_r, apc_gdc_w, 0xffff)
-//  0x46 UPD7220 reset interrupt
+	AM_RANGE(0x46, 0x47) AM_WRITE8(apc_irq_ack_w, 0x00ff)
 	AM_RANGE(0x48, 0x4f) AM_READWRITE8(apc_kbd_r, apc_kbd_w, 0x00ff)
 	AM_RANGE(0x50, 0x53) AM_DEVICE8("upd765", upd765a_device, map, 0x00ff ) // upd765
+	AM_RANGE(0x58, 0x59) AM_READWRITE8(apc_rtc_r, apc_rtc_w, 0x00ff)
 //  0x5a  APU data (Arithmetic Processing Unit!)
 //  0x5e  APU status/command
 	AM_RANGE(0x60, 0x67) AM_READWRITE8(apc_port_60_r, apc_port_60_w, 0xffff)
@@ -503,7 +537,7 @@ static INPUT_PORTS_START( apc )
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("[ / {") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x5b)
 	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\\ / |") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x5c)
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("] / }") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x5d)
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("¯ / ^") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x5e)
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("(up score) / ^") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x5e)
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("- / _") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x5f)
 //	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("unk6") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x26)
 
@@ -638,13 +672,14 @@ CASETBL:
 	BYTE	0X08			; 9C - back space
 */
 	PORT_START("KEY_S1")
-	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_ESC) PORT_CHAR(0x00) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x96)
+	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CHAR(0x00) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x96)
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(0x0d) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x97)
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("TAB") /*PORT_CODE(KEYCODE_TAB)*/ PORT_CHAR(0x09) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x98)
 	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_UNUSED) //0x99
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("HOME") PORT_CODE(KEYCODE_HOME) PORT_CHAR(0x1e) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x9a)
 	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_UNUSED) //0x9b
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("BACK SPACE") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(0x08) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x9c)
+	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ESC") PORT_CHAR(0x1b) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x1b)
 
 /*
 	BYTE	0X0B			; F7 - up arrow
@@ -667,7 +702,6 @@ CASETBL:
 	PORT_START("KEY_MOD")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-
 INPUT_PORTS_END
 
 void apc_state::fdc_drq(bool state)
@@ -696,6 +730,9 @@ void apc_state::machine_start()
 	m_fdc->set_rate(500000);
 	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(apc_state::fdc_irq), this));
 	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(apc_state::fdc_drq), this));
+
+	m_rtc->cs_w(1);
+//	m_rtc->oe_w(1);
 }
 
 void apc_state::machine_reset()
@@ -764,15 +801,15 @@ static const struct pit8253_config pit8253_config =
 {
 	{
 		{
-			1996800,              /* heartbeat IRQ */
+			MAIN_CLOCK,              /* heartbeat IRQ */
+			DEVCB_NULL,
+			DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir3_w)
+		}, {
+			MAIN_CLOCK,              /* Memory Refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			1996800,              /* Memory Refresh */
-			DEVCB_NULL,
-			DEVCB_NULL
-		}, {
-			1996800,              /* RS-232c */
+			MAIN_CLOCK,              /* RS-232c */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}
@@ -910,6 +947,12 @@ static I8237_INTERFACE( dmac_intf )
 	{ DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dack3_w) }
 };
 
+static UPD1990A_INTERFACE( apc_upd1990a_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 static const floppy_format_type apc_floppy_formats[] = {
 	FLOPPY_D88_FORMAT,
 	FLOPPY_IMD_FORMAT,
@@ -931,8 +974,6 @@ PALETTE_INIT_MEMBER(apc_state,apc)
 		palette_set_color_rgb(machine(), i, pal1bit(0), pal1bit(0), pal1bit(0));
 }
 
-#define MAIN_CLOCK XTAL_5MHz
-
 static MACHINE_CONFIG_START( apc, apc_state )
 
 	/* basic machine hardware */
@@ -946,6 +987,7 @@ static MACHINE_CONFIG_START( apc, apc_state )
 	MCFG_I8237_ADD("i8237", MAIN_CLOCK, dmac_intf)
 
 	MCFG_NVRAM_ADD_1FILL("cmos")
+	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, apc_upd1990a_intf)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", apc_floppies, "8", 0, apc_floppy_formats)
