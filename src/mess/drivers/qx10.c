@@ -313,7 +313,7 @@ static const floppy_format_type qx10_floppy_formats[] = {
 };
 
 static SLOT_INTERFACE_START( qx10_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
 void qx10_state::qx10_upd765_interrupt(bool state)
@@ -1040,8 +1040,8 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_UPD7220_ADD("upd7220", MAIN_CLK/4, hgdc_intf, upd7220_map)
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", qx10_floppies, "525hd", 0, qx10_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", qx10_floppies, "525hd", 0, qx10_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", qx10_floppies, "525dd", 0, qx10_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", qx10_floppies, "525dd", 0, qx10_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
