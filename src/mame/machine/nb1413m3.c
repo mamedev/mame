@@ -42,7 +42,7 @@ static int nb1413m3_outcoin_flag;
 
 #define NB1413M3_TIMER_BASE 20000000
 
-/* TODO: is all of this actually programmable in some way? */
+/* TODO: is all of this actually programmable? */
 static TIMER_CALLBACK( nb1413m3_timer_callback )
 {
 	machine.scheduler().timer_set(attotime::from_hz(NB1413M3_TIMER_BASE) * 256, FUNC(nb1413m3_timer_callback));
@@ -59,7 +59,6 @@ static TIMER_CALLBACK( nb1413m3_timer_callback )
 			nb1413m3_nmi_count++;
 		}
 
-#if 1
 		switch (nb1413m3_type)
 		{
 			case NB1413M3_TAIWANMB:
@@ -71,55 +70,12 @@ static TIMER_CALLBACK( nb1413m3_timer_callback )
 			case NB1413M3_PASTELG:
 				nb1413m3_74ls193_counter = 0x02;	// 96 ???
 				break;
-			//case NB1413M3_HYHOO:
+			case NB1413M3_HYHOO:
 			case NB1413M3_HYHOO2:
 				nb1413m3_74ls193_counter = 0x05;	// 128 ???
 				break;
 		}
-#endif
 	}
-
-#if 0
-	// nbmj1413m3_nmi_clock_w ?w??
-	// ----------------------------------------------------------------------------------------------------------------
-	//                      nbmj8688    Z80:5.00MHz (20000000/4)
-	// 7    144-145         mjsikaku, mjsikakb, otonano, mjcamera
-
-	// ----------------------------------------------------------------------------------------------------------------
-	//                      nbmj8891    Z80:5.00MHz (20000000/4)
-	// 7    144-145         msjiken, telmahjn, mjcamerb, mmcamera
-
-	// ----------------------------------------------------------------------------------------------------------------
-	//                      nbmj8688    Z80:5.00MHz (20000000/4)
-	// 6    130-131         kaguya, kaguya2, idhimitu
-
-	// ----------------------------------------------------------------------------------------------------------------
-	//                      nbmj8891    Z80:5.00MHz (20000000/4)
-	// 6    130-131         hanamomo, gionbana, mgion, abunai, mjfocus, mjfocusm, peepshow, scandal, scandalm, mgmen89,
-	//                      mjnanpas, mjnanpaa, mjnanpau, bananadr, mladyhtr, chinmoku, club90s, club90sa, lovehous,
-	//                      maiko, mmaiko, hanaoji, pairsten
-
-	// ----------------------------------------------------------------------------------------------------------------
-	//                      nbmj8991    Z80:5MHz (25000000/5)
-	// 6    130-131         galkoku, hyouban, galkaika, tokyogal, tokimbsj, mcontest, uchuuai
-
-	// ----------------------------------------------------------------------------------------------------------------
-	//                      nbmj8688    Z80:5.00MHz (20000000/4)
-	// 6     81- 82         crystalg(DAC?????x??),  crystal2(DAC?????x??)
-	// 6    130-131         bijokkoy(?A?j????), bijokkog(?A?j????)
-
-	// ----------------------------------------------------------------------------------------------------------------
-	//                      nbmj8688    Z80:5.00MHz (20000000/4)
-	// 4    108-109         bijokkoy(?A?j????), bijokkog(?A?j????)
-
-	// ----------------------------------------------------------------------------------------------------------------
-
-	// nbmj1413m3_nmi_clock_w ???w??
-	//*5    130-131?        hyhoo, hyhoo2   5.00MHz (????????DAC???????x???????????c)
-	//*5    130-131?        taiwanmb        5.00MHz (???@??????????DAC???????x?s??)
-	//*5    128-129?        omotesnd        5.00MHz
-	//*2    100-101?        pastelg         2.496MHz (19968000/8) ???
-#endif
 }
 
 MACHINE_START( nb1413m3 )
