@@ -505,7 +505,7 @@ void upd765_family_device::dma_w(UINT8 data)
 	fifo_push(data, false);
 }
 
-void upd765_family_device::live_start(floppy_info &fi, int state, bool mfm)
+void upd765_family_device::live_start(floppy_info &fi, int state)
 {
 	cur_live.tm = machine().time();
 	cur_live.state = state;
@@ -630,11 +630,18 @@ void upd765_family_device::live_run(attotime limit)
 					cur_live.bit_counter);
 #endif
 
-			if(cur_live.shift_reg == 0x4489) {
+			if(mfm && cur_live.shift_reg == 0x4489) {
 				cur_live.crc = 0x443b;
 				cur_live.data_separator_phase = false;
 				cur_live.bit_counter = 0;
 				cur_live.state = READ_HEADER_BLOCK_HEADER;
+			}
+
+			if(!mfm && cur_live.shift_reg == 0xf57e) {
+				cur_live.crc = 0xef21;
+				cur_live.data_separator_phase = false;
+				cur_live.bit_counter = 0;
+				cur_live.state = READ_ID_BLOCK;
 			}
 			break;
 
@@ -674,30 +681,6 @@ void upd765_family_device::live_run(attotime limit)
 			break;
 		}
 
-		case SEARCH_ADDRESS_MARK_HEADER_FM:
-			if(read_one_bit(limit))
-				return;
-#if 0
-			fprintf(stderr, "%s: shift = %04x data=%02x c=%d\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
-					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
-					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
-					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
-					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
-					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
-					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
-					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
-					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
-					cur_live.bit_counter);
-#endif
-
-			if(cur_live.shift_reg == 0xf57e) {
-				cur_live.crc = 0xef21;
-				cur_live.data_separator_phase = false;
-				cur_live.bit_counter = 0;
-				cur_live.state = READ_ID_BLOCK;
-			}
-			break;
-
 		case READ_ID_BLOCK: {
 			if(read_one_bit(limit))
 				return;
@@ -730,18 +713,35 @@ void upd765_family_device::live_run(attotime limit)
 					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
 					cur_live.bit_counter >> 4, cur_live.bit_counter & 15);
 #endif
-			// Large tolerance due to perpendicular recording at extended density
-			if(cur_live.bit_counter > 62*16) {
-				live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
-				return;
+
+			if(mfm) {
+				// Large tolerance due to perpendicular recording at extended density
+				if(cur_live.bit_counter > 62*16) {
+					live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
+					return;
+				}
+
+				if(cur_live.bit_counter >= 28*16 && cur_live.shift_reg == 0x4489) {
+					cur_live.crc = 0x443b;
+					cur_live.data_separator_phase = false;
+					cur_live.bit_counter = 0;
+					cur_live.state = READ_DATA_BLOCK_HEADER;
+				}
+
+			} else {
+				if(cur_live.bit_counter > 23*16) {
+					live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
+					return;
+				}
+
+				if(cur_live.bit_counter >= 11*16 && (cur_live.shift_reg == 0xf56a || cur_live.shift_reg == 0xf56f)) {
+					cur_live.crc = cur_live.shift_reg == 0xf56a ? 0x8fe7 : 0xbf84;
+					cur_live.data_separator_phase = false;
+					cur_live.bit_counter = 0;
+					cur_live.state = READ_SECTOR_DATA;
+				}
 			}
 
-			if(cur_live.bit_counter >= 28*16 && cur_live.shift_reg == 0x4489) {
-				cur_live.crc = 0x443b;
-				cur_live.data_separator_phase = false;
-				cur_live.bit_counter = 0;
-				cur_live.state = READ_DATA_BLOCK_HEADER;
-			}
 			break;
 
 		case READ_DATA_BLOCK_HEADER: {
@@ -787,34 +787,6 @@ void upd765_family_device::live_run(attotime limit)
 			cur_live.state = IDLE;
 			return;
 
-		case SEARCH_ADDRESS_MARK_DATA_FM:
-			if(read_one_bit(limit))
-				return;
-#if 0
-			fprintf(stderr, "%s: shift = %04x data=%02x c=%d.%x\n", tts(cur_live.tm).cstr(), cur_live.shift_reg,
-					(cur_live.shift_reg & 0x4000 ? 0x80 : 0x00) |
-					(cur_live.shift_reg & 0x1000 ? 0x40 : 0x00) |
-					(cur_live.shift_reg & 0x0400 ? 0x20 : 0x00) |
-					(cur_live.shift_reg & 0x0100 ? 0x10 : 0x00) |
-					(cur_live.shift_reg & 0x0040 ? 0x08 : 0x00) |
-					(cur_live.shift_reg & 0x0010 ? 0x04 : 0x00) |
-					(cur_live.shift_reg & 0x0004 ? 0x02 : 0x00) |
-					(cur_live.shift_reg & 0x0001 ? 0x01 : 0x00),
-					cur_live.bit_counter >> 4, cur_live.bit_counter & 15);
-#endif
-			if(cur_live.bit_counter > 23*16) {
-				live_delay(SEARCH_ADDRESS_MARK_DATA_FAILED);
-				return;
-			}
-
-			if(cur_live.bit_counter >= 11*16 && (cur_live.shift_reg == 0xf56a || cur_live.shift_reg == 0xf56f)) {
-				cur_live.crc = cur_live.shift_reg == 0xf56a ? 0x8fe7 : 0xbf84;
-				cur_live.data_separator_phase = false;
-				cur_live.bit_counter = 0;
-				cur_live.state = READ_SECTOR_DATA;
-			}
-			break;
-
 		case READ_SECTOR_DATA: {
 			if(read_one_bit(limit))
 				return;
@@ -853,7 +825,9 @@ void upd765_family_device::live_run(attotime limit)
 		case WRITE_SECTOR_SKIP_GAP2_BYTE:
 			if(read_one_bit(limit))
 				return;
-			if(cur_live.bit_counter != 22*16)
+			if(mfm && cur_live.bit_counter != 22*16)
+				break;
+			if(!mfm && cur_live.bit_counter != 11*16)
 				break;
 			cur_live.bit_counter = 0;
 			cur_live.byte_counter = 0;
@@ -861,23 +835,43 @@ void upd765_family_device::live_run(attotime limit)
 			return;
 
 		case WRITE_SECTOR_DATA:
-			if(cur_live.byte_counter < 12)
-				live_write_mfm(0x00);
-			else if(cur_live.byte_counter < 15)
-				live_write_raw(0x4489);
-			else if(cur_live.byte_counter < 16) {
-				cur_live.crc = 0xcdb4;
-				live_write_mfm(command[0] & 0x08 ? 0xf8 : 0xfb);
-			} else if(cur_live.byte_counter < 16+sector_size)
-				live_write_mfm(tc_done && !fifo_pos? 0x00 : fifo_pop(true));
-			else if(cur_live.byte_counter < 16+sector_size+2)
-				live_write_mfm(cur_live.crc >> 8);
-			else if(cur_live.byte_counter < 16+sector_size+2+command[7])
-				live_write_mfm(0x4e);
-			else {
-				cur_live.pll.stop_writing(cur_live.fi->dev, cur_live.tm);
-				cur_live.state = IDLE;
-				return;
+			if(mfm) {
+				if(cur_live.byte_counter < 12)
+					live_write_mfm(0x00);
+				else if(cur_live.byte_counter < 15)
+					live_write_raw(0x4489);
+				else if(cur_live.byte_counter < 16) {
+					cur_live.crc = 0xcdb4;
+					live_write_mfm(command[0] & 0x08 ? 0xf8 : 0xfb);
+				} else if(cur_live.byte_counter < 16+sector_size)
+					live_write_mfm(tc_done && !fifo_pos? 0x00 : fifo_pop(true));
+				else if(cur_live.byte_counter < 16+sector_size+2)
+					live_write_mfm(cur_live.crc >> 8);
+				else if(cur_live.byte_counter < 16+sector_size+2+command[7])
+					live_write_mfm(0x4e);
+				else {
+					cur_live.pll.stop_writing(cur_live.fi->dev, cur_live.tm);
+					cur_live.state = IDLE;
+					return;
+				}
+
+			} else {
+				if(cur_live.byte_counter < 6)
+					live_write_fm(0x00);
+				else if(cur_live.byte_counter < 7) {
+					cur_live.crc = 0xffff;
+					live_write_raw(command[0] & 0x08 ? 0xf56a : 0xf56f);
+				} else if(cur_live.byte_counter < 7+sector_size)
+					live_write_fm(tc_done && !fifo_pos? 0x00 : fifo_pop(true));
+				else if(cur_live.byte_counter < 7+sector_size+2)
+					live_write_fm(cur_live.crc >> 8);
+				else if(cur_live.byte_counter < 7+sector_size+2+command[7])
+					live_write_fm(0xff);
+				else {
+					cur_live.pll.stop_writing(cur_live.fi->dev, cur_live.tm);
+					cur_live.state = IDLE;
+					return;
+				}
 			}
 			cur_live.state = WRITE_SECTOR_DATA_BYTE;
 			cur_live.bit_counter = 16;
@@ -887,20 +881,36 @@ void upd765_family_device::live_run(attotime limit)
 		case WRITE_TRACK_PRE_SECTORS:
 			if(!cur_live.byte_counter && command[3])
 				fifo_expect(4, true);
-			if(cur_live.byte_counter < 80)
-				live_write_mfm(0x4e);
-			else if(cur_live.byte_counter < 92)
-				live_write_mfm(0x00);
-			else if(cur_live.byte_counter < 95)
-				live_write_raw(0x5224);
-			else if(cur_live.byte_counter < 96)
-				live_write_mfm(0xfc);
-			else if(cur_live.byte_counter < 146)
-				live_write_mfm(0x4e);
-			else {
-				cur_live.state = WRITE_TRACK_SECTOR;
-				cur_live.byte_counter = 0;
-				break;
+			if(mfm) {
+				if(cur_live.byte_counter < 80)
+					live_write_mfm(0x4e);
+				else if(cur_live.byte_counter < 92)
+					live_write_mfm(0x00);
+				else if(cur_live.byte_counter < 95)
+					live_write_raw(0x5224);
+				else if(cur_live.byte_counter < 96)
+					live_write_mfm(0xfc);
+				else if(cur_live.byte_counter < 146)
+					live_write_mfm(0x4e);
+				else {
+					cur_live.state = WRITE_TRACK_SECTOR;
+					cur_live.byte_counter = 0;
+					break;
+				}
+			} else {
+				if(cur_live.byte_counter < 40)
+					live_write_fm(0xff);
+				else if(cur_live.byte_counter < 46)
+					live_write_fm(0x00);
+				else if(cur_live.byte_counter < 47)
+					live_write_raw(0xf77a);
+				else if(cur_live.byte_counter < 73)
+					live_write_fm(0xff);
+				else {
+					cur_live.state = WRITE_TRACK_SECTOR;
+					cur_live.byte_counter = 0;
+					break;
+				}
 			}
 			cur_live.state = WRITE_TRACK_PRE_SECTORS_BYTE;
 			cur_live.bit_counter = 16;
@@ -913,36 +923,67 @@ void upd765_family_device::live_run(attotime limit)
 				if(command[3])
 					fifo_expect(4, true);
 			}
-			if(cur_live.byte_counter < 12)
-				live_write_mfm(0x00);
-			else if(cur_live.byte_counter < 15)
-				live_write_raw(0x4489);
-			else if(cur_live.byte_counter < 16) {
-				cur_live.crc = 0xcdb4;
-				live_write_mfm(0xfe);
-			} else if(cur_live.byte_counter < 20)
-				live_write_mfm(fifo_pop(true));
-			else if(cur_live.byte_counter < 22)
-				live_write_mfm(cur_live.crc >> 8);
-			else if(cur_live.byte_counter < 44)
-				live_write_mfm(0x4e);
-			else if(cur_live.byte_counter < 56)
-				live_write_mfm(0x00);
-			else if(cur_live.byte_counter < 59)
-				live_write_raw(0x4489);
-			else if(cur_live.byte_counter < 60) {
-				cur_live.crc = 0xcdb4;
-				live_write_mfm(0xfb);
-			} else if(cur_live.byte_counter < 60+sector_size)
-				live_write_mfm(command[5]);
-			else if(cur_live.byte_counter < 62+sector_size)
-				live_write_mfm(cur_live.crc >> 8);
-			else if(cur_live.byte_counter < 62+sector_size+command[4])
-				live_write_mfm(0x4e);
-			else {
-				cur_live.byte_counter = 0;
-				cur_live.state = command[3] ? WRITE_TRACK_SECTOR : WRITE_TRACK_POST_SECTORS;
-				break;
+			if(mfm) {
+				if(cur_live.byte_counter < 12)
+					live_write_mfm(0x00);
+				else if(cur_live.byte_counter < 15)
+					live_write_raw(0x4489);
+				else if(cur_live.byte_counter < 16) {
+					cur_live.crc = 0xcdb4;
+					live_write_mfm(0xfe);
+				} else if(cur_live.byte_counter < 20)
+					live_write_mfm(fifo_pop(true));
+				else if(cur_live.byte_counter < 22)
+					live_write_mfm(cur_live.crc >> 8);
+				else if(cur_live.byte_counter < 44)
+					live_write_mfm(0x4e);
+				else if(cur_live.byte_counter < 56)
+					live_write_mfm(0x00);
+				else if(cur_live.byte_counter < 59)
+					live_write_raw(0x4489);
+				else if(cur_live.byte_counter < 60) {
+					cur_live.crc = 0xcdb4;
+					live_write_mfm(0xfb);
+				} else if(cur_live.byte_counter < 60+sector_size)
+					live_write_mfm(command[5]);
+				else if(cur_live.byte_counter < 62+sector_size)
+					live_write_mfm(cur_live.crc >> 8);
+				else if(cur_live.byte_counter < 62+sector_size+command[4])
+					live_write_mfm(0x4e);
+				else {
+					cur_live.byte_counter = 0;
+					cur_live.state = command[3] ? WRITE_TRACK_SECTOR : WRITE_TRACK_POST_SECTORS;
+					break;
+				}
+
+			} else {
+				if(cur_live.byte_counter < 6)
+					live_write_fm(0x00);
+				else if(cur_live.byte_counter < 7) {
+					cur_live.crc = 0xffff;
+					live_write_raw(0xf57e);
+				} else if(cur_live.byte_counter < 11)
+					live_write_fm(fifo_pop(true));
+				else if(cur_live.byte_counter < 13)
+					live_write_fm(cur_live.crc >> 8);
+				else if(cur_live.byte_counter < 24)
+					live_write_fm(0xff);
+				else if(cur_live.byte_counter < 30)
+					live_write_fm(0x00);
+				else if(cur_live.byte_counter < 31) {
+					cur_live.crc = 0xffff;
+					live_write_raw(0xf56f);
+				} else if(cur_live.byte_counter < 31+sector_size)
+					live_write_fm(command[5]);
+				else if(cur_live.byte_counter < 33+sector_size)
+					live_write_fm(cur_live.crc >> 8);
+				else if(cur_live.byte_counter < 33+sector_size+command[4])
+					live_write_fm(0xff);
+				else {
+					cur_live.byte_counter = 0;
+					cur_live.state = command[3] ? WRITE_TRACK_SECTOR : WRITE_TRACK_POST_SECTORS;
+					break;
+				}
 			}
 			cur_live.state = WRITE_TRACK_SECTOR_BYTE;
 			cur_live.bit_counter = 16;
@@ -950,7 +991,10 @@ void upd765_family_device::live_run(attotime limit)
 			break;
 
 		case WRITE_TRACK_POST_SECTORS:
-			live_write_mfm(0x4e);
+			if(mfm)
+				live_write_mfm(0x4e);
+			else
+				live_write_fm(0xff);
 			cur_live.state = WRITE_TRACK_POST_SECTORS_BYTE;
 			cur_live.bit_counter = 16;
 			checkpoint();
@@ -1319,6 +1363,7 @@ void upd765_family_device::read_data_start(floppy_info &fi)
 {
 	fi.main_state = READ_DATA;
 	fi.sub_state = HEAD_LOAD_DONE;
+	mfm = command[0] & 0x40;
 	logerror("%s: command read%s data%s%s%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
 			 tag(),
 			 command[0] & 0x08 ? " deleted" : "",
@@ -1389,7 +1434,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 		case SEEK_DONE:
 			fi.counter = 0;
 			fi.sub_state = SCAN_ID;
-			live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM, command[0] & 0x40);
+			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 			return;
 
 		case SCAN_ID:
@@ -1410,7 +1455,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 					fi.sub_state = COMMAND_DONE;
 					break;
 				}
-				live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM, command[0] & 0x40);
+				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
 			logerror("%s: reading sector %02x %02x %02x %02x\n",
@@ -1422,7 +1467,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			sector_size = calc_sector_size(cur_live.idbuf[3]);
 			fifo_expect(sector_size, false);
 			fi.sub_state = SECTOR_READ;
-			live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_DATA : SEARCH_ADDRESS_MARK_DATA_FM, command[0] & 0x40);
+			live_start(fi, SEARCH_ADDRESS_MARK_DATA);
 			return;
 
 		case SCAN_ID_FAILED:
@@ -1494,6 +1539,7 @@ void upd765_family_device::write_data_start(floppy_info &fi)
 {
 	fi.main_state = WRITE_DATA;
 	fi.sub_state = HEAD_LOAD_DONE;
+	mfm = command[0] & 0x40;
 	logerror("%s: command write%s data%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
 			 tag(),
 			 command[0] & 0x08 ? " deleted" : "",
@@ -1527,12 +1573,12 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 		case HEAD_LOAD_DONE:
 			fi.counter = 0;
 			fi.sub_state = SCAN_ID;
-			live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM, command[0] & 0x40);
+			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 			return;
 
 		case SCAN_ID:
 			if(!sector_matches()) {
-				live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM, command[0] & 0x40);
+				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
 			if(cur_live.crc) {
@@ -1545,7 +1591,7 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 			sector_size = calc_sector_size(cur_live.idbuf[3]);
 			fifo_expect(sector_size, true);
 			fi.sub_state = SECTOR_WRITTEN;
-			live_start(fi, WRITE_SECTOR_SKIP_GAP2, command[0] & 0x40);
+			live_start(fi, WRITE_SECTOR_SKIP_GAP2);
 			return;
 
 		case SCAN_ID_FAILED:
@@ -1605,6 +1651,7 @@ void upd765_family_device::read_track_start(floppy_info &fi)
 {
 	fi.main_state = READ_TRACK;
 	fi.sub_state = HEAD_LOAD_DONE;
+	mfm = command[0] & 0x40;
 
 	logerror("%s: command read track%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
 			 tag(),
@@ -1667,19 +1714,19 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 		case SEEK_DONE:
 			fi.counter = 0;
 			fi.sub_state = SCAN_ID;
-			live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM, command[0] & 0x40);
+			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 			return;
 
 		case SCAN_ID:
 			if(cur_live.crc) {
 				fprintf(stderr, "Header CRC error\n");
-				live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM, command[0] & 0x40);
+				live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
 			sector_size = calc_sector_size(cur_live.idbuf[3]);
 			fifo_expect(sector_size, false);
 			fi.sub_state = SECTOR_READ;
-			live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_DATA : SEARCH_ADDRESS_MARK_DATA_FM, command[0] & 0x40);
+			live_start(fi, SEARCH_ADDRESS_MARK_DATA);
 			return;
 
 		case SCAN_ID_FAILED:
@@ -1725,6 +1772,7 @@ void upd765_family_device::format_track_start(floppy_info &fi)
 {
 	fi.main_state = FORMAT_TRACK;
 	fi.sub_state = HEAD_LOAD_DONE;
+	mfm = command[0] & 0x40;
 
 	logerror("%s: command format track %s h=%02x n=%02x sc=%02x gpl=%02x d=%02x\n",
 			 tag(),
@@ -1753,7 +1801,7 @@ void upd765_family_device::format_track_continue(floppy_info &fi)
 			logerror("%s: index found, writing track\n", tag());
 			fi.sub_state = TRACK_DONE;
 			cur_live.pll.start_writing(machine().time());
-			live_start(fi, WRITE_TRACK_PRE_SECTORS, command[0] & 0x40);
+			live_start(fi, WRITE_TRACK_PRE_SECTORS);
 			return;
 
 		case TRACK_DONE:
@@ -1780,6 +1828,7 @@ void upd765_family_device::read_id_start(floppy_info &fi)
 {
 	fi.main_state = READ_ID;
 	fi.sub_state = HEAD_LOAD_DONE;
+	mfm = command[0] & 0x40;
 
 	logerror("%s: command read id%s, rate=%d\n",
 			 tag(),
@@ -1806,7 +1855,7 @@ void upd765_family_device::read_id_continue(floppy_info &fi)
 		case HEAD_LOAD_DONE:
 			fi.counter = 0;
 			fi.sub_state = SCAN_ID;
-			live_start(fi, command[0] & 0x40 ? SEARCH_ADDRESS_MARK_HEADER : SEARCH_ADDRESS_MARK_HEADER_FM, command[0] & 0x40);
+			live_start(fi, SEARCH_ADDRESS_MARK_HEADER);
 			return;
 
 		case SCAN_ID:
@@ -1929,6 +1978,7 @@ void upd765_family_device::index_callback(floppy_image_device *floppy, int state
 		floppy_info &fi = flopi[fid];
 		if(fi.dev != floppy)
 			continue;
+		fprintf(stderr, "floppy %d index %d sub_state %d\n", fid, state, fi.sub_state);
 
 		if(fi.live)
 			live_sync();
@@ -2081,18 +2131,13 @@ void upd765_family_device::live_write_mfm(UINT8 mfm)
 
 void upd765_family_device::live_write_fm(UINT8 fm)
 {
-	bool context = cur_live.data_bit_context;
-	UINT16 raw = 0;
-	for(int i=0; i<8; i++) {
-		bool bit = fm & (0x80 >> i);
-		raw |= 0x8000 >> (2*i);
-		if(bit)
+	UINT16 raw = 0xaaaa;
+	for(int i=0; i<8; i++)
+		if(fm & (0x80 >> i))
 			raw |= 0x4000 >> (2*i);
-		context = bit;
-	}
 	cur_live.data_reg = fm;
 	cur_live.shift_reg = raw;
-	cur_live.data_bit_context = context;
+	cur_live.data_bit_context = fm & 1;
 	//  logerror("write %02x   %04x %04x\n", fm, cur_live.crc, raw);
 }
 

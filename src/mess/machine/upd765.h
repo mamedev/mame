@@ -208,12 +208,10 @@ protected:
 
 		// Live states
 		SEARCH_ADDRESS_MARK_HEADER,
-		SEARCH_ADDRESS_MARK_HEADER_FM,
 		READ_HEADER_BLOCK_HEADER,
 		READ_DATA_BLOCK_HEADER,
 		READ_ID_BLOCK,
 		SEARCH_ADDRESS_MARK_DATA,
-		SEARCH_ADDRESS_MARK_DATA_FM,
 		SEARCH_ADDRESS_MARK_DATA_FAILED,
 		READ_SECTOR_DATA,
 		READ_SECTOR_DATA_BYTE,
@@ -288,7 +286,7 @@ protected:
 
 	live_info cur_live, checkpoint_live;
 	line_cb intrq_cb, drq_cb;
-	bool cur_irq, polled_irq, data_irq, drq, internal_drq, tc, tc_done, locked;
+	bool cur_irq, polled_irq, data_irq, drq, internal_drq, tc, tc_done, locked, mfm;
 	floppy_info flopi[4];
 
 	int fifo_pos, fifo_expected, command_pos, result_pos;
@@ -368,7 +366,7 @@ protected:
 	void index_callback(floppy_image_device *floppy, int state);
 	bool sector_matches() const;
 
-	void live_start(floppy_info &fi, int live_state, bool mfm);
+	void live_start(floppy_info &fi, int live_state);
 	void live_abort();
 	void checkpoint();
 	void rollback();
