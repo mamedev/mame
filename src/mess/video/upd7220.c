@@ -1605,33 +1605,45 @@ void upd7220_device::update_graphics(bitmap_ind16 &bitmap, const rectangle &clip
 	UINT32 addr, sad;
 	UINT16 len;
 	int im, wd, area;
-	int y, tsy = 0, bsy = 0;
+	int y = 0, tsy = 0, bsy = 0;
 
-	for (area = 0; area < 2; area++)
+	for (area = 0; area < 4; area++)
 	{
 		get_graphics_partition(area, &sad, &len, &im, &wd);
 
-		for (y = 0; y < len; y++)
+		if (im || force_bitmap)
 		{
-			if (im || force_bitmap)
+			get_graphics_partition(area, &sad, &len, &im, &wd);
+
+			if(area >= 2) // TODO: correct?
+				break;
+
+			for (y = 0; y < len; y++)
 			{
 				addr = (sad & 0x3ffff) + (y * m_pitch * 2);
 
 				if (m_display_cb)
 					draw_graphics_line(bitmap, addr, y + bsy, wd);
 			}
-			else
-			{
-				/* TODO: text params are more limited compared to graphics */
-				addr = (sad & 0x3ffff) + (y * m_pitch);
+		}
+		else
+		{
+			get_text_partition(area, &sad, &len, &im, &wd);
 
-				if (m_draw_text_cb)
-					m_draw_text_cb(this, bitmap, addr, y + tsy, wd, m_pitch, 0, 0, m_aw * 8 - 1, len + bsy - 1, m_lr, m_dc, m_ead);
+			if(m_lr)
+			{
+				for (y = 0; y < len; y+=m_lr)
+				{
+					addr = (sad & 0x3ffff) + ((y / m_lr) * m_pitch);
+
+					if (m_draw_text_cb)
+						m_draw_text_cb(this, bitmap, addr, (y + tsy) / m_lr, wd, m_pitch, 0, 0, m_aw * 8 - 1, len + bsy - 1, m_lr, m_dc, m_ead);
+				}
 			}
 		}
 
 		if (m_lr)
-			tsy += (y / m_lr);
+			tsy += y;
 		bsy += y;
 	}
 }
