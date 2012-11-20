@@ -1248,13 +1248,13 @@ void upd7220_device::process_fifo()
 	case COMMAND_START: /* start display & end idle mode */
 		m_de = 1;
 
-		if (LOG) logerror("uPD7220 '%s' DE: 1\n", tag());
+		//if (LOG) logerror("uPD7220 '%s' DE: 1\n", tag());
 		break;
 
 	case COMMAND_BCTRL: /* display blanking control */
 		m_de = m_cr & 0x01;
 
-		if (LOG) logerror("uPD7220 '%s' DE: %u\n", tag(), m_de);
+		//if (LOG) logerror("uPD7220 '%s' DE: %u\n", tag(), m_de);
 		break;
 
 	case COMMAND_ZOOM: /* zoom factors specify */
@@ -1275,12 +1275,12 @@ void upd7220_device::process_fifo()
 
 			m_ead = (upper_addr << 16) | (m_pr[2] << 8) | m_pr[1];
 
-			if (LOG) logerror("uPD7220 '%s' EAD: %06x\n", tag(), m_ead);
+			//if (LOG) logerror("uPD7220 '%s' EAD: %06x\n", tag(), m_ead);
 
 			if(m_param_ptr == 4)
 			{
 				m_dad = m_pr[3] >> 4;
-				if (LOG) logerror("uPD7220 '%s' DAD: %01x\n", tag(), m_dad);
+				//if (LOG) logerror("uPD7220 '%s' DAD: %01x\n", tag(), m_dad);
 			}
 		}
 		break;

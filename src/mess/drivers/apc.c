@@ -5,12 +5,10 @@
     preliminary driver by Angelo Salese
 
     TODO:
-    - video emulation
-    - Floppy device
-    - keyboard
+    - video emulation (bitmap part)
     - Understand interrupt sources
     - NMI seems valid, dumps a x86 stack to vram?
-    - Unknown RTC device type;
+    - Unknown RTC device type (upd1990a?);
     - What are exactly APU and MPU devices? They sounds scary ...
     - DMA hook-ups
     - serial ports
@@ -191,7 +189,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	for(x=0;x<pitch;x++)
 	{
 		UINT8 tile_data;
-//      UINT8 secret,reverse,u_line,v_line;
+		UINT8 u_line, o_line, v_line, reverse, blink;
 		UINT8 color;
 		UINT8 tile,attr,pen;
 		UINT32 tile_addr;
@@ -202,11 +200,12 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		tile = state->m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0x00ff;
 		attr = (state->m_video_ram_1[(tile_addr*2 & 0x1fff) | 0x2000] & 0x00ff);
 
-//      secret = (attr & 1) ^ 1;
-		//blink = attr & 2;
-//      reverse = attr & 4;
-//      u_line = attr & 8;
-//      v_line = attr & 0x10;
+		u_line = attr & 0x01;
+		o_line = attr & 0x02;
+		v_line = attr & 0x04;
+		blink  = attr & 0x08;
+		reverse = attr & 0x10;
+//      secret= (attr & 1) ^ 1;
 		color = (attr & 0xe0) >> 5;
 
 		for(yi=0;yi<lr;yi++)
@@ -225,9 +224,11 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 //              tile_data = secret ? 0 : (state->m_char_rom[tile*char_size+interlace_on*0x800+yi]);
 				tile_data = (state->m_char_rom[(tile & 0x7f)+((tile & 0x80)<<4)+((yi & 0xf)*0x80)+((yi & 0x10)<<8)]);
 
-//              if(reverse) { tile_data^=0xff; }
-//              if(u_line && yi == 7) { tile_data = 0xff; }
-//              if(v_line)  { tile_data|=8; }
+				if(reverse) { tile_data^=0xff; }
+				if(u_line && yi == lr-1) { tile_data = 0xff; }
+				if(o_line && yi == 0) { tile_data = 0xff; }
+				if(v_line)  { tile_data|=8; }
+				if(blink && device->machine().primary_screen->frame_number() & 0x10) { tile_data = 0; } // TODO: rate & correct behaviour
 
 				if(cursor_on && cursor_addr == tile_addr && device->machine().primary_screen->frame_number() & 0x10)
 					tile_data^=0xff;
@@ -297,7 +298,7 @@ READ8_MEMBER(apc_state::apc_port_60_r)
 	}
 	else
 	{
-		printf("Read melody port %02x\n",offset+0x60);
+		//printf("Read melody port %02x\n",offset+0x60);
 		res = 0x80;
 	}
 
@@ -404,7 +405,10 @@ WRITE8_MEMBER(apc_state::apc_dma_w)
 
 static ADDRESS_MAP_START( apc_map, AS_PROGRAM, 16, apc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
-//  AM_RANGE(0xa0000, 0xaffff) space for an external ROM
+//  AM_RANGE(0xa0000, 0xa0fff) CMOS
+//	AM_RANGE(0xc0000, 0xcffff) standard character ROM
+//	AM_RANGE(0xde000, 0xdffff) AUX character RAM
+//	AM_RANGE(0xe0000, 0xeffff) Special Character RAM
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
@@ -743,24 +747,24 @@ static const struct pit8253_config pit8253_config =
 irq assignment:
 
 8259 master:
-ir0 (enabled at POST, unknown purpose)
-ir1
-ir2
-ir3 (enabled after CP/M loading, serial?)
+ir0 all stop (enabled at POST, unknown purpose)
+ir1 Communication
+ir2 Option
+ir3 Timer (enabled after CP/M loading, serial?)
 ir4 keyboard (almost trusted, check code at fe64a)
-ir5
-ir6
-ir7
+ir5 Option
+ir6 Option
+ir7 (ODA Printer?)
 
 8259 slave:
-ir0
-ir1
-ir2
-ir3 fdd irq?
-ir4
-ir5
-ir6
-ir7
+ir0 Option
+ir1 Option
+ir2 CRT
+ir3 FDD
+ir4 Option
+ir5 Option
+ir6 APU
+ir7 Option
 */
 
 WRITE_LINE_MEMBER(apc_state::apc_master_set_int_line)
