@@ -235,7 +235,7 @@
 #include "cpu/i386/i386.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/upd765.h"
 #include "machine/upd1990a.h"
@@ -256,15 +256,17 @@ class pc9801_state : public driver_device
 public:
 	pc9801_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_rtc(*this, UPD1990A_TAG),
-		  m_sio(*this, UPD8251_TAG),
-		  m_hgdc1(*this, "upd7220_chr"),
-		  m_hgdc2(*this, "upd7220_btm"),
+		m_maincpu(*this, "maincpu"),
+		m_dmac(*this, "i8237"),
+		m_rtc(*this, UPD1990A_TAG),
+		m_sio(*this, UPD8251_TAG),
+		m_hgdc1(*this, "upd7220_chr"),
+		m_hgdc2(*this, "upd7220_btm"),
 		m_video_ram_1(*this, "video_ram_1"),
 		m_video_ram_2(*this, "video_ram_2"){ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<am9517a_device> m_dmac;
 	required_device<upd1990a_device> m_rtc;
 	required_device<i8251_device> m_sio;
 	required_device<upd7220_device> m_hgdc1;
@@ -278,9 +280,8 @@ public:
 	UINT8 *m_char_rom;
 
 	UINT8 m_portb_tmp;
-	int m_dma_channel;
-	UINT8 m_dma_offset[2][4];
-	UINT8 m_at_pages[0x10];
+	UINT8 m_dma_offset[4];
+	int m_dack;
 
 	UINT8 m_vrtc_irq_mask;
 	UINT8 m_video_ff[8];
@@ -376,8 +377,6 @@ public:
 	DECLARE_READ8_MEMBER(pc9821_a0_r);
 	DECLARE_WRITE8_MEMBER(pc9821_a0_w);
 	DECLARE_READ8_MEMBER(ide_status_r);
-	DECLARE_READ8_MEMBER(pc_dma_read_byte);
-	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 	DECLARE_READ8_MEMBER(pc9801rs_access_ctrl_r);
 	DECLARE_WRITE8_MEMBER(pc9801rs_access_ctrl_w);
 
@@ -429,13 +428,16 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(shift_stroke);
 	DECLARE_WRITE_LINE_MEMBER(pc9801_master_set_int_line);
 	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
-	DECLARE_READ8_MEMBER(test_r);
-	DECLARE_WRITE8_MEMBER(test_w);
+	DECLARE_WRITE_LINE_MEMBER(pc9801_dma_hrq_changed);
+	DECLARE_WRITE_LINE_MEMBER(pc9801_tc_w);
+	DECLARE_READ8_MEMBER(pc9801_dma_read_byte);
+	DECLARE_WRITE8_MEMBER(pc9801_dma_write_byte);
+	DECLARE_WRITE_LINE_MEMBER(pc9801_dack0_w);
+	DECLARE_WRITE_LINE_MEMBER(pc9801_dack1_w);
+	DECLARE_WRITE_LINE_MEMBER(pc9801_dack2_w);
+	DECLARE_WRITE_LINE_MEMBER(pc9801_dack3_w);
+	DECLARE_READ8_MEMBER(fdc_r);
+	DECLARE_WRITE8_MEMBER(fdc_w);
 	DECLARE_READ8_MEMBER(ppi_sys_porta_r);
 	DECLARE_READ8_MEMBER(ppi_sys_portb_r);
 	DECLARE_READ8_MEMBER(ppi_prn_portb_r);
@@ -648,7 +650,7 @@ READ8_MEMBER(pc9801_state::pc9801_00_r)
 	}
 	else // odd
 	{
-		return i8237_r(machine().device("dma8237"), space, (offset & 0x1e) >> 1);
+		return m_dmac->read(space, (offset & 0x1e) >> 1, 0xff);
 	}
 
 	return 0xff;
@@ -665,7 +667,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_00_w)
 	}
 	else // odd
 	{
-		i8237_w(machine().device("dma8237"), space, (offset & 0x1e) >> 1, data);
+		m_dmac->write(space, (offset & 0x1e) >> 1, data, 0xff);
 	}
 }
 
@@ -708,8 +710,8 @@ WRITE8_MEMBER(pc9801_state::pc9801_20_w)
 	}
 	else // odd
 	{
-		printf("Write to DMA bank register %d %02x\n",((offset >> 1)+1) & 3,data);
-		m_dma_offset[0][((offset >> 1)+1) & 3] = data & 0x0f;
+		printf("Write to DMA bank register %d %02x\n",(offset >> 1) & 3,data);
+		m_dma_offset[(offset >> 1) & 3] = data & 0x0f; // TODO: old was +1? Why?
 	}
 }
 
@@ -2303,64 +2305,77 @@ static const struct pit8253_config pc9801rs_pit8253_config =
 *
 ****************************************/
 
-WRITE_LINE_MEMBER(pc9801_state::pc_dma_hrq_changed)
+WRITE_LINE_MEMBER(pc9801_state::pc9801_dma_hrq_changed)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
-	/* Assert HLDA */
-	i8237_hlda_w( machine().device("dma8237"), state );
+	m_dmac->hack_w(state);
+
+//  printf("%02x HLDA\n",state);
+}
+
+WRITE_LINE_MEMBER(pc9801_state::pc9801_tc_w )
+{
+	/* floppy terminal count */
+//	m_fdc->tc_w(state);
+
+//	printf("TC %02x\n",state);
+}
+
+READ8_MEMBER(pc9801_state::pc9801_dma_read_byte)
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
+
+//	printf("%08x\n",addr);
+
+	return program.read_byte(addr);
 }
 
 
-READ8_MEMBER(pc9801_state::pc_dma_read_byte)
+WRITE8_MEMBER(pc9801_state::pc9801_dma_write_byte)
 {
-	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
-		& 0xFF0000;
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
 
-	return space.read_byte(page_offset + offset);
-}
+//  printf("%08x %02x\n",addr,data);
 
-
-WRITE8_MEMBER(pc9801_state::pc_dma_write_byte)
-{
-	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
-		& 0xFF0000;
-
-	space.write_byte(page_offset + offset, data);
+	program.write_byte(addr, data);
 }
 
 static void set_dma_channel(running_machine &machine, int channel, int state)
 {
 	pc9801_state *drvstate = machine.driver_data<pc9801_state>();
-	if (!state) drvstate->m_dma_channel = channel;
+	if (!state) drvstate->m_dack = channel;
 }
 
-WRITE_LINE_MEMBER(pc9801_state::pc_dack0_w){ /*printf("%02x 0\n",state);*/ set_dma_channel(machine(), 0, state); }
-WRITE_LINE_MEMBER(pc9801_state::pc_dack1_w){ /*printf("%02x 1\n",state);*/ set_dma_channel(machine(), 1, state); }
-WRITE_LINE_MEMBER(pc9801_state::pc_dack2_w){ /*printf("%02x 2\n",state);*/ set_dma_channel(machine(), 2, state); }
-WRITE_LINE_MEMBER(pc9801_state::pc_dack3_w){ /*printf("%02x 3\n",state);*/ set_dma_channel(machine(), 3, state); }
+WRITE_LINE_MEMBER(pc9801_state::pc9801_dack0_w){ /*printf("%02x 0\n",state);*/ set_dma_channel(machine(), 0, state); }
+WRITE_LINE_MEMBER(pc9801_state::pc9801_dack1_w){ /*printf("%02x 1\n",state);*/ set_dma_channel(machine(), 1, state); }
+WRITE_LINE_MEMBER(pc9801_state::pc9801_dack2_w){ /*printf("%02x 2\n",state);*/ set_dma_channel(machine(), 2, state); }
+WRITE_LINE_MEMBER(pc9801_state::pc9801_dack3_w){ /*printf("%02x 3\n",state);*/ set_dma_channel(machine(), 3, state); }
 
-READ8_MEMBER(pc9801_state::test_r)
+/* TODO: double check channel for this one */
+READ8_MEMBER(pc9801_state::fdc_r)
 {
 	printf("2dd DACK R\n");
 
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc9801_state::test_w)
+WRITE8_MEMBER(pc9801_state::fdc_w)
 {
 	printf("2dd DACK W\n");
 }
 
-static I8237_INTERFACE( dma8237_config )
+static I8237_INTERFACE( dmac_intf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc_dma_hrq_changed),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pc9801_state, pc_dma_read_byte),
-	DEVCB_DRIVER_MEMBER(pc9801_state, pc_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,test_r) },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,test_w) },
-	{ DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc_dack0_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc_dack1_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc_dack2_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc_dack3_w) }
+	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dma_hrq_changed),
+	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_tc_w),
+	DEVCB_DRIVER_MEMBER(pc9801_state, pc9801_dma_read_byte),
+	DEVCB_DRIVER_MEMBER(pc9801_state, pc9801_dma_write_byte),
+	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,fdc_r), DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,fdc_w), DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack0_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack1_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack2_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack3_w) }
 };
 
 /****************************************
@@ -2654,7 +2669,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801f)
 
 	MCFG_PIT8253_ADD( "pit8253", pit8253_config )
-	MCFG_I8237_ADD( "dma8237", 5000000, dma8237_config ) //unknown clock
+	MCFG_I8237_ADD("i8237", 5000000, dmac_intf) // unknown clock
 	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
 	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
@@ -2721,7 +2736,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801rs)
 
 	MCFG_PIT8253_ADD( "pit8253", pc9801rs_pit8253_config )
-	MCFG_I8237_ADD( "dma8237", 16000000, dma8237_config ) //unknown clock
+	MCFG_I8237_ADD("i8237", 16000000, dmac_intf) // unknown clock
 	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
 	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
@@ -2782,7 +2797,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801rs)
 
 	MCFG_PIT8253_ADD( "pit8253", pc9801rs_pit8253_config )
-	MCFG_I8237_ADD( "dma8237", 16000000, dma8237_config ) //unknown clock
+	MCFG_I8237_ADD("i8237", 16000000, dmac_intf) // unknown clock
 	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
 	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
