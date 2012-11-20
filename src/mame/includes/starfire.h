@@ -4,6 +4,9 @@
 
 ***************************************************************************/
 
+#include "sound/samples.h"
+
+
 #define STARFIRE_MASTER_CLOCK	(XTAL_20MHz)
 #define STARFIRE_CPU_CLOCK		(STARFIRE_MASTER_CLOCK / 8)
 #define STARFIRE_PIXEL_CLOCK	(STARFIRE_MASTER_CLOCK / 4)
@@ -15,18 +18,22 @@
 #define STARFIRE_VBSTART		(0x100)
 #define	STARFIRE_NUM_PENS       (0x40)
 
+
 class starfire_state : public driver_device
 {
 public:
 	starfire_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_starfire_colorram(*this, "colorram"),
-		m_starfire_videoram(*this, "videoram")
+		m_starfire_videoram(*this, "videoram"),
+		m_samples(*this, "samples")
 	{ }
 
 	required_shared_ptr<UINT8> m_starfire_colorram;
 	required_shared_ptr<UINT8> m_starfire_videoram;
+	optional_device<samples_device> m_samples;
 
+	UINT8 m_prev_sound;
 	UINT8 m_fireone_select;
 
     UINT8 m_starfire_vidctrl;
@@ -44,7 +51,7 @@ public:
 	DECLARE_READ8_MEMBER(starfire_input_r);
 	DECLARE_READ8_MEMBER(fireone_input_r);
 	DECLARE_WRITE8_MEMBER(starfire_sound_w);
-	DECLARE_WRITE8_MEMBER(fireone_io2_w);
+	DECLARE_WRITE8_MEMBER(fireone_sound_w);
 	DECLARE_WRITE8_MEMBER(starfire_colorram_w);
 	DECLARE_READ8_MEMBER(starfire_colorram_r);
 	DECLARE_WRITE8_MEMBER(starfire_videoram_w);

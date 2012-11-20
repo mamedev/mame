@@ -46,6 +46,7 @@ starfira has one less rom in total than starfire but everything passes as
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "sound/samples.h"
 #include "includes/starfire.h"
 
 
@@ -96,10 +97,33 @@ READ8_MEMBER(starfire_state::starfire_scratch_r)
 
 WRITE8_MEMBER(starfire_state::starfire_sound_w)
 {
-	// TODO: sound
+	// starfire sound samples (preliminary)
+	UINT8 rise = data & ~m_prev_sound;
+	m_prev_sound = data;
+
+	// d0: rumble
+	if (rise & 1) m_samples->start(0, 0, true);
+	if (~data & 1) m_samples->stop(0);
+
+	// d1: explosion
+	// d2: tie weapon
+	// d3: laser
+	if (rise & 2) m_samples->start(1, 1);
+	if (rise & 4) m_samples->start(2, 2);
+	if (rise & 8) m_samples->start(3, 3);
+
+	// these are from the same generator (called "computer" in schematics)
+	// d4: track
+	// d5: lock
+	// d6: scanner
+	// d7: overheat
+	if (rise & 0x80) m_samples->start(4, 7);
+	else if (rise & 0x40) m_samples->start(4, 6);
+	else if (rise & 0x20) m_samples->start(4, 5);
+	else if (rise & 0x10) m_samples->start(4, 4);
 }
 
-WRITE8_MEMBER(starfire_state::fireone_io2_w)
+WRITE8_MEMBER(starfire_state::fireone_sound_w)
 {
 	// TODO: sound
 	m_fireone_select = (data & 0x8) ? 0 : 1;
@@ -111,7 +135,15 @@ READ8_MEMBER(starfire_state::starfire_input_r)
 	switch (offset & 15)
 	{
 		case 0: return ioport("DSW")->read();
-		case 1: return ioport("SYSTEM")->read();	/* Note: need to loopback sounds lengths on that one */
+		case 1:
+		{
+			// d3 and d4 come from the audio circuit, how does it work exactly?
+			// tie_on sounds ok, but laser_on sounds buggy
+			UINT8 tie_on = m_samples->playing(2) ? 0x00 : 0x08;
+			UINT8 laser_on = m_samples->playing(3) ? 0x00 : 0x10;
+			UINT8 input = ioport("SYSTEM")->read() & 0xe7;
+			return input | tie_on | laser_on | 0x10; // disable laser_on for now
+		}
 		case 5: return ioport("STICKZ")->read();
 		case 6: return ioport("STICKX")->read();
 		case 7: return ioport("STICKY")->read();
@@ -269,6 +301,27 @@ INPUT_PORTS_END
  *
  *************************************/
 
+static const char *const starfire_sample_names[] =
+{
+	"*starfire",
+	"size",
+	"explosion",
+	"tie",
+	"laser",
+	"track",
+	"lock",
+	"scanner",
+	"overheat",
+	0
+};
+
+static const samples_interface starfire_samples_interface =
+{
+	5,	/* 5 channels */
+	starfire_sample_names
+};
+
+
 INTERRUPT_GEN_MEMBER(starfire_state::vblank_int)
 {
 	// starfire has a jumper for disabling NMI, used to do a complete RAM test
@@ -276,7 +329,8 @@ INTERRUPT_GEN_MEMBER(starfire_state::vblank_int)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( starfire, starfire_state )
+
+static MACHINE_CONFIG_START( fireone, starfire_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, STARFIRE_CPU_CLOCK)
@@ -288,7 +342,17 @@ static MACHINE_CONFIG_START( starfire, starfire_state )
 	MCFG_SCREEN_RAW_PARAMS(STARFIRE_PIXEL_CLOCK, STARFIRE_HTOTAL, STARFIRE_HBEND, STARFIRE_HBSTART, STARFIRE_VTOTAL, STARFIRE_VBEND, STARFIRE_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(starfire_state, screen_update_starfire)
 
-	/* audio hardware */
+	/* sound hardware */
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( starfire, fireone )
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SAMPLES_ADD("samples", starfire_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -390,12 +454,15 @@ DRIVER_INIT_MEMBER(starfire_state,starfire)
 {
 	m_input_read = read8_delegate(FUNC(starfire_state::starfire_input_r),this);
 	m_io2_write = write8_delegate(FUNC(starfire_state::starfire_sound_w),this);
+
+	/* register for state saving */
+	save_item(NAME(m_prev_sound));
 }
 
 DRIVER_INIT_MEMBER(starfire_state,fireone)
 {
 	m_input_read = read8_delegate(FUNC(starfire_state::fireone_input_r),this);
-	m_io2_write = write8_delegate(FUNC(starfire_state::fireone_io2_w),this);
+	m_io2_write = write8_delegate(FUNC(starfire_state::fireone_sound_w),this);
 
 	/* register for state saving */
 	save_item(NAME(m_fireone_select));
@@ -409,7 +476,7 @@ DRIVER_INIT_MEMBER(starfire_state,fireone)
  *
  *************************************/
 
-GAME( 1979, starfire, 0,        starfire, starfire, starfire_state, starfire, ROT0, "Exidy", "Star Fire (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1979, starfirea,starfire, starfire, starfire, starfire_state, starfire, ROT0, "Exidy", "Star Fire (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1979, fireone,  0,        starfire, fireone,  starfire_state, fireone,  ROT0, "Exidy", "Fire One", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1979, starfir2, 0,        starfire, starfire, starfire_state, starfire, ROT0, "Exidy", "Star Fire 2", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, starfire, 0,        starfire, starfire, starfire_state, starfire, ROT0, "Exidy", "Star Fire (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, starfirea,starfire, starfire, starfire, starfire_state, starfire, ROT0, "Exidy", "Star Fire (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, fireone,  0,        fireone,  fireone,  starfire_state, fireone,  ROT0, "Exidy", "Fire One", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1979, starfir2, 0,        starfire, starfire, starfire_state, starfire, ROT0, "Exidy", "Star Fire 2", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
