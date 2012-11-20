@@ -347,11 +347,20 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( svmu )
 	ROM_REGION( 0x10000, "bios", 0 )
+	ROM_DEFAULT_BIOS("jp1004")
     // these ROMs come from the Sega Katana SDK and are scrambled, a simple way to restore it is to remove the first 4 bytes and xor the whole file for the xor key.
-	ROM_SYSTEM_BIOS(0, "jp1004", "Japan v1.004")
-	ROMX_LOAD( "fbios.bin",  0x0000, 0x10000, CRC(8e0f867a) SHA1(dc2fa2963138a1049a43f7f36439ad0a416ee8b4), ROM_BIOS(1))	// from Sega Katana SDK (original file: fbios.sbf, CRC: c7c77b3c, xor key: 0x37)
-	ROM_SYSTEM_BIOS(1, "jp1004q", "Japan v1.004 (quick start)")	// automatically boot the first game found in the flash
-	ROMX_LOAD( "qbios.bin",  0x0000, 0x10000, CRC(395e25f2) SHA1(37dea034322b5b80b35b2de784298d32c71ba7a3), ROM_BIOS(2))	// from Sega Katana SDK (original file: qbios.sbf, CRC: eed5524c, xor key: 0x43)
+	ROM_SYSTEM_BIOS(0, "jp1001", "VMS Japanese BIOS (v1.001)")
+	ROMX_LOAD("vmu1001.bin", 0x0000, 0x10000, CRC(e6339f4a) SHA1(688b2e1ff8c60bde6e8b07a2d2695cdacc07bd0c), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "jp1002", "VMS Japanese BIOS (v1.002)")
+	ROMX_LOAD("vmu1002.bin", 0x0000, 0x10000, CRC(6c020d48) SHA1(9ee7c87d7b033235e0b315a0b421e70deb547c7a), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "jp1004", "VMS Japanese BIOS (v1.004)")
+	ROMX_LOAD("vmu1004.bin", 0x0000, 0x10000, CRC(8e0f867a) SHA1(dc2fa2963138a1049a43f7f36439ad0a416ee8b4), ROM_BIOS(3))	// from Sega Katana SDK (original file: fbios.sbf, CRC: c7c77b3c, xor key: 0x37)
+	ROM_SYSTEM_BIOS(3, "jp1005", "VMS Japanese BIOS (v1.005)")
+	ROMX_LOAD("vmu1005.bin", 0x0000, 0x10000, CRC(47623324) SHA1(fca1aceff8a2f8c6826f3a865f4d5ef88dfd9ed1), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(4, "jp1004q", "Japan v1.004 (quick start)")	// automatically boot the first game found in the flash
+	ROMX_LOAD( "vmu1004q.bin",  0x0000, 0x10000, CRC(395e25f2) SHA1(37dea034322b5b80b35b2de784298d32c71ba7a3), ROM_BIOS(5))	// from Sega Katana SDK (original file: qbios.sbf, CRC: eed5524c, xor key: 0x43)	
+	ROM_SYSTEM_BIOS(5, "dev1004", "VMS Japanese Dev BIOS (v1.004)")
+	ROMX_LOAD( "vmsdev1004.bin", 0x0000, 0x10000, CRC(395e25f2) SHA1(37dea034322b5b80b35b2de784298d32c71ba7a3), ROM_BIOS(6))
 ROM_END
 
 
