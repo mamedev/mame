@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#define STARFIRE_MASTER_CLOCK	(20000000)
+#define STARFIRE_MASTER_CLOCK	(XTAL_20MHz)
 #define STARFIRE_CPU_CLOCK		(STARFIRE_MASTER_CLOCK / 8)
 #define STARFIRE_PIXEL_CLOCK	(STARFIRE_MASTER_CLOCK / 4)
 #define STARFIRE_HTOTAL			(0x13f)  /* could be 0x140, but I think this is right */
@@ -24,7 +24,8 @@ public:
 		m_starfire_videoram(*this, "videoram")
 	{ }
 
-    read8_delegate m_input_read;
+	required_shared_ptr<UINT8> m_starfire_colorram;
+	required_shared_ptr<UINT8> m_starfire_videoram;
 
 	UINT8 m_fireone_select;
 
@@ -33,8 +34,8 @@ public:
     UINT8 m_starfire_color;
     UINT16 m_starfire_colors[STARFIRE_NUM_PENS];
 
-	required_shared_ptr<UINT8> m_starfire_colorram;
-	required_shared_ptr<UINT8> m_starfire_videoram;
+    read8_delegate m_input_read;
+    write8_delegate m_io2_write;
 
     emu_timer* m_scanline_timer;
     bitmap_rgb32 m_starfire_screen;
@@ -42,6 +43,8 @@ public:
 	DECLARE_READ8_MEMBER(starfire_scratch_r);
 	DECLARE_READ8_MEMBER(starfire_input_r);
 	DECLARE_READ8_MEMBER(fireone_input_r);
+	DECLARE_WRITE8_MEMBER(starfire_sound_w);
+	DECLARE_WRITE8_MEMBER(fireone_io2_w);
 	DECLARE_WRITE8_MEMBER(starfire_colorram_w);
 	DECLARE_READ8_MEMBER(starfire_colorram_r);
 	DECLARE_WRITE8_MEMBER(starfire_videoram_w);

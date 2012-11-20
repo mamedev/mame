@@ -62,12 +62,9 @@ WRITE8_MEMBER(starfire_state::starfire_scratch_w)
 	{
 		switch (offset & 7)
 		{
-			case 0:	m_starfire_vidctrl = data; break;
-			case 1:	m_starfire_vidctrl1 = data; break;
-			case 2:
-				/* Sounds */
-				m_fireone_select = (data & 0x8) ? 0 : 1;
-				break;
+			case 0: m_starfire_vidctrl = data; break;
+			case 1: m_starfire_vidctrl1 = data; break;
+			case 2: m_io2_write(space, offset, data, 0xff); break;
 			default: break;
 		}
 	}
@@ -93,23 +90,34 @@ READ8_MEMBER(starfire_state::starfire_scratch_r)
 
 /*************************************
  *
- *  Game-specific input handlers
+ *  Game-specific I/O handlers
  *
  *************************************/
+
+WRITE8_MEMBER(starfire_state::starfire_sound_w)
+{
+	// TODO: sound
+}
+
+WRITE8_MEMBER(starfire_state::fireone_io2_w)
+{
+	// TODO: sound
+	m_fireone_select = (data & 0x8) ? 0 : 1;
+}
+
 
 READ8_MEMBER(starfire_state::starfire_input_r)
 {
 	switch (offset & 15)
 	{
-		case 0:	return ioport("DSW")->read();
-		case 1:	return ioport("SYSTEM")->read();	/* Note: need to loopback sounds lengths on that one */
+		case 0: return ioport("DSW")->read();
+		case 1: return ioport("SYSTEM")->read();	/* Note: need to loopback sounds lengths on that one */
 		case 5: return ioport("STICKZ")->read();
-		case 6:	return ioport("STICKX")->read();
-		case 7:	return ioport("STICKY")->read();
+		case 6: return ioport("STICKX")->read();
+		case 7: return ioport("STICKY")->read();
 		default: return 0xff;
 	}
 }
-
 
 READ8_MEMBER(starfire_state::fireone_input_r)
 {
@@ -124,17 +132,16 @@ READ8_MEMBER(starfire_state::fireone_input_r)
 		0x28,0x29,0x2b,0x2a,0x2e,0x2f,0x2d,0x2c,
 		0x24,0x25,0x27,0x26,0x22,0x23,0x21,0x20
 	};
-	int temp;
-
 
 	switch (offset & 15)
 	{
-		case 0:	return ioport("DSW")->read();
-		case 1:	return ioport("SYSTEM")->read();
+		case 0: return ioport("DSW")->read();
+		case 1: return ioport("SYSTEM")->read();
 		case 2:
-			temp = m_fireone_select ? ioport("P1")->read() : ioport("P2")->read();
-			temp = (temp & 0xc0) | fireone_paddle_map[temp & 0x3f];
-			return temp;
+		{
+			UINT8 input = m_fireone_select ? ioport("P1")->read() : ioport("P2")->read();
+			return (input & 0xc0) | fireone_paddle_map[input & 0x3f];
+		}
 		default: return 0xff;
 	}
 }
@@ -163,37 +170,37 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( starfire )
-	PORT_START("DSW")	/* DSW0 */
-	PORT_DIPNAME( 0x03, 0x00, "Time" )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x03, 0x00, "Time" )				PORT_DIPLOCATION("3A:1,2")
 	PORT_DIPSETTING(    0x00, "90 Sec" )
 	PORT_DIPSETTING(    0x01, "80 Sec" )
 	PORT_DIPSETTING(    0x02, "70 Sec" )
 	PORT_DIPSETTING(    0x03, "60 Sec" )
-	PORT_DIPNAME( 0x04, 0x00, "Coin(s) to Start" )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x04, "2" )
-	PORT_DIPNAME( 0x08, 0x00, "Fuel per Coin" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Coinage ) )	PORT_DIPLOCATION("3A:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x08, 0x00, "Fuel per Coin" )		PORT_DIPLOCATION("3A:4")
 	PORT_DIPSETTING(    0x00, "300" )
 	PORT_DIPSETTING(    0x08, "600" )
-	PORT_DIPNAME( 0x30, 0x00, "Bonus" )
+	PORT_DIPNAME( 0x30, 0x00, "Bonus" )				PORT_DIPLOCATION("3A:5,6")
 	PORT_DIPSETTING(    0x00, "300 points" )
 	PORT_DIPSETTING(    0x10, "500 points" )
 	PORT_DIPSETTING(    0x20, "700 points" )
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x00, "Score Table Hold" )
+	PORT_DIPNAME( 0x40, 0x00, "Score Table Hold" )	PORT_DIPLOCATION("3A:7")
 	PORT_DIPSETTING(    0x00, "fixed length" )
 	PORT_DIPSETTING(    0x40, "fixed length+fire" )
-	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
+	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_HIGH, "3A:8" )
 
 	PORT_START("SYSTEM")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) // (audio) TIE ON, see starfire_input_r
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) // (audio) LASER ON, see starfire_input_r
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT ) // SLAM/STATIC
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("STICKX")	/* IN2 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
@@ -212,7 +219,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( fireone )
-	PORT_START("DSW")	/* DSW0 */
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, "2 Coins/1 Player" )
 	PORT_DIPSETTING(    0x02, "2 Coins/1 or 2 Players" )
@@ -382,11 +389,13 @@ ROM_END
 DRIVER_INIT_MEMBER(starfire_state,starfire)
 {
 	m_input_read = read8_delegate(FUNC(starfire_state::starfire_input_r),this);
+	m_io2_write = write8_delegate(FUNC(starfire_state::starfire_sound_w),this);
 }
 
 DRIVER_INIT_MEMBER(starfire_state,fireone)
 {
 	m_input_read = read8_delegate(FUNC(starfire_state::fireone_input_r),this);
+	m_io2_write = write8_delegate(FUNC(starfire_state::fireone_io2_w),this);
 
 	/* register for state saving */
 	save_item(NAME(m_fireone_select));

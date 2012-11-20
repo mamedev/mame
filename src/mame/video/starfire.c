@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    Star Fire video system
+    Star Fire/Fire One system - video hardware
 
 ***************************************************************************/
 
@@ -17,7 +17,6 @@
 
 void starfire_state::video_start()
 {
-
 	machine().primary_screen->register_screen_bitmap(m_starfire_screen);
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(starfire_state::starfire_scanline_callback),this));
 	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(STARFIRE_VBEND), STARFIRE_VBEND);
@@ -38,7 +37,6 @@ void starfire_state::video_start()
 
 WRITE8_MEMBER(starfire_state::starfire_colorram_w)
 {
-
     /* handle writes to the pseudo-color RAM */
 	if ((offset & 0xe0) == 0)
 	{
@@ -72,7 +70,6 @@ WRITE8_MEMBER(starfire_state::starfire_colorram_w)
 
 READ8_MEMBER(starfire_state::starfire_colorram_r)
 {
-
 	/* handle writes to the pseudo-color RAM, which also happen on reads */
 	if ((offset & 0xe0) == 0)
 	{
