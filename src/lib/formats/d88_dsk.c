@@ -504,7 +504,6 @@ bool d88_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	if(!head_count)
 		return false;
 
-	UINT32 *track_data = global_alloc_array(UINT32, cell_count+10000);
 	UINT32 track_pos[164];
 	io_generic_read(io, track_pos, 32, 164*4);
 
@@ -514,97 +513,49 @@ bool d88_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			if(!pos)
 				continue;
 
+			desc_pc_sector sects[256];
 			UINT8 sect_data[65536];
-			int tpos = 0;
-
-			// gap 4a , IAM and gap 1
-			for(int i=0; i<80; i++) mfm_w(track_data, tpos, 8, 0x4e);
-			for(int i=0; i<12; i++) mfm_w(track_data, tpos, 8, 0x00);
-			for(int i=0; i< 3; i++) raw_w(track_data, tpos, 16, 0x5224);
-			mfm_w(track_data, tpos, 8, 0xfc);
-			for(int i=0; i<50; i++) mfm_w(track_data, tpos, 8, 0x4e);
-
-			// Read all sector headers to compute the available and expected size for gap3
+			int sdatapos = 0;
 			int sector_count = 1;
-			int gap3 = 84;
-			int etpos = tpos;
-			int rpos = pos;
-			for(int i=0; i<sector_count; i++) {
-				UINT8 hs[16];
-				io_generic_read(io, hs, rpos, 16);
-				UINT16 size = LITTLE_ENDIANIZE_INT16(*(UINT16 *)(hs+14));
-				rpos += 16+size;
-				if(i == 0) {
-					sector_count = LITTLE_ENDIANIZE_INT16(*(UINT16 *)(hs+4));
-					if(size < 512)
-						gap3 = form_factor == floppy_image::FF_35 ? 54 : 50;
-					else
-						gap3 = form_factor == floppy_image::FF_35 ? 84 : 80;
-				}
-				etpos += (12+3+5+2+22+12+3+1+size+2)*16;
-			}
-
-			if(etpos > cell_count)
-				throw emu_fatalerror("d88_format: Incorrect layout on track %d head %d, expected_size=%d, current_size=%d", track, head, cell_count, etpos);
-
-			if(etpos + gap3*16*(sector_count-1) > cell_count)
-				gap3 = (cell_count - etpos) / 16 / (sector_count-1);
-
-			// Build the track
 			for(int i=0; i<sector_count; i++) {
 				UINT8 hs[16];
 				io_generic_read(io, hs, pos, 16);
+				pos += 16;
+
 				UINT16 size = LITTLE_ENDIANIZE_INT16(*(UINT16 *)(hs+14));
-				io_generic_read(io, sect_data, pos+16, size);
-				pos += 16+size;
+				if(i == 0)
+					sector_count = LITTLE_ENDIANIZE_INT16(*(UINT16 *)(hs+4));
 
-				int cpos;
-				UINT16 crc;
-				// sync and IDAM and gap 2
-				for(int j=0; j<12; j++) mfm_w(track_data, tpos, 8, 0x00);
-				cpos = tpos;
-				for(int j=0; j< 3; j++) raw_w(track_data, tpos, 16, 0x4489);
-				mfm_w(track_data, tpos, 8, 0xfe);
-				mfm_w(track_data, tpos, 8, hs[0]);
-				mfm_w(track_data, tpos, 8, hs[1]);
-				mfm_w(track_data, tpos, 8, hs[2]);
-				mfm_w(track_data, tpos, 8, hs[3]);
-				crc = calc_crc_ccitt(track_data, cpos, tpos);
-				mfm_w(track_data, tpos, 16, crc);
-				for(int j=0; j<22; j++) mfm_w(track_data, tpos, 8, 0x4e);
+				sects[i].track       = hs[0];
+				sects[i].head        = hs[1];
+				sects[i].sector      = hs[2];
+				sects[i].size        = hs[3];
+				sects[i].actual_size = size;
+				sects[i].deleted     = hs[7] != 0;
+				sects[i].bad_crc     = false;
 
-				// sync, DAM, data and gap 3
-				for(int j=0; j<12; j++) mfm_w(track_data, tpos, 8, 0x00);
-				cpos = tpos;
-				for(int j=0; j< 3; j++) raw_w(track_data, tpos, 16, 0x4489);
-				mfm_w(track_data, tpos, 8, hs[7] ? 0xf8 : 0xfb);
-				for(int j=0; j<size; j++) mfm_w(track_data, tpos, 8, sect_data[j]);
-				crc = calc_crc_ccitt(track_data, cpos, tpos);
-				mfm_w(track_data, tpos, 16, crc);
-				for(int j=0; j<gap3; j++) mfm_w(track_data, tpos, 8, 0x4e);
+				if(size) {
+					sects[i].data    = sect_data + sdatapos;
+					io_generic_read(io, sects[i].data, pos+16, size);
+					pos += size;
+				}
 			}
 
-			// Gap 4b
-
-			while(tpos < cell_count-15) mfm_w(track_data, tpos, 8, 0x4e);
-			raw_w(track_data, tpos, cell_count-tpos, 0x9254 >> (16+tpos-cell_count));
-
-			generate_track_from_levels(track, head, track_data, cell_count, 0, image);
+			build_pc_track_mfm(track, head, image, cell_count, sector_count, sects, calc_default_pc_gap3_size(form_factor, sects[0].actual_size));
 		}
 
-	global_free(track_data);
 	return true;
 }
 
 
 bool d88_format::save(io_generic *io, floppy_image *image)
 {
-	return true;
+	return false;
 }
 
 bool d88_format::supports_save() const
 {
-	return true;
+	return false;
 }
 
 const floppy_format_type FLOPPY_D88_FORMAT = &floppy_image_format_creator<d88_format>;

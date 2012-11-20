@@ -414,7 +414,7 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		if(ssize == 0xff)
 			throw emu_fatalerror("imd_format: Unsupported variable sector size on track %d head %d", track, head);
 
-		UINT32 size = ssize < 7 ? 128 << ssize : 8192;
+		UINT32 actual_size = ssize < 7 ? 128 << ssize : 8192;
 
 		static const int rates[3] = { 500000, 300000, 250000 };
 		bool fm = mode < 3;
@@ -433,135 +433,44 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 		head &= 0x3f;
 
-		UINT32 *track_data = global_alloc_array(UINT32, cell_count+10000);
-		int tpos = 0;
+		int gap_3 = calc_default_pc_gap3_size(form_factor, actual_size);
 
-		// gap 4a , IAM and gap 1
-		if(fm) {
-			for(int i=0; i<40; i++) fm_w(track_data, tpos, 8, 0xff);
-			for(int i=0; i< 6; i++) fm_w(track_data, tpos, 8, 0x00);
-			raw_w(track_data, tpos, 16, 0xf77a);
-			for(int i=0; i<26; i++) fm_w(track_data, tpos, 8, 0xff);
-		} else {
-			for(int i=0; i<80; i++) mfm_w(track_data, tpos, 8, 0x4e);
-			for(int i=0; i<12; i++) mfm_w(track_data, tpos, 8, 0x00);
-			for(int i=0; i< 3; i++) raw_w(track_data, tpos, 16, 0x5224);
-			mfm_w(track_data, tpos, 8, 0xfc);
-			for(int i=0; i<50; i++) mfm_w(track_data, tpos, 8, 0x4e);
+		desc_pc_sector sects[256];
+
+		for(int i=0; i<sector_count; i++) {
+			UINT8 stype = img[pos++];
+			sects[i].track       = tnum ? tnum[i] : track;
+			sects[i].head        = hnum ? hnum[i] : head;
+			sects[i].sector      = snum[i];
+			sects[i].size        = ssize;
+			sects[i].actual_size = actual_size;
+
+			if(stype == 0 || stype > 8) {
+				sects[i].data = NULL;
+				
+			} else {
+				sects[i].deleted = stype == 3 || stype == 4 || stype == 7 || stype == 8;
+				sects[i].bad_crc = stype == 5 || stype == 6 || stype == 7 || stype == 8;
+
+				if(stype == 2 || stype == 4 || stype == 6 || stype == 8) {
+					sects[i].data = global_alloc_array(UINT8, actual_size);
+					memset(sects[i].data, img[pos++], actual_size);
+
+				} else {
+					sects[i].data = img + pos;
+					pos += actual_size;
+				}
+			}
 		}
 
-		// Compute the available and expected size for gap3
-		int gap3 = form_factor == floppy_image::FF_8 ? 25 :
-			size < 512 ?
-			(form_factor == floppy_image::FF_35 ? 54 : 50) :
-			(form_factor == floppy_image::FF_35 ? 84 : 80);
-
-		int etpos = tpos;
 		if(fm)
-			etpos += sector_count*(6+5+2+11+6+1+size+2)*16;
+			build_pc_track_fm(track, head, image, cell_count, sector_count, sects, gap_3);
 		else
-			etpos += sector_count*(12+3+5+2+22+12+3+1+size+2)*16;
+			build_pc_track_mfm(track, head, image, cell_count, sector_count, sects, gap_3);
 
-		if(etpos > cell_count)
-			throw emu_fatalerror("imd_format: Incorrect layout on track %d head %d, expected_size=%d, current_size=%d", track, head, cell_count, etpos);
-
-		if(etpos + gap3*16*(sector_count-1) > cell_count)
-			gap3 = (cell_count - etpos) / 16 / (sector_count-1);
-
-		// Build the track
-		if(fm) {
-			for(int i=0; i<sector_count; i++) {
-				UINT8 stype = img[pos++];
-
-				int cpos;
-				UINT16 crc;
-				// sync and IDAM and gap 2
-				for(int j=0; j< 6; j++) fm_w(track_data, tpos, 8, 0x00);
-				cpos = tpos;
-				raw_w(track_data, tpos, 16, 0xf57e);
-				fm_w (track_data, tpos, 8, tnum ? tnum[i] : track);
-				fm_w (track_data, tpos, 8, hnum ? hnum[i] : head);
-				fm_w (track_data, tpos, 8, snum[i]);
-				fm_w (track_data, tpos, 8, ssize);
-				crc = calc_crc_ccitt(track_data, cpos, tpos);
-				fm_w (track_data, tpos, 16, crc);
-				for(int j=0; j<11; j++) fm_w(track_data, tpos, 8, 0xff);
-
-				if(stype == 0 || stype > 8)
-					for(int j=0; j<6+1+size+2+gap3; j++) fm_w(track_data, tpos, 8, 0xff);
-
-				else {
-					// sync, DAM, data and gap 3
-					for(int j=0; j< 6; j++) fm_w(track_data, tpos, 8, 0x00);
-					cpos = tpos;
-					raw_w(track_data, tpos, 16, stype == 3 || stype == 4 || stype == 7 || stype == 8 ? 0xf56a : 0xf56f);
-					if(stype == 2 || stype == 4 || stype == 6 || stype == 8) {
-						for(int j=0; j<size; j++) fm_w(track_data, tpos, 8, img[pos]);
-						pos++;
-					} else
-						for(int j=0; j<size; j++) fm_w(track_data, tpos, 8, img[pos++]);
-					crc = calc_crc_ccitt(track_data, cpos, tpos);
-					if(stype == 5 || stype == 6 || stype == 7 || stype == 8)
-						crc = 0xffff^crc;
-					fm_w(track_data, tpos, 16, crc);
-					for(int j=0; j<gap3; j++) fm_w(track_data, tpos, 8, 0xff);
-				}
-			}
-
-			// Gap 4b
-
-			while(tpos < cell_count-15) fm_w(track_data, tpos, 8, 0xff);
-			raw_w(track_data, tpos, cell_count-tpos, 0xffff >> (16+tpos-cell_count));
-
-		} else {
-			for(int i=0; i<sector_count; i++) {
-				UINT8 stype = img[pos++];
-
-				int cpos;
-				UINT16 crc;
-				// sync and IDAM and gap 2
-				for(int j=0; j<12; j++) mfm_w(track_data, tpos, 8, 0x00);
-				cpos = tpos;
-				for(int j=0; j< 3; j++) raw_w(track_data, tpos, 16, 0x4489);
-				mfm_w(track_data, tpos, 8, 0xfe);
-				mfm_w(track_data, tpos, 8, tnum ? tnum[i] : track);
-				mfm_w(track_data, tpos, 8, hnum ? hnum[i] : head);
-				mfm_w(track_data, tpos, 8, snum[i]);
-				mfm_w(track_data, tpos, 8, ssize);
-				crc = calc_crc_ccitt(track_data, cpos, tpos);
-				mfm_w(track_data, tpos, 16, crc);
-				for(int j=0; j<22; j++) mfm_w(track_data, tpos, 8, 0x4e);
-
-				if(stype == 0 || stype > 8)
-					for(int j=0; j<12+4+size+2+gap3; j++) mfm_w(track_data, tpos, 8, 0x4e);
-
-				else {
-					// sync, DAM, data and gap 3
-					for(int j=0; j<12; j++) mfm_w(track_data, tpos, 8, 0x00);
-					cpos = tpos;
-					for(int j=0; j< 3; j++) raw_w(track_data, tpos, 16, 0x4489);
-					mfm_w(track_data, tpos, 8, stype == 3 || stype == 4 || stype == 7 || stype == 8 ? 0xf8 : 0xfb);
-					if(stype == 2 || stype == 4 || stype == 6 || stype == 8) {
-						for(int j=0; j<size; j++) mfm_w(track_data, tpos, 8, img[pos]);
-						pos++;
-					} else
-						for(int j=0; j<size; j++) mfm_w(track_data, tpos, 8, img[pos++]);
-					if(stype == 5 || stype == 6 || stype == 7 || stype == 8)
-						crc = 0xffff^crc;
-					crc = calc_crc_ccitt(track_data, cpos, tpos);
-					mfm_w(track_data, tpos, 16, crc);
-					for(int j=0; j<gap3; j++) mfm_w(track_data, tpos, 8, 0x4e);
-				}
-			}
-
-			// Gap 4b
-
-			while(tpos < cell_count-15) mfm_w(track_data, tpos, 8, 0x4e);
-			raw_w(track_data, tpos, cell_count-tpos, 0x9254 >> (16+tpos-cell_count));
-		}
-
-		generate_track_from_levels(track, head, track_data, cell_count, 0, image);
-		global_free(track_data);
+		for(int i=0; i<sector_count; i++)
+			if(sects[i].data && (sects[i].data < img || sects[i].data >= img+size))
+				global_free(sects[i].data);
 	}
 
 	global_free(img);
