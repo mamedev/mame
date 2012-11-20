@@ -96,6 +96,7 @@ public:
 	required_device<upd765a_device> m_fdc;
 	required_device<am9517a_device> m_dmac;
 	UINT8 *m_char_rom;
+	UINT8 *m_aux_pcg;
 
 	required_shared_ptr<UINT8> m_video_ram_1;
 	required_shared_ptr<UINT8> m_video_ram_2;
@@ -118,6 +119,8 @@ public:
 	DECLARE_WRITE8_MEMBER(apc_irq_ack_w);
 	DECLARE_READ8_MEMBER(apc_rtc_r);
 	DECLARE_WRITE8_MEMBER(apc_rtc_w);
+//	DECLARE_READ8_MEMBER(aux_pcg_r);
+//	DECLARE_WRITE8_MEMBER(aux_pcg_w);
 
 	struct {
 		UINT8 status; //status
@@ -163,6 +166,7 @@ protected:
 void apc_state::video_start()
 {
 	m_char_rom = memregion("gfx")->base();
+	m_aux_pcg = memregion("aux_pcg")->base();
 }
 
 UINT32 apc_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -203,11 +207,13 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		UINT8 color;
 		UINT8 tile,attr,pen;
 		UINT32 tile_addr;
+		UINT8 tile_sel;
 
 //      tile_addr = addr+(x*(state->m_video_ff[WIDTH40_REG]+1));
 		tile_addr = addr+(x*(1));
 
 		tile = state->m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0x00ff;
+		tile_sel = state->m_video_ram_1[(tile_addr*2) & 0x1fff] & 0x00ff;
 		attr = (state->m_video_ram_1[(tile_addr*2 & 0x1fff) | 0x2000] & 0x00ff);
 
 		u_line = attr & 0x01;
@@ -232,24 +238,31 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(res_x > 640 || res_y > 494) //TODO
 					continue;
 
-//              tile_data = secret ? 0 : (state->m_char_rom[tile*char_size+interlace_on*0x800+yi]);
 				/*
-				 Addr bus:   C BA98 7654 3210
-				             | |||| |\\\ \\\\- character number bits 0-6
-				             | |||| \--------- y' bit 0
-				             | |||\----------- y' bit 1
-				             | ||\------------ y' bit 2
-				             | |\------------- y' bit 3
-				             | \-------------- character number bit 7
-				             \---------------- y' bit 4
+				Addr bus:   C BA98 7654 3210
+				            | |||| |\\\ \\\\- character number bits 0-6
+				            | |||| \--------- y' bit 0
+				            | |||\----------- y' bit 1
+				            | ||\------------ y' bit 2
+				            | |\------------- y' bit 3
+				            | \-------------- character number bit 7
+				            \---------------- y' bit 4
 
 				y to y' (assumed; this needs hardware tests since there could be one more 'blank' line between all char rows):
 				y  =  0 1 2 3 ... 16 17 18
 				y' = 18 0 1 2 ... 15 16 17
 
-				 Data bus: 76543210 = pixels, in left->01234567->right order
-				 */
-				tile_data = (state->m_char_rom[(tile & 0x7f)+((tile & 0x80)<<4)+((yi_trans & 0xf)*0x80)+((yi_trans & 0x10)<<8)]);
+				Data bus: 76543210 = pixels, in left->01234567->right order
+				*/
+				if(tile_sel == 0x89)// Aux character RAM select TODO: correct triggering?
+				{
+					if(yi & 0x10)
+						tile_data = 0;
+					else
+						tile_data = state->m_aux_pcg[(tile & 0xff)*0x20+yi*2];
+				}
+				else
+					tile_data = state->m_char_rom[(tile & 0x7f)+((tile & 0x80)<<4)+((yi_trans & 0xf)*0x80)+((yi_trans & 0x10)<<8)];
 
 				if(reverse) { tile_data^=0xff; }
 				if(u_line && yi == lr-1) { tile_data = 0xff; }
@@ -459,7 +472,7 @@ static ADDRESS_MAP_START( apc_map, AS_PROGRAM, 16, apc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
 	AM_RANGE(0xa0000, 0xa0fff) AM_RAM AM_SHARE("cmos")
 //	AM_RANGE(0xc0000, 0xcffff) standard character ROM
-	AM_RANGE(0xd8000, 0xdffff) AM_RAM // AUX character RAM
+	AM_RANGE(0xd8000, 0xd9fff) AM_RAM AM_REGION("aux_pcg", 0) // AUX character RAM
 //	AM_RANGE(0xe0000, 0xeffff) Special Character RAM
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
@@ -797,11 +810,25 @@ static const gfx_layout charset_8x16 =
 	8
 };
 
+#if 0
+static const gfx_layout charset_pcg =
+{
+	8, 16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 7, 6, 5, 4, 3, 2, 1, 0 },
+	{ STEP16(0,16) },
+	8*32
+};
+#endif
+
 static GFXDECODE_START( apc )
 	GFXDECODE_ENTRY( "gfx", 0x0000, charset_8x16, 0, 128 )
 	GFXDECODE_ENTRY( "gfx", 0x0800, charset_8x16, 0, 128 )
 	GFXDECODE_ENTRY( "gfx", 0x1000, charset_8x16, 0, 128 )
 	GFXDECODE_ENTRY( "gfx", 0x1800, charset_8x16, 0, 128 )
+//	GFXDECODE_ENTRY( "aux_pcg", 0x0000, charset_pcg, 0, 128 )
 GFXDECODE_END
 
 
@@ -1049,6 +1076,8 @@ ROM_START( apc )
 
 	ROM_REGION( 0x2000, "gfx", ROMREGION_ERASE00 )
     ROM_LOAD("pfcu1r.bin",   0x000000, 0x002000, CRC(683efa94) SHA1(43157984a1746b2e448f3236f571011af9a3aa73) )
+
+	ROM_REGION( 0x2000, "aux_pcg", ROMREGION_ERASE00 )
 ROM_END
 
 DRIVER_INIT_MEMBER(apc_state,apc)
