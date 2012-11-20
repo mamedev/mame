@@ -252,7 +252,7 @@ bool floppy_image_device::call_load()
 	image = global_alloc(floppy_image(tracks, sides, form_factor));
 	best_format->load(&io, form_factor, image);
 
-	revolution_start_time = attotime::never;
+	revolution_start_time = motor_always_on ? machine().time() : attotime::never;
 	revolution_count = 0;
 
 	index_resync();

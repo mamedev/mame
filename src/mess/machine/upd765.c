@@ -1978,7 +1978,6 @@ void upd765_family_device::index_callback(floppy_image_device *floppy, int state
 		floppy_info &fi = flopi[fid];
 		if(fi.dev != floppy)
 			continue;
-		fprintf(stderr, "floppy %d index %d sub_state %d\n", fid, state, fi.sub_state);
 
 		if(fi.live)
 			live_sync();
