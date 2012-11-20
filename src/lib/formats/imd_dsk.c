@@ -419,7 +419,7 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		static const int rates[3] = { 500000, 300000, 250000 };
 		bool fm = mode < 3;
 		int rate = rates[mode % 3];
-		int rpm = form_factor == floppy_image::FF_8 || (form_factor == floppy_image::FF_525 && rate >= 300) ? 360 : 300;
+		int rpm = form_factor == floppy_image::FF_8 || (form_factor == floppy_image::FF_525 && rate >= 300000) ? 360 : 300;
 		int cell_count = (fm ? 1 : 2)*rate*60/rpm;
 
 		const UINT8 *snum = img+pos;
