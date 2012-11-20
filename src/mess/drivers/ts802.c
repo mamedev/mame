@@ -84,7 +84,17 @@ ROM_START( ts802 )
 	ROM_LOAD( "ts802.rom", 0x0000, 0x1000, CRC(60bd086a) SHA1(82c5b60223e0d895683d3592a56684ef2dabfba6) )
 ROM_END
 
+ROM_START( ts802h )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "8000050 050 2732", 0x0000, 0x1000, CRC(7054f384) SHA1(cf0a01a32283272532ed4890c3a3c2082f1618bf) )
+	ROM_LOAD( "i800000 047d.a53", 0x1000, 0x1000, CRC(94bfcbc1) SHA1(87c5f8898b0041d012e142ee7f559cb8a90f4dc1) )
+	ROM_LOAD( "a64", 0x2000, 0x1000, CRC(41b5feda) SHA1(c9435a97c032ffe457bdb84d5dde8ecf3677b56c) )
+	ROM_LOAD( "800000-002a.a67", 0x3000, 0x0800, CRC(4b6c6e29) SHA1(c236e4625bc16062154cbebc4dbc8d62183ef9ab) )
+	ROM_LOAD( "800000-003a.a68", 0x3800, 0x0800, CRC(24eeb74d) SHA1(77900937f1492b4c5a70ba3aac55da322d403fbd) )
+ROM_END
+
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 19??, ts802,   0,       0,     ts802,     ts802, driver_device,  0,  "Televideo", "TS802", GAME_IS_SKELETON)
+COMP( 19??, ts802,   0,       0,     ts802,     ts802, driver_device,  0,  "Televideo", "TS802", GAME_IS_SKELETON )
+COMP( 19??, ts802h,  ts802,   0,     ts802,     ts802, driver_device,  0,  "Televideo", "TS802H", GAME_IS_SKELETON )

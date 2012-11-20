@@ -245,6 +245,7 @@ SOUNDS += AWACS
 DRVLIBS += \
 	$(MESSOBJ)/acorn.a \
 	$(MESSOBJ)/act.a \
+	$(MESSOBJ)/adc.a \
 	$(MESSOBJ)/alesis.a \
 	$(MESSOBJ)/amiga.a \
 	$(MESSOBJ)/amstrad.a \
@@ -602,6 +603,10 @@ $(MESSOBJ)/act.a:				\
 	$(MESS_MACHINE)/apricotkb.o	\
 	$(MESS_DRIVERS)/victor9k.o	\
 	$(MESS_MACHINE)/victor9kb.o	\
+
+$(MESSOBJ)/adc.a:				\
+	$(MESS_DRIVERS)/super6.o	\
+	$(MESS_DRIVERS)/superslave.o	\
 
 $(MESSOBJ)/alesis.a:			\
 	$(MESS_DRIVERS)/alesis.o	\
@@ -2045,14 +2050,14 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/selz80.o	\
 	$(MESS_DRIVERS)/sitcom.o	\
 	$(MESS_DRIVERS)/slc1.o		\
-	$(MESS_DRIVERS)/super6.o	\
 	$(MESS_DRIVERS)/swtpc.o		\
 	$(MESS_DRIVERS)/sys2900.o	\
 	$(MESS_DRIVERS)/systec.o	\
 	$(MESS_DRIVERS)/terak.o		\
 	$(MESS_DRIVERS)/tim011.o	\
 	$(MESS_DRIVERS)/tricep.o	\
-	$(MESS_DRIVERS)/ts802.o	\
+	$(MESS_DRIVERS)/ts802.o		\
+	$(MESS_DRIVERS)/ts803.o		\
 	$(MESS_DRIVERS)/tsispch.o	\
 	$(MESS_DRIVERS)/unior.o		\
 	$(MESS_DRIVERS)/unistar.o	\
