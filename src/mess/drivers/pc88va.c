@@ -28,8 +28,8 @@
 #include "machine/upd765.h"
 #include "sound/2203intf.h"
 #include "formats/mfi_dsk.h"
-#include "formats/pc_dsk.h"
 #include "formats/xdf_dsk.h"
+#include "formats/d88_dsk.h"
 
 /* Note: for the time being, just disable FDC CPU, it's for PC-8801 compatibility mode anyway ... */
 #define TEST_SUBFDC 0
@@ -128,6 +128,8 @@ public:
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_upd765_interrupt);
+	UINT8 m_fdc_ctrl_2;
+	TIMER_CALLBACK_MEMBER(pc88va_fdc_timer);
 
 	void upd765_interrupt(bool state);
 };
@@ -987,10 +989,19 @@ READ8_MEMBER(pc88va_state::pc88va_fdc_r)
 	return 0xff;
 }
 
+TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_timer)
+{
+	if(m_fdc_ctrl_2 & 4) // XTMASK
+	{
+		pic8259_ir3_w(machine().device( "pic8259_slave"), 0);
+		pic8259_ir3_w(machine().device( "pic8259_slave"), 1);
+	}
+}
+
 WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 {
-	printf("%08x %02x\n",offset,data);
-	switch(offset*2)
+	printf("%08x %02x\n",offset<<1,data);
+	switch(offset<<1)
 	{
 		/*
         ---- ---x MODE: FDC op mode (0) Intelligent (1) DMA
@@ -1022,7 +1033,15 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
         ---- ---x TTRG: FDC timer trigger (0) FDC timer clearing (1) FDC timer start
         */
 		case 0x06:
-			printf("%02x\n",data);
+			//printf("%02x\n",data);
+			m_fdc_ctrl_2 = data;
+
+			if(data & 1)
+				machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(pc88va_state::pc88va_fdc_timer),this));
+
+			if(data & 0x80) // correct?
+				machine().device<upd765a_device>("upd765")->reset();
+
 			break; // FDC control port 2
 	}
 }
@@ -1051,6 +1070,7 @@ TIMER_CALLBACK_MEMBER(pc88va_state::t3_mouse_callback)
 {
 	if(m_timer3_io_reg & 0x80)
 	{
+		pic8259_ir5_w(machine().device("pic8259_slave"), 0);
 		pic8259_ir5_w(machine().device("pic8259_slave"), 1);
 		m_t3_mouse_timer->adjust(attotime::from_hz(120 >> (m_timer3_io_reg & 3)));
 	}
@@ -1560,6 +1580,10 @@ void pc88va_state::machine_start()
 	m_t3_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc88va_state::t3_mouse_callback),this));
 	m_t3_mouse_timer->adjust(attotime::never);
 	machine().device<upd765a_device>("upd765")->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc88va_state::upd765_interrupt), this));
+
+	machine().device<floppy_connector>("upd765:0")->get_device()->set_rpm(300);
+	machine().device<floppy_connector>("upd765:1")->get_device()->set_rpm(300);
+	machine().device<upd765a_device>("upd765")->set_rate(250000);
 }
 
 void pc88va_state::machine_reset()
@@ -1592,12 +1616,17 @@ void pc88va_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(pc88va_state::pc88va_vrtc_irq)
 {
+	pic8259_ir2_w(machine().device("pic8259_master"), 0);
 	pic8259_ir2_w(machine().device("pic8259_master"), 1);
 }
 
 WRITE_LINE_MEMBER(pc88va_state::pc88va_pit_out0_changed)
 {
-	pic8259_ir0_w(machine().device("pic8259_master"), 1);
+	if(state)
+	{
+		pic8259_ir0_w(machine().device("pic8259_master"), 0);
+		pic8259_ir0_w(machine().device("pic8259_master"), 1);
+	}
 }
 
 static const struct pit8253_config pc88va_pit8253_config =
@@ -1627,10 +1656,16 @@ static const struct pit8253_config pc88va_pit8253_config =
 
 void pc88va_state::upd765_interrupt(bool state)
 {
-	if(m_fdc_mode)
-		pic8259_ir3_w(machine().device( "pic8259_slave"), state);
+	if(m_fdc_mode && state)
+	{
+		//printf("%d\n",state);
+		pic8259_ir3_w(machine().device( "pic8259_slave"), 0);
+		pic8259_ir3_w(machine().device( "pic8259_slave"), 1);
+	}
+	#if TEST_SUBFDC
 	else
 		machine().device("fdccpu")->execute().set_input_line(0, HOLD_LINE);
+	#endif
 }
 
 
@@ -1648,9 +1683,9 @@ static const ym2203_interface pc88va_ym2203_intf =
 };
 
 static const floppy_format_type pc88va_floppy_formats[] = {
-	FLOPPY_PC_FORMAT,
 	FLOPPY_XDF_FORMAT,
 	FLOPPY_MFI_FORMAT,
+	FLOPPY_D88_FORMAT,
 	NULL
 };
 
@@ -1691,7 +1726,7 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_PIC8259_ADD( "pic8259_master", pc88va_pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pc88va_pic8259_slave_config )
 
-	MCFG_UPD765A_ADD("upd765", true, true)
+	MCFG_UPD765A_ADD("upd765", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88va_floppies, "525hd", 0, pc88va_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88va_floppies, "525hd", 0, pc88va_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc88va")
