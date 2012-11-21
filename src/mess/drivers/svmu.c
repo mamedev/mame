@@ -357,10 +357,8 @@ ROM_START( svmu )
 	ROMX_LOAD("vmu1004.bin", 0x0000, 0x10000, CRC(8e0f867a) SHA1(dc2fa2963138a1049a43f7f36439ad0a416ee8b4), ROM_BIOS(3))	// from Sega Katana SDK (original file: fbios.sbf, CRC: c7c77b3c, xor key: 0x37)
 	ROM_SYSTEM_BIOS(3, "jp1005", "VMS Japanese BIOS (v1.005)")
 	ROMX_LOAD("vmu1005.bin", 0x0000, 0x10000, CRC(47623324) SHA1(fca1aceff8a2f8c6826f3a865f4d5ef88dfd9ed1), ROM_BIOS(4))
-	ROM_SYSTEM_BIOS(4, "jp1004q", "Japan v1.004 (quick start)")	// automatically boot the first game found in the flash
-	ROMX_LOAD( "vmu1004q.bin",  0x0000, 0x10000, CRC(395e25f2) SHA1(37dea034322b5b80b35b2de784298d32c71ba7a3), ROM_BIOS(5))	// from Sega Katana SDK (original file: qbios.sbf, CRC: eed5524c, xor key: 0x43)	
-	ROM_SYSTEM_BIOS(5, "dev1004", "VMS Japanese Dev BIOS (v1.004)")
-	ROMX_LOAD( "vmsdev1004.bin", 0x0000, 0x10000, CRC(395e25f2) SHA1(37dea034322b5b80b35b2de784298d32c71ba7a3), ROM_BIOS(6))
+	ROM_SYSTEM_BIOS(4, "dev1004", "VMS Japanese Dev BIOS (v1.004)")	// automatically boot the first game found in the flash
+	ROMX_LOAD( "vmsdev1004.bin", 0x0000, 0x10000, CRC(395e25f2) SHA1(37dea034322b5b80b35b2de784298d32c71ba7a3), ROM_BIOS(5))	// from Sega Katana SDK (original file: qbios.sbf, CRC: eed5524c, xor key: 0x43)
 ROM_END
 
 
