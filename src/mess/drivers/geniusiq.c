@@ -592,12 +592,18 @@ static MACHINE_CONFIG_START( geniusiq, geniusiq_state )
 MACHINE_CONFIG_END
 
 /* ROM definition */
-ROM_START( geniusiq )
+
+ROM_START( gl8008cx )
+	ROM_REGION(0x200000, "maincpu", 0)
+	ROM_LOAD( "8008cx_ger.bin", 0x0000, 0x200000, CRC(fd49db46) SHA1(fc55bb31f42068f9d6cc8e2c2f419c3c4edb4fe6) )
+ROM_END
+
+ROM_START( iq128_fr )
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_LOAD( "geniusiq.bin", 0x0000, 0x200000, CRC(9b06cbf1) SHA1(b9438494a9575f78117c0033761f899e3c14e292) )
 ROM_END
 
-ROM_START( geniusiq_de )
+ROM_START( iq128 )
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_LOAD( "german.rom", 0x0000, 0x200000, CRC(a98fc3ff) SHA1(de76a5898182bd0180bd2b3e34c4502f0918a3fa) )
 ROM_END
@@ -605,5 +611,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                FULLNAME               FLAGS */
-COMP( 1997, geniusiq,      0,   		   0,    geniusiq,   geniusiq, driver_device,  0,  "Video Technology", "Genius IQ 128 (France)", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1997, geniusiq_de,   geniusiq,       0,    geniusiq,   geniusiq_de, driver_device,  0,  "Video Technology", "Genius IQ 128 (Germany)", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, gl8008cx,   0,              0,    geniusiq,   geniusiq_de, driver_device,  0,  "Video Technology", "Genius Leader 8008 CX (Germany)", GAME_IS_SKELETON)
+COMP( 1997, iq128_fr,      0,   		   0,    geniusiq,   geniusiq,    driver_device,  0,  "Video Technology", "Genius IQ 128 (France)", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1997, iq128,      geniusiq,       0,    geniusiq,   geniusiq_de, driver_device,  0,  "Video Technology", "Genius IQ 128 (Germany)", GAME_NOT_WORKING | GAME_NO_SOUND)

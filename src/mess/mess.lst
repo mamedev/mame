@@ -1127,8 +1127,9 @@ laser500  // 1984? Laser 500
 laser700  // 1984? Laser 700
 socrates  // 1988 Socrates Educational Video System
 socratfc  // 1988 Socrates SAITOUT
-geniusiq // 1997 Genius PC (France) / Genius IQ 128 (Germany)
-geniusiq_de
+gl8008cx
+iq128_fr // 1997 Genius PC (France) / Genius IQ 128 (Germany)
+iq128
 
 // Tangerine
 microtan  // 1979 Microtan 65
