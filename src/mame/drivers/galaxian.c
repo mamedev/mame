@@ -3534,5 +3534,25 @@ DRIVER_INIT_MEMBER(galaxian_state,moonwar)
 }
 
 
+DRIVER_INIT_MEMBER( galaxian_state, ghostmun )
+{
+	/* same as Pacmanbl... */
+	DRIVER_INIT_CALL(pacmanbl);
+
+	/* ...but sprite clip limits need to be adjusted */
+	//galaxian_sprite_clip_start = 12; // this adjustment no longer exists
+	//galaxian_sprite_clip_end = 250;
+}
+
+DRIVER_INIT_MEMBER( galaxian_state, froggrs )
+{
+	/* video extensions */
+	common_init(machine(), NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
+
+	/* decrypt */
+	decode_frogger_sound(machine());
+	decode_frogger_gfx(machine());
+}
+
 
 #include "galdrvr.c"

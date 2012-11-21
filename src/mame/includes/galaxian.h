@@ -218,6 +218,8 @@ public:
 	DECLARE_DRIVER_INIT(superbon);
 	DECLARE_DRIVER_INIT(calipso);
 	DECLARE_DRIVER_INIT(moonwar);
+	DECLARE_DRIVER_INIT(ghostmun);
+	DECLARE_DRIVER_INIT(froggrs);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	virtual void video_start();
 	virtual void palette_init();
