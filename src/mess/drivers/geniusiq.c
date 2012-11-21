@@ -343,7 +343,7 @@ static ADDRESS_MAP_START(geniusiq_mem, AS_PROGRAM, 16, geniusiq_state)
 	//AM_RANGE(0x600600, 0x600605)                      // sound ??
 	AM_RANGE(0x600606, 0x600609) AM_WRITE(gfx_base_w)
 	AM_RANGE(0x60060a, 0x60060b) AM_WRITE(gfx_idx_w)
-	//AM_RANGE(0x600802, 0x600803)                      // cartridge state
+	AM_RANGE(0x600802, 0x600803) AM_READ_PORT("CART")   // cartridge state
 	AM_RANGE(0x600918, 0x600919) AM_READ(unk0_r)        // loop at start if bit 0 is set
 	AM_RANGE(0x601008, 0x601009) AM_READ(unk_r)			// unknown, read at start and expect that bit 2 changes several times before continue
 	AM_RANGE(0x601010, 0x601011) AM_READ(unk0_r)		// loop at start if bit 1 is set
@@ -510,6 +510,13 @@ static INPUT_PORTS_START( geniusiq )
 	PORT_START("MOUSE")
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2 )	PORT_NAME("Mouse Button 2")		PORT_CODE(MOUSECODE_BUTTON2)	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_mouse_input, 0 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 )	PORT_NAME("Mouse Button 1")		PORT_CODE(MOUSECODE_BUTTON1)	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_mouse_input, 0 )
+
+	PORT_START("CART")
+	PORT_CONFNAME( 0x03, 0x03, "Cartridge" )
+	PORT_CONFSETTING( 0x00, "ROM/Flash cartridge" )	// check for cartridge header at 0xa00000
+	PORT_CONFSETTING( 0x01, "Cartouche I" )
+	PORT_CONFSETTING( 0x02, "Cartouche II" )
+	PORT_CONFSETTING( 0x03, "No cartridge" )
 INPUT_PORTS_END
 
 
@@ -555,6 +562,13 @@ static INPUT_PORTS_START( geniusiq_de )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_A )			PORT_CHAR('a')	PORT_CHAR('A')	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x64 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_Q )			PORT_CHAR('q')	PORT_CHAR('Q')	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x65 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_1 )			PORT_CHAR('1')	PORT_CHAR('!')	PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x66 )
+
+	PORT_MODIFY("CART")
+	PORT_CONFNAME( 0x03, 0x03, "Cartridge" )
+	PORT_CONFSETTING( 0x00, "ROM/Flash cartridge" )	// check for cartridge header at 0xa00000
+	PORT_CONFSETTING( 0x01, "Fit in Naturwissenschaften" )
+	PORT_CONFSETTING( 0x02, "No cartridge" )
+	PORT_CONFSETTING( 0x03, "No cartridge" )
 INPUT_PORTS_END
 
 
