@@ -743,7 +743,7 @@ void apc_state::fdc_drq(bool state)
 void apc_state::fdc_irq(bool state)
 {
 //  printf("IRQ %d\n",state);
-	pic8259_ir3_w(machine().device("pic8259_slave"), state);
+	pic8259_ir4_w(machine().device("pic8259_slave"), state);
 }
 
 static IRQ_CALLBACK(irq_callback)
@@ -859,26 +859,28 @@ static const struct pit8253_config pit8253_config =
 };
 /*
 irq assignment:
+(note: documentation shows ODA Printer at ir7 master, but clearly everything is shifted one place due of the
+ master-slave irq comms. This is trusted also because MS-DOS effectively wants FDC irq at ir4 slave)
 
 8259 master:
 ir0 all stop (enabled at POST, unknown purpose)
 ir1 Communication
 ir2 Option
-ir3 Timer (enabled after CP/M loading, serial?)
+ir3 Timer
 ir4 keyboard (almost trusted, check code at fe64a)
 ir5 Option
 ir6 Option
-ir7 (ODA Printer?)
+ir7 slave irq
 
 8259 slave:
-ir0 Option
+ir0 ODA Printer
 ir1 Option
-ir2 CRT
-ir3 FDD
-ir4 Option
+ir2 Option
+ir3 CRT
+ir4 FDD
 ir5 Option
-ir6 APU
-ir7 Option
+ir6 Option
+ir7 APU
 */
 
 WRITE_LINE_MEMBER(apc_state::apc_master_set_int_line)
