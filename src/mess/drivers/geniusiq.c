@@ -612,5 +612,5 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                FULLNAME               FLAGS */
 COMP( ????, gl8008cx,   0,              0,    geniusiq,   geniusiq_de, driver_device,  0,  "Video Technology", "Genius Leader 8008 CX (Germany)", GAME_IS_SKELETON)
-COMP( 1997, iq128_fr,      0,   		   0,    geniusiq,   geniusiq,    driver_device,  0,  "Video Technology", "Genius IQ 128 (France)", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1997, iq128,      geniusiq,       0,    geniusiq,   geniusiq_de, driver_device,  0,  "Video Technology", "Genius IQ 128 (Germany)", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1997, iq128_fr,   iq128,          0,    geniusiq,   geniusiq,    driver_device,  0,  "Video Technology", "Genius IQ 128 (France)", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1997, iq128,      0,              0,    geniusiq,   geniusiq_de, driver_device,  0,  "Video Technology", "Genius IQ 128 (Germany)", GAME_NOT_WORKING | GAME_NO_SOUND)
