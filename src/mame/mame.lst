@@ -6230,15 +6230,19 @@ popn2			// GX831 (c) 1998 (Japan)
 //popnstex  	// GX970 (c) 1999 (Japan)
 
 // Firebeat games
-ppp				// GQ977 (c) 2000
+ppp				// GQ977 (c) 2000 (Japan)
 ppd				// GQ977 (c) 2000 (Korea)
-ppp11			// GQ977 (c) 2000
-ppp1mp          // GQA11 (c) 2000?
-kbm				// GQ974 (c) 2000
-kbm2nd			// GCA01 (c) 2000
-kbm3rd			// GCA12 (c) 2001
-popn5			// GCA04 (c) 2000
-popn7			// not sure, doesn't boot yet (c) 2001
+ppp11			// GQ977 (c) 2000 (Japan)
+ppp1mp          // GQA11 (c) 2000 (Japan)
+kbm				// GQ974 (c) 2000 (Japan)
+kbm2nd			// GCA01 (c) 2000 (Japan)
+kbm3rd			// GCA12 (c) 2001 (Japan)
+popn4           // GQ986 (c) 2000 (Japan)
+popn5			// GCA04 (c) 2000 (Japan)
+popn6			// GQA16 (c) 2001 (Japan)
+popn7			// GCB00 (c) 2001 (Japan)
+popnanm2        // GEA02 (c) 2001 (Japan)
+popn8           // GQB30 (c) 2002 (Japan)
 
 // PowerPC based Konami games
 bujutsu			// G?645 (c)1997
