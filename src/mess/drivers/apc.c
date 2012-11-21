@@ -53,6 +53,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "audio/upd1771.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/am9517a.h"
@@ -107,8 +108,6 @@ public:
 
 	DECLARE_READ8_MEMBER(apc_port_28_r);
 	DECLARE_WRITE8_MEMBER(apc_port_28_w);
-	DECLARE_READ8_MEMBER(apc_port_60_r);
-	DECLARE_WRITE8_MEMBER(apc_port_60_w);
 	DECLARE_READ8_MEMBER(apc_gdc_r);
 	DECLARE_WRITE8_MEMBER(apc_gdc_w);
 	DECLARE_READ8_MEMBER(apc_kbd_r);
@@ -327,36 +326,6 @@ WRITE8_MEMBER(apc_state::apc_port_28_w)
 }
 
 
-READ8_MEMBER(apc_state::apc_port_60_r)
-{
-	UINT8 res;
-
-	if(offset & 1)
-	{
-		printf("Read undefined port %02x\n",offset+0x60);
-		res = 0xff;
-	}
-	else
-	{
-		//printf("Read melody port %02x\n",offset+0x60);
-		res = 0x80;
-	}
-
-	return res;
-}
-
-WRITE8_MEMBER(apc_state::apc_port_60_w)
-{
-	if(offset & 1)
-	{
-		printf("Write undefined port %02x\n",offset+0x60);
-	}
-	else
-	{
-		printf("Write melody port %02x %02x\n",offset+0x60,data);
-	}
-}
-
 READ8_MEMBER(apc_state::apc_gdc_r)
 {
 	UINT8 res;
@@ -491,8 +460,7 @@ static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 	AM_RANGE(0x58, 0x59) AM_READWRITE8(apc_rtc_r, apc_rtc_w, 0x00ff)
 //  0x5a  APU data (Arithmetic Processing Unit!)
 //  0x5e  APU status/command
-	AM_RANGE(0x60, 0x67) AM_READWRITE8(apc_port_60_r, apc_port_60_w, 0xffff)
-//  0x60 Melody Processing Unit
+	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE8_LEGACY("upd1771c", upd1771_r, upd1771_w, 0x00ff )
 //  AM_RANGE(0x68, 0x6f) i8255 , printer port (A: status (R) B: data (W) C: command (W))
 //  AM_DEVREADWRITE8("upd7220_btm", upd7220_device, read, write, 0x00ff)
 //	0x92, 0x9a, 0xa2, 0xaa is for a Hard Disk (unknown type)
@@ -969,14 +937,11 @@ WRITE_LINE_MEMBER(apc_state::apc_dack3_w){ /*printf("%02x 3\n",state);*/ set_dma
 
 READ8_MEMBER(apc_state::fdc_r)
 {
-//  printf("2dd DACK R\n");
-
 	return m_fdc->dma_r();
 }
 
 WRITE8_MEMBER(apc_state::fdc_w)
 {
-	//	printf("2dd DACK W\n");
 	m_fdc->dma_w(data);
 }
 
@@ -1018,6 +983,8 @@ PALETTE_INIT_MEMBER(apc_state,apc)
 		palette_set_color_rgb(machine(), i, pal1bit(0), pal1bit(0), pal1bit(0));
 }
 
+static const upd1771_interface upd1771c_config = { DEVCB_NULL };
+
 static MACHINE_CONFIG_START( apc, apc_state )
 
 	/* basic machine hardware */
@@ -1055,8 +1022,9 @@ static MACHINE_CONFIG_START( apc, apc_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD( "upd1771c", UPD1771C, MAIN_CLOCK )
+	MCFG_SOUND_CONFIG( upd1771c_config )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
 
 

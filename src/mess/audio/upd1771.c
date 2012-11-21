@@ -162,6 +162,11 @@ INLINE upd1771_state *get_safe_token(device_t *device)
 }
 
 
+READ8_DEVICE_HANDLER( upd1771_r )
+{
+	return 0x80; // TODO
+}
+
 /*
 *************TONE*****************
 Tone consist of a wavetable playback mechanism.
@@ -189,6 +194,7 @@ Byte3: 0b???VVVVV
    Note: volume is not a volume in a normal sense but some kind
    of bit cropping/rounding.
 */
+
 
 /*
 *************NOISE*****************

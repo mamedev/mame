@@ -54,6 +54,7 @@ extern const device_type UPD1771C;
     PROTOTYPES
 ***************************************************************************/
 
+DECLARE_READ8_DEVICE_HANDLER( upd1771_r );
 DECLARE_WRITE8_DEVICE_HANDLER( upd1771_w );
 WRITE_LINE_DEVICE_HANDLER( upd1771_pcm_w );
 
