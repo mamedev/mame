@@ -192,14 +192,14 @@ UINT32 geniusiq_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		{
 			UINT16 data = m_mouse_gfx[(y*6 + x)>>1];
 
-			for(int b=0; b<4; b++)
+			for(int b=0; b<8; b++)
 			{
-				UINT8 pen = (data>>12) & 0x0f;
+				UINT8 pen = (data>>14) & 0x03;
 
 				// I assume color 0 is transparent
-				if(pen != 0 && screen.visible_area().contains(m_mouse_gfx_posx + x*2 + b, m_mouse_gfx_posy + y))
-					bitmap.pix16(m_mouse_gfx_posy + y, m_mouse_gfx_posx + x*2 + b) = pen;
-				data <<= 4;
+				if(pen != 0 && screen.visible_area().contains(m_mouse_gfx_posx + x*4 + b, m_mouse_gfx_posy + y))
+					bitmap.pix16(m_mouse_gfx_posy + y, m_mouse_gfx_posx + x*4 + b) = pen;
+				data <<= 2;
 			}
 		}
 
