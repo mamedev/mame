@@ -17,7 +17,6 @@
       hooked up by the current z80 core
     - PC-88VA has two bogus opcodes. One is at 0xf0b15, another at 0xf0b31. Making a patch
       for the latter makes the system to jump into a "DIP-Switch" display.
-    - DMA almost certainly ISN'T i8237. What is it?
 
 ********************************************************************************************/
 
@@ -33,6 +32,7 @@
 #include "formats/mfi_dsk.h"
 #include "formats/xdf_dsk.h"
 #include "formats/d88_dsk.h"
+#include "machine/upd71071.h"
 
 /* Note: for the time being, just disable FDC CPU, it's for PC-8801 compatibility mode anyway ... */
 #define TEST_SUBFDC 0
@@ -59,8 +59,10 @@ class pc88va_state : public driver_device
 public:
 	pc88va_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
+		m_dmac(*this, "dmac"),
 		m_palram(*this, "palram"){ }
 
+	required_device<upd71071_device> m_dmac;
 	required_shared_ptr<UINT16> m_palram;
 	UINT16 m_bank_reg;
 	UINT16 m_screen_ctrl_reg;
@@ -129,8 +131,6 @@ public:
 	DECLARE_WRITE8_MEMBER(r232_ctrl_portc_w);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_pic_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
-	DECLARE_READ8_MEMBER(pc88va_dma_r);
-	DECLARE_WRITE8_MEMBER(pc88va_dma_w);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_upd765_interrupt);
 	UINT8 m_fdc_ctrl_2;
@@ -946,7 +946,7 @@ READ8_MEMBER(pc88va_state::rom_bank_r)
 
 READ8_MEMBER(pc88va_state::key_r)
 {
-	// note row C bit 2 does something at POST ... some kind of test mode?
+	// note row D bit 2 does something at POST ... some kind of test mode?
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
 	                                        "KEY4", "KEY5", "KEY6", "KEY7",
 	                                        "KEY8", "KEY9", "KEYA", "KEYB",
@@ -1125,42 +1125,6 @@ READ8_MEMBER(pc88va_state::no_subfdc_r)
 }
 #endif
 
-/* TODO: identify or emulate this DMAC */
-READ8_MEMBER(pc88va_state::pc88va_dma_r)
-{
-/*
-0: undefined
-1: ---x ---- mode
-   ---- xxxx select channel (bit-wise)
-2/3: xxxx xxxx count
-4/5: xxxx xxxx address
-6: ---- xxxx address
-8: ???? ???? Device control Register
-A: ???? ???? Mode control Register
-B: ???? ???? Status Register (r/o)
-F: xxxx xxxx Mask Register
-*/
-
-	return 0;
-}
-
-WRITE8_MEMBER(pc88va_state::pc88va_dma_w)
-{
-	switch(offset)
-	{
-		case 0x00: printf("DMA reset %02x\n",data & 1); break;
-		case 0x01: printf("DMA select channel %02x mode channel %02x\n",data & 3,(data & 4) >> 2); break;
-		case 0x02: printf("DMA count 7-0 %02x\n",data); break;
-		case 0x03: printf("DMA count 15-8 %02x\n",data); break;
-		case 0x04: printf("DMA address 7-0 %02x\n",data); break;
-		case 0x05: printf("DMA address 15-8 %02x\n",data); break;
-		case 0x06: printf("DMA address 19-16 %02x\n",data); break;
-		case 0x08: printf("DMA Device control register %02x\n",data); break;
-		case 0x0a: printf("DMA Mode control register %02x\n",data); break;
-		case 0x0f: printf("DMA Mask register %02x\n",data); break;
-	}
-}
-
 static ADDRESS_MAP_START( pc88va_io_map, AS_IO, 16, pc88va_state )
 	AM_RANGE(0x0000, 0x000f) AM_READ8(key_r,0xffff) // Keyboard ROW reading
 //  AM_RANGE(0x0010, 0x0010) Printer / Calendar Clock Interface
@@ -1211,7 +1175,7 @@ static ADDRESS_MAP_START( pc88va_io_map, AS_IO, 16, pc88va_state )
 	AM_RANGE(0x0156, 0x0157) AM_READ8(rom_bank_r,0x00ff) // ROM bank status
 //  AM_RANGE(0x0158, 0x0159) Interruption Mode Modification
 //  AM_RANGE(0x015c, 0x015f) NMI mask port (strobe port)
-	AM_RANGE(0x0160, 0x016f) AM_READWRITE8(pc88va_dma_r,pc88va_dma_w,0xffff) // DMA Controller
+	AM_RANGE(0x0160, 0x016f) AM_DEVREADWRITE8_LEGACY("dmac", upd71071_r, upd71071_w,0xffff) // DMA Controller
 	AM_RANGE(0x0184, 0x0187) AM_DEVREADWRITE8_LEGACY("pic8259_slave", pic8259_r, pic8259_w, 0x00ff)
 	AM_RANGE(0x0188, 0x018b) AM_DEVREADWRITE8_LEGACY("pic8259_master", pic8259_r, pic8259_w, 0x00ff) // ICU, also controls 8214 emulation
 //  AM_RANGE(0x0190, 0x0191) System Port 5
@@ -1456,8 +1420,8 @@ static INPUT_PORTS_START( pc88va )
 	PORT_START("SYSOP_SW")
 	PORT_DIPNAME( 0x03, 0x01, "System Operational Mode" )
 //  PORT_DIPSETTING(    0x00, "Reserved" )
-	PORT_DIPSETTING(    0x02, "N88 V1 Mode" )
 	PORT_DIPSETTING(    0x01, "N88 V2 Mode" )
+	PORT_DIPSETTING(    0x02, "N88 V1 Mode" )
 //  PORT_DIPSETTING(    0x03, "???" )
 INPUT_PORTS_END
 
@@ -1723,6 +1687,15 @@ static const ym2203_interface pc88va_ym2203_intf =
 	DEVCB_NULL
 };
 
+/* ch2 is FDC, ch0/3 are "user". ch1 is unused */
+static const upd71071_intf pc88va_dma_config =
+{
+	"maincpu",
+	8000000,
+	{ 0, 0, 0, 0 },
+	{ 0, 0, 0, 0 }
+};
+
 static const floppy_format_type pc88va_floppy_formats[] = {
 	FLOPPY_XDF_FORMAT,
 	FLOPPY_MFI_FORMAT,
@@ -1766,6 +1739,8 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 
 	MCFG_PIC8259_ADD( "pic8259_master", pc88va_pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pc88va_pic8259_slave_config )
+
+	MCFG_UPD71071_ADD("dmac",pc88va_dma_config)
 
 	MCFG_UPD765A_ADD("upd765", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88va_floppies, "525hd", 0, pc88va_floppy_formats)
