@@ -777,11 +777,24 @@ static INPUT_PORTS_START( galxwars )
 	PORT_DIPSETTING(    0x00, "3000" )
 	PORT_DIPSETTING(    0x08, "5000" )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 INPUT_PORTS_END
 
+static ADDRESS_MAP_START( starw1_io_map, AS_IO, 8, _8080bw_state )
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
+	AM_RANGE(0x03, 0x03) AM_WRITENOP	/* writes 9B at boot */
+	AM_RANGE(0x04, 0x04) AM_WRITE(invadpt2_sh_port_1_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(invadpt2_sh_port_2_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x07, 0x07) AM_WRITENOP	/* writes 89 at boot */
+ADDRESS_MAP_END
 
+static MACHINE_CONFIG_DERIVED_CLASS( starw1, invadpt2, _8080bw_state )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(starw1_io_map)
+MACHINE_CONFIG_END
 
 /*******************************************************/
 /*                                                     */
@@ -3260,6 +3273,22 @@ ROM_START( starw )
 	ROM_LOAD( "romf",         0x1c00, 0x0400, CRC(c8e42d3d) SHA1(841b27af251b9c3a964972e864fb7c88acc742e0) )
 ROM_END
 
+ROM_START( starw1 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gc.75",        0x0000, 0x0400, CRC(ad10c128) SHA1(c30ff9ff5cf8dedf7654c8e2799a4bb79a30104a) )
+	ROM_LOAD( "gc.77",        0x0400, 0x0400, CRC(ab77c474) SHA1(eb07dcad1f265834b93a8108298d4441d6a74b2e) )
+	ROM_LOAD( "gc.76",        0x0800, 0x0400, CRC(3638aed4) SHA1(1426c9270f248fd2ab134dc35526599c02051ccd) )
+	ROM_LOAD( "gc.80",        0x1400, 0x0400, CRC(4c67957b) SHA1(dda7bbd54e7395dea80d224e487318fb4429f027) )
+	ROM_LOAD( "gc.81",        0x1800, 0x0400, CRC(246621ef) SHA1(bddc5253f735fa81266d725a24b1c14faabe0c6a) )
+	ROM_LOAD( "gc.82",        0x1c00, 0x0400, CRC(19bd32ee) SHA1(a1718a6a6300c3d7df469793cb0d590c4a966aff) )
+
+	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	ROM_LOAD( "cv01",         0x0000, 0x0400, CRC(8d892ef3) SHA1(c471dd6197a3c779d89c33fcb425cf3bbdf4fc15) )
+	ROM_IGNORE( 0x0400 )
+	ROM_LOAD( "cv02",         0x0400, 0x0400, CRC(b44ddde8) SHA1(8793f370526c072e645d8d0b9794b1b64a7701ef) )
+	ROM_IGNORE( 0x0400 )
+ROM_END
+
 ROM_START( lrescue )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lrescue.1",    0x0000, 0x0800, CRC(2bbc4778) SHA1(0167f1ac1501ab0b4c4e555023fa5efed59d56ae) )
@@ -4017,6 +4046,7 @@ GAME( 1979, galxwars,   0,        invadpt2,  galxwars,  driver_device, 0, ROT270
 GAME( 1979, galxwars2,  galxwars, invadpt2,  galxwars,  driver_device, 0, ROT270, "Universal", "Galaxy Wars (Universal set 2)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1979, galxwarst,  galxwars, invadpt2,  galxwars,  driver_device, 0, ROT270, "Universal (Taito license?)", "Galaxy Wars (Taito?)" , GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) // Copyright not displayed
 GAME( 1979, starw,      galxwars, invaders,  galxwars,  driver_device, 0, ROT270, "bootleg", "Star Wars (bootleg of Galaxy Wars)", GAME_SUPPORTS_SAVE )
+GAME( 1979, starw1,     galxwars, starw1,    galxwars,  driver_device, 0, ROT270, "Yamashita", "Star Wars (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1979, cosmo,      0,        cosmo,     cosmo,     driver_device, 0, ROT90,  "TDS & MINTS", "Cosmo", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980?,invrvnge,   0,        invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 1)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND ) // copyright is either late-1980, or early-1981
 GAME( 1980?,invrvngea,  invrvnge, invrvnge,  invrvnge,  driver_device, 0, ROT270, "Zenitone-Microsec Ltd.", "Invader's Revenge (set 2)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
