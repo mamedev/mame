@@ -184,6 +184,34 @@ INLINE UINT32 get_addr_operand (z8000_state *cpustate, int opnum)
     return cpustate->op[opnum];
 }
 
+INLINE UINT32 get_raw_addr_operand (z8000_state *cpustate, int opnum)
+{
+    int i;
+    assert (cpustate->device->type() == Z8001 || cpustate->device->type() == Z8002);
+
+    for (i = 0; i < opnum; i++)
+        assert (cpustate->op_valid & (1 << i));
+
+    if (! (cpustate->op_valid & (1 << opnum)))
+    {
+        UINT32 seg = cpustate->direct->read_decrypted_word(cpustate->pc);
+        cpustate->pc += 2;
+        if (segmented_mode(cpustate))
+        {
+            if (seg & 0x8000)
+            {
+                cpustate->op[opnum] = (seg << 16) | cpustate->direct->read_decrypted_word(cpustate->pc);
+                cpustate->pc += 2;
+            }
+            else
+                cpustate->op[opnum] = (seg << 16) | (seg & 0xff);
+        }
+        else
+            cpustate->op[opnum] = seg;
+        cpustate->op_valid |= (1 << opnum);
+    }
+    return cpustate->op[opnum];
+}
 
 INLINE UINT8 RDMEM_B(z8000_state *cpustate, UINT32 addr)
 {

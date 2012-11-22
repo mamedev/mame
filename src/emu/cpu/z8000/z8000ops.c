@@ -6,6 +6,7 @@
  *
  *   Copyright Juergen Buchmueller, all rights reserved.
  *   Bug fixes and MSB_FIRST compliance Ernesto Corvi.
+ *   Bug fixes and segmented mode support Christian Groessler.
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or
@@ -73,7 +74,7 @@ INLINE void CHANGE_FCW(z8000_state *cpustate, UINT16 fcw)
 
 INLINE UINT32 make_segmented_addr(UINT32 addr)
 {
-    return ((addr & 0xffff0000) << 8) | (addr & 0xffff);
+    return ((addr & 0x007f0000) << 8) | 0x80000000 | (addr & 0xffff);
 }
 
 INLINE UINT32 segmented_addr(UINT32 addr)
@@ -91,10 +92,27 @@ INLINE UINT32 addr_from_reg(z8000_state *cpustate, int regno)
 
 INLINE void addr_to_reg(z8000_state *cpustate, int regno, UINT32 addr)
 {
-    if (segmented_mode(cpustate))
-        cpustate->RL(regno) = /*(cpustate->RL(regno) & 0x00ff0000) |*/ make_segmented_addr(addr);
+	if (segmented_mode(cpustate)) {
+		UINT32 segaddr = make_segmented_addr(addr);
+		cpustate->RW(regno) = (cpustate->RW(regno) & 0x80ff) | ((segaddr >> 16) & 0x7f00);
+		cpustate->RW(regno | 1) = segaddr & 0xffff;
+	}
     else
         cpustate->RW(regno) = addr;
+}
+
+INLINE void add_to_addr_reg(z8000_state *cpustate, int regno, UINT16 addend)
+{
+	if (segmented_mode(cpustate))
+		regno |= 1;
+	cpustate->RW(regno) += addend;
+}
+
+INLINE void sub_from_addr_reg(z8000_state *cpustate, int regno, UINT16 subtrahend)
+{
+	if (segmented_mode(cpustate))
+		regno |= 1;
+	cpustate->RW(regno) -= subtrahend;
 }
 
 INLINE void PUSHW(z8000_state *cpustate, UINT8 dst, UINT16 value)
@@ -1437,7 +1455,8 @@ static void Z0B_ssN0_dddd(z8000_state *cpustate)
 static void Z0C_ddN0_0000(z8000_state *cpustate)
 {
 	GET_DST(OP0,NIB3);
-	WRMEM_B(cpustate,  cpustate->RW(dst), COMB(cpustate, RDMEM_B(cpustate, addr_from_reg(cpustate, dst))));
+	UINT32 addr = addr_from_reg(cpustate, dst);
+	WRMEM_B(cpustate, addr, COMB(cpustate, RDMEM_B(cpustate, addr)));
 }
 
 /******************************************
@@ -1480,7 +1499,7 @@ static void Z0C_ddN0_0101_imm8(z8000_state *cpustate)
 {
 	GET_DST(OP0,NIB2);
 	GET_IMM8(OP1);
-	WRMEM_B(cpustate,  addr_from_reg(cpustate, dst), imm8);
+	WRMEM_B(cpustate, addr_from_reg(cpustate, dst), imm8);
 }
 
 /******************************************
@@ -1535,7 +1554,7 @@ static void Z0D_ddN0_0010(z8000_state *cpustate)
 {
 	GET_DST(OP0,NIB2);
     UINT32 addr = addr_from_reg(cpustate, dst);
-	WRMEM_W(cpustate,  addr, NEGW(cpustate, RDMEM_W(cpustate, addr)));
+	WRMEM_W(cpustate, addr, NEGW(cpustate, RDMEM_W(cpustate, addr)));
 }
 
 /******************************************
@@ -1578,7 +1597,7 @@ static void Z0D_ddN0_0110(z8000_state *cpustate)
 static void Z0D_ddN0_1000(z8000_state *cpustate)
 {
 	GET_DST(OP0,NIB2);
-	WRMEM_W(cpustate,  addr_from_reg(cpustate, dst), 0);
+	WRMEM_W(cpustate, addr_from_reg(cpustate, dst), 0);
 }
 
 /******************************************
@@ -1711,7 +1730,7 @@ static void Z14_ssN0_dddd(z8000_state *cpustate)
 }
 
 /******************************************
- popl    @rd,@rs
+ popl    rd,@rs
  flags:  ------
  ******************************************/
 static void Z15_ssN0_ddN0(z8000_state *cpustate)
@@ -1751,7 +1770,7 @@ static void Z17_ssN0_ddN0(z8000_state *cpustate)
 {
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	cpustate->RW(dst) = POPW(cpustate, src);
+	WRMEM_W(cpustate, addr_from_reg(cpustate, dst), POPW(cpustate, src));
 }
 
 /******************************************
@@ -1861,10 +1880,10 @@ static void Z1C_ddN0_1001_0000_ssss_0000_nmin1(z8000_state *cpustate)
     GET_DST(OP0,NIB2);
     GET_CNT(OP1,NIB3);
     GET_SRC(OP1,NIB1);
-	UINT16 idx = cpustate->RW(dst);
+	UINT32 addr = addr_from_reg(cpustate, dst);
     while (cnt-- >= 0) {
-        WRMEM_W(cpustate,  idx, cpustate->RW(src));
-		idx = (idx + 2) & 0xffff;
+        WRMEM_W(cpustate, addr, cpustate->RW(src));
+		addr = addr_add(cpustate, addr, 2);
 		src = (src+1) & 15;
     }
 }
@@ -1878,10 +1897,10 @@ static void Z1C_ssN0_0001_0000_dddd_0000_nmin1(z8000_state *cpustate)
 	GET_SRC(OP0,NIB2);
 	GET_CNT(OP1,NIB3);
 	GET_DST(OP1,NIB1);
-	UINT16 idx = cpustate->RW(src);
+	UINT32 addr = addr_from_reg(cpustate, src);
 	while (cnt-- >= 0) {
-		cpustate->RW(dst) = RDMEM_W(cpustate,  idx);
-		idx = (idx + 2) & 0xffff;
+		cpustate->RW(dst) = RDMEM_W(cpustate, addr);
+		addr = addr_add(cpustate, addr, 2);
 		dst = (dst+1) & 15;
     }
 }
@@ -2322,8 +2341,13 @@ static void Z34_ssN0_dddd_imm16(z8000_state *cpustate)
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_IDX16(OP1);
-	idx16 = addr_add(cpustate, addr_from_reg(cpustate, src), idx16);
-	addr_to_reg(cpustate, dst, idx16);
+	if (segmented_mode(cpustate)) {
+		cpustate->RL(dst) = cpustate->RL(src);
+	}
+	else {
+		cpustate->RW(dst) = cpustate->RW(src);
+	}
+	add_to_addr_reg(cpustate, dst, idx16);
 }
 
 /******************************************
@@ -2445,7 +2469,7 @@ static void Z3A_ssss_0000_0000_aaaa_dddd_x000(z8000_state *cpustate)
     GET_DST(OP1,NIB2);
     GET_CCC(OP1,NIB3);
     WRMEM_B(cpustate, addr_from_reg(cpustate, dst), RDPORT_B(cpustate,  0, cpustate->RW(src)));
-	addr_to_reg(cpustate, dst, addr_add(cpustate, addr_from_reg(cpustate, dst), 1));
+	add_to_addr_reg(cpustate, dst, 1);
 	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
 }
 
@@ -2480,7 +2504,7 @@ static void Z3A_ssss_0010_0000_aaaa_dddd_x000(z8000_state *cpustate)
     GET_DST(OP1,NIB2);
     GET_CCC(OP1,NIB3);
     WRPORT_B(cpustate,  0, cpustate->RW(dst), RDMEM_B(cpustate, addr_from_reg(cpustate, src)));
-	addr_to_reg(cpustate, src, addr_add(cpustate, addr_from_reg(cpustate, src), 1));
+	add_to_addr_reg(cpustate, src, 1);
 	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
 }
 
@@ -4424,7 +4448,13 @@ static void Z74_ssN0_dddd_0000_xxxx_0000_0000(z8000_state *cpustate)
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_IDX(OP1,NIB1);
-	addr_to_reg(cpustate, dst, addr_add(cpustate, addr_from_reg(cpustate, src), cpustate->RW(idx)));
+	if (segmented_mode(cpustate)) {
+		cpustate->RL(dst) = cpustate->RL(src);
+	}
+	else {
+		cpustate->RW(dst) = cpustate->RW(src);
+	}
+	add_to_addr_reg(cpustate, dst, cpustate->RW(idx));
 }
 
 /******************************************
@@ -4446,8 +4476,13 @@ static void Z75_ssN0_dddd_0000_xxxx_0000_0000(z8000_state *cpustate)
 static void Z76_0000_dddd_addr(z8000_state *cpustate)
 {
 	GET_DST(OP0,NIB3);
-	GET_ADDR(OP1);
-    addr_to_reg(cpustate, dst, addr);
+	GET_ADDR_RAW(OP1);
+	if (segmented_mode(cpustate)) {
+		cpustate->RL(dst) = addr;
+	}
+	else {
+		cpustate->RW(dst) = addr;
+	}
 }
 
 /******************************************
@@ -4455,12 +4490,17 @@ static void Z76_0000_dddd_addr(z8000_state *cpustate)
  flags:  ------
  ******************************************/
 static void Z76_ssN0_dddd_addr(z8000_state *cpustate)
-{
+{//@@@
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
-	GET_ADDR(OP1);
-	addr = addr_add(cpustate, addr, cpustate->RW(src));
-    addr_to_reg(cpustate, dst, addr);
+	GET_ADDR_RAW(OP1);
+	if (segmented_mode(cpustate)) {
+		cpustate->RL(dst) = addr;
+	}
+	else {
+		cpustate->RW(dst) = addr;
+	}
+	add_to_addr_reg(cpustate, dst, cpustate->RW(src));
 }
 
 /******************************************
@@ -5543,11 +5583,11 @@ static void ZB1_dddd_1010(z8000_state *cpustate)
 static void ZB2_dddd_0001_imm8(z8000_state *cpustate)
 {
 	GET_DST(OP0,NIB2);
-	GET_IMM16(OP1);
-	if (imm16 & S16)
-		cpustate->RB(dst) = SRLB(cpustate, cpustate->RB(dst), -(INT16)imm16);
+	GET_IMM8(OP1);
+	if (imm8 & S08)
+		cpustate->RB(dst) = SRLB(cpustate, cpustate->RB(dst), -(INT8)imm8);
 	else
-		cpustate->RB(dst) = SLLB(cpustate, cpustate->RB(dst), imm16);
+		cpustate->RB(dst) = SLLB(cpustate, cpustate->RB(dst), imm8);
 }
 
 /******************************************
@@ -5592,11 +5632,11 @@ static void ZB2_dddd_01I0(z8000_state *cpustate)
 static void ZB2_dddd_1001_imm8(z8000_state *cpustate)
 {
 	GET_DST(OP0,NIB2);
-	GET_IMM16(OP1);
-	if (imm16 & S16)
-		cpustate->RB(dst) = SRAB(cpustate, cpustate->RB(dst), -(INT16)imm16);
+	GET_IMM8(OP1);
+	if (imm8 & S08)
+		cpustate->RB(dst) = SRAB(cpustate, cpustate->RB(dst), -(INT8)imm8);
 	else
-		cpustate->RB(dst) = SLAB(cpustate, cpustate->RB(dst), imm16);
+		cpustate->RB(dst) = SLAB(cpustate, cpustate->RB(dst), imm8);
 }
 
 /******************************************
@@ -5840,7 +5880,7 @@ static void ZB8_ddN0_0010_0000_rrrr_ssN0_0000(z8000_state *cpustate)
 	UINT8 xlt = RDMEM_B(cpustate, addr_from_reg(cpustate, src) + RDMEM_B(cpustate, addr_from_reg(cpustate, dst)));
 	cpustate->RB(1) = xlt;	/* load RH1 */
 	if (xlt) CLR_Z; else SET_Z;
-	addr_to_reg(cpustate, dst, addr_add(cpustate, addr_from_reg(cpustate, dst), 1));
+	add_to_addr_reg(cpustate, dst, 1);
 	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
 }
 
@@ -5856,7 +5896,7 @@ static void ZB8_ddN0_0110_0000_rrrr_ssN0_1110(z8000_state *cpustate)
 	UINT8 xlt = RDMEM_B(cpustate, addr_from_reg(cpustate, src) + RDMEM_B(cpustate, addr_from_reg(cpustate, dst)));
 	cpustate->RB(1) = xlt;	/* load RH1 */
 	if (xlt) CLR_Z; else SET_Z;
-	addr_to_reg(cpustate, dst, addr_add(cpustate, addr_from_reg(cpustate, dst), 1));
+	add_to_addr_reg(cpustate, dst, 1);
 	if (--cpustate->RW(cnt)) {
 	  CLR_V;
 	  if (!xlt)
@@ -5877,7 +5917,7 @@ static void ZB8_ddN0_1010_0000_rrrr_ssN0_0000(z8000_state *cpustate)
 	UINT8 xlt = RDMEM_B(cpustate, addr_from_reg(cpustate, src) + RDMEM_B(cpustate, addr_from_reg(cpustate, dst)));
 	cpustate->RB(1) = xlt;	/* load RH1 */
 	if (xlt) CLR_Z; else SET_Z;
-	addr_to_reg(cpustate, dst, addr_sub(cpustate, addr_from_reg(cpustate, dst), 1));
+	sub_from_addr_reg(cpustate, dst, 1);
 	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
 }
 
@@ -5893,7 +5933,7 @@ static void ZB8_ddN0_1110_0000_rrrr_ssN0_1110(z8000_state *cpustate)
 	UINT8 xlt = RDMEM_B(cpustate, addr_from_reg(cpustate, src) + RDMEM_B(cpustate, addr_from_reg(cpustate, dst)));
 	cpustate->RB(1) = xlt;	/* load RH1 */
 	if (xlt) CLR_Z; else SET_Z;
-	addr_to_reg(cpustate, dst, addr_sub(cpustate, addr_from_reg(cpustate, dst), 1));
+	sub_from_addr_reg(cpustate, dst, 1);
 	if (--cpustate->RW(cnt)) {
 	  CLR_V;
 	  if (!xlt)
@@ -5914,7 +5954,7 @@ static void ZB8_ddN0_0000_0000_rrrr_ssN0_0000(z8000_state *cpustate)
 	UINT8 xlt = RDMEM_B(cpustate, addr_from_reg(cpustate, src) + RDMEM_B(cpustate, addr_from_reg(cpustate, dst)));
 	WRMEM_B(cpustate, addr_from_reg(cpustate, dst), xlt);
 	cpustate->RB(1) = xlt;	/* destroy RH1 */
-	addr_to_reg(cpustate, dst, addr_add(cpustate, addr_from_reg(cpustate, dst), 1));
+	add_to_addr_reg(cpustate, dst, 1);
 	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
 }
 
@@ -5930,7 +5970,7 @@ static void ZB8_ddN0_0100_0000_rrrr_ssN0_0000(z8000_state *cpustate)
 	UINT8 xlt = RDMEM_B(cpustate, addr_from_reg(cpustate, src) + RDMEM_B(cpustate, addr_from_reg(cpustate, dst)));
 	WRMEM_B(cpustate, addr_from_reg(cpustate, dst), xlt);
 	cpustate->RB(1) = xlt;	/* destroy RH1 */
-	addr_to_reg(cpustate, dst, addr_add(cpustate, addr_from_reg(cpustate, dst), 1));
+	add_to_addr_reg(cpustate, dst, 1);
 	if (--cpustate->RW(cnt)) { CLR_V; cpustate->pc -= 4; } else SET_V;
 }
 
@@ -5946,7 +5986,7 @@ static void ZB8_ddN0_1000_0000_rrrr_ssN0_0000(z8000_state *cpustate)
 	UINT8 xlt = RDMEM_B(cpustate, addr_from_reg(cpustate, src) + RDMEM_B(cpustate, addr_from_reg(cpustate, dst)));
 	WRMEM_B(cpustate, addr_from_reg(cpustate, dst), xlt);
 	cpustate->RB(1) = xlt;	/* destroy RH1 */
-	addr_to_reg(cpustate, dst, addr_sub(cpustate, addr_from_reg(cpustate, dst), 1));
+	sub_from_addr_reg(cpustate, dst, 1);
 	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
 }
 
@@ -5962,7 +6002,7 @@ static void ZB8_ddN0_1100_0000_rrrr_ssN0_0000(z8000_state *cpustate)
 	UINT8 xlt = RDMEM_B(cpustate, addr_from_reg(cpustate, src) + RDMEM_B(cpustate, addr_from_reg(cpustate, dst)));
 	WRMEM_B(cpustate, addr_from_reg(cpustate, dst), xlt);
 	cpustate->RB(1) = xlt;	/* destroy RH1 */
-	addr_to_reg(cpustate, dst, addr_sub(cpustate, addr_from_reg(cpustate, dst), 1));
+	sub_from_addr_reg(cpustate, dst, 1);
 	if (--cpustate->RW(cnt)) { CLR_V; cpustate->pc -= 4; } else SET_V;
 }
 
@@ -6010,7 +6050,7 @@ static void ZBA_ssN0_0000_0000_rrrr_dddd_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
     }
-	addr_to_reg(cpustate, src, addr_add(cpustate, addr_from_reg(cpustate, src), 1));
+	add_to_addr_reg(cpustate, src, 1);
 	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
 }
 
@@ -6026,8 +6066,8 @@ static void ZBA_ssN0_0001_0000_rrrr_ddN0_x000(z8000_state *cpustate)
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);	/* repeat? */
     WRMEM_B(cpustate,  addr_from_reg(cpustate, dst), RDMEM_B(cpustate, addr_from_reg(cpustate, src)));
-	addr_to_reg(cpustate, dst, addr_add(cpustate, addr_from_reg(cpustate, dst), 1));
-	addr_to_reg(cpustate, src, addr_add(cpustate, addr_from_reg(cpustate, src), 1));
+	add_to_addr_reg(cpustate, src, 1);
+	add_to_addr_reg(cpustate, dst, 1);
 	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
 }
 
@@ -6060,8 +6100,8 @@ static void ZBA_ssN0_0010_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
     }
-	addr_to_reg(cpustate, dst, addr_add(cpustate, addr_from_reg(cpustate, dst), 1));
-	addr_to_reg(cpustate, src, addr_add(cpustate, addr_from_reg(cpustate, src), 1));
+	add_to_addr_reg(cpustate, src, 1);
+	add_to_addr_reg(cpustate, dst, 1);
 	if (--cpustate->RW(cnt)) { CLR_V; if (!(cpustate->fcw & F_Z)) cpustate->pc -= 4; } else SET_V;
 }
 
@@ -6094,7 +6134,7 @@ static void ZBA_ssN0_0100_0000_rrrr_dddd_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
     }
-	addr_to_reg(cpustate, src, addr_add(cpustate, addr_from_reg(cpustate, src), 1));
+	add_to_addr_reg(cpustate, src, 1);
 	if (--cpustate->RW(cnt)) { CLR_V; if (!(cpustate->fcw & F_Z)) cpustate->pc -= 4; } else SET_V;
 }
 
@@ -6127,8 +6167,8 @@ static void ZBA_ssN0_0110_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
     }
-	addr_to_reg(cpustate, dst, addr_add(cpustate, addr_from_reg(cpustate, dst), 1));
-	addr_to_reg(cpustate, src, addr_add(cpustate, addr_from_reg(cpustate, src), 1));
+	add_to_addr_reg(cpustate, src, 1);
+	add_to_addr_reg(cpustate, dst, 1);
 	if (--cpustate->RW(cnt)) { CLR_V; if (!(cpustate->fcw & F_Z)) cpustate->pc -= 4; } else SET_V;
 }
 
@@ -6161,7 +6201,7 @@ static void ZBA_ssN0_1000_0000_rrrr_dddd_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
     }
-	addr_to_reg(cpustate, src, addr_sub(cpustate, addr_from_reg(cpustate, src), 1));
+	sub_from_addr_reg(cpustate, src, 1);
 	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
 }
 
@@ -6177,8 +6217,8 @@ static void ZBA_ssN0_1001_0000_rrrr_ddN0_x000(z8000_state *cpustate)
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
 	WRMEM_B(cpustate,  addr_from_reg(cpustate, dst), RDMEM_B(cpustate, addr_from_reg(cpustate, src)));
-	addr_to_reg(cpustate, dst, addr_sub(cpustate, addr_from_reg(cpustate, dst), 1));
-	addr_to_reg(cpustate, src, addr_sub(cpustate, addr_from_reg(cpustate, src), 1));
+	sub_from_addr_reg(cpustate, src, 1);
+	sub_from_addr_reg(cpustate, dst, 1);
 	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
 }
 
@@ -6211,8 +6251,8 @@ static void ZBA_ssN0_1010_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
     }
-	addr_to_reg(cpustate, dst, addr_sub(cpustate, addr_from_reg(cpustate, dst), 1));
-	addr_to_reg(cpustate, src, addr_sub(cpustate, addr_from_reg(cpustate, src), 1));
+	sub_from_addr_reg(cpustate, src, 1);
+	sub_from_addr_reg(cpustate, dst, 1);
 	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
 }
 
@@ -6245,7 +6285,7 @@ static void ZBA_ssN0_1100_0000_rrrr_dddd_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
     }
-	addr_to_reg(cpustate, src, addr_sub(cpustate, addr_from_reg(cpustate, src), 1));
+	sub_from_addr_reg(cpustate, src, 1);
 	if (--cpustate->RW(cnt)) { CLR_V; if (!(cpustate->fcw & F_Z)) cpustate->pc -= 4; } else SET_V;
 }
 
@@ -6278,8 +6318,8 @@ static void ZBA_ssN0_1110_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
 	}
-	addr_to_reg(cpustate, dst, addr_sub(cpustate, addr_from_reg(cpustate, dst), 1));
-	addr_to_reg(cpustate, src, addr_sub(cpustate, addr_from_reg(cpustate, src), 1));
+	sub_from_addr_reg(cpustate, src, 1);
+	sub_from_addr_reg(cpustate, dst, 1);
 	if (--cpustate->RW(cnt)) { CLR_V; if (!(cpustate->fcw & F_Z)) cpustate->pc -= 4; } else SET_V;
 }
 
@@ -6312,7 +6352,7 @@ static void ZBB_ssN0_0000_0000_rrrr_dddd_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
     }
-	addr_to_reg(cpustate, src, addr_add(cpustate, addr_from_reg(cpustate, src), 2));
+	add_to_addr_reg(cpustate, src, 2);
 	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
 }
 
@@ -6328,8 +6368,8 @@ static void ZBB_ssN0_0001_0000_rrrr_ddN0_x000(z8000_state *cpustate)
 	GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
 	WRMEM_W(cpustate,  addr_from_reg(cpustate, dst), RDMEM_W(cpustate, addr_from_reg(cpustate, src)));
-	addr_to_reg(cpustate, src, addr_add(cpustate, addr_from_reg(cpustate, src), 2));
-	addr_to_reg(cpustate, dst, addr_add(cpustate, addr_from_reg(cpustate, dst), 2));
+	add_to_addr_reg(cpustate, src, 2);
+	add_to_addr_reg(cpustate, dst, 2);
 	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
 }
 
@@ -6362,8 +6402,8 @@ static void ZBB_ssN0_0010_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
     }
-	addr_to_reg(cpustate, src, addr_add(cpustate, addr_from_reg(cpustate, src), 2));
-	addr_to_reg(cpustate, dst, addr_add(cpustate, addr_from_reg(cpustate, dst), 2));
+	add_to_addr_reg(cpustate, src, 2);
+	add_to_addr_reg(cpustate, dst, 2);
 	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
 }
 
@@ -6396,7 +6436,7 @@ static void ZBB_ssN0_0100_0000_rrrr_dddd_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
     }
-	addr_to_reg(cpustate, src, addr_add(cpustate, addr_from_reg(cpustate, src), 2));
+	add_to_addr_reg(cpustate, src, 2);
 	if (--cpustate->RW(cnt)) { CLR_V; if (!(cpustate->fcw & F_Z)) cpustate->pc -= 4; } else SET_V;
 }
 
@@ -6429,8 +6469,8 @@ static void ZBB_ssN0_0110_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
     }
-	addr_to_reg(cpustate, src, addr_add(cpustate, addr_from_reg(cpustate, src), 2));
-	addr_to_reg(cpustate, dst, addr_add(cpustate, addr_from_reg(cpustate, dst), 2));
+	add_to_addr_reg(cpustate, src, 2);
+	add_to_addr_reg(cpustate, dst, 2);
 	if (--cpustate->RW(cnt)) { CLR_V; if (!(cpustate->fcw & F_Z)) cpustate->pc -= 4; } else SET_V;
 }
 
@@ -6463,7 +6503,7 @@ static void ZBB_ssN0_1000_0000_rrrr_dddd_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
     }
-	addr_to_reg(cpustate, src, addr_sub(cpustate, addr_from_reg(cpustate, src), 2));
+	sub_from_addr_reg(cpustate, src, 2);
 	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
 }
 
@@ -6479,8 +6519,8 @@ static void ZBB_ssN0_1001_0000_rrrr_ddN0_x000(z8000_state *cpustate)
     GET_DST(OP1,NIB2);
 	GET_CCC(OP1,NIB3);
     WRMEM_W(cpustate,  addr_from_reg(cpustate, dst), RDMEM_W(cpustate, addr_from_reg(cpustate, src)));
-	addr_to_reg(cpustate, dst, addr_sub(cpustate, addr_from_reg(cpustate, dst), 2));
-	addr_to_reg(cpustate, src, addr_sub(cpustate, addr_from_reg(cpustate, src), 2));
+	sub_from_addr_reg(cpustate, src, 2);
+	sub_from_addr_reg(cpustate, dst, 2);
 	if (--cpustate->RW(cnt)) { CLR_V; if (cc == 0) cpustate->pc -= 4; } else SET_V;
 }
 
@@ -6513,8 +6553,8 @@ static void ZBB_ssN0_1010_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
     }
-	addr_to_reg(cpustate, dst, addr_sub(cpustate, addr_from_reg(cpustate, dst), 2));
-	addr_to_reg(cpustate, src, addr_sub(cpustate, addr_from_reg(cpustate, src), 2));
+	sub_from_addr_reg(cpustate, src, 2);
+	sub_from_addr_reg(cpustate, dst, 2);
 	if (--cpustate->RW(cnt)) CLR_V; else SET_V;
 }
 
@@ -6547,7 +6587,7 @@ static void ZBB_ssN0_1100_0000_rrrr_dddd_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
     }
-	addr_to_reg(cpustate, src, addr_sub(cpustate, addr_from_reg(cpustate, src), 2));
+	sub_from_addr_reg(cpustate, src, 2);
 	if (--cpustate->RW(cnt)) { CLR_V; if (!(cpustate->fcw & F_Z)) cpustate->pc -= 4; } else SET_V;
 }
 
@@ -6580,8 +6620,8 @@ static void ZBB_ssN0_1110_0000_rrrr_ddN0_cccc(z8000_state *cpustate)
 		case 14: if (CCE) SET_Z; else CLR_Z; break;
 		case 15: if (CCF) SET_Z; else CLR_Z; break;
     }
-	addr_to_reg(cpustate, dst, addr_sub(cpustate, addr_from_reg(cpustate, dst), 2));
-	addr_to_reg(cpustate, src, addr_sub(cpustate, addr_from_reg(cpustate, src), 2));
+	sub_from_addr_reg(cpustate, src, 2);
+	sub_from_addr_reg(cpustate, dst, 2);
 	if (--cpustate->RW(cnt)) { CLR_V; if (!(cpustate->fcw & F_Z)) cpustate->pc -= 4; } else SET_V;
 }
 

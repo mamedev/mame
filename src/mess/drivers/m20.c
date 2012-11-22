@@ -185,7 +185,7 @@ port21      =   0x21        !TTL latch
 !       1 selects single density    1 => Perform basic tests
 !                                   Latched copy when B7 is written to Port21
 !   B4  Uncommitted output          0 => 128K card(s) present
-!                                   1 => 32K(s) card present
+!                                   1 => 32K card(s) present
 !                                   Cannot mix types!
 !   B5  Uncommitted output          0 => 8-colour card present
 !                                   1 => 4-colour card present
@@ -202,7 +202,7 @@ READ16_MEMBER(m20_state::port21_r)
 
 WRITE16_MEMBER(m20_state::port21_w)
 {
-	printf("port21 write: offset 0x%x, data 0x%x\n", offset, data);
+	//printf("port21 write: offset 0x%x, data 0x%x\n", offset, data);
 	m_port21 = (m_port21 & 0xf8) | (data & 0x7);
 	m_port21_sd = (data & 8) ? 1 : 0;
 	//printf("port21: sd = %d\n", m_port21_sd);

@@ -188,6 +188,7 @@
 #define GET_DSP8		INT8 dsp8 = (INT8)get_operand(cpustate, 0)
 #define GET_DSP16		UINT32 dsp16 = addr_add(cpustate, cpustate->pc, (INT16)get_operand(cpustate, 1))
 #define GET_ADDR(o) 	UINT32 addr = (UINT32)get_addr_operand(cpustate, o)
+#define GET_ADDR_RAW(o) 	UINT32 addr = (UINT32)get_raw_addr_operand(cpustate, o)
 
 struct z8000_state;
 
