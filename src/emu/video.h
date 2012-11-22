@@ -99,6 +99,7 @@ public:
 	void set_frameskip(int frameskip);
 	void set_throttled(bool throttled = true) { m_throttle = throttled; }
 	void set_fastforward(bool ffwd = true) { m_fastforward = ffwd; }
+	void set_output_changed() { m_output_changed = true; }
 
 	// render a frame
 	void frame_update(bool debug = false);
@@ -146,6 +147,7 @@ private:
 
 	// screenless systems
 	emu_timer *			m_screenless_frame_timer;	// timer to signal VBLANK start
+	bool				m_output_changed;			// did an output element change?
 
 	// throttling calculations
 	osd_ticks_t			m_throttle_last_ticks;		// osd_ticks the last call to throttle

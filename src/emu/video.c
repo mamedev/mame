@@ -46,6 +46,7 @@
 #include "aviio.h"
 #include "crsshair.h"
 #include "rendersw.c"
+#include "output.h"
 
 #include "snap.lh"
 
@@ -86,6 +87,14 @@ const UINT8 video_manager::s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
 //  VIDEO MANAGER
 //**************************************************************************
 
+static void video_notifier_callback(const char *outname, INT32 value, void *param)
+{
+	video_manager *vm = (video_manager *)param;
+
+	vm->set_output_changed();
+}
+
+
 //-------------------------------------------------
 //  video_manager - constructor
 //-------------------------------------------------
@@ -93,6 +102,7 @@ const UINT8 video_manager::s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
 video_manager::video_manager(running_machine &machine)
 	: m_machine(machine),
 	  m_screenless_frame_timer(NULL),
+	  m_output_changed(false),
 	  m_throttle_last_ticks(0),
 	  m_throttle_realtime(attotime::zero),
 	  m_throttle_emutime(attotime::zero),
@@ -175,6 +185,7 @@ video_manager::video_manager(running_machine &machine)
 	{
 		m_screenless_frame_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(video_manager::screenless_update_callback), this));
 		m_screenless_frame_timer->adjust(screen_device::DEFAULT_FRAME_PERIOD, 0, screen_device::DEFAULT_FRAME_PERIOD);
+		output_set_notifier(NULL, video_notifier_callback, this);
 	}
 }
 
@@ -647,7 +658,8 @@ bool video_manager::finish_screen_updates()
 		screen->update_partial(screen->visible_area().max_y);
 
 	// now add the quads for all the screens
-	bool anything_changed = false;
+	bool anything_changed = m_output_changed;
+	m_output_changed = false;
 	for (screen_device *screen = iter.first(); screen != NULL; screen = iter.next())
 		if (screen->update_quads())
 			anything_changed = true;
