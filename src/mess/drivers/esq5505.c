@@ -109,7 +109,7 @@ public:
 	DECLARE_DRIVER_INIT(eps);
 	DECLARE_DRIVER_INIT(common);
 	DECLARE_DRIVER_INIT(sq1);
-	DECLARE_DRIVER_INIT(sd1);
+	DECLARE_DRIVER_INIT(denib);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 };
 
@@ -327,7 +327,6 @@ static void duart_tx(device_t *device, int channel, UINT8 data)
 
         if (state->m_bCalibSecondByte)
         {
-//            printf("KPC second byte %02x\n", data);
             if (data == 0xfd)   // calibration request
             {
                 duart68681_rx_data(state->m_duart, 1, (UINT8)(FPTR)0xff);   // this is the correct response for "calibration OK"
@@ -539,11 +538,11 @@ static INPUT_PORTS_START( vfx )
     PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 0x48)
     PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 0x49)
     PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 0x4a)
-    PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('e') PORT_CHAR('E') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 0x4b)
-    PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('r') PORT_CHAR('R') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 0x4c)
-    PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('t') PORT_CHAR('T') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 0x4d)
-    PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('y') PORT_CHAR('Y') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 0x4e)
-    PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('u') PORT_CHAR('U') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 0x4f)
+    PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 0x4b)
+    PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 0x4c)
+    PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 0x4d)
+    PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 0x4e)
+    PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 0x4f)
 
     PORT_START("KEY1")
     PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 0x0)
@@ -552,7 +551,7 @@ static INPUT_PORTS_START( vfx )
 INPUT_PORTS_END
 
 ROM_START( vfx )
-    ROM_REGION(0x20000, "osrom", 0)
+    ROM_REGION(0x40000, "osrom", 0)
     ROM_LOAD16_BYTE( "vfx210b-low.bin",  0x000000, 0x010000, CRC(c51b19cd) SHA1(2a125b92ffa02ae9d7fb88118d525491d785e87e) )
     ROM_LOAD16_BYTE( "vfx210b-high.bin", 0x000001, 0x010000, CRC(59853be8) SHA1(8e07f69d53f80885d15f624e0b912aeaf3212ee4) )
 
@@ -560,6 +559,8 @@ ROM_START( vfx )
     ROM_LOAD( "u14.bin",  0x000000, 0x080000, NO_DUMP ) // type 234000 on the schematic
     ROM_LOAD( "u15.bin",  0x080000, 0x080000, NO_DUMP )
     ROM_LOAD( "u16.bin",  0x100000, 0x080000, NO_DUMP )
+
+    ROM_REGION(0x80000, "nibbles", ROMREGION_ERASE00)
 ROM_END
 
 ROM_START( vfxsd )
@@ -568,15 +569,13 @@ ROM_START( vfxsd )
     ROM_LOAD16_BYTE( "vfxsd_200_upper.bin", 0x000001, 0x010000, CRC(9a40efa2) SHA1(e38a2a4514519c1573361cb1526139bfcf94e45a) )
 
     ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
-    ROM_LOAD( "u54.bin",  0x000000, 0x010000, NO_DUMP )
-    ROM_LOAD( "u55.bin",  0x010000, 0x010000, NO_DUMP )
-    ROM_LOAD( "u56.bin",  0x020000, 0x010000, NO_DUMP )
-    ROM_LOAD( "u57.bin",  0x030000, 0x080000, NO_DUMP )
-    ROM_LOAD( "u58.bin",  0x038000, 0x080000, NO_DUMP )
-    ROM_LOAD( "u59.bin",  0x040000, 0x010000, NO_DUMP )
-    ROM_LOAD( "u60.bin",  0x050000, 0x080000, NO_DUMP )
+    ROM_LOAD16_BYTE( "u57.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) ) 
+    ROM_LOAD16_BYTE( "u58.bin", 0x100001, 0x080000, CRC(c0055975) SHA1(5a22f1d5e437c6277eb0cfb1ff1b3f8dcdea1cc6) ) 
 
     ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00)
+
+    ROM_REGION(0x80000, "nibbles", 0)
+    ROM_LOAD( "u60.bin", 0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) ) 
 ROM_END
 
 ROM_START( sd1 )
@@ -591,7 +590,7 @@ ROM_START( sd1 )
     ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00) // BS=1 region (16-bit)
 
     ROM_REGION(0x80000, "nibbles", 0)
-    ROM_LOAD( "u36.bin",      0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) ) 
+    ROM_LOAD( "u36.bin", 0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) ) 
 ROM_END
 
 ROM_START( sd132 )
@@ -606,7 +605,7 @@ ROM_START( sd132 )
     ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00) // BS=1 region (16-bit)
 
     ROM_REGION(0x80000, "nibbles", ROMREGION_ERASE00)
-    ROM_LOAD( "u36.bin",      0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) ) 
+    ROM_LOAD( "u36.bin", 0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) ) 
 ROM_END
 
 
@@ -618,6 +617,8 @@ ROM_START( sq1 )
     ROM_REGION(0x200000, "waverom", 0)
     ROM_LOAD16_BYTE( "sq1-u25.bin",  0x000001, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) )
     ROM_LOAD16_BYTE( "sq1-u26.bin",  0x100001, 0x080000, CRC(2edaa9dc) SHA1(72fead505c4f44e5736ff7d545d72dfa37d613e2) )
+
+    ROM_REGION(0x80000, "nibbles", ROMREGION_ERASE00)
 ROM_END
 
 ROM_START( eps )
@@ -626,6 +627,8 @@ ROM_START( eps )
     ROM_LOAD16_BYTE( "eps-h.bin",    0x000001, 0x008000, CRC(d8747420) SHA1(460597751386eb5f08465699b61381c4acd78065) )
 
     ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)  // EPS-16 has no ROM sounds
+
+    ROM_REGION(0x80000, "nibbles", ROMREGION_ERASE00)
 ROM_END
 
 DRIVER_INIT_MEMBER(esq5505_state,common)
@@ -657,7 +660,7 @@ DRIVER_INIT_MEMBER(esq5505_state,sq1)
     m_system_type = SQ1;
 }
 
-DRIVER_INIT_MEMBER(esq5505_state,sd1)
+DRIVER_INIT_MEMBER(esq5505_state,denib)
 {
     UINT8 *pNibbles = (UINT8 *)machine().root_device().memregion("nibbles")->base();
     UINT8 *pBS0 = (UINT8 *)machine().root_device().memregion("waverom")->base();
@@ -675,10 +678,10 @@ DRIVER_INIT_MEMBER(esq5505_state,sd1)
 	}
 }
 
-CONS( 1988, eps,   0, 0, eps,   vfx, esq5505_state, eps,    "Ensoniq", "EPS", GAME_NOT_WORKING )   // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1989, vfx,   0, 0, vfx,   vfx, esq5505_state, common, "Ensoniq", "VFX", GAME_NOT_WORKING )       // 2x40 VFD
-CONS( 1989, vfxsd, 0, 0, vfxsd, vfx, esq5505_state, common, "Ensoniq", "VFX-SD", GAME_NOT_WORKING )    // 2x40 VFD
-CONS( 1990, sd1,   0, 0, vfxsd, vfx, esq5505_state, sd1,    "Ensoniq", "SD-1", GAME_NOT_WORKING )      // 2x40 VFD
-CONS( 1990, sd132, sd1, 0, vfx32, vfx, esq5505_state, sd1,    "Ensoniq", "SD-1 32", GAME_NOT_WORKING )   // 2x40 VFD
-CONS( 1990, sq1,   0, 0, sq1,   vfx, esq5505_state, sq1,    "Ensoniq", "SQ-1", GAME_NOT_WORKING )      // LCD of some sort
+CONS( 1988, eps,   0, 0,   eps,   vfx, esq5505_state, eps,    "Ensoniq", "EPS", GAME_NOT_WORKING )   // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
+CONS( 1989, vfx,   0, 0,   vfx,   vfx, esq5505_state, common, "Ensoniq", "VFX", GAME_NOT_WORKING )       // 2x40 VFD
+CONS( 1989, vfxsd, 0, 0,   vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "VFX-SD", GAME_NOT_WORKING )    // 2x40 VFD
+CONS( 1990, sd1,   0, 0,   vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "SD-1", GAME_NOT_WORKING )      // 2x40 VFD
+CONS( 1990, sd132, sd1, 0, vfx32, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 32", GAME_NOT_WORKING )   // 2x40 VFD
+CONS( 1990, sq1,   0, 0,   sq1,   vfx, esq5505_state, sq1,    "Ensoniq", "SQ-1", GAME_NOT_WORKING )      // LCD of some sort
 
