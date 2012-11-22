@@ -735,9 +735,7 @@ INPUT_PORTS_END
 void apc_state::fdc_drq(bool state)
 {
 //  printf("%02x DRQ\n",state);
-//  i8237_dreq0_w(m_dma, state);
 	m_dmac->dreq1_w(state);
-
 }
 
 void apc_state::fdc_irq(bool state)

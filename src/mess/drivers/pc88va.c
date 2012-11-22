@@ -15,8 +15,9 @@
     - What is exactly supposed to be a "bus slot"?
     - fdc "intelligent mode" has 0x7f as irq vector ... 0x7f is ld a,a and it IS NOT correctly
       hooked up by the current z80 core
-    - PC-88VA has two bogus opcodes. One is at 0xf0b15, another at 0xf0b31. Making a patch
-      for the latter makes the system to jump into a "DIP-Switch" display.
+    - PC-88VA stock version has two bogus opcodes. One is at 0xf0b15, another at 0xf0b31.
+      Making a patch for the latter makes the system to jump into a "DIP-Switch" display.
+	- unemulated upd71071 demand mode.
 
 ********************************************************************************************/
 
@@ -59,9 +60,11 @@ class pc88va_state : public driver_device
 public:
 	pc88va_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
+		m_fdc(*this, "upd765"),
 		m_dmac(*this, "dmac"),
 		m_palram(*this, "palram"){ }
 
+	required_device<upd765a_device> m_fdc;
 	required_device<upd71071_device> m_dmac;
 	required_shared_ptr<UINT16> m_palram;
 	UINT16 m_bank_reg;
@@ -132,11 +135,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc88va_pic_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_pit_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(pc88va_upd765_interrupt);
+//	DECLARE_WRITE_LINE_MEMBER(pc88va_upd765_interrupt);
 	UINT8 m_fdc_ctrl_2;
 	TIMER_CALLBACK_MEMBER(pc88va_fdc_timer);
+//	UINT16 m_fdc_dma_r(running_machine &machine);
+//	void m_fdc_dma_w(running_machine &machine, UINT16 data);
 
-	void upd765_interrupt(bool state);
+	void fdc_irq(bool state);
+	void fdc_drq(bool state);
 };
 
 
@@ -1024,6 +1030,10 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
         ---- --xx RV1/RV0: Drive 1/0 mode selection (0) 2D and 2DD mode (1) 2HD mode
         */
 		case 0x02: // FDC control port 0
+			machine().device<floppy_connector>("upd765:0")->get_device()->set_rpm(data & 0x01 ? 360 : 300);
+			machine().device<floppy_connector>("upd765:1")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
+
+			machine().device<upd765a_device>("upd765")->set_rate(data & 0x20 ? 500000 : 250000);
 			break;
 		/*
         ---- x--- PCM: ?
@@ -1039,13 +1049,16 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
         */
 		case 0x06:
 			//printf("%02x\n",data);
-			m_fdc_ctrl_2 = data;
-
 			if(data & 1)
 				machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(pc88va_state::pc88va_fdc_timer),this));
 
+			if((m_fdc_ctrl_2 & 0x10) != (data & 0x10))
+				upd71071_dmarq(m_dmac,1,2);
+
 			if(data & 0x80) // correct?
 				machine().device<upd765a_device>("upd765")->reset();
+
+			m_fdc_ctrl_2 = data;
 
 			break; // FDC control port 2
 	}
@@ -1584,7 +1597,8 @@ void pc88va_state::machine_start()
 
 	m_t3_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc88va_state::t3_mouse_callback),this));
 	m_t3_mouse_timer->adjust(attotime::never);
-	machine().device<upd765a_device>("upd765")->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc88va_state::upd765_interrupt), this));
+	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc88va_state::fdc_drq), this));
+	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc88va_state::fdc_irq), this));
 
 	machine().device<floppy_connector>("upd765:0")->get_device()->set_rpm(300);
 	machine().device<floppy_connector>("upd765:1")->get_device()->set_rpm(300);
@@ -1659,7 +1673,13 @@ static const struct pit8253_config pc88va_pit8253_config =
 };
 
 
-void pc88va_state::upd765_interrupt(bool state)
+void pc88va_state::fdc_drq(bool state)
+{
+	printf("%02x DRQ\n",state);
+	upd71071_dmarq(m_dmac,state,2);
+}
+
+void pc88va_state::fdc_irq(bool state)
 {
 	if(m_fdc_mode && state)
 	{
@@ -1687,13 +1707,28 @@ static const ym2203_interface pc88va_ym2203_intf =
 	DEVCB_NULL
 };
 
+static UINT16 m_fdc_dma_r(running_machine &machine)
+{
+	pc88va_state *state = machine.driver_data<pc88va_state>();
+	printf("R DMA\n");
+	return state->m_fdc->dma_r();
+}
+
+static void m_fdc_dma_w(running_machine &machine, UINT16 data)
+{
+	pc88va_state *state = machine.driver_data<pc88va_state>();
+	printf("W DMA %08x\n",data);
+	state->m_fdc->dma_w(data);
+}
+
+
 /* ch2 is FDC, ch0/3 are "user". ch1 is unused */
 static const upd71071_intf pc88va_dma_config =
 {
 	"maincpu",
 	8000000,
-	{ 0, 0, 0, 0 },
-	{ 0, 0, 0, 0 }
+	{ 0, 0, m_fdc_dma_r, 0 },
+	{ 0, 0, m_fdc_dma_w, 0 }
 };
 
 static const floppy_format_type pc88va_floppy_formats[] = {

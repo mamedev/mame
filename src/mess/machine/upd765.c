@@ -1203,9 +1203,8 @@ void upd765_family_device::start_command(int cmd)
 		if(fid == 4) {
 			st0 = ST0_UNK;
 			result[0] = st0;
-			result[1] = 0x00;
-			result_pos = 2;
-			logerror("%s: command sense interrupt status (%02x %02x)\n", tag(), result[0], result[1]);
+			result_pos = 1;
+			logerror("%s: command sense interrupt status (%02x)\n", tag(), result[0]);
 			break;
 		}
 		floppy_info &fi = flopi[fid];
@@ -1364,6 +1363,7 @@ void upd765_family_device::read_data_start(floppy_info &fi)
 	fi.main_state = READ_DATA;
 	fi.sub_state = HEAD_LOAD_DONE;
 	mfm = command[0] & 0x40;
+
 	logerror("%s: command read%s data%s%s%s%s cmd=%02x sel=%x chrn=(%d, %d, %d, %d) eot=%02x gpl=%02x dtl=%02x rate=%d\n",
 			 tag(),
 			 command[0] & 0x08 ? " deleted" : "",
