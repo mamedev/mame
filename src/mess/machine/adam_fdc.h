@@ -49,7 +49,7 @@ public:
 
 	void fdc_intrq_w(bool state);
 
-	static const floppy_format_type floppy_formats[];
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
 	// device-level overrides

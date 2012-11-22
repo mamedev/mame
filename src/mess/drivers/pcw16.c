@@ -971,11 +971,9 @@ static const ins8250_interface pcw16_com_interface[2]=
 	}
 };
 
-static const floppy_format_type pcw16_floppy_formats[] = {
-	FLOPPY_PC_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( pcw16_state::floppy_formats )
+	FLOPPY_PC_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( pcw16_floppies )
 	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
@@ -1097,8 +1095,8 @@ static MACHINE_CONFIG_START( pcw16, pcw16_state )
 	/* printer */
 	MCFG_PC_LPT_ADD("lpt", pcw16_lpt_config)
 	MCFG_PC_FDC_SUPERIO_ADD("fdc")
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcw16_floppies, "35hd", 0, pcw16_floppy_formats)
-    MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcw16_floppies, "35hd", 0, pcw16_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pcw16_floppies, "35hd", 0, pcw16_state::floppy_formats)
+    MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcw16_floppies, "35hd", 0, pcw16_state::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pcw16")
 

@@ -143,6 +143,7 @@ public:
 
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 
@@ -1731,12 +1732,9 @@ static const upd71071_intf pc88va_dma_config =
 	{ 0, 0, m_fdc_dma_w, 0 }
 };
 
-static const floppy_format_type pc88va_floppy_formats[] = {
-	FLOPPY_XDF_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_D88_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( pc88va_state::floppy_formats )
+	FLOPPY_XDF_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( pc88va_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
@@ -1778,8 +1776,8 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_UPD71071_ADD("dmac",pc88va_dma_config)
 
 	MCFG_UPD765A_ADD("upd765", false, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88va_floppies, "525hd", 0, pc88va_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88va_floppies, "525hd", 0, pc88va_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88va_floppies, "525hd", 0, pc88va_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88va_floppies, "525hd", 0, pc88va_state::floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc88va")
 
     MCFG_PIT8253_ADD("pit8253",pc88va_pit8253_config)

@@ -65,16 +65,42 @@ enum
 
 
 //**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// device type definition
+const device_type MSM6255 = &device_creator<msm6255_device>;
+
+
+// default address map
+static ADDRESS_MAP_START( msm6255, AS_0, 8, msm6255_device )
+	AM_RANGE(0x00000, 0xfffff) AM_RAM
+ADDRESS_MAP_END
+
+
+
+//**************************************************************************
 //  INLINE HELPERS
 //**************************************************************************
 
 //-------------------------------------------------
-//  read_video_data - read video ROM/RAM
+//  read_byte - 
 //-------------------------------------------------
 
-inline UINT8 msm6255_device::read_video_data(UINT16 ma, UINT8 ra)
+inline UINT8 msm6255_device::read_byte(UINT16 ma, UINT8 ra)
 {
-	return m_char_ram_r(this, ma, ra);
+	offs_t offset;
+
+	if (m_mor & MOR_GRAPHICS)
+	{
+		offset = ma;
+	}
+	else
+	{
+		offset = ((offs_t)ma << 4) | ra;
+	}
+
+	return space().read_byte(offset);
 }
 
 
@@ -83,41 +109,31 @@ inline UINT8 msm6255_device::read_video_data(UINT16 ma, UINT8 ra)
 //  LIVE DEVICE
 //**************************************************************************
 
-// device type definition
-const device_type MSM6255 = &device_creator<msm6255_device>;
-
 //-------------------------------------------------
 //  msm6255_device - constructor
 //-------------------------------------------------
 
 msm6255_device::msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, MSM6255, "MSM6255", tag, owner, clock),
+	  device_memory_interface(mconfig, *this),
+	  m_space_config("videoram", ENDIANNESS_LITTLE, 8, 20, 0, NULL, *ADDRESS_MAP_NAME(msm6255)),
 	  m_cursor(0)
 {
 }
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
+//  static_set_config - configuration helper
 //-------------------------------------------------
 
-void msm6255_device::device_config_complete()
+void msm6255_device::static_set_config(device_t &device, int char_clock, const char *screen_tag)
 {
-	// inherit a copy of the static data
-	const msm6255_interface *intf = reinterpret_cast<const msm6255_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<msm6255_interface *>(this) = *intf;
+	msm6255_device &msm6255 = downcast<msm6255_device &>(device);
 
-		m_char_ram_r = intf->m_char_ram_r;
-	}
-	// or initialize to defaults if none provided
-	else
-	{
-		fatalerror("Interface not specified!\n");
-	}
+	assert(screen_tag != NULL);
+
+	msm6255.m_char_clock = char_clock;
+	msm6255.m_screen_tag = screen_tag;
 }
 
 
@@ -153,6 +169,17 @@ void msm6255_device::device_start()
 void msm6255_device::device_reset()
 {
 	m_frame = 0;
+}
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *msm6255_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == AS_0) ? &m_space_config : NULL;
 }
 
 
@@ -329,7 +356,7 @@ void msm6255_device::draw_scanline(bitmap_ind16 &bitmap, const rectangle &clipre
 
 	for (sx = 0; sx < hn; sx++)
 	{
-		UINT8 data = read_video_data(ma, ra);
+		UINT8 data = read_byte(ma, ra);
 
 		if (m_cursor)
 		{
@@ -373,11 +400,11 @@ void msm6255_device::update_graphics(bitmap_ind16 &bitmap, const rectangle &clip
 	{
 		// draw upper half scanline
 		UINT16 ma = sar + (y * hn);
-		draw_scanline(bitmap, cliprect, y, ma, 0);
+		draw_scanline(bitmap, cliprect, y, ma);
 
 		// draw lower half scanline
 		ma = sar + ((y + nx) * hn);
-		draw_scanline(bitmap, cliprect, y + nx, ma, 0);
+		draw_scanline(bitmap, cliprect, y + nx, ma);
 	}
 }
 
@@ -432,7 +459,8 @@ UINT32 msm6255_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	}
 	else
 	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
+		bitmap.fill(0, cliprect);
 	}
+	
 	return 0;
 }

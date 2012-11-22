@@ -1032,12 +1032,6 @@ static MC2661_INTERFACE( epci_intf )
 //  upd765_interface fdc_intf
 //-------------------------------------------------
 
-
-static const floppy_format_type wangpc_floppy_formats[] = {
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
-
 static SLOT_INTERFACE_START( wangpc_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -1256,8 +1250,8 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_IM6402_ADD(IM6402_TAG, uart_intf)
 	MCFG_MC2661_ADD(SCN2661_TAG, 0, epci_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", 0, wangpc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", 0, wangpc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_WANGPC_KEYBOARD_ADD()
 

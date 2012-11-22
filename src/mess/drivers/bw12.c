@@ -613,25 +613,17 @@ static SLOT_INTERFACE_START( bw12_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_SSDD )
 SLOT_INTERFACE_END
 
-static const floppy_format_type bw12_floppy_formats[] = {
-	FLOPPY_BW12_FORMAT,
-	FLOPPY_IMD_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_MFM_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( bw12_state::bw12_floppy_formats )
+	FLOPPY_BW12_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( bw14_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-static const floppy_format_type bw14_floppy_formats[] = {
-	FLOPPY_BW12_FORMAT,
-	FLOPPY_IMD_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_MFM_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( bw12_state::bw14_floppy_formats )
+	FLOPPY_BW12_FORMAT
+FLOPPY_FORMATS_END
 
 /* F4 Character Displayer */
 static const gfx_layout bw12_charlayout =
@@ -691,8 +683,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bw12, common )
 	/* floppy drives */
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", bw12_floppies, "525dd", 0, bw12_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw12_floppies, "525dd", 0, bw12_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", bw12_floppies, "525dd", 0, bw12_state::bw12_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw12_floppies, "525dd", 0, bw12_state::bw12_floppy_formats)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "bw12")
@@ -704,8 +696,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bw14, common )
 	/* floppy drives */
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", bw14_floppies, "525dd", 0, bw14_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw14_floppies, "525dd", 0, bw14_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", bw14_floppies, "525dd", 0, bw12_state::bw14_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw14_floppies, "525dd", 0, bw12_state::bw14_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

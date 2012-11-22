@@ -25,7 +25,7 @@ public:
 	void adkcon_set(UINT16 data);
 	void dmacon_set(UINT16 data);
 
-	static const floppy_format_type floppy_formats[];
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
     virtual void device_start();

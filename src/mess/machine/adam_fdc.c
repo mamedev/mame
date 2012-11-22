@@ -105,10 +105,9 @@ void adam_fdc_device::fdc_intrq_w(bool state)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-const floppy_format_type adam_fdc_device::floppy_formats[] = {
-	FLOPPY_ADAM_FORMAT, FLOPPY_MFM_FORMAT, FLOPPY_MFI_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( adam_fdc_device::floppy_formats )
+	FLOPPY_ADAM_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( adam_fdc_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )

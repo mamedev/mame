@@ -8,11 +8,33 @@
 #define FLOPPY_H
 
 #include "formats/flopimg.h"
+#include "formats/d88_dsk.h"
+#include "formats/dfi_dsk.h"
+#include "formats/hxcmfm_dsk.h"
+#include "formats/imd_dsk.h"
+#include "formats/ipf_dsk.h"
+#include "formats/mfi_dsk.h"
 
 #define MCFG_FLOPPY_DRIVE_ADD(_tag, _slot_intf, _def_slot, _def_inp, _formats)	\
 	MCFG_DEVICE_ADD(_tag, FLOPPY_CONNECTOR, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
 	static_cast<floppy_connector *>(device)->set_formats(_formats);
+
+#define DECLARE_FLOPPY_FORMATS(_name) \
+	static const floppy_format_type _name [];
+
+#define FLOPPY_FORMATS_MEMBER(_member) \
+	const floppy_format_type _member [] = { \
+
+#define FLOPPY_FORMATS_END \
+		, \
+		FLOPPY_D88_FORMAT, \
+		FLOPPY_DFI_FORMAT, \
+		FLOPPY_IMD_FORMAT, \
+		FLOPPY_IPF_FORMAT, \
+		FLOPPY_MFI_FORMAT, \
+		FLOPPY_MFM_FORMAT, \
+		NULL };
 
 
 /***************************************************************************
@@ -88,6 +110,8 @@ public:
 	UINT32 get_variant() const;
 
 	virtual ui_menu *get_selection_menu(running_machine &machine, class render_container *container);
+
+	static const floppy_format_type default_floppy_formats[];
 
 protected:
 	// device-level overrides

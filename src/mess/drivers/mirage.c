@@ -90,7 +90,7 @@ public:
 
     int last_sndram_bank;
 
-	static const floppy_format_type floppy_formats[];
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
     void fdc_intrq_w(bool state);
 	DECLARE_DRIVER_INIT(mirage);
@@ -106,10 +106,9 @@ public:
 	DECLARE_READ8_MEMBER(mirage_via_read_cb2);
 };
 
-const floppy_format_type mirage_state::floppy_formats[] = {
-	FLOPPY_ESQ8IMG_FORMAT, FLOPPY_IPF_FORMAT, FLOPPY_MFI_FORMAT, FLOPPY_DFI_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( mirage_state::floppy_formats )
+	FLOPPY_ESQ8IMG_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( ensoniq_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )

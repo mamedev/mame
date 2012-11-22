@@ -25,6 +25,16 @@ const device_type FLOPPY_525_HD = &device_creator<floppy_525_hd>;
 const device_type FLOPPY_8_SSSD = &device_creator<floppy_8_sssd>;
 const device_type FLOPPY_8_DSDD = &device_creator<floppy_8_dsdd>;
 
+const floppy_format_type floppy_image_device::default_floppy_formats[] = {
+	FLOPPY_D88_FORMAT,
+	FLOPPY_DFI_FORMAT,
+	FLOPPY_IMD_FORMAT,
+	FLOPPY_IPF_FORMAT,
+	FLOPPY_MFI_FORMAT,
+	FLOPPY_MFM_FORMAT,
+	NULL
+};
+
 floppy_connector::floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, FLOPPY_CONNECTOR, "Floppy drive connector abstraction", tag, owner, clock),
 	device_slot_interface(mconfig, *this)

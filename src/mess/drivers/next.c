@@ -918,11 +918,9 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( next )
 INPUT_PORTS_END
 
-const floppy_format_type next_state::floppy_formats[] = {
-	FLOPPY_PC_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( next_state::floppy_formats )
+	FLOPPY_PC_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( next_floppies )
 	SLOT_INTERFACE( "35ed", FLOPPY_35_ED )

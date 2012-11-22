@@ -46,8 +46,6 @@ public:
 		m_p_ram(*this, "p_ram"){ }
 
 
-	static const floppy_format_type floppy_formats[];
-
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<device_t> m_duart;
@@ -56,12 +54,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ht68k_fdc_intrq_w);
 	required_shared_ptr<UINT16> m_p_ram;
 	virtual void machine_reset();
-};
-
-
-const floppy_format_type ht68k_state::floppy_formats[] = {
-	FLOPPY_MFM_FORMAT, FLOPPY_MFI_FORMAT,
-	NULL
 };
 
 
@@ -159,10 +151,10 @@ static MACHINE_CONFIG_START( ht68k, ht68k_state )
 
 	MCFG_WD1770x_ADD("wd1770", XTAL_8MHz )
 
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:2", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:3", ht68k_floppies, "525dd", 0, ht68k_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", ht68k_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", ht68k_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:2", ht68k_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("wd1770:3", ht68k_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 /* ROM definition */

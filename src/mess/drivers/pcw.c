@@ -1266,11 +1266,6 @@ static INPUT_PORTS_START(pcw)
 	PORT_BIT( 0xff, 0x00,	 IPT_UNUSED)
 INPUT_PORTS_END
 
-static const floppy_format_type pcw_floppy_formats[] = {
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
-
 static SLOT_INTERFACE_START( pcw_floppies )
 	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
 SLOT_INTERFACE_END
@@ -1310,8 +1305,8 @@ static MACHINE_CONFIG_START( pcw, pcw_state )
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pcw_floppies, "3dsdd", 0, pcw_floppy_formats)
-    MCFG_FLOPPY_DRIVE_ADD("upd765:1", pcw_floppies, "3dsdd", 0, pcw_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pcw_floppies, "3dsdd", 0, floppy_image_device::default_floppy_formats)
+    MCFG_FLOPPY_DRIVE_ADD("upd765:1", pcw_floppies, "3dsdd", 0, floppy_image_device::default_floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pcw")
 

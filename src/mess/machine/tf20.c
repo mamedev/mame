@@ -116,14 +116,6 @@ static UPD7201_INTERFACE( tf20_upd7201_intf )
 	}
 };
 
-static const floppy_format_type tf20_floppy_formats[] =
-{
-	FLOPPY_D88_FORMAT,
-	FLOPPY_MFM_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
-
 static SLOT_INTERFACE_START( tf20_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -144,8 +136,8 @@ static MACHINE_CONFIG_FRAGMENT( tf20 )
 	MCFG_UPD765A_ADD("5a", true, true)
 
 	// floppy drives
-	MCFG_FLOPPY_DRIVE_ADD("5a:0", tf20_floppies, "525dd", 0, tf20_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("5a:1", tf20_floppies, "525dd", 0, tf20_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("5a:0", tf20_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("5a:1", tf20_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
 
 	// serial interface to another device
 	MCFG_EPSON_SIO_ADD("sio")

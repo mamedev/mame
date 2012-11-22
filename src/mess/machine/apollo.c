@@ -37,7 +37,6 @@
 #include "machine/pic8259.h"
 
 #include "machine/pc_fdc.h"
-#include "formats/mfi_dsk.h"
 #include "formats/apollo_dsk.h"
 
 #include "cpu/m68000/m68000.h"
@@ -1279,11 +1278,9 @@ static DEVICE_RESET(apollo_sio2)
 #undef VERBOSE
 #define VERBOSE 0
 
-static const floppy_format_type apollo_floppy_formats[] = {
-	FLOPPY_APOLLO_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( apollo_state::floppy_formats )
+	FLOPPY_APOLLO_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( apollo_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
@@ -1399,7 +1396,7 @@ MACHINE_CONFIG_FRAGMENT( apollo )
     MCFG_DUART68681_ADD( APOLLO_SIO2_TAG, XTAL_3_6864MHz, apollo_sio2_config )
 
 	MCFG_PC_FDC_XT_ADD(APOLLO_FDC_TAG)
-	MCFG_FLOPPY_DRIVE_ADD(APOLLO_FDC_TAG ":0", apollo_floppies, "525hd", 0, apollo_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(APOLLO_FDC_TAG ":0", apollo_floppies, "525hd", 0, apollo_state::floppy_formats)
 
 	MCFG_OMTI8621_ADD(APOLLO_WDC_TAG, apollo_wdc_config)
 	MCFG_SC499_ADD(APOLLO_CTAPE_TAG, apollo_ctape_config)

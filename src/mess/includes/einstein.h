@@ -67,7 +67,7 @@ public:
 	UINT8 *m_crtc_ram;
 	UINT8	m_de;
 
-	static const floppy_format_type floppy_formats[];
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	DECLARE_WRITE8_MEMBER(einstein_80col_ram_w);
 	DECLARE_READ8_MEMBER(einstein_80col_ram_r);
 	DECLARE_READ8_MEMBER(einstein_80col_state_r);

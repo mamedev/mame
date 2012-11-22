@@ -13,6 +13,7 @@
 #include "machine/serial.h"
 #include "machine/ser_mouse.h"
 #include "machine/pc_kbdc.h"
+#include "machine/upd765.h"
 
 class pc_state : public driver_device
 {
@@ -129,6 +130,7 @@ public:
 
 	void fdc_interrupt(bool state);
 	void fdc_dma_drq(bool state);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 /*----------- defined in machine/pc.c -----------*/

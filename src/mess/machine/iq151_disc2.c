@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "iq151_disc2.h"
-#include "formats/mfi_dsk.h"
 #include "formats/iq151_dsk.h"
 
 
@@ -14,11 +13,9 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-static const floppy_format_type iq151_disc2_floppy_formats[] = {
-	FLOPPY_IQ151_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( iq151_disc2_device::floppy_formats )
+	FLOPPY_IQ151_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( iq151_disc2_floppies )
 	SLOT_INTERFACE( "8sssd", FLOPPY_8_SSSD )
@@ -26,8 +23,8 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( iq151_disc2 )
 	MCFG_UPD765A_ADD("fdc", false, true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", iq151_disc2_floppies, "8sssd", 0, iq151_disc2_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", iq151_disc2_floppies, "8sssd", 0, iq151_disc2_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", iq151_disc2_floppies, "8sssd", 0, iq151_disc2_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", iq151_disc2_floppies, "8sssd", 0, iq151_disc2_device::floppy_formats)
 MACHINE_CONFIG_END
 
 ROM_START( iq151_disc2 )

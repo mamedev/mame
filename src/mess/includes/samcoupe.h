@@ -11,6 +11,8 @@
 #ifndef SAMCOUPE_H_
 #define SAMCOUPE_H_
 
+#include "machine/wd1772.h"
+
 /* screen dimensions */
 #define SAM_BLOCK			8
 
@@ -114,7 +116,7 @@ public:
 
 	UINT8* sam_bank_read_ptr[4];
 	UINT8* sam_bank_write_ptr[4];
-
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 

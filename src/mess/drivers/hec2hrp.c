@@ -516,11 +516,6 @@ static MACHINE_CONFIG_START( hec2hrp, hec2hrp_state )
 
 MACHINE_CONFIG_END
 
-static const floppy_format_type hector_floppy_formats[] = {
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
-
 static SLOT_INTERFACE_START( hector_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
@@ -539,8 +534,8 @@ static MACHINE_CONFIG_START( hec2mx40, hec2hrp_state )
 	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_CPU_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", false, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", 0, hector_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", 0, hector_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)
 
@@ -591,8 +586,8 @@ static MACHINE_CONFIG_START( hec2hrx, hec2hrp_state )
 	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_CPU_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", false, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", 0, hector_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", 0, hector_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -690,8 +685,8 @@ static MACHINE_CONFIG_START( hec2mx80, hec2hrp_state )
 	MCFG_CPU_PROGRAM_MAP(hecdisc2_mem)
 	MCFG_CPU_IO_MAP(hecdisc2_io)
 	MCFG_UPD765A_ADD("upd765", false, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", 0, hector_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", 0, hector_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", hector_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", hector_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -155,6 +155,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_button_2_changed );
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_x_changed );
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_y_changed );
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	// system status register
 	int m_pit1;

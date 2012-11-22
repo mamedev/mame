@@ -62,6 +62,7 @@ public:
 	DECLARE_READ8_MEMBER(nanos_port_a_r);
 	DECLARE_READ8_MEMBER(nanos_port_b_r);
 	DECLARE_WRITE8_MEMBER(nanos_port_b_w);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 
@@ -463,11 +464,9 @@ static Z80PIO_INTERFACE( nanos_z80pio_intf )
 	DEVCB_NULL
 };
 
-static const floppy_format_type nanos_floppy_formats[] = {
-	FLOPPY_NANOS_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( nanos_state::floppy_formats )
+	FLOPPY_NANOS_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( nanos_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
@@ -519,7 +518,7 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_4MHz, nanos_z80pio_intf )
 	/* UPD765 */
 	MCFG_UPD765A_ADD("upd765", false, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", nanos_floppies, "525hd", 0, nanos_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", nanos_floppies, "525hd", 0, nanos_state::floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

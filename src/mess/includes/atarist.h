@@ -273,7 +273,7 @@ public:
 
 	floppy_image_device *floppy_devices[2];
 
-	static const floppy_format_type floppy_formats[];
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	TIMER_CALLBACK_MEMBER(st_mouse_tick);
 	TIMER_CALLBACK_MEMBER(atarist_shifter_tick);
 	TIMER_CALLBACK_MEMBER(atarist_glue_tick);

@@ -317,13 +317,6 @@ WRITE8_MEMBER( qx10_state::cmos_sel_w )
     FDD
 */
 
-static const floppy_format_type qx10_floppy_formats[] = {
-	FLOPPY_D88_FORMAT,
-	FLOPPY_IMD_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	NULL // TODO: TD0 format
-};
-
 static SLOT_INTERFACE_START( qx10_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -1051,8 +1044,8 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_UPD7220_ADD("upd7220", MAIN_CLK/4, hgdc_intf, upd7220_map)
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", qx10_floppies, "525dd", 0, qx10_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", qx10_floppies, "525dd", 0, qx10_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", qx10_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", qx10_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

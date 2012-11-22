@@ -608,11 +608,6 @@ void tandy2k_state::fdc_drq(bool state)
 	dma_request(0, state);
 }
 
-static const floppy_format_type tandy2k_floppy_formats[] = {
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
-
 static SLOT_INTERFACE_START( tandy2k_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
@@ -724,8 +719,8 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_PIC8259_ADD(I8259A_0_TAG, pic0_intf)
 	MCFG_PIC8259_ADD(I8259A_1_TAG, pic1_intf)
 	MCFG_I8272A_ADD(I8272A_TAG, true)
-	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", 0, tandy2k_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", 0, tandy2k_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":0", tandy2k_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(I8272A_TAG ":1", tandy2k_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_TANDY2K_KEYBOARD_ADD(kb_intf)
 

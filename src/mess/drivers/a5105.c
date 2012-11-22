@@ -67,6 +67,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 /* TODO */
@@ -520,11 +521,9 @@ static ADDRESS_MAP_START( upd7220_map, AS_0, 8, a5105_state)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
-static const floppy_format_type a5105_floppy_formats[] = {
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_A5105_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( a5105_state::floppy_formats )
+	FLOPPY_A5105_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( a5105_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
@@ -588,10 +587,10 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 
 	MCFG_UPD765A_ADD("upd765a", false, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", a5105_floppies, "525dd", 0, a5105_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", a5105_floppies, "525dd", 0, a5105_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", a5105_floppies, "525dd", 0, a5105_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:3", a5105_floppies, "525dd", 0, a5105_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", a5105_floppies, "525dd", 0, a5105_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", a5105_floppies, "525dd", 0, a5105_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", a5105_floppies, "525dd", 0, a5105_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:3", a5105_floppies, "525dd", 0, a5105_state::floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

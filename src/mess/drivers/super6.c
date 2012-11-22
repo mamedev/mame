@@ -447,13 +447,6 @@ static COM8116_INTERFACE( brg_intf )
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
-const floppy_format_type super6_state::floppy_formats[] = {
-	FLOPPY_IMD_FORMAT,
-	FLOPPY_MFM_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
-
 static SLOT_INTERFACE_START( super6_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -559,8 +552,8 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_24MHz/4, pio_intf)
 	MCFG_WD2793x_ADD(WD2793_TAG, 1000000)
 	MCFG_COM8116_ADD(BR1945_TAG, XTAL_5_0688MHz, brg_intf)
-	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", super6_floppies, "525dd", NULL, super6_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", super6_floppies, NULL,   NULL, super6_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", super6_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", super6_floppies, NULL,   NULL, floppy_image_device::default_floppy_formats)
 	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 4800)
 
 	// internal ram

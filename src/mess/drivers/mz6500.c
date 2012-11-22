@@ -119,11 +119,6 @@ void mz6500_state::fdc_drq(bool state)
 	//printf("%02x DRQ\n",state);
 }
 
-static const floppy_format_type mz6500_floppy_formats[] = {
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
-
 static SLOT_INTERFACE_START( mz6500_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
@@ -162,8 +157,8 @@ static MACHINE_CONFIG_START( mz6500, mz6500_state )
 	/* Devices */
 	MCFG_UPD7220_ADD("upd7220", 4000000, hgdc_intf, upd7220_map)
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", mz6500_floppies, "525hd", 0, mz6500_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", mz6500_floppies, "525hd", 0, mz6500_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", mz6500_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", mz6500_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 /* ROM definition */

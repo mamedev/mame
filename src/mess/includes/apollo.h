@@ -23,6 +23,7 @@
 #include "machine/sc499.h"
 #include "machine/3c505.h"
 #include "machine/68681.h"
+#include "machine/pc_fdc.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0
@@ -185,6 +186,7 @@ public:
 
 	void fdc_interrupt(bool state);
 	void fdc_dma_drq(bool state);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 MACHINE_CONFIG_EXTERN( apollo );

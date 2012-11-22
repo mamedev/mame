@@ -118,6 +118,7 @@ public:
 	int m_tc;
 	UINT32 screen_update_mm1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(kbclk_tick);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 

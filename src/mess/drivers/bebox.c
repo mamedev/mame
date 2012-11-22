@@ -18,7 +18,6 @@
 #include "machine/ins8250.h"
 #include "machine/pic8259.h"
 #include "machine/mc146818.h"
-#include "machine/upd765.h"
 #include "machine/pci.h"
 #include "machine/8237dma.h"
 #include "machine/pckeybrd.h"
@@ -33,8 +32,6 @@
 /* Devices */
 #include "machine/scsicd.h"
 #include "machine/scsihd.h"
-#include "imagedev/flopdrv.h"
-#include "formats/mfi_dsk.h"
 #include "formats/pc_dsk.h"
 #include "machine/ram.h"
 
@@ -131,11 +128,9 @@ static const struct LSI53C810interface lsi53c810_intf =
 };
 
 
-static const floppy_format_type bebox_floppy_formats[] = {
-	FLOPPY_PC_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( bebox_state::floppy_formats )
+	FLOPPY_PC_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( bebox_floppies )
 	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
@@ -203,7 +198,7 @@ static MACHINE_CONFIG_START( bebox, bebox_state )
 	/*MCFG_PCI_BUS_DEVICE(12, NULL, scsi53c810_pci_read, scsi53c810_pci_write)*/
 
 	MCFG_SMC37C78_ADD("smc37c78")
-	MCFG_FLOPPY_DRIVE_ADD("smc37c78:0", bebox_floppies, "35hd", 0, bebox_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("smc37c78:0", bebox_floppies, "35hd", 0, bebox_state::floppy_formats)
 
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 

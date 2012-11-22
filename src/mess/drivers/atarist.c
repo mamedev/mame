@@ -2305,10 +2305,9 @@ void stbook_state::machine_start()
 	ste_state::state_save();
 }
 
-const floppy_format_type st_state::floppy_formats[] = {
-	FLOPPY_ST_FORMAT, FLOPPY_MSA_FORMAT, FLOPPY_PASTI_FORMAT, FLOPPY_IPF_FORMAT, FLOPPY_MFI_FORMAT, FLOPPY_DFI_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( st_state::floppy_formats )
+	FLOPPY_ST_FORMAT, FLOPPY_MSA_FORMAT, FLOPPY_PASTI_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( atari_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )

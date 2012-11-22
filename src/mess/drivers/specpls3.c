@@ -364,11 +364,6 @@ DRIVER_INIT_MEMBER(spectrum_state,plus2)
 	m_floppy = 0;
 }
 
-static const floppy_format_type specpls3_floppy_formats[] = {
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
-
 static SLOT_INTERFACE_START( specpls3_floppies )
 	SLOT_INTERFACE( "3ssdd", FLOPPY_3_SSDD )
 SLOT_INTERFACE_END
@@ -401,8 +396,8 @@ static MACHINE_CONFIG_DERIVED( spectrum_plus3, spectrum_128 )
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum_plus3 )
 
 	MCFG_UPD765A_ADD("upd765", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", specpls3_floppies, "3ssdd", 0, specpls3_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", specpls3_floppies, "3ssdd", 0, specpls3_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", specpls3_floppies, "3ssdd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", specpls3_floppies, "3ssdd", 0, floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 /***************************************************************************

@@ -47,11 +47,9 @@ static ADDRESS_MAP_START(kc_d004_gide_io, AS_IO, 8, kc_d004_gide_device)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(gide_r, gide_w)
 ADDRESS_MAP_END
 
-static const floppy_format_type kc_d004_floppy_formats[] = {
-	FLOPPY_KC85_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( kc_d004_device::floppy_formats )
+	FLOPPY_KC85_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( kc_d004_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
@@ -80,10 +78,10 @@ static MACHINE_CONFIG_FRAGMENT(kc_d004)
 	MCFG_Z80CTC_ADD( Z80CTC_TAG, XTAL_8MHz/2, kc_d004_ctc_intf )
 
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", kc_d004_floppies, "525hd", 0, kc_d004_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", kc_d004_floppies, "525hd", 0, kc_d004_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", kc_d004_floppies, "525hd", 0, kc_d004_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":3", kc_d004_floppies, "525hd", 0, kc_d004_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", kc_d004_floppies, "525hd", 0, kc_d004_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", kc_d004_floppies, "525hd", 0, kc_d004_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", kc_d004_floppies, "525hd", 0, kc_d004_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":3", kc_d004_floppies, "525hd", 0, kc_d004_device::floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT(kc_d004_gide)

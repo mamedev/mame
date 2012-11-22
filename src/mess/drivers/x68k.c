@@ -2627,11 +2627,9 @@ DRIVER_INIT_MEMBER(x68k_state,x68030)
 	m_is_32bit = true;
 }
 
-static const floppy_format_type x68k_floppy_formats[] = {
-	FLOPPY_XDF_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( x68k_state::floppy_formats )
+    FLOPPY_XDF_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( x68k_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
@@ -2687,10 +2685,10 @@ static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
 	MCFG_UPD72065_ADD("upd72065", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd72065:0", x68k_floppies, "525hd", 0, x68k_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd72065:1", x68k_floppies, "525hd", 0, x68k_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd72065:2", x68k_floppies, "525hd", 0, x68k_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd72065:3", x68k_floppies, "525hd", 0, x68k_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd72065:0", x68k_floppies, "525hd", 0, x68k_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd72065:1", x68k_floppies, "525hd", 0, x68k_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd72065:2", x68k_floppies, "525hd", 0, x68k_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd72065:3", x68k_floppies, "525hd", 0, x68k_state::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","x68k_flop")
 

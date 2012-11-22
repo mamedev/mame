@@ -77,10 +77,9 @@
 #define VERBOSE_KEYBOARD	0
 #define VERBOSE_DISK		0
 
-const floppy_format_type einstein_state::floppy_formats[] = {
-	FLOPPY_DSK_FORMAT, FLOPPY_MFM_FORMAT, FLOPPY_MFI_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( einstein_state::floppy_formats )
+	FLOPPY_DSK_FORMAT
+FLOPPY_FORMATS_END
 
 /***************************************************************************
     80 COLUMN DEVICE

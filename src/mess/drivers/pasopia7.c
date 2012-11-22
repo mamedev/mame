@@ -977,11 +977,6 @@ void pasopia7_state::fdc_irq(bool state)
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const floppy_format_type pasopia7_floppy_formats[] = {
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
-
 static SLOT_INTERFACE_START( pasopia7_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
@@ -1026,8 +1021,8 @@ static MACHINE_CONFIG_START( p7_base, pasopia7_state )
 	MCFG_I8255_ADD( "ppi8255_1", ppi8255_intf_1 )
 	MCFG_I8255_ADD( "ppi8255_2", ppi8255_intf_2 )
 	MCFG_UPD765A_ADD("fdc", true, true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pasopia7_floppies, "525hd", 0, pasopia7_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pasopia7_floppies, "525hd", 0, pasopia7_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pasopia7_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pasopia7_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( p7_raster, p7_base )

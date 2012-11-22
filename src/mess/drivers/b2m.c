@@ -184,11 +184,6 @@ static LEGACY_FLOPPY_OPTIONS_START(b2m)
 LEGACY_FLOPPY_OPTIONS_END
 */
 
-static const floppy_format_type floppy_formats[] = {
-	FLOPPY_MFM_FORMAT, FLOPPY_MFI_FORMAT,
-	NULL
-};
-
 static SLOT_INTERFACE_START( b2m_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -234,8 +229,8 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 
 	MCFG_WD1773x_ADD("wd1793", XTAL_8MHz )
 
-	MCFG_FLOPPY_DRIVE_ADD("fd0", b2m_floppies, "525dd", 0, floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", b2m_floppies, "525dd", 0, floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", b2m_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", b2m_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

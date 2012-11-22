@@ -6,9 +6,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "formats/bw2_dsk.h"
-#include "formats/hxcmfm_dsk.h"
-#include "formats/imd_dsk.h"
-#include "formats/mfi_dsk.h"
 #include "machine/bw2exp.h"
 #include "machine/ctronics.h"
 #include "machine/i8251.h"
@@ -74,7 +71,7 @@ public:
 
 	void fdc_intrq_w(bool state);
 	void fdc_drq_w(bool state);
-	static const floppy_format_type floppy_formats[];
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	// keyboard state
 	UINT8 m_kb;

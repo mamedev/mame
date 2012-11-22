@@ -94,7 +94,7 @@ public:
     UINT8 m_duart_io;
     bool  m_bCalibSecondByte;
 
-	static const floppy_format_type floppy_formats[];
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 private:
     UINT16  es5510_dsp_ram[0x200];
@@ -113,10 +113,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 };
 
-const floppy_format_type esq5505_state::floppy_formats[] = {
-	FLOPPY_ESQIMG_FORMAT, FLOPPY_IPF_FORMAT, FLOPPY_MFI_FORMAT, FLOPPY_DFI_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( esq5505_state::floppy_formats )
+    FLOPPY_ESQIMG_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( ensoniq_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )

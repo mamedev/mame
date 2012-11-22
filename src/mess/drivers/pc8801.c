@@ -2271,13 +2271,6 @@ static UPD1990A_INTERFACE( pc8801_upd1990a_intf )
 
 /* Floppy Configuration */
 
-
-static const floppy_format_type pc88_floppy_formats[] = {
-	FLOPPY_D88_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
-
 static SLOT_INTERFACE_START( pc88_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
@@ -2702,8 +2695,8 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 
 	MCFG_I8251_ADD(I8251_TAG, uart_intf)
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88_floppies, "525hd", 0, pc88_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88_floppies, "525hd", 0, pc88_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc88_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc88_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc8801_flop")
 
 	/* video hardware */

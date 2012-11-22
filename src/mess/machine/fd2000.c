@@ -85,12 +85,6 @@ static const via6522_interface via_intf =
 	DEVCB_NULL
 };
 
-
-static const floppy_format_type fd2000_floppy_formats[] = {
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
-
 static SLOT_INTERFACE_START( fd2000_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -107,7 +101,7 @@ static MACHINE_CONFIG_FRAGMENT( fd2000 )
 	MCFG_VIA6522_ADD(M6522_TAG, 2000000, via_intf)
 	MCFG_UPD765A_ADD(DP8473_TAG, true, true)
 
-	MCFG_FLOPPY_DRIVE_ADD(DP8473_TAG ":0", fd2000_floppies, "525dd", 0, fd2000_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(DP8473_TAG ":0", fd2000_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 

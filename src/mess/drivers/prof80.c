@@ -507,11 +507,6 @@ static UPD1990A_INTERFACE( rtc_intf )
 //  upd765_interface fdc_intf
 //-------------------------------------------------
 
-static const floppy_format_type prof80_floppy_formats[] = {
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
-
 static SLOT_INTERFACE_START( prof80_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
@@ -623,8 +618,8 @@ static MACHINE_CONFIG_START( prof80, prof80_state )
 	// devices
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, rtc_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, true)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", prof80_floppies, "525hd", 0, prof80_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", prof80_floppies, "525hd", 0, prof80_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", prof80_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", prof80_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
 
 	// ECB bus
 	MCFG_ECBBUS_ADD(Z80_TAG, ecb_intf)

@@ -180,11 +180,6 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	}
 }
 
-static const floppy_format_type dmv_floppy_formats[] = {
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
-
 static SLOT_INTERFACE_START( dmv_floppies )
 	 SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -333,8 +328,8 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	MCFG_UPD7220_ADD( "upd7220", XTAL_4MHz, hgdc_intf, upd7220_map )
 	MCFG_I8237_ADD( "dma8237", XTAL_4MHz, dmv_dma8237_config )
 	MCFG_UPD765A_ADD( "upd765", true, true )
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", dmv_floppies, "525dd", 0, dmv_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", dmv_floppies, "525dd", 0, dmv_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", dmv_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", dmv_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 /* ROM definition */

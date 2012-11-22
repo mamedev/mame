@@ -969,11 +969,6 @@ WRITE_LINE_MEMBER(sf7000_state::sf7000_fdc_index_callback)
     floppy_interface sf7000_floppy_interface
 -------------------------------------------------*/
 
-static const floppy_format_type sf7000_floppy_formats[] = {
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
-
 static SLOT_INTERFACE_START( sf7000_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
@@ -1193,7 +1188,7 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	MCFG_I8255_ADD(UPD9255_1_TAG, sf7000_ppi_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, default_i8251_interface)
 	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sf7000_floppies, "525hd", 0, sf7000_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sf7000_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
 //  MCFG_PRINTER_ADD("sp400") /* serial printer */
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_interface)

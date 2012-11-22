@@ -28,6 +28,8 @@ public:
 
 	required_device<pc_fdc_interface> fdc;
 
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
 protected:
 	// device-level overrides
 	virtual void device_start();

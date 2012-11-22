@@ -58,14 +58,6 @@ const rom_entry *epson_pf10_device::device_rom_region() const
 //  machine configurations
 //-------------------------------------------------
 
-static const floppy_format_type pf10_floppy_formats[] =
-{
-	FLOPPY_D88_FORMAT,
-	FLOPPY_MFM_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
-
 static SLOT_INTERFACE_START( pf10_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
@@ -76,7 +68,7 @@ static MACHINE_CONFIG_FRAGMENT( pf10 )
 	MCFG_CPU_IO_MAP(cpu_io)
 
 	MCFG_UPD765A_ADD("upd765a", false, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", pf10_floppies, "35dd", 0, pf10_floppy_formats) // SMD-165
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", pf10_floppies, "35dd", 0, floppy_image_device::default_floppy_formats) // SMD-165
 
 	MCFG_EPSON_SIO_ADD("sio")
 MACHINE_CONFIG_END

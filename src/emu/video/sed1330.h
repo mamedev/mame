@@ -43,6 +43,9 @@ public:
 	// inline configuration helpers
 	static void static_set_config(device_t &device, const char *screen_tag);
 
+    // optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+
     DECLARE_READ8_MEMBER( status_r );
     DECLARE_WRITE8_MEMBER( command_w );
 
@@ -53,7 +56,7 @@ public:
 
 protected:
     // device-level overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual void device_config_complete() { m_shortname = "sed1330"; }
     virtual void device_start();
     virtual void device_reset();
 

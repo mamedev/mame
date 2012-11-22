@@ -74,6 +74,7 @@ public:
 	void floppy_load_unload();
 	int floppy_load(floppy_image_device *dev);
 	void floppy_unload(floppy_image_device *dev);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	struct
 	{

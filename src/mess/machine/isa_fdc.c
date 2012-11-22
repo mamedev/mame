@@ -14,11 +14,9 @@
 #include "formats/mfi_dsk.h"
 
 
-static const floppy_format_type pc_floppy_formats[] = {
-	FLOPPY_PC_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( isa8_fdc_device::floppy_formats )
+	FLOPPY_PC_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( pc_dd_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
@@ -32,32 +30,32 @@ SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT( cfg_xt )
 	MCFG_PC_FDC_XT_ADD("fdc")
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_dd_floppies, "525dd", 0, pc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_dd_floppies, "525dd", 0, pc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_dd_floppies, "525dd", 0, isa8_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_dd_floppies, "525dd", 0, isa8_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( cfg_at )
 	MCFG_PC_FDC_AT_ADD("fdc")
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", 0, pc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", 0, pc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", 0, isa8_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", 0, isa8_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( cfg_smc )
 	MCFG_SMC37C78_ADD("fdc")
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", 0, pc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", 0, pc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", 0, isa8_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", 0, isa8_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( cfg_ps2 )
 	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", 0, pc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", 0, pc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", 0, isa8_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", 0, isa8_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( cfg_superio )
 	MCFG_PC_FDC_SUPERIO_ADD("fdc")
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", 0, pc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", 0, pc_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pc_hd_floppies, "35hd", 0, isa8_fdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pc_hd_floppies, "35hd", 0, isa8_fdc_device::floppy_formats)
 MACHINE_CONFIG_END
 
 

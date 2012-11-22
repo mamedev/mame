@@ -7,6 +7,7 @@
 #ifndef PCW16_H_
 #define PCW16_H_
 
+#include "machine/upd765.h"		/* FDC superio */
 
 #define PCW16_BORDER_HEIGHT 8
 #define PCW16_BORDER_WIDTH 8
@@ -113,6 +114,7 @@ public:
 
 	void trigger_fdc_int();
 	void fdc_interrupt(bool state);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 #endif /* PCW16_H_ */

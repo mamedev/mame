@@ -9,9 +9,11 @@
 #ifndef BEBOX_H_
 #define BEBOX_H_
 
+#include "emu.h"
 #include "machine/ins8250.h"
 #include "machine/8237dma.h"
 #include "machine/53c810.h"
+#include "machine/upd765.h"
 
 struct bebox_devices_t
 {
@@ -86,6 +88,7 @@ public:
 
 	void fdc_interrupt(bool state);
 	void fdc_dma_drq(bool state);
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 

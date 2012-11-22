@@ -42,6 +42,8 @@ enum
 	ROM
 };
 
+#define HAS_KB_OF_RAM(_kb) \
+	(m_ram->size() >= (_kb * 1024))
 
 
 //**************************************************************************
@@ -70,44 +72,51 @@ READ8_MEMBER( bw2_state::read )
 	case ROM: rom = 0; break;
 	}
 
-	if (!rom)
+	if (offset < 0x8000)
 	{
-		data = memregion(Z80_TAG)->base()[offset & 0x3fff];
-	}
+		if (!rom)
+		{
+			data = memregion(Z80_TAG)->base()[offset & 0x3fff];
+		}
 
-	if (!vram)
-	{
-		data = m_video_ram[offset & 0x3fff];
-	}
+		if (!vram)
+		{
+			data = m_video_ram[offset & 0x3fff];
+		}
 
-	if (!ram1)
+		if (!ram1)
+		{
+			data = m_ram->pointer()[offset];
+		}
+
+		if (!ram2 && HAS_KB_OF_RAM(96))
+		{
+			data = m_ram->pointer()[0x10000 | offset];
+		}
+
+		if (!ram3 && HAS_KB_OF_RAM(128))
+		{
+			data = m_ram->pointer()[0x18000 | offset];
+		}
+
+		if (!ram4 && HAS_KB_OF_RAM(160))
+		{
+			data = m_ram->pointer()[0x20000 | offset];
+		}
+
+		if (!ram5 && HAS_KB_OF_RAM(192))
+		{
+			data = m_ram->pointer()[0x28000 | offset];
+		}
+
+		if (!ram6 && HAS_KB_OF_RAM(224))
+		{
+			data = m_ram->pointer()[0x30000 | offset];
+		}
+	}
+	else
 	{
 		data = m_ram->pointer()[offset];
-	}
-
-	if (!ram2 && (m_ram->size() >= 96 * 1024))
-	{
-		data = m_ram->pointer()[0x10000 | offset];
-	}
-
-	if (!ram3 && (m_ram->size() >= 128 * 1024))
-	{
-		data = m_ram->pointer()[0x18000 | offset];
-	}
-
-	if (!ram4 && (m_ram->size() >= 160 * 1024))
-	{
-		data = m_ram->pointer()[0x20000 | offset];
-	}
-
-	if (!ram5 && (m_ram->size() >= 192 * 1024))
-	{
-		data = m_ram->pointer()[0x28000 | offset];
-	}
-
-	if (!ram6 && (m_ram->size() >= 224 * 1024))
-	{
-		data = m_ram->pointer()[0x30000 | offset];
 	}
 
 	return m_exp->cd_r(space, offset, data, ram2, ram3, ram4, ram5, ram6);
@@ -133,39 +142,46 @@ WRITE8_MEMBER( bw2_state::write )
 	case RAM6: ram6 = 0; break;
 	}
 
-	if (!vram)
+	if (offset < 0x8000)
 	{
-		m_video_ram[offset & 0x3fff] = data;
-	}
+		if (!vram)
+		{
+			m_video_ram[offset & 0x3fff] = data;
+		}
 
-	if (!ram1)
+		if (!ram1)
+		{
+			m_ram->pointer()[offset] = data;
+		}
+
+		if (!ram2 && HAS_KB_OF_RAM(96))
+		{
+			m_ram->pointer()[0x10000 | offset] = data;
+		}
+
+		if (!ram3 && HAS_KB_OF_RAM(128))
+		{
+			m_ram->pointer()[0x18000 | offset] = data;
+		}
+
+		if (!ram4 && HAS_KB_OF_RAM(160))
+		{
+			m_ram->pointer()[0x20000 | offset] = data;
+		}
+
+		if (!ram5 && HAS_KB_OF_RAM(192))
+		{
+			m_ram->pointer()[0x28000 | offset] = data;
+		}
+
+		if (!ram6 && HAS_KB_OF_RAM(224))
+		{
+			m_ram->pointer()[0x30000 | offset] = data;
+		}
+	}
+	else
 	{
 		m_ram->pointer()[offset] = data;
-	}
-
-	if (!ram2 && (m_ram->size() >= 96 * 1024))
-	{
-		m_ram->pointer()[0x10000 | offset] = data;
-	}
-
-	if (!ram3 && (m_ram->size() >= 128 * 1024))
-	{
-		m_ram->pointer()[0x18000 | offset] = data;
-	}
-
-	if (!ram4 && (m_ram->size() >= 160 * 1024))
-	{
-		m_ram->pointer()[0x20000 | offset] = data;
-	}
-
-	if (!ram5 && (m_ram->size() >= 192 * 1024))
-	{
-		m_ram->pointer()[0x28000 | offset] = data;
-	}
-
-	if (!ram6 && (m_ram->size() >= 224 * 1024))
-	{
-		m_ram->pointer()[0x30000 | offset] = data;
 	}
 
 	m_exp->cd_w(space, offset, data, ram2, ram3, ram4, ram5, ram6);
@@ -183,8 +199,7 @@ WRITE8_MEMBER( bw2_state::write )
 
 static ADDRESS_MAP_START( bw2_mem, AS_PROGRAM, 8, bw2_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(read, write)
-	AM_RANGE(0x8000, 0xffff) AM_RAM
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
 
@@ -204,6 +219,16 @@ static ADDRESS_MAP_START( bw2_io, AS_IO, 8, bw2_state )
 	AM_RANGE(0x50, 0x50) AM_DEVWRITE(CENTRONICS_TAG, centronics_device, write)
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE(WD2797_TAG, wd2797_t, read, write)
 	AM_RANGE(0x70, 0x7f) AM_DEVREADWRITE(BW2_EXPANSION_SLOT_TAG, bw2_expansion_slot_device, modsel_r, modsel_w)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( lcdc_map )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( lcdc_map, AS_0, 8, bw2_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 
@@ -512,43 +537,16 @@ static const struct pit8253_config pit_intf =
 
 
 //-------------------------------------------------
-//  MSM6255_INTERFACE( lcdc_intf )
-//-------------------------------------------------
-
-void bw2_state::palette_init()
-{
-	palette_set_color_rgb(machine(), 0, 0xa5, 0xad, 0xa5);
-	palette_set_color_rgb(machine(), 1, 0x31, 0x39, 0x10);
-}
-
-static MSM6255_CHAR_RAM_READ( bw2_charram_r )
-{
-	bw2_state *state = device->machine().driver_data<bw2_state>();
-
-	return state->m_video_ram[ma & 0x3fff];
-}
-
-static MSM6255_INTERFACE( lcdc_intf )
-{
-	SCREEN_TAG,
-	0,
-	bw2_charram_r,
-};
-
-
-//-------------------------------------------------
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
 void bw2_state::fdc_intrq_w(bool state)
 {
-	logerror("intrq %u\n", state?1:0);
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void bw2_state::fdc_drq_w(bool state)
 {
-	logerror("drq %u\n", state?1:0);
 	if (state)
 	{
 		if (m_maincpu->state_int(Z80_HALT))
@@ -562,13 +560,9 @@ void bw2_state::fdc_drq_w(bool state)
 	}
 }
 
-const floppy_format_type bw2_state::floppy_formats[] = {
-	FLOPPY_BW2_FORMAT,
-	FLOPPY_IMD_FORMAT,
-	FLOPPY_MFM_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( bw2_state::floppy_formats )
+	FLOPPY_BW2_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( bw2_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD ) // Teac FD-35
@@ -598,14 +592,22 @@ static const rs232_port_interface rs232_intf =
 //**************************************************************************
 
 //-------------------------------------------------
+//  PALETTE_INIT( bw2 )
+//-------------------------------------------------
+
+void bw2_state::palette_init()
+{
+	palette_set_color_rgb(machine(), 0, 0xa5, 0xad, 0xa5);
+	palette_set_color_rgb(machine(), 1, 0x31, 0x39, 0x10);
+}
+
+
+//-------------------------------------------------
 //  MACHINE_START( bw2 )
 //-------------------------------------------------
 
 void bw2_state::machine_start()
 {
-	// allocate memory
-	m_video_ram.allocate(0x4000);
-
 	// floppy callbacks
 	m_fdc->setup_intrq_cb(wd2797_t::line_cb(FUNC(bw2_state::fdc_intrq_w), this));
 	m_fdc->setup_drq_cb(wd2797_t::line_cb(FUNC(bw2_state::fdc_drq_w), this));
@@ -645,7 +647,7 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	// devices
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
 	MCFG_I8255A_ADD(I8255A_TAG, ppi_intf)
-	MCFG_MSM6255_ADD(MSM6255_TAG, XTAL_16MHz, lcdc_intf)
+	MCFG_MSM6255_ADD(MSM6255_TAG, XTAL_16MHz, 0, SCREEN_TAG, lcdc_map)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_I8251_ADD(I8251_TAG, default_i8251_interface)
 	MCFG_WD2797x_ADD(WD2797_TAG, XTAL_16MHz/16)

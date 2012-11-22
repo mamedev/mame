@@ -472,12 +472,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_10hz_irq)
 	}
 }
 
-static const floppy_format_type pc100_floppy_formats[] = {
-	FLOPPY_D88_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	NULL
-};
-
 static SLOT_INTERFACE_START( pc100_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
@@ -506,8 +500,8 @@ static MACHINE_CONFIG_START( pc100, pc100_state )
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_MSM58321_ADD("rtc", XTAL_32_768kHz, rtc_intf)
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc100_floppies, "525hd", 0, pc100_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc100_floppies, "525hd", 0, pc100_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pc100_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pc100_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
