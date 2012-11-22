@@ -238,8 +238,6 @@ static void duart_tx(device_t *device, int channel, UINT8 data)
 #if KEYBOARD_HACK
 INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 {
-	esq1_state *state = device.machine().driver_data<esq1_state>();
-
     if (oldval == 0 && newval == 1)
     {
         printf("key on %02x\n", (int)(FPTR)param);

@@ -35,8 +35,7 @@
     O2: "AN2" (disk side select on EPS/EPS-16)
     O6: To ESPHALT pin on ES5510
     O7: "SACK"
-
-
+ 
 ***************************************************************************/
 
 #include "emu.h"
@@ -56,7 +55,7 @@
 #define EPS     (1)
 #define SQ1     (2)
 
-#define KEYBOARD_HACK (0)   // turn on to play the SQ-1: Z and X are program up/down, A/S/D/F/G/H/J/K/L and Q/W/E/R/T/Y/U play notes
+#define KEYBOARD_HACK (0)   // turn on to play the SQ-1, SD-1, and SD-1 32-voice: Z and X are program up/down, A/S/D/F/G/H/J/K/L and Q/W/E/R/T/Y/U play notes
 
 #if KEYBOARD_HACK
 static int program = 0;
@@ -110,6 +109,7 @@ public:
 	DECLARE_DRIVER_INIT(eps);
 	DECLARE_DRIVER_INIT(common);
 	DECLARE_DRIVER_INIT(sq1);
+	DECLARE_DRIVER_INIT(sd1);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 };
 
@@ -398,8 +398,6 @@ static void esq_fdc_write_byte(running_machine &machine, int addr, int data)
 #if KEYBOARD_HACK
 INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 {
-    esq5505_state *state = device.machine().driver_data<esq5505_state>();
-
     // send a MIDI Note On
     if (oldval == 0 && newval == 1)
     {
@@ -468,7 +466,7 @@ static const es5505_interface es5505_config =
 };
 
 static MACHINE_CONFIG_START( vfx, esq5505_state )
-	MCFG_CPU_ADD("maincpu", M68000, 10000000)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(vfx_map)
 
     MCFG_ESQ2x40_ADD("vfd")
@@ -476,15 +474,10 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_DUART68681_ADD("duart", 4000000, duart_config)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ensoniq", ES5505, 30476100/2)
+	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL_10MHz)
 	MCFG_SOUND_CONFIG(es5505_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED(sq1, vfx)
-    MCFG_ESQ2x40_REMOVE("vfd")
-    MCFG_ESQ2x40_SQ1_ADD("sq1vfd")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(eps, vfx)
@@ -506,6 +499,30 @@ static MACHINE_CONFIG_DERIVED(vfxsd, vfx)
 
     MCFG_WD1772x_ADD("wd1772", 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", 0, esq5505_state::floppy_formats)
+MACHINE_CONFIG_END
+
+// 32-voice machines with the VFX-SD type config
+static MACHINE_CONFIG_START(vfx32, esq5505_state)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_30_4761MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
+
+    MCFG_ESQ2x40_ADD("vfd")
+
+	MCFG_DUART68681_ADD("duart", 4000000, duart_config)
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL_30_4761MHz / 2)
+	MCFG_SOUND_CONFIG(es5505_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+    MCFG_WD1772x_ADD("wd1772", 8000000)
+	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", 0, esq5505_state::floppy_formats)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(sq1, vfx32)
+    MCFG_ESQ2x40_REMOVE("vfd")
+    MCFG_ESQ2x40_SQ1_ADD("sq1vfd")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( vfx )
@@ -567,9 +584,14 @@ ROM_START( sd1 )
     ROM_LOAD16_BYTE( "sd1_410_lo.bin", 0x000000, 0x020000, CRC(faa613a6) SHA1(60066765cddfa9d3b5d09057d8f83fb120f4e65e) )
     ROM_LOAD16_BYTE( "sd1_410_hi.bin", 0x000001, 0x010000, CRC(618c0aa8) SHA1(74acf458aa1d04a0a7a0cd5855c49e6855dbd301) )
 
-    ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
-    ROM_LOAD( "sd1-waves-1.bin",  0x000000, 0x080000, NO_DUMP )
-    ROM_LOAD( "sd1-waves-2.bin",  0x100000, 0x080000, NO_DUMP )
+    ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)  // BS=0 region (12-bit)
+    ROM_LOAD16_BYTE( "u34.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) ) 
+    ROM_LOAD16_BYTE( "u35.bin", 0x100001, 0x080000, CRC(c0055975) SHA1(5a22f1d5e437c6277eb0cfb1ff1b3f8dcdea1cc6) ) 
+
+    ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00) // BS=1 region (16-bit)
+
+    ROM_REGION(0x80000, "nibbles", 0)
+    ROM_LOAD( "u36.bin",      0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) ) 
 ROM_END
 
 ROM_START( sd132 )
@@ -577,13 +599,19 @@ ROM_START( sd132 )
     ROM_LOAD16_BYTE( "sd1_32_402_lo.bin", 0x000000, 0x020000, CRC(5da2572b) SHA1(cb6ddd637ed13bfeb40a99df56000479e63fc8ec) )
     ROM_LOAD16_BYTE( "sd1_32_402_hi.bin", 0x000001, 0x010000, CRC(fc45c210) SHA1(23b81ebd9176112e6eae0c7c75b39fcb1656c953) )
 
-    ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
-    ROM_LOAD( "sd1-waves-1.bin",  0x000000, 0x080000, NO_DUMP )
-    ROM_LOAD( "sd1-waves-2.bin",  0x100000, 0x080000, NO_DUMP )
+    ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)  // BS=0 region (12-bit)
+    ROM_LOAD16_BYTE( "u34.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) ) 
+    ROM_LOAD16_BYTE( "u35.bin", 0x100001, 0x080000, CRC(c0055975) SHA1(5a22f1d5e437c6277eb0cfb1ff1b3f8dcdea1cc6) ) 
+
+    ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00) // BS=1 region (16-bit)
+
+    ROM_REGION(0x80000, "nibbles", ROMREGION_ERASE00)
+    ROM_LOAD( "u36.bin",      0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) ) 
 ROM_END
 
+
 ROM_START( sq1 )
-    ROM_REGION(0x20000, "osrom", 0)
+    ROM_REGION(0x40000, "osrom", 0)
     ROM_LOAD16_BYTE( "esq5505lo.bin",    0x000000, 0x010000, CRC(b004cf05) SHA1(567b0dae2e35b06e39da108f9c041fd9bc38fa35) )
     ROM_LOAD16_BYTE( "esq5505up.bin",    0x000001, 0x010000, CRC(2e927873) SHA1(06a948cb71fa254b23f4b9236f29035d10778da1) )
 
@@ -629,10 +657,28 @@ DRIVER_INIT_MEMBER(esq5505_state,sq1)
     m_system_type = SQ1;
 }
 
+DRIVER_INIT_MEMBER(esq5505_state,sd1)
+{
+    UINT8 *pNibbles = (UINT8 *)machine().root_device().memregion("nibbles")->base();
+    UINT8 *pBS0 = (UINT8 *)machine().root_device().memregion("waverom")->base();
+
+    DRIVER_INIT_CALL(common);
+
+    // create the 12 bit samples by patching in the nibbles from the nibble ROM
+	for (int i = 0; i < 0x80000; i++)
+	{
+        *pBS0 = *pNibbles & 0xf0;
+        pBS0 += 2;
+        *pBS0 = (*pNibbles & 0x0f) << 4;
+        pBS0 += 2;
+        pNibbles++;
+	}
+}
+
 CONS( 1988, eps,   0, 0, eps,   vfx, esq5505_state, eps,    "Ensoniq", "EPS", GAME_NOT_WORKING )   // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
 CONS( 1989, vfx,   0, 0, vfx,   vfx, esq5505_state, common, "Ensoniq", "VFX", GAME_NOT_WORKING )       // 2x40 VFD
 CONS( 1989, vfxsd, 0, 0, vfxsd, vfx, esq5505_state, common, "Ensoniq", "VFX-SD", GAME_NOT_WORKING )    // 2x40 VFD
-CONS( 1990, sd1,   0, 0, vfxsd, vfx, esq5505_state, common, "Ensoniq", "SD-1", GAME_NOT_WORKING )      // 2x40 VFD
-CONS( 1990, sd132, 0, 0, vfxsd, vfx, esq5505_state, common, "Ensoniq", "SD-1 32", GAME_NOT_WORKING )   // 2x40 VFD
+CONS( 1990, sd1,   0, 0, vfxsd, vfx, esq5505_state, sd1,    "Ensoniq", "SD-1", GAME_NOT_WORKING )      // 2x40 VFD
+CONS( 1990, sd132, sd1, 0, vfx32, vfx, esq5505_state, sd1,    "Ensoniq", "SD-1 32", GAME_NOT_WORKING )   // 2x40 VFD
 CONS( 1990, sq1,   0, 0, sq1,   vfx, esq5505_state, sq1,    "Ensoniq", "SQ-1", GAME_NOT_WORKING )      // LCD of some sort
 
