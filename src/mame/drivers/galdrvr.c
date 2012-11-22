@@ -6483,7 +6483,6 @@ GAME( 1979, galaxiana,  galaxian, galaxian, superg, galaxian_state,   galaxian, 
 GAME( 1979, galaxianm,  galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "Namco (Midway license)", "Galaxian (Midway set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1979, galaxianmo, galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "Namco (Midway license)", "Galaxian (Midway set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1979, galaxiant,  galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "Namco (Taito license)", "Galaxian (Taito)", GAME_SUPPORTS_SAVE )
-GAME( 1980, astrians,   galaxian, galaxian, swarm,  galaxian_state,   galaxian, ROT90,  "BGV Ltd", "Astrians (clone of Swarm)", GAME_SUPPORTS_SAVE )
 
 /* straight Galaxian ripoffs on basic galaxian hardware */
 GAME( 1979, moonaln,  galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "Namco / Nichibutsu (Karateco license?)", "Moon Alien", GAME_SUPPORTS_SAVE ) // or bootleg?
@@ -6493,6 +6492,7 @@ GAME( 1979, galapx,   galaxian, galaxian, superg, galaxian_state,   galaxian, RO
 GAME( 1979, galap1,   galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "hack", "Space Invaders Galactica (galaxiana hack)", GAME_SUPPORTS_SAVE )
 GAME( 1979, galap4,   galaxian, galaxian, superg, galaxian_state,   galaxian, ROT90,  "hack (G.G.I)", "Galaxian Part 4 (hack)", GAME_SUPPORTS_SAVE )
 GAME( 1979, swarm,    galaxian, galaxian, swarm, galaxian_state,    galaxian, ROT90,  "bootleg? (Subelectro)", "Swarm (bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1980, astrians, galaxian, galaxian, swarm,  galaxian_state,   galaxian, ROT90,  "bootleg (BGV Ltd.)", "Astrians (clone of Swarm)", GAME_SUPPORTS_SAVE )
 GAME( 1979, zerotime, galaxian, galaxian, zerotime, galaxian_state, galaxian, ROT90,  "bootleg? (Petaco S.A.)", "Zero Time", GAME_SUPPORTS_SAVE )
 GAME( 1979, starfght, galaxian, galaxian, swarm, galaxian_state,    galaxian, ROT90,  "bootleg (Jeutel)", "Star Fighter", GAME_SUPPORTS_SAVE )
 GAME( 1979, galaxbsf, galaxian, galaxian, galaxian, galaxian_state, galaxian, ROT90,  "bootleg", "Galaxian (bootleg)", GAME_SUPPORTS_SAVE )
@@ -6540,7 +6540,7 @@ GAME( 1980, streakng, 0,        pacmanbl, streakng, galaxian_state, galaxian, RO
 GAME( 1980, streaknga,streakng, pacmanbl, streakng, galaxian_state, galaxian, ROT90,  "Shoei", "Streaking (set 2)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1981, pacmanbl, puckman,  pacmanbl, pacmanbl, galaxian_state, pacmanbl, ROT270, "bootleg", "Pac-Man (Galaxian hardware, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, pacmanbla,puckman,  pacmanbl, pacmanbl, galaxian_state, pacmanbl, ROT270, "bootleg", "Pac-Man (Galaxian hardware, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, ghostmun, puckman,  pacmanbl, streakng, galaxian_state, ghostmun, ROT90,  "Leisure and Allied", "Ghost Muncher", GAME_SUPPORTS_SAVE )
+GAME( 1981, ghostmun, puckman,  pacmanbl, streakng, galaxian_state, ghostmun, ROT90,  "bootleg (Leisure and Allied)", "Ghost Muncher", GAME_SUPPORTS_SAVE )
 GAME( 1981, phoenxp2, phoenix,  galaxian, phoenxp2, galaxian_state, batman2,  ROT270, "bootleg", "Phoenix Part 2", GAME_SUPPORTS_SAVE )
 GAME( 1981, batman2,  phoenix,  galaxian, batman2, galaxian_state,  batman2,  ROT270, "bootleg", "Batman Part 2", GAME_SUPPORTS_SAVE ) /* similar to pisces, but with different video banking characteristics */
 GAME( 1981, atlantisb,atlantis, galaxian, atlantib, galaxian_state, galaxian, ROT270, "bootleg", "Battle of Atlantis (bootleg)", GAME_SUPPORTS_SAVE ) // I don't know if this should have a starfield...
@@ -6646,7 +6646,7 @@ GAME( 1981, froggermc,frogger,  froggrmc, froggrmc, galaxian_state, froggrmc, RO
 GAME( 1981, froggers, frogger,  froggers, frogger, galaxian_state,  froggers, ROT90,  "bootleg", "Frog", GAME_SUPPORTS_SAVE )
 GAME( 1981, frogf,    frogger,  frogf,    frogger, galaxian_state,  froggers, ROT90,  "bootleg (Falcon)", "Frog (Falcon bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1981, frogg,    frogger,  galaxian, frogg, galaxian_state,    frogg,    ROT90,  "bootleg", "Frog (Galaxian hardware)", GAME_SUPPORTS_SAVE )
-GAME( 1981, froggrs,  frogger,  froggers, frogger,  galaxian_state, froggrs,  ROT90,  "Coin Music", "Frogger (Scramble hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1981, froggrs,  frogger,  froggers, frogger,  galaxian_state, froggrs,  ROT90,  "bootleg (Coin Music)", "Frogger (Scramble hardware)", GAME_SUPPORTS_SAVE )
 
 
 /*
@@ -6682,7 +6682,7 @@ GAME( 1981, scramblebb,scramble,scramble, scramble, galaxian_state, scramble, RO
 
 GAME( 1981, atlantis, 0,        theend,   atlantis, galaxian_state, atlantis, ROT90,  "Comsoft", "Battle of Atlantis (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, atlantis2,atlantis, theend,   atlantis, galaxian_state, atlantis, ROT90,  "Comsoft", "Battle of Atlantis (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 198?, bomber,   scramble, scramble, scramble, galaxian_state, scramble, ROT90,  "bootleg", "Bomber (bootleg of Scramble)", GAME_SUPPORTS_SAVE )
+GAME( 198?, bomber,   scramble, scramble, scramble, galaxian_state, scramble, ROT90,  "bootleg (Alca)", "Bomber (bootleg of Scramble)", GAME_SUPPORTS_SAVE )
 
 /* Scorpion hardware; based on Scramble but with a 3rd AY-8910 and a speech chip */
 GAME( 1982, scorpion, 0,		scorpion, scorpion, galaxian_state, scorpion, ROT90,  "Zaccaria", "Scorpion (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
