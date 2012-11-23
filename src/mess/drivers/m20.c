@@ -44,7 +44,7 @@ EI1     Vectored interrupt error
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
+#include "formats/m20_dsk.h"
 
 #include "machine/keyboard.h"
 
@@ -307,8 +307,7 @@ static ADDRESS_MAP_START(m20_mem, AS_PROGRAM, 16, m20_state)
     AM_RANGE( 0xa0000, 0xaffff ) AM_RAM
     AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM
     AM_RANGE( 0xc0000, 0xc3fff ) AM_RAM
-//  AM_RANGE( 0x34000, 0x37fff ) AM_RAM //extra vram for bitmap mode
-//  AM_RANGE( 0x20000, 0x2???? ) //work RAM?
+//  AM_RANGE( 0x34000, 0x37fff ) AM_RAM //extra vram for color mode
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
@@ -336,7 +335,6 @@ static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
 
 	AM_RANGE(0x140, 0x143) AM_READWRITE(m20_i8259_r, m20_i8259_w)
 
-	// 0x21?? / 0x21? - fdc ... seems to control the screen colors???
 ADDRESS_MAP_END
 
 #if 0
@@ -418,10 +416,10 @@ WRITE_LINE_MEMBER(m20_state::kbd_rxrdy_int)
 	pic8259_ir4_w(machine().device("i8259"), state);
 }
 
-#if 0
+#if 1
 READ_LINE_MEMBER(m20_state::wd177x_dden_r)
 {
-	printf ("wd177x_dden_r called, returning %d\n", !m_port21_sd);
+	//printf ("wd177x_dden_r called, returning %d\n", !m_port21_sd);
 	return !m_port21_sd;
 }
 #endif
@@ -459,20 +457,11 @@ static const i8251_interface tty_i8251_intf =
 
 const wd17xx_interface m20_wd17xx_interface =
 {
-	DEVCB_NULL, //DEVCB_DRIVER_LINE_MEMBER(m20_state, wd177x_dden_r),
+	/*DEVCB_NULL,*/ DEVCB_DRIVER_LINE_MEMBER(m20_state, wd177x_dden_r),
 	DEVCB_DRIVER_LINE_MEMBER(m20_state, wd177x_intrq_w),
 	DEVCB_NULL,
 	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
-
-static LEGACY_FLOPPY_OPTIONS_START(m20)
-	LEGACY_FLOPPY_OPTION(m20, "img", "M20 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([35])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
 
 static const floppy_interface m20_floppy_interface =
 {
@@ -487,10 +476,31 @@ static const floppy_interface m20_floppy_interface =
 	NULL
 };
 
+static unsigned char kbxlat[] =
+{
+	0x00, '\\', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+	'o',   'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3',
+	'4',   '5', '6', '7', '8', '9', '-', '^', '@', '[', ';', ':', ']', ',', '.', '/',
+	0x00,  '<', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
+	'O',   'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+};
+
 WRITE8_MEMBER( m20_state::kbd_put )
 {
 	if (data) {
         if (data == 0xd) data = 0xc1;
+        else if (data == 0x20) data = 0xc0;
+        else if (data == 8) data = 0x69; /* ^H */
+        else if (data == 3) data = 0x64; /* ^C */
+		else if (data >= '0' && data <= '9') data += 0x4c - '0';
+		else {
+			int i;
+			for (i = 0; i < sizeof(kbxlat); i++)
+				if (data == kbxlat[i]) {
+					data = i;
+					break;
+				}
+		}
 		printf("kbd_put called with 0x%02X\n", data);
 		m_kbdi8251->receive_character(data);
 	}

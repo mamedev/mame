@@ -139,6 +139,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/kc85_dsk.o	\
 	$(LIBOBJ)/formats/kim1_cas.o	\
 	$(LIBOBJ)/formats/lviv_lvt.o	\
+	$(LIBOBJ)/formats/m20_dsk.o	\
 	$(LIBOBJ)/formats/m5_dsk.o		\
 	$(LIBOBJ)/formats/mm_dsk.o		\
 	$(LIBOBJ)/formats/msx_dsk.o		\
