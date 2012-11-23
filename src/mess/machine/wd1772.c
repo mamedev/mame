@@ -183,7 +183,7 @@ void wd177x_t::seek_start(int state)
 		else
 			status &= ~S_HLD;
 	}
-	sub_state = has_motor() ? SPINUP : SPINUP_DONE;
+	sub_state = has_motor() && !has_head_load() ? SPINUP : SPINUP_DONE;
 	status_type_1 = true;
 	seek_continue();
 }
@@ -223,12 +223,11 @@ void wd177x_t::seek_continue()
 				floppy->dir_w(last_dir);
 				floppy->stp_w(0);
 				floppy->stp_w(1);
-
-				// When stepping with update, the track register is updated before seeking.
-				// Important for the sam coupe format code.
-				if(main_state == STEP && (command & 0x10))
-					track += last_dir ? -1 : 1;
 			}
+			// When stepping with update, the track register is updated before seeking.
+			// Important for the sam coupe format code.
+			if(main_state == STEP && (command & 0x10))
+				track += last_dir ? -1 : 1;
 			counter++;
 			sub_state = SEEK_WAIT_STEP_TIME;
 			delay_cycles(t_gen, step_time(command & 3));
@@ -278,6 +277,11 @@ void wd177x_t::seek_continue()
 
 		case SEEK_DONE:
 			if(command & 0x04) {
+				if(has_ready() && !is_ready()) {
+					status |= S_RNF;
+					command_end();
+					return;
+				}
 				sub_state = SCAN_ID;
 				counter = 0;
 				live_start(SEARCH_ADDRESS_MARK_HEADER);
@@ -338,7 +342,7 @@ void wd177x_t::read_sector_start()
 	drop_drq();
 	if (has_side_select() && floppy)
 		floppy->ss_w(BIT(command, 1));
-	sub_state = has_motor() ? SPINUP : SPINUP_DONE;
+	sub_state = has_motor() && !has_head_load() ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	read_sector_continue();
 }
@@ -428,7 +432,7 @@ void wd177x_t::read_track_start()
 	drop_drq();
 	if (has_side_select() && floppy)
 		floppy->ss_w(BIT(command, 1));
-	sub_state = has_motor() ? SPINUP : SPINUP_DONE;
+	sub_state = has_motor() && !has_head_load()  ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	read_track_continue();
 }
@@ -495,7 +499,7 @@ void wd177x_t::read_id_start()
 	drop_drq();
 	if (has_side_select() && floppy)
 		floppy->ss_w(BIT(command, 1));
-	sub_state = has_motor() ? SPINUP : SPINUP_DONE;
+	sub_state = has_motor() && !has_head_load()  ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	read_id_continue();
 }
@@ -560,7 +564,7 @@ void wd177x_t::write_track_start()
 	drop_drq();
 	if (has_side_select() && floppy)
 		floppy->ss_w(BIT(command, 1));
-	sub_state = has_motor() ? SPINUP : SPINUP_DONE;
+	sub_state = has_motor()  && !has_head_load() ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	write_track_continue();
 }
@@ -642,7 +646,7 @@ void wd177x_t::write_sector_start()
 	drop_drq();
 	if (has_side_select() && floppy)
 		floppy->ss_w(BIT(command, 1));
-	sub_state = has_motor() ? SPINUP : SPINUP_DONE;
+	sub_state = has_motor() && !has_head_load()  ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	write_sector_continue();
 }
