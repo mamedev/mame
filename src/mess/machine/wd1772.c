@@ -40,6 +40,7 @@ const device_type WD1772x = &device_creator<wd1772_t>;
 const device_type WD1773x = &device_creator<wd1773_t>;
 const device_type WD2793x = &device_creator<wd2793_t>;
 const device_type WD2797x = &device_creator<wd2797_t>;
+const device_type FD1793x = &device_creator<fd1793_t>;
 
 wd177x_t::wd177x_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, type, name, tag, owner, clock)
@@ -61,6 +62,7 @@ void wd177x_t::device_start()
 	save_item(NAME(sub_state));
 	save_item(NAME(track));
 	save_item(NAME(sector));
+	save_item(NAME(intrq_cond));
 	save_item(NAME(cmd_buffer));
 	save_item(NAME(track_buffer));
 	save_item(NAME(sector_buffer));
@@ -85,6 +87,7 @@ void wd177x_t::device_reset()
 	last_dir = 1;
 	intrq = false;
 	drq = false;
+	hld = false;
 	live_abort();
 }
 
@@ -115,6 +118,16 @@ void wd177x_t::setup_intrq_cb(line_cb cb)
 void wd177x_t::setup_drq_cb(line_cb cb)
 {
 	drq_cb = cb;
+}
+
+void wd177x_t::setup_hld_cb(line_cb cb)
+{
+	hld_cb = cb;
+}
+
+void wd177x_t::setup_enp_cb(line_cb cb)
+{
+	enp_cb = cb;
 }
 
 void wd177x_t::dden_w(bool _dden)
@@ -163,6 +176,13 @@ void wd177x_t::seek_start(int state)
 {
 	main_state = state;
 	status = (status & ~(S_CRC|S_RNF|S_SPIN)) | S_BUSY;
+	if(has_head_load()) {
+		// TODO get value from HLT callback
+		if (command & 8)
+			status |= S_HLD;
+		else
+			status &= ~S_HLD;
+	}
 	sub_state = has_motor() ? SPINUP : SPINUP_DONE;
 	status_type_1 = true;
 	seek_continue();
@@ -295,7 +315,7 @@ bool wd177x_t::sector_matches() const
 {
 	if(cur_live.idbuf[0] != track || cur_live.idbuf[2] != sector)
 		return false;
-	if(!has_side_check())
+	if(!has_side_check() || (command & 2))
 		return true;
 	if(command & 8)
 		return cur_live.idbuf[1] & 1;
@@ -303,8 +323,16 @@ bool wd177x_t::sector_matches() const
 		return !(cur_live.idbuf[1] & 1);
 }
 
+bool wd177x_t::is_ready()
+{
+	return (floppy && !floppy->ready_r());
+}
+
 void wd177x_t::read_sector_start()
 {
+	if(has_ready() && !is_ready())
+		command_end();
+
 	main_state = READ_SECTOR;
 	status = (status & ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM)) | S_BUSY;
 	drop_drq();
@@ -359,6 +387,7 @@ void wd177x_t::read_sector_continue()
 				live_start(SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
+			// TODO WD2795/7 alternate sector size
 			sector_size = 128 << (cur_live.idbuf[3] & 3);
 			sub_state = SECTOR_READ;
 			live_start(SEARCH_ADDRESS_MARK_DATA);
@@ -391,6 +420,9 @@ void wd177x_t::read_sector_continue()
 
 void wd177x_t::read_track_start()
 {
+	if(has_ready() && !is_ready())
+		command_end();
+	
 	main_state = READ_TRACK;
 	status = (status & ~(S_LOST|S_RNF)) | S_BUSY;
 	drop_drq();
@@ -455,6 +487,9 @@ void wd177x_t::read_track_continue()
 
 void wd177x_t::read_id_start()
 {
+	if(has_ready() && !is_ready())
+		command_end();
+	
 	main_state = READ_ID;
 	status = (status & ~(S_WP|S_DDM|S_LOST|S_RNF)) | S_BUSY;
 	drop_drq();
@@ -517,6 +552,9 @@ void wd177x_t::read_id_continue()
 
 void wd177x_t::write_track_start()
 {
+	if(has_ready() && !is_ready())
+		command_end();
+	
 	main_state = WRITE_TRACK;
 	status = (status & ~(S_WP|S_DDM|S_LOST|S_RNF)) | S_BUSY;
 	drop_drq();
@@ -596,6 +634,9 @@ void wd177x_t::write_track_continue()
 
 void wd177x_t::write_sector_start()
 {
+	if(has_ready() && !is_ready())
+		command_end();
+	
 	main_state = WRITE_SECTOR;
 	status = (status & ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM)) | S_BUSY;
 	drop_drq();
@@ -650,6 +691,7 @@ void wd177x_t::write_sector_continue()
 				live_start(SEARCH_ADDRESS_MARK_HEADER);
 				return;
 			}
+			// TODO WD2795/7 alternate sector size
 			sector_size = 128 << (cur_live.idbuf[3] & 3);
 			sub_state = SECTOR_WRITE;
 			live_start(WRITE_SECTOR_PRE);
@@ -686,12 +728,20 @@ void wd177x_t::interrupt_start()
 		drop_drq();
 		motor_timeout = 0;
 	}
-	if(command & 0x08) {
+	
+	if(!(command & 0x0f)) {
+		intrq_cond = 0;
+	} else {
+		intrq_cond = (intrq_cond & I_IMM) | (command & 0x07);
+	}
+
+	if(intrq_cond & I_IMM) {
 		intrq = true;
 		if(!intrq_cb.isnull())
 			intrq_cb(intrq);
 	}
-	if(command & 0x07) {
+
+	if(command & 0x03) {
 		logerror("%s: unhandled interrupt generation (%02x)\n", ttsn().cstr(), command);
 	}
 }
@@ -791,7 +841,9 @@ void wd177x_t::do_cmd_w()
 
 void wd177x_t::cmd_w(UINT8 val)
 {
-	if(intrq && ((command & 0xf8) != 0xd8)) {
+	logerror("wd1772 cmd: %02x\n", val);
+	
+	if(intrq && !(intrq_cond & I_IMM)) {
 		intrq = false;
 		if(!intrq_cb.isnull())
 			intrq_cb(intrq);
@@ -808,20 +860,10 @@ void wd177x_t::cmd_w(UINT8 val)
 
 UINT8 wd177x_t::status_r()
 {
-	if(intrq && ((command & 0xf8) != 0xd8)) {
+	if(intrq && !(intrq_cond & I_IMM)) {
 		intrq = false;
 		if(!intrq_cb.isnull())
 			intrq_cb(intrq);
-	}
-
-	if(status_type_1) {
-		status &= ~(S_TR00|S_WP);
-		if(floppy) {
-			if(floppy->wpt_r())
-				status |= S_WP;
-			if(!floppy->trk00_r())
-				status |= S_TR00;
-		}
 	}
 
 	if(main_state == IDLE || status_type_1) {
@@ -834,6 +876,23 @@ UINT8 wd177x_t::status_r()
 			status |= S_DRQ;
 		else
 			status &= ~S_DRQ;
+	}
+
+	if(status_type_1) {
+		status &= ~(S_TR00|S_WP);
+		if(floppy) {
+			if(floppy->wpt_r())
+				status |= S_WP;
+			if(!floppy->trk00_r())
+				status |= S_TR00;
+		}
+	}
+
+	if(has_ready()) {
+		if(!is_ready())
+			status |= S_NRDY;
+		else
+			status &= ~S_NRDY;
 	}
 
 	return status;
@@ -943,6 +1002,12 @@ void wd177x_t::index_callback(floppy_image_device *floppy, int state)
 		return;
 	}
 
+	if(intrq_cond & I_IDX) {
+		intrq = true;
+		if(!intrq_cb.isnull())
+			intrq_cb(intrq);
+	}
+
 	switch(sub_state) {
 	case IDLE:
 		if(has_motor()) {
@@ -1016,6 +1081,21 @@ bool wd177x_t::intrq_r()
 bool wd177x_t::drq_r()
 {
 	return drq;
+}
+
+bool wd177x_t::hld_r()
+{
+	return hld;
+}
+
+void wd177x_t::hlt_w(bool state)
+{
+	hlt = state;
+}
+
+bool wd177x_t::enp_r()
+{
+	return enp;
 }
 
 void wd177x_t::live_start(int state)
@@ -1747,6 +1827,16 @@ int wd177x_t::settle_time() const
 	return 240000;
 }
 
+bool wd177x_t::has_ready() const
+{
+	return false;
+}
+
+bool wd177x_t::has_head_load() const
+{
+	return false;
+}
+
 bool wd177x_t::has_side_check() const
 {
 	return false;
@@ -1757,22 +1847,22 @@ bool wd177x_t::has_side_select() const
 	return false;
 }
 
+bool wd177x_t::has_sector_length_select() const
+{
+	return false;
+}
+
+bool wd177x_t::has_precompensation() const
+{
+	return false;
+}
+
 wd1770_t::wd1770_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd177x_t(mconfig, WD1770x, "WD1770", tag, owner, clock)
 {
 }
 
-bool wd1770_t::has_motor() const
-{
-	return true;
-}
-
 wd1772_t::wd1772_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd177x_t(mconfig, WD1772x, "WD1772", tag, owner, clock)
 {
-}
-
-bool wd1772_t::has_motor() const
-{
-	return true;
 }
 
 int wd1772_t::step_time(int mode) const
@@ -1790,45 +1880,14 @@ wd1773_t::wd1773_t(const machine_config &mconfig, const char *tag, device_t *own
 {
 }
 
-bool wd1773_t::has_motor() const
-{
-	return false;
-}
-
-bool wd1773_t::has_side_check() const
-{
-	return false;
-}
-
 wd2793_t::wd2793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd177x_t(mconfig, WD2793x, "WD2793", tag, owner, clock)
 {
-}
-
-bool wd2793_t::has_motor() const
-{
-	return false;
-}
-
-bool wd2793_t::has_side_check() const
-{
-	return true;
 }
 
 wd2797_t::wd2797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd177x_t(mconfig, WD2797x, "WD2797", tag, owner, clock)
 {
 }
 
-bool wd2797_t::has_motor() const
+fd1793_t::fd1793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd177x_t(mconfig, FD1793x, "FD1793", tag, owner, clock)
 {
-	return false;
-}
-
-bool wd2797_t::has_side_check() const
-{
-	return false;
-}
-
-bool wd2797_t::has_side_select() const
-{
-	return true;
 }

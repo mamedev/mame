@@ -409,8 +409,8 @@ WRITE8_MEMBER( bw2_state::ppi_pa_w )
 	// drive select
 	m_floppy = NULL;
 
-	if (BIT(data, 4)) m_floppy = m_floppy0->get_device();
-	if (BIT(data, 5)) m_floppy = m_floppy1->get_device();
+	if (!BIT(data, 4)) m_floppy = m_floppy0->get_device();
+	if (!BIT(data, 5)) m_floppy = m_floppy1->get_device();
 
 	m_fdc->set_floppy(m_floppy);
 	if (m_floppy) m_floppy->mon_w(m_mtron);

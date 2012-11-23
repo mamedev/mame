@@ -63,8 +63,10 @@ public:
 	centronics_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~centronics_device();
 
-	DECLARE_WRITE8_MEMBER( write ) { if (m_dev) m_dev->write(data); }
-	DECLARE_READ8_MEMBER( read ) {  return (m_dev) ? m_dev->read() : 0x00; }
+	void write(UINT8 data) { if (m_dev) m_dev->write(data); }
+	DECLARE_WRITE8_MEMBER( write ) { write(data); }
+	UINT8 read() { return (m_dev) ? m_dev->read() : 0x00; }
+	DECLARE_READ8_MEMBER( read ) { return read(); }
 
 	/* access to the individual bits */
 	DECLARE_WRITE_LINE_MEMBER( d0_w ) { if (m_dev) m_dev->set_line(0, state); }

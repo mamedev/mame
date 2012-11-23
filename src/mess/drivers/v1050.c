@@ -463,7 +463,7 @@ static ADDRESS_MAP_START( v1050_io, AS_IO, 8, v1050_state )
 	AM_RANGE(0x8c, 0x8c) AM_DEVREADWRITE(I8251A_SIO_TAG, i8251_device, data_r, data_w)
 	AM_RANGE(0x8d, 0x8d) AM_DEVREADWRITE(I8251A_SIO_TAG, i8251_device, status_r, control_w)
 	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE(I8255A_MISC_TAG, i8255_device, read, write)
-	AM_RANGE(0x94, 0x97) AM_DEVREADWRITE_LEGACY(MB8877_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0x94, 0x97) AM_DEVREADWRITE(MB8877_TAG, fd1793_t, read, write)
 	AM_RANGE(0x9c, 0x9f) AM_DEVREADWRITE(I8255A_RTC_TAG, i8255_device, read, write)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE(vint_clr_r, vint_clr_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(dint_clr_r, dint_clr_w)
@@ -697,31 +697,29 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pa_w )
 
     */
 
-	int f_motor_on = !BIT(data, 6);
-
 	// floppy drive select
-	if (!BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
-	if (!BIT(data, 1)) wd17xx_set_drive(m_fdc, 1);
-	if (!BIT(data, 2)) wd17xx_set_drive(m_fdc, 2);
-	if (!BIT(data, 3)) wd17xx_set_drive(m_fdc, 3);
+	floppy_image_device *floppy = NULL;
+
+	if (!BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (!BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (!BIT(data, 2)) floppy = m_floppy2->get_device();
+	if (!BIT(data, 3)) floppy = m_floppy3->get_device();
+
+	m_fdc->set_floppy(floppy);
 
 	// floppy side select
-	wd17xx_set_side(m_fdc, BIT(data, 4));
+	if (floppy) floppy->ss_w(BIT(data, 4));
 
 	// floppy motor
-	floppy_mon_w(m_floppy0, BIT(data, 6));
-	floppy_mon_w(m_floppy1, BIT(data, 6));
-	floppy_drive_set_ready_state(m_floppy0, f_motor_on, 1);
-	floppy_drive_set_ready_state(m_floppy1, f_motor_on, 1);
+	if (floppy) floppy->mon_w(BIT(data, 6));
 
 	// density select
-	wd17xx_dden_w(m_fdc, BIT(data, 7));
+	m_fdc->dden_w(BIT(data, 7));
 }
 
 WRITE8_MEMBER(v1050_state::misc_ppi_pb_w)
 {
-	centronics_device *centronics = machine().device<centronics_device>(CENTRONICS_TAG);
-	centronics->write( machine().driver_data()->generic_space() , 0, ~data & 0xff);
+	m_centronics->write(~data & 0xff);
 }
 
 READ8_MEMBER(v1050_state::misc_ppi_pc_r)
@@ -742,9 +740,9 @@ READ8_MEMBER(v1050_state::misc_ppi_pc_r)
     */
 
 	UINT8 data = 0;
-	centronics_device *centronics = machine().device<centronics_device>(CENTRONICS_TAG);
-	data |= centronics->not_busy_r() << 4;
-	data |= centronics->pe_r() << 5;
+
+	data |= m_centronics->not_busy_r() << 4;
+	data |= m_centronics->pe_r() << 5;
 
 	return data;
 }
@@ -922,14 +920,14 @@ WRITE_LINE_MEMBER( v1050_state::sio_rxrdy_w )
 {
 	m_rxrdy = state;
 
-	set_interrupt(INT_RS_232, m_rxrdy | m_txrdy);
+	set_interrupt(INT_RS_232, m_rxrdy || m_txrdy);
 }
 
 WRITE_LINE_MEMBER( v1050_state::sio_txrdy_w )
 {
 	m_txrdy = state;
 
-	set_interrupt(INT_RS_232, m_rxrdy | m_txrdy);
+	set_interrupt(INT_RS_232, m_rxrdy || m_txrdy);
 }
 
 static const i8251_interface sio_8251_intf =
@@ -947,11 +945,15 @@ static const i8251_interface sio_8251_intf =
 
 // MB8877 Interface
 
-WRITE_LINE_MEMBER( v1050_state::fdc_intrq_w )
+static SLOT_INTERFACE_START( v1050_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD ) // Teac FD-55F
+SLOT_INTERFACE_END
+
+void v1050_state::fdc_intrq_w(bool state)
 {
 	if (m_f_int_enb)
 	{
-		set_interrupt(INT_FLOPPY, state);
+		set_interrupt(INT_FLOPPY, state ? 1 : 0);
 	}
 	else
 	{
@@ -959,11 +961,11 @@ WRITE_LINE_MEMBER( v1050_state::fdc_intrq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( v1050_state::fdc_drq_w )
+void v1050_state::fdc_drq_w(bool state)
 {
 	if (m_f_int_enb)
 	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, state);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else
 	{
@@ -971,14 +973,7 @@ WRITE_LINE_MEMBER( v1050_state::fdc_drq_w )
 	}
 }
 
-static const wd17xx_interface fdc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(v1050_state, fdc_intrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(v1050_state, fdc_drq_w),
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
-
+/*
 static LEGACY_FLOPPY_OPTIONS_START( v1050 )
 	LEGACY_FLOPPY_OPTION( v1050, "dsk", "Visual 1050 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
@@ -987,20 +982,7 @@ static LEGACY_FLOPPY_OPTIONS_START( v1050 )
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
 LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface v1050_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(v1050),
-	"floppy_5_25",
-	NULL
-};
-
+*/
 
 // Machine Initialization
 
@@ -1020,6 +1002,10 @@ static IRQ_CALLBACK( v1050_int_ack )
 void v1050_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
+
+	// floppy callbacks
+	m_fdc->setup_intrq_cb(fd1793_t::line_cb(FUNC(v1050_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(v1050_state::fdc_drq_w), this));
 
 	// initialize I8214
 	m_pic->etlg_w(1);
@@ -1103,8 +1089,11 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_I8255A_ADD(I8255A_M6502_TAG, m6502_ppi_intf)
 	MCFG_I8251_ADD(I8251A_KB_TAG, /*XTAL_16MHz/8,*/ kb_8251_intf)
 	MCFG_I8251_ADD(I8251A_SIO_TAG, /*XTAL_16MHz/8,*/ sio_8251_intf)
-	MCFG_MB8877_ADD(MB8877_TAG, /*XTAL_16MHz/16,*/ fdc_intf )
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(v1050_floppy_interface)
+	MCFG_FD1793x_ADD(MB8877_TAG, XTAL_16MHz/16)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", v1050_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", v1050_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", v1050_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":3", v1050_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_KB_TAG, v1050_state, kb_8251_tick, attotime::from_hz((double)XTAL_16MHz/4/13/8))
 	MCFG_TIMER_DRIVER_ADD(TIMER_SIO_TAG, v1050_state, sio_8251_tick)
 
