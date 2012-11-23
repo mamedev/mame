@@ -5,17 +5,28 @@
     Made using recording/analysis on a Yeno (PAL Super Cassete Vision)
     by plgDavid
 
-    Full markings on my 2 specimens are "NEC JAPAN 8431K9 D1771C 017"
-    31th week of 1984, mask rom #017
+    Full markings on my 2 specimens are
+    "NEC JAPAN 8431K9 D1771C 017" (31st week of 1984, mask rom #017)
 
-    Ive seen mentions of a 006, 011 and 015 on part miner sites.
+    I've since (October 2012) got a Grandstand Firefox F-7 Handheld game
+    (AKA Epoch GalagaX6/Epoch Astro Thunder 7/Tandy Astro Thunder),
+    (http://www.handheldmuseum.com/Grandstand/Firefox.htm)
+    which includes a
+    "NEC JAPAN 8319K9 D1771C 011" (19th week of 1983, mask rom #011)
+    Thanks to user 'Blanka' from Dragonslairfans for the nice catch!
+    (http://www.dragonslairfans.com/smfor/index.php?topic=3061.0)
+
+    I've also seen mentions of a 006 and 015 on part miner sites, and since lots
+    of part miner sites are the equivalent of email crawlers for chips,
+    its possible that these other variants actually exist.
+    Its anyone's guess at this point in which products.
+
     Since the chip generates tones using embeded wavetables,
     it is probable other sounds are possible and were made for other embeded systems.
-    Its anyone's guess at this point in which products.
 
     upd17XXX devices are typically 4bit NEC MCUs, so it wouldnt be a stretch to
     say that this chip is part of that lot.
-    Maybe mask roms 006,011 and 015 dont generate audio at all.
+    Maybe mask roms 006,and 015 dont generate audio at all, though 011 does.
 
      Used pinout in the SCV:
 
@@ -49,9 +60,9 @@
 
     Pins 11 and 13 go to a special circuit, which according to kevtris's analysis
     of my schematics, consist of a balanced output (not unlike XLR cables),
-    which are then combined togheter then sent to the RF box.
+    which are then combined together then sent to the RF box.
 
-    All NC pins are unknown, maybe some are  "test" pins.
+    All NC pins are unknown, maybe some are "test" pins.
 
     All writes are made through address 0x3600 on the upD7801
     Instead of using register=value, this chip require sending multiple
@@ -68,10 +79,10 @@
 #define MAX_PACKET_SIZE 0x8000
 
 /*
-  Each of the 8 waveforms have been sampled at 192Khz using period 0xFF,
+  Each of the 8 waveforms have been sampled at 192kHz using period 0xFF,
   filtered, and each of the 32 levels have been calculated with averages on around 10 samples
-  (removing the transition samples) then quantized to 8bit signed.
-  We are not clear on the exact DAC details yet, especially with regards to volume changes
+  (removing the transition samples) then quantized to int8_t's.
+  We are not clear on the exact DAC details yet, especially with regards to volume changes.
 
   External AC coupling is assumed in the use of this DAC, so we will center the 8bit data using a signed container
 */
@@ -136,14 +147,14 @@ struct upd1771_state
     UINT8    t_offset; //[0; 32]
     UINT16   t_period; //[0;255]
     UINT8    t_volume; //[0; 31]
-    UINT8    t_tpos;//timber pos
+    UINT8    t_tpos;//timbre pos
     UINT16   t_ppos;//period pos
 
     //noise wavetable LFSR
     UINT8    nw_timbre; //[0;  7]
     UINT8    nw_volume; //[0; 31]
     UINT32   nw_period;
-    UINT32   nw_tpos;   //timber pos
+    UINT32   nw_tpos;   //timbre pos
     UINT32   nw_ppos;   //period pos
 
     //noise pulse components
@@ -169,7 +180,7 @@ READ8_DEVICE_HANDLER( upd1771_r )
 
 /*
 *************TONE*****************
-Tone consist of a wavetable playback mechanism.
+Tone consists of a wavetable playback mechanism.
 Each wavetable is a looping period of 32 samples but can be played with an offset from any point in the table
 effectively shrinking the sample loop, thus allowing different pitch "macros ranges" to be played.
 This method is rather crude because the spectrum of the sound get heavily altered...
@@ -220,9 +231,9 @@ Byte3: 0b???VVVVV
    LSB 5 bits of "Volume"
 
 
-Byte4: 0bPPPPPPPP  Low Freq0 period(if not 0 this peridically resets the  Wavetable LFSR)
-Byte5: 0bPPPPPPPP  Low Freq1 period(if not 0 this peridically resets the  Wavetable LFSR)
-Byte6: 0bPPPPPPPP  Low Freq2 period(if not 0 this peridically resets the  Wavetable LFSR)
+Byte4: 0bPPPPPPPP  Low Freq0 period(if not 0 this periodically resets the  Wavetable LFSR)
+Byte5: 0bPPPPPPPP  Low Freq1 period(if not 0 this periodically resets the  Wavetable LFSR)
+Byte6: 0bPPPPPPPP  Low Freq2 period(if not 0 this periodically resets the  Wavetable LFSR)
 
 Byte7: 0b???VVVVV  Low Freq0 volume
 Byte8: 0b???VVVVV  Low Freq1 volume
