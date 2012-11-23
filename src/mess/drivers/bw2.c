@@ -408,9 +408,8 @@ WRITE8_MEMBER( bw2_state::ppi_pa_w )
 
 	// drive select
 	m_floppy = NULL;
-
-	if (!BIT(data, 4)) m_floppy = m_floppy0->get_device();
-	if (!BIT(data, 5)) m_floppy = m_floppy1->get_device();
+	if (BIT(data, 4)) m_floppy = m_floppy0->get_device();
+	if (BIT(data, 5)) m_floppy = m_floppy1->get_device();
 
 	m_fdc->set_floppy(m_floppy);
 	if (m_floppy) m_floppy->mon_w(m_mtron);
@@ -650,7 +649,7 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	MCFG_MSM6255_ADD(MSM6255_TAG, XTAL_16MHz, 0, SCREEN_TAG, lcdc_map)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_I8251_ADD(I8251_TAG, default_i8251_interface)
-	MCFG_WD2797x_ADD(WD2797_TAG, XTAL_16MHz/16)
+	MCFG_WD2797x_ADD(WD2797_TAG, XTAL_16MHz/16*8)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", bw2_floppies, "35dd", NULL, bw2_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", bw2_floppies, NULL,   NULL, bw2_state::floppy_formats)
 	MCFG_BW2_EXPANSION_SLOT_ADD(BW2_EXPANSION_SLOT_TAG, XTAL_16MHz, bw2_expansion_cards, NULL, NULL)
