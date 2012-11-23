@@ -2603,8 +2603,11 @@ static const upd71071_intf towns_dma_config =
 {
 	"maincpu",
 	4000000,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	{ towns_fdc_dma_r, towns_scsi_dma_r, 0, towns_cdrom_dma_r },
-	{ towns_fdc_dma_w, towns_scsi_dma_w, 0, 0 }
+	{ towns_fdc_dma_w, towns_scsi_dma_w, 0, 0 },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
 static const ym3438_interface ym3438_intf =

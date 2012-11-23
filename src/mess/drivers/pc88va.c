@@ -1728,8 +1728,11 @@ static const upd71071_intf pc88va_dma_config =
 {
 	"maincpu",
 	8000000,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	{ 0, 0, m_fdc_dma_r, 0 },
-	{ 0, 0, m_fdc_dma_w, 0 }
+	{ 0, 0, m_fdc_dma_w, 0 },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
 FLOPPY_FORMATS_MEMBER( pc88va_state::floppy_formats )

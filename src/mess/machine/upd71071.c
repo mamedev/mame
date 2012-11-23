@@ -108,6 +108,11 @@ struct upd71071_t
 	int transfer_size[4];
 	int base;
 	const upd71071_intf* intf;
+	devcb_resolved_write_line	m_out_hreq_func;
+	devcb_resolved_write_line	m_out_eop_func;
+	devcb_resolved_write_line	m_out_dack_func[4];
+	int m_hreq;
+	int m_eop;
 };
 
 INLINE upd71071_t *get_safe_token(device_t *device)
@@ -242,9 +247,12 @@ static DEVICE_START(upd71071)
 	int x;
 
 	dmac->intf = (const upd71071_intf*)device->static_config();
+	dmac->m_out_hreq_func.resolve(dmac->intf->m_out_hreq_cb, *device);
+	dmac->m_out_eop_func.resolve(dmac->intf->m_out_eop_cb, *device);
 	for(x=0;x<4;x++)
 	{
 		dmac->timer[x] = device->machine().scheduler().timer_alloc(FUNC(dma_transfer_timer), (void*)device);
+		dmac->m_out_dack_func[x].resolve(dmac->intf->m_out_dack_cb[x], *device);
 	}
 	dmac->selected_channel = 0;
 }
@@ -447,3 +455,26 @@ void upd71071_device::device_start()
 }
 
 
+void set_hreq( device_t *device, int state)
+{
+	upd71071_t* dmac = get_safe_token(device);
+
+	if (dmac->m_hreq != state)
+	{
+		dmac->m_out_hreq_func(state);
+
+		dmac->m_hreq = state;
+	}
+}
+
+void set_eop( device_t *device, int state)
+{
+	upd71071_t* dmac = get_safe_token(device);
+
+	if (dmac->m_eop != state)
+	{
+		dmac->m_out_eop_func(state);
+
+		dmac->m_eop = state;
+	}
+}
