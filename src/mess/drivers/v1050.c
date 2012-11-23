@@ -769,12 +769,7 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pc_w )
 
 	// floppy interrupt enable
 	m_f_int_enb = BIT(data, 1);
-
-	if (!m_f_int_enb)
-	{
-		set_interrupt(INT_FLOPPY, 0);
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	}
+	update_fdc();
 
 	// baud select
 	int baud_sel = (data >> 2) & 0x03;
@@ -945,32 +940,36 @@ static const i8251_interface sio_8251_intf =
 
 // MB8877 Interface
 
+void v1050_state::update_fdc()
+{
+	if (m_f_int_enb)
+	{
+		set_interrupt(INT_FLOPPY, m_fdc_irq ? 1 : 0);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, m_fdc_drq ? ASSERT_LINE : CLEAR_LINE);
+	}
+	else
+	{
+		set_interrupt(INT_FLOPPY, 0);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
+}
+
 static SLOT_INTERFACE_START( v1050_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD ) // Teac FD-55F
 SLOT_INTERFACE_END
 
 void v1050_state::fdc_intrq_w(bool state)
 {
-	if (m_f_int_enb)
-	{
-		set_interrupt(INT_FLOPPY, state ? 1 : 0);
-	}
-	else
-	{
-		set_interrupt(INT_FLOPPY, 0);
-	}
+	m_fdc_irq = state;
+
+	update_fdc();
 }
 
 void v1050_state::fdc_drq_w(bool state)
 {
-	if (m_f_int_enb)
-	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
-	}
-	else
-	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	}
+	m_fdc_drq = state;
+
+	update_fdc();
 }
 
 /*
@@ -1043,6 +1042,8 @@ void v1050_state::machine_start()
 	save_item(NAME(m_int_mask));
 	save_item(NAME(m_int_state));
 	save_item(NAME(m_f_int_enb));
+	save_item(NAME(m_fdc_irq));
+	save_item(NAME(m_fdc_drq));
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_keydata));
 	save_item(NAME(m_keyavail));
@@ -1055,10 +1056,11 @@ void v1050_state::machine_start()
 void v1050_state::machine_reset()
 {
 	m_bank = 0;
-
 	bankswitch();
 
 	m_timer_sio->adjust(attotime::zero, 0, attotime::from_hz((double)XTAL_16MHz/4/13/16));
+
+	m_fdc->reset();
 }
 
 // Machine Driver
@@ -1089,7 +1091,7 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_I8255A_ADD(I8255A_M6502_TAG, m6502_ppi_intf)
 	MCFG_I8251_ADD(I8251A_KB_TAG, /*XTAL_16MHz/8,*/ kb_8251_intf)
 	MCFG_I8251_ADD(I8251A_SIO_TAG, /*XTAL_16MHz/8,*/ sio_8251_intf)
-	MCFG_FD1793x_ADD(MB8877_TAG, XTAL_16MHz/16)
+	MCFG_FD1793x_ADD(MB8877_TAG, XTAL_16MHz/2)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", v1050_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", v1050_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", v1050_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)

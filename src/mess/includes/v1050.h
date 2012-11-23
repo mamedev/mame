@@ -138,6 +138,7 @@ public:
 	DECLARE_WRITE8_MEMBER( sasi_ctrl_w );
 
 	void bankswitch();
+	void update_fdc();
 	void set_interrupt(UINT8 mask, int state);
 	void scan_keyboard();
 
@@ -145,6 +146,8 @@ public:
 	UINT8 m_int_mask;			// interrupt mask
 	UINT8 m_int_state;			// interrupt status
 	int m_f_int_enb;			// floppy interrupt enable
+	bool m_fdc_irq;
+	bool m_fdc_drq;
 
 	// keyboard state
 	UINT8 m_keylatch;			// keyboard row select
