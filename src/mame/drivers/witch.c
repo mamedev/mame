@@ -2,10 +2,6 @@
 
 Witch / Pinball Champ '95
 
-
-Currently not dumped, the original(?) version that is (c) Excellent System 1992
-
-
 witch   : Witch
       press F1 to initialize NVRAM
 
@@ -16,15 +12,36 @@ pbchmp95: Pinball Champ '95. Seems to be a simple mod with the following differe
                         -Auto-initialization on NVRAM error(?)
                         -Stars keep falling at the title screen
 
-Hardware based on auction picture:
 
 ES-9104 PCB:
++-------------------------------------+
+|        12.00MHz                5.1A |
+|                                     |
+|   6116                         6116 |
+|   6116                         6116 |
+|          24S10N                     |
+|                                     |
+|       SW2         Z80A     6116     |
+|SW1 8255     SW5   Z80A              |
+|                                     |
+|      SW3                       6116 |
+|      SW4 YM2203                     |
+|          YM2203    U_5B.5U   3.3U   |
+|X2 M5202  1.10V     HM6264           |
+|  VR1     ES8712    BAT1             |
++-------------------------------------+
+
        Z80A: Two Z80A CPUs frequency unknown (3MHz? 12MHz/4) (CPU2 used mainly for sound effects)
-     YM2203: frequency unknown (music + sound effects + video scrolling access)
-     ES8712: frequency unknown (samples)
+     YM2203: Two Yamaha YM2203+YM3014B sound chip combos. Frequency unknown (music + sound effects + video scrolling access)
+      M5202: OKI M5202 ADPCM Speech Synthesis IC
+     ES8712: Excellent System ES-8712 Streaming single channel ADPCM, frequency unknown (samples)
+       8255: M5M82C255ASP Programmable Peripheral Interface
         OSC: 12.000MHz
-      other: 8-position dipswitch x 4, 3.6v battery + reset push button
-             Standard 8-liner harness connectors.
+         X2: Unknown rated OSC or Resonator to drive M5202 (and ES8712?)
+        VR1: Volume pot
+        SW1: Service push button
+      other: 8-position dipswitch x 4 (labeled SW2 through SW5)
+             Standard 8-liner harness connectors (36x2 edge connector + 10x2 edge connector).
 
 
 This is so far what could be reverse-engineered from the code.
@@ -197,6 +214,7 @@ Interesting memory locations
 
 TODO :
     - Figure out the ports for the "PayOut" stuff (a006/a00c?)
+    - Hook up the OKI M5202
 */
 
 #include "emu.h"
@@ -550,7 +568,7 @@ static INPUT_PORTS_START( witch )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("UNK")	/* DSW ?*/
+	PORT_START("UNK")	/* Not a DSW */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -592,8 +610,8 @@ F180 kkkbbppp ; Read onPORT 0xA005
  bb   = MAX BET | 20 ; 30 ; 40 ; 60
  kkk  = KEY IN  | 1-10 ; 1-20 ; 1-40 ; 1-50 ; 1-100 ; 1-200 ; 1-250 ; 1-500
 */
-	PORT_START("A005")	/* DSW */
-	PORT_DIPNAME( 0x07, 0x07, "PAY OUT" )
+	PORT_START("A005")	/* DSW "SW2" */
+	PORT_DIPNAME( 0x07, 0x07, "PAY OUT" )	PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x07, "60" )
 	PORT_DIPSETTING(    0x06, "65" )
 	PORT_DIPSETTING(    0x05, "70" )
@@ -602,12 +620,12 @@ F180 kkkbbppp ; Read onPORT 0xA005
 	PORT_DIPSETTING(    0x02, "85" )
 	PORT_DIPSETTING(    0x01, "90" )
 	PORT_DIPSETTING(    0x00, "95" )
-	PORT_DIPNAME( 0x18, 0x00, "MAX BET" )
+	PORT_DIPNAME( 0x18, 0x00, "MAX BET" )	PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "20" )
 	PORT_DIPSETTING(    0x10, "30" )
 	PORT_DIPSETTING(    0x08, "40" )
 	PORT_DIPSETTING(    0x00, "60" )
-	PORT_DIPNAME( 0xe0, 0xe0, "KEY IN" )
+	PORT_DIPNAME( 0xe0, 0xe0, "KEY IN" )	PORT_DIPLOCATION("SW2:6,7,8")
 	PORT_DIPSETTING(    0xE0, "1-10"  )
 	PORT_DIPSETTING(    0xC0, "1-20"  )
 	PORT_DIPSETTING(    0xA0, "1-40"  )
@@ -621,11 +639,14 @@ F180 kkkbbppp ; Read onPORT 0xA005
  d    = DOUBLE UP | ON ; OFF
  cccc = COIN IN1 | 1-1 ; 1-2 ; 1-3 ; 1-4 ; 1-5 ; 1-6 ; 1-7 ; 1-8 ; 1-9 ; 1-10 ; 1-15 ; 1-20 ; 1-25 ; 1-30 ; 1-40 ; 1-50
 */
-	PORT_START("A004")	/* DSW */
-	PORT_DIPNAME( 0x01, 0x00, "DOUBLE UP" )
+	PORT_START("A004")	/* DSW "SW3" Switches 2-4 not defined in manual */
+	PORT_DIPNAME( 0x01, 0x00, "DOUBLE UP" )		PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off  ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xf0, 0xf0, "COIN IN1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW3:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW3:4" )
+	PORT_DIPNAME( 0xf0, 0xf0, "COIN IN1" )		PORT_DIPLOCATION("SW3:5,6,7,8")
 	PORT_DIPSETTING(    0xf0, "1-1" )
 	PORT_DIPSETTING(    0xe0, "1-2" )
 	PORT_DIPSETTING(    0xd0, "1-3" )
@@ -650,8 +671,8 @@ F180 kkkbbppp ; Read onPORT 0xA005
  tt   = TIME | 40 ; 45 ; 50 ; 55
  s    = DEMO SOUND | ON ; OFF
 */
-	PORT_START("YM_PortA")	/* DSW */
-	PORT_DIPNAME( 0x0f, 0x0f, "COIN IN2" )
+	PORT_START("YM_PortA")	/* DSW "SW4" */
+	PORT_DIPNAME( 0x0f, 0x0f, "COIN IN2" )		PORT_DIPLOCATION("SW4:1,2,3,4")
 	PORT_DIPSETTING(    0x0f, "1-1" )
 	PORT_DIPSETTING(    0x0e, "1-2" )
 	PORT_DIPSETTING(    0x0d, "1-3" )
@@ -668,15 +689,15 @@ F180 kkkbbppp ; Read onPORT 0xA005
 	PORT_DIPSETTING(    0x02, "5-1" )
 	PORT_DIPSETTING(    0x01, "6-1" )
 	PORT_DIPSETTING(    0x00, "10-1" )
-	PORT_DIPNAME( 0x10, 0x00, "PAYOUT SWITCH" )
+	PORT_DIPNAME( 0x10, 0x00, "PAYOUT SWITCH" )	PORT_DIPLOCATION("SW4:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off  ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x60, 0x00, "TIME" )
+	PORT_DIPNAME( 0x60, 0x00, "TIME" )		PORT_DIPLOCATION("SW4:6,7")
 	PORT_DIPSETTING(    0x60, "40" )
 	PORT_DIPSETTING(    0x40, "45" )
 	PORT_DIPSETTING(    0x20, "50" )
 	PORT_DIPSETTING(    0x00, "55" )
-	PORT_DIPNAME( 0x80, 0x00, "DEMO SOUND" )
+	PORT_DIPNAME( 0x80, 0x00, "DEMO SOUND" )	PORT_DIPLOCATION("SW4:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off  ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -686,18 +707,24 @@ F180 kkkbbppp ; Read onPORT 0xA005
  ll   = GAME LIMIT | 500 ; 1000 ; 5000 ; 990000
  h    = HOPPER ACTIVE | LOW ; HIGH
 */
-	PORT_START("YM_PortB")	/* DSW */
-	PORT_DIPNAME( 0x01, 0x01, "AUTO BET" )
+	PORT_START("YM_PortB")	/* DSW "SW5" Switches 5, 6 & 8 undefined in manual */
+	PORT_DIPNAME( 0x01, 0x01, "AUTO BET" )		PORT_DIPLOCATION("SW5:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off  ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x06, "GAME LIMIT" )
+	PORT_DIPNAME( 0x06, 0x06, "GAME LIMIT" )	PORT_DIPLOCATION("SW5:2,3")
 	PORT_DIPSETTING(    0x06, "500" )
 	PORT_DIPSETTING(    0x04, "1000" )
 	PORT_DIPSETTING(    0x02, "5000" )
-	PORT_DIPSETTING(    0x00, "990000" )
-	PORT_DIPNAME( 0x08, 0x08, "HOPPER" )
+	PORT_DIPSETTING(    0x00, "990000" ) /* 10000 as defined in the Excellent System version manual */
+	PORT_DIPNAME( 0x08, 0x08, "HOPPER" )		PORT_DIPLOCATION("SW5:4")
 	PORT_DIPSETTING(    0x08, DEF_STR(Low) )
 	PORT_DIPSETTING(    0x00, DEF_STR(High) )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW5:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW5:6" )
+	PORT_DIPNAME( 0x40, 0x40, "Unknown Use" )	PORT_DIPLOCATION("SW5:7") /* As defined in the Excellent System version manual */
+	PORT_DIPSETTING(    0x40, "Matrix" )
+	PORT_DIPSETTING(    0x00, "Straight (Normal)" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW5:8" )
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8_layout =
@@ -842,42 +869,69 @@ static MACHINE_CONFIG_START( witch, witch_state )
 
 MACHINE_CONFIG_END
 
-/* this set has (c)1992 Sega / Vic Tokai in the roms? */
 ROM_START( witch )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "rom.u5", 0x10000, 0x20000, CRC(348fccb8) SHA1(947defd86c4a597fbfb9327eec4903aa779b3788)  )
+	ROM_LOAD( "u_5b.u5", 0x10000, 0x20000, CRC(5c9f685a) SHA1(b75950048009ffb8c3b356592b1c69f905a1a2bd) )
 	ROM_COPY( "maincpu" , 0x10000, 0x0000, 0x8000 )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "rom.s6", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0)  )
+	ROM_LOAD( "6.s6", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "rom.u3", 0x00000, 0x20000,  CRC(7007ced4) SHA1(6a0aac3ff9a4d5360c8ba1142f010add1b430ada)  )
+	ROM_LOAD( "3.u3", 0x00000, 0x20000,  CRC(7007ced4) SHA1(6a0aac3ff9a4d5360c8ba1142f010add1b430ada) )
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "rom.a1", 0x00000, 0x40000,  CRC(512300a5) SHA1(1e9ba58d1ddbfb8276c68f6d5c3591e6b77abf21)  )
+	ROM_LOAD( "5.a1", 0x00000, 0x40000,  CRC(fc37a9c2) SHA1(940d8c53d47eaa93a85a91e4ecb92fc4912d331d) )
 
 	ROM_REGION( 0x40000, "essnd", 0 )
-	ROM_LOAD( "rom.v10", 0x00000, 0x40000, CRC(62e42371) SHA1(5042abc2176d0c35fd6b698eca4145f93b0a3944) )
+	ROM_LOAD( "1.v10", 0x00000, 0x40000, CRC(62e42371) SHA1(5042abc2176d0c35fd6b698eca4145f93b0a3944) )
+
+	ROM_REGION( 0x100, "prom", 0 )
+	ROM_LOAD( "tbp24s10n.10k", 0x000, 0x100, CRC(ee7b9d8f) SHA1(3a7b75befab83bc37e4e403ad3632841c2d37707) ) /* Currently unused, unknown use */
+ROM_END
+
+
+ROM_START( witchs ) /* this set has (c)1992 Sega / Vic Tokai in the roms */
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "rom.u5", 0x10000, 0x20000, CRC(348fccb8) SHA1(947defd86c4a597fbfb9327eec4903aa779b3788) )
+	ROM_COPY( "maincpu" , 0x10000, 0x0000, 0x8000 )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "6.s6", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0) ) /* Same data as the Witch set */
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "3.u3", 0x00000, 0x20000,  CRC(7007ced4) SHA1(6a0aac3ff9a4d5360c8ba1142f010add1b430ada) ) /* Same data as the Witch set */
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "rom.a1", 0x00000, 0x40000,  CRC(512300a5) SHA1(1e9ba58d1ddbfb8276c68f6d5c3591e6b77abf21) )
+
+	ROM_REGION( 0x40000, "essnd", 0 )
+	ROM_LOAD( "1.v10", 0x00000, 0x40000, CRC(62e42371) SHA1(5042abc2176d0c35fd6b698eca4145f93b0a3944) ) /* Same data as the Witch set */
+
+	ROM_REGION( 0x100, "prom", 0 )
+	ROM_LOAD( "tbp24s10n.10k", 0x000, 0x100, CRC(ee7b9d8f) SHA1(3a7b75befab83bc37e4e403ad3632841c2d37707) ) /* Currently unused, unknown use */
 ROM_END
 
 
 ROM_START( pbchmp95 ) /* Licensed for Germany? */
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "3.bin", 0x10000, 0x20000, CRC(e881aa05) SHA1(10d259396cac4b9a1b72c262c11ffa5efbdac433)  )
+	ROM_LOAD( "3.bin", 0x10000, 0x20000, CRC(e881aa05) SHA1(10d259396cac4b9a1b72c262c11ffa5efbdac433) )
 	ROM_COPY( "maincpu" , 0x10000, 0x0000, 0x8000 )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "4.bin", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0)  )
+	ROM_LOAD( "4.bin", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0) ) /* Same data as the Witch set */
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "2.bin", 0x00000, 0x20000,  CRC(7007ced4) SHA1(6a0aac3ff9a4d5360c8ba1142f010add1b430ada)  )
+	ROM_LOAD( "2.bin", 0x00000, 0x20000,  CRC(7007ced4) SHA1(6a0aac3ff9a4d5360c8ba1142f010add1b430ada) ) /* Same data as the Witch set */
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "1.bin", 0x00000, 0x40000,  CRC(f6cf7ed6) SHA1(327580a17eb2740fad974a01d97dad0a4bef9881)  )
+	ROM_LOAD( "1.bin", 0x00000, 0x40000,  CRC(f6cf7ed6) SHA1(327580a17eb2740fad974a01d97dad0a4bef9881) )
 
 	ROM_REGION( 0x40000, "essnd", 0 )
-	ROM_LOAD( "5.bin", 0x00000, 0x40000, CRC(62e42371) SHA1(5042abc2176d0c35fd6b698eca4145f93b0a3944) )
+	ROM_LOAD( "5.bin", 0x00000, 0x40000, CRC(62e42371) SHA1(5042abc2176d0c35fd6b698eca4145f93b0a3944) ) /* Same data as the Witch set */
+
+	ROM_REGION( 0x100, "prom", 0 )
+	ROM_LOAD( "tbp24s10n.10k", 0x000, 0x100, CRC(ee7b9d8f) SHA1(3a7b75befab83bc37e4e403ad3632841c2d37707) ) /* Currently unused, unknown use */
 ROM_END
 
 DRIVER_INIT_MEMBER(witch_state,witch)
@@ -889,5 +943,6 @@ DRIVER_INIT_MEMBER(witch_state,witch)
 	m_bank = -1;
 }
 
-GAME( 1992, witch,    0,     witch, witch, witch_state, witch, ROT0, "Sega / Vic Tokai",     "Witch", 0 )
+GAME( 1992, witch,    0,     witch, witch, witch_state, witch, ROT0, "Excellent System",     "Witch", 0 )
+GAME( 1992, witchs,   witch, witch, witch, witch_state, witch, ROT0, "Sega / Vic Tokai",     "Witch (Sega License)", 0 )
 GAME( 1995, pbchmp95, witch, witch, witch, witch_state, witch, ROT0, "Veltmeijer Automaten", "Pinball Champ '95", 0 )
