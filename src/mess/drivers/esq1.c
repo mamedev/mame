@@ -63,7 +63,7 @@ TODO:
 
 #define WD1772_TAG		"wd1772"
 
-#define KEYBOARD_HACK   (0)
+#define KEYBOARD_HACK   (1)
 
 class esq1_state : public driver_device
 {
@@ -160,6 +160,8 @@ static ADDRESS_MAP_START( esq1_map, AS_PROGRAM, 8, esq1_state )
 	AM_RANGE(0x4000, 0x5fff) AM_RAM					// SEQRAM
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_device, read, write)
 	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE_LEGACY("duart", duart68681_r, duart68681_w)
+	AM_RANGE(0x6800, 0x68ff) AM_NOP	
+
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("osbank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("osrom", 0x8000)	// OS "high" ROM is always mapped here
 ADDRESS_MAP_END
@@ -272,9 +274,15 @@ static MACHINE_CONFIG_START( esq1, esq1_state )
     MCFG_ESQ2x40_ADD("vfd")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ES5503_ADD("es5503", 7000000, esq1_doc_irq, esq1_adc_read)
+	MCFG_ES5503_ADD("es5503", 7000000, 8, esq1_doc_irq, esq1_adc_read)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(2, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(3, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(4, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(5, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(6, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(7, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(sq80, esq1)

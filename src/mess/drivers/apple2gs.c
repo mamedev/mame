@@ -256,7 +256,7 @@ static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_ES5503_ADD("es5503", APPLE2GS_7M, apple2gs_doc_irq, apple2gs_adc_read)
+	MCFG_ES5503_ADD("es5503", APPLE2GS_7M, 2, apple2gs_doc_irq, apple2gs_adc_read)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

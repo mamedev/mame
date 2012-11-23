@@ -370,12 +370,10 @@ static MACHINE_CONFIG_START( mquake, amiga_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 0.50)
 
-	MCFG_ES5503_ADD("es5503", 7159090, NULL, NULL)		/* ES5503 is likely mono due to channel strobe used as bank select */
+	MCFG_ES5503_ADD("es5503", 7159090, 1, NULL, NULL)		/* ES5503 is likely mono due to channel strobe used as bank select */
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, mquake_es5503_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	/* cia */
 	MCFG_LEGACY_MOS8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, 0, cia_0_intf)

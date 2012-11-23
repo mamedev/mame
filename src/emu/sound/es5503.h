@@ -3,15 +3,22 @@
 #ifndef __ES5503_H__
 #define __ES5503_H__
 
-#define MCFG_ES5503_ADD(_tag, _clock, _irqf, _adcf) \
+// channels must be a power of two
+
+#define MCFG_ES5503_ADD(_tag, _clock, _channels, _irqf, _adcf)	\
 	MCFG_DEVICE_ADD(_tag, ES5503, _clock) \
+	MCFG_ES5503_OUTPUT_CHANNELS(_channels) \
 	MCFG_ES5503_IRQ_FUNC(_irqf) \
 	MCFG_ES5503_ADC_FUNC(_adcf)
 
-#define MCFG_ES5503_REPLACE(_tag, _clock, _irqf, _adcf) \
+#define MCFG_ES5503_REPLACE(_tag, _clock, _channels, _irqf, _adcf) \
 	MCFG_DEVICE_REPLACE(_tag, ES5503, _clock) \
+	MCFG_ES5503_OUTPUT_CHANNELS(_channels) \
 	MCFG_ES5503_IRQ_FUNC(_irqf) \
 	MCFG_ES5503_ADC_FUNC(_adcf)
+
+#define MCFG_ES5503_OUTPUT_CHANNELS(_channels) \
+	es5503_device::static_set_channels(*device, _channels); \
 
 #define MCFG_ES5503_IRQ_FUNC(_irqf) \
 	es5503_device::static_set_irqf(*device, _irqf); \
@@ -29,6 +36,7 @@ public:
     // construction/destruction
 	es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	static void static_set_channels(device_t &device, int channels);
     static void static_set_irqf(device_t &device, void (*irqf)(device_t *device, int state));
     static void static_set_adcf(device_t &device, UINT8 (*adcf)(device_t *device));
 
@@ -89,6 +97,7 @@ private:
 
     UINT8 m_channel_strobe;
 
+	int output_channels;
     UINT32 output_rate;
 
     emu_timer *m_timer;

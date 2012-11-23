@@ -86,6 +86,12 @@ const address_space_config *es5503_device::memory_space_config(address_spacenum 
 //  the IRQ callback
 //-------------------------------------------------
 
+void es5503_device::static_set_channels(device_t &device, int channels)
+{
+	es5503_device &es5503 = downcast<es5503_device &>(device);
+	es5503.output_channels = channels;
+}
+
 void es5503_device::static_set_irqf(device_t &device, void (*irqf)(device_t *device, int state))
 {
 	es5503_device &es5503 = downcast<es5503_device &>(device);
@@ -160,7 +166,7 @@ void es5503_device::halt_osc(int onum, int type, UINT32 *accumulator, int resshi
 
 void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	static INT32 mix[(44100/60)*4];
+	static INT32 mix[(44100/60)*2*8];
 	INT32 *mixp;
 	int osc, snum, i;
 	UINT32 ramptr;
@@ -168,78 +174,70 @@ void es5503_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 	assert(samples < (44100/60)*2);
 	memset(mix, 0, sizeof(mix));
 
-	for (osc = 0; osc < (oscsenabled+1); osc++)
+	for (int chan = 0; chan < output_channels; chan++)
 	{
-		ES5503Osc *pOsc = &oscillators[osc];
-
-		mixp = &mix[0];
-
-		if (!(pOsc->control & 1))
+		for (osc = 0; osc < (oscsenabled+1); osc++)
 		{
-			UINT32 wtptr = pOsc->wavetblpointer & wavemasks[pOsc->wavetblsize], altram;
-			UINT32 acc = pOsc->accumulator;
-			UINT16 wtsize = pOsc->wtsize - 1;
-			UINT8 ctrl = pOsc->control;
-			UINT16 freq = pOsc->freq;
-			INT16 vol = pOsc->vol;
-			INT8 data = -128;
-			int resshift = resshifts[pOsc->resolution] - pOsc->wavetblsize;
-			UINT32 sizemask = accmasks[pOsc->wavetblsize];
+			ES5503Osc *pOsc = &oscillators[osc];
 
-			for (snum = 0; snum < samples; snum++)
+			if (!(pOsc->control & 1) && ((pOsc->control >> 4) & (output_channels - 1)) == chan)
 			{
-				altram = acc >> resshift;
-				ramptr = altram & sizemask;
+				UINT32 wtptr = pOsc->wavetblpointer & wavemasks[pOsc->wavetblsize], altram;
+				UINT32 acc = pOsc->accumulator;
+				UINT16 wtsize = pOsc->wtsize - 1;
+				UINT8 ctrl = pOsc->control;
+				UINT16 freq = pOsc->freq;
+				INT16 vol = pOsc->vol;
+				INT8 data = -128;
+				int resshift = resshifts[pOsc->resolution] - pOsc->wavetblsize;
+				UINT32 sizemask = accmasks[pOsc->wavetblsize];
+				mixp = &mix[0] + chan;
 
-				acc += freq;
-
-				// channel strobe is always valid when reading; this allows potentially banking per voice
-				m_channel_strobe = (ctrl>>4) & 0xf;
-				data = (INT32)m_direct->read_raw_byte(ramptr + wtptr) ^ 0x80;
-
-				if (m_direct->read_raw_byte(ramptr + wtptr) == 0x00)
+				for (snum = 0; snum < samples; snum++)
 				{
-					halt_osc(osc, 1, &acc, resshift);
-				}
-				else
-				{
-					if (pOsc->control & 0x10)
+					altram = acc >> resshift;
+					ramptr = altram & sizemask;
+
+					acc += freq;
+
+					// channel strobe is always valid when reading; this allows potentially banking per voice
+					m_channel_strobe = (ctrl>>4) & 0xf;
+					data = (INT32)m_direct->read_raw_byte(ramptr + wtptr) ^ 0x80;
+
+					if (m_direct->read_raw_byte(ramptr + wtptr) == 0x00)
 					{
-						*mixp++ += (data * vol);
-						mixp++;
+						halt_osc(osc, 1, &acc, resshift);
 					}
 					else
 					{
-						mixp++;
-						*mixp++ += (data * vol);
+						*mixp += data * vol;
+						mixp += output_channels;
+
+						if (altram >= wtsize)
+						{
+							halt_osc(osc, 0, &acc, resshift);
+						}
 					}
 
-					if (altram >= wtsize)
+					// if oscillator halted, we've got no more samples to generate
+					if (pOsc->control & 1)
 					{
-						halt_osc(osc, 0, &acc, resshift);
+						ctrl |= 1;
+						break;
 					}
 				}
 
-				// if oscillator halted, we've got no more samples to generate
-				if (pOsc->control & 1)
-				{
-					ctrl |= 1;
-					break;
-				}
+				pOsc->control = ctrl;
+				pOsc->accumulator = acc;
+				pOsc->data = data ^ 0x80;
 			}
-
-			pOsc->control = ctrl;
-			pOsc->accumulator = acc;
-			pOsc->data = data ^ 0x80;
 		}
 	}
 
 	mixp = &mix[0];
 	for (i = 0; i < samples; i++)
-	{
-		outputs[0][i] = (*mixp++)>>1;
-		outputs[1][i] = (*mixp++)>>1;
-	}
+		for (int chan = 0; chan < output_channels; chan++)
+			outputs[chan][i] = (*mixp++)>>1;
 }
 
 
@@ -267,7 +265,7 @@ void es5503_device::device_start()
 	}
 
 	output_rate = (clock()/8)/34;	// (input clock / 8) / # of oscs. enabled + 2
-	m_stream = machine().sound().stream_alloc(*this, 0, 2, output_rate, this);
+	m_stream = machine().sound().stream_alloc(*this, 0, output_channels, output_rate, this);
 
 	m_timer = timer_alloc(0, NULL);
 	m_timer->adjust(attotime::from_hz(output_rate), 0, attotime::from_hz(output_rate));

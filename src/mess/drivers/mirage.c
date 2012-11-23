@@ -262,7 +262,7 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_ES5503_ADD("es5503", 7000000, mirage_doc_irq, mirage_adc_read)
+	MCFG_ES5503_ADD("es5503", 7000000, 2, mirage_doc_irq, mirage_adc_read)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
