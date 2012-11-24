@@ -114,6 +114,65 @@
     74(4Ah) FM-TOWNS MARTY
  */
 
+/*
+
+Fujitsu FM Towns Marty
+
+PCB Layout
+----------
+
+CA20142-B21X
+
+      CN10                                   CN1
+   |-| |-| |-|                    |----------------------|
+|--| |-| |-| |----|-|-------------|----------------------|------------|
+|14577           CN11  SW2       |--------|  MROM.M37|--------|       |
+|14576      TMS48C121DZ-80       |FUJITSU |          |FUJITSU |       |
+|           TMS48C121DZ-80       |CG24243 |          |CS10501 |       |
+|MB40968    TMS48C121DZ-80       |(QFP208)|  MROM.M36|(QFP160)|       |
+||--------| TMS48C121DZ-80       |--------|          |--------| 62256 |
+||FUJITSU | HM511664JP8    CN12                    FUJITSU            |
+||CE31755 |                                        8451 (DIP8)        |
+||(QFP160)|                                                           |
+||--------|                                   4.9152MHz               |
+|CN13            |--------|  28.63636MHz                            |-|
+|                |FUJITSU |                  |----------------------|
+|       RTC58323 |CG31553 |                  |                      |
+|BATTERY         |(QFP208)|  32MHz   74LS00  |                      |
+|                |--------|    |------|      |     CN2              |
+|    LC7881            MB84256 |I386SX|      |     PCMCIA SLOT      |
+|          TL084    CN4        | -16  |      |                      |
+||--------|                    |------|      |                      |
+||FUJITSU |    MB814400A-70PZ                |                      |
+||CS09501 |    MB814400A-70PZ                |----------------------|
+||(QFP120)|    MB814400A-70PZ              |--------|74LS14  74HC08 |-|
+||--------|    MB814400A-70PZ              | RICOH  |      3771       |
+|             YM3438                       |RU6101MF|                 |
+|4560                           MB81C78    |(QFP44) |                 |
+|             MB88505 |------|             |--------|                 |
+|         CN3         |YM6063|  LED2                     LED1   LED3  |
+|CN9  CN8     VOL     |(QFP80|      CN5        CN6    SW1          CN7|
+|---------------------|------|----------------------------------------|
+Notes:
+      All IC's shown.
+      Main CPU Intel 80386SX-16 running at 16.000MHz
+      CN1   - Multi-pin connector possibly for cartridge or external peripheral connector?
+      CN2   - PCMCIA slot
+      CN3   - 24 pin connector for ?
+      CN4   - CDROM connector? (multi-pin connector with internal slot for a thin cable)
+      CN5/6 - DB9 connectors (joystick ports?)
+      CN7   - Power input socket
+      CN8/9 - Headphone out jacks?
+      CN10  - Header with left/right RCA audio jacks and composite video output
+      CN11  - S-VIDEO output
+      CN12  - 8 pin connector (possibly power related for the CDROM?)
+      CN13  - 2 pin connector (fan power?)
+      SW1   - Reset Switch?
+      SW2   - 2 position slide switch
+      MROM* - Hitachi HN624116 16MBit SOP44 maskROM
+
+*/
+
 #include "includes/fmtowns.h"
 #include "machine/scsibus.h"
 #include "machine/scsihd.h"

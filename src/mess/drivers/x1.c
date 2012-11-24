@@ -223,7 +223,6 @@
 
 VIDEO_START_MEMBER(x1_state,x1)
 {
-
 	m_avram = auto_alloc_array_clear(machine(), UINT8, 0x800);
 	m_tvram = auto_alloc_array_clear(machine(), UINT8, 0x800);
 	m_kvram = auto_alloc_array_clear(machine(), UINT8, 0x800);
@@ -1935,8 +1934,6 @@ static Z80DMA_INTERFACE( x1_dma )
 
 INPUT_CHANGED_MEMBER(x1_state::ipl_reset)
 {
-	//address_space &space = machine().device("x1_cpu")->memory().space(AS_PROGRAM);
-
 	m_x1_cpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 
 	m_ram_bank = 0x00;
@@ -1947,7 +1944,6 @@ INPUT_CHANGED_MEMBER(x1_state::ipl_reset)
 /* Apparently most games doesn't support this (not even the Konami ones!), one that does is...177 :o */
 INPUT_CHANGED_MEMBER(x1_state::nmi_reset)
 {
-
 	m_x1_cpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -2512,7 +2508,6 @@ MACHINE_RESET_MEMBER(x1_state,x1turbo)
 
 MACHINE_START_MEMBER(x1_state,x1)
 {
-
 	/* set up RTC */
 	{
 		system_time systime;
