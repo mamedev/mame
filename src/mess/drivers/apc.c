@@ -348,7 +348,7 @@ WRITE8_MEMBER(apc_state::apc_gdc_w)
 
 READ8_MEMBER(apc_state::apc_kbd_r)
 {
-	UINT8 res;
+	UINT8 res = 0;
 
 	switch(offset & 3)
 	{
