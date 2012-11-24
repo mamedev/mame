@@ -119,14 +119,28 @@ const int GIEFLAG	= 0x2000;
 const device_type TMS32031 = &device_creator<tms32031_device>;
 const device_type TMS32032 = &device_creator<tms32032_device>;
 
+
 // internal memory maps
-static ADDRESS_MAP_START( internal_32031, AS_PROGRAM, 32, legacy_cpu_device )
+static ADDRESS_MAP_START( internal_32031, AS_PROGRAM, 32, tms32031_device )
 	AM_RANGE(0x809800, 0x809fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( internal_32032, AS_PROGRAM, 32, legacy_cpu_device )
+static ADDRESS_MAP_START( internal_32032, AS_PROGRAM, 32, tms32032_device )
 	AM_RANGE(0x87fe00, 0x87ffff) AM_RAM
 ADDRESS_MAP_END
+
+
+// ROM definitions for the internal boot loader programs
+// (Using assembled versions until the code ROMs are extracted from both DSPs)
+ROM_START( tms32031 )
+	ROM_REGION(0x4000, "tms32031", 0)
+	ROM_LOAD( "c31boot.bin", 0x0000, 0x4000, BAD_DUMP CRC(bddc2763) SHA1(96b2170ecee5bec5abaa1741bb2d3b6096ecc262) ) // Assembled from c31boot.asm (02-07-92)
+ROM_END
+
+ROM_START( tms32032 )
+	ROM_REGION(0x4000, "tms32032", 0)
+	ROM_LOAD( "c32boot.bin", 0x0000, 0x4000, BAD_DUMP CRC(ecf84729) SHA1(4d32ead450f921f563514b061ea561a222283616) ) // Assembled from c32boot.asm (03-04-96)
+ROM_END
 
 
 
@@ -275,14 +289,13 @@ tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type
 	  m_irq_state(0),
 	  m_delayed(false),
 	  m_irq_pending(false),
-	  m_mcu_mode(false),
 	  m_is_idling(false),
 	  m_icount(0),
 	  m_irq_callback(0),
 	  m_program(0),
 	  m_direct(0)
 {
-	m_bootoffset = 0;
+	m_mcbl_mode = false;
 	m_xf0_w = NULL;
 	m_xf1_w = NULL;
 	m_iack_w = NULL;
@@ -299,10 +312,29 @@ tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type
 }
 
 tms32031_device::tms32031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms3203x_device(mconfig, TMS32031, "TMS32031", tag, owner, clock, CHIP_TYPE_TMS32031, ADDRESS_MAP_NAME(internal_32031)) { }
+	: tms3203x_device(mconfig, TMS32031, "TMS32031", tag, owner, clock, CHIP_TYPE_TMS32031, ADDRESS_MAP_NAME(internal_32031))
+{
+	m_shortname = "tms32031";
+}
 
 tms32032_device::tms32032_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: tms3203x_device(mconfig, TMS32032, "TMS32032", tag, owner, clock, CHIP_TYPE_TMS32032, ADDRESS_MAP_NAME(internal_32032)) { }
+	: tms3203x_device(mconfig, TMS32032, "TMS32032", tag, owner, clock, CHIP_TYPE_TMS32032, ADDRESS_MAP_NAME(internal_32032))
+{
+	m_shortname = "tms32032";
+}
+
+
+DIRECT_UPDATE_MEMBER( tms3203x_device::direct_handler )
+{
+	// internal boot loader ROM
+	if (m_mcbl_mode && address < (0x1000 << 2))
+	{
+		direct.explicit_configure(0x000000, 0x003fff, 0x003fff, m_bootrom);
+		return (offs_t)-1;
+	}
+
+	return address;
+}
 
 
 //-------------------------------------------------
@@ -332,6 +364,21 @@ void tms3203x_device::static_set_config(device_t &device, const tms3203x_config 
 
 
 //-------------------------------------------------
+//  rom_region - return a pointer to the device's
+//  internal ROM region
+//-------------------------------------------------
+
+const rom_entry *tms3203x_device::device_rom_region() const
+{
+	switch (m_chip_type)
+	{
+		default:
+		case CHIP_TYPE_TMS32031:	return ROM_NAME( tms32031 );
+		case CHIP_TYPE_TMS32032:	return ROM_NAME( tms32032 );
+	}
+}
+
+//-------------------------------------------------
 //  ROPCODE - fetch an opcode
 //-------------------------------------------------
 
@@ -347,6 +394,9 @@ inline UINT32 tms3203x_device::ROPCODE(offs_t pc)
 
 inline UINT32 tms3203x_device::RMEM(offs_t addr)
 {
+	if (m_mcbl_mode && addr < 0x1000)
+		return m_bootrom[addr];
+		
 	return m_program->read_dword(addr << 2);
 }
 
@@ -371,6 +421,10 @@ void tms3203x_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 
+	// set up the internal boot loader ROM
+	m_bootrom = reinterpret_cast<UINT32*>(memregion(m_shortname)->base());
+	m_direct->set_direct_update(direct_update_delegate(FUNC(tms3203x_device::direct_handler), this));
+
 	// save state
 	save_item(NAME(m_pc));
 	for (int regnum = 0; regnum < 36; regnum++)
@@ -379,7 +433,6 @@ void tms3203x_device::device_start()
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_delayed));
 	save_item(NAME(m_irq_pending));
-	save_item(NAME(m_mcu_mode));
 	save_item(NAME(m_is_idling));
 
 	// register our state for the debugger
@@ -431,23 +484,16 @@ void tms3203x_device::device_start()
 
 void tms3203x_device::device_reset()
 {
-	// if we have a config struct, get the boot ROM address
-	if (m_bootoffset != 0)
-	{
-		m_mcu_mode = true;
-		m_pc = boot_loader(m_bootoffset);
-	}
-	else
-	{
-		m_mcu_mode = false;
-		m_pc = RMEM(0);
-	}
+	m_pc = RMEM(0);
 
 	// reset some registers
 	IREG(TMR_IE) = 0;
 	IREG(TMR_IF) = 0;
 	IREG(TMR_ST) = 0;
 	IREG(TMR_IOF) = 0;
+
+	// update IF with the external interrupt state (required for boot loader operation)
+	IREG(TMR_IF) |= m_irq_state & 0x0f;
 
 	// reset internal stuff
 	m_delayed = m_irq_pending = m_is_idling = false;
@@ -718,7 +764,7 @@ UINT32 tms3203x_device::execute_max_cycles() const
 
 UINT32 tms3203x_device::execute_input_lines() const
 {
-	return 11;
+	return (m_chip_type == CHIP_TYPE_TMS32032) ? 13 : 12;
 }
 
 
@@ -729,8 +775,16 @@ UINT32 tms3203x_device::execute_input_lines() const
 void tms3203x_device::execute_set_input(int inputnum, int state)
 {
 	// ignore anything out of range
-	if (inputnum >= 12)
+	if (inputnum >= 13)
 		return;
+
+	if (inputnum == TMS3203X_MCBL)
+	{
+		// switch between microcomputer/boot loader and microprocessor modes
+		m_mcbl_mode = (state == ASSERT_LINE);
+		m_direct->force_update();
+		return;
+	}
 
 	// update the external state
 	UINT16 intmask = 1 << inputnum;
@@ -825,67 +879,6 @@ void tms3203x_device::execute_run()
 
 			debugger_instruction_hook(this, m_pc);
 			execute_one();
-		}
-	}
-}
-
-
-//-------------------------------------------------
-//  boot_loader - reset the state of the system
-//  by simulating the internal boot loader
-//-------------------------------------------------
-
-UINT32 tms3203x_device::boot_loader(UINT32 boot_rom_addr)
-{
-	// read the size of the data
-	UINT32 bits = RMEM(boot_rom_addr);
-	if (bits != 8 && bits != 16 && bits != 32)
-		return 0;
-	UINT32 datamask = 0xffffffffUL >> (32 - bits);
-	UINT32 advance = 32 / bits;
-	boot_rom_addr += advance;
-
-	// read the control register
-	UINT32 control = RMEM(boot_rom_addr++) & datamask;
-	for (int i = 1; i < advance; i++)
-		control |= (RMEM(boot_rom_addr++) & datamask) << (bits * i);
-
-	// now parse the data
-	UINT32 start_offset = 0;
-	bool first = true;
-	while (1)
-	{
-		// read the length of this section
-		UINT32 len = RMEM(boot_rom_addr++) & datamask;
-		for (int i = 1; i < advance; i++)
-			len |= (RMEM(boot_rom_addr++) & datamask) << (bits * i);
-
-		// stop at 0
-		if (len == 0)
-			return start_offset;
-
-		// read the destination offset of this section
-		UINT32 offs = RMEM(boot_rom_addr++) & datamask;
-		for (int i = 1; i < advance; i++)
-			offs |= (RMEM(boot_rom_addr++) & datamask) << (bits * i);
-
-		// if this is the first block, that's where we boot to
-		if (first)
-		{
-			start_offset = offs;
-			first = false;
-		}
-
-		// now copy the data
-		while (len--)
-		{
-			// extract the 32-bit word
-			UINT32 data = RMEM(boot_rom_addr++) & datamask;
-			for (int i = 1; i < advance; i++)
-				data |= (RMEM(boot_rom_addr++) & datamask) << (bits * i);
-
-			// write it out
-			WMEM(offs++, data);
 		}
 	}
 }

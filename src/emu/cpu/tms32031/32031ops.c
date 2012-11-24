@@ -5693,8 +5693,6 @@ void tms3203x_device::trap(int trapnum)
 	IREG(TMR_ST) &= ~GIEFLAG;
 	if (m_chip_type == CHIP_TYPE_TMS32032)
 		m_pc = RMEM(((IREG(TMR_IF) >> 16) << 8) + trapnum);
-	else if (m_mcu_mode)
-		m_pc = 0x809fc0 + trapnum;
 	else
 		m_pc = RMEM(trapnum);
 	m_icount -= 4*2;

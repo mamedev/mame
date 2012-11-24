@@ -69,6 +69,7 @@ const int TMS3203X_TINT1	= 9;		// timer 1 interrupt
 const int TMS3203X_DINT		= 10;		// DMA interrupt
 const int TMS3203X_DINT0	= 10;		// DMA 0 interrupt (32032 only)
 const int TMS3203X_DINT1	= 11;		// DMA 1 interrupt (32032 only)
+const int TMS3203X_MCBL		= 12;		// Microcomputer/boot loader mode
 
 // register enumeration
 enum
@@ -138,7 +139,7 @@ typedef void (*tms3203x_iack_func)(tms3203x_device &device, UINT8 val, offs_t ad
 
 struct tms3203x_config
 {
-	UINT32				m_bootoffset;
+	bool				m_mcbl_mode;
 	tms3203x_xf_func	m_xf0_w;
 	tms3203x_xf_func	m_xf1_w;
 	tms3203x_iack_func	m_iack_w;
@@ -201,6 +202,8 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 
+	virtual const rom_entry *device_rom_region() const;
+
 	// device_execute_interface overrides
 	virtual UINT32 execute_min_cycles() const;
 	virtual UINT32 execute_max_cycles() const;
@@ -222,13 +225,13 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
 	// memory helpers
+	DECLARE_DIRECT_UPDATE_MEMBER(direct_handler);
 	UINT32 ROPCODE(offs_t pc);
 	UINT32 RMEM(offs_t addr);
 	void WMEM(offs_t addr, UINT32 data);
 
 	// misc helpers
 	void check_irqs();
-	UINT32 boot_loader(UINT32 boot_rom_addr);
 	void execute_one();
 	void update_special(int dreg);
 	bool condition(int which);
@@ -798,7 +801,6 @@ protected:
 	UINT16				m_irq_state;
 	bool				m_delayed;
 	bool				m_irq_pending;
-	bool				m_mcu_mode;
 	bool				m_is_idling;
 	int					m_icount;
 
@@ -806,6 +808,7 @@ protected:
 	device_irq_acknowledge_callback	m_irq_callback;
 	address_space *		m_program;
 	direct_read_data *	m_direct;
+	UINT32 *			m_bootrom;
 
 	// tables
 	static void (tms3203x_device::*const s_tms32031ops[])(UINT32 op);

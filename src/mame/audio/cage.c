@@ -603,6 +603,7 @@ void cage_control_w(running_machine &machine, UINT16 data)
 	if (!(state->control & 3))
 	{
 		state->cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+		state->cpu->set_input_line(TMS3203X_IRQ1, ASSERT_LINE);
 
 		state->dma_enabled = 0;
 		state->dma_timer_enabled = 0;
@@ -619,7 +620,10 @@ void cage_control_w(running_machine &machine, UINT16 data)
 		state->cage_to_cpu_ready = 0;
 	}
 	else
+	{
 		state->cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		state->cpu->set_input_line(TMS3203X_IRQ1, CLEAR_LINE);
+	}
 
 	/* update the control state */
 	update_control_lines(machine);
@@ -651,7 +655,7 @@ static WRITE32_HANDLER( speedup_w )
 
 static const tms3203x_config cage_config =
 {
-	0x400000
+	true
 };
 
 

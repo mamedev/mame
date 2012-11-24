@@ -980,7 +980,7 @@ static const adsp21xx_config adsp_config =
 
 static const tms3203x_config tms_config =
 {
-	0x1000,
+	true,
 	0,
 	0,
 	iack_w

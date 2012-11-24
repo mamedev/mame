@@ -496,7 +496,7 @@ static ADDRESS_MAP_START( midvunit_map, AS_PROGRAM, 32, midvunit_state )
 ADDRESS_MAP_END
 
 
-static const tms3203x_config midvplus_config = { 0, NULL, midvplus_xf1_w };
+static const tms3203x_config midvplus_config = { false, NULL, midvplus_xf1_w };
 
 static ADDRESS_MAP_START( midvplus_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_SHARE("ram_base")
