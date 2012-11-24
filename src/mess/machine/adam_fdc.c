@@ -227,13 +227,13 @@ READ8_MEMBER( adam_fdc_device::p1_r )
 
     */
 
-	UINT8 data = 0;
+	UINT8 data = 0x00;
 
 	// disk in place
-	data |= m_floppy0->get_device()->exists();
+	data |= m_floppy0->get_device()->exists() ? 0x01 : 0x00;
 
 	// floppy data request
-	data |= m_fdc->drq_r() ? 0x04 : 0;
+	data |= m_fdc->drq_r() ? 0x04 : 0x00;
 
 	// drive select
 	data |= ioport("SW3")->read() << 7;
