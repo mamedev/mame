@@ -2228,6 +2228,7 @@ $(MESS_DRIVERS)/stopthie.o:	$(MESS_LAYOUT)/stopthie.lh
 $(MESS_DRIVERS)/super80.o:	$(MESS_LAYOUT)/super80.lh
 $(MESS_DRIVERS)/supercon.o:	$(MESS_LAYOUT)/supercon.lh
 $(MESS_DRIVERS)/svision.o:	$(MESS_LAYOUT)/svision.lh
+$(MESS_DRIVERS)/svmu.o:		$(MESS_LAYOUT)/svmu.lh
 $(MESS_DRIVERS)/sym1.o:		$(MESS_LAYOUT)/sym1.lh
 $(MESS_DRIVERS)/tec1.o:		$(MESS_LAYOUT)/tec1.lh
 $(MESS_DRIVERS)/tk80bs.o:	$(MESS_LAYOUT)/tk80.lh

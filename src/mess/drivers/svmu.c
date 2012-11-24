@@ -6,7 +6,6 @@
 
         TODO:
         - add more bios versions
-        - layout for LCD symbols
         - serial
 
 ****************************************************************************/
@@ -16,7 +15,7 @@
 #include "imagedev/snapquik.h"
 #include "machine/intelfsh.h"
 #include "sound/speaker.h"
-#include "rendlay.h"
+#include "svmu.lh"
 
 #define		PIXEL_SIZE			7
 #define		PIXEL_DISTANCE		1
@@ -39,8 +38,6 @@ public:
 	virtual void machine_reset();
 
 	DECLARE_WRITE8_MEMBER(page_w);
-	DECLARE_READ8_MEMBER(flash_r);
-	DECLARE_WRITE8_MEMBER(flash_w);
 	DECLARE_READ8_MEMBER(prog_r);
 	DECLARE_WRITE8_MEMBER(prog_w);
 	DECLARE_READ8_MEMBER(p1_r);
@@ -56,16 +53,6 @@ private:
 WRITE8_MEMBER(svmu_state::page_w)
 {
 	m_page = data & 0x03;
-}
-
-READ8_MEMBER(svmu_state::flash_r)
-{
-	return m_flash->read(offset);
-}
-
-WRITE8_MEMBER(svmu_state::flash_w)
-{
-	m_flash->write(offset, data);
 }
 
 READ8_MEMBER(svmu_state::prog_r)
@@ -177,11 +164,6 @@ static LC8670_LCD_UPDATE( svmu_lcd_update )
 				for (int b=0; b<8; b++)
 					bitmap.plot_box((x*8 + b) * (PIXEL_SIZE + PIXEL_DISTANCE), y * (PIXEL_SIZE + PIXEL_DISTANCE), PIXEL_SIZE, PIXEL_SIZE, BIT(gfx,7-b));
 			}
-
-		popmessage("%c %c %c %c\n", BIT(vram[0xc1],6) ? 'F' : ' ',		// File icon
-									BIT(vram[0xc2],4) ? 'G' : ' ',		// Game icon
-									BIT(vram[0xc3],2) ? 'C' : ' ',		// Clock icon
-									BIT(vram[0xc4],0) ? 'A' : ' ');		// Flash icon
 	}
 	else
 	{
@@ -330,7 +312,7 @@ static MACHINE_CONFIG_START( svmu, svmu_state )
 	MCFG_SCREEN_SIZE(48 * (PIXEL_SIZE + PIXEL_DISTANCE), 32 * (PIXEL_SIZE + PIXEL_DISTANCE))
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*(PIXEL_SIZE + PIXEL_DISTANCE) - 1, 0, 32*(PIXEL_SIZE + PIXEL_DISTANCE) - 1)
 	MCFG_SCREEN_UPDATE_DEVICE("maincpu", lc8670_cpu_device, screen_update)
-	MCFG_DEFAULT_LAYOUT(layout_lcd)
+	MCFG_DEFAULT_LAYOUT(layout_svmu)
 	MCFG_PALETTE_LENGTH(2)
 
 	/* sound hardware */
