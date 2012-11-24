@@ -25,7 +25,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * それいけ! アンパンマン えいごとなかよし ようちえんでABC - Soreike! Anpanman - Eigo to Nakayoshi Youchiende ABC (Sega - 1994 - HPC-6012)
 * 3丁目のタマ モモちゃんはどこ! - 3-choume no Tama Momo-chan wa Doko! (Sega - 199407xx - HPC-6013)
 * 愛と夢と冒険 サンリオピューロランド - Ai to Yume to Bouken Sanrio Puroland! (Sega - 199410xx - HPC-6014)
-* スヌーピーのがくげいかい - Snoopy no Gakugeikai (Sega - 19951027 - HPC-6016)
 * めざせプロ野球 - Mezase Pro Yakyuu (Sega - 1995xxxx - HPC-6021)
 * 魔法騎士 レイアース マジックナイトたんじょう - Mahou Kishi Rayearth: Magic Knight Tanjou (Sega - 1995xxxx - HPC-6022)
 * 世界名作劇場 - Sekai Meisaku Gekijou (Sega - 19950725 - HPC-6024)
@@ -34,13 +33,11 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * ぺたぺたちょっきん あそべるずかん <どうぶつ> - Petapeta Chokkinna Soberuzukan ~Doubutsu~ (Sega - 199511xx - HPC-6028)
 * おんがくだいすきスヌーピー  - Ongaku Daisuki Snoopy (Sega - 1996xxxx - HPC-6030)
 * サンリオカーニバル たのしいカードづくり - Sanrio Carnival Tanoshii Card Dukuri (Sega - 19951130 - HPC-6031)
-* ゆかいな森のパケット - Yukai na Mori no Paketto (Sega - 199512xx - HPC-6034)
 * 怪盗セイント･テール セイントテールとワン･ツー･スリー! - Kaitou Saint Tail - Saint Tail to One, Two, Three! (Sega - ???? - HPC-6035)
 * バーバパパのうちゅうりょこう - Barbapapa no Uchuu Ryokou (Sega - 1996xxxx - HPC-6036)
 * みんなでおどろう オズのまほうつかい  - Minna de Odorou - Ozu no Mahou Tsukai (Sega - ???? - HPC-6037)
 * 超光戦士 シャンゼリオン  - Chou Hikari Senshi Shanzerion (Sega - 1996xxxx - HPC-6038)
 * ハローキティのすてきなおたんじょうび  - Hello Kitty no Suteki nao Tanjoubi (Sega - 1997xxxx - HPC-6040)
-* よべばこたえる ドラえもん のびたとひみつどうぐをみつけよう! - Yobeba Kotaeru Doraemon - Nobita to Himitsu Douguwomitsukeyou! (Sega - ???? - HPC-6041)
 * もしもしピコ セット だれがでるかな?もしもしピコで テレビとおしゃべり! <同梱> - Moshimoshi Pico Set with Darega Derukana? Moshimoshi Pico de Terebi Tooshaberi! (Sega - 1997xxxx - HPC-6046)
 * パケット2 ゆかいな仲間とゲームで数遊び  - Paketto 2 Yukai na Nakama to Game de Kazu Asobi (Sega - ???? - HPC-6048)
 * みんなでカラオケ! うたってピコ セット いっしょにうたおう すきなうた! <同梱> - Minna de Karaoke! Utatte Pico Set with Isshoni Utaou Sukinauta! (Sega - 1997xxxx - HPC-6049)
@@ -63,7 +60,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * 白雪姫 ～しらゆきひめ～ - Shirayukihime (Sega Toys - 199909xx - HPC-6077)
 * 6000人の先生たちがつくった たのしい小学校探検2 - 6000-nin no Sensei Tachiga Tsukutta Tanoshii Shougakkou Tanken 2 (Sega - ???? - HPC-6078)
 * McDonald's マクドナルドであそぼ! - McDonald's - McDonald de Asobo (Sega Toys - 2000xxxx - HPC-6079)
-* バグズ・ライフ - A Bug's Life (Sega Toys - ???? - HPC-6080)
 * いつでもいっしょ ドラえもん セット - Itsudemo Issho Doraemon Set (Sega Toys - ???? - HPC-6081)
 * フィッシングピコ ドナルドのアドベンチャーフィッシング セット - Fishing Pico - Donald no Adventure Fishing Set (Sega Toys - 2000xxxx - HPC-6082)
 * キティとみんなの キーボードピコ サンリオピューロランドにいこう! キティとみんなのはじめてキーボード!<同梱>! - Kitty to Minna no Keyboard Pico Sanrio Puroland ni Ikou! with Kitty to Minna no Hajimete Keyboard (Sega Toys - 2000xxxx - HPC-6084)
@@ -242,6 +238,21 @@ Games for the MIXT BOOK PLAYER COPERA
 			<feature name="ic1" value="MPR-19623 J32" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-19623 j32.ic1" size="1048576" crc="27bb0b0a" sha1="f9e2bde5351f34cd565c03a1cad3d1baedd8c7c3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bugslife">
+		<description>A Bug's Life (Jpn)</description>
+		<year>1999?</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6080"/>
+		<info name="alt_title" value="バグズ ライフ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="9K0-0007" />
+			<dataarea name="rom" size="2097152">
+				<rom name="9k0-0007.ic1" size="2097152" crc="96ee02a2" sha1="aff437671cbfa0119b1828c47e538ff32db3a0db" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1591,6 +1602,23 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+<!-- This was also released as dump from prototype, but development was complete apparently, since TeamEurope has confirmed it with a real cart -->
+	<software name="snoopy">
+		<description>Snoopy no Gakugeikai (Jpn)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6016"/>
+		<info name="release" value="19951027"/>
+		<info name="alt_title" value="スヌーピーのがくげいかい"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-17636-U" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17636-u.ic1" size="524288" crc="b76cd97c" sha1="6d6b49249cd4513d59e1c863fed5f273113d7e9b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sodatete">
 		<description>Sodatete Manabu - Doubutsu Oukoku! (Jpn)</description>
 		<year>1996</year>
@@ -1835,6 +1863,39 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic1" value="MPR-17507-H" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-17507-h.ic1" size="524288" crc="7f90e769" sha1="e650590a209a396fff6f3ebd7cd22ac9a62e42db" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yobedora">
+		<description>Yobeba Kotaeru Doraemon - Nobita to Himitsu Dougu wo Mitsukeyou! (Jpn)</description>
+		<year>1995?</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6041"/>
+		<info name="alt_title" value="よべばこたえる ドラえもん のびたとひみつどうぐをみつけよう!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7204A" />
+			<feature name="ic1" value="MPR-19549 J35" />
+			<feature name="ic2" value="315-6078" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-19549 j35.ic1" size="1048576" crc="39f38a22" sha1="df0f45c8b229e648347bc932225f185c0fe2465f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yukaimp">
+		<description>Yukai na Mori no Packet (Jpn)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6034"/>
+		<info name="release" value="199512xx"/>
+		<info name="alt_title" value="ゆかいな森のパケット"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7204A" />
+			<feature name="ic1" value="MPR-18804 J41" />
+			<feature name="ic2" value="315-5865" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18804 j41.ic1" size="1048576" crc="d130d765" sha1="97c99f623285af22a1f3201b7b1a2665c7bbb649" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -2828,17 +2889,6 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="pico soccer mezase soccer senshu (1995)(sega)(jp)(beta).bin" size="524288" crc="d9849eb8" sha1="ba61a1c98aa5d03958ba745282086637680b13b2" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="snoopy">
-		<description>Snoopy no Gakugeikai (Jpn, Prototype)</description>
-		<year>1995</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="snoopy no gakugeikai (1995)(sega)(jp)(beta).bin" size="524288" crc="b76cd97c" sha1="6d6b49249cd4513d59e1c863fed5f273113d7e9b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
