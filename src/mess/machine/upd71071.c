@@ -152,6 +152,7 @@ static TIMER_CALLBACK(dma_transfer_timer)
 					dmac->reg.count_current[channel] = dmac->reg.count_base[channel];
 				}
 				// TODO: send terminal count
+				set_eop(device,ASSERT_LINE);
 			}
 			else
 				dmac->reg.count_current[channel]--;
@@ -172,6 +173,7 @@ static TIMER_CALLBACK(dma_transfer_timer)
 					dmac->reg.count_current[channel] = dmac->reg.count_base[channel];
 				}
 				// TODO: send terminal count
+				set_eop(device,ASSERT_LINE);
 			}
 			else
 				dmac->reg.count_current[channel]--;
@@ -219,6 +221,8 @@ int upd71071_dmarq(device_t* device, int state,int channel)
 		{
 			case 0x00:  // Demand
 				// TODO
+				set_eop(device,CLEAR_LINE);
+				dmac->timer[channel]->adjust(attotime::from_hz(dmac->intf->clock),channel);
 				break;
 			case 0x40:  // Single
 				dmac->timer[channel]->adjust(attotime::from_hz(dmac->intf->clock),channel);

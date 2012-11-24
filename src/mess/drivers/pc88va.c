@@ -18,6 +18,7 @@
     - PC-88VA stock version has two bogus opcodes. One is at 0xf0b15, another at 0xf0b31.
       Making a patch for the latter makes the system to jump into a "DIP-Switch" display.
 	- unemulated upd71071 demand mode.
+	- Fix floppy motor hook-up;
 
 ********************************************************************************************/
 
@@ -140,6 +141,7 @@ public:
 	TIMER_CALLBACK_MEMBER(pc88va_fdc_timer);
 //	UINT16 m_fdc_dma_r(running_machine &machine);
 //	void m_fdc_dma_w(running_machine &machine, UINT16 data);
+	DECLARE_WRITE_LINE_MEMBER(pc88va_tc_w);
 
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);
@@ -1035,6 +1037,10 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 			machine().device<floppy_connector>("upd765:1")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
 
 			machine().device<upd765a_device>("upd765")->set_rate(data & 0x20 ? 500000 : 250000);
+			/* Temporary hack */
+			machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(0);
+			machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(0);
+
 			break;
 		/*
         ---- x--- PCM: ?
@@ -1708,6 +1714,15 @@ static const ym2203_interface pc88va_ym2203_intf =
 	DEVCB_NULL
 };
 
+WRITE_LINE_MEMBER( pc88va_state::pc88va_tc_w )
+{
+	/* floppy terminal count */
+	m_fdc->tc_w(state);
+
+//	printf("TC %02x\n",state);
+}
+
+
 static UINT16 m_fdc_dma_r(running_machine &machine)
 {
 	pc88va_state *state = machine.driver_data<pc88va_state>();
@@ -1729,7 +1744,7 @@ static const upd71071_intf pc88va_dma_config =
 	"maincpu",
 	8000000,
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(pc88va_state, pc88va_tc_w),
 	{ 0, 0, m_fdc_dma_r, 0 },
 	{ 0, 0, m_fdc_dma_w, 0 },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
