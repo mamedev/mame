@@ -28,8 +28,8 @@
     5505 interrupts are on normal autovector IRQ 1
 
     VFX / VFX-SD / SD-1 / SD-1 32 panel button codes:
-	2 = PROG-CNTL 
-	3 = WRITE EDIT PROGRAM 
+	2 = PROGRAM CONTROL
+	3 = WRITE
 	4 = WAVE 
 	5 = SELECT VOICE
 	6 = MIXER/SHAPER 
@@ -54,7 +54,7 @@
 	26 = PSEL 
 	27 = STAT 
 	28 = EFFECT 
-	29 = 
+	29 = ?
 	30 = TRAX 
     31 = TRAX (page 2)
     32 = ERROR 20 (VFX) / CLICK-REC
@@ -618,7 +618,7 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 		val += shift;
 		if (oldval == 0 && newval == 1)
 		{
-			printf("key pressed %d\n", val);
+			printf("key pressed %d\n", val&0x7f);
 			duart68681_rx_data(m_duart, 1, val);
 			duart68681_rx_data(m_duart, 1, 0x00);
 		}
