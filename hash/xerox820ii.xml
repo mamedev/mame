@@ -28,7 +28,7 @@
 			</dataarea>
 		</part>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Diagnostic Work Copy"/>
 			<dataarea name="flop" size="38342">
 				<rom name="diag_820-ii.imd" size="38342" crc="61639171" sha1="ba3a4491fa28f2a152a6409f93e3faa16fca32a5" offset="0" />
@@ -48,35 +48,35 @@
 			</dataarea>
 		</part>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Utility and Macro Asm"/>
 			<dataarea name="flop" size="288789">
 				<rom name="dos_util_asm.imd" size="288789" crc="00a3a9c6" sha1="b427cfbd249a792f880b237650b506d25dd64b36" offset="0" />
 			</dataarea>
 		</part>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Util Macro Asssmb DSDD"/>
 			<dataarea name="flop" size="289509">
 				<rom name="msdutil.imd" size="289509" crc="3a9a74f9" sha1="bc4196d7ccd1fb5c4aaf5f5b1bcd5682b8a1744a" offset="0" />
 			</dataarea>
 		</part>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="MS-Load Boot CP/M Boot Track"/>
 			<dataarea name="flop" size="266065">
 				<rom name="msload.imd" size="266065" crc="0be6d91d" sha1="6bda99437cc072505ab4d3b9e65a836bea2a8e97" offset="0" />
 			</dataarea>
 		</part>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Sys Disk"/>
 			<dataarea name="flop" size="344492">
 				<rom name="mssys.imd" size="344492" crc="7e452981" sha1="48fcf83199b452b869c2eb37b29b7783010e5da0" offset="0" />
 			</dataarea>
 		</part>
 
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Utilities"/>
 			<dataarea name="flop" size="306651">
 				<rom name="utils.imd" size="306651" crc="146ff7de" sha1="7e087276443677d9115336d2f8f7a63dfe02b37d" offset="0" />
