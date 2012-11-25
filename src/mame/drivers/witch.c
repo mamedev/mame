@@ -2,15 +2,15 @@
 
 Witch / Pinball Champ '95
 
-witch   : Witch
-      press F1 to initialize NVRAM
 
-pbchmp95: Pinball Champ '95. Seems to be a simple mod with the following differences:
-                        -The title screen is changed
-                        -The sample saying "witch" is not played (obviously)
-                        -Different configuration values (time limit, etc)
-                        -Auto-initialization on NVRAM error(?)
-                        -Stars keep falling at the title screen
+            Witch: press F1 to initialize NVRAM
+
+Pinball Champ '95: Seems to be a simple mod with the following differences:
+                   -The title screen is changed
+                   -The sample saying "witch" is not played (obviously)
+                   -Different configuration values (time limit, etc)
+                   -Auto-initialization on NVRAM error(?)
+                   -Stars keep falling at the title screen
 
 
 ES-9104 PCB:
@@ -33,12 +33,13 @@ ES-9104 PCB:
 
        Z80A: Two Z80A CPUs frequency unknown (3MHz? 12MHz/4) (CPU2 used mainly for sound effects)
      YM2203: Two Yamaha YM2203+YM3014B sound chip combos. Frequency unknown (music + sound effects + video scrolling access)
-      M5202: OKI M5202 ADPCM Speech Synthesis IC
+      M5202: OKI M5202 ADPCM Speech Synthesis IC @ 384kHz
      ES8712: Excellent System ES-8712 Streaming single channel ADPCM, frequency unknown (samples)
        8255: M5M82C255ASP Programmable Peripheral Interface
         OSC: 12.000MHz
-         X2: Unknown rated OSC or Resonator to drive M5202 (and ES8712?)
+         X2: 384kHz Resonator to drive M5202
         VR1: Volume pot
+       BAT1: 3.6V battery
         SW1: Service push button
       other: 8-position dipswitch x 4 (labeled SW2 through SW5)
              Standard 8-liner harness connectors (36x2 edge connector + 10x2 edge connector).
