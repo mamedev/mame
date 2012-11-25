@@ -404,13 +404,14 @@ static ADDRESS_MAP_START(geniusiq_mem, AS_PROGRAM, 16, geniusiq_state)
 	AM_RANGE(0x600606, 0x600609) AM_WRITE(gfx_base_w)
 	AM_RANGE(0x60060a, 0x60060b) AM_WRITE(gfx_idx_w)
 	AM_RANGE(0x600802, 0x600803) AM_READ_PORT("CART")   // cartridge state
+	AM_RANGE(0x600108, 0x600109) AM_READ(unk0_r)        // read before run a BASIC program
 	AM_RANGE(0x600918, 0x600919) AM_READ(unk0_r)        // loop at start if bit 0 is set
 	AM_RANGE(0x601008, 0x601009) AM_READ(unk_r)			// unknown, read at start and expect that bit 2 changes several times before continue
 	AM_RANGE(0x601010, 0x601011) AM_READ(unk0_r)		// loop at start if bit 1 is set
 	AM_RANGE(0x601018, 0x60101b) AM_WRITE(gfx_dest_w)
 	AM_RANGE(0x60101c, 0x60101f) AM_WRITE(gfx_color_w)
 	AM_RANGE(0x601060, 0x601063) AM_WRITE(mouse_pos_w)
-	AM_RANGE(0x601100, 0x6011ff) AM_RAM		AM_SHARE("mouse_gfx")	// mouse cursor gfx (12x16)
+	AM_RANGE(0x601100, 0x6011ff) AM_RAM		AM_SHARE("mouse_gfx")	// mouse cursor gfx (24x16)
 	//AM_RANGE(0xa00000, 0xa?????)                      // cartridge ??
 	// 0x600000 : some memory mapped hardware
 ADDRESS_MAP_END
@@ -646,7 +647,7 @@ void geniusiq_state::machine_reset()
 	m_mouse_gfx_posy = 0;
 }
 
-static MACHINE_CONFIG_START( geniusiq, geniusiq_state )
+static MACHINE_CONFIG_START( iq128, geniusiq_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // The main crystal is at 32MHz, not sure whats the CPU freq
 	MCFG_CPU_PROGRAM_MAP(geniusiq_mem)
@@ -663,6 +664,12 @@ static MACHINE_CONFIG_START( geniusiq, geniusiq_state )
 
 	/* internal flash */
 	MCFG_AMD_29F010_ADD("flash")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( iqtv512, iq128 )
+	/* internal flash */
+	MCFG_DEVICE_REMOVE("flash")
+	MCFG_AMD_29F040_ADD("flash")
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -690,7 +697,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                FULLNAME               FLAGS */
-COMP( ????, gl8008cx,   0,              0,    geniusiq,   geniusiq_de, driver_device,  0,  "Video Technology", "Genius Leader 8008 CX (Germany)", GAME_IS_SKELETON)
-COMP( 1997, iq128_fr,   iq128,          0,    geniusiq,   geniusiq,    driver_device,  0,  "Video Technology", "Genius IQ 128 (France)", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1997, iq128,      0,              0,    geniusiq,   geniusiq_de, driver_device,  0,  "Video Technology", "Genius IQ 128 (Germany)", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( ????, iqtv512,    0,              0,    geniusiq,   geniusiq_de, driver_device,  0,  "Video Technology", "Genius IQ TV 512 (Germany)", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, gl8008cx,   0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Genius Leader 8008 CX (Germany)", GAME_IS_SKELETON)
+COMP( 1997, iq128_fr,   iq128,          0,    iq128,     geniusiq,    driver_device,  0,  "Video Technology", "Genius IQ 128 (France)", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1997, iq128,      0,              0,    iq128,     geniusiq_de, driver_device,  0,  "Video Technology", "Genius IQ 128 (Germany)", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1998, iqtv512,    0,              0,    iqtv512,   geniusiq_de, driver_device,  0,  "Video Technology", "Genius IQ TV 512 (Germany)", GAME_NOT_WORKING | GAME_NO_SOUND)
