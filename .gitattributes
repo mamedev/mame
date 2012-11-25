@@ -227,6 +227,7 @@ hash/x1_flop.xml svneol=native#text/xml
 hash/x68k_flop.xml svneol=native#text/xml
 hash/xegs.xml svneol=native#text/xml
 hash/xerox820.xml svneol=native#text/xml
+hash/xerox820ii.xml svneol=native#text/xml
 hlsl/color.fx svneol=native#text/plain
 hlsl/deconverge.fx svneol=native#text/plain
 hlsl/focus.fx svneol=native#text/plain
