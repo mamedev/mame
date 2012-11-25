@@ -618,14 +618,14 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 		val += shift;
 		if (oldval == 0 && newval == 1)
 		{
-			printf("key pressed %d\n", val-0x60);
+			printf("key pressed %d\n", val);
 			duart68681_rx_data(m_duart, 1, val);
 			duart68681_rx_data(m_duart, 1, 0x00);
 		}
 		else if (oldval == 1 && newval == 0)
 		{
 	//        printf("key off %x\n", (UINT8)(FPTR)param);
-			duart68681_rx_data(m_duart, 1, val-0x60);
+			duart68681_rx_data(m_duart, 1, val&0x7f);
 			duart68681_rx_data(m_duart, 1, 0x00);
 		}
 	}
