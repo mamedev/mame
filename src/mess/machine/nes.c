@@ -1,3 +1,11 @@
+/*****************************************************************************
+
+	nes.c
+
+	Nintendo Entertainment System (Famicom)
+
+ ****************************************************************************/
+
 #include "emu.h"
 #include "crsshair.h"
 #include "cpu/m6502/m6502.h"
@@ -22,8 +30,6 @@
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-static void nes_machine_stop(running_machine &machine);
 
 
 static void fds_irq(device_t *device, int scanline, int vblank, int blanked);
@@ -284,16 +290,26 @@ static void nes_state_register( running_machine &machine )
 	machine.save().register_postload(save_prepost_delegate(FUNC(nes_banks_restore), state));
 }
 
+
+//-------------------------------------------------
+//  machine_start
+//-------------------------------------------------
+
 void nes_state::machine_start()
 {
-
 	m_ppu = machine().device<ppu2c0x_device>("ppu");
-	init_nes_core();
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(nes_machine_stop),&machine()));
 
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_sound = machine().device("nessound");
-	m_cart = machine().device("cart");
+	init_nes_core();
+
+	m_maincpu			= machine().device<cpu_device>("maincpu");
+	m_sound				= machine().device("nessound");
+	m_cart				= machine().device("cart");
+	m_io_ctrlsel		= ioport("CTRLSEL");
+	m_prg_bank_mem[0]	= membank("bank1");
+	m_prg_bank_mem[1]	= membank("bank2");
+	m_prg_bank_mem[2]	= membank("bank3");
+	m_prg_bank_mem[3]	= membank("bank4");
+	m_prg_bank_mem[4]	= membank("bank5");
 
 	// If we're starting famicom with no disk inserted, we still haven't initialized the VRAM needed for
 	// video emulation, so we need to take care of it now
@@ -312,23 +328,45 @@ void nes_state::machine_start()
 	nes_state_register(machine());
 }
 
-static void nes_machine_stop( running_machine &machine )
-{
-	nes_state *state = machine.driver_data<nes_state>();
-	device_image_interface *image = dynamic_cast<device_image_interface *>(state->m_cart);
-	/* Write out the battery file if necessary */
-	if (state->m_battery)
-		image->battery_save(state->m_battery_ram, state->m_battery_size);
 
-	if (state->m_mapper_bram_size)
-		image->battery_save(state->m_mapper_bram, state->m_mapper_bram_size);
+//-------------------------------------------------
+//  machine_stop
+//-------------------------------------------------
+
+void nes_state::machine_stop()
+{
+	device_image_interface *image = dynamic_cast<device_image_interface *>(m_cart);
+	/* Write out the battery file if necessary */
+	if (m_battery)
+		image->battery_save(m_battery_ram, m_battery_size);
+
+	if (m_mapper_bram_size)
+		image->battery_save(m_mapper_bram, m_mapper_bram_size);
+}
+
+
+
+//-------------------------------------------------
+//  update_prg_banks
+//-------------------------------------------------
+
+void nes_state::update_prg_banks(int prg_bank_start, int prg_bank_end)
+{
+	for (int prg_bank = prg_bank_start; prg_bank <= prg_bank_end; prg_bank++)
+	{
+		assert(prg_bank >= 0);
+		assert(prg_bank < ARRAY_LENGTH(m_prg_bank));
+		assert(prg_bank < ARRAY_LENGTH(m_prg_bank_mem));
+
+		m_prg_bank_mem[prg_bank]->set_entry(m_prg_bank[prg_bank]);
+	}
 }
 
 
 
 READ8_MEMBER(nes_state::nes_IN0_r)
 {
-	int cfg = ioport("CTRLSEL")->read();
+	int cfg = m_io_ctrlsel->read();
 	int ret;
 
 	if ((cfg & 0x000f) >= 0x08)	// for now we treat the FC keyboard separately from other inputs!
@@ -397,7 +435,7 @@ static UINT8 nes_read_subor_keyboard_line( running_machine &machine, UINT8 scan,
 
 READ8_MEMBER(nes_state::nes_IN1_r)
 {
-	int cfg = ioport("CTRLSEL")->read();
+	int cfg = m_io_ctrlsel->read();
 	int ret;
 
 	if ((cfg & 0x000f) == 0x08)	// for now we treat the FC keyboard separately from other inputs!
@@ -525,7 +563,7 @@ static void nes_read_input_device( running_machine &machine, int cfg, nes_input 
 
 TIMER_CALLBACK_MEMBER(nes_state::lightgun_tick)
 {
-	if ((machine().root_device().ioport("CTRLSEL")->read() & 0x000f) == 0x0002)
+	if ((m_io_ctrlsel->read() & 0x000f) == 0x0002)
 	{
 		/* enable lightpen crosshair */
 		crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_ALL);
@@ -536,7 +574,7 @@ TIMER_CALLBACK_MEMBER(nes_state::lightgun_tick)
 		crosshair_set_screen(machine(), 0, CROSSHAIR_SCREEN_NONE);
 	}
 
-	if ((machine().root_device().ioport("CTRLSEL")->read() & 0x00f0) == 0x0030)
+	if ((m_io_ctrlsel->read() & 0x00f0) == 0x0030)
 	{
 		/* enable lightpen crosshair */
 		crosshair_set_screen(machine(), 1, CROSSHAIR_SCREEN_ALL);
@@ -550,7 +588,7 @@ TIMER_CALLBACK_MEMBER(nes_state::lightgun_tick)
 
 WRITE8_MEMBER(nes_state::nes_IN0_w)
 {
-	int cfg = ioport("CTRLSEL")->read();
+	int cfg = m_io_ctrlsel->read();
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
 	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(nes_state::lightgun_tick),this));

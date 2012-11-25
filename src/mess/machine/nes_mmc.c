@@ -237,6 +237,8 @@ READ8_MEMBER(nes_state::nes_low_mapper_r)
 
 void nes_carts_state::wram_bank(int bank, int source)
 {
+	nes_state *state = machine().driver_data<nes_state>();
+
 	assert(m_battery || m_prg_ram);
 	if (source == NES_BATTERY)
 	{
@@ -248,16 +250,13 @@ void nes_carts_state::wram_bank(int bank, int source)
 		bank &= (m_wram_size / 0x2000) - 1;
 		m_prg_bank[4] = m_prgram_bank5_start + bank;
 	}
-	membank("bank5")->set_entry(m_prg_bank[4]);
+	state->update_prg_banks(4, 4);
 }
 
 INLINE void prg_bank_refresh( running_machine &machine )
 {
 	nes_state *state = machine.driver_data<nes_state>();
-	state->membank("bank1")->set_entry(state->m_prg_bank[0]);
-	state->membank("bank2")->set_entry(state->m_prg_bank[1]);
-	state->membank("bank3")->set_entry(state->m_prg_bank[2]);
-	state->membank("bank4")->set_entry(state->m_prg_bank[3]);
+	state->update_prg_banks(0, 3);
 }
 
 /* PRG ROM in 8K, 16K or 32K blocks */

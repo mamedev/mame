@@ -1,9 +1,9 @@
 /*****************************************************************************
- *
- * includes/nes.h
- *
- * Nintendo Entertainment System (Famicom)
- *
+
+	nes.h
+
+	Nintendo Entertainment System (Famicom)
+
  ****************************************************************************/
 
 #ifndef NES_H_
@@ -68,6 +68,7 @@ public:
 	void pcb_handlers_setup();
 	int pcb_initialize(int idx);
 	int nes_pcb_reset();
+	void update_prg_banks(int prg_bank_start, int prg_bank_end);
 
 	DECLARE_WRITE8_MEMBER(nes_chr_w);
 	DECLARE_READ8_MEMBER(nes_chr_r);
@@ -83,13 +84,6 @@ public:
 	read8_delegate    m_mmc_read_low;
 	read8_delegate    m_mmc_read_mid;
 	read8_delegate    m_mmc_read;
-
-	/* devices */
-//  cpu_device        *m_maincpu;
-//  ppu2c0x_device    *m_ppu;
-//  device_t          *m_sound;
-	device_t          *m_cart;
-//  emu_timer         *m_irq_timer;
 
 	/***** FDS-floppy related *****/
 
@@ -120,6 +114,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nes_vh_sprite_dma_w);
 	DECLARE_DRIVER_INIT(famicom);
 	virtual void machine_start();
+	virtual void machine_stop();
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
@@ -129,6 +124,16 @@ public:
 	DECLARE_READ8_MEMBER(psg_4015_r);
 	DECLARE_WRITE8_MEMBER(psg_4015_w);
 	DECLARE_WRITE8_MEMBER(psg_4017_w);
+
+private:
+	/* devices */
+//  cpu_device        *m_maincpu;
+//  ppu2c0x_device    *m_ppu;
+//  device_t          *m_sound;
+	device_t          *m_cart;
+//  emu_timer         *m_irq_timer;
+	ioport_port       *m_io_ctrlsel;
+	memory_bank       *m_prg_bank_mem[5];
 };
 
 /*----------- defined in machine/nes.c -----------*/
