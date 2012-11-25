@@ -27,15 +27,6 @@
     68681 uses custom vector 0x40 (address 0x100)
     5505 interrupts are on normal autovector IRQ 1
 
-    68681 GPIO lines (from VFX schematics):
-    I0: CARTIN (if cartridge is present)
- 
-    O0: "AN0"
-    O1: "AN1"
-    O2: "AN2" (disk side select on EPS/EPS-16)
-    O6: To ESPHALT pin on ES5510
-    O7: "SACK"
- 
     VFX / VFX-SD / SD-1 / SD-1 32 panel button codes:
 	2 = PROG-CNTL 
 	3 = WRITE EDIT PROGRAM 
@@ -56,45 +47,45 @@
     19 = ?
     20 = MASTER
     21 = STORAGE
-    22 = ?
-    23 = ?
+    22 = ERROR 129 (VFX-SD w/Seq. loaded)
+    23 = ERROR 129 (VFX-SD w/Seq. loaded)
 	24 = MIDI 
-	25 = INT9 
+	25 = BUTTON 9 
 	26 = PSEL 
 	27 = STAT 
 	28 = EFFECT 
-	29 = INT9 
+	29 = 
 	30 = TRAX 
     31 = TRAX (page 2)
     32 = ERROR 20 (VFX) / CLICK-REC
     33 = ERROR 20 (VFX) / LOCATE
-	34 = INT8 
-	35 = INT7 
-	36 = VOL 
+	34 = BUTTON 8
+	35 = BUTTON 7
+	36 = VOLUME
 	37 = PAN 
-	38 = TIMB 
-	39 = ZONE 
-	40 = XPOS 
-    41 = RELS
+	38 = TIMBRE
+	39 = KEY ZONE 
+	40 = TRANSPOSE 
+    41 = RELEASE
     42 = SOFT TOP CENTER
     43 = SOFT TOP RIGHT
     44 = SOFT BOTTOM CENTER
     45 = SOFT BOTTOM RIGHT
-    46 = INT3
-    47 = INT4
-    48 = INT5
-    49 = INT6
+    46 = BUTTON 3
+    47 = BUTTON 4
+    48 = BUTTON 5
+    49 = BUTTON 6
     50 = SOFT BOTTOM LEFT
-    51 = ERROR 20 (VFX) / SEQ0 $SONG-00
-    52 = BANK? (toggles INTx, RM0x, RM1x)
-    53 = INT0
-    54 = PSET
-    55 = RM10
-    56 = RM11
-    57 = RM12
+    51 = ERROR 202 (VFX) / SEQ0 $SONG-00
+    52 = CART
+    53 = SOUNDS
+    54 = PRESETS
+    55 = BUTTON 0
+    56 = BUTTON 1
+    57 = BUTTON 2
     58 = SOFT TOP LEFT
     59 = ERROR 20 (VFX) / EDIT SEQUENCE
-    60 = ERROR 20 (VFX) / SONG NOT SELECTED
+    60 = ERROR 20 (VFX) / EDIT SONG
     61 = ERROR 20 (VFX) / EDIT TRACK
     62 = DATA INCREMENT
     63 = DATA DECREMENT
@@ -119,11 +110,13 @@
 #define SQ1     (2)
 
 #define KEYBOARD_HACK (1)   // turn on to play the SQ-1, SD-1, and SD-1 32-voice: Z and X are program up/down, A/S/D/F/G/H/J/K/L and Q/W/E/R/T/Y/U play notes
-#define HACK_VIA_MIDI	(1)
+#define HACK_VIA_MIDI	(0)
 
 #if KEYBOARD_HACK
 #if HACK_VIA_MIDI
 static int program = 0;
+#else
+static int shift = 32;
 #endif
 #endif
 
@@ -396,9 +389,29 @@ static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 
 static UINT8 duart_input(device_t *device)
 {
-    esq5505_state *state = device->machine().driver_data<esq5505_state>();
+	floppy_connector *con = device->machine().device<floppy_connector>("wd1772:0");
+	floppy_image_device *floppy = con ? con->get_device() : 0;
+	UINT8 result = 0;	// DUART input lines are separate from the output lines
 
-    return state->m_duart_io;
+	// on VFX, bit 0 is 1 for 'cartridge present'.
+	// on VFX-SD and later, bit 0 is 1 for floppy present, bit 1 is 1 for cartridge present
+	if (mame_stricmp(device->machine().system().name, "vfx") == 0)
+	{
+		// todo: handle VFX cart-in when we support cartridges
+	}
+	else
+	{
+		if (floppy)
+		{
+			// ready_r returns true if the drive is *not* ready, false if it is
+//			if (!floppy->ready_r())
+			{
+				result |= 1;
+			}
+		}
+	}
+
+    return result;
 }
 
 static void duart_output(device_t *device, UINT8 data)
@@ -410,14 +423,15 @@ static void duart_output(device_t *device, UINT8 data)
     state->m_duart_io = data;
 
 	/* 
-		ESP: 
+	    EPS:
+	    bit 2 = SSEL
 	 
 	    VFX:
 	    bits 0/1/2 = analog sel
 	    bit 6 = ESPHALT
 	    bit 7 = SACK (?)
 	 
-	    SD-1 32:
+	    VFX-SD & SD-1 (32):
 	    bits 0/1/2 = analog sel
 	    bit 3 = SSEL (disk side)
 	    bit 4 = DSEL (drive select?)
@@ -582,19 +596,39 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
     }
     #else
 	int val = (UINT8)(FPTR)param;
-	val += 32;
-	if (oldval == 0 && newval == 1)
-    {
-        printf("key pressed %d\n", val&0x7f);
-        duart68681_rx_data(m_duart, 1, val);
-        duart68681_rx_data(m_duart, 1, 0x00);
-    }
-    else if (oldval == 1 && newval == 0)
-    {
-//        printf("key off %x\n", (UINT8)(FPTR)param);
-        duart68681_rx_data(m_duart, 1, val&0x7f);
-        duart68681_rx_data(m_duart, 1, 0x00);
-    }
+
+	if (val < 0x60)
+	{
+		if (oldval == 0 && newval == 1)
+		{
+			if (val == 0 && shift > 0)
+			{
+				shift -= 32;
+				printf("New shift %d\n", shift);
+			}
+			else if (val == 1 && shift < 32)
+			{
+				shift += 32;
+				printf("New shift %d\n", shift);
+			}
+		}
+	}
+	else
+	{
+		val += shift;
+		if (oldval == 0 && newval == 1)
+		{
+			printf("key pressed %d\n", val-0x60);
+			duart68681_rx_data(m_duart, 1, val);
+			duart68681_rx_data(m_duart, 1, 0x00);
+		}
+		else if (oldval == 1 && newval == 0)
+		{
+	//        printf("key off %x\n", (UINT8)(FPTR)param);
+			duart68681_rx_data(m_duart, 1, val-0x60);
+			duart68681_rx_data(m_duart, 1, 0x00);
+		}
+	}
     #endif
 }
 #endif
@@ -738,6 +772,10 @@ static INPUT_PORTS_START( vfx )
     PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 0x9d)
     PORT_BIT(0x4000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 0x9e)
     PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 0x9f)
+
+    PORT_START("KEY2")
+    PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 0)
+    PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHANGED_MEMBER(DEVICE_SELF, esq5505_state, key_stroke, 1)
 #endif
 #endif
 INPUT_PORTS_END
