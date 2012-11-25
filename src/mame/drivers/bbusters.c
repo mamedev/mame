@@ -914,6 +914,62 @@ ROM_START( mechattu )
 	ROM_LOAD( "ma9.bin",       0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) ) /* identical to ma8 */
 ROM_END
 
+/* official SNK boards, but NOT using MaskROMs like the above sets */
+/* does Ver1 on the roms mean it's a revision, the first version, or used because it's the single player version? */
+ROM_START( mechattu1 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ma_ver1_u5_a8002-1.n12",   0x000000, 0x20000, CRC(dcd2e971) SHA1(e292b251c429b6990e97233e86360e5d43f573f2) )
+	ROM_LOAD16_BYTE( "ma_ver1_u4_a8002-1.l12",   0x000001, 0x20000, CRC(69c8a85b) SHA1(07c6d395772a5e096e3ac42c5248eadccc146ad1) )
+	ROM_LOAD16_BYTE( "ma_u7_a8002-1.n13",   0x040000, 0x20000, CRC(f45b2c70) SHA1(65523d202d378bab890f1f7bffdde152dd246d4a) ) // == ma7u.bin
+	ROM_LOAD16_BYTE( "ma_u6_a8002-1.l13",   0x040001, 0x20000, CRC(d5d68ce6) SHA1(16057d882781015f6d1c7bb659e0812a8459c3f0) ) // == ma6u.bin
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "ma3.bin",       0x000000, 0x10000, CRC(c06cc8e1) SHA1(65f5f1901120d633f7c3ba07432a188fd7fd7272) ) // == ma3.bin
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "ma_1_a8002-1.l2",       0x000000, 0x10000, CRC(24766917) SHA1(9082a8ae849605ce65b5a0493ae69cfe282f7e7b) ) // == ma1.bin
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "s_9_a8002-6.a1",   0x000000, 0x20000, CRC(6e8e194c) SHA1(02bbd573a322a3f7f8e92ccceebffdd598b5489e) ) // these 4 == mao89p13.bin
+	ROM_LOAD16_BYTE( "s_1_a8002-6.b1",   0x000001, 0x20000, CRC(fd9161ed) SHA1(b3e2434dd9cb1cafe1022774b863b5f1a008a9d2) )
+	ROM_LOAD16_BYTE( "s_10_a8002-6.a2",  0x040000, 0x20000, CRC(fad6a1ab) SHA1(5347b4493c8004dc8cedc0b37aba494f203142b8) )
+	ROM_LOAD16_BYTE( "s_2_a8002-6.b2",   0x040001, 0x20000, CRC(549056f0) SHA1(f515aa98ab25f3735dbfdefcb8d55ba3b2075b70) )
+	ROM_LOAD16_BYTE( "s_11_a8002-6.a3",  0x080000, 0x20000, CRC(3887a382) SHA1(b40861fc1414b2fa299772e76a78cb8dc00b71b7) ) // these 4 == ma189p15.bin
+	ROM_LOAD16_BYTE( "s_3_a8002-6.b3",   0x080001, 0x20000, CRC(cb99f565) SHA1(9ed1b21f4a33b9a614bca38610378857560cdaba) )
+	ROM_LOAD16_BYTE( "s_12_a8002-6.a4",  0x0c0000, 0x20000, CRC(63417b49) SHA1(786249fa7e8770de5b5882debdc2913d58e9170e) )
+	ROM_LOAD16_BYTE( "s_4_a8002-6.b4",   0x0c0001, 0x20000, CRC(d739d48a) SHA1(04d2ecea72b6e651b815865946c9c9cfae4e5c4d) )
+	ROM_LOAD16_BYTE( "s_13_a8002-6.a5",  0x100000, 0x20000, CRC(eccd47b6) SHA1(6b9c63fee97a7568114f227a89a1effd6b04806a) ) // these 4 == ma289p17.bin
+	ROM_LOAD16_BYTE( "s_5_a8002-6.b5",   0x100001, 0x20000, CRC(e15244da) SHA1(ebf3072565c53d0098d373b5093ba6918c4eddae) )
+	ROM_LOAD16_BYTE( "s_14_a8002-6.a6",  0x140000, 0x20000, CRC(bbbf0461) SHA1(c5299ab1d45f685a5d160492247cf1303ef6937a) )
+	ROM_LOAD16_BYTE( "s_6_a8002-6.b6",   0x140001, 0x20000, CRC(4ee89f75) SHA1(bda0e9095da2d424faac341fd934000a621796eb) )
+	ROM_LOAD16_BYTE( "s_15_a8002-6.a7",  0x180000, 0x20000, CRC(cde29bad) SHA1(24c1b43c6d717eaaf7c01ec7de89837947334224) ) // these 4 == ma389m15.bin
+	ROM_LOAD16_BYTE( "s_7_a8002-6.b7",   0x180001, 0x20000, CRC(065ed221) SHA1(c03ca5b4d1198939a57b5fccf6a79d70afe1faaf) ) 
+	ROM_LOAD16_BYTE( "s_16_a8002-6.a8",  0x1c0000, 0x20000, CRC(70f28040) SHA1(91012728953563fcc576725337e6ba7e1b49d1ba) )
+	ROM_LOAD16_BYTE( "s_8_a8002-6.b8",   0x1c0001, 0x20000, CRC(a6f8574f) SHA1(87c041669b2eaec495ae10a6f45b6668accb92bf) )
+
+	ROM_REGION( 0x10000, "gfx3", ROMREGION_ERASEFF )
+	/* Unused */
+
+	ROM_REGION( 0x80000, "gfx4", 0 ) // these 4 == mab189a2.bin
+	ROM_LOAD( "s_21_a8002-5.b3",  0x000000, 0x20000, CRC(701a0072) SHA1(b03b6fa18e0cfcd5c7c541025fa2d3632d2f8387) )
+	ROM_LOAD( "s_22_a8002-5.b4",  0x020000, 0x20000, CRC(34e6225c) SHA1(f6335084f4f4c7a4b6528e6ad74962b88f81e3bc) )
+	ROM_LOAD( "s_23_a8002-5.b5",  0x040000, 0x20000, CRC(9a7399d3) SHA1(04e0327b0da75f621b51e1831cbdc4537082e32b) )
+	ROM_LOAD( "s_24_a8002-5.b6",  0x060000, 0x20000, CRC(f097459d) SHA1(466364677f048519eb2894ddecf76f5c52f6afe9) )
+
+	ROM_REGION( 0x80000, "gfx5", 0 ) // these 4 == mab289c2.bin
+	ROM_LOAD( "s_17_a8002-5.a3",  0x000000, 0x20000, CRC(cc47c4a3) SHA1(140f53b671b4eaed6fcc516c4018f07a6d7c2290) )
+	ROM_LOAD( "s_18_a8002-5.a4",  0x020000, 0x20000, CRC(a04377e8) SHA1(841c6c3073b137f6a5c875db32039186c014f785) )
+	ROM_LOAD( "s_19_a8002-5.a5",  0x040000, 0x20000, CRC(b07f5289) SHA1(8817bd225edf9b0fa439b220617f925365e39253) )
+	ROM_LOAD( "s_20_a8002-5.a6",  0x060000, 0x20000, CRC(a9bb4fa9) SHA1(ccede784671a864667b92a8101d686c26c78d76f) )
+
+	ROM_REGION( 0x20000, "ymsnd", 0 )
+	ROM_LOAD( "ma_2_a8002-1.d10",       0x000000, 0x20000, CRC(ea4cc30d) SHA1(d8f089fc0ce76309411706a8110ad907f93dc97e) ) // == ma2.bin
+
+	ROM_REGION( 0x20000, "user1", 0 ) /* Zoom table */
+	ROM_LOAD( "ma_8_a8002-2.e10",       0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) ) // == ma8.bin / ma9.bin
+	ROM_LOAD( "ma_9_a8002-2.e12",       0x000000, 0x10000, CRC(61f3de03) SHA1(736f9634fe054ea68a2aa90a743bd0dc320f23c9) ) /* identical to ma8 */
+ROM_END
+
 
 /******************************************************************************/
 
@@ -923,3 +979,4 @@ GAME( 1989, bbustersu,bbusters, bbusters, bbusters, driver_device, 0, ROT0,  "SN
 
 GAME( 1989, mechatt,  0,        mechatt,  mechatt, driver_device,  0, ROT0,  "SNK", "Mechanized Attack (World)", 0 )
 GAME( 1989, mechattu, mechatt,  mechatt,  mechattu, driver_device, 0, ROT0,  "SNK", "Mechanized Attack (US)", 0 )
+GAME( 1989, mechattu1,mechatt,  mechatt,  mechattu, driver_device, 0, ROT0,  "SNK", "Mechanized Attack (US, Single Player)", 0 )

@@ -1264,25 +1264,28 @@ ROM_END
 
 ROM_START( rampage )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pro0rev3.3b",  0x00000, 0x8000, CRC(2f7ca03c) SHA1(1e3a1f213fd67938adf14ea0d04dab687ea8f4ef) )
-	ROM_LOAD( "pro1rev3.5b",  0x08000, 0x8000, CRC(d89bd9a4) SHA1(3531464ffe49dfaf2755d9e2dc1aea23819b3a5d) )
-	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
+	ROM_LOAD( "pro-0_3b_rev_3_8-27-86.3b", 0x00000, 0x8000, CRC(2f7ca03c) SHA1(1e3a1f213fd67938adf14ea0d04dab687ea8f4ef) )
+	ROM_LOAD( "pro-1_5b_rev_3_8-27-86.5b", 0x08000, 0x8000, CRC(d89bd9a4) SHA1(3531464ffe49dfaf2755d9e2dc1aea23819b3a5d) )
+	ROM_FILL(                              0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
 
 	ROM_REGION( 0x40000, "sg:cpu", 0 )  /* 256k for the Sounds Good board */
-	ROM_LOAD16_BYTE( "ramp_u7.snd",  0x00000, 0x8000, CRC(cffd7fa5) SHA1(7c5cecce1d428f847fea37d53eb09c6f62055c6f) )	/* these are Revision 2 sound ROMs */
-	ROM_LOAD16_BYTE( "ramp_u17.snd", 0x00001, 0x8000, CRC(e92c596b) SHA1(4e2d87398f2e7b637cbad6cb16d832dfa8f8288c) )
-	ROM_LOAD16_BYTE( "ramp_u8.snd",  0x10000, 0x8000, CRC(11f787e4) SHA1(1fa195bf9169608099d17be5801738a4e17bec3d) )
-	ROM_LOAD16_BYTE( "ramp_u18.snd", 0x10001, 0x8000, CRC(6b8bf5e1) SHA1(aa8c0260dcd19a795bfc23197cd87348a685d20b) )
+	ROM_LOAD16_BYTE( "u-7_rev.2_8-14-86.u7",   0x00000, 0x8000, CRC(cffd7fa5) SHA1(7c5cecce1d428f847fea37d53eb09c6f62055c6f) )	/* these are Revision 2 sound ROMs */
+	ROM_LOAD16_BYTE( "u-17_rev.2_8-14-86.u17", 0x00001, 0x8000, CRC(e92c596b) SHA1(4e2d87398f2e7b637cbad6cb16d832dfa8f8288c) )
+	ROM_LOAD16_BYTE( "u-8_rev.2_8-14-86.u8",   0x10000, 0x8000, CRC(11f787e4) SHA1(1fa195bf9169608099d17be5801738a4e17bec3d) )
+	ROM_LOAD16_BYTE( "u-18_rev.2_8-14-86.u18", 0x10001, 0x8000, CRC(6b8bf5e1) SHA1(aa8c0260dcd19a795bfc23197cd87348a685d20b) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "bg-0",         0x00000, 0x04000, CRC(c0d8b7a5) SHA1(692219388a3124fb48db7e35c4127b0fe066a289) )
-	ROM_LOAD( "bg-1",         0x04000, 0x04000, CRC(2f6e3aa1) SHA1(ae86ce90bb6bf660e38c0f91e7ce90d44be82d60) )
+	ROM_LOAD( "bg-0_u15_7-23-86.15a", 0x00000, 0x04000, CRC(c0d8b7a5) SHA1(692219388a3124fb48db7e35c4127b0fe066a289) )
+	ROM_LOAD( "bg-1_u14_7-23-86.14b", 0x04000, 0x04000, CRC(2f6e3aa1) SHA1(ae86ce90bb6bf660e38c0f91e7ce90d44be82d60) )
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "fg-0",         0x00000, 0x10000, CRC(0974be5d) SHA1(be347faaa345383dc6e5c2b3789c372d6bd25905) )
-	ROM_LOAD( "fg-1",         0x10000, 0x10000, CRC(8728532b) SHA1(327df92db7e3506b827d497859980cd2de51f45d) )
-	ROM_LOAD( "fg-2",         0x20000, 0x10000, CRC(9489f714) SHA1(df17a45cdc6a9310856d64f89954be79bbeac12e) )
-	ROM_LOAD( "fg-3",         0x30000, 0x10000, CRC(81e1de40) SHA1(7e7818792845ec3687b3202eeade60a298ef513e) )
+	ROM_LOAD( "fg-0_8-e_6-30-86.8e",  0x00000, 0x10000, CRC(0974be5d) SHA1(be347faaa345383dc6e5c2b3789c372d6bd25905) )
+	ROM_LOAD( "fg-1_6e_6-30-86.6e",   0x10000, 0x10000, CRC(8728532b) SHA1(327df92db7e3506b827d497859980cd2de51f45d) )
+	ROM_LOAD( "fg-2_5e_6-30-86.5e",   0x20000, 0x10000, CRC(9489f714) SHA1(df17a45cdc6a9310856d64f89954be79bbeac12e) )
+	ROM_LOAD( "fg-3_4e_6-30-86.4e",   0x30000, 0x10000, CRC(81e1de40) SHA1(7e7818792845ec3687b3202eeade60a298ef513e) )
+
+    ROM_REGION( 0x0001, "sg:pal", 0 ) /* Sounds Good board pal */
+	ROM_LOAD( "e36a31axnaxqd.u15.bin", 0x0000, 0x0001, NO_DUMP) /* PAL20L10CNS */
 ROM_END
 
 
@@ -1293,20 +1296,23 @@ ROM_START( rampage2 )
 	ROM_FILL(                 0x0e000, 0x2000, 0xff )	/* upper 8k is not mapped on monoboard */
 
 	ROM_REGION( 0x40000, "sg:cpu", 0 )  /* 256k for the Sounds Good board */
-	ROM_LOAD16_BYTE( "ramp_u7.snd",  0x00000, 0x8000, CRC(cffd7fa5) SHA1(7c5cecce1d428f847fea37d53eb09c6f62055c6f) )    /* these are Revision 2 sound ROMs */
-	ROM_LOAD16_BYTE( "ramp_u17.snd", 0x00001, 0x8000, CRC(e92c596b) SHA1(4e2d87398f2e7b637cbad6cb16d832dfa8f8288c) )
-	ROM_LOAD16_BYTE( "ramp_u8.snd",  0x10000, 0x8000, CRC(11f787e4) SHA1(1fa195bf9169608099d17be5801738a4e17bec3d) )
-	ROM_LOAD16_BYTE( "ramp_u18.snd", 0x10001, 0x8000, CRC(6b8bf5e1) SHA1(aa8c0260dcd19a795bfc23197cd87348a685d20b) )
+	ROM_LOAD16_BYTE( "u-7_rev.2_8-14-86.u7",   0x00000, 0x8000, CRC(cffd7fa5) SHA1(7c5cecce1d428f847fea37d53eb09c6f62055c6f) )	/* these are Revision 2 sound ROMs */
+	ROM_LOAD16_BYTE( "u-17_rev.2_8-14-86.u17", 0x00001, 0x8000, CRC(e92c596b) SHA1(4e2d87398f2e7b637cbad6cb16d832dfa8f8288c) )
+	ROM_LOAD16_BYTE( "u-8_rev.2_8-14-86.u8",   0x10000, 0x8000, CRC(11f787e4) SHA1(1fa195bf9169608099d17be5801738a4e17bec3d) )
+	ROM_LOAD16_BYTE( "u-18_rev.2_8-14-86.u18", 0x10001, 0x8000, CRC(6b8bf5e1) SHA1(aa8c0260dcd19a795bfc23197cd87348a685d20b) )
 
 	ROM_REGION( 0x08000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "bg-0",         0x00000, 0x04000, CRC(c0d8b7a5) SHA1(692219388a3124fb48db7e35c4127b0fe066a289) )
-	ROM_LOAD( "bg-1",         0x04000, 0x04000, CRC(2f6e3aa1) SHA1(ae86ce90bb6bf660e38c0f91e7ce90d44be82d60) )
+	ROM_LOAD( "bg-0.15a",     0x00000, 0x04000, CRC(c0d8b7a5) SHA1(692219388a3124fb48db7e35c4127b0fe066a289) )
+	ROM_LOAD( "bg-1.14b",     0x04000, 0x04000, CRC(2f6e3aa1) SHA1(ae86ce90bb6bf660e38c0f91e7ce90d44be82d60) )
 
 	ROM_REGION( 0x40000, "gfx2", 0 )
-	ROM_LOAD( "fg-0",         0x00000, 0x10000, CRC(0974be5d) SHA1(be347faaa345383dc6e5c2b3789c372d6bd25905) )
-	ROM_LOAD( "fg-1",         0x10000, 0x10000, CRC(8728532b) SHA1(327df92db7e3506b827d497859980cd2de51f45d) )
-	ROM_LOAD( "fg-2",         0x20000, 0x10000, CRC(9489f714) SHA1(df17a45cdc6a9310856d64f89954be79bbeac12e) )
-	ROM_LOAD( "fg-3",         0x30000, 0x10000, CRC(81e1de40) SHA1(7e7818792845ec3687b3202eeade60a298ef513e) )
+	ROM_LOAD( "fg-0.8e",      0x00000, 0x10000, CRC(0974be5d) SHA1(be347faaa345383dc6e5c2b3789c372d6bd25905) )
+	ROM_LOAD( "fg-1.6e",      0x10000, 0x10000, CRC(8728532b) SHA1(327df92db7e3506b827d497859980cd2de51f45d) )
+	ROM_LOAD( "fg-2.5e",      0x20000, 0x10000, CRC(9489f714) SHA1(df17a45cdc6a9310856d64f89954be79bbeac12e) )
+	ROM_LOAD( "fg-3.4e",      0x30000, 0x10000, CRC(81e1de40) SHA1(7e7818792845ec3687b3202eeade60a298ef513e) )
+
+    ROM_REGION( 0x0001, "sg:pal", 0 ) /* Sounds Good board pal */
+	ROM_LOAD( "e36a31axnaxqd.u15.bin", 0x0000, 0x0001, NO_DUMP) /* PAL20L10CNS */
 ROM_END
 
 
@@ -1635,8 +1641,8 @@ DRIVER_INIT_MEMBER(mcr3_state,turbotag)
 GAME( 1984, demoderm, demoderb, mono_tcs,  demoderm, mcr3_state, demoderm, ROT0,  "Bally Midway", "Demolition Derby (2-Player Mono Board Version)", GAME_SUPPORTS_SAVE )
 GAME( 1985, sarge,    0,        mono_tcs,  sarge, mcr3_state,    sarge,    ROT0,  "Bally Midway", "Sarge", GAME_SUPPORTS_SAVE )
 GAME( 1986, maxrpm,   0,        mono_tcs,  maxrpm, mcr3_state,   maxrpm,   ROT0,  "Bally Midway", "Max RPM (ver 2)", GAME_SUPPORTS_SAVE )
-GAME( 1986, rampage,  0,        mono_sg,   rampage, mcr3_state,  rampage,  ROT0,  "Bally Midway", "Rampage (ver 3 8-27-86)", GAME_SUPPORTS_SAVE )
-GAME( 1986, rampage2, rampage,  mono_sg,   rampage, mcr3_state,  rampage,  ROT0,  "Bally Midway", "Rampage (ver 2 8-4-86)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rampage,  0,        mono_sg,   rampage, mcr3_state,  rampage,  ROT0,  "Bally Midway", "Rampage (Rev 3, 8/27/86)", GAME_SUPPORTS_SAVE )
+GAME( 1986, rampage2, rampage,  mono_sg,   rampage, mcr3_state,  rampage,  ROT0,  "Bally Midway", "Rampage (Rev 2, 8/4/86)", GAME_SUPPORTS_SAVE )
 GAME( 1986, powerdrv, 0,        mono_sg,   powerdrv, mcr3_state, powerdrv, ROT0,  "Bally Midway", "Power Drive", GAME_SUPPORTS_SAVE )
 GAME( 1987, stargrds, 0,        mono_sg,   stargrds, mcr3_state, stargrds, ROT0,  "Bally Midway", "Star Guards", GAME_SUPPORTS_SAVE )
 

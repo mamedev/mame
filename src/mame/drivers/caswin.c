@@ -37,7 +37,31 @@ TODO:
     Main processor  - Z80
     Sound           - AY-3-8910
 
-    ---
+    ----------------------------------------
+    Casino Royal by Dyna Electronics CO. LTD
+    ----------------------------------------
+
+    PCB No. D-2608208A1-1 (Has angled corner cut on the pcb next to this identifier.)
+
+    Brief hardware overview
+    -----------------------
+
+    Xtal            - 6.000 MHz @ 13L
+    Main processor  - Z80A
+    Sound           - AY-3-8910
+
+    ----------------------------------------
+    Casino Royal by Dyna Electronics CO. LTD
+    ----------------------------------------
+
+    PCB No. D-2608208A1-1 (Labeled with Nagoya Japan)
+
+    Brief hardware overview
+    -----------------------
+
+    Xtal            - 6.000 MHz @ 2G
+    Main processor  - Z80A
+    Sound           - AY-3-8910
 
 *******************************************************************************************/
 
@@ -359,5 +383,41 @@ ROM_START( rcasino )
 	ROM_LOAD( "prom2.8e",  0x0020, 0x0020, CRC(2b5c7826) SHA1(c0de392aebd6982e5846c12aeb2e871358be60d7) )
 ROM_END
 
-GAME( 1984, rcasino, 0,        vvillage, vvillage, driver_device, 0, ROT270, "Dyna Electronics", "Royal Casino", GAME_IMPERFECT_GRAPHICS )
-GAME( 1985, caswin,  rcasino,  vvillage, vvillage, driver_device, 0, ROT270, "Aristocrat",  "Casino Winner", GAME_IMPERFECT_GRAPHICS )
+ROM_START( rcasino1 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mrdu1.f1",  0x0000, 0x2000, CRC(ed105d69) SHA1(951697e1050f72967f0710155aa8ff72db73fce1) )
+	ROM_LOAD( "mrdu2.f2",  0x2000, 0x2000, CRC(a1a80b33) SHA1(2f969713cae288de1985d7baa70cad50c4148970) )
+	ROM_LOAD( "mrdu3.f4",  0x4000, 0x1000, CRC(acf77a36) SHA1(599470e461a261130e942d174051648459f37a37) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "6.e11",     0x0000, 0x2000, CRC(b2dd4e1e) SHA1(323dcfb26653c17951db65ce2ced3325d35489e4) )
+	ROM_LOAD( "v7.e13",    0x2000, 0x1000, CRC(c7ff4ce3) SHA1(51d4bafddcaef355571bd32b16753b1cee54368d) )
+	ROM_LOAD( "h.e9",      0x3000, 0x2000, CRC(645c7cbf) SHA1(5790422b86a59531764233dd3c9488fdbad476bc) )
+	ROM_LOAD( "mrdu4.e10", 0x5000, 0x1000, CRC(7ca0e78c) SHA1(163cfd1f76ecbd14219146963d1abc4c09c0ac8c) )
+
+	ROM_REGION( 0x40, "proms", 0 )
+	ROM_LOAD( "v1.a11",    0x0000, 0x0020, CRC(93312432) SHA1(3c7abc165e6bc7e0c56ca97d89b0b5e06323b82e) ) /* TBP18S030 */
+	ROM_LOAD( "v2.a12",    0x0020, 0x0020, CRC(2b5c7826) SHA1(c0de392aebd6982e5846c12aeb2e871358be60d7) ) /* TBP18S030 */
+ROM_END
+
+ROM_START( rcasinoo )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mrdu1.b18", 0x0000, 0x2000, CRC(ed105d69) SHA1(951697e1050f72967f0710155aa8ff72db73fce1) )
+	ROM_LOAD( "mrdu2.b16", 0x2000, 0x2000, CRC(a1a80b33) SHA1(2f969713cae288de1985d7baa70cad50c4148970) )
+	ROM_LOAD( "mrdu3.b15", 0x4000, 0x1000, CRC(acf77a36) SHA1(599470e461a261130e942d174051648459f37a37) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "5.b8",      0x0000, 0x2000, CRC(b2dd4e1e) SHA1(323dcfb26653c17951db65ce2ced3325d35489e4) )
+	ROM_LOAD( "6.b6",      0x2000, 0x1000, CRC(c7ff4ce3) SHA1(51d4bafddcaef355571bd32b16753b1cee54368d) )
+	ROM_LOAD( "3.b9",      0x3000, 0x2000, CRC(81d20577) SHA1(50a1e0231400c106539ffa78deb3e0e6c8afc3f5) )
+	ROM_LOAD( "mrdu4.b11", 0x5000, 0x1000, CRC(7ca0e78c) SHA1(163cfd1f76ecbd14219146963d1abc4c09c0ac8c) )
+
+	ROM_REGION( 0x40, "proms", 0 )
+	ROM_LOAD( "prom2.e9",  0x0000, 0x0020, CRC(93312432) SHA1(3c7abc165e6bc7e0c56ca97d89b0b5e06323b82e) ) /* MB7051 */
+	ROM_LOAD( "prom1.e8",  0x0020, 0x0020, CRC(2b5c7826) SHA1(c0de392aebd6982e5846c12aeb2e871358be60d7) ) /* MB7051 */
+ROM_END
+
+GAME( 1984, rcasino,  0,       vvillage, vvillage, driver_device, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-2)",                GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasino1, rcasino, vvillage, vvillage, driver_device, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Larger Board)",  GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, rcasinoo, rcasino, vvillage, vvillage, driver_device, 0, ROT270, "Dyna Electronics", "Royal Casino (D-2608208A1-1, Smaller Board)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, caswin,   rcasino, vvillage, vvillage, driver_device, 0, ROT270, "Aristocrat",       "Casino Winner",                               GAME_IMPERFECT_GRAPHICS )

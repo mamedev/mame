@@ -2715,6 +2715,7 @@ spdball			// (c) 1985
 alienar			// (c) 1985 Duncan Brown
 alienaru		// (c) 1985 Duncan Brown
 mysticm			// (c) 1983
+mysticmp		// (c) 1983 Prototype
 tshoot			// (c) 1984
 inferno			// (c) 1984
 joust2			// (c) 1986
@@ -6948,6 +6949,7 @@ prehislek		// A8003 'GT' (c) 1989
 gensitou		// A8003 'GT' (c) 1989
 mechatt			// A8002 'MA' (c) 1989
 mechattu		// A8002 'MA' (c) 1989
+mechattu1		// A8002 'MA' (c) 1989
 bbusters		// A9003 'BB' (c) 1989
 bbustersu		// A9003 'BB' (c) 1989
 
@@ -9986,7 +9988,9 @@ poker41			// (c) 1983 Game-A-Tron
 pulltabs		// (c) 1983 Game-A-Tron
 
 vroulet			// (c) 1989 World Game
-rcasino			// (c) 1984 Dyna Electronics
+rcasino			// (c) 1984 Dyna Electronics (D-2608208A1-2)
+rcasino1		// (c) 1984 Dyna Electronics (D-2608208A1-1, Larger Board)
+rcasinoo		// (c) 1984 Dyna Electronics (D-2608208A1-1, Smaller Board)
 ampoker2		// (c) 1990 Novomatic
 piccolop		// (c) 1990 Admiral - Novomatic
 ampkr2b1		// 1990 bootleg
