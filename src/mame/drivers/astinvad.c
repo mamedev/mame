@@ -193,18 +193,27 @@ UINT32 astinvad_state::screen_update_astinvad(screen_device &screen, bitmap_rgb3
 UINT32 astinvad_state::screen_update_spaceint(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const UINT8 *color_prom = memregion("proms")->base();
-	int offs;
+	offs_t offs,n;
+	UINT8 x,y,data,color;
 
 	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
-		UINT8 data = m_videoram[offs];
-		UINT8 color = m_colorram[offs];
+		data = m_videoram[offs];
+		color = m_colorram[offs];
 
-		UINT8 y = ~offs;
-		UINT8 x = offs >> 8 << 3;
+		if (m_screen_flip)
+		{
+			y = offs;
+			x = ~offs >> 8 << 3;
+		}
+		else
+		{
+			y = ~offs;
+			x = offs >> 8 << 3;
+		}
 
 		/* this is almost certainly wrong */
-		offs_t n = ((offs >> 5) & 0xf0) | color;
+		n = ((offs >> 5) & 0xf0) | color;
 		color = color_prom[n] & 0x07;
 
 		plot_byte(machine(), bitmap, y, x, data, color);
@@ -592,8 +601,8 @@ static MACHINE_CONFIG_START( kamikaze, astinvad_state )
 	MCFG_CPU_PROGRAM_MAP(kamikaze_map)
 	MCFG_CPU_IO_MAP(kamikaze_portmap)
 
-	MCFG_MACHINE_START_OVERRIDE(astinvad_state,kamikaze)
-	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state,kamikaze)
+	MCFG_MACHINE_START_OVERRIDE(astinvad_state, kamikaze)
+	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state, kamikaze)
 
 	MCFG_I8255A_ADD( "ppi8255_0", ppi8255_0_intf )
 	MCFG_I8255A_ADD( "ppi8255_1", ppi8255_1_intf )
@@ -625,13 +634,13 @@ static MACHINE_CONFIG_START( spaceint, astinvad_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)        /* a guess */
 	MCFG_CPU_PROGRAM_MAP(spaceint_map)
 	MCFG_CPU_IO_MAP(spaceint_portmap)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", astinvad_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", astinvad_state, irq0_line_hold)
 
-	MCFG_MACHINE_START_OVERRIDE(astinvad_state,spaceint)
-	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state,spaceint)
+	MCFG_MACHINE_START_OVERRIDE(astinvad_state, spaceint)
+	MCFG_MACHINE_RESET_OVERRIDE(astinvad_state, spaceint)
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(astinvad_state,spaceint)
+	MCFG_VIDEO_START_OVERRIDE(astinvad_state, spaceint)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
@@ -761,9 +770,9 @@ DRIVER_INIT_MEMBER(astinvad_state,spcking2)
  *
  *************************************/
 
-GAME( 1979, kamikaze, 0,        kamikaze, kamikaze, astinvad_state, kamikaze, ROT270, "Leijac Corporation", "Kamikaze",      GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, astinvad, kamikaze, kamikaze, astinvad, astinvad_state, kamikaze, ROT270, "Leijac Corporation (Stern Electronics license)", "Astro Invader", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 19??, kosmokil, kamikaze, kamikaze, kamikaze, astinvad_state, kamikaze, ROT270, "bootleg",            "Kosmo Killer",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // says >BEM< Mi Italy but it looks hacked in, dif revision of game tho.
-GAME( 1979, spcking2, 0,        spcking2, spcking2, astinvad_state, spcking2, ROT270, "Konami",             "Space King 2",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, spaceint, 0,        spaceint, spaceint, driver_device, 0,        ROT90,  "Shoei",              "Space Intruder", GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1980, spaceintj,spaceint, spaceint, spaceintj, driver_device,0,        ROT90,  "Shoei",              "Space Intruder (Japan)", GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1979, kamikaze, 0,        kamikaze, kamikaze,  astinvad_state, kamikaze, ROT270, "Leijac Corporation", "Kamikaze", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, astinvad, kamikaze, kamikaze, astinvad,  astinvad_state, kamikaze, ROT270, "Leijac Corporation (Stern Electronics license)", "Astro Invader", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 19??, kosmokil, kamikaze, kamikaze, kamikaze,  astinvad_state, kamikaze, ROT270, "bootleg", "Kosmo Killer", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // says >BEM< Mi Italy but it looks hacked in, dif revision of game tho.
+GAME( 1979, spcking2, 0,        spcking2, spcking2,  astinvad_state, spcking2, ROT270, "Konami", "Space King 2", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, spaceint, 0,        spaceint, spaceint,  driver_device,  0,        ROT90,  "Shoei", "Space Intruder", GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1980, spaceintj,spaceint, spaceint, spaceintj, driver_device,  0,        ROT90,  "Shoei", "Space Intruder (Japan)", GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
