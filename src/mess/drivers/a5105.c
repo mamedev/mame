@@ -5,6 +5,7 @@
     12/05/2009 Skeleton driver.
 
     http://www.robotrontechnik.de/index.htm?/html/computer/a5105.htm
+    http://www.sax.de/~zander/bic/bic_bw.html
 
     - this looks like "somehow" inspired by the MSX1 machine?
 
@@ -37,16 +38,28 @@ class a5105_state : public driver_device
 public:
 	a5105_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_hgdc(*this, "upd7220"),
-	m_cass(*this, CASSETTE_TAG),
-	m_beep(*this, BEEPER_TAG),
-	m_video_ram(*this, "video_ram"){ }
+		  m_maincpu(*this, "maincpu"),
+		  m_hgdc(*this, "upd7220"),
+		  m_cass(*this, CASSETTE_TAG),
+		  m_beep(*this, BEEPER_TAG),
+		  m_fdc(*this, "upd765a"),
+		  m_floppy0(*this, "upd765a:0"),
+		  m_floppy1(*this, "upd765a:1"),
+		  m_floppy2(*this, "upd765a:2"),
+		  m_floppy3(*this, "upd765a:3"),
+		  m_video_ram(*this, "video_ram")
+		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7220_device> m_hgdc;
 	required_device<cassette_image_device> m_cass;
 	required_device<device_t> m_beep;
+	required_device<upd765a_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+
 	DECLARE_READ8_MEMBER(a5105_memsel_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(key_mux_r);
@@ -312,7 +325,12 @@ WRITE8_MEMBER( a5105_state::a5105_memsel_w )
 
 WRITE8_MEMBER( a5105_state::a5105_upd765_w )
 {
-	machine().device<upd765a_device>("upd765a")->tc_w(BIT(data, 4));
+	m_floppy0->get_device()->mon_w(!BIT(data,0));
+	m_floppy1->get_device()->mon_w(!BIT(data,1));
+	m_floppy2->get_device()->mon_w(!BIT(data,2));
+	m_floppy3->get_device()->mon_w(!BIT(data,3));
+
+	m_fdc->tc_w(BIT(data, 4));
 }
 
 static ADDRESS_MAP_START(a5105_io, AS_IO, 8, a5105_state)
@@ -526,7 +544,7 @@ FLOPPY_FORMATS_MEMBER( a5105_state::floppy_formats )
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( a5105_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
 static Z80CTC_INTERFACE( a5105_ctc_intf )
@@ -586,11 +604,11 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 
-	MCFG_UPD765A_ADD("upd765a", false, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", a5105_floppies, "525dd", 0, a5105_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", a5105_floppies, "525dd", 0, a5105_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", a5105_floppies, "525dd", 0, a5105_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765a:3", a5105_floppies, "525dd", 0, a5105_state::floppy_formats)
+	MCFG_UPD765A_ADD("upd765a", true, true)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:0", a5105_floppies, "525qd", 0, a5105_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:1", a5105_floppies, "525qd", 0, a5105_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:2", a5105_floppies, "525qd", 0, a5105_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765a:3", a5105_floppies, "525qd", 0, a5105_state::floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
