@@ -5,9 +5,8 @@
 
 #include "emu.h"
 #include "machine/tvcexp.h"
-#include "machine/wd17xx.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
+#include "machine/wd1772.h"
+#include "formats/tvc_dsk.h"
 
 
 //**************************************************************************
@@ -28,6 +27,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const rom_entry *device_rom_region() const;
 
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -43,7 +44,7 @@ protected:
 
 private:
 	// internal state
-	required_device<fd1793_device>	m_fdc;
+	required_device<fd1793_t>	m_fdc;
 
 	UINT8 *		m_rom;
 	UINT8 *		m_ram;

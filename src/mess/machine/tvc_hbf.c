@@ -12,39 +12,19 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-static LEGACY_FLOPPY_OPTIONS_START(tvc_hbf)
-	LEGACY_FLOPPY_OPTION(tvc_hbf, "img,dsk", "TVC DS disk image (720KB)", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(tvc_hbf, "img,dsk", "TVC SS disk image (360KB)", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
+FLOPPY_FORMATS_MEMBER( tvc_hbf_device::floppy_formats )
+	FLOPPY_TVC_FORMAT
+FLOPPY_FORMATS_END
 
-static const floppy_interface tvc_hbf_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(tvc_hbf),
-	"floppy_5_25",
-	NULL
-};
+static SLOT_INTERFACE_START( tvc_hbf_floppies )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
+SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT(tvc_hbf)
-	MCFG_FD1793_ADD("fdc", default_wd17xx_interface_2_drives)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(tvc_hbf_floppy_interface)
+	MCFG_FD1793x_ADD("fdc", XTAL_16MHz / 16 * 8)		// real clock is 16MHz / 16
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", tvc_hbf_floppies, "525qd", NULL, tvc_hbf_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", tvc_hbf_floppies, "525qd", NULL, tvc_hbf_device::floppy_formats)
 MACHINE_CONFIG_END
-
 
 ROM_START( tvc_hbf )
 	ROM_REGION(0x4000, "hbf", 0)
@@ -154,9 +134,9 @@ READ8_MEMBER(tvc_hbf_device::io_read)
 	switch((offset>>2) & 0x03)
 	{
 		case 0x00:
-			return wd17xx_r(m_fdc, space, offset & 3);
+			return m_fdc->read(space, offset & 3);
 		case 0x01:
-			return (wd17xx_drq_r(m_fdc)<<7) | wd17xx_intrq_r(m_fdc);
+			return (m_fdc->drq_r()<<7) | m_fdc->intrq_r();
 		default:
 			return 0x00;
 	}
@@ -171,22 +151,24 @@ WRITE8_MEMBER(tvc_hbf_device::io_write)
 	switch((offset>>2) & 0x03)
 	{
 		case 0x00:
-			wd17xx_w(m_fdc, space, offset & 3, data);
+			m_fdc->write(space, offset & 3, data);
 			break;
 		case 0x01:
+		{
 			// bit 0-3   drive select
 			// bit 5     DDEN
 			// bit 6     floppy motor
 			// bit 7     side select
-			if (BIT(data, 0))
-				wd17xx_set_drive(m_fdc, 0);
-			else if (BIT(data, 1))
-				wd17xx_set_drive(m_fdc, 1);
-			wd17xx_dden_w(m_fdc, BIT(data, 5));
-			floppy_mon_w(subdevice(FLOPPY_0), !BIT(data, 6));
-			floppy_mon_w(subdevice(FLOPPY_1), !BIT(data, 6));
-			wd17xx_set_side(m_fdc, BIT(data, 7));
+			floppy_image_device *floppy = NULL;
+
+			if (BIT(data, 0)) floppy = subdevice<floppy_connector>("fdc:0")->get_device();
+			if (BIT(data, 1)) floppy = subdevice<floppy_connector>("fdc:1")->get_device();
+			m_fdc->set_floppy(floppy);
+			m_fdc->dden_w(BIT(data, 5));
+			if (floppy) floppy->mon_w(!BIT(data, 6));
+			if (floppy) floppy->ss_w(BIT(data, 7));
 			break;
+		}
 		case 0x02:
 			m_rom_bank = (data>>4) & 0x03;
 			break;

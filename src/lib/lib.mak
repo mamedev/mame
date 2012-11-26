@@ -173,6 +173,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/trs_cas.o		\
 	$(LIBOBJ)/formats/trs_dsk.o		\
 	$(LIBOBJ)/formats/tvc_cas.o		\
+	$(LIBOBJ)/formats/tvc_dsk.o		\
 	$(LIBOBJ)/formats/tzx_cas.o		\
 	$(LIBOBJ)/formats/uef_cas.o		\
 	$(LIBOBJ)/formats/upd765_dsk.o	\
