@@ -66,7 +66,7 @@ WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_2_w)
 	if (rising_bits & 0x08) m_samples->start(4, 6);		/* FLEET */
 	if (rising_bits & 0x10) m_samples->start(3, 7);		/* SAUCER HIT */
 
-	m_c8080bw_flip_screen = data & 0x20;
+	m_c8080bw_flip_screen = BIT(data, 5) & BIT(ioport(CABINET_PORT_TAG)->read(), 0);
 
 	m_port_2_last_extra = data;
 }
@@ -153,7 +153,7 @@ WRITE8_MEMBER(_8080bw_state::lrescue_sh_port_2_w)
 	if (rising_bits & 0x10) m_samples->start(3, 6);		/* Shooting Star and Rescue Ship sounds */
 	if ((~data & 0x10) && (m_port_2_last_extra & 0x10)) m_samples->stop(3);	/* This makes the rescue ship sound beep on and off */
 
-	m_c8080bw_flip_screen = data & 0x20;
+	m_c8080bw_flip_screen = BIT(data, 5) & BIT(ioport(CABINET_PORT_TAG)->read(), 0);
 
 	m_port_2_last_extra = data;
 }
@@ -255,7 +255,7 @@ WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_2_w)
 	if (data & 0x04) m_samples->start(0, 4);		/* Plane is dropping new balloons at start of level */
 	if (rising_bits & 0x10) m_samples->start(2, 2);		/* Balloon hit and bomb drops */
 
-	m_c8080bw_flip_screen = data & 0x20;
+	m_c8080bw_flip_screen = BIT(data, 5) & BIT(ioport(CABINET_PORT_TAG)->read(), 0);
 
 	m_port_2_last_extra = data;
 }
@@ -683,7 +683,7 @@ WRITE8_MEMBER(_8080bw_state::polaris_sh_port_3_w)
 
 	coin_lockout_global_w(machine(), data & 0x04);  /* SX8 */
 
-	m_c8080bw_flip_screen = data & 0x20;		/* SX11 */
+	m_c8080bw_flip_screen = BIT(data, 5) & BIT(ioport(CABINET_PORT_TAG)->read(), 0); /* SX11 */
 
 	/* 0x01 - SX6 - Plane Down */
 	discrete_sound_w(m_discrete, space, POLARIS_SX6_EN, data & 0x01);
@@ -1146,7 +1146,7 @@ WRITE8_MEMBER(_8080bw_state::schasercv_sh_port_2_w)
 
 	machine().sound().system_enable(data & 0x10);
 
-	m_c8080bw_flip_screen = data & 0x20;
+	m_c8080bw_flip_screen = BIT(data, 5) & BIT(ioport(CABINET_PORT_TAG)->read(), 0);
 }
 
 
