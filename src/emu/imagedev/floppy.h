@@ -96,6 +96,7 @@ public:
 	bool trk00_r() { return cyl != 0 || !image; }
 	int idx_r() { return idx; }
 	bool ss_r() { return ss; }
+	bool twosid_r();
 
 	void stp_w(int state);
 	void dir_w(int state) { dir = state; }
@@ -252,6 +253,28 @@ protected:
 	virtual void setup_characteristics();
 };
 
+class floppy_525_sssd_35t : public floppy_image_device {
+public:
+	floppy_525_sssd_35t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~floppy_525_sssd_35t();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
+	virtual void device_config_complete() { m_shortname = "floppy_525_sssd_35t"; }
+	virtual const char *image_interface() const { return "floppy_5_25"; }
+protected:
+	virtual void setup_characteristics();
+};
+
+class floppy_525_sssd : public floppy_image_device {
+public:
+	floppy_525_sssd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~floppy_525_sssd();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
+	virtual void device_config_complete() { m_shortname = "floppy_525_sssd"; }
+	virtual const char *image_interface() const { return "floppy_5_25"; }
+protected:
+	virtual void setup_characteristics();
+};
+
 class floppy_525_ssdd : public floppy_image_device {
 public:
 	floppy_525_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -307,6 +330,17 @@ protected:
 	virtual void setup_characteristics();
 };
 
+class floppy_8_ssdd : public floppy_image_device {
+public:
+	floppy_8_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~floppy_8_ssdd();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
+	virtual void device_config_complete() { m_shortname = "floppy_8_ssdd"; }
+	virtual const char *image_interface() const { return "floppy_8"; }
+protected:
+	virtual void setup_characteristics();
+};
+
 class floppy_8_dsdd : public floppy_image_device {
 public:
 	floppy_8_dsdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -345,11 +379,14 @@ extern const device_type FLOPPY_35_DD;
 extern const device_type FLOPPY_35_DD_NOSD;
 extern const device_type FLOPPY_35_HD;
 extern const device_type FLOPPY_35_ED;
+extern const device_type FLOPPY_525_SSSD_35T;
+extern const device_type FLOPPY_525_SSSD;
 extern const device_type FLOPPY_525_SSDD;
 extern const device_type FLOPPY_525_DD;
 extern const device_type FLOPPY_525_QD;
 extern const device_type FLOPPY_525_HD;
 extern const device_type FLOPPY_8_SSSD;
+extern const device_type FLOPPY_8_SSDD;
 extern const device_type FLOPPY_8_DSDD;
 
 #endif /* FLOPPY_H */
