@@ -169,6 +169,12 @@ void esqvfd_t::update_display()
             {
                 UINT32 segdata = conv_segments(font[m_chars[row][col]]);
 
+				// force bottom bar on all underlined chars
+				if (m_attrs[row][col] & AT_UNDERLINE)
+				{
+					segdata |= 0x0008;
+				}
+
                 output_set_indexed_value("vfd", (row*m_cols) + col, segdata);
 
                 m_dirty[row][col] = 0;
@@ -190,6 +196,22 @@ machine_config_constructor esq2x40_t::device_mconfig_additions() const
 
 void esq2x40_t::write_char(int data)
 {
+	// ESQ-1 sends (cursor move) 0xfa 0xYY to mark YY characters as underlined at the current cursor location
+	if (m_lastchar == 0xfa)
+	{
+		for (int i = 0; i < data; i++)
+		{
+			m_attrs[m_cursy][m_cursx + i] |= AT_UNDERLINE;
+			m_dirty[m_cursy][m_cursx + i] = 1;
+		}
+
+		m_lastchar = 0;
+		update_display();
+		return;
+	}
+
+	m_lastchar = data;
+
     if ((data >= 0x80) && (data < 0xd0))
     {
         m_cursy = ((data & 0x7f) >= 40) ? 1 : 0;
@@ -203,9 +225,13 @@ void esq2x40_t::write_char(int data)
                 m_curattr = AT_BLINK;
                 break;
 
-            case 0xd1:  // blink stop
-                m_curattr &= ~AT_BLINK;
+            case 0xd1:  // blink stop (cancel all attribs on VFX+)
+                m_curattr = 0; //&= ~AT_BLINK;
                 break;
+
+			case 0xd3:	// start underline
+				m_curattr |= AT_UNDERLINE;
+				break;
 
             case 0xd6:  // clear screen
                 m_cursx = m_cursy = 0;
@@ -355,4 +381,3 @@ esq2x40_sq1_t::esq2x40_sq1_t(const machine_config &mconfig, const char *tag, dev
     m_cols = 40;
     m_Wait87Shift = false;
 }
-

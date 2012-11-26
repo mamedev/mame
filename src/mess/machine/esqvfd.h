@@ -48,6 +48,7 @@ protected:
     int m_cursx, m_cursy;
     int m_rows, m_cols;
     UINT8 m_curattr;
+	UINT8 m_lastchar;
     UINT8 m_chars[2][40];
     UINT8 m_attrs[2][40];
     UINT8 m_dirty[2][40];
