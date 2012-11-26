@@ -35,12 +35,14 @@
 
 #include "debugger.h"
 
+const device_type FD1771x = &device_creator<fd1771_t>;
+const device_type FD1793x = &device_creator<fd1793_t>;
+const device_type FD1797x = &device_creator<fd1797_t>;
+const device_type WD2793x = &device_creator<wd2793_t>;
+const device_type WD2797x = &device_creator<wd2797_t>;
 const device_type WD1770x = &device_creator<wd1770_t>;
 const device_type WD1772x = &device_creator<wd1772_t>;
 const device_type WD1773x = &device_creator<wd1773_t>;
-const device_type WD2793x = &device_creator<wd2793_t>;
-const device_type WD2797x = &device_creator<wd2797_t>;
-const device_type FD1793x = &device_creator<fd1793_t>;
 
 wd177x_t::wd177x_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, type, name, tag, owner, clock)
@@ -1861,6 +1863,26 @@ bool wd177x_t::has_precompensation() const
 	return false;
 }
 
+fd1771_t::fd1771_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd177x_t(mconfig, FD1771x, "FD1771", tag, owner, clock)
+{
+}
+
+fd1793_t::fd1793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd177x_t(mconfig, FD1793x, "FD1793", tag, owner, clock)
+{
+}
+
+fd1797_t::fd1797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd177x_t(mconfig, FD1797x, "FD1797", tag, owner, clock)
+{
+}
+
+wd2793_t::wd2793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd177x_t(mconfig, WD2793x, "WD2793", tag, owner, clock)
+{
+}
+
+wd2797_t::wd2797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd177x_t(mconfig, WD2797x, "WD2797", tag, owner, clock)
+{
+}
+
 wd1770_t::wd1770_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd177x_t(mconfig, WD1770x, "WD1770", tag, owner, clock)
 {
 }
@@ -1881,17 +1903,5 @@ int wd1772_t::settle_time() const
 }
 
 wd1773_t::wd1773_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd177x_t(mconfig, WD1773x, "WD1773", tag, owner, clock)
-{
-}
-
-wd2793_t::wd2793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd177x_t(mconfig, WD2793x, "WD2793", tag, owner, clock)
-{
-}
-
-wd2797_t::wd2797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd177x_t(mconfig, WD2797x, "WD2797", tag, owner, clock)
-{
-}
-
-fd1793_t::fd1793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd177x_t(mconfig, FD1793x, "FD1793", tag, owner, clock)
 {
 }

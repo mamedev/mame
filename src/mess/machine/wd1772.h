@@ -4,6 +4,21 @@
 #include "emu.h"
 #include "imagedev/floppy.h"
 
+#define MCFG_FD1771x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1771x, _clock)
+
+#define MCFG_FD1793x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1793x, _clock)
+
+#define MCFG_FD1797x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1797x, _clock)
+
+#define MCFG_WD2793x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, WD2793x, _clock)
+
+#define MCFG_WD2797x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, WD2797x, _clock)
+
 #define MCFG_WD1770x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, WD1770x, _clock)
 
@@ -12,15 +27,6 @@
 
 #define MCFG_WD1773x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, WD1773x, _clock)
-
-#define MCFG_WD2793x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, WD2793x, _clock)
-
-#define MCFG_WD2797x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, WD2797x, _clock)
-
-#define MCFG_FD1793x_ADD(_tag, _clock)  \
-	MCFG_DEVICE_ADD(_tag, FD1793x, _clock)
 
 class wd177x_t : public device_t {
 public:
@@ -326,6 +332,63 @@ private:
 	void set_drq();
 };
 
+class fd1771_t : public wd177x_t {
+public:
+	fd1771_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual bool has_ready() const { return true; }
+	virtual bool has_motor() const { return false; }
+	virtual bool has_head_load() const { return true; }
+	virtual bool has_side_check() const { return true; }
+};
+
+class fd1793_t : public wd177x_t {
+public:
+	fd1793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual bool has_ready() const { return true; }
+	virtual bool has_motor() const { return false; }
+	virtual bool has_head_load() const { return true; }
+	virtual bool has_side_check() const { return true; }
+};
+
+class fd1797_t : public wd177x_t {
+public:
+	fd1797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual bool has_ready() const { return true; }
+	virtual bool has_motor() const { return false; }
+	virtual bool has_head_load() const { return true; }
+	virtual bool has_side_select() const { return true; }
+	virtual bool has_sector_length_select() const { return true; }
+};
+
+class wd2793_t : public wd177x_t {
+public:
+	wd2793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual bool has_ready() const { return true; }
+	virtual bool has_motor() const { return false; }
+	virtual bool has_head_load() const { return true; }
+	virtual bool has_side_check() const { return true; }
+};
+
+class wd2797_t : public wd177x_t {
+public:
+	wd2797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual bool has_ready() const { return true; }
+	virtual bool has_motor() const { return false; }
+	virtual bool has_head_load() const { return true; }
+	virtual bool has_side_select() const { return true; }
+	virtual bool has_sector_length_select() const { return true; }
+};
+
 class wd1770_t : public wd177x_t {
 public:
 	wd1770_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -356,45 +419,13 @@ protected:
 	virtual bool has_side_check() const { return true; }
 };
 
-class wd2793_t : public wd177x_t {
-public:
-	wd2793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	virtual bool has_ready() const { return true; }
-	virtual bool has_motor() const { return false; }
-	virtual bool has_head_load() const { return true; }
-	virtual bool has_side_check() const { return true; }
-};
-
-class wd2797_t : public wd177x_t {
-public:
-	wd2797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	virtual bool has_ready() const { return true; }
-	virtual bool has_motor() const { return false; }
-	virtual bool has_head_load() const { return true; }
-	virtual bool has_side_select() const { return true; }
-	virtual bool has_sector_length_select() const { return true; }
-};
-
-class fd1793_t : public wd177x_t {
-public:
-	fd1793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	virtual bool has_ready() const { return true; }
-	virtual bool has_motor() const { return false; }
-	virtual bool has_head_load() const { return true; }
-	virtual bool has_side_check() const { return true; }
-};
-
+extern const device_type FD1771x;
+extern const device_type FD1793x;
+extern const device_type FD1797x;
+extern const device_type WD2793x;
+extern const device_type WD2797x;
 extern const device_type WD1770x;
 extern const device_type WD1772x;
 extern const device_type WD1773x;
-extern const device_type WD2793x;
-extern const device_type WD2797x;
-extern const device_type FD1793x;
 
 #endif
