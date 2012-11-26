@@ -10,10 +10,15 @@
 
     TODO:
 
+	- Xerox 820
+		- floppy (wd1772.c FM support)
     - Xerox 820-II
+    	- floppy (read/write to FDC triggers Z80 WAIT)
+		- Winchester
+			- Shugart SA1004 (chs=256,4,40 ss=256)
+			- Shugart SA606 (chs=160,6, ss=256)
+			- Shugart SA1403D controller
     - Xerox 16/8
-    - Big Board (+ Italian version MK-82)
-    - Big Board II (+ Italian version MK-83) (see bigbord2.c)
     - Emerald Microware X120 board
     - type in Monitor v1.0 from manual
     - proper keyboard emulation (MCU?)
@@ -28,20 +33,6 @@
 */
 
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/z80/z80daisy.h"
-#include "cpu/i86/i86.h"
-#include "formats/basicdsk.h"
-#include "imagedev/flopdrv.h"
-#include "machine/ram.h"
-#include "machine/z80pio.h"
-#include "machine/z80ctc.h"
-#include "machine/z80dart.h"
-#include "machine/wd17xx.h"
-#include "machine/com8116.h"
-#include "sound/speaker.h"
-#include "sound/beep.h"
 #include "includes/xerox820.h"
 
 /* Keyboard HACK */
@@ -206,12 +197,12 @@ WRITE8_MEMBER( xerox820_state::x120_system_w )
 
 WRITE8_MEMBER( xerox820ii_state::bell_w )
 {
-	speaker_level_w(m_speaker, offset );
+	speaker_level_w(m_speaker, offset);
 }
 
 WRITE8_MEMBER( xerox820ii_state::slden_w )
 {
-	wd17xx_dden_w(m_fdc, offset ? CLEAR_LINE : ASSERT_LINE);
+	m_fdc->dden_w(offset);
 }
 
 WRITE8_MEMBER( xerox820ii_state::chrom_w )
@@ -248,12 +239,12 @@ static ADDRESS_MAP_START( xerox820_io, AS_IO, 8, xerox820_state )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff03) AM_DEVWRITE(COM8116_TAG, com8116_device, str_w)
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff02) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_d_r, z80dart_d_w)
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0xff02) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_c_r, z80dart_c_w)
-	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80GPPIO_TAG, z80pio_device, read_alt, write_alt)
+	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80PIO_GP_TAG, z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff03) AM_DEVWRITE(COM8116_TAG, com8116_device, stt_w)
-	AM_RANGE(0x10, 0x13) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(FD1797_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0x10, 0x13) AM_MIRROR(0xff00) AM_DEVREADWRITE(FD1771_TAG, wd177x_t, read, write)
 	AM_RANGE(0x14, 0x14) AM_MIRROR(0xff03) AM_MASK(0xff00) AM_WRITE(scroll_w)
 	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80KBPIO_TAG, z80pio_device, read_alt, write_alt)
+	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80PIO_KB_TAG, z80pio_device, read_alt, write_alt)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xerox820ii_mem, AS_PROGRAM, 8, xerox820ii_state )
@@ -385,7 +376,7 @@ static INPUT_PORTS_START( xerox820 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RIGHT CTRL") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 INPUT_PORTS_END
 
-TIMER_CALLBACK_MEMBER(xerox820_state::bigboard_beepoff)
+TIMER_CALLBACK_MEMBER( bigboard_state::bigboard_beepoff )
 {
 	beep_set_state(m_beeper, 0);
 }
@@ -409,10 +400,19 @@ READ8_MEMBER( xerox820_state::kbpio_pa_r )
 
     */
 
-	return (m_dsdd << 5) | (m_8n5 << 4) | (m_kbpio->rdy_b() << 3);
+    UINT8 data = 0;
+
+    // keyboard
+	data |= m_kbpio->rdy_b() << 3;
+
+	// floppy
+	data |= m_8n5 << 4;
+	data |= m_400_460 << 5;
+
+	return data;
 };
 
-void xerox820_state::common_kbpio_pa_w(UINT8 data)
+WRITE8_MEMBER( xerox820_state::kbpio_pa_w )
 {
 	/*
 
@@ -420,7 +420,7 @@ void xerox820_state::common_kbpio_pa_w(UINT8 data)
 
         0       _DVSEL1         drive select 1
         1       _DVSEL2         drive select 2
-        2       _DVSEL3         side select
+        2       SIDE            side select
         3
         4
         5
@@ -430,47 +430,49 @@ void xerox820_state::common_kbpio_pa_w(UINT8 data)
     */
 
 	/* drive select */
-	int dvsel1 = BIT(data, 0);
-	int dvsel2 = BIT(data, 1);
+	floppy_image_device *floppy = NULL;
 
-	if (dvsel1) wd17xx_set_drive(m_fdc, 0);
-	if (dvsel2) wd17xx_set_drive(m_fdc, 1);
+	if (BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) floppy = m_floppy1->get_device();
 
-	floppy_mon_w(m_floppy0, !dvsel1);
-	floppy_mon_w(m_floppy1, !dvsel2);
+	m_fdc->set_floppy(floppy);
 
-	floppy_drive_set_ready_state(m_floppy0, dvsel1, 1);
-	floppy_drive_set_ready_state(m_floppy1, dvsel2, 1);
+	if (floppy)
+	{
+		int _8n5 = (floppy->get_form_factor() == floppy_image::FF_8);
 
-	/* side select */
-	wd17xx_set_side(m_fdc, BIT(data, 2));
+		if (m_8n5 != _8n5)
+		{
+			m_8n5 = _8n5;
+			
+			m_fdc->set_unscaled_clock((m_8n5 ? XTAL_20MHz/10 : XTAL_20MHz/20) *8);
+		}
+
+		m_400_460 = floppy->twosid_r();
+
+		floppy->mon_w(0);
+		
+		floppy->ss_w(BIT(data, 2));
+	}
 
 	/* display character set */
 	m_ncset2 = !BIT(data, 6);
-}
-
-WRITE8_MEMBER( xerox820_state::kbpio_pa_w )
-{
-	common_kbpio_pa_w(data);
 
 	/* bank switching */
 	bankswitch(BIT(data, 7));
+}
+
+WRITE8_MEMBER( bigboard_state::kbpio_pa_w )
+{
+	xerox820_state::kbpio_pa_w(space, offset, data);
 
 	/* beeper on bigboard */
 	if (BIT(data, 5) & (!m_bit5))
 	{
-		machine().scheduler().timer_set(attotime::from_msec(40), timer_expired_delegate(FUNC(xerox820_state::bigboard_beepoff),this));
-		beep_set_state(m_beeper, 1 );
+		machine().scheduler().timer_set(attotime::from_msec(40), timer_expired_delegate(FUNC(bigboard_state::bigboard_beepoff),this));
+		beep_set_state(m_beeper, 1);
 	}
 	m_bit5 = BIT(data, 5);
-}
-
-WRITE8_MEMBER( xerox820ii_state::kbpio_pa_w )
-{
-	common_kbpio_pa_w(data);
-
-	/* bank switching */
-	bankswitch(BIT(data, 7));
 }
 
 READ8_MEMBER( xerox820_state::kbpio_pb_r )
@@ -508,7 +510,7 @@ static Z80PIO_INTERFACE( xerox820ii_kbpio_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),		/* callback when change interrupt status */
 	DEVCB_DRIVER_MEMBER(xerox820_state, kbpio_pa_r),	/* port A read callback */
-	DEVCB_DRIVER_MEMBER(xerox820ii_state, kbpio_pa_w),	/* port A write callback */
+	DEVCB_DRIVER_MEMBER(xerox820_state, kbpio_pa_w),	/* port A write callback */
 	DEVCB_NULL,											/* portA ready active callback */
 	DEVCB_DRIVER_MEMBER(xerox820_state, kbpio_pb_r),	/* port B read callback */
 	DEVCB_NULL,											/* port B write callback */
@@ -523,6 +525,71 @@ static Z80PIO_INTERFACE( gppio_intf )
 	DEVCB_NULL,		/* portA ready active callback */
 	DEVCB_NULL,		/* port B read callback */
 	DEVCB_NULL,		/* port B write callback */
+	DEVCB_NULL		/* portB ready active callback */
+};
+
+READ8_MEMBER( xerox820ii_state::rdpio_pb_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       NBSY
+	    1       NMSG
+	    2       NC/D
+	    3       NREQ
+	    4       NI/O
+	    5       
+	    6       LS74 Q
+	    7       
+	
+	*/
+
+	UINT8 data = 0;
+
+	data |= !m_sasibus->scsi_bsy_r();
+	data |= !m_sasibus->scsi_msg_r() << 1;
+	data |= !m_sasibus->scsi_cd_r() << 2;
+	data |= !m_sasibus->scsi_req_r() << 3;
+	data |= !m_sasibus->scsi_io_r() << 4;
+
+	return data;
+}
+
+WRITE8_MEMBER( xerox820ii_state::rdpio_pb_w )
+{
+	/*
+	
+	    bit     description
+	
+	    0       
+	    1       
+	    2       
+	    3       
+	    4       
+	    5       NSEL
+	    6       
+	    7       NRST
+	
+	*/
+
+	m_sasibus->scsi_sel_w(!BIT(data, 5));
+	m_sasibus->scsi_rst_w(!BIT(data, 7));
+}
+
+WRITE_LINE_MEMBER( xerox820ii_state::rdpio_pardy_w )
+{
+	// TODO
+}
+
+static Z80PIO_INTERFACE( rdpio_intf )
+{
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
+	DEVCB_DEVICE_MEMBER(SASIBUS_TAG ":host", scsicb_device, scsi_data_r),	/* port A read callback */
+	DEVCB_DEVICE_MEMBER(SASIBUS_TAG ":host", scsicb_device, scsi_data_w),	/* port A write callback */
+	DEVCB_DRIVER_LINE_MEMBER(xerox820ii_state, rdpio_pardy_w),		/* portA ready active callback */
+	DEVCB_DRIVER_MEMBER(xerox820ii_state, rdpio_pb_r),		/* port B read callback */
+	DEVCB_DRIVER_MEMBER(xerox820ii_state, rdpio_pb_w),		/* port B write callback */
 	DEVCB_NULL		/* portB ready active callback */
 };
 
@@ -551,31 +618,18 @@ static Z80DART_INTERFACE( sio_intf )
 
 /* Z80 CTC */
 
-TIMER_DEVICE_CALLBACK_MEMBER(xerox820_state::ctc_tick)
+TIMER_DEVICE_CALLBACK_MEMBER( xerox820_state::ctc_tick )
 {
 	m_ctc->trg0(1);
 	m_ctc->trg0(0);
 }
 
-WRITE_LINE_MEMBER(xerox820_state::ctc_z0_w)
-{
-//  device_t *device = machine().device(Z80CTC_TAG);
-//  z80ctc_trg1_w(device, state);
-}
-
-WRITE_LINE_MEMBER(xerox820_state::ctc_z2_w)
-{
-//  device_t *device = machine().device(Z80CTC_TAG);
-
-//  z80ctc_trg3_w(device, state);
-}
-
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(xerox820_state,ctc_z0_w),		/* ZC/TO0 callback */
-	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg2),	/* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(xerox820_state,ctc_z2_w)		/* ZC/TO2 callback */
+	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg1),	/* ZC/TO0 callback */
+	DEVCB_NULL,	/* ZC/TO1 callback */
+	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg3)	/* ZC/TO2 callback */
 };
 
 /* Z80 Daisy Chain */
@@ -583,45 +637,44 @@ static Z80CTC_INTERFACE( ctc_intf )
 static const z80_daisy_config xerox820_daisy_chain[] =
 {
 	{ Z80SIO_TAG },
-	{ Z80KBPIO_TAG },
-	{ Z80GPPIO_TAG },
+	{ Z80PIO_KB_TAG },
+	{ Z80PIO_GP_TAG },
 	{ Z80CTC_TAG },
 	{ NULL }
 };
 
 /* WD1771 Interface */
 
-WRITE_LINE_MEMBER( xerox820_state::intrq_w )
-{
-	int halt = m_maincpu->state_int(Z80_HALT);
+static SLOT_INTERFACE_START( xerox820_floppies )
+	SLOT_INTERFACE( "sa400", FLOPPY_525_SSSD_35T ) // Shugart SA-400
+	SLOT_INTERFACE( "sa450", FLOPPY_525_DD ) // Shugart SA-450
+	SLOT_INTERFACE( "sa800", FLOPPY_8_SSDD ) // Shugart SA-800
+	SLOT_INTERFACE( "sa850", FLOPPY_8_DSDD ) // Shugart SA-850
+SLOT_INTERFACE_END
 
+void xerox820_state::fdc_intrq_w(bool state)
+{
 	m_fdc_irq = state;
 
-	if (halt && state)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	else
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER( xerox820_state::drq_w )
-{
 	int halt = m_maincpu->state_int(Z80_HALT);
 
-	m_fdc_drq = state;
-
-	if (halt && state)
+	if (halt && (m_fdc_irq || m_fdc_drq))
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	else
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static const wd17xx_interface fdc_intf =
+void xerox820_state::fdc_drq_w(bool state)
 {
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(xerox820_state, intrq_w),
-	DEVCB_DRIVER_LINE_MEMBER(xerox820_state, drq_w),
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
+	m_fdc_drq = state;
+
+	int halt = m_maincpu->state_int(Z80_HALT);
+
+	if (halt && (m_fdc_irq || m_fdc_drq))
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	else
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
 
 /* COM8116 Interface */
 
@@ -643,7 +696,7 @@ void xerox820_state::video_start()
 }
 
 
-UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=(m_scroll + 1) * 0x80,x;
@@ -656,7 +709,7 @@ UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			UINT32 *p = &bitmap.pix32(sy++);
 
 			for (x = ma; x < ma + 80; x++)
 			{
@@ -675,13 +728,13 @@ UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 					gfx = 0xff;
 
 			/* Display a scanline of a character (7 pixels) */
-			*p++ = 0;
-			*p++ = BIT(gfx, 4) ^ 1;
-			*p++ = BIT(gfx, 3) ^ 1;
-			*p++ = BIT(gfx, 2) ^ 1;
-			*p++ = BIT(gfx, 1) ^ 1;
-			*p++ = BIT(gfx, 0) ^ 1;
-			*p++ = 0;
+			*p++ = RGB_MONOCHROME_WHITE[0];
+			*p++ = RGB_MONOCHROME_WHITE[BIT(gfx, 4) ^ 1];
+			*p++ = RGB_MONOCHROME_WHITE[BIT(gfx, 3) ^ 1];
+			*p++ = RGB_MONOCHROME_WHITE[BIT(gfx, 2) ^ 1];
+			*p++ = RGB_MONOCHROME_WHITE[BIT(gfx, 1) ^ 1];
+			*p++ = RGB_MONOCHROME_WHITE[BIT(gfx, 0) ^ 1];
+			*p++ = RGB_MONOCHROME_WHITE[0];
 			}
 		}
 		ma+=128;
@@ -689,48 +742,15 @@ UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-void xerox820_state::set_floppy_parameters(size_t length)
-{
-	switch (length)
-	{
-	case 77*1*26*128: // 250K 8" SSSD
-		m_8n5 = 1;
-		m_dsdd = 0;
-		break;
-
-	case 77*1*26*256: // 500K 8" SSDD
-		m_8n5 = 1;
-		m_dsdd = 0;
-		break;
-
-	case 40*1*18*128: // 90K 5.25" SSSD
-		m_8n5 = 0;
-		m_dsdd = 0;
-		break;
-
-	case 40*2*18*128: // 180K 5.25" DSSD
-		m_8n5 = 0;
-		m_dsdd = 1;
-		break;
-	}
-}
-
-static void xerox820_load_proc(device_image_interface &image)
-{
-	xerox820_state *state = image.device().machine().driver_data<xerox820_state>();
-
-	state->set_floppy_parameters(image.length());
-}
-
 /* Machine Initialization */
 
 void xerox820_state::machine_start()
 {
-	// set floppy load procs
-	floppy_install_load_proc(m_floppy0, xerox820_load_proc);
-	floppy_install_load_proc(m_floppy1, xerox820_load_proc);
+	// floppy callbacks
+	m_fdc->setup_intrq_cb(wd177x_t::line_cb(FUNC(xerox820_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(wd177x_t::line_cb(FUNC(xerox820_state::fdc_drq_w), this));
 
-	/* register for state saving */
+	// state saving
 	save_item(NAME(m_keydata));
 	save_item(NAME(m_scroll));
 	save_item(NAME(m_ncset2));
@@ -738,22 +758,34 @@ void xerox820_state::machine_start()
 	save_item(NAME(m_fdc_irq));
 	save_item(NAME(m_fdc_drq));
 	save_item(NAME(m_8n5));
-	save_item(NAME(m_dsdd));
+	save_item(NAME(m_400_460));
 }
 
 void xerox820_state::machine_reset()
 {
 	bankswitch(1);
+
+	m_fdc->reset();
+}
+
+void bigboard_state::machine_reset()
+{
+	bankswitch(1);
+
 	/* bigboard has a one-pulse output to drive a user-supplied beeper */
 	beep_set_state(m_beeper, 0);
 	beep_set_frequency(m_beeper, 950);
+
+	m_fdc->reset();
 }
 
 void xerox820ii_state::machine_reset()
 {
 	bankswitch(1);
-}
 
+	m_fdc->reset();
+}
+/*
 static LEGACY_FLOPPY_OPTIONS_START( xerox820 )
 	LEGACY_FLOPPY_OPTION( sssd8, "dsk", "8\" SSSD", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
@@ -780,19 +812,7 @@ static LEGACY_FLOPPY_OPTIONS_START( xerox820 )
 		SECTOR_LENGTH([128])
 		FIRST_SECTOR_ID([1]))
 LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface xerox820_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(xerox820),
-	NULL,
-	NULL
-};
+*/
 
 /* F4 Character Displayer */
 static const gfx_layout xerox820_charlayout =
@@ -844,30 +864,34 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_SCREEN_UPDATE_DRIVER(xerox820_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
 	MCFG_GFXDECODE(xerox820)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
 
 	/* keyboard */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", xerox820_state, xerox820_keyboard_tick, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(XTAL_20MHz/8))
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* bigboard only */
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(XTAL_20MHz/8))
 
 	/* devices */
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_20MHz/8, sio_intf)
-	MCFG_Z80PIO_ADD(Z80KBPIO_TAG, XTAL_20MHz/8, xerox820_kbpio_intf)
-	MCFG_Z80PIO_ADD(Z80GPPIO_TAG, XTAL_20MHz/8, gppio_intf)
+	MCFG_Z80PIO_ADD(Z80PIO_KB_TAG, XTAL_20MHz/8, xerox820_kbpio_intf)
+	MCFG_Z80PIO_ADD(Z80PIO_GP_TAG, XTAL_20MHz/8, gppio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_20MHz/8, ctc_intf)
-	MCFG_FD1797_ADD(FD1797_TAG, fdc_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(xerox820_floppy_interface)
+	MCFG_FD1771x_ADD(FD1771_TAG, XTAL_20MHz/20 *8)
+	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", xerox820_floppies, "sa400", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":1", xerox820_floppies, "sa400", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
+
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "xerox820")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED_CLASS( bigboard, xerox820, bigboard_state )
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* bigboard only */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
@@ -882,30 +906,38 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_SCREEN_UPDATE_DRIVER(xerox820ii_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
 	MCFG_GFXDECODE(xerox820ii)
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
 
 	/* keyboard */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", xerox820_state, xerox820_keyboard_tick, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(XTAL_16MHz/4))
+	//MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", xerox820_state, ctc_tick, attotime::from_hz(XTAL_16MHz/4))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0) // xerox820ii and xerox168
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_16MHz/4, sio_intf)
-	MCFG_Z80PIO_ADD(Z80KBPIO_TAG, XTAL_16MHz/4, xerox820ii_kbpio_intf)
-	MCFG_Z80PIO_ADD(Z80GPPIO_TAG, XTAL_16MHz/4, gppio_intf)
+	MCFG_Z80PIO_ADD(Z80PIO_KB_TAG, XTAL_16MHz/4, xerox820ii_kbpio_intf)
+	MCFG_Z80PIO_ADD(Z80PIO_GP_TAG, XTAL_16MHz/4, gppio_intf)
+	MCFG_Z80PIO_ADD(Z80PIO_RD_TAG, XTAL_20MHz/8, rdpio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)
-	MCFG_FD1797_ADD(FD1797_TAG, fdc_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(xerox820_floppy_interface)
+	MCFG_FD1797x_ADD(FD1797_TAG, XTAL_16MHz/16*8)
+	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", xerox820_floppies, "sa450", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", xerox820_floppies, "sa450", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
+	
+	// SASI bus
+	MCFG_SCSIBUS_ADD(SASIBUS_TAG)
+	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", SA1403D, SCSI_ID_0)
+	MCFG_SCSICB_ADD(SASIBUS_TAG ":host")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
+
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "xerox820ii")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( xerox168, xerox820ii )
@@ -925,9 +957,17 @@ MACHINE_CONFIG_END
 
 /* ROMs */
 
-ROM_START( xerox820 )
-	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
+ROM_START( bigboard )
+	ROM_REGION( 0x1000, "monitor", 0 )
+	ROM_LOAD( "bigboard.u67", 0x0000, 0x0800, CRC(5a85a228) SHA1(d51a2cbd0aae80315bda9530275aabfe8305364e))
+	
+	ROM_REGION( 0x800, "chargen", 0 )
+	ROM_LOAD( "bigboard.u73", 0x0000, 0x0800, CRC(10bf0d81) SHA1(7ec73670a4d9d6421a5d6a4c4edc8b7c87923f6c) )
+ROM_END
 
+#define rom_mk82 rom_bigboard
+
+ROM_START( x820 )
 	ROM_REGION( 0x1000, "monitor", 0 )
 	ROM_DEFAULT_BIOS( "v20" )
 	ROM_SYSTEM_BIOS( 0, "v10", "Xerox Monitor v1.0" )
@@ -945,9 +985,12 @@ ROM_START( xerox820 )
 
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "x820.u92", 0x0000, 0x0800, CRC(b823fa98) SHA1(ad0ea346aa257a53ad5701f4201896a2b3a0f928) )
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD( "keyboard", 0x0000, 0x0800, NO_DUMP )
 ROM_END
 
-ROM_START( xerox820ii )
+ROM_START( x820ii )
 	ROM_REGION( 0x1800, "monitor", 0 )
 	ROM_DEFAULT_BIOS( "v404" )
 	ROM_SYSTEM_BIOS( 0, "v404", "Balcones Operating System v4.04" )
@@ -958,9 +1001,12 @@ ROM_START( xerox820ii )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9) )
 	ROM_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3) )
+
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD( "keyboard", 0x0000, 0x0800, NO_DUMP )
 ROM_END
 
-ROM_START( xerox168 )
+ROM_START( x168 )
 	ROM_REGION( 0x1800, "monitor", 0 )
 	ROM_DEFAULT_BIOS( "v404" )
 	ROM_SYSTEM_BIOS( 0, "v404", "Balcones Operating System v4.04" )
@@ -974,13 +1020,9 @@ ROM_START( xerox168 )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9) )
 	ROM_LOAD( "x820ii.u58", 0x0800, 0x0800, CRC(aca4b9b3) SHA1(77f41470b0151945b8d3c3a935fc66409e9157b3) )
-ROM_END
 
-ROM_START( bigboard )
-	ROM_REGION( 0x1000, "monitor", 0 )
-	ROM_LOAD( "bigboard.u67", 0x0000, 0x0800, CRC(5a85a228) SHA1(d51a2cbd0aae80315bda9530275aabfe8305364e))
-	ROM_REGION( 0x800, "chargen", 0 )
-	ROM_LOAD( "bigboard.u73", 0x0000, 0x0800, CRC(10bf0d81) SHA1(7ec73670a4d9d6421a5d6a4c4edc8b7c87923f6c) )
+	ROM_REGION( 0x800, "keyboard", 0 )
+	ROM_LOAD( "keyboard", 0x0000, 0x0800, NO_DUMP )
 ROM_END
 
 ROM_START( mk83 )
@@ -989,11 +1031,13 @@ ROM_START( mk83 )
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "2716mk83.bin", 0x0000, 0x0800, CRC(10bf0d81) SHA1(7ec73670a4d9d6421a5d6a4c4edc8b7c87923f6c))
 ROM_END
+
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME        FLAGS */
-COMP( 1981, xerox820,   0,          0,      xerox820,   xerox820, driver_device,   0,      "Xerox",                        "Xerox 820",    GAME_NO_SOUND_HW)
-COMP( 1983, xerox820ii, xerox820,   0,      xerox820ii, xerox820, driver_device,   0,      "Xerox",                        "Xerox 820-II", GAME_NOT_WORKING )
-COMP( 1983, xerox168,   xerox820,   0,      xerox168,   xerox820, driver_device,   0,      "Xerox",                        "Xerox 16/8",   GAME_NOT_WORKING )
-COMP( 1980, bigboard,   0,          0,      xerox820,   xerox820, driver_device,   0,      "Digital Research Computers",   "Big Board",    GAME_NOT_WORKING )
-COMP( 198?, mk83,       0,          0,      mk83,       xerox820, driver_device,   0,      "Scomar",                       "MK-83",        GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1980, bigboard,   0,          0,      bigboard,   xerox820, driver_device,   0,      "Digital Research Computers",   "Big Board",    	GAME_IMPERFECT_KEYBOARD )
+COMP( 1981, x820,   	bigboard,   0,      xerox820,   xerox820, driver_device,   0,      "Xerox",                        "Xerox 820",    	GAME_IMPERFECT_KEYBOARD | GAME_NO_SOUND_HW )
+COMP( 1982, mk82,   	bigboard,   0,      bigboard,   xerox820, driver_device,   0,      "Scomar",                       "MK-82",    		GAME_IMPERFECT_KEYBOARD )
+COMP( 1983, x820ii, 	0,   		0,      xerox820ii, xerox820, driver_device,   0,      "Xerox",                        "Xerox 820-II", 	GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
+COMP( 1983, x168,   	x820ii, 	0,      xerox168,   xerox820, driver_device,   0,      "Xerox",                        "Xerox 16/8",   	GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
+COMP( 1983, mk83,       x820ii, 	0,      mk83,       xerox820, driver_device,   0,      "Scomar",                       "MK-83",        	GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD | GAME_NO_SOUND_HW )
