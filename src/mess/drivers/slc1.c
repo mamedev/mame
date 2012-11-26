@@ -62,7 +62,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
 	UINT8 m_digit;

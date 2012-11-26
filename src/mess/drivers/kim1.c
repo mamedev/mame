@@ -111,7 +111,7 @@ public:
 	m_cass(*this, CASSETTE_TAG)
 	{ }
 
-	required_device<device_t> m_riot2;
+	required_device<mos6530_device> m_riot2;
 	required_device<cassette_image_device> m_cass;
 	DECLARE_READ8_MEMBER(kim1_u2_read_a);
 	DECLARE_WRITE8_MEMBER(kim1_u2_write_a);

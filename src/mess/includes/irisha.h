@@ -24,8 +24,8 @@ public:
 		  m_speaker(*this, SPEAKER_TAG)
 		{ }
 
-	required_device<device_t> m_pit;
-	required_device<device_t> m_speaker;
+	required_device<pit8253_device> m_pit;
+	required_device<speaker_sound_device> m_speaker;
 
 	int m_keyboard_mask;
 	UINT8 m_keypressed;

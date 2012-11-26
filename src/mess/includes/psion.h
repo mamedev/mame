@@ -50,7 +50,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 	required_device<datapack_device> m_pack1;
 	required_device<datapack_device> m_pack2;
 

@@ -70,10 +70,10 @@ public:
 	m_vram_bank(0)
 	{ }
 
-	required_device<device_t> m_pit_1;
-	required_device<device_t> m_pit_2;
-	required_device<device_t> m_pic_m;
-	required_device<device_t> m_pic_s;
+	required_device<pit8253_device> m_pit_1;
+	required_device<pit8253_device> m_pit_2;
+	required_device<pic8259_device> m_pic_m;
+	required_device<pic8259_device> m_pic_s;
 	required_device<upd7201_device> m_scc;
 	required_device<i8255_device> m_ppi;
 	required_device<i8237_device> m_dma_1;

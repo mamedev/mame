@@ -35,7 +35,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
-	required_device<device_t> m_fdc;
+	required_device<fd1793_device> m_fdc;
 	required_device<i8255_device> m_ppi;
 	required_device<i8255_device> m_ppi2;
 	required_device<ram_device> m_ram;

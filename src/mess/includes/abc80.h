@@ -77,7 +77,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
-	required_device<device_t> m_psg;
+	required_device<sn76477_device> m_psg;
 	required_device<cassette_image_device> m_cassette;
 	required_device<abcbus_slot_device> m_bus;
 	required_device<abc80_keyboard_device> m_kb;

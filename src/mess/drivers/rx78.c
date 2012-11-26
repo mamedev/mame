@@ -63,7 +63,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
-	required_device<device_t> m_wave;
+	required_device<wave_device> m_wave;
 	DECLARE_READ8_MEMBER( key_r );
 	DECLARE_READ8_MEMBER( rx78_f0_r );
 	DECLARE_READ8_MEMBER( rx78_vram_r );

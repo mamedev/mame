@@ -22,7 +22,7 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_start();

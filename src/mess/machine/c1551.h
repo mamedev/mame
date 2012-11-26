@@ -85,8 +85,8 @@ private:
 	bool tpi1_selected(offs_t offset);
 
 	required_device<m6510t_device> m_maincpu;
-	required_device<device_t> m_tpi0;
-	required_device<device_t> m_tpi1;
+	required_device<tpi6525_device> m_tpi0;
+	required_device<tpi6525_device> m_tpi1;
 	required_device<c64h156_device> m_ga;
 	required_device<pls100_device> m_pla;
 	required_device<legacy_floppy_image_device> m_image;

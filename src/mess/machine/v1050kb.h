@@ -73,7 +73,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 
 	UINT8 m_y;
 	int m_so;

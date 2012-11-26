@@ -29,7 +29,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_lsi;
+	required_device<mc68328_device> m_lsi;
 	required_device<dac_device> m_dac;
 	required_device<ram_device> m_ram;
 	// mc68328 needs modernising

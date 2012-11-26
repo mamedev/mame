@@ -37,8 +37,8 @@ public:
 		m_p_ram(*this, "p_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_crtc;
-	required_device<device_t> m_speaker;
+	required_device<vt100_video_device> m_crtc;
+	required_device<beep_device> m_speaker;
 	DECLARE_READ8_MEMBER(vt100_flags_r);
 	DECLARE_WRITE8_MEMBER(vt100_keyboard_w);
 	DECLARE_READ8_MEMBER(vt100_keyboard_r);

@@ -7,6 +7,9 @@
 #ifndef INTV_H_
 #define INTV_H_
 
+#include "sound/ay8910.h"
+#include "sound/sp0256.h"
+
 struct intv_sprite_type
 {
 	int visible;
@@ -41,9 +44,9 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_intellivoice;
-	required_device<device_t> m_sound;
-	optional_device<device_t> m_ecs_sound;
+	required_device<sp0256_device> m_intellivoice;
+	required_device<ay8914_device> m_sound;
+	optional_device<ay8914_device> m_ecs_sound;
 	optional_shared_ptr<UINT16> m_intvkbd_dualport_ram;
 	optional_shared_ptr<UINT8> m_videoram;
 

@@ -81,14 +81,14 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<am9517a_device> m_dmac;
-	required_device<device_t> m_pic;
-	required_device<device_t> m_pit;
+	required_device<pic8259_device> m_pic;
+	required_device<pit8253_device> m_pit;
 	required_device<mc146818_device> m_rtc;
 	required_device<pc_fdc_xt_device> m_fdc;
 	required_device<ins8250_device> m_uart;
 	required_device<ams40041_device> m_vdu;
 	required_device<centronics_device> m_centronics;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<pc1512_keyboard_device> m_kb;
 	required_device<ram_device> m_ram;
 	required_device<floppy_image_device> m_floppy0;

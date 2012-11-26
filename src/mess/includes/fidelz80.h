@@ -9,6 +9,9 @@
 #ifndef _FIDELZ80_H_
 #define _FIDELZ80_H_
 
+#include "sound/beep.h"
+#include "sound/s14001a.h"
+
 class fidelz80_state : public driver_device
 {
 public:
@@ -22,8 +25,8 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<device_t> m_speech;
-	optional_device<device_t> m_beep;
+	optional_device<s14001a_device> m_speech;
+	optional_device<beep_device> m_beep;
 	optional_device<cpu_device> m_i8041;
 	optional_device<i8243_device> m_i8243;
 

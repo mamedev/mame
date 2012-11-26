@@ -52,10 +52,10 @@ protected:
 
 	required_device<via6522_device> m_via1;
 	required_device<via6522_device> m_via2;
-    required_device<device_t> m_ay1;
-    required_device<device_t> m_ay2;
-    optional_device<device_t> m_ay3;
-    optional_device<device_t> m_ay4;
+    required_device<ay8913_device> m_ay1;
+    required_device<ay8913_device> m_ay2;
+    optional_device<ay8913_device> m_ay3;
+    optional_device<ay8913_device> m_ay4;
 
     bool m_isPhasor, m_PhasorNative;
 

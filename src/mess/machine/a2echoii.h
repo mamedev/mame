@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "machine/a2bus.h"
+#include "sound/tms5220.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -28,7 +29,7 @@ public:
     // optional information overrides
     virtual machine_config_constructor device_mconfig_additions() const;
 
-    required_device<device_t> m_tms;
+    required_device<tms5220_device> m_tms;
 
 protected:
     virtual void device_start();

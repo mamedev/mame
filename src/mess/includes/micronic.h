@@ -33,7 +33,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 	required_device<mc146818_device> m_rtc;
 	required_device<ram_device> m_ram;
 

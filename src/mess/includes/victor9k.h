@@ -61,15 +61,15 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fdc_cpu;
 	required_device<ieee488_device> m_ieee488;
-	required_device<device_t> m_pic;
+	required_device<pic8259_device> m_pic;
 	required_device<mc6852_device> m_ssda;
 	required_device<via6522_device> m_via1;
 	required_device<via6522_device> m_via2;
-	required_device<device_t> m_cvsd;
+	required_device<hc55516_device> m_cvsd;
 	required_device<mc6845_device> m_crtc;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_floppy0;
-	required_device<device_t> m_floppy1;
+	required_device<legacy_floppy_image_device> m_floppy0;
+	required_device<legacy_floppy_image_device> m_floppy1;
 	required_device<victor9k_keyboard_device> m_kb;
 
 	virtual void machine_start();

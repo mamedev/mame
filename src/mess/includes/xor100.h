@@ -3,7 +3,17 @@
 #ifndef __XOR100__
 #define __XOR100__
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "formats/basicdsk.h"
+#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
+#include "machine/com8116.h"
+#include "machine/ctronics.h"
+#include "machine/i8255.h"
+#include "machine/i8251.h"
+#include "machine/terminal.h"
+#include "machine/wd17xx.h"
 #include "machine/z80ctc.h"
 
 #define SCREEN_TAG		"screen"
@@ -35,12 +45,12 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
 	required_device<i8251_device> m_uart_b;
-	required_device<device_t> m_fdc;
+	required_device<fd1795_device> m_fdc;
 	required_device<z80ctc_device> m_ctc;
 	required_device<ram_device> m_ram;
 	required_device<generic_terminal_device> m_terminal;
-	required_device<device_t> m_floppy0;
-	required_device<device_t> m_floppy1;
+	required_device<legacy_floppy_image_device> m_floppy0;
+	required_device<legacy_floppy_image_device> m_floppy1;
 
 	virtual void machine_start();
 	virtual void machine_reset();

@@ -20,7 +20,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<serial_terminal_device> m_terminal;
 	required_device<cassette_image_device> m_cassette;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 
 	virtual void machine_start();
 

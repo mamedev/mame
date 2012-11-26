@@ -53,9 +53,9 @@ public:
 	required_device<z80ctc_device>m_ctc;
 	required_device<z80pio_device> m_pio;
 	required_device<mc6845_device> m_crtc;
-	required_device<device_t> m_fdc;
+	required_device<fd1791_device> m_fdc;
 	required_device<centronics_device> m_centronics;
-	required_device<device_t> m_floppy;
+	required_device<legacy_floppy_image_device> m_floppy;
 	required_device<ram_device> m_ram;
 	required_device<trs80m2_keyboard_device> m_kb;
 
@@ -124,7 +124,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_subcpu;
-	required_device<device_t> m_pic;
+	required_device<pic8259_device> m_pic;
 
 	virtual void machine_start();
 

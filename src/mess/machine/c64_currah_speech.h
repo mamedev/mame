@@ -49,7 +49,7 @@ protected:
 private:
 	inline void set_osc1(int voice, int intonation);
 
-	required_device<device_t> m_nsp;
+	required_device<sp0256_device> m_nsp;
 };
 
 

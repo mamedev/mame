@@ -57,23 +57,23 @@ public:
 		  m_floppy0(*this, I8272A_TAG ":0:525qd"),
 		  m_floppy1(*this, I8272A_TAG ":1:525qd"),
 		  m_kb(*this, TANDY2K_KEYBOARD_TAG),
-		  m_kbdclk(0)
-	,
-		m_hires_ram(*this, "hires_ram"),
-		m_char_ram(*this, "char_ram"){ }
+		  m_kbdclk(0),
+		  m_hires_ram(*this, "hires_ram"),
+		  m_char_ram(*this, "char_ram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
-	required_device<device_t> m_pit;
+	required_device<pit8253_device> m_pit;
 	required_device<i8272a_device> m_fdc;
-	required_device<device_t> m_pic0;
-	required_device<device_t> m_pic1;
+	required_device<pic8259_device> m_pic0;
+	required_device<pic8259_device> m_pic1;
 	required_device<crt9007_device> m_vpac;
 	required_device<crt9212_device> m_drb0;
 	required_device<crt9212_device> m_drb1;
 	required_device<crt9021_device> m_vac;
 	required_device<centronics_device> m_centronics;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;

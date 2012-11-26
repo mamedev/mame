@@ -31,7 +31,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER(term_r);
 	DECLARE_READ8_MEMBER(term_status_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);

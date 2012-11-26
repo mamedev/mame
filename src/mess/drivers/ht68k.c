@@ -48,7 +48,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	required_device<device_t> m_duart;
+	required_device<duart68681_device> m_duart;
 	required_device<wd1770_t> m_fdc;
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_WRITE_LINE_MEMBER(ht68k_fdc_intrq_w);

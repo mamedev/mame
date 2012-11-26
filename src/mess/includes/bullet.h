@@ -48,10 +48,10 @@ public:
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dart_device> m_dart;
 	required_device<z80dma_device> m_dmac;
-	required_device<device_t> m_fdc;
+	required_device<mb8877_device> m_fdc;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_floppy0;
-	required_device<device_t> m_floppy1;
+	required_device<legacy_floppy_image_device> m_floppy0;
+	required_device<legacy_floppy_image_device> m_floppy1;
 	required_device<serial_terminal_device> m_terminal;
 	required_device<centronics_device> m_centronics;
 

@@ -32,7 +32,7 @@ public:
 
 	required_device<lc8670_cpu_device> m_maincpu;
 	required_device<intelfsh8_device> m_flash;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 
 	virtual void palette_init();
 	virtual void machine_reset();

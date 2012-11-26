@@ -80,8 +80,8 @@ protected:
 	virtual void econet_clk(int state);
 
 	required_device<m65c02_device> m_maincpu;
-	required_device<device_t> m_fdc;
-	required_device<device_t> m_adlc;
+	required_device<wd2793_device> m_fdc;
+	required_device<mc6854_device> m_adlc;
 	required_device<mc146818_device> m_rtc;
 	required_device<ram_device> m_ram;
 	required_device<scsicb_device> m_scsibus;

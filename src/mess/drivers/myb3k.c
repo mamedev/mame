@@ -29,7 +29,7 @@ public:
 		m_p_vram(*this, "p_vram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_fdc;
+	required_device<mb8877_device> m_fdc;
 	required_device<mc6845_device> m_crtc;
 	DECLARE_WRITE8_MEMBER(myb3k_6845_address_w);
 	DECLARE_WRITE8_MEMBER(myb3k_6845_data_w);

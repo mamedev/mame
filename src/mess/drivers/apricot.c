@@ -44,13 +44,13 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_sn;
+	required_device<sn76489_device> m_sn;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8255_device> m_ppi;
-	required_device<device_t> m_pic;
-	required_device<device_t> m_pit;
-	required_device<device_t> m_z80sio;
-	required_device<device_t> m_fdc;
+	required_device<pic8259_device> m_pic;
+	required_device<pit8253_device> m_pit;
+	required_device<z80sio_device> m_z80sio;
+	required_device<wd2793_device> m_fdc;
 	DECLARE_READ8_MEMBER(apricot_sysctrl_r);
 	DECLARE_WRITE8_MEMBER(apricot_sysctrl_w);
 	DECLARE_WRITE_LINE_MEMBER(apricot_pit8253_out1);

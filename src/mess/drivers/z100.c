@@ -166,11 +166,11 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_pia0;
-	required_device<device_t> m_pia1;
-	required_device<device_t> m_picm;
-	required_device<device_t> m_pics;
-	required_device<device_t> m_fdc;
+	required_device<pia6821_device> m_pia0;
+	required_device<pia6821_device> m_pia1;
+	required_device<pic8259_device> m_picm;
+	required_device<pic8259_device> m_pics;
+	required_device<fd1797_device> m_fdc;
 	required_device<mc6845_device> m_crtc;
 	DECLARE_READ8_MEMBER(z100_vram_r);
 	DECLARE_WRITE8_MEMBER(z100_vram_w);

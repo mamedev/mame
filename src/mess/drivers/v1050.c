@@ -106,10 +106,6 @@ Notes:
 */
 
 #include "includes/v1050.h"
-#include "machine/scsibus.h"
-#include "machine/scsicb.h"
-#include "machine/scsihd.h"
-#include "machine/s1410.h"
 
 void v1050_state::set_interrupt(UINT8 mask, int state)
 {
@@ -1091,7 +1087,7 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_I8255A_ADD(I8255A_M6502_TAG, m6502_ppi_intf)
 	MCFG_I8251_ADD(I8251A_KB_TAG, /*XTAL_16MHz/8,*/ kb_8251_intf)
 	MCFG_I8251_ADD(I8251A_SIO_TAG, /*XTAL_16MHz/8,*/ sio_8251_intf)
-	MCFG_FD1793x_ADD(MB8877_TAG, XTAL_16MHz/2)
+	MCFG_FD1793x_ADD(MB8877_TAG, XTAL_16MHz/16 *8)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", v1050_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", v1050_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", v1050_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)

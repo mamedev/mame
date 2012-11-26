@@ -55,7 +55,7 @@ public:
 	required_device<mc6847_base_device> m_vdg;
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 
 	virtual void machine_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

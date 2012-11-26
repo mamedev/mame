@@ -95,7 +95,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dma_device> m_dma;
-	required_device<device_t> m_fdc;
+	required_device<fd1793_device> m_fdc;
 	required_device<legacy_floppy_image_device> m_image0;
 	required_device<legacy_floppy_image_device> m_image1;
 

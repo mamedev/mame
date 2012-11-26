@@ -35,7 +35,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 	DECLARE_READ8_MEMBER(lx800_porta_r);
 	DECLARE_WRITE8_MEMBER(lx800_porta_w);
 	DECLARE_READ8_MEMBER(lx800_portc_r);

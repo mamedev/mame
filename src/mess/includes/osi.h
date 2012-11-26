@@ -34,12 +34,13 @@ public:
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_discrete(*this, DISCRETE_TAG),
 		  m_ram(*this, RAM_TAG),
-		m_video_ram(*this, "video_ram"),
-		m_color_ram(*this, "color_ram"){ }
+		  m_video_ram(*this, "video_ram"),
+		  m_color_ram(*this, "color_ram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
-	optional_device<device_t> m_discrete;
+	optional_device<discrete_sound_device> m_discrete;
 	required_device<ram_device> m_ram;
 
 	virtual void machine_start();
@@ -76,7 +77,7 @@ public:
 		  m_beep(*this, BEEPER_TAG)
 	{ }
 
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 
 	virtual void machine_start();
 
@@ -93,7 +94,7 @@ public:
 		  m_floppy(*this, FLOPPY_0)
 	{ }
 
-	required_device<device_t> m_floppy;
+	required_device<legacy_floppy_image_device> m_floppy;
 
 	virtual void machine_start();
 

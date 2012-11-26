@@ -65,8 +65,8 @@ public:
     required_device<i8251_device> m_kbdi8251;
     required_device<i8251_device> m_ttyi8251;
     required_device<i8255_device> m_i8255;
-    required_device<device_t> m_i8259;
-    required_device<device_t> m_wd177x;
+    required_device<pic8259_device> m_i8259;
+    required_device<fd1797_device> m_wd177x;
 
 	required_shared_ptr<UINT16> m_p_videoram;
 

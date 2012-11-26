@@ -73,7 +73,7 @@ public:
 	bool m_cb2;
 	bool m_nmi;
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_pia;
+	required_device<pia6821_device> m_pia;
 	required_shared_ptr<UINT8> m_p_nvram;
 	virtual void machine_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_cb1);

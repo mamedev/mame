@@ -77,7 +77,7 @@ public:
 	DECLARE_WRITE8_MEMBER(floppy_w);
 	DECLARE_READ8_MEMBER(floppy_r);
 	UINT8 selectedline(UINT16 data);
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;
 	DECLARE_DRIVER_INIT(pyl601);

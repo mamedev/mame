@@ -55,17 +55,17 @@ public:
 		  m_sio(*this, MK3887N4_TAG),
 		  m_pic(*this, P8259A_TAG),
 		  m_pit0(*this, P8253_5_0_TAG),
-		  m_pit1(*this, P8253_5_1_TAG)
-	,
-		m_video_ram(*this, "video_ram"){ }
+		  m_pit1(*this, P8253_5_1_TAG),
+		  m_video_ram(*this, "video_ram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_fdccpu;
 	required_device<z80dart_device> m_sio;
-	required_device<device_t> m_pic;
-	required_device<device_t> m_pit0;
-	required_device<device_t> m_pit1;
+	required_device<pic8259_device> m_pic;
+	required_device<pit8253_device> m_pit0;
+	required_device<pit8253_device> m_pit1;
 
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

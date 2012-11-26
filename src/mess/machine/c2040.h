@@ -102,7 +102,7 @@ protected:
 	required_device<m6504_device> m_fdccpu;
 	required_device<riot6532_device> m_riot0;
 	required_device<riot6532_device> m_riot1;
-	required_device<device_t> m_miot;
+	required_device<mos6530_device> m_miot;
 	required_device<via6522_device> m_via;
 	required_device<legacy_floppy_image_device> m_image0;
 	optional_device<legacy_floppy_image_device> m_image1;

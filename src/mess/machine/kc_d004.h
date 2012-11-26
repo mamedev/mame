@@ -103,7 +103,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gide_w);
 
 private:
-	required_device<device_t> m_ide;
+	required_device<ide_controller_device> m_ide;
 
 	UINT16				m_ide_data;
 	int 				m_lh;

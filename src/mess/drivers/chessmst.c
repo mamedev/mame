@@ -24,7 +24,7 @@ public:
 		  m_speaker(*this, SPEAKER_TAG)
 		{ }
 
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 
 	UINT16 m_matrix;
 	UINT16 m_led_sel;

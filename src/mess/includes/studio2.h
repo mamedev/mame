@@ -29,7 +29,7 @@ public:
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
-	required_device<device_t> m_speaker;
+	required_device<beep_device> m_speaker;
 	optional_device<cdp1861_device> m_vdc;
 
 	virtual void machine_start();

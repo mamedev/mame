@@ -32,19 +32,19 @@ public:
 		  m_srq(1),
 		  m_atn(1),
 		  m_rxrdy(0),
-		  m_txrdy(0)
-	,
-		m_video_ram(*this, "video_ram"){ }
+		  m_txrdy(0),
+		  m_video_ram(*this, "video_ram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_fdc;
-	required_device<device_t> m_io_i8155;
+	required_device<fd1797_device> m_fdc;
+	required_device<i8155_device> m_io_i8155;
 	required_device<i8251_device> m_usart;
-	required_device<device_t> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 	required_device<ieee488_device> m_ieee488;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_floppy0;
-	required_device<device_t> m_floppy1;
+	required_device<legacy_floppy_image_device> m_floppy0;
+	required_device<legacy_floppy_image_device> m_floppy1;
 
 	virtual void machine_start();
 	virtual void machine_reset();

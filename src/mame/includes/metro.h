@@ -40,7 +40,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<okim6295_device> m_oki;
-	optional_device<device_t> m_ymsnd;
+	optional_device<ym2151_device> m_ymsnd;
 	optional_device<k053936_device> m_k053936;
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_vram_0;

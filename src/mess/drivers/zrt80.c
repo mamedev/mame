@@ -36,7 +36,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<ins8250_device> m_8250;
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 	DECLARE_READ8_MEMBER(zrt80_10_r);
 	DECLARE_WRITE8_MEMBER(zrt80_30_w);
 	DECLARE_WRITE8_MEMBER(zrt80_38_w);

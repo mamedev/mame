@@ -61,7 +61,7 @@ protected:
 
 private:
 	// internal state
-	required_device<device_t> m_fdc;
+	required_device<mb8866_device> m_fdc;
 	required_device<com8116_device> m_dbrg;
 	device_t* m_floppy0;
 	device_t* m_floppy1;

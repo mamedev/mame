@@ -54,7 +54,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<UINT8> m_videoram;
 	virtual void palette_init();

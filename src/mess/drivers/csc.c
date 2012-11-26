@@ -28,7 +28,7 @@ public:
 		  m_speech(*this, "speech")
 		{ }
 
-	required_device<device_t> m_speech;
+	required_device<s14001a_device> m_speech;
 
 	virtual void machine_start();
 

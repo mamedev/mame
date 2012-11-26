@@ -56,8 +56,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dart_device> m_sio;
-	required_device<device_t> m_fdc;
-	required_device<device_t> m_floppy0;
+	required_device<wd2797_device> m_fdc;
+	required_device<legacy_floppy_image_device> m_floppy0;
 	required_device<centronics_device> m_centronics;
 	int m_ctc_int;
 	int m_sio_int;

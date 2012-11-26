@@ -136,8 +136,8 @@ public:
         m_vfd(*this, "vfd")
     { }
 
-    required_device<device_t> m_maincpu;
-    required_device<device_t> m_duart;
+    required_device<cpu_device> m_maincpu;
+    required_device<duart68681_device> m_duart;
     optional_device<wd1772_t> m_fdc;
     optional_device<esq2x40_t> m_vfd;
 

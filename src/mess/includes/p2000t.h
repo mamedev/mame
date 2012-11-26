@@ -24,7 +24,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	DECLARE_READ8_MEMBER(p2000t_port_000f_r);
 	DECLARE_READ8_MEMBER(p2000t_port_202f_r);
 	DECLARE_WRITE8_MEMBER(p2000t_port_101f_w);

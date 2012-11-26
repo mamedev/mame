@@ -8,9 +8,6 @@
 *********************************************************************/
 
 #include "abc_xebec.h"
-#include "machine/scsibus.h"
-#include "machine/scsicb.h"
-#include "machine/scsihd.h"
 
 
 

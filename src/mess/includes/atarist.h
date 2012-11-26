@@ -77,7 +77,6 @@ public:
 		  m_fdc(*this, WD1772_TAG),
 		  m_mfp(*this, MC68901_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
-		  //m_rs232(*this, RS232_TAG),
 		  m_ram(*this, RAM_TAG),
 		  m_acia_ikbd_irq(1),
 		  m_acia_midi_irq(1),
@@ -93,7 +92,6 @@ public:
 	required_device<wd1772_t> m_fdc;
 	required_device<mc68901_device> m_mfp;
 	required_device<centronics_device> m_centronics;
-	//required_device<device_t> m_rs232;
 	required_device<ram_device> m_ram;
 
 	void machine_start();

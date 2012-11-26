@@ -41,17 +41,17 @@ public:
 		m_fdc(*this, "fdc"),
 		m_ppi(*this, "ppi8255_2"),
 		m_floppy0(*this, FLOPPY_0),
-		m_floppy1(*this, FLOPPY_1)
-	,
-		m_vram(*this, "vram"){ }
+		m_floppy1(*this, FLOPPY_1),
+		m_vram(*this, "vram")
+	{ }
 
 	virtual void machine_start();
 
 	required_device<mc6845_device> m_6845;
-	required_device<device_t> m_fdc;
+	required_device<mb8876_device> m_fdc;
 	required_device<i8255_device> m_ppi;
-	required_device<device_t> m_floppy0;
-	required_device<device_t> m_floppy1;
+	required_device<legacy_floppy_image_device> m_floppy0;
+	required_device<legacy_floppy_image_device> m_floppy1;
 
 	DECLARE_READ8_MEMBER(from_master_r);
 	DECLARE_WRITE8_MEMBER(porta_w);

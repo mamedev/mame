@@ -77,9 +77,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<am9517a_device> m_dmac;
-	required_device<device_t> m_pic;
+	required_device<pic8259_device> m_pic;
 	required_device<i8255_device> m_ppi;
-	required_device<device_t> m_pit;
+	required_device<pit8253_device> m_pit;
 	required_device<im6402_device> m_uart;
 	required_device<mc2661_device> m_epci;
 	required_device<upd765a_device> m_fdc;

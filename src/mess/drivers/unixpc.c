@@ -30,15 +30,14 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_ram(*this, RAM_TAG),
 		  m_wd2797(*this, "wd2797"),
-		  m_floppy(*this, FLOPPY_0)
-	,
-		m_mapram(*this, "mapram"),
-		m_videoram(*this, "videoram"){ }
+		  m_floppy(*this, FLOPPY_0),
+		  m_mapram(*this, "mapram"),
+		  m_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_wd2797;
-	required_device<device_t> m_floppy;
+	required_device<wd2797_device> m_wd2797;
+	required_device<legacy_floppy_image_device> m_floppy;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

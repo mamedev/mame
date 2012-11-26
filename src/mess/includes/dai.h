@@ -58,7 +58,7 @@ public:
 		  m_sound(*this, "custom")
 		{ }
 
-	required_device<device_t> m_pit;
+	required_device<pit8253_device> m_pit;
 	required_device<tms5501_device> m_tms5501;
 	required_device<dai_sound_device> m_sound;
 

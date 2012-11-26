@@ -5,6 +5,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "video/mc6845.h"
 #include "video/mc6847.h"
 #include "sound/ay8910.h"
 #include "machine/ctronics.h"
@@ -31,14 +32,14 @@ public:
 		  m_crtc(*this, MC6845_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
-		  m_ram(*this, RAM_TAG)
-	,
-		m_mc6845_video_ram(*this, "mc6845_vram"),
-		m_mc6847_video_ram(*this, "mc6847_vram"){ }
+		  m_ram(*this, RAM_TAG),
+		  m_mc6845_video_ram(*this, "mc6845_vram"),
+		  m_mc6847_video_ram(*this, "mc6847_vram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
-	optional_device<device_t> m_crtc;
+	optional_device<mc6845_device> m_crtc;
 	required_device<centronics_device> m_centronics;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;

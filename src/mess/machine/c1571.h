@@ -107,7 +107,7 @@ protected:
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	required_device<mos6526_device> m_cia;
-	required_device<device_t> m_fdc;
+	required_device<wd1770_device> m_fdc;
 	required_device<c64h156_device> m_ga;
 	required_device<legacy_floppy_image_device> m_image;
 

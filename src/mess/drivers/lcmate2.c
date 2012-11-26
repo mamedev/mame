@@ -50,7 +50,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 	required_device<rp5c15_device> m_rtc;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 
 	virtual void machine_start();
 

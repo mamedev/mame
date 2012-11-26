@@ -52,7 +52,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	UINT8 m_framecnt;
-	required_device<device_t> m_beeper;
+	required_device<beep_device> m_beeper;
 	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<const UINT8> m_p_colorram;
 	required_shared_ptr<const UINT8> m_p_videoram;

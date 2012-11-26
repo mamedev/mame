@@ -66,7 +66,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 	fujitsu_29dl16x_device *m_flash[4];
 
 	UINT8 m_bank[4];

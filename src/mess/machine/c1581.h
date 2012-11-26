@@ -80,7 +80,7 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6526_device> m_cia;
-	required_device<device_t> m_fdc;
+	required_device<wd1770_device> m_fdc;
 	required_device<legacy_floppy_image_device> m_image;
 
 	int m_data_out;				// serial data out

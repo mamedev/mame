@@ -55,7 +55,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	//required_device<cassette_image_device> m_cass;
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 	DECLARE_WRITE8_MEMBER(bml3_6845_w);
 	DECLARE_READ8_MEMBER(bml3_keyboard_r);
 	DECLARE_WRITE8_MEMBER(bml3_hres_reg_w);

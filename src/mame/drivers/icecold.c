@@ -41,8 +41,8 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_ay8910_0;
-	required_device<device_t> m_ay8910_1;
+	required_device<ay8910_device> m_ay8910_0;
+	required_device<ay8910_device> m_ay8910_1;
 	required_device<pia6821_device> m_pia1;
 
 	UINT8	m_digit;			// scanlines from i8279

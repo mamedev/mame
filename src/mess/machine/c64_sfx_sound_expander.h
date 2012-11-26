@@ -58,7 +58,7 @@ protected:
 	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
 
 private:
-	required_device<device_t> m_opl;
+	required_device<ym3526_device> m_opl;
 	required_device<c64_expansion_slot_device> m_exp;
 };
 

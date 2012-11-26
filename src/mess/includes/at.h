@@ -101,18 +101,18 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<device_t> m_pic8259_master;
-	optional_device<device_t> m_pic8259_slave;
+	optional_device<pic8259_device> m_pic8259_master;
+	optional_device<pic8259_device> m_pic8259_slave;
 	optional_device<am9517a_device> m_dma8237_1;
 	optional_device<am9517a_device> m_dma8237_2;
-	optional_device<device_t> m_pit8254;
+	optional_device<pit8254_device> m_pit8254;
 	optional_device<cs8221_device> m_cs8221;
 	optional_device<cs4031_device> m_cs4031;
-	optional_device<device_t> m_ide;
+	optional_device<ide_controller_device> m_ide;
 	optional_device<at_keyboard_controller_device> m_keybc;
 	optional_device<isa16_device> m_isabus;
-	required_device<device_t> m_speaker;
-	optional_device<device_t> m_ram;
+	required_device<speaker_sound_device> m_speaker;
+	optional_device<ram_device> m_ram;
 	optional_device<mc146818_device> m_mc146818;
 	optional_device<pc_kbdc_device> m_pc_kbdc;
 	DECLARE_READ8_MEMBER(at_page8_r);

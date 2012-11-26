@@ -82,8 +82,8 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
-	required_device<device_t> m_speaker;
+	required_device<generic_terminal_device> m_terminal;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<acia6551_device> m_acia;
 	required_device<roc10937_t> m_vfd;
 	required_device<mm74c922_device> m_kb;

@@ -36,7 +36,7 @@ public:
 	m_riot(*this, "riot")
 	{ }
 
-	required_device<device_t> m_riot;
+	required_device<riot6532_device> m_riot;
 	DECLARE_READ8_MEMBER(junior_riot_a_r);
 	DECLARE_READ8_MEMBER(junior_riot_b_r);
 	DECLARE_WRITE8_MEMBER(junior_riot_a_w);

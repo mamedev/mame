@@ -84,7 +84,7 @@ public:
 	required_device<hd44102_device> m_lcdc8;
 	required_device<hd44102_device> m_lcdc9;
 	required_device<centronics_device> m_centronics;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 
@@ -173,7 +173,7 @@ public:
 	required_device<rp5c01_device> m_rtc;
 	required_device<hd61830_device> m_lcdc;
 	required_device<centronics_device> m_centronics;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 

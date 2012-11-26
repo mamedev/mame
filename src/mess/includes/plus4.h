@@ -59,7 +59,7 @@ public:
 	optional_device<acia6551_device> m_acia;
 	optional_device<mos6529_device> m_spi_user;
 	required_device<mos6529_device> m_spi_kb;
-	optional_device<device_t> m_t6721;
+	optional_device<t6721_device> m_t6721;
 	required_device<cbm_iec_device> m_iec;
 	required_device<plus4_expansion_slot_device> m_exp;
 	optional_device<plus4_user_port_device> m_user;

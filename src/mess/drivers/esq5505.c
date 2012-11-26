@@ -135,12 +135,12 @@ public:
     { }
 
     required_device<m68000_device> m_maincpu;
-    required_device<device_t> m_duart;
+    required_device<duart68681_device> m_duart;
     optional_device<wd1772_t> m_fdc;
     optional_device<esq1x22_t> m_epsvfd;
     optional_device<esq2x40_sq1_t> m_sq1vfd;
     optional_device<esq2x40_t> m_vfd;
-    optional_device<device_t> m_dmac;
+    optional_device<hd63450_device> m_dmac;
 
     virtual void machine_reset();
 

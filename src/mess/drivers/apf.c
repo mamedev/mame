@@ -79,11 +79,11 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_crtc;
-	required_device<device_t> m_speaker;
-	required_device<device_t> m_pia0;
-	optional_device<device_t> m_pia1;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<pia6821_device> m_pia0;
+	optional_device<pia6821_device> m_pia1;
 	optional_device<cassette_image_device> m_cass;
-	optional_device<device_t> m_fdc;
+	optional_device<wd1770_device> m_fdc;
 	DECLARE_READ8_MEMBER(apf_mc6847_videoram_r);
 	DECLARE_WRITE_LINE_MEMBER(apf_mc6847_fs_w);
 	DECLARE_READ8_MEMBER(apf_m1000_pia_in_a_func);

@@ -99,7 +99,7 @@ public:
 		m_fdc_rom(*this,"fdc_rom"),
 		m_fdc_ram(*this,"fdc_ram") { }
 
-	required_device<device_t> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<scc8530_t> m_scc;
 
 	required_shared_ptr<UINT8> m_fdc_rom;

@@ -33,7 +33,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;

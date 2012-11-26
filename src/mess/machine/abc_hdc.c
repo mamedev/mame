@@ -8,9 +8,6 @@
 *********************************************************************/
 
 #include "abc_hdc.h"
-#include "machine/scsibus.h"
-#include "machine/scsicb.h"
-#include "machine/scsihd.h"
 
 
 

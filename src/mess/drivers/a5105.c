@@ -53,7 +53,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7220_device> m_hgdc;
 	required_device<cassette_image_device> m_cass;
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;

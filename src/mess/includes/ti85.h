@@ -24,8 +24,8 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<device_t> m_speaker;
-	//optional_device<device_t> m_serial;
+	optional_device<speaker_sound_device> m_speaker;
+	//optional_device<> m_serial;
 	optional_shared_ptr<UINT8>	m_nvram;
 
 	UINT8 m_LCD_memory_base;

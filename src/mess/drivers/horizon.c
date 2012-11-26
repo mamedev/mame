@@ -25,7 +25,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_terminal;
+	required_device<generic_terminal_device> m_terminal;
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	//UINT8 m_term_data;
 	virtual void machine_reset();

@@ -58,8 +58,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
-	required_device<device_t> m_pia_s;
-	required_device<device_t> m_pia_u;
+	required_device<pia6821_device> m_pia_s;
+	required_device<pia6821_device> m_pia_u;
 	DECLARE_READ8_MEMBER( pegasus_keyboard_r );
 	DECLARE_READ8_MEMBER( pegasus_protection_r );
 	DECLARE_READ8_MEMBER( pegasus_pcg_r );

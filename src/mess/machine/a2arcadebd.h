@@ -41,7 +41,7 @@ protected:
     virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data);
 
     required_device<tms9918a_device> m_tms;
-    required_device<device_t> m_ay;
+    required_device<ay8910_device> m_ay;
 
 private:
 };

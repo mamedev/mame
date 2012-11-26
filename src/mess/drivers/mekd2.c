@@ -54,9 +54,9 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_pia_s;
-	required_device<device_t> m_pia_u;
-	required_device<device_t> m_acia;
+	required_device<pia6821_device> m_pia_s;
+	required_device<pia6821_device> m_pia_u;
+	required_device<acia6850_device> m_acia;
 	DECLARE_READ_LINE_MEMBER( mekd2_key40_r );
 	DECLARE_READ8_MEMBER( mekd2_key_r );
 	DECLARE_WRITE_LINE_MEMBER( mekd2_nmi_w );

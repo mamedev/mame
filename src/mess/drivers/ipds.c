@@ -22,7 +22,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_crtc;
+	required_device<i8275_device> m_crtc;
 	DECLARE_READ8_MEMBER(ipds_b0_r);
 	DECLARE_READ8_MEMBER(ipds_b1_r);
 	DECLARE_READ8_MEMBER(ipds_c0_r);

@@ -39,7 +39,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<ns16550_device> m_uart;
 	required_device<rs232_port_device> m_serport;
 

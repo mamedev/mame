@@ -42,8 +42,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
-	required_device<device_t> m_fdc;
-	required_device<device_t> m_beep;
+	required_device<mb8877_device> m_fdc;
+	required_device<beep_device> m_beep;
 	required_device<ram_device> m_ram;
 	required_device<ieee488_device> m_ieee;
 

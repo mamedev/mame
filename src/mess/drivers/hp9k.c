@@ -134,7 +134,7 @@ public:
 	UINT8 kbdBit;
 
 	required_device<cpu_device> m_maincpu;
-	//required_device<device_t> m_terminal;
+	//required_device<> m_terminal;
 	required_device<mc6845_device> m_6845;
 
 	UINT8 m_videoram[0x4000];

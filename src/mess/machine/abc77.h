@@ -105,7 +105,7 @@ protected:
 	devcb_resolved_write_line	m_out_keydown_func;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 
 	int m_txd;						// transmit data
 	int m_keylatch;					// keyboard row latch

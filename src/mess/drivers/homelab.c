@@ -63,7 +63,7 @@ public:
 	const UINT8 *m_p_videoram;
 	bool m_nmi;
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
 	DECLARE_DRIVER_INIT(brailab4);
 	DECLARE_VIDEO_START(homelab2);

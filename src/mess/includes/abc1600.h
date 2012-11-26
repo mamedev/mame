@@ -83,12 +83,12 @@ public:
 	required_device<z80dart_device> m_dart;
 	required_device<scc8530_t> m_scc;
 	required_device<z8536_device> m_cio;
-	required_device<device_t> m_fdc;
+	required_device<fd1797_device> m_fdc;
 	required_device<e0516_device> m_rtc;
 	required_device<nmc9306_device> m_nvram;
 	required_device<mc6845_device> m_crtc;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_floppy;
+	required_device<legacy_floppy_image_device> m_floppy;
 	required_device<abc1600bus_slot_device> m_bus0i;
 	required_device<abc1600bus_slot_device> m_bus0x;
 	required_device<abc1600bus_slot_device> m_bus1;

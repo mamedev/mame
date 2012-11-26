@@ -65,8 +65,8 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_speaker;
-	required_device<device_t> m_miot;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<mos6530_device> m_miot;
 	DECLARE_READ8_MEMBER(mk2_read_a);
 	DECLARE_WRITE8_MEMBER(mk2_write_a);
 	DECLARE_READ8_MEMBER(mk2_read_b);

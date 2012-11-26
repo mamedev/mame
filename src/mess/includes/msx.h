@@ -112,7 +112,7 @@ public:
 
 	optional_device<v9938_device> m_v9938;
 	required_device<cassette_image_device> m_cass;
-	required_device<device_t> m_ym;
+	required_device<ym2413_device> m_ym;
 	required_device<dac_device> m_dac;
 	optional_device<rp5c01_device> m_rtc;
 	DECLARE_READ8_MEMBER(msx_psg_port_a_r);

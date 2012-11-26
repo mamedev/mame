@@ -46,8 +46,8 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_ds0;
-	required_device<device_t> m_ds1;
+	required_device<dl1416_device> m_ds0;
+	required_device<dl1416_device> m_ds1;
 	DECLARE_WRITE_LINE_MEMBER(sod_led);
 	DECLARE_READ_LINE_MEMBER(sid_line);
 	virtual void machine_reset();

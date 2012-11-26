@@ -32,18 +32,6 @@
 */
 
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "formats/basicdsk.h"
-#include "imagedev/flopdrv.h"
-#include "machine/ram.h"
-#include "machine/com8116.h"
-#include "machine/ctronics.h"
-#include "machine/i8255.h"
-#include "machine/i8251.h"
-#include "machine/terminal.h"
-#include "machine/wd17xx.h"
-#include "machine/z80ctc.h"
 #include "includes/xor100.h"
 
 /* Read/Write Handlers */

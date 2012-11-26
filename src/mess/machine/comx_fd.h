@@ -60,9 +60,9 @@ private:
 	inline void update_ef4();
 
 	// internal state
-	required_device<device_t> m_fdc;
-	required_device<device_t> m_floppy0;
-	required_device<device_t> m_floppy1;
+	required_device<wd1770_device> m_fdc;
+	required_device<legacy_floppy_image_device> m_floppy0;
+	required_device<legacy_floppy_image_device> m_floppy1;
 
 	// floppy state
 	int m_ds;				// device select

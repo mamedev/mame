@@ -37,7 +37,7 @@ protected:
     virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data);
     virtual UINT8 read_cnxx(address_space &space, UINT8 offset);
 
-	required_device<device_t> m_fdc;
+	required_device<applefdc_base_device> m_fdc;
 
 private:
     UINT8 *m_rom;

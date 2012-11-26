@@ -66,7 +66,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<es5503_device> m_es5503;
-    required_device<device_t> m_fdc;
+    required_device<applefdc_base_device> m_fdc;
 
 	UINT8 *m_slowmem;
 	UINT8 m_newvideo;

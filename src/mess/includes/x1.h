@@ -190,7 +190,7 @@ public:
 
 	required_device<cpu_device> m_x1_cpu;
 	required_device<cassette_image_device> m_cass;
-	required_device<device_t> m_fdc;
+	required_device<mb8877_device> m_fdc;
 	required_device<mc6845_device> m_crtc;
 	required_device<z80ctc_device> m_ctc;
 	DECLARE_DRIVER_INIT(x1_kanji);

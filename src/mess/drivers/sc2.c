@@ -23,7 +23,7 @@ public:
 	m_beep(*this, BEEPER_TAG)
 	{ }
 
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 	DECLARE_READ8_MEMBER(pio_port_a_r);
 	DECLARE_READ8_MEMBER(pio_port_b_r);
 	DECLARE_WRITE8_MEMBER(pio_port_a_w);

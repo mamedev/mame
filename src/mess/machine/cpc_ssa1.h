@@ -80,7 +80,7 @@ private:
 	UINT8 m_lrq;
 	UINT8 m_sby;
 
-	required_device<device_t> m_sp0256_device;
+	required_device<sp0256_device> m_sp0256_device;
 };
 
 class cpc_dkspeech_device : public device_t,
@@ -117,7 +117,7 @@ private:
 	UINT8 m_lrq;
 	UINT8 m_sby;
 
-	required_device<device_t> m_sp0256_device;
+	required_device<sp0256_device> m_sp0256_device;
 };
 
 // device type definition

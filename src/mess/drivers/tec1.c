@@ -90,9 +90,9 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	optional_device<cassette_image_device> m_cass;
-	optional_device<device_t> m_wave;
+	optional_device<wave_device> m_wave;
 	emu_timer *m_kbd_timer;
 	DECLARE_READ8_MEMBER( tec1_kbd_r );
 	DECLARE_READ8_MEMBER( latch_r );

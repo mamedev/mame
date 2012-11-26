@@ -145,11 +145,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<mc6845_device> m_crtc;
-	required_device<device_t> m_speaker;
-	required_device<device_t> m_uart;
-	//required_device<device_t> m_i8251_rx_timer;
-	//required_device<device_t> m_i8251_tx_timer;
-	//required_device<device_t> m_sync_timer;
+	required_device<beep_device> m_speaker;
+	required_device<i8251_device> m_uart;
+	//required_device<> m_i8251_rx_timer;
+	//required_device<> m_i8251_tx_timer;
+	//required_device<> m_sync_timer;
 
 	UINT8* m_vram;
 	UINT8* m_trans;

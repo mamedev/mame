@@ -9,6 +9,8 @@
 #ifndef _TSISPCH_H_
 #define _TSISPCH_H_
 
+#include "machine/i8251.h"
+#include "machine/pic8259.h"
 #include "machine/terminal.h"
 
 class tsispch_state : public driver_device
@@ -25,9 +27,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dsp;
-	required_device<device_t> m_terminal;
-	required_device<device_t> m_uart;
-	required_device<device_t> m_pic;
+	required_device<generic_terminal_device> m_terminal;
+	required_device<i8251_device> m_uart;
+	required_device<pic8259_device> m_pic;
 
 	UINT8 m_infifo[32];			// input fifo
 	UINT8 m_infifo_tail_ptr;		// " tail

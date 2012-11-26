@@ -160,15 +160,12 @@ public:
 		  m_mc6847(*this, "mc6847"),
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
-		  m_printer(*this, "printer")
-	,
-		m_videoram(*this, "videoram"){ }
+		  m_videoram(*this, "videoram"){ }
 
 	/* devices */
 	required_device<mc6847_base_device> m_mc6847;
-	optional_device<device_t> m_speaker;
+	optional_device<speaker_sound_device> m_speaker;
 	optional_device<cassette_image_device> m_cassette;
-	optional_device<device_t> m_printer;
 
 	UINT8 *m_ram;
 	UINT32 m_ram_size;

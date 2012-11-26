@@ -87,7 +87,7 @@ public:
 		{ }
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<device_t> m_sound;
+	required_device<socrates_snd_device> m_sound;
 
 	rgb_t m_palette[256];
 

@@ -44,7 +44,7 @@ public:
 	required_device<z80ctc_device> m_ctc_0;
 	required_device<z80ctc_device> m_ctc_1;
 	required_device<upd765a_device> m_fdc;
-	required_device<device_t> m_key_t;
+	required_device<timer_device> m_key_t;
 	const UINT8 *m_p_chargen;
 	UINT8 m_key_command;
 	UINT8 m_last_code;

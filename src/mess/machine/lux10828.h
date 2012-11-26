@@ -99,7 +99,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
-	required_device<device_t> m_fdc;
+	required_device<mb8876_device> m_fdc;
 	required_device<legacy_floppy_image_device> m_image0;
 	required_device<legacy_floppy_image_device> m_image1;
 

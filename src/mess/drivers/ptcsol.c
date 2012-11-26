@@ -162,8 +162,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass1;
 	required_device<cassette_image_device> m_cass2;
-	required_device<device_t> m_uart;
-	required_device<device_t> m_uart_s;
+	required_device<ay31015_device> m_uart;
+	required_device<ay31015_device> m_uart_s;
 	required_shared_ptr<const UINT8> m_p_videoram;
 	required_ioport m_iop_arrows;
 	required_ioport m_iop_config;

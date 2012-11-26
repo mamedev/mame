@@ -54,7 +54,7 @@ public:
 	required_device<cdp1864_device> m_cti;
 	required_device<dm9368_device> m_led;
 	required_device<cassette_image_device> m_cassette;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 
 	virtual void machine_start();

@@ -84,10 +84,10 @@ public:
     { }
 
 
-	required_device<device_t> m_crtc;
-    required_device<device_t> m_i8088;
-    required_device<device_t> m_z80;
-    required_device<device_t> m_fdc;
+	required_device<vt100_video_device> m_crtc;
+    required_device<cpu_device> m_i8088;
+    required_device<cpu_device> m_z80;
+    required_device<fd1793_device> m_fdc;
     required_device<i8251_device> m_kbd8251;
     required_device<lk201_device> m_lk201;
 	required_shared_ptr<UINT8> m_p_ram;
@@ -198,7 +198,7 @@ INPUT_PORTS_END
 void rainbow_state::machine_reset()
 {
 
-    m_z80->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+    m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
     m_zflip = true;
     m_z80_halted = true;
@@ -278,28 +278,28 @@ WRITE8_MEMBER(rainbow_state::share_z80_w)
 READ8_MEMBER(rainbow_state::i8088_latch_r)
 {
 //    printf("Read %02x from 8088 mailbox\n", m_8088_mailbox);
-    m_i8088->execute().set_input_line(INPUT_LINE_INT1, CLEAR_LINE);
+    m_i8088->set_input_line(INPUT_LINE_INT1, CLEAR_LINE);
     return m_8088_mailbox;
 }
 
 WRITE8_MEMBER(rainbow_state::i8088_latch_w)
 {
 //    printf("%02x to Z80 mailbox\n", data);
-    m_z80->execute().set_input_line_and_vector(0, ASSERT_LINE, 0xf7);
+    m_z80->set_input_line_and_vector(0, ASSERT_LINE, 0xf7);
     m_z80_mailbox = data;
 }
 
 READ8_MEMBER(rainbow_state::z80_latch_r)
 {
 //    printf("Read %02x from Z80 mailbox\n", m_z80_mailbox);
-    m_z80->execute().set_input_line(0, CLEAR_LINE);
+    m_z80->set_input_line(0, CLEAR_LINE);
     return m_z80_mailbox;
 }
 
 WRITE8_MEMBER(rainbow_state::z80_latch_w)
 {
 //    printf("%02x to 8088 mailbox\n", data);
-    m_i8088->execute().set_input_line_and_vector(INPUT_LINE_INT1, ASSERT_LINE, 0x27);
+    m_i8088->set_input_line_and_vector(INPUT_LINE_INT1, ASSERT_LINE, 0x27);
     m_8088_mailbox = data;
 }
 
@@ -325,7 +325,7 @@ INTERRUPT_GEN_MEMBER(rainbow_state::vblank_irq)
 
 WRITE8_MEMBER( rainbow_state::clear_video_interrupt )
 {
-    m_i8088->execute().set_input_line(INPUT_LINE_INT0, CLEAR_LINE);
+    m_i8088->set_input_line(INPUT_LINE_INT0, CLEAR_LINE);
 }
 
 READ8_MEMBER( rainbow_state::diagnostic_r )
@@ -339,7 +339,7 @@ WRITE8_MEMBER( rainbow_state::diagnostic_w )
 
     if (!(data & 1))
     {
-        m_z80->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+        m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
         m_z80_halted = true;
     }
 
@@ -347,7 +347,7 @@ WRITE8_MEMBER( rainbow_state::diagnostic_w )
     {
         m_zflip = true;
         m_z80_halted = false;
-        m_z80->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+        m_z80->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
         m_z80->reset();
     }
 
@@ -358,11 +358,11 @@ void rainbow_state::update_kbd_irq()
 {
     if ((m_kbd_rx_ready) || (m_kbd_tx_ready))
     {
-        m_i8088->execute().set_input_line_and_vector(INPUT_LINE_INT2, ASSERT_LINE, 0x26);
+        m_i8088->set_input_line_and_vector(INPUT_LINE_INT2, ASSERT_LINE, 0x26);
     }
     else
     {
-        m_i8088->execute().set_input_line(INPUT_LINE_INT2, CLEAR_LINE);
+        m_i8088->set_input_line(INPUT_LINE_INT2, CLEAR_LINE);
     }
 }
 

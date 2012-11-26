@@ -50,7 +50,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	DECLARE_READ16_MEMBER( dim68k_duart_r );
 	DECLARE_READ16_MEMBER( dim68k_fdc_r );
 	DECLARE_READ16_MEMBER( dim68k_game_switches_r );

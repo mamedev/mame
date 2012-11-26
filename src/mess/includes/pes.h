@@ -10,6 +10,7 @@
 #define _PES_H_
 
 #include "machine/terminal.h"
+#include "sound/tms5220.h"
 
 class pes_state : public driver_device
 {
@@ -23,7 +24,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	required_device<device_t> m_speech;
+	required_device<tms5220_device> m_speech;
 
 	UINT8 m_wsstate;			// /WS
 	UINT8 m_rsstate;			// /RS

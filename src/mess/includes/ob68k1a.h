@@ -29,7 +29,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
-	required_device<device_t> m_acia0;
+	required_device<acia6850_device> m_acia0;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
 	required_device<serial_terminal_device> m_terminal;

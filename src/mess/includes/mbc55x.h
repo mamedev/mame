@@ -103,11 +103,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8251_device> m_kb_uart;
-	required_device<device_t> m_pit;
+	required_device<pit8253_device> m_pit;
 	required_device<i8255_device> m_ppi;
-	required_device<device_t> m_pic;
-	required_device<device_t> m_fdc;
-	required_device<device_t> m_speaker;
+	required_device<pic8259_device> m_pic;
+	required_device<fd1793_device> m_fdc;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 	//DECLARE_READ8_MEMBER(pic8259_r);
 	//DECLARE_WRITE8_MEMBER(pic8259_w);

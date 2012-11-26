@@ -76,11 +76,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	//required_device<cassette_image_device> m_cass;
-	//required_device<device_t> m_wave;
-	//required_device<device_t> m_speaker;
-	//required_device<device_t> m_printer;
+	//required_device<> m_wave;
+	//required_device<> m_speaker;
+	//required_device<> m_printer;
 	required_device<mc6845_device> m_crtc;
-	//required_device<device_t> m_fdc;
+	//required_device<> m_fdc;
 	DECLARE_READ8_MEMBER(fp1100_mem_r);
 	DECLARE_WRITE8_MEMBER(fp1100_mem_w);
 	DECLARE_WRITE8_MEMBER(main_bank_w);

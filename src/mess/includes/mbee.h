@@ -42,12 +42,12 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<cassette_image_device> m_cass;
-	required_device<device_t> m_wave;
-	required_device<device_t> m_speaker;
+	required_device<wave_device> m_wave;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<centronics_device> m_printer;
 	required_device<mc6845_device> m_crtc;
-	optional_device<device_t> m_fdc;
-	optional_device<device_t> m_rtc;
+	optional_device<wd2793_device> m_fdc;
+	optional_device<mc146818_device> m_rtc;
 	DECLARE_WRITE8_MEMBER( mbee_04_w );
 	DECLARE_WRITE8_MEMBER( mbee_06_w );
 	DECLARE_READ8_MEMBER( mbee_07_r );

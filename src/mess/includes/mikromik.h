@@ -50,12 +50,12 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8212_device> m_iop;
 	required_device<am9517a_device> m_dmac;
-	required_device<device_t> m_pit;
-	required_device<device_t> m_crtc;
+	required_device<pit8253_device> m_pit;
+	required_device<i8275_device> m_crtc;
 	required_device<upd765a_device> m_fdc;
 	required_device<upd7201_device> m_mpsc;
 	required_device<upd7220_device> m_hgdc;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 	required_device<ram_device> m_ram;

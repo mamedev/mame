@@ -32,9 +32,9 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_uart;
-	required_device<device_t> m_ppi;
-	required_device<device_t> m_crtc;
+	required_device<i8251_device> m_uart;
+	required_device<i8255_device> m_ppi;
+	required_device<i8275_device> m_crtc;
 	DECLARE_WRITE8_MEMBER(sm1800_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(sm1800_8255_portc_w);
 	DECLARE_READ8_MEMBER(sm1800_8255_porta_r);

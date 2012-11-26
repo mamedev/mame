@@ -90,10 +90,10 @@ public:
 	UINT8 m_at_pages[0x10];
 	UINT8 m_pc_spkrdata, m_pc_input;
 
-	required_device<device_t> m_pit8253;
-	required_device<device_t> m_pic8259_1;
-	required_device<device_t> m_pic8259_2;
-	required_device<device_t> m_dma8237_1;
+	required_device<pit8253_device> m_pit8253;
+	required_device<pic8259_device> m_pic8259_1;
+	required_device<pic8259_device> m_pic8259_2;
+	required_device<i8237_device> m_dma8237_1;
 
 	DECLARE_READ8_MEMBER(disk_iobank_r);
 	DECLARE_WRITE8_MEMBER(disk_iobank_w);

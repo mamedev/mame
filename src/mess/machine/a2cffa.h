@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "machine/a2bus.h"
+#include "machine/idectrl.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -40,7 +41,7 @@ protected:
     virtual UINT8 read_c800(address_space &space, UINT16 offset);
     virtual void write_c800(address_space &space, UINT16 offset, UINT8 data);
 
-    required_device<device_t> m_ide;
+    required_device<ide_controller_device> m_ide;
 
     UINT8 *m_rom;
     UINT8 m_eeprom[0x1000];

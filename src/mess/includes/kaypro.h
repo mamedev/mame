@@ -36,9 +36,9 @@ public:
 	required_device<z80sio_device> m_sio;
 	optional_device<z80sio_device> m_sio2x;
 	required_device<centronics_device> m_centronics;
-	required_device<device_t> m_fdc;
+	required_device<fd1793_device> m_fdc;
 	optional_device<mc6845_device> m_crtc;
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 	DECLARE_READ8_MEMBER(kaypro2x_87_r);
 	DECLARE_READ8_MEMBER(kaypro2x_system_port_r);
 	DECLARE_READ8_MEMBER(kaypro2x_status_r);

@@ -74,14 +74,14 @@ public:
 
 		//static IRQ_CALLBACK(at_irq_callback);
 		required_device<cpu_device> m_maincpu;
-		required_device<device_t> m_pic8259_master;
-		required_device<device_t> m_pic8259_slave;
-		required_device<device_t> m_dma8237_1;
-		required_device<device_t> m_dma8237_2;
-		required_device<device_t> m_pit8254;
+		required_device<pic8259_device> m_pic8259_master;
+		required_device<pic8259_device> m_pic8259_slave;
+		required_device<device_t> m_dma8237_1; // TODO use correct type
+		required_device<device_t> m_dma8237_2; // TODO use correct type
+		required_device<pit8254_device> m_pit8254;
 		required_device<at_keyboard_controller_device> m_keybc;
 		required_device<isa16_device> m_isabus;
-		required_device<device_t> m_speaker;
+		required_device<speaker_sound_device> m_speaker;
 		required_device<mc146818_device> m_mc146818;
 		required_device<pc_kbdc_device> m_pc_kbdc;
 		DECLARE_READ8_MEMBER(at_page8_r);

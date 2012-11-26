@@ -138,12 +138,12 @@ public:
 	required_device<z80ctc_device> m_ctca;
 	required_device<z80ctc_device> m_ctcb;
 	required_device<z80dma_device> m_dma;
-	required_device<device_t> m_fdc;
-	required_device<device_t> m_floppy0;
-	required_device<device_t> m_floppy1;
-	required_device<device_t> m_floppy2;
-	required_device<device_t> m_floppy3;
-	required_device<device_t> m_beeper;
+	required_device<fd1793_device> m_fdc;
+	required_device<legacy_floppy_image_device> m_floppy0;
+	required_device<legacy_floppy_image_device> m_floppy1;
+	required_device<legacy_floppy_image_device> m_floppy2;
+	required_device<legacy_floppy_image_device> m_floppy3;
+	required_device<beep_device> m_beeper;
 	DECLARE_DRIVER_INIT(bigbord2);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE_LINE_MEMBER(bigbord2_interrupt);

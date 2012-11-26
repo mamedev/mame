@@ -40,7 +40,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<f3853_device> m_smi;
 	required_device<uv201_device> m_uv;
-	required_device<device_t> m_discrete;
+	required_device<discrete_sound_device> m_discrete;
 	required_device<dac_device> m_dac;
 	required_device<videobrain_expansion_slot_device> m_exp;
 

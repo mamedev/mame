@@ -81,7 +81,7 @@ public:
 	{ }
 
 	required_device<tms9980a_device> m_tms9980a;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
 	optional_device<tms9918_device> m_tms9918;
 

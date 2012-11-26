@@ -144,14 +144,14 @@ public:
 	m_video_ram(*this, "video_ram") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_8253;
-	required_device<device_t> m_8254;
-	required_device<device_t> m_8259m;
-	required_device<device_t> m_8259s;
+	required_device<pit8253_device> m_8253;
+	required_device<pit8254_device> m_8254;
+	required_device<pic8259_device> m_8259m;
+	required_device<pic8259_device> m_8259s;
 	required_device<i8255_device> m_8255;
 	required_device<centronics_device> m_centronics;
 	required_device<i8251_device> m_uart;
-	required_device<device_t> m_rtc;
+	required_device<mm58274c_device> m_rtc;
 	required_device<i8272a_device> m_fdc;
 	required_device<upd7220_device> m_crtc;
 	DECLARE_READ16_MEMBER(compis_usart_r);

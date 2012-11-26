@@ -78,7 +78,7 @@ public:
 	{ }
 
 	required_device<m65c02_device> m_maincpu;
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 	DECLARE_WRITE8_MEMBER(write_lcd);
 	DECLARE_WRITE8_MEMBER(mephisto_NMI);
 	DECLARE_READ8_MEMBER(read_keys);

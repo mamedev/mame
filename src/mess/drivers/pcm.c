@@ -83,7 +83,7 @@ public:
 	required_device<z80sio_device> m_sio;
 	required_device<z80ctc_device> m_ctc_s;
 	required_device<z80ctc_device> m_ctc_u;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
 	DECLARE_READ8_MEMBER( pcm_85_r );
 	DECLARE_WRITE_LINE_MEMBER( pcm_82_w );

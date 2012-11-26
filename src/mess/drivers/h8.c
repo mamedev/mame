@@ -33,7 +33,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	//required_device<cassette_image_device> m_cass;
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 	DECLARE_READ8_MEMBER(h8_f0_r);
 	DECLARE_WRITE8_MEMBER(h8_f0_w);
 	DECLARE_WRITE8_MEMBER(h8_f1_w);

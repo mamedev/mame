@@ -96,10 +96,10 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	//required_device<cassette_image_device> m_cass;
-	//required_device<device_t> m_wave;
-	//required_device<device_t> m_printer;
+	//required_device<> m_wave;
+	//required_device<> m_printer;
 	required_device<mc6845_device> m_crtc;
-	//optional_device<device_t> m_fdc;
+	//optional_device<> m_fdc;
 	DECLARE_WRITE8_MEMBER(lynx48k_bank_w);
 	DECLARE_WRITE8_MEMBER(lynx128k_bank_w);
 	DECLARE_WRITE8_MEMBER(lynx128k_irq);

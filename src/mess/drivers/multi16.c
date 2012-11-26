@@ -22,7 +22,7 @@ public:
 		m_p_vram(*this, "p_vram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_pic;
+	required_device<pic8259_device> m_pic;
 	required_device<mc6845_device> m_crtc;
 	DECLARE_WRITE8_MEMBER(multi16_6845_address_w);
 	DECLARE_WRITE8_MEMBER(multi16_6845_data_w);

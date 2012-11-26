@@ -35,12 +35,12 @@ public:
 	{ }
 
 	required_device<cpu_device>	m_maincpu;
-	required_device<device_t>	m_mb8877;
+	required_device<mb8877_device>	m_mb8877;
 	required_device<ram_device>	m_messram;
 	required_device<pia6821_device>	m_pia_0;
 	required_device<pia6821_device>	m_pia_1;
 	required_device<z80dart_device>	m_sio;
-	required_device<device_t>	m_speaker;
+	required_device<speaker_sound_device>	m_speaker;
 
 	virtual void video_start();
 

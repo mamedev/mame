@@ -81,9 +81,9 @@ public:
 	required_device<i8255_device> m_ppi1;
 	required_device<i8255_device> m_ppi2;
 	required_device<cassette_image_device> m_cass;
-	required_device<device_t> m_wave;
+	required_device<wave_device> m_wave;
 	required_device<mc6845_device> m_crtc;
-	required_device<device_t> m_fdc;
+	required_device<fd1771_device> m_fdc;
 	required_device<sn76489_device> m_audio;
 	required_device<msm5832_device> m_rtc;
 	DECLARE_READ8_MEMBER( mycom_upper_r );

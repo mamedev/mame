@@ -29,8 +29,8 @@ public:
 		m_p_gvram(*this, "p_gvram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_pic;
-	required_device<device_t> m_dma;
+	required_device<pic8259_device> m_pic;
+	required_device<i8237_device> m_dma;
 	required_device<mc6845_device> m_crtc;
 	DECLARE_READ8_MEMBER(paso1600_pcg_r);
 	DECLARE_WRITE8_MEMBER(paso1600_pcg_w);

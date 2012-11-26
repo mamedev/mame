@@ -36,7 +36,7 @@ public:
 	DECLARE_READ8_MEMBER(llc2_port2_a_r);
 	DECLARE_WRITE8_MEMBER(llc2_port1_b_w);
 	const UINT8 *m_p_chargen;
-	optional_device<device_t> m_speaker;
+	optional_device<speaker_sound_device> m_speaker;
 	optional_shared_ptr<UINT8> m_p_videoram;
 	bool m_rv;
 	UINT8 m_term_status;

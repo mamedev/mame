@@ -48,7 +48,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 	required_device<pce220_serial_device> m_serial;
 
 	// HD61202 LCD controller

@@ -51,7 +51,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 
 	DECLARE_WRITE8_MEMBER( matrix_w );
 	DECLARE_WRITE8_MEMBER( pio_port_a_w );

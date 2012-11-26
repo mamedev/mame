@@ -22,7 +22,7 @@ public:
 
 	virtual void machine_start();
 
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 
 	DECLARE_READ8_MEMBER(read_k);
 	DECLARE_WRITE16_MEMBER(write_o);

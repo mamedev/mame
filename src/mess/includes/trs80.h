@@ -38,9 +38,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<centronics_device> m_printer;
-	optional_device<device_t> m_ay31015;
-	optional_device<device_t> m_fdc;
-	required_device<device_t> m_speaker;
+	optional_device<ay31015_device> m_ay31015;
+	optional_device<fd1793_device> m_fdc;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
 	DECLARE_WRITE8_MEMBER ( trs80_ff_w );
 	DECLARE_WRITE8_MEMBER ( lnw80_fe_w );

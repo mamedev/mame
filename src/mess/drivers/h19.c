@@ -55,8 +55,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
-	required_device<device_t> m_ace;
-	required_device<device_t> m_beep;
+	required_device<ins8250_device> m_ace;
+	required_device<beep_device> m_beep;
 	DECLARE_READ8_MEMBER(h19_80_r);
 	DECLARE_READ8_MEMBER(h19_a0_r);
 	DECLARE_WRITE8_MEMBER(h19_c0_w);

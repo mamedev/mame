@@ -83,7 +83,7 @@ public:
 		  m_psg(*this, AY8910_TAG)
 	{ }
 
-	required_device<device_t> m_psg;
+	required_device<ay8910_device> m_psg;
 
 	virtual void machine_start();
 

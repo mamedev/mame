@@ -93,7 +93,7 @@ public:
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dart_device> m_dart;
 	required_device<z80dart_device> m_sio;
-	optional_device<device_t> m_discrete;
+	optional_device<discrete_sound_device> m_discrete;
 	optional_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 
@@ -212,7 +212,7 @@ public:
 	{ }
 
 	required_device<mc6845_device> m_crtc;
-	optional_device<device_t> m_abc77;
+	optional_device<abc77_device> m_abc77;
 
 	DECLARE_DRIVER_INIT(driver_init);
 	virtual void machine_start();
@@ -255,7 +255,7 @@ public:
 
 	required_device<mc6845_device> m_crtc;
 	required_device<e0516_device> m_rtc;
-	optional_device<device_t> m_abc77;
+	optional_device<abc77_device> m_abc77;
 
 	DECLARE_DRIVER_INIT(driver_init);
 	virtual void machine_start();

@@ -70,7 +70,7 @@ public:
 	bool m_screen_on;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
-	required_device<device_t> m_pia;
+	required_device<pia6821_device> m_pia;
 	required_device<dac_device> m_dac;
 	required_shared_ptr<UINT8> m_videoram;
 private:

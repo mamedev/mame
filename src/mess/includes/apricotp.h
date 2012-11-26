@@ -73,13 +73,13 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<am9517a_device> m_dmac;
-	required_device<device_t> m_pic;
-	required_device<device_t> m_pit;
+	required_device<pic8259_device> m_pic;
+	required_device<pit8253_device> m_pit;
 	required_device<z80dart_device> m_sio;
-	required_device<device_t> m_fdc;
+	required_device<wd2797_device> m_fdc;
 	required_device<mc6845_device> m_crtc;
 	required_device<ram_device> m_ram;
-	required_device<device_t> m_floppy0;
+	required_device<legacy_floppy_image_device> m_floppy0;
 	required_device<centronics_device> m_centronics;
 
 	virtual void machine_start();

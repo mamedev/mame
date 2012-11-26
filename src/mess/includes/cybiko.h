@@ -73,9 +73,9 @@ public:
 	int cybiko_rs232_rx_queue();
 
 	required_device<hd66421_device> m_crtc;
-	required_device<device_t> m_speaker;
-	required_device<device_t> m_rtc;
-	optional_device<device_t> m_flash1;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<pcf8593_device> m_rtc;
+	optional_device<at45db041_device> m_flash1;
 	DECLARE_DRIVER_INIT(cybikoxt);
 	DECLARE_DRIVER_INIT(cybikov1);
 	DECLARE_DRIVER_INIT(cybikov2);

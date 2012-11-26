@@ -45,8 +45,8 @@ public:
 	}
 
 	required_device<pia6821_device> m_pia_2;
-	required_device<device_t> m_ay8912;
-	required_device<device_t> m_fdc;
+	required_device<ay8912_device> m_ay8912;
+	required_device<wd2797_device> m_fdc;
 
 	static const pia6821_interface pia2_config;
 	static const ay8910_interface ay8912_interface;

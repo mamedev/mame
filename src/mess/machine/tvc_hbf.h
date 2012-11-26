@@ -43,7 +43,7 @@ protected:
 
 private:
 	// internal state
-	required_device<device_t>	m_fdc;
+	required_device<fd1793_device>	m_fdc;
 
 	UINT8 *		m_rom;
 	UINT8 *		m_ram;

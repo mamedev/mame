@@ -73,8 +73,8 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_pic;
-	required_device<device_t> m_speaker;
+	required_device<pic8259_device> m_pic;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 
 	DECLARE_READ8_MEMBER(keyboard_row_r);

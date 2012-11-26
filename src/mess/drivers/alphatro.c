@@ -48,7 +48,7 @@ public:
 	required_device<mc6845_device> m_crtc;
 	required_device<i8251_device> m_usart;
 	required_device<cassette_image_device> m_cass;
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 
 	DECLARE_READ8_MEMBER(port10_r);
 	DECLARE_WRITE8_MEMBER(port10_w);

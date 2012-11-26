@@ -34,15 +34,15 @@ public:
 		  m_ppi(*this, M82C55A_TAG),
 		  m_uart(*this, M82C50A_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
-		  m_timer_tick(*this, TIMER_TICK_TAG)
-	,
-		m_contrast(*this, "contrast"){ }
+		  m_timer_tick(*this, TIMER_TICK_TAG),
+		  m_contrast(*this, "contrast")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
 	required_device<i8255_device> m_ppi;
 	required_device<ins8250_device> m_uart;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<timer_device> m_timer_tick;
 
 	virtual void machine_start();

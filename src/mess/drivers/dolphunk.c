@@ -91,7 +91,7 @@ public:
 	UINT8 m_last_key;
 	bool m_speaker_state;
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 };
 
 WRITE8_MEMBER( dolphunk_state::port00_w )

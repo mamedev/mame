@@ -36,7 +36,7 @@ public:
 		{ }
 
 	required_device<hd61700_cpu_device> m_maincpu;
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 	required_device<hd44352_device> m_hd44352;
 
 	emu_timer *m_kb_timer;

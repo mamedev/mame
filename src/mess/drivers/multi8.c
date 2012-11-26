@@ -34,7 +34,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
 	required_device<mc6845_device> m_crtc;
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 	DECLARE_WRITE8_MEMBER(multi8_6845_w);
 	DECLARE_READ8_MEMBER(key_input_r);
 	DECLARE_READ8_MEMBER(key_status_r);

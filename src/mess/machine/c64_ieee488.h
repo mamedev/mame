@@ -62,7 +62,7 @@ protected:
 	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
 
 private:
-	required_device<device_t> m_tpi;
+	required_device<tpi6525_device> m_tpi;
 	required_device<ieee488_device> m_bus;
 	required_device<c64_expansion_slot_device> m_exp;
 

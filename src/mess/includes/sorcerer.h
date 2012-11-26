@@ -74,10 +74,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass1;
 	required_device<cassette_image_device> m_cass2;
-	required_device<device_t> m_wave1;
-	required_device<device_t> m_wave2;
+	required_device<wave_device> m_wave1;
+	required_device<wave_device> m_wave2;
 	required_device<dac_device> m_dac;
-	required_device<device_t> m_uart;
+	required_device<ay31015_device> m_uart;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
 	required_ioport m_iop_config;

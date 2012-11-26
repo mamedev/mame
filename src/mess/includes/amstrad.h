@@ -7,6 +7,7 @@
 #ifndef AMSTRAD_H_
 #define AMSTRAD_H_
 
+#include "sound/ay8910.h"
 #include "machine/upd765.h"
 #include "video/mc6845.h"
 #include "machine/i8255.h"
@@ -107,7 +108,7 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_ay;
+	required_device<ay8912_device> m_ay;
 	optional_device<upd765_family_device> m_fdc;  // not on a GX4000
 	required_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen;

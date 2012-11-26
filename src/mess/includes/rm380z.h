@@ -87,7 +87,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_messram;
-	optional_device<device_t> m_fdc;
+	optional_device<fd1771_device> m_fdc;
 
 	rm380z_state(const machine_config &mconfig, device_type type, const char *tag)
 	  : driver_device(mconfig, type, tag),

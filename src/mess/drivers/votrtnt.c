@@ -56,7 +56,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	//required_device<device_t> m_acia;
+	//required_device<> m_acia;
 	required_device<votrax_sc01_device> m_votrax;
 	DECLARE_READ8_MEMBER(votrtnt_acia_status_r);
 	DECLARE_READ8_MEMBER(votrtnt_acia_data_r);

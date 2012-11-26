@@ -88,7 +88,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<centronics_device> m_centronics;
 	required_device<cassette_image_device> m_ext_cas;
-	required_device<device_t> m_speaker;
+	required_device<speaker_sound_device> m_speaker;
 	required_device<epson_sio_device> m_sio;
 
 	/* gapnit register */

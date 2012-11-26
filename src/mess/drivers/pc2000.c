@@ -31,7 +31,7 @@ public:
 		{ }
 
 	required_device<hd44780_device> m_lcdc;
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 
 	UINT8 m_mux_data;
 	UINT8 m_beep_state;

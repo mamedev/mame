@@ -63,7 +63,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_beep;
+	required_device<beep_device> m_beep;
 	DECLARE_WRITE16_MEMBER(glasgow_lcd_w);
 	DECLARE_WRITE16_MEMBER(glasgow_lcd_flag_w);
 	DECLARE_READ16_MEMBER(glasgow_keys_r);
