@@ -61,10 +61,12 @@ class pc88va_state : public driver_device
 public:
 	pc88va_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu"),
 		m_fdc(*this, "upd765"),
 		m_dmac(*this, "dmac"),
 		m_palram(*this, "palram"){ }
 
+	required_device<cpu_device> m_maincpu;
 	required_device<upd765a_device> m_fdc;
 	required_device<upd71071_device> m_dmac;
 	required_shared_ptr<UINT16> m_palram;
@@ -80,6 +82,7 @@ public:
 	UINT8 m_buf_index;
 	UINT8 m_buf_ram[16];
 	UINT8 m_portc_test;
+	UINT8 m_fdc_motor_status[2];
 
 	/* floppy state */
 	UINT8 m_i8255_0_pc;
@@ -100,9 +103,9 @@ public:
 	DECLARE_WRITE16_MEMBER(backupram_wp_1_w);
 	DECLARE_WRITE16_MEMBER(backupram_wp_0_w);
 	DECLARE_READ8_MEMBER(hdd_status_r);
-	DECLARE_WRITE8_MEMBER(upd765_mc_w);
 	#if TEST_SUBFDC
 	DECLARE_READ8_MEMBER(upd765_tc_r);
+	DECLARE_WRITE8_MEMBER(upd765_mc_w);
 	#else
 	DECLARE_READ8_MEMBER(no_subfdc_r);
 	#endif
@@ -139,8 +142,11 @@ public:
 //	DECLARE_WRITE_LINE_MEMBER(pc88va_upd765_interrupt);
 	UINT8 m_fdc_ctrl_2;
 	TIMER_CALLBACK_MEMBER(pc88va_fdc_timer);
+	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_0);
+	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_1);
 //	UINT16 m_fdc_dma_r(running_machine &machine);
 //	void m_fdc_dma_w(running_machine &machine, UINT16 data);
+	DECLARE_WRITE_LINE_MEMBER(pc88va_hlda_w);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_tc_w);
 
 	void fdc_irq(bool state);
@@ -979,13 +985,6 @@ READ8_MEMBER(pc88va_state::hdd_status_r)
 	return 0x20;
 }
 
-/* TODO: check this */
-WRITE8_MEMBER(pc88va_state::upd765_mc_w)
-{
-	machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(!(data & 1));
-	machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(!(data & 2));
-}
-
 READ8_MEMBER(pc88va_state::pc88va_fdc_r)
 {
 	printf("%08x\n",offset);
@@ -1010,6 +1009,18 @@ TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_timer)
 		pic8259_ir3_w(machine().device( "pic8259_slave"), 0);
 		pic8259_ir3_w(machine().device( "pic8259_slave"), 1);
 	}
+}
+
+TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_motor_start_0)
+{
+	machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(0);
+	m_fdc_motor_status[0] = 1;
+}
+
+TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_motor_start_1)
+{
+	machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(0);
+	m_fdc_motor_status[1] = 1;
 }
 
 WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
@@ -1037,16 +1048,31 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 			machine().device<floppy_connector>("upd765:1")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
 
 			machine().device<upd765a_device>("upd765")->set_rate(data & 0x20 ? 500000 : 250000);
-			/* Temporary hack */
-			machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(0);
-			machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(0);
-
 			break;
 		/*
         ---- x--- PCM: ?
-        ---- --xx M1/M0: Drive 1/0 motor control (0) Motor OFF (1) Motor ON
+        ---- --xx M1/M0: Drive 1/0 motor control (0) NOP (1) Change motor status
         */
-		case 0x04: upd765_mc_w(space,0,data); break;
+		case 0x04:
+			if(data & 1)
+			{
+				machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(1);
+				if(m_fdc_motor_status[0] == 0)
+					machine().scheduler().timer_set(attotime::from_msec(505), timer_expired_delegate(FUNC(pc88va_state::pc88va_fdc_motor_start_0),this));
+				else
+					m_fdc_motor_status[0] = 0;
+			}
+
+			if(data & 2)
+			{
+				machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(1);
+				if(m_fdc_motor_status[1] == 0)
+					machine().scheduler().timer_set(attotime::from_msec(505), timer_expired_delegate(FUNC(pc88va_state::pc88va_fdc_motor_start_1),this));
+				else
+					m_fdc_motor_status[1] = 0;
+			}
+
+			break;
 		/*
         x--- ---- FDCRST: FDC Reset
         -xx- ---- FDCFRY FRYCEN: FDC force ready control
@@ -1244,6 +1270,12 @@ READ8_MEMBER(pc88va_state::upd765_tc_r)
 WRITE8_MEMBER(pc88va_state::fdc_irq_vector_w)
 {
 	m_fdc_irq_opcode = data;
+}
+
+WRITE8_MEMBER(pc88va_state::upd765_mc_w)
+{
+	machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(!(data & 1));
+	machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(!(data & 2));
 }
 
 static ADDRESS_MAP_START( pc88va_z80_io_map, AS_IO, 8, pc88va_state )
@@ -1638,6 +1670,9 @@ void pc88va_state::machine_reset()
 	#if TEST_SUBFDC
 	machine().device("fdccpu")->execute().set_input_line_vector(0, 0);
 	#endif
+
+	m_fdc_motor_status[0] = 0;
+	m_fdc_motor_status[1] = 0;
 }
 
 INTERRUPT_GEN_MEMBER(pc88va_state::pc88va_vrtc_irq)
@@ -1714,6 +1749,15 @@ static const ym2203_interface pc88va_ym2203_intf =
 	DEVCB_NULL
 };
 
+WRITE_LINE_MEMBER(pc88va_state::pc88va_hlda_w)
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+
+//	m_dmac->hack_w(state);
+
+//  printf("%02x HLDA\n",state);
+}
+
 WRITE_LINE_MEMBER( pc88va_state::pc88va_tc_w )
 {
 	/* floppy terminal count */
@@ -1743,7 +1787,7 @@ static const upd71071_intf pc88va_dma_config =
 {
 	"maincpu",
 	8000000,
-	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(pc88va_state, pc88va_hlda_w),
 	DEVCB_DRIVER_LINE_MEMBER(pc88va_state, pc88va_tc_w),
 	{ 0, 0, m_fdc_dma_r, 0 },
 	{ 0, 0, m_fdc_dma_w, 0 },
