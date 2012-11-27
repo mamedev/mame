@@ -561,8 +561,8 @@ public:
 	DECLARE_WRITE32_MEMBER(atapi_reset_w);
 	DECLARE_WRITE32_MEMBER(security_w);
 	DECLARE_READ32_MEMBER(security_r);
-	DECLARE_READ32_MEMBER(flash_r);
-	DECLARE_WRITE32_MEMBER(flash_w);
+	DECLARE_READ16_MEMBER(flash_r);
+	DECLARE_WRITE16_MEMBER(flash_w);
 	DECLARE_READ32_MEMBER(ge765pwbba_r);
 	DECLARE_WRITE32_MEMBER(ge765pwbba_w);
 	DECLARE_READ32_MEMBER(gx700pwbf_io_r);
@@ -1242,35 +1242,26 @@ READ32_MEMBER(ksys573_state::security_r)
 	return data;
 }
 
-READ32_MEMBER(ksys573_state::flash_r)
+READ16_MEMBER(ksys573_state::flash_r)
 {
 	UINT32 data = 0;
 
 	if( m_flash_bank < 0 )
 	{
 		mame_printf_debug( "%08x: flash_r( %08x, %08x ) no bank selected %08x\n", space.device().safe_pc(), offset, mem_mask, m_control );
-		data = 0xffffffff;
+		data = 0xffff;
 	}
 	else
 	{
 		fujitsu_29f016a_device **flash_base = &m_flash_device[m_flash_bank >> 8][m_flash_bank & 0xff];
-		int adr = offset * 2;
 
 		if( ACCESSING_BITS_0_7 )
 		{
-			data |= ( flash_base[0]->read( adr + 0 ) & 0xff ) << 0; // 31m/31l/31j/31h
+			data |= ( flash_base[0]->read( offset ) & 0xff ) << 0; // 31m/31l/31j/31h
 		}
 		if( ACCESSING_BITS_8_15 )
 		{
-			data |= ( flash_base[1]->read( adr + 0 ) & 0xff ) << 8; // 27m/27l/27j/27h
-		}
-		if( ACCESSING_BITS_16_23 )
-		{
-			data |= ( flash_base[0]->read( adr + 1 ) & 0xff ) << 16; // 31m/31l/31j/31h
-		}
-		if( ACCESSING_BITS_24_31 )
-		{
-			data |= ( flash_base[1]->read( adr + 1 ) & 0xff ) << 24; // 27m/27l/27j/27h
+			data |= ( flash_base[1]->read( offset ) & 0xff ) << 8; // 27m/27l/27j/27h
 		}
 	}
 
@@ -1279,9 +1270,8 @@ READ32_MEMBER(ksys573_state::flash_r)
 	return data;
 }
 
-WRITE32_MEMBER(ksys573_state::flash_w)
+WRITE16_MEMBER(ksys573_state::flash_w)
 {
-
 	verboselog( machine(), 2, "flash_w( %08x, %08x, %08x\n", offset, mem_mask, data );
 
 	if( m_flash_bank < 0 )
@@ -1291,30 +1281,21 @@ WRITE32_MEMBER(ksys573_state::flash_w)
 	else
 	{
 		fujitsu_29f016a_device **flash_base = &m_flash_device[m_flash_bank >> 8][m_flash_bank & 0xff];
-		int adr = offset * 2;
 
 		if( ACCESSING_BITS_0_7 )
 		{
-			flash_base[0]->write( adr + 0, ( data >> 0 ) & 0xff );
+			flash_base[0]->write( offset, ( data >> 0 ) & 0xff );
 		}
 		if( ACCESSING_BITS_8_15 )
 		{
-			flash_base[1]->write( adr + 0, ( data >> 8 ) & 0xff );
-		}
-		if( ACCESSING_BITS_16_23 )
-		{
-			flash_base[0]->write( adr + 1, ( data >> 16 ) & 0xff );
-		}
-		if( ACCESSING_BITS_24_31 )
-		{
-			flash_base[1]->write( adr + 1, ( data >> 24 ) & 0xff );
+			flash_base[1]->write( offset, ( data >> 8 ) & 0xff );
 		}
 	}
 }
 
 static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32, ksys573_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
-	AM_RANGE(0x1f000000, 0x1f3fffff) AM_READWRITE(flash_r, flash_w )
+	AM_RANGE(0x1f000000, 0x1f3fffff) AM_READWRITE16( flash_r, flash_w, 0xffffffff )
 	AM_RANGE(0x1f400000, 0x1f400003) AM_READ_PORT( "IN0" ) AM_WRITE_PORT( "OUT0" )
 	AM_RANGE(0x1f400004, 0x1f400007) AM_READ(jamma_r )
 	AM_RANGE(0x1f400008, 0x1f40000b) AM_READ_PORT( "IN2" )
@@ -4850,6 +4831,45 @@ ROM_START( hndlchmp )
 	ROM_LOAD( "710ja.22h",    0x000000, 0x002000, CRC(b784de91) SHA1(048157e9ad6df46656dbac6349b0c821254e1c37) )
 ROM_END
 
+ROM_START( gchgchmp )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x200000, "pccard1.0", 0 )
+	ROM_LOAD( "ge877ja.8h",   0x100000, 0x100000, CRC(06b95144) SHA1(870fc99ba6c6b0c314ddc270b8ba0f44412978bd) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
+	ROM_REGION( 0x200000, "pccard1.1", 0 )
+	ROM_LOAD( "ge877ja.4d",   0x100000, 0x100000, CRC(2a3b639f) SHA1(c810a16a36c5e3f5a67a760d488d22108b8a35f7) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
+	ROM_REGION( 0x200000, "pccard1.2", 0 )
+	ROM_LOAD( "ge877ja.7g",   0x100000, 0x100000, CRC(e2b273ac) SHA1(73eda00d9a32e252e66ad166d35c5bc8a1a1bf97) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
+	ROM_REGION( 0x200000, "pccard1.3", 0 )
+	ROM_LOAD( "ge877ja.3c",   0x100000, 0x100000, CRC(247a6c18) SHA1(145a8bbf35f71ebf5c9232ad1a860ee4c10083c1) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
+	ROM_REGION( 0x200000, "pccard1.4", 0 )
+	ROM_LOAD( "ge877ja.6f",   0x100000, 0x100000, CRC(174a4551) SHA1(32c24c99824719cd3057281ac1114e624c16df81) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
+	ROM_REGION( 0x200000, "pccard1.5", 0 )
+	ROM_LOAD( "ge877ja.2b",   0x100000, 0x100000, CRC(45398c5f) SHA1(ec5f7e83dbd86807fb78e852e31c6f5db187204a) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
+	ROM_REGION( 0x200000, "pccard1.6", 0 )
+	ROM_LOAD( "ge877ja.5e",   0x100000, 0x100000, CRC(351cbbd6) SHA1(eccb5dc03dc668b0690a6209d57b37fb5cdc200a) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
+	ROM_REGION( 0x200000, "pccard1.7", 0 )
+	ROM_LOAD( "ge877ja.1a",   0x100000, 0x100000, CRC(7b28d962) SHA1(27a46e41dc53cb85f83ec4558bc1f88504d725eb) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
+	ROM_REGION( 0x0000224, "install_eeprom", 0 ) /* security cart eeprom */
+	ROM_LOAD( "ge877jaa.u1",  0x000000, 0x000224, CRC(06d0e427) SHA1(cf61c421c0ea236b492d49a00b4608062bbe9063) )
+ROM_END
+
 ROM_START( gtrfrks )
 	SYS573_BIOS_A
 
@@ -5464,6 +5484,7 @@ GAME( 1998, fbait2bc, sys573,   k573baitx,    fbaitbc, ksys573_state,   ge765pwb
 GAME( 1998, bassang2, fbait2bc, k573baitx,    fbaitbc, ksys573_state,   ge765pwbba, ROT0, "Konami", "Bass Angler 2 (GE865 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, hyperbbc, sys573,   konami573,    hyperbbc, ksys573_state,  konami573,  ROT0, "Konami", "Hyper Bishi Bashi Champ (GQ876 VER. EAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, hyperbbca,hyperbbc, konami573,    hyperbbc, ksys573_state,  konami573,  ROT0, "Konami", "Hyper Bishi Bashi Champ (GQ876 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, gchgchmp, sys573,   pccard1x,     konami573, ksys573_state, konami573,  ROT0, "Konami", "Gachaga Champ (GE877 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1999, drmn,     sys573,   konami573x,   drmn, ksys573_state,      drmn,       ROT0, "Konami", "DrumMania (GQ881 VER. JAD)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1999, gtrfrks,  sys573,   konami573x,   gtrfrks, ksys573_state,   gtrfrks,    ROT0, "Konami", "Guitar Freaks (GQ886 VER. EAC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, gtrfrksu, gtrfrks,  konami573x,   gtrfrks, ksys573_state,   gtrfrks,    ROT0, "Konami", "Guitar Freaks (GQ886 VER. UAC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
