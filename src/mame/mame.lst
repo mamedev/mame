@@ -15041,7 +15041,6 @@ sc4wtcd		//
 sc4wtce		//
 sc4wtcf		//
 sc4wspin	// Win Spinner (Qps)
-sc4wspina	//
 sc4wspinb	//
 sc4wspinc	//
 sc4wspind	//
@@ -15075,6 +15074,7 @@ sc4winspw	//
 sc4winspx	//
 sc4winspy	//
 sc4winspz	//
+sc4winsp0	//
 sc4wondw	// Wonder Wheel (Bellfruit)
 sc4wondwa	//
 sc4xmark	// X Marks The Spot (Bellfruit)
