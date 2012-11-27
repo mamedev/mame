@@ -25726,6 +25726,11 @@ DRIVER_INIT_MEMBER(sc4_state,sc4luckb)
 	m_reel_setup = sc4luckb_reel_configs;
 }
 
+DRIVER_INIT_MEMBER(sc4_state,sc4luckb_mbus)
+{
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4luckb_reel_configs;
+}
 
 // PR1033 CASINO LUCKY BALLS         PR1033 LUCKY BALLS SOUNDS11
 GAME( 200?, sc4luckb	,0,			sc4, sc4, sc4_state, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
@@ -25756,12 +25761,12 @@ GAME( 200?, sc4luckb3	,sc4luckb,	sc4, sc4, sc4_state, sc4luckb, ROT0, "BFM","Luc
 GAME( 200?, sc4luckb4	,sc4luckb,	sc4, sc4, sc4_state, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 26)", GAME_NOT_WORKING )
 
 // PR1033 CASINO LUCKY BALLS         PR1033 LUCKY BALLS SOUNDS11       LUCKY BALLS ARCADE
-GAME( 200?, sc4luckbq	,sc4luckb,	sc4, sc4, sc4_state, sc4luckb, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4luckbr	,sc4luckb,	sc4, sc4, sc4_state, sc4luckb, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4luckbs	,sc4luckb,	sc4, sc4, sc4_state, sc4luckb, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4luckby	,sc4luckb,	sc4, sc4, sc4_state, sc4luckb, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4luckbz	,sc4luckb,	sc4, sc4, sc4_state, sc4luckb, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING ) // incomplete pairing
-GAME( 200?, sc4luckb0	,sc4luckb,	sc4, sc4, sc4_state, sc4luckb, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4luckbq	,sc4luckb,	sc4, sc4, sc4_state, sc4luckb_mbus, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4luckbr	,sc4luckb,	sc4, sc4, sc4_state, sc4luckb_mbus, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4luckbs	,sc4luckb,	sc4, sc4, sc4_state, sc4luckb_mbus, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4luckby	,sc4luckb,	sc4, sc4, sc4_state, sc4luckb_mbus, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4luckbz	,sc4luckb,	sc4, sc4, sc4_state, sc4luckb_mbus, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING ) // incomplete pairing
+GAME( 200?, sc4luckb0	,sc4luckb,	sc4, sc4, sc4_state, sc4luckb_mbus, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
 
 // PR2535 MAGIC CIRCLE STANDARD 011         MAGICSND
@@ -25813,23 +25818,41 @@ GAME( 200?, sc4maxime	,sc4maxim,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Maxi
 GAME( 200?, sc4maximf	,sc4maxim,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Maximus Cash (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 GAME( 200?, sc4maximg	,sc4maxim,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Maximus Cash (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
+const stepper_interface* sc4maxcc_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpoint_interface_200step_reel,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4maxcc)
+{
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4maxcc_reel_configs;
+}
+
 // PR2130 CLUB MAXIMUS CASH         MAXIMUS CASH  CLUB  CMAX SOUNDS         MAXIMUS CASH
-GAME( 200?, sc4maxcc	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Maximus Cash Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4maxcca	,sc4maxcc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Maximus Cash Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4maxccb	,sc4maxcc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Maximus Cash Club (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4maxccc	,sc4maxcc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Maximus Cash Club (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4maxcc	,0,			sc4, sc4, sc4_state, sc4maxcc, ROT0, "Mazooma","Maximus Cash Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4maxcca	,sc4maxcc,	sc4, sc4, sc4_state, sc4maxcc, ROT0, "Mazooma","Maximus Cash Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4maxccb	,sc4maxcc,	sc4, sc4, sc4_state, sc4maxcc, ROT0, "Mazooma","Maximus Cash Club (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4maxccc	,sc4maxcc,	sc4, sc4, sc4_state, sc4maxcc, ROT0, "Mazooma","Maximus Cash Club (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
+// A:2 A:3 to boot
 // PR1217 MILJONAIRSART12         95004305 MILJONAIRE PR1157
-GAME( 200?, sc4miljo	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Miljonairs (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // Not English
+GAME( 200?, sc4miljo	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Miljonairs (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // Not English
 
+// A:2 A:3 to boot
 // PR1223 MILJONAIRS         95004305 MILJONAIRE PR1157
-GAME( 200?, sc4milja	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Miljonairs Arcade (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // Not English
+GAME( 200?, sc4milja	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Miljonairs Arcade (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // Not English
 
 // PR6904 MONEY BAGS         PR6904 MONEY BAGS SOUNDS11
-GAME( 200?, sc4mbags	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4mbagsa	,sc4mbags,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4mbagsb	,sc4mbags,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4mbagsc	,sc4mbags,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4mbags	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4mbagsa	,sc4mbags,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4mbagsb	,sc4mbags,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4mbagsc	,sc4mbags,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 
 const stepper_interface* sc4mgr_reel_configs[6] =
@@ -25871,35 +25894,70 @@ GAME( 200?, sc4mgrk	    ,sc4mgr,	sc4, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Mone
 GAME( 200?, sc4mgrl	    ,sc4mgr,	sc4, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING )
 GAME( 200?, sc4mgrm	    ,sc4mgr,	sc4, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING )
 
+const stepper_interface* sc4mspid_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpoint_interface_200step_reel,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4mspid)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4mspid_reel_configs;
+}
+
+DRIVER_INIT_MEMBER(sc4_state,sc4mspid_mbus)
+{
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4mspid_reel_configs;
+}
 
 // PR1325 CASINO MONEY SPIDER         PR1325 MONEYSPIDER SOUNDS11
-GAME( 200?, sc4mspid	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spider Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4mspida	,sc4mspid,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spider Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4mspidb	,sc4mspid,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spider Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4mspidc	,sc4mspid,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spider Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4mspidd	,sc4mspid,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spider Casino (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4mspide	,sc4mspid,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spider Casino (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4mspidf	,sc4mspid,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spider Casino (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4mspidg	,sc4mspid,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spider Casino (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
-GAME( 200?, sc4mspidj	,sc4mspid,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spider Casino (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
-GAME( 200?, sc4mspidk	,sc4mspid,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spider Casino (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
-GAME( 200?, sc4mspidl	,sc4mspid,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spider Casino (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
-GAME( 200?, sc4mspidm	,sc4mspid,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spider Casino (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
+GAME( 200?, sc4mspid	,0,			sc4, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4mspida	,sc4mspid,	sc4, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4mspidb	,sc4mspid,	sc4, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4mspidc	,sc4mspid,	sc4, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4mspidd	,sc4mspid,	sc4, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4mspide	,sc4mspid,	sc4, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4mspidf	,sc4mspid,	sc4, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4mspidg	,sc4mspid,	sc4, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+GAME( 200?, sc4mspidj	,sc4mspid,	sc4, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
+GAME( 200?, sc4mspidk	,sc4mspid,	sc4, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
+GAME( 200?, sc4mspidl	,sc4mspid,	sc4, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
+GAME( 200?, sc4mspidm	,sc4mspid,	sc4, sc4, sc4_state, sc4mspid, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
 // PR1325 CASINO MONEY SPIDER         MONEY SPIDER  ARCADE  PR1325 MONEYSPIDER SOUNDS11
-GAME( 200?, sc4mspidh	,sc4mspid,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spider Casino Arcade (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4mspidi	,sc4mspid,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spider Casino Arcade (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4mspidh	,sc4mspid,	sc4, sc4, sc4_state, sc4mspid_mbus, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING )
+GAME( 200?, sc4mspidi	,sc4mspid,	sc4, sc4, sc4_state, sc4mspid_mbus, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING )
 
+const stepper_interface* sc4msclb_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpoint_interface_200step_reel,
+	0,
+	0,
+};
 
+DRIVER_INIT_MEMBER(sc4_state,sc4msclb)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4msclb_reel_configs;
+}
 
 // PR1040 MONEY SPINNER         PR1040 MON S CLUB SOUNDS11
-GAME( 200?, sc4msclb	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spinner Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4msclba	,sc4msclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spinner Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4msclbb	,sc4msclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spinner Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4msclbc	,sc4msclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spinner Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4msclbd	,sc4msclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spinner Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4msclbe	,sc4msclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spinner Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4msclbf	,sc4msclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spinner Club (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4msclbg	,sc4msclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spinner Club (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+GAME( 200?, sc4msclb	,0,			sc4, sc4, sc4_state, sc4msclb, ROT0, "BFM","Money Spinner Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4msclba	,sc4msclb,	sc4, sc4, sc4_state, sc4msclb, ROT0, "BFM","Money Spinner Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4msclbb	,sc4msclb,	sc4, sc4, sc4_state, sc4msclb, ROT0, "BFM","Money Spinner Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4msclbc	,sc4msclb,	sc4, sc4, sc4_state, sc4msclb, ROT0, "BFM","Money Spinner Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4msclbd	,sc4msclb,	sc4, sc4, sc4_state, sc4msclb, ROT0, "BFM","Money Spinner Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4msclbe	,sc4msclb,	sc4, sc4, sc4_state, sc4msclb, ROT0, "BFM","Money Spinner Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4msclbf	,sc4msclb,	sc4, sc4, sc4_state, sc4msclb, ROT0, "BFM","Money Spinner Club (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4msclbg	,sc4msclb,	sc4, sc4, sc4_state, sc4msclb, ROT0, "BFM","Money Spinner Club (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
 // PR6803 MONEY TO BURN         PR6803 BURN SOUNDS11
 GAME( 200?, sc4mtb		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money To Burn (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
@@ -26999,6 +27057,7 @@ GAME( 200?, sc4wadzla	,sc4wadzl,	sc4, sc4, sc4_state, sc4wadzl, ROT0, "Mazooma",
 GAME( 200?, sc4wernr	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Nova","Werner (German) (Nova) (Scorpion 4)", GAME_NOT_WORKING )
 GAME( 200?, sc4wrnlt	,sc4wernr,	sc4, sc4, sc4_state, sc4, ROT0, "Nova","Werner Light (German) (Nova) (Scorpion 4)", GAME_NOT_WORKING )
 
+// Reel 4 is strange ERR24
 //  PR7065 WET 'N' WILD         WILD SOUNDS         WET 'N' WILD
 GAME( 200?, sc4waw		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wet & Wild (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4wawa		,sc4waw,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wet & Wild (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
@@ -27009,82 +27068,122 @@ GAME( 200?, sc4wawe		,sc4waw,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wet & W
 GAME( 200?, sc4wawf		,sc4waw,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wet & Wild (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 
 // PR6812 WHO DARES WINS         PR6812 WHO DARES WINS SOUNDS
-GAME( 200?, sc4wdw		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4wdwa		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4wdwb		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4wdwc		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4wdwd		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4wdwe		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4wdwf		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4wdwg		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
-GAME( 200?, sc4wdwh		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
-GAME( 200?, sc4wdwi		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
-GAME( 200?, sc4wdwj		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
+GAME( 200?, sc4wdw		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wdwa		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wdwb		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wdwc		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wdwd		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wdwe		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wdwf		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wdwg		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wdwh		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wdwi		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wdwj		,sc4wdw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Dares Wins (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_NO_SOUND )
+
+
+const stepper_interface* sc4leg_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpoint_interface_200step_reel,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4leg)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4leg_reel_configs;
+}
 
 // PR7120 WHO WANTS TO BE A LEGIONNAIRE         PR7120 LEGIONNAIRE SOUNDS11
-GAME( 200?, sc4leg		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4lega		,sc4leg,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4legb		,sc4leg,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4legc		,sc4leg,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4legd		,sc4leg,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4lege		,sc4leg,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4legf		,sc4leg,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4legg		,sc4leg,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+GAME( 200?, sc4leg		,0,			sc4, sc4, sc4_state, sc4leg, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4lega		,sc4leg,	sc4, sc4, sc4_state, sc4leg, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4legb		,sc4leg,	sc4, sc4, sc4_state, sc4leg, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4legc		,sc4leg,	sc4, sc4, sc4_state, sc4leg, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4legd		,sc4leg,	sc4, sc4, sc4_state, sc4leg, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4lege		,sc4leg,	sc4, sc4, sc4_state, sc4leg, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4legf		,sc4leg,	sc4, sc4, sc4_state, sc4leg, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4legg		,sc4leg,	sc4, sc4, sc4_state, sc4leg, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4cleg_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpoint_interface_200step_reel,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4cleg)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4cleg_reel_configs;
+}
+
+DRIVER_INIT_MEMBER(sc4_state,sc4cleg_mbus)
+{
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4cleg_reel_configs;
+}
 
 // PR1038 CLUB WHO WANTS TO BE A LEGIONNAIRE         PR1038 CLUB WWTBAL SOUNDS11
-GAME( 200?, sc4legcb	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Wants To Be A Legionnaire Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4legcba	,sc4legcb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Wants To Be A Legionnaire Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4legcbb	,sc4legcb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Wants To Be A Legionnaire Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4legcbc	,sc4legcb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Wants To Be A Legionnaire Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4legcb	,0,			sc4, sc4, sc4_state, sc4cleg, ROT0, "BFM","Who Wants To Be A Legionnaire Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4legcba	,sc4legcb,	sc4, sc4, sc4_state, sc4cleg, ROT0, "BFM","Who Wants To Be A Legionnaire Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4legcbb	,sc4legcb,	sc4, sc4, sc4_state, sc4cleg, ROT0, "BFM","Who Wants To Be A Legionnaire Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4legcbc	,sc4legcb,	sc4, sc4, sc4_state, sc4cleg, ROT0, "BFM","Who Wants To Be A Legionnaire Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+// Alarms through startup, doesn't start game
 //  PR1038 CLUB WHO WANTS TO BE A LEGIONNAIRE         WWTB LEGIONNAIRE  CLUB  PR1038 CLUB WWTBAL SOUNDS11
-GAME( 200?, sc4legcbd	,sc4legcb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Wants To Be A Legionnaire Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4legcbe	,sc4legcb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Who Wants To Be A Legionnaire Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4legcbd	,sc4legcb,	sc4, sc4, sc4_state, sc4cleg_mbus, ROT0, "BFM","Who Wants To Be A Legionnaire Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4legcbe	,sc4legcb,	sc4, sc4, sc4_state, sc4cleg_mbus, ROT0, "BFM","Who Wants To Be A Legionnaire Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
 // PR7144 WILD BUNCH         PR7144 CRAZY FRUITS SOUNDS11
-GAME( 200?, sc4wldbn	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4wldbna	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4wldbnb	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4wldbnc	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4wldbnd	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4wldbne	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4wldbnf	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4wldbni	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
-GAME( 200?, sc4wldbnj	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
-GAME( 200?, sc4wldbnk	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
-GAME( 200?, sc4wldbnn	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
-GAME( 200?, sc4wldbno	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
-GAME( 200?, sc4wldbnp	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING )
-GAME( 200?, sc4wldbnq	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING )
+GAME( 200?, sc4wldbn	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wldbna	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wldbnb	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wldbnc	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wldbnd	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wldbne	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wldbnf	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wldbni	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wldbnj	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wldbnk	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wldbnn	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wldbno	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wldbnp	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wldbnq	,sc4wldbn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 // PR7144 WILD BUNCH         PR7144 WILD BUNCH SOUNDS11        CAS WILD BUNCH  S.SITE
-GAME( 200?, sc4wldbng	,sc4wldbn,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Wild Bunch Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4wldbnh	,sc4wldbn,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Wild Bunch Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4wldbnl	,sc4wldbn,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Wild Bunch Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4wldbnm	,sc4wldbn,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Wild Bunch Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4wldbng	,sc4wldbn,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Wild Bunch Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wldbnh	,sc4wldbn,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Wild Bunch Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wldbnl	,sc4wldbn,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Wild Bunch Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wldbnm	,sc4wldbn,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Wild Bunch Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 // PR7110 WILD THING         PR7110 WILD THING SOUNDS11
-GAME( 200?, sc4wthng	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Thing (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4wthnga	,sc4wthng,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Thing (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4wthngb	,sc4wthng,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Thing (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4wthngc	,sc4wthng,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Thing (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4wthng	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Thing (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wthnga	,sc4wthng,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Thing (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wthngb	,sc4wthng,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Thing (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wthngc	,sc4wthng,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Thing (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 // PR7060CASINO WILDTHING         WILD THING  ARCADE  WILD SOUNDS         WILD THING
-GAME( 200?, sc4wthnm	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino Arcade (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4wthnma	,sc4wthnm,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino Arcade (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4wthnmb	,sc4wthnm,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino Arcade (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4wthnmc	,sc4wthnm,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino Arcade (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4wthnmd	,sc4wthnm,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino Arcade (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4wthnme	,sc4wthnm,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino Arcade (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4wthnmf	,sc4wthnm,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino Arcade (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4wthnm	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino Arcade (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wthnma	,sc4wthnm,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino Arcade (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wthnmb	,sc4wthnm,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino Arcade (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wthnmc	,sc4wthnm,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino Arcade (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wthnmd	,sc4wthnm,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino Arcade (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wthnme	,sc4wthnm,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino Arcade (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wthnmf	,sc4wthnm,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino Arcade (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 // PR7060CASINO WILDTHING         WILD SOUNDS         WILD THING
-GAME( 200?, sc4wtc		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4wtca		,sc4wtc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4wtcb		,sc4wtc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4wtcc		,sc4wtc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4wtcd		,sc4wtc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4wtce		,sc4wtc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4wtcf		,sc4wtc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4wtc		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wtca		,sc4wtc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wtcb		,sc4wtc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wtcc		,sc4wtc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wtcd		,sc4wtc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wtce		,sc4wtc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4wtcf		,sc4wtc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 const stepper_interface* sc4wspin_reel_configs[6] =
 {
