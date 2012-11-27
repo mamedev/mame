@@ -279,9 +279,12 @@ Games for the MIXT BOOK PLAYER COPERA
 		<description>Ein Jahr in Winnie Puuhs Leben (Ger)</description>
 		<year>199?</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="49021-18"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17790-H" />
 			<dataarea name="rom" size="524288">
-				<rom name="ein jahr in winnie puuhs leben (germany).bin" size="524288" crc="b4120752" sha1="3c3af9d643060e5a5477210c67528923ff107751" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17790-h.ic1" size="524288" crc="b4120752" sha1="3c3af9d643060e5a5477210c67528923ff107751" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -703,8 +706,10 @@ Games for the MIXT BOOK PLAYER COPERA
 		<publisher>Sega</publisher>
 		<info name="serial" value="49022-09" />
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-17736-MX" />
 			<dataarea name="rom" size="524288">
-				<rom name="ecco jr. et la chasse au tresor sous-marine! (france).bin" size="524288" crc="1b7b3825" sha1="64706b5f1240941a4989db96dab432aed6009e0a" offset="0" loadflag="load16_word_swap" />
+				<rom name="mpr-17736-mx.ic1" size="524288" crc="1b7b3825" sha1="64706b5f1240941a4989db96dab432aed6009e0a" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1212,9 +1217,12 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<description>The Lion King - Adventures at Pride Rock (Euro)</description>
 		<year>19??</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="49037-05"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18460 J30" />
 			<dataarea name="rom" size="1048576">
-				<rom name="the lion king - adventures at pride rock (europe).bin" size="1048576" crc="a7b92dc1" sha1="7f20cd3bec73624f93c8235887ad82f33a78077e"  offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18460 j30.ic1" size="1048576" crc="a7b92dc1" sha1="7f20cd3bec73624f93c8235887ad82f33a78077e"  offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1391,17 +1399,6 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="mickblstg" cloneof="mickblst" supported="no">
-		<description>Mickey - Ausflug in die Vergangenheit (Ger)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="mickey - ausflug in die vergangenheit (germany).bin" size="524288" crc="627ea96c" sha1="eab3c41aef6c30adc82e92e143ffc0360118b99e" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mickblstf" cloneof="mickblst" supported="no">
 		<description>Mickey - Fait un Voyage Eclair Dans Le Passé (Fra)</description>
 		<year>1994</year>
@@ -1412,6 +1409,34 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic1" value="MPR-17784-H" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-17784-h.ic1" size="524288" crc="fafee898" sha1="6cacd57339ad8dcdbc40f08abffb6fa0f00b5ae5" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblstg" cloneof="mickblst" supported="no">
+		<description>Mickey - Ausflug in die Vergangenheit (Ger)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49024-18" />
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17785-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17785-h.ic1" size="524288" crc="627ea96c" sha1="eab3c41aef6c30adc82e92e143ffc0360118b99e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblsti" cloneof="mickblst" supported="no">
+		<description>Lancio di Topolino nel Passato (Ita)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49024-13" />
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-17786-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17786-t.ic1" size="524288" crc="6e406f2c" sha1="16702ae751798a59e7c81c3e373ceb247b1ea0c3" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1578,11 +1603,14 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 
 	<software name="pocahont">
 		<description>Pocahontas (Euro)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>199?</year>
+		<publisher>Sega?</publisher>
+		<info name="serial" value="49030-05"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18579 J34" />
 			<dataarea name="rom" size="1048576">
-				<rom name="pocahontas (europe).bin" size="1048576" crc="deefbfd9" sha1="8376f01619def050fa7a2f53d48aa32ab0e860cd" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18579 j34.ic1" size="1048576" crc="deefbfd9" sha1="8376f01619def050fa7a2f53d48aa32ab0e860cd" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1591,6 +1619,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<description>Pocahontas - Riverbend Adventures (USA)</description>
 		<year>199?</year>
 		<publisher>Sega?</publisher>
+		<info name="serial" value="49030-00"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="pocahontas - riverbend adventures (u).bin" size="1048576" crc="edf2218b" sha1="b2c70bb26f9fed925b6beab27db73d8fc7e21cd7" offset="000000" loadflag="load16_word_swap" />
@@ -2031,18 +2060,21 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 
 	<software name="tailsmmg" cloneof="tailsmm">
 		<description>Tails und der Musikant (Ger)</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="49023-18"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17727-H" />
 			<dataarea name="rom" size="524288">
-				<rom name="tails und der musikant (germany).bin" size="524288" crc="8edf7d4c" sha1="0b477e485a143b5bab7d26925bd587b0f3da2695" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17727-h.ic1" size="524288" crc="8edf7d4c" sha1="0b477e485a143b5bab7d26925bd587b0f3da2695" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="tailsmmf" cloneof="tailsmm">
 		<description>Tails et le Faiseur de Musique (Fra)</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="49023-09" />
 		<part name="cart" interface="pico_cart">
