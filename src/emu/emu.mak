@@ -181,6 +181,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/eeprom.o		\
 	$(EMUMACHINE)/er2055.o		\
 	$(EMUMACHINE)/f3853.o		\
+	$(EMUMACHINE)/fdc_pll.o		\
 	$(EMUMACHINE)/generic.o		\
 	$(EMUMACHINE)/i2cmem.o		\
 	$(EMUMACHINE)/i8155.o		\

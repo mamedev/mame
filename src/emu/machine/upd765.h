@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "imagedev/floppy.h"
+#include "fdc_pll.h"
 
 /*
  * ready = true if the ready line is physically connected to the floppy drive
@@ -272,7 +273,7 @@ protected:
 		bool data_separator_phase, data_bit_context;
 		UINT8 data_reg;
 		UINT8 idbuf[6];
-		pll_t pll;
+		fdc_pll_t pll;
 	};
 
 	static int rates[4];
