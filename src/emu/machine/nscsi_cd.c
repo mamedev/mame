@@ -23,7 +23,7 @@ void nscsi_cdrom_device::device_reset()
 	cur_lba = -1;
 }
 
-cdrom_interface nscsi_cdrom_device::cd_intf = { 0, 0 };
+cdrom_interface nscsi_cdrom_device::cd_intf = { "cdrom", NULL };
 
 static MACHINE_CONFIG_FRAGMENT(scsi_cdrom)
 	MCFG_CDROM_ADD("image", nscsi_cdrom_device::cd_intf)

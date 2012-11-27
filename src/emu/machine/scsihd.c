@@ -52,8 +52,10 @@ void scsihd_device::device_reset()
 	}
 }
 
+harddisk_interface scsihd_device::hd_intf = { NULL, NULL, "scsi_hdd", NULL };
+
 static MACHINE_CONFIG_FRAGMENT(scsi_harddisk)
-	MCFG_HARDDISK_ADD("image")
+	MCFG_HARDDISK_CONFIG_ADD("image", scsihd_device::hd_intf)
 MACHINE_CONFIG_END
 
 machine_config_constructor scsihd_device::device_mconfig_additions() const

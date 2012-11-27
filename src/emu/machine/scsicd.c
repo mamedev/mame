@@ -64,7 +64,7 @@ void scsicd_device::device_reset()
 	play_err_flag = 0;
 }
 
-cdrom_interface scsicd_device::cd_intf = { 0, 0 };
+cdrom_interface scsicd_device::cd_intf = { "cdrom", NULL };
 
 static MACHINE_CONFIG_FRAGMENT(scsi_cdrom)
 	MCFG_CDROM_ADD("image", scsicd_device::cd_intf)
