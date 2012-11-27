@@ -260,7 +260,10 @@ bool floppy_image_device::call_load()
 	}
 
 	if(!best_format)
+	{
+		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to identify the image format");
 		return IMAGE_INIT_FAIL;
+	}
 
 	image = global_alloc(floppy_image(tracks, sides, form_factor));
 	best_format->load(&io, form_factor, image);
