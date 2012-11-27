@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "imagedev/floppy.h"
-#include "upd765.h"
+#include "machine/upd765.h"
 
 #define MCFG_PC_FDC_XT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PC_FDC_XT, 0)

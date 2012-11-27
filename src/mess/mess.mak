@@ -526,7 +526,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/mos6530.o	\
 	$(MESS_MACHINE)/s100.o		\
 	$(MESS_MACHINE)/serial.o	\
-	$(MESS_MACHINE)/upd765.o	\
 	$(MESS_MACHINE)/ncr5380.o	\
 	$(MESS_MACHINE)/ncr5390.o	\
 	$(MESS_MACHINE)/pc_kbdc.o	\
@@ -554,7 +553,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/dp8390.o	\
 	$(MESS_MACHINE)/ne1000.o	\
 	$(MESS_MACHINE)/ne2000.o	\
-	$(MESS_MACHINE)/wd1772.o	\
 	$(MESS_MACHINE)/3c503.o		\
 	$(MESS_FORMATS)/z80bin.o	\
 	$(MESS_MACHINE)/mb8795.o	\
