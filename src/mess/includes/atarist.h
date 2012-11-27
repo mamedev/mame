@@ -16,7 +16,7 @@
 #include "machine/mc68901.h"
 #include "machine/rescap.h"
 #include "machine/rp5c15.h"
-#include "machine/wd1772.h"
+#include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
 #include "sound/lmc1992.h"
 

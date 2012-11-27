@@ -17,7 +17,7 @@
 #include "formats/hxcmfm_dsk.h"
 #include "formats/mfi_dsk.h"
 #include "imagedev/flopdrv.h"
-#include "machine/wd1772.h"
+#include "machine/wd_fdc.h"
 #include "machine/ram.h"
 #include "includes/b2m.h"
 

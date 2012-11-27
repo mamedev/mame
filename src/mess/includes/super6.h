@@ -17,7 +17,7 @@
 #include "machine/z80pio.h"
 #include "machine/ram.h"
 #include "machine/terminal.h"
-#include "machine/wd1772.h"
+#include "machine/wd_fdc.h"
 
 #define Z80_TAG			"u30"
 #define Z80CTC_TAG		"u20"

@@ -10,7 +10,7 @@
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
-#include "machine/wd1772.h"
+#include "machine/wd_fdc.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
 

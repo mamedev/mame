@@ -12,7 +12,7 @@
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "machine/wd1772.h"
+#include "machine/wd_fdc.h"
 #include "machine/pic8259.h"
 #include "machine/i8251.h"
 #include "includes/b2m.h"

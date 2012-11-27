@@ -271,9 +271,9 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/upd7201.o		\
 	$(EMUMACHINE)/upd765.o		\
 	$(EMUMACHINE)/v3021.o		\
-	$(EMUMACHINE)/wd1772.o		\
 	$(EMUMACHINE)/wd17xx.o		\
 	$(EMUMACHINE)/wd33c93.o		\
+	$(EMUMACHINE)/wd_fdc.o		\
 	$(EMUMACHINE)/x2212.o		\
 	$(EMUMACHINE)/x76f041.o		\
 	$(EMUMACHINE)/x76f100.o		\

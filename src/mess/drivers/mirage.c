@@ -67,7 +67,7 @@ PA4/PA5 are the "enable" for the two LEDs
 #include "cpu/m6809/m6809.h"
 #include "machine/6850acia.h"
 #include "machine/6522via.h"
-#include "machine/wd1772.h"
+#include "machine/wd_fdc.h"
 #include "formats/esq8_dsk.h"
 #include "formats/mfi_dsk.h"
 #include "formats/dfi_dsk.h"

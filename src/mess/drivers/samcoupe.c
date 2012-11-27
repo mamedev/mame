@@ -34,7 +34,7 @@
 
 /* components */
 #include "cpu/z80/z80.h"
-#include "machine/wd1772.h"
+#include "machine/wd_fdc.h"
 #include "machine/msm6242.h"
 #include "machine/ctronics.h"
 #include "sound/saa1099.h"

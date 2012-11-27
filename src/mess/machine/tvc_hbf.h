@@ -5,7 +5,7 @@
 
 #include "emu.h"
 #include "machine/tvcexp.h"
-#include "machine/wd1772.h"
+#include "machine/wd_fdc.h"
 #include "formats/tvc_dsk.h"
 
 

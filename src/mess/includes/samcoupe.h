@@ -11,7 +11,7 @@
 #ifndef SAMCOUPE_H_
 #define SAMCOUPE_H_
 
-#include "machine/wd1772.h"
+#include "machine/wd_fdc.h"
 
 /* screen dimensions */
 #define SAM_BLOCK			8

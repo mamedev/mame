@@ -10,7 +10,7 @@
 #include "video/mc6845.h"
 #include "cpu/z80/z80daisy.h"
 #include "imagedev/floppy.h"
-#include "machine/wd1772.h"
+#include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 
 /***************************************************************************

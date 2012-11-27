@@ -19,7 +19,7 @@
 #include "formats/mfi_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/adamnet.h"
-#include "machine/wd1772.h"
+#include "machine/wd_fdc.h"
 
 
 

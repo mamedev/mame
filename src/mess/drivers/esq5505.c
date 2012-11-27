@@ -96,7 +96,7 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/es5506.h"
 #include "machine/68681.h"
-#include "machine/wd1772.h"
+#include "machine/wd_fdc.h"
 #include "machine/hd63450.h"    // compatible with MC68450, which is what these really have
 #include "formats/esq16_dsk.h"
 #include "formats/mfi_dsk.h"

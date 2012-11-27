@@ -61,7 +61,7 @@
 #include "video/tms9928a.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "machine/wd1772.h"
+#include "machine/wd_fdc.h"
 #include "formats/hxcmfm_dsk.h"
 #include "formats/mfi_dsk.h"
 #include "formats/dsk_dsk.h"

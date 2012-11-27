@@ -115,7 +115,7 @@ NOTES:
 #include "cpu/m6809/m6809.h"
 #include "sound/es5503.h"
 #include "machine/68681.h"
-#include "machine/wd1772.h"
+#include "machine/wd_fdc.h"
 
 #include "machine/esqvfd.h"
 

@@ -20,7 +20,7 @@
 #include "machine/scsicb.h"
 #include "machine/scsihd.h"
 #include "machine/v1050kb.h"
-#include "machine/wd1772.h"
+#include "machine/wd_fdc.h"
 #include "video/mc6845.h"
 
 #define SCREEN_TAG				"screen"
