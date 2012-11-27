@@ -14,11 +14,12 @@
     TODO (PC-9801RS):
     - floppy disk hook-up;
     - extra features;
-    - clean-up duplicating code;
+    - clean-up duplicate code;
 
     TODO (PC-9821):
     - fix CPU for some clones;
-    - PARITY ERROR, presumably it needs a far better emulation of the i8251 ports
+    - "cache error", there might be "windowed" RAM at 0x80000-0x9ffff (hence the RAM POST
+      that stops at 512k)
 
     TODO: (PC-486MU)
     - Tries to read port C of i8255_sys (-> 0x35) at boot without setting up the control
@@ -317,6 +318,8 @@ public:
 	/* PC9821 specific */
 	UINT8 m_analog256,m_analog256e;
 	UINT8 m_sdip[24], m_sdip_bank;
+	UINT8 *m_ideram;
+	UINT8 *m_ext_gvram;
 
 	DECLARE_READ8_MEMBER(pc9801_xx_r);
 	DECLARE_WRITE8_MEMBER(pc9801_xx_w);
@@ -376,9 +379,13 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9821_video_ff_w);
 	DECLARE_READ8_MEMBER(pc9821_a0_r);
 	DECLARE_WRITE8_MEMBER(pc9821_a0_w);
+	DECLARE_READ8_MEMBER(pc9821_pit_r);
+	DECLARE_WRITE8_MEMBER(pc9821_pit_w);
 	DECLARE_READ8_MEMBER(ide_status_r);
 	DECLARE_READ8_MEMBER(pc9801rs_access_ctrl_r);
 	DECLARE_WRITE8_MEMBER(pc9801rs_access_ctrl_w);
+	DECLARE_READ8_MEMBER(pc9821_memory_r);
+	DECLARE_WRITE8_MEMBER(pc9821_memory_w);
 
 	DECLARE_READ8_MEMBER(sdip_0_r);
 	DECLARE_READ8_MEMBER(sdip_1_r);
@@ -405,6 +412,11 @@ public:
 	DECLARE_WRITE8_MEMBER(sdip_9_w);
 	DECLARE_WRITE8_MEMBER(sdip_a_w);
 	DECLARE_WRITE8_MEMBER(sdip_b_w);
+
+	DECLARE_READ8_MEMBER(pc9821_ideram_r);
+	DECLARE_WRITE8_MEMBER(pc9821_ideram_w);
+	DECLARE_READ8_MEMBER(pc9821_ext_gvram_r);
+	DECLARE_WRITE8_MEMBER(pc9821_ext_gvram_w);
 
 	void fdc_2hd_irq(bool state);
 	void fdc_2hd_drq(bool state);
@@ -1305,7 +1317,6 @@ READ8_MEMBER(pc9801_state::pc9801rs_ipl_r)
 
 READ8_MEMBER(pc9801_state::pc9801rs_knjram_r)
 {
-
 	UINT8 *KNJRAM = memregion("kanji")->base();
 
 	return KNJRAM[offset];
@@ -1664,9 +1675,67 @@ ADDRESS_MAP_END
  *
  ************************************/
 
+/* Note: not hooking this up causes "MEMORY ERROR" at POST */
+READ8_MEMBER(pc9801_state::pc9821_ideram_r)
+{
+	return m_ideram[offset];
+}
+
+WRITE8_MEMBER(pc9801_state::pc9821_ideram_w)
+{
+	m_ideram[offset] = data;
+}
+
+READ8_MEMBER(pc9801_state::pc9821_ext_gvram_r)
+{
+	return m_ext_gvram[offset];
+}
+
+WRITE8_MEMBER(pc9801_state::pc9821_ext_gvram_w)
+{
+	m_ext_gvram[offset] = data;
+}
+
+
+READ8_MEMBER(pc9801_state::pc9821_memory_r)
+{
+	if(m_gate_a20 == 0)
+		offset &= 0xfffff;
+
+	if	   (                        offset <= 0x0007ffff)                   { return pc9801rs_wram_r(space,offset);               }
+	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { return pc9801_tvram_r(space,offset-0xa0000);        }
+	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { return pc9801rs_knjram_r(space,offset & 0xfff);     }
+	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { return pc9801_gvram_r(space,offset-0xa8000);        }
+	else if(offset >= 0x000da000 && offset <= 0x000dbfff)					{ return pc9821_ideram_r(space,offset & 0x1fff);      }
+	else if(offset >= 0x000e0000 && offset <= 0x000fffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
+	else if(offset >= 0x00f00000 && offset <= 0x00f9ffff)					{ return pc9821_ext_gvram_r(space,offset-0x00f00000); }
+	else if(offset >= 0x01000000 && offset <= 0x01000000+m_ram_size-1)      { return pc9801rs_ex_wram_r(space,offset-0x01000000); }
+	else if(offset >= 0xfffe0000 && offset <= 0xffffffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
+
+	printf("%08x\n",offset);
+	return 0x00;
+}
+
+
+WRITE8_MEMBER(pc9801_state::pc9821_memory_w)
+{
+	if(m_gate_a20 == 0)
+		offset &= 0xfffff;
+
+	if	   (                        offset <= 0x0007ffff)                   { pc9801rs_wram_w(space,offset,data);                  }
+	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { pc9801_tvram_w(space,offset-0xa0000,data);           }
+	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { pc9801rs_knjram_w(space,offset & 0xfff,data);        }
+	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { pc9801_gvram_w(space,offset-0xa8000,data);           }
+	else if(offset >= 0x000da000 && offset <= 0x000dbfff)					{ pc9821_ideram_w(space,offset & 0x1fff,data);         }
+	else if(offset >= 0x00f00000 && offset <= 0x00f9ffff)					{ pc9821_ext_gvram_w(space,offset-0x00f00000,data);    }
+	else if(offset >= 0x01000000 && offset <= 0x01000000+m_ram_size-1)      { pc9801rs_ex_wram_w(space,offset-0x01000000,data);    }
+	else
+	  printf("%08x %08x\n",offset,data);
+
+}
+
 WRITE8_MEMBER(pc9801_state::pc9821_video_ff_w)
 {
-
 	if(offset == 2)
 	{
 		switch(data & 0xf8)	// pc-9821 specific extended registers
@@ -1681,7 +1750,6 @@ WRITE8_MEMBER(pc9801_state::pc9821_video_ff_w)
 
 READ8_MEMBER(pc9801_state::pc9821_a0_r)
 {
-
 	if((offset & 1) == 0 && offset & 8)
 	{
 		if(m_analog256)
@@ -1718,6 +1786,39 @@ WRITE8_MEMBER(pc9801_state::pc9821_a0_w)
 	}
 
 	pc9801rs_a0_w(space,offset,data);
+}
+
+READ8_MEMBER(pc9801_state::pc9821_pit_r)
+{
+	if((offset & 1) == 0)
+	{
+		printf("Read to undefined port [%04x]\n",offset+0x3fd8);
+		return 0xff;
+	}
+	else // odd
+	{
+		if(offset & 0x08)
+			printf("Read to undefined port [%02x]\n",offset+0x3fd8);
+		else
+			return pit8253_r(machine().device("pit8253"), space, (offset & 6) >> 1);
+	}
+
+	return 0xff;
+}
+
+WRITE8_MEMBER(pc9801_state::pc9821_pit_w)
+{
+	if((offset & 1) == 0)
+	{
+		printf("Write to undefined port [%04x] <- %02x\n",offset+0x3fd8,data);
+	}
+	else // odd
+	{
+		if(offset < 0x08)
+			pit8253_w(machine().device("pit8253"), space, (offset & 6) >> 1, data);
+		else
+			printf("Write to undefined port [%04x] <- %02x\n",offset+0x3fd8,data);
+	}
 }
 
 READ8_MEMBER(pc9801_state::ide_status_r)
@@ -1782,7 +1883,7 @@ WRITE8_MEMBER(pc9801_state::sdip_b_w)
 }
 
 static ADDRESS_MAP_START( pc9821_map, AS_PROGRAM, 32, pc9801_state )
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE8(pc9801rs_memory_r,pc9801rs_memory_w,0xffffffff)
+	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE8(pc9821_memory_r,pc9821_memory_w,0xffffffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
@@ -1827,7 +1928,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 //  AM_RANGE(0x0c2d, 0x0c2d) cs4231 PCM board hi byte control
 //  AM_RANGE(0x0cc0, 0x0cc7) SCSI interface / <undefined>
 //  AM_RANGE(0x0cfc, 0x0cff) PCI bus
-//  AM_RANGE(0x3fd8, 0x3fdf) <undefined> / pit mirror ports
+	AM_RANGE(0x3fd8, 0x3fdf) AM_READWRITE8(pc9821_pit_r,        pc9821_pit_w,        0xffffffff) // <undefined> / pit mirror ports
 //  AM_RANGE(0x7fd8, 0x7fdf) <undefined> / mouse ppi8255 ports
 	AM_RANGE(0x841c, 0x841f) AM_READWRITE8(sdip_0_r,sdip_0_w,0xffffffff)
 	AM_RANGE(0x851c, 0x851f) AM_READWRITE8(sdip_1_r,sdip_1_w,0xffffffff)
@@ -2616,6 +2717,7 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 	m_rom_bank = 0;
 	m_fdc_ctrl = 3;
 	m_access_ctrl = 0;
+	m_keyb_press = 0xff; // temp kludge, for PC-9821 booting
 
 	m_ram_size = machine().device<ram_device>(RAM_TAG)->size() - 0xa0000;
 }
@@ -2623,7 +2725,13 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 MACHINE_START_MEMBER(pc9801_state,pc9821)
 {
 	MACHINE_START_CALL_MEMBER(pc9801);
+
+	m_ideram = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_ext_gvram = auto_alloc_array(machine(), UINT8, 0xa0000);
+
 	state_save_register_global_pointer(machine(), m_sdip, 24);
+	state_save_register_global_pointer(machine(), m_ideram, 0x2000);
+	state_save_register_global_pointer(machine(), m_ext_gvram, 0xa0000);
 }
 
 INTERRUPT_GEN_MEMBER(pc9801_state::pc9801_vrtc_irq)
