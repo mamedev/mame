@@ -1,5 +1,5 @@
-#ifndef WD1772_H
-#define WD1772_H
+#ifndef WD_FDC_H
+#define WD_FDC_H
 
 #include "emu.h"
 #include "imagedev/floppy.h"
@@ -65,11 +65,11 @@
 #define MCFG_WD1773x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, WD1773x, _clock)
 
-class wd177x_t : public device_t {
+class wd_fdc_t : public device_t {
 public:
 	typedef delegate<void (bool state)> line_cb;
 
-	wd177x_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	wd_fdc_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 	void dden_w(bool dden);
 	void set_floppy(floppy_image_device *floppy);
@@ -369,7 +369,7 @@ private:
 	void set_drq();
 };
 
-class fd1771_t : public wd177x_t {
+class fd1771_t : public wd_fdc_t {
 public:
 	fd1771_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
@@ -380,7 +380,7 @@ protected:
 	virtual bool has_side_check() const { return true; }
 };
 
-class fd1793_t : public wd177x_t {
+class fd1793_t : public wd_fdc_t {
 public:
 	fd1793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
@@ -391,7 +391,7 @@ protected:
 	virtual bool has_side_check() const { return true; }
 };
 
-class fd1797_t : public wd177x_t {
+class fd1797_t : public wd_fdc_t {
 public:
 	fd1797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
@@ -403,7 +403,7 @@ protected:
 	virtual bool has_sector_length_select() const { return true; }
 };
 
-class wd2793_t : public wd177x_t {
+class wd2793_t : public wd_fdc_t {
 public:
 	wd2793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
@@ -414,7 +414,7 @@ protected:
 	virtual bool has_side_check() const { return true; }
 };
 
-class wd2797_t : public wd177x_t {
+class wd2797_t : public wd_fdc_t {
 public:
 	wd2797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
@@ -426,7 +426,7 @@ protected:
 	virtual bool has_sector_length_select() const { return true; }
 };
 
-class wd1770_t : public wd177x_t {
+class wd1770_t : public wd_fdc_t {
 public:
 	wd1770_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
@@ -435,7 +435,7 @@ protected:
 	virtual bool has_precompensation() const { return true; }
 };
 
-class wd1772_t : public wd177x_t {
+class wd1772_t : public wd_fdc_t {
 public:
 	wd1772_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
@@ -446,7 +446,7 @@ protected:
 	virtual int settle_time() const;
 };
 
-class wd1773_t : public wd177x_t {
+class wd1773_t : public wd_fdc_t {
 public:
 	wd1773_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 

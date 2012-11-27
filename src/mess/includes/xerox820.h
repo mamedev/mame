@@ -59,7 +59,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_kbpio;
 	required_device<z80ctc_device> m_ctc;
-	required_device<wd177x_t> m_fdc;
+	required_device<fd1771_t> m_fdc;
 	required_device<ram_device> m_ram;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
