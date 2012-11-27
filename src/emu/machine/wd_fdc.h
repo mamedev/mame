@@ -4,6 +4,43 @@
 #include "emu.h"
 #include "imagedev/floppy.h"
 
+/*
+ * The Western Digital floppy controller family
+ *
+
+ * Chip   Bus      SCtrl SCmp Len HLO Motor Rdy MFM clock  ENMF 58 pll
+
+ * fd1771 inverted n     n    y   y   n     y   n   2MHz   n    n  analog
+
+ * fd1781 inverted n     n    y   y   n     y   y   1/2MHz n    n  analog
+
+ * fd1791 inverted n     y    n   y   n     y   y   1/2MHz n    n  analog
+ * fd1792 inverted n     y    n   y   n     y   n   1/2MHz n    n  analog
+ * fd1793 normal   n     y    n   y   n     y   y   1/2MHz n    n  analog
+ * fd1794 normal   n     y    n   y   n     y   n   1/2MHz n    n  analog
+ * fd1795 inverted y     n    y   y   n     y   y   1/2MHz n    n  analog
+ * fd1797 normal   y     n    y   y   n     y   y   1/2MHz n    n  analog
+
+ * mb8866 inverted n     n    n   y   n     y   y   1/2MHz n    n  analog   (fd1791 compatible)
+ * mb8876 inverted n     y    n   y   n     y   y   1/2MHz n    n  analog   (fd1791-01/02 compatible)
+ * mb8877 normal   n     y    n   y   n     y   y   1/2MHz n    n  analog   (fd1793 compatible)
+
+ * fd1761 inverted n     y    n   y   n     y   y   1MHz   n    n  analog
+ * fd1763 normal   n     y    n   y   n     y   y   1MHz   n    n  analog
+ * fd1765 inverted y     n    y   y   n     y   y   1MHz   n    n  analog
+ * fd1767 normal   y     n    y   y   n     y   y   1MHz   n    n  analog
+
+ * wd2791 inverted n     y    n   y   n     y   y   1/2MHz y    y  analog
+ * wd2793 normal   n     y    n   y   n     y   y   1/2MHz y    y  analog
+ * wd2795 inverted y     n    y   y   n     y   y   1/2MHz n    y  analog
+ * wd2797 normal   y     n    y   y   n     y   y   1/2MHz n    y  analog
+   
+ * wd1770 normal   n     n    n   n   y     n   y   8Mhz   n    n  digital
+ * wd1772 normal   n     n    n   n   y     n   y   8MHz   n    n  digital
+ * wd1773 normal   n     y    n   n   n     y   y   8MHz   n    n  digital
+
+ */
+
 #define MCFG_FD1771x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, FD1771x, _clock)
 
