@@ -1,22 +1,3 @@
-/*
-
-H8/3xx: Unknown opcode (PC=1c966) 10f - not a valid H8 or H8S opcode, either bad dump or banked ROM
-maygayep.c  ep_cfallc
-
-H8/3xx: Unknown opcode (PC=6bfffefe) 230 - STMAC
-coinmvga.c  cmkenosp
-
-H8/3xx: Unknown opcode (PC=67fffefe) 230 - STMAC
-coinmvga.c  cmkenospa
-
-H8/3xx: Unknown opcode (PC=8f91) aeb - ADD.L ERs, ERd
-maygayep.c  ep_hogmnc
-
-H8/3xx: Unknown opcode (PC=20000) 6b6e - MOV.B @ERs, Rd
-maygayep.c  ep_wordf
-
-*/
-
 static UINT32 udata32, address24;
 static INT32 sdata32;
 static UINT16 udata16, ext16;
@@ -1690,7 +1671,7 @@ static void h8_group5(h83xx_state *h8, UINT16 opcode)
 				h8_setreg32(h8, H8_SP, h8_getreg32(h8, H8_SP)+4);
 
 				// extended mode
-				h8->pc = udata32;
+				h8->pc = udata32 & H8_ADDR_MASK;
 			}
 			// must do this last, because set_ccr() does a check_irq()
 			h8_set_ccr(h8, udata8);
@@ -1908,6 +1889,40 @@ static void h8_group6(h83xx_state *h8, UINT16 opcode)
 			h8_mov8(h8, udata8); // flags only
 			h8_setreg8(h8, opcode & 0xf, udata8);
 			H8_IFETCH_TIMING(1);
+			H8_BYTE_TIMING(1, address24);
+			break;
+		case 0x1:	// btst #xx, @aa:16 or btst Rn, @aa:16
+			sdata16 = h8_mem_read16(h8, h8->pc);
+			h8->pc += 2;
+			address24 = sdata16 & H8_ADDR_MASK;
+			udata16 = h8_mem_read16(h8, h8->pc);
+			h8->pc += 2;
+			udata8 = h8_mem_read8(address24);
+			if ((udata16 & 0xff00) == 0x7300)
+			{
+				h8_btst8(h8, (udata16 >> 4) & 0x7, udata8);
+				h8_mem_write8(address24, udata8);
+			}
+			else if ((udata16 & 0xff0f) == 0x7000)
+			{
+				h8_bset8(h8, (udata16 >> 4) & 0x7, udata8);
+				h8_mem_write8(address24, udata8);
+			}
+			else if ((udata16 & 0xff00) == 0x6300) 
+			{
+				h8_btst8(h8, h8_getreg8(h8, (udata16 >> 4) & 0xf), udata8);
+				h8_mem_write8(address24, udata8);
+			}
+			else if ((udata16 & 0xff0f) == 0x6000) 
+			{
+				h8_bset8(h8, h8_getreg8(h8, (udata16 >> 4) & 0xf), udata8);
+				h8_mem_write8(address24, udata8);
+			}
+			else
+			{
+				h8->h8err = 1;
+			}
+			H8_IFETCH_TIMING(3);
 			H8_BYTE_TIMING(1, address24);
 			break;
 		case 0x2:
@@ -4219,11 +4234,9 @@ static int h8_branch(h83xx_state *h8, UINT8 condition)
 		if(h8->h8zflag == 1)taken = 1;
 		break;
 	case 8: // bvc V = 0
-		h8->h8err = 1;
 		if(h8->h8vflag == 0)taken = 1;
 		break;
 	case 9: // bvs V = 1
-		h8->h8err = 1;
 		if(h8->h8vflag == 1)taken = 1;
 		break;
 	case 0xa: // bpl N = 0

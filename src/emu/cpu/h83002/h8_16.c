@@ -723,6 +723,23 @@ static WRITE16_HANDLER( h8s2394_per_regs_w )
 	}
 }
 
+static WRITE16_HANDLER( h8s2655_per_regs_w )
+{
+	h83xx_state *h8 = get_safe_token(&space.device());
+	if (mem_mask == 0xffff)
+	{
+		h8s2655_per_regs_write_16(h8, (offset << 1), data);
+	}
+	else if (mem_mask & 0xff00)
+	{
+		h8s2655_per_regs_write_8(h8, (offset << 1), (data >> 8) & 0xff);
+	}
+	else if (mem_mask == 0x00ff)
+	{
+		h8s2655_per_regs_write_8(h8, (offset << 1) + 1, data & 0xff);
+	}
+}
+
 static READ16_HANDLER( h8s2241_per_regs_r )
 {
 	h83xx_state *h8 = get_safe_token(&space.device());
@@ -795,6 +812,24 @@ static READ16_HANDLER( h8s2394_per_regs_r )
 	return 0;
 }
 
+static READ16_HANDLER( h8s2655_per_regs_r )
+{
+	h83xx_state *h8 = get_safe_token(&space.device());
+	if (mem_mask == 0xffff)
+	{
+		return h8s2655_per_regs_read_16(h8, (offset << 1));
+	}
+	else if (mem_mask == 0xff00)
+	{
+		return h8s2655_per_regs_read_8(h8, (offset << 1)) << 8;
+	}
+	else if (mem_mask == 0x00ff)
+	{
+		return h8s2655_per_regs_read_8(h8, (offset << 1) + 1);
+	}
+	return 0;
+}
+
 // On-board RAM and peripherals
 static ADDRESS_MAP_START( h8_3002_internal_map, AS_PROGRAM, 16, legacy_cpu_device )
 	// 512B RAM
@@ -833,6 +868,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( h8s_2394_internal_map, AS_PROGRAM, 16, legacy_cpu_device )
 	AM_RANGE( 0xFF7C00, 0xFFFBFF ) AM_RAM // 32K of on-chip ram
 	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE_LEGACY( h8s2394_per_regs_r, h8s2394_per_regs_w ) // internal i/o registers
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( h8s_2655_internal_map, AS_PROGRAM, 16, legacy_cpu_device )
+	AM_RANGE( 0xFFEC00, 0xFFFBFF ) AM_RAM // on-chip ram
+	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE_LEGACY( h8s2655_per_regs_r, h8s2655_per_regs_w ) // internal i/o registers
 ADDRESS_MAP_END
 
 CPU_GET_INFO( h8_3002 )
@@ -989,6 +1029,20 @@ CPU_GET_INFO( h8s_2394 )
 	}
 }
 
+CPU_GET_INFO( h8s_2655 )
+{
+	switch (state)
+	{
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(h8s_2655_internal_map);  break;
+        case CPUINFO_FCT_SET_INFO:			info->setinfo = CPU_SET_INFO_NAME(h8s_2394);		break;
+		case CPUINFO_FCT_INIT:				info->init = CPU_INIT_NAME(h8s_2xxx);		break;
+		case CPUINFO_FCT_RESET:				info->reset= CPU_RESET_NAME(h8s_2xxx);			break;
+		case CPUINFO_STR_NAME:				strcpy(info->s, "H8S/2655");		break;
+		default:
+			CPU_GET_INFO_CALL(h8_3002);
+	}
+}
+
 DEFINE_LEGACY_CPU_DEVICE(H83002, h8_3002);
 DEFINE_LEGACY_CPU_DEVICE(H83007, h8_3007);
 DEFINE_LEGACY_CPU_DEVICE(H83044, h8_3044);
@@ -997,4 +1051,5 @@ DEFINE_LEGACY_CPU_DEVICE(H8S2241, h8s_2241);
 DEFINE_LEGACY_CPU_DEVICE(H8S2246, h8s_2246);
 DEFINE_LEGACY_CPU_DEVICE(H8S2323, h8s_2323);
 DEFINE_LEGACY_CPU_DEVICE(H8S2394, h8s_2394);
+DEFINE_LEGACY_CPU_DEVICE(H8S2655, h8s_2655);
 

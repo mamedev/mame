@@ -76,6 +76,8 @@ struct h83xx_state
 	H8S2XXX_TPU tpu[6];
 	H8S2XXX_SCI sci[3];
 
+    int tpu_max;
+
     UINT8 ddrs[H8_MAX_PORTS], drs[H8_MAX_PORTS], pcrs[H8_MAX_PORTS], odrs[H8_MAX_PORTS];
 
 	int mode_8bit;
@@ -122,20 +124,24 @@ UINT8 h8s2241_per_regs_read_8(h83xx_state *h8, int offset);
 UINT8 h8s2246_per_regs_read_8(h83xx_state *h8, int offset);
 UINT8 h8s2323_per_regs_read_8(h83xx_state *h8, int offset);
 UINT8 h8s2394_per_regs_read_8(h83xx_state *h8, int offset);
+UINT8 h8s2655_per_regs_read_8(h83xx_state *h8, int offset);
 
 UINT16 h8s2241_per_regs_read_16(h83xx_state *h8, int offset);
 UINT16 h8s2246_per_regs_read_16(h83xx_state *h8, int offset);
 UINT16 h8s2323_per_regs_read_16(h83xx_state *h8, int offset);
 UINT16 h8s2394_per_regs_read_16(h83xx_state *h8, int offset);
+UINT16 h8s2655_per_regs_read_16(h83xx_state *h8, int offset);
 
 void h8s2241_per_regs_write_8(h83xx_state *h8, int offset, UINT8 data);
 void h8s2246_per_regs_write_8(h83xx_state *h8, int offset, UINT8 data);
 void h8s2323_per_regs_write_8(h83xx_state *h8, int offset, UINT8 data);
 void h8s2394_per_regs_write_8(h83xx_state *h8, int offset, UINT8 data);
+void h8s2655_per_regs_write_8(h83xx_state *h8, int offset, UINT8 data);
 
 void h8s2241_per_regs_write_16(h83xx_state *h8, int offset, UINT16 data);
 void h8s2246_per_regs_write_16(h83xx_state *h8, int offset, UINT16 data);
 void h8s2323_per_regs_write_16(h83xx_state *h8, int offset, UINT16 data);
 void h8s2394_per_regs_write_16(h83xx_state *h8, int offset, UINT16 data);
+void h8s2655_per_regs_write_16(h83xx_state *h8, int offset, UINT16 data);
 
 #endif /* __H8PRIV_H__ */

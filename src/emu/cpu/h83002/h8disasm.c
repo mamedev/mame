@@ -1275,6 +1275,35 @@ static UINT32 h8disasm_6(UINT32 address, UINT32 opcode, char *buffer, const UINT
 			sprintf(buffer, "%4.4x mov.b @%x, %s", opcode, data16, reg_names8[opcode & 0xf]);
 			size = 4;
 			break;
+		case 0x1:
+			data32=h8_mem_read16(2);
+			if (data32 & 0x8000)
+			{
+				data32 |= 0xffff0000;
+			}
+			data16=h8_mem_read16(4);
+			if ((data16 & 0xff00) == 0x7300)
+			{
+				sprintf(buffer, "%4.4x btst #%d, @%8.8x", opcode, (data16 >> 4) & 7, data32 & addr_mask);
+			}
+			else if ((data16 & 0xff0f) == 0x7000)
+			{
+				sprintf(buffer, "%4.4x bset #%d, @%8.8x", opcode, (data16 >> 4) & 7, data32 & addr_mask);
+			}
+			else if ((data16 & 0xff00) == 0x6300)
+			{
+				sprintf(buffer, "%4.4x btst %s, @%8.8x", opcode, reg_names8[(data16 >> 4) & 0xf], data32 & addr_mask);
+			}
+			else if ((data16 & 0xff0f) == 0x6000)
+			{
+				sprintf(buffer, "%4.4x bset %s, @%8.8x", opcode, reg_names8[(data16 >> 4) & 0xf], data32 & addr_mask);
+			}
+			else
+			{
+				sprintf(buffer, "%4.4x ???", opcode);
+			}   	 
+			size = 6;   		  
+			break;
 		case 0x2:
 			data32=h8_mem_read32(2);
 			sprintf(buffer, "%4.4x mov.b @%8.8x, %s", opcode, data32&addr_mask, reg_names8[opcode & 0xf]);

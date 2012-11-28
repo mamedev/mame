@@ -8,6 +8,7 @@
     H8S/2246
     H8S/2323
     H8S/2394
+    H8S/2655
 */
 
 #include "emu.h"
@@ -404,17 +405,18 @@ void h8s_dtce_check(h83xx_state *h8,  int vecnum)
 
 void h8s_periph_reset(h83xx_state *h8)
 {
-	const int tpu_max = ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394)) ? 6 : 3;
+	int tpu_max = h8->tpu_max;
+	h8->tpu_max = tpu_max;
 	if ((h8->device->type() == H8S2241) || (h8->device->type() == H8S2246))
 	{
 		memcpy( h8->per_regs, H8S_RESET_H8S_IO_224x, sizeof( h8->per_regs));
 	}
-	else if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394))
+	else if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394) || (h8->device->type() == H8S2655))
 	{
 		memcpy( h8->per_regs, H8S_RESET_H8S_IO_2323, sizeof( h8->per_regs));
 	}
 	for (int i = 0; i < 2; i++) h8s_tmr_x_reset( h8, i);
-	for (int i = 0; i < tpu_max; i++) h8s_tpu_x_reset( h8, i);
+	for (int i = 0; i < tpu_max; i++) h8s_tpu_x_reset( h8, i );
 }
 
 /////////////////
@@ -659,7 +661,7 @@ static TIMER_CALLBACK( h8s_tmr_callback)
 
 void h8s_tpu_init(h83xx_state *h8)
 {
-	const int tpu_max = ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394)) ? 6 : 3;
+	const int tpu_max = ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394) || (h8->device->type() == H8S2655)) ? 6 : 3;
 	for (int i = 0; i < tpu_max; i++)
 	{
 		h8->tpu[i].timer = h8->device->machine().scheduler().timer_alloc(FUNC(h8s_tpu_callback), h8);
@@ -1128,7 +1130,7 @@ void h8s_tpu_5_write_tior( h83xx_state *h8, UINT8 data)
 
 void h8s_tpu_write_tstr( h83xx_state *h8, UINT8 data)
 {
-	const int tpu_max = ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394)) ? 6 : 3;
+	const int tpu_max = h8->tpu_max;
 	UINT8 old_data = h8->per_regs[H8S_IO_TSTR];
 	int i;
 	h8->per_regs[H8S_IO_TSTR] = data;
@@ -1345,7 +1347,7 @@ void h8s_onchip_reg_write_8(h83xx_state *h8, int offset, UINT8 data)
 		case H8S_IO_DMABCRL :
 		{
 			h8->per_regs[offset] = data;
-			if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394))
+			if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394) || (h8->device->type() == H8S2655))
 			{
 				if ((data & 0x40) && (data & 0x80))
 				{
@@ -1428,14 +1430,13 @@ void h8s_onchip_reg_write_8_ddr(h83xx_state *h8, int offset, UINT8 data)
             break;
 
 		// ...
-        #if 0
         // TPU
 		case H8S_IO_TSTR  : h8s_tpu_write_tstr( h8, data); break;
 		// DMA
 		case H8S_IO_DMABCRL :
 		{
 			h8->per_regs[offset] = data;
-			if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394))
+			if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394) || (h8->device->type() == H8S2655))
 			{
 				if ((data & 0x40) && (data & 0x80))
 				{
@@ -1458,11 +1459,9 @@ void h8s_onchip_reg_write_8_ddr(h83xx_state *h8, int offset, UINT8 data)
 			}
 		}
 		break;
-        #endif
 		// ...
 		default :
 		{
-            logerror("H8S: Unknown write %02x to I/O %x\n", data, offset);
 			h8->per_regs[offset] = data;
 		}
 		break;
@@ -1489,19 +1488,19 @@ void h8s_onchip_reg_write_16(h83xx_state *h8, int offset, UINT16 data)
 		case H8S_IO_TGR2A_H : h8s_tpu_x_write_tgra( h8, 2, data); break;
 		case H8S_IO_TGR2B_H : h8s_tpu_x_write_tgrb( h8, 2, data); break;
 		// TPU 3
-		case H8S_IO_TCNT3_H : if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394)) h8s_tpu_x_write_tcnt( h8, 3, data); break;
-		case H8S_IO_TGR3A_H : if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394)) h8s_tpu_x_write_tgra( h8, 3, data); break;
-		case H8S_IO_TGR3B_H : if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394)) h8s_tpu_x_write_tgrb( h8, 3, data); break;
-		case H8S_IO_TGR3C_H : if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394)) h8s_tpu_x_write_tgrc( h8, 3, data); break;
-		case H8S_IO_TGR3D_H : if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394)) h8s_tpu_x_write_tgrd( h8, 3, data); break;
+		case H8S_IO_TCNT3_H : if (h8->tpu_max == 6) h8s_tpu_x_write_tcnt( h8, 3, data); break;
+		case H8S_IO_TGR3A_H : if (h8->tpu_max == 6 ) h8s_tpu_x_write_tgra( h8, 3, data); break;
+		case H8S_IO_TGR3B_H : if (h8->tpu_max == 6 ) h8s_tpu_x_write_tgrb( h8, 3, data); break;
+		case H8S_IO_TGR3C_H : if (h8->tpu_max == 6 ) h8s_tpu_x_write_tgrc( h8, 3, data); break;
+		case H8S_IO_TGR3D_H : if (h8->tpu_max == 6 ) h8s_tpu_x_write_tgrd( h8, 3, data); break;
 		// TPU 4
-		case H8S_IO_TCNT4_H : if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394)) h8s_tpu_x_write_tcnt( h8, 4, data); break;
-		case H8S_IO_TGR4A_H : if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394)) h8s_tpu_x_write_tgra( h8, 4, data); break;
-		case H8S_IO_TGR4B_H : if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394)) h8s_tpu_x_write_tgrb( h8, 4, data); break;
+		case H8S_IO_TCNT4_H : if (h8->tpu_max == 6 ) h8s_tpu_x_write_tcnt( h8, 4, data); break;
+		case H8S_IO_TGR4A_H : if (h8->tpu_max == 6 ) h8s_tpu_x_write_tgra( h8, 4, data); break;
+		case H8S_IO_TGR4B_H : if (h8->tpu_max == 6 ) h8s_tpu_x_write_tgrb( h8, 4, data); break;
 		// TPU 5
-		case H8S_IO_TCNT5_H : if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394)) h8s_tpu_x_write_tcnt( h8, 5, data); break;
-		case H8S_IO_TGR5A_H : if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394)) h8s_tpu_x_write_tgra( h8, 5, data); break;
-		case H8S_IO_TGR5B_H : if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394)) h8s_tpu_x_write_tgrb( h8, 5, data); break;
+		case H8S_IO_TCNT5_H : if (h8->tpu_max == 6 ) h8s_tpu_x_write_tcnt( h8, 5, data); break;
+		case H8S_IO_TGR5A_H : if (h8->tpu_max == 6 ) h8s_tpu_x_write_tgra( h8, 5, data); break;
+		case H8S_IO_TGR5B_H : if (h8->tpu_max == 6 ) h8s_tpu_x_write_tgrb( h8, 5, data); break;
 		// ...
 		default :
 		{
@@ -1595,15 +1594,16 @@ UINT8 h8s_onchip_reg_read_8_ddr(h83xx_state *h8, int offset)
             }
             break;
 
-        #if 0
+		// ADCSR
+		case H8S_IO_ADCSR:	data = ADCSR_ADF; break;
+
         // TMR 0
 		case H8S_IO_TCNT0 : data = h8s_tmr_x_read_tcnt( h8, 0); break;
 		// TMR 1
 		case H8S_IO_TCNT1 : data = h8s_tmr_x_read_tcnt( h8, 1); break;
-        #endif
 		// ...
 		// default
-		default : data = h8->per_regs[offset]; logerror("H8S: unhandled I/O read at %x\n", offset); break;
+		default : data = h8->per_regs[offset]; logerror("H8S: possibly unhandled I/O read at %x (PC=%x)\n", offset, h8->ppc); break;
 	}
 	verboselog( h8->device->machine(), 9, "%08X | %08X -> %02X\n", h8->ppc, H8S_IO_ADDR(offset), data);
 	return data;
@@ -1617,9 +1617,9 @@ UINT16 h8s_onchip_reg_read_16(h83xx_state *h8, int offset)
 		case H8S_IO_TCNT0_H : data = h8s_tpu_x_read_tcnt( h8, 0); break;
 		case H8S_IO_TCNT1_H : data = h8s_tpu_x_read_tcnt( h8, 1); break;
 		case H8S_IO_TCNT2_H : data = h8s_tpu_x_read_tcnt( h8, 2); break;
-		case H8S_IO_TCNT3_H : if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394)) data = h8s_tpu_x_read_tcnt( h8, 3); break;
-		case H8S_IO_TCNT4_H : if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394)) data = h8s_tpu_x_read_tcnt( h8, 4); break;
-		case H8S_IO_TCNT5_H : if ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394)) data = h8s_tpu_x_read_tcnt( h8, 5); break;
+		case H8S_IO_TCNT3_H : if (h8->tpu_max == 6) data = h8s_tpu_x_read_tcnt( h8, 3); break;
+		case H8S_IO_TCNT4_H : if (h8->tpu_max == 6) data = h8s_tpu_x_read_tcnt( h8, 4); break;
+		case H8S_IO_TCNT5_H : if (h8->tpu_max == 6) data = h8s_tpu_x_read_tcnt( h8, 5); break;
 		default :
 		{
 			UINT8 b[2];
@@ -1713,4 +1713,23 @@ UINT16 h8s2394_per_regs_read_16(h83xx_state *h8, int offset)
 	return h8s_onchip_reg_read_16(h8, offset);
 }
 
+void h8s2655_per_regs_write_8(h83xx_state *h8, int offset, UINT8 data)
+{
+	h8s_onchip_reg_write_8_ddr(h8, offset, data);
+}
+
+UINT8 h8s2655_per_regs_read_8(h83xx_state *h8, int offset)
+{
+	return h8s_onchip_reg_read_8_ddr(h8, offset);
+}
+
+void h8s2655_per_regs_write_16(h83xx_state *h8, int offset, UINT16 data)
+{
+	h8s_onchip_reg_write_16(h8, offset, data);
+}
+
+UINT16 h8s2655_per_regs_read_16(h83xx_state *h8, int offset)
+{
+	return h8s_onchip_reg_read_16(h8, offset);
+}
 
