@@ -20,7 +20,7 @@
     - fix CPU for some clones;
     - "cache error"
     - undumped IDE ROM, kludged to work
-
+	- slave PIC never enables floppy IRQ (PC=0xffd08)
 
     TODO: (PC-486MU)
     - Tries to read port C of i8255_sys (-> 0x35) at boot without setting up the control
@@ -546,6 +546,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	int x;
 	UINT8 char_size,interlace_on;
 	UINT8 kanji_on;
+	UINT16 tile;
 
 	if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
@@ -553,6 +554,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	interlace_on = state->m_video_reg[2] == 0x10; /* TODO: correct? */
 	char_size = (interlace_on) ? 16 : 8;
 	kanji_on = 0;
+	tile = 0;
 
 	for(x=0;x<pitch;x++)
 	{
@@ -560,7 +562,6 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		UINT8 color;
 		UINT8 attr,pen;
 		UINT32 tile_addr;
-		UINT16 tile;
 		UINT8 knj_tile;
 
 		tile_addr = addr+(x*(state->m_video_ff[WIDTH40_REG]+1));
