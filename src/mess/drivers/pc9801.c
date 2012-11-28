@@ -440,11 +440,14 @@ private:
 	void m_sdip_write(UINT16 port, UINT8 sdip_offset,UINT8 data);
 public:
 	DECLARE_MACHINE_START(pc9801);
+	DECLARE_MACHINE_START(pc9801rs);
+	DECLARE_MACHINE_START(pc9821);
+
 	DECLARE_MACHINE_RESET(pc9801);
 	DECLARE_MACHINE_RESET(pc9801f);
-	DECLARE_PALETTE_INIT(pc9801);
 	DECLARE_MACHINE_RESET(pc9801rs);
-	DECLARE_MACHINE_START(pc9821);
+
+	DECLARE_PALETTE_INIT(pc9801);
 	INTERRUPT_GEN_MEMBER(pc9801_vrtc_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	DECLARE_INPUT_CHANGED_MEMBER(shift_stroke);
@@ -2825,7 +2828,7 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 	m_ram_size = machine().device<ram_device>(RAM_TAG)->size() - 0xa0000;
 }
 
-MACHINE_START_MEMBER(pc9801_state,pc9821)
+MACHINE_START_MEMBER(pc9801_state,pc9801rs)
 {
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 
@@ -2836,6 +2839,11 @@ MACHINE_START_MEMBER(pc9801_state,pc9821)
 	fdc = machine().device<upd765a_device>(":upd765_2hd");
 	fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc9801_state::pc9801rs_fdc_irq), this));
 	fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2hd_drq), this));
+}
+
+MACHINE_START_MEMBER(pc9801_state,pc9821)
+{
+	MACHINE_START_CALL_MEMBER(pc9801rs);
 
 	m_ideram = auto_alloc_array(machine(), UINT8, 0x2000);
 	m_vram256 = auto_alloc_array(machine(), UINT8, 0x8000);
@@ -2947,7 +2955,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_CPU_IO_MAP(pc9801rs_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
 
-	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801)
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801rs)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801rs)
 
 	MCFG_PIT8253_ADD( "pit8253", pc9801rs_pit8253_config )
