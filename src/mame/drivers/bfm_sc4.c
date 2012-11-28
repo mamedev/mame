@@ -24769,87 +24769,39 @@ DRIVER_INIT_MEMBER(sc4_state,sc4gx)
 }
 
 
-// boot as BARX, are these really 'Casino' sets or not, it isn't clear.
-// PR7036 GOLDEN X         BARX SOUNDS
-GAME( 200?, sc4gx		,0,			sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Golden X Casino (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // wasn't marked as Casino
-GAME( 200?, sc4gxcas	,sc4gx,		sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Golden X Casino (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4gxcasa	,sc4gx,		sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Golden X Casino (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4gxcasb	,sc4gx,		sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Golden X Casino (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4gxcasc	,sc4gx,		sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Golden X Casino (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4gxcasd	,sc4gx,		sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Golden X Casino (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-// PR7036GOLDEN X         BARX SOUNDS         GOLDEN 
-GAME( 200?, sc4gxcase	,sc4gx,		sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Golden X Casino (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4gxcasf	,sc4gx,		sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Golden X Casino (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
-GAME( 200?, sc4gxa		,sc4gx,		sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Golden X Casino (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING ) // wasn't marked as Casino
-GAME( 200?, sc4gxb		,sc4gx,		sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Golden X Casino (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING ) // wasn't marked as Casino
-
+// Listed as Bonus Bar X, what's the correct title?
 // PR7036GOLDEN X         GOLDEN X  ARCADE  BARX SOUNDS         GOLDEN X
-GAME( 200?, sc4bonbx	,0,			sc4, sc4bonbx4, sc4_state, sc4bonbxm, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4bonbxc	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbxm, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4bonbxd	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbxm, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4bonbxe	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbxm, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4bonbxf	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbxm, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-
+GAME( 200?, sc4bonbx	,0,			sc4, sc4bonbx4, sc4_state, sc4bonbxm, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4bonbxc	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbxm, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4bonbxd	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbxm, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4bonbxe	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbxm, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4bonbxf	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbxm, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 // PR7036GOLDEN X         BARX SOUNDS         GOLDEN X
-GAME( 200?, sc4bonbxa	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbx, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4bonbxb	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbx, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4bonbxg	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbx, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
-GAME( 200?, sc4bonbxh	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbx, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
-GAME( 200?, sc4bonbxi	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbx, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
-GAME( 200?, sc4bonbxj	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbx, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
-GAME( 200?, sc4bonbxk	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbx, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
-GAME( 200?, sc4bonbxl	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbx, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 13)", GAME_NOT_WORKING )
+GAME( 200?, sc4bonbxa	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4bonbxb	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4bonbxg	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+GAME( 200?, sc4bonbxh	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
+GAME( 200?, sc4bonbxi	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
+GAME( 200?, sc4bonbxj	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
+GAME( 200?, sc4bonbxk	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
+GAME( 200?, sc4bonbxl	,sc4bonbx,	sc4, sc4, sc4_state, sc4bonbx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (set 13)", GAME_NOT_WORKING )
+// PR7036 GOLDEN X         BARX SOUNDS  (these were listed as Golden X Casino but seem to be Bar X / Bonus Bar X)
+GAME( 200?, sc4gx		,sc4bonbx,	sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 1)", GAME_NOT_WORKING ) // wasn't marked as Casino
+GAME( 200?, sc4gxcas	,sc4bonbx,	sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4gxcasa	,sc4bonbx,	sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4gxcasb	,sc4bonbx,	sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4gxcasc	,sc4bonbx,	sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4gxcasd	,sc4bonbx,	sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 6)", GAME_NOT_WORKING )
+// PR7036GOLDEN X         BARX SOUNDS         GOLDEN 
+GAME( 200?, sc4gxcase	,sc4bonbx,	sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4gxcasf	,sc4bonbx,	sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 8)", GAME_NOT_WORKING )
+GAME( 200?, sc4gxa		,sc4bonbx,	sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 9)", GAME_NOT_WORKING ) // wasn't marked as Casino
+GAME( 200?, sc4gxb		,sc4bonbx,	sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 10)", GAME_NOT_WORKING ) // wasn't marked as Casino
 
 
 
 
 
-const stepper_interface* sc4gx3_reel_configs[6] =
-{
-	&starpoint_interface_200step_reel,
-	&starpoint_interface_200step_reel,
-	&starpoint_interface_200step_reel,
-	0,
-	0,
-	0,
-};
-
-DRIVER_INIT_MEMBER(sc4_state,sc4gx3)
-{
-	DRIVER_INIT_CALL(sc4);
-	m_reel_setup = sc4gx3_reel_configs;
-}
-
-// boot as GLDX, not happy with this sound rom..
-// PR2056  GOLDEN X         BARX SOUNDS         GOLDEN X
-GAME( 200?, sc4gx3		,0,			sc4, sc4, sc4_state, sc4gx3, ROT0, "Mazooma","Golden X Triple (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4gx3a		,sc4gx3,	sc4, sc4, sc4_state, sc4gx3, ROT0, "Mazooma","Golden X Triple (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4gx3b		,sc4gx3,	sc4, sc4, sc4_state, sc4gx3, ROT0, "Mazooma","Golden X Triple (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4gx3c		,sc4gx3,	sc4, sc4, sc4_state, sc4gx3, ROT0, "Mazooma","Golden X Triple (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4gx3d		,sc4gx3,	sc4, sc4, sc4_state, sc4gx3, ROT0, "Mazooma","Golden X Triple (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4gx3e		,sc4gx3,	sc4, sc4, sc4_state, sc4gx3, ROT0, "Mazooma","Golden X Triple (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4gx3f		,sc4gx3,	sc4, sc4, sc4_state, sc4gx3, ROT0, "Mazooma","Golden X Triple (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4gx3g		,sc4gx3,	sc4, sc4, sc4_state, sc4gx3, ROT0, "Mazooma","Golden X Triple (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
-
-
-// These all basically seem to have the same strings as header info... probably all builds of the same basic game
-
-// GLDX
-// PR2056  GOLDEN X         BARX SOUNDS         GOLDEN X
-GAME( 200?, sc4ggcas	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Game Casino (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4ggcasa	,sc4ggcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Game Casino (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4ggcasb	,sc4ggcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Game Casino (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4ggcasc	,sc4ggcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Game Casino (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-
-
-// GLDC
-// PR2056  GOLDEN X         BARX SOUNDS         GOLDEN X
-GAME( 200?, sc4gnc		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4gnca		,sc4gnc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4gncb		,sc4gnc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4gncc		,sc4gnc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4gncd		,sc4gnc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4gnce		,sc4gnc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
 const stepper_interface* sc4gggtb_reel_configs[6] =
 {
@@ -24900,6 +24852,22 @@ DRIVER_INIT_MEMBER(sc4_state,sc4ggame)
 {
 	DRIVER_INIT_CALL(sc4);
 	m_reel_setup = sc4ggame_reel_configs;
+}
+
+const stepper_interface* sc4gx3_reel_configs[6] =
+{
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	0,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4gx3)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4gx3_reel_configs;
 }
 
 // GLDX
@@ -24953,21 +24921,46 @@ GAME( 200?, sc4ggame0	,sc4ggame,	sc4, sc4, sc4_state, sc4ggame,  ROT0, "Mazooma"
 // PR2056  GOLDEN X         BARX SOUNDS         GOLDEN X  (are these really Gold Diggers?)
 GAME( 200?, sc4gdmz		,sc4ggame,	sc4, sc4, sc4_state, sc4ggame,  ROT0, "Mazooma","Golden X (Mazooma) (PR2056) (Scorpion 4) (set 3)", GAME_NOT_WORKING ) // GLDX
 GAME( 200?, sc4gdmza	,sc4ggame,	sc4, sc4, sc4_state, sc4ggame,  ROT0, "Mazooma","Golden X (Mazooma) (PR2056) (Scorpion 4) (set 4)", GAME_NOT_WORKING ) // GLDX
+// boot as GLDX, not happy with this sound rom..
+// PR2056  GOLDEN X         BARX SOUNDS         GOLDEN X
+GAME( 200?, sc4gx3		,sc4ggame,	sc4, sc4, sc4_state, sc4gx3, ROT0, "Mazooma","Golden X (Mazooma) (Scorpion 4) (GLDX, set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4gx3a		,sc4ggame,	sc4, sc4, sc4_state, sc4gx3, ROT0, "Mazooma","Golden X (Mazooma) (Scorpion 4) (GLDX, set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4gx3b		,sc4ggame,	sc4, sc4, sc4_state, sc4gx3, ROT0, "Mazooma","Golden X (Mazooma) (Scorpion 4) (GLDX, set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4gx3c		,sc4ggame,	sc4, sc4, sc4_state, sc4gx3, ROT0, "Mazooma","Golden X (Mazooma) (Scorpion 4) (GLDX, set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4gx3d		,sc4ggame,	sc4, sc4, sc4_state, sc4gx3, ROT0, "Mazooma","Golden X (Mazooma) (Scorpion 4) (GLDX, set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4gx3e		,sc4ggame,	sc4, sc4, sc4_state, sc4gx3, ROT0, "Mazooma","Golden X (Mazooma) (Scorpion 4) (GLDX, set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4gx3f		,sc4ggame,	sc4, sc4, sc4_state, sc4gx3, ROT0, "Mazooma","Golden X (Mazooma) (Scorpion 4) (GLDX, set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4gx3g		,sc4ggame,	sc4, sc4, sc4_state, sc4gx3, ROT0, "Mazooma","Golden X (Mazooma) (Scorpion 4) (GLDX, set 8)", GAME_NOT_WORKING )
+// GLDX
+// PR2056  GOLDEN X         BARX SOUNDS         GOLDEN X   (was Golden Game Casino)
+GAME( 200?, sc4ggcas	,sc4ggame,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden X (Mazooma) (Scorpion 4) (GLDX, set 9)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggcasa	,sc4ggame,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden X (Mazooma) (Scorpion 4) (GLDX, set 10)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggcasb	,sc4ggame,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden X (Mazooma) (Scorpion 4) (GLDX, set 11)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggcasc	,sc4ggame,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden X (Mazooma) (Scorpion 4) (GLDX, set 12)", GAME_NOT_WORKING )
+
+// GLDC
+// PR2056  GOLDEN X         BARX SOUNDS         GOLDEN X
+GAME( 200?, sc4gnc		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (GLDC, set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4gnca		,sc4gnc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (GLDC, set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4gncb		,sc4gnc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (GLDC, set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4gncc		,sc4gnc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (GLDC, set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4gncd		,sc4gnc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (GLDC, set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4gnce		,sc4gnc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (GLDC, set 6)", GAME_NOT_WORKING )
+
 
 // GGDX
 // these were in the above sets
 // PR2201  GOLDEN X         GOLDEN GAME MAZ GXDX SOUNDS         GOLDEN GAME DLX
-GAME( 200?, sc4ggdlx	,0,			sc4, sc4, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4ggdlxc	,sc4ggdlx,	sc4, sc4, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (set 4)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4ggdlx	,0,			sc4, sc4, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggdlxc	,sc4ggdlx,	sc4, sc4, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 2)", GAME_NOT_WORKING )// ^^
 // PR2201  GOLDEN X         GOLDEN GAME DLX MAZ GXDX SOUNDS         GOLDEN X
-GAME( 200?, sc4ggdlxa	,sc4ggdlx,	sc4, sc4, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4ggdlxb	,sc4ggdlx,	sc4, sc4, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (set 3)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4ggdlxd	,sc4ggdlx,	sc4, sc4, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (set 5)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4ggdlxe	,sc4ggdlx,	sc4, sc4, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (set 6)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4ggdlxa	,sc4ggdlx,	sc4, sc4, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggdlxb	,sc4ggdlx,	sc4, sc4, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 4)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4ggdlxd	,sc4ggdlx,	sc4, sc4, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 5)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4ggdlxe	,sc4ggdlx,	sc4, sc4, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 6)", GAME_NOT_WORKING )// ^^
 // PR2201  GOLDEN GAME DELUXE         GOLDEN GAME MAZ GXDX SOUNDS         GOLDEN GAME DLX
-GAME( 200?, sc4ggdlxf	,sc4ggdlx,	sc4, sc4, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4ggdlxg	,sc4ggdlx,	sc4, sc4, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (set 8)", GAME_NOT_WORKING )// ^^
-
+GAME( 200?, sc4ggdlxf	,sc4ggdlx,	sc4, sc4, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggdlxg	,sc4ggdlx,	sc4, sc4, sc4_state, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (GGDX, set 8)", GAME_NOT_WORKING )// ^^
 
 
 
@@ -25085,7 +25078,7 @@ GAME( 200?, sc4hi5e		,sc4hi5,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","High 5 (Bel
 GAME( 200?, sc4hi5f		,sc4hi5,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","High 5 (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 GAME( 200?, sc4hi5g		,sc4hi5,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","High 5 (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
-// mux row error
+
 //  PR2066 HIGHLY SPRUNG         HIGH SOUNDS          HIGHLY SPRUNG
 GAME( 200?, sc4sprng	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Highly Sprung (Mazooma) (Scorpion 4)", GAME_NOT_WORKING )
 
@@ -25125,56 +25118,114 @@ GAME( 200?, sc4h6clb	,sc4h6cl,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Hot Si
 GAME( 200?, sc4h6clc	,sc4h6cl,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Hot Six Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
+const stepper_interface* sc4ijclb_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4ijclb)
+{
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4ijclb_reel_configs;
+}
 
 
 // PR2403 CLUB ITALIAN JOB         CLUB ITALIAN JOB  CLUB  CLUB ITJB SOUNDS
-GAME( 200?, sc4ijclb	,0,			sc4, sc4, sc4_state, sc4mbus, ROT0, "Mazooma","Italian Job Club (Mazooma) (Scorpion 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4ijclb	,0,			sc4, sc4, sc4_state, sc4ijclb, ROT0, "Mazooma","Italian Job Club (Mazooma) (Scorpion 4)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4jack_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	&starpointrm20_interface_48step,
+	&starpoint_interface_200step_reel,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4jack)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4jack_reel_configs;
+}
+
 
 // PR2078 JACK THE KIPPER         JKIP SOUNDS         JACK THE KIPPER
-GAME( 200?, sc4jack		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4jacka	,sc4jack,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4jackb	,sc4jack,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4jackc	,sc4jack,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4jackd	,sc4jack,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4jacke	,sc4jack,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4jackf	,sc4jack,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4jackg	,sc4jack,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+GAME( 200?, sc4jack		,0,			sc4, sc4, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4jacka	,sc4jack,	sc4, sc4, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4jackb	,sc4jack,	sc4, sc4, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4jackc	,sc4jack,	sc4, sc4, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4jackd	,sc4jack,	sc4, sc4, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4jacke	,sc4jack,	sc4, sc4, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4jackf	,sc4jack,	sc4, sc4, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4jackg	,sc4jack,	sc4, sc4, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+
+
+const stepper_interface* sc4jjunc_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4jjunc)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4jjunc_reel_configs;
+}
 
 // PR1304 JACKPOT JUNCTION         PR1304 JACKPOT JUNCTION SOUNDS11
-GAME( 2002, sc4jjunc	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 2002, sc4jjunca	,sc4jjunc,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 2002, sc4jjuncb	,sc4jjunc,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 2002, sc4jjuncc	,sc4jjunc,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 2002, sc4jjuncd	,sc4jjunc,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 2002, sc4jjunce	,sc4jjunc,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 2002, sc4jjuncf	,sc4jjunc,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 2002, sc4jjuncg	,sc4jjunc,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
-GAME( 2002, sc4jjunch	,sc4jjunc,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
-GAME( 2002, sc4jjunci	,sc4jjunc,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
+GAME( 2002, sc4jjunc	,0,			sc4, sc4, sc4_state, sc4jjunc, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 2002, sc4jjunca	,sc4jjunc,	sc4, sc4, sc4_state, sc4jjunc, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 2002, sc4jjuncb	,sc4jjunc,	sc4, sc4, sc4_state, sc4jjunc, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 2002, sc4jjuncc	,sc4jjunc,	sc4, sc4, sc4_state, sc4jjunc, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 2002, sc4jjuncd	,sc4jjunc,	sc4, sc4, sc4_state, sc4jjunc, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 2002, sc4jjunce	,sc4jjunc,	sc4, sc4, sc4_state, sc4jjunc, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 2002, sc4jjuncf	,sc4jjunc,	sc4, sc4, sc4_state, sc4jjunc, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 2002, sc4jjuncg	,sc4jjunc,	sc4, sc4, sc4_state, sc4jjunc, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+GAME( 2002, sc4jjunch	,sc4jjunc,	sc4, sc4, sc4_state, sc4jjunc, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
+GAME( 2002, sc4jjunci	,sc4jjunc,	sc4, sc4, sc4_state, sc4jjunc, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
 
+// REEL7 ERR 27  (where does reel 7 connect?!)
 // PR1422 CLUB JACKPOT JUNCTION          PR1422 JACKPOT JUNCTION SOUNDS11
 GAME( 200?, sc4jjucl	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Junction Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4jjuclb	,sc4jjucl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Junction Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 // PR1422 CLUB JACKPOT JUNCTION          JACKPOT JUNCTION  CLUB  PR1422 JACKPOT JUNCTION SOUNDS11
-GAME( 200?, sc4jjucld	,sc4jjucl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Junction Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4jjucle	,sc4jjucl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Junction Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-
+GAME( 200?, sc4jjucld	,sc4jjucl,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Jackpot Junction Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4jjucle	,sc4jjucl,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Jackpot Junction Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 // PR1422 CLUB JACKPOT JUNCTION FERRY          PR1422 JACKPOT JUNCTION SOUNDS11
 GAME( 200?, sc4jjucla	,sc4jjucl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Junction Club (Ferry) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4jjuclc	,sc4jjucl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Junction Club (Ferry) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-// PR2096 JIVE MONEY         JIVE SOUNDS         JIVE MONEY
-GAME( 200?, sc4jive		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jive Money (PR2096) (Mazooma) (Scorpion 4)", GAME_NOT_WORKING )
-// PR2160 JIVE MONEY         JMON SOUNDS         JIVE MONEY
-GAME( 200?, sc4jivea	,sc4jive,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jive Money (PR2160) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4jiveb	,sc4jive,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jive Money (PR2160) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4jivec	,sc4jive,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jive Money (PR2160) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4jived	,sc4jive,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jive Money (PR2160) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+const stepper_interface* sc4jolly_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpoint_interface_200step_reel,
+	0, 
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4jolly)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4jolly_reel_configs;
+}
+
 
 // PR2054 JOLLY JOUSTINGV2.0         JJOLLSND          JOLLY JOUSTING
-GAME( 200?, sc4jolly	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Qps","Jolly Jousting (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4jollya	,sc4jolly,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Jolly Jousting (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4jolly	,0,			sc4, sc4, sc4_state, sc4jolly, ROT0, "Qps","Jolly Jousting (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4jollya	,sc4jolly,	sc4, sc4, sc4_state, sc4jolly, ROT0, "Qps","Jolly Jousting (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 // PR1136 JUICY JACKPOTS 65% FERRY         PR1136 JUICY JACKPOTS SOUNDS11
 GAME( 200?, sc4juicy	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Juicy Jackpots Club (PR1136) (65% Ferry) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
@@ -31886,7 +31937,13 @@ GAME( 200?, sc4wldjke	,sc4wldjk,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild
 GAME( 200?, sc4wldjkf	,sc4wldjk,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4wldjkg	,sc4wldjk,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
-
+// PR2096 JIVE MONEY         JIVE SOUNDS         JIVE MONEY
+GAME( 200?, sc4jive		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jive Money (PR2096) (Mazooma) (Scorpion 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
+// PR2160 JIVE MONEY         JMON SOUNDS         JIVE MONEY
+GAME( 200?, sc4jivea	,sc4jive,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jive Money (PR2160) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4jiveb	,sc4jive,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jive Money (PR2160) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4jivec	,sc4jive,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jive Money (PR2160) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4jived	,sc4jive,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jive Money (PR2160) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 /****************************************************************************************************************************************************************************************************************/
 /****************************************************************************************************************************************************************************************************************/
