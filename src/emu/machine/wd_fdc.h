@@ -341,6 +341,10 @@ private:
 	live_info cur_live, checkpoint_live;
 	line_cb intrq_cb, drq_cb, hld_cb, enp_cb;
 
+	UINT8 format_last_byte;
+	int format_last_byte_count;
+	astring format_description_string;
+
 	static astring tts(attotime t);
 	astring ttsn();
 

@@ -582,6 +582,11 @@ void wd_fdc_t::write_track_start()
 		floppy->ss_w(command & 0x02);
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
+
+	format_last_byte = 0;
+	format_last_byte_count = 0;
+	format_description_string = "";
+
 	write_track_continue();
 }
 
@@ -641,6 +646,15 @@ void wd_fdc_t::write_track_continue()
 			return;
 
 		case TRACK_DONE:
+			if(format_last_byte_count) {
+				char buf[32];
+				if(format_last_byte_count > 1)
+					sprintf(buf, "%dx%02x", format_last_byte_count, format_last_byte);
+				else
+					sprintf(buf, "%02x", format_last_byte);
+				format_description_string += buf;
+			}
+			logerror("wd1772: track description %s\n", format_description_string.cstr());
 			command_end();
 			return;
 
@@ -1521,6 +1535,19 @@ void wd_fdc_t::live_run(attotime limit)
 				status |= S_LOST;
 				data = 0;
 			}
+			if(data != format_last_byte) {
+				if(format_last_byte_count) {
+					char buf[32];
+					if(format_last_byte_count > 1)
+						sprintf(buf, "%dx%02x ", format_last_byte_count, format_last_byte);
+					else
+						sprintf(buf, "%02x ", format_last_byte);
+					format_description_string += buf;
+				}
+				format_last_byte = data;
+				format_last_byte_count = 1;
+			} else
+				format_last_byte_count++;
 
 			switch(data) {
 			case 0xf5:
