@@ -18,7 +18,7 @@
 #include "imagedev/flopdrv.h"
 #include "machine/6532riot.h"
 #include "machine/ieee488.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 
 
 
@@ -48,6 +48,8 @@ public:
 	DECLARE_WRITE8_MEMBER( riot1_pb_w );
 	DECLARE_READ8_MEMBER( fk5_r );
 	DECLARE_WRITE8_MEMBER( fk5_w );
+	void fdc_intrq_w(bool state);
+	void fdc_drq_w(bool state);
 
 protected:
     // device-level overrides
@@ -66,9 +68,10 @@ private:
 	required_device<cpu_device> m_fdccpu;
 	required_device<riot6532_device> m_riot0;
 	required_device<riot6532_device> m_riot1;
-	required_device<fd1797_device> m_fdc;
-	required_device<legacy_floppy_image_device> m_image0;
-	required_device<legacy_floppy_image_device> m_image1;
+	required_device<fd1797_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	floppy_image_device *m_floppy;
 
 	// IEEE-488 bus
 	int m_rfdo;							// not ready for data output

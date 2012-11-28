@@ -93,7 +93,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( c8280_fdc_mem, AS_PROGRAM, 8, c8280_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x300) AM_RAM
-	AM_RANGE(0x0080, 0x0081) AM_MIRROR(0x37e) AM_DEVREADWRITE_LEGACY(WD1797_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x37c) AM_DEVREADWRITE(WD1797_TAG, fd1797_t, read, write)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
@@ -300,26 +300,19 @@ static const riot6532_interface riot1_intf =
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
-static const floppy_interface c8280_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_8_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_8",
-	NULL
-};
+static SLOT_INTERFACE_START( c8280_floppies )
+	SLOT_INTERFACE( "8ssdd", FLOPPY_8_SSDD )
+SLOT_INTERFACE_END
 
-static struct wd17xx_interface fdc_intf =
+void c8280_device::fdc_intrq_w(bool state)
 {
-	DEVCB_NULL,
-	DEVCB_CPU_INPUT_LINE(M6502_FDC_TAG, M6502_IRQ_LINE),
-	DEVCB_CPU_INPUT_LINE(M6502_FDC_TAG, M6502_SET_OVERFLOW),
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
+	m_fdccpu->set_input_line(M6502_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void c8280_device::fdc_drq_w(bool state)
+{
+	m_fdccpu->set_input_line(M6502_SET_OVERFLOW, state ? ASSERT_LINE : CLEAR_LINE);
+}
 
 
 //-------------------------------------------------
@@ -336,9 +329,10 @@ static MACHINE_CONFIG_FRAGMENT( c8280 )
 	MCFG_CPU_ADD(M6502_FDC_TAG, M6502, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(c8280_fdc_mem)
 
-	MCFG_FD1797_ADD(WD1797_TAG, fdc_intf)
+	MCFG_FD1797x_ADD(WD1797_TAG, XTAL_12MHz/8 *8) // clock?
 
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(c8280_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG":0", c8280_floppies, "8ssdd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG":1", c8280_floppies, "8ssdd", NULL, floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -389,8 +383,8 @@ c8280_device::c8280_device(const machine_config &mconfig, const char *tag, devic
 	  m_riot0(*this, M6532_0_TAG),
 	  m_riot1(*this, M6532_1_TAG),
 	  m_fdc(*this, WD1797_TAG),
-	  m_image0(*this, FLOPPY_0),
-	  m_image1(*this, FLOPPY_1),
+	  m_floppy0(*this, WD1797_TAG":0"),
+	  m_floppy1(*this, WD1797_TAG":1"),
 	  m_rfdo(1),
 	  m_daco(1),
 	  m_atna(1)
@@ -404,6 +398,10 @@ c8280_device::c8280_device(const machine_config &mconfig, const char *tag, devic
 
 void c8280_device::device_start()
 {
+	// floppy callbacks
+	m_fdc->setup_intrq_cb(fd1797_t::line_cb(FUNC(c8280_device::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(fd1797_t::line_cb(FUNC(c8280_device::fdc_drq_w), this));
+
 	// state saving
 	save_item(NAME(m_rfdo));
 	save_item(NAME(m_daco));
@@ -429,13 +427,12 @@ void c8280_device::device_reset()
 	m_riot0->reset();
 	m_riot1->reset();
 
-	wd17xx_mr_w(m_fdc, 1);
-	wd17xx_mr_w(m_fdc, 0);
+	m_fdc->reset();
 
 	m_fk5 = 0;
-	wd17xx_dden_w(m_fdc, 0);
-	floppy_mon_w(m_image0, 1);
-	floppy_mon_w(m_image1, 1);
+	m_floppy = NULL;
+	m_fdc->set_floppy(m_floppy);
+	m_fdc->dden_w(0);
 }
 
 
@@ -483,15 +480,10 @@ READ8_MEMBER( c8280_device::fk5_r )
 
 	UINT8 data = m_fk5;
 
-	if (BIT(m_fk5, 0))
+	if (m_floppy)
 	{
-		data |= floppy_dskchg_r(m_image0) << 3;
-		data |= floppy_twosid_r(m_image0) << 4;
-	}
-	else if (BIT(m_fk5, 1))
-	{
-		data |= floppy_dskchg_r(m_image1) << 3;
-		data |= floppy_twosid_r(m_image1) << 4;
+		data |= m_floppy->dskchg_r() << 3;
+		data |= m_floppy->twosid_r() << 4;
 	}
 
 	return data;
@@ -517,13 +509,13 @@ WRITE8_MEMBER( c8280_device::fk5_w )
 	m_fk5 = data & 0x3f;
 
 	// drive select
-	if (BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
-	if (BIT(data, 1)) wd17xx_set_drive(m_fdc, 1);
+	m_floppy = NULL;
+
+	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();
+
+	m_fdc->set_floppy(m_floppy);
 
 	// density select
-	wd17xx_dden_w(m_fdc, BIT(data, 2));
-
-	// motor enable
-	floppy_mon_w(m_image0, !BIT(data, 5));
-	floppy_mon_w(m_image1, !BIT(data, 5));
+	m_fdc->dden_w(BIT(data, 2));
 }
