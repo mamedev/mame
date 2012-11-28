@@ -89,14 +89,14 @@
     GQ977      GQ977          2000    Para Para Dancing
     GQ977      GC977          2000    Para Para Paradise 1.1
     GQ977      GQA11          2000    Para Para Paradise 1st Mix+
-    GQA02(?)   ?              2000    Pop n' Music 4
-    ???        ?              2000    Pop n' Music 5
-    ???        ?              2001    Pop n' Music 6
-    GQA02      GCB00          2001    Pop n' Music 7
-    ???        ?              2002    Pop n' Music 8
-    ???        ?              2000    Pop n' Music Animelo
-    ???        ?              2001    Pop n' Music Animelo 2
-    ???        ?              2001    Pop n' Music Mickey Tunes
+    GQA02(?)   ?              2000    Pop'n Music 4
+    ???        ?              2000    Pop'n Music 5
+    ???        ?              2001    Pop'n Music 6
+    GQA02      GCB00          2001    Pop'n Music 7
+    ???        ?              2002    Pop'n Music 8
+    ???        ?              2000    Pop'n Music Animelo
+    ???        ?              2001    Pop'n Music Animelo 2
+    ???        ?              2001    Pop'n Music Mickey Tunes
 
     TODO:
         - The display list pointer setting in the graphics chip is not understood. Currently
@@ -2598,9 +2598,9 @@ GAME( 2000, ppp1mp,   ppp,     firebeat,      ppp, firebeat_state,    ppp,      
 GAMEL(2000, kbm,      0,       firebeat2,     kbm, firebeat_state,    kbm,    ROT270,   "Konami",  "Keyboardmania", GAME_NOT_WORKING, layout_firebeat)
 GAMEL(2000, kbm2nd,   0,       firebeat2,     kbm, firebeat_state,    kbm,    ROT270,   "Konami",  "Keyboardmania 2nd Mix", GAME_NOT_WORKING, layout_firebeat)
 GAMEL(2001, kbm3rd,   0,       firebeat2,     kbm, firebeat_state,    kbm,    ROT270,   "Konami",  "Keyboardmania 3rd Mix", GAME_NOT_WORKING, layout_firebeat)
-GAME( 2000, popn4, 	  0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop n' Music 4", GAME_NOT_WORKING)
-GAME( 2000, popn5,    0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop n' Music 5", GAME_NOT_WORKING)
-GAME( 2001, popn6, 	  0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop n' Music 6", GAME_NOT_WORKING)
-GAME( 2001, popn7,    0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop n' Music 7", GAME_NOT_WORKING)
-GAME( 2001, popnanm2, 0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop n' Music Animelo 2", GAME_NOT_WORKING)
-GAME( 2002, popn8,    0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop n' Music 8", GAME_NOT_WORKING)
+GAME( 2000, popn4, 	  0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 4", GAME_NOT_WORKING)
+GAME( 2000, popn5,    0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 5", GAME_NOT_WORKING)
+GAME( 2001, popn6, 	  0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 6", GAME_NOT_WORKING)
+GAME( 2001, popn7,    0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 7", GAME_NOT_WORKING)
+GAME( 2001, popnanm2, 0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music Animelo 2", GAME_NOT_WORKING)
+GAME( 2002, popn8,    0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 8", GAME_NOT_WORKING)
