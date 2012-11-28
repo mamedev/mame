@@ -44,17 +44,19 @@ void archimedes_state::archimedes_request_irq_a(int mask)
 {
 	m_ioc_regs[IRQ_STATUS_A] |= mask;
 
-	if (m_ioc_regs[IRQ_MASK_A] & mask)
-	{
+	if (m_ioc_regs[IRQ_STATUS_A] & m_ioc_regs[IRQ_MASK_A])
 		machine().device("maincpu")->execute().set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
-	}
+
+	if ((m_ioc_regs[IRQ_STATUS_A] & m_ioc_regs[IRQ_MASK_A]) == 0)
+		machine().device("maincpu")->execute().set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
+
 }
 
 void archimedes_state::archimedes_request_irq_b(int mask)
 {
 	m_ioc_regs[IRQ_STATUS_B] |= mask;
 
-	if (m_ioc_regs[IRQ_MASK_B] & mask)
+	if (m_ioc_regs[IRQ_STATUS_B] & m_ioc_regs[IRQ_MASK_B])
 	{
 		generic_pulse_irq_line(machine().device("maincpu")->execute(), ARM_IRQ_LINE, 1);
 	}
@@ -64,7 +66,7 @@ void archimedes_state::archimedes_request_fiq(int mask)
 {
 	m_ioc_regs[FIQ_STATUS] |= mask;
 
-	if (m_ioc_regs[FIQ_MASK] & mask)
+	if (m_ioc_regs[FIQ_STATUS] & m_ioc_regs[FIQ_MASK])
 	{
 		generic_pulse_irq_line(machine().device("maincpu")->execute(), ARM_FIRQ_LINE, 1);
 	}
@@ -78,11 +80,13 @@ void archimedes_state::archimedes_clear_irq_a(int mask)
 void archimedes_state::archimedes_clear_irq_b(int mask)
 {
 	m_ioc_regs[IRQ_STATUS_B] &= ~mask;
+	archimedes_request_irq_b(0);
 }
 
 void archimedes_state::archimedes_clear_fiq(int mask)
 {
 	m_ioc_regs[FIQ_STATUS] &= ~mask;
+	archimedes_request_fiq(0);
 }
 
 void archimedes_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -533,31 +537,32 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 		case IRQ_MASK_A:
 			m_ioc_regs[IRQ_MASK_A] = data & 0xff;
 
-			if(data & 0x80) //force an IRQ
-				archimedes_request_irq_a(ARCHIMEDES_IRQA_FORCE);
+			/* bit 7 forces an IRQ trap */
+			archimedes_request_irq_a((data & 0x80) ? ARCHIMEDES_IRQA_FORCE : 0);
 
 			if(data & 0x08) //set up the VBLANK timer
 				m_vbl_timer->adjust(machine().primary_screen->time_until_pos(m_vidc_regs[0xb4]));
 
 			break;
 
+		case IRQ_MASK_B:
+			m_ioc_regs[IRQ_MASK_B] = data & 0xff;
+
+			archimedes_request_irq_b(0);
+			break;
+
 		case FIQ_MASK:
 			m_ioc_regs[FIQ_MASK] = data & 0xff;
 
-			if(data & 0x80) //force a FIRQ
-				archimedes_request_fiq(ARCHIMEDES_FIQ_FORCE);
-
+		    /* bit 7 forces a FIRQ trap */
+			archimedes_request_fiq((data & 0x80) ? ARCHIMEDES_FIQ_FORCE : 0);
 			break;
 
 		case IRQ_REQUEST_A: 	// IRQ clear A
 			m_ioc_regs[IRQ_STATUS_A] &= ~(data&0xff);
 
-			// if that did it, clear the IRQ
-			//if (ioc_regs[IRQ_STATUS_A] == 0)
-			{
-				//printf("IRQ clear A\n");
-				machine().device("maincpu")->execute().set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
-			}
+			// check pending irqs
+			archimedes_request_irq_a(0);
 			break;
 
 		case T0_LATCH_LO:
@@ -929,8 +934,8 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 
 			case 4:	/* sound start */
 				//logerror("MEMC: SNDSTART %08x\n",data);
+				archimedes_clear_irq_b(ARCHIMEDES_IRQB_SOUND_EMPTY);
 				m_vidc_sndstart = 0x2000000 | ((data>>2)&0x7fff)*16;
-				m_ioc_regs[IRQ_STATUS_B] &= ~ARCHIMEDES_IRQB_SOUND_EMPTY;
 				break;
 
 			case 5: /* sound end */

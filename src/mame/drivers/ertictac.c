@@ -45,7 +45,7 @@ public:
 
 READ32_MEMBER(ertictac_state::ertictac_podule_r)
 {
-	m_ioc_regs[IRQ_STATUS_B] &= ~ARCHIMEDES_IRQB_PODULE_IRQ;
+	archimedes_clear_irq_b(ARCHIMEDES_IRQB_PODULE_IRQ);
 
 	switch(offset)
 	{
