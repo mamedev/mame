@@ -22,7 +22,7 @@
 #include "machine/mc6854.h"
 #include "machine/ram.h"
 #include "machine/scsicb.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 
 class e01_device : public device_t,
 				   public device_econet_interface
@@ -63,6 +63,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( scsi_bsy_w );
 	DECLARE_WRITE_LINE_MEMBER( scsi_req_w );
+	void fdc_irq_w(bool state);
+	void fdc_drq_w(bool state);
 
 protected:
     // device-level overrides
@@ -80,11 +82,13 @@ protected:
 	virtual void econet_clk(int state);
 
 	required_device<m65c02_device> m_maincpu;
-	required_device<wd2793_device> m_fdc;
+	required_device<wd2793_t> m_fdc;
 	required_device<mc6854_device> m_adlc;
 	required_device<mc146818_device> m_rtc;
 	required_device<ram_device> m_ram;
 	required_device<scsicb_device> m_scsibus;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 
 	inline void update_interrupts();
 	inline void network_irq_enable(int enabled);
@@ -97,7 +101,7 @@ protected:
 	int m_via_irq;
 	int m_hdc_irq;
 	int m_fdc_irq;
-	int m_fdc_drq;
+	bool m_fdc_drq;
 	int m_adlc_irq;
 
 	int m_clk_en;

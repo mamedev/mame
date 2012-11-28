@@ -237,28 +237,23 @@ static const floppy_interface e01_floppy_interface =
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( e01_device::fdc_irq_w )
+static SLOT_INTERFACE_START( e01_floppies )
+	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
+SLOT_INTERFACE_END
+
+void e01_device::fdc_irq_w(bool state)
 {
 	m_fdc_irq = state;
 
 	update_interrupts();
 }
 
-WRITE_LINE_MEMBER( e01_device::fdc_drq_w )
+void e01_device::fdc_drq_w(bool state)
 {
 	m_fdc_drq = state;
 
 	update_interrupts();
 }
-
-static const wd17xx_interface fdc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, e01_device, fdc_irq_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, e01_device, fdc_drq_w),
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
-
 
 WRITE_LINE_MEMBER( e01_device::scsi_bsy_w )
 {
@@ -301,7 +296,7 @@ static ADDRESS_MAP_START( e01_mem, AS_PROGRAM, 8, e01_device )
 	AM_RANGE(0xfc00, 0xfc00) AM_MIRROR(0x00c3) AM_READWRITE(rtc_address_r, rtc_address_w)
 	AM_RANGE(0xfc04, 0xfc04) AM_MIRROR(0x00c3) AM_READWRITE(rtc_data_r, rtc_data_w)
 	AM_RANGE(0xfc08, 0xfc08) AM_MIRROR(0x00c0) AM_READ(ram_select_r) AM_WRITE(floppy_w)
-	AM_RANGE(0xfc0c, 0xfc0f) AM_MIRROR(0x00c0) AM_DEVREADWRITE_LEGACY(WD2793_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0xfc0c, 0xfc0f) AM_MIRROR(0x00c0) AM_DEVREADWRITE(WD2793_TAG, wd2793_t, read, write)
 	AM_RANGE(0xfc10, 0xfc1f) AM_MIRROR(0x00c0) AM_DEVREADWRITE(R6522_TAG, via6522_device, read, write)
 	AM_RANGE(0xfc20, 0xfc23) AM_MIRROR(0x00c0) AM_DEVREADWRITE_LEGACY(MC6854_TAG, mc6854_r, mc6854_w)
 	AM_RANGE(0xfc24, 0xfc24) AM_MIRROR(0x00c3) AM_READWRITE(network_irq_disable_r, network_irq_disable_w)
@@ -329,8 +324,9 @@ static MACHINE_CONFIG_FRAGMENT( e01 )
 	// devices
 	MCFG_VIA6522_ADD(R6522_TAG, XTAL_8MHz/4, via_intf)
 	MCFG_MC6854_ADD(MC6854_TAG, adlc_intf)
-	MCFG_WD2793_ADD(WD2793_TAG, fdc_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(e01_floppy_interface)
+	MCFG_WD2793x_ADD(WD2793_TAG, XTAL_8MHz/4 *8)
+	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", e01_floppies, "35dd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", e01_floppies, "35dd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, e01_centronics_intf)
 
 	MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
@@ -443,6 +439,8 @@ e01_device::e01_device(const machine_config &mconfig, const char *tag, device_t 
 	  m_rtc(*this, HD146818_TAG),
 	  m_ram(*this, RAM_TAG),
 	  m_scsibus(*this, SCSIBUS_TAG ":host"),
+	  m_floppy0(*this, WD2793_TAG":0"),
+	  m_floppy1(*this, WD2793_TAG":1"),
 	  m_adlc_ie(0),
 	  m_hdc_ie(0),
 	  m_rtc_irq(CLEAR_LINE),
@@ -465,6 +463,8 @@ e01_device::e01_device(const machine_config &mconfig, device_type type, const ch
 	  m_rtc(*this, HD146818_TAG),
 	  m_ram(*this, RAM_TAG),
 	  m_scsibus(*this, SCSIBUS_TAG ":host"),
+	  m_floppy0(*this, WD2793_TAG":0"),
+	  m_floppy1(*this, WD2793_TAG":1"),
 	  m_adlc_ie(0),
 	  m_hdc_ie(0),
 	  m_rtc_irq(CLEAR_LINE),
@@ -506,6 +506,10 @@ void e01_device::device_config_complete()
 
 void e01_device::device_start()
 {
+	// floppy callbacks
+	m_fdc->setup_intrq_cb(wd2793_t::line_cb(FUNC(e01_device::fdc_irq_w), this));
+	m_fdc->setup_drq_cb(wd2793_t::line_cb(FUNC(e01_device::fdc_drq_w), this));
+
 	// setup memory banking
 	UINT8 *ram = m_ram->pointer();
 	UINT8 *rom = memregion(R65C102_TAG)->base();
@@ -599,26 +603,27 @@ WRITE8_MEMBER( e01_device::floppy_w )
 
     */
 
-	// floppy 1 select
-	if (!BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
+	// floppy select
+	floppy_image_device *floppy = NULL;
 
-	// floppy 2 select
-	if (!BIT(data, 1)) wd17xx_set_drive(m_fdc, 1);
+	if (!BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (!BIT(data, 1)) floppy = m_floppy1->get_device();
+
+	m_fdc->set_floppy(floppy);
 
 	// floppy side select
-	wd17xx_set_side(m_fdc, BIT(data, 2));
+	if (floppy) floppy->ss_w(BIT(data, 2));
 
 	// TODO NVRAM select
 	//mc146818_stby_w(m_rtc, BIT(data, 3));
 
 	// floppy density
-	wd17xx_dden_w(m_fdc, BIT(data, 4));
+	m_fdc->dden_w(BIT(data, 4));
 
 	// floppy master reset
-	wd17xx_mr_w(m_fdc, BIT(data, 5));
+	if (!BIT(data, 5)) m_fdc->reset();
 
 	// TODO floppy test
-	//wd17xx_test_w(m_fdc, BIT(data, 6));
 
 	// mode LED
 	output_set_value("led_0", BIT(data, 7));
