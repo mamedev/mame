@@ -108,7 +108,7 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<ay8912_device> m_ay;
+	required_device<ay8910_device> m_ay;
 	optional_device<upd765_family_device> m_fdc;  // not on a GX4000
 	required_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen;
