@@ -36,9 +36,23 @@
 #include "debugger.h"
 
 const device_type FD1771x = &device_creator<fd1771_t>;
+const device_type FD1781x = &device_creator<fd1781_t>;
+const device_type FD1791x = &device_creator<fd1791_t>;
+const device_type FD1792x = &device_creator<fd1792_t>;
 const device_type FD1793x = &device_creator<fd1793_t>;
+const device_type FD1794x = &device_creator<fd1794_t>;
+const device_type FD1795x = &device_creator<fd1795_t>;
 const device_type FD1797x = &device_creator<fd1797_t>;
+const device_type MB8866x = &device_creator<mb8866_t>;
+const device_type MB8876x = &device_creator<mb8876_t>;
+const device_type MB8877x = &device_creator<mb8877_t>;
+const device_type FD1761x = &device_creator<fd1761_t>;
+const device_type FD1763x = &device_creator<fd1763_t>;
+const device_type FD1765x = &device_creator<fd1765_t>;
+const device_type FD1767x = &device_creator<fd1767_t>;
+const device_type WD2791x = &device_creator<wd2791_t>;
 const device_type WD2793x = &device_creator<wd2793_t>;
+const device_type WD2795x = &device_creator<wd2795_t>;
 const device_type WD2797x = &device_creator<wd2797_t>;
 const device_type WD1770x = &device_creator<wd1770_t>;
 const device_type WD1772x = &device_creator<wd1772_t>;
@@ -106,7 +120,7 @@ void wd_fdc_t::set_floppy(floppy_image_device *_floppy)
 	floppy = _floppy;
 
 	if(floppy) {
-		if(has_motor())
+		if(motor_control)
 			floppy->mon_w(status & S_MON ? 0 : 1);
 		floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(wd_fdc_t::index_callback), this));
 	}
@@ -178,14 +192,14 @@ void wd_fdc_t::seek_start(int state)
 {
 	main_state = state;
 	status = (status & ~(S_CRC|S_RNF|S_SPIN)) | S_BUSY;
-	if(has_head_load()) {
+	if(head_control) {
 		// TODO get value from HLT callback
-		if (command & 8)
+		if(command & 8)
 			status |= S_HLD;
 		else
 			status &= ~S_HLD;
 	}
-	sub_state = has_motor() && !has_head_load() ? SPINUP : SPINUP_DONE;
+	sub_state = motor_control ? SPINUP : SPINUP_DONE;
 	status_type_1 = true;
 	seek_continue();
 }
@@ -259,7 +273,7 @@ void wd_fdc_t::seek_continue()
 
 				if(command & 0x04) {
 					sub_state = SEEK_WAIT_STABILIZATION_TIME;
-					delay_cycles(t_gen, 120000);
+					delay_cycles(t_gen, 30000);
 					return;
 				} else
 					sub_state = SEEK_DONE;
@@ -279,7 +293,7 @@ void wd_fdc_t::seek_continue()
 
 		case SEEK_DONE:
 			if(command & 0x04) {
-				if(has_ready() && !is_ready()) {
+				if(!is_ready()) {
 					status |= S_RNF;
 					command_end();
 					return;
@@ -321,7 +335,7 @@ bool wd_fdc_t::sector_matches() const
 {
 	if(cur_live.idbuf[0] != track || cur_live.idbuf[2] != sector)
 		return false;
-	if(!has_side_check() || (command & 2))
+	if(!side_compare || (command & 2))
 		return true;
 	if(command & 8)
 		return cur_live.idbuf[1] & 1;
@@ -331,20 +345,20 @@ bool wd_fdc_t::sector_matches() const
 
 bool wd_fdc_t::is_ready()
 {
-	return (floppy && !floppy->ready_r());
+	return !ready_hooked || (floppy && !floppy->ready_r());
 }
 
 void wd_fdc_t::read_sector_start()
 {
-	if(has_ready() && !is_ready())
+	if(!is_ready())
 		command_end();
 
 	main_state = READ_SECTOR;
 	status = (status & ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM)) | S_BUSY;
 	drop_drq();
-	if (has_side_select() && floppy)
-		floppy->ss_w(BIT(command, 1));
-	sub_state = has_motor() && !has_head_load() ? SPINUP : SPINUP_DONE;
+	if(side_control && floppy)
+		floppy->ss_w(command & 0x02);
+	sub_state = motor_control ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	read_sector_continue();
 }
@@ -426,15 +440,15 @@ void wd_fdc_t::read_sector_continue()
 
 void wd_fdc_t::read_track_start()
 {
-	if(has_ready() && !is_ready())
+	if(!is_ready())
 		command_end();
-	
+
 	main_state = READ_TRACK;
 	status = (status & ~(S_LOST|S_RNF)) | S_BUSY;
 	drop_drq();
-	if (has_side_select() && floppy)
-		floppy->ss_w(BIT(command, 1));
-	sub_state = has_motor() && !has_head_load()  ? SPINUP : SPINUP_DONE;
+	if(side_control && floppy)
+		floppy->ss_w(command & 0x02);
+	sub_state = motor_control ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	read_track_continue();
 }
@@ -493,15 +507,15 @@ void wd_fdc_t::read_track_continue()
 
 void wd_fdc_t::read_id_start()
 {
-	if(has_ready() && !is_ready())
+	if(!is_ready())
 		command_end();
-	
+
 	main_state = READ_ID;
 	status = (status & ~(S_WP|S_DDM|S_LOST|S_RNF)) | S_BUSY;
 	drop_drq();
-	if (has_side_select() && floppy)
-		floppy->ss_w(BIT(command, 1));
-	sub_state = has_motor() && !has_head_load()  ? SPINUP : SPINUP_DONE;
+	if(side_control && floppy)
+		floppy->ss_w(command & 0x02);
+	sub_state = motor_control ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	read_id_continue();
 }
@@ -558,15 +572,15 @@ void wd_fdc_t::read_id_continue()
 
 void wd_fdc_t::write_track_start()
 {
-	if(has_ready() && !is_ready())
+	if(!is_ready())
 		command_end();
-	
+
 	main_state = WRITE_TRACK;
 	status = (status & ~(S_WP|S_DDM|S_LOST|S_RNF)) | S_BUSY;
 	drop_drq();
-	if (has_side_select() && floppy)
-		floppy->ss_w(BIT(command, 1));
-	sub_state = has_motor()  && !has_head_load() ? SPINUP : SPINUP_DONE;
+	if(side_control && floppy)
+		floppy->ss_w(command & 0x02);
+	sub_state = motor_control ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	write_track_continue();
 }
@@ -602,7 +616,7 @@ void wd_fdc_t::write_track_continue()
 		case SETTLE_DONE:
 			set_drq();
 			sub_state = DATA_LOAD_WAIT;
-			delay_cycles(t_gen, 768);
+			delay_cycles(t_gen, 192);
 			return;
 
 		case DATA_LOAD_WAIT:
@@ -623,7 +637,7 @@ void wd_fdc_t::write_track_continue()
 		case WAIT_INDEX_DONE:
 			sub_state = TRACK_DONE;
 			live_start(WRITE_TRACK_DATA);
-			cur_live.pll.start_writing(machine().time());
+			pll_start_writing(machine().time());
 			return;
 
 		case TRACK_DONE:
@@ -640,15 +654,15 @@ void wd_fdc_t::write_track_continue()
 
 void wd_fdc_t::write_sector_start()
 {
-	if(has_ready() && !is_ready())
+	if(!is_ready())
 		command_end();
-	
+
 	main_state = WRITE_SECTOR;
 	status = (status & ~(S_CRC|S_LOST|S_RNF|S_WP|S_DDM)) | S_BUSY;
 	drop_drq();
-	if (has_side_select() && floppy)
-		floppy->ss_w(BIT(command, 1));
-	sub_state = has_motor() && !has_head_load()  ? SPINUP : SPINUP_DONE;
+	if(side_control && floppy)
+		floppy->ss_w(command & 0x02);
+	sub_state = motor_control  ? SPINUP : SPINUP_DONE;
 	status_type_1 = false;
 	write_sector_continue();
 }
@@ -734,7 +748,7 @@ void wd_fdc_t::interrupt_start()
 		drop_drq();
 		motor_timeout = 0;
 	}
-	
+
 	if(!(command & 0x0f)) {
 		intrq_cond = 0;
 	} else {
@@ -848,7 +862,7 @@ void wd_fdc_t::do_cmd_w()
 void wd_fdc_t::cmd_w(UINT8 val)
 {
 	logerror("wd1772 cmd: %02x\n", val);
-	
+
 	if(intrq && !(intrq_cond & I_IMM)) {
 		intrq = false;
 		if(!intrq_cb.isnull())
@@ -861,7 +875,7 @@ void wd_fdc_t::cmd_w(UINT8 val)
 
 	cmd_buffer = val;
 
-	delay_cycles(t_cmd, dden ? 384 : 184);
+	delay_cycles(t_cmd, dden ? 192 : 46);
 }
 
 UINT8 wd_fdc_t::status_r()
@@ -894,7 +908,7 @@ UINT8 wd_fdc_t::status_r()
 		}
 	}
 
-	if(has_ready()) {
+	if(ready_hooked) {
 		if(!is_ready())
 			status |= S_NRDY;
 		else
@@ -917,7 +931,7 @@ void wd_fdc_t::track_w(UINT8 val)
 		return;
 
 	track_buffer = val;
-	delay_cycles(t_track, dden ? 256 : 128);
+	delay_cycles(t_track, dden ? 64 : 32);
 }
 
 UINT8 wd_fdc_t::track_r()
@@ -938,7 +952,7 @@ void wd_fdc_t::sector_w(UINT8 val)
 		return;
 
 	sector_buffer = val;
-	delay_cycles(t_sector, dden ? 256 : 128);
+	delay_cycles(t_sector, dden ? 64 : 32);
 }
 
 UINT8 wd_fdc_t::sector_r()
@@ -981,7 +995,7 @@ UINT8 wd_fdc_t::gen_r(int reg)
 
 void wd_fdc_t::delay_cycles(emu_timer *tm, int cycles)
 {
-	tm->adjust(clocks_to_attotime(cycles));
+	tm->adjust(clocks_to_attotime(cycles*clock_ratio));
 }
 
 void wd_fdc_t::spinup()
@@ -1016,7 +1030,7 @@ void wd_fdc_t::index_callback(floppy_image_device *floppy, int state)
 
 	switch(sub_state) {
 	case IDLE:
-		if(has_motor()) {
+		if(motor_control) {
 			motor_timeout ++;
 			if(motor_timeout >= 5) {
 				status &= ~S_MON;
@@ -1117,22 +1131,24 @@ void wd_fdc_t::live_start(int state)
 	cur_live.previous_type = live_info::PT_NONE;
 	cur_live.data_bit_context = false;
 	cur_live.byte_counter = 0;
-	cur_live.pll.reset(cur_live.tm);
-	cur_live.pll.set_clock(clocks_to_attotime(1));
+	pll_reset(cur_live.tm);
 	checkpoint_live = cur_live;
+	pll_save_checkpoint();
 
 	live_run();
 }
 
 void wd_fdc_t::checkpoint()
 {
-	cur_live.pll.commit(floppy, cur_live.tm);
+	pll_commit(floppy, cur_live.tm);
 	checkpoint_live = cur_live;
+	pll_save_checkpoint();
 }
 
 void wd_fdc_t::rollback()
 {
 	cur_live = checkpoint_live;
+	pll_retrieve_checkpoint();
 }
 
 void wd_fdc_t::live_delay(int state)
@@ -1148,16 +1164,16 @@ void wd_fdc_t::live_sync()
 			//          fprintf(stderr, "%s: Rolling back and replaying (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
 			rollback();
 			live_run(machine().time());
-			cur_live.pll.commit(floppy, cur_live.tm);
+			pll_commit(floppy, cur_live.tm);
 		} else {
 			//          fprintf(stderr, "%s: Committing (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
-			cur_live.pll.commit(floppy, cur_live.tm);
+			pll_commit(floppy, cur_live.tm);
 			if(cur_live.next_state != -1) {
 				cur_live.state = cur_live.next_state;
 				cur_live.next_state = -1;
 			}
 			if(cur_live.state == IDLE) {
-				cur_live.pll.stop_writing(floppy, cur_live.tm);
+				pll_stop_writing(floppy, cur_live.tm);
 				cur_live.tm = attotime::never;
 			}
 		}
@@ -1173,7 +1189,7 @@ void wd_fdc_t::live_abort()
 		live_run(machine().time());
 	}
 
-	cur_live.pll.stop_writing(floppy, cur_live.tm);
+	pll_stop_writing(floppy, cur_live.tm);
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
@@ -1181,7 +1197,7 @@ void wd_fdc_t::live_abort()
 
 bool wd_fdc_t::read_one_bit(attotime limit)
 {
-	int bit = cur_live.pll.get_next_bit(cur_live.tm, floppy, limit);
+	int bit = pll_get_next_bit(cur_live.tm, floppy, limit);
 	if(bit < 0)
 		return true;
 	cur_live.shift_reg = (cur_live.shift_reg << 1) | bit;
@@ -1200,7 +1216,7 @@ bool wd_fdc_t::read_one_bit(attotime limit)
 bool wd_fdc_t::write_one_bit(attotime limit)
 {
 	bool bit = cur_live.shift_reg & 0x8000;
-	if(cur_live.pll.write_next_bit(bit, cur_live.tm, floppy, limit))
+	if(pll_write_next_bit(bit, cur_live.tm, floppy, limit))
 		return true;
 	if(cur_live.bit_counter & 1) {
 		if((cur_live.crc ^ (bit ? 0x8000 : 0x0000)) & 0x8000)
@@ -1590,7 +1606,7 @@ void wd_fdc_t::live_run(attotime limit)
 					// Is that correct?  It seems required (try ST formatting)
 					live_write_mfm(0xff);
 				else {
-					cur_live.pll.stop_writing(floppy, cur_live.tm);
+					pll_stop_writing(floppy, cur_live.tm);
 					cur_live.state = IDLE;
 					return;
 				}
@@ -1634,7 +1650,7 @@ void wd_fdc_t::live_run(attotime limit)
 				cur_live.bit_counter = 16;
 				cur_live.byte_counter = 0;
 				cur_live.data_bit_context = cur_live.data_reg & 1;
-				cur_live.pll.start_writing(cur_live.tm);
+				pll_start_writing(cur_live.tm);
 				live_write_mfm(0x00);
 				break;
 			}
@@ -1667,13 +1683,118 @@ void wd_fdc_t::drop_drq()
 	}
 }
 
-void wd_fdc_t::pll_t::set_clock(attotime period)
+int wd_fdc_t::step_time(int mode) const
+{
+	const static int step_times[4] = { 12000, 24000, 40000, 60000 };
+	return step_times[mode];
+}
+
+int wd_fdc_t::settle_time() const
+{
+	return 60000;
+}
+
+wd_fdc_analog_t::wd_fdc_analog_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+	wd_fdc_t(mconfig, type, name, tag, owner, clock)
+{
+	clock_ratio = 1;
+}
+
+void wd_fdc_analog_t::pll_reset(attotime when)
+{
+	cur_pll.reset(when);
+	cur_pll.set_clock(clocks_to_attotime(4));
+}
+
+void wd_fdc_analog_t::pll_start_writing(attotime tm)
+{
+	cur_pll.start_writing(tm);
+}
+
+void wd_fdc_analog_t::pll_commit(floppy_image_device *floppy, attotime tm)
+{
+	cur_pll.commit(floppy, tm);
+}
+
+void wd_fdc_analog_t::pll_stop_writing(floppy_image_device *floppy, attotime tm)
+{
+	cur_pll.stop_writing(floppy, tm);
+}
+
+void wd_fdc_analog_t::pll_save_checkpoint()
+{
+	checkpoint_pll = cur_pll;
+}
+
+void wd_fdc_analog_t::pll_retrieve_checkpoint()
+{
+	cur_pll = checkpoint_pll;
+}
+
+int wd_fdc_analog_t::pll_get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit)
+{
+	return cur_pll.get_next_bit(tm, floppy, limit);
+}
+
+bool wd_fdc_analog_t::pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit)
+{
+	return cur_pll.write_next_bit(bit, tm, floppy, limit);
+}
+
+wd_fdc_digital_t::wd_fdc_digital_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+	wd_fdc_t(mconfig, type, name, tag, owner, clock)
+{
+	clock_ratio = 4;
+}
+
+void wd_fdc_digital_t::pll_reset(attotime when)
+{
+	cur_pll.reset(when);
+	cur_pll.set_clock(clocks_to_attotime(1));
+}
+
+void wd_fdc_digital_t::pll_start_writing(attotime tm)
+{
+	cur_pll.start_writing(tm);
+}
+
+void wd_fdc_digital_t::pll_commit(floppy_image_device *floppy, attotime tm)
+{
+	cur_pll.commit(floppy, tm);
+}
+
+void wd_fdc_digital_t::pll_stop_writing(floppy_image_device *floppy, attotime tm)
+{
+	cur_pll.stop_writing(floppy, tm);
+}
+
+int wd_fdc_digital_t::pll_get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit)
+{
+	return cur_pll.get_next_bit(tm, floppy, limit);
+}
+
+bool wd_fdc_digital_t::pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit)
+{
+	return cur_pll.write_next_bit(bit, tm, floppy, limit);
+}
+
+void wd_fdc_digital_t::pll_save_checkpoint()
+{
+	checkpoint_pll = cur_pll;
+}
+
+void wd_fdc_digital_t::pll_retrieve_checkpoint()
+{
+	cur_pll = checkpoint_pll;
+}
+
+void wd_fdc_digital_t::digital_pll_t::set_clock(attotime period)
 {
 	for(int i=0; i<42; i++)
 		delays[i] = period*(i+1);
 }
 
-void wd_fdc_t::pll_t::reset(attotime when)
+void wd_fdc_digital_t::digital_pll_t::reset(attotime when)
 {
 	counter = 0;
 	increment = 128;
@@ -1689,7 +1810,7 @@ void wd_fdc_t::pll_t::reset(attotime when)
 	write_start_time = attotime::never;
 }
 
-int wd_fdc_t::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit)
+int wd_fdc_digital_t::digital_pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit)
 {
 	attotime when = floppy ? floppy->get_next_transition(ctime) : attotime::never;
 #if 0
@@ -1769,19 +1890,19 @@ int wd_fdc_t::pll_t::get_next_bit(attotime &tm, floppy_image_device *floppy, att
 	return bit;
 }
 
-void wd_fdc_t::pll_t::start_writing(attotime tm)
+void wd_fdc_digital_t::digital_pll_t::start_writing(attotime tm)
 {
 	write_start_time = tm;
 	write_position = 0;
 }
 
-void wd_fdc_t::pll_t::stop_writing(floppy_image_device *floppy, attotime tm)
+void wd_fdc_digital_t::digital_pll_t::stop_writing(floppy_image_device *floppy, attotime tm)
 {
 	commit(floppy, tm);
 	write_start_time = attotime::never;
 }
 
-bool wd_fdc_t::pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit)
+bool wd_fdc_digital_t::digital_pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit)
 {
 	if(write_start_time.is_never()) {
 		write_start_time = ctime;
@@ -1811,7 +1932,7 @@ bool wd_fdc_t::pll_t::write_next_bit(bool bit, attotime &tm, floppy_image_device
 	return false;
 }
 
-void wd_fdc_t::pll_t::commit(floppy_image_device *floppy, attotime tm)
+void wd_fdc_digital_t::digital_pll_t::commit(floppy_image_device *floppy, attotime tm)
 {
 	if(write_start_time.is_never() || tm == write_start_time)
 		return;
@@ -1822,86 +1943,233 @@ void wd_fdc_t::pll_t::commit(floppy_image_device *floppy, attotime tm)
 	write_position = 0;
 }
 
-int wd_fdc_t::step_time(int mode) const
+fd1771_t::fd1771_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1771x, "FD1771", tag, owner, clock)
 {
-	const static int step_times[4] = { 48000, 96000, 160000, 240000 };
-	return step_times[mode];
+	inverted_bus = true;
+	side_control = false;
+	side_compare = false;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
 }
 
-int wd_fdc_t::settle_time() const
+fd1781_t::fd1781_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1781x, "FD1781", tag, owner, clock)
 {
-	return 240000;
+	inverted_bus = true;
+	side_control = false;
+	side_compare = false;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
 }
 
-bool wd_fdc_t::has_ready() const
+fd1791_t::fd1791_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1791x, "FD1791", tag, owner, clock)
 {
-	return false;
+	inverted_bus = true;
+	side_control = false;
+	side_compare = true;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
 }
 
-bool wd_fdc_t::has_head_load() const
+fd1792_t::fd1792_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1792x, "FD1792", tag, owner, clock)
 {
-	return false;
+	inverted_bus = true;
+	side_control = false;
+	side_compare = true;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
 }
 
-bool wd_fdc_t::has_side_check() const
+fd1793_t::fd1793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1793x, "FD1793", tag, owner, clock)
 {
-	return false;
+	inverted_bus = false;
+	side_control = false;
+	side_compare = true;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
 }
 
-bool wd_fdc_t::has_side_select() const
+fd1794_t::fd1794_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1794x, "FD1794", tag, owner, clock)
 {
-	return false;
+	inverted_bus = false;
+	side_control = false;
+	side_compare = true;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
 }
 
-bool wd_fdc_t::has_sector_length_select() const
+fd1795_t::fd1795_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1795x, "FD1795", tag, owner, clock)
 {
-	return false;
+	inverted_bus = true;
+	side_control = false;
+	side_compare = false;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
 }
 
-bool wd_fdc_t::has_precompensation() const
+fd1797_t::fd1797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1797x, "FD1797", tag, owner, clock)
 {
-	return false;
+	inverted_bus = false;
+	side_control = false;
+	side_compare = false;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
 }
 
-fd1771_t::fd1771_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_t(mconfig, FD1771x, "FD1771", tag, owner, clock)
+mb8866_t::mb8866_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, MB8866x, "MB8866", tag, owner, clock)
 {
+	inverted_bus = true;
+	side_control = false;
+	side_compare = true;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
 }
 
-fd1793_t::fd1793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_t(mconfig, FD1793x, "FD1793", tag, owner, clock)
+mb8876_t::mb8876_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, MB8876x, "MB8876", tag, owner, clock)
 {
+	inverted_bus = true;
+	side_control = false;
+	side_compare = true;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
 }
 
-fd1797_t::fd1797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_t(mconfig, FD1797x, "FD1797", tag, owner, clock)
+mb8877_t::mb8877_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, MB8877x, "MB8877", tag, owner, clock)
 {
+	inverted_bus = false;
+	side_control = false;
+	side_compare = true;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
 }
 
-wd2793_t::wd2793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_t(mconfig, WD2793x, "WD2793", tag, owner, clock)
+fd1761_t::fd1761_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1761x, "FD1761", tag, owner, clock)
 {
+	inverted_bus = true;
+	side_control = false;
+	side_compare = true;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
 }
 
-wd2797_t::wd2797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_t(mconfig, WD2797x, "WD2797", tag, owner, clock)
+fd1763_t::fd1763_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1763x, "FD1763", tag, owner, clock)
 {
+	inverted_bus = false;
+	side_control = false;
+	side_compare = true;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
 }
 
-wd1770_t::wd1770_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_t(mconfig, WD1770x, "WD1770", tag, owner, clock)
+fd1765_t::fd1765_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1765x, "FD1765", tag, owner, clock)
 {
+	inverted_bus = true;
+	side_control = true;
+	side_compare = false;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
 }
 
-wd1772_t::wd1772_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_t(mconfig, WD1772x, "WD1772", tag, owner, clock)
+fd1767_t::fd1767_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1767x, "FD1767", tag, owner, clock)
 {
+	inverted_bus = false;
+	side_control = true;
+	side_compare = false;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
+}
+
+wd2791_t::wd2791_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, WD2791x, "WD2791", tag, owner, clock)
+{
+	inverted_bus = true;
+	side_control = false;
+	side_compare = true;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
+}
+
+wd2793_t::wd2793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, WD2793x, "WD2793", tag, owner, clock)
+{
+	inverted_bus = false;
+	side_control = false;
+	side_compare = true;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
+}
+
+wd2795_t::wd2795_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, WD2795x, "WD2795", tag, owner, clock)
+{
+	inverted_bus = true;
+	side_control = true;
+	side_compare = false;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
+}
+
+wd2797_t::wd2797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, WD2797x, "WD2797", tag, owner, clock)
+{
+	inverted_bus = false;
+	side_control = true;
+	side_compare = false;
+	head_control = true;
+	motor_control = false;
+	ready_hooked = true;
+}
+
+wd1770_t::wd1770_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_digital_t(mconfig, WD1770x, "WD1770", tag, owner, clock)
+{
+	inverted_bus = false;
+	side_control = false;
+	side_compare = false;
+	head_control = false;
+	motor_control = true;
+	ready_hooked = false;
+}
+
+wd1772_t::wd1772_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_digital_t(mconfig, WD1772x, "WD1772", tag, owner, clock)
+{
+	inverted_bus = false;
+	side_control = false;
+	side_compare = false;
+	head_control = false;
+	motor_control = true;
+	ready_hooked = false;
 }
 
 int wd1772_t::step_time(int mode) const
 {
-	const static int step_times[4] = { 48000, 96000, 16000, 24000 };
+	const static int step_times[4] = { 12000, 24000, 4000, 6000 };
 	return step_times[mode];
 }
 
 int wd1772_t::settle_time() const
 {
-	return 120000;
+	return 30000;
 }
 
-wd1773_t::wd1773_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_t(mconfig, WD1773x, "WD1773", tag, owner, clock)
+wd1773_t::wd1773_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_digital_t(mconfig, WD1773x, "WD1773", tag, owner, clock)
 {
+	inverted_bus = false;
+	side_control = false;
+	side_compare = true;
+	head_control = false;
+	motor_control = false;
+	ready_hooked = true;
 }

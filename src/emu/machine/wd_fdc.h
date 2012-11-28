@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "imagedev/floppy.h"
+#include "fdc_pll.h"
 
 /*
  * The Western Digital floppy controller family
@@ -44,14 +45,56 @@
 #define MCFG_FD1771x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, FD1771x, _clock)
 
+#define MCFG_FD1781x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1781x, _clock)
+
+#define MCFG_FD1791x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1791x, _clock)
+
+#define MCFG_FD1792x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1792x, _clock)
+
 #define MCFG_FD1793x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, FD1793x, _clock)
+
+#define MCFG_FD1794x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1794x, _clock)
+
+#define MCFG_FD1795x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1795x, _clock)
 
 #define MCFG_FD1797x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, FD1797x, _clock)
 
+#define MCFG_MB866x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, MB8866x, _clock)
+
+#define MCFG_MB876x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, MB8876x, _clock)
+
+#define MCFG_MB877x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, MB8877x, _clock)
+
+#define MCFG_FD1761x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1761x, _clock)
+
+#define MCFG_FD1763x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1763x, _clock)
+
+#define MCFG_FD1765x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1765x, _clock)
+
+#define MCFG_FD1767x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, FD1767x, _clock)
+
+#define MCFG_WD2791x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, WD2791x, _clock)
+
 #define MCFG_WD2793x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, WD2793x, _clock)
+
+#define MCFG_WD2795x_ADD(_tag, _clock)  \
+	MCFG_DEVICE_ADD(_tag, WD2795x, _clock)
 
 #define MCFG_WD2797x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, WD2797x, _clock)
@@ -112,19 +155,30 @@ public:
 	bool enp_r();
 
 protected:
+	// Chip-specific configuration flags
+	bool inverted_bus;
+	bool side_control;
+	bool side_compare;
+	bool head_control;
+	bool motor_control;
+	bool ready_hooked;
+	int clock_ratio;
+
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	virtual bool has_ready() const;
-	virtual bool has_motor() const = 0;
-	virtual bool has_head_load() const;
-	virtual bool has_side_check() const;
-	virtual bool has_side_select() const;
-	virtual bool has_sector_length_select() const;
-	virtual bool has_precompensation() const;
 	virtual int step_time(int mode) const;
 	virtual int settle_time() const;
+
+	virtual void pll_reset(attotime when) = 0;
+	virtual void pll_start_writing(attotime tm) = 0;
+	virtual void pll_commit(floppy_image_device *floppy, attotime tm) = 0;
+	virtual void pll_stop_writing(floppy_image_device *floppy, attotime tm) = 0;
+	virtual int pll_get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit) = 0;
+	virtual bool pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit) = 0;
+	virtual void pll_save_checkpoint() = 0;
+	virtual void pll_retrieve_checkpoint() = 0;
 
 private:
 	enum { TM_GEN, TM_CMD, TM_TRACK, TM_SECTOR };
@@ -233,30 +287,6 @@ private:
 		WRITE_SECTOR_PRE_BYTE,
 	};
 
-	struct pll_t {
-		UINT16 counter;
-		UINT16 increment;
-		UINT16 transition_time;
-		UINT8 history;
-		UINT8 slot;
-		UINT8 phase_add, phase_sub, freq_add, freq_sub;
-		attotime ctime;
-
-		attotime delays[42];
-
-		attotime write_start_time;
-		attotime write_buffer[32];
-		int write_position;
-
-		void set_clock(attotime period);
-		void reset(attotime when);
-		int get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit);
-		bool write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit);
-		void start_writing(attotime tm);
-		void commit(floppy_image_device *floppy, attotime tm);
-		void stop_writing(floppy_image_device *floppy, attotime tm);
-	};
-
 	struct live_info {
 		enum { PT_NONE, PT_CRC_1, PT_CRC_2 };
 
@@ -268,7 +298,6 @@ private:
 		bool data_separator_phase, data_bit_context;
 		UINT8 data_reg;
 		UINT8 idbuf[6];
-		pll_t pll;
 	};
 
 	enum {
@@ -294,6 +323,7 @@ private:
 		I_IDX = 0x04,
 		I_IMM = 0x08
 	};
+
 
 	floppy_image_device *floppy;
 
@@ -369,98 +399,204 @@ private:
 	void set_drq();
 };
 
-class fd1771_t : public wd_fdc_t {
+class wd_fdc_analog_t : public wd_fdc_t {
+public:
+	wd_fdc_analog_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual void pll_reset(attotime when);
+	virtual void pll_start_writing(attotime tm);
+	virtual void pll_commit(floppy_image_device *floppy, attotime tm);
+	virtual void pll_stop_writing(floppy_image_device *floppy, attotime tm);
+	virtual int pll_get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit);
+	virtual bool pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit);
+	virtual void pll_save_checkpoint();
+	virtual void pll_retrieve_checkpoint();
+
+private:
+	fdc_pll_t cur_pll, checkpoint_pll;
+};
+
+class wd_fdc_digital_t : public wd_fdc_t {
+public:
+	wd_fdc_digital_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual void pll_reset(attotime when);
+	virtual void pll_start_writing(attotime tm);
+	virtual void pll_commit(floppy_image_device *floppy, attotime tm);
+	virtual void pll_stop_writing(floppy_image_device *floppy, attotime tm);
+	virtual int pll_get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit);
+	virtual bool pll_write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit);
+	virtual void pll_save_checkpoint();
+	virtual void pll_retrieve_checkpoint();
+
+private:
+	struct digital_pll_t {
+		UINT16 counter;
+		UINT16 increment;
+		UINT16 transition_time;
+		UINT8 history;
+		UINT8 slot;
+		UINT8 phase_add, phase_sub, freq_add, freq_sub;
+		attotime ctime;
+
+		attotime delays[42];
+
+		attotime write_start_time;
+		attotime write_buffer[32];
+		int write_position;
+
+		void set_clock(attotime period);
+		void reset(attotime when);
+		int get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit);
+		bool write_next_bit(bool bit, attotime &tm, floppy_image_device *floppy, attotime limit);
+		void start_writing(attotime tm);
+		void commit(floppy_image_device *floppy, attotime tm);
+		void stop_writing(floppy_image_device *floppy, attotime tm);
+	};
+
+	digital_pll_t cur_pll, checkpoint_pll;
+};
+
+class fd1771_t : public wd_fdc_analog_t {
 public:
 	fd1771_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	virtual bool has_ready() const { return true; }
-	virtual bool has_motor() const { return false; }
-	virtual bool has_head_load() const { return true; }
-	virtual bool has_side_check() const { return true; }
 };
 
-class fd1793_t : public wd_fdc_t {
+class fd1781_t : public wd_fdc_analog_t {
+public:
+	fd1781_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class fd1791_t : public wd_fdc_analog_t {
+public:
+	fd1791_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class fd1792_t : public wd_fdc_analog_t {
+public:
+	fd1792_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class fd1793_t : public wd_fdc_analog_t {
 public:
 	fd1793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	virtual bool has_ready() const { return true; }
-	virtual bool has_motor() const { return false; }
-	virtual bool has_head_load() const { return true; }
-	virtual bool has_side_check() const { return true; }
 };
 
-class fd1797_t : public wd_fdc_t {
+class fd1794_t : public wd_fdc_analog_t {
+public:
+	fd1794_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class fd1795_t : public wd_fdc_analog_t {
+public:
+	fd1795_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class fd1797_t : public wd_fdc_analog_t {
 public:
 	fd1797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	virtual bool has_ready() const { return true; }
-	virtual bool has_motor() const { return false; }
-	virtual bool has_head_load() const { return true; }
-	virtual bool has_side_select() const { return true; }
-	virtual bool has_sector_length_select() const { return true; }
 };
 
-class wd2793_t : public wd_fdc_t {
+class mb8866_t : public wd_fdc_analog_t {
+public:
+	mb8866_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class mb8876_t : public wd_fdc_analog_t {
+public:
+	mb8876_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class mb8877_t : public wd_fdc_analog_t {
+public:
+	mb8877_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class fd1761_t : public wd_fdc_analog_t {
+public:
+	fd1761_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class fd1763_t : public wd_fdc_analog_t {
+public:
+	fd1763_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class fd1765_t : public wd_fdc_analog_t {
+public:
+	fd1765_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class fd1767_t : public wd_fdc_analog_t {
+public:
+	fd1767_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class wd2791_t : public wd_fdc_analog_t {
+public:
+	wd2791_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class wd2793_t : public wd_fdc_analog_t {
 public:
 	wd2793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	virtual bool has_ready() const { return true; }
-	virtual bool has_motor() const { return false; }
-	virtual bool has_head_load() const { return true; }
-	virtual bool has_side_check() const { return true; }
 };
 
-class wd2797_t : public wd_fdc_t {
+class wd2795_t : public wd_fdc_analog_t {
+public:
+	wd2795_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+class wd2797_t : public wd_fdc_analog_t {
 public:
 	wd2797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	virtual bool has_ready() const { return true; }
-	virtual bool has_motor() const { return false; }
-	virtual bool has_head_load() const { return true; }
-	virtual bool has_side_select() const { return true; }
-	virtual bool has_sector_length_select() const { return true; }
 };
 
-class wd1770_t : public wd_fdc_t {
+class wd1770_t : public wd_fdc_digital_t {
 public:
 	wd1770_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	virtual bool has_motor() const { return true; }
-	virtual bool has_precompensation() const { return true; }
 };
 
-class wd1772_t : public wd_fdc_t {
+class wd1772_t : public wd_fdc_digital_t {
 public:
 	wd1772_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual bool has_motor() const { return true; }
-	virtual bool has_precompensation() const { return true; }
 	virtual int step_time(int mode) const;
 	virtual int settle_time() const;
 };
 
-class wd1773_t : public wd_fdc_t {
+class wd1773_t : public wd_fdc_digital_t {
 public:
 	wd1773_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	virtual bool has_motor() const { return false; }
-	virtual bool has_head_load() const { return true; }
-	virtual bool has_side_check() const { return true; }
 };
 
 extern const device_type FD1771x;
+
+extern const device_type FD1781x;
+
+extern const device_type FD1791x;
+extern const device_type FD1792x;
 extern const device_type FD1793x;
+extern const device_type FD1795x;
 extern const device_type FD1797x;
+
+extern const device_type MB8866x;
+extern const device_type MB8876x;
+extern const device_type MB8877x;
+
+extern const device_type FD1761x;
+extern const device_type FD1763x;
+extern const device_type FD1765x;
+extern const device_type FD1767x;
+
+extern const device_type WD2791x;
 extern const device_type WD2793x;
+extern const device_type WD2795x;
 extern const device_type WD2797x;
+
 extern const device_type WD1770x;
 extern const device_type WD1772x;
 extern const device_type WD1773x;
