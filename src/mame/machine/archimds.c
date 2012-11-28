@@ -39,6 +39,7 @@ static const UINT32 pixel_rate[4] = { 8000000, 12000000, 16000000, 24000000};
 
 #define IOC_LOG 0
 
+/* TODO: fix pending irqs */
 void archimedes_state::archimedes_request_irq_a(int mask)
 {
 	m_ioc_regs[IRQ_STATUS_A] |= mask;
@@ -460,8 +461,8 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 		}
 
 		case KART:	// keyboard read
-			archimedes_request_irq_b(ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);
-			break;
+			//archimedes_request_irq_b(ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);
+			return m_kart->read(space,0);
 
 		case IRQ_STATUS_A:
 			return (m_ioc_regs[IRQ_STATUS_A] & 0x7f) | 0x80; // Force IRQ is always '1'
@@ -526,12 +527,7 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 			break;
 
 		case KART:
-			#if 0
-			if(data == 0x0d)
-				printf("\n");
-			else
-				printf("%c",data);
-			#endif
+			m_kart->write(space,0,data);
 			break;
 
 		case IRQ_MASK_A:

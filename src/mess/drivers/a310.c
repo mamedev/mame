@@ -62,6 +62,7 @@
 #include "sound/dac.h"
 #include "includes/archimds.h"
 #include "machine/i2cmem.h"
+#include "machine/aakart.h"
 #include "machine/ram.h"
 
 
@@ -272,7 +273,7 @@ static MACHINE_CONFIG_START( a310, a310_state )
 	MCFG_CPU_ADD("maincpu", ARM, 8000000)        /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(a310_mem)
 
-
+	MCFG_AAKART_ADD("kart", 8000000) // TODO: frequency
 	MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
 
 	/* video hardware */

@@ -1,13 +1,13 @@
 /***************************************************************************
 
-Template for skeleton device
+Acorn Archimedes KART interface
 
 ***************************************************************************/
 
 #pragma once
 
-#ifndef __XXXDEV_H__
-#define __XXXDEV_H__
+#ifndef __AAKARTDEV_H__
+#define __AAKARTDEV_H__
 
 
 
@@ -15,21 +15,21 @@ Template for skeleton device
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_XXX_ADD(_tag,_freq) \
-	MCFG_DEVICE_ADD(_tag, XXX, _freq) \
+#define MCFG_AAKART_ADD(_tag,_freq) \
+	MCFG_DEVICE_ADD(_tag, AAKART, _freq) \
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> xxx_device
+// ======================> aakart_device
 
-class xxx_device : public device_t
+class aakart_device : public device_t
 {
 public:
 	// construction/destruction
-	xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	aakart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
@@ -44,7 +44,7 @@ protected:
 
 
 // device type definition
-extern const device_type XXX;
+extern const device_type AAKART;
 
 
 

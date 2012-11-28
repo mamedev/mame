@@ -26,6 +26,7 @@ PCB has a single OSC at 24MHz
 #include "sound/dac.h"
 #include "includes/archimds.h"
 #include "machine/i2cmem.h"
+#include "machine/aakart.h"
 
 
 class ertictac_state : public archimedes_state
@@ -229,8 +230,8 @@ static MACHINE_CONFIG_START( ertictac, ertictac_state )
 	MCFG_CPU_PROGRAM_MAP(ertictac_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(ertictac_state, ertictac_podule_irq, 60) // FIXME: timing of this
 
-
 	MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
+//	MCFG_AAKART_ADD("kart", XTAL_24MHz/3) // TODO: frequency
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -1391,7 +1391,9 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_bank_w)
 		if((data & 0xf0) == 0x20)
 			m_vram_bank = (data & 2) >> 1;
 		else
+		{
 			printf("Unknown EMS RAM setting %02x\n",data);
+		}
 	}
 }
 
@@ -1445,7 +1447,7 @@ READ8_MEMBER(pc9801_state::pc9801rs_memory_r)
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { return pc9801rs_knjram_r(space,offset & 0xfff);     }
 	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { return pc9801_gvram_r(space,offset-0xa8000);        }
 	else if(offset >= 0x000e0000 && offset <= 0x000fffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
-	else if(offset >= 0x00100000 && offset <= 0x00100000+m_ram_size-1) { return pc9801rs_ex_wram_r(space,offset-0x00100000); }
+	else if(offset >= 0x00100000 && offset <= 0x00100000+m_ram_size-1)		{ return pc9801rs_ex_wram_r(space,offset-0x00100000); }
 	else if(offset >= 0xfffe0000 && offset <= 0xffffffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
 
 	//printf("%08x\n",offset);

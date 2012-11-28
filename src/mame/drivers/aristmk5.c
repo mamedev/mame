@@ -426,6 +426,7 @@ static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
     MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))	/* 1.6 - 2 seconds */
 
 //  MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
+//	MCFG_AAKART_ADD("kart", 12000000) // TODO: frequency
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

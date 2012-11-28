@@ -7,6 +7,8 @@
 #ifndef _ARCHIMEDES_H_
 #define _ARCHIMEDES_H_
 
+#include "machine/aakart.h"
+
 // interrupt definitions.  these are for the real Archimedes computer - arcade
 // and gambling knockoffs likely are a bit different.
 
@@ -38,8 +40,11 @@ class archimedes_state : public driver_device
 {
 public:
 	archimedes_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_kart(*this, "kart")
+		{ }
 
+	optional_device<aakart_device> m_kart;
 	void archimedes_init();
 	void archimedes_reset();
 	void archimedes_driver_init();
