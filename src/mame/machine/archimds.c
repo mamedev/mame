@@ -465,7 +465,6 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 		}
 
 		case KART:	// keyboard read
-			//archimedes_request_irq_b(ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);
 			return m_kart->read(space,0);
 
 		case IRQ_STATUS_A:

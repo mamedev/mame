@@ -62,7 +62,7 @@
 #include "sound/dac.h"
 #include "includes/archimds.h"
 #include "machine/i2cmem.h"
-#include "machine/aakart.h"
+//#include "machine/aakart.h"
 #include "machine/ram.h"
 
 
@@ -268,12 +268,34 @@ static const i2cmem_interface i2cmem_interface =
 	I2CMEM_SLAVE_ADDRESS, 0, 0x100
 };
 
+WRITE_LINE_MEMBER( archimedes_state::a310_kart_tx_w )
+{
+	if(state)
+		archimedes_request_irq_b(ARCHIMEDES_IRQB_KBD_RECV_FULL);
+	else
+		archimedes_clear_irq_b(ARCHIMEDES_IRQB_KBD_RECV_FULL);
+}
+
+WRITE_LINE_MEMBER( archimedes_state::a310_kart_rx_w )
+{
+	if(state)
+		archimedes_request_irq_b(ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);
+	else
+		archimedes_clear_irq_b(ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);
+}
+
+static AAKART_INTERFACE( kart_interface )
+{
+	DEVCB_DRIVER_LINE_MEMBER(archimedes_state, a310_kart_tx_w),
+	DEVCB_DRIVER_LINE_MEMBER(archimedes_state, a310_kart_rx_w)
+};
+
 static MACHINE_CONFIG_START( a310, a310_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 8000000)        /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(a310_mem)
 
-	MCFG_AAKART_ADD("kart", 8000000) // TODO: frequency
+	MCFG_AAKART_ADD("kart", 8000000/128, kart_interface) // TODO: frequency
 	MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
 
 	/* video hardware */

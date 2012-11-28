@@ -66,6 +66,8 @@ public:
 	DECLARE_WRITE32_MEMBER(archimedes_ioc_w);
 	DECLARE_READ32_MEMBER(archimedes_vidc_r);
 	DECLARE_WRITE32_MEMBER(archimedes_vidc_w);
+	DECLARE_WRITE_LINE_MEMBER( a310_kart_rx_w );
+	DECLARE_WRITE_LINE_MEMBER( a310_kart_tx_w );
 
 	UINT8 m_i2c_clk;
 	INT16 m_memc_pages[0x2000];	// the logical RAM area is 32 megs, and the smallest page size is 4k
