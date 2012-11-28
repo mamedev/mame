@@ -367,6 +367,9 @@ public:
 	DECLARE_DRIVER_INIT(sc4s6c);
 	DECLARE_DRIVER_INIT(sc4taekw);
 	DECLARE_DRIVER_INIT(sc4taekw_mbus);
+	DECLARE_DRIVER_INIT(sc4taknt);
+	DECLARE_DRIVER_INIT(sc4takcl);
+	DECLARE_DRIVER_INIT(sc4takcl_mbus);
 
 	
 	

@@ -10275,13 +10275,6 @@ ROM_END
 
 
 
-ROM_START( sc4mondxh )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95416018.lo", 0x00001, 0x080000, CRC(63401675) SHA1(1b30d39abbdfda0b159ffab9a45148ac5115f957) )
-	ROM_LOAD16_BYTE( "95416019.hi", 0x00000, 0x080000, CRC(751deaca) SHA1(c9a0bccbc944b9f20975b2c9f487ad10c6b91239) )
-	sc_mdlx_others
-ROM_END
-
 
 
 
@@ -20792,6 +20785,9 @@ ROM_START( sc4mondxe )
 	sc_monop_others
 ROM_END
 
+
+
+
 ROM_START( sc4mondxb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95416020.lo", 0x00001, 0x080000, CRC(03cc1803) SHA1(f8930e37be21059de9ffc1f0265f12dbc3122e86) )
@@ -26062,7 +26058,6 @@ GAME( 200?, sc4mondxg	,sc4mondx,	sc4, sc4, sc4_state, sc4mondx, ROT0, "Mazooma",
 // Plays without Top Box
 GAME( 200?, sc4mondxe	,sc4mondx,	sc4, sc4, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.1) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )// PR2202 MONOPOLY         MONOPOLY  TRIPLE  MAZ       MONOPOLY  DELUXE
 GAME( 200?, sc4mondxf	,sc4mondx,	sc4, sc4, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.1) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4mondxh	,sc4mondx,	sc4, sc4, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.1) (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )// ^^
 // Waits for Top Box
 GAME( 200?, sc4mondx	,0,			sc4, sc4, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.0) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )// PR2202 MONOPOLY DELUXE         MONOPOLY DELUXE MAZ MPDX SOUNDS             MONOPOLY
 GAME( 200?, sc4mondxa	,sc4mondx,	sc4, sc4, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.0) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )// ^^
@@ -27478,25 +27473,65 @@ GAME( 200?, sc4taekwd	,sc4taekw,	sc4, sc4, sc4_state, sc4taekw_mbus, ROT0, "Qps"
 GAME( 200?, sc4taekwe	,sc4taekw,	sc4, sc4, sc4_state, sc4taekw_mbus, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
 GAME( 200?, sc4taekwf	,sc4taekw,	sc4, sc4, sc4_state, sc4taekw_mbus, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
 
+
+const stepper_interface* sc4taknt_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	&starpointrm20_interface_48step,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4taknt)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4taknt_reel_configs;
+}
+
 // PR1302 AWP TAKE NOTE         PR1302 TAKE NOTE SOUNDS11
-GAME( 200?, sc4taknt	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Take Note (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4taknta	,sc4taknt,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Take Note (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4taknt	,0,			sc4, sc4, sc4_state, sc4taknt, ROT0, "BFM","Take Note (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4taknta	,sc4taknt,	sc4, sc4, sc4_state, sc4taknt, ROT0, "BFM","Take Note (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4takcl_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4takcl)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4takcl_reel_configs;
+}
+
+DRIVER_INIT_MEMBER(sc4_state,sc4takcl_mbus)
+{
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4takcl_reel_configs;
+}
+
 
 // PR1323 CLUB TAKE NOTE         PR1323 CNOT SOUNDS11
-GAME( 200?, sc4takcl	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4takcld	,sc4takcl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4takcli	,sc4takcl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4takclj	,sc4takcl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4takcl	,0,			sc4, sc4, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4takcld	,sc4takcl,	sc4, sc4, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4takcli	,sc4takcl,	sc4, sc4, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4takclj	,sc4takcl,	sc4, sc4, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 //  PR1323 CLUB TAKE NOTE         CLUB TAKE NOTE  CLUB  PR1323 CNOT SOUNDS11
-GAME( 200?, sc4takclg	,sc4takcl,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4takclh	,sc4takcl,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4takclg	,sc4takcl,	sc4, sc4, sc4_state, sc4takcl_mbus, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4takclh	,sc4takcl,	sc4, sc4, sc4_state, sc4takcl_mbus, ROT0, "BFM","Take Note Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 // PR1323 CLUB TAKE NOTE 500         PR1323 CNOT SOUNDS11
-GAME( 200?, sc4takcla	,sc4takcl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Take Note Club 500 (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4takcla	,sc4takcl,	sc4, sc4, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club 500 (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 // PR1323 CLUB TAKE NOTE FERRY         PR1323 CNOT SOUNDS11
-GAME( 200?, sc4takclb	,sc4takcl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4takclc	,sc4takcl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4takcle	,sc4takcl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4takclf	,sc4takcl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4takclb	,sc4takcl,	sc4, sc4, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4takclc	,sc4takcl,	sc4, sc4, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4takcle	,sc4takcl,	sc4, sc4, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4takclf	,sc4takcl,	sc4, sc4, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
 
