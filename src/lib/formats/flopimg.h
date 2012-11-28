@@ -24,11 +24,11 @@
 
 ***************************************************************************/
 
-#define FLOPPY_FLAGS_READWRITE		0
-#define FLOPPY_FLAGS_READONLY		1
+#define FLOPPY_FLAGS_READWRITE      0
+#define FLOPPY_FLAGS_READONLY       1
 
 /* sector has a deleted data address mark */
-#define ID_FLAG_DELETED_DATA	0x0001
+#define ID_FLAG_DELETED_DATA    0x0001
 /* CRC error in id field */
 #define ID_FLAG_CRC_ERROR_IN_ID_FIELD 0x0002
 /* CRC error in data field */
@@ -43,13 +43,13 @@
 
 enum floperr_t
 {
-	FLOPPY_ERROR_SUCCESS,			/* no error */
-	FLOPPY_ERROR_INTERNAL,			/* fatal internal error */
-	FLOPPY_ERROR_UNSUPPORTED,		/* this operation is unsupported */
-	FLOPPY_ERROR_OUTOFMEMORY,		/* ran out of memory */
-	FLOPPY_ERROR_SEEKERROR,			/* attempted to seek to nonexistant location */
-	FLOPPY_ERROR_INVALIDIMAGE,		/* this image in invalid */
-	FLOPPY_ERROR_READONLY,			/* attempt to write to read-only image */
+	FLOPPY_ERROR_SUCCESS,           /* no error */
+	FLOPPY_ERROR_INTERNAL,          /* fatal internal error */
+	FLOPPY_ERROR_UNSUPPORTED,       /* this operation is unsupported */
+	FLOPPY_ERROR_OUTOFMEMORY,       /* ran out of memory */
+	FLOPPY_ERROR_SEEKERROR,         /* attempted to seek to nonexistant location */
+	FLOPPY_ERROR_INVALIDIMAGE,      /* this image in invalid */
+	FLOPPY_ERROR_READONLY,          /* attempt to write to read-only image */
 	FLOPPY_ERROR_NOSPACE,
 	FLOPPY_ERROR_PARAMOUTOFRANGE,
 	FLOPPY_ERROR_PARAMNOTSPECIFIED
@@ -89,9 +89,9 @@ struct FloppyFormat
 	const char *param_guidelines;
 };
 
-#define FLOPPY_IDENTIFY(name)	floperr_t name(floppy_image_legacy *floppy, const struct FloppyFormat *format, int *vote)
-#define FLOPPY_CONSTRUCT(name)	floperr_t name(floppy_image_legacy *floppy, const struct FloppyFormat *format, option_resolution *params)
-#define FLOPPY_DESTRUCT(name)	floperr_t name(floppy_image_legacy *floppy, const struct FloppyFormat *format)
+#define FLOPPY_IDENTIFY(name)   floperr_t name(floppy_image_legacy *floppy, const struct FloppyFormat *format, int *vote)
+#define FLOPPY_CONSTRUCT(name)  floperr_t name(floppy_image_legacy *floppy, const struct FloppyFormat *format, option_resolution *params)
+#define FLOPPY_DESTRUCT(name)   floperr_t name(floppy_image_legacy *floppy, const struct FloppyFormat *format)
 
 FLOPPY_IDENTIFY(td0_dsk_identify);
 FLOPPY_CONSTRUCT(td0_dsk_construct);
@@ -112,47 +112,47 @@ FLOPPY_CONSTRUCT(d88_dsk_construct);
 FLOPPY_IDENTIFY(fdi_dsk_identify);
 FLOPPY_CONSTRUCT(fdi_dsk_construct);
 
-#define LEGACY_FLOPPY_OPTIONS_NAME(name)	floppyoptions_##name
+#define LEGACY_FLOPPY_OPTIONS_NAME(name)    floppyoptions_##name
 
-#define LEGACY_FLOPPY_OPTIONS_START(name)												\
-	const struct FloppyFormat floppyoptions_##name[] =								\
-	{																			\
+#define LEGACY_FLOPPY_OPTIONS_START(name)                                               \
+	const struct FloppyFormat floppyoptions_##name[] =                              \
+	{                                                                           \
 
 #define LEGACY_FLOPPY_OPTIONS_END0 \
-		{ NULL }							\
+		{ NULL }                            \
 	};
 
-#define LEGACY_FLOPPY_OPTIONS_EXTERN(name)												\
-	extern const struct FloppyFormat floppyoptions_##name[]							\
+#define LEGACY_FLOPPY_OPTIONS_EXTERN(name)                                              \
+	extern const struct FloppyFormat floppyoptions_##name[]                         \
 
 #define LEGACY_FLOPPY_OPTION(name, extensions_, description_, identify_, construct_, destruct_, ranges_)\
-	{ #name, extensions_, description_, identify_, construct_, destruct_, ranges_ },				\
+	{ #name, extensions_, description_, identify_, construct_, destruct_, ranges_ },                \
 
-#define LEGACY_FLOPPY_OPTIONS_END														\
+#define LEGACY_FLOPPY_OPTIONS_END                                                       \
 		LEGACY_FLOPPY_OPTION( fdi, "fdi", "Formatted Disk Image", fdi_dsk_identify, fdi_dsk_construct, NULL, NULL) \
-		LEGACY_FLOPPY_OPTION( td0, "td0", "Teledisk floppy disk image",	td0_dsk_identify, td0_dsk_construct, td0_dsk_destruct, NULL) \
-		LEGACY_FLOPPY_OPTION( imd, "imd", "IMD floppy disk image",	imd_dsk_identify, imd_dsk_construct, NULL, NULL) \
-		LEGACY_FLOPPY_OPTION( cqm, "cqm,dsk", "CopyQM floppy disk image",	cqm_dsk_identify, cqm_dsk_construct, NULL, NULL) \
-		LEGACY_FLOPPY_OPTION( dsk, "dsk", "DSK floppy disk image",	dsk_dsk_identify, dsk_dsk_construct, NULL, NULL) \
+		LEGACY_FLOPPY_OPTION( td0, "td0", "Teledisk floppy disk image", td0_dsk_identify, td0_dsk_construct, td0_dsk_destruct, NULL) \
+		LEGACY_FLOPPY_OPTION( imd, "imd", "IMD floppy disk image",  imd_dsk_identify, imd_dsk_construct, NULL, NULL) \
+		LEGACY_FLOPPY_OPTION( cqm, "cqm,dsk", "CopyQM floppy disk image",   cqm_dsk_identify, cqm_dsk_construct, NULL, NULL) \
+		LEGACY_FLOPPY_OPTION( dsk, "dsk", "DSK floppy disk image",  dsk_dsk_identify, dsk_dsk_construct, NULL, NULL) \
 		LEGACY_FLOPPY_OPTION( d88, "d77,d88,1dd", "D88 Floppy Disk image", d88_dsk_identify, d88_dsk_construct, NULL, NULL) \
 	LEGACY_FLOPPY_OPTIONS_END0
 
 LEGACY_FLOPPY_OPTIONS_EXTERN(default);
 
-#define PARAM_END				'\0'
-#define PARAM_HEADS				'H'
-#define PARAM_TRACKS			'T'
-#define PARAM_SECTORS			'S'
-#define PARAM_SECTOR_LENGTH		'L'
-#define PARAM_INTERLEAVE		'I'
-#define PARAM_FIRST_SECTOR_ID	'F'
+#define PARAM_END               '\0'
+#define PARAM_HEADS             'H'
+#define PARAM_TRACKS            'T'
+#define PARAM_SECTORS           'S'
+#define PARAM_SECTOR_LENGTH     'L'
+#define PARAM_INTERLEAVE        'I'
+#define PARAM_FIRST_SECTOR_ID   'F'
 
-#define HEADS(range)			"H" #range
-#define TRACKS(range)			"T" #range
-#define SECTORS(range)			"S" #range
-#define SECTOR_LENGTH(range)	"L" #range
-#define INTERLEAVE(range)		"I" #range
-#define FIRST_SECTOR_ID(range)	"F" #range
+#define HEADS(range)            "H" #range
+#define TRACKS(range)           "T" #range
+#define SECTORS(range)          "S" #range
+#define SECTOR_LENGTH(range)    "L" #range
+#define INTERLEAVE(range)       "I" #range
+#define FIRST_SECTOR_ID(range)  "F" #range
 
 
 /***************************************************************************
@@ -227,33 +227,33 @@ public:
 	virtual ~floppy_image_format_t();
 
 	/*! @brief Identify an image.
-      The identify function tests if the image is valid
-      for this particular format.
-      @param io buffer containing the image data.
-      @param form_factor Physical form factor of disk, from the enum
-      in floppy_image
-      @return 1 if image valid, 0 otherwise.
-    */
+	  The identify function tests if the image is valid
+	  for this particular format.
+	  @param io buffer containing the image data.
+	  @param form_factor Physical form factor of disk, from the enum
+	  in floppy_image
+	  @return 1 if image valid, 0 otherwise.
+	*/
 	virtual int identify(io_generic *io, UINT32 form_factor) = 0;
 
 	/*! @brief Load an image.
-      The load function opens an image file and converts it to the
-      internal MESS floppy representation.
-      @param io source buffer containing the image data.
-      @param form_factor Physical form factor of disk, from the enum
-      in floppy_image
-      @param image output buffer for data in MESS internal format.
-      @return true on success, false otherwise.
-    */
-    virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image) = 0;
+	  The load function opens an image file and converts it to the
+	  internal MESS floppy representation.
+	  @param io source buffer containing the image data.
+	  @param form_factor Physical form factor of disk, from the enum
+	  in floppy_image
+	  @param image output buffer for data in MESS internal format.
+	  @return true on success, false otherwise.
+	*/
+	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image) = 0;
 
-    /*! @brief Save an image.
-      The save function writes back an image from the MESS internal
-      floppy representation to the appropriate format on disk.
-      @param io output buffer for the data in the on-disk format.
-      @param image source buffer containing data in MESS internal format.
-      @return true on success, false otherwise.
-    */
+	/*! @brief Save an image.
+	  The save function writes back an image from the MESS internal
+	  floppy representation to the appropriate format on disk.
+	  @param io output buffer for the data in the on-disk format.
+	  @param image source buffer containing data in MESS internal format.
+	  @return true on success, false otherwise.
+	*/
 	virtual bool save(io_generic *io, floppy_image *image);
 
 	//! @returns string containing name of format.
@@ -293,9 +293,9 @@ protected:
 	//! A vector of these structures describes one track.
 
 	struct desc_e {
-		int type,	//!< An opcode
-			p1, 	//!< first param
-			p2; 	//!< second param
+		int type,   //!< An opcode
+			p1,     //!< first param
+			p2;     //!< second param
 	};
 
 	//! Opcodes of the format description language used by generate_track()
@@ -346,40 +346,40 @@ protected:
 
 
 	/*! @brief Generate one track according to the description vector.
-        @param desc track data description
-        @param track
-        @param head
-        @param sect a vector indexed by sector id.
-        @param sect_count number of sectors.
-        @param track_size in _cells_, i.e. 100000 for a usual 2us-per-cell track at 300rpm.
-        @param image
-    */
+	    @param desc track data description
+	    @param track
+	    @param head
+	    @param sect a vector indexed by sector id.
+	    @param sect_count number of sectors.
+	    @param track_size in _cells_, i.e. 100000 for a usual 2us-per-cell track at 300rpm.
+	    @param image
+	*/
 	void generate_track(const desc_e *desc, int track, int head, const desc_s *sect, int sect_count, int track_size, floppy_image *image);
 
 	/*! @brief Generate a track from cell binary values, MSB-first.
-        @param track
-        @param head
-        @param trackbuf track input buffer.
-        @param track_size in cells, not bytes.
-        @param image
-    */
+	    @param track
+	    @param head
+	    @param trackbuf track input buffer.
+	    @param track_size in cells, not bytes.
+	    @param image
+	*/
 	void generate_track_from_bitstream(int track, int head, const UINT8 *trackbuf, int track_size, floppy_image *image);
 
 	//! @brief Generate a track from cell level values (0/1/W/D/N).
 
 	/*! Note that this function needs to be able to split cells in two,
-        so no time value should be less than 2, and even values are a
-        good idea.
-    */
+	    so no time value should be less than 2, and even values are a
+	    good idea.
+	*/
 	/*! @param track
-        @param head
-        @param trackbuf track input buffer.
-        @param track_size in cells, not bytes.
-        @param splice_pos is the position of the track splice.  For normal
-        formats, use -1.  For protected formats, you're supposed to
-        know. trackbuf may be modified at that position or after.
-        @param image
-    */
+	    @param head
+	    @param trackbuf track input buffer.
+	    @param track_size in cells, not bytes.
+	    @param splice_pos is the position of the track splice.  For normal
+	    formats, use -1.  For protected formats, you're supposed to
+	    know. trackbuf may be modified at that position or after.
+	    @param image
+	*/
 	void generate_track_from_levels(int track, int head, UINT32 *trackbuf, int track_size, int splice_pos, floppy_image *image);
 
 	//! Normalize the times in a cell buffer to sum up to 200000000
@@ -421,51 +421,51 @@ protected:
 	// **** Writer helpers ****
 
 	/*! @brief Rebuild a cell bitstream for a track.
-        Takes the cell standard
-        angular size as a parameter, gives out a msb-first bitstream.
+	    Takes the cell standard
+	    angular size as a parameter, gives out a msb-first bitstream.
 
-        Beware that fuzzy bits will always give out the same value.
-        @param track
-        @param head
-        @param cell_size
-        @param trackbuf Output buffer size should be 34% more than the nominal number
-        of cells (the dpll tolerates a cell size down to 75% of the
-        nominal one, with gives a cell count of 1/0.75=1.333... times
-        the nominal one).
-        @param track_size Output size is given in bits (cells).
-        @param image
-    */
+	    Beware that fuzzy bits will always give out the same value.
+	    @param track
+	    @param head
+	    @param cell_size
+	    @param trackbuf Output buffer size should be 34% more than the nominal number
+	    of cells (the dpll tolerates a cell size down to 75% of the
+	    nominal one, with gives a cell count of 1/0.75=1.333... times
+	    the nominal one).
+	    @param track_size Output size is given in bits (cells).
+	    @param image
+	*/
 	/*! @verbatim
-     Computing the standard angular size of a cell is
-     simple. Noting:
-       d = standard cell duration in microseconds
-       r = motor rotational speed in rpm
-     then:
-       a = r * d * 10 / 3.
-     Some values:
-       Type           Cell    RPM    Size
+	 Computing the standard angular size of a cell is
+	 simple. Noting:
+	   d = standard cell duration in microseconds
+	   r = motor rotational speed in rpm
+	 then:
+	   a = r * d * 10 / 3.
+	 Some values:
+	   Type           Cell    RPM    Size
 
-     C1541 tr  1-17   3.25    300    3250
-     C1541 tr 18-24   3.50    300    3500
-     C1541 tr 25-30   3.75    300    3750
-     C1541 tr 31+     4.00    300    4000
-     5.25" SD         4       300    4000
-     5.25" DD         2       300    2000
-     5.25" HD         1       360    1200
-     3.5" SD          4       300    4000
-     3.5" DD          2       300    2000
-     3.5" HD          1       300    1000
-     3.5" ED          0.5     300     500
-     @endverbatim
-     */
+	 C1541 tr  1-17   3.25    300    3250
+	 C1541 tr 18-24   3.50    300    3500
+	 C1541 tr 25-30   3.75    300    3750
+	 C1541 tr 31+     4.00    300    4000
+	 5.25" SD         4       300    4000
+	 5.25" DD         2       300    2000
+	 5.25" HD         1       360    1200
+	 3.5" SD          4       300    4000
+	 3.5" DD          2       300    2000
+	 3.5" HD          1       300    1000
+	 3.5" ED          0.5     300     500
+	 @endverbatim
+	 */
 
 	void generate_bitstream_from_track(int track, int head, int cell_size,  UINT8 *trackbuf, int &track_size, floppy_image *image);
 
 	//! Defines a standard sector for extracting.
 	struct desc_xs {
-		int track,	//!< Track for this sector
-		    head,	//!< Head for this sector
-		    size;	//!< Size of this sector
+		int track,  //!< Track for this sector
+			head,   //!< Head for this sector
+			size;   //!< Size of this sector
 		const UINT8 *data; //!< Data within this sector
 	};
 
@@ -501,7 +501,7 @@ protected:
 
 	//! @brief Get a geometry (including sectors) from an image.
 
-    //!   PC-type sectors with MFM encoding
+	//!   PC-type sectors with MFM encoding
 	void get_geometry_mfm_pc(floppy_image *image, int cell_size, int &track_count, int &head_count, int &sector_count);
 	//!   PC-type sectors with FM encoding
 	void get_geometry_fm_pc(floppy_image *image, int cell_size, int &track_count, int &head_count, int &sector_count);
@@ -621,11 +621,11 @@ public:
 	enum {
 		TIME_MASK = 0x0fffffff,
 		MG_MASK   = 0xf0000000,
-		MG_SHIFT  = 28,	//!< Bitshift constant for magnetic orientation data
-		MG_A      = (0 << MG_SHIFT),	//!< - 0, MG_A -> Magnetic orientation A
-		MG_B      = (1 << MG_SHIFT),	//!< - 1, MG_B -> Magnetic orientation B
-		MG_N      = (2 << MG_SHIFT),	//!< - 2, MG_N -> Non-magnetized zone (neutral)
-		MG_D      = (3 << MG_SHIFT) 	//!< - 3, MG_D -> Damaged zone, reads as neutral but cannot be changed by writing
+		MG_SHIFT  = 28, //!< Bitshift constant for magnetic orientation data
+		MG_A      = (0 << MG_SHIFT),    //!< - 0, MG_A -> Magnetic orientation A
+		MG_B      = (1 << MG_SHIFT),    //!< - 1, MG_B -> Magnetic orientation B
+		MG_N      = (2 << MG_SHIFT),    //!< - 2, MG_N -> Non-magnetized zone (neutral)
+		MG_D      = (3 << MG_SHIFT)     //!< - 3, MG_D -> Damaged zone, reads as neutral but cannot be changed by writing
 	};
 
 
@@ -643,6 +643,7 @@ public:
 		SSSD  = 0x44535353, //!< "SSSD", Single-sided single-density
 		SSDD  = 0x44445353, //!< "SSDD", Single-sided double-density
 		SSQD  = 0x44515353, //!< "SSQD", Single-sided quad-density
+		DSSD  = 0x44535344, //!< "DSSD", Double-sided single-density
 		DSDD  = 0x44445344, //!< "DSDD", Double-sided double-density (720K in 3.5, 360K in 5.25)
 		DSQD  = 0x44515344, //!< "DSQD", Double-sided quad-density (720K in 5.25, means DD+80 tracks)
 		DSHD  = 0x44485344, //!< "DSHD", Double-sided high-density (1440K)
@@ -654,10 +655,10 @@ public:
 
 	//! floppy_image constructor
 	/*!
-      @param _tracks number of tracks.
-      @param _heads number of heads.
-      @param _form_factor form factor of drive (from enum)
-    */
+	  @param _tracks number of tracks.
+	  @param _heads number of heads.
+	  @param _form_factor form factor of drive (from enum)
+	*/
 	floppy_image(int tracks, int heads, UINT32 form_factor);
 	virtual ~floppy_image();
 
@@ -669,17 +670,17 @@ public:
 	void set_variant(UINT32 v) { variant = v; }
 
 	/*!
-      @param track
-      @param head
-      @param size size of this track
-    */
+	  @param track
+	  @param head
+	  @param size size of this track
+	*/
 	void set_track_size(int track, int head, UINT32 size) { track_size[track][head] = size; ensure_alloc(track, head); }
 
-    /*!
-      @param track track number
-      @param head head number
-      @return a pointer to the data buffer for this track and head
-    */
+	/*!
+	  @param track track number
+	  @param head head number
+	  @return a pointer to the data buffer for this track and head
+	*/
 	UINT32 *get_buffer(int track, int head) { return cell_data[track][head]; }
 	//! @return the track size
 	//! @param track
@@ -694,9 +695,9 @@ public:
 	//! representation is the angular position relative to the index.
 
 	/*! @param track
-        @param head
-        @param pos the position
-    */
+	    @param head
+	    @param pos the position
+	*/
 	void set_write_splice_position(int track, int head, UINT32 pos) { write_splice[track][head] = pos; }
 	//! @return the current write splice position.
 	UINT32 get_write_splice_position(int track, int head) const { return write_splice[track][head]; }
@@ -732,4 +733,3 @@ private:
 };
 
 #endif /* FLOPIMG_H */
-

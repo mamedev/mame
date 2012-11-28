@@ -66,13 +66,13 @@
 #define MCFG_FD1797x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, FD1797x, _clock)
 
-#define MCFG_MB866x_ADD(_tag, _clock)  \
+#define MCFG_MB8866x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, MB8866x, _clock)
 
-#define MCFG_MB876x_ADD(_tag, _clock)  \
+#define MCFG_MB8876x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, MB8876x, _clock)
 
-#define MCFG_MB877x_ADD(_tag, _clock)  \
+#define MCFG_MB8877x_ADD(_tag, _clock)  \
 	MCFG_DEVICE_ADD(_tag, MB8877x, _clock)
 
 #define MCFG_FD1761x_ADD(_tag, _clock)  \

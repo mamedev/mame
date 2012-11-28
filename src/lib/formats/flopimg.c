@@ -20,8 +20,8 @@
 #include "pool.h"
 #include "imageutl.h"
 
-#define TRACK_LOADED		0x01
-#define TRACK_DIRTY			0x02
+#define TRACK_LOADED        0x01
+#define TRACK_DIRTY         0x02
 
 
 struct floppy_image_legacy
@@ -57,12 +57,12 @@ struct floppy_params
 static floperr_t floppy_track_unload(floppy_image_legacy *floppy);
 
 OPTION_GUIDE_START(floppy_option_guide)
-	OPTION_INT('H', "heads",			"Heads")
-	OPTION_INT('T', "tracks",			"Tracks")
-	OPTION_INT('S', "sectors",			"Sectors")
-	OPTION_INT('L', "sectorlength",		"Sector Bytes")
-	OPTION_INT('I', "interleave",		"Interleave")
-	OPTION_INT('F', "firstsectorid",	"First Sector")
+	OPTION_INT('H', "heads",            "Heads")
+	OPTION_INT('T', "tracks",           "Tracks")
+	OPTION_INT('S', "sectors",          "Sectors")
+	OPTION_INT('L', "sectorlength",     "Sector Bytes")
+	OPTION_INT('I', "interleave",       "Interleave")
+	OPTION_INT('F', "firstsectorid",    "First Sector")
 OPTION_GUIDE_END
 
 
@@ -485,7 +485,7 @@ static floperr_t floppy_readwrite_sector(floppy_image_legacy *floppy, int head, 
 			if ((offset > 0) || (buffer_len < sector_length))
 			{
 				/* we will be doing an partial read/write; in other words we
-                 * will not be reading/writing a full sector */
+				 * will not be reading/writing a full sector */
 				if (alloc_buf) free(alloc_buf);
 				alloc_buf = (UINT8*)malloc(sector_length);
 				if (!alloc_buf)
@@ -550,7 +550,7 @@ done:
 
 
 
-floperr_t floppy_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, int offset,	void *buffer, size_t buffer_len)
+floperr_t floppy_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, int offset,  void *buffer, size_t buffer_len)
 {
 	return floppy_readwrite_sector(floppy, head, track, sector, offset, buffer, buffer_len, FALSE, FALSE, 0);
 }
@@ -564,7 +564,7 @@ floperr_t floppy_write_sector(floppy_image_legacy *floppy, int head, int track, 
 
 
 
-floperr_t floppy_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector_index, int offset,	void *buffer, size_t buffer_len)
+floperr_t floppy_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector_index, int offset,    void *buffer, size_t buffer_len)
 {
 	return floppy_readwrite_sector(floppy, head, track, sector_index, offset, buffer, buffer_len, FALSE, TRUE, 0);
 }
@@ -1015,7 +1015,7 @@ void floppy_image::get_actual_geometry(int &_tracks, int &_heads)
 				goto track_done;
 		maxt--;
 	}
- track_done:
+	track_done:
 	if(maxt >= 0)
 		while(maxh >= 0) {
 			for(int i=0; i<=maxt; i++)
@@ -1023,7 +1023,7 @@ void floppy_image::get_actual_geometry(int &_tracks, int &_heads)
 					goto head_done;
 			maxh--;
 		}
- head_done:
+	head_done:
 	_tracks = maxt+1;
 	_heads = maxh+1;
 }
@@ -1373,7 +1373,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			raw_w(buffer, offset, 8, gcr6fw_tb[(track & 0x40 ? 1 : 0) | (head ? 0x20 : 0)]);
 			break;
 
-        case SECTOR_ID:
+		case SECTOR_ID:
 			mfm_w(buffer, offset, 8, sect[sector_idx].sector_id);
 			break;
 
@@ -2131,7 +2131,7 @@ void floppy_image_format_t::generate_bitstream_from_track(int track, int head, i
 
 		// Wrap around
 		if(cur_entry == tsize-1 &&
-		   (tbuf[cur_entry] & floppy_image::TIME_MASK) < cur_pos) {
+			(tbuf[cur_entry] & floppy_image::TIME_MASK) < cur_pos) {
 			// Wrap to index 0 or 1 depending on whether there is a transition exactly at the index hole
 			cur_entry = (tbuf[tsize-1] & floppy_image::MG_MASK) != (tbuf[0] & floppy_image::MG_MASK) ?
 				0 : 1;
@@ -2524,7 +2524,7 @@ void floppy_image_format_t::build_pc_track_fm(int track, int head, floppy_image 
 		crc = calc_crc_ccitt(track_data, cpos, tpos);
 		fm_w (track_data, tpos, 16, crc);
 		for(int j=0; j<gap_2; j++) fm_w(track_data, tpos, 8, 0xff);
-			
+
 		if(!sects[i].data)
 			for(int j=0; j<6+1+sects[i].actual_size+2+gap_3; j++) fm_w(track_data, tpos, 8, 0xff);
 
@@ -2543,7 +2543,7 @@ void floppy_image_format_t::build_pc_track_fm(int track, int head, floppy_image 
 	}
 
 	// Gap 4b
-		
+
 	while(tpos < cell_count-15) fm_w(track_data, tpos, 8, 0xff);
 	raw_w(track_data, tpos, cell_count-tpos, 0xffff >> (16+tpos-cell_count));
 
@@ -2586,7 +2586,7 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 		for(int j=0; j<12; j++) mfm_w(track_data, tpos, 8, 0x00);
 		cpos = tpos;
 		for(int j=0; j< 3; j++) raw_w(track_data, tpos, 16, 0x4489);
-		mfm_w(track_data, tpos, 8, 0xfe);	
+		mfm_w(track_data, tpos, 8, 0xfe);
 		mfm_w(track_data, tpos, 8, sects[i].track);
 		mfm_w(track_data, tpos, 8, sects[i].head);
 		mfm_w(track_data, tpos, 8, sects[i].sector);
@@ -2603,7 +2603,7 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 			for(int j=0; j<12; j++) mfm_w(track_data, tpos, 8, 0x00);
 			cpos = tpos;
 			for(int j=0; j< 3; j++) raw_w(track_data, tpos, 16, 0x4489);
-			mfm_w(track_data, tpos, 8, sects[i].deleted ? 0xf8 : 0xfb);	
+			mfm_w(track_data, tpos, 8, sects[i].deleted ? 0xf8 : 0xfb);
 			for(int j=0; j<sects[i].actual_size; j++) mfm_w(track_data, tpos, 8, sects[i].data[j]);
 			crc = calc_crc_ccitt(track_data, cpos, tpos);
 			if(sects[i].bad_crc)
@@ -2621,4 +2621,3 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 	generate_track_from_levels(track, head, track_data, cell_count, 0, image);
 	global_free(track_data);
 }
-
