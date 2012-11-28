@@ -53,9 +53,9 @@ Notes:
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define MC6845_TAG			"mc6845"
-#define MC6845_SCREEN_TAG	"screen80"
-#define VIDEORAM_SIZE		0x800
+#define MC6845_TAG          "mc6845"
+#define MC6845_SCREEN_TAG   "screen80"
+#define VIDEORAM_SIZE       0x800
 
 
 
@@ -72,12 +72,15 @@ const device_type COMX_CLM = &device_creator<comx_clm_device>;
 
 ROM_START( comx_clm )
 	ROM_REGION( 0x2000, "c000", 0 )
-	ROM_LOAD( "p 1.0.cl1", 0x0000, 0x0800, CRC(b417d30a) SHA1(d428b0467945ecb9aec884211d0f4b1d8d56d738) ) // V1.0
-	ROM_LOAD( "p 1.1.cl1", 0x0000, 0x0800, CRC(0a2eaf19) SHA1(3f1f640caef964fb47aaa147cab6d215c2b30e9d) ) // V1.1
+	ROM_DEFAULT_BIOS( "v11" )
+	ROM_SYSTEM_BIOS( 0, "v10", "v1.0" )
+	ROMX_LOAD( "p 1.0.cl1", 0x0000, 0x0800, CRC(b417d30a) SHA1(d428b0467945ecb9aec884211d0f4b1d8d56d738), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v11", "v1.1" )
+	ROMX_LOAD( "p 1.1.cl1", 0x0000, 0x0800, CRC(0a2eaf19) SHA1(3f1f640caef964fb47aaa147cab6d215c2b30e9d), ROM_BIOS(2) )
 
 	ROM_REGION( 0x800, MC6845_TAG, 0 )
-	ROM_LOAD( "c 1.0.cl4", 0x0000, 0x0800, CRC(69dd7b07) SHA1(71d368adbb299103d165eab8359a97769e463e26) ) // V1.0
-	ROM_LOAD( "c 1.1.cl4", 0x0000, 0x0800, CRC(dc9b5046) SHA1(4e041cec03dda6dba5e2598d060c49908a4fab2a) ) // V1.1
+	ROMX_LOAD( "c 1.0.cl4", 0x0000, 0x0800, CRC(69dd7b07) SHA1(71d368adbb299103d165eab8359a97769e463e26), ROM_BIOS(1) )
+	ROMX_LOAD( "c 1.1.cl4", 0x0000, 0x0800, CRC(dc9b5046) SHA1(4e041cec03dda6dba5e2598d060c49908a4fab2a), ROM_BIOS(2) )
 ROM_END
 
 
@@ -97,7 +100,6 @@ const rom_entry *comx_clm_device::device_rom_region() const
 
 void comx_clm_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	for (int column = 0; column < x_count; column++)
 	{
 		UINT8 code = m_video_ram[((ma + column) & 0x7ff)];
@@ -114,7 +116,7 @@ void comx_clm_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitma
 			int x = (column * 8) + bit;
 			int color = BIT(data, 7) ? 7 : 0;
 
-			bitmap.pix32(y, x) = palette[color];
+			bitmap.pix32(y, x) = RGB_MONOCHROME_WHITE[color];
 
 			data <<= 1;
 		}
@@ -127,18 +129,6 @@ static MC6845_UPDATE_ROW( comx_clm_update_row )
 	clm->crtc_update_row(device,bitmap,cliprect,ma,ra,y,x_count,cursor_x,param);
 }
 
-WRITE_LINE_MEMBER( comx_clm_device::hsync_w )
-{
-	if (m_ds)
-	{
-		m_slot->ef4_w(state);
-	}
-	else
-	{
-		m_slot->ef4_w(CLEAR_LINE);
-	}
-}
-
 static const mc6845_interface crtc_intf =
 {
 	MC6845_SCREEN_TAG,
@@ -148,7 +138,7 @@ static const mc6845_interface crtc_intf =
 	NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, comx_clm_device, hsync_w),
+	DEVCB_NULL,
 	DEVCB_NULL,
 	NULL
 };
@@ -205,7 +195,7 @@ comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag,
 	device_t(mconfig, COMX_CLM, "COMX 80 Column Card", tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_crtc(*this, MC6845_TAG),
-	m_ds(0)
+	m_video_ram(*this, "video_ram")
 {
 }
 
@@ -216,13 +206,15 @@ comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag,
 
 void comx_clm_device::device_start()
 {
+	// find memory regions
 	m_rom = memregion("c000")->base();
 	m_char_rom = memregion(MC6845_TAG)->base();
-	m_video_ram = auto_alloc_array(machine(), UINT8, VIDEORAM_SIZE);
+
+	// allocate memory
+	m_video_ram.allocate(VIDEORAM_SIZE);
 
 	// state saving
 	save_item(NAME(m_ds));
-	save_pointer(NAME(m_video_ram), VIDEORAM_SIZE);
 }
 
 
@@ -236,12 +228,12 @@ void comx_clm_device::device_reset()
 
 
 //-------------------------------------------------
-//  comx_ds_w - device select write
+//  comx_ef4_r - external flag 4 read
 //-------------------------------------------------
 
-void comx_clm_device::comx_ds_w(int state)
+int comx_clm_device::comx_ef4_r()
 {
-	m_ds = state;
+	return m_ds ? m_crtc->hsync_r() : CLEAR_LINE;
 }
 
 
@@ -249,10 +241,8 @@ void comx_clm_device::comx_ds_w(int state)
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-UINT8 comx_clm_device::comx_mrd_r(offs_t offset, int *extrom)
+UINT8 comx_clm_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
 {
-	address_space &space = machine().firstcpu->space(AS_PROGRAM);
-
 	UINT8 data = 0xff;
 
 	if (offset >= 0xc000 && offset < 0xc800)
@@ -276,10 +266,8 @@ UINT8 comx_clm_device::comx_mrd_r(offs_t offset, int *extrom)
 //  comx_mwr_w - memory write
 //-------------------------------------------------
 
-void comx_clm_device::comx_mwr_w(offs_t offset, UINT8 data)
+void comx_clm_device::comx_mwr_w(address_space &space, offs_t offset, UINT8 data)
 {
-	address_space &space = machine().firstcpu->space(AS_PROGRAM);
-
 	if (offset >= 0xd000 && offset < 0xd800)
 	{
 		m_video_ram[offset & 0x7ff] = data;

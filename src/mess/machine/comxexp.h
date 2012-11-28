@@ -45,7 +45,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define COMX_EXPANSION_BUS_TAG		"comxexp"
+#define COMX_EXPANSION_BUS_TAG      "comxexp"
 
 
 
@@ -58,8 +58,8 @@
 
 
 #define MCFG_COMX_EXPANSION_SLOT_ADD(_tag, _config, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, COMX_EXPANSION_SLOT, 0) \
-    MCFG_DEVICE_CONFIG(_config) \
+	MCFG_DEVICE_ADD(_tag, COMX_EXPANSION_SLOT, 0) \
+	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
 
@@ -72,10 +72,9 @@
 
 struct comx_expansion_slot_interface
 {
-    devcb_write_line	m_out_int_cb;
-    devcb_write_line	m_out_ef4_cb;
-    devcb_write_line	m_out_wait_cb;
-    devcb_write_line	m_out_clear_cb;
+	devcb_write_line    m_out_int_cb;
+	devcb_write_line    m_out_wait_cb;
+	devcb_write_line    m_out_clear_cb;
 };
 
 
@@ -84,25 +83,26 @@ struct comx_expansion_slot_interface
 class device_comx_expansion_card_interface;
 
 class comx_expansion_slot_device : public device_t,
-								   public comx_expansion_slot_interface,
-								   public device_slot_interface
+									public comx_expansion_slot_interface,
+									public device_slot_interface
 {
 public:
 	// construction/destruction
 	comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~comx_expansion_slot_device();
 
-	UINT8 mrd_r(offs_t offset, int *extrom);
-	void mwr_w(offs_t offset, UINT8 data);
+	UINT8 mrd_r(address_space &space, offs_t offset, int *extrom);
+	void mwr_w(address_space &space, offs_t offset, UINT8 data);
 
-	UINT8 io_r(offs_t offset);
-	void io_w(offs_t offset, UINT8 data);
+	UINT8 io_r(address_space &space, offs_t offset);
+	void io_w(address_space &space, offs_t offset, UINT8 data);
+
+	DECLARE_READ_LINE_MEMBER( ef4_r );
 
 	DECLARE_WRITE_LINE_MEMBER( ds_w );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 
 	DECLARE_WRITE_LINE_MEMBER( int_w );
-	DECLARE_WRITE_LINE_MEMBER( ef4_w );
 	DECLARE_WRITE_LINE_MEMBER( wait_w );
 	DECLARE_WRITE_LINE_MEMBER( clear_w );
 
@@ -114,10 +114,9 @@ protected:
 	virtual void device_reset();
 	virtual void device_config_complete();
 
-	devcb_resolved_write_line	m_out_int_func;
-	devcb_resolved_write_line	m_out_ef4_func;
-	devcb_resolved_write_line	m_out_wait_func;
-	devcb_resolved_write_line	m_out_clear_func;
+	devcb_resolved_write_line   m_out_int_func;
+	devcb_resolved_write_line   m_out_wait_func;
+	devcb_resolved_write_line   m_out_clear_func;
 
 	device_comx_expansion_card_interface *m_card;
 };
@@ -137,18 +136,21 @@ public:
 
 protected:
 	// signals
-	virtual void comx_ds_w(int state) { };
+	virtual int comx_ef4_r() { return CLEAR_LINE; }
+	virtual void comx_ds_w(int state) { m_ds = state; };
 	virtual void comx_q_w(int state) { };
 
 	// memory access
-	virtual UINT8 comx_mrd_r(offs_t offset, int *extrom) { return 0; };
-	virtual void comx_mwr_w(offs_t offset, UINT8 data) { };
+	virtual UINT8 comx_mrd_r(address_space &space, offs_t offset, int *extrom) { return 0; };
+	virtual void comx_mwr_w(address_space &space, offs_t offset, UINT8 data) { };
 
 	// I/O access
-	virtual UINT8 comx_io_r(offs_t offset) { return 0; };
-	virtual void comx_io_w(offs_t offset, UINT8 data) { };
+	virtual UINT8 comx_io_r(address_space &space, offs_t offset) { return 0; };
+	virtual void comx_io_w(address_space &space, offs_t offset, UINT8 data) { };
 
 	comx_expansion_slot_device *m_slot;
+
+	int m_ds;
 };
 
 

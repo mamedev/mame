@@ -47,7 +47,7 @@ static CDP1869_CHAR_RAM_READ( comx35_charram_r )
 	UINT8 column = pmd & 0x7f;
 	UINT16 charaddr = (column << 4) | cma;
 
-	return state->m_charram[charaddr];
+	return state->m_char_ram[charaddr];
 }
 
 static CDP1869_CHAR_RAM_WRITE( comx35_charram_w )
@@ -57,7 +57,7 @@ static CDP1869_CHAR_RAM_WRITE( comx35_charram_w )
 	UINT8 column = pmd & 0x7f;
 	UINT16 charaddr = (column << 4) | cma;
 
-	state->m_charram[charaddr] = data;
+	state->m_char_ram[charaddr] = data;
 }
 
 static CDP1869_PCB_READ( comx35_pcb_r )
@@ -103,10 +103,7 @@ static CDP1869_INTERFACE( ntsc_cdp1869_intf )
 void comx35_state::video_start()
 {
 	// allocate memory
-	m_charram = auto_alloc_array(machine(), UINT8, COMX35_CHARRAM_SIZE);
-
-	// register for save state
-	save_pointer(NAME(m_charram), COMX35_CHARRAM_SIZE);
+	m_char_ram.allocate(COMX35_CHARRAM_SIZE);
 }
 
 /* Machine Drivers */

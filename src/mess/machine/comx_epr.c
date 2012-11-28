@@ -92,7 +92,7 @@ void comx_epr_device::device_reset()
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-UINT8 comx_epr_device::comx_mrd_r(offs_t offset, int *extrom)
+UINT8 comx_epr_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
 {
 	UINT8 data = 0;
 
@@ -114,7 +114,7 @@ UINT8 comx_epr_device::comx_mrd_r(offs_t offset, int *extrom)
 //  comx_io_w - I/O write
 //-------------------------------------------------
 
-void comx_epr_device::comx_io_w(offs_t offset, UINT8 data)
+void comx_epr_device::comx_io_w(address_space &space, offs_t offset, UINT8 data)
 {
 	if (offset == 1)
 	{

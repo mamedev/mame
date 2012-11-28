@@ -24,19 +24,17 @@
 
 READ8_MEMBER( comx35_state::mem_r )
 {
-	UINT8 *rom = memregion(CDP1802_TAG)->base();
-	UINT8 *ram = m_ram->pointer();
 	int extrom = 1;
 
-	UINT8 data = m_expansion->mrd_r(offset, &extrom);
+	UINT8 data = m_exp->mrd_r(space, offset, &extrom);
 
 	if (offset < 0x4000)
 	{
-		if (extrom) data = rom[offset & 0x3fff];
+		if (extrom) data = m_rom[offset & 0x3fff];
 	}
 	else if (offset >= 0x4000 && offset < 0xc000)
 	{
-		data = ram[offset - 0x4000];
+		data = m_ram->pointer()[offset - 0x4000];
 	}
 	else if (offset >= 0xf400 && offset < 0xf800)
 	{
@@ -53,13 +51,11 @@ READ8_MEMBER( comx35_state::mem_r )
 
 WRITE8_MEMBER( comx35_state::mem_w )
 {
-	UINT8 *ram = m_ram->pointer();
-
-	m_expansion->mwr_w(offset, data);
+	m_exp->mwr_w(space, offset, data);
 
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
-		ram[offset - 0x4000] = data;
+		m_ram->pointer()[offset - 0x4000] = data;
 	}
 	else if (offset >= 0xf400 && offset < 0xf800)
 	{
@@ -78,7 +74,7 @@ WRITE8_MEMBER( comx35_state::mem_w )
 
 READ8_MEMBER( comx35_state::io_r )
 {
-	UINT8 data = m_expansion->io_r(offset);
+	UINT8 data = m_exp->io_r(space, offset);
 
 	if (offset == 3)
 	{
@@ -95,7 +91,7 @@ READ8_MEMBER( comx35_state::io_r )
 
 WRITE8_MEMBER( comx35_state::io_w )
 {
-	m_expansion->io_w(offset, data);
+	m_exp->io_w(space, offset, data);
 
 	if (offset >= 3)
 	{
@@ -279,7 +275,7 @@ READ_LINE_MEMBER( comx35_state::ef2_r )
 
 READ_LINE_MEMBER( comx35_state::ef4_r )
 {
-	return m_ef4; // | (m_cassette->input() > 0.0f);
+	return m_exp->ef4_r(); // | (m_cassette->input() > 0.0f);
 }
 
 static COSMAC_SC_WRITE( comx35_sc_w )
@@ -335,23 +331,23 @@ WRITE_LINE_MEMBER( comx35_state::q_w )
 	m_cassette->output(state ? +1.0 : -1.0);
 
 	// expansion bus
-	m_expansion->q_w(state);
+	m_exp->q_w(state);
 }
 
 static COSMAC_INTERFACE( cosmac_intf )
 {
-	DEVCB_LINE_VCC,									// wait
+	DEVCB_LINE_VCC,                                 // wait
 	DEVCB_DRIVER_LINE_MEMBER(comx35_state, clear_r),// clear
-	DEVCB_NULL,										// EF1
-	DEVCB_DRIVER_LINE_MEMBER(comx35_state, ef2_r),	// EF2
-	DEVCB_NULL,										// EF3
-	DEVCB_DRIVER_LINE_MEMBER(comx35_state, ef4_r),	// EF4
-	DEVCB_DRIVER_LINE_MEMBER(comx35_state, q_w),	// Q
-	DEVCB_NULL,										// DMA in
-	DEVCB_NULL,										// DMA out
-	comx35_sc_w,									// SC
-	DEVCB_NULL,										// TPA
-	DEVCB_NULL										// TPB
+	DEVCB_NULL,                                     // EF1
+	DEVCB_DRIVER_LINE_MEMBER(comx35_state, ef2_r),  // EF2
+	DEVCB_NULL,                                     // EF3
+	DEVCB_DRIVER_LINE_MEMBER(comx35_state, ef4_r),  // EF4
+	DEVCB_DRIVER_LINE_MEMBER(comx35_state, q_w),    // Q
+	DEVCB_NULL,                                     // DMA in
+	DEVCB_NULL,                                     // DMA out
+	comx35_sc_w,                                    // SC
+	DEVCB_NULL,                                     // TPA
+	DEVCB_NULL                                      // TPB
 };
 
 
@@ -414,15 +410,9 @@ WRITE_LINE_MEMBER( comx35_state::int_w )
 	check_interrupt();
 }
 
-WRITE_LINE_MEMBER( comx35_state::ef4_w )
-{
-	m_ef4 = state;
-}
-
 static COMX_EXPANSION_INTERFACE( expansion_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(comx35_state, int_w),
-	DEVCB_DRIVER_LINE_MEMBER(comx35_state, ef4_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -469,10 +459,12 @@ void comx35_state::machine_start()
 	UINT8 *ram = m_ram->pointer();
 	memset(ram, 0, 0x8000);
 
+	// find memory regions
+	m_rom = memregion(CDP1802_TAG)->base();
+
 	// register for state saving
 	save_item(NAME(m_clear));
 	save_item(NAME(m_q));
-	save_item(NAME(m_ef4));
 	save_item(NAME(m_iden));
 	save_item(NAME(m_dma));
 	save_item(NAME(m_int));
@@ -487,12 +479,13 @@ void comx35_state::machine_start()
 
 void comx35_state::machine_reset()
 {
+	m_exp->reset();
+
 	int t = RES_K(27) * CAP_U(1) * 1000; // t = R1 * C1
 
 	m_clear = 0;
 	m_iden = 1;
 	m_cr1 = 1;
-	m_ef4 = CLEAR_LINE;
 	m_int = CLEAR_LINE;
 	m_prd = CLEAR_LINE;
 
@@ -523,9 +516,6 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	MCFG_CDP1871_ADD(CDP1871_TAG, kbc_intf, CDP1869_CPU_CLK_PAL / 8)
 	MCFG_QUICKLOAD_ADD("quickload", comx35_comx, "comx", 0)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cassette_intf)
-	MCFG_PRINTER_ADD("printer")
-
-	MCFG_COMXPL80_ADD()
 
 	// expansion bus
 	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, expansion_intf, comx_expansion_cards, "eb", NULL)
@@ -533,6 +523,9 @@ static MACHINE_CONFIG_START( pal, comx35_state )
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
+
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "comx35_flop")
 MACHINE_CONFIG_END
 
 
@@ -554,9 +547,6 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	MCFG_CDP1871_ADD(CDP1871_TAG, kbc_intf, CDP1869_CPU_CLK_NTSC / 8)
 	MCFG_QUICKLOAD_ADD("quickload", comx35_comx, "comx", 0)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cassette_intf)
-	MCFG_PRINTER_ADD("printer")
-
-	MCFG_COMXPL80_ADD()
 
 	// expansion bus
 	MCFG_COMX_EXPANSION_SLOT_ADD(EXPANSION_TAG, expansion_intf, comx_expansion_cards, "eb", NULL)
@@ -564,6 +554,9 @@ static MACHINE_CONFIG_START( ntsc, comx35_state )
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
+
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "comx35_flop")
 MACHINE_CONFIG_END
 
 
@@ -577,7 +570,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( comx35p )
-	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
+	ROM_REGION( 0x4000, CDP1802_TAG, 0 )
 	ROM_DEFAULT_BIOS( "basic100" )
 	ROM_SYSTEM_BIOS( 0, "basic100", "COMX BASIC V1.00" )
 	ROMX_LOAD( "comx_10.u21", 0x0000, 0x4000, CRC(68d0db2d) SHA1(062328361629019ceed9375afac18e2b7849ce47), ROM_BIOS(1) )
@@ -599,5 +592,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     INIT  COMPANY                         FULLNAME            FLAGS
-COMP( 1983, comx35p,	0,		0,		pal,		comx35, driver_device,   0,	"Comx World Operations Ltd",	"COMX 35 (PAL)",	GAME_IMPERFECT_SOUND )
-COMP( 1983, comx35n,	comx35p,0,		ntsc,		comx35, driver_device,   0,	"Comx World Operations Ltd",	"COMX 35 (NTSC)",	GAME_IMPERFECT_SOUND )
+COMP( 1983, comx35p,    0,      0,      pal,        comx35, driver_device,   0, "Comx World Operations Ltd",    "COMX 35 (PAL)",    GAME_IMPERFECT_SOUND )
+COMP( 1983, comx35n,    comx35p,0,      ntsc,       comx35, driver_device,   0, "Comx World Operations Ltd",    "COMX 35 (NTSC)",   GAME_IMPERFECT_SOUND )

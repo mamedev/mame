@@ -26,7 +26,7 @@
 // ======================> comx_clm_device
 
 class comx_clm_device : public device_t,
-					    public device_comx_expansion_card_interface
+						public device_comx_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -38,26 +38,24 @@ public:
 
 	// not really public
 	void crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
-	DECLARE_WRITE_LINE_MEMBER( hsync_w );
 
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete() { m_shortname = "comx_clm"; }
+	virtual void device_config_complete() { m_shortname = "comx_clm"; }
 
 	// device_comx_expansion_card_interface overrides
-	virtual void comx_ds_w(int state);
-	virtual UINT8 comx_mrd_r(offs_t offset, int *extrom);
-	virtual void comx_mwr_w(offs_t offset, UINT8 data);
+	virtual int comx_ef4_r();
+	virtual UINT8 comx_mrd_r(address_space &space, offs_t offset, int *extrom);
+	virtual void comx_mwr_w(address_space &space, offs_t offset, UINT8 data);
 
 private:
 	required_device<mc6845_device> m_crtc;
+	optional_shared_ptr<UINT8> m_video_ram;
 
-	int m_ds;				// device select
-	UINT8 *m_rom;			// program ROM
-	UINT8 *m_char_rom;		// character ROM
-	UINT8 *m_video_ram;		// video RAM
+	UINT8 *m_rom;           // program ROM
+	UINT8 *m_char_rom;      // character ROM
 };
 
 

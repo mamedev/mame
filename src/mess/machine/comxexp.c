@@ -28,7 +28,8 @@ const device_type COMX_EXPANSION_SLOT = &device_creator<comx_expansion_slot_devi
 //-------------------------------------------------
 
 device_comx_expansion_card_interface::device_comx_expansion_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device)
+	: device_slot_card_interface(mconfig, device),
+		m_ds(1)
 {
 	m_slot = dynamic_cast<comx_expansion_slot_device *>(device.owner());
 }
@@ -53,7 +54,7 @@ device_comx_expansion_card_interface::~device_comx_expansion_card_interface()
 //-------------------------------------------------
 
 comx_expansion_slot_device::comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, COMX_EXPANSION_SLOT, "COMX-35 expansion slot", tag, owner, clock),
+		device_t(mconfig, COMX_EXPANSION_SLOT, "COMX-35 expansion slot", tag, owner, clock),
 		device_slot_interface(mconfig, *this)
 {
 }
@@ -86,10 +87,9 @@ void comx_expansion_slot_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-    	memset(&m_out_ef4_cb, 0, sizeof(m_out_ef4_cb));
-    	memset(&m_out_wait_cb, 0, sizeof(m_out_wait_cb));
-    	memset(&m_out_clear_cb, 0, sizeof(m_out_clear_cb));
+		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
+		memset(&m_out_wait_cb, 0, sizeof(m_out_wait_cb));
+		memset(&m_out_clear_cb, 0, sizeof(m_out_clear_cb));
 	}
 }
 
@@ -104,7 +104,6 @@ void comx_expansion_slot_device::device_start()
 
 	// resolve callbacks
 	m_out_int_func.resolve(m_out_int_cb, *this);
-	m_out_ef4_func.resolve(m_out_ef4_cb, *this);
 	m_out_wait_func.resolve(m_out_wait_cb, *this);
 	m_out_clear_func.resolve(m_out_clear_cb, *this);
 }
@@ -123,13 +122,13 @@ void comx_expansion_slot_device::device_reset()
 //  mrd_r - memory read
 //-------------------------------------------------
 
-UINT8 comx_expansion_slot_device::mrd_r(offs_t offset, int *extrom)
+UINT8 comx_expansion_slot_device::mrd_r(address_space &space, offs_t offset, int *extrom)
 {
 	UINT8 data = 0;
 
 	if (m_card != NULL)
 	{
-		data = m_card->comx_mrd_r(offset, extrom);
+		data = m_card->comx_mrd_r(space, offset, extrom);
 	}
 
 	return data;
@@ -140,11 +139,11 @@ UINT8 comx_expansion_slot_device::mrd_r(offs_t offset, int *extrom)
 //  mwr_w - memory write
 //-------------------------------------------------
 
-void comx_expansion_slot_device::mwr_w(offs_t offset, UINT8 data)
+void comx_expansion_slot_device::mwr_w(address_space &space, offs_t offset, UINT8 data)
 {
 	if (m_card != NULL)
 	{
-		m_card->comx_mwr_w(offset, data);
+		m_card->comx_mwr_w(space, offset, data);
 	}
 }
 
@@ -153,13 +152,13 @@ void comx_expansion_slot_device::mwr_w(offs_t offset, UINT8 data)
 //  io_r - I/O read
 //-------------------------------------------------
 
-UINT8 comx_expansion_slot_device::io_r(offs_t offset)
+UINT8 comx_expansion_slot_device::io_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
 
 	if (m_card != NULL)
 	{
-		data = m_card->comx_io_r(offset);
+		data = m_card->comx_io_r(space, offset);
 	}
 
 	return data;
@@ -170,11 +169,11 @@ UINT8 comx_expansion_slot_device::io_r(offs_t offset)
 //  sout_w - I/O write
 //-------------------------------------------------
 
-void comx_expansion_slot_device::io_w(offs_t offset, UINT8 data)
+void comx_expansion_slot_device::io_w(address_space &space, offs_t offset, UINT8 data)
 {
 	if (m_card != NULL)
 	{
-		m_card->comx_io_w(offset, data);
+		m_card->comx_io_w(space, offset, data);
 	}
 }
 
@@ -204,8 +203,18 @@ WRITE_LINE_MEMBER( comx_expansion_slot_device::q_w )
 	}
 }
 
+READ_LINE_MEMBER( comx_expansion_slot_device::ef4_r )
+{
+	int state = CLEAR_LINE;
+
+	if (m_card != NULL)
+	{
+		state = m_card->comx_ef4_r();
+	}
+
+	return state;
+}
 
 WRITE_LINE_MEMBER( comx_expansion_slot_device::int_w ) { m_out_int_func(state); }
-WRITE_LINE_MEMBER( comx_expansion_slot_device::ef4_w ) { m_out_ef4_func(state); }
 WRITE_LINE_MEMBER( comx_expansion_slot_device::wait_w ) { m_out_wait_func(state); }
 WRITE_LINE_MEMBER( comx_expansion_slot_device::clear_w ) { m_out_clear_func(state); }

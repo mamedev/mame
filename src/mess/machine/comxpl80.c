@@ -31,28 +31,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type COMXPL80 = &device_creator<comxpl80_device>;
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void comxpl80_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const comxpl80_interface *intf = reinterpret_cast<const comxpl80_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<comxpl80_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-	}
-
-	m_shortname = "comxpl80";
-}
+const device_type COMX_PL80 = &device_creator<comx_pl80_device>;
 
 
 //-------------------------------------------------
@@ -73,7 +52,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *comxpl80_device::device_rom_region() const
+const rom_entry *comx_pl80_device::device_rom_region() const
 {
 	return ROM_NAME( comxpl80 );
 }
@@ -83,7 +62,7 @@ const rom_entry *comxpl80_device::device_rom_region() const
 //  ADDRESS_MAP( comxpl80_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( comxpl80_mem, AS_PROGRAM, 8, comxpl80_device )
+static ADDRESS_MAP_START( comxpl80_mem, AS_PROGRAM, 8, comx_pl80_device )
 /*  AM_RANGE(0x000, 0x000) AM_READWRITE(cx005_port_a_r, cx005_port_a_w)
     AM_RANGE(0x001, 0x001) AM_READWRITE(cx005_port_b_r, cx005_port_b_w)
     AM_RANGE(0x002, 0x002) AM_READWRITE(cx005_port_c_r, cx005_port_c_w)
@@ -106,7 +85,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( comxpl80_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( comxpl80_io, AS_IO, 8, comxpl80_device )
+static ADDRESS_MAP_START( comxpl80_io, AS_IO, 8, comx_pl80_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_WRITE(pa_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(pb_w)
@@ -132,7 +111,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor comxpl80_device::device_mconfig_additions() const
+machine_config_constructor comx_pl80_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( comxpl80 );
 }
@@ -165,7 +144,7 @@ INPUT_PORTS_END
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor comxpl80_device::device_input_ports() const
+ioport_constructor comx_pl80_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( comxpl80 );
 }
@@ -177,11 +156,12 @@ ioport_constructor comxpl80_device::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  comxpl80_device - constructor
+//  comx_pl80_device - constructor
 //-------------------------------------------------
 
-comxpl80_device::comxpl80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, COMXPL80, "COMX PL-80", tag, owner, clock)
+comx_pl80_device::comx_pl80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+    : device_t(mconfig, COMX_PL80, "COMX PL-80", tag, owner, clock),
+      device_centronics_peripheral_interface(mconfig, *this)
 {
 }
 
@@ -190,10 +170,9 @@ comxpl80_device::comxpl80_device(const machine_config &mconfig, const char *tag,
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void comxpl80_device::device_start()
+void comx_pl80_device::device_start()
 {
 	// state saving
-	save_item(NAME(m_centronics_data));
 	save_item(NAME(m_font_addr));
 	save_item(NAME(m_x_motor_phase));
 	save_item(NAME(m_y_motor_phase));
@@ -208,7 +187,7 @@ void comxpl80_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void comxpl80_device::device_reset()
+void comx_pl80_device::device_reset()
 {
 }
 
@@ -217,7 +196,7 @@ void comxpl80_device::device_reset()
 //  pa_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( comxpl80_device::pa_w )
+WRITE8_MEMBER( comx_pl80_device::pa_w )
 {
 	/*
 
@@ -254,7 +233,7 @@ WRITE8_MEMBER( comxpl80_device::pa_w )
 	if (!BIT(data, 6))
 	{
 		// read data from Centronics bus
-		m_plotter_data = m_centronics_data;
+		m_plotter_data = m_data;
 	}
 
 	if (BIT(data, 7))
@@ -269,7 +248,7 @@ WRITE8_MEMBER( comxpl80_device::pa_w )
 //  pb_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( comxpl80_device::pb_w )
+WRITE8_MEMBER( comx_pl80_device::pb_w )
 {
 	/*
 
@@ -296,7 +275,7 @@ WRITE8_MEMBER( comxpl80_device::pb_w )
 //  pc_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( comxpl80_device::pc_w )
+WRITE8_MEMBER( comx_pl80_device::pc_w )
 {
 	/*
 
@@ -326,7 +305,7 @@ WRITE8_MEMBER( comxpl80_device::pc_w )
 //  pd_r -
 //-------------------------------------------------
 
-READ8_MEMBER( comxpl80_device::pd_r )
+READ8_MEMBER( comx_pl80_device::pd_r )
 {
 	/*
 

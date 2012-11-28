@@ -25,7 +25,7 @@
 // ======================> comx_ram_device
 
 class comx_ram_device : public device_t,
-					    public device_comx_expansion_card_interface
+						public device_comx_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -38,9 +38,9 @@ protected:
 	virtual void device_config_complete() { m_shortname = "comx_ram"; }
 
 	// device_comx_expansion_card_interface overrides
-	virtual UINT8 comx_mrd_r(offs_t offset, int *extrom);
-	virtual void comx_mwr_w(offs_t offset, UINT8 data);
-	virtual void comx_io_w(offs_t offset, UINT8 data);
+	virtual UINT8 comx_mrd_r(address_space &space, offs_t offset, int *extrom);
+	virtual void comx_mwr_w(address_space &space, offs_t offset, UINT8 data);
+	virtual void comx_io_w(address_space &space, offs_t offset, UINT8 data);
 
 private:
 	UINT8 *m_ram;

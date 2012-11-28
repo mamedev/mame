@@ -55,10 +55,10 @@ Notes:
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define SLOT1_TAG			"slot1"
-#define SLOT2_TAG			"slot2"
-#define SLOT3_TAG			"slot3"
-#define SLOT4_TAG			"slot4"
+#define SLOT1_TAG           "slot1"
+#define SLOT2_TAG           "slot2"
+#define SLOT3_TAG           "slot3"
+#define SLOT4_TAG           "slot4"
 
 
 
@@ -76,7 +76,7 @@ const device_type COMX_EB = &device_creator<comx_eb_device>;
 ROM_START( comx_eb )
 	ROM_REGION( 0x1000, "e000", 0 )
 	ROM_SYSTEM_BIOS( 0, "comx", "Original" )
-	ROMX_LOAD( "expansion.e5",		   0x0000, 0x1000, CRC(52cb44e2) SHA1(3f9a3d9940b36d4fee5eca9f1359c99d7ed545b9), ROM_BIOS(1) )
+	ROMX_LOAD( "expansion.e5",         0x0000, 0x1000, CRC(52cb44e2) SHA1(3f9a3d9940b36d4fee5eca9f1359c99d7ed545b9), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS( 1, "fm31", "F&M 3.1" )
 	ROMX_LOAD( "f&m.expansion.3.1.e5", 0x0000, 0x1000, CRC(818ca2ef) SHA1(ea000097622e7fd472d53e7899e3c83773433045), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "fm32", "F&M 3.2" )
@@ -114,12 +114,6 @@ WRITE_LINE_DEVICE_HANDLER( int_w )
 	eb->set_int(device->tag(), state);
 }
 
-WRITE_LINE_DEVICE_HANDLER( ef4_w )
-{
-	comx_eb_device *eb = downcast<comx_eb_device *>(device->owner());
-	eb->set_ef4(device->tag(), state);
-}
-
 WRITE_LINE_DEVICE_HANDLER( wait_w )
 {
 	comx_expansion_slot_device *slot = dynamic_cast<comx_expansion_slot_device *>(device->owner()->owner());
@@ -135,7 +129,6 @@ WRITE_LINE_DEVICE_HANDLER( clear_w )
 static COMX_EXPANSION_INTERFACE( expansion_intf )
 {
 	DEVCB_LINE(int_w),
-	DEVCB_LINE(ef4_w),
 	DEVCB_LINE(wait_w),
 	DEVCB_LINE(clear_w)
 };
@@ -197,34 +190,6 @@ void comx_eb_device::set_int(const char *tag, int state)
 }
 
 
-//-------------------------------------------------
-//  set_ef4 - set EF4 line state
-//-------------------------------------------------
-
-void comx_eb_device::set_ef4(const char *tag, int state)
-{
-	int slot = 0;
-
-	for (slot = 0; slot < MAX_EB_SLOTS; slot++)
-	{
-		if (!strcmp(tag, m_expansion_slot[slot]->tag())) break;
-	}
-
-	assert(slot < MAX_EB_SLOTS);
-
-	m_ef4[slot] = state;
-
-	int ef4 = CLEAR_LINE;
-
-	for (slot = 0; slot < MAX_EB_SLOTS; slot++)
-	{
-		ef4 |= m_ef4[slot];
-	}
-
-	m_slot->ef4_w(ef4);
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -256,7 +221,6 @@ void comx_eb_device::device_start()
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
 		m_int[slot] = CLEAR_LINE;
-		m_ef4[slot] = CLEAR_LINE;
 	}
 
 	m_rom = memregion("e000")->base();
@@ -269,6 +233,38 @@ void comx_eb_device::device_start()
 
 void comx_eb_device::device_reset()
 {
+	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
+	{
+		if (m_expansion_slot[slot] != NULL)
+		{
+			m_expansion_slot[slot]->device().reset();
+			m_expansion_slot[slot]->ds_w(0);
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  comx_ef4_r - external flag 4 read
+//-------------------------------------------------
+
+int comx_eb_device::comx_ef4_r()
+{
+	int state = CLEAR_LINE;
+
+	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
+	{
+		if (m_expansion_slot[slot] != NULL)
+		{
+			if (m_expansion_slot[slot]->ef4_r() == ASSERT_LINE)
+			{
+				state = ASSERT_LINE;
+				break;
+			}
+		}
+	}
+
+	return state;
 }
 
 
@@ -292,7 +288,7 @@ void comx_eb_device::comx_q_w(int state)
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-UINT8 comx_eb_device::comx_mrd_r(offs_t offset, int *extrom)
+UINT8 comx_eb_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
 {
 	UINT8 data = 0;
 
@@ -311,7 +307,7 @@ UINT8 comx_eb_device::comx_mrd_r(offs_t offset, int *extrom)
 		{
 			if (BIT(m_select, slot) && m_expansion_slot[slot] != NULL)
 			{
-				data |= m_expansion_slot[slot]->mrd_r(offset, extrom);
+				data |= m_expansion_slot[slot]->mrd_r(space, offset, extrom);
 			}
 		}
 	}
@@ -324,13 +320,13 @@ UINT8 comx_eb_device::comx_mrd_r(offs_t offset, int *extrom)
 //  comx_mwr_w - memory write
 //-------------------------------------------------
 
-void comx_eb_device::comx_mwr_w(offs_t offset, UINT8 data)
+void comx_eb_device::comx_mwr_w(address_space &space, offs_t offset, UINT8 data)
 {
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
 		if (BIT(m_select, slot) && m_expansion_slot[slot] != NULL)
 		{
-			m_expansion_slot[slot]->mwr_w(offset, data);
+			m_expansion_slot[slot]->mwr_w(space, offset, data);
 		}
 	}
 }
@@ -340,7 +336,7 @@ void comx_eb_device::comx_mwr_w(offs_t offset, UINT8 data)
 //  comx_io_r - I/O read
 //-------------------------------------------------
 
-UINT8 comx_eb_device::comx_io_r(offs_t offset)
+UINT8 comx_eb_device::comx_io_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0;
 
@@ -348,7 +344,7 @@ UINT8 comx_eb_device::comx_io_r(offs_t offset)
 	{
 		if (BIT(m_select, slot) && m_expansion_slot[slot] != NULL)
 		{
-			data |= m_expansion_slot[slot]->io_r(offset);
+			data |= m_expansion_slot[slot]->io_r(space, offset);
 		}
 	}
 
@@ -360,9 +356,9 @@ UINT8 comx_eb_device::comx_io_r(offs_t offset)
 //  comx_io_w - I/O write
 //-------------------------------------------------
 
-void comx_eb_device::comx_io_w(offs_t offset, UINT8 data)
+void comx_eb_device::comx_io_w(address_space &space, offs_t offset, UINT8 data)
 {
-	if (offset == 1)
+	if (offset == 1 && !(BIT(data, 0)))
 	{
 		m_select = data >> 1;
 
@@ -379,7 +375,7 @@ void comx_eb_device::comx_io_w(offs_t offset, UINT8 data)
 	{
 		if (BIT(m_select, slot) && m_expansion_slot[slot] != NULL)
 		{
-			m_expansion_slot[slot]->io_w(offset, data);
+			m_expansion_slot[slot]->io_w(space, offset, data);
 		}
 	}
 }

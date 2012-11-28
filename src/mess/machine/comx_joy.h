@@ -41,7 +41,7 @@ protected:
 	virtual void device_config_complete() { m_shortname = "comx_joy"; }
 
 	// device_comx_expansion_card_interface overrides
-	virtual UINT8 comx_io_r(offs_t offset);
+	virtual UINT8 comx_io_r(address_space &space, offs_t offset);
 };
 
 

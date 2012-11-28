@@ -29,7 +29,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define MAX_EB_SLOTS	4
+#define MAX_EB_SLOTS    4
 
 
 
@@ -40,7 +40,7 @@
 // ======================> comx_eb_device
 
 class comx_eb_device : public device_t,
-					   public device_comx_expansion_card_interface
+						public device_comx_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -52,27 +52,26 @@ public:
 
 	// not really public
 	void set_int(const char *tag, int state);
-	void set_ef4(const char *tag, int state);
 
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete() { m_shortname = "comx_eb"; }
+	virtual void device_config_complete() { m_shortname = "comx_eb"; }
 
 	// device_comx_expansion_card_interface overrides
+	virtual int comx_ef4_r();
 	virtual void comx_q_w(int state);
-	virtual UINT8 comx_mrd_r(offs_t offset, int *extrom);
-	virtual void comx_mwr_w(offs_t offset, UINT8 data);
-	virtual UINT8 comx_io_r(offs_t offset);
-	virtual void comx_io_w(offs_t offset, UINT8 data);
+	virtual UINT8 comx_mrd_r(address_space &space, offs_t offset, int *extrom);
+	virtual void comx_mwr_w(address_space &space, offs_t offset, UINT8 data);
+	virtual UINT8 comx_io_r(address_space &space, offs_t offset);
+	virtual void comx_io_w(address_space &space, offs_t offset, UINT8 data);
 
 private:
-	UINT8 *m_rom;				// program ROM
+	UINT8 *m_rom;               // program ROM
 
-	comx_expansion_slot_device	*m_expansion_slot[MAX_EB_SLOTS];
+	comx_expansion_slot_device  *m_expansion_slot[MAX_EB_SLOTS];
 	int m_int[MAX_EB_SLOTS];
-	int m_ef4[MAX_EB_SLOTS];
 
 	UINT8 m_select;
 };

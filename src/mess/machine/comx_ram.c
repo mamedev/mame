@@ -15,7 +15,7 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define RAM_SIZE	0x8000
+#define RAM_SIZE    0x8000
 
 
 
@@ -67,7 +67,7 @@ void comx_ram_device::device_reset()
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-UINT8 comx_ram_device::comx_mrd_r(offs_t offset, int *extrom)
+UINT8 comx_ram_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
 {
 	UINT8 data = 0;
 
@@ -84,7 +84,7 @@ UINT8 comx_ram_device::comx_mrd_r(offs_t offset, int *extrom)
 //  comx_mwr_w - memory write
 //-------------------------------------------------
 
-void comx_ram_device::comx_mwr_w(offs_t offset, UINT8 data)
+void comx_ram_device::comx_mwr_w(address_space &space, offs_t offset, UINT8 data)
 {
 	if (offset >= 0xc000 && offset < 0xd000)
 	{
@@ -97,7 +97,7 @@ void comx_ram_device::comx_mwr_w(offs_t offset, UINT8 data)
 //  comx_io_w - I/O write
 //-------------------------------------------------
 
-void comx_ram_device::comx_io_w(offs_t offset, UINT8 data)
+void comx_ram_device::comx_io_w(address_space &space, offs_t offset, UINT8 data)
 {
 	if (offset == 1)
 	{

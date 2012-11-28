@@ -2,17 +2,27 @@
 
     formats/comx35_dsk.h
 
-    COMX35 disk images
+    COMX-35 disk image format
 
 *********************************************************************/
 
-#ifndef COMX35_DSK_H
-#define COMX35_DSK_H
+#ifndef COMX35_DSK_H_
+#define COMX35_DSK_H_
 
-#include "flopimg.h"
+#include "wd177x_dsk.h"
 
-/**************************************************************************/
+class comx35_format : public wd177x_format {
+public:
+	comx35_format();
 
-LEGACY_FLOPPY_OPTIONS_EXTERN(comx35);
+	virtual const char *name() const;
+	virtual const char *description() const;
+	virtual const char *extensions() const;
 
-#endif /* COMX35_DSK_H */
+private:
+	static const format formats[];
+};
+
+extern const floppy_format_type FLOPPY_COMX35_FORMAT;
+
+#endif

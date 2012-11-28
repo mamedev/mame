@@ -50,7 +50,7 @@ Notes:
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define WD1770_TAG			"wd1770"
+#define WD1770_TAG          "wd1770"
 
 
 
@@ -67,7 +67,7 @@ const device_type COMX_FD = &device_creator<comx_fd_device>;
 
 ROM_START( comx_fd )
 	ROM_REGION( 0x2000, "c000", 0 )
-	ROM_LOAD( "d.o.s. v1.2.f4",	0x0000, 0x2000, CRC(cf4ecd2e) SHA1(290e19bdc89e3c8059e63d5ae3cca4daa194e1fe) )
+	ROM_LOAD( "d.o.s. v1.2.f4", 0x0000, 0x2000, CRC(cf4ecd2e) SHA1(290e19bdc89e3c8059e63d5ae3cca4daa194e1fe) )
 ROM_END
 
 
@@ -85,38 +85,24 @@ const rom_entry *comx_fd_device::device_rom_region() const
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
-static const floppy_interface floppy_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSSD,
-	LEGACY_FLOPPY_OPTIONS_NAME(comx35),
-	"floppy_5_25",
-	NULL
-};
+FLOPPY_FORMATS_MEMBER( comx_fd_device::floppy_formats )
+	FLOPPY_COMX35_FORMAT
+FLOPPY_FORMATS_END
 
-WRITE_LINE_MEMBER( comx_fd_device::intrq_w )
+static SLOT_INTERFACE_START( comx_fd_floppies )
+	SLOT_INTERFACE( "525sd35t", FLOPPY_525_SD_35T )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
+SLOT_INTERFACE_END
+
+void comx_fd_device::intrq_w(bool state)
 {
 	m_intrq = state;
 }
 
-WRITE_LINE_MEMBER( comx_fd_device::drq_w )
+void comx_fd_device::drq_w(bool state)
 {
 	m_drq = state;
-
-	update_ef4();
 }
-
-static const wd17xx_interface fdc_intf =
-{
-	DEVCB_LINE_VCC,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, comx_fd_device, intrq_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, comx_fd_device, drq_w),
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
 
 
 //-------------------------------------------------
@@ -124,8 +110,10 @@ static const wd17xx_interface fdc_intf =
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( comx_fd )
-	MCFG_WD1770_ADD(WD1770_TAG, fdc_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
+	MCFG_WD1770x_ADD(WD1770_TAG, XTAL_8MHz)
+
+	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", comx_fd_floppies, "525sd35t", NULL, comx_fd_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":1", comx_fd_floppies, NULL,       NULL, comx_fd_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -142,28 +130,6 @@ machine_config_constructor comx_fd_device::device_mconfig_additions() const
 
 
 //**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  update_ef4 -
-//-------------------------------------------------
-
-inline void comx_fd_device::update_ef4()
-{
-	if (m_ds && !m_disb)
-	{
-		m_slot->ef4_w(!m_drq);
-	}
-	else
-	{
-		m_slot->ef4_w(CLEAR_LINE);
-	}
-}
-
-
-
-//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -175,13 +141,13 @@ comx_fd_device::comx_fd_device(const machine_config &mconfig, const char *tag, d
 	device_t(mconfig, COMX_FD, "COMX FD", tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, WD1770_TAG),
-	m_floppy0(*this, FLOPPY_0),
-	m_floppy1(*this, FLOPPY_1),
+	m_floppy0(*this, WD1770_TAG":0"),
+	m_floppy1(*this, WD1770_TAG":1"),
 	m_ds(0),
 	m_q(0),
 	m_addr(0),
-	m_intrq(0),
-	m_drq(0),
+	m_intrq(false),
+	m_drq(false),
 	m_disb(1)
 {
 }
@@ -193,7 +159,13 @@ comx_fd_device::comx_fd_device(const machine_config &mconfig, const char *tag, d
 
 void comx_fd_device::device_start()
 {
+	// find memory regions
 	m_rom = memregion("c000")->base();
+
+	// initialize floppy controller
+	m_fdc->setup_intrq_cb(wd1770_t::line_cb(FUNC(comx_fd_device::intrq_w), this));
+	m_fdc->setup_drq_cb(wd1770_t::line_cb(FUNC(comx_fd_device::drq_w), this));
+	m_fdc->dden_w(1);
 
 	// state saving
 	save_item(NAME(m_ds));
@@ -211,7 +183,24 @@ void comx_fd_device::device_start()
 
 void comx_fd_device::device_reset()
 {
-	wd17xx_reset(m_fdc);
+	m_fdc->reset();
+}
+
+
+//-------------------------------------------------
+//  comx_ef4_r - external flag 4 read
+//-------------------------------------------------
+
+int comx_fd_device::comx_ef4_r()
+{
+	int state = CLEAR_LINE;
+
+	if (m_ds && !m_disb)
+	{
+		state = m_drq ? ASSERT_LINE : CLEAR_LINE;
+	}
+
+	return state;
 }
 
 
@@ -226,22 +215,10 @@ void comx_fd_device::comx_q_w(int state)
 
 
 //-------------------------------------------------
-//  comx_ds_w - device select write
-//-------------------------------------------------
-
-void comx_fd_device::comx_ds_w(int state)
-{
-	m_ds = state;
-
-	update_ef4();
-}
-
-
-//-------------------------------------------------
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-UINT8 comx_fd_device::comx_mrd_r(offs_t offset, int *extrom)
+UINT8 comx_fd_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
 {
 	UINT8 data = 0xff;
 
@@ -263,7 +240,7 @@ UINT8 comx_fd_device::comx_mrd_r(offs_t offset, int *extrom)
 //  comx_io_r - I/O read
 //-------------------------------------------------
 
-UINT8 comx_fd_device::comx_io_r(offs_t offset)
+UINT8 comx_fd_device::comx_io_r(address_space &space, offs_t offset)
 {
 	UINT8 data = 0xff;
 
@@ -271,11 +248,11 @@ UINT8 comx_fd_device::comx_io_r(offs_t offset)
 	{
 		if (m_q)
 		{
-			data = m_intrq;
+			data = m_intrq ? 1 : 0;
 		}
 		else
 		{
-			data = wd17xx_r(m_fdc, machine().driver_data()->generic_space(), m_addr);
+			data = m_fdc->gen_r(m_addr);
 		}
 	}
 
@@ -287,7 +264,7 @@ UINT8 comx_fd_device::comx_io_r(offs_t offset)
 //  comx_io_w - I/O write
 //-------------------------------------------------
 
-void comx_fd_device::comx_io_w(offs_t offset, UINT8 data)
+void comx_fd_device::comx_io_w(address_space &space, offs_t offset, UINT8 data)
 {
 	if (offset == 2)
 	{
@@ -295,38 +272,36 @@ void comx_fd_device::comx_io_w(offs_t offset, UINT8 data)
 		{
 			/*
 
-                bit     description
+			    bit     description
 
-                0       A0
-                1       A1
-                2       DRIVE0
-                3       DRIVE1
-                4       F9 DISB
-                5       SIDE SELECT
+			    0       FDC A0
+			    1       FDC A1
+			    2       DRIVE0
+			    3       DRIVE1
+			    4       F9 DISB
+			    5       SIDE SELECT
 
-            */
+			*/
 
 			// latch data to F3
 			m_addr = data & 0x03;
 
-			if (BIT(data, 2))
-			{
-				wd17xx_set_drive(m_fdc, 0);
-			}
-			else if (BIT(data, 3))
-			{
-				wd17xx_set_drive(m_fdc, 1);
-			}
+			// drive select
+			floppy_image_device *floppy = NULL;
+
+			if (BIT(data, 2)) floppy = m_floppy0->get_device();
+			if (BIT(data, 3)) floppy = m_floppy1->get_device();
+
+			m_fdc->set_floppy(floppy);
+
+			if (floppy) floppy->ss_w(BIT(data, 5));
 
 			m_disb = !BIT(data, 4);
-			update_ef4();
-
-			wd17xx_set_side(m_fdc, BIT(data, 5));
 		}
 		else
 		{
 			// write data to WD1770
-			wd17xx_w(m_fdc, machine().driver_data()->generic_space(), m_addr, data);
+			m_fdc->gen_w(m_addr, data);
 		}
 	}
 }

@@ -14,11 +14,9 @@
 
 
 #include "emu.h"
-#include "formats/basicdsk.h"
 #include "formats/comx35_dsk.h"
-#include "imagedev/flopdrv.h"
 #include "machine/comxexp.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 
 
 
@@ -29,7 +27,7 @@
 // ======================> comx_fd_device
 
 class comx_fd_device : public device_t,
-					   public device_comx_expansion_card_interface
+						public device_comx_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -40,38 +38,40 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// not really public
-	DECLARE_WRITE_LINE_MEMBER( intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
+	void intrq_w(bool state);
+	void drq_w(bool state);
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete() { m_shortname = "comx_fd"; }
+	virtual void device_config_complete() { m_shortname = "comx_fd"; }
 
 	// device_comx_expansion_card_interface overrides
-	virtual void comx_ds_w(int state);
+	virtual int comx_ef4_r();
 	virtual void comx_q_w(int state);
-	virtual UINT8 comx_mrd_r(offs_t offset, int *extrom);
-	virtual UINT8 comx_io_r(offs_t offset);
-	virtual void comx_io_w(offs_t offset, UINT8 data);
+	virtual UINT8 comx_mrd_r(address_space &space, offs_t offset, int *extrom);
+	virtual UINT8 comx_io_r(address_space &space, offs_t offset);
+	virtual void comx_io_w(address_space &space, offs_t offset, UINT8 data);
 
 private:
 	inline void update_ef4();
 
 	// internal state
-	required_device<wd1770_device> m_fdc;
-	required_device<legacy_floppy_image_device> m_floppy0;
-	required_device<legacy_floppy_image_device> m_floppy1;
+	required_device<wd1770_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 
 	// floppy state
-	int m_ds;				// device select
+	int m_ds;               // device select
 	UINT8 *m_rom;
-	int m_q;				// FDC register select
-	int m_addr;				// FDC address
-	int m_intrq;			// interrupt request
-	int m_drq;				// data request
-	int m_disb;				// data request disable
+	int m_q;                // FDC register select
+	int m_addr;             // FDC address
+	bool m_intrq;           // interrupt request
+	bool m_drq;             // data request
+	int m_disb;             // data request disable
 };
 
 
