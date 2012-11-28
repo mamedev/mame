@@ -314,8 +314,39 @@ public:
 	DECLARE_DRIVER_INIT(sc4monoa);
 	DECLARE_DRIVER_INIT(sc4monoa_mbus);
 	DECLARE_DRIVER_INIT(sc4mondx);
+	DECLARE_DRIVER_INIT(sc4mou);
+	DECLARE_DRIVER_INIT(sc4oyf);
+	DECLARE_DRIVER_INIT(sc4pacqp);
+	DECLARE_DRIVER_INIT(sc4pacmn);
+	DECLARE_DRIVER_INIT(sc4paccs);
+	DECLARE_DRIVER_INIT(sc4paccs_mbus);
+	DECLARE_DRIVER_INIT(sc4paccl);
+	DECLARE_DRIVER_INIT(sc4pacpl);
+	DECLARE_DRIVER_INIT(sc4party);
+	DECLARE_DRIVER_INIT(sc4pmani);
+	DECLARE_DRIVER_INIT(sc4ppclb);
+	DECLARE_DRIVER_INIT(sc4pipe);
+	DECLARE_DRIVER_INIT(sc4plumb);
+	DECLARE_DRIVER_INIT(sc4polem);
+	DECLARE_DRIVER_INIT(sc4polen);
+	DECLARE_DRIVER_INIT(sc4polic);
+	DECLARE_DRIVER_INIT(sc4potsh);
+	DECLARE_DRIVER_INIT(sc4pogbl);
+	DECLARE_DRIVER_INIT(sc4pwrsg);
+	DECLARE_DRIVER_INIT(sc4pir);
+	DECLARE_DRIVER_INIT(sc4pen1);
+	DECLARE_DRIVER_INIT(sc4quidr);
+	DECLARE_DRIVER_INIT(sc4qmodo);
+	DECLARE_DRIVER_INIT(sc4rdrag);
+	DECLARE_DRIVER_INIT(sc4rdrcl);
+	DECLARE_DRIVER_INIT(sc4relcz);
+	DECLARE_DRIVER_INIT(sc4rotc);
+	DECLARE_DRIVER_INIT(sc4rich);
+	DECLARE_DRIVER_INIT(sc4rttt);
+	DECLARE_DRIVER_INIT(sc4rttt_mbus);
+	DECLARE_DRIVER_INIT(sc4roksc);
+	DECLARE_DRIVER_INIT(sc4rogds);
 
-	
 	
 	
 	
@@ -1965,11 +1996,10 @@ INPUT_PORTS_EXTERN( sc4_base );
 #define sc_rdrag_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95008485.bin", 0x0000, 0x0e7e1d, CRC(037269cd) SHA1(7b528427740c9f1b28e00d9b45ebeb5e77ca9ead) ) /* red dragon */ \
-	ROM_LOAD( "95008525.bin", 0x0000, 0x0e7e1d, CRC(0c7aa11d) SHA1(3d028d2d5558056e84626ba66f7c22286be34bd9) ) /* club red dragon */ \
 
 #define sc_rdrcl_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "95008525.bin", 0x0000, 0x0e7e1d, CRC(0c7aa11d) SHA1(3d028d2d5558056e84626ba66f7c22286be34bd9) ) \
+	ROM_LOAD( "95008525.bin", 0x0000, 0x0e7e1d, CRC(0c7aa11d) SHA1(3d028d2d5558056e84626ba66f7c22286be34bd9) ) /* club red dragon */ \
 
 #define sc_rhr \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -1999,6 +2029,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_revo_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	/* REVO SOUNDS, game wants REV SOUNDS */ \
 	ROM_LOAD( "95008871.bin", 0x0000, 0x0fd182, CRC(e4f3b731) SHA1(ef829105e1b45c307546127ba85f5e0e5403ab98) ) \
 
 #define sc_rttt_others \
@@ -2033,8 +2064,8 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_rich_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "95008084.lo", 0x000000, 0x100000, CRC(2231c842) SHA1(2180109949281b053313c8a8de33496d31d4279e) ) \
-	ROM_LOAD( "95008085.hi", 0x100000, 0x100000, CRC(eb748aa3) SHA1(b81acfbceb5ff9df8bb30d3da82deea70bfce2fe) ) \
+	ROM_LOAD( "95008085.hi", 0x000000, 0x100000, CRC(eb748aa3) SHA1(b81acfbceb5ff9df8bb30d3da82deea70bfce2fe) ) \
+	ROM_LOAD( "95008084.lo", 0x100000, 0x100000, CRC(2231c842) SHA1(2180109949281b053313c8a8de33496d31d4279e) ) \
 
 
 #define sc_rosts_others \
@@ -3027,7 +3058,8 @@ INPUT_PORTS_EXTERN( sc4_base );
 	ROM_LOAD( "pub-en.s1", 0x000000, 0x080000, CRC(7e3f4295) SHA1(b7a2c538d79663a3d21f89311195619158fa7197) ) /* need testing */ \
 	ROM_LOAD( "pub-en.s2", 0x080000, 0x080000, CRC(637d3c0f) SHA1(193964efc28e56b05f39099a696dd3e9119b80dd) ) \
 	\
-	ROM_REGION( 0x400000, "others", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x400000, "matrix", 0 ) \
+	/* I don't think the SC4 version uses a DMD */ \
 	ROM_LOAD( "pbemydot", 0x0000, 0x010000, CRC(b056d3d4) SHA1(6c1dbc6fcb4761c25f9cc8123e9f0fe791488c19) ) /* DMD rom? Possibly SC2 DM01 */ \
 
 #define sc_oyf_others \
