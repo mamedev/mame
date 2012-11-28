@@ -126,29 +126,12 @@ static const z80_daisy_config daisy_chain[] =
 
 
 //-------------------------------------------------
-//  wd17xx_interface fdc_intf
+//  SLOT_INTERFACE( abc_fd2_floppies )
 //-------------------------------------------------
 
-static const floppy_interface fd2_floppy_interface =
-{
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    FLOPPY_STANDARD_5_25_SSSD,
-    LEGACY_FLOPPY_OPTIONS_NAME(default),
-    "floppy_5_25",
-	NULL
-};
-
-static const wd17xx_interface fdc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
+static SLOT_INTERFACE_START( abc_fd2_floppies )
+	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD )
+SLOT_INTERFACE_END
 
 
 //-------------------------------------------------
@@ -162,8 +145,10 @@ static MACHINE_CONFIG_FRAGMENT( abc_fd2 )
 	MCFG_CPU_CONFIG(daisy_chain)
 
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, pio_intf) // ?
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(fd2_floppy_interface)
-	MCFG_FD1771_ADD(FD1771_TAG, fdc_intf)
+	MCFG_FD1771x_ADD(FD1771_TAG, XTAL_4MHz/2 *8) // ?
+
+	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", abc_fd2_floppies, "525sssd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":1", abc_fd2_floppies, "525sssd", NULL, floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -193,8 +178,8 @@ abc_fd2_device::abc_fd2_device(const machine_config &mconfig, const char *tag, d
 	  m_maincpu(*this, Z80_TAG),
 	  m_pio(*this, Z80PIO_TAG),
 	  m_fdc(*this, FD1771_TAG),
-	  m_image0(*this, FLOPPY_0),
-	  m_image1(*this, FLOPPY_1)
+	  m_floppy0(*this, FD1771_TAG":0"),
+	  m_floppy1(*this, FD1771_TAG":1")
 {
 }
 

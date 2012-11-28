@@ -16,10 +16,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "formats/basicdsk.h"
-#include "imagedev/flopdrv.h"
 #include "machine/abcbus.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "machine/z80pio.h"
 
 
@@ -54,9 +52,9 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
-	required_device<fd1771_device> m_fdc;
-	required_device<legacy_floppy_image_device> m_image0;
-	required_device<legacy_floppy_image_device> m_image1;
+	required_device<fd1771_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 };
 
 
