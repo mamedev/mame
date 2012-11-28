@@ -346,9 +346,28 @@ public:
 	DECLARE_DRIVER_INIT(sc4rttt_mbus);
 	DECLARE_DRIVER_INIT(sc4roksc);
 	DECLARE_DRIVER_INIT(sc4rogds);
+	DECLARE_DRIVER_INIT(sc4srrmz);
+	DECLARE_DRIVER_INIT(sc4srrmz_mbus);
+	DECLARE_DRIVER_INIT(sc4sidsp);
+	DECLARE_DRIVER_INIT(sc4sirpz);
+	DECLARE_DRIVER_INIT(sc4smk7);
+	DECLARE_DRIVER_INIT(sc4srr);
+	DECLARE_DRIVER_INIT(sc4slc);
+	DECLARE_DRIVER_INIT(sc4slc_mbus);
+	DECLARE_DRIVER_INIT(sc4solgl);
+	DECLARE_DRIVER_INIT(sc4sace);
+	DECLARE_DRIVER_INIT(sc4sbust);
+	DECLARE_DRIVER_INIT(sc4starp);
+	DECLARE_DRIVER_INIT(sc4stirc);
+	DECLARE_DRIVER_INIT(sc4strk);
+	DECLARE_DRIVER_INIT(sc4sahed);
+	DECLARE_DRIVER_INIT(sc4strx);
+	DECLARE_DRIVER_INIT(sc4suscl);
+	DECLARE_DRIVER_INIT(sc4suscl_mbus);
+	DECLARE_DRIVER_INIT(sc4s6c);
+	DECLARE_DRIVER_INIT(sc4taekw);
+	DECLARE_DRIVER_INIT(sc4taekw_mbus);
 
-	
-	
 	
 	
 	
@@ -2139,9 +2158,6 @@ INPUT_PORTS_EXTERN( sc4_base );
 	ROM_LOAD( "95008155.bin", 0x000000, 0x100000, CRC(2c12d323) SHA1(78199130f15b90f2c8f932f40d7e1e0e0646ce57) ) \
 	ROM_LOAD( "95008156.bin", 0x100000, 0x100000, CRC(775dd1cd) SHA1(2b0ffa326ae53b60dbda6eb1f066b2ea29e6dd26) ) \
 
-#define sc_srrca_others \
-	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-
 #define sc_s2k_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 
@@ -3195,7 +3211,8 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_stl_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "sk_t_lim.sn1", 0x000000, 0x080000, CRC(1b88bf7d) SHA1(76a8453fd2f8375030f69a3a569b45daceb3e4f7) ) /*Need testing*/ \
+	/* these are either NOT SC4 roms, or they're bad, no header, game won't accept */ \
+	ROM_LOAD( "sk_t_lim.sn1", 0x000000, 0x080000, CRC(1b88bf7d) SHA1(76a8453fd2f8375030f69a3a569b45daceb3e4f7) ) \
 	ROM_LOAD( "sk_t_lim.sn2", 0x080000, 0x080000, CRC(b3ecf658) SHA1(bf4ce85a3662df6dacfa42e3b4f9dfd6bba43b24) ) \
 
 #define sc_sbust_others \
@@ -3241,7 +3258,8 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_slih_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "s_l_i_ho.snd", 0x0000, 0x080000, CRC(13abf434) SHA1(99d7a323c03448827d16bcfb4358c09ab691b500) ) \
+	/* BAD or not for this HW type (no header) probably half size */ \
+	ROM_LOAD( "s_l_i_ho.snd", 0x0000, 0x080000, BAD_DUMP CRC(13abf434) SHA1(99d7a323c03448827d16bcfb4358c09ab691b500) ) \
 
 #define sc_spark_others \
 	ROM_REGION( 0x200000, "ymz", 0 ) \
