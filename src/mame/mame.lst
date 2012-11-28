@@ -14367,8 +14367,6 @@ sc4mclbb	//
 sc4mclbc	//
 sc4mclbd	//
 sc4mclbe	//
-sc4mdlx		// Monopoly Deluxe (Mazooma)
-sc4mondxg   //
 sc4mont		// Montego Pay (Qps)
 sc4monta	//
 sc4montb	//
@@ -15772,6 +15770,8 @@ sc4monoan	//
 sc4monoal	//
 sc4monot	//
 sc4monota	//
+sc4monotb	//
+sc4monotc	//
 sc4monoab	//
 sc4monoac	//
 sc4monog	//
@@ -15785,7 +15785,6 @@ sc4monoao	//
 sc4monoap	//
 sc4monoaq	//
 sc4monoam	//
-sc4monotb	//
 sc4monoah	//
 sc4monoai	//
 sc4monoaj	//
@@ -15796,19 +15795,10 @@ sc4mondxe	//
 sc4mondxb	//
 sc4mondxf	//
 sc4mondxc	//
+sc4mondxh	// Monopoly Deluxe (Mazooma)
+sc4mondxg   //
 sc4mcas		// Monopoly Casino (Mazooma)
-sc4mcasa	//
-sc4mcasb	//
-sc4mcasc	//
-sc4mcasd	//
-sc4mcase	//
-sc4mcasf	//
-sc4mcasg	//
-sc4mcash	//
-sc4mcasi	//
-sc4mcasj	//
 sc4mcask	//
-sc4mcasl	//
 sc4mcasm	//
 sc4mcasn	//
 sc4mcaso	//
@@ -15828,6 +15818,16 @@ sc4mcas1	//
 sc4mcas2	//
 sc4mcas3	//
 sc4mcas4	//
+sc4cmon		//
+sc4cmona	//
+sc4cmonb	//
+sc4cmonc	//
+sc4cmond	//
+sc4cmone	//
+sc4cmonf	//
+sc4cmong	//
+sc4cmonh	//
+sc4cmoni	//
 sc4mdm		// Monopoly Double Money (Bellfruit)
 sc4mdma		//
 sc4mhn		// Monopoly Here & Now (Mazooma)

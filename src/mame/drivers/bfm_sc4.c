@@ -10275,7 +10275,7 @@ ROM_END
 
 
 
-ROM_START( sc4mdlx )
+ROM_START( sc4mondxh )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95416018.lo", 0x00001, 0x080000, CRC(63401675) SHA1(1b30d39abbdfda0b159ffab9a45148ac5115f957) )
 	ROM_LOAD16_BYTE( "95416019.hi", 0x00000, 0x080000, CRC(751deaca) SHA1(c9a0bccbc944b9f20975b2c9f487ad10c6b91239) )
@@ -20558,19 +20558,7 @@ ROM_START( sc4monsp )
 	sc_monsp_others
 ROM_END
 
-ROM_START( sc4monop )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95408978.lo", 0x00001, 0x080000, CRC(b27e529e) SHA1(f73fcd70f48789914958890972a85ee1f1e7cb58) )
-	ROM_LOAD16_BYTE( "95408979.hi", 0x00000, 0x080000, CRC(04da3c33) SHA1(9f9d1b5410813b54d671f2f0272f93e0edefa769) )
-	sc_monop_others
-ROM_END
 
-ROM_START( sc4monopa )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95410474.lo", 0x00001, 0x080000, CRC(5612849e) SHA1(154aa5e60e09a70d3b8e22df959d9593ffd5c25c) )
-	ROM_LOAD16_BYTE( "95410475.hi", 0x00000, 0x080000, CRC(e28212d1) SHA1(e3b0fe66f675ed3b7ebdab244e2e269842bed143) )
-	sc_monop_others
-ROM_END
 
 ROM_START( sc4mono5 )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -20586,61 +20574,149 @@ ROM_START( sc4mono5a )
 	sc_mono_alt_others
 ROM_END
 
+
+
+ROM_START( sc4monop )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95408978.lo", 0x00001, 0x080000, CRC(b27e529e) SHA1(f73fcd70f48789914958890972a85ee1f1e7cb58) )
+	ROM_LOAD16_BYTE( "95408979.hi", 0x00000, 0x080000, CRC(04da3c33) SHA1(9f9d1b5410813b54d671f2f0272f93e0edefa769) )
+	sc_mcas_others
+ROM_END
+
+ROM_START( sc4monopa )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95410474.lo", 0x00001, 0x080000, CRC(5612849e) SHA1(154aa5e60e09a70d3b8e22df959d9593ffd5c25c) )
+	ROM_LOAD16_BYTE( "95410475.hi", 0x00000, 0x080000, CRC(e28212d1) SHA1(e3b0fe66f675ed3b7ebdab244e2e269842bed143) )
+	sc_mcas_others
+ROM_END
+
 ROM_START( sc4monoa )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95414454.lo", 0x00001, 0x080000, CRC(9faebd13) SHA1(d9253d30803836cc8e8eff6587878659a9e71267) )
 	ROM_LOAD16_BYTE( "95414455.hi", 0x00000, 0x080000, CRC(1b17644b) SHA1(ac53525daf0780345ea87749a5f8e8e9dc5b61c8) )
-	sc_monop_others
+	sc_mcas_others
 ROM_END
 
 ROM_START( sc4monoaa )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95414460.lo", 0x00001, 0x080000, CRC(24a640d4) SHA1(030a5b1349f35bd2c1fff3135d2a9562999b61fc) )
 	ROM_LOAD16_BYTE( "95414461.hi", 0x00000, 0x080000, CRC(ca2658cf) SHA1(f78eaa3fb69392b5c673e4801e177a424a8f90d5) )
-	sc_monop_others
+	sc_mcas_others
 ROM_END
 
 ROM_START( sc4monoan )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95414462.lo", 0x00001, 0x080000, CRC(a7a0c83e) SHA1(a24ab4d8667c6fab2bc1893e0a3b50bedac43b5c) )
 	ROM_LOAD16_BYTE( "95414463.hi", 0x00000, 0x080000, CRC(6410d507) SHA1(9b6aeb4683456bd82269a717124c49162cb24878) )
-	sc_monop_others
+	sc_mcas_others
 ROM_END
 
 ROM_START( sc4monoal )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95414480.lo", 0x00001, 0x080000, CRC(9d678b10) SHA1(26a2aad2f7bced36e8ad85c3fbe781df7d698c09) )
 	ROM_LOAD16_BYTE( "95414481.hi", 0x00000, 0x080000, CRC(e0f15310) SHA1(6ee52b756f3a69c96cec5d7363abb5e77227004f) )
-	sc_monop_others
+	sc_mcas_others
 ROM_END
 
-ROM_START( sc4monot )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95414492.lo", 0x00001, 0x080000, CRC(8164956c) SHA1(25e79399fd2e23ebbde581896c32285b4fbb06f2) )
-	ROM_LOAD16_BYTE( "95414493.hi", 0x00000, 0x080000, CRC(3bf28321) SHA1(efddbb5ebcf15d74361d039334d21d52cc5fbe9a) )
-	sc_monop_others
-ROM_END
-
-ROM_START( sc4monota )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95414494.lo", 0x00001, 0x080000, CRC(2b2bab9c) SHA1(8b1b4bb62e2f7d47d4b598815731b969f3ab1ba5) )
-	ROM_LOAD16_BYTE( "95414495.hi", 0x00000, 0x080000, CRC(ba683acd) SHA1(15b33c74abd86d26f7b03b121e766e240a23ec1e) )
-	sc_monop_others
-ROM_END
 
 ROM_START( sc4monoab )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95414784.lo", 0x00001, 0x080000, CRC(95591c90) SHA1(24dfc4dd1d3b6d05d9a123bcd7441c78f10866a5) )
 	ROM_LOAD16_BYTE( "95414785.hi", 0x00000, 0x080000, CRC(09bbf43c) SHA1(78e94f61333ccf7603fd083832cee7114584f593) )
-	sc_monop_others
+	sc_mcas_others
 ROM_END
 
 ROM_START( sc4monoac )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95414790.lo", 0x00001, 0x080000, CRC(a7121df8) SHA1(638902dea8950c5668911b3c88a7bcf0af8acf54) )
 	ROM_LOAD16_BYTE( "95414791.hi", 0x00000, 0x080000, CRC(04036214) SHA1(b1ee059c44f285e10b56ef5643d8fc68bb1e4502) )
-	sc_monop_others
+	sc_mcas_others
 ROM_END
+
+ROM_START( sc4monoad )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95415454.lo", 0x00001, 0x080000, CRC(895b8d82) SHA1(017baf2971576638d4b8f976f99e6097abe193e4) )
+	ROM_LOAD16_BYTE( "95415455.hi", 0x00000, 0x080000, CRC(37f16d0d) SHA1(76430ae7e79d9312cbea4b49e0b707f46b48a56a) )
+	sc_mcas_others
+ROM_END
+
+ROM_START( sc4monoae )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95415456.lo", 0x00001, 0x080000, CRC(3031b8db) SHA1(7aaa9b9a585f0407177d4959992000d2d77d4d69) )
+	ROM_LOAD16_BYTE( "95415457.hi", 0x00000, 0x080000, CRC(990f11aa) SHA1(549ae1cebaf6069300dc9048cae448235d69587b) )
+	sc_mcas_others
+ROM_END
+
+ROM_START( sc4monoaf )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95415458.lo", 0x00001, 0x080000, CRC(81091dce) SHA1(64d5352d2c5bccba496834dc2fe61e3fe9c3e49f) )
+	ROM_LOAD16_BYTE( "95415459.hi", 0x00000, 0x080000, CRC(a9a46e04) SHA1(82a019172bf2a6d440528e19c7c09e7b1c9d4980) )
+	sc_mcas_others
+ROM_END
+
+ROM_START( sc4monoag )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95415460.lo", 0x00001, 0x080000, CRC(05fd1a11) SHA1(69eeb4430453ce192f8f3869096e59c7335ea598) )
+	ROM_LOAD16_BYTE( "95415461.hi", 0x00000, 0x080000, CRC(41c97eea) SHA1(246f7ad3f0a73e407b2ca6818bd02b1832f75344) )
+	sc_mcas_others
+ROM_END
+
+ROM_START( sc4monoao )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95415462.lo", 0x00001, 0x080000, CRC(82fab458) SHA1(22b78f17eec971cc4ccd5cf61387983f53c88f2e) )
+	ROM_LOAD16_BYTE( "95415463.hi", 0x00000, 0x080000, CRC(ade4d484) SHA1(ae6e942780c951370b9ed19d209d533dc20e9f59) )
+	sc_mcas_others
+ROM_END
+
+ROM_START( sc4monoap )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95415464.lo", 0x00001, 0x080000, CRC(33346ded) SHA1(2cca98cc51bdf2f3ebffdab9983c48d6689e0562) )
+	ROM_LOAD16_BYTE( "95415465.hi", 0x00000, 0x080000, CRC(7f27c676) SHA1(ee5972174f307b11cc4c18fa3b2dd3b0543e8401) )
+	sc_mcas_others
+ROM_END
+
+ROM_START( sc4monoaq )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95415466.lo", 0x00001, 0x080000, CRC(560cc6d3) SHA1(d3df1cd502dc9e2513d89389e8d13f6b1967c99c) )
+	ROM_LOAD16_BYTE( "95415467.hi", 0x00000, 0x080000, CRC(7046b475) SHA1(a3bba1a11490c16495148d3a8f486d1716f877a5) )
+	sc_mcas_others
+ROM_END
+
+ROM_START( sc4monoam )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95415480.lo", 0x00001, 0x080000, CRC(bbd9a433) SHA1(0de5c345569eb266affaf4bdb8c0d353cf757f9b) )
+	ROM_LOAD16_BYTE( "95415481.hi", 0x00000, 0x080000, CRC(26dc3bfa) SHA1(07c2e9c0a68e860ddeb6ece5e9c94eaf572dd93d) )
+	sc_mcas_others
+ROM_END
+
+ROM_START( sc4monoah )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95415784.lo", 0x00001, 0x080000, CRC(7f9bcded) SHA1(117e652fcc29c2acffba13c0082ac10c52f983e2) )
+	ROM_LOAD16_BYTE( "95415785.hi", 0x00000, 0x080000, CRC(0885584c) SHA1(6ad16cb00535198b21a91574f953f2437c57ef1d) )
+	sc_mcas_others
+ROM_END
+
+ROM_START( sc4monoai )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95415786.lo", 0x00001, 0x080000, CRC(e639315d) SHA1(24fad5452338161e0838249229118608fb09417f) )
+	ROM_LOAD16_BYTE( "95415787.hi", 0x00000, 0x080000, CRC(7e896b08) SHA1(887d25ee15784d7b672f1d85d17fa04d98ed2e31) )
+	sc_mcas_others
+ROM_END
+
+ROM_START( sc4monoaj )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95415788.lo", 0x00001, 0x080000, CRC(cf1ab197) SHA1(eb1e166e057505b0957871c2f00b08a97428ca7c) )
+	ROM_LOAD16_BYTE( "95415789.hi", 0x00000, 0x080000, CRC(297508d2) SHA1(86933487fb4c63f0159f3b133509db503a4c6229) )
+	sc_mcas_others
+ROM_END
+
+ROM_START( sc4monoak )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95415790.lo", 0x00001, 0x080000, CRC(34ff1c8e) SHA1(41cfc6ef8ed15fa4ce368bd9a4e0a7e46be362db) )
+	ROM_LOAD16_BYTE( "95415791.hi", 0x00000, 0x080000, CRC(83e98ff0) SHA1(70c69ee23383530d0252b84895027af2d651fd07) )
+	sc_mcas_others
+ROM_END
+
 
 ROM_START( sc4monog )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -20663,96 +20739,37 @@ ROM_START( sc4mondx )
 	sc_monop_others
 ROM_END
 
-ROM_START( sc4monoad )
+
+ROM_START( sc4monot )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95415454.lo", 0x00001, 0x080000, CRC(895b8d82) SHA1(017baf2971576638d4b8f976f99e6097abe193e4) )
-	ROM_LOAD16_BYTE( "95415455.hi", 0x00000, 0x080000, CRC(37f16d0d) SHA1(76430ae7e79d9312cbea4b49e0b707f46b48a56a) )
-	sc_monop_others
+	ROM_LOAD16_BYTE( "95414492.lo", 0x00001, 0x080000, CRC(8164956c) SHA1(25e79399fd2e23ebbde581896c32285b4fbb06f2) )
+	ROM_LOAD16_BYTE( "95414493.hi", 0x00000, 0x080000, CRC(3bf28321) SHA1(efddbb5ebcf15d74361d039334d21d52cc5fbe9a) )
+	sc_monl_sounds
 ROM_END
 
-ROM_START( sc4monoae )
+ROM_START( sc4monota )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95415456.lo", 0x00001, 0x080000, CRC(3031b8db) SHA1(7aaa9b9a585f0407177d4959992000d2d77d4d69) )
-	ROM_LOAD16_BYTE( "95415457.hi", 0x00000, 0x080000, CRC(990f11aa) SHA1(549ae1cebaf6069300dc9048cae448235d69587b) )
-	sc_monop_others
-ROM_END
-
-ROM_START( sc4monoaf )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95415458.lo", 0x00001, 0x080000, CRC(81091dce) SHA1(64d5352d2c5bccba496834dc2fe61e3fe9c3e49f) )
-	ROM_LOAD16_BYTE( "95415459.hi", 0x00000, 0x080000, CRC(a9a46e04) SHA1(82a019172bf2a6d440528e19c7c09e7b1c9d4980) )
-	sc_monop_others
-ROM_END
-
-ROM_START( sc4monoag )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95415460.lo", 0x00001, 0x080000, CRC(05fd1a11) SHA1(69eeb4430453ce192f8f3869096e59c7335ea598) )
-	ROM_LOAD16_BYTE( "95415461.hi", 0x00000, 0x080000, CRC(41c97eea) SHA1(246f7ad3f0a73e407b2ca6818bd02b1832f75344) )
-	sc_monop_others
-ROM_END
-
-ROM_START( sc4monoao )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95415462.lo", 0x00001, 0x080000, CRC(82fab458) SHA1(22b78f17eec971cc4ccd5cf61387983f53c88f2e) )
-	ROM_LOAD16_BYTE( "95415463.hi", 0x00000, 0x080000, CRC(ade4d484) SHA1(ae6e942780c951370b9ed19d209d533dc20e9f59) )
-	sc_monop_others
-ROM_END
-
-ROM_START( sc4monoap )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95415464.lo", 0x00001, 0x080000, CRC(33346ded) SHA1(2cca98cc51bdf2f3ebffdab9983c48d6689e0562) )
-	ROM_LOAD16_BYTE( "95415465.hi", 0x00000, 0x080000, CRC(7f27c676) SHA1(ee5972174f307b11cc4c18fa3b2dd3b0543e8401) )
-	sc_monop_others
-ROM_END
-
-ROM_START( sc4monoaq )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95415466.lo", 0x00001, 0x080000, CRC(560cc6d3) SHA1(d3df1cd502dc9e2513d89389e8d13f6b1967c99c) )
-	ROM_LOAD16_BYTE( "95415467.hi", 0x00000, 0x080000, CRC(7046b475) SHA1(a3bba1a11490c16495148d3a8f486d1716f877a5) )
-	sc_monop_others
-ROM_END
-
-ROM_START( sc4monoam )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95415480.lo", 0x00001, 0x080000, CRC(bbd9a433) SHA1(0de5c345569eb266affaf4bdb8c0d353cf757f9b) )
-	ROM_LOAD16_BYTE( "95415481.hi", 0x00000, 0x080000, CRC(26dc3bfa) SHA1(07c2e9c0a68e860ddeb6ece5e9c94eaf572dd93d) )
-	sc_monop_others
+	ROM_LOAD16_BYTE( "95414494.lo", 0x00001, 0x080000, CRC(2b2bab9c) SHA1(8b1b4bb62e2f7d47d4b598815731b969f3ab1ba5) )
+	ROM_LOAD16_BYTE( "95414495.hi", 0x00000, 0x080000, CRC(ba683acd) SHA1(15b33c74abd86d26f7b03b121e766e240a23ec1e) )
+	sc_monl_sounds
 ROM_END
 
 ROM_START( sc4monotb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95415494.lo", 0x00001, 0x080000, CRC(2bffa151) SHA1(fbf1a18a92434a19be1f53d2967ffca3b0b1da6a) )
 	ROM_LOAD16_BYTE( "95415495.hi", 0x00000, 0x080000, CRC(1f831b76) SHA1(bf91cb69d482aba9df2fc5e7404df8f610b57ae3) )
-	sc_monop_others
+	sc_monl_sounds
 ROM_END
 
-ROM_START( sc4monoah )
+ROM_START( sc4monotc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95415784.lo", 0x00001, 0x080000, CRC(7f9bcded) SHA1(117e652fcc29c2acffba13c0082ac10c52f983e2) )
-	ROM_LOAD16_BYTE( "95415785.hi", 0x00000, 0x080000, CRC(0885584c) SHA1(6ad16cb00535198b21a91574f953f2437c57ef1d) )
-	sc_monop_others
+	ROM_LOAD16_BYTE( "95412230.lo", 0x00001, 0x080000, CRC(45f66b73) SHA1(049bfdbd73a2b8bd8222d0c1eca15c2d64414d51) )
+	ROM_LOAD16_BYTE( "95412231.hi", 0x00000, 0x080000, CRC(aac2e0a4) SHA1(e652dfd759128323b0f40a4a4118186a1dd57c23) )
+	sc_monl_sounds
 ROM_END
 
-ROM_START( sc4monoai )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95415786.lo", 0x00001, 0x080000, CRC(e639315d) SHA1(24fad5452338161e0838249229118608fb09417f) )
-	ROM_LOAD16_BYTE( "95415787.hi", 0x00000, 0x080000, CRC(7e896b08) SHA1(887d25ee15784d7b672f1d85d17fa04d98ed2e31) )
-	sc_monop_others
-ROM_END
 
-ROM_START( sc4monoaj )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95415788.lo", 0x00001, 0x080000, CRC(cf1ab197) SHA1(eb1e166e057505b0957871c2f00b08a97428ca7c) )
-	ROM_LOAD16_BYTE( "95415789.hi", 0x00000, 0x080000, CRC(297508d2) SHA1(86933487fb4c63f0159f3b133509db503a4c6229) )
-	sc_monop_others
-ROM_END
 
-ROM_START( sc4monoak )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95415790.lo", 0x00001, 0x080000, CRC(34ff1c8e) SHA1(41cfc6ef8ed15fa4ce368bd9a4e0a7e46be362db) )
-	ROM_LOAD16_BYTE( "95415791.hi", 0x00000, 0x080000, CRC(83e98ff0) SHA1(70c69ee23383530d0252b84895027af2d651fd07) )
-	sc_monop_others
-ROM_END
 
 ROM_START( sc4mondxa )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -20805,90 +20822,85 @@ ROM_START( sc4mondxg )
 	sc_monop_others
 ROM_END
 
-ROM_START( sc4mcas )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95412230.lo", 0x00001, 0x080000, CRC(45f66b73) SHA1(049bfdbd73a2b8bd8222d0c1eca15c2d64414d51) )
-	ROM_LOAD16_BYTE( "95412231.hi", 0x00000, 0x080000, CRC(aac2e0a4) SHA1(e652dfd759128323b0f40a4a4118186a1dd57c23) )
-	sc_mcas_others
-ROM_END
 
-ROM_START( sc4mcasa )
+
+ROM_START( sc4cmon )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95414526.lo", 0x00001, 0x080000, CRC(ea7dba5e) SHA1(e3f803ab5c4101e11084c30279679839ba60717f) )
 	ROM_LOAD16_BYTE( "95414527.hi", 0x00000, 0x080000, CRC(7095fbe4) SHA1(8b52db7d3ca52747a31894a88c7acecda1af277a) )
-	sc_mcas_others
+	sc_monl_sounds
 ROM_END
 
 
-ROM_START( sc4mcasb )
+ROM_START( sc4cmona )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95414752.lo", 0x00001, 0x080000, CRC(21b6f763) SHA1(7dab85f5da4ec18fe94b5f203ce7724784ff36d1) )
 	ROM_LOAD16_BYTE( "95414753.hi", 0x00000, 0x080000, CRC(bbe5e9a6) SHA1(7b915f711453ad0e078ab2aabd384138782a395a) )
-	sc_mcas_others
+	sc_monl_sounds
 ROM_END
 
 
-ROM_START( sc4mcasc )
+ROM_START( sc4cmonb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95414758.lo", 0x00001, 0x080000, CRC(bcda234a) SHA1(e48563941e26fa900587ac2de4b0858deb467b3e) )
 	ROM_LOAD16_BYTE( "95414759.hi", 0x00000, 0x080000, CRC(f8c45405) SHA1(f22c42cc38e2da2ca6f74c57cfbca3c2c9bd924f) )
-	sc_mcas_others
+	sc_monl_sounds
 ROM_END
 
 
-ROM_START( sc4mcasd )
+ROM_START( sc4cmonc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95415520.lo", 0x00001, 0x080000, CRC(9293c6ac) SHA1(ac65fb59f0da86031ea8f3b1249f75685105152c) )
 	ROM_LOAD16_BYTE( "95415521.hi", 0x00000, 0x080000, CRC(91534979) SHA1(d1618a40c4cc32e0f825603b58cacaa9b59da0a3) )
-	sc_mcas_others
+	sc_monl_sounds
 ROM_END
 
 
-ROM_START( sc4mcase )
+ROM_START( sc4cmond )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95415522.lo", 0x00001, 0x080000, CRC(2cbfa7b1) SHA1(295dee90b19612879d12c72675f8327a2b1f0d2a) )
 	ROM_LOAD16_BYTE( "95415523.hi", 0x00000, 0x080000, CRC(c13bb898) SHA1(c52449e479c5629851a89d43f9f29fb7373aeca2) )
-	sc_mcas_others
+	sc_monl_sounds
 ROM_END
 
 
-ROM_START( sc4mcasf )
+ROM_START( sc4cmone )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95415526.lo", 0x00001, 0x080000, CRC(b91074c3) SHA1(a78b20fc978a177910dbbe45a37dc5d7d5d5f9dc) )
 	ROM_LOAD16_BYTE( "95415527.hi", 0x00000, 0x080000, CRC(d5e18c67) SHA1(842d28e15b8e24f551449144947ceabafd54d021) )
-	sc_mcas_others
+	sc_monl_sounds
 ROM_END
 
 
-ROM_START( sc4mcasg )
+ROM_START( sc4cmonf )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95415752.lo", 0x00001, 0x080000, CRC(a001f1a7) SHA1(29405a687e1c8bad471f96fdb2b091074f33475b) )
 	ROM_LOAD16_BYTE( "95415753.hi", 0x00000, 0x080000, CRC(8e36db12) SHA1(155999b67b4a01a5d5f8e460e2a49e023cb63146) )
-	sc_mcas_others
+	sc_monl_sounds
 ROM_END
 
 
-ROM_START( sc4mcash )
+ROM_START( sc4cmong )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95415754.lo", 0x00001, 0x080000, CRC(6fdff81a) SHA1(3517866f169aa05d728878b974b971cb9b1d198c) )
 	ROM_LOAD16_BYTE( "95415755.hi", 0x00000, 0x080000, CRC(3c94180f) SHA1(498d617c29b99159e34dab4a07d8c38e22331176) )
-	sc_mcas_others
+	sc_monl_sounds
 ROM_END
 
 
-ROM_START( sc4mcasi )
+ROM_START( sc4cmonh )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95415756.lo", 0x00001, 0x080000, CRC(c28a5aed) SHA1(2b6fa68615352ef327a5d44bced1456d89c50e1c) )
 	ROM_LOAD16_BYTE( "95415757.hi", 0x00000, 0x080000, CRC(f9242cf5) SHA1(32cfd4cdc121d74673b6ebd04ccee1d0328b7928) )
-	sc_mcas_others
+	sc_monl_sounds
 ROM_END
 
 
-ROM_START( sc4mcasj )
+ROM_START( sc4cmoni )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95415758.lo", 0x00001, 0x080000, CRC(2625469c) SHA1(517be2d09e6c3146a8ecf57fbedc1a9a28a2cf44) )
 	ROM_LOAD16_BYTE( "95415759.hi", 0x00000, 0x080000, CRC(3daac87f) SHA1(8748df6ea4e7f35b71f53b79c16979d23b8981f9) )
-	sc_mcas_others
+	sc_monl_sounds
 ROM_END
 
 
@@ -20899,7 +20911,7 @@ ROM_START( sc4mcask )
 	sc_mcas_others
 ROM_END
 
-ROM_START( sc4mcasl )
+ROM_START( sc4mcas )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95420694.lo", 0x00001, 0x080000, CRC(902cbf08) SHA1(974b67da5c2da372a47569add00f593328de8f30) )
 	ROM_LOAD16_BYTE( "95420695.hi", 0x00000, 0x080000, CRC(4b5d5013) SHA1(e0600a752b7ca05fd1f274ee3bbe8e14257a8806) )
@@ -24827,7 +24839,7 @@ GAME( 200?, sc4ggtba	,sc4ggtb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden
 GAME( 200?, sc4ggtbb	,sc4ggtb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden X (Mazooma) (PR2056, TBOX) (Scorpion 4) (Top Box, set 3)", GAME_NOT_WORKING ) // ^^
 // PR2056  GOLD X TRIPLE         BARX SOUNDS         J  GOLD X TRIPLE  (this was in a set just called 'top box')
 GAME( 200?, sc4tbox		,sc4ggtb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden X (Mazooma) (PR2056, TBOX) (Scorpion 4) (Top Box, set 4)", GAME_NOT_WORKING )
-// PR2056  GOLD X TRIPLE         BARX SOUNDS         GOLD X TRIPLE   (these were in a Monopoly set, did it use the same top box code?)
+// PR2056  GOLD X TRIPLE         BARX SOUNDS         GOLD X TRIPLE   (these were in a Monopoly set, did it use the same top box code?, could be for Monopoly Deluxe?)
 GAME( 200?, sc4monog	,sc4ggtb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden X (Mazooma) (PR2056, TBOX) (Scorpion 4) (Top Box, set 5)", GAME_NOT_WORKING )// PR2056  GOLD X TRIPLE         BARX SOUNDS         GOLD X TRIPLE
 GAME( 200?, sc4monoga	,sc4ggtb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden X (Mazooma) (PR2056, TBOX) (Scorpion 4) (Top Box, set 6)", GAME_NOT_WORKING )// PR2056  GOLD X TRIPLE         BARX SOUNDS         GOLD X TRIPLE
 
@@ -25950,13 +25962,139 @@ GAME( 200?, sc4monobl	,sc4monob,	sc4, sc4, sc4_state, sc4monob, ROT0, "BFM","Mon
 GAME( 200?, sc4monobm	,sc4monob,	sc4, sc4, sc4_state, sc4monob, ROT0, "BFM","Monopoly (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING )
 
 
-// PR2164 CLUB MONOPOLY         CLB MONOPOLY WOW  CLUB  CWOW SOUNDS         CLUB MONOPOLOY
-GAME( 200?, sc4mclb		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4mclba	,sc4mclb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4mclbb	,sc4mclb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Club (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4mclbc	,sc4mclb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Club (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4mclbd	,sc4mclb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Club (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4mclbe	,sc4mclb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Club (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4mono5_reel_configs[6] =
+{
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	0,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4mono5)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4mono5_reel_configs;
+}
+
+GAME( 200?, sc4mono5	,0,			sc4, sc4, sc4_state, sc4mono5, ROT0, "Mazooma","Monopoly 5 (PR7089, MONF) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // PR7089  MONO  5         MONO SOUNDS             MONOPOLY
+GAME( 200?, sc4mono5a	,sc4mono5,	sc4, sc4, sc4_state, sc4mono5, ROT0, "Mazooma","Monopoly 5 (PR7089, MONF) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING ) // PR7089  MONO  5         MONO SOUNDS             MONOPOLY
+
+const stepper_interface* sc4monoa_reel_configs[6] =
+{
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	0,
+	0,
+	0,
+};
+
+
+
+DRIVER_INIT_MEMBER(sc4_state,sc4monoa)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4monoa_reel_configs;
+}
+
+DRIVER_INIT_MEMBER(sc4_state,sc4monoa_mbus)
+{
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4monoa_reel_configs;
+}
+
+GAME( 200?, sc4monoa	,0,			sc4, sc4, sc4_state, sc4monoa_mbus, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // PR2122 MONOPOLY         MONOPOLY  TRIPLE  ARCADE  MONO SOUNDS             MONOPOLY
+GAME( 200?, sc4monoaa	,sc4monoa,	sc4, sc4, sc4_state, sc4monoa_mbus, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING ) // ^^
+GAME( 200?, sc4monoad	,sc4monoa,	sc4, sc4, sc4_state, sc4monoa_mbus, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING ) // ^^
+GAME( 200?, sc4monoae	,sc4monoa,	sc4, sc4, sc4_state, sc4monoa_mbus, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING ) // ^^
+GAME( 200?, sc4monoaf	,sc4monoa,	sc4, sc4, sc4_state, sc4monoa_mbus, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING ) // ^^
+GAME( 200?, sc4monoag	,sc4monoa,	sc4, sc4, sc4_state, sc4monoa_mbus, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING ) // ^^
+// PAY UNIT ERR 17
+GAME( 200?, sc4monoab	,sc4monoa,	sc4, sc4, sc4_state, sc4monoa, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING ) // ^^
+GAME( 200?, sc4monoac	,sc4monoa,	sc4, sc4, sc4_state, sc4monoa, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING ) // ^^
+GAME( 200?, sc4monoah	,sc4monoa,	sc4, sc4, sc4_state, sc4monoa, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING ) // ^^
+GAME( 200?, sc4monoai	,sc4monoa,	sc4, sc4, sc4_state, sc4monoa, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4monoaj	,sc4monoa,	sc4, sc4, sc4_state, sc4monoa, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 11)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4monoak	,sc4monoa,	sc4, sc4, sc4_state, sc4monoa, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 12)", GAME_NOT_WORKING )// ^^
+
+GAME( 200?, sc4monoal	,sc4monoa,	sc4, sc4, sc4_state, sc4monoa, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 13)", GAME_NOT_WORKING )// PR2122 MONOPOLY         MONOPOLY  TRIPLE  ARCADE  MONOPOLY TRIPLE
+GAME( 200?, sc4monoam	,sc4monoa,	sc4, sc4, sc4_state, sc4monoa, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 14)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4monoan	,sc4monoa,	sc4, sc4, sc4_state, sc4monoa, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 15)", GAME_NOT_WORKING )// PR2122 MONOPOLY         MONO SOUNDS                   MONOPOLY
+GAME( 200?, sc4monoao	,sc4monoa,	sc4, sc4, sc4_state, sc4monoa, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 16)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4monoap	,sc4monoa,	sc4, sc4, sc4_state, sc4monoa, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 17)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4monoaq	,sc4monoa,	sc4, sc4, sc4_state, sc4monoa, ROT0, "Mazooma","Monopoly Triple (PR2122, MOTR) (Mazooma) (Scorpion 4) (set 18)", GAME_NOT_WORKING )// ^^
+
+GAME( 200?, sc4monop	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Triple (PR2056, TBOX) (Mazooma) (Scorpion 4) (Top Box, set 1)", GAME_NOT_WORKING ) // PR2056  MONOP  TRIPLE         MONO SOUNDS         MONOP TRIPLE
+GAME( 200?, sc4monopa	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Triple (PR2056, TBOX) (Mazooma) (Scorpion 4) (Top Box, set 2)", GAME_NOT_WORKING ) // PR2056  MONOP  TRIPLE         MONO SOUNDS         MONOP TRIPLE
+
+
+const stepper_interface* sc4mondx_reel_configs[6] =
+{
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	0,
+	0,
+	0,
+};
+
+
+
+DRIVER_INIT_MEMBER(sc4_state,sc4mondx)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4mondx_reel_configs;
+}
+
+// So which Top Box roms should thse use? Why do some play without one?
+
+// Waits for Top Box
+GAME( 200?, sc4mondxd	,sc4mondx,	sc4, sc4, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.1) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )// PR2202 MONOPOLY DELUXE         MONOPOLY  DELUXE  MAZ       MONOPOLY  TRIPLE
+GAME( 200?, sc4mondxg	,sc4mondx,	sc4, sc4, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.1) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )// ^^
+// Plays without Top Box
+GAME( 200?, sc4mondxe	,sc4mondx,	sc4, sc4, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.1) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )// PR2202 MONOPOLY         MONOPOLY  TRIPLE  MAZ       MONOPOLY  DELUXE
+GAME( 200?, sc4mondxf	,sc4mondx,	sc4, sc4, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.1) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4mondxh	,sc4mondx,	sc4, sc4, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.1) (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )// ^^
+// Waits for Top Box
+GAME( 200?, sc4mondx	,0,			sc4, sc4, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.0) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )// PR2202 MONOPOLY DELUXE         MONOPOLY DELUXE MAZ MPDX SOUNDS             MONOPOLY
+GAME( 200?, sc4mondxa	,sc4mondx,	sc4, sc4, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.0) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )// ^^
+// Plays without Top Box
+GAME( 200?, sc4mondxb	,sc4mondx,	sc4, sc4, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.0) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4mondxc	,sc4mondx,	sc4, sc4, sc4_state, sc4mondx, ROT0, "Mazooma","Monopoly Deluxe (PR2202, MPDX 1.0) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )// ^^
+
+
+
+
+
+// I think this is different to the above, this is GM** (Grand Monopoly?)
+GAME( 200?, sc4mcas 	,0,	        sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 1)", GAME_NOT_WORKING ) // PR2354 MONOPOLY CASINO         MONOPOLY  TRIPLE  MAZ MONO SOUNDS         MONOPOLY
+GAME( 200?, sc4mcasm	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 2)", GAME_NOT_WORKING ) // ^^
+GAME( 200?, sc4mcasn	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 3)", GAME_NOT_WORKING ) // ^^
+GAME( 200?, sc4mcaso	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 4)", GAME_NOT_WORKING ) // ^^
+GAME( 200?, sc4mcasp	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 5)", GAME_NOT_WORKING ) // ^^
+GAME( 200?, sc4mcasq	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 6)", GAME_NOT_WORKING ) // ^^
+GAME( 200?, sc4mcasr	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 7)", GAME_NOT_WORKING ) // ^^
+GAME( 200?, sc4mcass	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 8)", GAME_NOT_WORKING ) // ^^
+GAME( 200?, sc4mcast	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 9)", GAME_NOT_WORKING ) // ^^
+GAME( 200?, sc4mcasv	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 10)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4mcasw	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 11)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4mcasx	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 12)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4mcasy	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 13)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4mcasz	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 14)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4mcas0	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 15)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4mcas1	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 16)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4mcas2	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 17)", GAME_NOT_WORKING )// ^^
+GAME( 200?, sc4mcas3	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 18)", GAME_NOT_WORKING )// ^^
+// these have a different internal code compared to the PR2056 sets above which strongly indicates they're for the 'GMBU' sets above 
+GAME( 200?, sc4mcask	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2056) (Mazooma) (Scorpion 4) (GMTB, Top Box, set 1)", GAME_NOT_WORKING ) // PR2056  MONOP  TRIPLE         MONO SOUNDS         MONOP TRIPLE
+GAME( 200?, sc4mcasu	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2056) (Mazooma) (Scorpion 4) (GMTB, Top Box, set 2)", GAME_NOT_WORKING ) // ^^
+GAME( 200?, sc4mcas4	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2056) (Mazooma) (Scorpion 4) (GMTB, Top Box, set 3)", GAME_NOT_WORKING ) // ^^
+
+
+
 
 const stepper_interface* sc4mont_reel_configs[6] =
 {
@@ -29182,86 +29320,6 @@ GAME( 200?, sc4mmadf	,sc4mmad,	sc4, sc4, sc4_state, sc4mmad, ROT0, "Mazooma","Mo
 GAME( 200?, sc4mmadg	,sc4mmad,	sc4, sc4, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR0000) (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING ) // incomplete pairing
 
 
-GAME( 200?, sc4monop	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2056) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // PR2056  MONOP  TRIPLE         MONO SOUNDS         MONOP TRIPLE
-GAME( 200?, sc4monopa	,sc4monop,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2056) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING ) // PR2056  MONOP  TRIPLE         MONO SOUNDS         MONOP TRIPLE
-
-GAME( 200?, sc4mono5	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR7089) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // PR7089  MONO  5         MONO SOUNDS             MONOPOLY
-GAME( 200?, sc4mono5a	,sc4mono5,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR7089) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING ) // PR7089  MONO  5         MONO SOUNDS             MONOPOLY
-
-GAME( 200?, sc4monoa	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2122) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // PR2122 MONOPOLY         MONOPOLY  TRIPLE  ARCADE  MONO SOUNDS             MONOPOLY
-GAME( 200?, sc4monoaa	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2122) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4monoab	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2122) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4monoac	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2122) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4monoad	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2122) (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4monoae	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2122) (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4monoaf	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2122) (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4monoag	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2122) (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4monoah	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2122) (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4monoai	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2122) (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4monoaj	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2122) (Mazooma) (Scorpion 4) (set 11)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4monoak	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2122) (Mazooma) (Scorpion 4) (set 12)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4monoal	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2122) (Mazooma) (Scorpion 4) (set 13)", GAME_NOT_WORKING )// PR2122 MONOPOLY         MONOPOLY  TRIPLE  ARCADE  MONOPOLY TRIPLE
-GAME( 200?, sc4monoam	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2122) (Mazooma) (Scorpion 4) (set 14)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4monoan	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2122) (Mazooma) (Scorpion 4) (set 15)", GAME_NOT_WORKING )// PR2122 MONOPOLY         MONO SOUNDS                   MONOPOLY
-GAME( 200?, sc4monoao	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2122) (Mazooma) (Scorpion 4) (set 16)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4monoap	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2122) (Mazooma) (Scorpion 4) (set 17)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4monoaq	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2122) (Mazooma) (Scorpion 4) (set 18)", GAME_NOT_WORKING )// ^^
-
-
-GAME( 200?, sc4mondx	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Deluxe (PR2202) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )// PR2202 MONOPOLY DELUXE         MONOPOLY DELUXE MAZ MPDX SOUNDS             MONOPOLY
-GAME( 200?, sc4mondxa	,sc4mondx,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Deluxe (PR2202) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4mondxb	,sc4mondx,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Deluxe (PR2202) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4mondxc	,sc4mondx,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Deluxe (PR2202) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4mondxd	,sc4mondx,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Deluxe (PR2202) (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )// PR2202 MONOPOLY DELUXE         MONOPOLY  DELUXE  MAZ       MONOPOLY  TRIPLE
-GAME( 200?, sc4mondxg	,sc4mondx,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Deluxe (PR2202) (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )// ^^ (found in an sc4a40 set)
-GAME( 200?, sc4mondxe	,sc4mondx,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Deluxe (PR2202) (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )// PR2202 MONOPOLY         MONOPOLY  TRIPLE  MAZ       MONOPOLY  DELUXE
-GAME( 200?, sc4mondxf	,sc4mondx,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Deluxe (PR2202) (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )// ^^
-// PR2202 MONOPOLY         MONOPOLY  TRIPLE  MAZ       MONOPOLY  DELUXE  (same as sc4mondx?)
-GAME( 200?, sc4mdlx		,sc4mondx,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Deluxe (Mazooma) (Scorpion 4)", GAME_NOT_WORKING )
-
-
-
-GAME( 200?, sc4monot	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly TTT (PR2133) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )// PR2133MONOPOLY TTT         MONOPOLY TTT  MAZ MONL SOUNDS         MONOPOLY
-GAME( 200?, sc4monota	,sc4monot,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly TTT (PR2133) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4monotb	,sc4monot,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly TTT (PR2133) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4mcas		,sc4monot,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly TTT (PR2133) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING ) // PR2133MONOPOLY TTT         MONOPOLY TTT  ARCADE  MONL SOUNDS         MONOPOLY
-
-// WRONG SOUNDS, PAY UNIT ERR 17
-GAME( 200?, sc4mcasa	,0,    	    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2133) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // PR2133 CASINO MONOPOLY             MONOPOLY      ARCADE  MONL SOUNDS             MONOPOLY
-GAME( 200?, sc4mcasb	,sc4mcasa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2133) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4mcasc	,sc4mcasa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2133) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4mcasd	,sc4mcasa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2133) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4mcase	,sc4mcasa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2133) (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4mcasf	,sc4mcasa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2133) (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4mcasg	,sc4mcasa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2133) (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4mcash	,sc4mcasa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2133) (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4mcasi	,sc4mcasa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2133) (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4mcasj	,sc4mcasa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2133) (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING )// ^^
-
-GAME( 200?, sc4mcasl	,0,	        sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 1)", GAME_NOT_WORKING ) // PR2354 MONOPOLY CASINO         MONOPOLY  TRIPLE  MAZ MONO SOUNDS         MONOPOLY
-GAME( 200?, sc4mcasm	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 2)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4mcasn	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 3)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4mcaso	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 4)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4mcasp	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 5)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4mcasq	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 6)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4mcasr	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 7)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4mcass	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 8)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4mcast	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 9)", GAME_NOT_WORKING ) // ^^
-GAME( 200?, sc4mcasv	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 10)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4mcasw	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 11)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4mcasx	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 12)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4mcasy	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 13)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4mcasz	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 14)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4mcas0	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 15)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4mcas1	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 16)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4mcas2	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 17)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4mcas3	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 18)", GAME_NOT_WORKING )// ^^
-
-GAME( 200?, sc4mcask	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2056) (Mazooma) (Scorpion 4) (GMTB, Top Box, set 1)", GAME_NOT_WORKING )// PR2056  MONOP  TRIPLE         MONO SOUNDS         MONOP TRIPLE
-GAME( 200?, sc4mcasu	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2056) (Mazooma) (Scorpion 4) (GMTB, Top Box, set 2)", GAME_NOT_WORKING )// ^^
-GAME( 200?, sc4mcas4	,sc4mcasl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2056) (Mazooma) (Scorpion 4) (GMTB, Top Box, set 3)", GAME_NOT_WORKING )// ^^
-
-
 const stepper_interface* sc4mdm_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
@@ -32145,6 +32203,35 @@ GAME( 200?, sc4jivea	,sc4jive,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jive M
 GAME( 200?, sc4jiveb	,sc4jive,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jive Money (PR2160) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4jivec	,sc4jive,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jive Money (PR2160) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4jived	,sc4jive,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jive Money (PR2160) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
+
+// no sound roms
+// PR2164 CLUB MONOPOLY         CLB MONOPOLY WOW  CLUB  CWOW SOUNDS         CLUB MONOPOLOY
+GAME( 200?, sc4mclb		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4mclba	,sc4mclb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4mclbb	,sc4mclb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Club (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4mclbc	,sc4mclb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Club (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4mclbd	,sc4mclb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Club (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4mclbe	,sc4mclb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Club (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND )
+
+
+
+GAME( 200?, sc4monot	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly TTT (PR2133) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PR2133MONOPOLY TTT         MONOPOLY TTT  MAZ MONL SOUNDS         MONOPOLY
+GAME( 200?, sc4monota	,sc4monot,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly TTT (PR2133) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND ) // ^^
+GAME( 200?, sc4monotb	,sc4monot,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly TTT (PR2133) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND ) // ^^
+GAME( 200?, sc4monotc	,sc4monot,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly TTT (PR2133) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PR2133MONOPOLY TTT         MONOPOLY TTT  ARCADE  MONL SOUNDS         MONOPOLY
+
+// WRONG SOUNDS, PAY UNIT ERR 17
+GAME( 200?, sc4cmon		,0,    	    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Casino Monopoly (PR2133) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PR2133 CASINO MONOPOLY             MONOPOLY      ARCADE  MONL SOUNDS             MONOPOLY
+GAME( 200?, sc4cmona	,sc4cmon,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Casino Monopoly (PR2133) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND ) // ^^
+GAME( 200?, sc4cmonb	,sc4cmon,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Casino Monopoly (PR2133) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND ) // ^^
+GAME( 200?, sc4cmonc	,sc4cmon,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Casino Monopoly (PR2133) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND ) // ^^
+GAME( 200?, sc4cmond	,sc4cmon,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Casino Monopoly (PR2133) (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND ) // ^^
+GAME( 200?, sc4cmone	,sc4cmon,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Casino Monopoly (PR2133) (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND ) // ^^
+GAME( 200?, sc4cmonf	,sc4cmon,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Casino Monopoly (PR2133) (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND ) // ^^
+GAME( 200?, sc4cmong	,sc4cmon,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Casino Monopoly (PR2133) (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND ) // ^^
+GAME( 200?, sc4cmonh	,sc4cmon,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Casino Monopoly (PR2133) (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_NO_SOUND ) // ^^
+GAME( 200?, sc4cmoni	,sc4cmon,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Casino Monopoly (PR2133) (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_NO_SOUND ) // ^^
+
 
 /****************************************************************************************************************************************************************************************************************/
 /****************************************************************************************************************************************************************************************************************/

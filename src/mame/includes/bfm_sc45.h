@@ -310,6 +310,10 @@ public:
 	DECLARE_DRIVER_INIT(sc4lotrf);
 	DECLARE_DRIVER_INIT(sc4magic);
 	DECLARE_DRIVER_INIT(sc4maxim);
+	DECLARE_DRIVER_INIT(sc4mono5);
+	DECLARE_DRIVER_INIT(sc4monoa);
+	DECLARE_DRIVER_INIT(sc4monoa_mbus);
+	DECLARE_DRIVER_INIT(sc4mondx);
 
 	
 	
@@ -1723,6 +1727,11 @@ INPUT_PORTS_EXTERN( sc4_base );
 	/* 95004291 MONEYSPINNER PR1158 */ \
 	ROM_LOAD( "95004291.snd", 0x000000, 0x080000, CRC(0ea304f7) SHA1(3d524e108cd12e83956fec3997316a92a9e0898d) ) \
 
+#define sc_monl_sounds \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "monl sounds", 0x0000, 0x100000, NO_DUMP ) \
+
+
 #define sc_monop_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	/* MPDX SOUNDS */ \
@@ -1804,13 +1813,13 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 
 #define sc_mowow_others \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	/* WOW SOUNDS - wrong for this game, wants "WOTW SOUNDS" */ \
+	ROM_LOAD( "95008850.bin", 0x000000, 0x0af41f, CRC(8ca16e09) SHA1(9b494ad6946c2c7bbfad6591e62fa699fd53b6dc) ) \
 	ROM_REGION( 0x5000, "pics", 0 ) \
 	ROM_LOAD( "95890712.bin", 0x0000, 0x5000, CRC(ec6db00b) SHA1(d16a1527caa3c115e3326c897ce0fa66e3a0420d) ) \
 	ROM_LOAD( "95890713.bin", 0x0000, 0x5000, CRC(f0bb40b7) SHA1(33c19dab3086cdeae4f503fbf3f3cc5f0dad98c4) ) \
 	ROM_LOAD( "95890714.bin", 0x0000, 0x5000, CRC(33e16227) SHA1(87efc1a046ef6af0b72cc76a6ee393a4d1ddbce3) ) \
-	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	/* WOW SOUNDS - wrong for this game, wants "WOTW SOUNDS" */ \
-	ROM_LOAD( "95008850.bin", 0x000000, 0x0af41f, CRC(8ca16e09) SHA1(9b494ad6946c2c7bbfad6591e62fa699fd53b6dc) ) \
 	ROM_REGION( 0x400000, "others", ROMREGION_ERASE00 ) \
 	/* 95008551 STEPITS5 PR1666  - wrong game?? */ \
 	ROM_LOAD( "95008551.bin", 0x100000, 0x100000, CRC(2d89a52a) SHA1(244101df7f6beae545f9b823750f908f532ac1e4) ) \
@@ -1818,12 +1827,15 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_nmare_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	/* PR3002 ELM STREET SOUNDS11 */ \
-	ROM_LOAD( "95008664.bin", 0x000000, 0x100000, CRC(54d245d7) SHA1(503db10681bc1d6cf1cffb2a6f818c5d912a7f56) ) \
-	ROM_LOAD( "95008665.bin", 0x100000, 0x100000, CRC(79a00527) SHA1(b8207d3a81e97b2233fea1df883a4128388570e4) ) \
 	/* PR3002 ELM STREET SOUNDS11 (alt checksum..) */ \
 	ROM_LOAD( "95008703.bin", 0x000000, 0x100000, CRC(5c095089) SHA1(ffba71efccf4679c2b29ab620e67f3fa45ff19d4) ) \
 	ROM_LOAD( "95008704.bin", 0x100000, 0x100000, CRC(61e5d6f4) SHA1(6d221e0b3dce7507253bb7f07d99d03025d813cb) ) \
+	ROM_REGION( 0x400000, "altymz", ROMREGION_ERASE00 ) \
+	/* PR3002 ELM STREET SOUNDS11 */ \
+	ROM_LOAD( "95008664.bin", 0x000000, 0x100000, CRC(54d245d7) SHA1(503db10681bc1d6cf1cffb2a6f818c5d912a7f56) ) \
+	ROM_LOAD( "95008665.bin", 0x100000, 0x100000, CRC(79a00527) SHA1(b8207d3a81e97b2233fea1df883a4128388570e4) ) \
+
+
 
 #define sc_nunsb_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -2971,6 +2983,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_monob_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	/* both of these are the same, one is just padded */ \
 	ROM_LOAD( "95008359.bin", 0x0000, 0x0e89fa, CRC(763e4367) SHA1(c44b70f8336c2d6c00cd0dde9b6ca014667c59a6) ) \
 	ROM_LOAD( "monopoly95008359_sound1.bin", 0x0000, 0x100000, CRC(93f005f2) SHA1(d2351982d6352d9793efac617ac9fb9569f229c6) ) \
 
@@ -2987,6 +3000,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_mclb_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "cwow sounds", 0x000000, 0x100000, NO_DUMP ) \
 
 #define sc_mdlx_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
