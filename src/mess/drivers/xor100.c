@@ -202,14 +202,17 @@ WRITE8_MEMBER( xor100_state::fdc_dcont_w )
 
     */
 
-	/* drive select */
-	if (BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
-	if (BIT(data, 1)) wd17xx_set_drive(m_fdc, 1);
+	// drive select
+	floppy_image_device *floppy = NULL;
 
-	floppy_mon_w(m_floppy0, CLEAR_LINE);
-	floppy_mon_w(m_floppy1, CLEAR_LINE);
-	floppy_drive_set_ready_state(m_floppy0, 1, 1);
-	floppy_drive_set_ready_state(m_floppy1, 1, 1);
+	if (BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (BIT(data, 2)) floppy = m_floppy2->get_device();
+	if (BIT(data, 3)) floppy = m_floppy3->get_device();
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy) floppy->mon_w(0);
 }
 
 WRITE8_MEMBER( xor100_state::fdc_dsel_w )
@@ -237,7 +240,7 @@ WRITE8_MEMBER( xor100_state::fdc_dsel_w )
 	case 3: m_fdc_dden = !m_fdc_dden; break;
 	}
 
-	wd17xx_dden_w(m_fdc, m_fdc_dden);
+	m_fdc->dden_w(m_fdc_dden);
 }
 
 /* Memory Maps */
@@ -260,7 +263,7 @@ static ADDRESS_MAP_START( xor100_io, AS_IO, 8, xor100_state )
 	AM_RANGE(0x0a, 0x0a) AM_READ(prom_disable_r)
 	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("DSW0") AM_WRITE(baud_w)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE_LEGACY(WD1795_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE(WD1795_TAG, fd1795_t, read, write)
 	AM_RANGE(0xfc, 0xfc) AM_READWRITE(fdc_wait_r, fdc_dcont_w)
 	AM_RANGE(0xfd, 0xfd) AM_WRITE(fdc_dsel_w)
 ADDRESS_MAP_END
@@ -348,27 +351,23 @@ INPUT_PORTS_END
 
 /* COM5016 Interface */
 
-WRITE_LINE_MEMBER(xor100_state::com5016_fr_w)
+WRITE_LINE_MEMBER( xor100_state::com5016_fr_w )
 {
-	device_t *device = machine().device(I8251_A_TAG);
-	i8251_device* uart = dynamic_cast<i8251_device*>(device);
-	uart->transmit_clock();
-	uart->receive_clock();
+	m_uart_a->transmit_clock();
+	m_uart_a->receive_clock();
 }
 
-WRITE_LINE_MEMBER(xor100_state::com5016_ft_w)
+WRITE_LINE_MEMBER( xor100_state::com5016_ft_w )
 {
-	device_t *device = machine().device(I8251_B_TAG);
-	i8251_device* uart = dynamic_cast<i8251_device*>(device);
-	uart->transmit_clock();
-	uart->receive_clock();
+	m_uart_b->transmit_clock();
+	m_uart_b->receive_clock();
 }
 
 static COM8116_INTERFACE( com5016_intf )
 {
 	DEVCB_NULL,					/* fX/4 output */
-	DEVCB_DRIVER_LINE_MEMBER(xor100_state,com5016_fr_w),	/* fR output */
-	DEVCB_DRIVER_LINE_MEMBER(xor100_state,com5016_ft_w),	/* fT output */
+	DEVCB_DRIVER_LINE_MEMBER(xor100_state, com5016_fr_w),	/* fR output */
+	DEVCB_DRIVER_LINE_MEMBER(xor100_state, com5016_ft_w),	/* fT output */
 	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },	// WRONG?
 	{ 101376, 67584, 46080, 37686, 33792, 16896, 8448, 4224, 2816, 2534, 2112, 1408, 1056, 704, 528, 264 },	// WRONG?
 };
@@ -407,7 +406,6 @@ static const i8251_interface terminal_8251_intf =
 
 READ8_MEMBER(xor100_state::i8255_pc_r)
 {
-	centronics_device *centronics = machine().device<centronics_device>("centronics");
 	/*
 
         bit     description
@@ -426,10 +424,10 @@ READ8_MEMBER(xor100_state::i8255_pc_r)
 	UINT8 data = 0;
 
 	/* on line */
-	data |= centronics->vcc_r() << 4;
+	data |= m_centronics->vcc_r() << 4;
 
 	/* busy */
-	data |= centronics->busy_r() << 5;
+	data |= m_centronics->busy_r() << 5;
 
 	return data;
 }
@@ -440,7 +438,7 @@ static I8255A_INTERFACE( printer_8255_intf )
 	DEVCB_DEVICE_MEMBER(CENTRONICS_TAG, centronics_device, write),
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(CENTRONICS_TAG, centronics_device, strobe_w),
-	DEVCB_DRIVER_MEMBER(xor100_state,i8255_pc_r),
+	DEVCB_DRIVER_MEMBER(xor100_state, i8255_pc_r),
 	DEVCB_NULL
 };
 
@@ -453,29 +451,33 @@ static const centronics_interface xor100_centronics_intf =
 
 /* Z80-CTC Interface */
 
-WRITE_LINE_MEMBER(xor100_state::ctc_z0_w)
+WRITE_LINE_MEMBER( xor100_state::ctc_z0_w )
 {
 }
 
-WRITE_LINE_MEMBER(xor100_state::ctc_z1_w)
+WRITE_LINE_MEMBER( xor100_state::ctc_z1_w )
 {
 }
 
-WRITE_LINE_MEMBER(xor100_state::ctc_z2_w)
+WRITE_LINE_MEMBER( xor100_state::ctc_z2_w )
 {
 }
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_DRIVER_LINE_MEMBER(xor100_state,ctc_z0_w),			/* ZC/TO0 callback */
-	DEVCB_DRIVER_LINE_MEMBER(xor100_state,ctc_z1_w),			/* ZC/TO1 callback */
-	DEVCB_DRIVER_LINE_MEMBER(xor100_state,ctc_z2_w) 		/* ZC/TO2 callback */
+	DEVCB_DRIVER_LINE_MEMBER(xor100_state, ctc_z0_w),			/* ZC/TO0 callback */
+	DEVCB_DRIVER_LINE_MEMBER(xor100_state, ctc_z1_w),			/* ZC/TO1 callback */
+	DEVCB_DRIVER_LINE_MEMBER(xor100_state, ctc_z2_w) 		/* ZC/TO2 callback */
 };
 
 /* WD1795-02 Interface */
 
-WRITE_LINE_MEMBER( xor100_state::fdc_irq_w )
+static SLOT_INTERFACE_START( xor100_floppies )
+	SLOT_INTERFACE( "8ssdd", FLOPPY_8_SSDD ) // Shugart SA-100
+SLOT_INTERFACE_END
+
+void xor100_state::fdc_intrq_w(bool state)
 {
 	m_fdc_irq = state;
 	m_ctc->trg0(state);
@@ -487,7 +489,7 @@ WRITE_LINE_MEMBER( xor100_state::fdc_irq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( xor100_state::fdc_drq_w )
+void xor100_state::fdc_drq_w(bool state)
 {
 	m_fdc_drq = state;
 
@@ -498,26 +500,42 @@ WRITE_LINE_MEMBER( xor100_state::fdc_drq_w )
 	}
 }
 
-static const wd17xx_interface fdc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(xor100_state, fdc_irq_w),
-	DEVCB_DRIVER_LINE_MEMBER(xor100_state, fdc_drq_w),
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
-
 /* Terminal Interface */
 
-WRITE8_MEMBER(xor100_state::xor100_kbd_put)
+WRITE8_MEMBER( xor100_state::xor100_kbd_put )
 {
-	i8251_device* uart = dynamic_cast<i8251_device*>(machine().device(I8251_B_TAG));
-	uart->receive_character(data);
+	m_uart_b->receive_character(data);
 }
 
 static GENERIC_TERMINAL_INTERFACE( xor100_terminal_intf )
 {
-	DEVCB_DRIVER_MEMBER(xor100_state,xor100_kbd_put)
+	DEVCB_DRIVER_MEMBER(xor100_state, xor100_kbd_put)
 };
+
+static S100_INTERFACE( s100_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, Z80_INPUT_LINE_WAIT),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+};
+
+static SLOT_INTERFACE_START( xor100_s100_cards )
+SLOT_INTERFACE_END
 
 /* Machine Initialization */
 
@@ -551,19 +569,6 @@ void xor100_state::machine_reset()
 
 /* Machine Driver */
 
-static const floppy_interface xor100_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
-	NULL
-};
-
 static MACHINE_CONFIG_START( xor100, xor100_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
@@ -576,10 +581,27 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 	MCFG_I8255A_ADD(I8255A_TAG, printer_8255_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
 	MCFG_COM8116_ADD(COM5016_TAG, 5000000, com5016_intf)
-	MCFG_FD1795_ADD(WD1795_TAG, /*XTAL_8MHz/8,*/ fdc_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(xor100_floppy_interface)
+	MCFG_FD1795x_ADD(WD1795_TAG, XTAL_8MHz/8 *8)
+	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":0", xor100_floppies, "8ssdd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":1", xor100_floppies, "8ssdd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":2", xor100_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1795_TAG":3", xor100_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
+
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, xor100_centronics_intf)
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, xor100_terminal_intf)
+
+	// S-100
+	MCFG_S100_BUS_ADD(Z80_TAG, s100_intf)
+	MCFG_S100_SLOT_ADD("s100_1", xor100_s100_cards, NULL, NULL)
+	MCFG_S100_SLOT_ADD("s100_2", xor100_s100_cards, NULL, NULL)
+	MCFG_S100_SLOT_ADD("s100_3", xor100_s100_cards, NULL, NULL)
+	MCFG_S100_SLOT_ADD("s100_4", xor100_s100_cards, NULL, NULL)
+	MCFG_S100_SLOT_ADD("s100_5", xor100_s100_cards, NULL, NULL)
+	MCFG_S100_SLOT_ADD("s100_6", xor100_s100_cards, NULL, NULL)
+	MCFG_S100_SLOT_ADD("s100_7", xor100_s100_cards, NULL, NULL)
+	MCFG_S100_SLOT_ADD("s100_8", xor100_s100_cards, NULL, NULL)
+	MCFG_S100_SLOT_ADD("s100_9", xor100_s100_cards, NULL, NULL)
+	MCFG_S100_SLOT_ADD("s100_10", xor100_s100_cards, NULL, NULL)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
