@@ -230,6 +230,14 @@ public:
 	DECLARE_DRIVER_INIT(sc4count);
 	DECLARE_DRIVER_INIT(sc4ttomb);
 	DECLARE_DRIVER_INIT(sc4tbana);
+	DECLARE_DRIVER_INIT(sc4mtb);
+	DECLARE_DRIVER_INIT(sc4mtbcl);
+	DECLARE_DRIVER_INIT(sc4monob);
+	DECLARE_DRIVER_INIT(sc4mont);
+	DECLARE_DRIVER_INIT(sc4opses);
+	DECLARE_DRIVER_INIT(sc4nmtj);
+	DECLARE_DRIVER_INIT(sc4rt);
+	DECLARE_DRIVER_INIT(sc4rbank);
 
 	
 	
@@ -2027,7 +2035,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_stag_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "95008017.lo", 0x000000, 0x100000, CRC(dab74220) SHA1(321f765e1908b65ec9d3e64bb33533d78c9cc58a) ) /* start of rom is blank?! */ \
+	ROM_LOAD( "95008017.lo", 0x000000, 0x100000, BAD_DUMP CRC(dab74220) SHA1(321f765e1908b65ec9d3e64bb33533d78c9cc58a) ) /* start of rom is blank?! */ \
 	ROM_LOAD( "95008018.hi", 0x100000, 0x100000, CRC(ba328f08) SHA1(99880f22c2cac61b32c3e2a574b9b30daefefb3e) ) \
 
 #define sc_sahed_others \
@@ -2916,6 +2924,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_nudit_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	/* NGIT SOUNDS */ /* but header says it wants WILD SOUNDS? */ \
 	ROM_LOAD( "95404303.bin", 0x000000, 0x080000, CRC(adb71c93) SHA1(e91165b0280da9f79415b1cd7bb2ff8c1ea974fe) ) \
 	ROM_LOAD( "95404304.bin", 0x080000, 0x080000, CRC(96190422) SHA1(0e3192d959f1ea4296474684f04847c50a983400) ) \
 
