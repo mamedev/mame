@@ -14,11 +14,9 @@
 
 
 #include "emu.h"
-#include "formats/basicdsk.h"
-#include "imagedev/flopdrv.h"
 #include "machine/s100.h"
 #include "machine/com8116.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 
 
 
@@ -41,8 +39,8 @@ public:
 	virtual ioport_constructor device_input_ports() const;
 
 	// not really public
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_intrq_w(bool state);
+	void fdc_drq_w(bool state);
 
 protected:
 	// device-level overrides
@@ -61,10 +59,13 @@ protected:
 
 private:
 	// internal state
-	required_device<mb8866_device> m_fdc;
+	required_device<mb8866_t> m_fdc;
 	required_device<com8116_device> m_dbrg;
-	device_t* m_floppy0;
-	device_t* m_floppy1;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+	floppy_image_device *m_floppy;
 
 	// floppy state
 	int m_drive;				// selected drive
