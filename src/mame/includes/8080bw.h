@@ -53,6 +53,7 @@ public:
 	DECLARE_WRITE8_MEMBER(steelwkr_sh_port_3_w);
 	DECLARE_WRITE8_MEMBER(invadpt2_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(invadpt2_sh_port_2_w);
+	DECLARE_WRITE8_MEMBER(spacerng_sh_port_2_w);
 	DECLARE_WRITE8_MEMBER(spcewars_sh_port_w);
 	DECLARE_WRITE8_MEMBER(lrescue_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(lrescue_sh_port_2_w);

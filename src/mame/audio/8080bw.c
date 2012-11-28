@@ -66,12 +66,33 @@ WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_2_w)
 	if (rising_bits & 0x08) m_samples->start(4, 6);		/* FLEET */
 	if (rising_bits & 0x10) m_samples->start(3, 7);		/* SAUCER HIT */
 
-	m_c8080bw_flip_screen = BIT(data, 5) & BIT(ioport(CABINET_PORT_TAG)->read(), 0);
+	m_c8080bw_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
 
 	m_port_2_last_extra = data;
 }
 
 
+
+/*******************************************************/
+/*                                                     */
+/* Space Ranger                                        */
+/*                                                     */
+/*******************************************************/
+
+WRITE8_MEMBER(_8080bw_state::spacerng_sh_port_2_w)
+{
+	UINT8 rising_bits = data & ~m_port_2_last_extra;
+
+	if (rising_bits & 0x01) m_samples->start(4, 3);		/* FLEET */
+	if (rising_bits & 0x02) m_samples->start(4, 4);		/* FLEET */
+	if (rising_bits & 0x04) m_samples->start(4, 5);		/* FLEET */
+	if (rising_bits & 0x08) m_samples->start(4, 6);		/* FLEET */
+	if (rising_bits & 0x10) m_samples->start(3, 7);		/* SAUCER HIT */
+
+	m_c8080bw_flip_screen = BIT(~data, 5) & ioport(CABINET_PORT_TAG)->read();
+
+	m_port_2_last_extra = data;
+}
 
 /*******************************************************/
 /*                                                     */
