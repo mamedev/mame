@@ -5549,14 +5549,14 @@ ROM_START( sc4feverk )
 ROM_END
 
 
-ROM_START( sc4feveri )
+ROM_START( sc4fevdt )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95406360.lo", 0x00001, 0x080000, CRC(b0ab3f6b) SHA1(48bb1faba0917d16558221f4c0d1cd6a3fa72767) )
 	ROM_LOAD16_BYTE( "95406361.hi", 0x00000, 0x080000, CRC(88874cc3) SHA1(8afe9b666eac553380f9bb80459491a7b4811793) )
 	sc_fever7157_others
 ROM_END
 
-ROM_START( sc4feverj )
+ROM_START( sc4fevdta )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95406782.lo", 0x00001, 0x080000, CRC(7346b7d3) SHA1(24ff011729419b454430d7c4f92c4618338d7ec0) )
 	ROM_LOAD16_BYTE( "95406783.hi", 0x00000, 0x080000, CRC(fe3d7b7c) SHA1(7618444990a85d227850009393e130d128fe035f) )
@@ -5564,7 +5564,7 @@ ROM_START( sc4feverj )
 ROM_END
 
 
-ROM_START( sc4feverl )
+ROM_START( sc4fevdtb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95408920.lo", 0x00001, 0x080000, CRC(e29cf521) SHA1(c0b2211030caf5ff37bb6ffb813a0dfd7b72963d) )
 	ROM_LOAD16_BYTE( "95408921.hi", 0x00000, 0x080000, CRC(db3025ee) SHA1(e21f56adee4eda6a77618e82f6b029955e939741) )
@@ -24078,9 +24078,6 @@ GAME( 200?, sc4cclasp	,sc4cclas,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Club Cla
 
 
 
-// PR1208 COLOSSUS         95004235 COLOSSUS PR7155             COLOSSUS
-GAME( 200?, sc4colos	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Colossus (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // Not English
-
 
 const stepper_interface* sc4crcc_reel_configs[6] =
 {
@@ -24458,10 +24455,6 @@ GAME( 200?, sc4feverf	,sc4fever,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever (P
 GAME( 200?, sc4feverg	,sc4fever,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 GAME( 200?, sc4feverh	,sc4fever,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
 GAME( 200?, sc4feverk	,sc4fever,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
-//  PR1202 FEVER         95004239 FEVER PR7157
-GAME( 200?, sc4feveri	,sc4fever,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever (PR1202) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // Not English
-GAME( 200?, sc4feverj	,sc4fever,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever (PR1202) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING ) // Not English
-GAME( 200?, sc4feverl	,sc4fever,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever (PR1202) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING ) // Not English
 
 // PR7119 FEVER_PITCH         PR7119 FEVER PITCH SOUNDS11
 GAME( 200?, sc4fpitc	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
@@ -24477,9 +24470,6 @@ GAME( 200?, sc4fpitci	,sc4fpitc,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever Pi
 GAME( 200?, sc4fpitcj	,sc4fpitc,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
 GAME( 200?, sc4fpitck	,sc4fpitc,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
 
-// PR1216 FEVER ART12         95004318 FEVER T N PR1251
-GAME( 200?, sc4fevnx	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever The Next (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // Not English
-GAME( 200?, sc4fevnxa	,sc4fevnx,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever The Next (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING ) // Not English
 
 const stepper_interface* sc4fcc_reel_configs[6] =
 {
@@ -24601,10 +24591,6 @@ GAME( 200?, sc4fulltf	,sc4fullt,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Full Thr
 GAME( 200?, sc4fullti	,sc4fullt,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Full Throttle (013) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-// PR1224 THE GAME CASINO         95004285 THEGAME PR1153
-GAME( 200?, sc4gamcs	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","The Game Casino (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // Not English
-// PR1213 THE GAME         95004285 THEGAME PR1153
-GAME( 200?, sc4game		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","The Game (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // Not English
 
 
 // PR2162 GETTIN' ZIGGY         ZIGY SOUNDS         GETTIN' ZIGGY
@@ -25031,8 +25017,6 @@ GAME( 200?, sc4gggs		,sc4ggg,	sc4, sc4, sc4_state, sc4ggg, ROT0, "Mazooma","Gran
 
 
 
-// PR1211 GOUDKOORTS         95004288 GOUDKOORTS PR1151
-GAME( 200?, sc4goud		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Goudkoorts (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // Not English
 
 // PR7019 GRAB A GRANNY         GRANNY SOUNDS
 GAME( 200?, sc4gag		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grab A Granny (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
@@ -25072,13 +25056,6 @@ GAME( 200?, sc4hfg		,sc4hf,		sc4, sc4, sc4_state, sc4, ROT0, "BFM","Happy Fruits
 GAME( 200?, sc4hfcl		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Happy Fruits Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4hfcla	,sc4hfcl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Happy Fruits Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-// PR1216 HEATWAVE ART 12         95004287 HEATWAVE PR1156
-GAME( 200?, sc4heatw	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Heatwave (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // Not English
-
-// PR1254 HELLRAISER ART12         95004326 HELLRAISER PR1254
-GAME( 200?, sc4helrd	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Hellraiser (Bellfruit) [Dutch] (Scorpion 4)", GAME_NOT_WORKING )
-// PR1254 HELLRAISER ART12         95004326 HELLRAISER PR1254
-GAME( 200?, sc4helrs	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Hellraiser (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
 
 
@@ -25241,9 +25218,6 @@ GAME( 200?, sc4kaleic	,sc4kalei,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Kaleidos
 GAME( 200?, sc4kaleid	,sc4kalei,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Kaleidoscope (051) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4kaleie	,sc4kalei,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Kaleidoscope (051) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-// PR1209 LAS VEGAS         95004261 LASVEGAS PR7159
-GAME( 200?, sc4lasv		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Las Vegas (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // Not English
-GAME( 200?, sc4lasva	,sc4lasv,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Las Vegas (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING ) // Not English
 
 // PR1001  LET IT ROLL         PR1001 LETITROLL SOUNDS11
 GAME( 200?, sc4lir		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
@@ -25552,13 +25526,7 @@ GAME( 200?, sc4maximf	,sc4maxim,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Maxi
 GAME( 200?, sc4maximg	,sc4maxim,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Maximus Cash (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
 
-// A:2 A:3 to boot
-// PR1217 MILJONAIRSART12         95004305 MILJONAIRE PR1157
-GAME( 200?, sc4miljo	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Miljonairs (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // Not English
 
-// A:2 A:3 to boot
-// PR1223 MILJONAIRS         95004305 MILJONAIRE PR1157
-GAME( 200?, sc4milja	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Miljonairs Arcade (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // Not English
 
 const stepper_interface* sc4mgr_reel_configs[6] =
 {
@@ -25909,8 +25877,6 @@ GAME( 200?, sc4pmania	,sc4pmani,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pac 
 // PR7151 PARTY TIME 1.02         95008113 G PARTYTIME SOUNDS11
 GAME( 200?, sc4party	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Nova","Party Time (German) (Nova) (Scorpion 4)", GAME_NOT_WORKING )
 
-//  PR1205 PAY TIME         95004224 PAYTIME PR7156             PAY TIME
-GAME( 200?, sc4paytm	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Pay Time (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // Not English
 
 const stepper_interface* sc4pgold_reel_configs[6] =
 {
@@ -25937,11 +25903,6 @@ GAME( 200?, sc4pgoldd	,sc4pgold,	sc4, sc4, sc4_state, sc4pgold, ROT0, "BFM","Pha
 GAME( 200?, sc4pgoldf	,sc4pgold,	sc4, sc4, sc4_state, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
 
-// same name, but a different game? (Less reels..)
-//  PR1261 PHARAOH'S GOLD         95004316 CAS PHAR GOLD PR1261
-GAME( 200?, sc4pglcs	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Pharaoh's Gold Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // Not English
-GAME( 200?, sc4pglcsa	,sc4pglcs,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Pharaoh's Gold Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING ) // Not English
-GAME( 200?, sc4pglcsb	,sc4pglcs,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Pharaoh's Gold Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING ) // Not English
 
 
 
@@ -26069,9 +26030,6 @@ GAME( 200?, sc4quidra	,sc4quidr,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Quid Roc
 GAME( 200?, sc4quidrb	,sc4quidr,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Quid Rock (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4quidrc	,sc4quidr,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Quid Rock (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-// PR1206 RED ALERT         95004266 REDALERT PR1051
-GAME( 200?, sc4redad	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Red Alert (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // Not English
-GAME( 200?, sc4redada	,sc4redad,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Red Alert (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING ) // Not English
 
 // PR2542 RED DRAGON 011         REDDRAGONSND           RED   DRAGON
 GAME( 200?, sc4rdrag	,0,			sc4, sc4, sc4_state, sc4mbus, ROT0, "Qps","Red Dragon (011) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
@@ -26117,11 +26075,6 @@ GAME( 200?, sc4rotcb	,sc4rotc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Return
 GAME( 200?, sc4rotcc	,sc4rotc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Return Of The Count (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 GAME( 200?, sc4rotcd	,sc4rotc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Return Of The Count (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 
-// PR1252 REVOLUTION  NEXT         95004320 REVOLUTIONTN PR1252
-GAME( 200?, sc4rvlnx	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Revolution The Next (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // Not English
-
-// PR1203 REVOLUTION         95004259 REVOLUTION PR7158
-GAME( 200?, sc4rvl		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Revolution (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // Not English
 
 // PR2020 REVOLVER         REV SOUNDS               REVOLVER
 GAME( 200?, sc4revo		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Revolver (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
@@ -26146,8 +26099,6 @@ GAME( 200?, sc4richj	,sc4rich,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Rich Geeze
 GAME( 200?, sc4richk	,sc4rich,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
 GAME( 200?, sc4richl	,sc4rich,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING )
 
-// PR1222    RIO GRANDE         95004309 RIO GRANDE SOUNDS11
-GAME( 200?, sc4rio		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Rio Grande (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // Not English
 
 // PR2089 RISE TO THE TOP         RISE SOUNDS         RISE TO THE TOP
 GAME( 200?, sc4rttt		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Rise To The Top (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
@@ -26386,13 +26337,6 @@ GAME( 200?, sc4starpi	,sc4starp,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Starpriz
 GAME( 200?, sc4starpj	,sc4starp,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
 GAME( 200?, sc4starpk	,sc4starp,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
 
-// PR1219 STARS 'N BARS         95004290 STARSNBARS PR1159
-GAME( 200?, sc4strbr	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Stars 'n' Bars (PR1219) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // Not English
-GAME( 200?, sc4strbrb	,sc4strbr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Stars 'n' Bars (PR1219) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING ) // Not English
-// PR1263 SNBA ART13 STARS 'N' BARS ARCADE - ART13         95004290 STARSNBARS PR1159
-GAME( 200?, sc4strbra	,sc4strbr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // Not English
-GAME( 200?, sc4strbrc	,sc4strbr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING ) // Not English
-GAME( 200?, sc4strbrd	,sc4strbr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING ) // Not English
 
 // REEL 4 ERR 24
 // PR2005 STIR CRAZY         STIR SOUNDS           STIR  CRAZY
@@ -26747,17 +26691,13 @@ GAME( 200?, sc4tubb		,sc4tub,	sc4, sc4, sc4_state, sc4tub, ROT0, "BFM","Tubular 
 GAME( 200?, sc4tubc		,sc4tub,	sc4, sc4, sc4_state, sc4tub, ROT0, "BFM","Tubular Bells (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-// Turn on A:2 A:3
-// PR1214 TWILIGHT         95004299 TWILIGHT PR1154
-GAME( 200?, sc4twilt	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Twilight (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // Not English
+
 
 
 
 // PR7025 GERMAN VALHALLA         7025 VER1 SOUNDS
 GAME( 200?, sc4valnv	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Nova","Valhalla (German) (Nova) (Scorpion 4)", GAME_NOT_WORKING )
-// A:2 A:3 to boot
-// PR2040E VALHALLA...PR2040 SOUNDS V1.... (non-standard header)
-GAME( 200?, sc4valqp	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Qps / Eurocoin","Valhalla (Dutch) (Qps) (Scorpion 4)", GAME_NOT_WORKING )
+
 
 const stepper_interface* sc4vrgcl_reel_configs[6] =
 {
@@ -26918,8 +26858,6 @@ DRIVER_INIT_MEMBER(sc4_state,sc4wwys)
 GAME( 200?, sc4wwys		,0,			sc4, sc4, sc4_state, sc4wwys, ROT0, "BFM","Win When Your Spinning (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4wwysa	,sc4wwys,	sc4, sc4, sc4_state, sc4wwys, ROT0, "BFM","Win When Your Spinning (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-// PR1207 WIN XPLOSION         95004265 WINXPLOSION PR1053
-GAME( 200?, sc4winxp	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Win X-plosion (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
 
 // PR2526 WINNING SPIN TOP BOX         WINNINGSPINSND           WINNING SPIN
@@ -27003,8 +26941,6 @@ DRIVER_INIT_MEMBER(sc4_state,sc4xmark)
 GAME( 200?, sc4xmark	,0,			sc4, sc4, sc4_state, sc4xmark, ROT0, "BFM","X Marks The Spot (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4xmarka	,sc4xmark,	sc4, sc4, sc4_state, sc4xmark, ROT0, "BFM","X Marks The Spot (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-// PR1264 XTRA CASH ART13 XTRA CASH CASINO (LOTECH) - ART13         95004321 XTRACASH PR1264
-GAME( 200?, sc4xcash	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Xtra Cash Casino (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
 
 const stepper_interface* sc4blokq_reel_configs[6] =
@@ -28799,10 +28735,8 @@ GAME( 200?, sc4hntcss	,sc4hntcs,	sc4, sc4, sc4_state, sc4hntcs, ROT0, "BFM","Hap
 
 
 
-// PR1201 HELLS BELLS         95004211 HELLS BELLS PR6945         HELLS  BELLS  (non english?)
-GAME( 200?, sc4helld	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM / Eurocoin","Hells Bells (PR1201) (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
-// not the same game as above
+
 // PR1419 AWP HELLS BELLS         PR1402 HELLS BELLS SOUNDS11
 GAME( 200?, sc4hellb	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4hellbb	,sc4hellb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
@@ -29011,8 +28945,6 @@ GAME( 200?, sc4mmade	,sc4mmad,	sc4, sc4, sc4_state, sc4mmad, ROT0, "Mazooma","Mo
 GAME( 200?, sc4mmadf	,sc4mmad,	sc4, sc4, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR0000) (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING ) // incomplete pairing
 GAME( 200?, sc4mmadg	,sc4mmad,	sc4, sc4, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR0000) (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING ) // incomplete pairing
 
-// PR1218 MONEY SPINNER ART12         95004291 MONEYSPINNER PR1158
-GAME( 200?, sc4monsp	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Money Spinner (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // Not English
 
 GAME( 200?, sc4monop	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2056) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // PR2056  MONOP  TRIPLE         MONO SOUNDS         MONOP TRIPLE
 GAME( 200?, sc4monopa	,sc4monop,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly (PR2056) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING ) // PR2056  MONOP  TRIPLE         MONO SOUNDS         MONOP TRIPLE
@@ -29449,38 +29381,74 @@ GAME( 200?, sc4showtd	,sc4showt,	sc4, sc4, sc4_state, sc4showt, ROT0, "BFM","Sho
 GAME( 200?, sc4showte	,sc4showt,	sc4, sc4, sc4_state, sc4showt, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 GAME( 200?, sc4showtf	,sc4showt,	sc4, sc4, sc4_state, sc4showt, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 
-// PR1411 AWP SNAKES AND LADDERS         PR1411 SNAKES A L SOUNDS11        SNAKES & LADDERS  S.SITE
-GAME( 200?, sc4slad		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4slada	,sc4slad,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4sladb	,sc4slad,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4sladc	,sc4slad,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4sladd	,sc4slad,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4slade	,sc4slad,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4sladf	,sc4slad,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4sladg	,sc4slad,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
-GAME( 200?, sc4sladh	,sc4slad,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
 
+const stepper_interface* sc4spice_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	&starpointrm20_interface_48step,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4spice)
+{
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4spice_reel_configs;
+}
 
 // PR1921 AWP SPICE IT UP SCORP4         PR1901 SPICE IT UP SOUNDS11       SPICE IT UP S.SITE
-GAME( 200?, sc4spice	,0,			sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4spicea	,sc4spice,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4spiceb	,sc4spice,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4spicec	,sc4spice,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4spice	,0,			sc4, sc4, sc4_state, sc4spice, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4spicea	,sc4spice,	sc4, sc4, sc4_state, sc4spice, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4spiceb	,sc4spice,	sc4, sc4, sc4_state, sc4spice, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4spicec	,sc4spice,	sc4, sc4, sc4_state, sc4spice, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
+const stepper_interface* sc4sus_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	&starpointrm20_interface_48step,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4sus)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4sus_reel_configs;
+}
 
 // PR2255 SUITUSIR         SUIT SOUNDS         SUITS U SIR
-GAME( 200?, sc4sus		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4susc		,sc4sus,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4susf		,sc4sus,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4susg		,sc4sus,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4sush		,sc4sus,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4susi		,sc4sus,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4susj		,sc4sus,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4susk		,sc4sus,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+GAME( 200?, sc4sus		,0,			sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4susc		,sc4sus,	sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4susf		,sc4sus,	sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4susg		,sc4sus,	sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4sush		,sc4sus,	sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4susi		,sc4sus,	sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4susj		,sc4sus,	sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4susk		,sc4sus,	sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4sslam_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4sslam)
+{
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4sslam_reel_configs;
+}
 
 // PR3081 CLUB SUPER SLAM         SUPER SLAM  CLUB  PR3080 SUPER SLAM SOUNDS11
-GAME( 200?, sc4sslam	,0,			sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Super Slam (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4sslama	,sc4sslam,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Super Slam (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4sslam	,0,			sc4, sc4, sc4_state, sc4sslam, ROT0, "BFM","Super Slam (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4sslama	,sc4sslam,	sc4, sc4, sc4_state, sc4sslam, ROT0, "BFM","Super Slam (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
 const stepper_interface* sc4swbak_reel_configs[6] =
@@ -29707,9 +29675,6 @@ GAME( 200?, sc4nunsmh	,sc4nunsm,	sc4, sc4, sc4_state, sc4nunsm, ROT0, "Mazooma",
 GAME( 200?, sc4nunsmi	,sc4nunsm,	sc4, sc4, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
 GAME( 200?, sc4nunsmj	,sc4nunsm,	sc4, sc4, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
 
-// PR1227 4PLAY ART13         95004313 4PLAY PR1227
-GAME( 200?, sc4ivply	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","4 Play (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // not english
-
 
 const stepper_interface* sc4acesh_reel_configs[6] =
 {
@@ -29734,51 +29699,131 @@ GAME( 200?, sc4aceshb	,sc4acesh,	sc4, sc4, sc4_state, sc4acesh, ROT0, "Mazooma",
 GAME( 200?, sc4aceshc	,sc4acesh,	sc4, sc4, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-// PR1225 AZTEC CASINO
-// Turn on A:2 & A:3 to boot
-GAME( 200?, sc4aztec	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFG / Eurocoin","Aztec Casino (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
-// PR1215 AZTEC EURO
-// Turn on A:2 & A:3 to boot
-GAME( 200?, sc4azteca	,sc4aztec,	sc4, sc4, sc4_state, sc4, ROT0, "BFG / Eurocoin","Aztec (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+const stepper_interface* sc4bed_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	&starpointrm20_interface_48step,
+	0,
+};
 
-// PR???? BANKETYBANK V1.0         BANKETYBANKSND           BANKETY BANK
-GAME( 200?, sc4bankb	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4bankba	,sc4bankb,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+DRIVER_INIT_MEMBER(sc4_state,sc4bed)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4bed_reel_configs;
+}
+
 
 // PR2094 BEDAZZLED         BEDZ SOUNDS         BEDAZZLED
-GAME( 200?, sc4bed		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4beda		,sc4bed,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4bedb		,sc4bed,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4bedc		,sc4bed,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4bedd		,sc4bed,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4bede		,sc4bed,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4bed		,0,			sc4, sc4, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4beda		,sc4bed,	sc4, sc4, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4bedb		,sc4bed,	sc4, sc4, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4bedc		,sc4bed,	sc4, sc4, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4bedd		,sc4bed,	sc4, sc4, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4bede		,sc4bed,	sc4, sc4, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4bedcl_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4bedcl)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4bedcl_reel_configs;
+}
+
 
 // PR2102 CLUB BEDAZZLED         CBED SOUNDS         CLUB BEDAZZLED
-GAME( 200?, sc4bedcl	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4bedcl	,0,			sc4, sc4, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 // PR2102 CLUB BEDAZZLED         CLUB BEDAZZLED  CLUB  CBED SOUNDS         CLUB BEDAZZLED
-GAME( 200?, sc4bedcla	,sc4bedcl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4bedclb	,sc4bedcl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4bedclc	,sc4bedcl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4bedcld	,sc4bedcl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4bedcla	,sc4bedcl,	sc4, sc4, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4bedclb	,sc4bedcl,	sc4, sc4, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4bedclc	,sc4bedcl,	sc4, sc4, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4bedcld	,sc4bedcl,	sc4, sc4, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4bblas_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	&starpointrm20_interface_48step,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4bblas)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4bblas_reel_configs;
+}
+
+DRIVER_INIT_MEMBER(sc4_state,sc4bblas_mbus)
+{
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4bblas_reel_configs;
+}
 
 // PR2083 BIG BLASTER         BBST SOUNDS         BIG BLASTER
-GAME( 200?, sc4bblas	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4bblasa	,sc4bblas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4bblasb	,sc4bblas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4bblasc	,sc4bblas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4bblasd	,sc4bblas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4bblase	,sc4bblas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4bblasf	,sc4bblas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4bblas	,0,			sc4, sc4, sc4_state, sc4bblas, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4bblasa	,sc4bblas,	sc4, sc4, sc4_state, sc4bblas, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4bblasb	,sc4bblas,	sc4, sc4, sc4_state, sc4bblas, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4bblasc	,sc4bblas,	sc4, sc4, sc4_state, sc4bblas_mbus, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4bblasd	,sc4bblas,	sc4, sc4, sc4_state, sc4bblas_mbus, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4bblase	,sc4bblas,	sc4, sc4, sc4_state, sc4bblas_mbus, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4bblasf	,sc4bblas,	sc4, sc4, sc4_state, sc4bblas_mbus, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 
 
+const stepper_interface* sc4bankb_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpoint_interface_200step_reel,
+	0,
+};
 
+DRIVER_INIT_MEMBER(sc4_state,sc4bankb)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4bankb_reel_configs;
+}
+
+
+// PR???? BANKETYBANK V1.0         BANKETYBANKSND           BANKETY BANK
+GAME( 200?, sc4bankb	,0,			sc4, sc4, sc4_state, sc4bankb, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4bankba	,sc4bankb,	sc4, sc4, sc4_state, sc4bankb, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 // PR???? BANKETYBANK 011         BANKETYBANKSND           BANKETY BANK
-GAME( 200?, sc4bb		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Qps","Blankety Bank (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4bba		,sc4bb,		sc4, sc4, sc4_state, sc4, ROT0, "Qps","Blankety Bank (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4bb		,sc4bankb,	sc4, sc4, sc4_state, sc4bankb, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4bba		,sc4bankb,	sc4, sc4, sc4_state, sc4bankb, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4bobcl_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4bobcl)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4bobcl_reel_configs;
+}
 
 // PR2298 CLUB BOBBY DAZZLER         CLUB BOB DAZZLER  CLUB  CLUBBOBD SOUNDS
-GAME( 200?, sc4bobcl	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4bobcla	,sc4bobcl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4bobcl	,0,			sc4, sc4, sc4_state, sc4bobcl, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4bobcla	,sc4bobcl,	sc4, sc4, sc4_state, sc4bobcl, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 // PR2033 BREAK THE SPELL         SPELL SOUNDS         BREAK THE SPELL
 GAME( 200?, sc4brksp	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
@@ -29831,9 +29876,7 @@ GAME( 200?, sc4clashe	,sc4clash,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Cash
 GAME( 200?, sc4clashf	,sc4clash,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 GAME( 200?, sc4clashg	,sc4clash,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
-// IN A:2 allows it to boot
-// PR2038E Dutch12 Cashanova  (not a standard string)
-GAME( 200?, sc4cashn	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma / Eurocoin","Cashanova (Dutch) (Mazooma / Eurocoin) (Scorpion 4)", GAME_NOT_WORKING )
+
 
 
 // PR1426 CASINO CRAZY FRUITS GOLD         PR1426 CRAZY F GOLD SOUNDS11      CRAZY FRUIT GOLD  S.SITE  (set was marked as Casino Crazy Keys)
@@ -29854,20 +29897,49 @@ GAME( 200?, sc4cckeym	,sc4cckey,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casi
 GAME( 200?, sc4cckeyn	,sc4cckey,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 15)", GAME_NOT_WORKING )
 GAME( 200?, sc4cckeyo	,sc4cckey,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 16)", GAME_NOT_WORKING )
 
+const stepper_interface* sc4clclo_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4clclo)
+{
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4clclo_reel_configs;
+}
 
 // PR2383 CLUBCLOUSEAU         CLUBCLOUSEAU  CLUB  CCLOU SOUNDS         CLUB CLOSEAU
-GAME( 200?, sc4clclo	,0,			sc4, sc4, sc4_state, sc4mbus, ROT0, "QPS","Club Clouseau (QPS) (Scorpion 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4clclo	,0,			sc4, sc4, sc4_state, sc4clclo, ROT0, "QPS","Club Clouseau (QPS) (Scorpion 4)", GAME_NOT_WORKING )
 
+const stepper_interface* sc4cjcl_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+};
 
+DRIVER_INIT_MEMBER(sc4_state,sc4cjcl)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4cjcl_reel_configs;
+}
 
 // PR1621 CLUB COOL JEWELS         PR1621 COOL SOUNDS11         CLUB COOL JEWELS  CLUB
-GAME( 200?, sc4cjcl		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4cjcla	,sc4cjcl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4cjclb	,sc4cjcl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4cjclc	,sc4cjcl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4cjcld	,sc4cjcl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4cjcle	,sc4cjcl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4cjclf	,sc4cjcl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4cjcl		,0,			sc4, sc4, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4cjcla	,sc4cjcl,	sc4, sc4, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4cjclb	,sc4cjcl,	sc4, sc4, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4cjclc	,sc4cjcl,	sc4, sc4, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4cjcld	,sc4cjcl,	sc4, sc4, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4cjcle	,sc4cjcl,	sc4, sc4, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4cjclf	,sc4cjcl,	sc4, sc4, sc4_state, sc4cjcl, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 
 
 
@@ -29983,8 +30055,6 @@ GAME( 200?, sc4cfgcla	,sc4cfgcl,	sc4, sc4, sc4_state, sc4cfgcl, ROT0, "BFM","Cra
 GAME( 200?, sc4cfgclb	,sc4cfgcl,	sc4, sc4, sc4_state, sc4cfgcl, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4cfgclc	,sc4cfgcl,	sc4, sc4, sc4_state, sc4cfgcl, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-// PR1221 CRISSCROSSCRAZY  ART13         95004282 CRISSCROSS PR1161
-GAME( 200?, sc4ccc		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Criss Cross Crazy (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // not english
 
 const stepper_interface* sc4derby_reel_configs[6] =
 {
@@ -30053,6 +30123,562 @@ DRIVER_INIT_MEMBER(sc4_state,sc4boomb)
 //PROJECT NUMBER PR3332 AWP MONOPOLY BOOM OR BUST S4         PR3307 MPOLY BOOM OR B SOUNDS11   BOOM OR BUST  S.SITE
 GAME( 200?, sc4boomb	,0, 	    sc4, sc4, sc4_state, sc4boomb, ROT0, "BFM","Monopoly Boom Or Bust (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4boomba	,sc4boomb,	sc4, sc4, sc4_state, sc4boomb, ROT0, "BFM","Monopoly Boom Or Bust (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+
+/**********************************************************************************************************************************/
+/*  Games below are Dutch versions, and seem to be build on very different code even when titles match other games                */
+/*   they will all alarm for a while complaining about the battery but will then init NVRAM                                       */
+/**********************************************************************************************************************************/
+
+const stepper_interface* sc4aztec_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4aztec)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4aztec_reel_configs;
+}
+
+
+GAME( 200?, sc4aztec	,0,			sc4, sc4, sc4_state, sc4aztec, ROT0, "BFG / Eurocoin","Aztec Casino (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )// PR1225 AZTEC CASINO
+GAME( 200?, sc4azteca	,sc4aztec,	sc4, sc4, sc4_state, sc4aztec, ROT0, "BFG / Eurocoin","Aztec (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // PR1215 AZTEC EURO
+
+
+const stepper_interface* sc4helrd_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4helrd)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4helrd_reel_configs;
+}
+
+// PR1254 HELLRAISER ART12         95004326 HELLRAISER PR1254
+GAME( 200?, sc4helrd	,0,			sc4, sc4, sc4_state, sc4helrd, ROT0, "BFM","Hellraiser (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4helrs	,sc4helrd,	sc4, sc4, sc4_state, sc4helrd, ROT0, "BFM","Hellraiser (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+
+
+const stepper_interface* sc4heatw_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4heatw)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4heatw_reel_configs;
+}
+
+
+
+// PR1216 HEATWAVE ART 12         95004287 HEATWAVE PR1156
+GAME( 200?, sc4heatw	,0,			sc4, sc4, sc4_state, sc4heatw, ROT0, "BFM","Heatwave (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+
+
+const stepper_interface* sc4colos_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4colos)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4colos_reel_configs;
+}
+
+
+// PR1208 COLOSSUS         95004235 COLOSSUS PR7155             COLOSSUS
+GAME( 200?, sc4colos	,0,			sc4, sc4, sc4_state, sc4colos, ROT0, "BFM","Colossus (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4fevdt_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4fevdt)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4fevdt_reel_configs;
+}
+
+//  PR1202 FEVER         95004239 FEVER PR7157
+GAME( 200?, sc4fevdt	,0,			sc4, sc4, sc4_state, sc4fevdt, ROT0, "BFM","Fever (PR1202) (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4fevdta	,sc4fevdt,	sc4, sc4, sc4_state, sc4fevdt, ROT0, "BFM","Fever (PR1202) (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4fevdtb	,sc4fevdt,	sc4, sc4, sc4_state, sc4fevdt, ROT0, "BFM","Fever (PR1202) (Dutch) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4fevnx_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4fevnx)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4fevnx_reel_configs;
+}
+
+// PR1216 FEVER ART12         95004318 FEVER T N PR1251
+GAME( 200?, sc4fevnx	,0,			sc4, sc4, sc4_state, sc4fevnx, ROT0, "BFM","Fever The Next (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4fevnxa	,sc4fevnx,	sc4, sc4, sc4_state, sc4fevnx, ROT0, "BFM","Fever The Next (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4game_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4game)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4game_reel_configs;
+}
+
+GAME( 200?, sc4gamcs	,0,			sc4, sc4, sc4_state, sc4game, ROT0, "BFM","The Game Casino (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // PR1224 THE GAME CASINO         95004285 THEGAME PR1153
+GAME( 200?, sc4game		,sc4gamcs,	sc4, sc4, sc4_state, sc4game, ROT0, "BFM","The Game (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // PR1213 THE GAME         95004285 THEGAME PR1153
+
+const stepper_interface* sc4goud_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpoint_interface_200step_reel,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4goud)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4goud_reel_configs;
+}
+
+// PR1211 GOUDKOORTS         95004288 GOUDKOORTS PR1151
+GAME( 200?, sc4goud		,0,			sc4, sc4, sc4_state, sc4goud, ROT0, "BFM","Goudkoorts (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+
+
+const stepper_interface* sc4lasv_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4lasv)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4lasv_reel_configs;
+}
+
+// PR1209 LAS VEGAS         95004261 LASVEGAS PR7159
+GAME( 200?, sc4lasv		,0,			sc4, sc4, sc4_state, sc4lasv, ROT0, "BFM","Las Vegas (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4lasva	,sc4lasv,	sc4, sc4, sc4_state, sc4lasv, ROT0, "BFM","Las Vegas (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4miljo_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4miljo)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4miljo_reel_configs;
+}
+
+
+GAME( 200?, sc4miljo	,0,			sc4, sc4, sc4_state, sc4miljo, ROT0, "BFM","Miljonairs (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // PR1217 MILJONAIRSART12         95004305 MILJONAIRE PR1157
+GAME( 200?, sc4milja	,sc4miljo,	sc4, sc4, sc4_state, sc4miljo, ROT0, "BFM","Miljonairs Arcade (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // PR1223 MILJONAIRS         95004305 MILJONAIRE PR1157
+
+const stepper_interface* sc4paytm_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4paytm)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4paytm_reel_configs;
+}
+
+//  PR1205 PAY TIME         95004224 PAYTIME PR7156             PAY TIME
+GAME( 200?, sc4paytm	,0,			sc4, sc4, sc4_state, sc4paytm, ROT0, "BFM","Pay Time (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+
+
+const stepper_interface* sc4pglcs_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4pglcs)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4pglcs_reel_configs;
+}
+
+//  PR1261 PHARAOH'S GOLD         95004316 CAS PHAR GOLD PR1261
+GAME( 200?, sc4pglcs	,0,			sc4, sc4, sc4_state, sc4pglcs, ROT0, "BFM","Pharaoh's Gold Casino (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4pglcsa	,sc4pglcs,	sc4, sc4, sc4_state, sc4pglcs, ROT0, "BFM","Pharaoh's Gold Casino (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4pglcsb	,sc4pglcs,	sc4, sc4, sc4_state, sc4pglcs, ROT0, "BFM","Pharaoh's Gold Casino (Dutch) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4redad_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4redad)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4redad_reel_configs;
+}
+
+
+// PR1206 RED ALERT         95004266 REDALERT PR1051
+GAME( 200?, sc4redad	,0,			sc4, sc4, sc4_state, sc4redad, ROT0, "BFM","Red Alert (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4redada	,sc4redad,	sc4, sc4, sc4_state, sc4redad, ROT0, "BFM","Red Alert (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+
+
+const stepper_interface* sc4rvlnx_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpoint_interface_200step_reel,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4rvlnx)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4rvlnx_reel_configs;
+}
+
+
+// PR1252 REVOLUTION  NEXT         95004320 REVOLUTIONTN PR1252
+GAME( 200?, sc4rvlnx	,0,			sc4, sc4, sc4_state, sc4rvlnx, ROT0, "BFM","Revolution The Next (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4rvl_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpoint_interface_200step_reel,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4rvl)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4rvl_reel_configs;
+}
+
+
+// PR1203 REVOLUTION         95004259 REVOLUTION PR7158
+GAME( 200?, sc4rvl		,0,			sc4, sc4, sc4_state, sc4rvl, ROT0, "BFM","Revolution (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4rio_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4rio)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4rio_reel_configs;
+}
+
+// PR1222    RIO GRANDE         95004309 RIO GRANDE SOUNDS11
+GAME( 200?, sc4rio		,0,			sc4, sc4, sc4_state, sc4rio, ROT0, "BFM","Rio Grande (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+
+	
+const stepper_interface* sc4strbr_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4strbr)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4strbr_reel_configs;
+}
+
+// PR1219 STARS 'N BARS         95004290 STARSNBARS PR1159
+GAME( 200?, sc4strbr	,0,			sc4, sc4, sc4_state, sc4strbr, ROT0, "BFM","Stars 'n' Bars (PR1219) (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4strbrb	,sc4strbr,	sc4, sc4, sc4_state, sc4strbr, ROT0, "BFM","Stars 'n' Bars (PR1219) (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+// PR1263 SNBA ART13 STARS 'N' BARS ARCADE - ART13         95004290 STARSNBARS PR1159
+GAME( 200?, sc4strbra	,sc4strbr,	sc4, sc4, sc4_state, sc4strbr, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4strbrc	,sc4strbr,	sc4, sc4, sc4_state, sc4strbr, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4strbrd	,sc4strbr,	sc4, sc4, sc4_state, sc4strbr, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Dutch) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4twilt_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4twilt)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4twilt_reel_configs;
+}
+
+
+// PR1214 TWILIGHT         95004299 TWILIGHT PR1154
+GAME( 200?, sc4twilt	,0,			sc4, sc4, sc4_state, sc4twilt, ROT0, "BFM","Twilight (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+
+
+const stepper_interface* sc4monsp_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpoint_interface_200step_reel,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4monsp)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4monsp_reel_configs;
+}
+
+// PR1218 MONEY SPINNER ART12         95004291 MONEYSPINNER PR1158
+GAME( 200?, sc4monsp	,0,			sc4, sc4, sc4_state, sc4monsp, ROT0, "BFM","Money Spinner (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+
+
+const stepper_interface* sc4ivply_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4ivply)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4ivply_reel_configs;
+}
+
+
+// PR1227 4PLAY ART13         95004313 4PLAY PR1227
+GAME( 200?, sc4ivply	,0,			sc4, sc4, sc4_state, sc4ivply, ROT0, "BFM","4 Play (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4ccc_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4ccc)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4ccc_reel_configs;
+}
+
+
+// PR1221 CRISSCROSSCRAZY  ART13         95004282 CRISSCROSS PR1161
+GAME( 200?, sc4ccc		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Criss Cross Crazy (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4valqp_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4valqp)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4valqp_reel_configs;
+}
+
+// PR2040E VALHALLA...PR2040 SOUNDS V1.... (non-standard header)
+GAME( 200?, sc4valqp	,0,			sc4, sc4, sc4_state, sc4valqp, ROT0, "Qps / Eurocoin","Valhalla (Dutch) (Qps) (Scorpion 4)", GAME_NOT_WORKING )
+
+
+const stepper_interface* sc4winxp_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4winxp)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4winxp_reel_configs;
+}
+
+// PR1207 WIN XPLOSION         95004265 WINXPLOSION PR1053
+GAME( 200?, sc4winxp	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Win X-plosion (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+
+
+const stepper_interface* sc4xcash_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4xcash)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4xcash_reel_configs;
+}
+
+
+// PR1264 XTRA CASH ART13 XTRA CASH CASINO (LOTECH) - ART13         95004321 XTRACASH PR1264
+GAME( 200?, sc4xcash	,0,			sc4, sc4, sc4_state, sc4xcash, ROT0, "BFM","Xtra Cash Casino (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4helld_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4helld)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4helld_reel_configs;
+}
+
+
+// PR1201 HELLS BELLS         95004211 HELLS BELLS PR6945         HELLS  BELLS  (non english?)
+GAME( 200?, sc4helld	,0,			sc4, sc4, sc4_state, sc4helld, ROT0, "BFM / Eurocoin","Hells Bells (PR1201) (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+
+const stepper_interface* sc4cashn_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4cashn)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4cashn_reel_configs;
+}
+
+
+// PR2038E Dutch12 Cashanova  (not a standard string)
+GAME( 200?, sc4cashn	,0,			sc4, sc4, sc4_state, sc4cashn, ROT0, "Mazooma / Eurocoin","Cashanova (Dutch) (Mazooma / Eurocoin) (Scorpion 4)", GAME_NOT_WORKING )
+
+
+/**********************************************************************************************************************************/
+/*  Games below don't do enough to add real configs yet                                                                           */
+/**********************************************************************************************************************************/
+
+
+// PAY UNIT ERR 17
+// PR1411 AWP SNAKES AND LADDERS         PR1411 SNAKES A L SOUNDS11        SNAKES & LADDERS  S.SITE
+GAME( 200?, sc4slad		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4slada	,sc4slad,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4sladb	,sc4slad,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4sladc	,sc4slad,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4sladd	,sc4slad,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4slade	,sc4slad,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4sladf	,sc4slad,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4sladg	,sc4slad,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+GAME( 200?, sc4sladh	,sc4slad,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
+
 
 /****************************************************************************************************************************************************************************************************************/
 /****************************************************************************************************************************************************************************************************************/
