@@ -23673,6 +23673,53 @@ GAME( 200?, sc4gslame	,sc4gslam,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grandsla
 GAME( 200?, sc4gslamf	,sc4gslam,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 
 
+const stepper_interface* sc4gcclb_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4gcclb)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4gcclb_reel_configs;
+}
+
+DRIVER_INIT_MEMBER(sc4_state,sc4gcclb_mbus)
+{
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4gcclb_reel_configs;
+}
+
+// this was marked (and has the header) GRAND CASINO, and was paired with some (bad dumps) of 'Grand Casino' sound roms, but it actually
+// appears to be a version of Grandslam and expects the Grandslam sounds
+// PR7194 GRAND CASINO         PR6934 SLM2 SOUNDS11           GRAND CASINO
+GAME( 200?, sc4gcclb	,0,			sc4, sc4, sc4_state, sc4gcclb, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcclba	,sc4gcclb,	sc4, sc4, sc4_state, sc4gcclb, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcclbb	,sc4gcclb,	sc4, sc4, sc4_state, sc4gcclb, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcclbc	,sc4gcclb,	sc4, sc4, sc4_state, sc4gcclb, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcclbd	,sc4gcclb,	sc4, sc4, sc4_state, sc4gcclb, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcclbe	,sc4gcclb,	sc4, sc4, sc4_state, sc4gcclb, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcclbf	,sc4gcclb,	sc4, sc4, sc4_state, sc4gcclb, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcclbg	,sc4gcclb,	sc4, sc4, sc4_state, sc4gcclb, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcclbh	,sc4gcclb,	sc4, sc4, sc4_state, sc4gcclb, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcclbi	,sc4gcclb,	sc4, sc4, sc4_state, sc4gcclb, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcclbj	,sc4gcclb,	sc4, sc4, sc4_state, sc4gcclb, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcclbk	,sc4gcclb,	sc4, sc4, sc4_state, sc4gcclb, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
+// PR7194 GRAND CASINO         PR6934 SLM2 SOUNDS11           GRAND CASINO    GRAND CASINO  CLUB
+GAME( 200?, sc4gcclbl	,sc4gcclb,	sc4, sc4, sc4_state, sc4gcclb_mbus, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcclbm	,sc4gcclb,	sc4, sc4, sc4_state, sc4gcclb_mbus, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcclbn	,sc4gcclb,	sc4, sc4, sc4_state, sc4gcclb_mbus, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 15)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcclbp	,sc4gcclb,	sc4, sc4, sc4_state, sc4gcclb_mbus, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 16)", GAME_NOT_WORKING )
+// PR7149 GRAND CASINO         GRAND CASINO  CLUB  PR6934 SLM2 SOUNDS11           GRAND CASINO
+GAME( 200?, sc4gcclbo	,sc4gcclb,	sc4, sc4, sc4_state, sc4gcclb_mbus, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 17)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcclbq	,sc4gcclb,	sc4, sc4, sc4_state, sc4gcclb_mbus, ROT0, "BFM","Grandslam Casino (Bellfruit) (Scorpion 4) (set 18)", GAME_NOT_WORKING )
+
+
 
 const stepper_interface* sc4botn_reel_configs[6] =
 {
@@ -28260,47 +28307,6 @@ GAME( 200?, sc4clbtmc	,sc4clbtm,	sc4dmd, sc4, sc4_state, sc4clbtm, ROT0, "BFM","
 GAME( 200?, sc4clbtmd	,sc4clbtm,	sc4dmd, sc4, sc4_state, sc4clbtm, ROT0, "BFM","Club Temptation (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4clbtme	,sc4clbtm,	sc4dmd, sc4, sc4_state, sc4clbtm, ROT0, "BFM","Club Temptation (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-// PR2544 DOUBLE CRAZY REELS 021         DCRZYSND
-GAME( 200?, sc4dcrls	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (021) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4dcrlsf	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (021) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-// PR2544 DOUBLE CRAZY REELS 031         DCRZYSND
-GAME( 200?, sc4dcrlsa	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (031) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4dcrlsg	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (031) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-// PR2544 DOUBLE CRAZY REELS 022         DCRZYSND
-GAME( 200?, sc4dcrlsb	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (022) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4dcrlsh	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (022) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-// PR2544 DOUBLE CRAZY REELS 032         DCRZYSND
-GAME( 200?, sc4dcrlsc	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (032) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4dcrlsi	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (032) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-// PR2544 DOUBLE CRAZY REELS 023         DCRZYSND
-GAME( 200?, sc4dcrlsd	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (023) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4dcrlsj	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (023) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-// PR2544 DOUBLE CRAZY REELS 033         DCRZYSND
-GAME( 200?, sc4dcrlse	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (033) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4dcrlsk	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (033) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-
-// PR7194 GRAND CASINO         PR6934 SLM2 SOUNDS11           GRAND CASINO
-GAME( 200?, sc4gcclb	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcclba	,sc4gcclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcclbb	,sc4gcclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcclbc	,sc4gcclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcclbd	,sc4gcclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcclbe	,sc4gcclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcclbf	,sc4gcclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcclbg	,sc4gcclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcclbh	,sc4gcclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcclbi	,sc4gcclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcclbj	,sc4gcclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcclbk	,sc4gcclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
-// PR7194 GRAND CASINO         PR6934 SLM2 SOUNDS11           GRAND CASINO    GRAND CASINO  CLUB
-GAME( 200?, sc4gcclbl	,sc4gcclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcclbm	,sc4gcclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcclbn	,sc4gcclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 15)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcclbp	,sc4gcclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 16)", GAME_NOT_WORKING )
-// PR7149 GRAND CASINO         GRAND CASINO  CLUB  PR6934 SLM2 SOUNDS11           GRAND CASINO
-GAME( 200?, sc4gcclbo	,sc4gcclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 17)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcclbq	,sc4gcclb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Grand Casino Club (Bellfruit) (Scorpion 4) (set 18)", GAME_NOT_WORKING )
-
 const stepper_interface* sc4onup_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
@@ -32246,7 +32252,25 @@ GAME( 200?, sc4magcit	,sc4magci,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Ci
 GAME( 200?, sc4magcij	,sc4magci,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (034) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4magciu	,sc4magci,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Magic Circle (034) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-
+// PAY UNIT ERR 17
+// PR2544 DOUBLE CRAZY REELS 021         DCRZYSND
+GAME( 200?, sc4dcrls	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (021) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4dcrlsf	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (021) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+// PR2544 DOUBLE CRAZY REELS 031         DCRZYSND
+GAME( 200?, sc4dcrlsa	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (031) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4dcrlsg	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (031) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+// PR2544 DOUBLE CRAZY REELS 022         DCRZYSND
+GAME( 200?, sc4dcrlsb	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (022) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4dcrlsh	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (022) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+// PR2544 DOUBLE CRAZY REELS 032         DCRZYSND
+GAME( 200?, sc4dcrlsc	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (032) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4dcrlsi	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (032) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+// PR2544 DOUBLE CRAZY REELS 023         DCRZYSND
+GAME( 200?, sc4dcrlsd	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (023) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4dcrlsj	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (023) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+// PR2544 DOUBLE CRAZY REELS 033         DCRZYSND
+GAME( 200?, sc4dcrlse	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (033) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4dcrlsk	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (033) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
 /****************************************************************************************************************************************************************************************************************/
@@ -33308,6 +33332,8 @@ GAME( 200?, sc4sdrb		,sc4sdr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Super Diamo
 // PR6921 DIAMONDS AND RUBIES SP98         PR6921 DARB SOUNDS11
 GAME( 200?, sc4sdra		,sc4sdr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Super Diamonds & Rubies SP98 (PR6921) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4sdrc		,sc4sdr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Super Diamonds & Rubies SP98 (PR6921) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+
+
 
 
 /****************************************************************************************************************************************************************************************************************/

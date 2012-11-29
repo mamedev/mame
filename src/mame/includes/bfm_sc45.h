@@ -384,6 +384,8 @@ public:
 	DECLARE_DRIVER_INIT(sc4waw);
 	DECLARE_DRIVER_INIT(sc4winsptb);
 	DECLARE_DRIVER_INIT(sc4winsp);
+	DECLARE_DRIVER_INIT(sc4gcclb);
+	DECLARE_DRIVER_INIT(sc4gcclb_mbus);
 
 	
 	
@@ -3489,10 +3491,19 @@ INPUT_PORTS_EXTERN( sc4_base );
 	ROM_LOAD( "95008482.bin", 0x0000, 0x04c048, CRC(e0b13788) SHA1(e364ccedd31e1fe0560312a28ad6d5cfaac5bfaa) ) \
 
 #define sc_gcclb_others \
+	ROM_REGION( 0x400000, "altymz", ROMREGION_ERASE00 ) \
+	/* original files */ \
+	/* ROM_LOAD( "95004252.bin", 0x0000, 0x134084, CRC(b05844f8) SHA1(e2a2f3ad69cc9a66ca703e9e07ac008300d4139d) ) */ \
+	/* ROM_LOAD( "95004253.bin", 0x0000, 0x134084, CRC(a546da40) SHA1(fead6e4f8dab919f65c48cf04100a7742432b1f4) ) */ \
+	/* converted to binary from intel hex */ \
+	/* GRAND`CASINO`SOUND */ \
+	ROM_LOAD( "95004252.bin", 0x000000, 0x080000, BAD_DUMP CRC(2b5e88d5) SHA1(2ec98e569a185d0ce72bc09aedabbcaa1d4a7c9c) ) /* 'fixed bits' */ \
+	ROM_LOAD( "95004253.bin", 0x080000, 0x080000, CRC(dcea501a) SHA1(c1fdcaa3f0a6143d26389d3f614af63cc48a2e58) ) \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	/* this is intel hex format - convert */ \
-	ROM_LOAD( "95004252.bin", 0x0000, 0x134084, CRC(b05844f8) SHA1(e2a2f3ad69cc9a66ca703e9e07ac008300d4139d) ) \
-	ROM_LOAD( "95004253.bin", 0x0000, 0x134084, CRC(a546da40) SHA1(fead6e4f8dab919f65c48cf04100a7742432b1f4) ) \
+	/* However the game we have wants the Grand Slam sounds? */ \
+	ROM_LOAD( "95004169.bin", 0x000000, 0x080000, CRC(d2293b2f) SHA1(e3eed38a15885c5a6d63fc79d95f77c5225e9168) ) \
+	ROM_LOAD( "95004170.bin", 0x080000, 0x080000, CRC(1da0db8f) SHA1(b3c37b5e02efe7267556d8603c362298ed55bb88) ) \
+
 
 #define sc_onup_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
