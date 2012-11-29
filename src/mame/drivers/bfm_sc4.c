@@ -194,7 +194,7 @@ static const bfmdm01_interface dm01_interface =
 
 
 /* default reels */
-const stepper_interface* default_reel_configs[6] =
+static const stepper_interface* default_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -6355,7 +6355,7 @@ ROM_START( sc4db )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95416326.lo", 0x00001, 0x080000, CRC(131c13b5) SHA1(9fbce59022f8489d156296c3aa5a0acc1c62ffe5) )
 	ROM_LOAD16_BYTE( "95416327.hi", 0x00000, 0x080000, CRC(5dbcfdb6) SHA1(f017cad0eb55937936f3908add20aaa0321e8b8d) )
-	sc_db_others
+	sc_gfev_others
 ROM_END
 
 
@@ -6670,26 +6670,23 @@ ROM_END
 
 ROM_START( sc4goldoc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	// why do we only have a combined rom for this one?
+	// why do we only have a combined rom for this one? (is it same as sc4gocasa once split?) 
 	ROM_LOAD( "95401643.bin", 0x0000, 0x100000, CRC(3a85490e) SHA1(e1e4765785d631a7ec4e5daa33d1ce4fbdaee446) ) // TODO SPLIT THIS
 	sc4goldo_others
 ROM_END
-
-
-
 
 ROM_START( sc4gocas )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95400623.lo", 0x00001, 0x080000, CRC(51a41329) SHA1(af87c760715996fd5b52a8a45e1bcb6f7f7747bd) )
 	ROM_LOAD16_BYTE( "95400624.hi", 0x00000, 0x080000, CRC(f04779ce) SHA1(2268e8502e265a62dbfc6a7d3b64847a2ba0e370) )
-	sc_gocas_others
+	sc4goldo_others
 ROM_END
 
 ROM_START( sc4gocasa )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95401623.lo", 0x00001, 0x080000, CRC(623d6dd3) SHA1(fede0f19764927ee45f2b167c33e73dd3e4e540d) )
 	ROM_LOAD16_BYTE( "95401624.hi", 0x00000, 0x080000, CRC(d3e74fd9) SHA1(0d3c1c264290727cf01e6f9f6bec43e52423917c) )
-	sc_gocas_others
+	sc4goldo_others
 ROM_END
 
 
@@ -6758,28 +6755,28 @@ ROM_START( sc4goldwd )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1437p41.hi", 0x00000, 0x080000, CRC(d5e38e06) SHA1(85be2c45747ee2e80614cd455ea6525e89c53de6) )
 	ROM_LOAD16_BYTE( "p1437p41.lo", 0x00001, 0x080000, CRC(c31f15ff) SHA1(57247c02adc0e8f2826f11f6a80ccda1f668b274) )
-	sc_goldw_others
+	PR1436_TRIPLE_CASINO_SOUNDS11
 ROM_END
 
 ROM_START( sc4goldwe )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1437p51.hi", 0x00000, 0x080000, CRC(d0bcbd31) SHA1(21700e771355776ea3b87113ac4f6b4e55732392) )
 	ROM_LOAD16_BYTE( "p1437p51.lo", 0x00001, 0x080000, CRC(62378c3e) SHA1(0f5dc74b1ac4b294d3dac34e303d8a1de1001046) )
-	sc_goldw_others
+	PR1436_TRIPLE_CASINO_SOUNDS11
 ROM_END
 
 ROM_START( sc4goldwf )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1437s41.hi", 0x00000, 0x080000, CRC(73f7f759) SHA1(6ef14b597ce94693f5db7f1b13daf91f218147a4) )
 	ROM_LOAD16_BYTE( "p1437s41.lo", 0x00001, 0x080000, CRC(f49e4698) SHA1(1580070484c998175921f93fd0be2c12e1e7fefc) )
-	sc_goldw_others
+	PR1436_TRIPLE_CASINO_SOUNDS11
 ROM_END
 
 ROM_START( sc4goldwg )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1437s51.hi", 0x00000, 0x080000, CRC(76a8c46e) SHA1(8bd5e7806bd03ef3b17a3b7291049fdc1708ef07) )
 	ROM_LOAD16_BYTE( "p1437s51.lo", 0x00001, 0x080000, CRC(55b6df59) SHA1(6ce2dd23078a9411d8937f1e27f59e6fc337e406) )
-	sc_goldw_others
+	PR1436_TRIPLE_CASINO_SOUNDS11
 ROM_END
 
 
@@ -23544,7 +23541,7 @@ ROM_END
 
 GAME( 200?, sc4tst		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Scorpion 4 Test Rig (Bellfruit) (Scorpion ?)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4pstat_reel_configs[6] =
+static const stepper_interface* sc4pstat_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -23595,7 +23592,7 @@ GAME( 200?, sc4pstatj	,sc4pstat,	sc4, sc4, sc4_state, sc4pstat_mbus, ROT0, "QPS"
 GAME( 200?, sc4pstato	,sc4pstat,	sc4, sc4, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V042) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4pstatq	,sc4pstat,	sc4, sc4, sc4_state, sc4pstat, ROT0, "QPS","Paystation (V042) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4cvani_reel_configs[6] =
+static const stepper_interface* sc4cvani_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -23623,7 +23620,7 @@ GAME( 200?, sc4cvanig	,sc4cvani,	sc4, sc4, sc4_state, sc4cvani, ROT0, "QPS","Cas
 GAME( 200?, sc4cvanih	,sc4cvani,	sc4, sc4, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
 GAME( 200?, sc4cvanii	,sc4cvani,	sc4, sc4, sc4_state, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4cvclb_reel_configs[6] =
+static const stepper_interface* sc4cvclb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -23658,7 +23655,7 @@ GAME( 200?, sc4cvclbf	,sc4cvclb,	sc4, sc4, sc4_state, sc4cvclb_mbus, ROT0, "QPS"
 GAME( 200?, sc4cvclbg	,sc4cvclb,	sc4, sc4, sc4_state, sc4cvclb_mbus, ROT0, "QPS","Cashvania Club (V411) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4spark_reel_configs[6] =
+static const stepper_interface* sc4spark_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -23683,7 +23680,7 @@ GAME( 200?, sc4sparkc	,sc4spark,	sc4, sc4, sc4_state, sc4spark, ROT0, "BFM","Sou
 GAME( 200?, sc4sparkd	,sc4spark,	sc4, sc4, sc4_state, sc4spark, ROT0, "BFM","South Park (BFM) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4sparke	,sc4spark,	sc4, sc4, sc4_state, sc4spark, ROT0, "BFM","South Park (BFM) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4brkfs_reel_configs[6] =
+static const stepper_interface* sc4brkfs_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -23706,7 +23703,7 @@ GAME( 200?, sc4brkfsa	,sc4brkfs,	sc4, sc4, sc4_state, sc4brkfs, ROT0, "BFM","The
 GAME( 200?, sc4brkfsb	,sc4brkfs,	sc4, sc4, sc4_state, sc4brkfs, ROT0, "BFM","The Big Breakfast (BFM) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4brkfsc	,sc4brkfs,	sc4, sc4, sc4_state, sc4brkfs, ROT0, "BFM","The Big Breakfast (BFM) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4gslam_reel_configs[6] =
+static const stepper_interface* sc4gslam_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -23732,7 +23729,7 @@ GAME( 200?, sc4gslame	,sc4gslam,	sc4, sc4, sc4_state, sc4gslam, ROT0, "BFM","Gra
 GAME( 200?, sc4gslamf	,sc4gslam,	sc4, sc4, sc4_state, sc4gslam, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4gcclb_reel_configs[6] =
+static const stepper_interface* sc4gcclb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -23780,7 +23777,7 @@ GAME( 200?, sc4gcclbq	,sc4gcclb,	sc4, sc4, sc4_state, sc4gcclb_mbus, ROT0, "BFM"
 
 
 
-const stepper_interface* sc4botn_reel_configs[6] =
+static const stepper_interface* sc4botn_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -23802,7 +23799,7 @@ GAME( 200?, sc4botn		,0,			sc4, sc4, sc4_state, sc4botn, ROT0, "Qps","Back Of Th
 GAME( 200?, sc4botna	,sc4botn,	sc4, sc4, sc4_state, sc4botn, ROT0, "Qps","Back Of The Net (Qps) (Scorpion 4) (set 2, 011)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4bbclb_reel_configs[6] =
+static const stepper_interface* sc4bbclb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -23835,7 +23832,7 @@ GAME( 200?, sc4bbclbb	,sc4bbclb,	sc4, sc4, sc4_state, sc4bbclb_mbus, ROT0, "Qps"
 GAME( 200?, sc4bbclbc	,sc4bbclb,	sc4, sc4, sc4_state, sc4bbclb_mbus, ROT0, "Qps","Bankety Bank Club (V411) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4canca_reel_configs[6] =
+static const stepper_interface* sc4canca_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -23858,7 +23855,7 @@ GAME( 200?, sc4cancab	,sc4canca,	sc4, sc4, sc4_state, sc4canca, ROT0, "Mazooma",
 GAME( 200?, sc4cancac	,sc4canca,	sc4, sc4, sc4_state, sc4canca, ROT0, "Mazooma","Can Can Cash Casino (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4captn_reel_configs[6] =
+static const stepper_interface* sc4captn_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -23885,7 +23882,7 @@ GAME( 200?, sc4captnd	,sc4captn,	sc4, sc4, sc4_state, sc4captn, ROT0, "Qps","Cap
 GAME( 200?, sc4captne	,sc4captn,	sc4, sc4, sc4_state, sc4captn, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 GAME( 200?, sc4captnf	,sc4captn,	sc4, sc4, sc4_state, sc4captn, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4cmous_reel_configs[6] =
+static const stepper_interface* sc4cmous_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -23909,7 +23906,7 @@ GAME( 200?, sc4cmousb	,sc4cmous,	sc4, sc4, sc4_state, sc4cmous, ROT0, "Qps","Cas
 GAME( 200?, sc4cmousa	,sc4cmous,	sc4, sc4, sc4_state, sc4cmous, ROT0, "Qps","Cash & Mouse (V011) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4cmousc	,sc4cmous,	sc4, sc4, sc4_state, sc4cmous, ROT0, "Qps","Cash & Mouse (V011) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4hotpr_reel_configs[6] =
+static const stepper_interface* sc4hotpr_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -23939,7 +23936,7 @@ GAME( 200?, sc4cburn	,sc4hotpr,	sc4, sc4, sc4_state, sc4hotpr, ROT0, "Qps","Cash
 GAME( 200?, sc4cburna	,sc4hotpr,	sc4, sc4, sc4_state, sc4hotpr, ROT0, "Qps","Cash 'n' Burn (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4cnfr_reel_configs[6] =
+static const stepper_interface* sc4cnfr_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -23969,7 +23966,7 @@ GAME( 200?, sc4cnfrd	,sc4cnfr,	sc4, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash '
 GAME( 200?, sc4cnfrh	,sc4cnfr,	sc4, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit S+P98 (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4cnfri	,sc4cnfr,	sc4, sc4, sc4_state, sc4cnfr, ROT0, "BFM","Cash 'n' Fruit S+P98 (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4cad_reel_configs[6] =
+static const stepper_interface* sc4cad_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24018,7 +24015,7 @@ GAME( 200?, sc4cadp		,sc4cad,	sc4, sc4, sc4_state, sc4cad, ROT0, "Qps","Cash Add
 GAME( 200?, sc4cado		,sc4cad,	sc4, sc4, sc4_state, sc4cad, ROT0, "Qps","Cash Adder (V043) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4cadq		,sc4cad,	sc4, sc4, sc4_state, sc4cad, ROT0, "Qps","Cash Adder (V043) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4cadcl_reel_configs[6] =
+static const stepper_interface* sc4cadcl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24038,7 +24035,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4cadcl)
 GAME( 200?, sc4cadcl	,0,			sc4, sc4, sc4_state, sc4cadcl, ROT0, "Qps","Cash Adder Club (411) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4cadcla	,sc4cadcl,	sc4, sc4, sc4_state, sc4cadcl, ROT0, "Qps","Cash Adder Club (411) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4cr_reel_configs[6] =
+static const stepper_interface* sc4cr_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24066,7 +24063,7 @@ GAME( 200?, sc4crd		,sc4cr,		sc4, sc4, sc4_state, sc4cr, ROT0, "Qps","Cash Raker
 GAME( 200?, sc4crf		,sc4cr,		sc4, sc4, sc4_state, sc4cr, ROT0, "Qps","Cash Raker (V2.2) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4crcl_reel_configs[6] =
+static const stepper_interface* sc4crcl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24101,7 +24098,7 @@ GAME( 200?, sc4crcld	,sc4crcl,	sc4, sc4, sc4_state, sc4crcl, ROT0, "Qps","Cash R
 GAME( 200?, sc4crcle	,sc4crcl,	sc4, sc4, sc4_state, sc4crcl_mbus, ROT0, "Qps","Cash Raker Club (411) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4crclf	,sc4crcl,	sc4, sc4, sc4_state, sc4crcl_mbus, ROT0, "Qps","Cash Raker Club (411) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4cashm_reel_configs[6] =
+static const stepper_interface* sc4cashm_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24128,7 +24125,7 @@ GAME( 200?, sc4cashme	,sc4cashm,	sc4, sc4, sc4_state, sc4cashm, ROT0, "Mazooma",
 
 
 
-const stepper_interface* sc4ckxtb_reel_configs[6] =
+static const stepper_interface* sc4ckxtb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24138,7 +24135,7 @@ const stepper_interface* sc4ckxtb_reel_configs[6] =
 	&starpointrm20_interface_48step,
 };
 
-const stepper_interface* sc4ckx3p_reel_configs[6] =
+static const stepper_interface* sc4ckx3p_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -24174,7 +24171,7 @@ GAME( 200?, sc4ckxe		,sc4ckx,	sc4, sc4, sc4_state, sc4ckx3p, ROT0, "Mazooma","Ca
 GAME( 200?, sc4ckxf		,sc4ckx,	sc4, sc4, sc4_state, sc4ckx3p, ROT0, "Mazooma","Casino King X (Mazooma) (Scorpion 4) (Base, set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4ckxg		,sc4ckx,	sc4, sc4, sc4_state, sc4ckx3p, ROT0, "Mazooma","Casino King X (Mazooma) (Scorpion 4) (Base, set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4chick_reel_configs[6] =
+static const stepper_interface* sc4chick_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24194,7 +24191,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4chick)
 GAME( 200?, sc4chick	,0,			sc4, sc4, sc4_state, sc4chick, ROT0, "Mazooma","Chickendales (Mazooma) (Scorpion 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4cla7_reel_configs[6] =
+static const stepper_interface* sc4cla7_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -24216,7 +24213,7 @@ GAME( 200?, sc4cla7a	,sc4cla7,	sc4, sc4, sc4_state, sc4cla7, ROT0, "Mazooma","Cl
 GAME( 200?, sc4cla7b	,sc4cla7,	sc4, sc4, sc4_state, sc4cla7, ROT0, "Mazooma","Classic 7s (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4cla7c	,sc4cla7,	sc4, sc4, sc4_state, sc4cla7, ROT0, "Mazooma","Classic 7s (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4ccogs_reel_configs[6] =
+static const stepper_interface* sc4ccogs_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24236,7 +24233,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4ccogs)
 GAME( 200?, sc4ccogs	,0,			sc4, sc4, sc4_state, sc4ccogs, ROT0, "Qps","Clever Cogs (Qps) (Scorpion 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4cclas_reel_configs[6] =
+static const stepper_interface* sc4cclas_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24298,7 +24295,7 @@ GAME( 200?, sc4cclasp	,sc4cclas,	sc4, sc4, sc4_state, sc4cclas, ROT0, "BFM","Clu
 
 
 
-const stepper_interface* sc4crcc_reel_configs[6] =
+static const stepper_interface* sc4crcc_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24326,7 +24323,7 @@ GAME( 200?, sc4crccc	,sc4crcc,	sc4dmd, sc4, sc4_state, sc4crcc, ROT0, "BFM","Cop
 
 
 
-const stepper_interface* sc4cclim_reel_configs[6] =
+static const stepper_interface* sc4cclim_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24373,15 +24370,32 @@ GAME( 200?, sc4cclimr	,sc4cclim,	sc4, sc4, sc4_state, sc4cclim_mbus, ROT0, "BFM"
 GAME( 200?, sc4cclimt	,sc4cclim,	sc4, sc4, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 21)", GAME_NOT_WORKING )
 GAME( 200?, sc4cclimu	,sc4cclim,	sc4, sc4, sc4_state, sc4cclim_mbus, ROT0, "BFM","Casino Crazy Climber (Bellfruit) (Scorpion 4) (set 22)", GAME_NOT_WORKING )
 
+
+static const stepper_interface* sc4czfr_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4czfr)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4czfr_reel_configs;
+}
+
 // the unusual sound rom numbering suggests a non-English market version, although the startup messages are in English
 // PR6982 CRAZY FRUITS 1.02         95004150 CRAZY FRUITS PR6982        CRAZY FRUITS
-GAME( 200?, sc4czfr		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (Germany?) (PR6982, GCRF, 1.02) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // German set?
+GAME( 200?, sc4czfr		,0,			sc4, sc4, sc4_state, sc4czfr, ROT0, "BFM","Crazy Fruits (Germany?) (PR6982, GCRF, 1.02) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // German set?
 // P_6_8_ _R_Z_ _R_I_S_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _5_0_1_0_C_A_Y_F_U_T_ _R_9_2_ _
-GAME( 200?, sc4czfrd	,sc4czfr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (Germany?) (PR6982, GCRF) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // incomplete pairing (in 'up for it' set)
+GAME( 200?, sc4czfrd	,sc4czfr,	sc4, sc4, sc4_state, sc4czfr, ROT0, "BFM","Crazy Fruits (Germany?) (PR6982, GCRF) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // incomplete pairing (in 'up for it' set)
 
 
 
-const stepper_interface* sc4cfqps_reel_configs[6] =
+static const stepper_interface* sc4cfqps_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24397,7 +24411,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4cfqps)
 	m_reel_setup = sc4cfqps_reel_configs;
 }
 
-const stepper_interface* sc4cfqps_alt_reel_configs[6] =
+static const stepper_interface* sc4cfqps_alt_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24449,7 +24463,7 @@ GAME( 200?, sc4cfqpsm	,sc4cfqps,	sc4, sc4, sc4_state, sc4cfqps, ROT0, "BFM / Whi
 GAME( 200?, sc4cfqpso	,sc4cfqps,	sc4, sc4, sc4_state, sc4cfqps, ROT0, "BFM / Whitbread","Crazy Fruits SP98 (PR4613) (BFM / Whitbread) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4cfcas_reel_configs[6] =
+static const stepper_interface* sc4cfcas_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24526,7 +24540,7 @@ GAME( 200?, sc4cfcasad	,sc4cfcas,	sc4, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM
 GAME( 200?, sc4cfcasae	,sc4cfcas,	sc4, sc4, sc4_state, sc4cfcas_mbus, ROT0, "BFM","Casino Crazy Fruits (CCFR) (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4cfclb_reel_configs[6] =
+static const stepper_interface* sc4cfclb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24618,18 +24632,35 @@ GAME( 200?, sc4crzkyv	,sc4crzky,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casi
 GAME( 200?, sc4crzkyw	,sc4crzky,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
 
 
+static const stepper_interface* sc4cccsh_reel_configs[6] =
+{
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4cccsh)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4cccsh_reel_configs;
+}
+
+
 // SWP, different buttons to most games, no reels
 // PR7023 CRISS CROSS CASH         CCC SOUNDS
-GAME( 200?, sc4cccsh	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Criss Cross Cash (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4cccsha	,sc4cccsh,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Criss Cross Cash (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4cccshb	,sc4cccsh,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Criss Cross Cash (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4cccshc	,sc4cccsh,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Criss Cross Cash (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4cccshd	,sc4cccsh,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Criss Cross Cash (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4cccshe	,sc4cccsh,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Criss Cross Cash (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4cccsh	,0,			sc4, sc4, sc4_state, sc4cccsh, ROT0, "Mazooma","Criss Cross Cash (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4cccsha	,sc4cccsh,	sc4, sc4, sc4_state, sc4cccsh, ROT0, "Mazooma","Criss Cross Cash (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4cccshb	,sc4cccsh,	sc4, sc4, sc4_state, sc4cccsh, ROT0, "Mazooma","Criss Cross Cash (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4cccshc	,sc4cccsh,	sc4, sc4, sc4_state, sc4cccsh, ROT0, "Mazooma","Criss Cross Cash (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4cccshd	,sc4cccsh,	sc4, sc4, sc4_state, sc4cccsh, ROT0, "Mazooma","Criss Cross Cash (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4cccshe	,sc4cccsh,	sc4, sc4, sc4_state, sc4cccsh, ROT0, "Mazooma","Criss Cross Cash (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
 
 
-const stepper_interface* sc4daylt_reel_configs[6] =
+static const stepper_interface* sc4daylt_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -24664,7 +24695,7 @@ GAME( 200?, sc4dayltk	,sc4daylt,	sc4, sc4, sc4_state, sc4daylt, ROT0, "BFM","Day
 GAME( 200?, sc4dayltl	,sc4daylt,	sc4, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery SP98 (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4dayltm	,sc4daylt,	sc4, sc4, sc4_state, sc4daylt, ROT0, "BFM","Daylight Robbery SP98 (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4deepi_reel_configs[6] =
+static const stepper_interface* sc4deepi_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24688,7 +24719,7 @@ GAME( 200?, sc4deepid	,sc4deepi,	sc4, sc4, sc4_state, sc4deepi, ROT0, "Mazooma",
 
 
 
-const stepper_interface* sc4disco_reel_configs[6] =
+static const stepper_interface* sc4disco_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24711,7 +24742,7 @@ GAME( 200?, sc4discoa	,sc4disco,	sc4, sc4, sc4_state, sc4disco, ROT0, "Mazooma",
 GAME( 200?, sc4discoc	,sc4disco,	sc4, sc4, sc4_state, sc4disco, ROT0, "Mazooma","Disco Inferno (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 GAME( 200?, sc4discod	,sc4disco,	sc4, sc4, sc4_state, sc4disco, ROT0, "Mazooma","Disco Inferno (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4dblfr_reel_configs[6] =
+static const stepper_interface* sc4dblfr_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24736,7 +24767,7 @@ GAME( 200?, sc4dblfrc	,sc4dblfr,	sc4, sc4, sc4_state, sc4dblfr, ROT0, "Qps","Dou
 GAME( 200?, sc4dblfrd	,sc4dblfr,	sc4, sc4, sc4_state, sc4dblfr, ROT0, "Qps","Double Frenzy (PR2276) (212) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4dblfre	,sc4dblfr,	sc4, sc4, sc4_state, sc4dblfr, ROT0, "Qps","Double Frenzy (PR2276) (212) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4darwr_reel_configs[6] =
+static const stepper_interface* sc4darwr_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24758,7 +24789,7 @@ GAME( 200?, sc4darwa	,sc4darw,	sc4, sc4, sc4_state, sc4darw, ROT0, "Qps","Dough 
 GAME( 200?, sc4darwb	,sc4darw,	sc4, sc4, sc4_state, sc4darw, ROT0, "Qps","Dough & Arrow (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4darwc	,sc4darw,	sc4, sc4, sc4_state, sc4darw, ROT0, "Qps","Dough & Arrow (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4sstep_reel_configs[6] =
+static const stepper_interface* sc4sstep_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24781,7 +24812,7 @@ GAME( 200?, sc4sstepa	,sc4sstep,	sc4, sc4, sc4_state, sc4sstep, ROT0, "Qps","Sup
 GAME( 200?, sc4sstepb	,sc4sstep,	sc4, sc4, sc4_state, sc4sstep, ROT0, "Qps / 21 Casino","Super Step (Qps / 21 Casino) (Scorpion 4)", GAME_NOT_WORKING ) // This one contains 21-Casino and Super Step strings
 
 
-const stepper_interface* sc4duckq_reel_configs[6] =
+static const stepper_interface* sc4duckq_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24802,7 +24833,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4duckq)
 GAME( 200?, sc4duckq	,0,			sc4, sc4, sc4_state, sc4duckq, ROT0, "Qps","Ducks Of Hazzard (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4duckqa	,sc4duckq,	sc4, sc4, sc4_state, sc4duckq, ROT0, "Qps","Ducks Of Hazzard (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4eascs_reel_configs[6] =
+static const stepper_interface* sc4eascs_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24832,7 +24863,7 @@ GAME( 200?, sc4eascsi	,sc4eascs,	sc4, sc4, sc4_state, sc4eascs, ROT0, "BFM","Cas
 GAME( 200?, sc4eascsj	,sc4eascs,	sc4, sc4, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
 GAME( 200?, sc4eascsk	,sc4eascs,	sc4, sc4, sc4_state, sc4eascs, ROT0, "BFM","Casino Easy Streak (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4fastf_reel_configs[6] =
+static const stepper_interface* sc4fastf_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24854,7 +24885,7 @@ GAME( 200?, sc4fastfa	,sc4fastf,	sc4, sc4, sc4_state, sc4fastf, ROT0, "Mazooma",
 GAME( 200?, sc4fastfb	,sc4fastf,	sc4, sc4, sc4_state, sc4fastf, ROT0, "Mazooma","Fast 'n' Furious (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4fastfc	,sc4fastf,	sc4, sc4, sc4_state, sc4fastf, ROT0, "Mazooma","Fast 'n' Furious (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4ffru_reel_configs[6] =
+static const stepper_interface* sc4ffru_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24880,7 +24911,7 @@ GAME( 200?, sc4ffrud	,sc4ffru,	sc4, sc4, sc4_state, sc4ffru, ROT0, "Qps","Fast F
 GAME( 200?, sc4ffrue	,sc4ffru,	sc4, sc4, sc4_state, sc4ffru, ROT0, "Qps","Fast Fruit (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4fpitc_reel_configs[6] =
+static const stepper_interface* sc4fpitc_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24911,7 +24942,7 @@ GAME( 200?, sc4fpitck	,sc4fpitc,	sc4, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fev
 GAME( 200?, sc4fpitcc	,sc4fpitc,	sc4, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
 GAME( 200?, sc4fpitcg	,sc4fpitc,	sc4, sc4, sc4_state, sc4fpitc, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4fcc_reel_configs[6] =
+static const stepper_interface* sc4fcc_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24934,7 +24965,7 @@ GAME( 200?, sc4fcca		,sc4fcc,	sc4dmd, sc4, sc4_state, sc4fcc, ROT0, "BFM","Firec
 GAME( 200?, sc4fccb		,sc4fcc,	sc4dmd, sc4, sc4_state, sc4fcc, ROT0, "BFM","Firecracker Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4fccc		,sc4fcc,	sc4dmd, sc4, sc4_state, sc4fcc, ROT0, "BFM","Firecracker Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4fire_reel_configs[6] =
+static const stepper_interface* sc4fire_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24956,7 +24987,7 @@ GAME( 200?, sc4fire		,0,			sc4, sc4, sc4_state, sc4fire, ROT0, "Mazooma","Firepo
 GAME( 200?, sc4firea	,sc4fire,	sc4, sc4, sc4_state, sc4fire, ROT0, "Mazooma","Firepower (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4fwp_reel_configs[6] =
+static const stepper_interface* sc4fwp_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -24982,7 +25013,7 @@ GAME( 200?, sc4fwpcs	,sc4fwp,	sc4, sc4, sc4_state, sc4fwp, ROT0, "Mazooma","Five
 GAME( 200?, sc4fwpcsa	,sc4fwp,	sc4, sc4, sc4_state, sc4fwp, ROT0, "Mazooma","Five Ways Pays (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 GAME( 200?, sc4fwpcsb	,sc4fwp,	sc4, sc4, sc4_state, sc4fwp, ROT0, "Mazooma","Five Ways Pays (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4fd7th_reel_configs[6] =
+static const stepper_interface* sc4fd7th_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -25012,7 +25043,7 @@ GAME( 200?, sc4fd7thd	,sc4fd7th,	sc4, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Fra
 GAME( 200?, sc4fd7thh	,sc4fd7th,	sc4, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven SP98 (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4fd7thi	,sc4fd7th,	sc4, sc4, sc4_state, sc4fd7th, ROT0, "BFM","Frankie Dettori's 7th Heaven SP98 (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4frenz_reel_configs[6] =
+static const stepper_interface* sc4frenz_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -25036,7 +25067,7 @@ GAME( 200?, sc4frenzc	,sc4frenz,	sc4, sc4, sc4_state, sc4frenz, ROT0, "BFM","Fru
 GAME( 200?, sc4frenzd	,sc4frenz,	sc4, sc4, sc4_state, sc4frenz, ROT0, "BFM","Fruit Frenzy (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4frenze	,sc4frenz,	sc4, sc4, sc4_state, sc4frenz, ROT0, "BFM","Fruit Frenzy (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4ftopi_reel_configs[6] =
+static const stepper_interface* sc4ftopi_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -25068,7 +25099,7 @@ GAME( 200?, sc4ftopig	,sc4ftopi,	sc4, sc4, sc4_state, sc4ftopi, ROT0, "Qps","Fru
 GAME( 200?, sc4ftopie	,sc4ftopi,	sc4, sc4, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (V2.2) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4ftopih	,sc4ftopi,	sc4, sc4, sc4_state, sc4ftopi, ROT0, "Qps","Fruitopia (V2.2) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4frsu_reel_configs[6] =
+static const stepper_interface* sc4frsu_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -25094,50 +25125,91 @@ GAME( 200?, sc4frsue	,sc4frsu,	sc4, sc4, sc4_state, sc4frsu, ROT0, "BFM","Casino
 GAME( 200?, sc4frsuf	,sc4frsu,	sc4, sc4, sc4_state, sc4frsu, ROT0, "BFM","Casino Fruits 'n' Suits (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 GAME( 200?, sc4frsug	,sc4frsu,	sc4, sc4, sc4_state, sc4frsu, ROT0, "BFM","Casino Fruits 'n' Suits (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
+static const stepper_interface* sc4fullt_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4fullt)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4fullt_reel_configs;
+}
+
 // PR2537 FULL THROTTLE 011         FULLTHROTTLESND          FULL  THROTTLE
-GAME( 200?, sc4fullt	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Qps","Full Throttle (011) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4fulltb	,sc4fullt,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Full Throttle (011) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4fullt	,0,			sc4, sc4, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (011) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4fulltb	,sc4fullt,	sc4, sc4, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (011) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 // PR2537 FULL THROTTLE 041         FULLTHROTTLESND          FULL  THROTTLE
-GAME( 200?, sc4fullta	,sc4fullt,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Full Throttle (041) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4fulltc	,sc4fullt,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Full Throttle (041) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4fullta	,sc4fullt,	sc4, sc4, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (041) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4fulltc	,sc4fullt,	sc4, sc4, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (041) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 // PR2537 FULL THROTTLE 012         FULLTHROTTLESND          FULL  THROTTLE
-GAME( 200?, sc4fulltd	,sc4fullt,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Full Throttle (012) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4fulltg	,sc4fullt,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Full Throttle (012) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4fulltd	,sc4fullt,	sc4, sc4, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (012) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4fulltg	,sc4fullt,	sc4, sc4, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (012) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 // PR2537 FULL THROTTLE 042         FULLTHROTTLESND          FULL  THROTTLE
-GAME( 200?, sc4fullte	,sc4fullt,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Full Throttle (042) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4fullth	,sc4fullt,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Full Throttle (042) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4fullte	,sc4fullt,	sc4, sc4, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (042) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4fullth	,sc4fullt,	sc4, sc4, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (042) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 // R2537 FULL THROTTLE 013         FULLTHROTTLESND          FULL  THROTTLE
-GAME( 200?, sc4fulltf	,sc4fullt,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Full Throttle (013) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4fullti	,sc4fullt,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Full Throttle (013) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4fulltf	,sc4fullt,	sc4, sc4, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (013) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4fullti	,sc4fullt,	sc4, sc4, sc4_state, sc4fullt, ROT0, "Qps","Full Throttle (013) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
+static const stepper_interface* sc4ziggy_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	&starpoint_interface_200step_reel,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4ziggy)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4ziggy_reel_configs;
+}
 
 
 // PR2162 GETTIN' ZIGGY         ZIGY SOUNDS         GETTIN' ZIGGY
-GAME( 200?, sc4ziggy	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Gettin Ziggy With It (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4ziggya	,sc4ziggy,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Gettin Ziggy With It (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4ziggyb	,sc4ziggy,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Gettin Ziggy With It (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4ziggyc	,sc4ziggy,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Gettin Ziggy With It (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4ziggyd	,sc4ziggy,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Gettin Ziggy With It (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4ziggye	,sc4ziggy,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Gettin Ziggy With It (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4ziggyf	,sc4ziggy,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Gettin Ziggy With It (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4ziggyg	,sc4ziggy,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Gettin Ziggy With It (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+GAME( 200?, sc4ziggy	,0,			sc4, sc4, sc4_state, sc4ziggy, ROT0, "Mazooma","Gettin Ziggy With It (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4ziggya	,sc4ziggy,	sc4, sc4, sc4_state, sc4ziggy, ROT0, "Mazooma","Gettin Ziggy With It (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4ziggyb	,sc4ziggy,	sc4, sc4, sc4_state, sc4ziggy, ROT0, "Mazooma","Gettin Ziggy With It (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4ziggyc	,sc4ziggy,	sc4, sc4, sc4_state, sc4ziggy, ROT0, "Mazooma","Gettin Ziggy With It (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4ziggyd	,sc4ziggy,	sc4, sc4, sc4_state, sc4ziggy, ROT0, "Mazooma","Gettin Ziggy With It (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4ziggye	,sc4ziggy,	sc4, sc4, sc4_state, sc4ziggy, ROT0, "Mazooma","Gettin Ziggy With It (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4ziggyf	,sc4ziggy,	sc4, sc4, sc4_state, sc4ziggy, ROT0, "Mazooma","Gettin Ziggy With It (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4ziggyg	,sc4ziggy,	sc4, sc4, sc4_state, sc4ziggy, ROT0, "Mazooma","Gettin Ziggy With It (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
+static const stepper_interface* sc4gldcl_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4gldcl)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4gldcl_reel_configs;
+}
 
 // PR2292 CLUB GLADIATOR         CLUB GLADIATOR  CLUB  CLUB GLAD SOUNDS         CLUB GLADIATOR
-GAME( 200?, sc4gldcl	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Gladiator Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4gldcla	,sc4gldcl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Gladiator Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-
-
-GAME( 200?, sc4gfev		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Gold Fever (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // PR20XX GOLD FEVER PUSHER         GOLDFEVER SOUNDS          GOLD FEVER
-GAME( 200?, sc4gfeva	,sc4gfev,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Gold Fever (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING ) // PR2142 GOLD FEVER PUSHER USA         GOLDFEVER SOUNDS          GOLD FEVER
-GAME( 200?, sc4gfevb	,sc4gfev,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Gold Fever (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING ) // ^^
-// PR2142 GOLD FEVER PUSHER USA         GOLDFEVER SOUNDS          GOLD FEVER   (mislabeled?)
-GAME( 200?, sc4db		,sc4gfev,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Gold Fever (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING ) // ^^  (was D & B (Mazooma) (Scorpion 4) but D&B just seem to be a company associated with Mazooma? )
+GAME( 200?, sc4gldcl	,0,			sc4, sc4, sc4_state, sc4gldcl, ROT0, "QPS","Gladiator Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4gldcla	,sc4gldcl,	sc4, sc4, sc4_state, sc4gldcl, ROT0, "QPS","Gladiator Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
 
-const stepper_interface* sc4ghost_reel_configs[6] =
+
+
+static const stepper_interface* sc4ghost_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -25148,7 +25220,7 @@ const stepper_interface* sc4ghost_reel_configs[6] =
 };
 
 
-const stepper_interface* sc4ghosttb_reel_configs[6] =
+static const stepper_interface* sc4ghosttb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -25182,60 +25254,132 @@ GAME( 200?, sc4ghosta	,sc4ghost,	sc4, sc4, sc4_state, sc4ghosttb, ROT0, "Mazooma
 GAME( 200?, sc4ghostd	,sc4ghost,	sc4, sc4, sc4_state, sc4ghosttb, ROT0, "Mazooma","Golden Ghost (Mazooma) (Scorpion 4) (Top Box, set 2)", GAME_NOT_WORKING )
 GAME( 200?, sc4ghosth	,sc4ghost,	sc4, sc4, sc4_state, sc4ghosttb, ROT0, "Mazooma","Golden Ghost (Mazooma) (Scorpion 4) (Top Box, set 3)", GAME_NOT_WORKING )
 
-// PR2518 GOLDEN GRID V1.0         GOLDENGRIDSND           GOLDEN  GRID
-GAME( 200?, sc4ggrid	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Grid (V1.0) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4ggrida	,sc4ggrid,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Grid (V1.0) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4ggride	,sc4ggrid,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Grid (V1.0) (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4ggridf	,sc4ggrid,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Grid (V1.0) (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-// PR2518 GOLDEN GRID V1.1         GOLDENGRIDSND           GOLDEN  GRID
-GAME( 200?, sc4ggridb	,sc4ggrid,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Grid (V1.1) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4ggridc	,sc4ggrid,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Grid (V1.1) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4ggridg	,sc4ggrid,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Grid (V1.1) (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4ggridh	,sc4ggrid,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Grid (V1.1) (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-// PR2518 GOLDEN GRID V1.3         GOLDENGRIDSND           GOLDEN  GRID
-GAME( 200?, sc4ggridd	,sc4ggrid,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Grid (V1.3) (Qps) (Scorpion 4)", GAME_NOT_WORKING )
-// PR2518 GOLDEN GRID V011         GOLDENGRIDSND           GOLDEN  GRID
-GAME( 200?, sc4ggridi	,sc4ggrid,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Grid (V011) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4ggridk	,sc4ggrid,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Grid (V011) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-// PR2518 GOLDEN GRID V041         GOLDENGRIDSND           GOLDEN  GRID
-GAME( 200?, sc4ggridj	,sc4ggrid,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Grid (V041) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4ggridl	,sc4ggrid,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Grid (V041) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-// PR2518 GOLDEN GRID V012         GOLDENGRIDSND           GOLDEN  GRID
-GAME( 200?, sc4ggridm	,sc4ggrid,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Grid (V012) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4ggridn	,sc4ggrid,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Grid (V012) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
+static const stepper_interface* sc4ggrid_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4ggrid)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4ggrid_reel_configs;
+}
+
+DRIVER_INIT_MEMBER(sc4_state,sc4ggrid_mbus)
+{
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4ggrid_reel_configs;
+}
+
+// PR2518 GOLDEN GRID V1.0         GOLDENGRIDSND           GOLDEN  GRID
+GAME( 200?, sc4ggrid	,0,			sc4, sc4, sc4_state, sc4ggrid, ROT0, "Qps","Golden Grid (V1.0) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggrida	,sc4ggrid,	sc4, sc4, sc4_state, sc4ggrid, ROT0, "Qps","Golden Grid (V1.0) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggride	,sc4ggrid,	sc4, sc4, sc4_state, sc4ggrid, ROT0, "Qps","Golden Grid (V1.0) (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggridf	,sc4ggrid,	sc4, sc4, sc4_state, sc4ggrid, ROT0, "Qps","Golden Grid (V1.0) (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+// PR2518 GOLDEN GRID V1.1         GOLDENGRIDSND           GOLDEN  GRID
+GAME( 200?, sc4ggridb	,sc4ggrid,	sc4, sc4, sc4_state, sc4ggrid, ROT0, "Qps","Golden Grid (V1.1) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggridc	,sc4ggrid,	sc4, sc4, sc4_state, sc4ggrid, ROT0, "Qps","Golden Grid (V1.1) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggridg	,sc4ggrid,	sc4, sc4, sc4_state, sc4ggrid, ROT0, "Qps","Golden Grid (V1.1) (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggridh	,sc4ggrid,	sc4, sc4, sc4_state, sc4ggrid, ROT0, "Qps","Golden Grid (V1.1) (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+// PR2518 GOLDEN GRID V1.3         GOLDENGRIDSND           GOLDEN  GRID
+GAME( 200?, sc4ggridd	,sc4ggrid,	sc4, sc4, sc4_state, sc4ggrid, ROT0, "Qps","Golden Grid (V1.3) (Qps) (Scorpion 4)", GAME_NOT_WORKING )
+// PR2518 GOLDEN GRID V011         GOLDENGRIDSND           GOLDEN  GRID
+GAME( 200?, sc4ggridi	,sc4ggrid,	sc4, sc4, sc4_state, sc4ggrid_mbus, ROT0, "Qps","Golden Grid (V011) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggridk	,sc4ggrid,	sc4, sc4, sc4_state, sc4ggrid_mbus, ROT0, "Qps","Golden Grid (V011) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+// PR2518 GOLDEN GRID V041         GOLDENGRIDSND           GOLDEN  GRID
+GAME( 200?, sc4ggridj	,sc4ggrid,	sc4, sc4, sc4_state, sc4ggrid_mbus, ROT0, "Qps","Golden Grid (V041) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggridl	,sc4ggrid,	sc4, sc4, sc4_state, sc4ggrid_mbus, ROT0, "Qps","Golden Grid (V041) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+// PR2518 GOLDEN GRID V012         GOLDENGRIDSND           GOLDEN  GRID
+GAME( 200?, sc4ggridm	,sc4ggrid,	sc4, sc4, sc4_state, sc4ggrid_mbus, ROT0, "Qps","Golden Grid (V012) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggridn	,sc4ggrid,	sc4, sc4, sc4_state, sc4ggrid_mbus, ROT0, "Qps","Golden Grid (V012) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+
+static const stepper_interface* sc4ggcl_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4ggcl)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4ggcl_reel_configs;
+}
+
+DRIVER_INIT_MEMBER(sc4_state,sc4ggcl_mbus)
+{
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4ggcl_reel_configs;
+}
 
 // PR????  CLUB GOLDEN GRID V1.0         CLUBGOLDENGRIDSND         CLUB GOLDEN GRID
-GAME( 200?, sc4ggcl		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Grid Club (V1.0) (Qps) (Scorpion 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggcl		,0,			sc4, sc4, sc4_state, sc4ggcl, ROT0, "Qps","Golden Grid Club (V1.0) (Qps) (Scorpion 4)", GAME_NOT_WORKING )
 // PR????  CLUB GOLDEN GRID 411         CLUBGOLDENGRIDSND         CLUB GOLDEN GRID
-GAME( 200?, sc4ggcla	,sc4ggcl,	sc4, sc4, sc4_state, sc4mbus, ROT0, "Qps","Golden Grid Club (V411) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4ggclb	,sc4ggcl,	sc4, sc4, sc4_state, sc4mbus, ROT0, "Qps","Golden Grid Club (V411) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggcla	,sc4ggcl,	sc4, sc4, sc4_state, sc4ggcl_mbus, ROT0, "Qps","Golden Grid Club (V411) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggclb	,sc4ggcl,	sc4, sc4, sc4_state, sc4ggcl_mbus, ROT0, "Qps","Golden Grid Club (V411) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 // PR????  CLUB GOLDEN GRID 412         CLUBGOLDENGRIDSND         CLUB GOLDEN GRID
-GAME( 200?, sc4ggclc	,sc4ggcl,	sc4, sc4, sc4_state, sc4mbus, ROT0, "Qps","Golden Grid Club (V412) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4ggcld	,sc4ggcl,	sc4, sc4, sc4_state, sc4mbus, ROT0, "Qps","Golden Grid Club (V412) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggclc	,sc4ggcl,	sc4, sc4, sc4_state, sc4ggcl_mbus, ROT0, "Qps","Golden Grid Club (V412) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4ggcld	,sc4ggcl,	sc4, sc4, sc4_state, sc4ggcl_mbus, ROT0, "Qps","Golden Grid Club (V412) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+
+
+static const stepper_interface* sc4goldo_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4goldo)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4goldo_reel_configs;
+}
 
 
 // PR7024 GOLDEN OLDIE         OLDIE SOUNDS
-GAME( 200?, sc4goldo	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Oldie (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4goldoa	,sc4goldo,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Oldie (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4goldob	,sc4goldo,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Oldie (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4goldoc	,sc4goldo,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Oldie (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-// PR7024 GOLDEN OLDIE         OLDIE SOUNDS  (same as above?)
-GAME( 200?, sc4gocas	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Oldie Casino (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4gocasa	,sc4gocas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden Oldie Casino (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4goldo	,0,			sc4, sc4, sc4_state, sc4goldo, ROT0, "Mazooma","Casino Golden Oldie (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4goldoa	,sc4goldo,	sc4, sc4, sc4_state, sc4goldo, ROT0, "Mazooma","Casino Golden Oldie (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4goldob	,sc4goldo,	sc4, sc4, sc4_state, sc4goldo, ROT0, "Mazooma","Casino Golden Oldie (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4goldoc	,sc4goldo,	sc4, sc4, sc4_state, sc4goldo, ROT0, "Mazooma","Casino Golden Oldie (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4gocas	,sc4goldo,	sc4, sc4, sc4_state, sc4goldo, ROT0, "Mazooma","Casino Golden Oldie (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4gocasa	,sc4goldo,	sc4, sc4, sc4_state, sc4goldo, ROT0, "Mazooma","Casino Golden Oldie (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-// PR2564 GOLDEN SHOT Standard Version         GOLDENSHOTLOTECHSND
-GAME( 200?, sc4gshot	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Shot (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4gshotb	,sc4gshot,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Shot (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-// PR2564 GOLDEN SHOT Arcade Version         GOLDENSHOTLOTECHSND
-GAME( 200?, sc4gshota	,sc4gshot,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Shot Arcade (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4gshotc	,sc4gshot,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Shot Arcade (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
+static const stepper_interface* sc4goldw_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4goldw)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4goldw_reel_configs;
+}
+
+
+// the dot matrix calls these 'classic crazy fruits' was it not shown or is Golden Winner a subtitle?
 // PR1431 GOLDEN WINNER         PR1431 GOLDEN WINNER SND11
-GAME( 200?, sc4goldw	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Golden Winner (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4goldwa	,sc4goldw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Golden Winner (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4goldwb	,sc4goldw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Golden Winner (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4goldwc	,sc4goldw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Golden Winner (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4goldw	,0,			sc4, sc4, sc4_state, sc4goldw, ROT0, "BFM","Golden Winner (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4goldwa	,sc4goldw,	sc4, sc4, sc4_state, sc4goldw, ROT0, "BFM","Golden Winner (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4goldwb	,sc4goldw,	sc4, sc4, sc4_state, sc4goldw, ROT0, "BFM","Golden Winner (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4goldwc	,sc4goldw,	sc4, sc4, sc4_state, sc4goldw, ROT0, "BFM","Golden Winner (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 // PR1437 GOLDEN WINNER         PR1436 TRIPLE CASINO SOUNDS11  // these show init comms
 GAME( 200?, sc4goldwd	,sc4goldw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Golden Winner (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4goldwe	,sc4goldw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Golden Winner (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
@@ -25243,7 +25387,7 @@ GAME( 200?, sc4goldwf	,sc4goldw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Golden W
 GAME( 200?, sc4goldwg	,sc4goldw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Golden Winner (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4bonbx_reel_configs[6] =
+static const stepper_interface* sc4bonbx_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -25272,7 +25416,7 @@ INPUT_PORTS_START( sc4bonbx4 )
 	SC4_JACKPOT_KEY_SETTINGS
 INPUT_PORTS_END
 
-const stepper_interface* sc4gx_reel_configs[6] =
+static const stepper_interface* sc4gx_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -25322,7 +25466,7 @@ GAME( 200?, sc4gxb		,sc4bonbx,	sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar 
 
 
 
-const stepper_interface* sc4gggtb_reel_configs[6] =
+static const stepper_interface* sc4gggtb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -25351,7 +25495,7 @@ GAME( 200?, sc4monog	,sc4ggtb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden
 GAME( 200?, sc4monoga	,sc4ggtb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Golden X (Mazooma) (PR2056, TBOX) (Scorpion 4) (Top Box, set 6)", GAME_NOT_WORKING )// PR2056  GOLD X TRIPLE         BARX SOUNDS         GOLD X TRIPLE
 
 
-const stepper_interface* sc4ggame_reel_configs[6] =
+static const stepper_interface* sc4ggame_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -25373,7 +25517,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4ggame)
 	m_reel_setup = sc4ggame_reel_configs;
 }
 
-const stepper_interface* sc4gx3_reel_configs[6] =
+static const stepper_interface* sc4gx3_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -25483,7 +25627,7 @@ GAME( 200?, sc4ggdlxg	,sc4ggdlx,	sc4, sc4, sc4_state, sc4ggame, ROT0, "Mazooma",
 
 
 
-const stepper_interface* sc4ggg_reel_configs[6] =
+static const stepper_interface* sc4ggg_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -25527,47 +25671,103 @@ GAME( 200?, sc4gggtba	,sc4ggg,	sc4, sc4, sc4_state, sc4gggtb, ROT0, "Mazooma","G
 
 
 
+static const stepper_interface* sc4gag_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4gag)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4gag_reel_configs;
+}
 
 
-
-
+// the (PR7019, GRAN) sets requires 3:2 and 3:3 ON to boot, (PR7019, GRAB) I'm not sure
 // PR7019 GRAB A GRANNY         GRANNY SOUNDS
-GAME( 200?, sc4gag		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grab A Granny (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4gaga		,sc4gag,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grab A Granny (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4gagb		,sc4gag,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grab A Granny (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4gagc		,sc4gag,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grab A Granny (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4gag		,0,			sc4, sc4, sc4_state, sc4gag, ROT0, "Mazooma","Grab A Granny (PR7019, GRAB) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4gagb		,sc4gag,	sc4, sc4, sc4_state, sc4gag, ROT0, "Mazooma","Grab A Granny (PR7019, GRAB) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4gaga		,sc4gag,	sc4, sc4, sc4_state, sc4gag, ROT0, "Mazooma","Grab A Granny (PR7019, GRAN) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4gagc		,sc4gag,	sc4, sc4, sc4_state, sc4gag, ROT0, "Mazooma","Grab A Granny (PR7019, GRAN) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-// PR2125 GRAND BLASTER CASH         GRAN SOUNDS         GRAND BLASTER
-GAME( 200?, sc4gcb		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcba		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcbb		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcbc		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcbd		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcbe		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcbf		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcbg		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcbh		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcbi		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
-GAME( 200?, sc4gcbj		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
+
+static const stepper_interface* sc4greed_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	&starpointrm20_interface_48step,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4greed)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4greed_reel_configs;
+}
+
 
 
 // PR1401 AWP GREEDY GONZALEZ         PR1401 GREEDY GONZ SOUNDS11
-GAME( 200?, sc4greed	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Greedy Gonzalez (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4greeda	,sc4greed,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Greedy Gonzalez (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4greed	,0,			sc4, sc4, sc4_state, sc4greed, ROT0, "BFM","Greedy Gonzalez (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4greeda	,sc4greed,	sc4, sc4, sc4_state, sc4greed, ROT0, "BFM","Greedy Gonzalez (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+
+static const stepper_interface* sc4hf_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4hf)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4hf_reel_configs;
+}
+
+
 
 //PR1011 HAPPY FRUITS         PR1011 HAPPY FRUITS SOUNDS11
-GAME( 200?, sc4hf		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Happy Fruits (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4hfa		,sc4hf,		sc4, sc4, sc4_state, sc4, ROT0, "BFM","Happy Fruits (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4hfb		,sc4hf,		sc4, sc4, sc4_state, sc4, ROT0, "BFM","Happy Fruits (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4hfc		,sc4hf,		sc4, sc4, sc4_state, sc4, ROT0, "BFM","Happy Fruits (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4hfd		,sc4hf,		sc4, sc4, sc4_state, sc4, ROT0, "BFM","Happy Fruits (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4hfe		,sc4hf,		sc4, sc4, sc4_state, sc4, ROT0, "BFM","Happy Fruits (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4hff		,sc4hf,		sc4, sc4, sc4_state, sc4, ROT0, "BFM","Happy Fruits (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4hfg		,sc4hf,		sc4, sc4, sc4_state, sc4, ROT0, "BFM","Happy Fruits (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+GAME( 200?, sc4hf		,0,			sc4, sc4, sc4_state, sc4hf, ROT0, "BFM","Happy Fruits (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4hfa		,sc4hf,		sc4, sc4, sc4_state, sc4hf, ROT0, "BFM","Happy Fruits (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4hfb		,sc4hf,		sc4, sc4, sc4_state, sc4hf, ROT0, "BFM","Happy Fruits (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4hfc		,sc4hf,		sc4, sc4, sc4_state, sc4hf, ROT0, "BFM","Happy Fruits (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4hfd		,sc4hf,		sc4, sc4, sc4_state, sc4hf, ROT0, "BFM","Happy Fruits (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4hfe		,sc4hf,		sc4, sc4, sc4_state, sc4hf, ROT0, "BFM","Happy Fruits (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4hff		,sc4hf,		sc4, sc4, sc4_state, sc4hf, ROT0, "BFM","Happy Fruits (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4hfg		,sc4hf,		sc4, sc4, sc4_state, sc4hf, ROT0, "BFM","Happy Fruits (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+
+
+static const stepper_interface* sc4hfcl_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4hfcl)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4hfcl_reel_configs;
+}
+
+
 
 //  PR1021 CLUB HAPPY FRUITS         PR1021 HAPPY SOUNDS11           HAPPY FRUITS
-GAME( 200?, sc4hfcl		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Happy Fruits Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4hfcla	,sc4hfcl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Happy Fruits Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4hfcl		,0,			sc4, sc4, sc4_state, sc4hfcl, ROT0, "BFM","Happy Fruits Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4hfcla	,sc4hfcl,	sc4, sc4, sc4_state, sc4hfcl, ROT0, "BFM","Happy Fruits Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
 
@@ -25637,7 +25837,7 @@ GAME( 200?, sc4h6clb	,sc4h6cl,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Hot Si
 GAME( 200?, sc4h6clc	,sc4h6cl,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Hot Six Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4ijclb_reel_configs[6] =
+static const stepper_interface* sc4ijclb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -25657,7 +25857,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4ijclb)
 // PR2403 CLUB ITALIAN JOB         CLUB ITALIAN JOB  CLUB  CLUB ITJB SOUNDS
 GAME( 200?, sc4ijclb	,0,			sc4, sc4, sc4_state, sc4ijclb, ROT0, "Mazooma","Italian Job Club (Mazooma) (Scorpion 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4jack_reel_configs[6] =
+static const stepper_interface* sc4jack_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -25685,7 +25885,7 @@ GAME( 200?, sc4jackf	,sc4jack,	sc4, sc4, sc4_state, sc4jack, ROT0, "Mazooma","Ja
 GAME( 200?, sc4jackg	,sc4jack,	sc4, sc4, sc4_state, sc4jack, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4jjunc_reel_configs[6] =
+static const stepper_interface* sc4jjunc_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -25725,7 +25925,7 @@ GAME( 200?, sc4jjucla	,sc4jjucl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot 
 GAME( 200?, sc4jjuclc	,sc4jjucl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Jackpot Junction Club (Ferry) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4jolly_reel_configs[6] =
+static const stepper_interface* sc4jolly_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -25747,7 +25947,7 @@ GAME( 200?, sc4jolly	,0,			sc4, sc4, sc4_state, sc4jolly, ROT0, "Qps","Jolly Jou
 GAME( 200?, sc4jollya	,sc4jolly,	sc4, sc4, sc4_state, sc4jolly, ROT0, "Qps","Jolly Jousting (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4juicy_reel_configs[6] =
+static const stepper_interface* sc4juicy_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -25787,7 +25987,7 @@ GAME( 200?, sc4juicya	,sc4juicy,	sc4, sc4, sc4_state, sc4juicy, ROT0, "BFM","Jui
 GAME( 200?, sc4juicyc	,sc4juicy,	sc4, sc4, sc4_state, sc4juicy, ROT0, "BFM","Juicy Jackpots Club (PR1123) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4jjf_reel_configs[6] =
+static const stepper_interface* sc4jjf_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -25821,7 +26021,7 @@ GAME( 200?, sc4jjfk		,sc4jjf,	sc4, sc4, sc4_state, sc4jjf, ROT0, "BFM","Jumping 
 GAME( 200?, sc4jjfl		,sc4jjf,	sc4, sc4, sc4_state, sc4jjf, ROT0, "BFM","Jumping Jack Flash SP98 (PR4607) (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 GAME( 200?, sc4jjfm		,sc4jjf,	sc4, sc4, sc4_state, sc4jjf, ROT0, "BFM","Jumping Jack Flash SP98 (PR4607) (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4kalei_reel_configs[6] =
+static const stepper_interface* sc4kalei_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -25847,7 +26047,7 @@ GAME( 200?, sc4kaleic	,sc4kalei,	sc4, sc4, sc4_state, sc4kalei, ROT0, "Qps","Kal
 GAME( 200?, sc4kaleid	,sc4kalei,	sc4, sc4, sc4_state, sc4kalei, ROT0, "Qps","Kaleidoscope (051) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4kaleie	,sc4kalei,	sc4, sc4, sc4_state, sc4kalei, ROT0, "Qps","Kaleidoscope (051) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4lir_reel_configs[6] =
+static const stepper_interface* sc4lir_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -25876,7 +26076,7 @@ GAME( 200?, sc4lirh		,sc4lir,	sc4, sc4, sc4_state, sc4lir, ROT0, "BFM","Let It R
 GAME( 200?, sc4liri		,sc4lir,	sc4, sc4, sc4_state, sc4lir, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4lined_reel_configs[6] =
+static const stepper_interface* sc4lined_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -25921,7 +26121,7 @@ GAME( 200?, sc4ldcasc	,sc4lined,	sc4, sc4, sc4_state, sc4lined, ROT0, "Mazooma",
 GAME( 200?, sc4ldcasd	,sc4lined,	sc4, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Casino (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4ldcase	,sc4lined,	sc4, sc4, sc4_state, sc4lined, ROT0, "Mazooma","Line Dancer Casino (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4ldvcl_reel_configs[6] =
+static const stepper_interface* sc4ldvcl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -25940,7 +26140,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4ldvcl)
 // PR2421 LITTLEDEVIL         CLUB LITTLEDEVIL  CLUB  CLILDEV SOUNDS         CLUB LITTLEDEVIL
 GAME( 200?, sc4ldvcl	,0,			sc4, sc4, sc4_state, sc4ldvcl, ROT0, "Mazooma","Little Devil Club (Mazooma) (Scorpion 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4lockb_reel_configs[6] =
+static const stepper_interface* sc4lockb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -25966,7 +26166,7 @@ GAME( 200?, sc4lockbe	,sc4lockb,	sc4, sc4, sc4_state, sc4lockb, ROT0, "BFM","Loc
 GAME( 200?, sc4lockbf	,sc4lockb,	sc4, sc4, sc4_state, sc4lockb, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 GAME( 200?, sc4lockbg	,sc4lockb,	sc4, sc4, sc4_state, sc4lockb, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4lkbcl_reel_configs[6] =
+static const stepper_interface* sc4lkbcl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26005,7 +26205,7 @@ GAME( 200?, sc4lkbcld	,sc4lkbcl,	sc4, sc4, sc4_state, sc4lkbcl, ROT0, "BFM","Loc
 GAME( 200?, sc4lkbclf	,sc4lkbcl,	sc4, sc4, sc4_state, sc4lkbcl, ROT0, "BFM","Lock Buster Club (Ferry) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4lotrf_reel_configs[6] =
+static const stepper_interface* sc4lotrf_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26035,7 +26235,7 @@ GAME( 200?, sc4lotrt	,sc4lotrf,	sc4, sc4, sc4_state, sc4lotrf, ROT0, "BFM","Lord
 GAME( 200?, sc4lotrta	,sc4lotrf,	sc4, sc4, sc4_state, sc4lotrf, ROT0, "BFM","Lord Of The Rings - The Fellowship Of The Ring (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4lotr2_reel_configs[6] =
+static const stepper_interface* sc4lotr2_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26074,7 +26274,7 @@ GAME( 200?, sc4lotr2g	,sc4lotr2,	sc4, sc4, sc4_state, sc4lotr2_mbus, ROT0, "BFM"
 GAME( 200?, sc4lotr2h	,sc4lotr2,	sc4, sc4, sc4_state, sc4lotr2_mbus, ROT0, "BFM","Lord Of The Rings - The Two Towers (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING )
 GAME( 200?, sc4lotr2i	,sc4lotr2,	sc4, sc4, sc4_state, sc4lotr2_mbus, ROT0, "BFM","Lord Of The Rings - The Two Towers (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4ltr2c_reel_configs[6] =
+static const stepper_interface* sc4ltr2c_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26112,7 +26312,7 @@ GAME( 200?, sc4ltr2ci	,sc4ltr2c,	sc4, sc4, sc4_state, sc4ltr2c_mbus, ROT0, "BFM"
 GAME( 200?, sc4ltr2cj	,sc4ltr2c,	sc4, sc4, sc4_state, sc4ltr2c_mbus, ROT0, "BFM","Lord Of The Rings - The Two Towers Club (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
 GAME( 200?, sc4ltr2ck	,sc4ltr2c,	sc4, sc4, sc4_state, sc4ltr2c_mbus, ROT0, "BFM","Lord Of The Rings - The Two Towers Club (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4luck7tb_reel_configs[6] =
+static const stepper_interface* sc4luck7tb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26122,7 +26322,7 @@ const stepper_interface* sc4luck7tb_reel_configs[6] =
 	0,
 };
 
-const stepper_interface* sc4luck7_reel_configs[6] =
+static const stepper_interface* sc4luck7_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -26156,7 +26356,7 @@ GAME( 200?, sc4luck7c	,sc4luck7,	sc4, sc4, sc4_state, sc4luck7, ROT0, "Mazooma",
 // PR2085  LUCKY SEVENS         LUCKY SEVENS  ARCADE  LUCKY SOUNDS         LUCKY SEVENS
 GAME( 200?, sc4luck7d	,sc4luck7,	sc4, sc4, sc4_state, sc4luck7, ROT0, "Mazooma","Lucky 7s (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4luckb_reel_configs[6] =
+static const stepper_interface* sc4luckb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26214,7 +26414,7 @@ GAME( 200?, sc4luckby	,sc4luckb,	sc4, sc4, sc4_state, sc4luckb_mbus, ROT0, "BFM"
 GAME( 200?, sc4luckbz	,sc4luckb,	sc4, sc4, sc4_state, sc4luckb_mbus, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING ) // incomplete pairing
 GAME( 200?, sc4luckb0	,sc4luckb,	sc4, sc4, sc4_state, sc4luckb_mbus, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4magic_reel_configs[6] =
+static const stepper_interface* sc4magic_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26237,7 +26437,7 @@ GAME( 200?, sc4magica	,sc4magic,	sc4, sc4, sc4_state, sc4magic, ROT0, "Qps","Mag
 GAME( 200?, sc4magicb	,sc4magic,	sc4, sc4, sc4_state, sc4magic, ROT0, "Qps","Magic Poundabout (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4magicc	,sc4magic,	sc4, sc4, sc4_state, sc4magic, ROT0, "Qps","Magic Poundabout (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4maxim_reel_configs[6] =
+static const stepper_interface* sc4maxim_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26266,7 +26466,7 @@ GAME( 200?, sc4maximg	,sc4maxim,	sc4, sc4, sc4_state, sc4maxim, ROT0, "Mazooma",
 
 
 
-const stepper_interface* sc4mgr_reel_configs[6] =
+static const stepper_interface* sc4mgr_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26305,7 +26505,7 @@ GAME( 200?, sc4mgrk	    ,sc4mgr,	sc4, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Mone
 GAME( 200?, sc4mgrl	    ,sc4mgr,	sc4, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING )
 GAME( 200?, sc4mgrm	    ,sc4mgr,	sc4, sc4, sc4_state, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4mspid_reel_configs[6] =
+static const stepper_interface* sc4mspid_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26344,7 +26544,7 @@ GAME( 200?, sc4mspidm	,sc4mspid,	sc4, sc4, sc4_state, sc4mspid, ROT0, "BFM","Cas
 GAME( 200?, sc4mspidh	,sc4mspid,	sc4, sc4, sc4_state, sc4mspid_mbus, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING )
 GAME( 200?, sc4mspidi	,sc4mspid,	sc4, sc4, sc4_state, sc4mspid_mbus, ROT0, "BFM","Casino Money Spider (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4msclb_reel_configs[6] =
+static const stepper_interface* sc4msclb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26370,7 +26570,7 @@ GAME( 200?, sc4msclbe	,sc4msclb,	sc4, sc4, sc4_state, sc4msclb, ROT0, "BFM","Mon
 GAME( 200?, sc4msclbf	,sc4msclb,	sc4, sc4, sc4_state, sc4msclb, ROT0, "BFM","Money Spinner Club (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 GAME( 200?, sc4msclbg	,sc4msclb,	sc4, sc4, sc4_state, sc4msclb, ROT0, "BFM","Money Spinner Club (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4mtb_reel_configs[6] =
+static const stepper_interface* sc4mtb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26400,7 +26600,7 @@ GAME( 200?, sc4mtbd		,sc4mtb,	sc4, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To
 GAME( 200?, sc4mtbh		,sc4mtb,	sc4, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn SP98 (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4mtbi		,sc4mtb,	sc4, sc4, sc4_state, sc4mtb, ROT0, "BFM","Money To Burn SP98 (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4mtbcl_reel_configs[6] =
+static const stepper_interface* sc4mtbcl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26435,7 +26635,7 @@ GAME( 200?, sc4mtbclm	,sc4mtbcl,	sc4, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Mon
 GAME( 200?, sc4mtbcln	,sc4mtbcl,	sc4, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 15)", GAME_NOT_WORKING )
 GAME( 200?, sc4mtbclo	,sc4mtbcl,	sc4, sc4, sc4_state, sc4mtbcl, ROT0, "BFM","Money To Burn Club (Bellfruit) (Scorpion 4) (set 16)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4monob_reel_configs[6] =
+static const stepper_interface* sc4monob_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26470,7 +26670,7 @@ GAME( 200?, sc4monobm	,sc4monob,	sc4, sc4, sc4_state, sc4monob, ROT0, "BFM","Mon
 
 
 
-const stepper_interface* sc4mono5_reel_configs[6] =
+static const stepper_interface* sc4mono5_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -26489,7 +26689,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4mono5)
 GAME( 200?, sc4mono5	,0,			sc4, sc4, sc4_state, sc4mono5, ROT0, "Mazooma","Monopoly 5 (PR7089, MONF) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // PR7089  MONO  5         MONO SOUNDS             MONOPOLY
 GAME( 200?, sc4mono5a	,sc4mono5,	sc4, sc4, sc4_state, sc4mono5, ROT0, "Mazooma","Monopoly 5 (PR7089, MONF) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING ) // PR7089  MONO  5         MONO SOUNDS             MONOPOLY
 
-const stepper_interface* sc4monoa_reel_configs[6] =
+static const stepper_interface* sc4monoa_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -26538,7 +26738,7 @@ GAME( 200?, sc4monop	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monop
 GAME( 200?, sc4monopa	,sc4monoa,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Triple (PR2056, TBOX) (Mazooma) (Scorpion 4) (Top Box, set 2)", GAME_NOT_WORKING ) // PR2056  MONOP  TRIPLE         MONO SOUNDS         MONOP TRIPLE
 
 
-const stepper_interface* sc4mondx_reel_configs[6] =
+static const stepper_interface* sc4mondx_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -26602,7 +26802,7 @@ GAME( 200?, sc4mcas4	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopo
 
 
 
-const stepper_interface* sc4mont_reel_configs[6] =
+static const stepper_interface* sc4mont_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26632,7 +26832,7 @@ GAME( 200?, sc4month	,sc4mont,	sc4, sc4, sc4_state, sc4mont, ROT0, "Qps","Monteg
 GAME( 200?, sc4monti	,sc4mont,	sc4, sc4, sc4_state, sc4mont, ROT0, "Qps","Montego Pay (Qps) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4mou_reel_configs[6] =
+static const stepper_interface* sc4mou_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26653,7 +26853,7 @@ GAME( 200?, sc4mou		,0,			sc4, sc4, sc4_state, sc4mou, ROT0, "Qps","Move On Up (
 GAME( 200?, sc4moua		,sc4mou,	sc4, sc4, sc4_state, sc4mou, ROT0, "Qps","Move On Up (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 GAME( 200?, sc4moub		,sc4mou,	sc4, sc4, sc4_state, sc4mou, ROT0, "Qps","Move On Up (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4nmtj_reel_configs[6] =
+static const stepper_interface* sc4nmtj_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26676,7 +26876,7 @@ GAME( 200?, sc4nmtjc	,sc4nmtj,	sc4, sc4, sc4_state, sc4nmtj, ROT0, "Mazooma","Ne
 GAME( 200?, sc4nmtjb	,sc4nmtj,	sc4, sc4, sc4_state, sc4nmtj, ROT0, "Mazooma","Never Mind The Jackpots (Mazooma) (Scorpion 4) (044, set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4nmtjd	,sc4nmtj,	sc4, sc4, sc4_state, sc4nmtj, ROT0, "Mazooma","Never Mind The Jackpots (Mazooma) (Scorpion 4) (044, set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4oyf_reel_configs[6] =
+static const stepper_interface* sc4oyf_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26697,7 +26897,7 @@ GAME( 200?, sc4oyf		,0,			sc4, sc4, sc4_state, sc4oyf, ROT0, "BFM","Off Your Fac
 GAME( 200?, sc4oyfa		,sc4oyf,	sc4, sc4, sc4_state, sc4oyf, ROT0, "BFM","Off Your Face (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4opses_reel_configs[6] =
+static const stepper_interface* sc4opses_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26718,7 +26918,7 @@ GAME( 200?, sc4opses	,0,			sc4, sc4, sc4_state, sc4opses, ROT0, "BFM","Open Sesa
 GAME( 200?, sc4opsesa	,sc4opses,	sc4, sc4, sc4_state, sc4opses, ROT0, "BFM","Open Sesame (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4pacqp_reel_configs[6] =
+static const stepper_interface* sc4pacqp_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26740,7 +26940,7 @@ GAME( 200?, sc4pacqp	,0,	        sc4, sc4, sc4_state, sc4pacqp, ROT0, "QPS","Pac
 GAME( 200?, sc4pacqpa	,sc4pacqp,	sc4, sc4, sc4_state, sc4pacqp, ROT0, "QPS","Pac Man (PR7072, QPAC) (QPS) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 GAME( 200?, sc4pacqpb	,sc4pacqp,	sc4, sc4, sc4_state, sc4pacqp, ROT0, "QPS","Pac Man (PR7072, QPAC) (QPS) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4pacmn_reel_configs[6] =
+static const stepper_interface* sc4pacmn_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26761,7 +26961,7 @@ GAME( 200?, sc4pacmn	,0,			sc4, sc4, sc4_state, sc4pacmn, ROT0, "Mazooma","Pac M
 GAME( 200?, sc4pacmna	,sc4pacmn,	sc4, sc4, sc4_state, sc4pacmn, ROT0, "Mazooma","Pac Man (PR7026, PMAN) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 GAME( 200?, sc4pacmnb	,sc4pacmn,	sc4, sc4, sc4_state, sc4pacmn, ROT0, "Mazooma","Pac Man (PR7026, PMAN) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4paccs_reel_configs[6] =
+static const stepper_interface* sc4paccs_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26798,7 +26998,7 @@ GAME( 200?, sc4paccsl	,sc4paccs,	sc4, sc4, sc4_state, sc4paccs, ROT0, "Mazooma",
 GAME( 200?, sc4paccsh	,sc4paccs,	sc4, sc4, sc4_state, sc4paccs_mbus, ROT0, "Mazooma","Pac Man Casino (PR7049, PACL) (Mazooma) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
 GAME( 200?, sc4paccsi	,sc4paccs,	sc4, sc4, sc4_state, sc4paccs_mbus, ROT0, "Mazooma","Pac Man Casino (PR7049, PACL) (Mazooma) (Scorpion 4) (set 13)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4paccl_reel_configs[6] =
+static const stepper_interface* sc4paccl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26820,7 +27020,7 @@ GAME( 200?, sc4paccla	,sc4paccl,	sc4, sc4, sc4_state, sc4paccl, ROT0, "Mazooma",
 GAME( 200?, sc4pacclb	,sc4paccl,	sc4, sc4, sc4_state, sc4paccl, ROT0, "Mazooma","Pac Man Club (PR2018, CPAC) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4pacclc	,sc4paccl,	sc4, sc4, sc4_state, sc4paccl, ROT0, "Mazooma","Pac Man Club (PR2018, CPAC) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4pacpl_reel_configs[6] =
+static const stepper_interface* sc4pacpl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26848,7 +27048,7 @@ GAME( 200?, sc4pacplg	,sc4pacpl,	sc4, sc4, sc4_state, sc4pacpl, ROT0, "Mazooma",
 GAME( 200?, sc4pacplh	,sc4pacpl,	sc4, sc4, sc4_state, sc4pacpl, ROT0, "Mazooma","Pac Man Plus (PR7058, PACP) (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4pmani_reel_configs[6] =
+static const stepper_interface* sc4pmani_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26869,7 +27069,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4pmani)
 GAME( 200?, sc4pmani	,0,			sc4, sc4, sc4_state, sc4pmani, ROT0, "Mazooma","Pac Mania (PR2031, ANIA) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4pmania	,sc4pmani,	sc4, sc4, sc4_state, sc4pmani, ROT0, "Mazooma","Pac Mania (PR2031, ANIA) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4party_reel_configs[6] =
+static const stepper_interface* sc4party_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26889,7 +27089,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4party)
 GAME( 200?, sc4party	,0,			sc4, sc4, sc4_state, sc4party, ROT0, "Nova","Party Time (German) (PR7151, GPTM) (Nova) (Scorpion 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4pgold_reel_configs[6] =
+static const stepper_interface* sc4pgold_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26915,7 +27115,7 @@ GAME( 200?, sc4pgoldf	,sc4pgold,	sc4, sc4, sc4_state, sc4pgold, ROT0, "BFM","Pha
 
 
 
-const stepper_interface* sc4ppclb_reel_configs[6] =
+static const stepper_interface* sc4ppclb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26938,7 +27138,7 @@ GAME( 200?, sc4ppclbb	,sc4ppclb,	sc4, sc4, sc4_state, sc4ppclb, ROT0, "Qps","Pin
 GAME( 200?, sc4ppclba	,sc4ppclb,	sc4, sc4, sc4_state, sc4ppclb, ROT0, "Qps","Pink Panther Club (412) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4ppclbc	,sc4ppclb,	sc4, sc4, sc4_state, sc4ppclb, ROT0, "Qps","Pink Panther Club (412) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4pipe_reel_configs[6] =
+static const stepper_interface* sc4pipe_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26959,7 +27159,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4pipe)
 GAME( 200?, sc4pipe		,0,			sc4, sc4, sc4_state, sc4pipe, ROT0, "Mazooma","Piping Hot (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4pipea	,sc4pipe,	sc4, sc4, sc4_state, sc4pipe, ROT0, "Mazooma","Piping Hot (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4plumb_reel_configs[6] =
+static const stepper_interface* sc4plumb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -26987,7 +27187,7 @@ GAME( 200?, sc4plumbd	,sc4plumb,	sc4, sc4, sc4_state, sc4plumb, ROT0, "Qps","Plu
 GAME( 200?, sc4plumbe	,sc4plumb,	sc4, sc4, sc4_state, sc4plumb, ROT0, "Qps","Plumb Crazy Club (412) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4polem_reel_configs[6] =
+static const stepper_interface* sc4polem_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27014,7 +27214,7 @@ GAME( 200?, sc4polemc	,sc4polem,	sc4, sc4, sc4_state, sc4polem, ROT0, "Mazooma",
 GAME( 200?, sc4polemd	,sc4polem,	sc4, sc4, sc4_state, sc4polem, ROT0, "Mazooma","Pole Position (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4polic_reel_configs[6] =
+static const stepper_interface* sc4polic_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27039,7 +27239,7 @@ GAME( 200?, sc4polica	,sc4polic,	sc4, sc4, sc4_state, sc4polic, ROT0, "Qps","Pol
 GAME( 200?, sc4policc	,sc4polic,	sc4, sc4, sc4_state, sc4polic, ROT0, "Qps","Police Squid (V2.0) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4potsh_reel_configs[6] =
+static const stepper_interface* sc4potsh_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27061,7 +27261,7 @@ GAME( 200?, sc4potsh	,0,			sc4, sc4, sc4_state, sc4potsh, ROT0, "Qps","Pot Shot 
 GAME( 200?, sc4potsha	,sc4potsh,	sc4, sc4, sc4_state, sc4potsh, ROT0, "Qps","Pot Shot (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4pogbl_reel_configs[6] =
+static const stepper_interface* sc4pogbl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27085,7 +27285,7 @@ GAME( 200?, sc4pogblc	,sc4pogbl,	sc4, sc4, sc4_state, sc4pogbl, ROT0, "BFM","Pot
 GAME( 200?, sc4pogbld	,sc4pogbl,	sc4, sc4, sc4_state, sc4pogbl, ROT0, "BFM","Pots Of Gold Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4pogble	,sc4pogbl,	sc4, sc4, sc4_state, sc4pogbl, ROT0, "BFM","Pots Of Gold Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4pwrsg_reel_configs[6] =
+static const stepper_interface* sc4pwrsg_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27108,7 +27308,7 @@ GAME( 200?, sc4pwrsga	,sc4pwrsg,	sc4, sc4, sc4_state, sc4pwrsg, ROT0, "Qps","Pow
 GAME( 200?, sc4pwrsgb	,sc4pwrsg,	sc4, sc4, sc4_state, sc4pwrsg, ROT0, "Qps","Power Surge (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4pwrsgc	,sc4pwrsg,	sc4, sc4, sc4_state, sc4pwrsg, ROT0, "Qps","Power Surge (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4pir_reel_configs[6] =
+static const stepper_interface* sc4pir_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27136,7 +27336,7 @@ GAME( 200?, sc4pirf		,sc4pir,	sc4, sc4, sc4_state, sc4pir, ROT0, "BFM","The Priz
 GAME( 200?, sc4pirg		,sc4pir,	sc4, sc4, sc4_state, sc4pir, ROT0, "BFM","The Prize Is Right (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4pen1_reel_configs[6] =
+static const stepper_interface* sc4pen1_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27161,7 +27361,7 @@ GAME( 200?, sc4pen1b	,sc4pen1,	sc4, sc4, sc4_state, sc4pen1, ROT0, "BFM","Public
 GAME( 200?, sc4pen1c	,sc4pen1,	sc4, sc4, sc4_state, sc4pen1, ROT0, "BFM","Public Enemy No1 (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 GAME( 200?, sc4pen1d	,sc4pen1,	sc4, sc4, sc4_state, sc4pen1, ROT0, "BFM","Public Enemy No1 (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4qmodo_reel_configs[6] =
+static const stepper_interface* sc4qmodo_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27184,7 +27384,7 @@ GAME( 200?, sc4qmodob	,sc4qmodo,	sc4, sc4, sc4_state, sc4qmodo, ROT0, "Qps","Qua
 GAME( 200?, sc4qmodoc	,sc4qmodo,	sc4, sc4, sc4_state, sc4qmodo, ROT0, "Qps","Quazzi Mo' Dough (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 GAME( 200?, sc4qmodod	,sc4qmodo,	sc4, sc4, sc4_state, sc4qmodo, ROT0, "Qps","Quazzi Mo' Dough (Qps) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4quidr_reel_configs[6] =
+static const stepper_interface* sc4quidr_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27206,7 +27406,7 @@ GAME( 200?, sc4quidra	,sc4quidr,	sc4, sc4, sc4_state, sc4quidr, ROT0, "Qps","Qui
 GAME( 200?, sc4quidrb	,sc4quidr,	sc4, sc4, sc4_state, sc4quidr, ROT0, "Qps","Quid Rock (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4quidrc	,sc4quidr,	sc4, sc4, sc4_state, sc4quidr, ROT0, "Qps","Quid Rock (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4rdrag_reel_configs[6] =
+static const stepper_interface* sc4rdrag_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27231,7 +27431,7 @@ GAME( 200?, sc4rdragc	,sc4rdrag,	sc4, sc4, sc4_state, sc4rdrag, ROT0, "Qps","Red
 GAME( 200?, sc4rdragf	,sc4rdrag,	sc4, sc4, sc4_state, sc4rdrag, ROT0, "Qps","Red Dragon (021) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4rdrcl_reel_configs[6] =
+static const stepper_interface* sc4rdrcl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27254,7 +27454,7 @@ GAME( 200?, sc4rdrclb	,sc4rdrcl,	sc4, sc4, sc4_state, sc4rdrcl, ROT0, "Qps","Red
 GAME( 200?, sc4rdrcla	,sc4rdrcl,	sc4, sc4, sc4_state, sc4rdrcl, ROT0, "Qps","Red Dragon Club (412) (Qps) (Scorpion 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4relcz_reel_configs[6] =
+static const stepper_interface* sc4relcz_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27278,7 +27478,7 @@ GAME( 200?, sc4relczb	,sc4relcz,	sc4, sc4, sc4_state, sc4relcz, ROT0, "BFM","Ree
 GAME( 200?, sc4relczc	,sc4relcz,	sc4, sc4, sc4_state, sc4relcz, ROT0, "BFM","Reely Crazy (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4rotc_reel_configs[6] =
+static const stepper_interface* sc4rotc_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27302,7 +27502,7 @@ GAME( 200?, sc4rotcb	,sc4rotc,	sc4, sc4, sc4_state, sc4rotc, ROT0, "Mazooma","Re
 GAME( 200?, sc4rotcc	,sc4rotc,	sc4, sc4, sc4_state, sc4rotc, ROT0, "Mazooma","Return Of The Count (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 GAME( 200?, sc4rotcd	,sc4rotc,	sc4, sc4, sc4_state, sc4rotc, ROT0, "Mazooma","Return Of The Count (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4rich_reel_configs[6] =
+static const stepper_interface* sc4rich_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27334,7 +27534,7 @@ GAME( 200?, sc4richk	,sc4rich,	sc4, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich G
 GAME( 200?, sc4richl	,sc4rich,	sc4, sc4, sc4_state, sc4rich, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4rttt_reel_configs[6] =
+static const stepper_interface* sc4rttt_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27365,7 +27565,7 @@ GAME( 200?, sc4rtttc	,sc4rttt,	sc4, sc4, sc4_state, sc4rttt_mbus, ROT0, "Mazooma
 GAME( 200?, sc4rtttd	,sc4rttt,	sc4, sc4, sc4_state, sc4rttt_mbus, ROT0, "Mazooma","Rise To The Top (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4rttte	,sc4rttt,	sc4, sc4, sc4_state, sc4rttt_mbus, ROT0, "Mazooma","Rise To The Top (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4roksc_reel_configs[6] =
+static const stepper_interface* sc4roksc_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27389,7 +27589,7 @@ GAME( 200?, sc4roksca	,sc4roksc,	sc4, sc4, sc4_state, sc4roksc, ROT0, "Qps","Roc
 GAME( 200?, sc4rokscc	,sc4roksc,	sc4, sc4, sc4_state, sc4roksc, ROT0, "Qps","Rocket Science (011) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4rogds_reel_configs[6] =
+static const stepper_interface* sc4rogds_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27420,7 +27620,7 @@ GAME( 200?, sc4rogdsf	,sc4rogds,	sc4, sc4, sc4_state, sc4rogds, ROT0, "Qps","Rog
 GAME( 200?, sc4rogdsg	,sc4rogds,	sc4, sc4, sc4_state, sc4rogds, ROT0, "Qps","Rogan Dosh (v2.1) (Qps) (Scorpion 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4rt_reel_configs[6] =
+static const stepper_interface* sc4rt_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27445,7 +27645,7 @@ GAME( 200?, sc4rtc		,sc4rt,		sc4, sc4, sc4_state, sc4rt, ROT0, "Mazooma","Rollin
 GAME( 200?, sc4rtd		,sc4rt,		sc4, sc4, sc4_state, sc4rt, ROT0, "Mazooma","Rolling Thunder (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4rbank_reel_configs[6] =
+static const stepper_interface* sc4rbank_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27470,7 +27670,7 @@ GAME( 200?, sc4rbankb	,sc4rbank,	sc4, sc4, sc4_state, sc4rbank, ROT0, "BFM","Roy
 GAME( 200?, sc4rbankc	,sc4rbank,	sc4, sc4, sc4_state, sc4rbank, ROT0, "BFM","Royle Banker (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4royle_reel_configs[6] =
+static const stepper_interface* sc4royle_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27504,7 +27704,7 @@ GAME( 200?, sc4roylel	,sc4royle,	sc4, sc4, sc4_state, sc4royle, ROT0, "BFM","Roy
 GAME( 200?, sc4roylem	,sc4royle,	sc4, sc4, sc4_state, sc4royle, ROT0, "BFM","Royle Family (REV 2) (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4srrmz_reel_configs[6] =
+static const stepper_interface* sc4srrmz_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27552,7 +27752,7 @@ GAME( 200?, sc4srrmzl	,sc4srrmz,	sc4, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazo
 GAME( 200?, sc4srrmzm	,sc4srrmz,	sc4, sc4, sc4_state, sc4srrmz_mbus, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4sidsp_reel_configs[6] =
+static const stepper_interface* sc4sidsp_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27575,7 +27775,7 @@ GAME( 200?, sc4sidspa	,sc4sidsp,	sc4, sc4, sc4_state, sc4sidsp, ROT0, "Mazooma",
 GAME( 200?, sc4sidspb	,sc4sidsp,	sc4, sc4, sc4_state, sc4sidsp, ROT0, "Mazooma","Side Splitter (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4sidspc	,sc4sidsp,	sc4, sc4, sc4_state, sc4sidsp, ROT0, "Mazooma","Side Splitter (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4sirpz_reel_configs[6] =
+static const stepper_interface* sc4sirpz_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27598,7 +27798,7 @@ GAME( 200?, sc4sirpz	,0,			sc4, sc4, sc4_state, sc4sirpz, ROT0, "Mazooma","Sir P
 GAME( 200?, sc4sirpza	,sc4sirpz,	sc4, sc4, sc4_state, sc4sirpz, ROT0, "Mazooma","Sir Prize (PR7079, SIRP) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4sirpzb	,sc4sirpz,	sc4, sc4, sc4_state, sc4sirpz, ROT0, "Mazooma","Sir Prize (PR7079, SIRP) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4smk7_reel_configs[6] =
+static const stepper_interface* sc4smk7_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27618,7 +27818,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4smk7)
 // PR6924 SMOKIN SEVENS         PR6924 SMOKIN SEVENS SOUNDS11
 GAME( 200?, sc4smk7		,0,			sc4, sc4, sc4_state, sc4smk7, ROT0, "BFM","Smoking 7's (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4srr_reel_configs[6] =
+static const stepper_interface* sc4srr_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27641,7 +27841,7 @@ GAME( 200?, sc4srra		,sc4srr,	sc4, sc4, sc4_state, sc4srr, ROT0, "BFM","Snake Ra
 GAME( 200?, sc4srrb		,sc4srr,	sc4, sc4, sc4_state, sc4srr, ROT0, "BFM","Snake Rattle 'n' Roll (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4srrc		,sc4srr,	sc4, sc4, sc4_state, sc4srr, ROT0, "BFM","Snake Rattle 'n' Roll (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4slc_reel_configs[6] =
+static const stepper_interface* sc4slc_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27682,7 +27882,7 @@ GAME( 2003, sc4slcl		,sc4slc,	sc4, sc4, sc4_state, sc4slc, ROT0, "BFM","Snakes &
 GAME( 2003, sc4slch		,sc4slc,	sc4, sc4, sc4_state, sc4slc, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4solgl_reel_configs[6] =
+static const stepper_interface* sc4solgl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27704,7 +27904,7 @@ GAME( 200?, sc4solgla	,sc4solgl,	sc4, sc4, sc4_state, sc4solgl, ROT0, "BFM","Sol
 GAME( 200?, sc4solglb	,sc4solgl,	sc4, sc4, sc4_state, sc4solgl, ROT0, "BFM","Solid Gold (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4solglc	,sc4solgl,	sc4, sc4, sc4_state, sc4solgl, ROT0, "BFM","Solid Gold (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4sace_reel_configs[6] =
+static const stepper_interface* sc4sace_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27726,7 +27926,7 @@ GAME( 200?, sc4sace		,0,			sc4, sc4, sc4_state, sc4sace, ROT0, "Qps","Space Ace 
 GAME( 200?, sc4sacea	,sc4sace,	sc4, sc4, sc4_state, sc4sace, ROT0, "Qps","Space Ace (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4sbust_reel_configs[6] =
+static const stepper_interface* sc4sbust_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27748,7 +27948,7 @@ GAME( 200?, sc4sbust	,0,			sc4, sc4, sc4_state, sc4sbust, ROT0, "Qps","Space Bus
 GAME( 200?, sc4sbusta	,sc4sbust,	sc4, sc4, sc4_state, sc4sbust, ROT0, "Qps","Space Buster (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4starp_reel_configs[6] =
+static const stepper_interface* sc4starp_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27780,7 +27980,7 @@ GAME( 200?, sc4starpj	,sc4starp,	sc4, sc4, sc4_state, sc4starp, ROT0, "BFM","Sta
 GAME( 200?, sc4starpk	,sc4starp,	sc4, sc4, sc4_state, sc4starp, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4stirc_reel_configs[6] =
+static const stepper_interface* sc4stirc_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27810,7 +28010,7 @@ GAME( 200?, sc4stirci	,sc4stirc,	sc4, sc4, sc4_state, sc4stirc, ROT0, "Mazooma",
 GAME( 200?, sc4stircj	,sc4stirc,	sc4, sc4, sc4_state, sc4stirc, ROT0, "Mazooma","Stir Crazy (Mazooma) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4strk_reel_configs[6] =
+static const stepper_interface* sc4strk_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27840,7 +28040,7 @@ GAME( 200?, sc4strki	,sc4strk,	sc4, sc4, sc4_state, sc4strk, ROT0, "Mazooma","Th
 GAME( 200?, sc4strkj	,sc4strk,	sc4, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
 GAME( 200?, sc4strkk	,sc4strk,	sc4, sc4, sc4_state, sc4strk, ROT0, "Mazooma","The Streak (Mazooma) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4tristtb_reel_configs[6] =
+static const stepper_interface* sc4tristtb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27850,7 +28050,7 @@ const stepper_interface* sc4tristtb_reel_configs[6] =
 	0,
 };
 
-const stepper_interface* sc4trist_reel_configs[6] =
+static const stepper_interface* sc4trist_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27903,7 +28103,7 @@ GAME( 200?, sc4tristx	,sc4trist,	sc4, sc4, sc4_state, sc4trist, ROT0, "Mazooma",
 GAME( 200?, sc4tristy	,sc4trist,	sc4, sc4, sc4_state, sc4trist, ROT0, "Mazooma","Triple Streak (PR2167) (Mazooma) (Scorpion 4) (set 24)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4sahed_reel_configs[6] =
+static const stepper_interface* sc4sahed_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27924,7 +28124,7 @@ GAME( 200?, sc4sahed	,0,			sc4, sc4, sc4_state, sc4sahed, ROT0, "Qps","Streaks A
 GAME( 200?, sc4saheda	,sc4sahed,	sc4, sc4, sc4_state, sc4sahed, ROT0, "Qps","Streaks Ahead (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 GAME( 200?, sc4sahedb	,sc4sahed,	sc4, sc4, sc4_state, sc4sahed, ROT0, "Qps","Streaks Ahead (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4strx_reel_configs[6] =
+static const stepper_interface* sc4strx_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27949,7 +28149,7 @@ GAME( 200?, sc4strxc	,sc4strx,	sc4, sc4, sc4_state, sc4strx, ROT0, "BFM","Strike
 
 
 
-const stepper_interface* sc4suscl_reel_configs[6] =
+static const stepper_interface* sc4suscl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -27978,7 +28178,7 @@ GAME( 200?, sc4susclc	,sc4suscl,	sc4, sc4, sc4_state, sc4suscl_mbus, ROT0, "Qps"
 GAME( 200?, sc4suscla	,sc4suscl,	sc4, sc4, sc4_state, sc4suscl_mbus, ROT0, "Qps","Suits U Sir Club (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4s6c_reel_configs[6] =
+static const stepper_interface* sc4s6c_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28005,7 +28205,7 @@ GAME( 200?, sc4s6ce		,sc4s6c,	sc4, sc4, sc4_state, sc4s6c, ROT0, "BFM","Super 6 
 
 
 
-const stepper_interface* sc4taekw_reel_configs[6] =
+static const stepper_interface* sc4taekw_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28041,7 +28241,7 @@ GAME( 200?, sc4taekwe	,sc4taekw,	sc4, sc4, sc4_state, sc4taekw_mbus, ROT0, "Qps"
 GAME( 200?, sc4taekwf	,sc4taekw,	sc4, sc4, sc4_state, sc4taekw_mbus, ROT0, "Qps","Tae Kwon Dough (Qps) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4taknt_reel_configs[6] =
+static const stepper_interface* sc4taknt_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28061,7 +28261,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4taknt)
 GAME( 200?, sc4taknt	,0,			sc4, sc4, sc4_state, sc4taknt, ROT0, "BFM","Take Note (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4taknta	,sc4taknt,	sc4, sc4, sc4_state, sc4taknt, ROT0, "BFM","Take Note (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4takcl_reel_configs[6] =
+static const stepper_interface* sc4takcl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28100,7 +28300,7 @@ GAME( 200?, sc4takclc	,sc4takcl,	sc4, sc4, sc4_state, sc4takcl, ROT0, "BFM","Tak
 GAME( 200?, sc4takcle	,sc4takcl,	sc4, sc4, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4takclf	,sc4takcl,	sc4, sc4, sc4_state, sc4takcl, ROT0, "BFM","Take Note Club (Ferry) (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4tetri_reel_configs[6] =
+static const stepper_interface* sc4tetri_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28131,7 +28331,7 @@ GAME( 200?, sc4tetrij	,sc4tetri,	sc4, sc4, sc4_state, sc4tetri, ROT0, "Mazooma",
 GAME( 200?, sc4tetrik	,sc4tetri,	sc4, sc4, sc4_state, sc4tetri, ROT0, "Mazooma","Tetris (Mazooma) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4tic2_reel_configs[6] =
+static const stepper_interface* sc4tic2_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28174,7 +28374,7 @@ GAME( 200?, sc4tic2l	,sc4tic2,	sc4, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Ti
 GAME( 200?, sc4tic2m	,sc4tic2,	sc4, sc4, sc4_state, sc4tic2, ROT0, "Mazooma","Tic Tac Two Casino Arcade (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4tbana_reel_configs[6] =
+static const stepper_interface* sc4tbana_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28196,7 +28396,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4tbana)
 GAME( 200?, sc4tbana	,0,			sc4, sc4, sc4_state, sc4tbana, ROT0, "BFM","Top Banana (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4tbanaa	,sc4tbana,	sc4, sc4, sc4_state, sc4tbana, ROT0, "BFM","Top Banana (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4tgear_reel_configs[6] =
+static const stepper_interface* sc4tgear_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28224,7 +28424,7 @@ GAME( 200?, sc4tgearf	,sc4tgear,	sc4, sc4, sc4_state, sc4tgear, ROT0, "Mazooma",
 GAME( 200?, sc4tgearg	,sc4tgear,	sc4, sc4, sc4_state, sc4tgear, ROT0, "Mazooma","Top Gear (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4tload_reel_configs[6] =
+static const stepper_interface* sc4tload_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28245,7 +28445,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4tload)
 GAME( 200?, sc4tload	,0,			sc4, sc4, sc4_state, sc4tload, ROT0, "Mazooma","Top Loader (Mazooma) (Scorpion 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4ticlb_reel_configs[6] =
+static const stepper_interface* sc4ticlb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28269,7 +28469,7 @@ GAME( 200?, sc4ticlbb	,sc4ticlb,	sc4dmd, sc4, sc4_state, sc4ticlb, ROT0, "BFM","
 GAME( 200?, sc4ticlba	,sc4ticlb,	sc4dmd, sc4, sc4_state, sc4ticlb, ROT0, "BFM","Treasure Island Club (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4ticlbc	,sc4ticlb,	sc4dmd, sc4, sc4_state, sc4ticlb, ROT0, "BFM","Treasure Island Club (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4ttomb_reel_configs[6] =
+static const stepper_interface* sc4ttomb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28293,7 +28493,7 @@ GAME( 200?, sc4ttombb	,sc4ttomb,	sc4, sc4, sc4_state, sc4ttomb, ROT0, "BFM","Tre
 GAME( 200?, sc4ttombc	,sc4ttomb,	sc4, sc4, sc4_state, sc4ttomb, ROT0, "BFM","Treasure Tomb (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4tridn_reel_configs[6] =
+static const stepper_interface* sc4tridn_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28313,7 +28513,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4tridn)
 GAME( 200?, sc4tridn	,0,			sc4, sc4, sc4_state, sc4tridn, ROT0, "Mazooma","Trident, The (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4tridna	,sc4tridn,	sc4, sc4, sc4_state, sc4tridn, ROT0, "Mazooma","Trident, The (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4tri7tb_reel_configs[6] =
+static const stepper_interface* sc4tri7tb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28323,7 +28523,7 @@ const stepper_interface* sc4tri7tb_reel_configs[6] =
 	0,
 };
 
-const stepper_interface* sc4tri7_reel_configs[6] =
+static const stepper_interface* sc4tri7_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -28380,7 +28580,7 @@ GAME( 200?, sc4tri7d	,sc4tri7,	sc4, sc4, sc4_state, sc4tri7_mbus, ROT0, "BFM","T
 GAME( 200?, sc4tri7e	,sc4tri7,	sc4, sc4, sc4_state, sc4tri7_mbus, ROT0, "BFM","Triple 7's Arcade (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4tub_reel_configs[6] =
+static const stepper_interface* sc4tub_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28405,7 +28605,7 @@ GAME( 200?, sc4tubc		,sc4tub,	sc4, sc4, sc4_state, sc4tub, ROT0, "BFM","Tubular 
 
 
 
-const stepper_interface* sc4vrgcl_reel_configs[6] =
+static const stepper_interface* sc4vrgcl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28440,7 +28640,7 @@ GAME( 200?, sc4vrgclg	,sc4vrgcl,	sc4, sc4, sc4_state, sc4vrgcl, ROT0, "BFM","Ver
 GAME( 200?, sc4vrgclh	,sc4vrgcl,	sc4, sc4, sc4_state, sc4vrgcl_mbus, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
 GAME( 200?, sc4vrgcli	,sc4vrgcl,	sc4, sc4, sc4_state, sc4vrgcl_mbus, ROT0, "BFM","Very Rich Geezer Club (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4vmclb_reel_configs[6] =
+static const stepper_interface* sc4vmclb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28463,7 +28663,7 @@ GAME( 200?, sc4vmclba	,sc4vmclb,	sc4, sc4, sc4_state, sc4vmclb, ROT0, "BFM","Viv
 GAME( 200?, sc4vmclbb	,sc4vmclb,	sc4, sc4, sc4_state, sc4vmclb, ROT0, "BFM","Viva Mexico Club (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4waw_reel_configs[6] =
+static const stepper_interface* sc4waw_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28490,7 +28690,7 @@ GAME( 200?, sc4wawe		,sc4waw,	sc4, sc4, sc4_state, sc4waw, ROT0, "Mazooma","Wet 
 GAME( 200?, sc4wawf		,sc4waw,	sc4, sc4, sc4_state, sc4waw, ROT0, "Mazooma","Wet & Wild (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4leg_reel_configs[6] =
+static const stepper_interface* sc4leg_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28516,7 +28716,7 @@ GAME( 200?, sc4lege		,sc4leg,	sc4, sc4, sc4_state, sc4leg, ROT0, "BFM","Who Want
 GAME( 200?, sc4legf		,sc4leg,	sc4, sc4, sc4_state, sc4leg, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 GAME( 200?, sc4legg		,sc4leg,	sc4, sc4, sc4_state, sc4leg, ROT0, "BFM","Who Wants To Be A Legionnaire (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4cleg_reel_configs[6] =
+static const stepper_interface* sc4cleg_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28548,7 +28748,7 @@ GAME( 200?, sc4legcbc	,sc4legcb,	sc4, sc4, sc4_state, sc4cleg, ROT0, "BFM","Who 
 GAME( 200?, sc4legcbd	,sc4legcb,	sc4, sc4, sc4_state, sc4cleg_mbus, ROT0, "BFM","Who Wants To Be A Legionnaire Club (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4legcbe	,sc4legcb,	sc4, sc4, sc4_state, sc4cleg_mbus, ROT0, "BFM","Who Wants To Be A Legionnaire Club (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4wspin_reel_configs[6] =
+static const stepper_interface* sc4wspin_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28572,7 +28772,7 @@ GAME( 200?, sc4wspinc	,sc4wspin,	sc4, sc4, sc4_state, sc4wspin, ROT0, "Qps","Win
 GAME( 200?, sc4wspinb	,sc4wspin,	sc4, sc4, sc4_state, sc4wspin, ROT0, "Qps","Win Spinner SP Arcade (011) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4wspind	,sc4wspin,	sc4, sc4, sc4_state, sc4wspin, ROT0, "Qps","Win Spinner SP Arcade (011) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4wwys_reel_configs[6] =
+static const stepper_interface* sc4wwys_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28592,7 +28792,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4wwys)
 GAME( 200?, sc4wwys		,0,			sc4, sc4, sc4_state, sc4wwys, ROT0, "BFM","Win When Your Spinning (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4wwysa	,sc4wwys,	sc4, sc4, sc4_state, sc4wwys, ROT0, "BFM","Win When Your Spinning (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4winsptb_reel_configs[6] =
+static const stepper_interface* sc4winsptb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28609,7 +28809,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4winsptb)
 }
 
 
-const stepper_interface* sc4winsp_reel_configs[6] =
+static const stepper_interface* sc4winsp_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28668,7 +28868,7 @@ GAME( 200?, sc4winspu	,sc4winsp,	sc4, sc4, sc4_state, sc4winsp, ROT0, "Qps","Win
 GAME( 200?, sc4winspp	,sc4winsp,	sc4, sc4, sc4_state, sc4winsp, ROT0, "Qps","Winning Spin (Arcade V062) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4winspv	,sc4winsp,	sc4, sc4, sc4_state, sc4winsp, ROT0, "Qps","Winning Spin (Arcade V062) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4wondw_reel_configs[6] =
+static const stepper_interface* sc4wondw_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28688,7 +28888,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4wondw)
 GAME( 200?, sc4wondw	,0,			sc4, sc4, sc4_state, sc4wondw, ROT0, "BFM","Wonder Wheel (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4wondwa	,sc4wondw,	sc4, sc4, sc4_state, sc4wondw, ROT0, "BFM","Wonder Wheel (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4xmark_reel_configs[6] =
+static const stepper_interface* sc4xmark_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28710,7 +28910,7 @@ GAME( 200?, sc4xmarka	,sc4xmark,	sc4, sc4, sc4_state, sc4xmark, ROT0, "BFM","X M
 
 
 
-const stepper_interface* sc4blokq_reel_configs[6] =
+static const stepper_interface* sc4blokq_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28737,7 +28937,7 @@ GAME( 200?, sc4blokqe	,sc4blokq,	sc4, sc4, sc4_state, sc4blokq, ROT0, "Qps","Blo
 GAME( 200?, sc4bbust	,sc4blokq,	sc4, sc4, sc4_state, sc4blokq, ROT0, "Mazooma","Blockbuster (Mazooma) (Scorpion 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4clbtm_reel_configs[6] =
+static const stepper_interface* sc4clbtm_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28763,7 +28963,7 @@ GAME( 200?, sc4clbtmc	,sc4clbtm,	sc4dmd, sc4, sc4_state, sc4clbtm, ROT0, "BFM","
 GAME( 200?, sc4clbtmd	,sc4clbtm,	sc4dmd, sc4, sc4_state, sc4clbtm, ROT0, "BFM","Club Temptation (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4clbtme	,sc4clbtm,	sc4dmd, sc4, sc4_state, sc4clbtm, ROT0, "BFM","Club Temptation (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4onup_reel_configs[6] =
+static const stepper_interface* sc4onup_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28823,7 +29023,7 @@ GAME( 200?, sc4po8l		,sc4po8,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Pieces Of E
    It's possible some of these are just topbox / link units for games otherwise on SC5 hardware, although many are just revisions of games which were released on both */
 
 
-const stepper_interface* sc4adjb_reel_configs[6] =
+static const stepper_interface* sc4adjb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28871,7 +29071,7 @@ GAME( 200?, sc4a40clb	,sc4a40cl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Arou
 GAME( 200?, sc4a40clc	,sc4a40cl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Around The Board In 40 Days Club (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4bantm_reel_configs[6] =
+static const stepper_interface* sc4bantm_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28909,7 +29109,7 @@ GAME( 200?, sc4batl		,0,			sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Battleship
 GAME( 200?, sc4batla	,sc4batl,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Battleships & Cruisers (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4bull_reel_configs[6] =
+static const stepper_interface* sc4bull_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28931,7 +29131,7 @@ GAME( 200?, sc4bulla	,sc4bull,	sc4, sc4, sc4_state, sc4bull, ROT0, "BFM","Bullse
 GAME( 200?, sc4bullb	,sc4bull,	sc4, sc4, sc4_state, sc4bull, ROT0, "BFM","Bullseye (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4bullc	,sc4bull,	sc4, sc4, sc4_state, sc4bull, ROT0, "BFM","Bullseye (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4bullcs_reel_configs[6] =
+static const stepper_interface* sc4bullcs_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28953,7 +29153,7 @@ GAME( 200?, sc4bulcsa	,sc4bulcs,	sc4, sc4, sc4_state, sc4bullcs, ROT0, "BFM","Bu
 GAME( 200?, sc4bulcsb	,sc4bulcs,	sc4, sc4, sc4_state, sc4bullcs, ROT0, "BFM","Bullseye Classic (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4bulcsc	,sc4bulcs,	sc4, sc4, sc4_state, sc4bullcs, ROT0, "BFM","Bullseye Classic (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4butch_reel_configs[6] =
+static const stepper_interface* sc4butch_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -28981,7 +29181,7 @@ GAME( 200?, sc4butchf	,sc4butch,	sc4, sc4, sc4_state, sc4butch, ROT0, "BFM","But
 GAME( 200?, sc4butchg	,sc4butch,	sc4, sc4, sc4_state, sc4butch, ROT0, "BFM","Butch Cashidy & The Sundance Quid (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4cabin_reel_configs[6] =
+static const stepper_interface* sc4cabin_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29013,7 +29213,7 @@ GAME( 200?, sc4cabink	,sc4cabin,	sc4, sc4, sc4_state, sc4cabin, ROT0, "Mazooma",
 GAME( 200?, sc4cabinl	,sc4cabin,	sc4, sc4, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 13)", GAME_NOT_WORKING )
 GAME( 200?, sc4cabinm	,sc4cabin,	sc4, sc4, sc4_state, sc4cabin, ROT0, "Mazooma","Cabin Fever (Mazooma) (Scorpion 4) (set 14)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4cari_reel_configs[6] =
+static const stepper_interface* sc4cari_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29052,7 +29252,7 @@ GAME( 200?, sc4cblas	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Voodoo Games","Cash 
 GAME( 200?, sc4cblasa	,sc4cblas,	sc4, sc4, sc4_state, sc4, ROT0, "Voodoo Games","Cash Blast (Voodoo Games) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4casxt_reel_configs[6] =
+static const stepper_interface* sc4casxt_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -29097,7 +29297,7 @@ GAME( 200?, sc4chavyf	,sc4chavy,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Chav
 GAME( 200?, sc4chavyg	,sc4chavy,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4cmani_reel_configs[6] =
+static const stepper_interface* sc4cmani_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29126,7 +29326,7 @@ GAME( 200?, sc4cjb		,sc4cj,		sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cool Jewels 
 GAME( 200?, sc4cjc		,sc4cj,		sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cool Jewels (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 GAME( 200?, sc4cjd		,sc4cj,		sc4, sc4, sc4_state, sc4, ROT0, "BFM","Cool Jewels (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING ) // incomplete pairing
 
-const stepper_interface* sc4ctl_reel_configs[6] =
+static const stepper_interface* sc4ctl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29185,7 +29385,7 @@ GAME( 200?, sc4coron	,sc4coro,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Corona
 GAME( 200?, sc4corcl	,0,			sc4, sc4, sc4_state, sc4mbus, ROT0, "Mazooma","Coronation Street Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4corcla	,sc4corcl,	sc4, sc4, sc4_state, sc4mbus, ROT0, "Mazooma","Coronation Street Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4count_reel_configs[6] =
+static const stepper_interface* sc4count_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29211,7 +29411,7 @@ GAME( 200?, sc4counta	,sc4count,	sc4, sc4, sc4_state, sc4count, ROT0, "BFM","Cou
 GAME( 200?, sc4crnjw	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crown Jewels (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4crnjwa	,sc4crnjw,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crown Jewels (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4dnd_reel_configs[6] =
+static const stepper_interface* sc4dnd_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29259,7 +29459,7 @@ GAME( 200?, sc4dndo		,sc4dnd,	sc4, sc4dnd35, sc4_state, sc4dnd, ROT0, "BFM","Dea
 GAME( 200?, sc4dndk		,sc4dnd,	sc4, sc4dnd35, sc4_state, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL428, set 1)", GAME_NOT_WORKING )// DONL 428
 GAME( 200?, sc4dndm		,sc4dnd,	sc4, sc4dnd35, sc4_state, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL428, set 2)", GAME_NOT_WORKING )// DONL 428
 
-const stepper_interface* sc4dndcs_reel_configs[6] =
+static const stepper_interface* sc4dndcs_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29290,7 +29490,7 @@ GAME( 200?, sc4dndcsc	,sc4dndcs,	sc4, sc4dndcs5, sc4_state, sc4dndcs, ROT0, "BFM
 GAME( 200?, sc4dndcsd	,sc4dndcs,	sc4, sc4dndcs5, sc4_state, sc4dndcs, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD215, set 1)", GAME_NOT_WORKING ) // CLDD 215
 GAME( 200?, sc4dndcse	,sc4dndcs,	sc4, sc4dndcs5, sc4_state, sc4dndcs, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD215, set 2)", GAME_NOT_WORKING ) // CLDD 215
 
-const stepper_interface* sc4dndbb_reel_configs[6] =
+static const stepper_interface* sc4dndbb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29333,7 +29533,7 @@ GAME( 200?, sc4dndbbh	,sc4dndbb,	sc4, sc4dndbb70, sc4_state, sc4dndbb, ROT0, "BF
 GAME( 200?, sc4dndbbf	,sc4dndbb,	sc4, sc4dndbb70, sc4_state, sc4dndbb, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE572, set 1)", GAME_NOT_WORKING ) // CRBE 572
 GAME( 200?, sc4dndbbi	,sc4dndbb,	sc4, sc4dndbb70, sc4_state, sc4dndbb, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE572, set 2)", GAME_NOT_WORKING )// CRBE 572
 
-const stepper_interface* sc4dndcl_reel_configs[6] =
+static const stepper_interface* sc4dndcl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29373,7 +29573,7 @@ GAME( 200?, sc4dndcld	,sc4dndcl,	sc4, sc4dndcl250, sc4_state, sc4dndcl, ROT0, "B
 GAME( 200?, sc4dndclb	,sc4dndcl,	sc4, sc4dndcl250, sc4_state, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL391, set 1)", GAME_NOT_WORKING ) // DNDL 391 CLUB ?250
 GAME( 200?, sc4dndclf	,sc4dndcl,	sc4, sc4dndcl250, sc4_state, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL391, set 2)", GAME_NOT_WORKING ) // DNDL 391 CLUB ?250
 
-const stepper_interface* sc4dnddd_reel_configs[6] =
+static const stepper_interface* sc4dnddd_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29414,7 +29614,7 @@ GAME( 200?, sc4dndddf	,sc4dnddd,	sc4, sc4dnddd70, sc4_state, sc4dnddd, ROT0, "BF
 GAME( 200?, sc4dndddc	,sc4dnddd,	sc4, sc4dnddd70, sc4_state, sc4dnddd, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO573, set 1)", GAME_NOT_WORKING ) // DDNO 573
 GAME( 200?, sc4dndddg	,sc4dnddd,	sc4, sc4dnddd70, sc4_state, sc4dnddd, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO573, set 2)", GAME_NOT_WORKING ) // DDNO 573
 
-const stepper_interface* sc4dndhf_reel_configs[6] =
+static const stepper_interface* sc4dndhf_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29459,7 +29659,7 @@ GAME( 200?, sc4dndhfe	,sc4dndhf,	sc4, sc4dndhf70, sc4_state, sc4dndhf, ROT0, "BF
 GAME( 200?, sc4dndhfk	,sc4dndhf,	sc4, sc4dndhf70, sc4_state, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA572, set 1, bad?)", GAME_NOT_WORKING ) // error 51 (bad rom?)
 GAME( 200?, sc4dndhfl	,sc4dndhf,	sc4, sc4dndhf70, sc4_state, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA572, set 2, bad?)", GAME_NOT_WORKING ) // error 51 (bad rom?)
 
-const stepper_interface* sc4dndys_reel_configs[6] =
+static const stepper_interface* sc4dndys_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29497,7 +29697,7 @@ GAME( 200?, sc4dndysb	,sc4dndys,	sc4, sc4dndys70, sc4_state, sc4dndys, ROT0, "BF
 GAME( 200?, sc4dndysa	,sc4dndys,	sc4, sc4dndys35, sc4_state, sc4dndys, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (DOBO474, set 1)", GAME_NOT_WORKING ) // DOBO 474
 GAME( 200?, sc4dndysc	,sc4dndys,	sc4, sc4dndys35, sc4_state, sc4dndys, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (DOBO474, set 2)", GAME_NOT_WORKING ) // DOBO 474
 
-const stepper_interface* sc4dndlp_reel_configs[6] =
+static const stepper_interface* sc4dndlp_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29530,7 +29730,7 @@ GAME( 200?, sc4dndlpd	,sc4dndlp,	sc4, sc4dndlp70, sc4_state, sc4dndlp, ROT0, "BF
 GAME( 200?, sc4dndlpb	,sc4dndlp,	sc4, sc4dndlp70, sc4_state, sc4dndlp, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (LPDN573, set 1)", GAME_NOT_WORKING )// LPDN 573
 GAME( 200?, sc4dndlpe	,sc4dndlp,	sc4, sc4dndlp70, sc4_state, sc4dndlp, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (LPDN573, set 2)", GAME_NOT_WORKING )// LPDN 573
 
-const stepper_interface* sc4dndra_reel_configs[6] =
+static const stepper_interface* sc4dndra_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29568,7 +29768,7 @@ GAME( 200?, sc4dndrad	,sc4dndra,	sc4, sc4dndra35, sc4_state, sc4dndra, ROT0, "BF
 GAME( 200?, sc4dndrac	,sc4dndra,	sc4, sc4dndra70, sc4_state, sc4dndra, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT572, set 1)", GAME_NOT_WORKING ) // REDT 572
 GAME( 200?, sc4dndrae	,sc4dndra,	sc4, sc4dndra70, sc4_state, sc4dndra, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT572, set 2)", GAME_NOT_WORKING ) // REDT 572
 
-const stepper_interface* sc4dndbd_reel_configs[6] =
+static const stepper_interface* sc4dndbd_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29607,7 +29807,7 @@ GAME( 200?, sc4dndbdd	,sc4dndbd,	sc4, sc4dndbd35, sc4_state, sc4dndbd, ROT0, "BF
 GAME( 200?, sc4dndbdc	,sc4dndbd,	sc4, sc4dndbd70, sc4_state, sc4dndbd, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA571, set 1)", GAME_NOT_WORKING ) // BGDA 571
 GAME( 200?, sc4dndbde	,sc4dndbd,	sc4, sc4dndbd70, sc4_state, sc4dndbd, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA571, set 2)", GAME_NOT_WORKING ) // BGDA 571
 
-const stepper_interface* sc4dndbr_reel_configs[6] =
+static const stepper_interface* sc4dndbr_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29648,7 +29848,7 @@ GAME( 200?, sc4dndbrf	,sc4dndbr,	sc4, sc4dndbr35, sc4_state, sc4dndbr, ROT0, "BF
 GAME( 200?, sc4dndbre	,sc4dndbr,	sc4, sc4dndbr70, sc4_state, sc4dndbr, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD571, set 1)", GAME_NOT_WORKING ) // BIGD 571
 GAME( 200?, sc4dndbrg	,sc4dndbr,	sc4, sc4dndbr70, sc4_state, sc4dndbr, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD571, set 2)", GAME_NOT_WORKING ) // BIGD 571
 
-const stepper_interface* sc4dndcc_reel_configs[6] =
+static const stepper_interface* sc4dndcc_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29688,7 +29888,7 @@ GAME( 200?, sc4dndcce	,sc4dndcc,	sc4, sc4dndcc35, sc4_state, sc4dndcc, ROT0, "BF
 GAME( 200?, sc4dndccd	,sc4dndcc,	sc4, sc4dndcc70, sc4_state, sc4dndcc, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR571, set 1)", GAME_NOT_WORKING ) // CRZR 571
 GAME( 200?, sc4dndccf	,sc4dndcc,	sc4, sc4dndcc70, sc4_state, sc4dndcc, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR571, set 2)", GAME_NOT_WORKING ) // CRZR 571
 
-const stepper_interface* sc4dnddw_reel_configs[6] =
+static const stepper_interface* sc4dnddw_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29728,7 +29928,7 @@ GAME( 200?, sc4dnddwf	,sc4dnddw,	sc4, sc4dnddw35, sc4_state, sc4dnddw, ROT0, "BF
 GAME( 200?, sc4dnddwe	,sc4dnddw,	sc4, sc4dnddw70, sc4_state, sc4dnddw, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN572, set 1)", GAME_NOT_WORKING ) // DOFN 572
 GAME( 200?, sc4dnddwg	,sc4dnddw,	sc4, sc4dnddw70, sc4_state, sc4dnddw, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN572, set 2)", GAME_NOT_WORKING ) // DOFN 572
 
-const stepper_interface* sc4dnddf_reel_configs[6] =
+static const stepper_interface* sc4dnddf_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29766,7 +29966,7 @@ GAME( 200?, sc4dnddfd	,sc4dnddf,	sc4, sc4dnddf35, sc4_state, sc4dnddf, ROT0, "BF
 GAME( 200?, sc4dnddfc	,sc4dnddf,	sc4, sc4dnddf70, sc4_state, sc4dnddf, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC571, set 1)", GAME_NOT_WORKING ) // TDFC 571
 GAME( 200?, sc4dnddfe	,sc4dnddf,	sc4, sc4dnddf70, sc4_state, sc4dnddf, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC571, set 2)", GAME_NOT_WORKING ) // TDFC 571
 
-const stepper_interface* sc4dndpg_reel_configs[6] =
+static const stepper_interface* sc4dndpg_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29805,7 +30005,7 @@ GAME( 200?, sc4dndpgd	,sc4dndpg,	sc4, sc4dndpg70, sc4_state, sc4dndpg, ROT0, "BF
 GAME( 200?, sc4dndpgb	,sc4dndpg,	sc4, sc4dndpg70, sc4_state, sc4dndpg, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPBG572, set 1)", GAME_NOT_WORKING ) // TPGB 572
 GAME( 200?, sc4dndpge	,sc4dndpg,	sc4, sc4dndpg70, sc4_state, sc4dndpg, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPGB572, set 2)", GAME_NOT_WORKING ) // TPGB 572
 
-const stepper_interface* sc4dndtp_reel_configs[6] =
+static const stepper_interface* sc4dndtp_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29845,7 +30045,7 @@ GAME( 200?, sc4dndtpj	,sc4dndtp,	sc4, sc4dndtp35, sc4_state, sc4dndtp, ROT0, "BF
 GAME( 200?, sc4dndtpk	,sc4dndtp,	sc4, sc4dndtp35, sc4_state, sc4dndtp, ROT0, "BFM","Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV41A, set 2)", GAME_NOT_WORKING )// TPRV 41A
 
 
-const stepper_interface* sc4dndww_reel_configs[6] =
+static const stepper_interface* sc4dndww_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29877,7 +30077,7 @@ GAME( 200?, sc4dndwwe	,sc4dndww,	sc4, sc4dndww35, sc4_state, sc4dndww, ROT0, "BF
 GAME( 200?, sc4dndwwc	,sc4dndww,	sc4, sc4dndww35, sc4_state, sc4dndww, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH415, set 1)", GAME_NOT_WORKING ) // TWOH 415
 GAME( 200?, sc4dndwwd	,sc4dndww,	sc4, sc4dndww35, sc4_state, sc4dndww, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH415, set 2)", GAME_NOT_WORKING ) // TWOH 415
 
-const stepper_interface* sc4dndcw_reel_configs[6] =
+static const stepper_interface* sc4dndcw_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29907,7 +30107,7 @@ GAME( 200?, sc4dndcwb	,sc4dndcw,	sc4, sc4dndcw5, sc4_state, sc4dndcw, ROT0, "BFM
 GAME( 200?, sc4dndcwa	,sc4dndcw,	sc4, sc4dndcw5, sc4_state, sc4dndcw, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (CWOH272, set 1)", GAME_NOT_WORKING ) // CWOH 272
 GAME( 200?, sc4dndcwc	,sc4dndcw,	sc4, sc4dndcw5, sc4_state, sc4dndcw, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (CWOH272, set 2)", GAME_NOT_WORKING ) // CWOH 272
 
-const stepper_interface* sc4dndtr_reel_configs[6] =
+static const stepper_interface* sc4dndtr_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29935,7 +30135,7 @@ INPUT_PORTS_END
 GAME( 200?, sc4dndtr	,0,			sc4, sc4dndtr70, sc4_state, sc4dndtr, ROT0, "BFM","Deal Or No Deal Think Red (Bellfruit) (Scorpion 4) (THRE571, set 1)", GAME_NOT_WORKING ) // THRE 571
 GAME( 200?, sc4dndtra	,sc4dndtr,	sc4, sc4dndtr70, sc4_state, sc4dndtr, ROT0, "BFM","Deal Or No Deal Think Red (Bellfruit) (Scorpion 4) (THRE571, set 2)", GAME_NOT_WORKING ) // THRE 571
 
-const stepper_interface* sc4dndwb_reel_configs[6] =
+static const stepper_interface* sc4dndwb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -29968,7 +30168,7 @@ GAME( 200?, sc4dndwbe	,sc4dndwb,	sc4, sc4dndwb35, sc4_state, sc4dndwb, ROT0, "BF
 GAME( 200?, sc4dndwbf	,sc4dndwb,	sc4, sc4dndwb35, sc4_state, sc4dndwb, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX419, set 1)", GAME_NOT_WORKING ) // WIYX 419
 GAME( 200?, sc4dndwbg	,sc4dndwb,	sc4, sc4dndwb35, sc4_state, sc4dndwb, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX419, set 2)", GAME_NOT_WORKING ) // WIYX 419
 
-const stepper_interface* sc4dndbe_reel_configs[6] =
+static const stepper_interface* sc4dndbe_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30014,7 +30214,7 @@ GAME( 200?, sc4dndbej	,sc4dndbe,	sc4, sc4dndbe35, sc4_state, sc4dndbe, ROT0, "BF
 GAME( 200?, sc4dndbem	,sc4dndbe,	sc4, sc4dndbe35, sc4_state, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK426, set 1)", GAME_NOT_WORKING ) // DBTK 426
 GAME( 200?, sc4dndben	,sc4dndbe,	sc4, sc4dndbe35, sc4_state, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK426, set 2)", GAME_NOT_WORKING ) // DBTK 426
 
-const stepper_interface* sc4dndbc_reel_configs[6] =
+static const stepper_interface* sc4dndbc_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30052,7 +30252,7 @@ GAME( 200?, sc4dmined	,sc4dmine,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Diamond 
 GAME( 200?, sc4dminee	,sc4dmine,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4ddosh_reel_configs[6] =
+static const stepper_interface* sc4ddosh_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30104,7 +30304,7 @@ GAME( 200?, sc4dhhc		,sc4dhh,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Dough H
 GAME( 200?, sc4dhhd		,sc4dhh,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Dough Ho Ho (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4dhhe		,sc4dhh,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Dough Ho Ho (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4dough_reel_configs[6] =
+static const stepper_interface* sc4dough_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30124,7 +30324,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4dough)
 GAME( 200?, sc4dough	,0,			sc4, sc4, sc4_state, sc4dough, ROT0, "BFM","Dough Selecta (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4dougha	,sc4dough,	sc4, sc4, sc4_state, sc4dough, ROT0, "BFM","Dough Selecta (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4emmer_reel_configs[6] =
+static const stepper_interface* sc4emmer_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30148,7 +30348,7 @@ GAME( 200?, sc4emmerb	,sc4emmer,	sc4, sc4, sc4_state, sc4emmer, ROT0, "Mazooma",
 GAME( 200?, sc4emmerc	,sc4emmer,	sc4, sc4, sc4_state, sc4emmer, ROT0, "Mazooma","Emmerdale (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4evol_reel_configs[6] =
+static const stepper_interface* sc4evol_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30174,7 +30374,7 @@ GAME( 200?, sc4evole	,sc4evol,	sc4, sc4, sc4_state, sc4evol, ROT0, "Qps","Evolut
 GAME( 200?, sc4evolf	,sc4evol,	sc4, sc4, sc4_state, sc4evol, ROT0, "Qps","Evolution (Qps) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 GAME( 200?, sc4evolg	,sc4evol,	sc4, sc4, sc4_state, sc4evol, ROT0, "Qps","Evolution (Qps) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4fguy_reel_configs[6] =
+static const stepper_interface* sc4fguy_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30212,7 +30412,7 @@ GAME( 200?, sc4fguyc	,sc4fguy,	sc4, sc4fguy70, sc4_state, sc4fguy, ROT0, "BFM","
 GAME( 200?, sc4fguyd	,sc4fguy,	sc4, sc4, sc4_state, sc4fguy, ROT0, "BFM","Family Guy (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4fguye	,sc4fguy,	sc4, sc4, sc4_state, sc4fguy, ROT0, "BFM","Family Guy (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4fbspn_reel_configs[6] =
+static const stepper_interface* sc4fbspn_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30235,7 +30435,7 @@ GAME( 200?, sc4fbspnb	,sc4fbspn,	sc4, sc4, sc4_state, sc4fbspn, ROT0, "BFM","Fat
 GAME( 200?, sc4fbspnc	,sc4fbspn,	sc4, sc4, sc4_state, sc4fbspn, ROT0, "BFM","Fat Boy Spin (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4fmj_reel_configs[6] =
+static const stepper_interface* sc4fmj_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30258,7 +30458,7 @@ GAME( 200?, sc4fmjb		,sc4fmj,	sc4, sc4, sc4_state, sc4fmj, ROT0, "QPS / Mazooma"
 GAME( 200?, sc4fmjc		,sc4fmj,	sc4, sc4, sc4_state, sc4fmj, ROT0, "QPS / Mazooma","Full Metal Jackpot (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4gd_reel_configs[6] =
+static const stepper_interface* sc4gd_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30284,7 +30484,7 @@ GAME( 200?, sc4gde		,sc4gd,		sc4, sc4, sc4_state, sc4gd, ROT0, "BFM","Gold Digge
 GAME( 200?, sc4gdf		,sc4gd,		sc4, sc4, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 GAME( 200?, sc4gdg		,sc4gd,		sc4, sc4, sc4_state, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4gdclb_reel_configs[6] =
+static const stepper_interface* sc4gdclb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30315,7 +30515,7 @@ GAME( 200?, sc4gdclbi	,sc4gdclb,	sc4, sc4, sc4_state, sc4gdclb, ROT0, "BFM","Gol
 GAME( 200?, sc4gdclbj	,sc4gdclb,	sc4, sc4, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
 GAME( 200?, sc4gdclbk	,sc4gdclb,	sc4, sc4, sc4_state, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4gbcas_reel_configs[6] =
+static const stepper_interface* sc4gbcas_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30339,7 +30539,7 @@ GAME( 200?, sc4gbcasb	,sc4gbcas,	sc4, sc4, sc4_state, sc4gbcas, ROT0, "BFM","Cas
 GAME( 200?, sc4gbcasc	,sc4gbcas,	sc4, sc4, sc4_state, sc4gbcas, ROT0, "BFM","Casino Golden Balls (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4gball_reel_configs[6] =
+static const stepper_interface* sc4gball_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30362,7 +30562,7 @@ GAME( 200?, sc4gballa	,sc4gball,	sc4, sc4, sc4_state, sc4gball, ROT0, "BFM","Gol
 GAME( 200?, sc4gballb	,sc4gball,	sc4, sc4, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4gballc	,sc4gball,	sc4, sc4, sc4_state, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4gunp_reel_configs[6] =
+static const stepper_interface* sc4gunp_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30388,7 +30588,7 @@ GAME( 200?, sc4gunpe	,sc4gunp,	sc4, sc4, sc4_state, sc4gunp, ROT0, "BFM","Gunpow
 GAME( 200?, sc4gunpf	,sc4gunp,	sc4, sc4, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 GAME( 200?, sc4gunpg	,sc4gunp,	sc4, sc4, sc4_state, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4hapnt_reel_configs[6] =
+static const stepper_interface* sc4hapnt_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30412,7 +30612,7 @@ GAME( 200?, sc4hapntc	,sc4hapnt,	sc4, sc4, sc4_state, sc4hapnt, ROT0, "BFM","Hap
 GAME( 200?, sc4hapntd	,sc4hapnt,	sc4, sc4, sc4_state, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4hapnte	,sc4hapnt,	sc4, sc4, sc4_state, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4hntcs_reel_configs[6] =
+static const stepper_interface* sc4hntcs_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30477,7 +30677,7 @@ GAME( 200?, sc4hellbh	,sc4hellb,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Hell
 GAME( 200?, sc4hellbi	,sc4hellb,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
 GAME( 200?, sc4hellbj	,sc4hellb,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4hill_reel_configs[6] =
+static const stepper_interface* sc4hill_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30498,7 +30698,7 @@ GAME( 200?, sc4hill		,0,			sc4, sc4, sc4_state, sc4hill, ROT0, "BFM","Hill Billi
 GAME( 200?, sc4hilla	,sc4hill,	sc4, sc4, sc4_state, sc4hill, ROT0, "BFM","Hill Billionaire (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4hiss_reel_configs[6] =
+static const stepper_interface* sc4hiss_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30551,7 +30751,7 @@ GAME( 200?, sc4celebc	,sc4celeb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","I'm A Ce
 GAME( 200?, sc4celebd	,sc4celeb,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","I'm A Celebrity (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4inspn_reel_configs[6] =
+static const stepper_interface* sc4inspn_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30608,7 +30808,7 @@ GAME( 200?, sc4lotrrc	,sc4lotrr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Lord Of 
 GAME( 200?, sc4lotrrd	,sc4lotrr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Lord Of The Rings - Return Of The King (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4lotrre	,sc4lotrr,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Lord Of The Rings - Return Of The King (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4manic_reel_configs[6] =
+static const stepper_interface* sc4manic_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30634,7 +30834,7 @@ GAME( 200?, sc4manice	,sc4manic,	sc4, sc4, sc4_state, sc4manic, ROT0, "BFM","Man
 GAME( 200?, sc4manicf	,sc4manic,	sc4, sc4, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
 GAME( 200?, sc4manicg	,sc4manic,	sc4, sc4, sc4_state, sc4manic, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4mmm_reel_configs[6] =
+static const stepper_interface* sc4mmm_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30661,7 +30861,7 @@ GAME( 200?, sc4mmme		,sc4mmm,	sc4, sc4, sc4_state, sc4mmm, ROT0, "Mazooma","Ment
 GAME( 200?, sc4mmmf		,sc4mmm,	sc4, sc4, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 GAME( 200?, sc4mmmg		,sc4mmm,	sc4, sc4, sc4_state, sc4mmm, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4mmad_reel_configs[6] =
+static const stepper_interface* sc4mmad_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30689,7 +30889,7 @@ GAME( 200?, sc4mmadf	,sc4mmad,	sc4, sc4, sc4_state, sc4mmad, ROT0, "Mazooma","Mo
 GAME( 200?, sc4mmadg	,sc4mmad,	sc4, sc4, sc4_state, sc4mmad, ROT0, "Mazooma","Money Madness (PR0000) (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING ) // incomplete pairing
 
 
-const stepper_interface* sc4mdm_reel_configs[6] =
+static const stepper_interface* sc4mdm_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30709,7 +30909,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4mdm)
 GAME( 200?, sc4mdm		,0,			sc4, sc4, sc4_state, sc4mdm, ROT0, "BFM","Monopoly Double Money (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4mdma		,sc4mdm,	sc4, sc4, sc4_state, sc4mdm, ROT0, "BFM","Monopoly Double Money (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4mhn_reel_configs[6] =
+static const stepper_interface* sc4mhn_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30730,7 +30930,7 @@ GAME( 200?, sc4mhn		,0,			sc4, sc4, sc4_state, sc4mhn, ROT0, "Mazooma","Monopoly
 GAME( 200?, sc4mhna		,sc4mhn,	sc4, sc4, sc4_state, sc4mhn, ROT0, "Mazooma","Monopoly Here & Now (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4mhp_reel_configs[6] =
+static const stepper_interface* sc4mhp_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30764,7 +30964,7 @@ GAME( 200?, sc4mhpl	    ,sc4mhp,	sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monop
 GAME( 200?, sc4mhpm	    ,sc4mhp,	sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING ) // 272
 GAME( 200?, sc4mhpn	    ,sc4mhp,	sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 15)", GAME_NOT_WORKING ) // 272
 
-const stepper_interface* sc4mmb_reel_configs[6] =
+static const stepper_interface* sc4mmb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30785,7 +30985,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4mmb)
 GAME( 200?, sc4mmb		,0,			sc4, sc4, sc4_state, sc4mmb, ROT0, "BFM","Monopoly Money Bags (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4mmba		,sc4mmb,	sc4, sc4, sc4_state, sc4mmb, ROT0, "BFM","Monopoly Money Bags (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4mrh_reel_configs[6] =
+static const stepper_interface* sc4mrh_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -30810,7 +31010,7 @@ GAME( 200?, sc4mrhc		,sc4mrh,	sc4, sc4, sc4_state, sc4mrh, ROT0, "Mazooma","Mono
 GAME( 200?, sc4mrhd		,sc4mrh,	sc4, sc4, sc4_state, sc4mrh, ROT0, "Mazooma","Monopoly Red Hot (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4mrhe		,sc4mrh,	sc4, sc4, sc4_state, sc4mrh, ROT0, "Mazooma","Monopoly Red Hot (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4mr2r_reel_configs[6] =
+static const stepper_interface* sc4mr2r_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30835,7 +31035,7 @@ GAME( 200?, sc4mr2rc	,sc4mr2r,	sc4, sc4, sc4_state, sc4mr2r, ROT0, "Mazooma","Mo
 GAME( 200?, sc4mr2rd	,sc4mr2r,	sc4, sc4, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4mr2re	,sc4mr2r,	sc4, sc4, sc4_state, sc4mr2r, ROT0, "Mazooma","Monopoly Road To Riches (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4nmare_reel_configs[6] =
+static const stepper_interface* sc4nmare_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30859,7 +31059,7 @@ GAME( 200?, sc4nmareb	,sc4nmare,	sc4, sc4, sc4_state, sc4nmare, ROT0, "BFM","A N
 GAME( 200?, sc4nmarec	,sc4nmare,	sc4, sc4, sc4_state, sc4nmare, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4potp_reel_configs[6] =
+static const stepper_interface* sc4potp_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30896,7 +31096,7 @@ GAME( 200?, sc4ppcrj	,sc4ppcr,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink P
 GAME( 200?, sc4ppcrtb	,sc4ppcr,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Clouseau's Revenge Top Box (Mazooma) (Scorpion 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4ppctc_reel_configs[6] =
+static const stepper_interface* sc4ppctc_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30937,7 +31137,7 @@ GAME( 200?, sc4ppdymi	,sc4ppdym,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink
 GAME( 200?, sc4ppdymtb	,sc4ppdym,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money Top Box (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4ppdymtba	,sc4ppdym,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Pink Panther Double Your Money Top Box (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4pony_reel_configs[6] =
+static const stepper_interface* sc4pony_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30962,7 +31162,7 @@ GAME( 200?, sc4ponyc	,sc4pony,	sc4, sc4, sc4_state, sc4pony, ROT0, "BFM","Pony E
 GAME( 200?, sc4ponyd	,sc4pony,	sc4, sc4, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4ponye	,sc4pony,	sc4, sc4, sc4_state, sc4pony, ROT0, "BFM","Pony Express (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING ) // incomplete pairing
 
-const stepper_interface* sc4popey_reel_configs[6] =
+static const stepper_interface* sc4popey_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -30987,7 +31187,7 @@ GAME( 200?, sc4popeyd	,sc4popey,	sc4, sc4, sc4_state, sc4popey, ROT0, "Mazooma",
 GAME( 200?, sc4popeye	,sc4popey,	sc4, sc4, sc4_state, sc4popey, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4pwrbl_reel_configs[6] =
+static const stepper_interface* sc4pwrbl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31010,7 +31210,7 @@ GAME( 200?, sc4pwrbl	,0,			sc4, sc4, sc4_state, sc4pwrbl, ROT0, "BFM","Powerball
 GAME( 200?, sc4pwrbla	,sc4pwrbl,	sc4, sc4, sc4_state, sc4pwrbl, ROT0, "BFM","Powerball (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4quidv_reel_configs[6] =
+static const stepper_interface* sc4quidv_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31032,7 +31232,7 @@ GAME( 200?, sc4quidva	,sc4quidv,	sc4, sc4, sc4_state, sc4quidv, ROT0, "Mazooma",
 GAME( 200?, sc4quidvb	,sc4quidv,	sc4, sc4, sc4_state, sc4quidv, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4quidvc	,sc4quidv,	sc4, sc4, sc4_state, sc4quidv, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4rhx_reel_configs[6] =
+static const stepper_interface* sc4rhx_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -31082,7 +31282,7 @@ GAME( 200?, sc4rhxv		,sc4rhx,	sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red 
 GAME( 200?, sc4rhxw		,sc4rhx,	sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 24)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4rhxcs_reel_configs[6] =
+static const stepper_interface* sc4rhxcs_reel_configs[6] =
 {
 	&starpoint_interface_200step_reel,
 	&starpoint_interface_200step_reel,
@@ -31114,7 +31314,7 @@ GAME( 200?, sc4rhxclc	,sc4rhxcl,	sc4, sc4, sc4_state, sc4rhx, ROT0, "Mazooma","R
 
 
 
-const stepper_interface* sc4redsq_reel_configs[6] =
+static const stepper_interface* sc4redsq_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31137,7 +31337,7 @@ GAME( 200?, sc4redsqb	,sc4redsq,	sc4, sc4, sc4_state, sc4redsq, ROT0, "Mazooma",
 GAME( 200?, sc4redsqc	,sc4redsq,	sc4, sc4, sc4_state, sc4redsq, ROT0, "Mazooma","Red Square (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4rosts_reel_configs[6] =
+static const stepper_interface* sc4rosts_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31164,7 +31364,7 @@ GAME( 200?, sc4rostse	,sc4rosts,	sc4, sc4, sc4_state, sc4rosts, ROT0, "BFM","Ron
 GAME( 200?, sc4rostsf	,sc4rosts,	sc4, sc4, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 GAME( 200?, sc4rostsg	,sc4rosts,	sc4, sc4, sc4_state, sc4rosts, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4rovrt_reel_configs[6] =
+static const stepper_interface* sc4rovrt_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31189,7 +31389,7 @@ GAME( 200?, sc4rovrtc	,sc4rovrt,	sc4, sc4, sc4_state, sc4rovrt, ROT0, "Mazooma",
 GAME( 200?, sc4rovrtd	,sc4rovrt,	sc4, sc4, sc4_state, sc4rovrt, ROT0, "Mazooma","Rovers Return (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4rovrte	,sc4rovrt,	sc4, sc4, sc4_state, sc4rovrt, ROT0, "Mazooma","Rovers Return (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4showt_reel_configs[6] =
+static const stepper_interface* sc4showt_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31216,7 +31416,7 @@ GAME( 200?, sc4showte	,sc4showt,	sc4, sc4, sc4_state, sc4showt, ROT0, "BFM","Sho
 GAME( 200?, sc4showtf	,sc4showt,	sc4, sc4, sc4_state, sc4showt, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4spice_reel_configs[6] =
+static const stepper_interface* sc4spice_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31238,7 +31438,7 @@ GAME( 200?, sc4spicea	,sc4spice,	sc4, sc4, sc4_state, sc4spice, ROT0, "BFM","Spi
 GAME( 200?, sc4spiceb	,sc4spice,	sc4, sc4, sc4_state, sc4spice, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4spicec	,sc4spice,	sc4, sc4, sc4_state, sc4spice, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4sus_reel_configs[6] =
+static const stepper_interface* sc4sus_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31264,7 +31464,7 @@ GAME( 200?, sc4susi		,sc4sus,	sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U 
 GAME( 200?, sc4susj		,sc4sus,	sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 GAME( 200?, sc4susk		,sc4sus,	sc4, sc4, sc4_state, sc4sus, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4sslam_reel_configs[6] =
+static const stepper_interface* sc4sslam_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31285,7 +31485,7 @@ GAME( 200?, sc4sslam	,0,			sc4, sc4, sc4_state, sc4sslam, ROT0, "BFM","Super Sla
 GAME( 200?, sc4sslama	,sc4sslam,	sc4, sc4, sc4_state, sc4sslam, ROT0, "BFM","Super Slam (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4swbak_reel_configs[6] =
+static const stepper_interface* sc4swbak_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31308,7 +31508,7 @@ GAME( 200?, sc4swbakb	,sc4swbak,	sc4, sc4, sc4_state, sc4swbak, ROT0, "QPS","Swi
 GAME( 200?, sc4swbakc	,sc4swbak,	sc4, sc4, sc4_state, sc4swbak, ROT0, "QPS","Switch Back (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4ttpie_reel_configs[6] =
+static const stepper_interface* sc4ttpie_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31337,7 +31537,7 @@ GAME( 200?, sc4ttpief	,sc4ttpie,	sc4, sc4, sc4_state, sc4ttpie, ROT0, "BFM","Tak
 GAME( 200?, sc4ttpieg	,sc4ttpie,	sc4, sc4, sc4_state, sc4ttpie, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4typ_reel_configs[6] =
+static const stepper_interface* sc4typ_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31360,7 +31560,7 @@ GAME( 200?, sc4typa		,sc4typ,	sc4, sc4, sc4_state, sc4typ, ROT0, "BFM","Take You
 GAME( 200?, sc4typb		,sc4typ,	sc4, sc4, sc4_state, sc4typ, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4typc		,sc4typ,	sc4, sc4, sc4_state, sc4typ, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4trail_reel_configs[6] =
+static const stepper_interface* sc4trail_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31383,7 +31583,7 @@ GAME( 200?, sc4trailb	,sc4trail,	sc4, sc4, sc4_state, sc4trail, ROT0, "Mazooma",
 GAME( 200?, sc4trailc	,sc4trail,	sc4, sc4, sc4_state, sc4trail, ROT0, "Mazooma","Trailblazer (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4vivam_reel_configs[6] =
+static const stepper_interface* sc4vivam_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31420,7 +31620,7 @@ GAME( 200?, sc4vivcsg	,sc4vivcs,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Viva Mex
 
 
 
-const stepper_interface* sc4bpb_reel_configs[6] =
+static const stepper_interface* sc4bpb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31446,7 +31646,7 @@ GAME( 200?, sc4bpbd		,sc4bpb,	sc4, sc4, sc4_state, sc4bpb, ROT0, "BFM","Bully's 
 GAME( 200?, sc4bpbe		,sc4bpb,	sc4, sc4, sc4_state, sc4bpb, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4bsp_reel_configs[6] =
+static const stepper_interface* sc4bsp_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31474,7 +31674,7 @@ GAME( 200?, sc4bspe		,sc4bsp,	sc4, sc4, sc4_state, sc4bsp, ROT0, "BFM","Bully's 
 GAME( 200?, sc4bspf		,sc4bsp,	sc4, sc4, sc4_state, sc4bsp, ROT0, "BFM","Bully's Star Prize (PR3042) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4chain_reel_configs[6] =
+static const stepper_interface* sc4chain_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31498,7 +31698,7 @@ GAME( 200?, sc4chainb	,sc4chain,	sc4, sc4, sc4_state, sc4chain, ROT0, "BFM","Cha
 GAME( 200?, sc4chainc	,sc4chain,	sc4, sc4, sc4_state, sc4chain, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4clown_reel_configs[6] =
+static const stepper_interface* sc4clown_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31550,7 +31750,7 @@ GAME( 200?, sc4mwwtbc	,sc4mwwtb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Mono
 GAME( 200?, sc4mwwtbd	,sc4mwwtb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2389, Top Box) (Scorpion 4) (set 5)", GAME_NOT_WORKING )// ^^
 
 
-const stepper_interface* sc4bwow_reel_configs[6] =
+static const stepper_interface* sc4bwow_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31570,7 +31770,7 @@ GAME( 200?, sc4bwow	  ,0,	    sc4, sc4, sc4_state, sc4bwow, ROT0, "BFM","Wheel O
 GAME( 200?, sc4bwowa  ,sc4bwow,	sc4, sc4, sc4_state, sc4bwow, ROT0, "BFM","Wheel Of Wealth (Bellfruit) (PR1726) (Scorpion 4) (WHEL013, set 2)", GAME_NOT_WORKING ) // ^^
 
 
-const stepper_interface* sc4nunsm_reel_configs[6] =
+static const stepper_interface* sc4nunsm_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31599,7 +31799,7 @@ GAME( 200?, sc4nunsmi	,sc4nunsm,	sc4, sc4, sc4_state, sc4nunsm, ROT0, "Mazooma",
 GAME( 200?, sc4nunsmj	,sc4nunsm,	sc4, sc4, sc4_state, sc4nunsm, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4acesh_reel_configs[6] =
+static const stepper_interface* sc4acesh_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31622,7 +31822,7 @@ GAME( 200?, sc4aceshb	,sc4acesh,	sc4, sc4, sc4_state, sc4acesh, ROT0, "Mazooma",
 GAME( 200?, sc4aceshc	,sc4acesh,	sc4, sc4, sc4_state, sc4acesh, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4bed_reel_configs[6] =
+static const stepper_interface* sc4bed_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31647,7 +31847,7 @@ GAME( 200?, sc4bedc		,sc4bed,	sc4, sc4, sc4_state, sc4bed, ROT0, "Mazooma","Beda
 GAME( 200?, sc4bedd		,sc4bed,	sc4, sc4, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4bede		,sc4bed,	sc4, sc4, sc4_state, sc4bed, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4bedcl_reel_configs[6] =
+static const stepper_interface* sc4bedcl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31672,7 +31872,7 @@ GAME( 200?, sc4bedclb	,sc4bedcl,	sc4, sc4, sc4_state, sc4bedcl, ROT0, "Mazooma",
 GAME( 200?, sc4bedclc	,sc4bedcl,	sc4, sc4, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 GAME( 200?, sc4bedcld	,sc4bedcl,	sc4, sc4, sc4_state, sc4bedcl, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4bblas_reel_configs[6] =
+static const stepper_interface* sc4bblas_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31704,7 +31904,7 @@ GAME( 200?, sc4bblase	,sc4bblas,	sc4, sc4, sc4_state, sc4bblas_mbus, ROT0, "Mazo
 GAME( 200?, sc4bblasf	,sc4bblas,	sc4, sc4, sc4_state, sc4bblas_mbus, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4bankb_reel_configs[6] =
+static const stepper_interface* sc4bankb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31728,7 +31928,7 @@ GAME( 200?, sc4bankba	,sc4bankb,	sc4, sc4, sc4_state, sc4bankb, ROT0, "Qps","Ban
 GAME( 200?, sc4bb		,sc4bankb,	sc4, sc4, sc4_state, sc4bankb, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4bba		,sc4bankb,	sc4, sc4, sc4_state, sc4bankb, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4bobcl_reel_configs[6] =
+static const stepper_interface* sc4bobcl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31820,7 +32020,7 @@ GAME( 200?, sc4cckeym	,sc4cckey,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casi
 GAME( 200?, sc4cckeyn	,sc4cckey,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 15)", GAME_NOT_WORKING )
 GAME( 200?, sc4cckeyo	,sc4cckey,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 16)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4clclo_reel_configs[6] =
+static const stepper_interface* sc4clclo_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31839,7 +32039,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4clclo)
 // PR2383 CLUBCLOUSEAU         CLUBCLOUSEAU  CLUB  CCLOU SOUNDS         CLUB CLOSEAU
 GAME( 200?, sc4clclo	,0,			sc4, sc4, sc4_state, sc4clclo, ROT0, "QPS","Club Clouseau (QPS) (Scorpion 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4cjcl_reel_configs[6] =
+static const stepper_interface* sc4cjcl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31909,7 +32109,7 @@ GAME( 2003, sc4crgcv	,sc4crgc,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cops '
 
 
 
-const stepper_interface* sc4cfcla_reel_configs[6] =
+static const stepper_interface* sc4cfcla_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31933,7 +32133,7 @@ GAME( 200?, sc4cfclad	,sc4cfcla,	sc4, sc4, sc4_state, sc4cfcla, ROT0, "BFM","Cra
 GAME( 200?, sc4cfclae	,sc4cfcla,	sc4, sc4, sc4_state, sc4cfcla, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
 GAME( 200?, sc4cfclaf	,sc4cfcla,	sc4, sc4, sc4_state, sc4cfcla, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4cfdu_reel_configs[6] =
+static const stepper_interface* sc4cfdu_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31956,7 +32156,7 @@ GAME( 200?, sc4cfdub	,sc4cfdu,	sc4, sc4, sc4_state, sc4cfdu, ROT0, "BFM","Crazy 
 GAME( 200?, sc4cfduc	,sc4cfdu,	sc4, sc4, sc4_state, sc4cfdu, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4cfgcl_reel_configs[6] =
+static const stepper_interface* sc4cfgcl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -31979,7 +32179,7 @@ GAME( 200?, sc4cfgclb	,sc4cfgcl,	sc4, sc4, sc4_state, sc4cfgcl, ROT0, "BFM","Cra
 GAME( 200?, sc4cfgclc	,sc4cfgcl,	sc4, sc4, sc4_state, sc4cfgcl, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4derby_reel_configs[6] =
+static const stepper_interface* sc4derby_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32027,7 +32227,7 @@ GAME( 200?, sc4clbmnb	,sc4clbmn,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Club
 GAME( 200?, sc4clbmnc	,sc4clbmn,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Club Moneybags (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4boomb_reel_configs[6] =
+static const stepper_interface* sc4boomb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32052,7 +32252,7 @@ GAME( 200?, sc4boomba	,sc4boomb,	sc4, sc4, sc4_state, sc4boomb, ROT0, "BFM","Mon
 /*   they will all alarm for a while complaining about the battery but will then init NVRAM                                       */
 /**********************************************************************************************************************************/
 
-const stepper_interface* sc4aztec_reel_configs[6] =
+static const stepper_interface* sc4aztec_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32073,7 +32273,7 @@ GAME( 200?, sc4aztec	,0,			sc4, sc4, sc4_state, sc4aztec, ROT0, "BFG / Eurocoin"
 GAME( 200?, sc4azteca	,sc4aztec,	sc4, sc4, sc4_state, sc4aztec, ROT0, "BFG / Eurocoin","Aztec (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // PR1215 AZTEC EURO
 
 
-const stepper_interface* sc4helrd_reel_configs[6] =
+static const stepper_interface* sc4helrd_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32094,7 +32294,7 @@ GAME( 200?, sc4helrd	,0,			sc4, sc4, sc4_state, sc4helrd, ROT0, "BFM","Hellraise
 GAME( 200?, sc4helrs	,sc4helrd,	sc4, sc4, sc4_state, sc4helrd, ROT0, "BFM","Hellraiser (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4heatw_reel_configs[6] =
+static const stepper_interface* sc4heatw_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32116,7 +32316,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4heatw)
 GAME( 200?, sc4heatw	,0,			sc4, sc4, sc4_state, sc4heatw, ROT0, "BFM","Heatwave (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4colos_reel_configs[6] =
+static const stepper_interface* sc4colos_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32136,7 +32336,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4colos)
 // PR1208 COLOSSUS         95004235 COLOSSUS PR7155             COLOSSUS
 GAME( 200?, sc4colos	,0,			sc4, sc4, sc4_state, sc4colos, ROT0, "BFM","Colossus (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4fevdt_reel_configs[6] =
+static const stepper_interface* sc4fevdt_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32157,7 +32357,7 @@ GAME( 200?, sc4fevdt	,0,			sc4, sc4, sc4_state, sc4fevdt, ROT0, "BFM","Fever (PR
 GAME( 200?, sc4fevdta	,sc4fevdt,	sc4, sc4, sc4_state, sc4fevdt, ROT0, "BFM","Fever (PR1202) (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 GAME( 200?, sc4fevdtb	,sc4fevdt,	sc4, sc4, sc4_state, sc4fevdt, ROT0, "BFM","Fever (PR1202) (Dutch) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4fevnx_reel_configs[6] =
+static const stepper_interface* sc4fevnx_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32177,7 +32377,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4fevnx)
 GAME( 200?, sc4fevnx	,0,			sc4, sc4, sc4_state, sc4fevnx, ROT0, "BFM","Fever The Next (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4fevnxa	,sc4fevnx,	sc4, sc4, sc4_state, sc4fevnx, ROT0, "BFM","Fever The Next (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4game_reel_configs[6] =
+static const stepper_interface* sc4game_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32196,7 +32396,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4game)
 GAME( 200?, sc4gamcs	,0,			sc4, sc4, sc4_state, sc4game, ROT0, "BFM","The Game Casino (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // PR1224 THE GAME CASINO         95004285 THEGAME PR1153
 GAME( 200?, sc4game		,sc4gamcs,	sc4, sc4, sc4_state, sc4game, ROT0, "BFM","The Game (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // PR1213 THE GAME         95004285 THEGAME PR1153
 
-const stepper_interface* sc4goud_reel_configs[6] =
+static const stepper_interface* sc4goud_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32216,7 +32416,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4goud)
 GAME( 200?, sc4goud		,0,			sc4, sc4, sc4_state, sc4goud, ROT0, "BFM","Goudkoorts (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4lasv_reel_configs[6] =
+static const stepper_interface* sc4lasv_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32236,7 +32436,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4lasv)
 GAME( 200?, sc4lasv		,0,			sc4, sc4, sc4_state, sc4lasv, ROT0, "BFM","Las Vegas (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4lasva	,sc4lasv,	sc4, sc4, sc4_state, sc4lasv, ROT0, "BFM","Las Vegas (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4miljo_reel_configs[6] =
+static const stepper_interface* sc4miljo_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32256,7 +32456,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4miljo)
 GAME( 200?, sc4miljo	,0,			sc4, sc4, sc4_state, sc4miljo, ROT0, "BFM","Miljonairs (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // PR1217 MILJONAIRSART12         95004305 MILJONAIRE PR1157
 GAME( 200?, sc4milja	,sc4miljo,	sc4, sc4, sc4_state, sc4miljo, ROT0, "BFM","Miljonairs Arcade (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING ) // PR1223 MILJONAIRS         95004305 MILJONAIRE PR1157
 
-const stepper_interface* sc4paytm_reel_configs[6] =
+static const stepper_interface* sc4paytm_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32276,7 +32476,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4paytm)
 GAME( 200?, sc4paytm	,0,			sc4, sc4, sc4_state, sc4paytm, ROT0, "BFM","Pay Time (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4pglcs_reel_configs[6] =
+static const stepper_interface* sc4pglcs_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32297,7 +32497,7 @@ GAME( 200?, sc4pglcs	,0,			sc4, sc4, sc4_state, sc4pglcs, ROT0, "BFM","Pharaoh's
 GAME( 200?, sc4pglcsa	,sc4pglcs,	sc4, sc4, sc4_state, sc4pglcs, ROT0, "BFM","Pharaoh's Gold Casino (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 GAME( 200?, sc4pglcsb	,sc4pglcs,	sc4, sc4, sc4_state, sc4pglcs, ROT0, "BFM","Pharaoh's Gold Casino (Dutch) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4redad_reel_configs[6] =
+static const stepper_interface* sc4redad_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32319,7 +32519,7 @@ GAME( 200?, sc4redad	,0,			sc4, sc4, sc4_state, sc4redad, ROT0, "BFM","Red Alert
 GAME( 200?, sc4redada	,sc4redad,	sc4, sc4, sc4_state, sc4redad, ROT0, "BFM","Red Alert (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4rvlnx_reel_configs[6] =
+static const stepper_interface* sc4rvlnx_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32339,7 +32539,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4rvlnx)
 // PR1252 REVOLUTION  NEXT         95004320 REVOLUTIONTN PR1252
 GAME( 200?, sc4rvlnx	,0,			sc4, sc4, sc4_state, sc4rvlnx, ROT0, "BFM","Revolution The Next (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4rvl_reel_configs[6] =
+static const stepper_interface* sc4rvl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32359,7 +32559,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4rvl)
 // PR1203 REVOLUTION         95004259 REVOLUTION PR7158
 GAME( 200?, sc4rvl		,0,			sc4, sc4, sc4_state, sc4rvl, ROT0, "BFM","Revolution (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4rio_reel_configs[6] =
+static const stepper_interface* sc4rio_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32379,7 +32579,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4rio)
 GAME( 200?, sc4rio		,0,			sc4, sc4, sc4_state, sc4rio, ROT0, "BFM","Rio Grande (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
 	
-const stepper_interface* sc4strbr_reel_configs[6] =
+static const stepper_interface* sc4strbr_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32403,7 +32603,7 @@ GAME( 200?, sc4strbra	,sc4strbr,	sc4, sc4, sc4_state, sc4strbr, ROT0, "BFM","Sta
 GAME( 200?, sc4strbrc	,sc4strbr,	sc4, sc4, sc4_state, sc4strbr, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 GAME( 200?, sc4strbrd	,sc4strbr,	sc4, sc4, sc4_state, sc4strbr, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Dutch) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4twilt_reel_configs[6] =
+static const stepper_interface* sc4twilt_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32424,7 +32624,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4twilt)
 GAME( 200?, sc4twilt	,0,			sc4, sc4, sc4_state, sc4twilt, ROT0, "BFM","Twilight (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4monsp_reel_configs[6] =
+static const stepper_interface* sc4monsp_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32444,7 +32644,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4monsp)
 GAME( 200?, sc4monsp	,0,			sc4, sc4, sc4_state, sc4monsp, ROT0, "BFM","Money Spinner (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4ivply_reel_configs[6] =
+static const stepper_interface* sc4ivply_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32464,7 +32664,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4ivply)
 // PR1227 4PLAY ART13         95004313 4PLAY PR1227
 GAME( 200?, sc4ivply	,0,			sc4, sc4, sc4_state, sc4ivply, ROT0, "BFM","4 Play (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4ccc_reel_configs[6] =
+static const stepper_interface* sc4ccc_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32482,9 +32682,9 @@ DRIVER_INIT_MEMBER(sc4_state,sc4ccc)
 
 
 // PR1221 CRISSCROSSCRAZY  ART13         95004282 CRISSCROSS PR1161
-GAME( 200?, sc4ccc		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Criss Cross Crazy (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4ccc		,0,			sc4, sc4, sc4_state, sc4ccc, ROT0, "BFM","Criss Cross Crazy (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4valqp_reel_configs[6] =
+static const stepper_interface* sc4valqp_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32504,7 +32704,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4valqp)
 GAME( 200?, sc4valqp	,0,			sc4, sc4, sc4_state, sc4valqp, ROT0, "Qps / Eurocoin","Valhalla (Dutch) (Qps) (Scorpion 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4winxp_reel_configs[6] =
+static const stepper_interface* sc4winxp_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32521,10 +32721,10 @@ DRIVER_INIT_MEMBER(sc4_state,sc4winxp)
 }
 
 // PR1207 WIN XPLOSION         95004265 WINXPLOSION PR1053
-GAME( 200?, sc4winxp	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Win X-plosion (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4winxp	,0,			sc4, sc4, sc4_state, sc4winxp, ROT0, "BFM","Win X-plosion (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4xcash_reel_configs[6] =
+static const stepper_interface* sc4xcash_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32544,7 +32744,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4xcash)
 // PR1264 XTRA CASH ART13 XTRA CASH CASINO (LOTECH) - ART13         95004321 XTRACASH PR1264
 GAME( 200?, sc4xcash	,0,			sc4, sc4, sc4_state, sc4xcash, ROT0, "BFM","Xtra Cash Casino (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4helld_reel_configs[6] =
+static const stepper_interface* sc4helld_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32564,7 +32764,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4helld)
 // PR1201 HELLS BELLS         95004211 HELLS BELLS PR6945         HELLS  BELLS  (non english?)
 GAME( 200?, sc4helld	,0,			sc4, sc4, sc4_state, sc4helld, ROT0, "BFM / Eurocoin","Hells Bells (PR1201) (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
-const stepper_interface* sc4cashn_reel_configs[6] =
+static const stepper_interface* sc4cashn_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32585,7 +32785,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4cashn)
 GAME( 200?, sc4cashn	,0,			sc4, sc4, sc4_state, sc4cashn, ROT0, "Mazooma / Eurocoin","Cashanova (Dutch) (Mazooma / Eurocoin) (Scorpion 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4czfra_reel_configs[6] =
+static const stepper_interface* sc4czfra_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32603,7 +32803,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4czfra)
 
 
 // PR1212 CRAZY FRUITS          PR1152 CRAZY FRUITS SOUNDS11
-GAME( 200?, sc4czfra	,0,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (Dutch) (PR1212, CRAZ) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4czfra	,0,	sc4, sc4, sc4_state, sc4czfra, ROT0, "BFM","Crazy Fruits (Dutch) (PR1212, CRAZ) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
 
 /**********************************************************************************************************************************/
@@ -32612,7 +32812,7 @@ GAME( 200?, sc4czfra	,0,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Fruits (Du
 /**********************************************************************************************************************************/
 
 
-const stepper_interface* sc4polen_reel_configs[6] =
+static const stepper_interface* sc4polen_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32632,7 +32832,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4polen)
 GAME( 200?, sc4polen	,0,			sc4, sc4, sc4_state, sc4polen, ROT0, "Nova","Pole Position (German) (PR7012, GPOS) (Nova) (Scorpion 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4valnv_reel_configs[6] =
+static const stepper_interface* sc4valnv_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32653,7 +32853,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4valnv)
 GAME( 200?, sc4valnv	,0,			sc4, sc4, sc4_state, sc4valnv, ROT0, "Nova","Valhalla (German) (PR7025, GVAL) (Nova) (Scorpion 4)", GAME_NOT_WORKING )
 
 
-const stepper_interface* sc4wernr_reel_configs[6] =
+static const stepper_interface* sc4wernr_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32750,6 +32950,15 @@ GAME( 200?, sc4dcrlsj	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Doub
 GAME( 200?, sc4dcrlse	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (033) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4dcrlsk	,sc4dcrls,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Double Crazy Reels (033) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
+// PAY UNIT ERR 17
+// PR2564 GOLDEN SHOT Standard Version         GOLDENSHOTLOTECHSND
+GAME( 200?, sc4gshot	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Shot (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4gshotb	,sc4gshot,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Shot (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+// PR2564 GOLDEN SHOT Arcade Version         GOLDENSHOTLOTECHSND
+GAME( 200?, sc4gshota	,sc4gshot,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Shot Arcade (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4gshotc	,sc4gshot,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Golden Shot Arcade (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+
+
 // fails to boot, like many of the Pole Position sets, probably needs some specific dips setting due to buggy code?
 // PR7008 CHUBBY DOES VEGAS         VEGAS SOUNDS11
 GAME( 200?, sc4chub		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Chubby Does Vegas (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
@@ -32777,7 +32986,7 @@ GAME( 200?, sc4drubyd	,sc4druby,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Diamonds
 /****************************************************************************************************************************************************************************************************************/
 /****************************************************************************************************************************************************************************************************************/
 
-const stepper_interface* sc4abra_reel_configs[6] =
+static const stepper_interface* sc4abra_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32811,7 +33020,7 @@ GAME( 200?, sc4alada	,sc4alad,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Aladdi
 
 
 
-const stepper_interface* sc4broll_reel_configs[6] =
+static const stepper_interface* sc4broll_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32836,7 +33045,7 @@ GAME( 200?, sc4brollb	,sc4broll,	sc4, sc4, sc4_state, sc4broll, ROT0, "Mazooma",
 GAME( 200?, sc4brollc	,sc4broll,	sc4, sc4, sc4_state, sc4broll, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 
-const stepper_interface* sc4bigdl_reel_configs[6] =
+static const stepper_interface* sc4bigdl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32859,7 +33068,7 @@ GAME( 200?, sc4bigdla	,sc4bigdl,	sc4, sc4, sc4_state, sc4bigdl, ROT0, "Qps","Big
 
 
 
-const stepper_interface* sc4blast_reel_configs[6] =
+static const stepper_interface* sc4blast_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32896,7 +33105,7 @@ GAME( 200?, sc4blued	,sc4blue,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Blue R
 GAME( 200?, sc4bluee	,sc4blue,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 
-const stepper_interface* sc4brix_reel_configs[6] =
+static const stepper_interface* sc4brix_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32920,7 +33129,7 @@ GAME( 200?, sc4brixa	,sc4brix,	sc4, sc4, sc4_state, sc4brix, ROT0, "Nova","Brix 
 GAME( 200?, sc4brixb	,sc4brix,	sc4, sc4, sc4_state, sc4brix, ROT0, "Nova","Brix (German) (Nova) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 
-const stepper_interface* sc4bugs_reel_configs[6] =
+static const stepper_interface* sc4bugs_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32945,7 +33154,7 @@ GAME( 200?, sc4bugsb	,sc4bugs,	sc4, sc4, sc4_state, sc4bugs, ROT0, "BFM","Bugs M
 GAME( 200?, sc4bugsc	,sc4bugs,	sc4, sc4, sc4_state, sc4bugs, ROT0, "BFM","Bugs Money (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 
-const stepper_interface* sc4cconx_reel_configs[6] =
+static const stepper_interface* sc4cconx_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32955,7 +33164,7 @@ const stepper_interface* sc4cconx_reel_configs[6] =
 	0,
 };
 
-const stepper_interface* sc4cconxd_reel_configs[6] =
+static const stepper_interface* sc4cconxd_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -32987,7 +33196,7 @@ GAME( 200?, sc4cconxb	,sc4cconx,	sc4, sc4, sc4_state, sc4cconx, ROT0, "Mazooma",
 GAME( 200?, sc4cconxc	,sc4cconx,	sc4, sc4, sc4_state, sc4cconx, ROT0, "Mazooma","Cash Connexion (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4cconxd	,sc4cconx,	sc4, sc4, sc4_state, sc4cconxd, ROT0, "Mazooma","Cash Connexion (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND ) // this one won't init without a 200 step reel
 
-const stepper_interface* sc4ccrus_reel_configs[6] =
+static const stepper_interface* sc4ccrus_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -33010,7 +33219,7 @@ GAME( 200?, sc4ccrusa	,sc4ccrus,	sc4, sc4, sc4_state, sc4ccrus, ROT0, "Mazooma",
 GAME( 200?, sc4ccrusb	,sc4ccrus,	sc4, sc4, sc4_state, sc4ccrus, ROT0, "Mazooma","Cash Crusaders (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 
-const stepper_interface* sc4chand_reel_configs[6] =
+static const stepper_interface* sc4chand_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -33034,7 +33243,7 @@ GAME( 200?, sc4chandb	,sc4chand,	sc4, sc4, sc4_state, sc4chand, ROT0, "BFM","Cas
 GAME( 200?, sc4chandc	,sc4chand,	sc4, sc4, sc4_state, sc4chand, ROT0, "BFM","Cash In Hand (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 
-const stepper_interface* sc4cinv_reel_configs[6] =
+static const stepper_interface* sc4cinv_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -33065,7 +33274,7 @@ GAME( 200?, sc4cinvh	,sc4cinv,	sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash I
 GAME( 200?, sc4cinvi	,sc4cinv,	sc4, sc4, sc4_state, sc4cinv, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 
-const stepper_interface* sc4jjc_reel_configs[6] =
+static const stepper_interface* sc4jjc_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -33117,7 +33326,7 @@ GAME( 200?, sc4kkongh	,sc4kkong,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","King
 GAME( 200?, sc4kkongi	,sc4kkong,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_NO_SOUND  )
 GAME( 200?, sc4kkongj	,sc4kkong,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","King Kong Cash (Mazooma) (Scorpion 4) (set 11)", GAME_NOT_WORKING | GAME_NO_SOUND  )
 
-const stepper_interface* sc4knok_reel_configs[6] =
+static const stepper_interface* sc4knok_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -33127,7 +33336,7 @@ const stepper_interface* sc4knok_reel_configs[6] =
 	0,
 };
 
-const stepper_interface* sc4knokb_reel_configs[6] =
+static const stepper_interface* sc4knokb_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -33161,7 +33370,7 @@ GAME( 200?, sc4knokc	,sc4knok,	sc4, sc4, sc4_state, sc4knokb, ROT0, "Mazooma","K
 
 
 
-const stepper_interface* sc4maxcc_reel_configs[6] =
+static const stepper_interface* sc4maxcc_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -33210,7 +33419,7 @@ GAME( 200?, sc4ufid		,sc4ufi,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Up For It (
 GAME( 200?, sc4ufie		,sc4ufi,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Up For It (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND ) // incomplete pairing
 
 
-const stepper_interface* sc4wadzl_reel_configs[6] =
+static const stepper_interface* sc4wadzl_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -33331,7 +33540,7 @@ GAME( 200?, sc4ducksa	,sc4ducks,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Duck
 GAME( 200?, sc4ducksb	,sc4ducks,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Ducks Of Hazzard (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4ducksc	,sc4ducks,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Ducks Of Hazzard (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
-const stepper_interface* sc4glad_reel_configs[6] =
+static const stepper_interface* sc4glad_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -33364,7 +33573,7 @@ GAME( 200?, sc4hotdgb	,sc4hotdg,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Hot 
 GAME( 200?, sc4hotdgc	,sc4hotdg,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Hot Dog (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 
-const stepper_interface* sc4pp_reel_configs[6] =
+static const stepper_interface* sc4pp_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -33422,7 +33631,7 @@ GAME( 200?, sc4pwrplb	,sc4pwrpl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Powe
 GAME( 200?, sc4pwrplc	,sc4pwrpl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Power Play (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 
-const stepper_interface* sc4swywm_reel_configs[6] =
+static const stepper_interface* sc4swywm_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -33449,7 +33658,7 @@ GAME( 200?, sc4swywme	,sc4swywm,	sc4, sc4, sc4_state, sc4swywm, ROT0, "Mazooma",
 GAME( 200?, sc4swywmf	,sc4swywm,	sc4, sc4, sc4_state, sc4swywm, ROT0, "Mazooma","Spin When Your Winning (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4swywmg	,sc4swywm,	sc4, sc4, sc4_state, sc4swywm, ROT0, "Mazooma","Spin When Your Winning (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
-const stepper_interface* sc4sumit_reel_configs[6] =
+static const stepper_interface* sc4sumit_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
@@ -33879,6 +34088,27 @@ GAME( 200?, sc4frboo	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Frooty Booty (
 GAME( 200?, sc4frbooa	,sc4frboo,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Frooty Booty (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4frboob	,sc4frboo,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Frooty Booty (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4frbooc	,sc4frboo,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Frooty Booty (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
+
+// no sound roms
+// not a fruit machine? coin pusher?
+GAME( 200?, sc4gfev		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Gold Fever (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING ) // PR20XX GOLD FEVER PUSHER         GOLDFEVER SOUNDS          GOLD FEVER
+GAME( 200?, sc4gfeva	,sc4gfev,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Gold Fever (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING ) // PR2142 GOLD FEVER PUSHER USA         GOLDFEVER SOUNDS          GOLD FEVER
+GAME( 200?, sc4gfevb	,sc4gfev,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Gold Fever (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING ) // ^^
+GAME( 200?, sc4db		,sc4gfev,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Gold Fever (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING ) // PR2142 GOLD FEVER PUSHER USA         GOLDFEVER SOUNDS          GOLD FEVER
+
+// no sound roms
+// PR2125 GRAND BLASTER CASH         GRAN SOUNDS         GRAND BLASTER
+GAME( 200?, sc4gcb		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcba		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcbb		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcbc		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcbd		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcbe		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcbf		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcbg		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcbh		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcbi		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
+GAME( 200?, sc4gcbj		,sc4gcb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Grand Blaster Cash (Mazooma) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
 
 /****************************************************************************************************************************************************************************************************************/
 /****************************************************************************************************************************************************************************************************************/

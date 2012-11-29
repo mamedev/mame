@@ -422,7 +422,23 @@ public:
 	DECLARE_DRIVER_INIT(sc4frenz);
 	DECLARE_DRIVER_INIT(sc4ftopi);
 	DECLARE_DRIVER_INIT(sc4frsu);
+	DECLARE_DRIVER_INIT(sc4czfr);
+	DECLARE_DRIVER_INIT(sc4cccsh);
+	DECLARE_DRIVER_INIT(sc4fullt);
+	DECLARE_DRIVER_INIT(sc4ziggy);
+	DECLARE_DRIVER_INIT(sc4gldcl);
+	DECLARE_DRIVER_INIT(sc4ggrid);
+	DECLARE_DRIVER_INIT(sc4ggrid_mbus);
+	DECLARE_DRIVER_INIT(sc4ggcl);
+	DECLARE_DRIVER_INIT(sc4ggcl_mbus);
+	DECLARE_DRIVER_INIT(sc4goldo);
+	DECLARE_DRIVER_INIT(sc4goldw);
+	DECLARE_DRIVER_INIT(sc4gag);
+	DECLARE_DRIVER_INIT(sc4greed);
+	DECLARE_DRIVER_INIT(sc4hf);
+	DECLARE_DRIVER_INIT(sc4hfcl);
 
+	
 	
 	
 	DECLARE_MACHINE_START(sc4);
@@ -1090,8 +1106,6 @@ INPUT_PORTS_EXTERN( sc4_base );
 #define sc_dracp_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 
-#define sc_db_others \
-	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 
 #define sc_daylt_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -1543,8 +1557,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 	ROM_LOAD( "95004165.bin", 0x000000, 0x080000, CRC(c52f4218) SHA1(2648f3ef35d68bdd14a0a773151157dae0271067) ) \
 	ROM_LOAD( "95004166.bin", 0x080000, 0x080000, CRC(a77f1337) SHA1(e292c87fa8e643846cc0ddd7b9a585429b7efdd6) ) \
 
-#define sc_gocas_others \
-	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+
 
 #define sc_gshot_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -1553,10 +1566,14 @@ INPUT_PORTS_EXTERN( sc4_base );
 #define sc_goldw_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95008356.bin", 0x0000, 0x080000, CRC(c8f1ca20) SHA1(13136df35c09fea102c5176e249436f9e64616a5) ) /* golden winner */ \
-	ROM_LOAD( "95008423.bin", 0x0000, 0x100000, CRC(4cab20ee) SHA1(e27221a94e54db340eaf7fc30e722b354c85686d) ) /* triple casino */ \
 	ROM_REGION( 0x400000, "sc1", ROMREGION_ERASE00 ) /* looks like a sc1/sc2 game, move */ \
 	ROM_LOAD16_BYTE( "958402.11 10p no enrich.bin", 0x0000, 0x008000, CRC(00ed0ab4) SHA1(60e6a4abcf74ed705007cda699cdf8f52160a683) ) \
 	ROM_LOAD16_BYTE( "958402.12 10p no enrich.bin", 0x0000, 0x008000, CRC(51af0108) SHA1(e6333e2879f7b2b3b558b6909e177f3101f503e6) ) \
+
+#define PR1436_TRIPLE_CASINO_SOUNDS11 \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "95008423.bin", 0x0000, 0x100000, CRC(4cab20ee) SHA1(e27221a94e54db340eaf7fc30e722b354c85686d) ) /* triple casino */ \
+
 
 #define sc_gx_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
