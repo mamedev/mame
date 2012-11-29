@@ -54,15 +54,6 @@ Notes:
 */
 
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "imagedev/flopdrv.h"
-#include "machine/ram.h"
-#include "machine/i8155.h"
-#include "machine/ieee488.h"
-#include "machine/i8251.h"
-#include "machine/wd17xx.h"
-#include "sound/discrete.h"
 #include "includes/vixen.h"
 
 
@@ -242,13 +233,11 @@ READ8_MEMBER( vixen_state::port3_r )
 
     */
 
-	UINT8 data = 0xff; //0xfc;
+	UINT8 data = 0xff;
 
 	// TODO ring indicator
-	//data |= rs232_ri_r(m_rs232);
 
 	// TODO data carrier detect
-	//data |= rs232_dcd_r(m_rs232) << 1;
 
 	return data;
 }
@@ -277,7 +266,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vixen_io, AS_IO, 8, vixen_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY(FDC1797_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(FDC1797_TAG, fd1797_t, read, write)
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READWRITE(status_r, cmd_w)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0x01) AM_DEVREADWRITE(P8155H_TAG, i8155_device, read, write)
 	AM_RANGE(0x0c, 0x0d) AM_DEVWRITE(P8155H_TAG, i8155_device, ale_w)
@@ -422,10 +411,10 @@ void vixen_state::video_start()
 
 
 //-------------------------------------------------
-//  SCREEN_UPDATE_IND16( vixen )
+//  SCREEN_UPDATE( vixen )
 //-------------------------------------------------
 
-UINT32 vixen_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	for (int txadr = 0; txadr < 26; txadr++)
 	{
@@ -470,7 +459,7 @@ UINT32 vixen_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				{
 					int color = (BIT(char_data, 7 - x) ^ reverse) & !blank;
 
-					bitmap.pix16((txadr * 10) + scan, (chadr * 8) + x) = color;
+					bitmap.pix32((txadr * 10) + scan, (chadr * 8) + x) = RGB_MONOCHROME_AMBER[color];
 				}
 			}
 		}
@@ -532,10 +521,10 @@ WRITE8_MEMBER( vixen_state::i8155_pc_w )
 
         bit     description
 
-        0       DSEL1
-        1       DSEL2
-        2       DDEN
-        3       ALT CHARSET
+        0       DSEL1/
+        1       DSEL2/
+        2       DDEN/
+        3       ALT CHARSET/
         4       256 CHARS
         5       BEEP ENB
         6
@@ -544,11 +533,17 @@ WRITE8_MEMBER( vixen_state::i8155_pc_w )
     */
 
 	// drive select
-	if (!BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
-	if (!BIT(data, 1)) wd17xx_set_drive(m_fdc, 1);
+	floppy_image_device *floppy = NULL;
+
+	if (!BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (!BIT(data, 1)) floppy = m_floppy1->get_device();
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy) floppy->mon_w(0);
 
 	// density select
-	wd17xx_dden_w(m_fdc, BIT(data, 2));
+	m_fdc->dden_w(BIT(data, 2));
 
 	// charset
 	m_alt = BIT(data, 3);
@@ -720,37 +715,15 @@ static IEEE488_INTERFACE( ieee488_intf )
 	DEVCB_NULL
 };
 
+static SLOT_INTERFACE_START( vixen_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
 
-//-------------------------------------------------
-//  wd17xx_interface fdc_intf
-//-------------------------------------------------
-
-static const floppy_interface vixen_floppy_interface =
-{
-    DEVCB_NULL,
-	DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    FLOPPY_STANDARD_5_25_SSDD_40,
-    LEGACY_FLOPPY_OPTIONS_NAME(default),
-    "floppy_5_25",
-	NULL
-};
-
-WRITE_LINE_MEMBER( vixen_state::fdint_w )
+void vixen_state::fdc_intrq_w(bool state)
 {
 	m_fdint = state;
 	update_interrupt();
 }
-
-static const wd17xx_interface fdc_intf =
-{
-	DEVCB_NULL,
-    DEVCB_DRIVER_LINE_MEMBER(vixen_state, fdint_w),
-	DEVCB_NULL,
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
 
 
 
@@ -822,6 +795,10 @@ void vixen_state::machine_reset()
 	m_cmd_d0 = 0;
 	m_cmd_d1 = 0;
 	update_interrupt();
+
+	m_fdc->reset();
+	m_io_i8155->reset();
+	m_usart->reset();
 }
 
 
@@ -846,9 +823,6 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_23_9616MHz/2, 96*8, 0*8, 81*8, 27*10, 0*10, 26*10)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("vsync", vixen_state, vsync_tick, SCREEN_TAG, 26*10, 27*10)
 
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(monochrome_amber)
-
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
@@ -859,12 +833,13 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_I8155_ADD(P8155H_TAG, XTAL_23_9616MHz/6, i8155_intf)
 	MCFG_I8155_ADD(P8155H_IO_TAG, XTAL_23_9616MHz/6, io_i8155_intf)
 	MCFG_I8251_ADD(P8251A_TAG, usart_intf)
-	MCFG_FD1797_ADD(FDC1797_TAG, fdc_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(vixen_floppy_interface)
+	MCFG_FD1797x_ADD(FDC1797_TAG, XTAL_23_9616MHz/24)
+	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":0", vixen_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":1", vixen_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_IEEE488_BUS_ADD(ieee488_intf)
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","vixen")
+	MCFG_SOFTWARE_LIST_ADD("disk_list", "vixen")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

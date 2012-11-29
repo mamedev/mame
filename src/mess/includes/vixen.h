@@ -3,7 +3,14 @@
 #ifndef __VIXEN__
 #define __VIXEN__
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
+#include "machine/i8155.h"
+#include "machine/i8251.h"
+#include "machine/ieee488.h"
 #include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "sound/discrete.h"
 
 #define Z8400A_TAG		"5f"
 #define FDC1797_TAG		"5n"
@@ -25,8 +32,8 @@ public:
 		  m_discrete(*this, DISCRETE_TAG),
 		  m_ieee488(*this, IEEE488_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1),
+		  m_floppy0(*this, FDC1797_TAG":0"),
+		  m_floppy1(*this, FDC1797_TAG":1"),
 		  m_fdint(0),
 		  m_vsync(0),
 		  m_srq(1),
@@ -37,20 +44,20 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<fd1797_device> m_fdc;
+	required_device<fd1797_t> m_fdc;
 	required_device<i8155_device> m_io_i8155;
 	required_device<i8251_device> m_usart;
 	required_device<discrete_sound_device> m_discrete;
 	required_device<ieee488_device> m_ieee488;
 	required_device<ram_device> m_ram;
-	required_device<legacy_floppy_image_device> m_floppy0;
-	required_device<legacy_floppy_image_device> m_floppy1;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	virtual void video_start();
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void update_interrupt();
 
@@ -69,7 +76,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( atn_w );
 	DECLARE_WRITE_LINE_MEMBER( rxrdy_w );
 	DECLARE_WRITE_LINE_MEMBER( txrdy_w );
-	DECLARE_WRITE_LINE_MEMBER( fdint_w );
+	void fdc_intrq_w(bool state);
 	DIRECT_UPDATE_MEMBER(vixen_direct_update_handler);
 
 	// memory state
@@ -82,7 +89,7 @@ public:
 	int m_cmd_d0;
 	int m_cmd_d1;
 
-	int m_fdint;
+	bool m_fdint;
 	int m_vsync;
 
 	int m_srq;
@@ -104,7 +111,6 @@ public:
 	const UINT8 *m_sync_rom;
 	const UINT8 *m_char_rom;
 	DECLARE_DRIVER_INIT(vixen);
-	UINT32 screen_update_vixen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_tick);
 };
 
