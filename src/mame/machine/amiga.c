@@ -1163,8 +1163,11 @@ READ16_HANDLER( amiga_custom_r )
 			return CUSTOM_REG(REG_DMACON);
 
 		case REG_VPOSR:
-			CUSTOM_REG(REG_VPOSR) &= 0xff00;
+			CUSTOM_REG(REG_VPOSR) &= 0x7f00;
 			CUSTOM_REG(REG_VPOSR) |= amiga_gethvpos(*space.machine().primary_screen) >> 16;
+			if(CUSTOM_REG(REG_BPLCON0) & BPLCON0_LACE && space.machine().primary_screen->frame_number() & 0x1)
+				CUSTOM_REG(REG_VPOSR) |= 0x8000; // LOF bit
+
 			return CUSTOM_REG(REG_VPOSR);
 
 		case REG_VHPOSR:
