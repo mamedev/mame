@@ -352,6 +352,17 @@ protected:
 	virtual void setup_characteristics();
 };
 
+class floppy_8_dssd : public floppy_image_device {
+public:
+	floppy_8_dssd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~floppy_8_dssd();
+	virtual void handled_variants(UINT32 *variants, int &var_count) const;
+	virtual void device_config_complete() { m_shortname = "floppy_8_dssd"; }
+	virtual const char *image_interface() const { return "floppy_8"; }
+protected:
+	virtual void setup_characteristics();
+};
+
 class floppy_8_ssdd : public floppy_image_device {
 public:
 	floppy_8_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -410,6 +421,7 @@ extern const device_type FLOPPY_525_DD;
 extern const device_type FLOPPY_525_QD;
 extern const device_type FLOPPY_525_HD;
 extern const device_type FLOPPY_8_SSSD;
+extern const device_type FLOPPY_8_DSSD;
 extern const device_type FLOPPY_8_SSDD;
 extern const device_type FLOPPY_8_DSDD;
 

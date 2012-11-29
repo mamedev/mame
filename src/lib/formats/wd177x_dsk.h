@@ -26,7 +26,7 @@ public:
 		int per_sector_size[40]; // if sector_base_size is 0
 		int sector_base_id;      // 0 or 1 usually, -1 if there's interleave
 		int per_sector_id[40];   // if sector_base_id is -1.  If both per are used, then sector per_sector_id[i] has size per_sector_size[i]
-		int gap_1;               // Usually around 544 - number of 4e between index and first IDAM sync
+		int gap_1;               // Usually around 80 - number of 4e between index and first IDAM sync
 		int gap_2;               // 22 for <=1.44Mb, 41 for 2.88Mb - number of 4e between sector header and data sync
 		int gap_3;               // Usually 84 - number of 4e between sector crc and next IDAM
 	};

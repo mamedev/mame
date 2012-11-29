@@ -27,6 +27,7 @@ const device_type FLOPPY_525_DD = &device_creator<floppy_525_dd>;
 const device_type FLOPPY_525_QD = &device_creator<floppy_525_qd>;
 const device_type FLOPPY_525_HD = &device_creator<floppy_525_hd>;
 const device_type FLOPPY_8_SSSD = &device_creator<floppy_8_sssd>;
+const device_type FLOPPY_8_DSSD = &device_creator<floppy_8_dssd>;
 const device_type FLOPPY_8_SSDD = &device_creator<floppy_8_ssdd>;
 const device_type FLOPPY_8_DSDD = &device_creator<floppy_8_dsdd>;
 
@@ -201,7 +202,7 @@ void floppy_image_device::device_start()
 	cyl = 0;
 	ss  = 0;
 	stp = 1;
-	dskchg = 0;
+	dskchg = exists() ? 1 : 0;
 	index_timer = timer_alloc(0);
 	image_dirty = false;
 }
@@ -364,6 +365,7 @@ void floppy_image_device::index_resync()
 
 	if(new_idx != idx) {
 		idx = new_idx;
+
 		if (!cur_index_pulse_cb.isnull())
 			cur_index_pulse_cb(this, idx);
 	}
@@ -1142,7 +1144,7 @@ void floppy_525_hd::handled_variants(UINT32 *variants, int &var_count) const
 }
 
 floppy_8_sssd::floppy_8_sssd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_8_SSSD, "8\" single density floppy drive", tag, owner, clock)
+	floppy_image_device(mconfig, FLOPPY_8_SSSD, "8\" single density single sided floppy drive", tag, owner, clock)
 {
 }
 
@@ -1163,6 +1165,31 @@ void floppy_8_sssd::handled_variants(UINT32 *variants, int &var_count) const
 {
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
+}
+
+floppy_8_dssd::floppy_8_dssd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	floppy_image_device(mconfig, FLOPPY_8_SSSD, "8\" single density double sided floppy drive", tag, owner, clock)
+{
+}
+
+floppy_8_dssd::~floppy_8_dssd()
+{
+}
+
+void floppy_8_dssd::setup_characteristics()
+{
+	form_factor = floppy_image::FF_8;
+	tracks = 77;
+	sides = 2;
+	motor_always_on = true;
+	set_rpm(360);
+}
+
+void floppy_8_dssd::handled_variants(UINT32 *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+	variants[var_count++] = floppy_image::DSSD;
 }
 
 floppy_8_ssdd::floppy_8_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :

@@ -875,6 +875,8 @@ void wd_fdc_t::do_cmd_w()
 
 void wd_fdc_t::cmd_w(UINT8 val)
 {
+	if (inverted_bus) val ^= 0xff;
+	
 	logerror("wd1772 cmd: %02x\n", val);
 
 	if(intrq && !(intrq_cond & I_IMM)) {
@@ -929,7 +931,10 @@ UINT8 wd_fdc_t::status_r()
 			status &= ~S_NRDY;
 	}
 
-	return status;
+	UINT8 val = status;
+	if (inverted_bus) val ^= 0xff;
+	
+	return val;
 }
 
 void wd_fdc_t::do_track_w()
@@ -940,6 +945,8 @@ void wd_fdc_t::do_track_w()
 
 void wd_fdc_t::track_w(UINT8 val)
 {
+	if (inverted_bus) val ^= 0xff;
+
 	// No more than one write in flight
 	if(track_buffer != -1)
 		return;
@@ -950,7 +957,10 @@ void wd_fdc_t::track_w(UINT8 val)
 
 UINT8 wd_fdc_t::track_r()
 {
-	return track;
+	UINT8 val = track;
+	if (inverted_bus) val ^= 0xff;
+	
+	return val;
 }
 
 void wd_fdc_t::do_sector_w()
@@ -961,6 +971,8 @@ void wd_fdc_t::do_sector_w()
 
 void wd_fdc_t::sector_w(UINT8 val)
 {
+	if (inverted_bus) val ^= 0xff;
+	
 	// No more than one write in flight
 	if(sector_buffer != -1)
 		return;
@@ -971,11 +983,16 @@ void wd_fdc_t::sector_w(UINT8 val)
 
 UINT8 wd_fdc_t::sector_r()
 {
-	return sector;
+	UINT8 val = sector;
+	if (inverted_bus) val ^= 0xff;
+	
+	return val;
 }
 
 void wd_fdc_t::data_w(UINT8 val)
 {
+	if (inverted_bus) val ^= 0xff;
+	
 	data = val;
 	drop_drq();
 }
@@ -983,7 +1000,11 @@ void wd_fdc_t::data_w(UINT8 val)
 UINT8 wd_fdc_t::data_r()
 {
 	drop_drq();
-	return data;
+
+	UINT8 val = data;
+	if (inverted_bus) val ^= 0xff;
+	
+	return val;
 }
 
 void wd_fdc_t::gen_w(int reg, UINT8 val)
