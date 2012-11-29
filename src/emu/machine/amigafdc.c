@@ -406,6 +406,7 @@ WRITE8_MEMBER( amiga_fdc::ciaaprb_w )
 		floppy->dir_w((data >> 1) & 1);
 		floppy->stp_w(data & 1);
 		floppy->mon_w((data >> 7) & 1);
+		output_set_value("fdc_led",data & 0x80); // LED directly connected to FDC motor
 	}
 
 	if(floppy) {

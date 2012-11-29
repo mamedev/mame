@@ -1,0 +1,32 @@
+<!-- Basic display of drive LEDs for the Amiga Family -->
+
+<mamelayout version="2">
+
+	<element name="red_led">
+		<rect>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="orange_led">
+		<rect>
+			<color red="1.0" green="0.5" blue="0.0" />
+		</rect>
+	</element>
+
+	<view name="Simple Artwork">
+		<bounds left="0" right="400" top="0" bottom="330" />
+		<screen index="0">
+			<bounds left="0" right="400" top="0" bottom="300" />
+		</screen>
+
+		<bezel name="fdc_led" element="red_led">
+			<bounds x="372" y="312" width="14" height="4" />
+		</bezel>
+
+		<bezel name="audio_led" element="orange_led">
+			<bounds x="372" y="320" width="14" height="4" />
+		</bezel>
+	</view>
+
+</mamelayout>

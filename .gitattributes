@@ -6419,6 +6419,7 @@ src/mess/layout/acrnsys1.lay svneol=native#text/plain
 src/mess/layout/aim65.lay svneol=native#text/plain
 src/mess/layout/aim65_40.lay svneol=native#text/plain
 src/mess/layout/amico2k.lay svneol=native#text/plain
+src/mess/layout/amiga.lay svneol=native#text/plain
 src/mess/layout/apollo.lay svneol=native#text/plain
 src/mess/layout/apollo_15i.lay svneol=native#text/plain
 src/mess/layout/apollo_dsp.lay svneol=native#text/plain

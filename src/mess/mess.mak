@@ -2147,6 +2147,7 @@ $(MESS_DRIVERS)/aim65.o:	$(MESS_LAYOUT)/aim65.lh
 $(MESS_DRIVERS)/aim65_40.o:	$(MESS_LAYOUT)/aim65_40.lh
 $(MESS_DRIVERS)/alesis.o:	$(MESS_LAYOUT)/sr16.lh
 $(MESS_DRIVERS)/amico2k.o:	$(MESS_LAYOUT)/amico2k.lh
+$(MESS_DRIVERS)/amiga.o:	$(MESS_LAYOUT)/amiga.lh
 $(MESS_VIDEO)/apollo.o:		$(MESS_LAYOUT)/apollo.lh
 $(MESS_VIDEO)/apollo.o:		$(MESS_LAYOUT)/apollo_15i.lh
 $(MESS_DRIVERS)/apollo.o:	$(MESS_LAYOUT)/apollo_dsp.lh

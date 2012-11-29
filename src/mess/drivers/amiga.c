@@ -60,6 +60,7 @@ would commence ($C00000).
 #include "machine/nvram.h"
 #include "sound/cdda.h"
 #include "machine/i2cmem.h"
+#include "amiga.lh"
 
 /* Devices */
 #include "imagedev/chd_cd.h"
@@ -390,7 +391,7 @@ WRITE8_MEMBER(a1200_state::ami1200_cia_0_porta_w)
 	device_t *device = machine().device("cia_0");
 
 	/* bit 2 = Power Led on Amiga */
-	set_led_status(machine(), 0, !BIT(data, 1));
+	output_set_value("audio_led", !BIT(data, 1));
 
 	handle_cd32_joystick_cia(this, data, mos6526_r(device, space, 2));
 }
@@ -636,6 +637,8 @@ static MACHINE_CONFIG_START( ntsc, amiga_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(amiga_state, amiga )
 
+	MCFG_DEFAULT_LAYOUT(layout_amiga)
+
     /* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_SIZE(228*4, 262)
@@ -827,6 +830,7 @@ static MACHINE_CONFIG_START( a1200n, a1200_state )
 
 	MCFG_VIDEO_START_OVERRIDE(a1200_state,amiga_aga)
 
+	MCFG_DEFAULT_LAYOUT(layout_amiga)
 
 	MCFG_PALETTE_LENGTH(4096)
 	MCFG_PALETTE_INIT_OVERRIDE(amiga_state, amiga )
@@ -913,6 +917,8 @@ static MACHINE_CONFIG_START( a3000n, amiga_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 
 	MCFG_MACHINE_RESET_OVERRIDE(amiga_state, amiga )
+
+	MCFG_DEFAULT_LAYOUT(layout_amiga)
 
     /* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
