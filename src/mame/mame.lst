@@ -2893,8 +2893,8 @@ sf2				// 22/05/1991 (c) 1991 (World)
 sf2eb			// 14/02/1991 (c) 1991 (World)
 sf2ee			// 28/02/1991 (c) 1991 (World)
 sf2ebbl			// 14/02/1991 (c) 1991 (World, bootleg)
-sf2stt			// bootleg
-sf2unkb			// bootleg
+sf2stt		// bootleg
+sf2rk			// bootleg
 sf2ua			// 06/02/1991 (c) 1991 (USA)
 sf2ub			// 14/02/1991 (c) 1991 (USA)
 sf2uc			// 06/03/1991 (c) 1991 (USA)
@@ -2955,9 +2955,11 @@ sf2m4			// hack
 sf2m5			// hack
 sf2m6			// hack
 sf2m7			// hack
+sf2m8			// bootleg
 sf2yyc			// hack
 sf2koryu		// hack
 sf2mdt			// bootleg
+sf2mdta			// bootleg
 cworld2j		// 11/06/1992 (c) 1992 (Japan)
 varth			// 14/07/1992 (c) 1992 (World)
 varthr1			// 12/06/1992 (c) 1992 (World)
