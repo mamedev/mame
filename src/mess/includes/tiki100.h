@@ -7,13 +7,12 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "formats/basicdsk.h"
-#include "imagedev/flopdrv.h"
+#include "formats/tiki100_dsk.h"
 #include "machine/ram.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/z80pio.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
 
 #define SCREEN_TAG		"screen"
@@ -40,16 +39,16 @@ public:
 		  m_ctc(*this, Z80CTC_TAG),
 		  m_fdc(*this, FD1797_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, FLOPPY_0),
-		  m_floppy1(*this, FLOPPY_1)
+		  m_floppy0(*this, FD1797_TAG":0"),
+		  m_floppy1(*this, FD1797_TAG":1")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
-	required_device<fd1797_device> m_fdc;
+	required_device<fd1797_t> m_fdc;
 	required_device<ram_device> m_ram;
-	required_device<legacy_floppy_image_device> m_floppy0;
-	required_device<legacy_floppy_image_device> m_floppy1;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 
 	virtual void machine_start();
 
@@ -64,6 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER( system_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
 	DECLARE_WRITE8_MEMBER( video_scroll_w );
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	void bankswitch();
 

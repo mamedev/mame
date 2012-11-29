@@ -169,6 +169,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/thom_cas.o	\
 	$(LIBOBJ)/formats/thom_dsk.o	\
 	$(LIBOBJ)/formats/ti99_dsk.o	\
+	$(LIBOBJ)/formats/tiki100_dsk.o	\
 	$(LIBOBJ)/formats/trd_dsk.o		\
 	$(LIBOBJ)/formats/trs_cas.o		\
 	$(LIBOBJ)/formats/trs_dsk.o		\

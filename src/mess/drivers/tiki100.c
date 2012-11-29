@@ -14,9 +14,7 @@
 
     - floppy broken
     - palette RAM should be written during HBLANK
-    - double sided disks have t0s0,t0s1,t1s0,t1s1... format
     - DART clocks
-    - daisy chain order?
     - winchester hard disk
     - analog/digital I/O
     - light pen
@@ -176,18 +174,19 @@ WRITE8_MEMBER( tiki100_state::system_w )
 
     */
 
-	/* drive select */
-	if (BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
-	if (BIT(data, 1)) wd17xx_set_drive(m_fdc, 1);
+	// drive select
+	floppy_image_device *floppy = NULL;
 
-	/* density select */
-	wd17xx_dden_w(m_fdc, BIT(data, 4));
+	if (BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) floppy = m_floppy1->get_device();
 
-	/* floppy motor */
-	floppy_mon_w(m_floppy0, !BIT(data, 6));
-	floppy_mon_w(m_floppy1, !BIT(data, 6));
-	floppy_drive_set_ready_state(m_floppy0, BIT(data, 6), 1);
-	floppy_drive_set_ready_state(m_floppy1, BIT(data, 6), 1);
+	m_fdc->set_floppy(floppy);
+
+	// density select
+	m_fdc->dden_w(BIT(data, 4));
+
+	// floppy motor
+	if (floppy) floppy->mon_w(!BIT(data, 6));
 
 	/* GRAFIKK key led */
 	set_led_status(machine(), 1, BIT(data, 5));
@@ -218,13 +217,13 @@ static ADDRESS_MAP_START( tiki100_io, AS_IO, 8, tiki100_state )
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_cd_ba_r, z80dart_cd_ba_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x03) AM_WRITE(video_mode_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY(FD1797_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(FD1797_TAG, fd1797_t, read, write)
 	AM_RANGE(0x14, 0x14) AM_MIRROR(0x01) AM_WRITE(palette_w)
 	AM_RANGE(0x16, 0x16) AM_DEVWRITE_LEGACY(AY8912_TAG, ay8910_address_w)
 	AM_RANGE(0x17, 0x17) AM_DEVREADWRITE_LEGACY(AY8912_TAG, ay8910_r, ay8910_data_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0x03) AM_WRITE(system_w)
-//  AM_RANGE(0x20, 0x27) winchester controller
+	AM_RANGE(0x20, 0x27) AM_NOP // winchester controller
 //  AM_RANGE(0x60, 0x6f) analog I/O (SINTEF)
 //  AM_RANGE(0x60, 0x67) digital I/O (RVO)
 //  AM_RANGE(0x70, 0x77) analog/digital I/O
@@ -499,20 +498,21 @@ WRITE_LINE_MEMBER( tiki100_state::ctc_z1_w )
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF,z80ctc_device, trg2),	/* ZC/TO0 callback */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg2),	/* ZC/TO0 callback */
 	DEVCB_DRIVER_LINE_MEMBER(tiki100_state, ctc_z1_w),		/* ZC/TO1 callback */
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF,z80ctc_device, trg3)	/* ZC/TO2 callback */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg3)	/* ZC/TO2 callback */
 };
 
 /* FD1797 Interface */
 
-static const wd17xx_interface fdc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
+FLOPPY_FORMATS_MEMBER( tiki100_state::floppy_formats )
+	FLOPPY_TIKI100_FORMAT
+FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( tiki100_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD ) // Tead FD-55A
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD ) // Teac FD-55F
+SLOT_INTERFACE_END
 
 /* AY-3-8912 Interface */
 
@@ -536,8 +536,8 @@ static const ay8910_interface ay8910_intf =
 static const z80_daisy_config tiki100_daisy_chain[] =
 {
 	{ Z80CTC_TAG },
-	{ Z80PIO_TAG },
 	{ Z80DART_TAG },
+	{ Z80PIO_TAG },
 	{ NULL }
 };
 
@@ -572,47 +572,6 @@ void tiki100_state::machine_start()
 	save_item(NAME(m_keylatch));
 }
 
-// physical disks have 2:1 sector interleave
-static LEGACY_FLOPPY_OPTIONS_START(tiki100)
-	LEGACY_FLOPPY_OPTION(tiki100, "dsk", "SSSD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([18])
-		SECTOR_LENGTH([128])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(tiki100, "dsk", "SSDD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(tiki100, "dsk", "DSDD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(tiki100, "dsk", "DSHD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-
-static const floppy_interface tiki100_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(tiki100),
-	"floppy_5_25",
-	NULL
-};
-
 /* Machine Driver */
 
 static MACHINE_CONFIG_START( tiki100, tiki100_state )
@@ -638,8 +597,9 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/4, pio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/4, ctc_intf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", tiki100_state, ctc_tick, attotime::from_hz(XTAL_8MHz/4))
-	MCFG_FD1797_ADD(FD1797_TAG, fdc_intf) // FD1767PL-02 or FD1797-PL
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(tiki100_floppy_interface)
+	MCFG_FD1797x_ADD(FD1797_TAG, XTAL_8MHz/8) // FD1767PL-02 or FD1797-PL
+	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", tiki100_floppies, "525dd", NULL, tiki100_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", tiki100_floppies, "525dd", NULL, tiki100_state::floppy_formats)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
