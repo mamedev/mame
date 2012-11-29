@@ -445,7 +445,7 @@ WRITE8_MEMBER( xerox820_state::kbpio_pa_w )
 		{
 			m_8n5 = _8n5;
 			
-			m_fdc->set_unscaled_clock((m_8n5 ? XTAL_20MHz/10 : XTAL_20MHz/20) *8);
+			m_fdc->set_unscaled_clock(m_8n5 ? XTAL_20MHz/10 : XTAL_20MHz/20);
 		}
 
 		m_400_460 = floppy->twosid_r();
@@ -874,7 +874,7 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_Z80PIO_ADD(Z80PIO_KB_TAG, XTAL_20MHz/8, xerox820_kbpio_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_GP_TAG, XTAL_20MHz/8, gppio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_20MHz/8, ctc_intf)
-	MCFG_FD1771x_ADD(FD1771_TAG, XTAL_20MHz/20 *8)
+	MCFG_FD1771x_ADD(FD1771_TAG, XTAL_20MHz/10)
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", xerox820_floppies, "sa400", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":1", xerox820_floppies, "sa400", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
@@ -922,7 +922,7 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_Z80PIO_ADD(Z80PIO_GP_TAG, XTAL_16MHz/4, gppio_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_RD_TAG, XTAL_20MHz/8, rdpio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)
-	MCFG_FD1797x_ADD(FD1797_TAG, XTAL_16MHz/16*8)
+	MCFG_FD1797x_ADD(FD1797_TAG, XTAL_16MHz/8)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", xerox820_floppies, "sa450", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", xerox820_floppies, "sa450", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)

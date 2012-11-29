@@ -112,7 +112,7 @@ void s100_dj2db_device::fdc_drq_w(bool state)
 
 static MACHINE_CONFIG_FRAGMENT( s100_dj2db )
 	MCFG_COM8116_ADD(BR1941_TAG, XTAL_5_0688MHz, brg_intf)
-	MCFG_MB8866x_ADD(MB8866_TAG, 1000000 *8) // ?
+	MCFG_MB8866x_ADD(MB8866_TAG, XTAL_10MHz/5)
 
 	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":0", s100_dj2db_floppies, "8dsdd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8866_TAG":1", s100_dj2db_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)

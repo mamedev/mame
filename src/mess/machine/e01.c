@@ -324,7 +324,7 @@ static MACHINE_CONFIG_FRAGMENT( e01 )
 	// devices
 	MCFG_VIA6522_ADD(R6522_TAG, XTAL_8MHz/4, via_intf)
 	MCFG_MC6854_ADD(MC6854_TAG, adlc_intf)
-	MCFG_WD2793x_ADD(WD2793_TAG, XTAL_8MHz/4 *8)
+	MCFG_WD2793x_ADD(WD2793_TAG, XTAL_8MHz/4)
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", e01_floppies, "35dd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", e01_floppies, "35dd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, e01_centronics_intf)

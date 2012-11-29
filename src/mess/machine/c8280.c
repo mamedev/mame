@@ -7,6 +7,16 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+
+	- format
+		
+		wd1772: track description 80x4e 12x00 3xf6 fc 50x4e 12x00 3xf5 fe 2x00 2x01 f7 22x4e 12x00 3xf5 fb 256xaa f7 54x4e
+
+*/
+
 #include "c8280.h"
 
 
@@ -301,7 +311,7 @@ static const riot6532_interface riot1_intf =
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( c8280_floppies )
-	SLOT_INTERFACE( "8ssdd", FLOPPY_8_SSDD )
+	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
 void c8280_device::fdc_intrq_w(bool state)
@@ -329,10 +339,10 @@ static MACHINE_CONFIG_FRAGMENT( c8280 )
 	MCFG_CPU_ADD(M6502_FDC_TAG, M6502, XTAL_12MHz/8)
 	MCFG_CPU_PROGRAM_MAP(c8280_fdc_mem)
 
-	MCFG_FD1797x_ADD(WD1797_TAG, XTAL_12MHz/8 *8) // clock?
+	MCFG_FD1797x_ADD(WD1797_TAG, XTAL_12MHz/6) // clock?
 
-	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG":0", c8280_floppies, "8ssdd", NULL, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG":1", c8280_floppies, "8ssdd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG":0", c8280_floppies, "8dsdd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1797_TAG":1", c8280_floppies, "8dsdd", NULL, floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -480,11 +490,8 @@ READ8_MEMBER( c8280_device::fk5_r )
 
 	UINT8 data = m_fk5;
 
-	if (m_floppy)
-	{
-		data |= m_floppy->dskchg_r() << 3;
-		data |= m_floppy->twosid_r() << 4;
-	}
+	data |= (m_floppy ? m_floppy->dskchg_r() : 1) << 3;
+	data |= (m_floppy ? m_floppy->twosid_r() : 1) << 4;
 
 	return data;
 }
@@ -506,7 +513,7 @@ WRITE8_MEMBER( c8280_device::fk5_w )
 
     */
 
-	m_fk5 = data & 0x3f;
+	m_fk5 = data & 0x27;
 
 	// drive select
 	m_floppy = NULL;
@@ -515,6 +522,8 @@ WRITE8_MEMBER( c8280_device::fk5_w )
 	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();
 
 	m_fdc->set_floppy(m_floppy);
+
+	if (m_floppy) m_floppy->mon_w(!BIT(data, 5));
 
 	// density select
 	m_fdc->dden_w(BIT(data, 2));
