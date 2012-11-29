@@ -1712,27 +1712,6 @@ ROM_END
 
 ROM_START( sc1clbtm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-
-	/* these are other hw (SC4?)
-    ROM_LOAD( "95008055.bin", 0x0000, 0x100000, CRC(df9ae6e3) SHA1(5766cb1749aa92c34a76270a641f7a9302cc44d7) )
-    ROM_LOAD( "95008055.p1", 0x0000, 0x800000, CRC(ef474fd3) SHA1(e7427184683603b57a3a8b37452fa6ec7a41e34c) )
-    ROM_LOAD( "95008056.p2", 0x0000, 0x800000, CRC(39b1b566) SHA1(937ec27964124b92b75d4b37d09a35585baa68c6) )
-    ROM_LOAD( "95402149.lo", 0x0000, 0x080000, CRC(f5eee630) SHA1(102ef766562a67cd5c339d755f527252aee924be) )
-    ROM_LOAD( "95402150.hi", 0x0000, 0x080000, CRC(19ada5f4) SHA1(3719e29465249026c781fe5226d05770c2e8ce99) )
-    ROM_LOAD( "95402257.lo", 0x0000, 0x080000, CRC(fca966af) SHA1(63aa17640405fb858d776799e2388679dfe02a26) )
-    ROM_LOAD( "95402258.hi", 0x0000, 0x080000, CRC(24ca572a) SHA1(5daa89c4427e70d0fbebfca116ea6932716f38f8) )
-    ROM_LOAD( "95403149.lo", 0x0000, 0x080000, CRC(a62d1945) SHA1(197f9245d46cb156987cbacc1ac0c8230030fdcd) )
-    ROM_LOAD( "95403150.hi", 0x0000, 0x080000, CRC(9f79e460) SHA1(0162d5fc54361c5853dc865d61849f766f833545) )
-    ROM_LOAD( "95403257.lo", 0x0000, 0x080000, CRC(5aada808) SHA1(e24bc5e523961abdedfb27ec5cff2cbb6f45bddd) )
-    ROM_LOAD( "95403258.hi", 0x0000, 0x080000, CRC(2b133e43) SHA1(805ca1ddf1ebcf6cbbd4b8b41baf5c2056b5bf17) )
-    ROM_LOAD( "95404682.lo", 0x0000, 0x080000, CRC(3b9e429f) SHA1(01046d8671a287b2a1c739f84d28c69ba2c8c80f) )
-    ROM_LOAD( "95404683.hi", 0x0000, 0x080000, CRC(f84b37ad) SHA1(4430c7fe6274d25de58342d255c4c4a52966b0b3) )
-    ROM_LOAD( "95405682.lo", 0x0000, 0x080000, CRC(12d4bf1a) SHA1(2b28c5fdca13e7a70496984e02bfd3b98d60a9ac) )
-    ROM_LOAD( "95405683.hi", 0x0000, 0x080000, CRC(b9aba368) SHA1(ec6404447c9e23e179ec1200848d966d5f3f846b) )
-    ROM_LOAD( "95717692a.bin", 0x0000, 0x008000, CRC(f9fe7b9a) SHA1(0e3fe5da9fc837726d08f02a2c6ed782f016c982) )
-    ROM_LOAD( "club-temptation_mtx_(ihex)ss.hex", 0x0000, 0x01d0da, CRC(08ebee96) SHA1(2e87d734c966abab1d4a59c9481ebea161f77286) )
-    ROM_LOAD( "clubtempdot.bin", 0x0000, 0x010000, CRC(283d2d9c) SHA1(5b76a13ad674f8a40c270e5dbc61dac04d411d02) )
-    */
 	ROM_LOAD( "temp12b.bin", 0x0000, 0x8000, CRC(3c27c592) SHA1(081d61f974e2ae5c64729b32be4c0e5067a20550) )
 	ROM_LOAD( "temp11a.bin", 0x8000, 0x8000, CRC(37c8b73e) SHA1(f718572d170be7b582c3818df7163309cea232b5) )
 
@@ -1745,6 +1724,16 @@ ROM_START( sc1clbtma )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "temptp2", 0x0000, 0x8000, CRC(d165fa87) SHA1(aef8a4af8b6e83ef09dffc8aca305eaf7dd3936b) )
 	ROM_LOAD( "temptp1", 0x8000, 0x8000, CRC(6f03648d) SHA1(a6402c94ebf4d570d1d3fb462eb621566c27f307) )
+
+	ROM_REGION( 0x40000, "upd", 0 )
+	ROM_LOAD( "tempsnd1.bin", 0x00000, 0x10000, CRC(168e2a18) SHA1(db97acf9131b1a54efe1cd375aecae1679bab19e) )
+	ROM_LOAD( "tempsnd2.bin", 0x00000, 0x10000, CRC(b717f347) SHA1(189c82318d622f18580a23eed48b17c0c34dedd5) )
+ROM_END
+
+ROM_START( sc1clbtmb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	// missing a rom?
+	ROM_LOAD( "95717692a.bin", 0x8000, 0x8000, CRC(f9fe7b9a) SHA1(0e3fe5da9fc837726d08f02a2c6ed782f016c982) )
 
 	ROM_REGION( 0x40000, "upd", 0 )
 	ROM_LOAD( "tempsnd1.bin", 0x00000, 0x10000, CRC(168e2a18) SHA1(db97acf9131b1a54efe1cd375aecae1679bab19e) )
@@ -1849,8 +1838,6 @@ ROM_START( sc1dago )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dgnlg051_single_site_euro.bin", 0x0000, 0x010000, CRC(5ccb9773) SHA1(4940d7b17d36d409504a263acd54d017c6cbb1e1) )
 ROM_END
-
-
 
 
 ROM_START( sc1disc )
@@ -3091,6 +3078,23 @@ ROM_START( sc1wud )
 	ROM_LOAD( "car2-9n.p2", 0x000000, 0x008000, CRC(865c23f3) SHA1(e4e874cc003cb62012cdc741e163becfb29caa12) )
 ROM_END
 
+ROM_START( sc1goldw )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "958402.11 10p no enrich.bin", 0x0000, 0x8000, BAD_DUMP CRC(00ed0ab4) SHA1(60e6a4abcf74ed705007cda699cdf8f52160a683) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "958402.12 10p no enrich.bin", 0x8000, 0x8000, BAD_DUMP CRC(51af0108) SHA1(e6333e2879f7b2b3b558b6909e177f3101f503e6) ) // 1ST AND 2ND HALF IDENTICAL
+ROM_END
+
+
+
+ROM_START( sc1druby )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "95730028.bin", 0x8000, 0x8000, CRC(015f3760) SHA1(74dfd188f4a7ad057fda45a349e684be37a3f6bc) ) \
+ROM_END
+
+ROM_START( sc1drubya )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "95730068.bin", 0x8000, 0x8000, CRC(2bcbcf0d) SHA1(30dbb5ec3be34520ad89aedead42e1eda7841b63) ) \
+ROM_END
 
 /////////////////////////////////////////////////////////////////////////////////////
 
@@ -3153,6 +3157,7 @@ GAME( 198?, sc1clbrn		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			,
 GAME( 198?, sc1clbsp		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club Spinner (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1clbtm		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club Temptation (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1clbtma		, sc1clbtm	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club Temptation (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
+GAME( 199?, sc1clbtmb		, sc1clbtm	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Club Temptation (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS)
 GAME( 198?, sc1clbw			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club Wise (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1clbwa		, sc1clbw	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club Wise (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1clbwb		, sc1clbw	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club Wise (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS )
@@ -3331,6 +3336,11 @@ GAME( 199?, sc1potpa		, sc1potp	, scorpion1			, scorpion1	, bfm_sc1_state, lotse
 GAME( 199?, sc1scunk		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "<unknown>",      "unknown Scorpion 1 'Super ?' (Bellfruit) (Scorpion 1)", GAME_FLAGS) // ^ with above.. seems the same game, but different name
 
 GAME( 199?, sc1wud			,0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "<unknown>",      "What's Up Dr (Scorpion 1?)", GAME_FLAGS) // was in maygayep.c whats up doc set
+
+GAME( 199?, sc1goldw		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Golden Winner (Bellfruit) (Scorpion ?)", GAME_FLAGS) // bad dump (from sc4 set)
+GAME( 199?, sc1druby		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Diamonds & Rubys (Bellfruit) (Scorpion ?) (set 1)", GAME_FLAGS) // from sc4 set.. incomplete, or not sc1/2 (uses sc1/2 crypt tho)
+GAME( 199?, sc1drubya		, sc1druby	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Diamonds & Rubys (Bellfruit) (Scorpion ?) (set 2)", GAME_FLAGS) // from sc4 set.. incomplete, or not sc1/2 (uses sc1/2 crypt tho)
+
 
 //Adder 2
 GAME( 1996, m_tppokr		, 0			,  scorpion1_adder2	, toppoker	, bfm_sc1_state, toppoker		, 0,       "BFM/ELAM",    "Top Poker (Dutch, Game Card 95-750-899)", GAME_FLAGS )

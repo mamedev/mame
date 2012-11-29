@@ -460,8 +460,19 @@ public:
 	DECLARE_DRIVER_INIT(sc4chavi);
 	DECLARE_DRIVER_INIT(sc4chavy);
 	DECLARE_DRIVER_INIT(sc4dmine);
+	DECLARE_DRIVER_INIT(sc4hotsh);
+	DECLARE_DRIVER_INIT(sc4hotrd);
+	DECLARE_DRIVER_INIT(sc4hotwd);
+	DECLARE_DRIVER_INIT(sc4lotrr);
+	DECLARE_DRIVER_INIT(sc4ldvl);
+	DECLARE_DRIVER_INIT(sc4ijob);
+	DECLARE_DRIVER_INIT(sc4vivcs);
+	DECLARE_DRIVER_INIT(sc4brksp);
+	DECLARE_DRIVER_INIT(sc4bulcl);
+	DECLARE_DRIVER_INIT(sc4carry);
+	DECLARE_DRIVER_INIT(sc4celeb);
 
-
+	
 	
 	DECLARE_MACHINE_START(sc4);
 	DECLARE_MACHINE_RESET(sc4);
@@ -607,8 +618,6 @@ INPUT_PORTS_EXTERN( sc4_base );
 #define sc_bar7_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) /* PR1433 BAR SEVENS SOUNDS11 */ \
 	ROM_LOAD( "95008409.bin", 0x0000, 0x080000, CRC(ec29c758) SHA1(ceb99fb6edcab5c5e1b0ec46d622ee0f2cdb20be) ) \
-	ROM_REGION( 0x400000, "others3", ROMREGION_ERASE00 ) /* shouldn't be here? - sc1/2 */ \
-	ROM_LOAD( "95751960.p1", 0x0000, 0x010000, CRC(9f944d0c) SHA1(feb8fe4ce0a8f5c4a034aafec0f5aae29a834e8d) ) \
 
 #define PR1492_CAS_BAR_SEVENS_SOUNDS11 \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) /* PR1492 CAS BAR SEVENS SOUNDS11 */ \
@@ -1586,9 +1595,6 @@ INPUT_PORTS_EXTERN( sc4_base );
 #define sc_goldw_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95008356.bin", 0x0000, 0x080000, CRC(c8f1ca20) SHA1(13136df35c09fea102c5176e249436f9e64616a5) ) /* golden winner */ \
-	ROM_REGION( 0x400000, "sc1", ROMREGION_ERASE00 ) /* looks like a sc1/sc2 game, move */ \
-	ROM_LOAD16_BYTE( "958402.11 10p no enrich.bin", 0x0000, 0x008000, CRC(00ed0ab4) SHA1(60e6a4abcf74ed705007cda699cdf8f52160a683) ) \
-	ROM_LOAD16_BYTE( "958402.12 10p no enrich.bin", 0x0000, 0x008000, CRC(51af0108) SHA1(e6333e2879f7b2b3b558b6909e177f3101f503e6) ) \
 
 #define PR1436_TRIPLE_CASINO_SOUNDS11 \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -2788,10 +2794,6 @@ INPUT_PORTS_EXTERN( sc4_base );
 #define sc_druby_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95008423.bin", 0x0000, 0x100000, CRC(4cab20ee) SHA1(e27221a94e54db340eaf7fc30e722b354c85686d) ) /* triple casino */ \
-	ROM_REGION( 0x400000, "others", ROMREGION_ERASE00 ) \
-	/* not sc4/sc5?, scorpion 1/2? */ \
-	ROM_LOAD( "95730028.bin", 0x0000, 0x008000, CRC(015f3760) SHA1(74dfd188f4a7ad057fda45a349e684be37a3f6bc) ) \
-	ROM_LOAD( "95730068.bin", 0x0000, 0x008000, CRC(2bcbcf0d) SHA1(30dbb5ec3be34520ad89aedead42e1eda7841b63) ) \
 
 #define sc_darw_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
@@ -2855,7 +2857,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 // we seem to be missing fever sounds 11, which is what our sets want?
 #define sc_fever_others \
-	ROM_REGION( 0x400000, "others", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	/* PR1007 FEVER SOUNDS12 */ \
 	ROM_LOAD( "95008137.bin", 0x000000, 0x100000, CRC(f74f3916) SHA1(659b160db41e46a53149688f8677e73a78f22e63) ) \
 	ROM_LOAD( "95008138.bin", 0x100000, 0x100000, CRC(68563cdd) SHA1(df92dadecf9242bfa147e3134039266e9016faea) ) \
@@ -3548,11 +3550,9 @@ INPUT_PORTS_EXTERN( sc4_base );
 	ROM_REGION( 0x1000000, "ymz", ROMREGION_ERASE00 ) \
 	/* both halves of this valid sound data? */ \
 	ROM_LOAD( "95008055.bin", 0x0000, 0x100000, BAD_DUMP CRC(df9ae6e3) SHA1(5766cb1749aa92c34a76270a641f7a9302cc44d7) ) \
-	/* first 512kb of this = unique sound data? rest ig garbage? */ \
+	/* first 512kb of this = unique sound data? rest is garbage? */ \
 	ROM_LOAD( "95008056.p2", 0x100000, 0x800000, BAD_DUMP CRC(39b1b566) SHA1(937ec27964124b92b75d4b37d09a35585baa68c6) ) \
 	\
-	ROM_REGION( 0x400000, "others", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "95717692a.bin", 0x0000, 0x008000, CRC(f9fe7b9a) SHA1(0e3fe5da9fc837726d08f02a2c6ed782f016c982) ) /* this looks like an sc1/2 game? */ \
 
 
 #define sc_clbtm_matrix \

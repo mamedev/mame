@@ -12399,6 +12399,7 @@ sc1clbrn	// Club Runner (Bellfruit)
 sc1clbsp	// Club Spinner (Bellfruit)
 sc1clbtm	// Club Temptation (Bellfruit)
 sc1clbtma
+sc1clbtmb
 sc1clbw		// Club Wise (Bellfruit)
 sc1clbwa
 sc1clbwb
@@ -12558,6 +12559,9 @@ sc1potp		// Pick Of The Pack (Bellfruit)
 sc1potpa	// Double Dealer (Bellfruit)?
 sc1scunk	//
 sc1wud		// What's Up Dr
+sc1goldw
+sc1druby
+sc1drubya
 
 // Scorpion 1 + Adder Video board
 
@@ -12927,6 +12931,8 @@ sc2scshx	// Super Cash X (Concept)
 sc2scshxgman // Gamesman hardware
 sc2scshxstar // Starpoint hardware
 sc2scshxcas // Super Casino Cash X (Concept)
+
+sc2bar7x	// from an SC4 set
 
 // Scorpion 2 + Dot Matrix Display
 

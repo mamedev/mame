@@ -7348,6 +7348,15 @@ ROM_START( sc2topwkp )
 ROM_END
 
 
+/* was in an SC4 set, is it meant to link with the SC4 units? */
+ROM_START( sc2bar7x )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "95751960.p1", 0x0000, 0x010000, CRC(9f944d0c) SHA1(feb8fe4ce0a8f5c4a034aafec0f5aae29a834e8d) ) \
+
+	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+ROM_END
+
+
 ROM_START( sc2cb7 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bar7.bin", 0x0000, 0x010000, CRC(c5b426e8) SHA1(a60aed70f2a4cf4356fae61c1031124fd5987d86) )
@@ -7899,6 +7908,8 @@ GAME( 199?, sc2cb7p		, sc2cb7	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0
 GAME( 199?, sc2cb71		, sc2cb7	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Casino Bar 7 (Bellfruit) (set 2, UK, All Cash) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2cb72		, sc2cb7	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Casino Bar 7 (Bellfruit) (set 3, UK, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2cb72p	, sc2cb7	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Casino Bar 7 (Bellfruit) (set 3, UK, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2bar7x	, sc2cb7	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Casino Bar 7 (Bellfruit) (Scorpion 2/3)", GAME_FLAGS) // from an SC4 set, check sound rom
+
 
 GAME( 199?, sc2cgcas	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Club Grand Casino (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2cgcasp	, sc2cgcas	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Club Grand Casino (Bellfruit) (set 1, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
