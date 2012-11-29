@@ -9,9 +9,9 @@
 #ifndef BW2_DSK_H_
 #define BW2_DSK_H_
 
-#include "wd177x_dsk.h"
+#include "upd765_dsk.h"
 
-class bw2_format : public wd177x_format {
+class bw2_format : public upd765_format {
 public:
 	bw2_format();
 

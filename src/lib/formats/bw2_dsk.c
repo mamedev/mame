@@ -42,7 +42,7 @@
 #include "emu.h"
 #include "formats/bw2_dsk.h"
 
-bw2_format::bw2_format() : wd177x_format(formats)
+bw2_format::bw2_format() : upd765_format(formats)
 {
 }
 
@@ -61,15 +61,14 @@ const char *bw2_format::extensions() const
 	return "dsk";
 }
 
-// Unverified gap sizes
 const bw2_format::format bw2_format::formats[] = {
-	{   /*  340K 3 1/2 inch double density */
-		floppy_image::FF_35,  floppy_image::SSDD,
-		2000, 17, 80, 1, 256, {}, 0, {}, 100, 22, 20
+	{   // 340K 3 1/2 inch double density
+		floppy_image::FF_35, floppy_image::SSDD,
+		2000, 17, 80, 1, 256, {}, 0, {}, 80, 20, 22, 14
 	},
-	{   /*  360K 3 1/2 inch double density */
-		floppy_image::FF_35,  floppy_image::SSDD,
-		2000, 18, 80, 1, 256, {}, 0, {}, 100, 22, 20
+	{   // 360K 3 1/2 inch double density
+		floppy_image::FF_35, floppy_image::SSDD,
+		2000, 18, 80, 1, 256, {}, 0, {}, 80, 20, 22, 14
 	},
 	{}
 };
