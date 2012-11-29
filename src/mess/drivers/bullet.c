@@ -58,9 +58,6 @@ Notes:
 */
 
 #include "includes/bullet.h"
-#include "machine/scsibus.h"
-#include "machine/scsicb.h"
-#include "machine/scsihd.h"
 
 
 
@@ -205,16 +202,32 @@ WRITE8_MEMBER( bullet_state::exdsk_w )
     */
 
 	// drive select
-	wd17xx_set_drive(m_fdc, data & 0x03);
+	m_floppy = NULL;
 
-	// side select
-	wd17xx_set_side(m_fdc, BIT(data, 4));
+	switch (data & 0x07)
+	{
+	// 5.25"
+	case 0: m_floppy = m_floppy0->get_device(); break;
+	case 1: m_floppy = m_floppy1->get_device(); break;
+	case 2: m_floppy = m_floppy2->get_device(); break;
+	case 3: m_floppy = m_floppy3->get_device(); break;
+	// 8"
+	case 4: m_floppy = m_floppy4->get_device(); break;
+	case 5: m_floppy = m_floppy5->get_device(); break;
+	case 6: m_floppy = m_floppy6->get_device(); break;
+	case 7: m_floppy = m_floppy7->get_device(); break;
+	}
 
-	// floppy motor
-	floppy_mon_w(m_floppy0, BIT(data, 5));
-	floppy_mon_w(m_floppy1, BIT(data, 5));
-	floppy_drive_set_ready_state(m_floppy0, 1, 1);
-	floppy_drive_set_ready_state(m_floppy1, 1, 1);
+	m_fdc->set_floppy(m_floppy);
+
+	if (m_floppy)
+	{
+		// side select
+		m_floppy->ss_w(BIT(data, 4));
+
+		// floppy motor
+		m_floppy->mon_w(BIT(data, 5));
+	}
 }
 
 
@@ -272,7 +285,7 @@ WRITE8_MEMBER( bullet_state::hdcon_w )
 	m_fdc->set_unscaled_clock(BIT(data, 2) ? XTAL_16MHz/16 : XTAL_16MHz/8);
 
 	// density select
-	wd17xx_dden_w(m_fdc, BIT(data, 3));
+	m_fdc->dden_w(BIT(data, 3));
 }
 
 
@@ -297,16 +310,16 @@ READ8_MEMBER( bullet_state::info_r )
 
     */
 
-	UINT8 data = 0x10;
+	UINT8 data = 0;
 
 	// DIP switches
 	data |= ioport("SW1")->read() & 0x0f;
 
-	// floppy interrupt
-	data |= wd17xx_intrq_r(m_fdc) << 6;
-
-	// floppy data request
-	data |= wd17xx_drq_r(m_fdc) << 7;
+	// floppy
+	data |= m_fdc->hld_r() << 4;
+	data |= m_floppy ? m_floppy->dskchg_r() : 1;
+	data |= m_fdc->intrq_r() << 6;
+	data |= m_fdc->drq_r() << 7;
 
 	return data;
 }
@@ -429,23 +442,42 @@ WRITE8_MEMBER( bulletf_state::xfdc_w )
 
     */
 
-	// floppy drive select
-	wd17xx_set_drive(m_fdc, data & 0x0f);
+	// drive select
+	m_floppy = NULL;
 
-	// floppy side select
-	wd17xx_set_side(m_fdc, BIT(data, 4));
+	switch (data & 0x0f)
+	{
+	// 5.25"
+	case 0: m_floppy = m_floppy0->get_device(); break;
+	case 1: m_floppy = m_floppy1->get_device(); break;
+	case 2: m_floppy = m_floppy2->get_device(); break;
+	case 3: m_floppy = m_floppy3->get_device(); break;
+	// 8"
+	case 4: m_floppy = m_floppy4->get_device(); break;
+	case 5: m_floppy = m_floppy5->get_device(); break;
+	case 6: m_floppy = m_floppy6->get_device(); break;
+	case 7: m_floppy = m_floppy7->get_device(); break;
+	// 3.5"
+	case 8: m_floppy = m_floppy8->get_device(); break;
+	case 9: m_floppy = m_floppy9->get_device(); break;
+	}
 
-	// floppy motor
-	floppy_mon_w(m_floppy0, BIT(data, 5));
-	floppy_mon_w(m_floppy1, BIT(data, 5));
-	floppy_drive_set_ready_state(m_floppy0, BIT(data, 5), 1);
-	floppy_drive_set_ready_state(m_floppy1, BIT(data, 5), 1);
+	m_fdc->set_floppy(m_floppy);
+
+	if (m_floppy)
+	{
+		// side select
+		m_floppy->ss_w(BIT(data, 4));
+
+		// floppy motor
+		m_floppy->mon_w(BIT(data, 5));
+	}
 
 	// FDC clock
 	m_fdc->set_unscaled_clock(BIT(data, 6) ? XTAL_16MHz/16 : XTAL_16MHz/8);
 
 	// density select
-	wd17xx_dden_w(m_fdc, BIT(data, 7));
+	m_fdc->dden_w(BIT(data, 7));
 }
 
 
@@ -527,7 +559,7 @@ READ8_MEMBER( bulletf_state::hwsts_r )
 
     */
 
-	UINT8 data = 0x10;
+	UINT8 data = 0;
 
 	// centronics busy
 	data |= m_centronics->busy_r();
@@ -535,11 +567,12 @@ READ8_MEMBER( bulletf_state::hwsts_r )
 	// DIP switches
 	data |= ioport("SW1")->read() & 0x06;
 
-	// floppy interrupt
-	data |= wd17xx_intrq_r(m_fdc) << 6;
-
-	// floppy data request
-	data |= wd17xx_drq_r(m_fdc) << 7;
+	// floppy
+	data |= (m_floppy ? m_floppy->twosid_r() : 1) << 3;
+	data |= m_fdc->hld_r() << 4;
+	data |= (m_floppy ? m_floppy->dskchg_r() : 1) << 5;
+	data |= m_fdc->intrq_r() << 6;
+	data |= m_fdc->drq_r() << 7;
 
 	return data;
 }
@@ -569,7 +602,7 @@ static ADDRESS_MAP_START( bullet_io, AS_IO, 8, bullet_state )
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x03) AM_READWRITE(win_r, wstrobe_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY(MB8877_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(MB8877_TAG, mb8877_t, read, write)
 	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
 	AM_RANGE(0x15, 0x15) AM_READWRITE(brom_r, brom_w)
 	AM_RANGE(0x16, 0x16) AM_WRITE(exdsk_w)
@@ -598,7 +631,7 @@ static ADDRESS_MAP_START( bulletf_io, AS_IO, 8, bulletf_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY(MB8877_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(MB8877_TAG, mb8877_t, read, write)
 	AM_RANGE(0x14, 0x14) AM_WRITE(xdma0_w)
 	AM_RANGE(0x16, 0x16) AM_WRITE(xfdc_w)
 	AM_RANGE(0x17, 0x17) AM_WRITE(mbank_w)
@@ -631,8 +664,11 @@ INPUT_PORTS_START( bullet )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0xf0, 0xf0, "Floppy Type" ) PORT_DIPLOCATION("SW1:5,6,7,8")
-	// TODO
+	PORT_DIPNAME( 0xf0, 0x50, "Floppy Type" ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(    0xf0, "5.25\" SD" )
+	PORT_DIPSETTING(    0x50, "5.25\" DD" )
+	PORT_DIPSETTING(    0x60, "8\" SD" )
+	PORT_DIPSETTING(    0x00, "8\" DD" )
 INPUT_PORTS_END
 
 
@@ -657,7 +693,7 @@ INPUT_PORTS_START( bulletf )
 	PORT_DIPNAME( 0xf0, 0xc0, "Floppy Type" ) PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0x10, "3\" DD" )
 	PORT_DIPSETTING(    0xc0, "5.25\" SD" )
-	PORT_DIPSETTING(    0x40, "3\" DD" )
+	PORT_DIPSETTING(    0x40, "5.25\" DD" )
 	PORT_DIPSETTING(    0xa0, "8\" SD" )
 	PORT_DIPSETTING(    0x20, "8\" DD" )
 INPUT_PORTS_END
@@ -686,15 +722,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(bullet_state::ctc_tick)
 
 WRITE_LINE_MEMBER(bullet_state::dart_rxtxca_w)
 {
-	device_t *device = machine().device(Z80DART_TAG);
-	z80dart_txca_w(device, state);
-	z80dart_rxca_w(device, state);
+	z80dart_txca_w(m_dart, state);
+	z80dart_rxca_w(m_dart, state);
 }
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),		// interrupt handler
-	DEVCB_DRIVER_LINE_MEMBER(bullet_state,dart_rxtxca_w),		// ZC/TO0 callback
+	DEVCB_DRIVER_LINE_MEMBER(bullet_state, dart_rxtxca_w),		// ZC/TO0 callback
 	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rxtxcb_w),	// ZC/TO1 callback
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg3)							// ZC/TO2 callback
 };
@@ -980,45 +1015,35 @@ static Z80PIO_INTERFACE( bulletf_pio_intf )
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( bullet_state::fdrdy_w )
+static SLOT_INTERFACE_START( bullet_525_floppies )
+	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START( bullet_8_floppies )
+	SLOT_INTERFACE( "8dssd", FLOPPY_8_DSSD )
+	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START( bullet_35_floppies )
+	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
+SLOT_INTERFACE_END
+void bullet_state::fdc_intrq_w(bool state)
+{
+	z80dart_dcda_w(m_dart, state);
+}
+
+void bulletf_state::fdc_intrq_w(bool state)
+{
+	z80dart_rib_w(m_dart, state);
+}
+
+void bullet_state::fdc_drq_w(bool state)
 {
 	m_fdrdy = !state;
 	update_dma_rdy();
 }
-
-static const floppy_interface bullet_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_5_25",
-	NULL
-};
-
-static const wd17xx_interface fdc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_dcda_w),
-	DEVCB_DRIVER_LINE_MEMBER(bullet_state, fdrdy_w),
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
-
-
-//-------------------------------------------------
-//  wd17xx_interface bulletf_fdc_intf
-//-------------------------------------------------
-
-static const wd17xx_interface bulletf_fdc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rib_w),
-	DEVCB_DRIVER_LINE_MEMBER(bullet_state, fdrdy_w),
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
 
 WRITE_LINE_MEMBER( bulletf_state::req_w )
 {
@@ -1033,6 +1058,10 @@ WRITE_LINE_MEMBER( bulletf_state::req_w )
 	update_dma_rdy();
 }
 
+
+//-------------------------------------------------
+//  serial_terminal_interface terminal_intf
+//-------------------------------------------------
 
 static serial_terminal_interface terminal_intf =
 {
@@ -1065,6 +1094,10 @@ static const z80_daisy_config daisy_chain[] =
 
 void bullet_state::machine_start()
 {
+	// floppy callbacks
+	m_fdc->setup_intrq_cb(mb8877_t::line_cb(FUNC(bullet_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(mb8877_t::line_cb(FUNC(bullet_state::fdc_drq_w), this));
+
 	// state saving
 	save_item(NAME(m_segst));
 	save_item(NAME(m_brom));
@@ -1085,6 +1118,10 @@ void bullet_state::machine_start()
 
 void bulletf_state::machine_start()
 {
+	// floppy callbacks
+	m_fdc->setup_intrq_cb(mb8877_t::line_cb(FUNC(bulletf_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(mb8877_t::line_cb(FUNC(bulletf_state::fdc_drq_w), this));
+
 	// state saving
 	save_item(NAME(m_fdrdy));
 	save_item(NAME(m_rome));
@@ -1151,8 +1188,15 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_16MHz/4, dart_intf)
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_16MHz/4, pio_intf)
-	MCFG_MB8877_ADD(MB8877_TAG, fdc_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bullet_floppy_interface)
+	MCFG_MB8877x_ADD(MB8877_TAG, XTAL_16MHz/8)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", bullet_525_floppies, "525qd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", bullet_525_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", bullet_525_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":3", bullet_525_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":4", bullet_8_floppies, NULL, NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":5", bullet_8_floppies, NULL, NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":6", bullet_8_floppies, NULL, NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":7", bullet_8_floppies, NULL, NULL, floppy_image_device::default_floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 4800)
 
@@ -1182,8 +1226,17 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_16MHz/4, dart_intf)
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_16MHz/4, bulletf_pio_intf)
-	MCFG_MB8877_ADD(MB8877_TAG, bulletf_fdc_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(bullet_floppy_interface)
+	MCFG_MB8877x_ADD(MB8877_TAG, XTAL_16MHz/8)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", bullet_525_floppies, "525qd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", bullet_525_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", bullet_525_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":3", bullet_525_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":4", bullet_8_floppies, NULL, NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":5", bullet_8_floppies, NULL, NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":6", bullet_8_floppies, NULL, NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":7", bullet_8_floppies, NULL, NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":8", bullet_35_floppies, NULL, NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":9", bullet_35_floppies, NULL, NULL, floppy_image_device::default_floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 4800)
 
@@ -1226,5 +1279,5 @@ ROM_END
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME                FLAGS
 // the setname 'bullet' is used by Sega's Bullet in MAME.
-COMP( 1982, wmbullet,		0,			0,		bullet,		bullet, driver_device,		0,		"Wave Mate",	"Bullet",				GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
+COMP( 1982, wmbullet,		0,			0,		bullet,		bullet, driver_device,	0,		"Wave Mate",	"Bullet",				GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
 COMP( 1984, wmbulletf,	wmbullet,		0,		bulletf,	bulletf, driver_device,	0,		"Wave Mate",	"Bullet (Revision F)",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )
