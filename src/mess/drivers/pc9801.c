@@ -420,6 +420,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sdip_b_w);
 
 	DECLARE_READ8_MEMBER(pc9821_ide_r);
+	DECLARE_READ8_MEMBER(pc9821_unkrom_r);
 	DECLARE_READ8_MEMBER(pc9821_ideram_r);
 	DECLARE_WRITE8_MEMBER(pc9821_ideram_w);
 	DECLARE_READ8_MEMBER(pc9821_ext_gvram_r);
@@ -446,6 +447,7 @@ public:
 	DECLARE_MACHINE_RESET(pc9801);
 	DECLARE_MACHINE_RESET(pc9801f);
 	DECLARE_MACHINE_RESET(pc9801rs);
+	DECLARE_MACHINE_RESET(pc9821);
 
 	DECLARE_PALETTE_INIT(pc9801);
 	INTERRUPT_GEN_MEMBER(pc9801_vrtc_irq);
@@ -1355,18 +1357,20 @@ READ8_MEMBER(pc9801_state::pc9801rs_ipl_r)
 	return ROM[(offset & 0x1ffff)+(m_rom_bank*0x20000)];
 }
 
+/* TODO: it's possible that the offset calculation is actually linear. */
+/* TODO: having this non-linear makes the system to boot in BASIC for PC-9821. Perhaps it stores settings? How to change these? */
 READ8_MEMBER(pc9801_state::pc9801rs_knjram_r)
 {
-	UINT8 *KNJRAM = memregion("kanji")->base();
+	UINT8 *pcg = memregion("pcg")->base();
 
-	return KNJRAM[offset];
+	return pcg[((m_font_addr & 0x7f7f) << 4) | m_font_lr | ((offset >> 1) & 0x0f)];
 }
 
 WRITE8_MEMBER(pc9801_state::pc9801rs_knjram_w)
 {
-	UINT8 *KNJRAM = memregion("kanji")->base();
+	UINT8 *pcg = memregion("pcg")->base();
 
-	KNJRAM[offset] = data;
+	pcg[((m_font_addr & 0x7f7f) << 4) | m_font_lr | ((offset >> 1) & 0x0f)] = data;
 }
 
 /* FF-based */
@@ -1770,6 +1774,12 @@ WRITE8_MEMBER(pc9801_state::pc9821_ext_gvram_w)
 	m_ext_gvram[offset] = data;
 }
 
+READ8_MEMBER(pc9801_state::pc9821_unkrom_r)
+{
+	UINT8 *UNKROM = memregion("unkrom")->base();
+
+	return UNKROM[offset];
+}
 
 READ8_MEMBER(pc9801_state::pc9821_memory_r)
 {
@@ -1784,6 +1794,7 @@ READ8_MEMBER(pc9801_state::pc9821_memory_r)
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { return pc9801_tvram_r(space,offset-0xa0000);        }
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { return pc9801rs_knjram_r(space,offset & 0xfff);     }
 	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { return pc9801_gvram_r(space,offset-0xa8000);        }
+	else if(offset >= 0x000cc000 && offset <= 0x000cffff)					{ return pc9821_unkrom_r(space,offset & 0x3fff);      }
 	else if(offset >= 0x000d8000 && offset <= 0x000d9fff)					{ return pc9821_ide_r(space,offset & 0x1fff);         }
 	else if(offset >= 0x000da000 && offset <= 0x000dbfff)					{ return pc9821_ideram_r(space,offset & 0x1fff);      }
 	else if(offset >= 0x000e0000 && offset <= 0x000e7fff)                   { return pc9821_vram256_r(space,offset & 0x1ffff);    }
@@ -1792,7 +1803,7 @@ READ8_MEMBER(pc9801_state::pc9821_memory_r)
 	else if(offset >= 0x00f00000 && offset <= 0x00f9ffff)					{ return pc9821_ext_gvram_r(space,offset-0x00f00000); }
 	else if(offset >= 0xfffe0000 && offset <= 0xffffffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
 
-	//printf("%08x\n",offset);
+	printf("%08x\n",offset);
 	return 0x00;
 }
 
@@ -1810,13 +1821,15 @@ WRITE8_MEMBER(pc9801_state::pc9821_memory_w)
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { pc9801_tvram_w(space,offset-0xa0000,data);           }
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { pc9801rs_knjram_w(space,offset & 0xfff,data);        }
 	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { pc9801_gvram_w(space,offset-0xa8000,data);           }
+	else if(offset >= 0x000cc000 && offset <= 0x000cffff)					{ /* TODO: shadow ROM */                               }
+	else if(offset >= 0x000d8000 && offset <= 0x000d9fff)					{ /* TODO: shadow ROM */                               }
 	else if(offset >= 0x000da000 && offset <= 0x000dbfff)					{ pc9821_ideram_w(space,offset & 0x1fff,data);         }
 	else if(offset >= 0x000e0000 && offset <= 0x000e7fff)                   { pc9821_vram256_w(space,offset & 0x1ffff,data);       }
-	else if(offset >= 0x000e8000 && offset <= 0x000fffff)					{ /* TODO: shadow ROM */ }
+	else if(offset >= 0x000e8000 && offset <= 0x000fffff)					{ /* TODO: shadow ROM */                               }
 	else if(offset >= 0x00100000 && offset <= 0x00100000+m_ram_size-1)      { pc9801rs_ex_wram_w(space,offset-0x00100000,data);    }
 	else if(offset >= 0x00f00000 && offset <= 0x00f9ffff)					{ pc9821_ext_gvram_w(space,offset-0x00f00000,data);    }
-	//else
-	//  printf("%08x %08x\n",offset,data);
+	else
+		printf("%08x %08x\n",offset,data);
 
 }
 
@@ -1924,6 +1937,8 @@ WRITE8_MEMBER(pc9801_state::pc9821_window_bank_w)
 {
 	if(offset == 1)
 		m_pc9821_window_bank = data & 0xfe;
+	else
+		printf("PC-9821 $f0000 window bank %02x\n",data);
 }
 
 UINT8 pc9801_state::m_sdip_read(UINT16 port, UINT8 sdip_offset)
@@ -2857,6 +2872,13 @@ MACHINE_START_MEMBER(pc9801_state,pc9821)
 	state_save_register_global_pointer(machine(), m_ext_gvram, 0xa0000);
 }
 
+MACHINE_RESET_MEMBER(pc9801_state,pc9821)
+{
+	MACHINE_RESET_CALL_MEMBER(pc9801rs);
+
+	m_pc9821_window_bank = 0x08;
+}
+
 INTERRUPT_GEN_MEMBER(pc9801_state::pc9801_vrtc_irq)
 {
 	#if 0
@@ -3019,7 +3041,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821)
-	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801rs)
+	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9821)
 
 	MCFG_PIT8253_ADD( "pit8253", pc9801rs_pit8253_config )
 	MCFG_I8237_ADD("i8237", 16000000, dmac_intf) // unknown clock
@@ -3245,6 +3267,10 @@ ROM_START( pc9821 )
 	ROM_LOAD( "ide.rom",  0x00000, 0x02000, NO_DUMP )
 	ROM_FILL( 0x0000, 0x2000, 0xcb )
 
+	ROM_REGION( 0x4000, "unkrom", ROMREGION_ERASEFF ) // pnp?
+	ROM_LOAD( "unk.rom",  0x00000, 0x04000, NO_DUMP )
+	ROM_FILL( 0x0000, 0x4000, 0xcb )
+
 	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x700000, "ex_wram", ROMREGION_ERASE00 )
@@ -3275,6 +3301,11 @@ ROM_START( pc9821as )
 
 	ROM_REGION( 0x2000, "ide", ROMREGION_ERASEFF )
 	ROM_LOAD( "ide.rom",  0x00000, 0x02000, NO_DUMP )
+	ROM_FILL( 0x0000, 0x2000, 0xcb )
+
+	ROM_REGION( 0x4000, "unkrom", ROMREGION_ERASEFF ) // pnp?
+	ROM_LOAD( "unk.rom",  0x00000, 0x04000, NO_DUMP )
+	ROM_FILL( 0x0000, 0x4000, 0xcb )
 
 	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
 
@@ -3304,6 +3335,11 @@ ROM_START( pc9821ne )
 
 	ROM_REGION( 0x2000, "ide", ROMREGION_ERASEFF )
 	ROM_LOAD( "ide.rom",  0x00000, 0x02000, NO_DUMP )
+	ROM_FILL( 0x0000, 0x2000, 0xcb )
+
+	ROM_REGION( 0x4000, "unkrom", ROMREGION_ERASEFF ) // pnp?
+	ROM_LOAD( "unk.rom",  0x00000, 0x04000, NO_DUMP )
+	ROM_FILL( 0x0000, 0x4000, 0xcb )
 
 	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
 
@@ -3332,6 +3368,11 @@ ROM_START( pc486mu )
 
 	ROM_REGION( 0x2000, "ide", ROMREGION_ERASEFF )
 	ROM_LOAD( "ide.rom",  0x00000, 0x02000, NO_DUMP )
+	ROM_FILL( 0x0000, 0x2000, 0xcb )
+
+	ROM_REGION( 0x4000, "unkrom", ROMREGION_ERASEFF ) // pnp?
+	ROM_LOAD( "unk.rom",  0x00000, 0x04000, NO_DUMP )
+	ROM_FILL( 0x0000, 0x4000, 0xcb )
 
 	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
 
@@ -3360,6 +3401,11 @@ ROM_START( pc9821ce2 )
 
 	ROM_REGION( 0x2000, "ide", ROMREGION_ERASEFF )
 	ROM_LOAD( "ide.rom",  0x00000, 0x02000, NO_DUMP )
+	ROM_FILL( 0x0000, 0x2000, 0xcb )
+
+	ROM_REGION( 0x4000, "unkrom", ROMREGION_ERASEFF ) // pnp?
+	ROM_LOAD( "unk.rom",  0x00000, 0x04000, NO_DUMP )
+	ROM_FILL( 0x0000, 0x4000, 0xcb )
 
 	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
 
@@ -3388,6 +3434,11 @@ ROM_START( pc9821xs )
 
 	ROM_REGION( 0x2000, "ide", ROMREGION_ERASEFF )
 	ROM_LOAD( "ide.rom",  0x00000, 0x02000, NO_DUMP )
+	ROM_FILL( 0x0000, 0x2000, 0xcb )
+
+	ROM_REGION( 0x4000, "unkrom", ROMREGION_ERASEFF ) // pnp?
+	ROM_LOAD( "unk.rom",  0x00000, 0x04000, NO_DUMP )
+	ROM_FILL( 0x0000, 0x4000, 0xcb )
 
 	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
 
@@ -3417,6 +3468,11 @@ ROM_START( pc9821v13 )
 
 	ROM_REGION( 0x2000, "ide", ROMREGION_ERASEFF )
 	ROM_LOAD( "ide.rom",  0x00000, 0x02000, NO_DUMP )
+	ROM_FILL( 0x0000, 0x2000, 0xcb )
+
+	ROM_REGION( 0x4000, "unkrom", ROMREGION_ERASEFF ) // pnp?
+	ROM_LOAD( "unk.rom",  0x00000, 0x04000, NO_DUMP )
+	ROM_FILL( 0x0000, 0x4000, 0xcb )
 
 	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
 
@@ -3445,6 +3501,11 @@ ROM_START( pc9821v20 )
 
 	ROM_REGION( 0x2000, "ide", ROMREGION_ERASEFF )
 	ROM_LOAD( "ide.rom",  0x00000, 0x02000, NO_DUMP )
+	ROM_FILL( 0x0000, 0x2000, 0xcb )
+
+	ROM_REGION( 0x4000, "unkrom", ROMREGION_ERASEFF ) // pnp?
+	ROM_LOAD( "unk.rom",  0x00000, 0x04000, NO_DUMP )
+	ROM_FILL( 0x0000, 0x4000, 0xcb )
 
 	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
 
