@@ -33,7 +33,8 @@
 	4 = WAVE 
 	5 = SELECT VOICE
 	6 = MIXER/SHAPER 
-	7 & 8 =  EFFECT
+    7 =  EFFECT
+    8 = COMPARE
 	9 = COPY EFFECTS PARAMETERS 
 	10 = LFO 
 	11 = PITCH 
@@ -43,7 +44,7 @@
 	15 = FILTER 
 	16 = ENV3 
     17 = OUTPUT
-    18 = ERROR 20 (VFX) / SEQUENCER MUST BE LOADED (VFX-SD/SD-1)
+    18 = ERROR 20 (VFX) / SEQ. CONTROL
     19 = ?
     20 = MASTER
     21 = STORAGE
@@ -54,9 +55,9 @@
 	26 = PSEL 
 	27 = STAT 
 	28 = EFFECT 
-	29 = ?
-	30 = TRAX 
-    31 = TRAX (page 2)
+	29 = SEQ?  (toggles INT0 / TRAX display)
+	30 = TRACKS 1-6
+    31 = TRACKS 7-12
     32 = ERROR 20 (VFX) / CLICK-REC
     33 = ERROR 20 (VFX) / LOCATE
 	34 = BUTTON 8
@@ -76,7 +77,7 @@
     48 = BUTTON 5
     49 = BUTTON 6
     50 = SOFT BOTTOM LEFT
-    51 = ERROR 202 (VFX) / SEQ0 $SONG-00
+    51 = ERROR 202 (VFX) / SEQ.
     52 = CART
     53 = SOUNDS
     54 = PRESETS
@@ -110,7 +111,7 @@
 #define SQ1     (2)
 
 #define KEYBOARD_HACK (1)   // turn on to play the SQ-1, SD-1, and SD-1 32-voice: Z and X are program up/down, A/S/D/F/G/H/J/K/L and Q/W/E/R/T/Y/U play notes
-#define HACK_VIA_MIDI	(0)
+#define HACK_VIA_MIDI	(1)
 
 #if KEYBOARD_HACK
 #if HACK_VIA_MIDI
@@ -148,6 +149,8 @@ public:
     DECLARE_WRITE16_MEMBER(es5510_dsp_w);
     DECLARE_READ16_MEMBER(mc68681_r);
     DECLARE_WRITE16_MEMBER(mc68681_w);
+    DECLARE_READ16_MEMBER(lower_r);
+    DECLARE_WRITE16_MEMBER(lower_w);
 
     int m_system_type;
     UINT8 m_duart_io;
@@ -164,6 +167,9 @@ private:
     UINT32  es5510_dadr_latch;
     UINT32  es5510_gpr_latch;
     UINT8   es5510_ram_sel;
+
+	UINT16 	*m_rom, *m_ram;
+
 public:
 	DECLARE_DRIVER_INIT(eps);
 	DECLARE_DRIVER_INIT(common);
@@ -182,15 +188,10 @@ SLOT_INTERFACE_END
 
 void esq5505_state::machine_reset()
 {
-	UINT8 *ROM = machine().root_device().memregion("osrom")->base();
-	UINT8 *RAM = (UINT8 *)machine().root_device().memshare("osram")->ptr();
+	m_rom = (UINT16 *)machine().root_device().memregion("osrom")->base();
+	m_ram = (UINT16 *)machine().root_device().memshare("osram")->ptr();
 
-    memcpy(RAM, ROM, 256);
-
-    // pick up the new vectors
-    m_maincpu->reset();
-
-    m_bCalibSecondByte = false;
+	m_bCalibSecondByte = false;
 }
 
 READ16_MEMBER(esq5505_state::es5510_dsp_r)
@@ -284,8 +285,53 @@ WRITE16_MEMBER(esq5505_state::es5510_dsp_w)
 	}
 }
 
+READ16_MEMBER(esq5505_state::lower_r)
+{
+	offset &= 0x7fff;
+
+	// get pointers when 68k resets
+	if (!m_rom)
+	{
+		m_rom = (UINT16 *)machine().root_device().memregion("osrom")->base();
+		m_ram = (UINT16 *)machine().root_device().memshare("osram")->ptr();
+	}
+
+	if (offset < 0x4000)
+	{
+		if (m68k_get_fc(m_maincpu) == 0x6)	// supervisor mode, ROM
+		{
+			return m_rom[offset];
+		}
+		else
+		{
+			return m_ram[offset];
+		}
+	}
+	else
+	{
+		return m_ram[offset];
+	}
+}
+
+WRITE16_MEMBER(esq5505_state::lower_w)
+{
+	offset &= 0x7fff;
+
+	if (offset < 0x4000)
+	{
+		if (m68k_get_fc(m_maincpu) != 0x6)	// if not supervisor mode, RAM
+		{
+			COMBINE_DATA(&m_ram[offset]);
+		}
+	}
+	else
+	{
+		COMBINE_DATA(&m_ram[offset]);
+	}
+}
+
 static ADDRESS_MAP_START( vfx_map, AS_PROGRAM, 16, esq5505_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_MIRROR(0x30000) AM_SHARE("osram")
+	AM_RANGE(0x000000, 0x03ffff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
 	AM_RANGE(0x260000, 0x2601ff) AM_READWRITE(es5510_dsp_r, es5510_dsp_w)
     AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff)
@@ -294,7 +340,7 @@ static ADDRESS_MAP_START( vfx_map, AS_PROGRAM, 16, esq5505_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vfxsd_map, AS_PROGRAM, 16, esq5505_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("osram") AM_MIRROR(0x30000)
+	AM_RANGE(0x000000, 0x03ffff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
 	AM_RANGE(0x260000, 0x2601ff) AM_READWRITE(es5510_dsp_r, es5510_dsp_w)
     AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff)
@@ -305,7 +351,7 @@ static ADDRESS_MAP_START( vfxsd_map, AS_PROGRAM, 16, esq5505_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_MIRROR(0x30000) AM_SHARE("osram")
+	AM_RANGE(0x000000, 0x03ffff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
     AM_RANGE(0x240000, 0x2400ff) AM_DEVREADWRITE_LEGACY("mc68450", hd63450_r, hd63450_w)
     AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff)
@@ -461,6 +507,7 @@ static void duart_tx(device_t *device, int channel, UINT8 data)
     if (channel == 1)
     {
 //        printf("ch %d: [%02x] (PC=%x)\n", channel, data, state->m_maincpu->pc());
+
         switch (state->m_system_type)
         {
             case GENERIC:
@@ -818,6 +865,8 @@ ROM_START( sd1 )
     ROM_LOAD16_BYTE( "u35.bin", 0x100001, 0x080000, CRC(c0055975) SHA1(5a22f1d5e437c6277eb0cfb1ff1b3f8dcdea1cc6) ) 
 
     ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00) // BS=1 region (16-bit)
+	ROM_LOAD16_WORD_SWAP( "u38.bin", 0x000000, 0x100000, CRC(a904190e) SHA1(e4fd4e1130906086fb4182dcb8b51269969e2836) ) 
+	ROM_LOAD16_WORD_SWAP( "u37.bin", 0x100000, 0x100000, CRC(d706cef3) SHA1(24ba35248509e9ca45110e2402b8085006ea0cfc) ) 
 
     ROM_REGION(0x80000, "nibbles", 0)
     ROM_LOAD( "u36.bin", 0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) ) 
@@ -833,6 +882,8 @@ ROM_START( sd132 )
     ROM_LOAD16_BYTE( "u35.bin", 0x100001, 0x080000, CRC(c0055975) SHA1(5a22f1d5e437c6277eb0cfb1ff1b3f8dcdea1cc6) ) 
 
     ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00) // BS=1 region (16-bit)
+	ROM_LOAD16_WORD_SWAP( "u38.bin", 0x000000, 0x100000, CRC(a904190e) SHA1(e4fd4e1130906086fb4182dcb8b51269969e2836) ) 
+	ROM_LOAD16_WORD_SWAP( "u37.bin", 0x100000, 0x100000, CRC(d706cef3) SHA1(24ba35248509e9ca45110e2402b8085006ea0cfc) ) 
 
     ROM_REGION(0x80000, "nibbles", ROMREGION_ERASE00)
     ROM_LOAD( "u36.bin", 0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) ) 
