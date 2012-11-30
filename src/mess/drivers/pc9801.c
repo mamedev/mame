@@ -279,8 +279,12 @@ public:
 
 	required_shared_ptr<UINT8> m_video_ram_1;
 	required_shared_ptr<UINT8> m_video_ram_2;
+	UINT8 *m_ipl_rom;
+	UINT8 *m_work_ram;
+	UINT8 *m_ext_work_ram;
 	UINT8 *m_char_rom;
 	UINT8 *m_kanji_rom;
+	UINT8 *m_pcg_ram;
 
 	UINT8 m_portb_tmp;
 	UINT8 m_dma_offset[4];
@@ -320,7 +324,9 @@ public:
 	/* PC9821 specific */
 	UINT8 m_analog256,m_analog256e;
 	UINT8 m_sdip[24], m_sdip_bank;
-	UINT8 *m_ideram;
+	UINT8 *m_ide_rom;
+	UINT8 *m_ide_ram;
+	UINT8 *m_unk_rom;
 	UINT8 *m_ext_gvram;
 	UINT8 *m_vram256;
 	UINT8 m_pc9821_window_bank;
@@ -440,7 +446,8 @@ private:
 	UINT8 m_sdip_read(UINT16 port, UINT8 sdip_offset);
 	void m_sdip_write(UINT16 port, UINT8 sdip_offset,UINT8 data);
 public:
-	DECLARE_MACHINE_START(pc9801);
+	DECLARE_MACHINE_START(pc9801_common);
+	DECLARE_MACHINE_START(pc9801f);
 	DECLARE_MACHINE_START(pc9801rs);
 	DECLARE_MACHINE_START(pc9821);
 
@@ -842,7 +849,9 @@ WRITE8_MEMBER(pc9801_state::pc9801_40_w)
 		if(offset & 4)
 			printf("Write to undefined port [%02x] <- %02x\n",offset+0x40,data);
 		else
-			printf("Write to 8251 kbd port [%02x] <- %02x\n",offset+0x40,data);
+		{
+			//printf("Write to 8251 kbd port [%02x] <- %02x\n",offset+0x40,data);
+		}
 	}
 }
 
@@ -1042,11 +1051,7 @@ READ8_MEMBER(pc9801_state::pc9801_a0_r)
 		switch((offset & 0xe) + 1)
 		{
 			case 0x09://cg window font read
-			{
-				UINT8 *pcg = memregion("pcg")->base();
-
-				return pcg[((m_font_addr & 0x7f7f) << 4) | m_font_lr | (m_font_line & 0x0f)];
-			}
+				return m_pcg_ram[((m_font_addr & 0x7f7f) << 4) | m_font_lr | (m_font_line & 0x0f)];
 		}
 
 		printf("Read to undefined port [%02x]\n",offset+0xa0);
@@ -1109,9 +1114,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 				return;
 			case 0x09: //cg window font write
 			{
-				UINT8 *pcg = memregion("pcg")->base();
-
-				pcg[((m_font_addr & 0x7f7f) << 4) | m_font_lr | m_font_line] = data;
+				m_pcg_ram[((m_font_addr & 0x7f7f) << 4) | m_font_lr | m_font_line] = data;
 				return;
 			}
 		}
@@ -1322,61 +1325,29 @@ ADDRESS_MAP_END
  *
  ************************************/
 
-READ8_MEMBER(pc9801_state::pc9801rs_wram_r)
-{
-	UINT8 *WRAM = memregion("wram")->base();
+READ8_MEMBER(pc9801_state::pc9801rs_wram_r) { return m_work_ram[offset]; }
+WRITE8_MEMBER(pc9801_state::pc9801rs_wram_w) { m_work_ram[offset] = data; }
 
-	return WRAM[offset];
-}
+READ8_MEMBER(pc9801_state::pc9801rs_ex_wram_r) { return m_ext_work_ram[offset]; }
+WRITE8_MEMBER(pc9801_state::pc9801rs_ex_wram_w) { m_ext_work_ram[offset] = data; }
 
-WRITE8_MEMBER(pc9801_state::pc9801rs_wram_w)
-{
-	UINT8 *WRAM = memregion("wram")->base();
-
-	WRAM[offset] = data;
-}
-
-READ8_MEMBER(pc9801_state::pc9801rs_ex_wram_r)
-{
-	UINT8 *EX_WRAM = memregion("ex_wram")->base();
-
-	return EX_WRAM[offset];
-}
-
-WRITE8_MEMBER(pc9801_state::pc9801rs_ex_wram_w)
-{
-	UINT8 *EX_WRAM = memregion("ex_wram")->base();
-
-	EX_WRAM[offset] = data;
-}
-
-READ8_MEMBER(pc9801_state::pc9801rs_ipl_r)
-{
-	UINT8 *ROM = memregion("ipl")->base();
-
-	return ROM[(offset & 0x1ffff)+(m_rom_bank*0x20000)];
-}
+READ8_MEMBER(pc9801_state::pc9801rs_ipl_r) { return m_ipl_rom[(offset & 0x1ffff)+(m_rom_bank*0x20000)]; }
 
 /* TODO: it's possible that the offset calculation is actually linear. */
 /* TODO: having this non-linear makes the system to boot in BASIC for PC-9821. Perhaps it stores settings? How to change these? */
 READ8_MEMBER(pc9801_state::pc9801rs_knjram_r)
 {
-	UINT8 *pcg = memregion("pcg")->base();
-
-	return pcg[((m_font_addr & 0x7f7f) << 4) | m_font_lr | ((offset >> 1) & 0x0f)];
+	return m_pcg_ram[((m_font_addr & 0x7f7f) << 4) | m_font_lr | ((offset >> 1) & 0x0f)];
 }
 
 WRITE8_MEMBER(pc9801_state::pc9801rs_knjram_w)
 {
-	UINT8 *pcg = memregion("pcg")->base();
-
-	pcg[((m_font_addr & 0x7f7f) << 4) | m_font_lr | ((offset >> 1) & 0x0f)] = data;
+	m_pcg_ram[((m_font_addr & 0x7f7f) << 4) | m_font_lr | ((offset >> 1) & 0x0f)] = data;
 }
 
 /* FF-based */
 WRITE8_MEMBER(pc9801_state::pc9801rs_bank_w)
 {
-
 	if(offset == 1)
 	{
 		if((data & 0xf0) == 0x00 || (data & 0xf0) == 0x10)
@@ -1442,7 +1413,6 @@ READ8_MEMBER(pc9801_state::pc9801rs_30_r)
 
 READ8_MEMBER(pc9801_state::pc9801rs_memory_r)
 {
-
 	if(m_gate_a20 == 0)
 		offset &= 0xfffff;
 
@@ -1461,7 +1431,6 @@ READ8_MEMBER(pc9801_state::pc9801rs_memory_r)
 
 WRITE8_MEMBER(pc9801_state::pc9801rs_memory_w)
 {
-
 	if(m_gate_a20 == 0)
 		offset &= 0xfffff;
 
@@ -1472,7 +1441,6 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_memory_w)
 	else if(offset >= 0x00100000 && offset <= 0x00100000+m_ram_size-1) { pc9801rs_ex_wram_w(space,offset-0x00100000,data);    }
 	//else
 	//  printf("%08x %08x\n",offset,data);
-
 }
 
 READ8_MEMBER(pc9801_state::pc9810rs_fdc_ctrl_r)
@@ -1666,12 +1634,10 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffffffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank
-
 ADDRESS_MAP_END
 
 READ8_MEMBER(pc9801_state::pc980ux_memory_r)
 {
-
 	//printf("%08x %d\n",offset,m_gate_a20);
 
 	//if(m_gate_a20 == 0)
@@ -1691,7 +1657,6 @@ READ8_MEMBER(pc9801_state::pc980ux_memory_r)
 
 WRITE8_MEMBER(pc9801_state::pc9801ux_memory_w)
 {
-
 	//if(m_gate_a20 == 0)
 	//  offset &= 0xfffff;
 
@@ -1702,7 +1667,6 @@ WRITE8_MEMBER(pc9801_state::pc9801ux_memory_w)
 	else if(offset >= 0x00100000 && offset <= 0x00100000+m_ram_size-1) { pc9801rs_ex_wram_w(space,offset-0x00100000,data);    }
 	//else
 	//  printf("%08x %08x\n",offset,data);
-
 }
 
 static ADDRESS_MAP_START( pc9801ux_map, AS_PROGRAM, 16, pc9801_state )
@@ -1736,50 +1700,19 @@ ADDRESS_MAP_END
  *
  ************************************/
 
-READ8_MEMBER(pc9801_state::pc9821_ide_r)
-{
-	UINT8 *IDE = memregion("ide")->base();
+READ8_MEMBER(pc9801_state::pc9821_ide_r) { return m_ide_rom[offset]; }
+READ8_MEMBER(pc9801_state::pc9821_unkrom_r) { return m_unk_rom[offset]; }
 
-	return IDE[offset];
-}
-
-READ8_MEMBER(pc9801_state::pc9821_vram256_r)
-{
-	return m_vram256[offset];
-}
-
-WRITE8_MEMBER(pc9801_state::pc9821_vram256_w)
-{
-	m_vram256[offset] = data;
-}
+READ8_MEMBER(pc9801_state::pc9821_vram256_r) { return m_vram256[offset]; }
+WRITE8_MEMBER(pc9801_state::pc9821_vram256_w) {	m_vram256[offset] = data; }
 
 /* Note: not hooking this up causes "MEMORY ERROR" at POST */
-READ8_MEMBER(pc9801_state::pc9821_ideram_r)
-{
-	return m_ideram[offset];
-}
+READ8_MEMBER(pc9801_state::pc9821_ideram_r) { return m_ide_ram[offset]; }
+WRITE8_MEMBER(pc9801_state::pc9821_ideram_w) { m_ide_ram[offset] = data; }
 
-WRITE8_MEMBER(pc9801_state::pc9821_ideram_w)
-{
-	m_ideram[offset] = data;
-}
+READ8_MEMBER(pc9801_state::pc9821_ext_gvram_r) { return m_ext_gvram[offset]; }
+WRITE8_MEMBER(pc9801_state::pc9821_ext_gvram_w) { m_ext_gvram[offset] = data; }
 
-READ8_MEMBER(pc9801_state::pc9821_ext_gvram_r)
-{
-	return m_ext_gvram[offset];
-}
-
-WRITE8_MEMBER(pc9801_state::pc9821_ext_gvram_w)
-{
-	m_ext_gvram[offset] = data;
-}
-
-READ8_MEMBER(pc9801_state::pc9821_unkrom_r)
-{
-	UINT8 *UNKROM = memregion("unkrom")->base();
-
-	return UNKROM[offset];
-}
 
 READ8_MEMBER(pc9801_state::pc9821_memory_r)
 {
@@ -1788,6 +1721,8 @@ READ8_MEMBER(pc9801_state::pc9821_memory_r)
 
 	if(offset >= 0x00080000 && offset <= 0x0009ffff)
 		offset = (offset & 0x1ffff) | (m_pc9821_window_bank & 0xfe) * 0x10000;
+
+	/* TODO: window bank at 0xa0000 - 0xbffff */
 
 	if	   (                        offset <= 0x0009ffff)                   { return pc9801rs_wram_r(space,offset);               }
 //	else if(offset >= 0x00080000 && offset <= 0x0009ffff)					{ return pc9821_winram_r(space,offset & 0x1ffff);     }
@@ -1815,6 +1750,8 @@ WRITE8_MEMBER(pc9801_state::pc9821_memory_w)
 
 	if(offset >= 0x00080000 && offset <= 0x0009ffff)
 		offset = (offset & 0x1ffff) | (m_pc9821_window_bank & 0xfe) * 0x10000;
+
+	/* TODO: window bank at 0xa0000 - 0xbffff */
 
 	if	   (                        offset <= 0x0009ffff)                   { pc9801rs_wram_w(space,offset,data);                  }
 //	else if(offset >= 0x00080000 && offset <= 0x0009ffff)					{ pc9821_winram_w(space,offset & 0x1ffff,data);        }
@@ -2738,6 +2675,7 @@ static const i8251_interface pc9801_uart_interface =
 *
 ****************************************/
 
+//
 PALETTE_INIT_MEMBER(pc9801_state,pc9801)
 {
 	int i;
@@ -2753,12 +2691,22 @@ static IRQ_CALLBACK(irq_callback)
 	return pic8259_acknowledge( device->machine().device( "pic8259_master" ));
 }
 
-MACHINE_START_MEMBER(pc9801_state,pc9801)
+MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 {
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
+
+	m_ipl_rom = memregion("ipl")->base();
+	m_pcg_ram = auto_alloc_array(machine(), UINT8, 0x80000);
+
+	state_save_register_global_pointer(machine(), m_pcg_ram, 0x80000);
+}
+
+MACHINE_START_MEMBER(pc9801_state,pc9801f)
+{
+	MACHINE_START_CALL_MEMBER(pc9801_common);
 
 	upd765a_device *fdc;
 	fdc = machine().device<upd765a_device>(":upd765_2hd");
@@ -2774,7 +2722,37 @@ MACHINE_START_MEMBER(pc9801_state,pc9801)
 		fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2dd_irq), this));
 		fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2dd_drq), this));
 	}
+}
 
+MACHINE_START_MEMBER(pc9801_state,pc9801rs)
+{
+	MACHINE_START_CALL_MEMBER(pc9801_common);
+
+	m_work_ram = auto_alloc_array(machine(), UINT8, 0xa0000);
+	m_ext_work_ram = auto_alloc_array(machine(), UINT8, 0x700000);
+	state_save_register_global_pointer(machine(), m_work_ram, 0xa0000);
+	state_save_register_global_pointer(machine(), m_ext_work_ram, 0x700000);
+
+	upd765a_device *fdc;
+	fdc = machine().device<upd765a_device>(":upd765_2hd");
+	fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc9801_state::pc9801rs_fdc_irq), this));
+	fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2hd_drq), this));
+}
+
+MACHINE_START_MEMBER(pc9801_state,pc9821)
+{
+	MACHINE_START_CALL_MEMBER(pc9801rs);
+
+	m_ide_ram = auto_alloc_array(machine(), UINT8, 0x2000);
+	m_vram256 = auto_alloc_array(machine(), UINT8, 0x8000);
+	m_ext_gvram = auto_alloc_array(machine(), UINT8, 0xa0000);
+	m_ide_rom = memregion("ide")->base();
+	m_unk_rom = memregion("unkrom")->base();
+
+	state_save_register_global_pointer(machine(), m_sdip, 24);
+	state_save_register_global_pointer(machine(), m_ide_ram, 0x2000);
+	state_save_register_global_pointer(machine(), m_vram256, 0x8000);
+	state_save_register_global_pointer(machine(), m_ext_gvram, 0xa0000);
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9801)
@@ -2845,33 +2823,6 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 	m_ram_size = machine().device<ram_device>(RAM_TAG)->size() - 0xa0000;
 }
 
-MACHINE_START_MEMBER(pc9801_state,pc9801rs)
-{
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
-
-	m_rtc->cs_w(1);
-	m_rtc->oe_w(1);
-
-	upd765a_device *fdc;
-	fdc = machine().device<upd765a_device>(":upd765_2hd");
-	fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc9801_state::pc9801rs_fdc_irq), this));
-	fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2hd_drq), this));
-}
-
-MACHINE_START_MEMBER(pc9801_state,pc9821)
-{
-	MACHINE_START_CALL_MEMBER(pc9801rs);
-
-	m_ideram = auto_alloc_array(machine(), UINT8, 0x2000);
-	m_vram256 = auto_alloc_array(machine(), UINT8, 0x8000);
-	m_ext_gvram = auto_alloc_array(machine(), UINT8, 0xa0000);
-
-	state_save_register_global_pointer(machine(), m_sdip, 24);
-	state_save_register_global_pointer(machine(), m_ideram, 0x2000);
-	state_save_register_global_pointer(machine(), m_vram256, 0x8000);
-	state_save_register_global_pointer(machine(), m_ext_gvram, 0xa0000);
-}
-
 MACHINE_RESET_MEMBER(pc9801_state,pc9821)
 {
 	MACHINE_RESET_CALL_MEMBER(pc9801rs);
@@ -2881,20 +2832,6 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9821)
 
 INTERRUPT_GEN_MEMBER(pc9801_state::pc9801_vrtc_irq)
 {
-	#if 0
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	static UINT8 test;
-
-	if(machine().input().code_pressed_once(JOYCODE_BUTTON1))
-		test^=1;
-
-	if(test)
-	{
-		popmessage("Go hack go");
-		space.write_word(0x55e,space.machine().rand());
-	}
-	#endif
-
 	if(m_vrtc_irq_mask)
 	{
 		pic8259_ir2_w(machine().device("pic8259_master"), 1);
@@ -2912,7 +2849,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_CPU_IO_MAP(pc9801_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
 
-	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801)
+	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801f)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801f)
 
 	MCFG_PIT8253_ADD( "pit8253", pit8253_config )
@@ -3092,6 +3029,17 @@ static MACHINE_CONFIG_DERIVED( pc9821v20, pc9821 )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
 MACHINE_CONFIG_END
 
+#define LOAD_IDE_ROM \
+	ROM_REGION( 0x2000, "ide", ROMREGION_ERASEFF ) \
+	ROM_LOAD( "ide.rom",  0x00000, 0x02000, NO_DUMP ) \
+	ROM_FILL( 0x0000, 0x2000, 0xcb ) \
+
+// pnp?
+#define LOAD_UNK_ROM \
+	ROM_REGION( 0x4000, "unkrom", ROMREGION_ERASEFF ) \
+	ROM_LOAD( "unk.rom",  0x00000, 0x04000, NO_DUMP ) \
+	ROM_FILL( 0x0000, 0x4000, 0xcb ) \
+
 /*
 F - 8086 5
 */
@@ -3130,8 +3078,6 @@ ROM_START( pc9801f )
 	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x8000, CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) )
 	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x10000, 0x8000, CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) )
 	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x10001, 0x8000, CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) )
-
-	ROM_REGION( 0x80000, "pcg", ROMREGION_ERASEFF )
 ROM_END
 
 /*
@@ -3143,10 +3089,6 @@ ROM_START( pc9801ux )
 	ROM_LOAD( "itf_ux.rom",  0x18000, 0x08000, CRC(c7942563) SHA1(61bb210d64c7264be939b11df1e9cd14ffeee3c9) )
     ROM_LOAD( "bios_ux.rom", 0x28000, 0x18000, BAD_DUMP CRC(97375ca2) SHA1(bfe458f671d90692104d0640730972ca8dc0a100) )
 
-	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x700000, "ex_wram", ROMREGION_ERASE00 )
-
 	ROM_REGION( 0x10000, "soundcpu", 0 )
     ROM_LOAD( "sound_ux.rom", 0x0000, 0x4000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
 
@@ -3155,9 +3097,6 @@ ROM_START( pc9801ux )
 
 	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
 	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
-
-	ROM_REGION( 0x80000, "pcg", ROMREGION_ERASEFF )
-
 ROM_END
 
 /*
@@ -3167,11 +3106,7 @@ RX - 80286 12 (no V30?)
 ROM_START( pc9801rx )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "itf_rs.rom",  0x18000, 0x08000, BAD_DUMP CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
-    ROM_LOAD( "bios_rx.rom",     0x28000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
-
-	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x700000, "ex_wram", ROMREGION_ERASE00 )
+    ROM_LOAD( "bios_rx.rom", 0x28000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
     ROM_LOAD( "sound_rx.rom",    0x000000, 0x004000, CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef) )
@@ -3181,9 +3116,6 @@ ROM_START( pc9801rx )
 
 	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
 	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
-
-	ROM_REGION( 0x80000, "pcg", ROMREGION_ERASEFF )
-
 ROM_END
 
 /*
@@ -3196,10 +3128,6 @@ ROM_START( pc9801rs )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "itf_rs.rom",  0x18000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
 	ROM_LOAD( "bios_rs.rom", 0x28000, 0x18000, BAD_DUMP CRC(315d2703) SHA1(4f208d1dbb68373080d23bff5636bb6b71eb7565) )
-
-	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x700000, "ex_wram", ROMREGION_ERASE00 )
 
 	/* following is an emulator memory dump, should be checked and nuked */
 	ROM_REGION( 0x100000, "memory", 0 )
@@ -3220,9 +3148,6 @@ ROM_START( pc9801rs )
 
 	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
 	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
-
-	ROM_REGION( 0x80000, "pcg", ROMREGION_ERASEFF )
-
 ROM_END
 
 /*
@@ -3234,11 +3159,7 @@ TODO: this ISN'T a real VM model!
 ROM_START( pc9801vm )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "itf_rs.rom",  0x18000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
-    ROM_LOAD( "bios_vm.rom",     0x028000, 0x018000, CRC(2e2d7cee) SHA1(159549f845dc70bf61955f9469d2281a0131b47f) )
-
-	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x700000, "ex_wram", ROMREGION_ERASE00 )
+    ROM_LOAD( "bios_vm.rom", 0x28000, 0x018000, CRC(2e2d7cee) SHA1(159549f845dc70bf61955f9469d2281a0131b47f) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
     ROM_LOAD( "sound_vm.rom",    0x000000, 0x004000, CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef) )
@@ -3248,8 +3169,6 @@ ROM_START( pc9801vm )
 
 	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
 	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
-
-	ROM_REGION( 0x80000, "pcg", ROMREGION_ERASEFF )
 ROM_END
 
 /*
@@ -3263,17 +3182,8 @@ ROM_START( pc9821 )
 	ROM_LOAD( "itf.rom",  0x18000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
 	ROM_LOAD( "bios.rom", 0x28000, 0x18000, BAD_DUMP CRC(34a19a59) SHA1(2e92346727b0355bc1ec9a7ded1b444a4917f2b9) )
 
-	ROM_REGION( 0x2000, "ide", ROMREGION_ERASEFF )
-	ROM_LOAD( "ide.rom",  0x00000, 0x02000, NO_DUMP )
-	ROM_FILL( 0x0000, 0x2000, 0xcb )
-
-	ROM_REGION( 0x4000, "unkrom", ROMREGION_ERASEFF ) // pnp?
-	ROM_LOAD( "unk.rom",  0x00000, 0x04000, NO_DUMP )
-	ROM_FILL( 0x0000, 0x4000, 0xcb )
-
-	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x700000, "ex_wram", ROMREGION_ERASE00 )
+	LOAD_IDE_ROM
+	LOAD_UNK_ROM
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
@@ -3286,8 +3196,6 @@ ROM_START( pc9821 )
 	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x8000, BAD_DUMP CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) )
 	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x10000, 0x8000, BAD_DUMP CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) )
 	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x10001, 0x8000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) )
-
-	ROM_REGION( 0x80000, "pcg", ROMREGION_ERASEFF )
 ROM_END
 
 /*
@@ -3296,20 +3204,11 @@ As - 80486DX 33
 
 ROM_START( pc9821as )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf.rom",  0x18000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
-    ROM_LOAD( "bios_as.rom",     0x028000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
+	ROM_LOAD( "itf.rom",     0x18000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+    ROM_LOAD( "bios_as.rom", 0x28000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
 
-	ROM_REGION( 0x2000, "ide", ROMREGION_ERASEFF )
-	ROM_LOAD( "ide.rom",  0x00000, 0x02000, NO_DUMP )
-	ROM_FILL( 0x0000, 0x2000, 0xcb )
-
-	ROM_REGION( 0x4000, "unkrom", ROMREGION_ERASEFF ) // pnp?
-	ROM_LOAD( "unk.rom",  0x00000, 0x04000, NO_DUMP )
-	ROM_FILL( 0x0000, 0x4000, 0xcb )
-
-	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x700000, "ex_wram", ROMREGION_ERASE00 )
+	LOAD_IDE_ROM
+	LOAD_UNK_ROM
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
     ROM_LOAD( "sound_as.rom",    0x000000, 0x004000, CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef) )
@@ -3319,8 +3218,6 @@ ROM_START( pc9821as )
 
 	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
 	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
-
-	ROM_REGION( 0x80000, "pcg", ROMREGION_ERASEFF )
 ROM_END
 
 
@@ -3330,20 +3227,11 @@ ROM_END
 
 ROM_START( pc9821ne )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf.rom",  0x18000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+	ROM_LOAD( "itf.rom",     0x18000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
 	ROM_LOAD( "bios_ne.rom", 0x28000, 0x18000, BAD_DUMP CRC(2ae070c4) SHA1(d7963942042bfd84ed5fc9b7ba8f1c327c094172) )
 
-	ROM_REGION( 0x2000, "ide", ROMREGION_ERASEFF )
-	ROM_LOAD( "ide.rom",  0x00000, 0x02000, NO_DUMP )
-	ROM_FILL( 0x0000, 0x2000, 0xcb )
-
-	ROM_REGION( 0x4000, "unkrom", ROMREGION_ERASEFF ) // pnp?
-	ROM_LOAD( "unk.rom",  0x00000, 0x04000, NO_DUMP )
-	ROM_FILL( 0x0000, 0x4000, 0xcb )
-
-	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x700000, "ex_wram", ROMREGION_ERASE00 )
+	LOAD_IDE_ROM
+	LOAD_UNK_ROM
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sound_ne.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
@@ -3353,8 +3241,6 @@ ROM_START( pc9821ne )
 
 	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
 	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
-
-	ROM_REGION( 0x80000, "pcg", ROMREGION_ERASEFF )
 ROM_END
 
 /*
@@ -3366,17 +3252,8 @@ ROM_START( pc486mu )
 	ROM_LOAD( "bios_486mu.rom", 0x08000, 0x18000, BAD_DUMP CRC(57b5d701) SHA1(15029800842e93e07615b0fd91fb9f2bfe3e3c24))
 	ROM_RELOAD( 				0x28000, 0x18000 ) // missing rom?
 
-	ROM_REGION( 0x2000, "ide", ROMREGION_ERASEFF )
-	ROM_LOAD( "ide.rom",  0x00000, 0x02000, NO_DUMP )
-	ROM_FILL( 0x0000, 0x2000, 0xcb )
-
-	ROM_REGION( 0x4000, "unkrom", ROMREGION_ERASEFF ) // pnp?
-	ROM_LOAD( "unk.rom",  0x00000, 0x04000, NO_DUMP )
-	ROM_FILL( 0x0000, 0x4000, 0xcb )
-
-	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x700000, "ex_wram", ROMREGION_ERASE00 )
+	LOAD_IDE_ROM
+	LOAD_UNK_ROM
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sound_486mu.rom", 0x0000, 0x4000, CRC(6cdfa793) SHA1(4b8250f9b9db66548b79f961d61010558d6d6e1c))
@@ -3386,8 +3263,6 @@ ROM_START( pc486mu )
 
 	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
 	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
-
-	ROM_REGION( 0x80000, "pcg", ROMREGION_ERASEFF )
 ROM_END
 
 /*
@@ -3397,19 +3272,10 @@ ROM_END
 ROM_START( pc9821ce2 )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "itf_ce2.rom",  0x18000, 0x08000, CRC(273e9e88) SHA1(9bca7d5116788776ed0f297bccb4dfc485379b41) )
-    ROM_LOAD( "bios_ce2.rom",     0x28000, 0x018000, BAD_DUMP CRC(76affd90) SHA1(910fae6763c0cd59b3957b6cde479c72e21f33c1) )
+    ROM_LOAD( "bios_ce2.rom", 0x28000, 0x018000, BAD_DUMP CRC(76affd90) SHA1(910fae6763c0cd59b3957b6cde479c72e21f33c1) )
 
-	ROM_REGION( 0x2000, "ide", ROMREGION_ERASEFF )
-	ROM_LOAD( "ide.rom",  0x00000, 0x02000, NO_DUMP )
-	ROM_FILL( 0x0000, 0x2000, 0xcb )
-
-	ROM_REGION( 0x4000, "unkrom", ROMREGION_ERASEFF ) // pnp?
-	ROM_LOAD( "unk.rom",  0x00000, 0x04000, NO_DUMP )
-	ROM_FILL( 0x0000, 0x4000, 0xcb )
-
-	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x700000, "ex_wram", ROMREGION_ERASE00 )
+	LOAD_IDE_ROM
+	LOAD_UNK_ROM
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
     ROM_LOAD( "sound_ce2.rom",    0x000000, 0x004000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
@@ -3419,8 +3285,6 @@ ROM_START( pc9821ce2 )
 
 	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
 	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
-
-	ROM_REGION( 0x80000, "pcg", ROMREGION_ERASEFF )
 ROM_END
 
 /*
@@ -3432,17 +3296,8 @@ ROM_START( pc9821xs )
 	ROM_LOAD( "itf.rom",  0x18000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
     ROM_LOAD( "bios_xs.rom",     0x28000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
 
-	ROM_REGION( 0x2000, "ide", ROMREGION_ERASEFF )
-	ROM_LOAD( "ide.rom",  0x00000, 0x02000, NO_DUMP )
-	ROM_FILL( 0x0000, 0x2000, 0xcb )
-
-	ROM_REGION( 0x4000, "unkrom", ROMREGION_ERASEFF ) // pnp?
-	ROM_LOAD( "unk.rom",  0x00000, 0x04000, NO_DUMP )
-	ROM_FILL( 0x0000, 0x4000, 0xcb )
-
-	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x700000, "ex_wram", ROMREGION_ERASE00 )
+	LOAD_IDE_ROM
+	LOAD_UNK_ROM
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
     ROM_LOAD( "sound_xs.rom",    0x000000, 0x004000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
@@ -3452,8 +3307,6 @@ ROM_START( pc9821xs )
 
 	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
 	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
-
-	ROM_REGION( 0x80000, "pcg", ROMREGION_ERASEFF )
 ROM_END
 
 
@@ -3463,20 +3316,11 @@ ROM_END
 
 ROM_START( pc9821v13 )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf.rom",  0x18000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+	ROM_LOAD( "itf.rom",      0x18000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
 	ROM_LOAD( "bios_v13.rom", 0x28000, 0x18000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
 
-	ROM_REGION( 0x2000, "ide", ROMREGION_ERASEFF )
-	ROM_LOAD( "ide.rom",  0x00000, 0x02000, NO_DUMP )
-	ROM_FILL( 0x0000, 0x2000, 0xcb )
-
-	ROM_REGION( 0x4000, "unkrom", ROMREGION_ERASEFF ) // pnp?
-	ROM_LOAD( "unk.rom",  0x00000, 0x04000, NO_DUMP )
-	ROM_FILL( 0x0000, 0x4000, 0xcb )
-
-	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x700000, "ex_wram", ROMREGION_ERASE00 )
+	LOAD_IDE_ROM
+	LOAD_UNK_ROM
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sound_v13.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
@@ -3486,8 +3330,6 @@ ROM_START( pc9821v13 )
 
 	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
 	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
-
-	ROM_REGION( 0x80000, "pcg", ROMREGION_ERASEFF )
 ROM_END
 
 /*
@@ -3497,19 +3339,10 @@ ROM_END
 ROM_START( pc9821v20 )
 	ROM_REGION( 0x60000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "itf_v20.rom",  0x18000, 0x08000, CRC(10e52302) SHA1(f95b8648e3f5a23e507a9fbda8ab2e317d8e5151) )
-	ROM_LOAD( "bios_v20.rom",     0x28000, 0x018000, BAD_DUMP CRC(d5d1f13b) SHA1(bf44b5f4e138e036f1b848d6616fbd41b5549764) )
+	ROM_LOAD( "bios_v20.rom", 0x28000, 0x018000, BAD_DUMP CRC(d5d1f13b) SHA1(bf44b5f4e138e036f1b848d6616fbd41b5549764) )
 
-	ROM_REGION( 0x2000, "ide", ROMREGION_ERASEFF )
-	ROM_LOAD( "ide.rom",  0x00000, 0x02000, NO_DUMP )
-	ROM_FILL( 0x0000, 0x2000, 0xcb )
-
-	ROM_REGION( 0x4000, "unkrom", ROMREGION_ERASEFF ) // pnp?
-	ROM_LOAD( "unk.rom",  0x00000, 0x04000, NO_DUMP )
-	ROM_FILL( 0x0000, 0x4000, 0xcb )
-
-	ROM_REGION( 0x0a0000, "wram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x700000, "ex_wram", ROMREGION_ERASE00 )
+	LOAD_IDE_ROM
+	LOAD_UNK_ROM
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
     ROM_LOAD( "sound_v20.rom",    0x000000, 0x004000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
@@ -3519,8 +3352,6 @@ ROM_START( pc9821v20 )
 
 	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
 	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
-
-	ROM_REGION( 0x80000, "pcg", ROMREGION_ERASEFF )
 ROM_END
 
 /* Genuine dumps */
