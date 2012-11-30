@@ -1467,8 +1467,8 @@ WRITE8_MEMBER(pc9801_state::pc9810rs_fdc_ctrl_w)
 	machine().device<upd765a_device>("upd765_2hd")->set_rate(data & 0x02 ? 500000 : 250000);
 
 	m_fdc_ctrl = data;
-	if(data & 0xfc)
-		printf("FDC ctrl called with %02x\n",data);
+	//if(data & 0xfc)
+	//	printf("FDC ctrl called with %02x\n",data);
 }
 
 READ8_MEMBER(pc9801_state::pc9801rs_2hd_r)
@@ -1743,7 +1743,7 @@ READ8_MEMBER(pc9801_state::pc9821_memory_r)
 	else if(offset >= 0x00f00000 && offset <= 0x00f9ffff)					{ return pc9821_ext_gvram_r(space,offset-0x00f00000); }
 	else if(offset >= 0xfffe0000 && offset <= 0xffffffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
 
-	printf("%08x\n",offset);
+	//printf("%08x\n",offset);
 	return 0x00;
 }
 
@@ -1770,8 +1770,8 @@ WRITE8_MEMBER(pc9801_state::pc9821_memory_w)
 	else if(offset >= 0x000e8000 && offset <= 0x000fffff)					{ /* TODO: shadow ROM */                               }
 	else if(offset >= 0x00100000 && offset <= 0x00100000+m_ram_size-1)      { pc9801rs_ex_wram_w(space,offset-0x00100000,data);    }
 	else if(offset >= 0x00f00000 && offset <= 0x00f9ffff)					{ pc9821_ext_gvram_w(space,offset-0x00f00000,data);    }
-	else
-		printf("%08x %08x\n",offset,data);
+	//else
+	//	printf("%08x %08x\n",offset,data);
 
 }
 
@@ -2662,7 +2662,7 @@ void pc9801_state::pc9801rs_fdc_irq(bool state)
 {
 	/* 0xffaf8 */
 
-	printf("%02x %d\n",m_fdc_ctrl,state);
+	//cprintf("%02x %d\n",m_fdc_ctrl,state);
 
 	if(m_fdc_ctrl & 1)
 		pic8259_ir3_w(machine().device("pic8259_slave"), state);
@@ -2672,6 +2672,8 @@ void pc9801_state::pc9801rs_fdc_irq(bool state)
 
 void pc9801_state::pc9801rs_fdc_drq(bool state)
 {
+	printf("DRQ %d\n",state);
+
 	if(m_fdc_ctrl & 1)
 		m_dmac->dreq2_w(state);
 	else
