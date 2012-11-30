@@ -260,6 +260,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dmac(*this, "i8237"),
+		m_fdc_2hd(*this, "upd765_2hd"),
+		m_fdc_2dd(*this, "upd765_2dd"),
 		m_rtc(*this, UPD1990A_TAG),
 		m_sio(*this, UPD8251_TAG),
 		m_hgdc1(*this, "upd7220_chr"),
@@ -269,6 +271,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<am9517a_device> m_dmac;
+	required_device<upd765a_device> m_fdc_2hd;
+	optional_device<upd765a_device> m_fdc_2dd;
 	required_device<upd1990a_device> m_rtc;
 	required_device<i8251_device> m_sio;
 	required_device<upd7220_device> m_hgdc1;
@@ -441,6 +445,7 @@ public:
 	void fdc_2dd_drq(bool state);
 
 	void pc9801rs_fdc_irq(bool state);
+	void pc9801rs_fdc_drq(bool state);
 
 private:
 	UINT8 m_sdip_read(UINT16 port, UINT8 sdip_offset);
@@ -484,7 +489,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_2hd_drq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_irq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_drq);
-	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_irq);
+//	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_irq);
 };
 
 
@@ -771,8 +776,8 @@ WRITE8_MEMBER(pc9801_state::pc9801_20_w)
 	}
 	else // odd
 	{
-		printf("Write to DMA bank register %d %02x\n",(offset >> 1) & 3,data);
-		m_dma_offset[(offset >> 1) & 3] = data & 0x0f; // TODO: old was +1? Why?
+		printf("Write to DMA bank register %d %02x\n",((offset >> 1)+1) & 3,data);
+		m_dma_offset[((offset >> 1)+1) & 3] = data & 0x0f;
 	}
 }
 
@@ -1620,7 +1625,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,        pc9801_00_w,        0xffffffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
-
+	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(pc9801_20_r,        pc9801_20_w,        0xffffffff) // RTC / DMA registers (LS244)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffffffff) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(pc9801_40_r,        pc9801_40_w,        0xffffffff) //i8255 printer port / i8251 keyboard
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(pc9801_60_r,        pc9801_60_w,        0xffffffff) //upd7220 character ports / <undefined>
@@ -1676,7 +1681,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,        pc9801_00_w,        0xffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
-
+	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(pc9801_20_r,        pc9801_20_w,        0xffff) // RTC / DMA registers (LS244)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffff) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(pc9801_40_r,        pc9801_40_w,        0xffff) //i8255 printer port / i8251 keyboard
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(pc9801_60_r,        pc9801_60_w,        0xffff) //upd7220 character ports / <undefined>
@@ -1945,7 +1950,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,        pc9801_00_w,        0xffffffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
-
+	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(pc9801_20_r,        pc9801_20_w,        0xffffffff) // RTC / DMA registers (LS244)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffffffff) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(pc9801_40_r,        pc9801_40_w,        0xffffffff) //i8255 printer port / i8251 keyboard
 	AM_RANGE(0x005c, 0x005f) AM_READ(pc9821_timestamp_r) AM_WRITENOP
@@ -2476,7 +2481,7 @@ WRITE_LINE_MEMBER(pc9801_state::pc9801_dma_hrq_changed)
 WRITE_LINE_MEMBER(pc9801_state::pc9801_tc_w )
 {
 	/* floppy terminal count */
-//	m_fdc->tc_w(state);
+	m_fdc_2hd->tc_w(state);
 
 //	printf("TC %02x\n",state);
 }
@@ -2513,19 +2518,17 @@ WRITE_LINE_MEMBER(pc9801_state::pc9801_dack1_w){ /*printf("%02x 1\n",state);*/ s
 WRITE_LINE_MEMBER(pc9801_state::pc9801_dack2_w){ /*printf("%02x 2\n",state);*/ set_dma_channel(machine(), 2, state); }
 WRITE_LINE_MEMBER(pc9801_state::pc9801_dack3_w){ /*printf("%02x 3\n",state);*/ set_dma_channel(machine(), 3, state); }
 
-/* TODO: double check channel for this one */
 READ8_MEMBER(pc9801_state::fdc_r)
 {
-	printf("2dd DACK R\n");
-
-	return 0xff;
+	return m_fdc_2hd->dma_r();
 }
 
 WRITE8_MEMBER(pc9801_state::fdc_w)
 {
-	printf("2dd DACK W\n");
+	m_fdc_2hd->dma_w(data);
 }
 
+/* TODO: check channels for this */
 static I8237_INTERFACE( dmac_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dma_hrq_changed),
@@ -2534,6 +2537,23 @@ static I8237_INTERFACE( dmac_intf )
 	DEVCB_DRIVER_MEMBER(pc9801_state, pc9801_dma_write_byte),
 	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,fdc_r), DEVCB_DRIVER_MEMBER(pc9801_state,fdc_r), DEVCB_DRIVER_MEMBER(pc9801_state,fdc_r) },
 	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,fdc_w), DEVCB_DRIVER_MEMBER(pc9801_state,fdc_w), DEVCB_DRIVER_MEMBER(pc9801_state,fdc_w) },
+	{ DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack0_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack1_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack2_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack3_w) }
+};
+
+
+/*
+ch1 cs-4231a
+ch2 FDC
+ch3 SCSI
+*/
+static I8237_INTERFACE( pc9801rs_dmac_intf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dma_hrq_changed),
+	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_tc_w),
+	DEVCB_DRIVER_MEMBER(pc9801_state, pc9801_dma_read_byte),
+	DEVCB_DRIVER_MEMBER(pc9801_state, pc9801_dma_write_byte),
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,fdc_r), DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,fdc_w), DEVCB_NULL },
 	{ DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack0_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack1_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack2_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack3_w) }
 };
 
@@ -2650,6 +2670,14 @@ void pc9801_state::pc9801rs_fdc_irq(bool state)
 		pic8259_ir2_w(machine().device("pic8259_slave"), state);
 }
 
+void pc9801_state::pc9801rs_fdc_drq(bool state)
+{
+	if(m_fdc_ctrl & 1)
+		m_dmac->dreq2_w(state);
+	else
+		printf("DRQ %02x %d\n",m_fdc_ctrl,state);
+}
+
 static UPD1990A_INTERFACE( pc9801_upd1990a_intf )
 {
 	DEVCB_NULL,
@@ -2736,7 +2764,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9801rs)
 	upd765a_device *fdc;
 	fdc = machine().device<upd765a_device>(":upd765_2hd");
 	fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc9801_state::pc9801rs_fdc_irq), this));
-	fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2hd_drq), this));
+	fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::pc9801rs_fdc_drq), this));
 }
 
 MACHINE_START_MEMBER(pc9801_state,pc9821)
@@ -2920,7 +2948,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801rs)
 
 	MCFG_PIT8253_ADD( "pit8253", pc9801rs_pit8253_config )
-	MCFG_I8237_ADD("i8237", 16000000, dmac_intf) // unknown clock
+	MCFG_I8237_ADD("i8237", 16000000, pc9801rs_dmac_intf) // unknown clock
 	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
 	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
@@ -2981,7 +3009,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9821)
 
 	MCFG_PIT8253_ADD( "pit8253", pc9801rs_pit8253_config )
-	MCFG_I8237_ADD("i8237", 16000000, dmac_intf) // unknown clock
+	MCFG_I8237_ADD("i8237", 16000000, pc9801rs_dmac_intf) // unknown clock
 	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
 	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
