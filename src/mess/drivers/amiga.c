@@ -14,6 +14,11 @@ map a mirror of the custom chips right after any fast-mem we mapped.
 If we didn't map any, then we still put a mirror, but where fast-mem
 would commence ($C00000).
 
+Note 2: when you do disk swapping it often causes crashes in the system.
+This is because you have to UNLOAD the image first then LOAD whatever image
+the program asked to. Just like on a real system, apparently the Amiga is
+very fussy with the state machine.
+
 ***************************************************************************/
 /*
     Amiga 1200
