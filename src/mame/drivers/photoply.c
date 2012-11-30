@@ -38,6 +38,10 @@ public:
 	device_t	*m_pic8259_2;
 	device_t	*m_dma8237_1;
 	device_t	*m_dma8237_2;
+	DECLARE_READ32_MEMBER(ide_r);
+	DECLARE_WRITE32_MEMBER(ide_w);
+	DECLARE_READ32_MEMBER(fdc_r);
+	DECLARE_WRITE32_MEMBER(fdc_w);
 	DECLARE_READ8_MEMBER(pc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 	DECLARE_READ8_MEMBER(dma_page_select_r);
@@ -165,6 +169,31 @@ static I8237_INTERFACE( dma8237_2_config )
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
+READ32_MEMBER(photoply_state::ide_r)
+{
+	device_t *device = machine().device("ide");
+	return ide_controller32_r(device, space, 0x1f0/4 + offset, mem_mask);
+}
+
+WRITE32_MEMBER(photoply_state::ide_w)
+{
+	device_t *device = machine().device("ide");
+	ide_controller32_w(device, space, 0x1f0/4 + offset, data, mem_mask);
+}
+
+READ32_MEMBER(photoply_state::fdc_r)
+{
+	device_t *device = machine().device("ide");
+	return ide_controller32_r(device, space, 0x3f0/4 + offset, mem_mask);
+}
+
+WRITE32_MEMBER(photoply_state::fdc_w)
+{
+	device_t *device = machine().device("ide");
+	//mame_printf_debug("FDC: write %08X, %08X, %08X\n", data, offset, mem_mask);
+	ide_controller32_w(device, space, 0x3f0/4 + offset, data, mem_mask);
+}
+
 
 /******************
 8259 IRQ controller
@@ -259,13 +288,14 @@ static ADDRESS_MAP_START( photoply_io, AS_IO, 32, photoply_state )
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8_LEGACY("dma8237_2", i8237_r, i8237_w, 0xffff)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
+	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
 	AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
 	AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
 	//AM_RANGE(0x03bc, 0x03bf) AM_RAM //parallel port 3
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", vga_device, port_03b0_r, port_03b0_w, 0xffffffff)
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", vga_device, port_03c0_r, port_03c0_w, 0xffffffff)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", vga_device, port_03d0_r, port_03d0_w, 0xffffffff)
-//  AM_RANGE(0x03f4, 0x03f7) AM_READ_LEGACY(kludge_r) // fdc
+	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE(fdc_r, fdc_w)
 ADDRESS_MAP_END
 
 #define AT_KEYB_HELPER(bit, text, key1) \
@@ -355,6 +385,9 @@ static MACHINE_CONFIG_START( photoply, photoply_state )
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
 	MCFG_PIT8254_ADD( "pit8254", at_pit8254_config )
 
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_devices, "hdd", NULL, true)
+	MCFG_IDE_CONTROLLER_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
+
 	MCFG_FRAGMENT_ADD( pcvideo_vga )
 MACHINE_CONFIG_END
 
@@ -372,7 +405,7 @@ ROM_START(photoply)
 	ROM_REGION(0x8000, "video_bios", 0 )
 	ROM_LOAD("vga.bin", 0x000000, 0x8000, CRC(7a859659) SHA1(ff667218261969c48082ec12aa91088a01b0cb2a) )
 
-	DISK_REGION( "ide" )
+	DISK_REGION( "drive_0" )
 	DISK_IMAGE( "pp201", 0, SHA1(23e1940d485d19401e7d0ad912ddad2cf2ea10b4) )
 ROM_END
 

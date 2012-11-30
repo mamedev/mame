@@ -306,10 +306,6 @@ WRITE32_MEMBER(calchase_state::ide_w)
 	ide_controller32_w(device, space, 0x1f0/4 + offset, data, mem_mask);
 }
 
-
-
-
-
 READ32_MEMBER(calchase_state::fdc_r)
 {
 	device_t *device = machine().device("ide");
@@ -917,7 +913,6 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 	MCFG_CPU_PROGRAM_MAP(calchase_map)
 	MCFG_CPU_IO_MAP(calchase_io)
 
-
 	MCFG_PIT8254_ADD( "pit8254", calchase_pit8254_config )
 	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
 	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
@@ -938,16 +933,13 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 	MCFG_DAC_ADD("dac_l")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5)
-
 	MCFG_DAC_ADD("dac_r")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
-
 MACHINE_CONFIG_END
 
 
 READ32_MEMBER(calchase_state::calchase_idle_skip_r)
 {
-
 	if(space.device().safe_pc()==0x1406f48)
 		m_maincpu->spin_until_interrupt();
 
@@ -956,7 +948,6 @@ READ32_MEMBER(calchase_state::calchase_idle_skip_r)
 
 WRITE32_MEMBER(calchase_state::calchase_idle_skip_w)
 {
-
 	COMBINE_DATA(&m_idle_skip_ram);
 }
 
