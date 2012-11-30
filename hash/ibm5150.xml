@@ -2419,6 +2419,30 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 
 	<!-- OS -->
 
+	<software name="cpm86">
+		<description>CP/M-86 for the IBM Personal Computer</description>
+		<year>1982</year>
+		<publisher>Digital Research</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="cpm86.img" size="163840" crc="79c8ef92" sha1="f4074a4b2f5826faa893869b163461a8808d13ef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ibmdos11">
+		<description>IBM Personal Computer DOS Version 1.10</description>
+		<year>1982</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="1.10" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="ibmdos 1.10.img" size="163840" crc="ddfe9550" sha1="437bec5be7d28cc2248d5477f38a07545816e49a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ibmdos2">
 		<description>IBM Personal Computer DOS Version 2.0</description>
 		<year>1983</year>
