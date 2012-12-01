@@ -36,6 +36,19 @@ Notes: it's important that "user1" is 0xa0000 bytes with empty space filled
        service mode says "6221-51 U5-0 12/02/86"
 
        ---------------------------------------------------------------------------
+
+Merit Riviera Notes - There are several known versions:
+  Riviera Hi-Score
+  Riviera Americana (not dumped)
+  Riviera Super Star (not dumped)
+  Riviera Montana Version (with journal printer, not dumped)
+  Riviera Tennessee Draw (not dumped)
+  Michigan Superstar (not dumped)
+
+  There are several law suites over the Riviera games. Riviera Distributors Inc. bought earlier versions
+  of the various video poker games from Merit. RDI then licensed the games to Michigan Coin Op-Vending
+  Inc. The legal battles over true ownership started in 2004 and carried on through at least 09/01/2011.
+
 */
 
 #include "emu.h"
@@ -971,7 +984,6 @@ static INPUT_PORTS_START( casino5 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1007,7 +1019,6 @@ static INPUT_PORTS_START( casino5 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bigappg )
@@ -1034,7 +1045,6 @@ static INPUT_PORTS_START( bigappg )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1071,7 +1081,121 @@ static INPUT_PORTS_START( bigappg )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
 
+static INPUT_PORTS_START( dodge )
+	PORT_START("IN0") /* These are NOT verified */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME( "Hold 1 / Take / Lo" )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME( "Hold 5 / Double Up / Hi" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME( "Cash Out / Hi-Score" )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, merit_state,rndbit_r, NULL)
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( riviera )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME( "Hold 1 / Take / Lo" )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME( "Hold 5 / Double Up / Hi" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME( "Cash Out / Hi-Score" )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, merit_state,rndbit_r, NULL)
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x00, "Auto Hold" )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Bonus Jackpot" )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "Raise Option" )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Points Per Coin" )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x10, "1" )
+	PORT_DIPNAME( 0x20, 0x00, "Double Up" )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0x00, "Maximum Bet" )	PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0xc0, "20" )
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPSETTING(    0x80, "50" ) /* Duplicate setting */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( couple )
@@ -1276,6 +1400,7 @@ static MACHINE_CONFIG_DERIVED( dodge, pitboss )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dodge_map)
+	MCFG_CPU_IO_MAP(tictac_io_map)
 
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", merit_state, dodge_nvram_init)
 MACHINE_CONFIG_END
@@ -1401,6 +1526,32 @@ ROM_START( casino5 )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "u40", 0x0000, 0x2000, CRC(b13a3fb1) SHA1(25760aa27c88b8be248a87df724bf8797d179e7a) )
+ROM_END
+
+ROM_START( riviera ) /* PAL16L8ANC labeled DEC-003 at U13 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2131-08_u5-4a.u5", 0x0000, 0x8000, CRC(0bc8cf26) SHA1(da52010be2d44a240160bb1a13288b35e8feade2) ) /* 08 U5-4A 111287 2131-84A, label shows (c) 1988 */
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "hisc_u39.u39", 0x00000, 0x2000, CRC(1814c2ea) SHA1(fecc5dc1c0a56cbc7b68ee6a52222de348d6cc79) )
+	ROM_LOAD( "hisc_u38.u38", 0x02000, 0x2000, CRC(ef1d7a80) SHA1(539662bee187a300a6f1bcded954758c87171219) )
+	ROM_LOAD( "hisc_u37.u37", 0x04000, 0x2000, CRC(f6e709f8) SHA1(02905be912d0aa794f82926462f854e8e67dc407) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "hisc_u40.u40", 0x00000, 0x2000, CRC(6d2a1ca8) SHA1(96ef3e0914c2b213ed9c9082fa3e27d75d52a8ec) )
+ROM_END
+
+ROM_START( rivieraa ) /* PAL16L8ANC labeled DEC-003 at U13 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2131-08_u5-4.u5", 0x0000, 0x8000, CRC(ce0b00f2) SHA1(c467c2c08d0bbadf80d67f41e17127e08ce3b3ff) ) /* 08 U5-4 111786 2131-84, label shows (c) 1987 */
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "hisc_u39.u39", 0x00000, 0x2000, CRC(1814c2ea) SHA1(fecc5dc1c0a56cbc7b68ee6a52222de348d6cc79) )
+	ROM_LOAD( "hisc_u38.u38", 0x02000, 0x2000, CRC(ef1d7a80) SHA1(539662bee187a300a6f1bcded954758c87171219) )
+	ROM_LOAD( "hisc_u37.u37", 0x04000, 0x2000, CRC(f6e709f8) SHA1(02905be912d0aa794f82926462f854e8e67dc407) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "hisc_u40.u40", 0x00000, 0x2000, CRC(6d2a1ca8) SHA1(96ef3e0914c2b213ed9c9082fa3e27d75d52a8ec) )
 ROM_END
 
 ROM_START( bigappg )
@@ -2125,11 +2276,14 @@ GAME( 1986, phrcrazeb,phrcraze,phrcraze, phrcrazs, merit_state, key_7,  ROT0,  "
 GAME( 1986, phrcrazec,phrcraze,phrcraze, phrcrazs, merit_state, key_7,  ROT0,  "Merit", "Phraze Craze (Expanded Questions, set 2)",    GAME_SUPPORTS_SAVE )
 GAME( 1986, phrcrazev,phrcraze,phrcraze, phrcrazs, merit_state, key_7,  ROT90, "Merit", "Phraze Craze (Sex Kit, Vertical)",            GAME_SUPPORTS_SAVE )
 
+GAME( 1987, riviera,        0, dodge,   riviera, driver_device,   0,   ROT0,   "Merit", "Riviera Hi-Score (2131-08, U5-4A)",           GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1986, rivieraa, riviera, dodge,   riviera, driver_device,   0,   ROT0,   "Merit", "Riviera Hi-Score (2131-08, U5-4)",            GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+
 GAME( 1986, bigappg,  0,       bigappg,  bigappg, driver_device,  0,    ROT0,  "Merit", "Big Apple Games (2131-13)",                   GAME_SUPPORTS_SAVE )
 
-GAME( 1986, dodgectya,dodgecty,dodge,    couple, driver_device,   0,    ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",                 GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1986, dodgectyb,dodgecty,dodge,    couple, driver_device,   0,    ROT0,  "Merit", "Dodge City (2131-82, U5-50)",                 GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1986, dodgectyc,dodgecty,dodge,    couple, driver_device,   0,    ROT0,  "Merit", "Dodge City (2131-82, U5-0 GT)",               GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1986, dodgectya,dodgecty,dodge,    dodge,  driver_device,   0,    ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",                 GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1986, dodgectyb,dodgecty,dodge,    dodge,  driver_device,   0,    ROT0,  "Merit", "Dodge City (2131-82, U5-50)",                 GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1986, dodgectyc,dodgecty,dodge,    dodge,  driver_device,   0,    ROT0,  "Merit", "Dodge City (2131-82, U5-0 GT)",               GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 
 GAME( 1987, dtrvwz5,  0,       dtrvwz5,  dtrvwh5, merit_state,  dtrvwz5,ROT0,  "Merit", "Deluxe Trivia ? Whiz (Edition 5)",  GAME_SUPPORTS_SAVE )
 
