@@ -434,21 +434,46 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
   | HT04A MB624018 MB624019 |
   | AT28C16                 |
   |                         |
-  |  29F017.1L   29F017A.1U |
+  | 29F017A.1L   29F017A.1U |
+  | 90PFTR       90PFTN     |
   |                         |
-  | 29F017A.2L    29F017.2U |
+  | 29F017A.2L   29F017A.2U |
+  | 90PFTN       90PFTR     |
   |                         |
-  |  29F017.3L   29F017A.3U |
+  | 29F017A.3L   29F017A.3U |
+  | 90PFTR       90PFTN     |
   |                         |
-  | 29F017A.4L    29F017.4U |
+  | 29F017A.4L   29F017A.4U |
+  | 90PFTN       90PFTR     |
   |                         |
-  |-------------------------|
+  |------------------SWITCH-|
+
+  Back
+
+  |----PCMCIA CONNECTOR-----|
+  |                         |
+  |                         |
+  |                         |
+  |                         |
+  | 29F017A.5L   29F017A.5U |
+  | 90PFTR       90PFTN     |
+  |                         |
+  | 29F017A.6L   29F017A.6U |
+  | 90PFTN       90PFTR     |
+  |                         |
+  | 29F017A.7L   29F017A.7U |
+  | 90PFTR       90PFTN     |
+  |                         |
+  | 29F017A.8L   29F017A.8U |
+  | 90PFTN       90PFTR     |
+  |                         |
+  |-SWITCH------------------|
 
   Texas Instruments HT04A
-  Atmel AT28C16 16K (2K x 8) Parallel EEPROM
   Fujitsu MB624018 CMOS GATE ARRAY
   Fujitsu MB624019 CMOS GATE ARRAY
-  Fujitsu 29F017-12PFTR 16M (2M x 8) BIT Flash Memory Reverse Pinout
+  Atmel AT28C16 16K (2K x 8) Parallel EEPROM
+  Fujitsu 29F017A-90PFTR 16M (2M x 8) BIT Flash Memory Reverse Pinout
   Fujitsu 29F017A-90PFTN 16M (2M x 8) BIT Flash Memory Standard Pinout
 
   */
