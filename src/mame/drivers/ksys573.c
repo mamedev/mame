@@ -473,7 +473,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
   Fujitsu MB624018 CMOS GATE ARRAY
   Fujitsu MB624019 CMOS GATE ARRAY
   Atmel AT28C16 16K (2K x 8) Parallel EEPROM
-  Fujitsu 29F017A-90PFTR 16M (2M x 8) BIT Flash Memory Reverse Pinout
+  Fujitsu 29F017A-90PFTR 16M (2M x 8) BIT Flash Memory Reverse Pinout (Gachaga Champ card used 29F017-12PFTR instead)
   Fujitsu 29F017A-90PFTN 16M (2M x 8) BIT Flash Memory Standard Pinout
 
   */
