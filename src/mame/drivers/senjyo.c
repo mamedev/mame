@@ -7,7 +7,11 @@ driver by Mirko Buffoni
 TODO:
 - wrong background colors in baluba, intermissions after round 13 (btanb or
   fixed at some point)
+- Star Force: the Larios is supposed to blink at the third loop of the BGM.
+  Right now it does at second and half, presumably due of the unknown PCB clocks.
 
+Note:
+- Star Force shows default MAME palette at POST. Putted it all_black for now.
 
 This board was obviously born to run Senjyo. Four scrolling layers, gradient
 background, sprite/background priorities, and even a small bitmap for the
@@ -181,14 +185,12 @@ ADDRESS_MAP_END
 /* are scroll registers 1+2 linked on the bootleg?, only one copy is written */
 WRITE8_MEMBER(senjyo_state::starforb_scrolly2)
 {
-
 	m_scrolly2[offset] = data;
 	m_scrolly1[offset] = data;
 }
 
 WRITE8_MEMBER(senjyo_state::starforb_scrollx2)
 {
-
 	m_scrollx2[offset] = data;
 	m_scrollx1[offset] = data;
 }
@@ -592,7 +594,7 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 
 	MCFG_GFXDECODE(senjyo)
 	MCFG_PALETTE_LENGTH(512+2)	/* 512 real palette + 2 for the radar */
-
+	MCFG_PALETTE_INIT(all_black)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
