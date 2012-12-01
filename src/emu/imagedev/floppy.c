@@ -108,6 +108,11 @@ void floppy_image_device::setup_index_pulse_cb(index_pulse_cb cb)
 	cur_index_pulse_cb = cb;
 }
 
+void floppy_image_device::setup_ready_cb(ready_cb cb)
+{
+	cur_ready_cb = cb;
+}
+
 void floppy_image_device::set_formats(const floppy_format_type *formats)
 {
 	image_device_format **formatptr;
@@ -205,6 +210,8 @@ void floppy_image_device::device_start()
 	dskchg = exists() ? 1 : 0;
 	index_timer = timer_alloc(0);
 	image_dirty = false;
+	ready = true;
+	ready_counter = 0;
 }
 
 void floppy_image_device::device_reset()
@@ -212,6 +219,11 @@ void floppy_image_device::device_reset()
 	revolution_start_time = attotime::never;
 	revolution_count = 0;
 	mon = 1;
+	if(!ready) {
+		ready = true;
+		if(!cur_ready_cb.isnull())
+			cur_ready_cb(this, ready);
+	}
 	if(motor_always_on)
 		mon_w(0);
 }
@@ -280,6 +292,10 @@ bool floppy_image_device::call_load()
 
 	if (!cur_load_cb.isnull())
 		return cur_load_cb(this);
+
+	if(motor_always_on || !mon)
+		ready_counter = 2;
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -295,6 +311,11 @@ void floppy_image_device::call_unload()
 	}
 	if (!cur_unload_cb.isnull())
 		cur_unload_cb(this);
+	if(!ready) {
+		ready = true;
+		if(!cur_ready_cb.isnull())
+			cur_ready_cb(this, ready);
+	}
 }
 
 bool floppy_image_device::call_create(int format_type, option_resolution *format_options)
@@ -316,6 +337,7 @@ void floppy_image_device::mon_w(int state)
 	if (!mon && image)
 	{
 		revolution_start_time = machine().time();
+		ready_counter = 2;
 		index_resync();
 	}
 
@@ -325,6 +347,11 @@ void floppy_image_device::mon_w(int state)
 			commit_image();
 		revolution_start_time = attotime::never;
 		index_timer->adjust(attotime::zero);
+		if(!ready) {
+			ready = true;
+			if(!cur_ready_cb.isnull())
+				cur_ready_cb(this, ready);
+		}
 	}
 }
 
@@ -365,7 +392,14 @@ void floppy_image_device::index_resync()
 
 	if(new_idx != idx) {
 		idx = new_idx;
-
+		if(idx && ready) {
+			ready_counter--;
+			if(!ready_counter) {
+				ready = false;
+				if(!cur_ready_cb.isnull())
+					cur_ready_cb(this, ready);
+			}
+		}
 		if (!cur_index_pulse_cb.isnull())
 			cur_index_pulse_cb(this, idx);
 	}
@@ -373,14 +407,7 @@ void floppy_image_device::index_resync()
 
 bool floppy_image_device::ready_r()
 {
-	if (exists())
-	{
-		if (mon == 0)
-		{
-			return 0;
-		}
-	}
-	return 1;
+	return ready;
 }
 
 double floppy_image_device::get_pos()

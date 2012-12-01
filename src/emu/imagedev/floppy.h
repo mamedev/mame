@@ -49,6 +49,7 @@ public:
 	typedef delegate<int (floppy_image_device *)> load_cb;
 	typedef delegate<void (floppy_image_device *)> unload_cb;
 	typedef delegate<void (floppy_image_device *, int)> index_pulse_cb;
+	typedef delegate<void (floppy_image_device *, int)> ready_cb;
 
 	// construction/destruction
 	floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
@@ -83,6 +84,7 @@ public:
 	void setup_load_cb(load_cb cb);
 	void setup_unload_cb(unload_cb cb);
 	void setup_index_pulse_cb(index_pulse_cb cb);
+	void setup_ready_cb(ready_cb cb);
 
 	UINT32* get_buffer() { return image->get_buffer(cyl, ss); }
 	UINT32 get_len() { return image->get_track_size(cyl, ss); }
@@ -149,6 +151,7 @@ protected:
 	int wpt;  /* write protect */
 	int rdy;  /* ready */
 	int dskchg;     /* disk changed */
+	bool ready;
 
 	/* rotation per minute => gives index pulse frequency */
 	float rpm;
@@ -158,10 +161,12 @@ protected:
 	int cyl;
 
 	bool image_dirty;
+	int ready_counter;
 
 	load_cb cur_load_cb;
 	unload_cb cur_unload_cb;
 	index_pulse_cb cur_index_pulse_cb;
+	ready_cb cur_ready_cb;
 
 	UINT32 find_position(attotime &base, attotime when);
 	int find_index(UINT32 position, const UINT32 *buf, int buf_size);
