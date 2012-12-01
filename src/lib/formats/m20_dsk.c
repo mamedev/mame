@@ -167,3 +167,115 @@ static FLOPPY_CONSTRUCT(m20_dsk_construct)
 LEGACY_FLOPPY_OPTIONS_START( m20 )
 	LEGACY_FLOPPY_OPTION(m20_dsk, "img", "M20 disk image", m20_dsk_identify, m20_dsk_construct, NULL, NULL)
 LEGACY_FLOPPY_OPTIONS_END
+
+
+/***************************************************************************
+
+    Copyright Olivier Galibert
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+****************************************************************************/
+
+/*********************************************************************
+
+    formats/m20_dsk.c
+
+    m20 format
+
+*********************************************************************/
+
+#include "emu.h"
+#include "formats/m20_dsk.h"
+
+m20_format::m20_format()
+{
+}
+
+const char *m20_format::name() const
+{
+	return "m20";
+}
+
+const char *m20_format::description() const
+{
+	return "M20 disk image";
+}
+
+const char *m20_format::extensions() const
+{
+	return "img";
+}
+
+bool m20_format::supports_save() const
+{
+	return false;
+}
+
+int m20_format::identify(io_generic *io, UINT32 form_factor)
+{
+	if(io_generic_size(io) == 286720)
+		return 50;
+	return 0;
+}
+
+bool m20_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+{
+	for(int track = 0; track < 35; track++)
+		for(int head = 0; head < 2; head ++) {
+			bool mfm = track || head;
+			desc_pc_sector sects[16];
+			UINT8 sectdata[16*256];
+			io_generic_read(io, sectdata, 16*256*(track*2+head), 16*256);
+			for(int i=0; i<16; i++) {
+				int j = i/2 + (i & 1 ? 0 : 8);
+				sects[i].track = track;
+				sects[i].head = head;
+				sects[i].sector = j+1;
+				sects[i].size = mfm ? 1 : 0;
+				sects[i].actual_size = mfm ? 256 : 128;
+				sects[i].data = sectdata + 256*j;
+				sects[i].deleted = false;
+				sects[i].bad_crc = false;
+			}
+
+			if(mfm)
+				build_wd_track_mfm(track, head, image, 100000, 16, sects, 50, 32, 22);
+			else
+				build_wd_track_fm(track, head, image, 50000, 16, sects, 24, 16, 11);
+		}
+				
+	return true;
+}
+
+bool m20_format::save(io_generic *io, floppy_image *image)
+{
+	return false;
+}
+
+const floppy_format_type FLOPPY_M20_FORMAT = &floppy_image_format_creator<m20_format>;

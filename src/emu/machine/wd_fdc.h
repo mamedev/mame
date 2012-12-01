@@ -156,6 +156,7 @@ public:
 
 protected:
 	// Chip-specific configuration flags
+	bool disable_mfm;
 	bool inverted_bus;
 	bool side_control;
 	bool side_compare;
@@ -171,7 +172,7 @@ protected:
 	virtual int step_time(int mode) const;
 	virtual int settle_time() const;
 
-	virtual void pll_reset(attotime when) = 0;
+	virtual void pll_reset(bool fm, attotime when) = 0;
 	virtual void pll_start_writing(attotime tm) = 0;
 	virtual void pll_commit(floppy_image_device *floppy, attotime tm) = 0;
 	virtual void pll_stop_writing(floppy_image_device *floppy, attotime tm) = 0;
@@ -398,6 +399,7 @@ private:
 
 	void live_write_raw(UINT16 raw);
 	void live_write_mfm(UINT8 mfm);
+	void live_write_fm(UINT8 fm);
 
 	void drop_drq();
 	void set_drq();
@@ -408,7 +410,7 @@ public:
 	wd_fdc_analog_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void pll_reset(attotime when);
+	virtual void pll_reset(bool fm, attotime when);
 	virtual void pll_start_writing(attotime tm);
 	virtual void pll_commit(floppy_image_device *floppy, attotime tm);
 	virtual void pll_stop_writing(floppy_image_device *floppy, attotime tm);
@@ -426,7 +428,7 @@ public:
 	wd_fdc_digital_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual void pll_reset(attotime when);
+	virtual void pll_reset(bool fm, attotime when);
 	virtual void pll_start_writing(attotime tm);
 	virtual void pll_commit(floppy_image_device *floppy, attotime tm);
 	virtual void pll_stop_writing(floppy_image_device *floppy, attotime tm);

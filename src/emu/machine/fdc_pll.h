@@ -24,6 +24,8 @@ public:
 	void start_writing(attotime tm);
 	void commit(floppy_image_device *floppy, attotime tm);
 	void stop_writing(floppy_image_device *floppy, attotime tm);
+
+	astring tts(attotime tm);
 };
 
 #endif

@@ -38,7 +38,7 @@ EI1     Vectored interrupt error
 #include "cpu/z8000/z8000.h"
 #include "cpu/i86/i86.h"
 #include "video/mc6845.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
@@ -58,7 +58,9 @@ public:
         m_ttyi8251(*this, "i8251_2"),
         m_i8255(*this, "ppi8255"),
         m_i8259(*this, "i8259"),
-		m_wd177x(*this, "fd1797"),
+		m_fd1797(*this, "fd1797"),
+		m_floppy0(*this, "fd1797:0:5dd"),
+		m_floppy1(*this, "fd1797:1:5dd"),
 		m_p_videoram(*this, "p_videoram"){ }
 
     required_device<z8001_device> m_maincpu;
@@ -66,10 +68,13 @@ public:
     required_device<i8251_device> m_ttyi8251;
     required_device<i8255_device> m_i8255;
     required_device<pic8259_device> m_i8259;
-    required_device<fd1797_device> m_wd177x;
+    required_device<fd1797_t> m_fd1797;
+	required_device<floppy_image_device> m_floppy0;
+	required_device<floppy_image_device> m_floppy1;
 
 	required_shared_ptr<UINT16> m_p_videoram;
 
+    virtual void machine_start();
     virtual void machine_reset();
 
     DECLARE_READ16_MEMBER(m20_i8259_r);
@@ -84,20 +89,21 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(kbd_tx);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 
-	bool m_port21_sd;
-
 private:
 	bool m_kbrecv_in_progress;
 	int m_kbrecv_bitcount;
 	UINT16 m_kbrecv_data;
 	UINT8 m_port21;
+
 public:
 	DECLARE_DRIVER_INIT(m20);
 	virtual void video_start();
 	UINT32 screen_update_m20(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(kbd_rxrdy_int);
-	DECLARE_READ_LINE_MEMBER(wd177x_dden_r);
-	DECLARE_WRITE_LINE_MEMBER(wd177x_intrq_w);
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
+	void fdc_intrq_w(bool state);
 };
 
 
@@ -204,32 +210,27 @@ WRITE16_MEMBER(m20_state::port21_w)
 {
 	//printf("port21 write: offset 0x%x, data 0x%x\n", offset, data);
 	m_port21 = (m_port21 & 0xf8) | (data & 0x7);
-	m_port21_sd = (data & 8) ? 1 : 0;
-	//printf("port21: sd = %d\n", m_port21_sd);
 
 	// floppy drive select
 	if (data & 1) {
-		wd17xx_set_drive(m_wd177x, 0);
-		floppy_mon_w(floppy_get_device(machine(), 0) , 0);
-		floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 1, 0);
+		m_floppy0->mon_w(0);
+		m_fd1797->set_floppy(m_floppy0);
 	}
-	else {
-		floppy_mon_w(floppy_get_device(machine(), 0) , 1);
-		floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 0, 0);
-	}
+	else
+		m_floppy0->mon_w(1);
 
 	if (data & 2) {
-		wd17xx_set_drive(m_wd177x, 1);
-		floppy_mon_w(floppy_get_device(machine(), 1) , 0);
-		floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 1, 0);
+		m_floppy1->mon_w(0);
+		m_fd1797->set_floppy(m_floppy1);
 	}
-	else {
-		floppy_mon_w(floppy_get_device(machine(), 1) , 1);
-		floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 0, 0);
-	}
+	else
+		m_floppy1->mon_w(1);
+
+	if(!(data & 3))
+		m_fd1797->set_floppy(NULL);
 
 	// density select 1 - sd, 0 - dd
-	wd17xx_dden_w(m_wd177x, m_port21_sd);
+	m_fd1797->dden_w(data & 8);
 }
 
 READ16_MEMBER(m20_state::m20_i8259_r)
@@ -313,10 +314,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
 
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE8_LEGACY("fd1797", wd17xx_status_r, wd17xx_command_w, 0x00ff)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE8_LEGACY("fd1797", wd17xx_track_r, wd17xx_track_w, 0x00ff)
-	AM_RANGE(0x04, 0x05) AM_DEVREADWRITE8_LEGACY("fd1797", wd17xx_sector_r, wd17xx_sector_w, 0x00ff)
-	AM_RANGE(0x06, 0x07) AM_DEVREADWRITE8_LEGACY("fd1797", wd17xx_data_r, wd17xx_data_w, 0x00ff)
+	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE8("fd1797", fd1797_t, read, write, 0x00ff)
 
 	AM_RANGE(0x20, 0x21) AM_READWRITE(port21_r, port21_w);
 
@@ -368,6 +366,11 @@ static IRQ_CALLBACK( m20_irq_callback )
         return pic8259_acknowledge(device->machine().device("i8259"));
 }
 
+void m20_state::machine_start()
+{
+	m_fd1797->setup_intrq_cb(fd1797_t::line_cb(FUNC(m20_state::fdc_intrq_w), this));
+}
+
 void m20_state::machine_reset()
 {
 	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
@@ -376,12 +379,10 @@ void m20_state::machine_reset()
     ROM += 0x10000; // don't know why they load at an offset, but let's go with it
 
 	m_port21 = 0xff;
-	m_port21_sd = 1;
 
 	m_maincpu->set_irq_acknowledge_callback(m20_irq_callback);
 
-	wd17xx_mr_w(m_wd177x, 0);
-	//wd17xx_mr_w(m_wd177x, space, 1);
+	m_fd1797->reset();
 
     memcpy(RAM, ROM, 8);  // we need only the reset vector
     m_maincpu->reset();     // reset the CPU to ensure it picks up the new vector
@@ -416,15 +417,7 @@ WRITE_LINE_MEMBER(m20_state::kbd_rxrdy_int)
 	pic8259_ir4_w(machine().device("i8259"), state);
 }
 
-#if 1
-READ_LINE_MEMBER(m20_state::wd177x_dden_r)
-{
-	//printf ("wd177x_dden_r called, returning %d\n", !m_port21_sd);
-	return !m_port21_sd;
-}
-#endif
-
-WRITE_LINE_MEMBER(m20_state::wd177x_intrq_w)
+void m20_state::fdc_intrq_w(bool state)
 {
 	pic8259_ir0_w(machine().device("i8259"), state);
 }
@@ -453,14 +446,6 @@ static const i8251_interface tty_i8251_intf =
 	DEVCB_NULL,         // tx ready
 	DEVCB_NULL,         // tx empty
 	DEVCB_NULL          // syndet
-};
-
-const wd17xx_interface m20_wd17xx_interface =
-{
-	/*DEVCB_NULL,*/ DEVCB_DRIVER_LINE_MEMBER(m20_state, wd177x_dden_r),
-	DEVCB_DRIVER_LINE_MEMBER(m20_state, wd177x_intrq_w),
-	DEVCB_NULL,
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
 };
 
 static const floppy_interface m20_floppy_interface =
@@ -539,6 +524,14 @@ const struct pic8259_interface pic_intf =
 	DEVCB_NULL
 };
 
+static SLOT_INTERFACE_START( m20_floppies )
+	SLOT_INTERFACE( "5dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
+
+FLOPPY_FORMATS_MEMBER( m20_state::floppy_formats )
+	FLOPPY_M20_FORMAT
+FLOPPY_FORMATS_END
+
 static MACHINE_CONFIG_START( m20, m20_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z8001, MAIN_CLOCK)
@@ -563,7 +556,9 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_PALETTE_INIT(black_and_white)
 
 	/* Devices */
-	MCFG_FD1797_ADD("fd1797", m20_wd17xx_interface )
+	MCFG_FD1797x_ADD("fd1797", 1000000)
+	MCFG_FLOPPY_DRIVE_ADD("fd1797:0", m20_floppies, "5dd", NULL, m20_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1797:1", m20_floppies, "5dd", NULL, m20_state::floppy_formats)
 	MCFG_MC6845_ADD("crtc", MC6845, PIXEL_CLOCK/8, mc6845_intf)	/* hand tuned to get ~50 fps */
 	MCFG_I8255A_ADD("ppi8255",  ppi_interface)
 	MCFG_I8251_ADD("i8251_1", kbd_i8251_intf)

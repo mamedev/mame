@@ -1,5 +1,16 @@
 #include "fdc_pll.h"
 
+astring fdc_pll_t::tts(attotime t)
+{
+	char buf[256];
+	bool neg = t.seconds < 0;
+	if(neg)
+		t = attotime::zero - t;
+	int nsec = t.attoseconds / ATTOSECONDS_PER_NANOSECOND;
+	sprintf(buf, "%c%3d.%03d,%03d,%03d", neg ? '-' : ' ', int(t.seconds), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
+	return buf;
+}
+
 void fdc_pll_t::set_clock(attotime _period)
 {
 	period = _period;
