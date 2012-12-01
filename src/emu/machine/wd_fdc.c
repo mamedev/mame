@@ -112,18 +112,27 @@ void wd_fdc_t::set_floppy(floppy_image_device *_floppy)
 	if(floppy == _floppy)
 		return;
 
+	int prev_ready = floppy ? floppy->ready_r() : 1;
+
 	if(floppy) {
 		floppy->mon_w(1);
 		floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
+		floppy->setup_ready_cb(floppy_image_device::ready_cb());
 	}
 
 	floppy = _floppy;
+
+	int next_ready = floppy ? floppy->ready_r() : 1;
 
 	if(floppy) {
 		if(motor_control)
 			floppy->mon_w(status & S_MON ? 0 : 1);
 		floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(wd_fdc_t::index_callback), this));
+		floppy->setup_ready_cb(floppy_image_device::ready_cb(FUNC(wd_fdc_t::ready_callback), this));
 	}
+
+	if(prev_ready != next_ready)
+		ready_callback(floppy, next_ready);
 }
 
 void wd_fdc_t::setup_intrq_cb(line_cb cb)
@@ -1059,6 +1068,19 @@ void wd_fdc_t::spinup()
 
 }
 
+void wd_fdc_t::ready_callback(floppy_image_device *floppy, int state)
+{
+	live_sync();
+	if(!ready_hooked)
+		return;
+
+	if(!intrq && (((intrq_cond & I_RDY) && state) || ((intrq_cond & I_NRDY) && !state))) {
+		intrq = true;
+		if(!intrq_cb.isnull())
+			intrq_cb(intrq);
+	}
+}
+
 void wd_fdc_t::index_callback(floppy_image_device *floppy, int state)
 {
 	live_sync();
@@ -1068,7 +1090,7 @@ void wd_fdc_t::index_callback(floppy_image_device *floppy, int state)
 		return;
 	}
 
-	if(intrq_cond & I_IDX) {
+	if(!intrq && (intrq_cond & I_IDX)) {
 		intrq = true;
 		if(!intrq_cb.isnull())
 			intrq_cb(intrq);

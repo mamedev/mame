@@ -384,6 +384,7 @@ private:
 
 	void spinup();
 	void index_callback(floppy_image_device *floppy, int state);
+	void ready_callback(floppy_image_device *floppy, int state);
 	bool sector_matches() const;
 	bool is_ready();
 
