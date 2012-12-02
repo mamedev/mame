@@ -569,6 +569,11 @@ ROM_START( hb_hotst )
 	ROM_LOAD16_BYTE( "hstv0-07.u2", 0x000001, 0x080000, CRC(adde3b86) SHA1(95b65b9ae2c2034370c895803eb5dcac0a69a77a) )
 ROM_END
 
+ROM_START( hb_medal )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "80000002.p1", 0x000000, 0x080000, CRC(4789c981) SHA1(597de01ef44621cf1223694338470fde2b4e527b) )
+	ROM_LOAD16_BYTE( "80000002.p2", 0x000001, 0x080000, CRC(16b2cc93) SHA1(ea0dd43e19602791cde16816c699e6d70b5cbe41) )
+ROM_END
 
 
 
@@ -618,3 +623,4 @@ GAME( 200?, hb_rckrl	,0,			pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Rock '
 GAME( 200?, hb_ydd		,0,			pluto5, pluto5, pluto5_state, hb, ROT0, "Qps","Yabba-Dabba-Dough (Qps)", GAME_IS_SKELETON_MECHANICAL )
 
 GAME( 200?, hb_hotst	,0,			pluto5, pluto5, pluto5_state, hb, ROT0, "Barcrest?","Hot Stuff (Barcrest?)", GAME_IS_SKELETON_MECHANICAL ) // was in a Barcrest MPU5 set, but I doubt it is
+GAME( 200?, hb_medal	,0,			pluto5, pluto5, pluto5_state, hb, ROT0, "Qps", "Medallion Job (Qps)", GAME_IS_SKELETON_MECHANICAL ) // was in an IMPACT set, strings indicate it's the same game, rebuild for this HW I guess

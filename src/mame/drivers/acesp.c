@@ -3893,10 +3893,34 @@ ROM_START( sp_crunb )
 	SP_CRUN_SOUND
 ROM_END
 
+#define SP_ROOF_SOUND \
+	ROM_REGION(	0x100000, "oki", ROMREGION_ERASE00 ) \
+	/* not used, or missing? */ \
+
+ROM_START( sp_roof )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "034p1-2h.bin", 0x0000, 0x8000, CRC(2b0353fa) SHA1(5c9f06fdda33c4a4a09c69f1e969ae4041513fd9) )
+	ROM_LOAD( "034p1-2a.bin", 0x8000, 0x8000, NO_DUMP )
+	SP_ROOF_SOUND
+ROM_END
+
+ROM_START( sp_roofa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "034p1-2i.bin", 0x000000, 0x008000, CRC(a64797fc) SHA1(7437dc2e203efc525aab251da5196d31b95d159a) )
+	ROM_LOAD( "034p1-2a.bin", 0x8000, 0x8000, NO_DUMP )
+	SP_ROOF_SOUND
+ROM_END
+
+#define SP_CPAL_SOUND \
+	ROM_REGION(	0x100000, "oki", ROMREGION_ERASE00 ) \
+	/* not used, or missing? */ \
 
 
-
-
+ROM_START( sp_cpal )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "fm519d11.bin", 0x0000, 0x010000, CRC(0272325e) SHA1(2f632ea7246c2afd485b11a03afeef4c9e30f5cf) )
+	SP_CPAL_SOUND
+ROM_END
 
 // mpu4.c
 extern void descramble_crystal( UINT8* region, int start, int end, UINT8 extra_xor);
@@ -4461,4 +4485,12 @@ GAME(199?, sp_fivea	,sp_five	,ace_sp	,ace_sp		, ace_sp_state,ace_cr,	ROT0,   "Cr
 GAME(199?, sp_crun	,0			,ace_sp	,ace_sp		, ace_sp_state,ace_cr,	ROT0,   "Crystal","Cash Run (Crystal) (sp.ACE?) (set 1)",GAME_IS_SKELETON_MECHANICAL )
 GAME(199?, sp_cruna	,sp_crun	,ace_sp	,ace_sp		, ace_sp_state,ace_cr,	ROT0,   "Crystal","Cash Run (Crystal) (sp.ACE?) (set 2)",GAME_IS_SKELETON_MECHANICAL )
 GAME(199?, sp_crunb	,sp_crun	,ace_sp	,ace_sp		, ace_sp_state,ace_cr,	ROT0,   "Crystal","Cash Run (Crystal) (sp.ACE?) (set 3)",GAME_IS_SKELETON_MECHANICAL )
+
+// incomplete dump (was mixed with the IMPACT rebuild)
+GAME( 199?, sp_roof		,0			,ace_sp	,ace_sp	, ace_sp_state,ace_sp	,ROT0	,"Ace", "Thru' The Roof (Ace) (sp.ACE) (set 1)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, sp_roofa	,sp_roof	,ace_sp	,ace_sp	, ace_sp_state,ace_sp	,ROT0	,"Ace", "Thru' The Roof (Ace) (sp.ACE) (set 2)",GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, sp_cpal		,0			,ace_sp	,ace_sp	, ace_sp_state,ace_sp	,ROT0	,"Ace", "Caesars Palace (Ace) (sp.ACE?)",GAME_IS_SKELETON_MECHANICAL ) // was in an IMPACT set, might be a different game but CPU seems correct for here
+
+
 

@@ -11,7 +11,15 @@ MACHINE_CONFIG_EXTERN( impctawp );
 INPUT_PORTS_EXTERN( tbirds );
 
 
-
+// note: Apparently the public release of JPeMu v1.45 required the author to specifically encrypt any ROMs
+//       before they would run on the emulator, as a way of 'controlling' the users, and what they could run.
+//       These are therefore worthless garbage.
+//  Football Crazy
+//  ROM_LOAD16_BYTE( "fce.p1", 0x00000, 0x020000, CRC(57220618) SHA1(7bd717e438e2bf230179b0f5bb358888a3501c59) )
+//  ROM_LOAD16_BYTE( "fce.p2", 0x00001, 0x020000, CRC(16d20bc6) SHA1(0e8ac586ccf3d02189e24bdd2ed88052491aceb6) )
+//  j6cas5
+//	ROM_LOAD16_BYTE( "c-1.bin", 0x000000, 0x020000, CRC(fc45950a) SHA1(8721758e8f2ac41f26700965ed942cd1a311bb22) )
+//	ROM_LOAD16_BYTE( "c-2.bin", 0x000001, 0x020000, CRC(e36aaf42) SHA1(c9da129f85c7b8ce27ea8cb9f090ae647eeac10d) )
 
 
 
@@ -515,10 +523,6 @@ ROM_START( j6cas5 )
 	ROM_LOAD16_BYTE( "cas5line.p1", 0x00000, 0x020000, CRC(def7635e) SHA1(d47fb7d3d1212892fb4ca7c6deb508ba79b2d665) )
 	ROM_LOAD16_BYTE( "cas5line.p2", 0x00001, 0x020000, CRC(7004a4d1) SHA1(003809bdaad1a6c9b72d2c16a2203bc62bc065a5) )
 
-	// these two just look like random garabage, or are encrypted, something else?
-	//  see note with j6fbcrz set
-	//ROM_LOAD16_BYTE( "c-1.bin", 0x000000, 0x020000, CRC(fc45950a) SHA1(8721758e8f2ac41f26700965ed942cd1a311bb22) )
-	//ROM_LOAD16_BYTE( "c-2.bin", 0x000001, 0x020000, CRC(e36aaf42) SHA1(c9da129f85c7b8ce27ea8cb9f090ae647eeac10d) )
 
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
 	ROM_LOAD( "cfl-snd.bin", 0x000000, 0x080000, CRC(0016ab04) SHA1(82d133f485b325b29db901f6254c80ca959abd3e) )
@@ -931,8 +935,8 @@ ROM_START( j6euphor )
 	ROM_LOAD16_BYTE( "euph-1p1.bin", 0x000000, 0x020000, CRC(72d261bf) SHA1(7fcc2e9fc17742e4c43360ca8ffb1f45b1a3dbf4) )
 	ROM_LOAD16_BYTE( "euph11.bin", 0x000000, 0x020000, CRC(994c3587) SHA1(013f98d5d1ca6927628cbd63ad7f4de12ec009a5) )
 	ROM_LOAD16_BYTE( "euph1np1.bin", 0x000000, 0x020000, CRC(43e4d97b) SHA1(5b95539b84a5688dc1706d53e150b962494ac924) )
-	ROM_LOAD( "euphoria.p1", 0x0000, 0x020000, CRC(27d40f99) SHA1(5732aa3b8d0e67acef3dda640453ad60caec1bcb) )
-	ROM_LOAD( "euphoria.p2", 0x0000, 0x020000, CRC(480b239c) SHA1(9d0cdb979b2f63bdf5eef2d8b7a4718100b0c1bd) )
+	ROM_LOAD16_BYTE( "euphoria.p1", 0x0000, 0x020000, CRC(27d40f99) SHA1(5732aa3b8d0e67acef3dda640453ad60caec1bcb) )
+	ROM_LOAD16_BYTE( "euphoria.p2", 0x0000, 0x020000, CRC(480b239c) SHA1(9d0cdb979b2f63bdf5eef2d8b7a4718100b0c1bd) )
 
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
 	ROM_LOAD( "euphoriasnd.bin", 0x000000, 0x080000, CRC(d3097d34) SHA1(3db500b5ee38dfa580336b4bac43b139a31d2638) )
@@ -1350,12 +1354,6 @@ ROM_START( j6hilosv )
 	ROM_LOAD16_BYTE( "20575.bin", 0x000000, 0x020000, CRC(97958436) SHA1(8d6afa9431a217eb022223ba5875321b3e6a9546) )
 	ROM_LOAD16_BYTE( "20577.bin", 0x000000, 0x020000, CRC(c5514457) SHA1(a6cfcb2b22f24fa994f9913c6efbb0495c77e6f8) )
 
-
-// this looks like something else
-//  ROM_LOAD16_BYTE( "hihosilver1.1.bin", 0x000000, 0x008000, CRC(e8b5532d) SHA1(45a62028649cde884f313cfabadee994e13f1ea3) )
-//  ROM_LOAD16_BYTE( "hihosilver1.2.bin", 0x000000, 0x008000, CRC(8cffe4ac) SHA1(c81ea16fca08f6f2daa8ff629a0f53e7a641c792) )
-//  ROM_LOAD16_BYTE( "hihosilver1.3.bin", 0x000000, 0x008000, CRC(ea18c31f) SHA1(a6ac9e2e70cb156e453821723f3eed23b4ade3c4) )
-
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
 	ROM_LOAD( "hi_lo_silver_snd.bin", 0x000000, 0x080000, CRC(fd88e3a6) SHA1(07c2fec617faea189ceddc46ec477fb09c0ec4a9) )
 
@@ -1729,10 +1727,6 @@ ROM_START( j6medal )
 	ROM_LOAD16_BYTE( "60001103.odd", 0x000000, 0x080000, CRC(66dcc1da) SHA1(3cf289e9c44b24cfb3a74ec810f3cbd4b7bdb891) )
 	ROM_LOAD16_BYTE( "60001104.evn", 0x000000, 0x080000, CRC(a3955286) SHA1(19f864dc04b158882322b1079d40d0588a41b517) )
 	ROM_LOAD16_BYTE( "60001104.odd", 0x000000, 0x080000, CRC(36ec7263) SHA1(d554b702ffd6af0c7c8b700f8e09d348b387598d) )
-
-	// what is this? looks ike something else (encrypted or bad) to me..
-	ROM_LOAD16_BYTE( "80000002.p1", 0x000000, 0x080000, CRC(4789c981) SHA1(597de01ef44621cf1223694338470fde2b4e527b) )
-	ROM_LOAD16_BYTE( "80000002.p2", 0x000000, 0x080000, CRC(16b2cc93) SHA1(ea0dd43e19602791cde16816c699e6d70b5cbe41) )
 
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
 	ROM_LOAD( "medjob.bin", 0x000000, 0x080000, CRC(dd8296bf) SHA1(c9209abf4276d81897476420177d24e739f0441e) )
@@ -2204,10 +2198,10 @@ ROM_START( j6redarw )
 	ROM_LOAD16_BYTE( "rear-7a1.bin", 0x000000, 0x020000, CRC(3ff236e6) SHA1(f0c42885b6f908ffdcf41ae3b6789bfa95c8f36f) )
 	ROM_LOAD16_BYTE( "rear-7n1.bin", 0x000000, 0x020000, CRC(5c004e43) SHA1(eb4dfdb35efc5226df366cd3f2cdcd486098ba53) )
 	ROM_LOAD16_BYTE( "rear-7p1.bin", 0x000000, 0x020000, CRC(86a8a2bf) SHA1(1c7301c3e5a3ff1d791b21e617d50875c06a7463) )
+	ROM_LOAD16_BYTE( "rear7np1.bin", 0x000000, 0x020000, CRC(b79e1a7b) SHA1(806ae7180dbee9b605bd8d923179a2323a7d38ee) )
 
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) // which is correct?
 	ROM_LOAD( "rear-snd.bin", 0x000000, 0x080000, CRC(7e8c05ce) SHA1(616b0f94b94331f86d7b1fec11dd05cf9b0968cf) )
-	ROM_LOAD16_BYTE( "rear7np1.bin", 0x000000, 0x020000, CRC(b79e1a7b) SHA1(806ae7180dbee9b605bd8d923179a2323a7d38ee) )
 ROM_END
 
 ROM_START( j6redarww )
@@ -2217,7 +2211,6 @@ ROM_START( j6redarww )
 
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) // which is correct?
 	ROM_LOAD( "rear-snd.bin", 0x000000, 0x080000, CRC(7e8c05ce) SHA1(616b0f94b94331f86d7b1fec11dd05cf9b0968cf) )
-	ROM_LOAD16_BYTE( "rear7np1.bin", 0x000000, 0x020000, CRC(b79e1a7b) SHA1(806ae7180dbee9b605bd8d923179a2323a7d38ee) )
 ROM_END
 
 
@@ -2629,10 +2622,6 @@ ROM_START( j6roof )
 	ROM_REGION( 0x1000000, "altrevs", 0 )
 	ROM_LOAD16_BYTE( "prom1p.bin", 0x000000, 0x020000, CRC(2b934324) SHA1(13864411cb12a68a6794fd063af725d9c130bdfe) )
 
-	// something else?
-	ROM_LOAD16_BYTE( "034p1-2h.bin", 0x000000, 0x008000, CRC(2b0353fa) SHA1(5c9f06fdda33c4a4a09c69f1e969ae4041513fd9) )
-	ROM_LOAD16_BYTE( "034p1-2i.bin", 0x000000, 0x008000, CRC(a64797fc) SHA1(7437dc2e203efc525aab251da5196d31b95d159a) )
-
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
 	/* missing? */
 ROM_END
@@ -2715,10 +2704,10 @@ ROM_START( j6tbrdcl )
 	ROM_LOAD16_BYTE( "tbcl-ee1.bin", 0x000000, 0x020000, CRC(1c7405df) SHA1(2d1e5bb1af37699765d0b5d8ecc8e39058835523) )
 	ROM_LOAD16_BYTE( "tbcl-ef1.bin", 0x000000, 0x020000, CRC(c035baad) SHA1(65ebaa609dd0b6251a7697f48571bd9bf934c8ca) )
 	ROM_LOAD16_BYTE( "tbcl-ep1.bin", 0x000000, 0x020000, CRC(ef710d85) SHA1(befbd30fc8807ca80c5fa9963a8025860624ac51) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) // which is correct?
-	ROM_LOAD( "tbcl-snd.bin", 0x000000, 0x80000, CRC(1cc197be) SHA1(2247aa1a0e6aab7389b3222f373890f54e907361) )
 	ROM_LOAD16_BYTE( "tbclbnp1.bin", 0x000000, 0x020000, CRC(e3f0694d) SHA1(cdc3853aba0e226c24e3b7ad2acd9527405b5bb0) )
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	ROM_LOAD( "tbcl-snd.bin", 0x000000, 0x80000, CRC(1cc197be) SHA1(2247aa1a0e6aab7389b3222f373890f54e907361) )
 ROM_END
 
 
@@ -3193,7 +3182,6 @@ ROM_START( j6cpala )
 	ROM_LOAD16_BYTE( "capa1.bin", 0x0000, 0x020000, CRC(ee4221d1) SHA1(d79440ddbb7083c95d15a00e3e9395b43a1af376) )
 	ROM_LOAD16_BYTE( "capa2.bin", 0x0000, 0x020000, CRC(775f6d12) SHA1(03559f8f7830b84cb718e0d005d842ddf515b6a1) )
 
-	ROM_LOAD16_BYTE( "fm519d11.bin", 0x0000, 0x010000, CRC(0272325e) SHA1(2f632ea7246c2afd485b11a03afeef4c9e30f5cf) ) // this is some other game on different hw by the looks of it0
 
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
 	ROM_LOAD( "cpalace22-06-98 68d0a91.bin", 0x0000, 0x080000, CRC(56d581e0) SHA1(d22796ec6d96f4d4ea10dfdb925ceaff032fe7d0) )
@@ -3653,16 +3641,6 @@ ROM_START( j6fbcrz )
 	ROM_LOAD16_BYTE( "fc.p1", 0x00000, 0x020000, CRC(6493c4c6) SHA1(ae4c18b35a55ef08b02fdabb8021eb008660543e) )
 	ROM_LOAD16_BYTE( "fc.p2", 0x00001, 0x020000, CRC(2563c918) SHA1(7b5a58892019d59aff02f982cafd8617f116a812) )
 
-	ROM_REGION( 0x1000000, "encrypted", ROMREGION_ERASE00 )
-	// these both seem encrypted with the same scheme, the data becomes the same in the place where the normal
-	// program roms have a 0xff fill.  Encryption is atypical of Impact tho, so what's going on here??
-
-	// edit: Apparently the public release of JPeMu v1.45 required the author to specifically encrypt any ROMs
-	//       before they would run on the emulator, as a way of 'controlling' the users, and what they could run.
-	//       These are therefore worthless garbage.
-//  ROM_LOAD16_BYTE( "fce.p1", 0x00000, 0x020000, CRC(57220618) SHA1(7bd717e438e2bf230179b0f5bb358888a3501c59) )0
-//  ROM_LOAD16_BYTE( "fce.p2", 0x00001, 0x020000, CRC(16d20bc6) SHA1(0e8ac586ccf3d02189e24bdd2ed88052491aceb6) )
-
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
 	ROM_LOAD( "fcsnd.bin", 0x0000, 0x080000, CRC(53806516) SHA1(e5689759ccba30ac974eee4361330ad503a29909) )
 ROM_END
@@ -3703,7 +3681,6 @@ ROM_END
 ROM_START( j6shoot )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "shoot out p1", 0x00000, 0x020000, CRC(d1797023) SHA1(6a75451b0e5954c87f65f333a5fc73d3ac43d1f4) )
-	//ROM_LOAD( "shoot ou", 0x0000, 0x020000, CRC(d1797023) SHA1(6a75451b0e5954c87f65f333a5fc73d3ac43d1f4) )
 	ROM_LOAD16_BYTE( "shootp2", 0x00001, 0x020000, CRC(c345c0a9) SHA1(8e9dfb58b3295b2d44bfa810f5502872cf7111d1) )
 
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )

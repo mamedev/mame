@@ -25993,6 +25993,9 @@ sp_fivea		//
 sp_crun			// Cash Run (Crystal)
 sp_cruna		//
 sp_crunb		//
+sp_roof			// Thru The Roof (Ace)
+sp_roofa		//
+sp_cpal			// Caesars Palace (Ace)
 
 
 // Project - PROCONN
@@ -26840,6 +26843,7 @@ hb_ringb	// Ring A Bell (JPM)
 hb_rckrl	// Rock 'n' Roll (Qps)
 hb_ydd		// Yabba-Dabba-Dough (Qps)
 hb_hotst	// Hot Stuff??
+hb_medal	// Medallion Job (Qps)
 
 /* Summit Coin */
 
