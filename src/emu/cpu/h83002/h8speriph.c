@@ -1384,7 +1384,6 @@ void h8s_onchip_reg_write_8_ddr(h83xx_state *h8, int offset, UINT8 data)
 	verboselog( h8->device->machine(), 9, "%08X | %08X <- %02X\n", h8->ppc, H8S_IO_ADDR(offset), data);
 	switch (offset)
 	{
-        #if 0
 		// SCI 0
 		case H8S_IO_SSR0  : h8->per_regs[offset] = data; if ((data & H8S_SSR_TDRE) == 0) h8s_sci_execute(h8, 0); break;
 		case H8S_IO_SCR0  : h8->per_regs[offset] = data; if (data & H8S_SCR_TIE) h8s2xxx_interrupt_request(h8, h8s_sci_entry(0)->int_tx); break;
@@ -1407,8 +1406,8 @@ void h8s_onchip_reg_write_8_ddr(h83xx_state *h8, int offset, UINT8 data)
 		case H8S_IO_TCNT1  : h8s_tmr_x_write_tcnt( h8, 1, data); break;
 		case H8S_IO_TCORA1 : h8s_tmr_x_write_tcora( h8, 1, data); break;
 		case H8S_IO_TCORB1 : h8s_tmr_x_write_tcorb( h8, 1, data); break;
-        #endif
 
+		case H8S_IO_IER:
         case H8S_IO_IFR:
 			h8->per_regs[offset] = data;
             break;
@@ -1620,6 +1619,16 @@ UINT16 h8s_onchip_reg_read_16(h83xx_state *h8, int offset)
 		case H8S_IO_TCNT3_H : if (h8->tpu_max == 6) data = h8s_tpu_x_read_tcnt( h8, 3); break;
 		case H8S_IO_TCNT4_H : if (h8->tpu_max == 6) data = h8s_tpu_x_read_tcnt( h8, 4); break;
 		case H8S_IO_TCNT5_H : if (h8->tpu_max == 6) data = h8s_tpu_x_read_tcnt( h8, 5); break;
+
+		case H8S_IO_ADDRA: case H8S_IO_ADDRB: case H8S_IO_ADDRC: case H8S_IO_ADDRD:
+		case H8S_IO_ADDRE: case H8S_IO_ADDRF: case H8S_IO_ADDRG: case H8S_IO_ADDRH:
+			{
+				int pbase = (offset - H8S_IO_ADDRA) + H8_ADC_0_H;
+				data = (h8->io->read_byte(pbase) << 8);
+				data |= h8->io->read_byte(pbase+1);
+			}
+			break;
+
 		default :
 		{
 			UINT8 b[2];

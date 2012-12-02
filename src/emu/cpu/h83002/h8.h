@@ -87,6 +87,14 @@ enum
 	H8_ADC_2_L,
 	H8_ADC_3_H,
 	H8_ADC_3_L,
+	H8_ADC_4_H,
+	H8_ADC_4_L,
+	H8_ADC_5_H,
+	H8_ADC_5_L,
+	H8_ADC_6_H,
+	H8_ADC_6_L,
+	H8_ADC_7_H,
+	H8_ADC_7_L,
 
 	// serial ports
 	H8_SERIAL_0 = 0x30,
@@ -193,6 +201,14 @@ enum
 #define H8S_IO_SCMR2  H8S_IO(0xFF8E)
 
 // ADC
+#define H8S_IO_ADDRA  H8S_IO(0xFF90)
+#define H8S_IO_ADDRB  H8S_IO(0xFF92)
+#define H8S_IO_ADDRC  H8S_IO(0xFF94)
+#define H8S_IO_ADDRD  H8S_IO(0xFF96)
+#define H8S_IO_ADDRE  H8S_IO(0xFF98)
+#define H8S_IO_ADDRF  H8S_IO(0xFF9A)
+#define H8S_IO_ADDRG  H8S_IO(0xFF9C)
+#define H8S_IO_ADDRH  H8S_IO(0xFF9E)
 #define H8S_IO_ADCSR  H8S_IO(0xFFA0)
 #define H8S_IO_ADCR   H8S_IO(0xFFA1)
 
