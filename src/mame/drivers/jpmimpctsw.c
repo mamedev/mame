@@ -80,99 +80,292 @@ ROM_START( j6amdrm )
 	ROM_LOAD( "americandreamsound.bin", 0x000000, 0x080000, CRC(8a23d027) SHA1(c475032411e28c4c889a3c112ca332ba222b93fe) )
 ROM_END
 
+#define j6arcade_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "arca-snd.bin", 0x000000, 0x080000, CRC(111c3c40) SHA1(9ce6da8101eb9c26c7ff5616ef24e7c119803777) ) \
+
 
 ROM_START( j6arcade )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "arca-9_1.bin", 0x000000, 0x020000, CRC(09838350) SHA1(ffb37a229e20fd2f9690659bc4a2841269b5d918) )
 	ROM_LOAD16_BYTE( "arca-9_2.bin", 0x000001, 0x020000, CRC(a2170a26) SHA1(ed23f9a4b197c1603014eff238c73564fca1bd0c) )
-
-	ROM_REGION( 0x1000000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "arca-9a1.bin", 0x000000, 0x020000, CRC(5b474331) SHA1(a8cfadab98ece97fb66fcf2e87e97be528ab5bf7) )
-	ROM_LOAD16_BYTE( "arca-9n1.bin", 0x000000, 0x020000, CRC(38b53b94) SHA1(a28d7ac1eb594251d9534901ee38b797cd563dc7) )
-	ROM_LOAD16_BYTE( "arca-9np.bin", 0x000000, 0x020000, CRC(d32b6fac) SHA1(1cb16c214da888adacba090d59f88694d1d9e25b) )
-	ROM_LOAD16_BYTE( "arca-9p1.bin", 0x000000, 0x020000, CRC(e21dd768) SHA1(94132c7ba9b90ab6b52a56e60b68bf4e5d30e063) )
-	ROM_LOAD16_BYTE( "arca10_1.bin", 0x000000, 0x020000, CRC(4c632e9e) SHA1(1e76e26941b164ba3a51c1c3caaa3b4d384a90d3) )
-	ROM_LOAD16_BYTE( "arca10_2.bin", 0x000000, 0x020000, CRC(2175520c) SHA1(0a12506a72a93c8cd74f6666d41bacdfd4e72a54) )
-	ROM_LOAD16_BYTE( "arcadia.p2",	 0x000000, 0x020000, CRC(1533ea6f) SHA1(0dff53bcee961781312eb108cd705664f772ce1d) ) //differs by 2 bytes from arca10_2.bin
-	ROM_LOAD16_BYTE( "arca10a1.bin", 0x000000, 0x020000, CRC(1ea7eeff) SHA1(8b8a1b0543d53d95fd2fd44add1114c6ad48b6c7) )
-	ROM_LOAD16_BYTE( "arca10n1.bin", 0x000000, 0x020000, CRC(7d55965a) SHA1(96ca11708bbba84ccbb0c43b6ddaca8c9285ffb8) )
-	ROM_LOAD16_BYTE( "arca10np.bin", 0x000000, 0x020000, CRC(96cbc262) SHA1(0fdb783443240db94bf22a09f2177de958a2ecfe) )
-	ROM_LOAD16_BYTE( "arca10p1.bin", 0x000000, 0x020000, CRC(a7fd7aa6) SHA1(9f083900ee50d1669f23eecc7d6d7779d2a27301) )
-	ROM_LOAD( "arcadiaarca10-1.bin", 0x000000, 0x080000, CRC(998ae103) SHA1(cabbd7ec8dcaf5107de0c23a8d67680254acbe5d) )
-	ROM_LOAD( "arcadiaarca10-2.bin", 0x000000, 0x080000, CRC(98c15e57) SHA1(3207c9760ca1b9f11b24253d6c974e4efeb0c46c) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD( "arca-snd.bin", 0x000000, 0x080000, CRC(111c3c40) SHA1(9ce6da8101eb9c26c7ff5616ef24e7c119803777) )
+	j6arcade_sound
 ROM_END
 
+ROM_START( j6arcadea )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "arca-9a1.bin", 0x000000, 0x020000, CRC(5b474331) SHA1(a8cfadab98ece97fb66fcf2e87e97be528ab5bf7) )
+	ROM_LOAD16_BYTE( "arca-9_2.bin", 0x000001, 0x020000, CRC(a2170a26) SHA1(ed23f9a4b197c1603014eff238c73564fca1bd0c) )
+	j6arcade_sound
+ROM_END
+
+ROM_START( j6arcadeb )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "arca-9n1.bin", 0x000000, 0x020000, CRC(38b53b94) SHA1(a28d7ac1eb594251d9534901ee38b797cd563dc7) )
+	ROM_LOAD16_BYTE( "arca-9_2.bin", 0x000001, 0x020000, CRC(a2170a26) SHA1(ed23f9a4b197c1603014eff238c73564fca1bd0c) )
+	j6arcade_sound
+ROM_END
+
+ROM_START( j6arcadec )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "arca-9np.bin", 0x000000, 0x020000, CRC(d32b6fac) SHA1(1cb16c214da888adacba090d59f88694d1d9e25b) )
+	ROM_LOAD16_BYTE( "arca-9_2.bin", 0x000001, 0x020000, CRC(a2170a26) SHA1(ed23f9a4b197c1603014eff238c73564fca1bd0c) )
+	j6arcade_sound
+ROM_END
+
+ROM_START( j6arcaded )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "arca-9p1.bin", 0x000000, 0x020000, CRC(e21dd768) SHA1(94132c7ba9b90ab6b52a56e60b68bf4e5d30e063) )
+	ROM_LOAD16_BYTE( "arca-9_2.bin", 0x000001, 0x020000, CRC(a2170a26) SHA1(ed23f9a4b197c1603014eff238c73564fca1bd0c) )
+	j6arcade_sound
+ROM_END
+
+ROM_START( j6arcadee )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "arca10_1.bin", 0x000000, 0x020000, CRC(4c632e9e) SHA1(1e76e26941b164ba3a51c1c3caaa3b4d384a90d3) )
+	ROM_LOAD16_BYTE( "arca10_2.bin", 0x000001, 0x020000, CRC(2175520c) SHA1(0a12506a72a93c8cd74f6666d41bacdfd4e72a54) )
+	j6arcade_sound
+ROM_END
+
+ROM_START( j6arcadef )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "arca10_1.bin", 0x000000, 0x020000, CRC(4c632e9e) SHA1(1e76e26941b164ba3a51c1c3caaa3b4d384a90d3) )
+	ROM_LOAD16_BYTE( "arcadia.p2",	 0x000001, 0x020000, CRC(1533ea6f) SHA1(0dff53bcee961781312eb108cd705664f772ce1d) ) //differs by 2 bytes from arca10_2.bin, one is probably bad (or hacked)
+	j6arcade_sound
+ROM_END
+
+ROM_START( j6arcadeg )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "arca10a1.bin", 0x000000, 0x020000, CRC(1ea7eeff) SHA1(8b8a1b0543d53d95fd2fd44add1114c6ad48b6c7) )
+	ROM_LOAD16_BYTE( "arca10_2.bin", 0x000001, 0x020000, CRC(2175520c) SHA1(0a12506a72a93c8cd74f6666d41bacdfd4e72a54) )
+	j6arcade_sound
+ROM_END
+
+ROM_START( j6arcadeh )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "arca10n1.bin", 0x000000, 0x020000, CRC(7d55965a) SHA1(96ca11708bbba84ccbb0c43b6ddaca8c9285ffb8) )
+	ROM_LOAD16_BYTE( "arca10_2.bin", 0x000001, 0x020000, CRC(2175520c) SHA1(0a12506a72a93c8cd74f6666d41bacdfd4e72a54) )
+	j6arcade_sound
+ROM_END
+
+ROM_START( j6arcadei )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "arca10np.bin", 0x000000, 0x020000, CRC(96cbc262) SHA1(0fdb783443240db94bf22a09f2177de958a2ecfe) )
+	ROM_LOAD16_BYTE( "arca10_2.bin", 0x000001, 0x020000, CRC(2175520c) SHA1(0a12506a72a93c8cd74f6666d41bacdfd4e72a54) )
+	j6arcade_sound
+ROM_END
+
+ROM_START( j6arcadej )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "arca10p1.bin", 0x000000, 0x020000, CRC(a7fd7aa6) SHA1(9f083900ee50d1669f23eecc7d6d7779d2a27301) )
+	ROM_LOAD16_BYTE( "arca10_2.bin", 0x000001, 0x020000, CRC(2175520c) SHA1(0a12506a72a93c8cd74f6666d41bacdfd4e72a54) )
+	j6arcade_sound
+ROM_END
+
+ROM_START( j6arcadek )
+	ROM_REGION( 0x1000000, "maincpu", 0 ) // overdumps? might be useful to verify which p2 is correct tho
+	ROM_LOAD16_BYTE( "arcadiaarca10-1.bin", 0x000000, 0x080000, CRC(998ae103) SHA1(cabbd7ec8dcaf5107de0c23a8d67680254acbe5d) )
+	ROM_LOAD16_BYTE( "arcadiaarca10-2.bin", 0x000001, 0x080000, CRC(98c15e57) SHA1(3207c9760ca1b9f11b24253d6c974e4efeb0c46c) )
+	j6arcade_sound
+ROM_END
+
+
+#define j6bnkrcl_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "cbsnd.bin", 0x000000, 0x080000, CRC(e7e587c9) SHA1(fde7a7761253dc4133340b766d220873731c11c7) ) \
 
 ROM_START( j6bnkrcl )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "clba-6_1.bin", 0x000000, 0x020000, CRC(b0407200) SHA1(88792a7cc71be3830a0156fa10195bad3cc58066) )
 	ROM_LOAD16_BYTE( "clba-6_2.bin", 0x000001, 0x020000, CRC(fd055187) SHA1(7634c1dfbfab66c13c2a0453dc70643f9b33edef) )
+	j6bnkrcl_sound
+ROM_END
 
-	ROM_REGION( 0x1000000, "altrevs", 0 )
+ROM_START( j6bnkrcla )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "clba-6f1.bin", 0x000000, 0x020000, CRC(749a9110) SHA1(8607d6edd4d2f2d799d3a60ead779f9a80e93823) )
-	ROM_LOAD16_BYTE( "clba-6p1.bin", 0x000000, 0x020000, CRC(5bde2638) SHA1(d7247d74acb030c986aecc58991c56207ae2ade9) )
+	ROM_LOAD16_BYTE( "clba-6_2.bin", 0x000001, 0x020000, CRC(fd055187) SHA1(7634c1dfbfab66c13c2a0453dc70643f9b33edef) )
+	j6bnkrcl_sound
+ROM_END
 
+ROM_START( j6bnkrclb )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "clba-6p1.bin", 0x000000, 0x020000, CRC(5bde2638) SHA1(d7247d74acb030c986aecc58991c56207ae2ade9) )
+	ROM_LOAD16_BYTE( "clba-6_2.bin", 0x000001, 0x020000, CRC(fd055187) SHA1(7634c1dfbfab66c13c2a0453dc70643f9b33edef) )
+	j6bnkrcl_sound
+ROM_END
+
+ROM_START( j6bnkrclc )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cl_banke.p1", 0x00000, 0x020000, CRC(4604d13d) SHA1(8e96b5ac7537fbe496178f26be0786049efcbc49) )
 	ROM_LOAD16_BYTE( "cl_banke.p2", 0x00001, 0x020000, CRC(6aea1ffd) SHA1(cf9356106f5e64ebfde6d98314afad3a5377eaf4) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD( "cbsnd.bin", 0x000000, 0x080000, CRC(e7e587c9) SHA1(fde7a7761253dc4133340b766d220873731c11c7) )
+	j6bnkrcl_sound
 ROM_END
+
+
+#define j6big50_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "1386.bin", 0x000000, 0x080000, CRC(72ddabc9) SHA1(c68b0896b4c25b591029231dff045b16eab61ac4) ) \
 
 
 ROM_START( j6big50 )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "9347.bin", 0x000000, 0x020000, CRC(2d05fc2b) SHA1(c5c3cf89b5d75876eecc9f9acf0426b58bacbd79) )
 	ROM_LOAD16_BYTE( "9348.bin", 0x000001, 0x020000, CRC(d131967e) SHA1(9028c3d55d365de9e90ea4a2af29aaace0d8e588) )
-
-	ROM_REGION( 0x1000000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "9349.bin", 0x000000, 0x020000, CRC(c69ba813) SHA1(6b12aac1ed5bfdb71cc6ece67162fc890ec924a6) )
-	ROM_LOAD16_BYTE( "9350.bin", 0x000000, 0x020000, CRC(7fc13c4a) SHA1(a260914f04ea05ac9e9fbf53d914f54a3e84b3ee) )
-	ROM_LOAD16_BYTE( "9351.bin", 0x000000, 0x020000, CRC(4f688da3) SHA1(0abb33b3783a73ddd5f1677bf84075682da09bcf) )
-	ROM_LOAD16_BYTE( "bg50v8p1", 0x000000, 0x020000, CRC(a28eadba) SHA1(fb7bb3305324a80454c1b4fa053c185d721e387e) )
-	ROM_LOAD16_BYTE( "bg50v8p2", 0x000000, 0x020000, CRC(6724f61d) SHA1(9ccd7940c934f1edbba7c7defc87f8ac12ed5374) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD( "1386.bin", 0x000000, 0x080000, CRC(72ddabc9) SHA1(c68b0896b4c25b591029231dff045b16eab61ac4) )
+	j6big50_sound
 ROM_END
+
+ROM_START( j6big50a )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "9349.bin", 0x000000, 0x020000, CRC(c69ba813) SHA1(6b12aac1ed5bfdb71cc6ece67162fc890ec924a6) )
+	ROM_LOAD16_BYTE( "9348.bin", 0x000001, 0x020000, CRC(d131967e) SHA1(9028c3d55d365de9e90ea4a2af29aaace0d8e588) )
+	j6big50_sound
+ROM_END
+
+ROM_START( j6big50b )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "9350.bin", 0x000000, 0x020000, CRC(7fc13c4a) SHA1(a260914f04ea05ac9e9fbf53d914f54a3e84b3ee) )
+	ROM_LOAD16_BYTE( "9348.bin", 0x000001, 0x020000, CRC(d131967e) SHA1(9028c3d55d365de9e90ea4a2af29aaace0d8e588) )
+	j6big50_sound
+ROM_END
+
+ROM_START( j6big50c )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "9351.bin", 0x000000, 0x020000, CRC(4f688da3) SHA1(0abb33b3783a73ddd5f1677bf84075682da09bcf) )
+	ROM_LOAD16_BYTE( "9348.bin", 0x000001, 0x020000, CRC(d131967e) SHA1(9028c3d55d365de9e90ea4a2af29aaace0d8e588) )
+	j6big50_sound
+ROM_END
+
+ROM_START( j6big50d )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "bg50v8p1", 0x000000, 0x020000, CRC(a28eadba) SHA1(fb7bb3305324a80454c1b4fa053c185d721e387e) )
+	ROM_LOAD16_BYTE( "bg50v8p2", 0x000001, 0x020000, CRC(6724f61d) SHA1(9ccd7940c934f1edbba7c7defc87f8ac12ed5374) )
+	j6big50_sound
+ROM_END
+
+#define j6bigbnk_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "1109.bin", 0x000000, 0x080000, CRC(b4d7ac12) SHA1(ac194d15e9d4e5cdadddbf2dc3c9660b52f116c2) ) \
 
 
 ROM_START( j6bigbnk )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "20346.bin", 0x000000, 0x020000, CRC(6e717ecd) SHA1(f285a2d0fb0aa56b743a922087c416fa66ec1f52) )
 	ROM_LOAD16_BYTE( "20347.bin", 0x000001, 0x020000, CRC(c515e34e) SHA1(fc3aeb2f3fa9ba463f8f39cf26d3795be869ffbc) )
+	j6bigbnk_sound
+ROM_END
 
-	ROM_REGION( 0x1000000, "altrevs", 0 )
+ROM_START( j6bigbnka )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "20348.bin", 0x000000, 0x020000, CRC(85ef2af5) SHA1(ccfd4e5296e3889045b0b8ba11a066104b266f13) )
-	ROM_LOAD16_BYTE( "20349.bin", 0x000000, 0x020000, CRC(3cb5beac) SHA1(017fe4f39faff27e23ef1eba7dd687a276824da7) )
-	ROM_LOAD16_BYTE( "20350.bin", 0x000000, 0x020000, CRC(0c1c0f45) SHA1(6da230716fd6bcb2df55857cf8bfa1d3a6fd0484) )
-	ROM_LOAD16_BYTE( "6996.bin", 0x000000, 0x020000, CRC(5fcf0a19) SHA1(07ca6d27db65b7af16f330e5fb284f7b72220a23) )
-	ROM_LOAD16_BYTE( "6997.bin", 0x000000, 0x020000, CRC(ef4bb8ba) SHA1(1fdbffbc5e504934310cca90eb6f2ca4194eea77) )
-	ROM_LOAD16_BYTE( "6998.bin", 0x000000, 0x020000, CRC(b4515e21) SHA1(b8fc75056b4e5be288a6a7e210c11d9ea6c7b48a) )
-	ROM_LOAD16_BYTE( "6999.bin", 0x000000, 0x020000, CRC(0d0bca78) SHA1(8b28af82f4f21d4e7102a9787aa54413ed46e21c) )
-	ROM_LOAD16_BYTE( "7000.bin", 0x000000, 0x020000, CRC(5382a428) SHA1(86f513cbd969dbfbcac53de637e3796daab03037) )
-	ROM_LOAD16_BYTE( "7306.bin", 0x000000, 0x020000, CRC(b33ec3b3) SHA1(12abb4621b9bce57994c1958c9df66b1048d8819) )
-	ROM_LOAD16_BYTE( "7373.bin", 0x000000, 0x020000, CRC(36c4b97c) SHA1(e925c85220ff96af5dde67300f7c0b9e3e54dcb2) )
-	ROM_LOAD16_BYTE( "7426.bin", 0x000000, 0x020000, CRC(d8cbee6c) SHA1(47a86689a8dc2946765520633d3d1f0fb4a2a051) )
-	ROM_LOAD16_BYTE( "7427.bin", 0x000000, 0x020000, CRC(ceab9d77) SHA1(56b56781983509db84eeb53c2f70010d1d221fff) )
-	ROM_LOAD16_BYTE( "7428.bin", 0x000000, 0x020000, CRC(3355ba54) SHA1(48eb078d0ec0b56a997fa949a2054da1fd24b1f2) )
-	ROM_LOAD16_BYTE( "7660.bin", 0x000000, 0x020000, CRC(af560c17) SHA1(1a3b8db230d5ade8dbdd2f1d776c54d1c3601992) )
-	ROM_LOAD16_BYTE( "7661.bin", 0x000000, 0x020000, CRC(d0365768) SHA1(29d11dbeb5ffbd692247a42a9f14668cb376d56d) )
-	ROM_LOAD16_BYTE( "7662.bin", 0x000000, 0x020000, CRC(44c8582f) SHA1(e877134bfd9b3ac638340f9e0e02f3f63d52c434) )
-	ROM_LOAD16_BYTE( "7663.bin", 0x000000, 0x020000, CRC(fd92cc76) SHA1(f566a1c6fdbbee6db5efcb0eef8bce39d48a4cf2) )
-	ROM_LOAD16_BYTE( "bb20p1ac", 0x000000, 0x020000, CRC(9865f664) SHA1(e44263ade7dbe4c4e0d0616afd6502780b058d8f) )
-	ROM_LOAD16_BYTE( "bb20p2ac", 0x000000, 0x020000, CRC(16d40b7e) SHA1(df81916860495f6d53ed4016c435dde8d6d7ad5f) )
-	ROM_LOAD16_BYTE( "bb841ac", 0x000000, 0x020000, CRC(793d3d36) SHA1(d62e2ee62ed4f3a19c05edae1ea092679a57e8a5) )
-	ROM_LOAD16_BYTE( "bba915p1", 0x000000, 0x020000, CRC(3b8ccfbc) SHA1(7f42d9dbcf976c12721324ea29cf942ad634985d) )
-	ROM_LOAD16_BYTE( "bba915p2", 0x000000, 0x020000, CRC(bad068d5) SHA1(dd77602f7bdbcb04c7e6d3cb4a52e270fd3e7d52) )
-	ROM_LOAD16_BYTE( "bbv48p2", 0x000000, 0x020000, CRC(96a9f1f5) SHA1(2b8b4f06edbe35f5b73d25bac8a973feeaa77b47) )
-	ROM_LOAD16_BYTE( "bbv4p18c", 0x000000, 0x020000, CRC(793d3d36) SHA1(d62e2ee62ed4f3a19c05edae1ea092679a57e8a5) )
+	ROM_LOAD16_BYTE( "20347.bin", 0x000001, 0x020000, CRC(c515e34e) SHA1(fc3aeb2f3fa9ba463f8f39cf26d3795be869ffbc) )
+	j6bigbnk_sound
+ROM_END
 
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD( "1109.bin", 0x000000, 0x080000, CRC(b4d7ac12) SHA1(ac194d15e9d4e5cdadddbf2dc3c9660b52f116c2) )
+ROM_START( j6bigbnkb )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "20349.bin", 0x000000, 0x020000, CRC(3cb5beac) SHA1(017fe4f39faff27e23ef1eba7dd687a276824da7) )
+	ROM_LOAD16_BYTE( "20347.bin", 0x000001, 0x020000, CRC(c515e34e) SHA1(fc3aeb2f3fa9ba463f8f39cf26d3795be869ffbc) )
+	j6bigbnk_sound
+ROM_END
+
+ROM_START( j6bigbnkc )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "20350.bin", 0x000000, 0x020000, CRC(0c1c0f45) SHA1(6da230716fd6bcb2df55857cf8bfa1d3a6fd0484) )
+	ROM_LOAD16_BYTE( "20347.bin", 0x000001, 0x020000, CRC(c515e34e) SHA1(fc3aeb2f3fa9ba463f8f39cf26d3795be869ffbc) )
+	j6bigbnk_sound
+ROM_END
+
+ROM_START( j6bigbnkd )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7660.bin", 0x000000, 0x020000, CRC(af560c17) SHA1(1a3b8db230d5ade8dbdd2f1d776c54d1c3601992) )
+	ROM_LOAD16_BYTE( "7661.bin", 0x000001, 0x020000, CRC(d0365768) SHA1(29d11dbeb5ffbd692247a42a9f14668cb376d56d) )
+	j6bigbnk_sound
+ROM_END
+
+ROM_START( j6bigbnke )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7662.bin", 0x000000, 0x020000, CRC(44c8582f) SHA1(e877134bfd9b3ac638340f9e0e02f3f63d52c434) )
+	ROM_LOAD16_BYTE( "7661.bin", 0x000001, 0x020000, CRC(d0365768) SHA1(29d11dbeb5ffbd692247a42a9f14668cb376d56d) )
+	j6bigbnk_sound
+ROM_END
+
+ROM_START( j6bigbnkf )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7663.bin", 0x000000, 0x020000, CRC(fd92cc76) SHA1(f566a1c6fdbbee6db5efcb0eef8bce39d48a4cf2) )
+	ROM_LOAD16_BYTE( "7661.bin", 0x000001, 0x020000, CRC(d0365768) SHA1(29d11dbeb5ffbd692247a42a9f14668cb376d56d) )
+	j6bigbnk_sound
+ROM_END
+
+ROM_START( j6bigbnkg )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7426.bin", 0x000000, 0x020000, CRC(d8cbee6c) SHA1(47a86689a8dc2946765520633d3d1f0fb4a2a051) )
+	ROM_LOAD16_BYTE( "7427.bin", 0x000001, 0x020000, CRC(ceab9d77) SHA1(56b56781983509db84eeb53c2f70010d1d221fff) )
+	j6bigbnk_sound
+ROM_END
+
+ROM_START( j6bigbnkh )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7428.bin", 0x000000, 0x020000, CRC(3355ba54) SHA1(48eb078d0ec0b56a997fa949a2054da1fd24b1f2) )
+	ROM_LOAD16_BYTE( "7427.bin", 0x000001, 0x020000, CRC(ceab9d77) SHA1(56b56781983509db84eeb53c2f70010d1d221fff) )
+	j6bigbnk_sound
+ROM_END
+
+ROM_START( j6bigbnki )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "6996.bin", 0x000000, 0x020000, CRC(5fcf0a19) SHA1(07ca6d27db65b7af16f330e5fb284f7b72220a23) )
+	ROM_LOAD16_BYTE( "6997.bin", 0x000001, 0x020000, CRC(ef4bb8ba) SHA1(1fdbffbc5e504934310cca90eb6f2ca4194eea77) )
+	j6bigbnk_sound
+ROM_END
+
+ROM_START( j6bigbnkj )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "6998.bin", 0x000000, 0x020000, CRC(b4515e21) SHA1(b8fc75056b4e5be288a6a7e210c11d9ea6c7b48a) )
+	ROM_LOAD16_BYTE( "6997.bin", 0x000001, 0x020000, CRC(ef4bb8ba) SHA1(1fdbffbc5e504934310cca90eb6f2ca4194eea77) )
+	j6bigbnk_sound
+ROM_END
+
+ROM_START( j6bigbnkk )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "6999.bin", 0x000000, 0x020000, CRC(0d0bca78) SHA1(8b28af82f4f21d4e7102a9787aa54413ed46e21c) )
+	ROM_LOAD16_BYTE( "6997.bin", 0x000001, 0x020000, CRC(ef4bb8ba) SHA1(1fdbffbc5e504934310cca90eb6f2ca4194eea77) )
+	j6bigbnk_sound
+ROM_END
+
+ROM_START( j6bigbnkl )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7000.bin", 0x000000, 0x020000, CRC(5382a428) SHA1(86f513cbd969dbfbcac53de637e3796daab03037) )
+	ROM_LOAD16_BYTE( "6997.bin", 0x000001, 0x020000, CRC(ef4bb8ba) SHA1(1fdbffbc5e504934310cca90eb6f2ca4194eea77) )
+	j6bigbnk_sound
+ROM_END
+
+ROM_START( j6bigbnkm )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "bb20p1ac", 0x000000, 0x020000, CRC(9865f664) SHA1(e44263ade7dbe4c4e0d0616afd6502780b058d8f) )
+	ROM_LOAD16_BYTE( "bb20p2ac", 0x000001, 0x020000, CRC(16d40b7e) SHA1(df81916860495f6d53ed4016c435dde8d6d7ad5f) )
+	j6bigbnk_sound
+ROM_END
+
+ROM_START( j6bigbnkn )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "bba915p1", 0x000000, 0x020000, CRC(3b8ccfbc) SHA1(7f42d9dbcf976c12721324ea29cf942ad634985d) )
+	ROM_LOAD16_BYTE( "bba915p2", 0x000001, 0x020000, CRC(bad068d5) SHA1(dd77602f7bdbcb04c7e6d3cb4a52e270fd3e7d52) )
+	j6bigbnk_sound
+ROM_END
+
+
+ROM_START( j6bigbnko ) // are the numbers correct?
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7373.bin", 0x000000, 0x020000, CRC(36c4b97c) SHA1(e925c85220ff96af5dde67300f7c0b9e3e54dcb2) )
+	ROM_LOAD16_BYTE( "7306.bin", 0x000001, 0x020000, CRC(b33ec3b3) SHA1(12abb4621b9bce57994c1958c9df66b1048d8819) )
+	j6bigbnk_sound
+ROM_END
+
+ROM_START( j6bigbnkp ) 
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "bbv4p18c", 0x000000, 0x020000, CRC(793d3d36) SHA1(d62e2ee62ed4f3a19c05edae1ea092679a57e8a5) ) // aka bb841ac
+	ROM_LOAD16_BYTE( "bbv48p2",  0x000001, 0x020000, CRC(96a9f1f5) SHA1(2b8b4f06edbe35f5b73d25bac8a973feeaa77b47) )
+	j6bigbnk_sound
 ROM_END
 
 
@@ -3701,14 +3894,60 @@ DRIVER_INIT_MEMBER(jpmimpct_state,j6fbcrz)
 #define GAME_FLAGS GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL|GAME_NO_SOUND
 
 GAME( 199?, j6fifth		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Ace", "5th Dimension (Ace) (IMPACT)", GAME_FLAGS )
+
 GAME( 199?, j6aceclb	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Ace Of Clubs (Crystal) (IMPACT, set 1)", GAME_FLAGS )
 GAME( 199?, j6aceclba	, j6aceclb	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Ace Of Clubs (Crystal) (IMPACT, set 2)", GAME_FLAGS )
+
 GAME( 199?, j6acehi		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Ace", "Aces High (Ace) (IMPACT)", GAME_FLAGS )
+
 GAME( 199?, j6amdrm		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Mdm", "American Dream (Mdm) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6arcade	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6bnkrcl	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Banker Club (JPM) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6big50		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big 50 (JPM) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6bigbnk	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Banker (JPM) (IMPACT)", GAME_FLAGS )
+
+GAME( 199?, j6arcade	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 1)", GAME_FLAGS )
+GAME( 199?, j6arcadea	, j6arcade	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 2)", GAME_FLAGS )
+GAME( 199?, j6arcadeb	, j6arcade	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 3)", GAME_FLAGS )
+GAME( 199?, j6arcadec	, j6arcade	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 4)", GAME_FLAGS )
+GAME( 199?, j6arcaded	, j6arcade	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V9, set 5)", GAME_FLAGS )
+GAME( 199?, j6arcadee	, j6arcade	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 1)", GAME_FLAGS )
+GAME( 199?, j6arcadef	, j6arcade	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 2)", GAME_FLAGS )
+GAME( 199?, j6arcadeg	, j6arcade	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 3)", GAME_FLAGS )
+GAME( 199?, j6arcadeh	, j6arcade	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 4)", GAME_FLAGS )
+GAME( 199?, j6arcadei	, j6arcade	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 5)", GAME_FLAGS )
+GAME( 199?, j6arcadej	, j6arcade	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 6)", GAME_FLAGS )
+GAME( 199?, j6arcadek	, j6arcade	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Arcadia (JPM) (IMPACT) (V10, set 7)", GAME_FLAGS )
+
+GAME( 199?, j6bnkrcl	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Banker Club (JPM) (IMPACT) (V6, set 1)", GAME_FLAGS )
+GAME( 199?, j6bnkrcla	, j6bnkrcl	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Banker Club (JPM) (IMPACT) (V6, set 2)", GAME_FLAGS )
+GAME( 199?, j6bnkrclb	, j6bnkrcl	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Banker Club (JPM) (IMPACT) (V6, set 3)", GAME_FLAGS )
+GAME( 199?, j6bnkrclc	, j6bnkrcl	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Banker Club (JPM) (IMPACT) (V2)", GAME_FLAGS )
+
+// all ERROR 5.5
+GAME( 199?, j6big50		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big 50 (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 199?, j6big50a	, j6big50	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big 50 (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 199?, j6big50b	, j6big50	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big 50 (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 199?, j6big50c	, j6big50	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big 50 (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 199?, j6big50d	, j6big50	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big 50 (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+
+// all ERROR 2.9
+// the code in brackets is just what it shows at startup, not sure what it means at the moment
+GAME( 199?, j6bigbnk	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB10C  20) (set 1)", GAME_FLAGS )
+GAME( 199?, j6bigbnka	, j6bigbnk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB10C  20) (set 2)", GAME_FLAGS )
+GAME( 199?, j6bigbnkb	, j6bigbnk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB10C  20) (set 3)", GAME_FLAGS )
+GAME( 199?, j6bigbnkc	, j6bigbnk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB10C  20) (set 4)", GAME_FLAGS )
+GAME( 199?, j6bigbnkd	, j6bigbnk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB8   H18)", GAME_FLAGS )
+GAME( 199?, j6bigbnke	, j6bigbnk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB8 P H18)", GAME_FLAGS )
+GAME( 199?, j6bigbnkf	, j6bigbnk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB8  AH18)", GAME_FLAGS )
+GAME( 199?, j6bigbnkg	, j6bigbnk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB6 C  16) (set 1)", GAME_FLAGS )
+GAME( 199?, j6bigbnkh	, j6bigbnk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB6 C  16) (set 2)", GAME_FLAGS )
+GAME( 199?, j6bigbnki	, j6bigbnk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB2B  H11)", GAME_FLAGS )
+GAME( 199?, j6bigbnkj	, j6bigbnk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB2BP H11)", GAME_FLAGS )
+GAME( 199?, j6bigbnkk	, j6bigbnk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB2B AH11)", GAME_FLAGS )
+GAME( 199?, j6bigbnkl	, j6bigbnk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB2BI H11)", GAME_FLAGS )
+GAME( 199?, j6bigbnkm	, j6bigbnk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB2II H08)", GAME_FLAGS )
+GAME( 199?, j6bigbnkn	, j6bigbnk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB 9C  19)", GAME_FLAGS )
+GAME( 199?, j6bigbnko	, j6bigbnk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB5 I H15)", GAME_FLAGS )
+GAME( 199?, j6bigbnkp	, j6bigbnk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Banker (JPM) (IMPACT) (BB4 I H09)", GAME_FLAGS )
+
+
 GAME( 199?, j6bigbuk	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Big Bucks (JPM) (IMPACT)", GAME_FLAGS )
 GAME( 199?, j6bigcsh	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Empire", "Big Cash Machine (Empire) (IMPACT)", GAME_FLAGS )
 GAME( 199?, j6bigpct	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Ace", "Big Picture (Ace) (IMPACT)", GAME_FLAGS )
