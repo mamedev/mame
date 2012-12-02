@@ -17,49 +17,27 @@
     e800-e803: WD1770 FDC
     ec00-ecef: ES5503 "DOC" sound chip
     f000-ffff: boot ROM
-
-LED patterns
-
-     80
-    _____
-   |     | 40
-04 | 02  |
-    _____
-   |     | 20
-08 |     |
-    _____
-     10
-        76543210
-PORT A: 111xyzzz
-
-PA4/PA5 are the "enable" for the two LEDs
-
-7seg Display    Bits
-'0'  %11111100 $FC
-'1'  %01100000 $60
-'2'  %11011010 $DA
-'3'  %11110010 $F2
-'4'  %01100110 $66
-'5'  %10110110 $B6
-'6'  %10111110 $BE
-'7'  %11100000 $E0
-'8'  %11111110 $FE
-'9'  %11100110 $E6
-'A'  %11101110 $EE
-'b'  %00111110 $3E
-'C'  %10011100 $9C
-'d'  %01111010 $7A
-'E'  %10011110 $9E
-'F'  %10001110 $8E
-'L'  %00011100 $1C
-'n'  %00101010 $2A
-'o'  %00111010 $3A
-'P'  %11001110 $CE
-'r'  %00001010 $0A
-'U' %01111100 $7C
-'c' %00011010 $1A
-'u' %01111000 $38
-
+ 
+    NMI: IRQ from WD1772
+    IRQ: DRQ from WD1772 wire-ORed with IRQ from ES5503 wire-ORed with IRQ from VIA6522
+    FIRQ: IRQ from 6850 UART
+ 
+    LED / switch matrix:
+ 
+    		A           B           C             D         E         F         G        DP
+    ROW 0:  LOAD UPPER  LOAD LOWER  SAMPLE UPPER  PLAY SEQ  LOAD SEQ  SAVE SEQ  REC SEQ  SAMPLE LOWER
+    ROW 1:  3           6           9             5         8         0         2        Enter
+    ROW 2:  1           4           7             up arrow  PARAM     dn arrow  VALUE    CANCEL
+    L. AN:  SEG A       SEG B       SEG C         SEG D     SEG E     SEG F     SEG G    SEG DP (decimal point)
+    R. AN:  SEG A       SEG B       SEG C         SEG D     SEG E     SEG F     SEG G    SEG DP
+ 
+    Column number in VIA port A bits 0-2 is converted to discrete lines by a 74LS145.
+    Port A bit 3 is right anode, bit 4 is left anode
+    ROW 0 is read on VIA port A bit 5, ROW 1 in port A bit 6, and ROW 2 in port A bit 7.
+ 
+    Keyboard models talk to the R6500 through the VIA shifter: CA2 is handshake, CB1 is shift clock, CB2 is shift data.
+    This is unconnected on the rackmount version.
+ 
 ***************************************************************************/
 
 
@@ -73,6 +51,8 @@ PA4/PA5 are the "enable" for the two LEDs
 #include "formats/dfi_dsk.h"
 #include "formats/ipf_dsk.h"
 #include "sound/es5503.h"
+
+#include "mirage.lh"
 
 class mirage_state : public driver_device
 {
@@ -105,6 +85,11 @@ public:
 	DECLARE_READ8_MEMBER(mirage_via_read_cb1);
 	DECLARE_READ8_MEMBER(mirage_via_read_ca2);
 	DECLARE_READ8_MEMBER(mirage_via_read_cb2);
+
+	DECLARE_WRITE_LINE_MEMBER(acia_irq_w);
+
+	UINT8 m_l_segs, m_r_segs;
+	int   m_l_hi, m_r_hi;
 };
 
 FLOPPY_FORMATS_MEMBER( mirage_state::floppy_formats )
@@ -115,6 +100,11 @@ static SLOT_INTERFACE_START( ensoniq_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
+WRITE_LINE_MEMBER(mirage_state::acia_irq_w)
+{
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+}
+
 void mirage_state::fdc_intrq_w(bool state)
 {
     m_maincpu->set_input_line(INPUT_LINE_NMI, state);
@@ -122,16 +112,17 @@ void mirage_state::fdc_intrq_w(bool state)
 
 void mirage_state::fdc_drq_w(bool state)
 {
-    m_maincpu->set_input_line(M6809_FIRQ_LINE, state);
+    m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
 static void mirage_doc_irq(device_t *device, int state)
 {
+//    m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
 static UINT8 mirage_adc_read(device_t *device)
 {
-	return 0x80;
+	return 0x00;
 }
 
 void mirage_state::video_start()
@@ -163,9 +154,55 @@ static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 8, mirage_state )
 ADDRESS_MAP_END
 
 // port A: front panel
+// bits 0-2: column select from 0-7
+// bits 3/4 = right and left LED enable
+// bits 5/6/7 keypad rows 0/1/2 return
 WRITE8_MEMBER(mirage_state::mirage_via_write_porta)
 {
-//  printf("PORT A: %02x\n", data);
+	UINT8 seg = data & 7;
+	static const int segconv[8] =
+	{
+		16, 8, 32, 2, 1, 64, 128, 4
+	};
+
+//	printf("PA: %02x (PC=%x)\n", data, m_maincpu->pc());
+
+	// left LED selected?
+	if ((data & 0x10) == 0x10)
+	{
+		// if the segment number is lower than last time, we've
+		// started a new refresh cycle
+		if ((seg < m_l_hi) || (seg == 0))
+		{
+			m_l_segs = segconv[seg];
+		}
+		else
+		{
+			m_l_segs |= segconv[seg];
+		}
+
+		m_l_hi = seg;
+		output_set_digit_value(0, m_l_segs);
+//		printf("L LED: seg %d (hi %d conv %02x, %02x)\n", seg, m_l_hi, segconv[seg], m_l_segs);
+	}
+	// right LED selected?
+	if ((data & 0x08) == 0x08)
+	{
+		// if the segment number is lower than last time, we've
+		// started a new refresh cycle
+		if ((seg < m_r_hi) || (seg == 0))
+		{
+			m_r_segs = segconv[seg];
+		}
+		else
+		{
+			m_r_segs |= segconv[seg];
+		}
+
+		m_r_hi = seg;
+		output_set_digit_value(1, m_r_segs);
+//		printf("R LED: seg %d (hi %d conv %02x, %02x)\n", seg, m_r_hi, segconv[seg], m_r_segs);
+	}
 }
 
 // port B:
@@ -197,7 +234,7 @@ READ8_MEMBER(mirage_state::mirage_via_read_porta)
 }
 
 // port B:
-//  bit 6: IN FDC disk loaded
+//  bit 6: IN FDC disk ready
 //  bit 5: IN 5503 sync (?)
 READ8_MEMBER(mirage_state::mirage_via_read_portb)
 {
@@ -231,14 +268,14 @@ READ8_MEMBER(mirage_state::mirage_via_read_cb2)
 
 const via6522_interface mirage_via =
 {
-	DEVCB_DRIVER_MEMBER(mirage_state,mirage_via_read_porta),
-	DEVCB_DRIVER_MEMBER(mirage_state,mirage_via_read_portb),
-	DEVCB_DRIVER_MEMBER(mirage_state,mirage_via_read_ca1),
-	DEVCB_DRIVER_MEMBER(mirage_state,mirage_via_read_cb1),
-	DEVCB_DRIVER_MEMBER(mirage_state,mirage_via_read_ca2),
-	DEVCB_DRIVER_MEMBER(mirage_state,mirage_via_read_cb2),
-	DEVCB_DRIVER_MEMBER(mirage_state,mirage_via_write_porta),
-	DEVCB_DRIVER_MEMBER(mirage_state,mirage_via_write_portb),
+	DEVCB_DRIVER_MEMBER(mirage_state, mirage_via_read_porta),
+	DEVCB_DRIVER_MEMBER(mirage_state, mirage_via_read_portb),
+	DEVCB_DRIVER_MEMBER(mirage_state, mirage_via_read_ca1),
+	DEVCB_DRIVER_MEMBER(mirage_state, mirage_via_read_cb1),
+	DEVCB_DRIVER_MEMBER(mirage_state, mirage_via_read_ca2),
+	DEVCB_DRIVER_MEMBER(mirage_state, mirage_via_read_cb2),
+	DEVCB_DRIVER_MEMBER(mirage_state, mirage_via_write_porta),
+	DEVCB_DRIVER_MEMBER(mirage_state, mirage_via_write_portb),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -255,19 +292,14 @@ static ACIA6850_INTERFACE( mirage_acia6850_interface )
 	DEVCB_NULL,			// cts in
 	DEVCB_NULL,			// rts out
 	DEVCB_NULL,			// dcd in
-	DEVCB_NULL
-	//	DEVCB_CPU_INPUT_LINE("maincpu", M6809_FIRQ_LINE)
+	DEVCB_DRIVER_LINE_MEMBER(mirage_state, acia_irq_w)
 };
 
 static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_CPU_ADD("maincpu", M6809E, 4000000)
 	MCFG_CPU_PROGRAM_MAP(mirage_map)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(mirage_state, screen_update_mirage)
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+	MCFG_DEFAULT_LAYOUT( layout_mirage )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_ES5503_ADD("es5503", 7000000, 2, mirage_doc_irq, mirage_adc_read)
@@ -305,7 +337,9 @@ DRIVER_INIT_MEMBER(mirage_state,mirage)
 
         floppy->ss_w(0);
     }
+
+	m_l_hi = m_r_hi = 9;
+	m_l_segs = m_r_segs = 0;
 }
 
 CONS( 1984, enmirage, 0, 0, mirage, mirage, mirage_state, mirage, "Ensoniq", "Ensoniq Mirage", GAME_NOT_WORKING )
-

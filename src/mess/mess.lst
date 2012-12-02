@@ -332,6 +332,9 @@ neocdz	// NeoGeo CDZ
 // Philips
 cdimono1  // Philips CD-i (Mono-I board)
 
+// Yamaha
+mu100	// 1997 MU-100
+
 //***************COMPUTERS**************************************************
 
 // Acorn

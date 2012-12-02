@@ -405,6 +405,7 @@ DRVLIBS += \
 	$(MESSOBJ)/wang.a \
 	$(MESSOBJ)/wavemate.a \
 	$(MESSOBJ)/xerox.a \
+	$(MESSOBJ)/yamaha.a \
 	$(MESSOBJ)/zpa.a \
 	$(MESSOBJ)/zvt.a \
 	$(MESSOBJ)/shared.a \
@@ -1953,6 +1954,9 @@ $(MESSOBJ)/xerox.a:				\
 	$(MESS_DRIVERS)/xerox820.o	\
 	$(MESS_DRIVERS)/bigbord2.o	\
 
+$(MESSOBJ)/yamaha.a:			\
+	$(MESS_DRIVERS)/ymmu100.o	\
+
 $(MESSOBJ)/zpa.a:				\
 	$(MESS_DRIVERS)/iq151.o		\
 	$(MESS_MACHINE)/iq151cart.o	\
@@ -2198,6 +2202,7 @@ $(MESS_DRIVERS)/mekd2.o:	$(MESS_LAYOUT)/mekd2.lh
 $(MESS_DRIVERS)/mephisto.o:	$(MESS_LAYOUT)/mephisto.lh
 $(MESS_DRIVERS)/merlin.o:	$(MESS_LAYOUT)/merlin.lh
 $(MESS_DRIVERS)/mikrolab.o:	$(MESS_LAYOUT)/mikrolab.lh
+$(MESS_DRIVERS)/mirage.o:	$(MESS_LAYOUT)/mirage.lh
 $(MESS_DRIVERS)/mk1.o:		$(MESS_LAYOUT)/mk1.lh
 $(MESS_DRIVERS)/mk14.o:		$(MESS_LAYOUT)/mk14.lh
 $(MESS_DRIVERS)/mk2.o:		$(MESS_LAYOUT)/mk2.lh
