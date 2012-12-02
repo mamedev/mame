@@ -1487,6 +1487,16 @@ ROM_START( j6indy )
 	ROM_LOAD( "indisnd.bin", 0x0000, 0x080000, CRC(90ff139b) SHA1(9555553dc01055c311d4917e6ed7f5d3b6bf3b71) )
 ROM_END
 
+ROM_START( j6indya )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "indy04020.p1", 0x00000, 0x10000, CRC(52ca267c) SHA1(7cd90b536d974afd504620f12868c5efe83ef9dd) )
+	ROM_LOAD16_BYTE( "indy04020.p2", 0x00001, 0x10000, CRC(d96e3937) SHA1(902bb6021f5e1fa7471bce9de207e4df5f071fc4) )
+
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD( "indy04020.snd", 0x00000, 0x080000, CRC(0266d48e) SHA1(c16ebdc6f73a6c832f765b909ca5511eaf728897) )
+ROM_END
+
+
 
 ROM_START( j6showtm )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
@@ -3798,6 +3808,7 @@ GAME( 199?, j6hiphop	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Ace", "H
 GAME( 199?, j6hotsht	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Ace", "Hot Shot (Ace) (IMPACT)", GAME_FLAGS )
 GAME( 199?, j6impuls	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Impulse (JPM) (IMPACT)", GAME_FLAGS )
 GAME( 199?, j6indy		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT)", GAME_FLAGS )
+GAME( 199?, j6indya		, j6indy	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT, German)", GAME_FLAGS ) // was marked as Sys5 'Indy 500' but is clearly IMPACT and has Indiana Jones / Holy Grail strings (might be a different game to the english set)
 GAME( 199?, j6showtm	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "It's Showtime (JPM) (IMPACT)", GAME_FLAGS )
 GAME( 199?, j6jackjs	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Qps", "Jackpot Justice (Qps) (IMPACT)", GAME_FLAGS )
 GAME( 199?, j6jkrgld	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Jokers Gold (JPM) (IMPACT)", GAME_FLAGS )

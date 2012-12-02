@@ -809,14 +809,6 @@ ROM_START( j5indsum )
 ROM_END
 
 
-ROM_START( j5indy )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "indy04020.p1", 0x00000, 0x10000, CRC(52ca267c) SHA1(7cd90b536d974afd504620f12868c5efe83ef9dd) )
-	ROM_LOAD16_BYTE( "indy04020.p2", 0x00001, 0x10000, CRC(d96e3937) SHA1(902bb6021f5e1fa7471bce9de207e4df5f071fc4) )
-
-	ROM_REGION( 0x80000, "upd7759", 0 )
-	ROM_LOAD( "indy04020.snd", 0x00000, 0x080000, CRC(0266d48e) SHA1(c16ebdc6f73a6c832f765b909ca5511eaf728897) )
-ROM_END
 
 
 ROM_START( j5intr )
@@ -1538,7 +1530,6 @@ GAME( 199?, j5hotdoga	, j5hotdog	, jpmsys5_ym, popeye, driver_device, 0, ROT0, "
 
 GAME( 199?, j5indsum	, 0			, jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Indian Summer (JPM) (SYSTEM5)", GAME_FLAGS )
 
-GAME( 199?, j5indy		, 0			, jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Indy 500 (JPM) (SYSTEM5)", GAME_FLAGS ) // accesses 0x4800A6, 4800A0  (impact?)
 
 GAME( 199?, j5intr		, 0			, jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Intrigue (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
 GAME( 199?, j5intra		, j5intr	, jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Intrigue (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
