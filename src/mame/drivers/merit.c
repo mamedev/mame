@@ -1179,7 +1179,7 @@ static INPUT_PORTS_START( riviera )
 	PORT_DIPNAME( 0x02, 0x00, "Bonus Jackpot" )	PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:3") /* Flyer suggests this might be "10-IN-A-ROW" bonus */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, "Raise Option" )	PORT_DIPLOCATION("SW1:4")
