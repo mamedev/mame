@@ -846,10 +846,12 @@ $(MAMEOBJ)/jaleco.a: \
 $(MAMEOBJ)/jpm.a: \
 	$(DRIVERS)/guab.o \
 	$(DRIVERS)/jpmsys5.o \
+	$(DRIVERS)/jpmsys5sw.o \
 	$(DRIVERS)/jpmmps.o \
 	$(DRIVERS)/jpms80.o \
 	$(DRIVERS)/jpmsru.o \
 	$(DRIVERS)/jpmimpct.o $(VIDEO)/jpmimpct.o \
+	$(DRIVERS)/jpmimpctsw.o \
 	$(DRIVERS)/pluto5.o \
 	$(DRIVERS)/jpmsys7.o \
 	$(VIDEO)/awpvid.o \

@@ -17089,33 +17089,7 @@ ROM_START( sc4coroa )
 	sc_coro_others
 ROM_END
 
-ROM_START( sc4corotb )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95416742.lo", 0x00001, 0x080000, CRC(5e3c1a6a) SHA1(8d4c83be4f9192df01aa3b04a1a1ce17fe48a2a7) )
-	ROM_LOAD16_BYTE( "95416743.hi", 0x00000, 0x080000, CRC(b9020b30) SHA1(3e27080ef2e341b4ce37e803f54ade398a4eaca6) )
-	sc_coro_others
-ROM_END
 
-ROM_START( sc4coroc )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95416752.lo", 0x00001, 0x080000, CRC(b50fae97) SHA1(9f3afd1c6dfff818155ccaeaf18889224cd6d625) )
-	ROM_LOAD16_BYTE( "95416753.hi", 0x00000, 0x080000, CRC(5a88a8dc) SHA1(4f32fb7744af6f05bc9b6ba82f4ca5ccf6c4fa12) )
-	sc_coro_others
-ROM_END
-
-ROM_START( sc4corod )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95416838.lo", 0x00001, 0x080000, CRC(0964030d) SHA1(451f681e85223d9bf25e1a3803a178948f3e2cc1) )
-	ROM_LOAD16_BYTE( "95416839.hi", 0x00000, 0x080000, CRC(75e641fb) SHA1(655e1694cec922d99b013d52ea008e6f0c87ad4c) )
-	sc_coro_others
-ROM_END
-
-ROM_START( sc4corotba )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95416904.lo", 0x00001, 0x080000, CRC(af23d81c) SHA1(f2854e93a2992671dcfefaa8b980d95b1ec0a483) )
-	ROM_LOAD16_BYTE( "95416905.hi", 0x00000, 0x080000, CRC(de4cf602) SHA1(d71cb4f2746d8c0fa2eeb577296ff8b7b08bcd79) )
-	sc_coro_others
-ROM_END
 
 ROM_START( sc4corof )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -17131,19 +17105,6 @@ ROM_START( sc4corog )
 	sc_coro_others
 ROM_END
 
-ROM_START( sc4coroh )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95417752.lo", 0x00001, 0x080000, CRC(0860b91a) SHA1(3cb58778418fbffd2fd43d70fcbd4854dc595aa7) )
-	ROM_LOAD16_BYTE( "95417753.hi", 0x00000, 0x080000, CRC(0344ba50) SHA1(c8210b78fc2427db3620c5fe5f26b8df28f7e16d) )
-	sc_coro_others
-ROM_END
-
-ROM_START( sc4coroi )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95417838.lo", 0x00001, 0x080000, CRC(1c90823a) SHA1(7787c98aa784f3cfc9443c1ef9ab22dc814b9a80) )
-	ROM_LOAD16_BYTE( "95417839.hi", 0x00000, 0x080000, CRC(70d722e7) SHA1(bafeb7828b88a8b25daa9cb6bb4d540f89e71f6f) )
-	sc_coro_others
-ROM_END
 
 ROM_START( sc4coroj )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -17173,13 +17134,56 @@ ROM_START( sc4corom )
 	sc_coro_others
 ROM_END
 
+
 ROM_START( sc4coron )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95416744.lo", 0x00001, 0x080000, CRC(4582bb6a) SHA1(70189c6602dc258baa8c7273820b1b5e9696ab3e) )
 	ROM_LOAD16_BYTE( "95416745.hi", 0x00000, 0x080000, NO_DUMP )
-	sc_coro_others
+	COROST_TRIPLE_SOUNDS
 ROM_END
 
+ROM_START( sc4corotb )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95416742.lo", 0x00001, 0x080000, CRC(5e3c1a6a) SHA1(8d4c83be4f9192df01aa3b04a1a1ce17fe48a2a7) )
+	ROM_LOAD16_BYTE( "95416743.hi", 0x00000, 0x080000, CRC(b9020b30) SHA1(3e27080ef2e341b4ce37e803f54ade398a4eaca6) )
+	COROST_TRIPLE_SOUNDS
+ROM_END
+
+
+ROM_START( sc4corotba )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95416904.lo", 0x00001, 0x080000, CRC(af23d81c) SHA1(f2854e93a2992671dcfefaa8b980d95b1ec0a483) )
+	ROM_LOAD16_BYTE( "95416905.hi", 0x00000, 0x080000, CRC(de4cf602) SHA1(d71cb4f2746d8c0fa2eeb577296ff8b7b08bcd79) )
+	COROST_TRIPLE_SOUNDS
+ROM_END
+
+ROM_START( sc4coroc )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95416752.lo", 0x00001, 0x080000, CRC(b50fae97) SHA1(9f3afd1c6dfff818155ccaeaf18889224cd6d625) )
+	ROM_LOAD16_BYTE( "95416753.hi", 0x00000, 0x080000, CRC(5a88a8dc) SHA1(4f32fb7744af6f05bc9b6ba82f4ca5ccf6c4fa12) )
+	COROST_TRIPLE_SOUNDS
+ROM_END
+
+ROM_START( sc4corod )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95416838.lo", 0x00001, 0x080000, CRC(0964030d) SHA1(451f681e85223d9bf25e1a3803a178948f3e2cc1) )
+	ROM_LOAD16_BYTE( "95416839.hi", 0x00000, 0x080000, CRC(75e641fb) SHA1(655e1694cec922d99b013d52ea008e6f0c87ad4c) )
+	COROST_TRIPLE_SOUNDS
+ROM_END
+
+ROM_START( sc4coroh )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95417752.lo", 0x00001, 0x080000, CRC(0860b91a) SHA1(3cb58778418fbffd2fd43d70fcbd4854dc595aa7) )
+	ROM_LOAD16_BYTE( "95417753.hi", 0x00000, 0x080000, CRC(0344ba50) SHA1(c8210b78fc2427db3620c5fe5f26b8df28f7e16d) )
+	COROST_TRIPLE_SOUNDS
+ROM_END
+
+ROM_START( sc4coroi )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95417838.lo", 0x00001, 0x080000, CRC(1c90823a) SHA1(7787c98aa784f3cfc9443c1ef9ab22dc814b9a80) )
+	ROM_LOAD16_BYTE( "95417839.hi", 0x00000, 0x080000, CRC(70d722e7) SHA1(bafeb7828b88a8b25daa9cb6bb4d540f89e71f6f) )
+	COROST_TRIPLE_SOUNDS
+ROM_END
 
 ROM_START( sc4count )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -22673,7 +22677,7 @@ ROM_START( sc4tbox )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95406948.lo", 0x00001, 0x080000, CRC(54c8a319) SHA1(e1ec970b0031f89822efe6f9751ca3c2b0338d25) )
 	ROM_LOAD16_BYTE( "95406949.hi", 0x00000, 0x080000, CRC(48d8cd13) SHA1(bab50430c53b5dde848698f1a97140e1bfeb895f) )
-	sc_tbox_others
+	sc_ggame_others
 ROM_END
 
 
@@ -24613,32 +24617,56 @@ GAME( 200?, sc4crzgn7	,sc4crzgn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Ga
 GAME( 200?, sc4crzgn8	,sc4crzgn,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Crazy Gang Arcade (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
 
 
+static const stepper_interface* sc4crzky_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4crzky)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4crzky_reel_configs;
+}
+
+
+DRIVER_INIT_MEMBER(sc4_state,sc4crzky_mbus)
+{
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4crzky_reel_configs;
+}
+
+
 // PR1128 CASINO CRAZY KEYS         PR1128 CRAZY KEYS SOUNDS11
-GAME( 200?, sc4crzky	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkya	,sc4crzky,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkyb	,sc4crzky,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkyc	,sc4crzky,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkyd	,sc4crzky,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkye	,sc4crzky,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkyf	,sc4crzky,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkyg	,sc4crzky,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING ) // incomplete pairing
-GAME( 200?, sc4crzkyh	,sc4crzky,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkyl	,sc4crzky,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkym	,sc4crzky,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkyn	,sc4crzky,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkyt	,sc4crzky,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkyu	,sc4crzky,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzky	,0,			sc4, sc4, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkya	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkyb	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkyc	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkyd	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkye	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkyf	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkyg	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING ) // incomplete pairing
+GAME( 200?, sc4crzkyh	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkyl	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkym	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 11)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkyn	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 12)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkyt	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkyu	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky, ROT0, "BFM","Casino Crazy Keys (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING )
 // PR1128 CASINO CRAZY KEYS         CRAZY KEYS  ARCADE  PR1128 CRAZY KEYS SOUNDS11
-GAME( 200?, sc4crzkyi	,sc4crzky,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkyj	,sc4crzky,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkyk	,sc4crzky,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkyo	,sc4crzky,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkyp	,sc4crzky,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkyq	,sc4crzky,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkyr	,sc4crzky,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkys	,sc4crzky,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkyv	,sc4crzky,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
-GAME( 200?, sc4crzkyw	,sc4crzky,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkyi	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkyj	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkyk	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkyo	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkyp	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkyq	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkyr	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkys	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkyv	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING )
+GAME( 200?, sc4crzkyw	,sc4crzky,	sc4, sc4, sc4_state, sc4crzky_mbus, ROT0, "BFM","Casino Crazy Keys Arcade (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING )
 
 
 static const stepper_interface* sc4cccsh_reel_configs[6] =
@@ -29694,30 +29722,104 @@ GAME( 200?, sc4crsce	,sc4crsc,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cops '
 GAME( 200?, sc4crscf	,sc4crsc,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
 GAME( 200?, sc4crscg	,sc4crsc,	sc4, sc4, sc4_state, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
 
+
+static const stepper_interface* sc4coro_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	&starpointrm20_interface_48step,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4coro)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4coro_reel_configs;
+}
+
 // PR2252 CORONATION  ST         CORRY SOUNDS                 CORONATION  ST
-GAME( 200?, sc4coro		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4coroa	,sc4coro,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-GAME( 200?, sc4corof	,sc4coro,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
-GAME( 200?, sc4corog	,sc4coro,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
-GAME( 200?, sc4coroj	,sc4coro,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
-GAME( 200?, sc4corok	,sc4coro,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
-GAME( 200?, sc4corol	,sc4coro,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
-GAME( 200?, sc4corom	,sc4coro,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+GAME( 200?, sc4coro		,0,			sc4, sc4, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4coroa	,sc4coro,	sc4, sc4, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4corof	,sc4coro,	sc4, sc4, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
+GAME( 200?, sc4corog	,sc4coro,	sc4, sc4, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
+GAME( 200?, sc4coroj	,sc4coro,	sc4, sc4, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+GAME( 200?, sc4corok	,sc4coro,	sc4, sc4, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 6)", GAME_NOT_WORKING )
+GAME( 200?, sc4corol	,sc4coro,	sc4, sc4, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING )
+GAME( 200?, sc4corom	,sc4coro,	sc4, sc4, sc4_state, sc4coro, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING )
+
+
+static const stepper_interface* sc4corod_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4corod)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4corod_reel_configs;
+}
+
+
+static const stepper_interface* sc4corotb_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	0,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4corotb)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4corotb_reel_configs;
+}
+
+
+// I think the 'Triple' is a different game, with base units + the top box
+// it seems more like a 'Casino' game with far less lamps used, although only sets sc4corod / sc4coroi run and neither waits for the topbox, so it's probably optional
+
 // PR2249 CORONATION ST Arcade Version 012         COROST_TRIPLE SOUNDS          CORONATION  ST
-GAME( 200?, sc4coroc	,sc4coro,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street Arcade (PR2249) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4coroh	,sc4coro,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street Arcade (PR2249) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-// PR2249 CORONATION STREET         CORS  MAZ COROST_TRIPLE SOUNDS
-GAME( 200?, sc4corod	,sc4coro,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street Triple (PR2249) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4coroi	,sc4coro,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street Triple (PR2249) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
-// PR2526 CORONATION ST TOP BOX         COROST_TRIPLE SOUNDS          CORONATION ST
-GAME( 200?, sc4corotb	,sc4coro,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street Top Box (PR2526, CSTB) (Mazooma) (Scorpion 4) (Top Box, set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4corotba	,sc4coro,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street Top Box (PR2526, CSTB) (Mazooma) (Scorpion 4) (Top Box, set 2)", GAME_NOT_WORKING )
+// PAY UINT ERR 17
+GAME( 200?, sc4coroc	,0,	        sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street Triple (Arcade Version 012) (PR2249) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4coroh	,sc4coroc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street Triple (Arcade Version 012) (PR2249) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
 // P_2_4_ _O_O_A_I_N_S_ _i_g_ _e_s_o_ _1_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _O_O_T_T_I_L_ _O_N_S_ _ _ _ _ _ _ _C_R_N_T_O_ _S_ _ _ _
-GAME( 200?, sc4coron	,sc4coro,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street Bingo Version ?1 (PR2?4?) (Mazooma) (Scorpion 4) ", GAME_NOT_WORKING ) // incomplete pair, was in 'show me the money' set 'Bingo Version' is a guess
+GAME( 200?, sc4coron	,sc4coroc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Coronation Street Triple (Bingo Version ?1) (PR2?4?) (Mazooma) (Scorpion 4) ", GAME_NOT_WORKING ) // incomplete pair, was in 'show me the money' set 'Bingo Version' is a guess
+// PR2249 CORONATION STREET         CORS  MAZ COROST_TRIPLE SOUNDS
+GAME( 200?, sc4corod	,sc4coroc,	sc4, sc4, sc4_state, sc4corod, ROT0, "Mazooma","Coronation Street Triple (PR2249) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4coroi	,sc4coroc,	sc4, sc4, sc4_state, sc4corod, ROT0, "Mazooma","Coronation Street Triple (PR2249) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
+// PR2526 CORONATION ST TOP BOX         COROST_TRIPLE SOUNDS          CORONATION ST
+GAME( 200?, sc4corotb	,sc4coroc,	sc4, sc4, sc4_state, sc4corotb, ROT0, "Mazooma","Coronation Street Triple Top Box (PR2526, CSTB) (Mazooma) (Scorpion 4) (Top Box, set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4corotba	,sc4coroc,	sc4, sc4, sc4_state, sc4corotb, ROT0, "Mazooma","Coronation Street Triple Top Box (PR2526, CSTB) (Mazooma) (Scorpion 4) (Top Box, set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
+
+static const stepper_interface* sc4corcl_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4corcl)
+{
+	DRIVER_INIT_CALL(sc4mbus);
+	m_reel_setup = sc4corcl_reel_configs;
+}
+
 
 // PR2383 CLUBCORONATIONSTREET         CLUBCORONATIONST  CLUB  CCORO SOUNDS         CLUB CORO ST
-GAME( 200?, sc4corcl	,0,			sc4, sc4, sc4_state, sc4mbus, ROT0, "Mazooma","Coronation Street Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
-GAME( 200?, sc4corcla	,sc4corcl,	sc4, sc4, sc4_state, sc4mbus, ROT0, "Mazooma","Coronation Street Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4corcl	,0,			sc4, sc4, sc4_state, sc4corcl, ROT0, "Mazooma","Coronation Street Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4corcla	,sc4corcl,	sc4, sc4, sc4_state, sc4corcl, ROT0, "Mazooma","Coronation Street Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
 static const stepper_interface* sc4count_reel_configs[6] =
 {
@@ -32765,6 +32867,38 @@ DRIVER_INIT_MEMBER(sc4_state,sc4boomb)
 GAME( 200?, sc4boomb	,0, 	    sc4, sc4, sc4_state, sc4boomb, ROT0, "BFM","Monopoly Boom Or Bust (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4boomba	,sc4boomb,	sc4, sc4, sc4_state, sc4boomb, ROT0, "BFM","Monopoly Boom Or Bust (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
+
+
+static const stepper_interface* sc4fever_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpoint_interface_200step_reel,
+	&starpointrm20_interface_48step,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4fever)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4fever_reel_configs;
+}
+
+// we have FEVER SOUNDS12 but it accepts those?
+// PR1007 FEVER         PR1007 FEVER SOUNDS11
+GAME( 200?, sc4fever	,0,			sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4fevera	,sc4fever,	sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4feverb	,sc4fever,	sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4feverc	,sc4fever,	sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4feverd	,sc4fever,	sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4fevere	,sc4fever,	sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4feverf	,sc4fever,	sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4feverg	,sc4fever,	sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4feverh	,sc4fever,	sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4feverk	,sc4fever,	sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_NO_SOUND )
+
+
 /**********************************************************************************************************************************/
 /*  Games below are Dutch versions, and seem to be build on very different code even when titles match other games                */
 /*   they will all alarm for a while complaining about the battery but will then init NVRAM                                       */
@@ -34606,18 +34740,6 @@ GAME( 200?, sc4crzwle	,sc4crzwl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Craz
 GAME( 200?, sc4crzwlf	,sc4crzwl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Crazy World (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4crzwlg	,sc4crzwl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Crazy World (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
-// we have FEVER SOUNDS12
-// PR1007 FEVER         PR1007 FEVER SOUNDS11
-GAME( 200?, sc4fever	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4fevera	,sc4fever,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4feverb	,sc4fever,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4feverc	,sc4fever,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4feverd	,sc4fever,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4fevere	,sc4fever,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 6)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4feverf	,sc4fever,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4feverg	,sc4fever,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4feverh	,sc4fever,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 9)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4feverk	,sc4fever,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 // no sound roms
 // PR6814 FOOTBALL CRAZY         PR6814 FOOTBALL CRAZY SOUNDS
