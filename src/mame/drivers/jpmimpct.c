@@ -86,6 +86,20 @@
 
 ****************************************************************************/
 
+/**************************************************************************
+
+IMPACT Games
+
+IMPACT apparently stands for Interactive Moving Picture Amusment Control
+Technology, and is intended as a replacement for the JPM System 5 board.
+Large sections of the processing were moved to two identical custom ASICs
+(U1 and U2), only half of each is used.
+
+Thanks to Tony Friery and JPeMU for I/O routines and documentation.
+
+***************************************************************************/
+
+
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 
@@ -94,6 +108,10 @@
 #include "machine/meters.h"
 #include "machine/nvram.h"
 #include "jpmimpct.lh"
+#include "video/awpvid.h"
+#include "machine/steppers.h"
+#include "machine/roc10937.h"
+#include "machine/i8255.h"
 
 /*************************************
  *
@@ -608,6 +626,43 @@ static ADDRESS_MAP_START( m68k_program_map, AS_PROGRAM, 16, jpmimpct_state )
 	AM_RANGE(0x00f00000, 0x00ffffff) AM_ROM
 ADDRESS_MAP_END
 
+/*************************************
+ *
+ *  Main CPU memory handlers
+ *
+ *************************************/
+static ADDRESS_MAP_START( awp68k_program_map, AS_PROGRAM, 16, jpmimpct_state )
+	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
+	AM_RANGE(0x00100000, 0x001fffff) AM_ROM
+	AM_RANGE(0x00400000, 0x00403fff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x00480000, 0x0048001f) AM_READWRITE(duart_1_r, duart_1_w)
+	AM_RANGE(0x00480020, 0x00480033) AM_READ(inputs1awp_r)
+	AM_RANGE(0x00480034, 0x00480035) AM_READ(ump_r)
+	AM_RANGE(0x00480040, 0x00480041) AM_READ(optos_r)
+	AM_RANGE(0x00480060, 0x00480067) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write,0x00ff)
+	AM_RANGE(0x00480080, 0x00480081) AM_WRITE(upd7759_w)
+	AM_RANGE(0x00480082, 0x00480083) AM_WRITE(volume_w)
+	AM_RANGE(0x00480084, 0x00480085) AM_READ(upd7759_r)
+	AM_RANGE(0x00480086, 0x0048009f) AM_READ(prot_1_r)
+	AM_RANGE(0x004800a0, 0x004800af) AM_READWRITE(jpmio_r, jpmioawp_w)
+//  AM_RANGE(0x004800b0, 0x004800df) AM_READ(prot_1_r)
+//  AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE(unk_w)
+//  AM_RANGE(0x00480086, 0x006576ff) AM_READ(prot_1_r)
+	AM_RANGE(0x004801dc, 0x004801dd) AM_READ(prot_1_r)
+	AM_RANGE(0x004801de, 0x006575ff) AM_READ(prot_1_r)
+	AM_RANGE(0x00657600, 0x00657601) AM_READ(prot_0_r)
+	AM_RANGE(0x00657602, 0x00ffffff) AM_READ(prot_1_r)
+
+//  AM_RANGE(0x004801dc, 0x004801dd) AM_READ(unk_r)
+//  AM_RANGE(0x004801de, 0x004801df) AM_READ(unk_r)
+	//AM_RANGE(0x00657602, 0x00bfffff) AM_READ(prot_1_r)
+//  AM_RANGE(0x004801e0, 0x004801ff) AM_READWRITE(duart_2_r, duart_2_w)
+//  AM_RANGE(0x00c00000, 0x00cfffff) AM_ROM
+//  AM_RANGE(0x00d00000, 0x00dfffff) AM_ROM
+//  AM_RANGE(0x00e00000, 0x00efffff) AM_ROM
+//  AM_RANGE(0x00f00000, 0x00ffffff) AM_ROM
+ADDRESS_MAP_END
+
 
 /*************************************
  *
@@ -841,23 +896,7 @@ static MACHINE_CONFIG_START( jpmimpct, jpmimpct_state )
 MACHINE_CONFIG_END
 
 
-/**************************************************************************
 
-Mechanical IMPACT Games
-
-IMPACT apparently stands for Interactive Moving Picture Amusment Control
-Technology, and is intended as a replacement for the JPM System 5 board.
-Large sections of the processing were moved to two identical custom ASICs
-(U1 and U2), only half of each is used.
-
-Thanks to Tony Friery and JPeMU for I/O routines and documentation.
-
-***************************************************************************/
-
-#include "video/awpvid.h"
-#include "machine/steppers.h"
-#include "machine/roc10937.h"
-#include "machine/i8255.h"
 
 /*************************************
  *
@@ -1203,42 +1242,7 @@ READ16_MEMBER(jpmimpct_state::ump_r)
 	return 0xff;//0xffff;
 }
 
-/*************************************
- *
- *  Main CPU memory handlers
- *
- *************************************/
-static ADDRESS_MAP_START( awp68k_program_map, AS_PROGRAM, 16, jpmimpct_state )
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
-	AM_RANGE(0x00100000, 0x001fffff) AM_ROM
-	AM_RANGE(0x00400000, 0x00403fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x00480000, 0x0048001f) AM_READWRITE(duart_1_r, duart_1_w)
-	AM_RANGE(0x00480020, 0x00480033) AM_READ(inputs1awp_r)
-	AM_RANGE(0x00480034, 0x00480035) AM_READ(ump_r)
-	AM_RANGE(0x00480040, 0x00480041) AM_READ(optos_r)
-	AM_RANGE(0x00480060, 0x00480067) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write,0x00ff)
-	AM_RANGE(0x00480080, 0x00480081) AM_WRITE(upd7759_w)
-	AM_RANGE(0x00480082, 0x00480083) AM_WRITE(volume_w)
-	AM_RANGE(0x00480084, 0x00480085) AM_READ(upd7759_r)
-	AM_RANGE(0x00480086, 0x0048009f) AM_READ(prot_1_r)
-	AM_RANGE(0x004800a0, 0x004800af) AM_READWRITE(jpmio_r, jpmioawp_w)
-//  AM_RANGE(0x004800b0, 0x004800df) AM_READ(prot_1_r)
-//  AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE(unk_w)
-//  AM_RANGE(0x00480086, 0x006576ff) AM_READ(prot_1_r)
-	AM_RANGE(0x004801dc, 0x004801dd) AM_READ(prot_1_r)
-	AM_RANGE(0x004801de, 0x006575ff) AM_READ(prot_1_r)
-	AM_RANGE(0x00657600, 0x00657601) AM_READ(prot_0_r)
-	AM_RANGE(0x00657602, 0x00ffffff) AM_READ(prot_1_r)
 
-//  AM_RANGE(0x004801dc, 0x004801dd) AM_READ(unk_r)
-//  AM_RANGE(0x004801de, 0x004801df) AM_READ(unk_r)
-	//AM_RANGE(0x00657602, 0x00bfffff) AM_READ(prot_1_r)
-//  AM_RANGE(0x004801e0, 0x004801ff) AM_READWRITE(duart_2_r, duart_2_w)
-//  AM_RANGE(0x00c00000, 0x00cfffff) AM_ROM
-//  AM_RANGE(0x00d00000, 0x00dfffff) AM_ROM
-//  AM_RANGE(0x00e00000, 0x00efffff) AM_ROM
-//  AM_RANGE(0x00f00000, 0x00ffffff) AM_ROM
-ADDRESS_MAP_END
 
 INPUT_PORTS_START( tbirds )
 	PORT_START("DSW")
