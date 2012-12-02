@@ -26823,26 +26823,98 @@ gl_hbhcla
 /* Unknown, Pluto? */
 
 hb_cr		// Cash Raker (QPS)
+hb_cra		//
+hb_crb		//
 hb_bar7		// Bar Seven (Fairgames)
+hb_bar7a	//
 hb_bigx		// Big X (JPM)
+hb_bigxa	//
+hb_bigxb	//
+hb_bigxc	//
+hb_bigxd	//
 hb_ccow		// Cash Cow (Qps)
+hb_ccowa	//
+hb_ccowb	//
 hb_cashc	// Cash Crusade (Qps)
+hb_cashca	//
+hb_cashcb	//
 hb_cashx	// Cash X (Fairgames)
+hb_cashxa	//
 hb_cwf		// Cherry Win Falls (Fairgames)
+hb_cwfa		//
 hb_dac		// Dough & Arrow Club (Qps) [c]
 hb_daca		//
+hb_dacb		//
+hb_dacc		//
+hb_dacd		//
+hb_dace		//
+hb_dacf		//
+hb_dacg		//
+hb_dacz		//
 hb_frtcl	// Fruitopia Club (Qps) [c]
+hb_frtcla	//
+hb_frtclb	//
+hb_frtclc	//
+hb_frtcld	//
+hb_frtcle	//
+hb_frtclf	//
+hb_frtclg	//
+hb_frtclh	//
+hb_frtcli	//
+hb_frtclj	//
+hb_frtclk	//
+hb_frtcll	//
+hb_frtclm	//
+hb_frtcln	//
 hb_gpal		// G' Palace (Qps)
+hb_gpala	//
+hb_gpalb	//
+hb_gpalc	//
+hb_gpald	//
+hb_gpale	//
+hb_gpalf	//
+hb_gpalg	//
+hb_gpalh	//
+hb_gpali	//
 hb_gldpl	// Golden Palace (Mazooma)
+hb_gldpla	//
 hb_gldwn	// Golden Winner (Fairgames)
+hb_gldwna	//
 hb_jailb	// Jail Break (Qps)
+hb_jailba	//
 hb_jkrwl	// Jokers Wild (Fairgames)
+hb_jkrwla	//
 hb_mrmon	// Mr. Money (Qps)
+hb_mrmona	//
+hb_mrmonb	//
+hb_mrmonc	//
 hb_rhv		// Red Hot Voucher (Qps)
+hb_rhva		//
 hb_ringb	// Ring A Bell (JPM)
+hb_ringba	//
+hb_ringbb	//
+hb_ringbc	//
+hb_ringbd	//
+hb_ringbe	//
 hb_rckrl	// Rock 'n' Roll (Qps)
+hb_rckrla	//
+hb_rckrlb	//
+hb_rckrlc	//
+hb_rckrld	//
+hb_rckrle	//
+hb_rckrlf	//
+hb_rckrlg	//
 hb_ydd		// Yabba-Dabba-Dough (Qps)
+hb_ydda		//
 hb_hotst	// Hot Stuff??
+hb_hotsta	//
+hb_hotstb	//
+hb_hotstc	//
+hb_hotstd	//
+hb_hotste	//
+hb_hotstf	//
+hb_hotstg	//
+hb_hotsth	//
 hb_medal	// Medallion Job (Qps)
 
 /* Summit Coin */
