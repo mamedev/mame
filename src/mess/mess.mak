@@ -448,6 +448,7 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/pcshare.o	\
 	$(MAME_MACHINE)/megadriv.o  \
 	$(MAME_MACHINE)/megacd.o \
+	$(MAME_MACHINE)/megacdcd.o \
 	$(MAME_MACHINE)/mega32x.o \
 	$(MAME_MACHINE)/megasvp.o \
 	$(MAME_MACHINE)/megavdp.o \

@@ -1243,6 +1243,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/kopunch.o $(VIDEO)/kopunch.o \
 	$(MACHINE)/megadriv.o \
 	$(MACHINE)/megacd.o \
+	$(MACHINE)/megacdcd.o \
 	$(MACHINE)/mega32x.o \
 	$(MACHINE)/megasvp.o \
 	$(MACHINE)/megavdp.o \

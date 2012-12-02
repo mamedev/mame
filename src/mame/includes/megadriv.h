@@ -10,7 +10,7 @@
 #include "sound/dac.h"
 #include "sound/rf5c68.h"
 #include "sound/sn76496.h"
-#include "imagedev/chd_cd.h"
+
 #include "machine/nvram.h"
 #include "cpu/ssp1601/ssp1601.h"
 
