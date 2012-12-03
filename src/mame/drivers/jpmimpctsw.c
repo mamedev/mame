@@ -3749,54 +3749,118 @@ ROM_START( j6lucklab )
 	j6luckla_sound
 ROM_END
 
-
+#define j6magcir_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "f098.bin", 0x000000, 0x080000, CRC(a4431105) SHA1(2dad84011ccf08be5b642884b2353718ebb4a6c7) ) \
 
 ROM_START( j6magcir )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "magic1.bin", 0x000000, 0x020000, CRC(c7a646dc) SHA1(c4c6e2ecccdccb66421a4c926b9cac5260f855e3) )
 	ROM_LOAD16_BYTE( "magic2.bin", 0x000001, 0x020000, CRC(fc4c700b) SHA1(a25900062b531956420394a412d9b08f1ef2bd02) )
-
-	ROM_REGION( 0x1000000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "927f", 0x000000, 0x020000, CRC(622fc61e) SHA1(c81fcc062c101d5895c54f772d70a31facca3c89) )
-	ROM_LOAD16_BYTE( "92df", 0x000000, 0x020000, CRC(037ca5cc) SHA1(01e9608d912c6ee416bdcbe70001c3333119e26e) )
-	ROM_LOAD16_BYTE( "92f7", 0x000000, 0x020000, CRC(f690fe18) SHA1(f392c48d8693fd822967b5515190bec39410a379) )
-	ROM_LOAD16_BYTE( "92fe", 0x000000, 0x020000, CRC(2c3812e4) SHA1(8b3fac6f854eb0a4807b77a3626f72eff37ebc45) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD( "f098.bin", 0x000000, 0x080000, CRC(a4431105) SHA1(2dad84011ccf08be5b642884b2353718ebb4a6c7) )
+	j6magcir_sound
 ROM_END
+
+ROM_START( j6magcira )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "927f", 0x000000, 0x020000, CRC(622fc61e) SHA1(c81fcc062c101d5895c54f772d70a31facca3c89) )
+	ROM_LOAD16_BYTE( "magic2.bin", 0x000001, 0x020000, CRC(fc4c700b) SHA1(a25900062b531956420394a412d9b08f1ef2bd02) )
+	j6magcir_sound
+ROM_END
+
+ROM_START( j6magcirb )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "92df", 0x000000, 0x020000, CRC(037ca5cc) SHA1(01e9608d912c6ee416bdcbe70001c3333119e26e) )
+	ROM_LOAD16_BYTE( "magic2.bin", 0x000001, 0x020000, CRC(fc4c700b) SHA1(a25900062b531956420394a412d9b08f1ef2bd02) )
+	j6magcir_sound
+ROM_END
+
+ROM_START( j6magcirc )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "92f7", 0x000000, 0x020000, CRC(f690fe18) SHA1(f392c48d8693fd822967b5515190bec39410a379) )
+	ROM_LOAD16_BYTE( "magic2.bin", 0x000001, 0x020000, CRC(fc4c700b) SHA1(a25900062b531956420394a412d9b08f1ef2bd02) )
+	j6magcir_sound
+ROM_END
+
+ROM_START( j6magcird )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "92fe", 0x000000, 0x020000, CRC(2c3812e4) SHA1(8b3fac6f854eb0a4807b77a3626f72eff37ebc45) )
+	ROM_LOAD16_BYTE( "magic2.bin", 0x000001, 0x020000, CRC(fc4c700b) SHA1(a25900062b531956420394a412d9b08f1ef2bd02) )
+	j6magcir_sound
+ROM_END
+
+#define j6mavrk_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "1431.bin", 0x000000, 0x080000, CRC(2c95a586) SHA1(81f27d408f29bec0c79a7ac635e74a11cc93f2cc) ) \
 
 
 ROM_START( j6mavrk )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "9435.bin", 0x000000, 0x020000, CRC(b89e31a6) SHA1(9661f14fa9f655ac9748c67802755815da6a688e) )
 	ROM_LOAD16_BYTE( "9436.bin", 0x000001, 0x020000, CRC(cbd565db) SHA1(afdb708a0724746feefde39dd202aaf4250a039b) )
-
-	ROM_REGION( 0x1000000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "9437.bin", 0x000000, 0x020000, CRC(5300659e) SHA1(f5be69a4abce517b4d00877ed8ffbf4ed6fc62ac) )
-	ROM_LOAD16_BYTE( "9438.bin", 0x000000, 0x020000, CRC(ea5af1c7) SHA1(c004d418801e1caf239df4fdaf44ec1382988eea) )
-	ROM_LOAD16_BYTE( "9439.bin", 0x000000, 0x020000, CRC(daf3402e) SHA1(9b57ea4649b4b198c59d49b2be2541dce00fc6af) )
-	ROM_LOAD16_BYTE( "mav4_p2.bin", 0x000000, 0x020000, CRC(9813901e) SHA1(5e8e6565632ef6c0d1ee2ce9a5d68cb1de096d0c) )
-	ROM_LOAD16_BYTE( "mav4p1.bin", 0x000000, 0x020000, CRC(d341b640) SHA1(8bdeb5ef07de5179685862ea82b33b337ed40055) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD( "1431.bin", 0x000000, 0x080000, CRC(2c95a586) SHA1(81f27d408f29bec0c79a7ac635e74a11cc93f2cc) )
+	j6mavrk_sound
 ROM_END
+
+ROM_START( j6mavrka )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "9437.bin", 0x000000, 0x020000, CRC(5300659e) SHA1(f5be69a4abce517b4d00877ed8ffbf4ed6fc62ac) )
+	ROM_LOAD16_BYTE( "9436.bin", 0x000001, 0x020000, CRC(cbd565db) SHA1(afdb708a0724746feefde39dd202aaf4250a039b) )
+	j6mavrk_sound
+ROM_END
+
+ROM_START( j6mavrkb )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "9438.bin", 0x000000, 0x020000, CRC(ea5af1c7) SHA1(c004d418801e1caf239df4fdaf44ec1382988eea) )
+	ROM_LOAD16_BYTE( "9436.bin", 0x000001, 0x020000, CRC(cbd565db) SHA1(afdb708a0724746feefde39dd202aaf4250a039b) )
+	j6mavrk_sound
+ROM_END
+
+ROM_START( j6mavrkc )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "9439.bin", 0x000000, 0x020000, CRC(daf3402e) SHA1(9b57ea4649b4b198c59d49b2be2541dce00fc6af) )
+	ROM_LOAD16_BYTE( "9436.bin", 0x000001, 0x020000, CRC(cbd565db) SHA1(afdb708a0724746feefde39dd202aaf4250a039b) )
+	j6mavrk_sound
+ROM_END
+
+ROM_START( j6mavrkd )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "mav4p1.bin", 0x000000, 0x020000, CRC(d341b640) SHA1(8bdeb5ef07de5179685862ea82b33b337ed40055) )
+	ROM_LOAD16_BYTE( "mav4_p2.bin", 0x000001, 0x020000, CRC(9813901e) SHA1(5e8e6565632ef6c0d1ee2ce9a5d68cb1de096d0c) )
+	j6mavrk_sound
+ROM_END
+
+#define j6maxod_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "maov-snd.bin", 0x000000, 0x080000, CRC(9b527476) SHA1(6a6333aea592a1a7331a79372bbd6a16ff35c252) ) \
 
 
 ROM_START( j6maxod )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "maov-4s1.bin", 0x000000, 0x020000, CRC(f7b64d04) SHA1(1e534125c499a6c5bee1a84287c30caac06dd1fd) )
 	ROM_LOAD16_BYTE( "maov-4s2.bin", 0x000001, 0x020000, CRC(b15d7a78) SHA1(77c14983a9ed9a58a183202390070a28f746f0a7) )
-
-	ROM_REGION( 0x1000000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "maov-4a1.bin", 0x000000, 0x020000, CRC(a5728d65) SHA1(55a25f8fc3c372c324b5eb3105e6b0a249481672) )
-	ROM_LOAD16_BYTE( "maov-4p1.bin", 0x000000, 0x020000, CRC(1c28193c) SHA1(6788344909819863e624974b8a2b60b0f5d4e235) )
-	ROM_LOAD16_BYTE( "maov-4w1.bin", 0x000000, 0x020000, CRC(95db3c8c) SHA1(bd5a7101ec7b04187178a5fec882a2ea5264c97f) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD( "maov-snd.bin", 0x000000, 0x080000, CRC(9b527476) SHA1(6a6333aea592a1a7331a79372bbd6a16ff35c252) )
+	j6maxod_sound
 ROM_END
+
+ROM_START( j6maxoda )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "maov-4a1.bin", 0x000000, 0x020000, CRC(a5728d65) SHA1(55a25f8fc3c372c324b5eb3105e6b0a249481672) )
+	ROM_LOAD16_BYTE( "maov-4s2.bin", 0x000001, 0x020000, CRC(b15d7a78) SHA1(77c14983a9ed9a58a183202390070a28f746f0a7) )
+	j6maxod_sound
+ROM_END
+
+ROM_START( j6maxodb )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "maov-4p1.bin", 0x000000, 0x020000, CRC(1c28193c) SHA1(6788344909819863e624974b8a2b60b0f5d4e235) )
+	ROM_LOAD16_BYTE( "maov-4s2.bin", 0x000001, 0x020000, CRC(b15d7a78) SHA1(77c14983a9ed9a58a183202390070a28f746f0a7) )
+	j6maxod_sound
+ROM_END
+
+ROM_START( j6maxodc )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "maov-4w1.bin", 0x000000, 0x020000, CRC(95db3c8c) SHA1(bd5a7101ec7b04187178a5fec882a2ea5264c97f) )
+	ROM_LOAD16_BYTE( "maov-4s2.bin", 0x000001, 0x020000, CRC(b15d7a78) SHA1(77c14983a9ed9a58a183202390070a28f746f0a7) )
+	j6maxod_sound
+ROM_END
+
 
 
 // startup code very different here.. but still makes the same 4800a0 write in the end
@@ -3809,41 +3873,87 @@ ROM_START( j6maxcsh )
 	ROM_LOAD( "maxcashsnd.bin", 0x000000, 0x080000, CRC(bfa9b42e) SHA1(2dae055df7571b4fd5feed55900f3873cfb00719) )
 ROM_END
 
+#define j6medal_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "medjob.bin", 0x000000, 0x080000, CRC(dd8296bf) SHA1(c9209abf4276d81897476420177d24e739f0441e) ) \
+
 
 ROM_START( j6medal )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "60000101.evn", 0x000000, 0x080000, CRC(c26a8f9c) SHA1(d8ab81ee2c3e00016f215c68d3bc77b8cb3b5cf5) )
 	ROM_LOAD16_BYTE( "60000101.odd", 0x000001, 0x080000, CRC(acf2ec0a) SHA1(b5d0b586c486de0185aa2c7fc991a5f13cebd9a7) )
-
-	ROM_REGION( 0x1000000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "60000103.evn", 0x000000, 0x080000, CRC(1ca919ac) SHA1(72df757a7f04b0224d84032ac8ca39caa40f6b67) )
-	ROM_LOAD16_BYTE( "60000103.odd", 0x000000, 0x080000, CRC(7cba5d94) SHA1(b0f2dd057163879a653cae9270feece8570849ce) )
-	ROM_LOAD16_BYTE( "60000104.evn", 0x000000, 0x080000, CRC(96389082) SHA1(03ef585ef3dc2c612d688a47399ac6b7fcd0d562) )
-	ROM_LOAD16_BYTE( "60000104.odd", 0x000000, 0x080000, CRC(1add99b1) SHA1(228ef281ff45610dee999975c2aa51eb95ac4a29) )
-	ROM_LOAD16_BYTE( "60001103.evn", 0x000000, 0x080000, CRC(1bf17077) SHA1(f14a0d1f255ab9665ac8ea4e02cdbc4178396b55) )
-	ROM_LOAD16_BYTE( "60001103.odd", 0x000000, 0x080000, CRC(66dcc1da) SHA1(3cf289e9c44b24cfb3a74ec810f3cbd4b7bdb891) )
-	ROM_LOAD16_BYTE( "60001104.evn", 0x000000, 0x080000, CRC(a3955286) SHA1(19f864dc04b158882322b1079d40d0588a41b517) )
-	ROM_LOAD16_BYTE( "60001104.odd", 0x000000, 0x080000, CRC(36ec7263) SHA1(d554b702ffd6af0c7c8b700f8e09d348b387598d) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD( "medjob.bin", 0x000000, 0x080000, CRC(dd8296bf) SHA1(c9209abf4276d81897476420177d24e739f0441e) )
+	j6medal_sound
 ROM_END
 
+ROM_START( j6medala )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "60000103.evn", 0x000000, 0x080000, CRC(1ca919ac) SHA1(72df757a7f04b0224d84032ac8ca39caa40f6b67) )
+	ROM_LOAD16_BYTE( "60000103.odd", 0x000001, 0x080000, CRC(7cba5d94) SHA1(b0f2dd057163879a653cae9270feece8570849ce) )
+	j6medal_sound
+ROM_END
+
+ROM_START( j6medalb )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "60000104.evn", 0x000000, 0x080000, CRC(96389082) SHA1(03ef585ef3dc2c612d688a47399ac6b7fcd0d562) )
+	ROM_LOAD16_BYTE( "60000104.odd", 0x000001, 0x080000, CRC(1add99b1) SHA1(228ef281ff45610dee999975c2aa51eb95ac4a29) )
+	j6medal_sound
+ROM_END
+
+ROM_START( j6medalc )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "60001103.evn", 0x000000, 0x080000, CRC(1bf17077) SHA1(f14a0d1f255ab9665ac8ea4e02cdbc4178396b55) )
+	ROM_LOAD16_BYTE( "60001103.odd", 0x000001, 0x080000, CRC(66dcc1da) SHA1(3cf289e9c44b24cfb3a74ec810f3cbd4b7bdb891) )
+	j6medal_sound
+ROM_END
+
+ROM_START( j6medald )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "60001104.evn", 0x000000, 0x080000, CRC(a3955286) SHA1(19f864dc04b158882322b1079d40d0588a41b517) )
+	ROM_LOAD16_BYTE( "60001104.odd", 0x000001, 0x080000, CRC(36ec7263) SHA1(d554b702ffd6af0c7c8b700f8e09d348b387598d) )
+	j6medal_sound
+ROM_END
+
+
+#define j6megbck_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "mebu-snd.bin", 0x000000, 0x080000, CRC(20bce62c) SHA1(50c5959eb5a5f8436a08f9a6a096b18cbf49970e) ) \
 
 ROM_START( j6megbck )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "mebu-4_1.bin", 0x000000, 0x020000, CRC(85080234) SHA1(9a65e7adbf4f5f4832f7daebc2ff9abd430b74a2) )
 	ROM_LOAD16_BYTE( "mebu-4_2.bin", 0x000001, 0x020000, CRC(4f34f862) SHA1(918f056a394c415d45b9a2d4cbe24b7d0ff531f7) )
-
-	ROM_REGION( 0x1000000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "mebu-4a1.bin", 0x000000, 0x020000, CRC(d7ccc255) SHA1(337be895b7af3222bf05b0dd36701684f118afac) )
-	ROM_LOAD16_BYTE( "mebu-4n1.bin", 0x000000, 0x020000, CRC(b43ebaf0) SHA1(08af12e11e20d37a95528e43b0a50dc5a7e657fa) )
-	ROM_LOAD16_BYTE( "mebu-4p1.bin", 0x000000, 0x020000, CRC(6e96560c) SHA1(af35cc8fda76100776312f4c53c1c15a508b175a) )
-	ROM_LOAD16_BYTE( "mebu-4w1.bin", 0x000000, 0x020000, CRC(e76573bc) SHA1(58b65f7423d66d9ba839a450dd40100b4bfc6ffd) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD( "mebu-snd.bin", 0x000000, 0x080000, CRC(20bce62c) SHA1(50c5959eb5a5f8436a08f9a6a096b18cbf49970e) )
+	j6megbck_sound
 ROM_END
+
+ROM_START( j6megbcka )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "mebu-4a1.bin", 0x000000, 0x020000, CRC(d7ccc255) SHA1(337be895b7af3222bf05b0dd36701684f118afac) )
+	ROM_LOAD16_BYTE( "mebu-4_2.bin", 0x000001, 0x020000, CRC(4f34f862) SHA1(918f056a394c415d45b9a2d4cbe24b7d0ff531f7) )
+	j6megbck_sound
+ROM_END
+
+ROM_START( j6megbckb )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "mebu-4n1.bin", 0x000000, 0x020000, CRC(b43ebaf0) SHA1(08af12e11e20d37a95528e43b0a50dc5a7e657fa) )
+	ROM_LOAD16_BYTE( "mebu-4_2.bin", 0x000001, 0x020000, CRC(4f34f862) SHA1(918f056a394c415d45b9a2d4cbe24b7d0ff531f7) )
+	j6megbck_sound
+ROM_END
+
+ROM_START( j6megbckc )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "mebu-4p1.bin", 0x000000, 0x020000, CRC(6e96560c) SHA1(af35cc8fda76100776312f4c53c1c15a508b175a) )
+	ROM_LOAD16_BYTE( "mebu-4_2.bin", 0x000001, 0x020000, CRC(4f34f862) SHA1(918f056a394c415d45b9a2d4cbe24b7d0ff531f7) )
+	j6megbck_sound
+ROM_END
+
+ROM_START( j6megbckd )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "mebu-4w1.bin", 0x000000, 0x020000, CRC(e76573bc) SHA1(58b65f7423d66d9ba839a450dd40100b4bfc6ffd) )
+	ROM_LOAD16_BYTE( "mebu-4_2.bin", 0x000001, 0x020000, CRC(4f34f862) SHA1(918f056a394c415d45b9a2d4cbe24b7d0ff531f7) )
+	j6megbck_sound
+ROM_END
+
+
 
 
 ROM_START( j6monmad )
@@ -3863,63 +3973,170 @@ ROM_START( j6monspd )
 
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
 	/* missing? */
-
 ROM_END
+
+
+#define j6montlk_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+/*  ROM_LOAD( "1109.bin", 0x000000, 0x080000, CRC(b4d7ac12) SHA1(ac194d15e9d4e5cdadddbf2dc3c9660b52f116c2) ) */  \
+	ROM_LOAD( "mtsnd.bin", 0x000000, 0x080000, CRC(b4d7ac12) SHA1(ac194d15e9d4e5cdadddbf2dc3c9660b52f116c2) ) \
 
 
 ROM_START( j6montlk )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "money talks 8 3-1.bin", 0x000000, 0x020000, CRC(42936de2) SHA1(e9ba9f2af8a6e2bcf887976f50ff7e3e3dcf86d7) )
 	ROM_LOAD16_BYTE( "money talks 8 3-2.bin", 0x000001, 0x020000, CRC(25ad84ed) SHA1(f704eceadc6f4f422f6ff421837aa6c9f2f533f7) )
-
-	ROM_REGION( 0x1000000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "6844.bin", 0x000000, 0x020000, CRC(9d25282a) SHA1(4e8205a85853ed99e3568976edf95601e8b35599) )
-	ROM_LOAD16_BYTE( "6845.bin", 0x000000, 0x020000, CRC(b747c0d4) SHA1(4bdabdf6156fdf588f5f55447f120ef5bf19621f) )
-	ROM_LOAD16_BYTE( "6846.bin", 0x000000, 0x020000, CRC(76bb7c12) SHA1(a0f025a90e10cfce8bbf4c2671b30fb3ede12ba0) )
-	ROM_LOAD16_BYTE( "6847.bin", 0x000000, 0x020000, CRC(cfe1e84b) SHA1(275bf18954e706a98371d463a9372f3b5e7310f3) )
-	ROM_LOAD16_BYTE( "6848.bin", 0x000000, 0x020000, CRC(ff4859a2) SHA1(23bd372d6899eafc423afbee00c14954b8a37477) )
-	ROM_LOAD16_BYTE( "8299.bin", 0x000000, 0x020000, CRC(360cdf5a) SHA1(947ef29e101539515c321058712bcf685909f6d6) )
-	ROM_LOAD16_BYTE( "8300.bin", 0x000000, 0x020000, CRC(71650174) SHA1(6907f82e54549fe6ecc1fd9f5d342b41357578a8) )
-	ROM_LOAD16_BYTE( "8301.bin", 0x000000, 0x020000, CRC(dd928b62) SHA1(f79652160c23700c88b254120b5ba3ddc3ca6cf3) )
-	ROM_LOAD16_BYTE( "8302.bin", 0x000000, 0x020000, CRC(64c81f3b) SHA1(0572f8c962432b08edd442512dcbc3b1461a4ede) )
-	ROM_LOAD16_BYTE( "money talks 8 3i1.bin", 0x000000, 0x020000, CRC(4edec3d3) SHA1(fa05a84819f4fc7f128b149ea4fcd6edee6d3b78) )
-	ROM_LOAD16_BYTE( "mtalk8ac", 0x000000, 0x020000, CRC(4edec3d3) SHA1(fa05a84819f4fc7f128b149ea4fcd6edee6d3b78) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-//  ROM_LOAD( "1109.bin", 0x000000, 0x080000, CRC(b4d7ac12) SHA1(ac194d15e9d4e5cdadddbf2dc3c9660b52f116c2) )
-	ROM_LOAD( "mtsnd.bin", 0x000000, 0x080000, CRC(b4d7ac12) SHA1(ac194d15e9d4e5cdadddbf2dc3c9660b52f116c2) )
+	j6montlk_sound
 ROM_END
+
+ROM_START( j6montlka )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "mtalk8ac", 0x000000, 0x020000, CRC(4edec3d3) SHA1(fa05a84819f4fc7f128b149ea4fcd6edee6d3b78) ) // aka money talks 8 3i1.bin
+	ROM_LOAD16_BYTE( "money talks 8 3-2.bin", 0x000001, 0x020000, CRC(25ad84ed) SHA1(f704eceadc6f4f422f6ff421837aa6c9f2f533f7) )
+	j6montlk_sound
+ROM_END
+
+ROM_START( j6montlkb )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "6844.bin", 0x000000, 0x020000, CRC(9d25282a) SHA1(4e8205a85853ed99e3568976edf95601e8b35599) )
+	ROM_LOAD16_BYTE( "6845.bin", 0x000001, 0x020000, CRC(b747c0d4) SHA1(4bdabdf6156fdf588f5f55447f120ef5bf19621f) )
+	j6montlk_sound
+ROM_END
+
+ROM_START( j6montlkc )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "6846.bin", 0x000000, 0x020000, CRC(76bb7c12) SHA1(a0f025a90e10cfce8bbf4c2671b30fb3ede12ba0) )
+	ROM_LOAD16_BYTE( "6845.bin", 0x000001, 0x020000, CRC(b747c0d4) SHA1(4bdabdf6156fdf588f5f55447f120ef5bf19621f) )
+	j6montlk_sound
+ROM_END
+
+ROM_START( j6montlkd )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "6847.bin", 0x000000, 0x020000, CRC(cfe1e84b) SHA1(275bf18954e706a98371d463a9372f3b5e7310f3) )
+	ROM_LOAD16_BYTE( "6845.bin", 0x000001, 0x020000, CRC(b747c0d4) SHA1(4bdabdf6156fdf588f5f55447f120ef5bf19621f) )
+	j6montlk_sound
+ROM_END
+
+ROM_START( j6montlke )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "6848.bin", 0x000000, 0x020000, CRC(ff4859a2) SHA1(23bd372d6899eafc423afbee00c14954b8a37477) )
+	ROM_LOAD16_BYTE( "6845.bin", 0x000001, 0x020000, CRC(b747c0d4) SHA1(4bdabdf6156fdf588f5f55447f120ef5bf19621f) )
+	j6montlk_sound
+ROM_END
+
+ROM_START( j6montlkf )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "8299.bin", 0x000000, 0x020000, CRC(360cdf5a) SHA1(947ef29e101539515c321058712bcf685909f6d6) )
+	ROM_LOAD16_BYTE( "8300.bin", 0x000001, 0x020000, CRC(71650174) SHA1(6907f82e54549fe6ecc1fd9f5d342b41357578a8) )
+	j6montlk_sound
+ROM_END
+
+ROM_START( j6montlkg )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "8301.bin", 0x000000, 0x020000, CRC(dd928b62) SHA1(f79652160c23700c88b254120b5ba3ddc3ca6cf3) )
+	ROM_LOAD16_BYTE( "8300.bin", 0x000001, 0x020000, CRC(71650174) SHA1(6907f82e54549fe6ecc1fd9f5d342b41357578a8) )
+	j6montlk_sound
+ROM_END
+
+ROM_START( j6montlkh )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "8302.bin", 0x000000, 0x020000, CRC(64c81f3b) SHA1(0572f8c962432b08edd442512dcbc3b1461a4ede) )
+	ROM_LOAD16_BYTE( "8300.bin", 0x000001, 0x020000, CRC(71650174) SHA1(6907f82e54549fe6ecc1fd9f5d342b41357578a8) )
+	j6montlk_sound
+ROM_END
+
+
+#define j6mono60_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "monop60.snd", 0x000000, 0x080000, CRC(c79af6d0) SHA1(518a7b16978a843bdb83938279b11f446503361e) ) /* aka mon60_snd.bin */ \
 
 
 ROM_START( j6mono60 )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "9362.bin", 0x000000, 0x020000, CRC(b90825e1) SHA1(526399eb77f876f2946b8468ca2f980b66b0d739) )
 	ROM_LOAD16_BYTE( "9363.bin", 0x000001, 0x020000, CRC(0eba908b) SHA1(29bd7dc6000004039037173f6098e52f20931b1e) )
-
-	ROM_REGION( 0x1000000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "8305.bin", 0x000000, 0x020000, CRC(f542b4da) SHA1(821be9da2c5f83f7c833eb729a136723b680905a) )
-	ROM_LOAD16_BYTE( "8306.bin", 0x000000, 0x020000, CRC(4c182083) SHA1(6647236b6511c5292bf6159713d61be8faa2597f) )
-	ROM_LOAD16_BYTE( "8307.bin", 0x000000, 0x020000, CRC(7cb1916a) SHA1(861e43efbaa28c5e8fc9f509173e855385c96131) )
-	ROM_LOAD16_BYTE( "8308.bin", 0x000000, 0x020000, CRC(12914ed3) SHA1(21d5c3cab4d51a4ae623ba1c407edbee282a485a) )
-	ROM_LOAD16_BYTE( "8659.bin", 0x000000, 0x020000, CRC(f90f1aeb) SHA1(ec21a7f6be4d9c5df3631ea8e42e1a6dbc63174d) )
-	ROM_LOAD16_BYTE( "9364.bin", 0x000000, 0x020000, CRC(529671d9) SHA1(1807b56e63d0d82fd03a72cfc9928b5ba9cbc0b7) )
-	ROM_LOAD16_BYTE( "9365.bin", 0x000000, 0x020000, CRC(ebcce580) SHA1(3323d93e7eb9ea54c79f050326d4ea77f470dc4f) )
-	ROM_LOAD16_BYTE( "9366.bin", 0x000000, 0x020000, CRC(db655469) SHA1(ef6924063384a85b6d3c6503f3ca8833076cbdb6) )
-	ROM_LOAD16_BYTE( "mo60.p1", 0x000000, 0x020000, CRC(1edce0e2) SHA1(626055d1df8a8ee2f9c650cee6cfeb047699e532) )
-	ROM_LOAD16_BYTE( "mo60.p2", 0x000000, 0x020000, CRC(1a1ea1da) SHA1(25e14d7ae82888e1b14d0dfb391d2dbafdb1b643) )
-	ROM_LOAD16_BYTE( "mon608p1", 0x000000, 0x020000, CRC(418ef9f2) SHA1(0bd2296f9b59a97befa9b87b967d21dac049f91c) )
-	ROM_LOAD16_BYTE( "mon608p2", 0x000000, 0x00e000, CRC(f30f2300) SHA1(ba9e8ccbdebc0fb0f656b44886b6bee89d019b39) ) // looks bad
-	ROM_LOAD16_BYTE( "mon60_p1.bin", 0x000000, 0x020000, CRC(1edce0e2) SHA1(626055d1df8a8ee2f9c650cee6cfeb047699e532) )
-	ROM_LOAD16_BYTE( "mon60_p2.bin", 0x000000, 0x020000, CRC(1a1ea1da) SHA1(25e14d7ae82888e1b14d0dfb391d2dbafdb1b643) )
-	ROM_LOAD16_BYTE( "monov8p1", 0x000000, 0x020000, CRC(948ae4a2) SHA1(fdf4cb950d2637d5c8c18cb2709c8c5265609425) )
-	ROM_LOAD16_BYTE( "monov8p2", 0x000000, 0x020000, CRC(16379f37) SHA1(65ed96cbbd816d5ae07b489981a50f445c6b07f4) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-//  ROM_LOAD( "mon60_snd.bin", 0x000000, 0x080000, CRC(c79af6d0) SHA1(518a7b16978a843bdb83938279b11f446503361e) )
-	ROM_LOAD( "monop60.snd", 0x000000, 0x080000, CRC(c79af6d0) SHA1(518a7b16978a843bdb83938279b11f446503361e) )
+	j6mono60_sound
 ROM_END
 
 ROM_START( j6mono60a )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "9364.bin", 0x000000, 0x020000, CRC(529671d9) SHA1(1807b56e63d0d82fd03a72cfc9928b5ba9cbc0b7) )
+	ROM_LOAD16_BYTE( "9363.bin", 0x000001, 0x020000, CRC(0eba908b) SHA1(29bd7dc6000004039037173f6098e52f20931b1e) )
+	j6mono60_sound
+ROM_END
+
+ROM_START( j6mono60b )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "9365.bin", 0x000000, 0x020000, CRC(ebcce580) SHA1(3323d93e7eb9ea54c79f050326d4ea77f470dc4f) )
+	ROM_LOAD16_BYTE( "9363.bin", 0x000001, 0x020000, CRC(0eba908b) SHA1(29bd7dc6000004039037173f6098e52f20931b1e) )
+	j6mono60_sound
+ROM_END
+
+ROM_START( j6mono60c )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "9366.bin", 0x000000, 0x020000, CRC(db655469) SHA1(ef6924063384a85b6d3c6503f3ca8833076cbdb6) )
+	ROM_LOAD16_BYTE( "9363.bin", 0x000001, 0x020000, CRC(0eba908b) SHA1(29bd7dc6000004039037173f6098e52f20931b1e) )
+	j6mono60_sound
+ROM_END
+
+ROM_START( j6mono60d )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "mo60.p1", 0x000000, 0x020000, CRC(1edce0e2) SHA1(626055d1df8a8ee2f9c650cee6cfeb047699e532) ) // aka mon60_p1.bin
+	ROM_LOAD16_BYTE( "mo60.p2", 0x000001, 0x020000, CRC(1a1ea1da) SHA1(25e14d7ae82888e1b14d0dfb391d2dbafdb1b643) ) // aka mon60_p2.bin
+	j6mono60_sound
+ROM_END
+
+ROM_START( j6mono60e )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "8305.bin", 0x000000, 0x020000, CRC(f542b4da) SHA1(821be9da2c5f83f7c833eb729a136723b680905a) )
+	ROM_LOAD16_BYTE( "mo60.p2", 0x000001, 0x020000, CRC(1a1ea1da) SHA1(25e14d7ae82888e1b14d0dfb391d2dbafdb1b643) ) // aka mon60_p2.bin
+	j6mono60_sound
+ROM_END
+
+ROM_START( j6mono60f )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "8306.bin", 0x000000, 0x020000, CRC(4c182083) SHA1(6647236b6511c5292bf6159713d61be8faa2597f) )
+	ROM_LOAD16_BYTE( "mo60.p2", 0x000001, 0x020000, CRC(1a1ea1da) SHA1(25e14d7ae82888e1b14d0dfb391d2dbafdb1b643) ) // aka mon60_p2.bin
+	j6mono60_sound
+ROM_END
+
+ROM_START( j6mono60g )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "8307.bin", 0x000000, 0x020000, CRC(7cb1916a) SHA1(861e43efbaa28c5e8fc9f509173e855385c96131) )
+	ROM_LOAD16_BYTE( "mo60.p2", 0x000001, 0x020000, CRC(1a1ea1da) SHA1(25e14d7ae82888e1b14d0dfb391d2dbafdb1b643) ) // aka mon60_p2.bin
+	j6mono60_sound
+ROM_END
+
+ROM_START( j6mono60h )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "8308.bin", 0x000000, 0x020000, CRC(12914ed3) SHA1(21d5c3cab4d51a4ae623ba1c407edbee282a485a) )
+	ROM_LOAD16_BYTE( "mo60.p2", 0x000001, 0x020000, CRC(1a1ea1da) SHA1(25e14d7ae82888e1b14d0dfb391d2dbafdb1b643) ) // aka mon60_p2.bin
+	j6mono60_sound
+ROM_END
+
+ROM_START( j6mono60i )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "8659.bin", 0x000000, 0x020000, CRC(f90f1aeb) SHA1(ec21a7f6be4d9c5df3631ea8e42e1a6dbc63174d) )
+	ROM_LOAD16_BYTE( "mo60.p2", 0x000001, 0x020000, CRC(1a1ea1da) SHA1(25e14d7ae82888e1b14d0dfb391d2dbafdb1b643) ) // aka mon60_p2.bin
+	j6mono60_sound
+ROM_END
+
+ROM_START( j6mono60j )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "monov8p1", 0x000000, 0x020000, CRC(948ae4a2) SHA1(fdf4cb950d2637d5c8c18cb2709c8c5265609425) )
+	ROM_LOAD16_BYTE( "monov8p2", 0x000001, 0x020000, CRC(16379f37) SHA1(65ed96cbbd816d5ae07b489981a50f445c6b07f4) )
+	j6mono60_sound
+ROM_END
+
+ROM_START( j6mono60k )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "mon608p1", 0x000000, 0x020000, CRC(418ef9f2) SHA1(0bd2296f9b59a97befa9b87b967d21dac049f91c) )
+	ROM_LOAD16_BYTE( "mon608p2", 0x000001, 0x00e000, BAD_DUMP CRC(f30f2300) SHA1(ba9e8ccbdebc0fb0f656b44886b6bee89d019b39) ) // wrong size
+	j6mono60_sound
+ROM_END
+
+// different sound rom..
+ROM_START( j6mono60l )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "s60_pound8p1", 0x00000, 0x020000, CRC(f5220142) SHA1(2d9460fbd833b477f579f0925dd999fa3d4355cc) )
 	ROM_LOAD16_BYTE( "s60_pound8p2", 0x00001, 0x020000, CRC(3786bbb8) SHA1(d45d1d6713e480fa6e430fd1900778dcc56250c9) )
@@ -3927,87 +4144,161 @@ ROM_START( j6mono60a )
 	ROM_LOAD( "s60snd", 0x0000, 0x080000, CRC(f597a454) SHA1(ab88779657524df2b04b91ed35f25dc9206a5623) )
 ROM_END
 
+#define j6monobn_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+
 ROM_START( j6monobn )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "7935.bin", 0x000000, 0x020000, CRC(afdb6320) SHA1(33f49e796f2ee08ebd604caf140f07febdedc0d0) )
 	ROM_LOAD16_BYTE( "7936.bin", 0x000001, 0x020000, CRC(782cabbb) SHA1(9103126580923427741a6bb8cea75cf4b7fe78dd) )
+	j6monobn_sound
+ROM_END
 
-	ROM_REGION( 0x1000000, "altrevs", 0 )
+ROM_START( j6monobna )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "7937.bin", 0x000000, 0x020000, CRC(44453718) SHA1(35dc2238155d9415fe1d4f518bc02368ca27a1a7) )
-	ROM_LOAD16_BYTE( "7938.bin", 0x000000, 0x020000, CRC(cdb612a8) SHA1(346eecf0c301f9028691055cf83e939fc5ae303f) )
+	ROM_LOAD16_BYTE( "7936.bin", 0x000001, 0x020000, CRC(782cabbb) SHA1(9103126580923427741a6bb8cea75cf4b7fe78dd) )
+	j6monobn_sound
+ROM_END
 
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	/* missing? */
+ROM_START( j6monobnb )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7938.bin", 0x000000, 0x020000, CRC(cdb612a8) SHA1(346eecf0c301f9028691055cf83e939fc5ae303f) )
+	ROM_LOAD16_BYTE( "7936.bin", 0x000001, 0x020000, CRC(782cabbb) SHA1(9103126580923427741a6bb8cea75cf4b7fe78dd) )
+	j6monobn_sound
 ROM_END
 
 
 
 
+#define j6outlaw_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "outlawsnd.bin", 0x000000, 0x080000, CRC(9b9f21dc) SHA1(aca23a525f1288f49a18a74eb36ac3a67efa7e20) ) \
+
 ROM_START( j6outlaw )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "7547.bin", 0x000000, 0x020000, CRC(7a4efbf1) SHA1(5e184e172a129aad6ad34409f63de25916414146) )
 	ROM_LOAD16_BYTE( "7548.bin", 0x000001, 0x020000, CRC(e5d61efc) SHA1(2e3ce747b14341ad5fcbf815a6b7e9a38a59478a) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD( "outlawsnd.bin", 0x000000, 0x080000, CRC(9b9f21dc) SHA1(aca23a525f1288f49a18a74eb36ac3a67efa7e20) )
+	j6outlaw_sound
 ROM_END
 
 ROM_START( j6outlawd )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "7549.bin", 0x000000, 0x020000, CRC(91d0afc9) SHA1(267500478d8fb73e61a869e53b598d0bea3c3caa) )
 	ROM_LOAD16_BYTE( "7548.bin", 0x000001, 0x020000, CRC(e5d61efc) SHA1(2e3ce747b14341ad5fcbf815a6b7e9a38a59478a) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD( "outlawsnd.bin", 0x000000, 0x080000, CRC(9b9f21dc) SHA1(aca23a525f1288f49a18a74eb36ac3a67efa7e20) )
+	j6outlaw_sound
 ROM_END
 
 ROM_START( j6outlawc )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "outlaw.p1", 0x000000, 0x020000, CRC(42b7d388) SHA1(4d647879a95b27788ea87885f266272344e910ea) )
 	ROM_LOAD16_BYTE( "outlaw.p2", 0x000001, 0x020000, CRC(4c06f95a) SHA1(42085ea0c10930a27f0b223a6f0742165ee85727) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD( "outlawsnd.bin", 0x000000, 0x080000, CRC(9b9f21dc) SHA1(aca23a525f1288f49a18a74eb36ac3a67efa7e20) )
+	j6outlaw_sound
 ROM_END
 
-
+#define j6oxo_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "oxo_bingo_snd.bin", 0x000000, 0x080000, CRC(008a2d6a) SHA1(a89114154489142556b373ab24cd32fadf5856b3) ) \
 
 ROM_START( j6oxo )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "7613.bin", 0x000000, 0x020000, CRC(0621762a) SHA1(ec09cfed79158b09093a162785b6bdd1916ce50c) )
 	ROM_LOAD16_BYTE( "7614.bin", 0x000001, 0x020000, CRC(f3bc7c8b) SHA1(a46928b9c5c7c14c5c555fb893a528763cd35963) )
-
-	ROM_REGION( 0x1000000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "7425.bin", 0x000000, 0x020000, CRC(13d3b623) SHA1(bfc27e3ad60209f5567f2fa66cffb6a7a099bbce) )
-	ROM_LOAD16_BYTE( "7615.bin", 0x000000, 0x020000, CRC(54e5b64b) SHA1(280f8b9f3fa871511d77c6cce0e836fa30b3bfc6) )
-	ROM_LOAD16_BYTE( "7616.bin", 0x000000, 0x020000, CRC(edbf2212) SHA1(a467baae065d0b7f19d32add1af6db226d1d2d85) )
-	ROM_LOAD16_BYTE( "7617.bin", 0x000000, 0x020000, CRC(25d4b1c2) SHA1(58526fd300882124cedc514bb6968729aee6a04b) )
-	ROM_LOAD16_BYTE( "7618.bin", 0x000000, 0x020000, CRC(c88bdd77) SHA1(9c18c7c30e4d5c43752864eb4972a6d02865293f) )
-	ROM_LOAD16_BYTE( "7619.bin", 0x000000, 0x020000, CRC(771071a3) SHA1(02c7490230b0f92cc6672934e5cc8d0fc21dba33) )
-	ROM_LOAD16_BYTE( "7620.bin", 0x000000, 0x020000, CRC(ce4ae5fa) SHA1(fe46e4d3db6e5bcfd9b478e5ae5da035a677b941) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD( "oxo_bingo_snd.bin", 0x000000, 0x080000, CRC(008a2d6a) SHA1(a89114154489142556b373ab24cd32fadf5856b3) )
+	j6oxo_sound
 ROM_END
+
+ROM_START( j6oxoa )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7615.bin", 0x000000, 0x020000, CRC(54e5b64b) SHA1(280f8b9f3fa871511d77c6cce0e836fa30b3bfc6) )
+	ROM_LOAD16_BYTE( "7614.bin", 0x000001, 0x020000, CRC(f3bc7c8b) SHA1(a46928b9c5c7c14c5c555fb893a528763cd35963) )
+	j6oxo_sound
+ROM_END
+
+ROM_START( j6oxob )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7616.bin", 0x000000, 0x020000, CRC(edbf2212) SHA1(a467baae065d0b7f19d32add1af6db226d1d2d85) )
+	ROM_LOAD16_BYTE( "7614.bin", 0x000001, 0x020000, CRC(f3bc7c8b) SHA1(a46928b9c5c7c14c5c555fb893a528763cd35963) )
+	j6oxo_sound
+ROM_END
+
+ROM_START( j6oxoc )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7617.bin", 0x000000, 0x020000, CRC(25d4b1c2) SHA1(58526fd300882124cedc514bb6968729aee6a04b) )
+	ROM_LOAD16_BYTE( "7618.bin", 0x000001, 0x020000, CRC(c88bdd77) SHA1(9c18c7c30e4d5c43752864eb4972a6d02865293f) )
+	j6oxo_sound
+ROM_END
+
+ROM_START( j6oxod )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7619.bin", 0x000000, 0x020000, CRC(771071a3) SHA1(02c7490230b0f92cc6672934e5cc8d0fc21dba33) )
+	ROM_LOAD16_BYTE( "7618.bin", 0x000001, 0x020000, CRC(c88bdd77) SHA1(9c18c7c30e4d5c43752864eb4972a6d02865293f) )
+	j6oxo_sound
+ROM_END
+
+ROM_START( j6oxoe )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7620.bin", 0x000000, 0x020000, CRC(ce4ae5fa) SHA1(fe46e4d3db6e5bcfd9b478e5ae5da035a677b941) )
+	ROM_LOAD16_BYTE( "7618.bin", 0x000001, 0x020000, CRC(c88bdd77) SHA1(9c18c7c30e4d5c43752864eb4972a6d02865293f) )
+	j6oxo_sound
+ROM_END
+
+
+#define j6oxobin_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "oxo_bingo_snd.bin", 0x000000, 0x080000, CRC(008a2d6a) SHA1(a89114154489142556b373ab24cd32fadf5856b3) ) \
 
 
 ROM_START( j6oxobin )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "7423.bin", 0x000000, 0x020000, CRC(f84de21b) SHA1(fb401153681ec271e8ddad4cd292a8c1dccfcb19) )
 	ROM_LOAD16_BYTE( "7424.bin", 0x000001, 0x020000, CRC(7a4b827b) SHA1(28bd2e527c54780f2d866baa8909c1ade39825f6) )
-
-	ROM_REGION( 0x1000000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "7775.bin", 0x000000, 0x020000, CRC(ea87746c) SHA1(2608c4461362dc96527c04454b3f616b88a4dace) )
-	ROM_LOAD16_BYTE( "7776.bin", 0x000000, 0x020000, CRC(a570d3b3) SHA1(1ee001078a87774167784555f57a95c6713057c1) )
-	ROM_LOAD16_BYTE( "7777.bin", 0x000000, 0x020000, CRC(01192054) SHA1(7768d318532c37c08f8b695deb200a3d92cca550) )
-	ROM_LOAD16_BYTE( "7967.bin", 0x000000, 0x020000, CRC(03a5cb12) SHA1(7da2bec83e8808b40c96af8ac4741dfa1d8f6c39) )
-	ROM_LOAD16_BYTE( "7968.bin", 0x000000, 0x020000, CRC(ec5aeab7) SHA1(2df0fbe853e90a82f0c2ed0bc2a728b17b99062a) )
-	ROM_LOAD16_BYTE( "7969.bin", 0x000000, 0x020000, CRC(61c8ba9a) SHA1(bf0e979aaa36c11dac950e06cb713bb8b2b4ccdb) )
-	ROM_LOAD16_BYTE( "7970.bin", 0x000000, 0x020000, CRC(e83b9f2a) SHA1(c297ed9066487b547a605636fdd8d3c04cc726a2) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD( "oxo_bingo_snd.bin", 0x000000, 0x080000, CRC(008a2d6a) SHA1(a89114154489142556b373ab24cd32fadf5856b3) )
+	j6oxobin_sound
 ROM_END
+
+ROM_START( j6oxobina )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7425.bin", 0x000000, 0x020000, CRC(13d3b623) SHA1(bfc27e3ad60209f5567f2fa66cffb6a7a099bbce) )
+	ROM_LOAD16_BYTE( "7424.bin", 0x000001, 0x020000, CRC(7a4b827b) SHA1(28bd2e527c54780f2d866baa8909c1ade39825f6) )
+	j6oxobin_sound
+ROM_END
+
+ROM_START( j6oxobinb )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7775.bin", 0x000000, 0x020000, CRC(ea87746c) SHA1(2608c4461362dc96527c04454b3f616b88a4dace) )
+	ROM_LOAD16_BYTE( "7776.bin", 0x000001, 0x020000, CRC(a570d3b3) SHA1(1ee001078a87774167784555f57a95c6713057c1) )
+	j6oxobin_sound
+ROM_END
+
+ROM_START( j6oxobinc )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7777.bin", 0x000000, 0x020000, CRC(01192054) SHA1(7768d318532c37c08f8b695deb200a3d92cca550) )
+	ROM_LOAD16_BYTE( "7776.bin", 0x000001, 0x020000, CRC(a570d3b3) SHA1(1ee001078a87774167784555f57a95c6713057c1) )
+	j6oxobin_sound
+ROM_END
+
+ROM_START( j6oxobind )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7967.bin", 0x000000, 0x020000, CRC(03a5cb12) SHA1(7da2bec83e8808b40c96af8ac4741dfa1d8f6c39) )
+	ROM_LOAD16_BYTE( "7968.bin", 0x000001, 0x020000, CRC(ec5aeab7) SHA1(2df0fbe853e90a82f0c2ed0bc2a728b17b99062a) )
+	j6oxobin_sound
+ROM_END
+
+ROM_START( j6oxobine )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7969.bin", 0x000000, 0x020000, CRC(61c8ba9a) SHA1(bf0e979aaa36c11dac950e06cb713bb8b2b4ccdb) )
+	ROM_LOAD16_BYTE( "7968.bin", 0x000001, 0x020000, CRC(ec5aeab7) SHA1(2df0fbe853e90a82f0c2ed0bc2a728b17b99062a) )
+	j6oxobin_sound
+ROM_END
+
+ROM_START( j6oxobinf )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7970.bin", 0x000000, 0x020000, CRC(e83b9f2a) SHA1(c297ed9066487b547a605636fdd8d3c04cc726a2) )
+	ROM_LOAD16_BYTE( "7968.bin", 0x000001, 0x020000, CRC(ec5aeab7) SHA1(2df0fbe853e90a82f0c2ed0bc2a728b17b99062a) )
+	j6oxobin_sound
+ROM_END
+
 
 
 ROM_START( j6pacman )
@@ -6392,23 +6683,93 @@ GAME( 199?, j6luckla	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "L
 GAME( 199?, j6lucklaa	, j6luckla	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Lucky Las Vegas (JPM) (IMPACT) (set 2)", GAME_FLAGS )
 GAME( 199?, j6lucklab	, j6luckla	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Lucky Las Vegas (JPM) (IMPACT) (set 3)", GAME_FLAGS )
 
-GAME( 199?, j6magcir	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Magic Circle Club (JPM) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6mavrk		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Maverick (JPM) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6maxod		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Maximum Overdrive (JPM) (IMPACT)", GAME_FLAGS )
+GAME( 199?, j6magcir	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Magic Circle Club (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 199?, j6magcira	, j6magcir	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Magic Circle Club (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 199?, j6magcirb	, j6magcir	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Magic Circle Club (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 199?, j6magcirc	, j6magcir	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Magic Circle Club (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 199?, j6magcird	, j6magcir	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Magic Circle Club (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+
+
+GAME( 199?, j6mavrk		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Maverick (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 199?, j6mavrka	, j6mavrk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Maverick (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 199?, j6mavrkb	, j6mavrk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Maverick (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 199?, j6mavrkc	, j6mavrk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Maverick (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 199?, j6mavrkd	, j6mavrk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Maverick (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+
+GAME( 199?, j6maxod		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Maximum Overdrive (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 199?, j6maxoda	, j6maxod	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Maximum Overdrive (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 199?, j6maxodb	, j6maxod	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Maximum Overdrive (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 199?, j6maxodc	, j6maxod	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Maximum Overdrive (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+
 GAME( 199?, j6maxcsh	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Maximus Cash (JPM) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6medal		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Qps", "Medallion Job (Qps) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6megbck	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Mega Bucks (JPM) (IMPACT)", GAME_FLAGS )
+
+GAME( 199?, j6medal		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Qps", "Medallion Job (Qps) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 199?, j6medala	, j6medal	, impctawp, tbirds, driver_device, 0, ROT0, "Qps", "Medallion Job (Qps) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 199?, j6medalb	, j6medal	, impctawp, tbirds, driver_device, 0, ROT0, "Qps", "Medallion Job (Qps) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 199?, j6medalc	, j6medal	, impctawp, tbirds, driver_device, 0, ROT0, "Qps", "Medallion Job (Qps) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 199?, j6medald	, j6medal	, impctawp, tbirds, driver_device, 0, ROT0, "Qps", "Medallion Job (Qps) (IMPACT) (set 5)", GAME_FLAGS )
+
+
+GAME( 199?, j6megbck	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Mega Bucks (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 199?, j6megbcka	, j6megbck	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Mega Bucks (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 199?, j6megbckb	, j6megbck	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Mega Bucks (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 199?, j6megbckc	, j6megbck	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Mega Bucks (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 199?, j6megbckd	, j6megbck	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Mega Bucks (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+
 GAME( 199?, j6monmad	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Ace", "Money Madness (Ace) (IMPACT)", GAME_FLAGS )
+
 GAME( 199?, j6monspd	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Ace", "Money Spider (Ace) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6montlk	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Money Talks (JPM) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6mono60	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT, set 1)", GAME_FLAGS )
-GAME( 199?, j6mono60a	, j6mono60	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT, set 2)", GAME_FLAGS )
-GAME( 199?, j6monobn	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly Bingo (JPM) (IMPACT)", GAME_FLAGS )
+
+GAME( 199?, j6montlk	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 199?, j6montlka	, j6montlk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 199?, j6montlkb	, j6montlk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 199?, j6montlkc	, j6montlk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 199?, j6montlkd	, j6montlk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+GAME( 199?, j6montlke	, j6montlk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 6)", GAME_FLAGS )
+GAME( 199?, j6montlkf	, j6montlk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 7)", GAME_FLAGS )
+GAME( 199?, j6montlkg	, j6montlk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 8)", GAME_FLAGS )
+GAME( 199?, j6montlkh	, j6montlk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 9)", GAME_FLAGS )
+
+
+GAME( 199?, j6mono60	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 199?, j6mono60a	, j6mono60	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 199?, j6mono60b	, j6mono60	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 199?, j6mono60c	, j6mono60	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 199?, j6mono60d	, j6mono60	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+GAME( 199?, j6mono60e	, j6mono60	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 6)", GAME_FLAGS )
+GAME( 199?, j6mono60f	, j6mono60	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 7)", GAME_FLAGS )
+GAME( 199?, j6mono60g	, j6mono60	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 8)", GAME_FLAGS )
+GAME( 199?, j6mono60h	, j6mono60	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 9)", GAME_FLAGS )
+GAME( 199?, j6mono60i	, j6mono60	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 10)", GAME_FLAGS )
+GAME( 199?, j6mono60j	, j6mono60	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 11)", GAME_FLAGS )
+GAME( 199?, j6mono60k	, j6mono60	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 12)", GAME_FLAGS )
+GAME( 199?, j6mono60l	, j6mono60	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly 60th Anniversary Edition (JPM) (IMPACT) (set 13)", GAME_FLAGS )
+
+GAME( 199?, j6monobn	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly Bingo (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 199?, j6monobna	, j6monobn	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly Bingo (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 199?, j6monobnb	, j6monobn	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Monopoly Bingo (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+
 GAME( 199?, j6outlaw	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Outlaw (JPM) (IMPACT, v3)", GAME_FLAGS )
 GAME( 199?, j6outlawd	, j6outlaw	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Outlaw (JPM) (IMPACT, v3) (Protocol)", GAME_FLAGS )
 GAME( 199?, j6outlawc	, j6outlaw	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Outlaw (JPM) (IMPACT, Club?)", GAME_FLAGS )
-GAME( 199?, j6oxo		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Oxo (JPM) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6oxobin	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT)", GAME_FLAGS )
+
+
+GAME( 199?, j6oxo		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Oxo (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 199?, j6oxoa		, j6oxo		, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Oxo (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 199?, j6oxob		, j6oxo		, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Oxo (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 199?, j6oxoc		, j6oxo		, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Oxo (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 199?, j6oxod		, j6oxo		, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Oxo (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+GAME( 199?, j6oxoe		, j6oxo		, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Oxo (JPM) (IMPACT) (set 6)", GAME_FLAGS )
+
+GAME( 199?, j6oxobin	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 199?, j6oxobina	, j6oxobin	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 199?, j6oxobinb	, j6oxobin	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 199?, j6oxobinc	, j6oxobin	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 199?, j6oxobind	, j6oxobin	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+GAME( 199?, j6oxobine	, j6oxobin	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 6)", GAME_FLAGS )
+GAME( 199?, j6oxobinf	, j6oxobin	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Oxo Bingo (JPM) (IMPACT) (set 7)", GAME_FLAGS )
+
+
 GAME( 199?, j6pacman	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Qps", "Pac Man Plus (Qps) (IMPACT)", GAME_FLAGS )
 GAME( 199?, j6papa		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Empire", "Paparazzi (Empire) (IMPACT)", GAME_FLAGS )
 GAME( 199?, j6phxgld	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Phoenix Gold (JPM) (IMPACT)", GAME_FLAGS )
