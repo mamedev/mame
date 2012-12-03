@@ -152,6 +152,7 @@ public:
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	void pc88va_fdc_update_ready(floppy_image_device *, int);
 };
 
 
@@ -1023,6 +1024,23 @@ TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_motor_start_1)
 	m_fdc_motor_status[1] = 1;
 }
 
+/* TODO: double check schematics */
+void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
+{
+	bool ready_0 = m_fdc_ctrl_2 & 0x20;
+	bool ready_1 = m_fdc_ctrl_2 & 0x40;
+
+	floppy_image_device *floppy;
+	floppy = machine().device<floppy_connector>("upd765:0")->get_device();
+	if(floppy && ready_0)
+		ready_0 = floppy->ready_r();
+	floppy = machine().device<floppy_connector>("upd765:1")->get_device();
+	if(floppy && ready_1)
+		ready_1 = floppy->ready_r();
+
+	m_fdc->ready_w(ready_0 || ready_1);
+}
+
 WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 {
 	printf("%08x %02x\n",offset<<1,data);
@@ -1092,6 +1110,8 @@ WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
 				machine().device<upd765a_device>("upd765")->reset();
 
 			m_fdc_ctrl_2 = data;
+
+			pc88va_fdc_update_ready(NULL, 0);
 
 			break; // FDC control port 2
 	}
@@ -1638,6 +1658,14 @@ void pc88va_state::machine_start()
 	m_t3_mouse_timer->adjust(attotime::never);
 	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc88va_state::fdc_drq), this));
 	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc88va_state::fdc_irq), this));
+	floppy_image_device *floppy;
+	floppy = machine().device<floppy_connector>("upd765:0")->get_device();
+	if(floppy)
+		floppy->setup_ready_cb(floppy_image_device::ready_cb(FUNC(pc88va_state::pc88va_fdc_update_ready), this));
+
+	floppy = machine().device<floppy_connector>("upd765:1")->get_device();
+	if(floppy)
+		floppy->setup_ready_cb(floppy_image_device::ready_cb(FUNC(pc88va_state::pc88va_fdc_update_ready), this));
 
 	machine().device<floppy_connector>("upd765:0")->get_device()->set_rpm(300);
 	machine().device<floppy_connector>("upd765:1")->get_device()->set_rpm(300);
