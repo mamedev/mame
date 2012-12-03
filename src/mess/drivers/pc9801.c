@@ -334,6 +334,7 @@ public:
 	UINT8 *m_ext_gvram;
 	UINT8 *m_vram256;
 	UINT8 m_pc9821_window_bank;
+	UINT8 m_joy_sel;
 
 	DECLARE_READ8_MEMBER(pc9801_xx_r);
 	DECLARE_WRITE8_MEMBER(pc9801_xx_w);
@@ -402,6 +403,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9821_memory_w);
 	DECLARE_READ8_MEMBER(pc9821_vram256_r);
 	DECLARE_WRITE8_MEMBER(pc9821_vram256_w);
+	DECLARE_READ8_MEMBER(opn_porta_r);
+	DECLARE_WRITE8_MEMBER(opn_portb_w);
 
 	DECLARE_READ8_MEMBER(sdip_0_r);
 	DECLARE_READ8_MEMBER(sdip_1_r);
@@ -594,13 +597,13 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		{
 			tile = state->m_video_ram_1[(tile_addr*2) & 0x1fff] & 0x00ff;
 			knj_tile = state->m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0x7f;
-			if((tile & 0xf0) == 0 && knj_tile) // kanji select
+			if((tile & 0xe0) == 0 && knj_tile) // kanji select
 			{
 				tile <<= 8;
 				tile |= knj_tile;
 				/* annoying kanji bit-swap applied on the address bus ... */
 				tile = BITSWAP16(tile,7,15,14,13,12,11,6,5,10,9,8,4,3,2,1,0);
-				tile &= 0xfff;
+				tile &= 0x1fff;
 				kanji_on = 2;
 			}
 		}
@@ -1475,8 +1478,8 @@ WRITE8_MEMBER(pc9801_state::pc9810rs_fdc_ctrl_w)
     ---- ---x select irq
     */
 
-	machine().device<floppy_connector>("upd765_2hd:0")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
-	machine().device<floppy_connector>("upd765_2hd:1")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
+//	machine().device<floppy_connector>("upd765_2hd:0")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
+//	machine().device<floppy_connector>("upd765_2hd:1")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
 
 	machine().device<upd765a_device>("upd765_2hd")->set_rate(data & 0x02 ? 500000 : 250000);
 
@@ -1515,8 +1518,11 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_2hd_w)
 
 				pc9801_fdc_2hd_update_ready(NULL, 0);
 
-				machine().device<floppy_connector>("upd765_2hd:0")->get_device()->mon_w(data & 0x08 ? ASSERT_LINE : CLEAR_LINE);
-				machine().device<floppy_connector>("upd765_2hd:1")->get_device()->mon_w(data & 0x08 ? ASSERT_LINE : CLEAR_LINE);
+				machine().device<floppy_connector>("upd765_2hd:0")->get_device()->mon_w(data & 0x40 ? ASSERT_LINE : CLEAR_LINE);
+				machine().device<floppy_connector>("upd765_2hd:1")->get_device()->mon_w(data & 0x40 ? ASSERT_LINE : CLEAR_LINE);
+
+//				machine().device<floppy_connector>("upd765_2hd:0")->get_device()->mon_w(data & 0x08 ? ASSERT_LINE : CLEAR_LINE);
+//				machine().device<floppy_connector>("upd765_2hd:1")->get_device()->mon_w(data & 0x08 ? ASSERT_LINE : CLEAR_LINE);
 				return;
 		}
 	}
@@ -2309,6 +2315,24 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )
 
+	PORT_START("OPN_PA1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 2")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("OPN_PA2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Joystick Button 1")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Joystick Button 2")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("ROM_LOAD")
 	PORT_CONFNAME( 0x01, 0x01, "Load floppy 2hd BIOS" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
@@ -2702,7 +2726,7 @@ void pc9801_state::pc9801rs_fdc_drq(bool state)
 	printf("DRQ %d\n",state);
 
 	if(m_fdc_ctrl & 1)
-		m_dmac->dreq2_w(state);
+		m_dmac->dreq2_w(state ^ 1);
 	else
 		printf("DRQ %02x %d\n",m_fdc_ctrl,state);
 }
@@ -2917,15 +2941,31 @@ static void pc9801_sound_irq( device_t *device, int irq )
 	pic8259_ir4_w(device->machine().device("pic8259_slave"), irq);
 }
 
+READ8_MEMBER(pc9801_state::opn_porta_r)
+{
+	if(m_joy_sel == 0x80)
+		return machine().root_device().ioport("OPN_PA1")->read();
+
+	if(m_joy_sel == 0xc0)
+		return machine().root_device().ioport("OPN_PA2")->read();
+
+//	0x81?
+//	printf("%02x\n",m_joy_sel);
+	return 0xff;
+}
+
+WRITE8_MEMBER(pc9801_state::opn_portb_w){ m_joy_sel = data; }
+
+
 static const ym2203_interface pc98_ym2203_intf =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL,//(pc8801_state,opn_porta_r),
+		DEVCB_DRIVER_MEMBER(pc9801_state,opn_porta_r),
 		DEVCB_NULL,//(pc8801_state,opn_portb_r),
-		DEVCB_NULL,
-		DEVCB_NULL
+		DEVCB_NULL,//(pc9801_state,opn_porta_w),
+		DEVCB_DRIVER_MEMBER(pc9801_state,opn_portb_w),
 	},
 	DEVCB_LINE(pc9801_sound_irq)
 };
