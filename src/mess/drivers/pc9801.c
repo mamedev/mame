@@ -780,7 +780,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_20_w)
 	}
 	else // odd
 	{
-		printf("Write to DMA bank register %d %02x\n",((offset >> 1)+1) & 3,data);
+//		printf("Write to DMA bank register %d %02x\n",((offset >> 1)+1) & 3,data);
 		m_dma_offset[((offset >> 1)+1) & 3] = data & 0x0f;
 	}
 }
@@ -1010,7 +1010,7 @@ READ8_MEMBER(pc9801_state::pc9801_sasi_r)
 	if((offset & 1) == 0)
 	{
 		//printf("Read to SASI port [%02x]\n",offset+0x80);
-		return 0;
+		return 0x20;
 	}
 	else // odd
 	{
@@ -2903,11 +2903,12 @@ INTERRUPT_GEN_MEMBER(pc9801_state::pc9801_vrtc_irq)
 {
 	if(m_vrtc_irq_mask)
 	{
+		pic8259_ir2_w(machine().device("pic8259_master"), 0);
 		pic8259_ir2_w(machine().device("pic8259_master"), 1);
 		m_vrtc_irq_mask = 0; // TODO: this irq auto-masks?
 	}
-	else
-		pic8259_ir2_w(machine().device("pic8259_master"), 0);
+//	else
+//		pic8259_ir2_w(machine().device("pic8259_master"), 0);
 }
 
 
