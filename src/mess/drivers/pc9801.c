@@ -502,6 +502,7 @@ public:
 
 
 #define WIDTH40_REG 2
+#define INTERLACE_REG 4
 #define MEMSW_REG   6
 #define DISPLAY_REG 7
 
@@ -540,7 +541,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
 
-	interlace_on = state->m_video_reg[2] == 0x10;
+	interlace_on = state->m_video_ff[INTERLACE_REG];
 
 	for(xi=0;xi<8;xi++)
 	{
@@ -575,7 +576,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
 
-	interlace_on = state->m_video_reg[2] == 0x10; /* TODO: correct? */
+	interlace_on = state->m_video_ff[INTERLACE_REG];
 	char_size = (interlace_on) ? 16 : 8;
 	kanji_on = 0;
 	tile = 0;
