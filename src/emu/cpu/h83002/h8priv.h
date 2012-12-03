@@ -101,7 +101,8 @@ INLINE h83xx_state *get_safe_token(device_t *device)
 		   device->type() == H8S2241 ||
 		   device->type() == H8S2246 ||
 		   device->type() == H8S2323 ||
-		   device->type() == H8S2394);
+		   device->type() == H8S2394 ||
+           device->type() == H8S2655);
 	return (h83xx_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
