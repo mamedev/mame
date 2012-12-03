@@ -1591,7 +1591,7 @@ void upd7220_device::draw_graphics_line(bitmap_ind16 &bitmap, UINT32 addr, int y
 		if((sx << 3) < m_aw * 16 && y < m_al)
 			m_display_cb(this, bitmap, y, sx << 3, addr);
 
-		if (wd) addr += 2; else addr++;
+		addr+= wd + 1;
 	}
 }
 
@@ -1620,7 +1620,7 @@ void upd7220_device::update_graphics(bitmap_ind16 &bitmap, const rectangle &clip
 
 			for (y = 0; y < len; y++)
 			{
-				addr = (sad & 0x3ffff) + (y * m_pitch * 2);
+				addr = ((sad << 1) & 0x3ffff) + (y * m_pitch * 2);
 
 				if (m_display_cb)
 					draw_graphics_line(bitmap, addr, y + bsy, wd);

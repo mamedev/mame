@@ -544,9 +544,9 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 		res_x = x + xi;
 		res_y = y;
 
-		pen = ((state->m_video_ram_2[address + (0x08000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 1 : 0;
-		pen|= ((state->m_video_ram_2[address + (0x10000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 2 : 0;
-		pen|= ((state->m_video_ram_2[address + (0x18000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 4 : 0;
+		pen = ((state->m_video_ram_2[(address & 0x7fff) + (0x08000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 1 : 0;
+		pen|= ((state->m_video_ram_2[(address & 0x7fff) + (0x10000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 2 : 0;
+		pen|= ((state->m_video_ram_2[(address & 0x7fff) + (0x18000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 4 : 0;
 
 		if(interlace_on)
 		{
@@ -1276,16 +1276,15 @@ WRITE8_MEMBER(pc9801_state::pc9801_tvram_w)
 	m_video_ram_1[offset] = data; //TODO: check me
 }
 
+/* +0x8000 is trusted (bank 0 is actually used by 16 colors mode) */
 READ8_MEMBER(pc9801_state::pc9801_gvram_r)
 {
-
-	return m_video_ram_2[offset+0x8000+m_vram_bank*0x20000];
+	return m_video_ram_2[offset+0x08000+m_vram_bank*0x20000];
 }
 
 WRITE8_MEMBER(pc9801_state::pc9801_gvram_w)
 {
-
-	m_video_ram_2[offset+0x8000+m_vram_bank*0x20000] = data;
+	m_video_ram_2[offset+0x08000+m_vram_bank*0x20000] = data;
 }
 
 READ8_MEMBER(pc9801_state::pc9801_opn_r)
@@ -2381,7 +2380,7 @@ GFXDECODE_END
 ****************************************/
 
 /*
-irq assignment:
+irq assignment (PC-9801F):
 
 8259 master:
 ir0 PIT
@@ -2398,7 +2397,7 @@ ir0 <connection with master 8259?>
 ir1
 ir2 2dd floppy irq
 ir3 2hd floppy irq
-ir4
+ir4 opn
 ir5
 ir6
 ir7
@@ -2911,7 +2910,25 @@ INTERRUPT_GEN_MEMBER(pc9801_state::pc9801_vrtc_irq)
 //		pic8259_ir2_w(machine().device("pic8259_master"), 0);
 }
 
+static void pc9801_sound_irq( device_t *device, int irq )
+{
+//	pc9801_state *state = device->machine().driver_data<pc9801_state>();
 
+	pic8259_ir4_w(device->machine().device("pic8259_slave"), irq);
+}
+
+static const ym2203_interface pc98_ym2203_intf =
+{
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_NULL,//(pc8801_state,opn_porta_r),
+		DEVCB_NULL,//(pc8801_state,opn_portb_r),
+		DEVCB_NULL,
+		DEVCB_NULL
+	},
+	DEVCB_LINE(pc9801_sound_irq)
+};
 
 static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_CPU_ADD("maincpu", I8086, 5000000) //unknown clock
@@ -2965,6 +2982,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("opn", YM2203, 4000000) // unknown clock / divider
+	MCFG_SOUND_CONFIG(pc98_ym2203_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
