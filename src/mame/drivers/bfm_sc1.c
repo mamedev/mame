@@ -1482,15 +1482,12 @@ ROM_END
 
 ROM_START( sc1cexplb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "95717084b mk2 var%.bin", 0x0000, 0x8000, CRC(e2d973be) SHA1(56ed3e3d6caf12f82d6ccc1527ff8da215e09cb0) )
-	ROM_LOAD( "95717083a mk2 var%.bin", 0x8000, 0x8000, CRC(1fe1b3a1) SHA1(dd10d74c71a455900a2325ac9d7b3c8e45eb9c6c) )
+	ROM_LOAD( "95717084b mk2 var%.bin", 0x0000, 0x8000, CRC(e2d973be) SHA1(56ed3e3d6caf12f82d6ccc1527ff8da215e09cb0) ) // aka 95717084b.bin
+	ROM_LOAD( "95717083a mk2 var%.bin", 0x8000, 0x8000, CRC(1fe1b3a1) SHA1(dd10d74c71a455900a2325ac9d7b3c8e45eb9c6c) ) // aka 95717083a.bin
 ROM_END
 
-ROM_START( sc1cexplc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "95717084b.bin", 0x0000, 0x8000, CRC(e2d973be) SHA1(56ed3e3d6caf12f82d6ccc1527ff8da215e09cb0) )
-	ROM_LOAD( "95717083a.bin", 0x8000, 0x8000, CRC(1fe1b3a1) SHA1(dd10d74c71a455900a2325ac9d7b3c8e45eb9c6c) )
-ROM_END
+
+
 
 ROM_START( sc1cexpld )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1749,17 +1746,12 @@ ROM_END
 
 ROM_START( sc1clbwa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "club wise 95717551b.bin", 0x0000, 0x8000, CRC(0528a718) SHA1(27f4225c948d93ce1c833679f97e045f3b7a6aac) )
-	ROM_LOAD( "club wise 95717550a.bin", 0x8000, 0x8000, CRC(5b305f11) SHA1(592ea71fcb72eaa90fd421e3bd3761cfd686b019) )
+	ROM_LOAD( "club wise 95717551b.bin", 0x0000, 0x8000, CRC(0528a718) SHA1(27f4225c948d93ce1c833679f97e045f3b7a6aac) ) // aka cwise_b.bin
+	ROM_LOAD( "club wise 95717550a.bin", 0x8000, 0x8000, CRC(5b305f11) SHA1(592ea71fcb72eaa90fd421e3bd3761cfd686b019) ) // aka cwise_a.bin
 	sc1_clbw_sound
 ROM_END
 
-ROM_START( sc1clbwb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cwise_b.bin", 0x0000, 0x8000, CRC(0528a718) SHA1(27f4225c948d93ce1c833679f97e045f3b7a6aac) )
-	ROM_LOAD( "cwise_a.bin", 0x8000, 0x8000, CRC(5b305f11) SHA1(592ea71fcb72eaa90fd421e3bd3761cfd686b019) )
-	sc1_clbw_sound
-ROM_END
+
 
 
 ROM_START( sc1copdd )
@@ -3126,7 +3118,6 @@ GAME( 198?, sc1cexpd		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			,
 GAME( 198?, sc1cexpl		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Explosion (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1cexpla		, sc1cexpl	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Explosion (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1cexplb		, sc1cexpl	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Explosion (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1cexplc		, sc1cexpl	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Explosion (Bellfruit) (set 4) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1cexpld		, sc1cexpl	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Explosion (Bellfruit) (set 5) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1cshwz		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Wise (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1cshwza		, sc1cshwz	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Wise (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
@@ -3160,7 +3151,6 @@ GAME( 198?, sc1clbtma		, sc1clbtm	, scorpion1			, scorpion1	, bfm_sc1_state, lot
 GAME( 199?, sc1clbtmb		, sc1clbtm	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Club Temptation (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS)
 GAME( 198?, sc1clbw			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club Wise (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1clbwa		, sc1clbw	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club Wise (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1clbwb		, sc1clbw	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club Wise (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1cops			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cops 'n' Robbers (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1copsa		, sc1cops	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cops 'n' Robbers (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1copdd		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Cops 'n' Robbers Deluxe (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )

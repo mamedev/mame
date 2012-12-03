@@ -12403,7 +12403,6 @@ j6gogolda	//
 j6gogoldb	//
 j6gogoldc	//
 j6gldmin	// Gold Mine (Empire)
-j6gldday	// Golden Day (JPM)
 j6golddm	// Golden Demons (JPM)
 j6golddma	//
 j6goldgl	// Golden Goal (JPM)
@@ -12579,14 +12578,42 @@ j6oxobine	//
 j6oxobinf	//
 j6pacman	// Pac Man Plus (Qps)
 j6papa		// Paparazzi (Empire)
+j6papaa		//
+j6papab		//
+j6papac		//
+j6papad		//
+j6papae		//
+j6papaf		//
 j6phxgld	// Phoenix Gold (JPM)
+j6phxglda	//
+j6phxgldb	//
+j6phxgldc	//
+j6phxgldd	//
+j6phxglde	//
+j6phxgldf	//
+j6phxgldg	//
 j6pnxgd		// Phoenix Gold De Luxe (JPM)
 j6pnxmil	// Phoenix Millennium (JPM)
 j6pinwzd	// Pinball Wizard (JPM)
+j6pinwzda	//
+j6pinwzdb	//
+j6pinwzdc	//
+j6pinwzdd	//
+j6pinwzde	//
+j6pinwzc	// Pinball Wizard (Crystal)
+j6pinwzca	//
+j6pinwzcb	//
 j6pirgld	// Pirates Gold (JPM)
+j6pirglda	//
 j6popoli	// Popeye & Olive (JPM)
+j6popolia	//
 j6pog		// Pot Of Gold (Ace)
+j6poga		//
+j6pogb		//
+j6pogc		//
 j6pogcls	// Pot Of Gold Classic (JPM)
+j6pogclsa	//
+j6pogclsb	//
 j6pwrlin	// Power Lines (JPM)
 j6pwrspn	// Powerspin (JPM)
 j6quantm	// Quantum Leap (JPM)
@@ -12672,7 +12699,6 @@ j6kfc		// Kung Fu Club (Crystal)
 j6lucklo	// Lucky Lottery Club (Crystal)
 j6monst		// Monster Cash Club (Crystal)
 j6pinfvr	// Pinball Fever (Crystal)
-j6pinwzdc	// Pinball Wizard (Crystal)
 j6potg		// Pot Of Gold (Crystal)
 j6ramese	// Rameses' Riches Club (Crystal)
 j6r2rum		// Ready To Rumble (Crystal)
@@ -12787,7 +12813,6 @@ sc1cexpd	// Cash Explosion (Bellfruit) (Dutch)
 sc1cexpl	// Cash Explosion (Bellfruit)
 sc1cexpla
 sc1cexplb
-sc1cexplc
 sc1cexpld
 sc1cshwz	// Cash Wise (Bellfruit)
 sc1cshwza
@@ -12821,7 +12846,6 @@ sc1clbtma
 sc1clbtmb
 sc1clbw		// Club Wise (Bellfruit)
 sc1clbwa
-sc1clbwb
 sc1cops 	// Cops 'n' Robbers (Bellfruit)
 sc1copsa
 sc1copdd	// Cops 'n' Robbers Deluxe (Bellfruit) [Dutch]

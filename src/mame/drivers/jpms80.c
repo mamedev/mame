@@ -179,7 +179,7 @@ ROM_END
 
 ROM_START( j80nudg2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ndu.p1", 0x0000, 0x1000, CRC(4cfd3c6f) SHA1(06ad825343178a694585ee3b4ff8400caf15dd21) )
+	ROM_LOAD( "ndu.p1", 0x0000, 0x1000, CRC(4cfd3c6f) SHA1(06ad825343178a694585ee3b4ff8400caf15dd21) ) // aka ndudx5-1-5p.p1 (was in j2nuddud)
 ROM_END
 
 

@@ -889,9 +889,6 @@ ROM_START( j2nuddud )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nudgedoubleupdelux1.1", 0x0000, 0x8000, CRC(638321d3) SHA1(d1e5a7debfb957ad4d85e7501ec78a37fe56921d) )
 	ROM_LOAD( "nudgedoubleupdelux1.2", 0x8000, 0x8000, CRC(398eafaa) SHA1(84eb5729cf0a7a387693eda0a7214e0c23ae9bab) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) /* split later */
-	ROM_LOAD( "ndudx5-1-5p.p1", 0x0000, 0x1000, CRC(4cfd3c6f) SHA1(06ad825343178a694585ee3b4ff8400caf15dd21) )
 ROM_END
 
 
