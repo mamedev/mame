@@ -1631,7 +1631,7 @@ WRITE_LINE_MEMBER(bfcobra_state::z80_acia_tx_w)
 
 WRITE_LINE_MEMBER(bfcobra_state::z80_acia_irq)
 {
-	m_acia_irq = state ? CLEAR_LINE : ASSERT_LINE;
+	m_acia_irq = state;
 	update_irqs(machine());
 }
 

@@ -155,7 +155,7 @@ void acia6850_device::device_reset()
 	m_tx_state = START;
 	m_irq = 0;
 
-	m_out_irq_func(1);
+	m_out_irq_func(CLEAR_LINE);
 
 	if (m_first_reset)
 	{
@@ -320,12 +320,12 @@ void acia6850_device::check_interrupts()
 		if (irq)
 		{
 			m_status |= ACIA6850_STATUS_IRQ;
-			m_out_irq_func(0);
+			m_out_irq_func(ASSERT_LINE);
 		}
 		else
 		{
 			m_status &= ~ACIA6850_STATUS_IRQ;
-			m_out_irq_func(1);
+			m_out_irq_func(CLEAR_LINE);
 		}
 	}
 }

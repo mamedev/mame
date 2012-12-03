@@ -323,7 +323,7 @@ static void update_mpu68_interrupts(running_machine &machine)
 {
 	mpu4vid_state *state = machine.driver_data<mpu4vid_state>();
 	machine.device("video")->execute().set_input_line(1, state->m_m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	machine.device("video")->execute().set_input_line(2, state->m_m6850_irq_state ? CLEAR_LINE : ASSERT_LINE);
+	machine.device("video")->execute().set_input_line(2, state->m_m6850_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	machine.device("video")->execute().set_input_line(3, state->m_scn2674->get_irq_state() ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -356,8 +356,8 @@ READ_LINE_MEMBER(mpu4vid_state::m6809_acia_dcd_r)
 
 WRITE_LINE_MEMBER(mpu4vid_state::m6809_acia_irq)
 {
-	m_m68k_acia_cts = !state;
-	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+	m_m68k_acia_cts = state;
+	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, state);
 }
 
 static ACIA6850_INTERFACE( m6809_acia_if )
@@ -399,7 +399,7 @@ READ_LINE_MEMBER(mpu4vid_state::m68k_acia_dcd_r)
 
 WRITE_LINE_MEMBER(mpu4vid_state::m68k_acia_irq)
 {
-	m_m6809_acia_cts = !state;
+	m_m6809_acia_cts = state;
 	m_m6850_irq_state = state;
 	update_mpu68_interrupts(machine());
 }

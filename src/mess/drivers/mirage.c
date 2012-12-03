@@ -102,7 +102,7 @@ SLOT_INTERFACE_END
 
 WRITE_LINE_MEMBER(mirage_state::acia_irq_w)
 {
-	m_maincpu->set_input_line(M6809_FIRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(M6809_FIRQ_LINE, state);
 }
 
 void mirage_state::fdc_intrq_w(bool state)
