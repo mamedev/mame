@@ -16,7 +16,6 @@
 
 const device_type PC_FDC_XT = &device_creator<pc_fdc_xt_device>;
 const device_type PC_FDC_AT = &device_creator<pc_fdc_at_device>;
-const device_type PC_FDC_JR = &device_creator<pc_fdc_jr_device>;
 
 static MACHINE_CONFIG_FRAGMENT( cfg )
 	MCFG_UPD765A_ADD("upd765", false, false)
@@ -41,8 +40,6 @@ DEVICE_ADDRESS_MAP_START(map, 8, pc_fdc_at_device)
 	AM_RANGE(0x4, 0x5) AM_DEVICE("upd765", upd765a_device, map)
 	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
 ADDRESS_MAP_END
-
-
 
 pc_fdc_family_device::pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) : pc_fdc_interface(mconfig, type, name, tag, owner, clock), fdc(*this, "upd765")
 {
@@ -197,11 +194,6 @@ pc_fdc_xt_device::pc_fdc_xt_device(const machine_config &mconfig, const char *ta
 pc_fdc_at_device::pc_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : pc_fdc_family_device(mconfig, PC_FDC_AT, "PC FDC AT", tag, owner, clock)
 {
 	m_shortname = "pc_fdc_at";
-}
-
-pc_fdc_jr_device::pc_fdc_jr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : pc_fdc_family_device(mconfig, PC_FDC_JR, "PC FDC JR", tag, owner, clock)
-{
-	m_shortname = "pc_fdc_jr";
 }
 
 #if 0

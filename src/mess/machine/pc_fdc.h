@@ -17,10 +17,6 @@
 #define MCFG_PC_FDC_AT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PC_FDC_AT, 0)
 
-#define MCFG_PC_FDC_JR_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PC_FDC_JR, 0)
-
-
 class pc_fdc_family_device : public pc_fdc_interface {
 public:
 	pc_fdc_family_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
@@ -74,16 +70,8 @@ public:
 	virtual DECLARE_ADDRESS_MAP(map, 8);
 };
 
-class pc_fdc_jr_device : public pc_fdc_family_device {
-public:
-	pc_fdc_jr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-};
-
-
 extern const device_type PC_FDC_XT;
 extern const device_type PC_FDC_AT;
-extern const device_type PC_FDC_JR;
-
 
 #if 0
 /* interface has been seperated, so that it can be used in the super i/o chip */

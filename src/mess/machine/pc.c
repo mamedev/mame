@@ -1171,6 +1171,42 @@ static void pc_set_keyb_int(running_machine &machine, int state)
 	pc_set_irq_line( machine, 1, state );
 }
 
+TIMER_CALLBACK_MEMBER(pc_state::pcjr_fdc_watchdog)
+{
+	if(m_pcjr_dor & 0x20)
+		fdc_interrupt(1);
+	else
+		fdc_interrupt(0);
+}
+
+WRITE8_MEMBER(pc_state::pcjr_fdc_dor_w)
+{
+	logerror("fdc: dor = %02x\n", data);
+	UINT8 pdor = m_pcjr_dor;
+	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
+	floppy_image_device *floppy = machine().device<floppy_connector>("upd765:0")->get_device();
+	m_pcjr_dor = data; 
+
+	if(floppy)
+		floppy->mon_w(!(m_pcjr_dor & 1));
+
+	if(m_pcjr_dor & 1)
+		fdc->set_floppy(floppy);
+	else
+		fdc->set_floppy(NULL);
+
+	if((pdor^m_pcjr_dor) & 0x80)
+		fdc->reset();
+	
+	if(m_pcjr_dor & 0x20) {
+		if((pdor & 0x40) && !(m_pcjr_dor & 0x40))
+			m_pcjr_watchdog->adjust(attotime::from_seconds(3));
+	} else {
+		m_pcjr_watchdog->adjust(attotime::never);
+		fdc_interrupt(0);
+	}
+}
+
 /*
  * MC1502 uses a FD1793 clone instead of uPD765
  */
@@ -1428,11 +1464,14 @@ MACHINE_START_MEMBER(pc_state,mc1502)
 
 MACHINE_START_MEMBER(pc_state,pcjr)
 {
-	pc_fdc_interface *fdc = machine().device<pc_fdc_interface>("fdc");
-	fdc->setup_intrq_cb(pc_fdc_interface::line_cb(FUNC(pc_state::fdc_interrupt), this));
 	pc_int_delay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pcjr_delayed_pic8259_irq),this));
-	m_maincpu = machine().device<cpu_device>("maincpu" );
+	m_pcjr_watchdog = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pcjr_fdc_watchdog),this));
+	pcjr_keyb.keyb_signal_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pcjr_keyb_signal_callback),this));
+	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_maincpu->set_irq_acknowledge_callback(pc_irq_callback);
+
+	machine().device<upd765a_device>("upd765")->set_ready_line_connected(false);
+	
 
 	m_pic8259 = machine().device("pic8259");
 	m_dma8237 = NULL;
@@ -1459,6 +1498,7 @@ MACHINE_RESET_MEMBER(pc_state,pcjr)
 	m_ppi_data_signal = 0;
 	m_ppi_shift_register = 0;
 	m_ppi_shift_enable = 0;
+	m_pcjr_dor = 0;
 	speaker_level_w( speaker, 0 );
 
 	pcjr_keyb_init(machine());

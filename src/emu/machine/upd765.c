@@ -127,7 +127,7 @@ void upd765_family_device::device_start()
 
 	if(ready_polled) {
 		poll_timer = timer_alloc(TIMER_DRIVE_READY_POLLING);
-		poll_timer->adjust(attotime::from_usec(1024), 0, attotime::from_usec(1024));
+		poll_timer->adjust(attotime::from_usec(100), 0, attotime::from_usec(1024));
 	} else
 		poll_timer = NULL;
 
@@ -171,7 +171,7 @@ void upd765_family_device::soft_reset()
 
 	check_irq();
 	if(ready_polled)
-		poll_timer->adjust(attotime::from_usec(1024), 0, attotime::from_usec(1024));
+		poll_timer->adjust(attotime::from_usec(100), 0, attotime::from_usec(1024));
 }
 
 void upd765_family_device::tc_w(bool _tc)
@@ -295,7 +295,7 @@ READ8_MEMBER(upd765_family_device::msr_r)
 	for(int i=0; i<4; i++)
 		if(flopi[i].main_state == RECALIBRATE || flopi[i].main_state == SEEK) {
 			msr |= 1<<i;
-			msr |= MSR_CB;
+			//msr |= MSR_CB;
 		}
 
 	if(data_irq) {
@@ -1493,18 +1493,22 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			command[4]++;
 			if(command[4] > command[6]) {
 				command[4] = 1;
+				command[3] = command[3] ^ 1;
 				if(command[0] & 0x80) {
-					command[3] = command[3] ^ 1;
 					if(fi.dev)
 						fi.dev->ss_w(command[3] & 1);
-				}
-				if(!(command[0] & 0x80) || !(command[3] & 1)) {
-					command[2]++;
-					if(!tc_done) {
-						st0 |= ST0_FAIL;
-						st1 |= ST1_EN;
+					if(!command[3]) {
+						done = true;
+						command[2]++;
 					}
+				} else {
 					done = true;
+					if(!command[3])
+						command[2]++;
+				}
+				if(!tc_done && done) {
+					st0 |= ST0_FAIL;
+					st1 |= ST1_EN;
 				}
 			}
 			if(!done) {
@@ -1605,18 +1609,22 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 			command[4]++;
 			if(command[4] > command[6]) {
 				command[4] = 1;
+				command[3] = command[3] ^ 1;
 				if(command[0] & 0x80) {
-					command[3] = command[3] ^ 1;
 					if(fi.dev)
 						fi.dev->ss_w(command[3] & 1);
-				}
-				if(!(command[0] & 0x80) || !(command[3] & 1)) {
-					command[2]++;
-					if(!tc_done) {
-						st0 |= ST0_FAIL;
-						st1 |= ST1_EN;
+					if(!command[3]) {
+						done = true;
+						command[2]++;
 					}
+				} else {
 					done = true;
+					if(!command[3])
+						command[2]++;
+				}
+				if(!tc_done && done) {
+					st0 |= ST0_FAIL;
+					st1 |= ST1_EN;
 				}
 			}
 			if(!done) {
