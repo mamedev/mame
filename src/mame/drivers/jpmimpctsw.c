@@ -22,6 +22,9 @@ INPUT_PORTS_EXTERN( tbirds );
 //	ROM_LOAD16_BYTE( "c-2.bin", 0x000001, 0x020000, CRC(e36aaf42) SHA1(c9da129f85c7b8ce27ea8cb9f090ae647eeac10d) )
 
 
+// the 68k dies on many sets, but this seems to be due to our emulation, not a problem with the sets
+//  the games can be fussy about unmapped reads etc.
+
 #define PRGSIZE_LARGE 0x100000
 //#define PRGSIZE_REGULAR 0x40000
 #define PRGSIZE_REGULAR 0x100000
@@ -31,7 +34,7 @@ INPUT_PORTS_EXTERN( tbirds );
 // I believe all IMPACT roms should have a samples rom (it's the only sound output?) so any without are almost
 // certainly missing it.
 
-// 68k dies, mismatched set?
+
 ROM_START( j6fifth )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "fdm30dsk.1", 0x000000, 0x020000, CRC(ec6a2687) SHA1(4cafd1c8d6d20fb034493c16d3abfafa2a1906f5) )
@@ -701,14 +704,6 @@ ROM_START( j6bucks )
 ROM_END
 
 
-ROM_START( j6buzz ) // extra hw at 80000? // or overdumps - video
-	ROM_REGION( PRGSIZE_LARGE, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "prom1n.bin", 0x000000, 0x080000, CRC(2b47efd8) SHA1(bc96a5ea2511081f73a120e025249018c517c638) )
-	ROM_LOAD16_BYTE( "prom2.bin",  0x000001, 0x080000, CRC(3a1c38a3) SHA1(cb85e1a9535ba646724db5e3dfbdb81384ada918) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	/* missing? */
-ROM_END
 
 
 
@@ -7646,7 +7641,6 @@ GAME( 199?, j6brkouta	, j6brkout	, impctawp, tbirds, driver_device, 0, ROT0, "JP
 
 GAME( 199?, j6bucks		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Ace", "Bucks Fizz (Ace) (IMPACT)", GAME_FLAGS )
 
-GAME( 199?, j6buzz		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Ace", "Buzzundrum (Ace) (IMPACT)", GAME_FLAGS )
 
 GAME( 199?, j6cpclb		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Caesar's Palace Club (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME( 199?, j6cpclba	, j6cpclb	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Caesar's Palace Club (JPM) (IMPACT) (set 2)", GAME_FLAGS )

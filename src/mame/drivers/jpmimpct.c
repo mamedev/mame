@@ -1750,6 +1750,18 @@ ROM_START( snlad ) // probably incomplete
 ROM_END
 
 
+ROM_START( buzzundr )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "prom1n.bin", 0x000000, 0x080000, CRC(2b47efd8) SHA1(bc96a5ea2511081f73a120e025249018c517c638) )
+	ROM_LOAD16_BYTE( "prom2.bin",  0x000001, 0x080000, CRC(3a1c38a3) SHA1(cb85e1a9535ba646724db5e3dfbdb81384ada918) )
+
+	ROM_REGION16_LE( 0x200000, "user1", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "gr1.bin", 0x000000, 0x100000, NO_DUMP )
+	ROM_LOAD16_BYTE( "gr2.bin", 0x000001, 0x100000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	/* missing? */
+ROM_END
 
 
 /************************************
@@ -1773,6 +1785,6 @@ GAME( 1998, hngmnjpm, 0,       jpmimpct, hngmnjpm, driver_device, 0, ROT0, "JPM"
 GAME( 1998, hngmnjpmd,hngmnjpm,jpmimpct, hngmnjpm, driver_device, 0, ROT0, "JPM", "Hangman (JPM) (Protocol)",    GAME_SUPPORTS_SAVE )
 GAME( 1999, coronatn, 0,       jpmimpct, coronatn, driver_device, 0, ROT0, "JPM", "Coronation Street Quiz Game", GAME_SUPPORTS_SAVE )
 GAME( 1999, coronatnd,coronatn,jpmimpct, coronatn, driver_device, 0, ROT0, "JPM", "Coronation Street Quiz Game (Protocol)", GAME_SUPPORTS_SAVE )
-GAME( 199?, tqst,	  0,	   jpmimpct, cluedo	 , driver_device, 0, ROT0, "JPM", "Treasure Quest"			   , GAME_NOT_WORKING) // seems to be a video set (different to the games below), but probably incomplete, was marked as 'ACE' ?
-GAME( 199?, snlad,	  0,	   jpmimpct, cluedo	 , driver_device, 0, ROT0, "JPM", "Snake & Ladders"			   , GAME_NOT_WORKING) // probably incomplete
-
+GAME( 199?, tqst,	  0,	   jpmimpct, cluedo	 , driver_device, 0, ROT0, "JPM", "Treasure Quest"			   , GAME_NOT_WORKING) // incomplete (ACE?)
+GAME( 199?, snlad,	  0,	   jpmimpct, cluedo	 , driver_device, 0, ROT0, "JPM", "Snake & Ladders"			   , GAME_NOT_WORKING) // incomplete
+GAME( 199?, buzzundr, 0,       jpmimpct, cluedo  , driver_device, 0, ROT0, "Ace", "Buzzundrum (Ace)", GAME_NOT_WORKING )

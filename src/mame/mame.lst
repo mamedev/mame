@@ -12133,7 +12133,6 @@ j6bnzak		//
 j6brkout	// Breakout (JPM)
 j6brkouta	//
 j6bucks		// Bucks Fizz (Ace)
-j6buzz		// Buzzundrum (Ace)
 j6cpclb		// Caesar's Palace Club (JPM)
 j6cpclba	//
 j6cpclbb	//
@@ -12956,6 +12955,7 @@ coronatn		// (c) 1999
 coronatnd		// (c) 1999
 tqst			// (c) ACE?
 snlad			// (c) 199?
+buzzundr		// Buzzundrum (Ace)
 
 // Unknown JPM platform
 j7bmagic		// Black Magic (JPM)
