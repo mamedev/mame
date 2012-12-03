@@ -250,14 +250,14 @@ protected:
 	};
 
 	struct floppy_info {
-		enum { IRQ_NONE, IRQ_SEEK, IRQ_POLLED };
+		enum { IRQ_NONE, IRQ_POLLED, IRQ_SEEK, IRQ_DONE };
 		emu_timer *tm;
 		floppy_image_device *dev;
 		int id;
 		int main_state, sub_state;
 		int dir, counter;
-		UINT8 pcn;
-		int irq;
+		UINT8 pcn, st0;
+		bool st0_filled;
 		bool live, index, ready;
 	};
 
@@ -287,13 +287,13 @@ protected:
 
 	live_info cur_live, checkpoint_live;
 	line_cb intrq_cb, drq_cb;
-	bool cur_irq, polled_irq, data_irq, drq, internal_drq, tc, tc_done, locked, mfm;
+	bool cur_irq, other_irq, data_irq, drq, internal_drq, tc, tc_done, locked, mfm;
 	floppy_info flopi[4];
 
 	int fifo_pos, fifo_expected, command_pos, result_pos;
 	bool fifo_write;
 	UINT8 dor, dsr, msr, fifo[16], command[16], result[16];
-	UINT8 st0, st1, st2, st3;
+	UINT8 st1, st2, st3;
 	UINT8 fifocfg, dor_reset;
 	UINT8 precomp, perpmode;
 	UINT16 spec;

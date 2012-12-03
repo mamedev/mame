@@ -150,10 +150,11 @@ void upd765_family_device::soft_reset()
 		flopi[i].sub_state = IDLE;
 		flopi[i].live = false;
 		flopi[i].ready = !ready_polled;
-		flopi[i].irq = floppy_info::IRQ_NONE;
+		flopi[i].st0 = i;
+		flopi[i].st0_filled = false;
 	}
 	data_irq = false;
-	polled_irq = false;
+	other_irq = false;
 	internal_drq = false;
 	fifo_pos = 0;
 	command_pos = 0;
@@ -167,7 +168,7 @@ void upd765_family_device::soft_reset()
 	cur_live.next_state = -1;
 	cur_live.fi = NULL;
 	tc_done = false;
-	st0 = st1 = st2 = st3 = 0x00;
+	st1 = st2 = st3 = 0x00;
 
 	check_irq();
 	if(ready_polled)
@@ -1196,45 +1197,44 @@ void upd765_family_device::start_command(int cmd)
 	}
 
 	case C_SENSE_INTERRUPT_STATUS: {
+		// Documentation is somewhat contradictory w.r.t polling
+		// and irq.  PC bios, especially 5150, requires that only
+		// one irq happens.  That's also wait the ns82077a doc
+		// says it does.  OTOH, a number of docs says you need to
+		// call SIS 4 times, once per drive...
+		//
+		// There's also the interaction with the seek irq.  The
+		// somewhat borderline tf20 code seems to think that
+		// essentially ignoring the polling irq should work.
+		//
+		// And the pc98 expects to be able to accumulate irq reasons
+		// for different drives and things to work.
+		//
+		// Current hypothesis:
+		// - each drive has its own st0 and irq trigger
+		// - SIS drops the irq always, but also returns the first full st0 it finds
+
 		main_phase = PHASE_RESULT;
 
 		int fid;
-		for(fid=0; fid<4 && flopi[fid].irq == floppy_info::IRQ_NONE; fid++);
+		for(fid=0; fid<4 && !flopi[fid].st0_filled; fid++);
 		if(fid == 4) {
-			st0 = ST0_UNK;
-			result[0] = st0;
+			result[0] = ST0_UNK;
 			result_pos = 1;
 			logerror("%s: command sense interrupt status (%02x)\n", tag(), result[0]);
 			break;
 		}
+
 		floppy_info &fi = flopi[fid];
-		if(fi.irq == floppy_info::IRQ_POLLED) {
-			// Documentation is somewhat contradictory w.r.t polling
-			// and irq.  PC bios, especially 5150, requires that only
-			// one irq happens.  That's also wait the ns82077a doc
-			// says it does.  OTOH, a number of docs says you need to
-			// call SIS 4 times, once per drive...
-			//
-			// There's also the interaction with the seek irq.  The
-			// somewhat borderline tf20 code seems to think that
-			// essentially ignoring the polling irq should work.
-			//
-			// So at that point the best bet seems to drop the
-			// "polled" irq as soon as a SIS happens, and override any
-			// polled-in-waiting information when a seek irq happens
-			// for a given floppy.
+		fi.st0_filled = false;
 
-			st0 = ST0_ABRT | fid;
-		}
-		fi.irq = floppy_info::IRQ_NONE;
-
-		polled_irq = false;
-
-		result[0] = st0;
+		result[0] = fi.st0;
 		result[1] = fi.pcn;
+
 		logerror("%s: command sense interrupt status (fid=%d %02x %02x)\n", tag(), fid, result[0], result[1]);
 		result_pos = 2;
 
+		other_irq = false;
 		check_irq();
 		break;
 	}
@@ -1267,7 +1267,8 @@ void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 	if(data_completion)
 		data_irq = true;
 	else
-		fi.irq = floppy_info::IRQ_SEEK;
+		other_irq = true;
+	fi.st0_filled = true;
 	check_irq();
 }
 
@@ -1337,7 +1338,7 @@ void upd765_family_device::seek_continue(floppy_info &fi)
 				if(done)
 					fi.pcn = 0;
 				else if(!fi.counter) {
-					st0 = ST0_FAIL|ST0_SE|ST0_EC;
+					fi.st0 = ST0_FAIL|ST0_SE|ST0_EC | fi.id;
 					command_end(fi, false);
 					return;
 				}
@@ -1347,7 +1348,7 @@ void upd765_family_device::seek_continue(floppy_info &fi)
 				break;
 			}
 			if(done) {
-				st0 = ST0_SE;
+				fi.st0 = ST0_SE | fi.id;
 				command_end(fi, false);
 				return;
 			}
@@ -1382,7 +1383,7 @@ void upd765_family_device::read_data_start(floppy_info &fi)
 			 command[8],
 			 cur_rate);
 
-	st0 = command[1] & 7;
+	fi.st0 = command[1] & 7;
 	st1 = ST1_MA;
 	st2 = 0x00;
 
@@ -1400,7 +1401,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 				fi.sub_state = SEEK_DONE;
 				break;
 			}
-			st0 |= ST0_SE;
+			fi.st0 |= ST0_SE;
 			if(fi.dev) {
 				fi.dev->dir_w(fi.pcn > command[2] ? 1 : 0);
 				fi.dev->stp_w(0);
@@ -1439,7 +1440,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 
 		case SCAN_ID:
 			if(cur_live.crc) {
-				st0 |= ST0_FAIL;
+				fi.st0 |= ST0_FAIL;
 				st1 |= ST1_DE|ST1_ND;
 				fi.sub_state = COMMAND_DONE;
 				break;
@@ -1451,7 +1452,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 						st2 |= ST2_WC|ST2_BC;
 					else
 						st2 |= ST2_WC;
-					st0 |= ST0_FAIL;
+					fi.st0 |= ST0_FAIL;
 					fi.sub_state = COMMAND_DONE;
 					break;
 				}
@@ -1471,19 +1472,19 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			return;
 
 		case SCAN_ID_FAILED:
-			st0 |= ST0_FAIL;
+			fi.st0 |= ST0_FAIL;
 			st1 |= ST1_ND;
 			fi.sub_state = COMMAND_DONE;
 			break;
 
 		case SECTOR_READ: {
 			if(st2 & ST2_MD) {
-				st0 |= ST0_FAIL;
+				fi.st0 |= ST0_FAIL;
 				fi.sub_state = COMMAND_DONE;
 				break;
 			}
 			if(cur_live.crc) {
-				st0 |= ST0_FAIL;
+				fi.st0 |= ST0_FAIL;
 				st1 |= ST1_DE;
 				st2 |= ST2_CM;
 				fi.sub_state = COMMAND_DONE;
@@ -1507,7 +1508,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 						command[2]++;
 				}
 				if(!tc_done && done) {
-					st0 |= ST0_FAIL;
+					fi.st0 |= ST0_FAIL;
 					st1 |= ST1_EN;
 				}
 			}
@@ -1521,7 +1522,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 
 		case COMMAND_DONE:
 			main_phase = PHASE_RESULT;
-			result[0] = st0;
+			result[0] = fi.st0;
 			result[1] = st1;
 			result[2] = st2;
 			result[3] = command[2];
@@ -1563,7 +1564,7 @@ void upd765_family_device::write_data_start(floppy_info &fi)
 	if(fi.dev)
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
 
-	st0 = command[1] & 7;
+	fi.st0 = command[1] & 7;
 	st1 = ST1_MA;
 	st2 = 0x00;
 
@@ -1586,7 +1587,7 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 				return;
 			}
 			if(cur_live.crc) {
-				st0 |= ST0_FAIL;
+				fi.st0 |= ST0_FAIL;
 				st1 |= ST1_DE|ST1_ND;
 				fi.sub_state = COMMAND_DONE;
 				break;
@@ -1599,7 +1600,7 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 			return;
 
 		case SCAN_ID_FAILED:
-			st0 |= ST0_FAIL;
+			fi.st0 |= ST0_FAIL;
 			st1 |= ST1_ND;
 			fi.sub_state = COMMAND_DONE;
 			break;
@@ -1623,7 +1624,7 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 						command[2]++;
 				}
 				if(!tc_done && done) {
-					st0 |= ST0_FAIL;
+					fi.st0 |= ST0_FAIL;
 					st1 |= ST1_EN;
 				}
 			}
@@ -1637,7 +1638,7 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 
 		case COMMAND_DONE:
 			main_phase = PHASE_RESULT;
-			result[0] = st0;
+			result[0] = fi.st0;
 			result[1] = st1;
 			result[2] = st2;
 			result[3] = command[2];
@@ -1846,7 +1847,7 @@ void upd765_family_device::read_id_start(floppy_info &fi)
 	if(fi.dev)
 		fi.dev->ss_w(command[1] & 4 ? 1 : 0);
 
-	st0 = command[1] & 7;
+	fi.st0 = command[1] & 7;
 	st1 = 0x00;
 	st2 = 0x00;
 
@@ -1868,21 +1869,21 @@ void upd765_family_device::read_id_continue(floppy_info &fi)
 
 		case SCAN_ID:
 			if(cur_live.crc) {
-				st0 |= ST0_FAIL;
+				fi.st0 |= ST0_FAIL;
 				st1 |= ST1_MA|ST1_DE|ST1_ND;
 			}
 			fi.sub_state = COMMAND_DONE;
 			break;
 
 		case SCAN_ID_FAILED:
-			st0 |= ST0_FAIL;
+			fi.st0 |= ST0_FAIL;
 			st1 |= ST1_ND|ST1_MA;
 			fi.sub_state = COMMAND_DONE;
 			break;
 
 		case COMMAND_DONE:
 			main_phase = PHASE_RESULT;
-			result[0] = st0;
+			result[0] = fi.st0;
 			result[1] = st1;
 			result[2] = st2;
 			result[3] = cur_live.idbuf[0];
@@ -1903,9 +1904,7 @@ void upd765_family_device::read_id_continue(floppy_info &fi)
 void upd765_family_device::check_irq()
 {
 	bool old_irq = cur_irq;
-	cur_irq = data_irq || polled_irq || internal_drq;
-	for(int i=0; i<4; i++)
-		cur_irq = cur_irq || flopi[i].irq == floppy_info::IRQ_SEEK;
+	cur_irq = data_irq || other_irq || internal_drq;
 	cur_irq = cur_irq && (dor & 4) && (dor & 8);
 	if(cur_irq != old_irq && !intrq_cb.isnull()) {
 		logerror("%s: irq = %d\n", tag(), cur_irq);
@@ -1969,15 +1968,16 @@ void upd765_family_device::run_drive_ready_polling()
 		if(ready != flopi[fid].ready) {
 			logerror("%s: polled %d : %d -> %d\n", tag(), fid, flopi[fid].ready, ready);
 			flopi[fid].ready = ready;
-			if(flopi[fid].irq == floppy_info::IRQ_NONE) {
-				flopi[fid].irq = floppy_info::IRQ_POLLED;
-				polled_irq = true;
+			if(!flopi[fid].st0_filled) {
+				flopi[fid].st0 = ST0_ABRT | fid;
+				flopi[fid].st0_filled = true;
+				other_irq = true;
 				changed = true;
 			}
 		}
 	}
-	if(changed)
-		check_irq();
+
+	check_irq();
 }
 
 void upd765_family_device::index_callback(floppy_image_device *floppy, int state)
