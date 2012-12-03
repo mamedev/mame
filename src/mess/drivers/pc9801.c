@@ -2506,7 +2506,7 @@ READ8_MEMBER(pc9801_state::pc9801_dma_read_byte)
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
 
-	printf("%08x\n",addr);
+//	printf("%08x\n",addr);
 
 	return program.read_byte(addr);
 }
@@ -2517,7 +2517,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_dma_write_byte)
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
 
-	printf("%08x %02x\n",addr,data);
+//	printf("%08x %02x\n",addr,data);
 
 	program.write_byte(addr, data);
 }
@@ -2666,8 +2666,8 @@ void pc9801_state::fdc_2hd_irq(bool state)
 
 void pc9801_state::fdc_2hd_drq(bool state)
 {
-	printf("%02x DRQ\n",state);
-	m_dmac->dreq2_w(state);
+//	printf("%02x DRQ\n",state);
+	m_dmac->dreq2_w(state ^ 1);
 }
 
 void pc9801_state::fdc_2dd_irq(bool state)
@@ -2682,8 +2682,8 @@ void pc9801_state::fdc_2dd_irq(bool state)
 
 void pc9801_state::fdc_2dd_drq(bool state)
 {
-	printf("%02x DRQ\n",state);
-	m_dmac->dreq3_w(state);
+//	printf("%02x DRQ\n",state);
+	m_dmac->dreq3_w(state ^ 1);
 }
 
 void pc9801_state::pc9801rs_fdc_irq(bool state)
