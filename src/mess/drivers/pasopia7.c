@@ -571,7 +571,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_fdc_w )
 		case 6:
 			if(data & 0x80)
 				m_fdc->reset();
-			m_floppy->mon_w(!(data & 0x40));
+			m_floppy->mon_w(data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
 			break;
 	}
 }

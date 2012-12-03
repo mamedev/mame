@@ -475,8 +475,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc9801_dack1_w);
 	DECLARE_WRITE_LINE_MEMBER(pc9801_dack2_w);
 	DECLARE_WRITE_LINE_MEMBER(pc9801_dack3_w);
-	DECLARE_READ8_MEMBER(fdc_r);
-	DECLARE_WRITE8_MEMBER(fdc_w);
+	DECLARE_READ8_MEMBER(fdc_2hd_r);
+	DECLARE_WRITE8_MEMBER(fdc_2hd_w);
+	DECLARE_READ8_MEMBER(fdc_2dd_r);
+	DECLARE_WRITE8_MEMBER(fdc_2dd_w);
 	DECLARE_READ8_MEMBER(ppi_sys_porta_r);
 	DECLARE_READ8_MEMBER(ppi_sys_portb_r);
 	DECLARE_READ8_MEMBER(ppi_prn_portb_r);
@@ -1187,8 +1189,8 @@ WRITE8_MEMBER(pc9801_state::pc9801_fdc_2hd_w)
 				m_fdc_2hd_ctrl = data;
 				pc9801_fdc_2hd_update_ready(NULL, 0);
 
-				//machine().device<floppy_connector>("upd765_2hd:0")->get_device()->mon_w(!(data & 0x40));
-				//machine().device<floppy_connector>("upd765_2hd:1")->get_device()->mon_w(!(data & 0x40));
+				machine().device<floppy_connector>("upd765_2hd:0")->get_device()->mon_w(data & 0x40 ? ASSERT_LINE : CLEAR_LINE);
+				machine().device<floppy_connector>("upd765_2hd:1")->get_device()->mon_w(data & 0x40 ? ASSERT_LINE : CLEAR_LINE);
 				break;
 		}
 	}
@@ -1239,10 +1241,8 @@ WRITE8_MEMBER(pc9801_state::pc9801_fdc_2dd_w)
 					machine().device<upd765a_device>("upd765_2dd")->reset();
 
 				m_fdc_2dd_ctrl = data;
-				//floppy_mon_w(floppy_get_device(machine(), 0), (data & 8) ? CLEAR_LINE : ASSERT_LINE);
-				//floppy_mon_w(floppy_get_device(machine(), 1), (data & 8) ? CLEAR_LINE : ASSERT_LINE);
-				//floppy_drive_set_ready_state(floppy_get_device(machine(), 0), (data & 8), 0);
-				//floppy_drive_set_ready_state(floppy_get_device(machine(), 1), (data & 8), 0);
+				machine().device<floppy_connector>("upd765_2dd:0")->get_device()->mon_w(data & 0x08 ? ASSERT_LINE : CLEAR_LINE);
+				machine().device<floppy_connector>("upd765_2dd:1")->get_device()->mon_w(data & 0x08 ? ASSERT_LINE : CLEAR_LINE);
 				break;
 		}
 	}
@@ -1516,8 +1516,8 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_2hd_w)
 
 				pc9801_fdc_2hd_update_ready(NULL, 0);
 
-				machine().device<floppy_connector>("upd765_2hd:0")->get_device()->mon_w(!(data & 0x08));
-				machine().device<floppy_connector>("upd765_2hd:1")->get_device()->mon_w(!(data & 0x08));
+				machine().device<floppy_connector>("upd765_2hd:0")->get_device()->mon_w(data & 0x08 ? ASSERT_LINE : CLEAR_LINE);
+				machine().device<floppy_connector>("upd765_2hd:1")->get_device()->mon_w(data & 0x08 ? ASSERT_LINE : CLEAR_LINE);
 				return;
 		}
 	}
@@ -2496,6 +2496,7 @@ WRITE_LINE_MEMBER(pc9801_state::pc9801_tc_w )
 {
 	/* floppy terminal count */
 	m_fdc_2hd->tc_w(state);
+	// TODO: 2dd?
 
 //	printf("TC %02x\n",state);
 }
@@ -2505,7 +2506,7 @@ READ8_MEMBER(pc9801_state::pc9801_dma_read_byte)
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
 
-//	printf("%08x\n",addr);
+	printf("%08x\n",addr);
 
 	return program.read_byte(addr);
 }
@@ -2516,7 +2517,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_dma_write_byte)
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
 
-//  printf("%08x %02x\n",addr,data);
+	printf("%08x %02x\n",addr,data);
 
 	program.write_byte(addr, data);
 }
@@ -2532,25 +2533,36 @@ WRITE_LINE_MEMBER(pc9801_state::pc9801_dack1_w){ /*printf("%02x 1\n",state);*/ s
 WRITE_LINE_MEMBER(pc9801_state::pc9801_dack2_w){ /*printf("%02x 2\n",state);*/ set_dma_channel(machine(), 2, state); }
 WRITE_LINE_MEMBER(pc9801_state::pc9801_dack3_w){ /*printf("%02x 3\n",state);*/ set_dma_channel(machine(), 3, state); }
 
-READ8_MEMBER(pc9801_state::fdc_r)
+READ8_MEMBER(pc9801_state::fdc_2hd_r)
 {
 	return m_fdc_2hd->dma_r();
 }
 
-WRITE8_MEMBER(pc9801_state::fdc_w)
+WRITE8_MEMBER(pc9801_state::fdc_2hd_w)
 {
 	m_fdc_2hd->dma_w(data);
 }
 
-/* TODO: check channels for this */
+READ8_MEMBER(pc9801_state::fdc_2dd_r)
+{
+	return m_fdc_2dd->dma_r();
+}
+
+WRITE8_MEMBER(pc9801_state::fdc_2dd_w)
+{
+	m_fdc_2dd->dma_w(data);
+}
+
+
+/* TODO: check channels 0 - 1 */
 static I8237_INTERFACE( dmac_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dma_hrq_changed),
 	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_tc_w),
 	DEVCB_DRIVER_MEMBER(pc9801_state, pc9801_dma_read_byte),
 	DEVCB_DRIVER_MEMBER(pc9801_state, pc9801_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,fdc_r), DEVCB_DRIVER_MEMBER(pc9801_state,fdc_r), DEVCB_DRIVER_MEMBER(pc9801_state,fdc_r) },
-	{ DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,fdc_w), DEVCB_DRIVER_MEMBER(pc9801_state,fdc_w), DEVCB_DRIVER_MEMBER(pc9801_state,fdc_w) },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,fdc_2hd_r), DEVCB_DRIVER_MEMBER(pc9801_state,fdc_2dd_r) },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,fdc_2hd_w), DEVCB_DRIVER_MEMBER(pc9801_state,fdc_2dd_w) },
 	{ DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack0_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack1_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack2_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack3_w) }
 };
 
@@ -2566,8 +2578,8 @@ static I8237_INTERFACE( pc9801rs_dmac_intf )
 	DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_tc_w),
 	DEVCB_DRIVER_MEMBER(pc9801_state, pc9801_dma_read_byte),
 	DEVCB_DRIVER_MEMBER(pc9801_state, pc9801_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,fdc_r), DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,fdc_w), DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,fdc_2hd_r), DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(pc9801_state,fdc_2hd_w), DEVCB_NULL },
 	{ DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack0_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack1_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack2_w), DEVCB_DRIVER_LINE_MEMBER(pc9801_state, pc9801_dack3_w) }
 };
 
@@ -2648,13 +2660,14 @@ SLOT_INTERFACE_END
 
 void pc9801_state::fdc_2hd_irq(bool state)
 {
-	printf("IRQ 2HD %d\n",state);
+//	printf("IRQ 2HD %d\n",state);
 	pic8259_ir3_w(machine().device("pic8259_slave"), state);
 }
 
 void pc9801_state::fdc_2hd_drq(bool state)
 {
 	printf("%02x DRQ\n",state);
+	m_dmac->dreq2_w(state);
 }
 
 void pc9801_state::fdc_2dd_irq(bool state)
@@ -2670,13 +2683,14 @@ void pc9801_state::fdc_2dd_irq(bool state)
 void pc9801_state::fdc_2dd_drq(bool state)
 {
 	printf("%02x DRQ\n",state);
+	m_dmac->dreq3_w(state);
 }
 
 void pc9801_state::pc9801rs_fdc_irq(bool state)
 {
 	/* 0xffaf8 */
 
-	//cprintf("%02x %d\n",m_fdc_ctrl,state);
+	//printf("%02x %d\n",m_fdc_ctrl,state);
 
 	if(m_fdc_ctrl & 1)
 		pic8259_ir3_w(machine().device("pic8259_slave"), state);
@@ -2775,6 +2789,8 @@ MACHINE_START_MEMBER(pc9801_state,pc9801f)
 		fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2dd_irq), this));
 		fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::fdc_2dd_drq), this));
 	}
+	m_fdc_2hd->set_rate(500000);
+	m_fdc_2dd->set_rate(250000);
 }
 
 MACHINE_START_MEMBER(pc9801_state,pc9801rs)
