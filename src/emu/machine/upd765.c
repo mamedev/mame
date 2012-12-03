@@ -1491,27 +1491,25 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 				break;
 			}
 			bool done = tc_done;
-			command[4]++;
-			if(command[4] > command[6]) {
-				command[4] = 1;
-				command[3] = command[3] ^ 1;
+			if(command[4] == command[6]) {
 				if(command[0] & 0x80) {
+					command[3] = command[3] ^ 1;
+					command[4] = 1;
 					if(fi.dev)
 						fi.dev->ss_w(command[3] & 1);
-					if(!command[3]) {
-						done = true;
+				}
+				if(!(command[0] & 0x80) || !(command[3] & 1)) {
+					if(!tc_done) {
+						fi.st0 |= ST0_FAIL;
+						st1 |= ST1_EN;
+					} else {
 						command[2]++;
+						command[4] = 1;
 					}
-				} else {
 					done = true;
-					if(!command[3])
-						command[2]++;
 				}
-				if(!tc_done && done) {
-					fi.st0 |= ST0_FAIL;
-					st1 |= ST1_EN;
-				}
-			}
+			} else
+				command[4]++;
 			if(!done) {
 				fi.sub_state = SEEK_DONE;
 				break;
@@ -1607,27 +1605,25 @@ void upd765_family_device::write_data_continue(floppy_info &fi)
 
 		case SECTOR_WRITTEN: {
 			bool done = tc_done;
-			command[4]++;
-			if(command[4] > command[6]) {
-				command[4] = 1;
-				command[3] = command[3] ^ 1;
+			if(command[4] == command[6]) {
 				if(command[0] & 0x80) {
+					command[3] = command[3] ^ 1;
+					command[4] = 1;
 					if(fi.dev)
 						fi.dev->ss_w(command[3] & 1);
-					if(!command[3]) {
-						done = true;
+				}
+				if(!(command[0] & 0x80) || !(command[3] & 1)) {
+					if(!tc_done) {
+						fi.st0 |= ST0_FAIL;
+						st1 |= ST1_EN;
+					} else {
 						command[2]++;
+						command[4] = 1;
 					}
-				} else {
 					done = true;
-					if(!command[3])
-						command[2]++;
 				}
-				if(!tc_done && done) {
-					fi.st0 |= ST0_FAIL;
-					st1 |= ST1_EN;
-				}
-			}
+			} else
+				command[4]++;
 			if(!done) {
 				fi.sub_state = HEAD_LOAD_DONE;
 				break;
