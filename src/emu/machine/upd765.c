@@ -1958,7 +1958,6 @@ void upd765_family_device::run_drive_ready_polling()
 	if(main_phase != PHASE_CMD || (fifocfg & FIF_POLL))
 		return;
 
-	bool changed = false;
 	for(int fid=0; fid<4; fid++) {
 		bool ready = get_ready(fid);
 		if(ready != flopi[fid].ready) {
@@ -1968,7 +1967,6 @@ void upd765_family_device::run_drive_ready_polling()
 				flopi[fid].st0 = ST0_ABRT | fid;
 				flopi[fid].st0_filled = true;
 				other_irq = true;
-				changed = true;
 			}
 		}
 	}
