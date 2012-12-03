@@ -20,7 +20,7 @@ TODO:
 
 - Input handling is wrong in crystalg, crystal2 and nightlov.
 
-- Some games display "GFXROM BANK OVER!!" or "GFXROM ADDRESS OVER!!"
+0- Some games display "GFXROM BANK OVER!!" or "GFXROM ADDRESS OVER!!"
   in Debug build.
 
 - Screen flip is not perfect.
@@ -2096,28 +2096,28 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( orangec )
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x07, "1 (Easy)" )
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPSETTING(    0x05, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPSETTING(    0x02, "6" )
+	PORT_DIPSETTING(    0x01, "7" )
+	PORT_DIPSETTING(    0x00, "8 (Hard)" )
 	PORT_DIPNAME( 0x08, 0x00, "Select Girl" )
 	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x00, "Extend TSUMO" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x40, 0x40, "Character Display Test" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "DIPSW 1-8" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -3603,8 +3603,9 @@ ROM_START( orangec )
 	ROM_LOAD( "ic2.bin",  0x140000, 0x40000, CRC(da46163e) SHA1(c6e5f59fe813915f94d81ff28526614c943b7082) )
 	ROM_LOAD( "ic3.bin",  0x180000, 0x40000, CRC(efb13b61) SHA1(61d100b52d01e447dd599cc9ff06b97dd7a4ae0b) )
 	ROM_LOAD( "ic4.bin",  0x1c0000, 0x40000, CRC(9acc54fa) SHA1(7975370e1dd32ecd98d7f2e32f14feb88e0cdb43) )
-	ROM_LOAD( "ic6i.bin", 0x0f0000, 0x10000, CRC(94bf4847) SHA1(a1ff0a5b1918b9f1a0f608ad341d091512988c1a) )
-	ROM_LOAD( "ic7i.bin", 0x110000, 0x10000, CRC(284f5648) SHA1(f0a734744901313f5052ea1727815e11a93e1811) )	// overlaps ic1!
+	ROM_LOAD( "ic6i.bin", 0x0f0000, 0x10000, CRC(94bf4847) SHA1(a1ff0a5b1918b9f1a0f608ad341d091512988c1a) )	// orangec/ic6i.bin
+	ROM_LOAD( "ic7i.bin", 0x100000, 0x10000, CRC(284f5648) SHA1(f0a734744901313f5052ea1727815e11a93e1811) )	// orangec/ic7i.bin overlaps ic1!
+	ROM_LOAD( "ic7i.bin", 0x110000, 0x10000, CRC(284f5648) SHA1(f0a734744901313f5052ea1727815e11a93e1811) )	// orangec/ic7i.bin overlaps ic1!
 ROM_END
 
 ROM_START( orangeci )
@@ -3626,8 +3627,9 @@ ROM_START( orangeci )
 	ROM_LOAD( "ic2.bin",  0x140000, 0x40000, CRC(da46163e) SHA1(c6e5f59fe813915f94d81ff28526614c943b7082) )
 	ROM_LOAD( "ic3.bin",  0x180000, 0x40000, CRC(efb13b61) SHA1(61d100b52d01e447dd599cc9ff06b97dd7a4ae0b) )
 	ROM_LOAD( "ic4.bin",  0x1c0000, 0x40000, CRC(9acc54fa) SHA1(7975370e1dd32ecd98d7f2e32f14feb88e0cdb43) )
-	ROM_LOAD( "ic6i.bin", 0x0f0000, 0x10000, CRC(94bf4847) SHA1(a1ff0a5b1918b9f1a0f608ad341d091512988c1a) )
-	ROM_LOAD( "ic7i.bin", 0x110000, 0x10000, CRC(284f5648) SHA1(f0a734744901313f5052ea1727815e11a93e1811) )	// overlaps ic1!
+	ROM_LOAD( "ic6i.bin", 0x0f0000, 0x10000, CRC(94bf4847) SHA1(a1ff0a5b1918b9f1a0f608ad341d091512988c1a) )	// orangec/ic6i.bin
+	ROM_LOAD( "ic7i.bin", 0x100000, 0x10000, CRC(284f5648) SHA1(f0a734744901313f5052ea1727815e11a93e1811) )	// orangec/ic7i.bin overlaps ic1!
+	ROM_LOAD( "ic7i.bin", 0x110000, 0x10000, CRC(284f5648) SHA1(f0a734744901313f5052ea1727815e11a93e1811) )	// orangec/ic7i.bin overlaps ic1!
 ROM_END
 
 ROM_START( vipclub )
@@ -3636,7 +3638,7 @@ ROM_START( vipclub )
 	ROM_LOAD( "1.2c",     0x08000, 0x08000, CRC(42101925) SHA1(b3e1b4a3c905e0c5ad85fd1276b221440937719e) )
 
 	ROM_REGION( 0x10000, "voice", 0 ) /* voice */
-	ROM_LOAD( "ft3.5c",   0x00000, 0x10000, CRC(2390a28b) SHA1(7bced9e7680d0cc98e30ab82da1c4ab0c4ef37b4) )	// orangec/ft3.5c
+	ROM_LOAD( "ft3.5c",   0x00000, 0x10000, CRC(2390a28b) SHA1(7bced9e7680d0cc98e30ab82da1c4ab0c4ef37b4) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* gfx */
 	ROM_LOAD( "ic5.bin",  0x000000, 0x10000, CRC(e6fe4540) SHA1(00625ea017305b2622ac31ad2e6e4c928ee0cfcd) )	// orangec/ic5.bin
@@ -3650,6 +3652,7 @@ ROM_START( vipclub )
 	ROM_LOAD( "ic3.bin",  0x180000, 0x40000, CRC(efb13b61) SHA1(61d100b52d01e447dd599cc9ff06b97dd7a4ae0b) )	// orangec/ic3.bin
 	ROM_LOAD( "ic4.bin",  0x1c0000, 0x40000, CRC(9acc54fa) SHA1(7975370e1dd32ecd98d7f2e32f14feb88e0cdb43) )	// orangec/ic4.bin
 	ROM_LOAD( "ic6i.bin", 0x0f0000, 0x10000, CRC(94bf4847) SHA1(a1ff0a5b1918b9f1a0f608ad341d091512988c1a) )	// orangec/ic6i.bin
+	ROM_LOAD( "ic7i.bin", 0x100000, 0x10000, CRC(284f5648) SHA1(f0a734744901313f5052ea1727815e11a93e1811) )	// orangec/ic7i.bin overlaps ic1!
 	ROM_LOAD( "ic7i.bin", 0x110000, 0x10000, CRC(284f5648) SHA1(f0a734744901313f5052ea1727815e11a93e1811) )	// orangec/ic7i.bin overlaps ic1!
 ROM_END
 
@@ -4045,9 +4048,9 @@ GAME( 1987, housemn2, 0,        mbmj_p16bit_LCD, housemn2, nbmj8688_state, house
 GAME( 1987, livegal,  0,        mbmj_p16bit_LCD, livegal, nbmj8688_state,  livegal,  ROT0, "Central Denshi", "Live Gal (Japan 870530)", 0 )
 GAME( 1987, bijokkoy, 0,        mbmj_p16bit_LCD, bijokkoy, nbmj8688_state, bijokkoy, ROT0, "Nichibutsu", "Bijokko Yume Monogatari (Japan 870925)", 0 )
 GAME( 1988, bijokkog, 0,        mbmj_p16bit_LCD, bijokkog, nbmj8688_state, bijokkog, ROT0, "Nichibutsu", "Bijokko Gakuen (Japan 880116)", 0 )
-GAME( 1988, orangec,  0,        mbmj_p16bit,     orangec, nbmj8688_state,  orangec,  ROT0, "Daiichi Denshi", "Orange Club - Maruhi Kagai Jugyou (Japan 880213)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, orangeci, orangec,  mbmj_p16bit,     orangeci, nbmj8688_state, orangeci, ROT0, "Daiichi Denshi", "Orange Club - Maru-hi Ippatsu Kaihou [BET] (Japan 880221)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, vipclub,  orangec,  mbmj_p16bit,     vipclub, nbmj8688_state,  vipclub,  ROT0, "Daiichi Denshi", "Vip Club - Maru-hi Ippatsu Kaihou [BET] (Japan 880310)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, orangec,  0,        mbmj_p16bit,     orangec, nbmj8688_state,  orangec,  ROT0, "Daiichi Denshi", "Orange Club - Maruhi Kagai Jugyou (Japan 880213)", 0 )
+GAME( 1988, orangeci, orangec,  mbmj_p16bit,     orangeci, nbmj8688_state, orangeci, ROT0, "Daiichi Denshi", "Orange Club - Maru-hi Ippatsu Kaihou [BET] (Japan 880221)", 0 )
+GAME( 1988, vipclub,  orangec,  mbmj_p16bit,     vipclub, nbmj8688_state,  vipclub,  ROT0, "Daiichi Denshi", "Vip Club - Maru-hi Ippatsu Kaihou [BET] (Japan 880310)", 0 )
 
 /* pure 12-bit palette */
 GAME( 1988, kaguya,   0,        mbmj_p12bit,     kaguya, nbmj8688_state,   kaguya,   ROT0, "Miki Syouji", "Mahjong Kaguyahime [BET] (Japan 880521)", 0 )

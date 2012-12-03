@@ -110,13 +110,13 @@ enum {
 	NB1413M3_PAIRSTEN
 };
 
-#define NB1413M3_VCR_NOP	0x00
-#define NB1413M3_VCR_POWER	0x01
-#define NB1413M3_VCR_STOP	0x02
-#define NB1413M3_VCR_REWIND	0x04
-#define NB1413M3_VCR_PLAY	0x08
+#define NB1413M3_VCR_NOP		0x00
+#define NB1413M3_VCR_POWER		0x01
+#define NB1413M3_VCR_STOP		0x02
+#define NB1413M3_VCR_REWIND		0x04
+#define NB1413M3_VCR_PLAY		0x08
 #define NB1413M3_VCR_FFORWARD	0x10
-#define NB1413M3_VCR_PAUSE	0x20
+#define NB1413M3_VCR_PAUSE		0x20
 
 
 /*----------- defined in machine/nb1413m3.c -----------*/

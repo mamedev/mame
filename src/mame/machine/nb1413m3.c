@@ -16,11 +16,9 @@ Memo:
 
 
 #define NB1413M3_DEBUG	0
-#define NB1413M3_CHEAT	0
 
 
 int nb1413m3_type;
-//int nb1413m3_sndromregion;
 const char * nb1413m3_sndromrgntag;
 int nb1413m3_sndrombank1;
 int nb1413m3_sndrombank2;
@@ -62,17 +60,17 @@ static TIMER_CALLBACK( nb1413m3_timer_callback )
 		switch (nb1413m3_type)
 		{
 			case NB1413M3_TAIWANMB:
-				nb1413m3_74ls193_counter = 0x05;	// 130 ???
+				nb1413m3_74ls193_counter = 0x05;
 				break;
 			case NB1413M3_OMOTESND:
-				nb1413m3_74ls193_counter = 0x05;	// 130 ???
+				nb1413m3_74ls193_counter = 0x05;
 				break;
 			case NB1413M3_PASTELG:
-				nb1413m3_74ls193_counter = 0x02;	// 96 ???
+				nb1413m3_74ls193_counter = 0x02;
 				break;
 			case NB1413M3_HYHOO:
 			case NB1413M3_HYHOO2:
-				nb1413m3_74ls193_counter = 0x05;	// 128 ???
+				nb1413m3_74ls193_counter = 0x05;
 				break;
 		}
 	}
@@ -152,18 +150,12 @@ WRITE8_HANDLER( nb1413m3_nmi_clock_w )
 
 INTERRUPT_GEN( nb1413m3_interrupt )
 {
-//  nb1413m3_busyflag = 1;
-//  nb1413m3_busyctr = 0;
 	device->execute().set_input_line(0, HOLD_LINE);
 
 #if NB1413M3_DEBUG
 	popmessage("NMI SW:%01X CLOCK:%02X COUNT:%02X", nb1413m3_nmi_enable, nb1413m3_nmi_clock, nb1413m3_nmi_count);
 	nb1413m3_nmi_count = 0;
 #endif
-
-	#if NB1413M3_CHEAT
-	#include "nbmjchet.inc"
-	#endif
 }
 
 READ8_HANDLER( nb1413m3_sndrom_r )
@@ -201,6 +193,8 @@ READ8_HANDLER( nb1413m3_sndrom_r )
 		case NB1413M3_HOUSEMN2:		// 0-1
 		case NB1413M3_LIVEGAL:		// 0-1
 		case NB1413M3_ORANGEC:		// 0-1
+		case NB1413M3_ORANGECI:		// 0-1
+		case NB1413M3_VIPCLUB:		// 0-1
 		case NB1413M3_KAGUYA:		// 0-3
 		case NB1413M3_KAGUYA2:		// 0-3 + 4-5 for protection
 		case NB1413M3_BIJOKKOY:		// 0-7

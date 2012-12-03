@@ -706,6 +706,13 @@ static INPUT_PORTS_START( hanamomo )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )			// COIN1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )		// SERVICE
 
+	/* This DIPSW is fake. Type A is common, Type B is rare */
+	PORT_START("FONTTYPE")
+	PORT_CONFNAME(    0x01, 0x00, "Font Type" )
+	PORT_CONFSETTING( 0x00,       "Type-A" )
+	PORT_CONFSETTING( 0x01,       "Type-B" )
+	PORT_BIT(         0xfe,       IP_ACTIVE_HIGH, IPT_UNUSED )
+
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
 
@@ -2625,7 +2632,7 @@ static MACHINE_CONFIG_START( gionbana, nbmj8891_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mgion, gionbana )

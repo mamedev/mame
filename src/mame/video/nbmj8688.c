@@ -319,7 +319,9 @@ static void mbmj8688_gfxdraw(running_machine &machine, int gfxtype)
 
 	gfxlen = machine.root_device().memregion("gfx1")->bytes();
 	gfxaddr = (state->m_mjsikaku_gfxrom << 17) + (state->m_blitter_src_addr << 1);
+
 //popmessage("ADDR:%08X DX:%03d DY:%03d SX:%03d SY:%03d", gfxaddr, startx, starty, sizex, sizey);
+//logerror("ADDR:%08X DX:%03d DY:%03d SX:%03d SY:%03d\n", gfxaddr, startx, starty, sizex, sizey);
 //if (state->m_blitter_direction_x|state->m_blitter_direction_y) popmessage("ADDR:%08X FX:%01d FY:%01d", gfxaddr, state->m_blitter_direction_x, state->m_blitter_direction_y);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)
@@ -328,9 +330,9 @@ static void mbmj8688_gfxdraw(running_machine &machine, int gfxtype)
 		{
 			if ((gfxaddr > (gfxlen - 1)))
 			{
-#ifdef MAME_DEBUG
+//#ifdef MAME_DEBUG
 				popmessage("GFXROM ADDRESS OVER!!");
-#endif
+//#endif
 				gfxaddr = 0;
 			}
 
@@ -664,6 +666,11 @@ UINT32 nbmj8688_state::screen_update_mbmj8688(screen_device &screen, bitmap_ind1
 {
 	int x, y;
 
+if(machine().input().code_pressed_once(KEYCODE_T))
+{
+	//
+}
+
 	if (m_mjsikaku_screen_refresh)
 	{
 		m_mjsikaku_screen_refresh = 0;
@@ -676,7 +683,7 @@ UINT32 nbmj8688_state::screen_update_mbmj8688(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	if (m_mjsikaku_dispflag)
+//	if (m_mjsikaku_dispflag)
 	{
 		int scrolly;
 		if (m_mjsikaku_flipscreen) scrolly =   m_mjsikaku_scrolly;
@@ -685,8 +692,8 @@ UINT32 nbmj8688_state::screen_update_mbmj8688(screen_device &screen, bitmap_ind1
 		copybitmap(bitmap, *m_mjsikaku_tmpbitmap, 0, 0, 0, scrolly,       cliprect);
 		copybitmap(bitmap, *m_mjsikaku_tmpbitmap, 0, 0, 0, scrolly - 256, cliprect);
 	}
-	else
-		bitmap.fill(0);
+//	else
+//		bitmap.fill(0);
 
 	return 0;
 }
