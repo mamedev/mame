@@ -1514,8 +1514,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_2hd_w)
 				if(data & 0x80)
 					machine().device<upd765a_device>("upd765_2hd")->reset();
 
-				if(data & 0x40)
-					machine().device<upd765a_device>("upd765_2hd")->ready_w(1);
+				pc9801_fdc_2hd_update_ready(NULL, 0);
 
 				machine().device<floppy_connector>("upd765_2hd:0")->get_device()->mon_w(!(data & 0x08));
 				machine().device<floppy_connector>("upd765_2hd:1")->get_device()->mon_w(!(data & 0x08));
@@ -2767,7 +2766,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9801f)
 
 		floppy = machine().device<floppy_connector>("upd765_2hd:1")->get_device();
 		if(floppy)
-			floppy->setup_ready_cb(floppy_image_device::ready_cb(FUNC(pc9801_state::pc9801_fdc_2hd_update_ready), this));		
+			floppy->setup_ready_cb(floppy_image_device::ready_cb(FUNC(pc9801_state::pc9801_fdc_2hd_update_ready), this));
 	}
 
 	fdc = machine().device<upd765a_device>(":upd765_2dd");
