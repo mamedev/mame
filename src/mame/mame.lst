@@ -12381,26 +12381,87 @@ j6frtpota	//
 j6frtpotb	//
 j6frtpotc	//
 j6gforce	// G Force (JPM)
-j6gforceb	// G Force (JPM) 15GBP
+j6gforcea	//
+j6gforceb	//
+j6gforcec	//
+j6gforced	// G Force (JPM) 15GBP
 j6gidogh	// G.I. Dough (Ace)
 j6guab		// Give Us A Break (JPM)
+j6guaba		//
+j6guabb		//
+j6guabc		//
+j6guabd		//
+j6guabe		//
+j6guabf		//
 j6guabcl	// Give Us A Break Club (JPM)
+j6guabcla	//
 j6gldclb	// Gladiator Club (JPM)
+j6gldclba	//
+j6gldclbb	//
 j6gogold	// Go For Gold (JPM)
+j6gogolda	//
+j6gogoldb	//
+j6gogoldc	//
 j6gldmin	// Gold Mine (Empire)
 j6gldday	// Golden Day (JPM)
 j6golddm	// Golden Demons (JPM)
+j6golddma	//
 j6goldgl	// Golden Goal (JPM)
+j6goldgla	//
+j6goldglb	//
+j6goldglc	//
+j6goldgld	//
+j6goldgle	//
+j6goldglf	//
+j6goldglg	//
+j6goldglh	//
+j6goldgli	//
+j6goldglj	//
+j6goldglk	//
+j6goldgll	//
 j6hapyhr	// Happy Hour (JPM)
+j6hapyhra	//
+j6hapyhrb	//
 j6hifly		// Hi Flyer (Ace)
 j6impact	// Hi Impact (JPM)
-j6impactb	// Hi Impact (JPM) 15GBP
+j6impacta	//
+j6impactb	//
+j6impactc	// Hi Impact (JPM) 15GBP
 j6hilosv	// Hi Lo Silver (JPM)
+j6hilosva	//
+j6hilosvb	//
+j6hilosvc	//
+j6hilosvd	//
+j6hilosve	//
 j6hirol		// Hi Roller (JPM)
+j6hirola	//
+j6hirolb	//
+j6hirolc	//
+j6hirold	//
 j6hirlcl	// Hi Roller Club (JPM)
+j6hirlcla	//
+j6hirlclb	//
+j6hirlclc	//
 j6histk		// Hi Stakes (Qps)
+j6histka	//
 j6hiphop	// Hip Hopper (Ace)
+j6hiphopa	//
+j6hiphopb	//
+j6hiphopc	//
+j6hiphopd	//
 j6hotsht	// Hot Shot (Ace)
+j6hotshta	//
+j6hotshtb	//
+j6hotshtc	//
+j6hotshtd	//
+j6hotshte	//
+j6hotshtf	//
+j6hotshtg	//
+j6hotshth	//
+j6hotshti	//
+j6hotshtj	//
+j6hotshtk	//
+j6hotshtl	//
 j6impuls	// Impulse (JPM)
 j6indy		// Indiana Jones (JPM)
 j6indya		//
