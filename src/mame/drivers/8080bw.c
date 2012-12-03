@@ -2793,7 +2793,6 @@ ROM_START( searthina )
 	ROM_LOAD( "unka.a1",   0x1c00, 0x0400, CRC(4b65bd7c) SHA1(3931f9f5b0e3339ab484eee14473d3a474935fd9) )
 ROM_END
 
-/* Clone of Super Earth Invasion, possibly licenced. Dumped by Andy Welburn. */
 ROM_START( searthie )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "searthie.h",   0x0000, 0x0800, CRC(92b08b91) SHA1(4cebb70735e5231717619c7b8e5d3080694338b7) )
