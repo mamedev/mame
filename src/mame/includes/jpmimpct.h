@@ -103,7 +103,7 @@ public:
 	DECLARE_READ8_MEMBER(hopper_c_r);
 	DECLARE_WRITE8_MEMBER(payen_a_w);
 	DECLARE_WRITE8_MEMBER(display_c_w);
-	DECLARE_DRIVER_INIT(j6fbcrz);
+
 	DECLARE_MACHINE_START(jpmimpct);
 	DECLARE_MACHINE_RESET(jpmimpct);
 	DECLARE_VIDEO_START(jpmimpct);

@@ -632,8 +632,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 static ADDRESS_MAP_START( awp68k_program_map, AS_PROGRAM, 16, jpmimpct_state )
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
-	AM_RANGE(0x00100000, 0x001fffff) AM_ROM
+	AM_RANGE(0x00000000, 0x000fffff) AM_ROM // most games are 0x00000000 - 0x0003ffff, but some QPS ones go up to fffff, check for any mirroring etc.
 	AM_RANGE(0x00400000, 0x00403fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x00480000, 0x0048001f) AM_READWRITE(duart_1_r, duart_1_w)
 	AM_RANGE(0x00480020, 0x00480033) AM_READ(inputs1awp_r)
