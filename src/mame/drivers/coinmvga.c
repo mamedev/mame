@@ -376,6 +376,8 @@ static ADDRESS_MAP_START( coinmvga_map, AS_PROGRAM, 16, coinmvga_state )
 	AM_RANGE(0x600008, 0x600009) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xffff)
 	AM_RANGE(0x610000, 0x61000f) AM_RAM //touch screen i/o
 
+	AM_RANGE(0x700000, 0x7fffff) AM_ROM AM_REGION("maincpu", 0) // ?
+
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1") //"arrow" r?
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	//0x800008 "arrow" w?
