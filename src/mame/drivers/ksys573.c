@@ -455,16 +455,16 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
   |                         |
   |                         |
   |                         |
-  | 29F017A.5L   29F017A.5U |
+  | 29F017A.5U   29F017A.5L |
   | 90PFTR       90PFTN     |
   |                         |
-  | 29F017A.6L   29F017A.6U |
+  | 29F017A.6U   29F017A.6L |
   | 90PFTN       90PFTR     |
   |                         |
-  | 29F017A.7L   29F017A.7U |
+  | 29F017A.7U   29F017A.7L |
   | 90PFTR       90PFTN     |
   |                         |
-  | 29F017A.8L   29F017A.8U |
+  | 29F017A.8U   29F017A.8L |
   | 90PFTN       90PFTR     |
   |                         |
   |-SWITCH------------------|
@@ -1317,14 +1317,14 @@ READ16_MEMBER(ksys573_state::flash_r)
 		}
 	}
 
-	verboselog( machine(), 2, "flash_r( %08x, %08x, %08x) bank = %08x\n", offset, mem_mask, data, m_flash_bank );
+	verboselog( machine(), 2, "flash_r( %08x, %04x) %04x bank = %04x\n", offset, mem_mask, data, m_flash_bank );
 
 	return data;
 }
 
 WRITE16_MEMBER(ksys573_state::flash_w)
 {
-	verboselog( machine(), 2, "flash_w( %08x, %08x, %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "flash_w( %08x, %04x, %04x) bank = %04x\n", offset, mem_mask, data, m_flash_bank );
 
 	if( m_flash_bank < 0 )
 	{
@@ -5284,37 +5284,68 @@ ROM_START( gunmania )
 	ROM_LOAD( "gl906jaa.27h",  0x000000, 0x200000, CRC(8861b858) SHA1(2a67d465786759a74162ebebc0a44ba9309ffa60) )
 
 	ROM_REGION( 0x200000, "pccard2.0", 0 ) /* PCCARD2 */
-	ROM_LOAD( "gl906jaa.1l",   0x0000000, 0x200000, BAD_DUMP CRC(b2f3dc23) SHA1(65f7b986d2b12b26dfc364e6f990f7c504b5519f) )
+	ROM_LOAD( "gl906jaa.1l",   0x100000, 0x100000, BAD_DUMP CRC(4ad00681) SHA1(93fb97bd148c72f13d6d3b713d8bc6eeda7383ef) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
 	ROM_REGION( 0x200000, "pccard2.1", 0 ) /* PCCARD2 */
-	ROM_LOAD( "gl906jaa.1u",   0x0000000, 0x200000, BAD_DUMP CRC(5e40ed31) SHA1(5594b0c42b2ae8dd06259b93cc29bc3b44a85d44) )
+	ROM_LOAD( "gl906jaa.1u",   0x100000, 0x100000, BAD_DUMP CRC(6730d49a) SHA1(4f1810c04f078ef6de3a582d1982c6d54223998b) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
 	ROM_REGION( 0x200000, "pccard2.2", 0 ) /* PCCARD2 */
-	ROM_LOAD( "gl906jaa.2l",   0x0000000, 0x200000, BAD_DUMP CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) )
+	ROM_LOAD( "gl906jaa.2l",   0x100000, 0x100000, BAD_DUMP CRC(383c80f6) SHA1(b540aba095526ce956a9a81e43bf46cb3eca6a9e) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
 	ROM_REGION( 0x200000, "pccard2.3", 0 ) /* PCCARD2 */
-	ROM_LOAD( "gl906jaa.2u",   0x0000000, 0x200000, BAD_DUMP CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) )
+	ROM_LOAD( "gl906jaa.2u",   0x100000, 0x100000, BAD_DUMP CRC(68a92d52) SHA1(05584cd7e94ac551a82cfb435c637aabe6d4d044) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
 	ROM_REGION( 0x200000, "pccard2.4", 0 ) /* PCCARD2 */
-	ROM_LOAD( "gl906jaa.3l",   0x0000000, 0x200000, BAD_DUMP CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) )
+	ROM_LOAD( "gl906jaa.3l",   0x100000, 0x100000, BAD_DUMP CRC(390b3ff7) SHA1(9ff79043125c11d5338a32443693259c728f8640) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
 	ROM_REGION( 0x200000, "pccard2.5", 0 ) /* PCCARD2 */
-	ROM_LOAD( "gl906jaa.3u",   0x0000000, 0x200000, BAD_DUMP CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) )
+	ROM_LOAD( "gl906jaa.3u",   0x100000, 0x100000, BAD_DUMP CRC(b2ba1f4d) SHA1(1cd9227b99498d3f6bf464d7185fb511babb135e) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
 	ROM_REGION( 0x200000, "pccard2.6", 0 ) /* PCCARD2 */
-	ROM_LOAD( "gl906jaa.4l",   0x0000000, 0x200000, BAD_DUMP CRC(074370b9) SHA1(2dabc3bebc52b3fe09a73ced4ccbe9a5065feb70) )
+	ROM_LOAD( "gl906jaa.4l",   0x100000, 0x100000, BAD_DUMP CRC(fed293be) SHA1(9109a18a342f455d7ee6f08c09e494781b6ae400) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
 	ROM_REGION( 0x200000, "pccard2.7", 0 ) /* PCCARD2 */
-	ROM_LOAD( "gl906jaa.4u",   0x0000000, 0x200000, BAD_DUMP CRC(9645dd9e) SHA1(34a85d349496eaed124db3cd8f40724f92fa3600) )
+	ROM_LOAD( "gl906jaa.4u",   0x100000, 0x100000, BAD_DUMP CRC(ac42d147) SHA1(0dcb9515f6f8c609cc10a73f07683aa132927f18) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
 	ROM_REGION( 0x200000, "pccard2.8", 0 ) /* PCCARD2 */
-	ROM_LOAD( "gl906jaa.5l",   0x0000000, 0x200000, BAD_DUMP CRC(0daf5c60) SHA1(fc507cb9bb746d217d4cccf393dc311d3e64a16f) )
+	ROM_LOAD( "gl906jaa.5l",   0x100000, 0x100000, BAD_DUMP CRC(8209c1e0) SHA1(9f1f47f49e45bd3c71cd07c6719f8616c2518014) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
 	ROM_REGION( 0x200000, "pccard2.9", 0 ) /* PCCARD2 */
-	ROM_LOAD( "gl906jaa.5u",   0x0000000, 0x200000, BAD_DUMP CRC(e51dc4c2) SHA1(8214cbd329d68df1aa625801c5e8d6b1f30358aa) )
+	ROM_LOAD( "gl906jaa.5u",   0x100000, 0x100000, BAD_DUMP CRC(1e3f0f1a) SHA1(2e6134a1d64ae3367261adfad5af61265d00340a) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
 	ROM_REGION( 0x200000, "pccard2.10", 0 ) /* PCCARD2 */
-	ROM_LOAD( "gl906jaa.6l",   0x0000000, 0x200000, BAD_DUMP CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) )
+	ROM_LOAD( "gl906jaa.6l",   0x100000, 0x100000, BAD_DUMP CRC(53ca942e) SHA1(4d82bf406a338e4f96eb28c5c6f2707d73e53086) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
 	ROM_REGION( 0x200000, "pccard2.11", 0 ) /* PCCARD2 */
-	ROM_LOAD( "gl906jaa.6u",   0x0000000, 0x200000, BAD_DUMP CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) )
+	ROM_LOAD( "gl906jaa.6u",   0x100000, 0x100000, BAD_DUMP CRC(82cfd213) SHA1(cd18de5d93541c64bdacc76ab8cd41656827284e) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
 	ROM_REGION( 0x200000, "pccard2.12", 0 ) /* PCCARD2 */
-	ROM_LOAD( "gl906jaa.7l",   0x0000000, 0x200000, BAD_DUMP CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) )
+	ROM_LOAD( "gl906jaa.7l",   0x100000, 0x100000, BAD_DUMP CRC(bcf3ed36) SHA1(8c9c97b0c5a21222ce1d680110509231abb58b9e) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
 	ROM_REGION( 0x200000, "pccard2.13", 0 ) /* PCCARD2 */
-	ROM_LOAD( "gl906jaa.7u",   0x0000000, 0x200000, BAD_DUMP CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) )
+	ROM_LOAD( "gl906jaa.7u",   0x100000, 0x100000, BAD_DUMP CRC(b5d5da7d) SHA1(000c2db950c3a4ac6296edb45b7c89b4be724071) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
 	ROM_REGION( 0x200000, "pccard2.14", 0 ) /* PCCARD2 */
-	ROM_LOAD( "gl906jaa.8l",   0x0000000, 0x200000, BAD_DUMP CRC(11d5630b) SHA1(26a94780eac653fb4912c533040356d79ba0fe94) )
+	ROM_LOAD( "gl906jaa.8l",   0x100000, 0x100000, BAD_DUMP CRC(96c5e4fe) SHA1(9c7429f0352357b4b370d39b0e0fb9ce4b514a1b) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
+
 	ROM_REGION( 0x200000, "pccard2.15", 0 ) /* PCCARD2 */
-	ROM_LOAD( "gl906jaa.8u",   0x0000000, 0x200000, BAD_DUMP CRC(e62d18e6) SHA1(b32b884fbd9b5a65efcdd1b50dd3b7a99fdceeb9) )
+	ROM_LOAD( "gl906jaa.8u",   0x100000, 0x100000, BAD_DUMP CRC(030fff86) SHA1(5a04fde970fe542b13327ef54b9b6ad6c79a9e3c) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
 ROM_END
 
 ROM_START( hyperbbc )
