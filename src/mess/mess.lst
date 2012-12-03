@@ -1089,6 +1089,7 @@ coco3p	// Color Computer 3 (PAL)
 coco3h	// Hacked Color Computer 3 (6309)
 dragon32  // Dragon 32
 dragon64  // Dragon 64
+dragon200 // Dragon 200
 d64plus   // Dragon 64 + Compusense Plus addon
 dgnalpha  // Dragon Alpha
 dgnbeta   // Dragon Beta
