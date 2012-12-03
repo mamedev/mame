@@ -256,7 +256,7 @@ ROM_START( cball )
 	ROM_LOAD_NIB_HIGH( "canball.1j", 0x7c00, 0x0400, CRC(5b905d69) SHA1(2408dd6e44c51c0c9bdb82d2d33826c03f8308c4) )
 
 	ROM_REGION( 0x0200, "gfx1", 0 ) /* tiles */
-	ROM_LOAD_NIB_LOW ( "canball.6m", 0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD_NIB_LOW ( "canball.6m", 0x0000, 0x0200, BAD_DUMP CRC(b2aa7578) SHA1(5c3eb80066420002bc3dcc7ca4ab6efad7ed4ae5) ) // missing rom, zerofilled
 	ROM_LOAD_NIB_HIGH( "canball.6l", 0x0000, 0x0200, CRC(5b1c9e88) SHA1(6e9630db9907170c53942a21302bcf8b721590a3) )
 
 	ROM_REGION( 0x0200, "gfx2", 0 ) /* sprites */
