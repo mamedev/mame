@@ -20,7 +20,7 @@ TODO:
 
 - Input handling is wrong in crystalg, crystal2 and nightlov.
 
-0- Some games display "GFXROM BANK OVER!!" or "GFXROM ADDRESS OVER!!"
+- Some games display "GFXROM BANK OVER!!" or "GFXROM ADDRESS OVER!!"
   in Debug build.
 
 - Screen flip is not perfect.
