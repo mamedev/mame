@@ -1764,6 +1764,19 @@ ROM_START( buzzundr )
 ROM_END
 
 
+ROM_START( monspdr )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "msp10dsk.1", 0x000000, 0x080000, CRC(892aa085) SHA1(cfb8d4edbf22a88906b3b1fa52156be201d81b44) )
+	ROM_LOAD16_BYTE( "msp10.2",    0x000001, 0x080000, CRC(3db5e13e) SHA1(79eb1f17a8e1b3220cd7c5f46212b8a2e1a112cb) )
+
+	ROM_REGION16_LE( 0x200000, "user1", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "gr1.bin", 0x000000, 0x100000, NO_DUMP )
+	ROM_LOAD16_BYTE( "gr2.bin", 0x000001, 0x100000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
+	/* missing? */
+ROM_END
+
 /************************************
  *
  *  Game driver(s)
@@ -1788,3 +1801,4 @@ GAME( 1999, coronatnd,coronatn,jpmimpct, coronatn, driver_device, 0, ROT0, "JPM"
 GAME( 199?, tqst,	  0,	   jpmimpct, cluedo	 , driver_device, 0, ROT0, "JPM", "Treasure Quest"			   , GAME_NOT_WORKING) // incomplete (ACE?)
 GAME( 199?, snlad,	  0,	   jpmimpct, cluedo	 , driver_device, 0, ROT0, "JPM", "Snake & Ladders"			   , GAME_NOT_WORKING) // incomplete
 GAME( 199?, buzzundr, 0,       jpmimpct, cluedo  , driver_device, 0, ROT0, "Ace", "Buzzundrum (Ace)", GAME_NOT_WORKING )
+GAME( 199?, monspdr	, 0,       jpmimpct, cluedo  , driver_device, 0, ROT0, "Ace", "Money Spider (Ace)", GAME_NOT_WORKING )

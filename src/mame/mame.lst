@@ -12534,7 +12534,6 @@ j6megbckb	//
 j6megbckc	//
 j6megbckd	//
 j6monmad	// Money Madness (Ace)
-j6monspd	// Money Spider (Ace)
 j6montlk	// Money Talks (JPM)
 j6montlka	//
 j6montlkb	//
@@ -12956,6 +12955,8 @@ coronatnd		// (c) 1999
 tqst			// (c) ACE?
 snlad			// (c) 199?
 buzzundr		// Buzzundrum (Ace)
+monspdr			// Money Spider (Ace)
+
 
 // Unknown JPM platform
 j7bmagic		// Black Magic (JPM)

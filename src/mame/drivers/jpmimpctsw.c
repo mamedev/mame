@@ -3987,14 +3987,6 @@ ROM_START( j6monmad )
 ROM_END
 
 
-ROM_START( j6monspd ) // not overdumps, video?
-	ROM_REGION( PRGSIZE_LARGE, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "msp10dsk.1", 0x000000, 0x080000, CRC(892aa085) SHA1(cfb8d4edbf22a88906b3b1fa52156be201d81b44) )
-	ROM_LOAD16_BYTE( "msp10.2",    0x000001, 0x080000, CRC(3db5e13e) SHA1(79eb1f17a8e1b3220cd7c5f46212b8a2e1a112cb) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	/* missing? */
-ROM_END
 
 
 #define j6montlk_sound \
@@ -8170,7 +8162,6 @@ GAME( 199?, j6megbckd	, j6megbck	, impctawp, tbirds, driver_device, 0, ROT0, "JP
 
 GAME( 199?, j6monmad	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Ace", "Money Madness (Ace) (IMPACT)", GAME_FLAGS )
 
-GAME( 199?, j6monspd	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Ace", "Money Spider (Ace) (IMPACT)", GAME_FLAGS )
 
 GAME( 199?, j6montlk	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME( 199?, j6montlka	, j6montlk	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Money Talks (JPM) (IMPACT) (set 2)", GAME_FLAGS )
