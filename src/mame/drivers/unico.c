@@ -734,7 +734,6 @@ by Unico
 ***************************************************************************/
 
 ROM_START( burglarx )
-
 	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "bx-rom2.pgm", 0x000000, 0x080000, CRC(f81120c8) SHA1(f0240cf9aceb755e3c920bc3bcae0a9de29fd8c1) )
 	ROM_LOAD16_BYTE( "bx-rom3.pgm", 0x000001, 0x080000, CRC(080b4e82) SHA1(7eb08a7ea7684297e879123ae7ddc88d7fc1b87b) )
@@ -819,7 +818,7 @@ ROM_START( zeropnt )
 
 	ROM_REGION( 0x80000 * 2, "oki", 0 )	/* Samples */
 	ROM_LOAD( "zero_1.bin", 0x000000, 0x080000, CRC(fd2384fa) SHA1(8ae83665fe952c5d03bd62d2abb507c351cf0fb5) )
-	ROM_RELOAD(            0x080000, 0x080000             )
+	ROM_RELOAD(             0x080000, 0x080000 )
 ROM_END
 
 
@@ -842,7 +841,30 @@ ROM_START( zeropnta )
 
 	ROM_REGION( 0x80000 * 2, "oki", 0 )	/* Samples */
 	ROM_LOAD( "zero_1.bin", 0x000000, 0x080000, CRC(fd2384fa) SHA1(8ae83665fe952c5d03bd62d2abb507c351cf0fb5) )
-	ROM_RELOAD(            0x080000, 0x080000             )
+	ROM_RELOAD(             0x080000, 0x080000 )
+ROM_END
+
+
+ROM_START( zeropntj )
+	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "zero_2.bin", 0x000000, 0x080000, CRC(098d9756) SHA1(c98ae2774d2eff7d0ea66887c57d4b55d6939ad8) )
+	ROM_LOAD16_BYTE( "zero_3.bin", 0x000001, 0x080000, CRC(58e105f3) SHA1(6069ec030d6ce11ec4b9514f366197068f1220ee) )
+
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_INVERT )	/* 16x16x8 Sprites */
+	ROM_LOAD( "zpobjz01.bin", 0x000000, 0x200000, CRC(1f2768a3) SHA1(75c83458afc527dda47bfbd86a8e9c5ded7a5444) )
+	ROM_LOAD( "zpobjz02.bin", 0x200000, 0x200000, CRC(529c36ee) SHA1(3c1d1b94b9cf84fd07689cd5fbfe86820bb878e6) )
+	ROM_LOAD( "zpobjz03.bin", 0x400000, 0x200000, CRC(d7a657f7) SHA1(f1f9e6a01eef4d0c8c4b2e161136cc4438d770e2) )
+	ROM_LOAD( "zpobjz04.bin", 0x600000, 0x200000, CRC(3aec2f8d) SHA1(6fb1cfabfb0bddf688d3bfb60f7538209efbd8f1) )
+
+	ROM_REGION( 0x800000, "gfx2", ROMREGION_INVERT )	/* 16x16x8 Layers */
+	ROM_LOAD( "zpscrz06.bin", 0x000000, 0x200000, CRC(e1e53cf0) SHA1(b440e09f6229d486d1a8be476ac8a17adde1ff7e) )
+	ROM_LOAD( "zpscrz05.bin", 0x200000, 0x200000, CRC(0d7d4850) SHA1(43f87d0461fe022b68b4e57e6c9542bcd78e301b) )
+	ROM_LOAD( "zpscrz07.bin", 0x400000, 0x200000, CRC(bb178f32) SHA1(1354f4d90a8cec58d1f2b6809985776b309b96a8) )
+	ROM_LOAD( "zpscrz08.bin", 0x600000, 0x200000, CRC(672f02e5) SHA1(8e8b28a8b2293950764d453a3c385d7083eb5a57) )
+
+	ROM_REGION( 0x80000 * 2, "oki", 0 )	/* Samples */
+	ROM_LOAD( "zero_1.bin", 0x000000, 0x080000, CRC(fd2384fa) SHA1(8ae83665fe952c5d03bd62d2abb507c351cf0fb5) )
+	ROM_RELOAD(             0x080000, 0x080000 )
 ROM_END
 
 /***************************************************************************
@@ -1026,7 +1048,7 @@ ROM_START( zeropnt2 )
 
 	ROM_REGION( 0x80000 * 2, "oki1", 0 )	/* Samples */
 	ROM_LOAD( "uzp2-1.bin", 0x000000, 0x080000, CRC(ed0966ed) SHA1(a43b9c493f94d1fb11e1b189caaf37d3d792c730) )
-	ROM_RELOAD(             0x080000, 0x080000             )
+	ROM_RELOAD(             0x080000, 0x080000 )
 
 	ROM_REGION( 0x40000, "oki2", 0 )	/* Samples */
 	ROM_LOAD( "uzp2-2.bin", 0x000000, 0x040000, CRC(db8cb455) SHA1(6723b4018208d554bd1bf1e0640b72d2f4f47302) )
@@ -1042,6 +1064,7 @@ ROM_END
 ***************************************************************************/
 
 GAME( 1997, burglarx, 0,       burglarx, burglarx, driver_device, 0, ROT0, "Unico", "Burglar X" , 0 )
-GAME( 1998, zeropnt,  0,       zeropnt,  zeropnt, driver_device,  0, ROT0, "Unico", "Zero Point (set 1)", 0 )
-GAME( 1998, zeropnta, zeropnt, zeropnt,  zeropnt, driver_device,  0, ROT0, "Unico", "Zero Point (set 2)", 0 )
+GAME( 1998, zeropnt,  0,       zeropnt,  zeropnt,  driver_device, 0, ROT0, "Unico", "Zero Point (set 1)", 0 )
+GAME( 1998, zeropnta, zeropnt, zeropnt,  zeropnt,  driver_device, 0, ROT0, "Unico", "Zero Point (set 2)", 0 )
+GAME( 1998, zeropntj, zeropnt, zeropnt,  zeropnt,  driver_device, 0, ROT0, "Unico", "Zero Point (Japan)", 0 )
 GAME( 1999, zeropnt2, 0,       zeropnt2, zeropnt2, driver_device, 0, ROT0, "Unico", "Zero Point 2", 0 )
