@@ -7605,138 +7605,215 @@ ROM_END
 
 
 
-
+#define j6r2rum_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	ROM_LOAD(  "rtrsnd.bin", 0x0000, 0x080000, CRC(ba72e377) SHA1(99e123eebb8e7ceb2fb36fd17f1c23d3ce04d2d6) ) \
 
 
 ROM_START( j6r2rum )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+	ROM_LOAD16_BYTE(  "rtr-11.bin", 0x00000, 0x020000, CRC(979246a1) SHA1(78666f916bced21a6057f2c96fad8dde70df14bd) )
+	ROM_LOAD16_BYTE(  "rtr-12.bin", 0x00001, 0x020000, CRC(1bc680a3) SHA1(43cc3e3b24de205345350ae6ac773969f698ae09) )
+	j6r2rum_sound
+ROM_END
+
+ROM_START( j6r2ruma )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+	ROM_LOAD16_BYTE(  "rtr-1a1.bin", 0x0000, 0x020000, CRC(c55686c0) SHA1(48d4a24585a6d5735c07f9df16270d12b6f74030) )
+	ROM_LOAD16_BYTE(  "rtr-12.bin", 0x00001, 0x020000, CRC(1bc680a3) SHA1(43cc3e3b24de205345350ae6ac773969f698ae09) )
+	j6r2rum_sound
+ROM_END
+
+ROM_START( j6r2rumb )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+	ROM_LOAD16_BYTE(  "rtr-1p1.bin", 0x0000, 0x020000, CRC(7c0c1299) SHA1(78f96af3f8c91c14f4341c74d8b89b7486bfaa56) )
+	ROM_LOAD16_BYTE(  "rtr-12.bin", 0x00001, 0x020000, CRC(1bc680a3) SHA1(43cc3e3b24de205345350ae6ac773969f698ae09) )
+	j6r2rum_sound
+ROM_END
+
+ROM_START( j6r2rumc )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "rrb1.b8", 0x00000, 0x020000, CRC(0970162e) SHA1(5e83f7b6ca1e2b33a5adbbb8ad69c60c213d2ed3) )
 	ROM_LOAD16_BYTE(  "rrb2.b8", 0x00001, 0x020000, CRC(17d03879) SHA1(d5d569435a3e131f71dcd4e4dd56c227801fe898) )
+	j6r2rum_sound
+ROM_END
 
-	ROM_REGION( 0x1000000, "altrevs", 0 )
+ROM_START( j6r2rumd )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "rrba.b8", 0x0000, 0x020000, CRC(5bb4d64f) SHA1(6b61181a73dc08a9e7fe6206a339dedd311505cf) )
-	ROM_LOAD16_BYTE(  "rrbp.b8", 0x0000, 0x020000, CRC(e2ee4216) SHA1(d9a29b04ca6018bfd03bb09c2391d69a1a27e271) )
-	ROM_LOAD16_BYTE(  "rtr-11.bin", 0x0000, 0x020000, CRC(979246a1) SHA1(78666f916bced21a6057f2c96fad8dde70df14bd) )
-	ROM_LOAD16_BYTE(  "rtr-12.bin", 0x0000, 0x020000, CRC(1bc680a3) SHA1(43cc3e3b24de205345350ae6ac773969f698ae09) )
-	ROM_LOAD16_BYTE(  "rtr-1a1.bin", 0x0000, 0x020000, CRC(c55686c0) SHA1(48d4a24585a6d5735c07f9df16270d12b6f74030) )
-	ROM_LOAD16_BYTE(  "rtr-1p1.bin", 0x0000, 0x020000, CRC(7c0c1299) SHA1(78f96af3f8c91c14f4341c74d8b89b7486bfaa56) )
+	ROM_LOAD16_BYTE(  "rrb2.b8", 0x00001, 0x020000, CRC(17d03879) SHA1(d5d569435a3e131f71dcd4e4dd56c227801fe898) )
+	j6r2rum_sound
+ROM_END
 
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD(  "rtrsnd.bin", 0x0000, 0x080000, CRC(ba72e377) SHA1(99e123eebb8e7ceb2fb36fd17f1c23d3ce04d2d6) )
+ROM_START( j6r2rume )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+	ROM_LOAD16_BYTE(  "rrbp.b8", 0x0000, 0x020000, CRC(e2ee4216) SHA1(d9a29b04ca6018bfd03bb09c2391d69a1a27e271) )
+	ROM_LOAD16_BYTE(  "rrb2.b8", 0x00001, 0x020000, CRC(17d03879) SHA1(d5d569435a3e131f71dcd4e4dd56c227801fe898) )
+	j6r2rum_sound
 ROM_END
 
 
 
+#define j6redal_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	/* missing? */ \
 
 ROM_START( j6redal )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "real-c1.bin", 0x00000, 0x020000, CRC(eabec7ae) SHA1(5722dc489b3cf5ff90d9688d52fd8489d80b9c96) )
 	ROM_LOAD16_BYTE(  "real-c2.bin", 0x00001, 0x020000, CRC(104bbeee) SHA1(1f4a3d05c729e03f91b9fa09c0d09b952ea2ce9d) )
+	j6redal_sound
+ROM_END
 
-	ROM_REGION( 0x1000000, "altrevs", 0 )
+ROM_START( j6redala )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "raa1a.bin", 0x0000, 0x020000, CRC(839e7773) SHA1(57dcd6fcf933ea3f2d903a62f673a1c71d028748) )
 	ROM_LOAD16_BYTE(  "raa2.bin", 0x0000, 0x020000, CRC(bbfa6d4d) SHA1(2a1e1df72acb95e1e8eaa498727aafd1734bb5d1) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	/* missing? */
+	j6redal_sound
 ROM_END
 
 
-
+#define j6reelb_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	/* missing? */ \
 
 ROM_START( j6reelb )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "fg81.bin", 0x00000, 0x020000, CRC(570cd8b3) SHA1(91563b30d2ff229a000dfb3299a9cf343517fc72) )
 	ROM_LOAD16_BYTE(  "fg82.bin", 0x00001, 0x020000, CRC(952a7743) SHA1(908e03279f0b98921b417e4c85117e0ef7f5c8b3) )
+	j6reelb_sound
+ROM_END
 
-	ROM_REGION( 0x1000000, "altrevs", 0 )
+ROM_START( j6reelba )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "fg81p.bin", 0x0000, 0x020000, CRC(bc928c8b) SHA1(6411994eebdfaac494725f64446cb711eb54c2b7) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	/* missing? */
+	ROM_LOAD16_BYTE(  "fg82.bin", 0x00001, 0x020000, CRC(952a7743) SHA1(908e03279f0b98921b417e4c85117e0ef7f5c8b3) )
+	j6reelb_sound
 ROM_END
 
 
 
+#define j6slagn_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	ROM_LOAD(  "snlsasnd.bin", 0x0000, 0x080000, CRC(288e4ce1) SHA1(6690eccb1af94731af160d73b4d8903a98fa27bb) ) \
 
-ROM_START( j6sl )
+ROM_START( j6slagn )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "s&l31.b8", 0x00000, 0x020000, CRC(e8cadadb) SHA1(e7edfa79e1648658e200ddbbb1d280641e03b93e) )
 	ROM_LOAD16_BYTE(  "s&l32.b8", 0x00001, 0x020000, CRC(b2251a43) SHA1(024c82509026561022ebcd3b2654d5beaa838d24) )
+	j6slagn_sound
+ROM_END
 
-	ROM_REGION( 0x1000000, "altrevs", 0 )
+ROM_START( j6slagna )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "s&l3p.b8", 0x0000, 0x020000, CRC(03548ee3) SHA1(f4727303725b005ae04d9e4572a9249c07b705f3) )
-	ROM_LOAD16_BYTE(  "sal111.bin", 0x0000, 0x020000, CRC(e82a1072) SHA1(5175e39ad471f2fa9240364bf893a9f493b44f63) )
+	ROM_LOAD16_BYTE(  "s&l32.b8", 0x00001, 0x020000, CRC(b2251a43) SHA1(024c82509026561022ebcd3b2654d5beaa838d24) )
+	j6slagn_sound
+ROM_END
+
+ROM_START( j6slagnb )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+	ROM_LOAD16_BYTE(  "sal111.bin", 0x00000, 0x020000, CRC(e82a1072) SHA1(5175e39ad471f2fa9240364bf893a9f493b44f63) )
+	ROM_LOAD16_BYTE(  "sal112.bin", 0x00001, 0x020000, CRC(a5cc9b6a) SHA1(facd8fcd8ae61b73d5b42809619bc27d8bd6ef9a) )
+	j6slagn_sound
+ROM_END
+
+ROM_START( j6slagnc )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "sal111a.bin", 0x0000, 0x020000, CRC(baeed013) SHA1(0366f27b47bae80d3f51f66baf24e2b1faad8d57) )
+	ROM_LOAD16_BYTE(  "sal112.bin", 0x00001, 0x020000, CRC(a5cc9b6a) SHA1(facd8fcd8ae61b73d5b42809619bc27d8bd6ef9a) )
+	j6slagn_sound
+ROM_END
+
+ROM_START( j6slagnd )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "sal111p.bin", 0x0000, 0x020000, CRC(03b4444a) SHA1(fcd77cd44fb1e6c9094296bf21c561acb27f5ea9) )
-	ROM_LOAD16_BYTE(  "sal112.bin", 0x0000, 0x020000, CRC(a5cc9b6a) SHA1(facd8fcd8ae61b73d5b42809619bc27d8bd6ef9a) )
+	ROM_LOAD16_BYTE(  "sal112.bin", 0x00001, 0x020000, CRC(a5cc9b6a) SHA1(facd8fcd8ae61b73d5b42809619bc27d8bd6ef9a) )
+	j6slagn_sound
+ROM_END
+
+ROM_START( j6slagne )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "salft1p1.bin", 0x0000, 0x020000, CRC(cf0540b1) SHA1(f225195c663e5b081af21e4e212d776a0bb08b7a) )
-	ROM_LOAD16_BYTE(  "salft1p2.bin", 0x0000, 0x020000, CRC(e7ce4c21) SHA1(b6571c028710f5797607f871c7c2cb87df749131) )
+	ROM_LOAD16_BYTE(  "salft1p2.bin", 0x00001, 0x020000, CRC(e7ce4c21) SHA1(b6571c028710f5797607f871c7c2cb87df749131) )
+	j6slagn_sound
+ROM_END
+	
+ROM_START( j6slagnf )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "snakes&ladders-crystal-p1.bin", 0x0000, 0x020000, CRC(4f27b6c7) SHA1(cd457f4a4e7d518d4d19f6860d6e07207afff4c6) )
-	ROM_LOAD16_BYTE(  "snakes&ladders-crystal-p2.bin", 0x0000, 0x020000, CRC(3b3f5d04) SHA1(1f190296667aa599af1cc0b001be40a7b212e5d8) )
-	ROM_LOAD16_BYTE(  "snla-41.bin", 0x0000, 0x020000, CRC(bb964fe0) SHA1(451dd54d9bb9e066dd650551861f3ee818f81d7c) )
-	ROM_LOAD16_BYTE(  "snla-42.bin", 0x0000, 0x020000, CRC(7af3cc94) SHA1(34111cff7dcf61c5d3c14f58456d88e7eda2e0c1) )
-	ROM_LOAD16_BYTE(  "snla-4p1.bin", 0x0000, 0x020000, CRC(50081bd8) SHA1(ebbf1d1b4c7ec03667ff617ee83065764d3f89db) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	/* missing? */
+	ROM_LOAD16_BYTE(  "snakes&ladders-crystal-p2.bin", 0x0001, 0x020000, CRC(3b3f5d04) SHA1(1f190296667aa599af1cc0b001be40a7b212e5d8) )
+	j6slagn_sound
 ROM_END
 
-
-
-
-ROM_START( j6sla )
+ROM_START( j6slagng )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
-	ROM_LOAD16_BYTE(  "s&l31.b8", 0x00000, 0x020000, CRC(e8cadadb) SHA1(e7edfa79e1648658e200ddbbb1d280641e03b93e) )
-	ROM_LOAD16_BYTE(  "s&l32.b8", 0x00001, 0x020000, CRC(b2251a43) SHA1(024c82509026561022ebcd3b2654d5beaa838d24) )
-
-	ROM_REGION( 0x1000000, "altrevs", 0 )
-	ROM_LOAD16_BYTE(  "s&l3p.b8", 0x0000, 0x020000, CRC(03548ee3) SHA1(f4727303725b005ae04d9e4572a9249c07b705f3) )
-	ROM_LOAD16_BYTE(  "sal111.bin", 0x0000, 0x020000, CRC(e82a1072) SHA1(5175e39ad471f2fa9240364bf893a9f493b44f63) )
-	ROM_LOAD16_BYTE(  "sal111a.bin", 0x0000, 0x020000, CRC(baeed013) SHA1(0366f27b47bae80d3f51f66baf24e2b1faad8d57) )
-	ROM_LOAD16_BYTE(  "sal111p.bin", 0x0000, 0x020000, CRC(03b4444a) SHA1(fcd77cd44fb1e6c9094296bf21c561acb27f5ea9) )
-	ROM_LOAD16_BYTE(  "sal112.bin", 0x0000, 0x020000, CRC(a5cc9b6a) SHA1(facd8fcd8ae61b73d5b42809619bc27d8bd6ef9a) )
-	ROM_LOAD16_BYTE(  "salft1p1.bin", 0x0000, 0x020000, CRC(cf0540b1) SHA1(f225195c663e5b081af21e4e212d776a0bb08b7a) )
-	ROM_LOAD16_BYTE(  "salft1p2.bin", 0x0000, 0x020000, CRC(e7ce4c21) SHA1(b6571c028710f5797607f871c7c2cb87df749131) )
 	ROM_LOAD16_BYTE(  "snla-41.bin", 0x0000, 0x020000, CRC(bb964fe0) SHA1(451dd54d9bb9e066dd650551861f3ee818f81d7c) )
-	ROM_LOAD16_BYTE(  "snla-42.bin", 0x0000, 0x020000, CRC(7af3cc94) SHA1(34111cff7dcf61c5d3c14f58456d88e7eda2e0c1) )
-	ROM_LOAD16_BYTE(  "snla-4p1.bin", 0x0000, 0x020000, CRC(50081bd8) SHA1(ebbf1d1b4c7ec03667ff617ee83065764d3f89db) )
+	ROM_LOAD16_BYTE(  "snla-42.bin", 0x0001, 0x020000, CRC(7af3cc94) SHA1(34111cff7dcf61c5d3c14f58456d88e7eda2e0c1) )
+	j6slagn_sound
+ROM_END
 
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD(  "snlsasnd.bin", 0x0000, 0x080000, CRC(288e4ce1) SHA1(6690eccb1af94731af160d73b4d8903a98fa27bb) )
+ROM_START( j6slagnh )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+	ROM_LOAD16_BYTE(  "snla-4p1.bin", 0x0000, 0x020000, CRC(50081bd8) SHA1(ebbf1d1b4c7ec03667ff617ee83065764d3f89db) )
+	ROM_LOAD16_BYTE(  "snla-42.bin", 0x0001, 0x020000, CRC(7af3cc94) SHA1(34111cff7dcf61c5d3c14f58456d88e7eda2e0c1) )
+	j6slagn_sound
 ROM_END
 
 
 
+
+
+
+
+#define j6thril_sound \
+	ROM_LOAD(  "thlr-snd.bin", 0x0000, 0x020000, CRC(03771692) SHA1(2f42859d09e4354689887f1e40f9fce1eb858e3e) ) /* probably bad */ \
+	ROM_LOAD(  "thrillersnd.bin", 0x0000, 0x080000, CRC(c93bc625) SHA1(ecceddd90a721c39ef3da8cef442c0d78dacaed2) ) \
 
 ROM_START( j6thril )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "fpe1.bin", 0x00000, 0x020000, CRC(d2e60e6f) SHA1(525022907858021a2a274a870336de6b414c0b05) )
 	ROM_LOAD16_BYTE(  "fpe2.bin", 0x00001, 0x020000, CRC(08700f25) SHA1(aa1b80a7805a80899c3a852866e93fbce9b0ad7c) )
-
-	ROM_REGION( 0x1000000, "altrevs", 0 )
-	ROM_LOAD16_BYTE(  "fpep1.bin", 0x0000, 0x020000, CRC(39785a57) SHA1(df748f3c92584c8549d4e60cb61f3deadf9a516e) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD(  "thlr-snd.bin", 0x0000, 0x020000, CRC(03771692) SHA1(2f42859d09e4354689887f1e40f9fce1eb858e3e) ) // probably bad
-	ROM_LOAD(  "thrillersnd.bin", 0x0000, 0x080000, CRC(c93bc625) SHA1(ecceddd90a721c39ef3da8cef442c0d78dacaed2) )
+	j6thril_sound
 ROM_END
 
+ROM_START( j6thrila )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+	ROM_LOAD16_BYTE(  "fpep1.bin", 0x0000, 0x020000, CRC(39785a57) SHA1(df748f3c92584c8549d4e60cb61f3deadf9a516e) )
+	ROM_LOAD16_BYTE(  "fpe2.bin", 0x00001, 0x020000, CRC(08700f25) SHA1(aa1b80a7805a80899c3a852866e93fbce9b0ad7c) )
+	j6thril_sound
+ROM_END
 
+#define j6tqust_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	ROM_LOAD(  "tresquestsnd.bin", 0x0000, 0x080000, CRC(c7254d62) SHA1(9b97c7d1a844cd39c3dcfd984e1908ece47db00e) ) \
 
 ROM_START( j6tqust )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "tq21.b8", 0x00000, 0x020000, CRC(b114c904) SHA1(bf4d2f13525aa9b91bd5985eb62e022751bba596) )
 	ROM_LOAD16_BYTE(  "tq22.b8", 0x00001, 0x020000, CRC(aa62d195) SHA1(a9ba505245580444d03c7aa5f6aa3b54cb6b6fbc) )
+	j6tqust_sound
+ROM_END
 
-	ROM_REGION( 0x1000000, "altrevs", 0 )
+ROM_START( j6tqusta )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "tq2p.b8", 0x0000, 0x020000, CRC(5a8a9d3c) SHA1(cee5dec688f12ea0c7477c12493324e2f0162a6a) )
-	ROM_LOAD16_BYTE(  "trqu-31.bin", 0x0000, 0x020000, CRC(d6fe4bdc) SHA1(ee95e7f1bc5f48691f1f0dfdb57a9ea38c58c557) )
-	ROM_LOAD16_BYTE(  "trqu-32.bin", 0x0000, 0x020000, CRC(4fabc6ba) SHA1(eb643359e687c5b33847b782b0d3e5b33c891fca) )
-	ROM_LOAD16_BYTE(  "trqu-3p1.bin", 0x0000, 0x020000, CRC(3d601fe4) SHA1(84b3c53165e4e416173861f9bf9f1be1c74888a4) )
+	ROM_LOAD16_BYTE(  "tq22.b8", 0x00001, 0x020000, CRC(aa62d195) SHA1(a9ba505245580444d03c7aa5f6aa3b54cb6b6fbc) )
+	j6tqust_sound
+ROM_END
 
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	ROM_LOAD(  "tresquestsnd.bin", 0x0000, 0x080000, CRC(c7254d62) SHA1(9b97c7d1a844cd39c3dcfd984e1908ece47db00e) )
+ROM_START( j6tqustb )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+	ROM_LOAD16_BYTE(  "trqu-31.bin", 0x0000, 0x020000, CRC(d6fe4bdc) SHA1(ee95e7f1bc5f48691f1f0dfdb57a9ea38c58c557) )
+	ROM_LOAD16_BYTE(  "trqu-32.bin", 0x0001, 0x020000, CRC(4fabc6ba) SHA1(eb643359e687c5b33847b782b0d3e5b33c891fca) )
+	j6tqust_sound
+ROM_END
+
+ROM_START( j6tqustc )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+	ROM_LOAD16_BYTE(  "trqu-3p1.bin", 0x0000, 0x020000, CRC(3d601fe4) SHA1(84b3c53165e4e416173861f9bf9f1be1c74888a4) )
+	ROM_LOAD16_BYTE(  "trqu-32.bin", 0x0001, 0x020000, CRC(4fabc6ba) SHA1(eb643359e687c5b33847b782b0d3e5b33c891fca) )
+	j6tqust_sound
 ROM_END
 
 
@@ -7770,16 +7847,23 @@ ROM_START( j6h5clba )
 	j6h5clb_sound
 ROM_END
 
+#define j6milln_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
+	/* missing? */ \
+
+
 ROM_START( j6milln )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "pljm-f_1.bin", 0x00000, 0x020000, CRC(a4a9c5b8) SHA1(2fa9f4a7ef05352498b91c2b7bcf4d9ca20614a5) )
 	ROM_LOAD16_BYTE( "pljm-f_2.bin", 0x00001, 0x020000, CRC(71f303b2) SHA1(7fba05cb6107296cea9b5be575569daf98f2b9c1) )
+	j6milln_sound
+ROM_END
 
+ROM_START( j6millna )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ljc-g1.bin", 0x00000, 0x020000, CRC(518088da) SHA1(d144ab37d17a8ea2174a7ed2dd32b37f3d112dcd) )
 	ROM_LOAD16_BYTE( "ljc-g2.bin", 0x00001, 0x020000, CRC(e42c5cc0) SHA1(612973ba3dac2b1098dd746fd4fd6e7bb0246949) )
-
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
-	/* missing? */
+	j6milln_sound
 ROM_END
 
 ROM_START( j6gldpl )
@@ -9030,16 +9114,45 @@ GAME( 199?, j6ramesee	, j6ramese	, impctawp, tbirds, driver_device, 0, ROT0, "Cr
 GAME( 199?, j6ramesef	, j6ramese	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Rameses' Riches Club (Crystal) (IMPACT) (set 7)", GAME_FLAGS )
 
 
-GAME( 199?, j6r2rum		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6redal		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Red Alert (Crystal) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6reelb		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Reel Bingo Classic Club (Crystal) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6sl		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Snakes & Ladders (Crystal) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6sla		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6thril		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Thriller (Crystal) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6tqust		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Treasure Quest (Crystal) (IMPACT)", GAME_FLAGS )
-GAME( 199?, j6gldpl		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Qps / Mazooma", "Golden Palace (Qps / Mazooma) (IMPACT)", GAME_FLAGS ) // Mazooma rebuild? only has QPS strings tho
-GAME( 199?, j6shoot		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM / Whitbread", "ShootOut (JPM / Whitbread) (IMPACT)", GAME_FLAGS ) // Mazooma rebuild? only has QPS strings tho
+GAME( 199?, j6r2rum		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 199?, j6r2ruma	, j6r2rum	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 199?, j6r2rumb	, j6r2rum	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 199?, j6r2rumc	, j6r2rum	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 199?, j6r2rumd	, j6r2rum	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 5)", GAME_FLAGS )
+GAME( 199?, j6r2rume	, j6r2rum	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Ready To Rumble (Crystal) (IMPACT) (set 6)", GAME_FLAGS )
 
 
-// was marked as SWP, should this be a video game? - Apparently it's just a link box using the same hardware, but for 3 PC based units which aren't dumped, and probably can't really be emulated :-/
-GAME( 199?, j6milln		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Millionaire (JPM) (IMPACT)", GAME_FLAGS )
+GAME( 199?, j6redal		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Red Alert (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 199?, j6redala	, j6redal	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Red Alert (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
+
+
+GAME( 199?, j6reelb		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Reel Bingo Classic Club (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 199?, j6reelba	, j6reelb	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Reel Bingo Classic Club (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
+
+GAME( 199?, j6slagn		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 199?, j6slagna	, j6slagn	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 199?, j6slagnb	, j6slagn	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 199?, j6slagnc	, j6slagn	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 199?, j6slagnd	, j6slagn	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 5)", GAME_FLAGS )
+GAME( 199?, j6slagne	, j6slagn	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 6)", GAME_FLAGS )
+GAME( 199?, j6slagnf	, j6slagn	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 7)", GAME_FLAGS )
+GAME( 199?, j6slagng	, j6slagn	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 8)", GAME_FLAGS )
+GAME( 199?, j6slagnh	, j6slagn	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Snakes & Ladders Slides Again (Crystal) (IMPACT) (set 9)", GAME_FLAGS )
+
+
+GAME( 199?, j6thril		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Thriller (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 199?, j6thrila	, j6thril	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Thriller (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
+
+
+GAME( 199?, j6tqust		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Treasure Quest (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
+GAME( 199?, j6tqusta	, j6tqust	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Treasure Quest (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
+GAME( 199?, j6tqustb	, j6tqust	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Treasure Quest (Crystal) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 199?, j6tqustc	, j6tqust	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Treasure Quest (Crystal) (IMPACT) (set 4)", GAME_FLAGS )
+
+GAME( 199?, j6gldpl		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Qps", "Golden Palace (Qps) (IMPACT)", GAME_FLAGS )
+
+GAME( 199?, j6shoot		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM / Whitbread", "ShootOut (JPM / Whitbread) (IMPACT)", GAME_FLAGS ) 
+
+GAME( 199?, j6milln		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Millionaire (JPM) (IMPACT) (set 1)", GAME_FLAGS ) // was marked as SWP, should this be a video game? - Apparently it's just a link box using the same hardware, but for 3 PC based units which aren't dumped
+GAME( 199?, j6millna	, j6milln	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Millionaire (JPM) (IMPACT) (set 2)", GAME_FLAGS )
+
