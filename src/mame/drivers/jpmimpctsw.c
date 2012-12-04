@@ -6767,28 +6767,23 @@ ROM_END
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
 	/* missing? */ \
 
+
+
 ROM_START( j6hikar )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "hikarate-p1.bin", 0x000000, 0x020000, CRC(de24d4d2) SHA1(9cebc0fe9476e6c555845f9ed42f13c52fd3486b) )
-	ROM_LOAD16_BYTE( "hikarate-p2.bin", 0x000001, 0x020000, CRC(aaf75168) SHA1(0407464768fcd8b260926efbba3fd727df78a4f7) )
+	ROM_LOAD16_BYTE( "hk4a1.b8", 0x000000, 0x020000, CRC(de24d4d2) SHA1(9cebc0fe9476e6c555845f9ed42f13c52fd3486b) ) // aka hikarate-p1.bin
+	ROM_LOAD16_BYTE( "hk4a2.b8", 0x000001, 0x020000, CRC(aaf75168) SHA1(0407464768fcd8b260926efbba3fd727df78a4f7) ) // aka hikarate-p2.bin
 	j6hikar_sound
 ROM_END
 
 ROM_START( j6hikara )
-	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "hk4a1.b8", 0x000000, 0x020000, CRC(de24d4d2) SHA1(9cebc0fe9476e6c555845f9ed42f13c52fd3486b) )
-	ROM_LOAD16_BYTE( "hk4a2.b8", 0x000001, 0x020000, CRC(aaf75168) SHA1(0407464768fcd8b260926efbba3fd727df78a4f7) )
-	j6hikar_sound
-ROM_END
-
-ROM_START( j6hikarb )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "hika-51.bin", 0x00000, 0x020000, CRC(533bba89) SHA1(4abfb9fc925f47e65dc45511289a966acd88c200) )
 	ROM_LOAD16_BYTE( "hika-52.bin", 0x00001, 0x020000, CRC(930351ba) SHA1(40705df03e858ffbef684606ce2d667859f40e05) )
 	j6hikar_sound
 ROM_END
 
-ROM_START( j6hikarc )
+ROM_START( j6hikarb )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "hika-51a.bin", 0x0000, 0x020000, CRC(01ff7ae8) SHA1(70073a34e8f0e01ceab7e8afb88c68282006080e) )
 	ROM_LOAD16_BYTE( "hika-52.bin", 0x00001, 0x020000, CRC(930351ba) SHA1(40705df03e858ffbef684606ce2d667859f40e05) )
@@ -8972,7 +8967,6 @@ GAME( 199?, j6ewn		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Eac
 GAME( 199?, j6hikar		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Hi Karate (Crystal) (IMPACT) (set 1)", GAME_FLAGS )
 GAME( 199?, j6hikara	, j6hikar	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Hi Karate (Crystal) (IMPACT) (set 2)", GAME_FLAGS )
 GAME( 199?, j6hikarb	, j6hikar	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Hi Karate (Crystal) (IMPACT) (set 3)", GAME_FLAGS )
-GAME( 199?, j6hikarc	, j6hikar	, impctawp, tbirds, driver_device, 0, ROT0, "Crystal", "Hi Karate (Crystal) (IMPACT) (set 4)", GAME_FLAGS )
 
 GAME( 199?, j6hisprt	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Empire", "High Spirits (Empire) (IMPACT) (prototype?)", GAME_FLAGS ) // roms are marked 'DEMO'
 
