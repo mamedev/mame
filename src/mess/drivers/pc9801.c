@@ -689,7 +689,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					if(kanji_on)
 						tile_data = (state->m_kanji_rom[tile*0x20+yi*2+(kanji_on & 1)]);
 					else if(pcg_sel)
-						tile_data = (state->m_pcg_ram[0xac000*2+tile*0x40+yi*2+pcg_lr]);
+						tile_data = (state->m_pcg_ram[0xac000*2+tile*0x40+yi*2+lr+pcg_lr]);
 					else
 						tile_data = (state->m_char_rom[tile*char_size+interlace_on*0x800+yi]);
 				}
@@ -3218,8 +3218,8 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
 	//"upd765_2dd"
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
@@ -3280,8 +3280,8 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
 	//"upd765_2dd"
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
