@@ -158,7 +158,7 @@ enum
 	XTAL_25_447MHz  	= 25447000,		/* Namco EVA3A (Funcube2) */
 	XTAL_25_590906MHz	= 25590906,		/* Atari Jaguar NTSC */
 	XTAL_25_593900MHz	= 25593900,		/* Atari Jaguar PAL */
-	XTAL_25_601712MHz	= 25601712,		/* Astro Corp.'s Show Hand */
+	XTAL_26_601712MHz	= 26601712,		/* Astro Corp.'s Show Hand, PAL Vtech/Yeno Socrates (6x PAL subcarrier) */
 	XTAL_26_66666MHz	= 26666666,		/* Irem M92 but most use 27MHz */
 	XTAL_26_686MHz		= 26686000,		/* Typically used on 90's Taito PCBs to drive the custom chips */
 	XTAL_27MHz  		= 27000000,		/* Some Banpresto games macrossp, Irem M92 and 90's Toaplan games */

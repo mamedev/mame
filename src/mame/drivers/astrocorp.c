@@ -579,7 +579,7 @@ CPU     1x MC68HC000FN12 (main)
         1x AD-65 (equivalent to OKI6295)(sound)
         1x ASTRO 0001B (custom)
         1x oscillator 20.000MHz
-        1x oscillator 25.601712MHz
+        1x oscillator 25.601712MHz (Note Dec/3/2012: should this be 26.601712Mhz, 6x PAL subcarrier?)
 
 ROMs    2x 27C512 (1,2)
         2x M27C801 (3,4)
