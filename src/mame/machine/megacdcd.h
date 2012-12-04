@@ -187,38 +187,27 @@ public:
 	UINT16 CDC_REG0;
 	UINT16 CDC_REG1;
 	UINT16 CDC_DMA_ADDR;
-	UINT16 CDC_IFSTAT;
-	UINT8 CDC_HEADB0;
-	UINT8 CDC_HEADB1;
-	UINT8 CDC_HEADB2;
-	UINT8 CDC_HEADB3;
-	UINT8 CDC_STATB0;
-	UINT8 CDC_STATB1;
-	UINT8 CDC_STATB2;
-	UINT8 CDC_STATB3;
-	UINT16 CDC_SBOUT;
-	UINT16 CDC_IFCTRL;
-	UINT8 CDC_CTRLB0;
-	UINT8 CDC_CTRLB1;
-	UINT8 CDC_CTRLB2;
+
 	UINT8 CDC_BUFFER[(32 * 1024 * 2) + SECTOR_SIZE];
+
+
+	UINT8 CDD_RX[10];
+	UINT8 CDD_TX[10];
 
 	UINT32 CDD_STATUS;
 	UINT32 CDD_MIN;
 	UINT32 CDD_SEC;
-
-	UINT8 CDD_RX[10];
-	UINT8 CDD_TX[10];
 	UINT32 CDD_FRAME;
 	UINT32 CDD_EXT;
+
 	UINT16 CDD_CONTROL;
+
 	INT16  CDD_DONE;
 
 	inline int to_bcd(int val, bool byte);
 	void set_data_audio_mode(void);
 	void CDD_DoChecksum(void);
 	void CDD_Export(void);
-	void CDC_UpdateHEAD(void);
 	void scd_ctrl_checks(running_machine& machine);
 	void scd_advance_current_readpos(void);
 	int Read_LBA_To_Buffer(running_machine& machine);

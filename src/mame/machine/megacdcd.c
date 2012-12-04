@@ -322,7 +322,7 @@ void lc89510_temp_device::CDD_Play(running_machine &machine)
 	SCD_CURLBA = msf_to_lba(msf)-150;
 	UINT32 end_msf = segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) + 1 ].physframeofs;
 	SCD_CURTRK = cdrom_get_track(segacd.cd, SCD_CURLBA)+1;
-	CDC_UpdateHEAD();
+	LC8951UpdateHeader();
 	SCD_STATUS = CDD_PLAYINGCDDA;
 	CDD_STATUS = 0x0102;
 	set_data_audio_mode();
@@ -340,7 +340,7 @@ void lc89510_temp_device::CDD_Seek(void)
 	UINT32 msf = getmsf_from_regs();
 	SCD_CURLBA = msf_to_lba(msf)-150;
 	SCD_CURTRK = cdrom_get_track(segacd.cd, SCD_CURLBA)+1;
-	CDC_UpdateHEAD();
+	LC8951UpdateHeader();
 	STOP_CDC_READ
 	SCD_STATUS = CDD_READY;
 	CDD_STATUS = 0x0200;
@@ -437,15 +437,15 @@ void lc89510_temp_device::CDD_Reset(void)
 void lc89510_temp_device::CDC_Reset(void)
 {
 	memset(CDC_BUFFER, 0x00, ((16 * 1024 * 2) + SECTOR_SIZE));
-	CDC_UpdateHEAD();
+	LC8951UpdateHeader();
 
-	CDC_DMA_ADDRC = CDC_DMACNT = CDC_PT = CDC_SBOUT = CDC_IFCTRL = CDC_CTRLB0 = CDC_CTRLB1 =
-		CDC_CTRLB2 = CDC_HEADB1 = CDC_HEADB2 = CDC_HEADB3 = CDC_STATB0 = CDC_STATB1 = CDC_STATB2 = CDC_DECODE = 0;
+	CDC_DMA_ADDRC = CDC_DMACNT = CDC_PT = LC8951RegistersW[REG_W_SBOUT] = LC8951RegistersW[REG_W_IFCTRL] = LC8951RegistersW[REG_W_CTRL0] = LC8951RegistersW[REG_W_CTRL1] =
+		LC8951RegistersW[REG_W_CTRL2] = LC8951RegistersR[REG_R_HEAD1] = LC8951RegistersR[REG_R_HEAD2] = LC8951RegistersR[REG_R_HEAD3] = LC8951RegistersR[REG_R_STAT0] = LC8951RegistersR[REG_R_STAT1] = LC8951RegistersR[REG_R_STAT2] = CDC_DECODE = 0;
 
-	CDC_IFSTAT = 0xFF;
+	LC8951RegistersR[REG_R_IFSTAT] = 0xFF;
 	CDC_WA = SECTOR_SIZE * 2;
-	CDC_HEADB0 = 0x01;
-	CDC_STATB3 = 0x80;
+	LC8951RegistersR[REG_R_HEAD0] = 0x01;
+	LC8951RegistersR[REG_R_STAT3] = 0x80;
 }
 
 
@@ -462,11 +462,11 @@ void lc89510_temp_device::CDC_End_Transfer(running_machine& machine)
 	STOP_CDC_DMA
 	CDC_REG0 |= 0x8000;
 	CDC_REG0 &= ~0x4000;
-	CDC_IFSTAT |= 0x08;
+	LC8951RegistersR[REG_R_IFSTAT] |= 0x08;
 
-	if (CDC_IFCTRL & 0x40)
+	if (LC8951RegistersW[REG_W_IFCTRL] & 0x40)
 	{
-		CDC_IFSTAT &= ~0x40;
+		LC8951RegistersR[REG_R_IFSTAT] &= ~0x40;
 		CHECK_SCD_LV5_INTERRUPT
 	}
 }
@@ -557,29 +557,29 @@ UINT8 lc89510_temp_device::CDC_Reg_r(void)
 	switch (reg)
 	{
 		case REG_R_COMIN:  ret = 0/*COMIN*/;            break;
-		case REG_R_IFSTAT: ret = CDC_IFSTAT;           break;
+		case REG_R_IFSTAT: ret = LC8951RegistersR[REG_R_IFSTAT];           break;
 		case REG_R_DBCL:   ret = CDC_DMACNT & 0xff;       break;
 		case REG_R_DBCH:   ret = (CDC_DMACNT >>8) & 0xff; break;
-		case REG_R_HEAD0:  ret = CDC_HEADB0;           break;
-		case REG_R_HEAD1:  ret = CDC_HEADB1;           break;
-		case REG_R_HEAD2:  ret = CDC_HEADB2;           break;
-		case REG_R_HEAD3:  ret = CDC_HEADB3;           break;
+		case REG_R_HEAD0:  ret = LC8951RegistersR[REG_R_HEAD0];           break;
+		case REG_R_HEAD1:  ret = LC8951RegistersR[REG_R_HEAD1];           break;
+		case REG_R_HEAD2:  ret = LC8951RegistersR[REG_R_HEAD2];           break;
+		case REG_R_HEAD3:  ret = LC8951RegistersR[REG_R_HEAD3];           break;
 		case REG_R_PTL:	   ret = CDC_PT & 0xff;        break;
 		case REG_R_PTH:	   ret = (CDC_PT >>8) & 0xff;  break;
 		case REG_R_WAL:    ret = CDC_WA & 0xff;        break;
 		case REG_R_WAH:    ret = (CDC_WA >>8) & 0xff;  break;
-		case REG_R_STAT0:  ret = CDC_STATB0;           break;
-		case REG_R_STAT1:  ret = CDC_STATB1;           break;
-		case REG_R_STAT2:  ret = CDC_STATB2;           break;
-		case REG_R_STAT3:  ret = CDC_STATB3;
+		case REG_R_STAT0:  ret = LC8951RegistersR[REG_R_STAT0];           break;
+		case REG_R_STAT1:  ret = LC8951RegistersR[REG_R_STAT1];           break;
+		case REG_R_STAT2:  ret = LC8951RegistersR[REG_R_STAT2];           break;
+		case REG_R_STAT3:  ret = LC8951RegistersR[REG_R_STAT3];
 
-			CDC_IFSTAT |= 0x20;
+			LC8951RegistersR[REG_R_IFSTAT] |= 0x20;
 
 			// ??
-			if ((CDC_CTRLB0 & 0x80) && (CDC_IFCTRL & 0x20))
+			if ((LC8951RegistersW[REG_W_CTRL0] & 0x80) && (LC8951RegistersW[REG_W_IFCTRL] & 0x20))
 			{
 				if ((CDC_DECODE & decoderegs) == decoderegs)
-				CDC_STATB3 = 0x80;
+				LC8951RegistersR[REG_R_STAT3] = 0x80;
 			}
 			break;
 	}
@@ -599,17 +599,17 @@ void lc89510_temp_device::CDC_Reg_w(UINT8 data)
 	switch (reg)
 	{
 	case REG_W_SBOUT:
-			CDC_SBOUT = data;
+			LC8951RegistersW[REG_W_SBOUT] = data;
 			break;
 
 	case REG_W_IFCTRL:
-			CDC_IFCTRL = data;
+			LC8951RegistersW[REG_W_IFCTRL] = data;
 
-			if (!(CDC_IFCTRL & 0x02))
+			if (!(LC8951RegistersW[REG_W_IFCTRL] & 0x02))
 			{
 				CDC_DMACNT = 0;
 				STOP_CDC_DMA;
-				CDC_IFSTAT |= 0x08;
+				LC8951RegistersR[REG_R_IFSTAT] |= 0x08;
 			}
 			break;
 
@@ -619,22 +619,22 @@ void lc89510_temp_device::CDC_Reg_w(UINT8 data)
 	case REG_W_DACH: CDC_DMA_ADDRC = (CDC_DMA_ADDRC &~ 0xff00) | (data & 0x00ff) << 8; break;
 
 	case REG_W_DTTRG:
-			if (CDC_IFCTRL & 0x02)
+			if (LC8951RegistersW[REG_W_IFCTRL] & 0x02)
 			{
-				CDC_IFSTAT &= ~0x08;
+				LC8951RegistersR[REG_R_IFSTAT] &= ~0x08;
 				SET_CDC_DMA;
 				CDC_REG0 &= ~0x8000;
 			}
 			break;
 
-	case REG_W_DTACK: CDC_IFSTAT |= 0x40; break;
+	case REG_W_DTACK: LC8951RegistersR[REG_R_IFSTAT] |= 0x40; break;
 	case REG_W_WAL: CDC_WA = (CDC_WA &~ 0x00ff) | (data & 0x00ff) << 0; break;
 	case REG_W_WAH:	CDC_WA = (CDC_WA &~ 0xff00) | (data & 0x00ff) << 8;	break;
-	case REG_W_CTRL0: CDC_CTRLB0 = data; break;
-	case REG_W_CTRL1: CDC_CTRLB1 = data; break;
+	case REG_W_CTRL0: LC8951RegistersW[REG_W_CTRL0] = data; break;
+	case REG_W_CTRL1: LC8951RegistersW[REG_W_CTRL1] = data; break;
 	case REG_W_PTL: CDC_PT = (CDC_PT &~ 0x00ff) | (data & 0x00ff) << 0; break;
 	case REG_W_PTH: CDC_PT = (CDC_PT &~ 0xff00) | (data & 0x00ff) << 8;	break;
-	case REG_W_CTRL2: CDC_CTRLB2 = data; break;
+	case REG_W_CTRL2: LC8951RegistersW[REG_W_CTRL2] = data; break;
 	case REG_W_RESET: CDC_Reset();       break;
 	}
 }
@@ -1465,22 +1465,6 @@ void lc89510_temp_device::NeoCDCommsControl(UINT8 clock, UINT8 send)
 }
 
 
-void lc89510_temp_device::CDC_UpdateHEAD(void) // segacd
-{
-	if (CDC_CTRLB1 & 0x01)
-	{
-		CDC_HEADB0 = CDC_HEADB1 = CDC_HEADB2 = CDC_HEADB3 = 0x00;
-	}
-	else
-	{
-		UINT32 msf = lba_to_msf_alt(SCD_CURLBA+150);
-		CDC_HEADB0 = to_bcd (((msf & 0x00ff0000)>>16), true);
-		CDC_HEADB1 = to_bcd (((msf & 0x0000ff00)>>8), true);
-		CDC_HEADB2 = to_bcd (((msf & 0x000000ff)>>0), true);
-		CDC_HEADB3 = 0x01;
-	}
-}
-
 void lc89510_temp_device::LC8951UpdateHeader() // neocd
 {
 
@@ -1706,15 +1690,15 @@ void lc89510_temp_device::Read_LBA_To_Buffer_NeoCD()
 
 void lc89510_temp_device::scd_ctrl_checks(running_machine& machine)
 {
-	CDC_STATB0 = 0x80;
+	LC8951RegistersR[REG_R_STAT0] = 0x80;
 
-	(CDC_CTRLB0 & 0x10) ? (CDC_STATB2 = CDC_CTRLB1 & 0x08) : (CDC_STATB2 = CDC_CTRLB1 & 0x0C);
-	(CDC_CTRLB0 & 0x02) ? (CDC_STATB3 = 0x20) : (CDC_STATB3 = 0x00);
+	(LC8951RegistersW[REG_W_CTRL0] & 0x10) ? (LC8951RegistersR[REG_R_STAT2] = LC8951RegistersW[REG_W_CTRL1] & 0x08) : (LC8951RegistersR[REG_R_STAT2] = LC8951RegistersW[REG_W_CTRL1] & 0x0C);
+	(LC8951RegistersW[REG_W_CTRL0] & 0x02) ? (LC8951RegistersR[REG_R_STAT3] = 0x20) : (LC8951RegistersR[REG_R_STAT3] = 0x00);
 
-	if (CDC_IFCTRL & 0x20)
+	if (LC8951RegistersW[REG_W_IFCTRL] & 0x20)
 	{
 		CHECK_SCD_LV5_INTERRUPT
-		CDC_IFSTAT &= ~0x20;
+		LC8951RegistersR[REG_R_IFSTAT] &= ~0x20;
 		CDC_DECODE = 0;
 	}
 }
@@ -1738,26 +1722,26 @@ int lc89510_temp_device::Read_LBA_To_Buffer(running_machine& machine)
 	if (data_track)
 		cdrom_read_data(segacd.cd, SCD_CURLBA, SCD_BUFFER, CD_TRACK_MODE1);
 
-	CDC_UpdateHEAD();
+	LC8951UpdateHeader();
 
 	if (!data_track)
 	{
 		scd_advance_current_readpos();
 	}
 
-	if (CDC_CTRLB0 & 0x80)
+	if (LC8951RegistersW[REG_W_CTRL0] & 0x80)
 	{
-		if (CDC_CTRLB0 & 0x04)
+		if (LC8951RegistersW[REG_W_CTRL0] & 0x04)
 		{
 			if (data_track)
 			{
 				scd_advance_current_readpos();
 
 				memcpy(&CDC_BUFFER[CDC_PT + 4], SCD_BUFFER, 2048);
-				CDC_BUFFER[CDC_PT+0] = CDC_HEADB0;
-				CDC_BUFFER[CDC_PT+1] = CDC_HEADB1;
-				CDC_BUFFER[CDC_PT+2] = CDC_HEADB2;
-				CDC_BUFFER[CDC_PT+3] = CDC_HEADB3;
+				CDC_BUFFER[CDC_PT+0] = LC8951RegistersR[REG_R_HEAD0];
+				CDC_BUFFER[CDC_PT+1] = LC8951RegistersR[REG_R_HEAD1];
+				CDC_BUFFER[CDC_PT+2] = LC8951RegistersR[REG_R_HEAD2];
+				CDC_BUFFER[CDC_PT+3] = LC8951RegistersR[REG_R_HEAD3];
 			}
 			else
 			{
