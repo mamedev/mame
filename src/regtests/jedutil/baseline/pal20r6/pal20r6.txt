@@ -1,3 +1,20 @@
+Inputs:
+
+2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23
+
+Outputs:
+
+15 (Combinatorial, Output feedback output, Active low)
+16 (Registered, Output feedback registered, Active low)
+17 (Registered, Output feedback registered, Active low)
+18 (Registered, Output feedback registered, Active low)
+19 (Registered, Output feedback registered, Active low)
+20 (Registered, Output feedback registered, Active low)
+21 (Registered, Output feedback registered, Active low)
+22 (Combinatorial, Output feedback output, Active low)
+
+Equations:
+
 /o15 = i2 & i6 & i7 +
        i6 & rf16 +
        i3 & /rf16 +

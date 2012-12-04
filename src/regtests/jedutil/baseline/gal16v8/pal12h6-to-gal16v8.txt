@@ -1,3 +1,18 @@
+Inputs:
+
+1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 17, 18, 19
+
+Outputs:
+
+13 (Combinatorial, Output feedback output, Active high)
+14 (Combinatorial, Output feedback output, Active high)
+15 (Combinatorial, No output feedback, Active high)
+16 (Combinatorial, No output feedback, Active high)
+17 (Combinatorial, Output feedback output, Active high)
+18 (Combinatorial, Output feedback output, Active high)
+
+Equations:
+
 o13 = /i1 & i2 & i3 & i4 & i5 & i6 & i7 & i8 +
       i9 & i11 +
       /i19 +

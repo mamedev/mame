@@ -1,0 +1,1 @@
+These files are for use with the utilities place and plcom which are included with ICT Place.  The place tool was used to configure the pins and the plcom tool was used to create the jed files.  (Under Windows 7 64-bit the place tool will not run under the Windows XP VM downloadable for free with Windows 7, but will run under DOSBox.)
