@@ -273,7 +273,7 @@ void wd_fdc_t::seek_continue()
 			bool done = false;
 			switch(main_state) {
 			case RESTORE:
-				done = !floppy || !floppy->trk00_r();
+				done = floppy && !floppy->trk00_r();
 				break;
 			case SEEK:
 				track += last_dir ? -1 : 1;

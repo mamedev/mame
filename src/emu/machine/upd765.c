@@ -1334,7 +1334,7 @@ void upd765_family_device::seek_continue(floppy_info &fi)
 			switch(fi.main_state) {
 			case RECALIBRATE:
 				fi.counter--;
-				done = !fi.dev || !fi.dev->trk00_r();
+				done = fi.dev && !fi.dev->trk00_r();
 				if(done)
 					fi.pcn = 0;
 				else if(!fi.counter) {

@@ -95,7 +95,7 @@ public:
 
 	bool wpt_r() { return output_format == 0; }
 	int dskchg_r() { return dskchg; }
-	bool trk00_r() { return cyl != 0 || !image; }
+	bool trk00_r() { return cyl != 0; }
 	int idx_r() { return idx; }
 	bool ss_r() { return ss; }
 	bool twosid_r();
