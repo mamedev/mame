@@ -299,7 +299,7 @@ WRITE8_MEMBER(hd44780_device::control_write)
 
 READ8_MEMBER(hd44780_device::control_read)
 {
-	return m_busy_flag<<7 || m_ac&0x7f;
+	return (m_busy_flag << 7) | (m_ac & 0x7f);
 }
 
 void hd44780_device::update_ac(void) // m_data_bus_flag was left as global so old savestates will work
