@@ -24,10 +24,6 @@ lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const ch
 		CDD_RX[i] = 0;
 	NeoCDCommsWordCount = 0;
 	NeoCDAssyStatus = 0;
-	NeoCDTrack = 0;
-	NeoCDSectorMin = 0;
-	NeoCDSectorSec = 0;
-	NeoCDSectorFrm = 0;
 	SCD_CURLBA = 0;
 	for (int i=0;i<2352;i++)
 		NeoCDSectorData[i] = 0;
@@ -116,6 +112,7 @@ void lc89510_temp_device::CDD_DoChecksum(void)
 	CDD_RX[9] = checksum;
 }
 
+// converts our 16-bit working regs to 8-bit regs and checksums them
 void lc89510_temp_device::CDD_Export(void)
 {
 	CDD_RX[0] = (CDD_STATUS  & 0xff00)>>8;
@@ -275,6 +272,36 @@ void lc89510_temp_device::CDD_GetTrackAdr(void)
 
 	if (segacd.toc->tracks[track - 1].trktype != CD_TRACK_AUDIO)
 		CDD_FRAME |= 0x0800;
+}
+
+// verify what this is.. the NeoCd emu code only checked the track type but
+// checked it where we put CDD_EXT, not CDD_FRAME (RX[7] vs RX[8] in Export)
+void lc89510_temp_device::CDD_GetTrackType(void)
+{
+	CLEAR_CDD_RESULT
+
+	int track = (CDD_TX[5] & 0xF) + (CDD_TX[4] & 0xF) * 10;
+	int last_track = cdrom_get_last_track(segacd.cd);
+
+	CDD_STATUS &= 0xFF;
+	if(segacd.cd == NULL) // no cd is there, bail out
+		return;
+	CDD_STATUS |= SCD_STATUS;
+
+	if (track > last_track)
+		track = last_track;
+
+	if (track < 1)
+		track = 1;
+
+	if (segacd.toc->tracks[track - 1].trktype != CD_TRACK_AUDIO)
+	{
+		CDD_EXT = 0x08;
+		CDD_FRAME |= 0x0800;
+	}
+
+
+
 }
 
 UINT32 lc89510_temp_device::getmsf_from_regs(void)
@@ -631,6 +658,7 @@ void lc89510_temp_device::CDD_Handle_TOC_Commands(void)
 		case TOCCMD_LENGTH:    CDD_Length();      break;
 		case TOCCMD_FIRSTLAST: CDD_FirstLast();   break;
 		case TOCCMD_TRACKADDR: CDD_GetTrackAdr(); break;
+		case 6:                CDD_GetTrackType(); break; // NGCD, might be wrong, make sure Sega CD doesn't hate it
 		default:               CDD_GetStatus();   break;
 	}
 }
@@ -958,114 +986,6 @@ static inline CDEmuStatusValue CDEmuGetStatus()
 	return CDEmuStatus;
 }
 
-UINT8* lc89510_temp_device::CDEmuReadQChannel(int SCD_CURLBA)
-{
-//	printf("CDEmuReadQChannel\n");
-	static unsigned char QChannelData[8];
-
-	if(segacd.cd == NULL) // no cd is there, bail out
-		return QChannelData;
-
-//  SCD_CURLBA
-	switch (CDEmuStatus) {
-		case reading:
-		case playing: {
-
-			UINT32 msf;
-			msf = lba_to_msf_alt(SCD_CURLBA+150);
-
-
-
-			QChannelData[0] = cdrom_get_track(segacd.cd, SCD_CURLBA);
-
-			QChannelData[1] = (msf >> 16)&0xff;
-			QChannelData[2] = (msf >> 8)&0xff;
-			QChannelData[3] = (msf >> 0)&0xff;
-
-			int elapsedlba;
-			elapsedlba = SCD_CURLBA - segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) ].physframeofs;
-			msf = lba_to_msf_alt (elapsedlba);
-
-			QChannelData[4] = (msf >> 16)&0xff;
-			QChannelData[5] = (msf >> 8)&0xff;
-			QChannelData[6] = (msf >> 0)&0xff;
-
-			if (QChannelData[0]==1)
-				QChannelData[7] = 0x4;
-			else
-				QChannelData[7] = 0x0;
-
-			break;
-		}
-		case paused: {
-			break;
-		}
-		default: {
-			memset(QChannelData, 0, sizeof(QChannelData));
-		}
-	}
-
-	return QChannelData;
-}
-
-UINT8* lc89510_temp_device::CDEmuReadTOC(INT32 track)
-{
-//	printf("CDEmuReadTOC\n");
-
-	static unsigned char TOCEntry[4];
-
-	if(segacd.cd == NULL)
-		return TOCEntry;
-
-
-	if (track == -1) {
-		printf("get first/last track nums\n");
-		TOCEntry[0] = 1;
-		TOCEntry[1] = cdrom_get_last_track(segacd.cd);
-		TOCEntry[2] = 0;
-		TOCEntry[3] = 0;
-
-		return TOCEntry;
-	}
-	else if (track == -2) {
-		printf("get disc length\n");
-
-		UINT32 startlba = (segacd.toc->tracks[cdrom_get_last_track(segacd.cd)].physframeofs);
-		UINT32 startmsf = lba_to_msf_alt( startlba );
-
-
-		TOCEntry[0] = (startmsf >> 16)&0xff;
-		TOCEntry[1] = (startmsf >> 8)&0xff;
-		TOCEntry[2] = (startmsf >> 0)&0xff;
-
-		TOCEntry[3] = 0;
-
-		return TOCEntry;
-	}
-	else
-	{
-		printf("get track address\n");
-
-		int last_track = cdrom_get_last_track(segacd.cd);
-
-		if (track > last_track)
-			track = last_track;
-
-		if (track < 1)
-			track = 1;
-
-		UINT32 startlba = (segacd.toc->tracks[track-1].physframeofs);
-		UINT32 startmsf = lba_to_msf_alt( startlba+150 );
-
-		TOCEntry[0] = (startmsf >> 16)&0xff;
-		TOCEntry[1] = (startmsf >> 8)&0xff;
-		TOCEntry[2] = (startmsf >> 0)&0xff;
-		TOCEntry[3] =  track % 10;;
-	}
-
-	return TOCEntry;
-
-}
 
 static void CDEmuStartRead()
 {
@@ -1103,12 +1023,6 @@ INT32 lc89510_temp_device::CDEmuLoadSector(INT32 LBA, char* pBuffer)
 
 
 
-void lc89510_temp_device::NeoCDLBAToMSF(const INT32 LBA)
-{
-	NeoCDSectorMin = (LBA + CD_FRAMES_PREGAP)                    / CD_FRAMES_MINUTE;
-	NeoCDSectorSec = (LBA + CD_FRAMES_PREGAP) % CD_FRAMES_MINUTE / CD_FRAMES_SECOND;
-	NeoCDSectorFrm = (LBA + CD_FRAMES_PREGAP) % CD_FRAMES_SECOND;
-}
 
 
 void lc89510_temp_device::NeoCDCommsReset()
@@ -1397,129 +1311,9 @@ void lc89510_temp_device::NeoCDProcessCommand()
 			break;
 		case CMD_GETTOC: // CDD_Handle_TOC_Commands();
 //                              //bprintf(PRINT_ERROR, _T("    CD comms received command %i\n"), CDD_TX[0]);
-			CDD_RX[1] = CDD_TX[3];
-			 switch (CDD_TX[3]) {
-
-
-
-				case TOCCMD_CURPOS: { //  CDD_GetPos();
-					UINT8* ChannelData = CDEmuReadQChannel(SCD_CURLBA);
-
-					CDD_RX[2] = ChannelData[1] / 10;
-					CDD_RX[3] = ChannelData[1] % 10;
-
-					CDD_RX[4] = ChannelData[2] / 10;
-					CDD_RX[5] = ChannelData[2] % 10;
-
-					CDD_RX[6] = ChannelData[3] / 10;
-					CDD_RX[7] = ChannelData[3] % 10;
-
-					CDD_RX[8] = ChannelData[7];
-
-// //bprintf(PRINT_ERROR, _T("    %02i %02i:%02i:%02i %02i:%02i:%02i %02i\n"), ChannelData[0], ChannelData[1], ChannelData[2], ChannelData[3], ChannelData[4], ChannelData[5], ChannelData[6], ChannelData[7]);
-
-					break;
-				}
-				case TOCCMD_TRKPOS: { //  CDD_GetTrackPos();
-					UINT8* ChannelData = CDEmuReadQChannel(SCD_CURLBA);
-
-					CDD_RX[2] = ChannelData[4] / 10;
-					CDD_RX[3] = ChannelData[4] % 10;
-
-					CDD_RX[4] = ChannelData[5] / 10;
-					CDD_RX[5] = ChannelData[5] % 10;
-
-					CDD_RX[6] = ChannelData[6] / 10;
-					CDD_RX[7] = ChannelData[6] % 10;
-
-					CDD_RX[8] = ChannelData[7];
-
-					break;
-				}
-				case TOCCMD_CURTRK: { //  CDD_GetTrack();
-
-					UINT8* ChannelData = CDEmuReadQChannel(SCD_CURLBA);
-
-					CDD_RX[2] = ChannelData[0] / 10;
-					CDD_RX[3] = ChannelData[0] % 10;
-
-
-					CDD_RX[8] = ChannelData[7];
-
-					break;
-				}
-				case TOCCMD_LENGTH: { //  CDD_Length();
-					UINT8* TOCEntry = CDEmuReadTOC(-2);
-
-					CDD_RX[2] = TOCEntry[0] / 10;
-					CDD_RX[3] = TOCEntry[0] % 10;
-
-					CDD_RX[4] = TOCEntry[1] / 10;
-					CDD_RX[5] = TOCEntry[1] % 10;
-
-					CDD_RX[6] = TOCEntry[2] / 10;
-					CDD_RX[7] = TOCEntry[2] % 10;
-
-					break;
-				}
-				case TOCCMD_FIRSTLAST: { //  CDD_FirstLast();
-					UINT8* TOCEntry = CDEmuReadTOC(-1);
-
-					CDD_RX[2] = TOCEntry[0] / 10;
-					CDD_RX[3] = TOCEntry[0] % 10;
-
-					CDD_RX[4] = TOCEntry[1] / 10;
-					CDD_RX[5] = TOCEntry[1] % 10;
-
-					break;
-				}
-				case TOCCMD_TRACKADDR:	{ //  CDD_GetTrackAdr(); 
-					NeoCDTrack = CDD_TX[4] * 10 + CDD_TX[5];
-
-					UINT8* TOCEntry = CDEmuReadTOC(NeoCDTrack);
-
-					CDD_RX[2] = TOCEntry[0] / 10;
-					CDD_RX[3] = TOCEntry[0] % 10;
-
-					CDD_RX[4] = TOCEntry[1] / 10;
-					CDD_RX[5] = TOCEntry[1] % 10;
-
-					CDD_RX[6] = TOCEntry[2] / 10;
-					CDD_RX[7] = TOCEntry[2] % 10;
-
-					// bit 3 of the 1st minutes digit indicates a data track
-					if (TOCEntry[3] & 4) {
-						CDD_RX[6] |= 8;
-					}
-
-					CDD_RX[8] = NeoCDTrack % 10;
-
-					break;
-				}
-
-				case 6: {
-
-					UINT8* ChannelData = CDEmuReadQChannel(SCD_CURLBA);
-
-					CDD_RX[8] = ChannelData[7];
-
-					break;
-				}
-
-				case 7: {
-
-					// must be 02, 0E, 0F, or 05
-					CDD_RX[2] = 0;
-					CDD_RX[3] = 5;
-
-					CDD_RX[4] = 0;
-					CDD_RX[5] = 0;
-
-					CDD_RX[6] = 0;
-					CDD_RX[7] = 0;
-					break;
-				}
-			 }
+	
+			CDD_Handle_TOC_Commands();
+			CDD_Export();
 			break;
 
 
@@ -1689,7 +1483,6 @@ void lc89510_temp_device::CDC_UpdateHEAD(void) // segacd
 
 void lc89510_temp_device::LC8951UpdateHeader() // neocd
 {
-	NeoCDLBAToMSF(SCD_CURLBA);
 
 	if (LC8951RegistersW[REG_W_CTRL1] & 1) {
 
@@ -1703,11 +1496,12 @@ void lc89510_temp_device::LC8951UpdateHeader() // neocd
 	} else {
 
 		// HEAD registers have header
+		UINT32 msf = lba_to_msf_alt(SCD_CURLBA+150);
 
-		LC8951RegistersR[REG_R_HEAD0] = ((NeoCDSectorMin / 10) << 4) | (NeoCDSectorMin % 10);	// HEAD0
-		LC8951RegistersR[REG_R_HEAD1] = ((NeoCDSectorSec / 10) << 4) | (NeoCDSectorSec % 10);	// HEAD1
-		LC8951RegistersR[REG_R_HEAD2] = ((NeoCDSectorFrm / 10) << 4) | (NeoCDSectorFrm % 10);	// HEAD2
-		LC8951RegistersR[REG_R_HEAD3] = 1;													// HEAD3
+		LC8951RegistersR[REG_R_HEAD0] = to_bcd (((msf & 0x00ff0000)>>16), true);	// HEAD0
+		LC8951RegistersR[REG_R_HEAD1] = to_bcd (((msf & 0x0000ff00)>>8), true);		// HEAD1
+		LC8951RegistersR[REG_R_HEAD2] = to_bcd (((msf & 0x000000ff)>>0), true);		// HEAD2
+		LC8951RegistersR[REG_R_HEAD3] = 0x1;										// HEAD3
 	}
 }
 

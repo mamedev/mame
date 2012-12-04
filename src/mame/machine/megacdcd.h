@@ -231,6 +231,7 @@ public:
 	void CDD_Length(void);
 	void CDD_FirstLast(void);
 	void CDD_GetTrackAdr(void);
+	void CDD_GetTrackType(void);
 	UINT32 getmsf_from_regs(void);
 	void CDD_Play(running_machine &machine);
 	void CDD_Seek(void);
@@ -296,11 +297,6 @@ public:
 
 	INT32 NeoCDAssyStatus;
 
-	INT32 NeoCDTrack;
-
-	INT32 NeoCDSectorMin;
-	INT32 NeoCDSectorSec;
-	INT32 NeoCDSectorFrm;
 
 	bool bNeoCDLoadSector;
 
@@ -325,7 +321,6 @@ public:
 	char* LC8915InitTransfer();
 	void LC8915EndTransfer();
 	void LC8951Reset();
-	void NeoCDLBAToMSF(const INT32 LBA);
 	void neocd_cdd_tx_w(UINT8 data);
 	UINT8 neocd_cdd_rx_r();
 	void NeoCDCommsReset();
@@ -335,8 +330,6 @@ public:
 	UINT32 SekReadByte(UINT32 a);
 	UINT32 SekReadWord(UINT32 a);
 
-	UINT8* CDEmuReadQChannel(int SCD_CURLBA);
-	UINT8* CDEmuReadTOC(INT32 track);
 	INT32 CDEmuLoadSector(INT32 LBA, char* pBuffer);
 	void set_DMA_regs(int offset, UINT16 wordValue);
 	void reset_NeoCd(void);

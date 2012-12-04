@@ -10,15 +10,6 @@ rather old now.
 
 Cleanup / Rewrite notes:
 
-On SegaC2 the VDP never turns on the IRQ6 enable register
-  This is because on the real PCB that line of the VDP isn't
-  connected.  Instead the IRQ6 interrupt is triggered by the
-  line that is used to generate the Z80 interrupt on a standard
-  genesis.  (Once, every frame, on screenline 224)
-
-  I should provide interrupt callback functions for each
-  vdp line state change, which can be configured in the init
-  rather than hardcoding them.
 
 
 Known Non-Issues (confirmed on Real Genesis)
