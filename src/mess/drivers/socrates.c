@@ -953,8 +953,53 @@ static MACHINE_CONFIG_START( socrates, socrates_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "socrates")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_START( socrates_pal, socrates_state )
+    /* basic machine hardware */
+    MCFG_CPU_ADD("maincpu", Z80, XTAL_26_601712MHz/6)  /* Toshiba TMPZ84C00AP @ 4.433 MHz? /6 or 7 or 8? TODO: verify divider!*/
+    MCFG_CPU_PROGRAM_MAP(z80_mem)
+    MCFG_CPU_IO_MAP(z80_io)
+    MCFG_QUANTUM_TIME(attotime::from_hz(50))
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", socrates_state,  assert_irq)
+    //MCFG_MACHINE_START_OVERRIDE(socrates_state,socrates)
+
+    /* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_SIZE(264, 238) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
+	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 229) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
+	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
+
+	MCFG_PALETTE_LENGTH(256)
 
 
+    /* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("soc_snd", SOCRATES, XTAL_26_601712MHz/(512+256)) // TODO: verify divider for pal mode
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("socrates_cart")
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "socrates")
+MACHINE_CONFIG_END
+
+/* This doesn't work for some reason.
+static MACHINE_CONFIG_DERIVED( socrates_pal, socrates )
+	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_26_601712MHz/8)
+	MCFG_SCREEN_REPLACE("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(264, 256) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
+	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 256) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
+	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
+	MCFG_SOUND_REPLACE("soc_snd", SOCRATES, XTAL_26_601712MHz/(512+256)) // this is correct, as strange as it sounds.
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+*/
 /******************************************************************************
  ROM Definitions
 ******************************************************************************/
@@ -1000,7 +1045,7 @@ ROM_START(socrates)
     ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
     ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
-    ROM_LOAD("tmp42c40p1844.bin", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
+    ROM_LOAD("tmp42c40p1844.u2", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
     /* english speech cart has a green QC sticker */
     ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
@@ -1022,7 +1067,7 @@ ROM_START(socratfc)
     ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
     ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
-    ROM_LOAD("tmp42c40p1844.bin", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
+    ROM_LOAD("tmp42c40p1844.u2", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
     ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
     ROM_LOAD_OPTIONAL("speech_fra_internal.bin", 0x0000, 0x2000, BAD_DUMP CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // probably same on french and english speech carts
@@ -1031,6 +1076,27 @@ ROM_START(socratfc)
     ROM_LOAD_OPTIONAL("speech_fra_vsm1.bin", 0x0000, 0x4000, NO_DUMP) // 16k in serial rom
     ROM_LOAD_OPTIONAL("speech_fra_vsm2.bin", 0x4000, 0x4000, NO_DUMP) // 16k in serial rom
     ROM_LOAD_OPTIONAL("speech_fra_vsm3.bin", 0x8000, 0x4000, NO_DUMP) // 16k in serial rom
+    ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
+ROM_END
+
+ROM_START(profweis)
+    ROM_REGION(0x80000, "maincpu", ROMREGION_ERASEVAL(0xF3))
+    /* Yeno Professor Weiss-Alles (German PAL) */
+    ROM_LOAD("27-00885-001-000.u1", 0x00000, 0x40000, CRC(fcaf8850) SHA1(a99011ee6a1ef63461c00d062278951252f117db)) // Label: "(Vtech) 27-00884-001-000 // (C)1988 VIDEO TECHNOLOGY // 8911 D"
+    ROM_CART_LOAD( "cart", 0x40000, 0x20000, 0 )
+
+    ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
+
+    ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
+    ROM_LOAD("tmp42c40p1844.u2", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
+
+    ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
+    ROM_LOAD_OPTIONAL("speech_ger_internal.bin", 0x0000, 0x2000, BAD_DUMP CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // probably same on french and english speech carts
+
+    ROM_REGION(0x10000, "speechext", ROMREGION_ERASE00) // speech serial modules outside of the speech chip but still on speech cart
+    ROM_LOAD_OPTIONAL("speech_ger_vsm1.bin", 0x0000, 0x4000, NO_DUMP) // 16k in serial rom
+    ROM_LOAD_OPTIONAL("speech_ger_vsm2.bin", 0x4000, 0x4000, NO_DUMP) // 16k in serial rom
+    ROM_LOAD_OPTIONAL("speech_ger_vsm3.bin", 0x8000, 0x4000, NO_DUMP) // 16k in serial rom
     ROM_FILL(0xC000, 0x4000, 0xff) // last vsm isn't present, FF fill
 ROM_END
 
@@ -1043,6 +1109,6 @@ ROM_END
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT       COMPANY                     FULLNAME                            FLAGS */
 COMP( 1988, socrates,   0,          0,      socrates,   socrates, socrates_state, socrates, "Video Technology",        "Socrates Educational Video System", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // English NTSC
 COMP( 1988, socratfc,   socrates,   0,      socrates,   socrates, socrates_state, socrates, "Video Technology",        "Socrates SAITOUT", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // French Canandian NTSC
-// Yeno Professor Weiss-Alles goes here (german PAL)
+COMP( 1988, profweis,   socrates,   0,      socrates_pal,   socrates, socrates_state, socrates, "Video Technology/Yeno",        "Professor Weiss-Alles", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // German PAL
 // Yeno Professeur Saitout goes here (french SECAM)
 // ? goes here (spanish PAL)
