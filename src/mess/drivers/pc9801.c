@@ -275,6 +275,8 @@
 #define UPD1990A_TAG "upd1990a"
 #define UPD8251_TAG  "upd8251"
 
+#define DEBUG_PCG	1
+
 class pc9801_state : public driver_device
 {
 public:
@@ -346,7 +348,6 @@ public:
 		UINT8 pal_entry;
 		UINT8 r[16],g[16],b[16];
 	}m_analog16;
-	UINT8 m_support_16_colors;
 
 	/* PC9821 specific */
 	UINT8 m_analog256,m_analog256e;
@@ -389,6 +390,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9801_tvram_w);
 	DECLARE_READ8_MEMBER(pc9801_gvram_r);
 	DECLARE_WRITE8_MEMBER(pc9801_gvram_w);
+	DECLARE_READ8_MEMBER(pc9801_mouse_r);
+	DECLARE_WRITE8_MEMBER(pc9801_mouse_w);
 //	DECLARE_READ8_MEMBER(pc9801rs_gvram_r);
 	DECLARE_WRITE8_MEMBER(pc9801rs_gvram_w);
 	DECLARE_READ8_MEMBER(pc9801_opn_r);
@@ -515,6 +518,13 @@ public:
 	DECLARE_READ8_MEMBER(ppi_fdd_portb_r);
 	DECLARE_READ8_MEMBER(ppi_fdd_portc_r);
 	DECLARE_WRITE8_MEMBER(ppi_fdd_portc_w);
+	DECLARE_READ8_MEMBER(ppi_mouse_porta_r);
+	DECLARE_READ8_MEMBER(ppi_mouse_portb_r);
+	DECLARE_READ8_MEMBER(ppi_mouse_portc_r);
+	DECLARE_WRITE8_MEMBER(ppi_mouse_porta_w);
+	DECLARE_WRITE8_MEMBER(ppi_mouse_portb_w);
+	DECLARE_WRITE8_MEMBER(ppi_mouse_portc_w);
+
 	DECLARE_WRITE_LINE_MEMBER(fdc_2hd_irq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_2hd_drq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_irq);
@@ -568,7 +578,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 		return;
 
 	interlace_on = state->m_video_ff[INTERLACE_REG];
-	colors16_mode = (state->m_ex_video_ff[0] && state->m_support_16_colors) ? 16 : 8;
+	colors16_mode = (state->m_ex_video_ff[0]) ? 16 : 8;
 
 	for(xi=0;xi<8;xi++)
 	{
@@ -1349,6 +1359,28 @@ WRITE8_MEMBER(pc9801_state::pc9801_opn_w)
 	}
 }
 
+READ8_MEMBER(pc9801_state::pc9801_mouse_r)
+{
+	if((offset & 1) == 0)
+		return 0xff;
+	else
+	{
+		return machine().device<i8255_device>("ppi8255_mouse")->read(space, (offset & 6) >> 1);
+	}
+}
+
+WRITE8_MEMBER(pc9801_state::pc9801_mouse_w)
+{
+	if((offset & 1) == 0)
+	{
+		//return 0xff;
+	}
+	else
+	{
+		machine().device<i8255_device>("ppi8255_mouse")->write(space, (offset & 6) >> 1,data);
+	}
+}
+
 
 static ADDRESS_MAP_START( pc9801_map, AS_PROGRAM, 16, pc9801_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM //work RAM
@@ -1377,6 +1409,7 @@ static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,pc9801_a0_w,0xffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00c8, 0x00cd) AM_READWRITE8(pc9801_fdc_2dd_r,pc9801_fdc_2dd_w,0xffff) //upd765a 2dd / <undefined>
 	AM_RANGE(0x0188, 0x018b) AM_READWRITE8(pc9801_opn_r,pc9801_opn_w,0xffff) //ym2203 opn / <undefined>
+	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,pc9801_mouse_w,0xffff) // <undefined> / mouse ppi8255 ports
 ADDRESS_MAP_END
 
 /*************************************
@@ -2713,6 +2746,49 @@ static I8255A_INTERFACE( ppi_fdd_intf )
 	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_fdd_portc_w)					/* Port C write */
 };
 
+READ8_MEMBER(pc9801_state::ppi_mouse_porta_r)
+{
+	printf("A\n");
+	return 0xff;
+}
+
+READ8_MEMBER(pc9801_state::ppi_mouse_portb_r)
+{
+	printf("B\n");
+	return 0xff;
+}
+
+READ8_MEMBER(pc9801_state::ppi_mouse_portc_r)
+{
+	printf("C\n");
+	return 0xff;
+}
+
+WRITE8_MEMBER(pc9801_state::ppi_mouse_porta_w)
+{
+	printf("A %02x\n",data);
+}
+
+WRITE8_MEMBER(pc9801_state::ppi_mouse_portb_w)
+{
+	printf("B %02x\n",data);
+}
+
+WRITE8_MEMBER(pc9801_state::ppi_mouse_portc_w)
+{
+	printf("C %02x\n",data);
+}
+
+static I8255A_INTERFACE( ppi_mouse_intf )
+{
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_porta_r),					/* Port A read */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_porta_w),					/* Port A write */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_portb_r),					/* Port B read */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_portb_w),					/* Port B write */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_portc_r),					/* Port C read */
+	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_mouse_portc_w)					/* Port C write */
+};
+
 /****************************************
 *
 * UPD765 interface
@@ -2824,7 +2900,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 	m_ipl_rom = memregion("ipl")->base();
 	m_pcg_ram = auto_alloc_array(machine(), UINT8, 0x80000);
 
-	m_support_16_colors = 0;
 	state_save_register_global_pointer(machine(), m_pcg_ram, 0x80000);
 }
 
@@ -2867,8 +2942,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9801rs)
 	m_ext_work_ram = auto_alloc_array(machine(), UINT8, 0x700000);
 	state_save_register_global_pointer(machine(), m_work_ram, 0xa0000);
 	state_save_register_global_pointer(machine(), m_ext_work_ram, 0x700000);
-
-	m_support_16_colors = 1;
 
 	upd765a_device *fdc;
 	fdc = machine().device<upd765a_device>(":upd765_2hd");
@@ -3032,6 +3105,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
 	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
+	MCFG_I8255_ADD( "ppi8255_mouse", ppi_mouse_intf )
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc9801_upd1990a_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
