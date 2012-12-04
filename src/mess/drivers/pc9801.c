@@ -276,8 +276,6 @@
 #define UPD1990A_TAG "upd1990a"
 #define UPD8251_TAG  "upd8251"
 
-#define DEBUG_PCG	1
-
 class pc9801_state : public driver_device
 {
 public:
@@ -555,6 +553,10 @@ void pc9801_state::video_start()
 	// find memory regions
 	m_char_rom = memregion("chargen")->base();
 	m_kanji_rom = memregion("kanji")->base();
+
+	m_pcg_ram = auto_alloc_array(machine(), UINT8, 0x200000);
+
+	state_save_register_global_pointer(machine(), m_pcg_ram, 0x200000);
 }
 
 UINT32 pc9801_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -564,7 +566,6 @@ UINT32 pc9801_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	/* graphics */
 	m_hgdc2->screen_update(screen, bitmap, cliprect);
 	m_hgdc1->screen_update(screen, bitmap, cliprect);
-
 	return 0;
 }
 
@@ -614,6 +615,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	UINT8 char_size,interlace_on;
 	UINT8 kanji_on;
 	UINT16 tile;
+	UINT8 pcg_sel, pcg_lr;
 
 	if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
@@ -636,18 +638,27 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		if(kanji_on)
 			kanji_on--;
 
+		pcg_sel = 0;
+		pcg_lr = 0;
+
 		if(kanji_on == 0)
 		{
 			tile = state->m_video_ram_1[(tile_addr*2) & 0x1fff] & 0x00ff;
-			knj_tile = state->m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0x7f;
-			if((tile & 0xe0) == 0 && knj_tile) // kanji select
+			knj_tile = state->m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0xff;
+			if((tile & 0xe0) == 0 && knj_tile) // kanji select, TODO
 			{
 				tile <<= 8;
-				tile |= knj_tile;
+				tile |= (knj_tile & 0x7f);
 				/* annoying kanji bit-swap applied on the address bus ... */
 				tile = BITSWAP16(tile,7,15,14,13,12,11,6,5,10,9,8,4,3,2,1,0);
 				tile &= 0x1fff;
 				kanji_on = 2;
+			}
+			else if(tile == 0x56 && knj_tile)
+			{
+				pcg_sel = 1;
+				tile = knj_tile & 0x7f;
+				pcg_lr = (knj_tile & 0x80) >> 7;
 			}
 		}
 		attr = (state->m_video_ram_1[(tile_addr*2 & 0x1fff) | 0x2000] & 0x00ff);
@@ -671,12 +682,17 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(res_x > 640 || res_y > char_size*25) //TODO
 					continue;
 
-				if(kanji_on)
+				tile_data = 0;
+
+				if(!secret)
 				{
-					tile_data = secret ? 0 : (state->m_kanji_rom[tile*0x20+yi*2+(kanji_on & 1)]);
+					if(kanji_on)
+						tile_data = (state->m_kanji_rom[tile*0x20+yi*2+(kanji_on & 1)]);
+					else if(pcg_sel)
+						tile_data = (state->m_pcg_ram[0xac000*2+tile*0x40+yi*2+pcg_lr]);
+					else
+						tile_data = (state->m_char_rom[tile*char_size+interlace_on*0x800+yi]);
 				}
-				else
-					tile_data = secret ? 0 : (state->m_char_rom[tile*char_size+interlace_on*0x800+yi]);
 
 				if(reverse) { tile_data^=0xff; }
 				if(u_line && yi == 7) { tile_data = 0xff; }
@@ -687,6 +703,13 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 				if(yi >= char_size)
 					pen = 0;
+				else if(pcg_sel)
+				{
+					pen = 0;
+					if(color & 1) pen |= ((tile_data >> (7-xi) & 1) ? 1 : 0);
+					if(color & 2) pen |= ((tile_data >> (7-xi) & 1) ? 2 : 0);
+					if(color & 4) pen |= ((tile_data >> (7-xi) & 1) ? 4 : 0);
+				}
 				else
 					pen = (tile_data >> (7-xi) & 1) ? color : 0;
 
@@ -1106,7 +1129,14 @@ READ8_MEMBER(pc9801_state::pc9801_a0_r)
 		switch((offset & 0xe) + 1)
 		{
 			case 0x09://cg window font read
-				return m_pcg_ram[((m_font_addr & 0x7f7f) << 4) | m_font_lr | (m_font_line & 0x0f)];
+			{
+				UINT32 pcg_offset;
+
+				pcg_offset = m_font_addr << 6;
+				pcg_offset|= m_font_line;
+				pcg_offset|= m_font_lr;
+				return m_pcg_ram[pcg_offset];
+			}
 		}
 
 		printf("Read to undefined port [%02x]\n",offset+0xa0);
@@ -1165,13 +1195,18 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 				return;
 			case 0x05:
 				//printf("%02x\n",data);
-				m_font_line = data & 0x1f;
-				m_font_lr = data & 0x20 ? 0x000 : 0x800;
+				m_font_line = ((data & 0x1f) << 1);
+				m_font_lr = ((data & 0x20) >> 5) ^ 1;
 				return;
 			case 0x09: //cg window font write
 			{
-				//printf("W\n");
-				m_pcg_ram[((m_font_addr & 0x7f7f) << 4) | m_font_lr | m_font_line] = data;
+				UINT32 pcg_offset;
+
+				pcg_offset = m_font_addr << 6;
+				pcg_offset|= m_font_line;
+				pcg_offset|= m_font_lr;
+				//printf("%04x %02x %02x %08x\n",m_font_addr,m_font_line,m_font_lr,pcg_offset);
+				m_pcg_ram[pcg_offset] = data;
 				return;
 			}
 		}
@@ -2901,9 +2936,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 	m_rtc->oe_w(1);
 
 	m_ipl_rom = memregion("ipl")->base();
-	m_pcg_ram = auto_alloc_array(machine(), UINT8, 0x80000);
-
-	state_save_register_global_pointer(machine(), m_pcg_ram, 0x80000);
 }
 
 MACHINE_START_MEMBER(pc9801_state,pc9801f)
