@@ -271,6 +271,7 @@
 #include "machine/ram.h"
 #include "formats/mfi_dsk.h"
 #include "formats/d88_dsk.h"
+#include "formats/pc98fdi_dsk.h"
 
 #define UPD1990A_TAG "upd1990a"
 #define UPD8251_TAG  "upd8251"
@@ -469,6 +470,8 @@ public:
 	DECLARE_READ8_MEMBER(pc9821_window_bank_r);
 	DECLARE_WRITE8_MEMBER(pc9821_window_bank_w);
 	DECLARE_READ32_MEMBER(pc9821_timestamp_r);
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	void fdc_2hd_irq(bool state);
 	void fdc_2hd_drq(bool state);
@@ -3089,6 +3092,10 @@ static const ym2203_interface pc98_ym2203_intf =
 	DEVCB_LINE(pc9801_sound_irq)
 };
 
+FLOPPY_FORMATS_MEMBER( pc9801_state::floppy_formats )
+	FLOPPY_PC98FDI_FORMAT
+FLOPPY_FORMATS_END
+
 static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_CPU_ADD("maincpu", I8086, 5000000) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9801_map)
@@ -3111,10 +3118,10 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 
 	MCFG_UPD765A_ADD("upd765_2hd", false, true)
 	MCFG_UPD765A_ADD("upd765_2dd", false, true)
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2dd:0", pc9801_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765_2dd:1", pc9801_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2dd:0", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765_2dd:1", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc98")
 
