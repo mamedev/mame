@@ -1865,6 +1865,7 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0188, 0x018b) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffffffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank
+	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,     pc9801_mouse_w,     0xffffffff) // <undefined> / mouse ppi8255 ports
 ADDRESS_MAP_END
 
 READ8_MEMBER(pc9801_state::pc980ux_memory_r)
@@ -1922,6 +1923,7 @@ static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x0188, 0x018b) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffff) //ym2203 opn / <undefined>
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffff) //ROM/RAM bank
+	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,     pc9801_mouse_w,     0xffff) // <undefined> / mouse ppi8255 ports
 
 ADDRESS_MAP_END
 
@@ -2219,7 +2221,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 //  AM_RANGE(0x0cc0, 0x0cc7) SCSI interface / <undefined>
 //  AM_RANGE(0x0cfc, 0x0cff) PCI bus
 	AM_RANGE(0x3fd8, 0x3fdf) AM_READWRITE8(pc9821_pit_r,        pc9821_pit_w,        0xffffffff) // <undefined> / pit mirror ports
-//  AM_RANGE(0x7fd8, 0x7fdf) <undefined> / mouse ppi8255 ports
+	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,pc9801_mouse_w,0xffffffff) // <undefined> / mouse ppi8255 ports
 	AM_RANGE(0x841c, 0x841f) AM_READWRITE8(sdip_0_r,sdip_0_w,0xffffffff)
 	AM_RANGE(0x851c, 0x851f) AM_READWRITE8(sdip_1_r,sdip_1_w,0xffffffff)
 	AM_RANGE(0x861c, 0x861f) AM_READWRITE8(sdip_2_r,sdip_2_w,0xffffffff)
@@ -3308,6 +3310,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
 	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
+	MCFG_I8255_ADD( "ppi8255_mouse", ppi_mouse_intf )
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
@@ -3370,6 +3373,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
 	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
+	MCFG_I8255_ADD( "ppi8255_mouse", ppi_mouse_intf )
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
