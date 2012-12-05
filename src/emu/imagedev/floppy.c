@@ -1195,7 +1195,7 @@ void floppy_8_sssd::handled_variants(UINT32 *variants, int &var_count) const
 }
 
 floppy_8_dssd::floppy_8_dssd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_8_SSSD, "8\" single density double sided floppy drive", tag, owner, clock)
+	floppy_image_device(mconfig, FLOPPY_8_DSSD, "8\" single density double sided floppy drive", tag, owner, clock)
 {
 }
 
