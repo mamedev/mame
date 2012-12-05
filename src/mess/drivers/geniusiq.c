@@ -15,11 +15,11 @@ Memory map:
     00200000 RAM (256K)
     00400000 Flash memory (128K)
     00600000 Some memory mapped hardware
-    ???????? Cartridge port
+    00a00000 Cartridge port
 
 TODO:
     - Sound
-    - Cartridge
+    - Flash cartridge
     - Dump the MCU and rewrites everything using low-level emulation
     - Check with different countries ROMs
 
@@ -187,6 +187,7 @@ TMP47C241MG = TCLS-47 series 4-bit CPU with 2048x8 internal ROM
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/intelfsh.h"
+#include "imagedev/cartslot.h"
 
 
 #define KEYBOARD_QUEUE_SIZE     0x80
@@ -194,21 +195,33 @@ TMP47C241MG = TCLS-47 series 4-bit CPU with 2048x8 internal ROM
 class geniusiq_state : public driver_device
 {
 public:
+	enum
+	{
+		IQ128_ROM_CART      = 0x00,
+		IQ128_ROMLESS1_CART = 0x01,
+		IQ128_ROMLESS2_CART = 0x02,
+		IQ128_NO_CART       = 0x03
+	};
+
 	geniusiq_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_flash(*this, "flash"),
 		m_vram(*this, "vram"),
-		m_mouse_gfx(*this, "mouse_gfx")
+		m_mouse_gfx(*this, "mouse_gfx"),
+		m_cart_state(IQ128_NO_CART)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<intelfsh8_device> m_flash;
 	required_shared_ptr<UINT16> m_vram;
 	required_shared_ptr<UINT16> m_mouse_gfx;
+
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void palette_init();
 	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	DECLARE_READ8_MEMBER(flash_r);
 	DECLARE_WRITE8_MEMBER(flash_w);
 	DECLARE_READ16_MEMBER(input_r);
@@ -220,6 +233,9 @@ public:
 	DECLARE_WRITE16_MEMBER(gfx_color_w);
 	DECLARE_WRITE16_MEMBER(gfx_idx_w);
 	void queue_input(UINT16 data);
+	DECLARE_READ16_MEMBER(cart_state_r);
+	int cart_load(device_image_interface &image);
+	void cart_unload(device_image_interface &image);
 
 	DECLARE_READ16_MEMBER(unk0_r) { return 0; }
 	DECLARE_READ16_MEMBER(unk_r) { return machine().rand(); }
@@ -233,6 +249,8 @@ private:
 	UINT8       m_mouse_posy;
 	UINT16      m_mouse_gfx_posx;
 	UINT16      m_mouse_gfx_posy;
+	UINT8 *		m_cart;
+	UINT8		m_cart_state;
 	struct
 	{
 		UINT16  buffer[KEYBOARD_QUEUE_SIZE];
@@ -328,6 +346,11 @@ READ8_MEMBER(geniusiq_state::flash_r)
 WRITE8_MEMBER(geniusiq_state::flash_w)
 {
 	m_flash->write(offset, data);
+}
+
+READ16_MEMBER( geniusiq_state::cart_state_r )
+{
+	return m_cart_state;
 }
 
 WRITE16_MEMBER( geniusiq_state::mouse_pos_w )
@@ -461,7 +484,7 @@ static ADDRESS_MAP_START(geniusiq_mem, AS_PROGRAM, 16, geniusiq_state)
 	//AM_RANGE(0x600600, 0x600605)                      // sound ??
 	AM_RANGE(0x600606, 0x600609) AM_WRITE(gfx_base_w)
 	AM_RANGE(0x60060a, 0x60060b) AM_WRITE(gfx_idx_w)
-	AM_RANGE(0x600802, 0x600803) AM_READ_PORT("CART")   // cartridge state
+	AM_RANGE(0x600802, 0x600803) AM_READ(cart_state_r)  // cartridge state
 	AM_RANGE(0x600108, 0x600109) AM_READ(unk0_r)        // read before run a BASIC program
 	AM_RANGE(0x600918, 0x600919) AM_READ(unk0_r)        // loop at start if bit 0 is set
 	AM_RANGE(0x601008, 0x601009) AM_READ(unk_r)         // unknown, read at start and expect that bit 2 changes several times before continue
@@ -470,7 +493,7 @@ static ADDRESS_MAP_START(geniusiq_mem, AS_PROGRAM, 16, geniusiq_state)
 	AM_RANGE(0x60101c, 0x60101f) AM_WRITE(gfx_color_w)
 	AM_RANGE(0x601060, 0x601063) AM_WRITE(mouse_pos_w)
 	AM_RANGE(0x601100, 0x6011ff) AM_RAM     AM_SHARE("mouse_gfx")   // mouse cursor gfx (24x16)
-	//AM_RANGE(0xa00000, 0xa?????)                      // cartridge ??
+	AM_RANGE(0xa00000, 0xafffff) AM_REGION("cart", 0)               // cartridge
 	// 0x600000 : some memory mapped hardware
 ADDRESS_MAP_END
 
@@ -629,13 +652,6 @@ static INPUT_PORTS_START( geniusiq )
 	PORT_START("MOUSE")
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Mouse Button 2")     PORT_CODE(MOUSECODE_BUTTON2)    PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_mouse_input, 0 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Mouse Button 1")     PORT_CODE(MOUSECODE_BUTTON1)    PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_mouse_input, 0 )
-
-	PORT_START("CART")
-	PORT_CONFNAME( 0x03, 0x03, "Cartridge" )
-	PORT_CONFSETTING( 0x00, "ROM/Flash cartridge" ) // check for cartridge header at 0xa00000
-	PORT_CONFSETTING( 0x01, "Cartouche I" )
-	PORT_CONFSETTING( 0x02, "Cartouche II" )
-	PORT_CONFSETTING( 0x03, "No cartridge" )
 INPUT_PORTS_END
 
 
@@ -681,17 +697,15 @@ static INPUT_PORTS_START( geniusiq_de )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_A )         PORT_CHAR('a')  PORT_CHAR('A')  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x64 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_Q )         PORT_CHAR('q')  PORT_CHAR('Q')  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x65 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_1 )         PORT_CHAR('1')  PORT_CHAR('!')  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x66 )
-
-	PORT_MODIFY("CART")
-	PORT_CONFNAME( 0x03, 0x03, "Cartridge" )
-	PORT_CONFSETTING( 0x00, "ROM/Flash cartridge" ) // check for cartridge header at 0xa00000
-	PORT_CONFSETTING( 0x01, "Fit in Naturwissenschaften" )
-	PORT_CONFSETTING( 0x02, "No cartridge" )
-	PORT_CONFSETTING( 0x03, "No cartridge" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gl8008cx )
 INPUT_PORTS_END
+
+void geniusiq_state::machine_start()
+{
+	m_cart = (UINT8*)(*memregion("cart"));
+}
 
 void geniusiq_state::machine_reset()
 {
@@ -705,6 +719,57 @@ void geniusiq_state::machine_reset()
 	m_mouse_posy = 0;
 	m_mouse_gfx_posx = 0;
 	m_mouse_gfx_posy = 0;
+}
+
+int geniusiq_state::cart_load(device_image_interface &image)
+{
+	if (image.software_entry() == NULL)
+	{
+		UINT32 size = image.length();
+		if (image.fread(m_cart, size) != size)
+			return IMAGE_INIT_FAIL;
+
+		m_cart_state = IQ128_ROM_CART;
+	}
+	else
+	{
+		UINT32 size = image.get_software_region_length("rom");
+		if (size > 1)
+			memcpy(m_cart, image.get_software_region("rom"), size);
+
+		const char *pcb_type = image.get_feature("pcb_type");
+		if (pcb_type)
+		{
+			if (!strcmp(pcb_type, "romless1"))
+				m_cart_state = IQ128_ROMLESS1_CART;
+			else if (!strcmp(pcb_type, "romless2"))
+				m_cart_state = IQ128_ROMLESS2_CART;
+			else if (!strcmp(pcb_type, "rom"))
+				m_cart_state = IQ128_ROM_CART;
+		}
+		else
+		{
+			m_cart_state = IQ128_ROM_CART;
+		}
+	}
+
+	return IMAGE_INIT_PASS;
+}
+
+void geniusiq_state::cart_unload(device_image_interface &image)
+{
+	memset(m_cart, 0xff, memregion("cart")->bytes());
+	m_cart_state = IQ128_NO_CART;
+}
+
+static DEVICE_IMAGE_LOAD(iq128_cart)
+{
+	return image.device().machine().driver_data<geniusiq_state>()->cart_load(image);
+}
+
+static DEVICE_IMAGE_UNLOAD(iq128_cart)
+{
+	image.device().machine().driver_data<geniusiq_state>()->cart_unload(image);
 }
 
 static MACHINE_CONFIG_START( iq128, geniusiq_state )
@@ -724,6 +789,17 @@ static MACHINE_CONFIG_START( iq128, geniusiq_state )
 
 	/* internal flash */
 	MCFG_AMD_29F010_ADD("flash")
+
+	/* cartridge */
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_NOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(iq128_cart)
+	MCFG_CARTSLOT_UNLOAD(iq128_cart)
+	MCFG_CARTSLOT_INTERFACE("iq128_cart")
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "iq128")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( iqtv512, iq128 )
@@ -751,16 +827,22 @@ MACHINE_CONFIG_END
 ROM_START( iq128 )
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_LOAD( "27-5947-00.bin", 0x0000, 0x200000, CRC(a98fc3ff) SHA1(de76a5898182bd0180bd2b3e34c4502f0918a3fa) )
+
+	ROM_REGION(0x100000, "cart", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( iq128_fr )
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_LOAD( "geniusiq.bin", 0x0000, 0x200000, CRC(9b06cbf1) SHA1(b9438494a9575f78117c0033761f899e3c14e292) )
+
+	ROM_REGION(0x100000, "cart", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( iqtv512 )
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_LOAD( "27-06171-000.bin", 0x0000, 0x200000, CRC(2597af70) SHA1(9db8151a84517407d380424410b6fa0003ceb1eb) )
+
+	ROM_REGION(0x100000, "cart", ROMREGION_ERASEFF)
 ROM_END
 
 ROM_START( gl8008cx )

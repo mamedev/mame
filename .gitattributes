@@ -97,6 +97,7 @@ hash/ibmpcjr_flop.xml svneol=native#text/xml
 hash/intv.hsi svneol=native#text/plain
 hash/intv.xml svneol=native#text/xml
 hash/intvecs.xml svneol=native#text/xml
+hash/iq128.xml svneol=native#text/xml
 hash/iq151_cart.xml svneol=native#text/xml
 hash/iq151_flop.xml svneol=native#text/xml
 hash/jaguar.xml svneol=native#text/xml

@@ -258,20 +258,6 @@ On one was the highest adressline set to HIGH, on the other one this adressline 
 
 <!-- Third chunk of dumps, misc compatibility -->
 
-<!-- According to the boxart, this is compatible with: IQ 128 -->
-	<software name="fitnatur">
-		<description>Fit in Naturwissenschaften</description>
-		<year>200?</year>
-		<publisher>Video Technology</publisher>
-		<info name="serial" value="80-13375" />
-
-		<part name="rom" interface="genius_rom">
-			<dataarea name="rom" size="0">
-				<!-- cartridge contains only a jumper wire -->
-			</dataarea>
-		</part>
-	</software>
-
 <!-- According to the boxart, this is compatible with: Master Mega Color -->
 	<software name="zahlenkn">
 		<description>Zahlenknacker</description>
