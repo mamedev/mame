@@ -491,7 +491,7 @@ public:
 	DECLARE_MACHINE_START(pc9801rs);
 	DECLARE_MACHINE_START(pc9821);
 
-	DECLARE_MACHINE_RESET(pc9801);
+	DECLARE_MACHINE_RESET(pc9801_common);
 	DECLARE_MACHINE_RESET(pc9801f);
 	DECLARE_MACHINE_RESET(pc9801rs);
 	DECLARE_MACHINE_RESET(pc9821);
@@ -522,18 +522,25 @@ public:
 	DECLARE_READ8_MEMBER(ppi_fdd_portb_r);
 	DECLARE_READ8_MEMBER(ppi_fdd_portc_r);
 	DECLARE_WRITE8_MEMBER(ppi_fdd_portc_w);
-	DECLARE_READ8_MEMBER(ppi_mouse_porta_r);
-	DECLARE_READ8_MEMBER(ppi_mouse_portb_r);
-	DECLARE_READ8_MEMBER(ppi_mouse_portc_r);
-	DECLARE_WRITE8_MEMBER(ppi_mouse_porta_w);
-	DECLARE_WRITE8_MEMBER(ppi_mouse_portb_w);
-	DECLARE_WRITE8_MEMBER(ppi_mouse_portc_w);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_2hd_irq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_2hd_drq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_irq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_drq);
 //	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_irq);
+
+	DECLARE_READ8_MEMBER(ppi_mouse_porta_r);
+	DECLARE_READ8_MEMBER(ppi_mouse_portb_r);
+	DECLARE_READ8_MEMBER(ppi_mouse_portc_r);
+	DECLARE_WRITE8_MEMBER(ppi_mouse_porta_w);
+	DECLARE_WRITE8_MEMBER(ppi_mouse_portb_w);
+	DECLARE_WRITE8_MEMBER(ppi_mouse_portc_w);
+	struct{
+		UINT8 control;
+		UINT8 lx;
+		UINT8 ly;
+	}m_mouse;
+	TIMER_DEVICE_CALLBACK_MEMBER( mouse_irq_cb );
 
 	void pc9801_fdc_2hd_update_ready(floppy_image_device *, int);
 	inline UINT32 m_calc_grcg_addr(int i,UINT32 offset);
@@ -2553,6 +2560,18 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Joystick Button 2")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_START("MOUSE_X")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_RESET PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
+
+	PORT_START("MOUSE_Y")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_RESET PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
+
+	PORT_START("MOUSE_B")
+	PORT_BIT(0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Middle Button")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Right Button")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Left Button")
+
 	PORT_START("ROM_LOAD")
 	PORT_CONFNAME( 0x01, 0x01, "Load floppy 2hd BIOS" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Yes ) )
@@ -2634,15 +2653,15 @@ ir3
 ir4 rs-232c
 ir5
 ir6
-ir7
+ir7 slave irq
 
 8259 slave:
-ir0 <connection with master 8259?>
+ir0 printer
 ir1
 ir2 2dd floppy irq
 ir3 2hd floppy irq
 ir4 opn
-ir5
+ir5 mouse
 ir6
 ir7
 */
@@ -2893,8 +2912,25 @@ static I8255A_INTERFACE( ppi_fdd_intf )
 
 READ8_MEMBER(pc9801_state::ppi_mouse_porta_r)
 {
-	printf("A\n");
-	return 0xff;
+	UINT8 res;
+	UINT8 isporthi;
+	const char *const mousenames[] = { "MOUSE_X", "MOUSE_Y" };
+
+	res = ioport("MOUSE_B")->read() & 0xe0;
+	isporthi = ((m_mouse.control & 0x20) >> 5)*4;
+
+	if((m_mouse.control & 0x80) == 0)
+		res |= ioport(mousenames[(m_mouse.control & 0x40) >> 6])->read() >> (isporthi) & 0xf;
+	else
+	{
+		if(m_mouse.control & 0x40)
+			res |= (m_mouse.ly >> isporthi) & 0xf;
+		else
+			res |= (m_mouse.lx >> isporthi) & 0xf;
+	}
+
+//	printf("A\n");
+	return res;
 }
 
 READ8_MEMBER(pc9801_state::ppi_mouse_portb_r)
@@ -2921,7 +2957,13 @@ WRITE8_MEMBER(pc9801_state::ppi_mouse_portb_w)
 
 WRITE8_MEMBER(pc9801_state::ppi_mouse_portc_w)
 {
-	printf("C %02x\n",data);
+	if((m_mouse.control & 0x80) == 0 && data & 0x80)
+	{
+		m_mouse.lx = ioport("MOUSE_X")->read();
+		m_mouse.ly = ioport("MOUSE_Y")->read();
+	}
+
+	m_mouse.control = data;
 }
 
 static I8255A_INTERFACE( ppi_mouse_intf )
@@ -3107,7 +3149,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9821)
 	state_save_register_global_pointer(machine(), m_ext_gvram, 0xa0000);
 }
 
-MACHINE_RESET_MEMBER(pc9801_state,pc9801)
+MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 {
 
 	/* this looks like to be some kind of backup ram, system will boot with green colors otherwise */
@@ -3127,11 +3169,12 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801)
 	beep_set_state(machine().device(BEEPER_TAG),0);
 
 	m_nmi_ff = 0;
+	m_mouse.control = 0xff;
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
 {
-	MACHINE_RESET_CALL_MEMBER(pc9801);
+	MACHINE_RESET_CALL_MEMBER(pc9801_common);
 
 	/* 2dd interface ready line is ON by default */
 	floppy_image_device *floppy;
@@ -3164,7 +3207,7 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 {
-	MACHINE_RESET_CALL_MEMBER(pc9801);
+	MACHINE_RESET_CALL_MEMBER(pc9801_common);
 
 	m_gate_a20 = 0;
 	m_rom_bank = 0;
@@ -3235,6 +3278,22 @@ FLOPPY_FORMATS_MEMBER( pc9801_state::floppy_formats )
 	FLOPPY_PC98FDI_FORMAT
 FLOPPY_FORMATS_END
 
+TIMER_DEVICE_CALLBACK_MEMBER( pc9801_state::mouse_irq_cb )
+{
+	if((m_mouse.control & 0x10) == 0)
+	{
+		pic8259_ir5_w(machine().device("pic8259_slave"), 0);
+		pic8259_ir5_w(machine().device("pic8259_slave"), 1);
+	}
+}
+
+static MACHINE_CONFIG_FRAGMENT( pc9801_mouse )
+	MCFG_I8255_ADD( "ppi8255_mouse", ppi_mouse_intf )
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", pc9801_state, mouse_irq_cb, attotime::from_hz(120))
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_CPU_ADD("maincpu", I8086, 5000000) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9801_map)
@@ -3251,7 +3310,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
 	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
-	MCFG_I8255_ADD( "ppi8255_mouse", ppi_mouse_intf )
+	MCFG_FRAGMENT_ADD(pc9801_mouse)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc9801_upd1990a_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
@@ -3320,7 +3379,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
 	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
-	MCFG_I8255_ADD( "ppi8255_mouse", ppi_mouse_intf )
+	MCFG_FRAGMENT_ADD(pc9801_mouse)
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
@@ -3383,7 +3442,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
 	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
-	MCFG_I8255_ADD( "ppi8255_mouse", ppi_mouse_intf )
+	MCFG_FRAGMENT_ADD(pc9801_mouse)
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
