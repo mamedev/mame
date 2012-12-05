@@ -37,6 +37,7 @@
 	- Microsoft Windows 1.0 MSDOS.SYS error (can be bypassed by loading MS-DOS first)
 
 	List of per-game TODO:
+	- 4D Boxing: tries to format User Disk;
 	- Absolutely Mahjong: Epson splash screen doesn't appear at all, why?
 	- Dragon Buster: has lots of gfx artifacts;
 	- Far Side Moon: doesn't detect neither mouse nor sound board;
@@ -661,7 +662,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				tile &= 0x1fff;
 				kanji_on = 2;
 			}
-			else if(tile == 0x56 && knj_tile)
+			else if((tile == 0x56 || tile == 0x57) && knj_tile)
 			{
 				pcg_sel = 1;
 				tile = knj_tile & 0x7f;
@@ -696,7 +697,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					if(kanji_on)
 						tile_data = (state->m_kanji_rom[tile*0x20+yi*2+(kanji_on & 1)]);
 					else if(pcg_sel)
-						tile_data = (state->m_pcg_ram[0xac000*2+tile*0x40+yi*2+lr+pcg_lr]);
+						tile_data = (state->m_pcg_ram[0xac000*2+tile*0x40+yi*2+pcg_lr]);
 					else
 						tile_data = (state->m_char_rom[tile*char_size+interlace_on*0x800+yi]);
 				}
@@ -1142,7 +1143,10 @@ READ8_MEMBER(pc9801_state::pc9801_a0_r)
 				pcg_offset = m_font_addr << 6;
 				pcg_offset|= m_font_line;
 				pcg_offset|= m_font_lr;
-				return m_pcg_ram[pcg_offset];
+				if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
+					return m_pcg_ram[pcg_offset];
+
+				return machine().rand(); // TODO, kanji ROM
 			}
 		}
 
@@ -1213,7 +1217,8 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 				pcg_offset|= m_font_line;
 				pcg_offset|= m_font_lr;
 				//printf("%04x %02x %02x %08x\n",m_font_addr,m_font_line,m_font_lr,pcg_offset);
-				m_pcg_ram[pcg_offset] = data;
+				if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
+					m_pcg_ram[pcg_offset] = data;
 				return;
 			}
 		}
@@ -1530,12 +1535,16 @@ READ8_MEMBER(pc9801_state::pc9801rs_ipl_r) { return m_ipl_rom[(offset & 0x1ffff)
 /* TODO: having this non-linear makes the system to boot in BASIC for PC-9821. Perhaps it stores settings? How to change these? */
 READ8_MEMBER(pc9801_state::pc9801rs_knjram_r)
 {
-	return m_pcg_ram[((m_font_addr & 0x7f7f) << 4) | m_font_lr | ((offset >> 1) & 0x0f)];
+	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
+		return m_pcg_ram[((m_font_addr & 0x7f7f) << 4) | m_font_lr | ((offset >> 1) & 0x0f)];
+
+	return machine().rand();
 }
 
 WRITE8_MEMBER(pc9801_state::pc9801rs_knjram_w)
 {
-	m_pcg_ram[((m_font_addr & 0x7f7f) << 4) | m_font_lr | ((offset >> 1) & 0x0f)] = data;
+	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
+		m_pcg_ram[((m_font_addr & 0x7f7f) << 4) | m_font_lr | ((offset >> 1) & 0x0f)] = data;
 }
 
 /* FF-based */
@@ -3542,7 +3551,10 @@ ROM_START( pc9801rs )
 	ROM_LOAD( "font_rs.rom", 0x00000, 0x46800, BAD_DUMP CRC(da370e7a) SHA1(584d0c7fde8c7eac1f76dc5e242102261a878c5e) )
 
 	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
-	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
+	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x8000, BAD_DUMP CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) )
+	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x8000, BAD_DUMP CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) )
+	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x10000, 0x8000, BAD_DUMP CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) )
+	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x10001, 0x8000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) )
 ROM_END
 
 /*
