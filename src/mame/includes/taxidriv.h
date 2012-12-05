@@ -51,5 +51,6 @@ public:
 	DECLARE_READ8_MEMBER(p8910_1a_r);
 	DECLARE_WRITE8_MEMBER(p8910_0b_w);
 	DECLARE_WRITE8_MEMBER(taxidriv_spritectrl_w);
+	virtual void palette_init();
 	UINT32 screen_update_taxidriv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
