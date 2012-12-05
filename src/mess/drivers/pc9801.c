@@ -37,7 +37,7 @@
 	- Microsoft Windows 1.0 MSDOS.SYS error (can be bypassed by loading MS-DOS first)
 
 	List of per-game TODO:
-	- Absolutely Mahjong: GRCG doesn't seem to work at all, also Epson splash screen doesn't appear at all;
+	- Absolutely Mahjong: Epson splash screen doesn't appear at all, why?
 	- Dragon Buster: has lots of gfx artifacts;
 	- Far Side Moon: doesn't detect neither mouse nor sound board;
 	- First Queen: has broken text display;
@@ -397,8 +397,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9801_gvram_w);
 	DECLARE_READ8_MEMBER(pc9801_mouse_r);
 	DECLARE_WRITE8_MEMBER(pc9801_mouse_w);
-	DECLARE_READ8_MEMBER(pc9801rs_grcg_r);
-	DECLARE_WRITE8_MEMBER(pc9801rs_grcg_w);
+	inline UINT8 m_pc9801rs_grcg_r(UINT32 offset,int vbank);
+	inline void m_pc9801rs_grcg_w(UINT32 offset,int vbank,UINT8 data);
 	DECLARE_READ8_MEMBER(pc9801_opn_r);
 	DECLARE_WRITE8_MEMBER(pc9801_opn_w);
 	DECLARE_READ8_MEMBER(pc9801rs_wram_r);
@@ -1381,12 +1381,12 @@ inline UINT32 pc9801_state::m_calc_grcg_addr(int i,UINT32 offset)
 	return (offset) + (((i+1)*0x8000) & 0x1ffff) + (m_vram_bank*0x20000);
 }
 
-READ8_MEMBER(pc9801_state::pc9801rs_grcg_r)
+inline UINT8 pc9801_state::m_pc9801rs_grcg_r(UINT32 offset,int vbank)
 {
 	UINT8 res;
 
 	if((m_grcg.mode & 0x80) == 0 || (m_grcg.mode & 0x40))
-		res = m_video_ram_2[offset+0+m_vram_bank*0x20000];
+		res = m_video_ram_2[offset+vbank*0x8000+m_vram_bank*0x20000];
 	else
 	{
 		int i;
@@ -1404,10 +1404,10 @@ READ8_MEMBER(pc9801_state::pc9801rs_grcg_r)
 	return res;
 }
 
-WRITE8_MEMBER(pc9801_state::pc9801rs_grcg_w)
+inline void pc9801_state::m_pc9801rs_grcg_w(UINT32 offset,int vbank,UINT8 data)
 {
 	if((m_grcg.mode & 0x80) == 0)
-		m_video_ram_2[offset+0+m_vram_bank*0x20000] = data;
+		m_video_ram_2[offset+vbank*0x8000+m_vram_bank*0x20000] = data;
 	else
 	{
 		int i;
@@ -1648,8 +1648,10 @@ READ8_MEMBER(pc9801_state::pc9801rs_memory_r)
 	if	   (                        offset <= 0x0009ffff)                   { return pc9801rs_wram_r(space,offset);               }
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { return pc9801_tvram_r(space,offset-0xa0000);        }
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { return pc9801rs_knjram_r(space,offset & 0xfff);     }
-	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { return pc9801_gvram_r(space,offset-0xa8000);        }
-	else if(offset >= 0x000e0000 && offset <= 0x000e7fff)                   { return pc9801rs_grcg_r(space,offset & 0x7fff);      }
+	else if(offset >= 0x000a8000 && offset <= 0x000affff)                   { return m_pc9801rs_grcg_r(offset & 0x7fff,1);        }
+	else if(offset >= 0x000b0000 && offset <= 0x000b7fff)                   { return m_pc9801rs_grcg_r(offset & 0x7fff,2);        }
+	else if(offset >= 0x000b8000 && offset <= 0x000bffff)                   { return m_pc9801rs_grcg_r(offset & 0x7fff,3);        }
+	else if(offset >= 0x000e0000 && offset <= 0x000e7fff)                   { return m_pc9801rs_grcg_r(offset & 0x7fff,0);        }
 	else if(offset >= 0x000e0000 && offset <= 0x000fffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
 	else if(offset >= 0x00100000 && offset <= 0x00100000+m_ram_size-1)		{ return pc9801rs_ex_wram_r(space,offset-0x00100000); }
 	else if(offset >= 0xfffe0000 && offset <= 0xffffffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
@@ -1667,8 +1669,10 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_memory_w)
 	if	   (                        offset <= 0x0009ffff)                   { pc9801rs_wram_w(space,offset,data);                  }
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { pc9801_tvram_w(space,offset-0xa0000,data);           }
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { pc9801rs_knjram_w(space,offset & 0xfff,data);        }
-	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { pc9801_gvram_w(space,offset-0xa8000,data);           }
-	else if(offset >= 0x000e0000 && offset <= 0x000e7fff)                   { pc9801rs_grcg_w(space,offset & 0x7fff,data);        }
+	else if(offset >= 0x000a8000 && offset <= 0x000affff)                   { m_pc9801rs_grcg_w(offset & 0x7fff,1,data);        }
+	else if(offset >= 0x000b0000 && offset <= 0x000b7fff)                   { m_pc9801rs_grcg_w(offset & 0x7fff,2,data);        }
+	else if(offset >= 0x000b8000 && offset <= 0x000bffff)                   { m_pc9801rs_grcg_w(offset & 0x7fff,3,data);        }
+	else if(offset >= 0x000e0000 && offset <= 0x000e7fff)                   { m_pc9801rs_grcg_w(offset & 0x7fff,0,data);        }
 	else if(offset >= 0x00100000 && offset <= 0x00100000+m_ram_size-1)      { pc9801rs_ex_wram_w(space,offset-0x00100000,data);    }
 	//else
 	//  printf("%08x %08x\n",offset,data);
