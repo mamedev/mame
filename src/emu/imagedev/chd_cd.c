@@ -63,7 +63,7 @@ void cdrom_image_device::device_config_complete()
 	format->m_index 	  = 0;
 	format->m_name        = "chdcd";
 	format->m_description = "CD-ROM drive";
-	format->m_extensions  = "chd,cue,toc,nrg,gdi";
+	format->m_extensions  = "chd,cue,toc,nrg,gdi,iso";
 	format->m_optspec     = cd_option_spec;
 	format->m_next		  = NULL;
 
