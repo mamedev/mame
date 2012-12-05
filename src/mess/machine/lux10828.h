@@ -16,11 +16,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "formats/basicdsk.h"
-#include "imagedev/flopdrv.h"
 #include "machine/abcbus.h"
-#include "machine/devhelpr.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "machine/z80pio.h"
 
 
@@ -28,9 +25,6 @@
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LUXOR_55_10828_TAG	"luxor_55_10828"
-
 
 #define ADDRESS_ABC830			45
 #define ADDRESS_ABC832			44
@@ -73,8 +67,8 @@ public:
 	DECLARE_READ8_MEMBER( pio_pb_r );
 	DECLARE_WRITE8_MEMBER( pio_pb_w );
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_intrq_w(bool state);
+	void fdc_drq_w(bool state);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -99,22 +93,20 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
-	required_device<mb8876_device> m_fdc;
-	required_device<legacy_floppy_image_device> m_image0;
-	required_device<legacy_floppy_image_device> m_image1;
+	required_device<mb8876_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_ioport m_sw1;
+	required_ioport m_s1;
 
 	bool m_cs;				// card selected
 	UINT8 m_status;			// ABC BUS status
 	UINT8 m_data;			// ABC BUS data
-	int m_fdc_irq;			// floppy interrupt
-	int m_fdc_drq;			// floppy data request
+	bool m_fdc_irq;			// floppy interrupt
+	bool m_fdc_drq;			// floppy data request
 	int m_wait_enable;		// wait enable
 	int m_sel0;				// drive select 0
 	int m_sel1;				// drive select 1
-
-	UINT8 m_sw1;				// single/double sided/density
-	UINT8 m_drive_type;			// drive type
-	UINT8 m_s1;					// ABC bus address
 };
 
 

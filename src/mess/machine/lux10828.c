@@ -237,7 +237,7 @@ READ8_MEMBER( luxor_55_10828_device::pio_pb_r )
 	UINT8 data = 0x04;
 
 	// single/double sided drive
-	UINT8 sw1 = ioport("SW1")->read() & 0x0f;
+	UINT8 sw1 = m_sw1->read() & 0x0f;
 	int ds0 = m_sel0 ? BIT(sw1, 0) : 1;
 	int ds1 = m_sel1 ? BIT(sw1, 1) : 1;
 	data |= !(ds0 & ds1);
@@ -251,8 +251,8 @@ READ8_MEMBER( luxor_55_10828_device::pio_pb_r )
 	data |= 0x10;
 
 	// head load
-//  data |= wd17xx_hdld_r(device) << 6;
-	data |= 0x40;
+	data |= m_fdc->hld_r() << 6;
+	data |= 0x40; // TODO remove
 
 	// FDC interrupt request
 	data |= m_fdc_irq << 7;
@@ -278,10 +278,10 @@ WRITE8_MEMBER( luxor_55_10828_device::pio_pb_w )
     */
 
 	// double density enable
-	wd17xx_dden_w(m_fdc, BIT(data, 3));
+	m_fdc->dden_w(BIT(data, 3));
 
 	// head load timing
-//  wd17xx_hlt_w(m_fdc, BIT(data, 5));
+	m_fdc->hlt_w(BIT(data, 5));
 }
 
 static Z80PIO_INTERFACE( pio_intf )
@@ -311,20 +311,15 @@ static const z80_daisy_config daisy_chain[] =
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
-static const floppy_interface lux10828_floppy_interface =
-{
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    FLOPPY_STANDARD_5_25_DSDD,
-    LEGACY_FLOPPY_OPTIONS_NAME(default),
-    "floppy_5_25",
-	NULL
-};
+static SLOT_INTERFACE_START( abc_floppies )
+	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD )
+	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
+	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
+SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_intrq_w )
+void luxor_55_10828_device::fdc_intrq_w(bool state)
 {
 	m_fdc_irq = state;
 	m_pio->port_b_write(state << 7);
@@ -332,20 +327,12 @@ WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_intrq_w )
 	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_drq_w )
+void luxor_55_10828_device::fdc_drq_w(bool state)
 {
 	m_fdc_drq = state;
 
 	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 }
-
-static const wd17xx_interface fdc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, luxor_55_10828_device, fdc_intrq_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, luxor_55_10828_device, fdc_drq_w),
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
 
 
 //-------------------------------------------------
@@ -353,16 +340,16 @@ static const wd17xx_interface fdc_intf =
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( luxor_55_10828 )
-	// main CPU
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz/2)
 	MCFG_CPU_PROGRAM_MAP(luxor_55_10828_mem)
 	MCFG_CPU_IO_MAP(luxor_55_10828_io)
 	MCFG_CPU_CONFIG(daisy_chain)
 
-	// devices
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, pio_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(lux10828_floppy_interface)
-	MCFG_FD1791_ADD(FD1791_TAG, fdc_intf)
+	MCFG_FD1791x_ADD(FD1791_TAG, XTAL_4MHz/2)
+
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", abc_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", abc_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -428,8 +415,10 @@ luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, cons
 	  m_maincpu(*this, Z80_TAG),
 	  m_pio(*this, Z80PIO_TAG),
 	  m_fdc(*this, FD1791_TAG),
-	  m_image0(*this, FLOPPY_0),
-	  m_image1(*this, FLOPPY_1),
+	  m_floppy0(*this, FD1791_TAG":0"),
+	  m_floppy1(*this, FD1791_TAG":1"),
+	  m_sw1(*this, "SW1"),
+	  m_s1(*this, "S1"),
 	  m_cs(false),
 	  m_fdc_irq(0),
 	  m_fdc_drq(0),
@@ -488,7 +477,7 @@ void luxor_55_10828_device::device_reset()
 
 void luxor_55_10828_device::abcbus_cs(UINT8 data)
 {
-	UINT8 address = 0x2c | BIT(ioport("S1")->read(), 0);
+	UINT8 address = 0x2c | BIT(m_s1->read(), 0);
 
 	m_cs = (data == address);
 }
@@ -619,27 +608,30 @@ WRITE8_MEMBER( luxor_55_10828_device::ctrl_w )
     */
 
 	// drive selection
-	if (BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
-	if (BIT(data, 1)) wd17xx_set_drive(m_fdc, 1);
-//  if (BIT(data, 2)) wd17xx_set_drive(m_fdc, 2);
 	m_sel0 = BIT(data, 0);
 	m_sel1 = BIT(data, 1);
 
-	// motor enable
-	int moton = BIT(data, 3);
-	floppy_mon_w(m_image0, moton);
-	floppy_mon_w(m_image1, moton);
-	floppy_drive_set_ready_state(m_image0, !moton, 1);
-	floppy_drive_set_ready_state(m_image1, !moton, 1);
+    floppy_image_device *floppy = NULL;
 
-	// side selection
-	//wd17xx_set_side(m_fdc, BIT(data, 4));
+	if (BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) floppy = m_floppy1->get_device();
+
+	m_fdc->set_floppy(floppy);
+
+	if (floppy)
+	{
+		// motor enable
+		floppy->mon_w(BIT(data, 3));
+
+		// side select
+		floppy->ss_w(BIT(data, 4));
+	}
 
 	// wait enable
 	m_wait_enable = BIT(data, 6);
 
 	// FDC master reset
-	wd17xx_mr_w(m_fdc, BIT(data, 7));
+	if (!BIT(data, 7)) m_fdc->reset();
 }
 
 
@@ -664,10 +656,10 @@ WRITE8_MEMBER( luxor_55_10828_device::status_w )
 
     */
 
-	// interrupt
-//  abcbus_int_w(m_bus, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
-
 	m_status = data & 0xfe;
+
+	// interrupt
+    m_bus->int_w(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -677,23 +669,14 @@ WRITE8_MEMBER( luxor_55_10828_device::status_w )
 
 READ8_MEMBER( luxor_55_10828_device::fdc_r )
 {
-	UINT8 data = 0xff;
-
 	if (!m_wait_enable && !m_fdc_irq && !m_fdc_drq)
 	{
-		logerror("WAIT\n");
+		fatalerror("Z80 WAIT not supported by MAME core\n");
+		
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 	}
 
-	switch (offset & 0x03)
-	{
-	case 0: data = wd17xx_status_r(m_fdc, space, 0); break;
-	case 1: data = wd17xx_track_r(m_fdc, space, 0);  break;
-	case 2: data = wd17xx_sector_r(m_fdc, space, 0); break;
-	case 3: data = wd17xx_data_r(m_fdc, space, 0);   break;
-	}
-
-	return data;
+	return m_fdc->gen_r(offset);
 }
 
 
@@ -705,17 +688,12 @@ WRITE8_MEMBER( luxor_55_10828_device::fdc_w )
 {
 	if (!m_wait_enable && !m_fdc_irq && !m_fdc_drq)
 	{
-		logerror("WAIT\n");
+		fatalerror("Z80 WAIT not supported by MAME core\n");
+
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 	}
 
-	switch (offset & 0x03)
-	{
-	case 0: wd17xx_command_w(m_fdc, space, 0, data); break;
-	case 1: wd17xx_track_w(m_fdc, space, 0, data);   break;
-	case 2: wd17xx_sector_w(m_fdc, space, 0, data);  break;
-	case 3: wd17xx_data_w(m_fdc, space, 0, data);    break;
-	}
+	m_fdc->gen_w(offset, data);
 }
 
 

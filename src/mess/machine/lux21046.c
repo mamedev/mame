@@ -74,14 +74,6 @@ Notes:
 
 */
 
-/*
-
-    TODO:
-
-    - 8" floppy is not supported, but there are no dumps available either
-
-*/
-
 #include "lux21046.h"
 
 
@@ -110,9 +102,13 @@ const device_type LUXOR_55_21046 = &device_creator<luxor_55_21046_device>;
 
 ROM_START( luxor_55_21046 )
 	ROM_REGION( 0x4000, Z80_TAG, 0 ) // A13 is always high, thus loading at 0x2000
-	ROM_LOAD_OPTIONAL( "cntr 108.6cd", 0x2000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d) ) // 1986-03-12
-	ROM_LOAD_OPTIONAL( "diab 207.6cd", 0x2000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2) ) // 1987-06-24
-	ROM_LOAD( "cntr 1.07 6490318-07.6cd", 0x0000, 0x4000, CRC(db8c1c0e) SHA1(8bccd5bc72124984de529ee058df779f06d2c1d5) ) // 1985-07-03
+	ROM_DEFAULT_BIOS( "v107" )
+    ROM_SYSTEM_BIOS( 0, "v107", "Luxor v1.07 (1985-07-03)" )
+	ROMX_LOAD( "cntr 1.07 6490318-07.6cd", 0x0000, 0x4000, CRC(db8c1c0e) SHA1(8bccd5bc72124984de529ee058df779f06d2c1d5), ROM_BIOS(1) )
+    ROM_SYSTEM_BIOS( 1, "v108", "Luxor v1.08 (1986-03-12)" )
+	ROMX_LOAD( "cntr 108.6cd", 0x2000, 0x2000, CRC(229764cb) SHA1(a2e2f6f49c31b827efc62f894de9a770b65d109d), ROM_BIOS(2) )
+    ROM_SYSTEM_BIOS( 2, "v207", "DiAB v2.07 (1987-06-24)" )
+	ROMX_LOAD( "diab 207.6cd", 0x2000, 0x2000, CRC(86622f52) SHA1(61ad271de53152c1640c0b364fce46d1b0b4c7e2), ROM_BIOS(3) )
 ROM_END
 
 
@@ -150,8 +146,8 @@ static ADDRESS_MAP_START( luxor_55_21046_io, AS_IO, 8, luxor_55_21046_device )
 	AM_RANGE(0x30, 0x30) AM_MIRROR(0xff0f) AM_WRITE(_9b_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0xff0f) AM_WRITE(_8a_w)
 	AM_RANGE(0x50, 0x50) AM_MIRROR(0xff0f) AM_MASK(0xff00) AM_READ(_9a_r)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff0c) AM_DEVREAD_LEGACY(SAB1793_TAG, wd17xx_r)
-	AM_RANGE(0x70, 0x73) AM_MIRROR(0xff0c) AM_DEVWRITE_LEGACY(SAB1793_TAG, wd17xx_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff0c) AM_DEVREAD(SAB1793_TAG, fd1793_t, read)
+	AM_RANGE(0x70, 0x73) AM_MIRROR(0xff0c) AM_DEVWRITE(SAB1793_TAG, fd1793_t, write)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff0f) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
 ADDRESS_MAP_END
 
@@ -242,34 +238,26 @@ static Z80DMA_INTERFACE( dma_intf )
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
-static const floppy_interface lux21046_floppy_interface =
-{
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    FLOPPY_STANDARD_5_25_DSDD,
-    LEGACY_FLOPPY_OPTIONS_NAME(default),
-    "floppy_5_25",
-	NULL
-};
+static SLOT_INTERFACE_START( abc_floppies )
+	SLOT_INTERFACE( "525sssd", FLOPPY_525_SSSD )
+	SLOT_INTERFACE( "525sd", FLOPPY_525_SD )
+	SLOT_INTERFACE( "525ssdd", FLOPPY_525_SSDD )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
+SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER( luxor_55_21046_device::fdc_intrq_w )
+void luxor_55_21046_device::fdc_intrq_w(bool state)
 {
 	m_fdc_irq = state;
 
 	// FDC and DMA interrupts are wire-ORed to the Z80
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_fdc_irq | m_dma_irq);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_fdc_irq || m_dma_irq);
 }
 
-static const wd17xx_interface fdc_intf =
+void luxor_55_21046_device::fdc_drq_w(bool state)
 {
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, luxor_55_21046_device, fdc_intrq_w),
-	DEVCB_DEVICE_LINE(Z80DMA_TAG, z80dma_rdy_w),
-	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
-};
+	m_dma->rdy_w(state);
+}
 
 
 //-------------------------------------------------
@@ -277,15 +265,15 @@ static const wd17xx_interface fdc_intf =
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( luxor_55_21046 )
-	// main CPU
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(luxor_55_21046_mem)
 	MCFG_CPU_IO_MAP(luxor_55_21046_io)
 
-	// devices
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(lux21046_floppy_interface)
-	MCFG_FD1793_ADD(SAB1793_TAG, fdc_intf)
+	MCFG_FD1793x_ADD(SAB1793_TAG, XTAL_16MHz/16)
+
+	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -396,8 +384,12 @@ luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, cons
 	  m_maincpu(*this, Z80_TAG),
 	  m_dma(*this, Z80DMA_TAG),
 	  m_fdc(*this, SAB1793_TAG),
-	  m_image0(*this, FLOPPY_0),
-	  m_image1(*this, FLOPPY_1),
+	  m_floppy0(*this, SAB1793_TAG":0"),
+	  m_floppy1(*this, SAB1793_TAG":1"),
+	  m_floppy(NULL),
+	  m_sw1(*this, "SW1"),
+	  m_sw2(*this, "SW2"),
+	  m_sw3(*this, "SW3"),
 	  m_cs(false),
 	  m_fdc_irq(0),
 	  m_dma_irq(0),
@@ -438,11 +430,6 @@ void luxor_55_21046_device::device_start()
 void luxor_55_21046_device::device_reset()
 {
 	m_cs = false;
-
-	floppy_mon_w(m_image0, ASSERT_LINE);
-	floppy_mon_w(m_image1, ASSERT_LINE);
-	floppy_drive_set_ready_state(m_image0, 1, 1);
-	floppy_drive_set_ready_state(m_image1, 1, 1);
 }
 
 
@@ -457,7 +444,7 @@ void luxor_55_21046_device::device_reset()
 
 void luxor_55_21046_device::abcbus_cs(UINT8 data)
 {
-	m_cs = (data == ioport("SW3")->read());
+	m_cs = (data == m_sw3->read());
 }
 
 
@@ -639,19 +626,21 @@ WRITE8_MEMBER( luxor_55_21046_device::_9b_w )
     */
 
 	// drive select
-	if (BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
-	if (BIT(data, 1)) wd17xx_set_drive(m_fdc, 1);
-	//if (BIT(data, 2)) wd17xx_set_drive(m_fdc, 2);
+    m_floppy = NULL;
 
-	// motor enable
-	int mtron = BIT(data, 3);
-	floppy_mon_w(m_image0, !mtron);
-	floppy_mon_w(m_image1, !mtron);
-	floppy_drive_set_ready_state(m_image0, mtron, 1);
-	floppy_drive_set_ready_state(m_image1, mtron, 1);
+	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();
 
-	// side select
-	wd17xx_set_side(m_fdc, BIT(data, 5));
+	m_fdc->set_floppy(m_floppy);
+
+	if (m_floppy)
+	{
+		// motor enable
+		m_floppy->mon_w(!BIT(data, 3));
+
+		// side select
+		m_floppy->ss_w(BIT(data, 5));
+	}
 }
 
 
@@ -679,10 +668,10 @@ WRITE8_MEMBER( luxor_55_21046_device::_8a_w )
     */
 
 	// FDC master reset
-	wd17xx_mr_w(m_fdc, BIT(data, 0));
+	if (!BIT(data, 0)) m_fdc->reset();
 
 	// density select
-	wd17xx_dden_w(m_fdc, BIT(data, 1));
+	m_fdc->dden_w(BIT(data, 1));
 }
 
 
@@ -699,7 +688,7 @@ READ8_MEMBER( luxor_55_21046_device::_9a_r )
         0       busy        controller busy
         1       _FD2S       double-sided disk
         2       SW2
-        3       _DCG ?      disk changed
+        3       _DCG        disk changed
         4       SW1-1
         5       SW1-2
         6       SW1-3
@@ -712,13 +701,12 @@ READ8_MEMBER( luxor_55_21046_device::_9a_r )
 	// busy
 	data |= m_busy;
 
-	// SW1
-	UINT8 sw1 = ioport("SW1")->read() & 0x0f;
-
-	data |= sw1 << 4;
+	// floppy
+	data |= (m_floppy ? m_floppy->twosid_r() : 1) << 1;
+	data |= (m_floppy ? m_floppy->dskchg_r() : 1) << 3;
 
 	// SW2
-	UINT8 sw2 = ioport("SW2")->read() & 0x0f;
+	UINT8 sw2 = m_sw2->read() & 0x0f;
 
 	// TTL inputs float high so DIP switch in off position equals 1
 	int sw2_1 = BIT(sw2, 0) ? 1 : BIT(offset, 8);
@@ -728,6 +716,9 @@ READ8_MEMBER( luxor_55_21046_device::_9a_r )
 	int sw2_data = !(sw2_1 & sw2_2 & !(sw2_3 ^ sw2_4));
 
 	data |= sw2_data << 2;
+
+	// SW1
+	data |= (m_sw1->read() & 0x0f) << 4;
 
 	return data ^ 0xff;
 }

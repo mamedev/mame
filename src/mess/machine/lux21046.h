@@ -16,11 +16,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "formats/basicdsk.h"
-#include "imagedev/flopdrv.h"
 #include "machine/abcbus.h"
-#include "machine/devhelpr.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "machine/z80dma.h"
 
 
@@ -28,9 +25,6 @@
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LUXOR_55_21046_TAG		"luxor_55_21046"
-
 
 #define ADDRESS_ABC832			44
 #define ADDRESS_ABC830			45
@@ -74,8 +68,11 @@ public:
 	DECLARE_WRITE8_MEMBER( _9b_w );
 	DECLARE_WRITE8_MEMBER( _8a_w );
 	DECLARE_READ8_MEMBER( _9a_r );
+
 	DECLARE_WRITE_LINE_MEMBER( dma_int_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+
+	void fdc_intrq_w(bool state);
+	void fdc_drq_w(bool state);
 
 protected:
     // device-level overrides
@@ -95,15 +92,19 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dma_device> m_dma;
-	required_device<fd1793_device> m_fdc;
-	required_device<legacy_floppy_image_device> m_image0;
-	required_device<legacy_floppy_image_device> m_image1;
+	required_device<fd1793_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	floppy_image_device *m_floppy;
+	required_ioport m_sw1;
+	required_ioport m_sw2;
+	required_ioport m_sw3;
 
 	bool m_cs;					// card selected
 	UINT8 m_status;				// ABC BUS status
 	UINT8 m_data_in;			// ABC BUS data in
 	UINT8 m_data_out;			// ABC BUS data out
-	int m_fdc_irq;				// FDC interrupt
+	bool m_fdc_irq;				// FDC interrupt
 	int m_dma_irq;				// DMA interrupt
 	int m_busy;					// busy bit
 	int m_force_busy;			// force busy bit
