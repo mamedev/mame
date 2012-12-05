@@ -221,16 +221,20 @@ WRITE8_MEMBER( trs80m2_state::drvslt_w )
     */
 
 	// drive select
-	if (!BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
-	if (!BIT(data, 1)) wd17xx_set_drive(m_fdc, 1);
-	if (!BIT(data, 2)) wd17xx_set_drive(m_fdc, 2);
-	if (!BIT(data, 3)) wd17xx_set_drive(m_fdc, 3);
+	m_floppy = NULL;
+
+	if (!BIT(data, 0)) m_floppy = m_floppy0->get_device();
+	if (!BIT(data, 1)) m_floppy = m_floppy1->get_device();
+	if (!BIT(data, 2)) m_floppy = m_floppy2->get_device();
+	if (!BIT(data, 3)) m_floppy = m_floppy3->get_device();
+
+	m_fdc->set_floppy(m_floppy);
 
 	// side select
-	wd17xx_set_side(m_fdc, !BIT(data, 6));
+	if (m_floppy) m_floppy->ss_w(!BIT(data, 6));
 
 	// FM/MFM
-	wd17xx_dden_w(m_fdc, BIT(data, 7));
+	m_fdc->dden_w(BIT(data, 7));
 }
 
 READ8_MEMBER( trs80m2_state::keyboard_r )
@@ -332,12 +336,12 @@ WRITE8_MEMBER( trs80m2_state::nmi_w )
 
 READ8_MEMBER( trs80m2_state::fdc_r )
 {
-	return wd17xx_r(m_fdc, space, offset) ^ 0xff;
+	return m_fdc->gen_r(offset) ^ 0xff;
 }
 
 WRITE8_MEMBER( trs80m2_state::fdc_w )
 {
-	wd17xx_w(m_fdc, space, offset, data ^ 0xff);
+	m_fdc->gen_w(offset, data ^ 0xff);
 }
 
 WRITE8_MEMBER( trs80m16_state::tcl_w )
@@ -730,13 +734,13 @@ READ8_MEMBER( trs80m2_state::pio_pa_r )
 	UINT8 data = 0;
 
 	// floppy interrupt
-	data |= wd17xx_intrq_r(m_fdc);
+	data |= m_fdc->intrq_r();
 
 	// 2-sided diskette
-	data |= floppy_twosid_r(m_floppy) << 1;
+	data |= (m_floppy ? m_floppy->twosid_r() : 1) << 1;
 
 	// disk change
-	data |= floppy_dskchg_r(m_floppy) << 2;
+	data |= (m_floppy ? m_floppy->dskchg_r() : 1) << 2;
 
 	// printer fault
 	data |= m_centronics->fault_r() << 4;
@@ -855,31 +859,20 @@ static Z80CTC_INTERFACE( ctc_intf )
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
-static const floppy_interface trs80m2_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_8_DSDD, // Shugart SA-800
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_8",
-	NULL
-};
+static SLOT_INTERFACE_START( trs80m2_floppies )
+	SLOT_INTERFACE( "8ssdd", FLOPPY_8_SSDD ) // Shugart SA-800
+	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD ) // Shugart SA-850
+SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER( trs80m2_state::fdc_intrq_w )
+void trs80m2_state::fdc_intrq_w(bool state)
 {
 	m_pio->port_a_write(state);
 }
 
-static const wd17xx_interface fdc_intf =
+void trs80m2_state::fdc_drq_w(bool state)
 {
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(trs80m2_state, fdc_intrq_w),
-	DEVCB_DEVICE_LINE(Z80DMA_TAG, z80dma_rdy_w),
-	{ FLOPPY_0, NULL, NULL, NULL }
-};
+	m_dmac->rdy_w(state);
+}
 
 
 //-------------------------------------------------
@@ -926,8 +919,9 @@ static const struct pic8259_interface pic_intf =
 
 void trs80m2_state::machine_start()
 {
-	// Shugart SA-800 motor spins constantly
-	floppy_mon_w(m_floppy, CLEAR_LINE);
+	// floppy callbacks
+	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(trs80m2_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(trs80m2_state::fdc_drq_w), this));
 
 	// register for state saving
 	save_item(NAME(m_boot_rom));
@@ -1009,14 +1003,17 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_12_48MHz/8, mc6845_intf)
 
 	// devices
-	MCFG_FD1791_ADD(FD1791_TAG, fdc_intf)
+	MCFG_FD1791x_ADD(FD1791_TAG, XTAL_8MHz/8)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, trs80m2_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8dsdd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
 	MCFG_TRS80M2_KEYBOARD_ADD(kb_intf)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", trs80m2_state, trs80m2_keyboard_tick, attotime::from_hz(60))
@@ -1057,14 +1054,17 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, XTAL_12_48MHz/8, mc6845_intf)
 
 	// devices
-	MCFG_FD1791_ADD(FD1791_TAG, fdc_intf)
+	MCFG_FD1791x_ADD(FD1791_TAG, XTAL_8MHz/8)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", trs80m2_state, ctc_tick, attotime::from_hz(XTAL_8MHz/2/2))
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, trs80m2_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", trs80m2_floppies, "8ssdd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", trs80m2_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":2", trs80m2_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":3", trs80m2_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
 	MCFG_PIC8259_ADD(AM9519A_TAG, pic_intf)
 	MCFG_TRS80M2_KEYBOARD_ADD(kb_intf)
 
@@ -1084,23 +1084,6 @@ MACHINE_CONFIG_END
 //**************************************************************************
 //  ROMS
 //**************************************************************************
-
-//-------------------------------------------------
-//  ROM( trs80m2 )
-//-------------------------------------------------
-
-ROM_START( trs80m2 )
-	ROM_REGION( 0x800, Z80_TAG, 0 )
-	ROM_LOAD( "8043216.u11", 0x0000, 0x0800, CRC(7017a373) SHA1(1c7127fcc99fc351a40d3a3199ba478e783c452e) )
-
-	ROM_REGION( 0x800, MC6845_TAG, 0 )
-	ROM_LOAD( "8043316.u9", 0x0000, 0x0800, CRC(04425b03) SHA1(32a29dc202b7fcf21838289cc3bffc51ef943dab) )
-ROM_END
-
-
-//-------------------------------------------------
-//  ROM( trs80m16 )
-//-------------------------------------------------
 
 /*
 
@@ -1135,22 +1118,36 @@ ROM_END
 
 */
 
-ROM_START( trs80m16 )
+//-------------------------------------------------
+//  ROM( trs80m2 )
+//-------------------------------------------------
+
+ROM_START( trs80m2 )
 	ROM_REGION( 0x800, Z80_TAG, 0 )
-	ROM_SYSTEM_BIOS( 0, "v1", "Version 1 (S/N 120353)" )
-	ROMX_LOAD( "cpu_c8ff.u11", 0x0000, 0x0800, CRC(7017a373) SHA1(1c7127fcc99fc351a40d3a3199ba478e783c452e), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "v2", "Version 2 (S/N 187173)" )
-	ROMX_LOAD( "cpu_2bff.u11", 0x0000, 0x0800, CRC(c6c71d8b) SHA1(7107e2cbbe769851a4460680c2deff8e76a101b5), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "v3", "Version 3 (S/N 64014509)" )
+	ROM_DEFAULT_BIOS( "9733" )
+	ROM_SYSTEM_BIOS( 0, "c8ff", "Version 1" )
+	ROMX_LOAD( "8043216.u11", 0x0000, 0x0800, CRC(7017a373) SHA1(1c7127fcc99fc351a40d3a3199ba478e783c452e), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "2bff", "Version 2 (1981-07-29)" )
+	ROMX_LOAD( "8047316.u11", 0x0000, 0x0800, CRC(c6c71d8b) SHA1(7107e2cbbe769851a4460680c2deff8e76a101b5), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "2119", "Version 3 (1982-05-07)" )
 	ROMX_LOAD( "cpu_2119.u11", 0x0000, 0x0800, CRC(7a663049) SHA1(f308439ce266df717bfe79adcdad6024b4faa141), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS( 3, "v4", "Version 4 (S/N ?)" )
-	ROMX_LOAD( "cpu_fc86.u11", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(4) )
-	ROM_SYSTEM_BIOS( 4, "v5", "Version 5 (S/N 161993)" )
-	ROMX_LOAD( "cpu_9733.u11", 0x0000, 0x0800, CRC(823924b1) SHA1(aee0625bcbd8620b28ab705e15ad9bea804c8476), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS( 3, "1bbe", "Version 3 (1982-05-07, Alt)" )
+	ROMX_LOAD( "cpu_11be.u11", 0x0000, 0x0800, CRC(8edceea7) SHA1(3d797acedd8a71a82c695129ca764f85aa9022b2), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 4, "fc86", "Version 4 (1982-11-18)" )
+	ROMX_LOAD( "cpu_fc86.u11", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS( 5, "9733", "Version 5 (1983-07-29)" )
+	ROMX_LOAD( "u54.u11", 0x0000, 0x0800, CRC(823924b1) SHA1(aee0625bcbd8620b28ab705e15ad9bea804c8476), ROM_BIOS(6) )
 
 	ROM_REGION( 0x800, MC6845_TAG, 0 )
 	ROM_LOAD( "8043316.u9", 0x0000, 0x0800, CRC(04425b03) SHA1(32a29dc202b7fcf21838289cc3bffc51ef943dab) )
 ROM_END
+
+
+//-------------------------------------------------
+//  ROM( trs80m16 )
+//-------------------------------------------------
+
+#define rom_trs80m16 rom_trs80m2
 
 
 

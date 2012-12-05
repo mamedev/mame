@@ -14,7 +14,7 @@
 #include "machine/pic8259.h"
 #include "machine/ram.h"
 #include "machine/trs80m2kb.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dma.h"
 #include "machine/z80pio.h"
@@ -40,22 +40,32 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, Z80_TAG),
 		  m_ctc(*this, Z80CTC_TAG),
+		  m_dmac(*this, Z80DMA_TAG),
 		  m_pio(*this, Z80PIO_TAG),
 		  m_crtc(*this, MC6845_TAG),
 		  m_fdc(*this, FD1791_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
-		  m_floppy(*this, FLOPPY_0),
+		  m_floppy0(*this, FD1791_TAG":0"),
+		  m_floppy1(*this, FD1791_TAG":1"),
+		  m_floppy2(*this, FD1791_TAG":2"),
+		  m_floppy3(*this, FD1791_TAG":3"),
+		  m_floppy(NULL),
 		  m_ram(*this, RAM_TAG),
 		  m_kb(*this, TRS80M2_KEYBOARD_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<z80ctc_device>m_ctc;
+	required_device<z80ctc_device> m_ctc;
+	required_device<z80dma_device> m_dmac;
 	required_device<z80pio_device> m_pio;
 	required_device<mc6845_device> m_crtc;
-	required_device<fd1791_device> m_fdc;
+	required_device<fd1791_t> m_fdc;
 	required_device<centronics_device> m_centronics;
-	required_device<legacy_floppy_image_device> m_floppy;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+	floppy_image_device *m_floppy;
 	required_device<ram_device> m_ram;
 	required_device<trs80m2_keyboard_device> m_kb;
 
@@ -84,7 +94,8 @@ public:
 	DECLARE_READ8_MEMBER( pio_pa_r );
 	DECLARE_WRITE8_MEMBER( pio_pa_w );
 	DECLARE_WRITE_LINE_MEMBER( strobe_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
+	void fdc_intrq_w(bool state);
+	void fdc_drq_w(bool state);
 	DECLARE_WRITE_LINE_MEMBER( kb_clock_w );
 
 	void scan_keyboard();
