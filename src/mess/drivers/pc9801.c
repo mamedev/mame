@@ -912,6 +912,7 @@ READ8_MEMBER(pc9801_state::pc9801_40_r)
 				UINT8 res;
 
 				res = m_keyb_press;
+				pic8259_ir1_w(machine().device("pic8259_master"), 0);
 
 				return res;
 			}
@@ -2281,8 +2282,8 @@ INPUT_CHANGED_MEMBER(pc9801_state::key_stroke)
 
 	if(oldval && !newval)
 	{
-		m_keyb_press = 0;
-		pic8259_ir1_w(machine().device("pic8259_master"), 0);
+		m_keyb_press = ((UINT8)(FPTR)(param) & 0x7f) | 0x80;
+		pic8259_ir1_w(machine().device("pic8259_master"), 1);
 	}
 }
 
@@ -2297,8 +2298,8 @@ INPUT_CHANGED_MEMBER(pc9801_state::shift_stroke)
 	}
 	else
 	{
-		m_keyb_press = 0;
-		pic8259_ir1_w(machine().device("pic8259_master"), 0);
+		m_keyb_press = ((UINT8)(FPTR)(param) & 0x7f) | 0x80;
+		pic8259_ir1_w(machine().device("pic8259_master"), 1);
 	}
 }
 
