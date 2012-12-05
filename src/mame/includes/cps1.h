@@ -139,6 +139,14 @@ public:
 	int          m_stars_rom_size;
 	UINT8        m_empty_tile[32*32];
 	int          m_cps_version;
+	
+	/* fcrash video config */
+	UINT8        m_layer_enable_reg;
+	UINT8        m_layer_mask_reg[4];
+	int          m_layer_scroll1x_offset;
+	int          m_layer_scroll2x_offset;
+	int          m_layer_scroll3x_offset;
+	int          m_sprite_base;
 
 	/* devices */
 	cpu_device *m_maincpu;
@@ -207,19 +215,24 @@ public:
 	DECLARE_MACHINE_START(common);
 	DECLARE_MACHINE_START(cps2);
 	DECLARE_VIDEO_START(cps2);
-	DECLARE_MACHINE_START(fcrash);
-	DECLARE_MACHINE_RESET(fcrash);
-	DECLARE_MACHINE_START(kodb);
 	DECLARE_MACHINE_START(qsound);
 	DECLARE_MACHINE_RESET(cps);
 	DECLARE_VIDEO_START(cps);
 	UINT32 screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_kodb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_cps1(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(cps1_interrupt);
 	INTERRUPT_GEN_MEMBER(cps1_qsound_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
+	
+	/* fcrash handlers */
+	DECLARE_DRIVER_INIT(cawingbl);
+	DECLARE_MACHINE_START(fcrash);
+	DECLARE_MACHINE_RESET(fcrash);
+	DECLARE_MACHINE_START(kodb);
+	DECLARE_MACHINE_START(cawingbl);
+	DECLARE_WRITE16_MEMBER(cawingbl_soundlatch_w);
+	UINT32 screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_kodb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in drivers/cps1.c -----------*/

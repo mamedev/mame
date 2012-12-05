@@ -51,6 +51,17 @@ static WRITE16_HANDLER( fcrash_soundlatch_w )
 	}
 }
 
+WRITE16_MEMBER(cps_state::cawingbl_soundlatch_w)
+{
+	cps_state *state = space.machine().driver_data<cps_state>();
+
+	if (ACCESSING_BITS_8_15)
+	{
+		state->soundlatch_byte_w(space, 0, data  >> 8);
+		state->m_audiocpu->set_input_line(0, HOLD_LINE);
+	}
+}
+
 static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 {
 	cps_state *state = space.machine().driver_data<cps_state>();
@@ -103,20 +114,14 @@ static void fcrash_update_transmasks( running_machine &machine )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 	int i;
-	int priority[4];
-
-	priority[0] = 0x26;
-	priority[1] = 0x30;
-	priority[2] = 0x28;
-	priority[3] = 0x32;
 
 	for (i = 0; i < 4; i++)
 	{
 		int mask;
 
 		/* Get transparency registers */
-		if (priority[i])
-			mask = state->m_cps_b_regs[priority[i] / 2] ^ 0xffff;
+		if (state->m_layer_mask_reg[i])
+			mask = state->m_cps_b_regs[state->m_layer_mask_reg[i] / 2] ^ 0xffff;
 		else
 			mask = 0xffff;	/* completely transparent if priority masks not defined (mercs, qad) */
 
@@ -130,14 +135,23 @@ static void fcrash_render_sprites( running_machine &machine, bitmap_ind16 &bitma
 {
 	cps_state *state = machine.driver_data<cps_state>();
 	int pos;
-	int base = 0x50c8 / 2;
+	int base = state->m_sprite_base / 2;
+	int num_sprites = machine.gfx[2]->elements();
 
 	// sprite base registers need hooking up properly.. on fcrash it is NOT cps1_cps_a_regs[0]
 	//  on kodb, it might still be, unless that's just a leftover and it writes somewhere else too
 //  if (state->m_cps_a_regs[0] & 0x00ff) base = 0x10c8/2;
 //  printf("cps1_cps_a_regs %04x\n", state->m_cps_a_regs[0]);
 
+	/* get end of sprite list marker */
+	int last_sprite_offset = 0x1ffc;
+	
 	for (pos = 0x1ffc; pos >= 0x0000; pos -= 4)
+	{
+		if (state->m_gfxram[base + pos - 1] == 0x8000) last_sprite_offset = pos;
+	}
+
+	for (pos = last_sprite_offset; pos >= 0x0000; pos -= 4)
 	{
 		int tileno;
 		int xpos;
@@ -145,14 +159,15 @@ static void fcrash_render_sprites( running_machine &machine, bitmap_ind16 &bitma
 		int flipx, flipy;
 		int colour;
 
-		tileno = state->m_gfxram[base +pos];
-		xpos   = state->m_gfxram[base +pos + 2];
-		ypos   = state->m_gfxram[base +pos - 1] & 0xff;
-		flipx  = state->m_gfxram[base +pos + 1] & 0x20;
-		flipy  = state->m_gfxram[base +pos + 1] & 0x40;
-		colour = state->m_gfxram[base +pos + 1] & 0x1f;
-		ypos = 256 - ypos;
-
+		tileno = state->m_gfxram[base + pos];
+		if (tileno >= num_sprites) continue; /* don't render anything outside our tiles */
+		xpos   = state->m_gfxram[base + pos + 2] & 0x1ff;
+		ypos   = state->m_gfxram[base + pos - 1] & 0x1ff;
+		flipx  = state->m_gfxram[base + pos + 1] & 0x20;
+		flipy  = state->m_gfxram[base + pos + 1] & 0x40;
+		colour = state->m_gfxram[base + pos + 1] & 0x1f;
+		ypos   = 256 - ypos;
+		
 		pdrawgfx_transpen(bitmap, cliprect, machine.gfx[2], tileno, colour, flipx, flipy, xpos + 49, ypos - 16, machine.priority_bitmap, 0x02, 15);
 
 	}
@@ -198,10 +213,13 @@ static void fcrash_build_palette( running_machine &machine )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 	int offset;
-
+	
+	// all the bootlegs seem to write the palette offset as usual
+	int palettebase = (state->m_cps_a_regs[0x0a / 2] << 8) & 0x1ffff;
+	
 	for (offset = 0; offset < 32 * 6 * 16; offset++)
 	{
-		int palette = state->m_gfxram[0x14000 / 2 + offset];
+		int palette = state->m_gfxram[palettebase / 2 + offset];
 		int r, g, b, bright;
 
 		// from my understanding of the schematics, when the 'brightness'
@@ -225,7 +243,7 @@ UINT32 cps_state::screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitm
 
 	flip_screen_set(videocontrol & 0x8000);
 
-	layercontrol = m_cps_b_regs[0x20 / 2];
+	layercontrol = m_cps_b_regs[m_layer_enable_reg / 2];
 
 	/* Get video memory base registers */
 	cps1_get_video_base(machine());
@@ -235,7 +253,7 @@ UINT32 cps_state::screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitm
 
 	fcrash_update_transmasks(machine());
 
-	m_bg_tilemap[0]->set_scrollx(0, m_scroll1x - 62);
+	m_bg_tilemap[0]->set_scrollx(0, m_scroll1x - m_layer_scroll1x_offset);
 	m_bg_tilemap[0]->set_scrolly(0, m_scroll1y);
 
 	if (videocontrol & 0x01)	/* linescroll enable */
@@ -254,10 +272,10 @@ UINT32 cps_state::screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitm
 	else
 	{
 		m_bg_tilemap[1]->set_scroll_rows(1);
-		m_bg_tilemap[1]->set_scrollx(0, m_scroll2x - 60);
+		m_bg_tilemap[1]->set_scrollx(0, m_scroll2x - m_layer_scroll2x_offset);
 	}
 	m_bg_tilemap[1]->set_scrolly(0, m_scroll2y);
-	m_bg_tilemap[2]->set_scrollx(0, m_scroll3x - 64);
+	m_bg_tilemap[2]->set_scrollx(0, m_scroll3x - m_layer_scroll3x_offset);
 	m_bg_tilemap[2]->set_scrolly(0, m_scroll3y);
 
 
@@ -580,6 +598,84 @@ static INPUT_PORTS_START( fcrash )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cawingbl )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSWA")
+	CPS1_COINAGE_1
+	PORT_DIPNAME( 0x40, 0x40, "2 Coins to Start, 1 to Continue" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )							// Overrides all other coinage settings
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )							// according to manual
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )						// This switch is not documented
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x07, 0x04, "Difficulty Level (Enemy's Strength)" )	PORT_DIPLOCATION("SW(B):1,2,3")
+	PORT_DIPSETTING(    0x07, "1 (Easiest)" )
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPSETTING(    0x05, "3" )
+	PORT_DIPSETTING(    0x04, "4 (Normal)" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPSETTING(    0x02, "6" )
+	PORT_DIPSETTING(    0x01, "7" )
+	PORT_DIPSETTING(    0x00, "8 (Hardest)" )
+	PORT_DIPNAME( 0x18, 0x18, "Difficulty Level (Player's Strength)" )	PORT_DIPLOCATION("SW(B):4,5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW(B):6" )						// This switch is not documented
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW(B):7" )						// This switch is not documented
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW(B):8" )						// This switch is not documented
+
+	PORT_START("DSWC")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW(C):1" )						// This switch is not documented
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW(C):2" )						// This switch is not documented
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )					PORT_DIPLOCATION("SW(C):3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Freeze" )								PORT_DIPLOCATION("SW(C):4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )					PORT_DIPLOCATION("SW(C):5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )					PORT_DIPLOCATION("SW(C):6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )				PORT_DIPLOCATION("SW(C):7")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, "Game Mode")								PORT_DIPLOCATION("SW(C):8")
+	PORT_DIPSETTING(    0x80, "Game" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( kodb )
 	PORT_START("IN0")
@@ -698,11 +794,36 @@ MACHINE_START_MEMBER(cps_state,fcrash)
 	m_audiocpu = machine().device<cpu_device>("soundcpu");
 	m_msm_1 = machine().device<msm5205_device>("msm1");
 	m_msm_2 = machine().device<msm5205_device>("msm2");
+	
+	m_layer_enable_reg = 0x20;
+	m_layer_mask_reg[0] = 0x26;
+	m_layer_mask_reg[1] = 0x30;
+	m_layer_mask_reg[2] = 0x28;
+	m_layer_mask_reg[3] = 0x32;
+	m_layer_scroll1x_offset = 62;
+	m_layer_scroll2x_offset = 60;
+	m_layer_scroll3x_offset = 64;
+	m_sprite_base = 0x50c8;
 
 	save_item(NAME(m_sample_buffer1));
 	save_item(NAME(m_sample_buffer2));
 	save_item(NAME(m_sample_select1));
 	save_item(NAME(m_sample_select2));
+}
+
+MACHINE_START_MEMBER(cps_state, cawingbl)
+{
+	MACHINE_START_CALL_MEMBER(fcrash);
+	
+	m_layer_enable_reg = 0x0c;
+	m_layer_mask_reg[0] = 0x0a;
+	m_layer_mask_reg[1] = 0x08;
+	m_layer_mask_reg[2] = 0x06;
+	m_layer_mask_reg[3] = 0x04;
+	m_layer_scroll1x_offset = 63;
+	m_layer_scroll2x_offset = 62;
+	m_layer_scroll3x_offset = 65;
+	m_sprite_base = 0x1000;
 }
 
 MACHINE_START_MEMBER(cps_state,kodb)
@@ -770,6 +891,14 @@ static MACHINE_CONFIG_START( fcrash, cps_state )
 	MCFG_SOUND_ADD("msm2", MSM5205, 24000000/64)	/* ? */
 	MCFG_SOUND_CONFIG(msm5205_interface2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( cawingbl, fcrash )
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  irq6_line_hold) /* needed to write to scroll values */
+	
+	MCFG_MACHINE_START_OVERRIDE(cps_state, cawingbl)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( kodb, cps_state )
@@ -909,20 +1038,55 @@ ROM_START( kodb )
 	ROM_LOAD( "2.ic19",      0x00000, 0x40000, CRC(a2db1575) SHA1(1a4a29e4b045af50700adf1665697feab12cc234) )
 ROM_END
 
+
 ROM_START( cawingbl )
 	ROM_REGION( 0x400000, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "caw2.bin",    0x00000, 0x80000, CRC(8125d3f0) SHA1(a0e48c326c6164ca189c9372f5c38a7c103772c1) )
 	ROM_LOAD16_BYTE( "caw1.bin",    0x00001, 0x80000, CRC(b19b10ce) SHA1(3c71f1dc830d1e8b8ba26d8a71e12f477659480c) )
 
 	ROM_REGION( 0x200000, "gfx", 0 )
-	ROMX_LOAD( "caw4.bin", 0x000000, 0x80000, CRC(4937fc41) SHA1(dac179715be483a521df8e515afc1fb7a2cd8f13) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "caw5.bin", 0x000002, 0x80000, CRC(30dd78db) SHA1(e0295001d6f5fb4a9276c432f971e88f73c5e39a) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "caw6.bin", 0x000004, 0x80000, CRC(61192f7c) SHA1(86643c62653a62a5c7541d50cfdecae9b607440d) , ROM_GROUPWORD | ROM_SKIP(6) )
-	ROMX_LOAD( "caw7.bin", 0x000006, 0x80000, CRC(a045c689) SHA1(8946c55635121282ea03586a278e50de20d92633) , ROM_GROUPWORD | ROM_SKIP(6) )
-
+	ROMX_LOAD( "caw7.bin", 0x000000, 0x80000, CRC(a045c689) SHA1(8946c55635121282ea03586a278e50de20d92633) , ROM_SKIP(3) )
+	ROMX_LOAD( "caw6.bin", 0x000001, 0x80000, CRC(61192f7c) SHA1(86643c62653a62a5c7541d50cfdecae9b607440d) , ROM_SKIP(3) )
+	ROMX_LOAD( "caw5.bin", 0x000002, 0x80000, CRC(30dd78db) SHA1(e0295001d6f5fb4a9276c432f971e88f73c5e39a) , ROM_SKIP(3) )
+	ROMX_LOAD( "caw4.bin", 0x000003, 0x80000, CRC(4937fc41) SHA1(dac179715be483a521df8e515afc1fb7a2cd8f13) , ROM_SKIP(3) )
+	
 	ROM_REGION( 0x30000, "soundcpu", 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "caw3.bin",  0x00000, 0x20000, CRC(ffe16cdc) SHA1(8069ea69f0b89d61c35995c8040a4989d7be9c1f) )
-	ROM_RELOAD(          0x10000, 0x20000 )
+	ROM_RELOAD(            0x10000, 0x20000 )
+ROM_END
+
+ROM_START( cawingb2 )
+	ROM_REGION( 0x400000, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_BYTE( "8.8",    0x00000, 0x20000, CRC(f655708c) SHA1(9962a1c96ea08bc71b25d4f58e5d1fb1beebf0dc) )
+	ROM_LOAD16_BYTE( "4.4",    0x00001, 0x20000, CRC(a02fb5aa) SHA1(c9c064a83899c48f681ac803cfc5886503b9d992) )
+	ROM_LOAD16_BYTE( "7.7",    0x40000, 0x20000, CRC(8c6c7430) SHA1(3ed5713caf774b050b41a6adea026e1307b570df) )
+	ROM_LOAD16_BYTE( "3.3",    0x40001, 0x20000, CRC(f585bf2c) SHA1(3a3169791f8deace8d9bee1adb08f19fbcd309c6) )
+	ROM_LOAD16_BYTE( "6.6",    0x80000, 0x20000, CRC(5fda906e) SHA1(7b3ef17d494a2f92e58ab7e34a3beaad8c149fca) )
+	ROM_LOAD16_BYTE( "2.2",    0x80001, 0x20000, CRC(736c1835) SHA1(a91f479fab30603a111304adc0478d430faa80fc) )
+	ROM_LOAD16_BYTE( "5.5",    0xc0000, 0x20000, CRC(76458083) SHA1(cbb4ef5f7615c834b2ee1ad3c86e7262f2f62c01) )
+	ROM_LOAD16_BYTE( "1.1",    0xc0001, 0x20000, CRC(d3523f34) SHA1(005ea378c2b78782f85ecc591946c027ca2ca023) )
+	
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROMX_LOAD( "17.17",     0x000000, 0x20000, CRC(0b538062) SHA1(ac6e5dc82efdca311adfe6e6cdda160ad4a0d04d) , ROM_SKIP(3) )
+	ROMX_LOAD( "19.19",     0x000001, 0x20000, CRC(3ad62311) SHA1(1c132696b55191d16af30ebd36d2320d979eab36) , ROM_SKIP(3) )
+	ROMX_LOAD( "21.21",     0x000002, 0x20000, CRC(1b872a98) SHA1(7a3f72c6d384dfa8e224f93604997a7b6e5c8926) , ROM_SKIP(3) )
+	ROMX_LOAD( "23.23",     0x000003, 0x20000, CRC(ad49eecd) SHA1(39909996765391ed734a02c74f683e1bd9ce1561) , ROM_SKIP(3) )
+	ROMX_LOAD( "9.9",       0x080000, 0x20000, CRC(8cd4df5b) SHA1(771b6d6a6baa95a669335fe64e2219fe7226e140) , ROM_SKIP(3) )
+	ROMX_LOAD( "11.11",     0x080001, 0x20000, CRC(bf14418a) SHA1(7a0e1c65b8825a252338d6c1db59a88966ec6cfb) , ROM_SKIP(3) )
+	ROMX_LOAD( "13.13",     0x080002, 0x20000, CRC(cef1aab8) SHA1(677a889b939ff00e95737a4a53053744bb6744c0) , ROM_SKIP(3) )
+	ROMX_LOAD( "15.15",     0x080003, 0x20000, CRC(397725dc) SHA1(9450362bbf2f91b4225a088d6e283d7b16407b74) , ROM_SKIP(3) )
+	ROMX_LOAD( "18.18",     0x100000, 0x20000, CRC(9b14f7ed) SHA1(72b6e1174d4faab487261aa6739de842d2423e1a) , ROM_SKIP(3) )
+	ROMX_LOAD( "20.20",     0x100001, 0x20000, CRC(59bcc1bb) SHA1(c725060e068294dea1d962c54a9018050fa70297) , ROM_SKIP(3) )
+	ROMX_LOAD( "22.22",     0x100002, 0x20000, CRC(23dc647a) SHA1(2d8d4c4c7b2d0616430360d1639b07216dd731d6) , ROM_SKIP(3) )
+	ROMX_LOAD( "24.24",     0x100003, 0x20000, CRC(eda9fa6b) SHA1(4a3510ce71b015a1ea568fd0bbe61c5c093a2fbf) , ROM_SKIP(3) )
+	ROMX_LOAD( "10.10",     0x180000, 0x20000, CRC(17174249) SHA1(71c6424ab4629065dd6af8bb47b18f5b5d0fbe49) , ROM_SKIP(3) )
+	ROMX_LOAD( "12.12",     0x180001, 0x20000, CRC(490440b2) SHA1(2597bf16340308f84b32cfa048c426db571b4a35) , ROM_SKIP(3) )
+	ROMX_LOAD( "14.14",     0x180002, 0x20000, CRC(344a8270) SHA1(fdb588a7ba60783225e3b5c72446f79625de4f9c) , ROM_SKIP(3) )
+	ROMX_LOAD( "16.16",     0x180003, 0x20000, CRC(b991ad91) SHA1(5c59131ddf068cb54d23f8836293360fbc967d58) , ROM_SKIP(3) )
+	
+	ROM_REGION( 0x30000, "soundcpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "5.a",       0x00000, 0x20000, CRC(ffe16cdc) SHA1(8069ea69f0b89d61c35995c8040a4989d7be9c1f) )
+	ROM_RELOAD(            0x10000, 0x20000 )
 ROM_END
 
 // 24mhz crystal (maincpu), 28.322 crystal (video), 3.579545 crystal (sound)
@@ -974,11 +1138,18 @@ ROM_START( sgyxz )
 ROM_END
 
 
+DRIVER_INIT_MEMBER(cps_state, cawingbl)
+{
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x882000, 0x882001, "IN1");
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x882006, 0x882007, write16_delegate(FUNC(cps_state::cawingbl_soundlatch_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x882008, 0x88200f, read16_delegate(FUNC(cps_state::cps1_dsw_r),this));
+
+	DRIVER_INIT_CALL(cps1);
+}
 
 
-
-
-GAME( 1990, fcrash,   ffight,  fcrash,     fcrash, cps_state,   cps1,     ROT0,   "bootleg (Playmark)", "Final Crash (bootleg of Final Fight)", GAME_SUPPORTS_SAVE )
-GAME( 1991, kodb,     kod,     kodb,       kodb, cps_state,     cps1,     ROT0,   "bootleg (Playmark)", "The King of Dragons (bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )	// 910731  "ETC"
-GAME( 1990, cawingbl, cawing,  fcrash,     fcrash, cps_state,   cps1,     ROT0,   "bootleg", "Carrier Air Wing (bootleg with 2xYM2203)", GAME_NOT_WORKING )
-GAME( 199?, sgyxz,    wof,     sgyxz,     fcrash, cps_state,    cps1,     ROT0,   "bootleg (All-In Electronic)", "Warriors of Fate ('sgyxz' bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1990, fcrash,    ffight,  fcrash,    fcrash,   cps_state, cps1,     ROT0,   "bootleg (Playmark)", "Final Crash (bootleg of Final Fight)", GAME_SUPPORTS_SAVE )
+GAME( 1991, kodb,      kod,     kodb,      kodb,     cps_state, cps1,     ROT0,   "bootleg (Playmark)", "The King of Dragons (bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )	// 910731  "ETC"
+GAME( 1990, cawingbl,  cawing,  cawingbl,  cawingbl, cps_state, cawingbl, ROT0,   "bootleg", "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM205 set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, cawingb2,  cawing,  cawingbl,  cawingbl, cps_state, cawingbl, ROT0,   "bootleg", "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM205 set 2)", GAME_SUPPORTS_SAVE )
+GAME( 199?, sgyxz,     wof,     sgyxz,     fcrash,   cps_state, cps1,     ROT0,   "bootleg (All-In Electronic)", "Warriors of Fate ('sgyxz' bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND )
