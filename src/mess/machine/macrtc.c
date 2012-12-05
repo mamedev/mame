@@ -252,7 +252,7 @@ void rtc3430042_device::rtc_execute_cmd(int data)
 		case 8: case 9: case 10: case 11:	/* RAM address $10-$13 */
 			if (LOG_RTC)
 				printf("PRAM write, address = %X, data = %X\n", (i & 3) + 0x10, (int) m_rtc_data_byte);
-			m_pram[(i & 3) + 0x10] = m_rtc_data_byte;
+			m_pram[i] = m_rtc_data_byte;
 			break;
 
 		case 12:
@@ -274,7 +274,7 @@ void rtc3430042_device::rtc_execute_cmd(int data)
 		case 28: case 29: case 30: case 31:
 			if (LOG_RTC)
 				printf("PRAM write, address = %X, data = %X\n", i & 15, (int) m_rtc_data_byte);
-			m_pram[i & 15] = m_rtc_data_byte;
+			m_pram[i] = m_rtc_data_byte;
 			break;
 
 		default:
@@ -314,7 +314,7 @@ void rtc3430042_device::rtc_execute_cmd(int data)
 					case 8: case 9: case 10: case 11:
 						if (LOG_RTC)
 							printf("PRAM read, address = %X data = %x\n", (i & 3) + 0x10, m_pram[(i & 3) + 0x10]);
-						m_rtc_data_byte = m_pram[(i & 3) + 0x10];
+						m_rtc_data_byte = m_pram[i];
 						break;
 
 					case 16: case 17: case 18: case 19:
@@ -323,7 +323,7 @@ void rtc3430042_device::rtc_execute_cmd(int data)
 					case 28: case 29: case 30: case 31:
 						if (LOG_RTC)
 							printf("PRAM read, address = %X data = %x\n", i & 15, m_pram[i & 15]);
-						m_rtc_data_byte = m_pram[i & 15];
+						m_rtc_data_byte = m_pram[i];
 						break;
 
 					default:
@@ -350,22 +350,6 @@ void rtc3430042_device::rtc_execute_cmd(int data)
 void rtc3430042_device::nvram_default()
 {
 	memset(m_pram, 0, 0x100);
-
-    // some Mac ROMs are buggy in the presence of
-    // no NVRAM, so let's try to setup some reasonable defaults
-    m_pram[0] = 0xa8;	// valid
-    m_pram[4] = 0xcc;
-    m_pram[5] = 0x0a;
-    m_pram[6] = 0xcc;
-    m_pram[7] = 0x0a;
-    m_pram[0xc] = 0x42;	// XPRAM valid for Plus/SE
-    m_pram[0xd] = 0x75;
-    m_pram[0xe] = 0x67;
-    m_pram[0xf] = 0x73;
-    m_pram[0x10] = 0x1b;    // volume
-    m_pram[0x11] = 0x88;
-    m_pram[0x12] = 0x01;
-    m_pram[0x13] = 0x4c;
 }
 
 void rtc3430042_device::nvram_read(emu_file &file)
