@@ -147,6 +147,7 @@ public:
 	int          m_layer_scroll2x_offset;
 	int          m_layer_scroll3x_offset;
 	int          m_sprite_base;
+	int          m_sprite_list_end_marker;
 
 	/* devices */
 	cpu_device *m_maincpu;
@@ -225,14 +226,15 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
 	
 	/* fcrash handlers */
+	DECLARE_DRIVER_INIT(kodb);
 	DECLARE_DRIVER_INIT(cawingbl);
 	DECLARE_MACHINE_START(fcrash);
 	DECLARE_MACHINE_RESET(fcrash);
 	DECLARE_MACHINE_START(kodb);
 	DECLARE_MACHINE_START(cawingbl);
+	DECLARE_WRITE16_MEMBER(kodb_layer_w);
 	DECLARE_WRITE16_MEMBER(cawingbl_soundlatch_w);
 	UINT32 screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_kodb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in drivers/cps1.c -----------*/
