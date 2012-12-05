@@ -342,11 +342,15 @@ public:
 	UINT8 m_rom_bank;
 	UINT8 m_fdc_ctrl;
 	UINT32 m_ram_size;
-	UINT8 m_ex_video_ff[4];
+	UINT8 m_ex_video_ff[128];
 	struct {
 		UINT8 pal_entry;
 		UINT8 r[16],g[16],b[16];
 	}m_analog16;
+	struct {
+		UINT8 mode;
+		UINT8 tile[4], tile_index;
+	}m_grcg;
 
 	/* PC9821 specific */
 	UINT8 m_analog256,m_analog256e;
@@ -377,6 +381,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9801_video_ff_w);
 	DECLARE_READ8_MEMBER(pc9801_70_r);
 	DECLARE_WRITE8_MEMBER(pc9801_70_w);
+	DECLARE_READ8_MEMBER(pc9801rs_70_r);
+	DECLARE_WRITE8_MEMBER(pc9801rs_70_w);
 	DECLARE_READ8_MEMBER(pc9801_sasi_r);
 	DECLARE_WRITE8_MEMBER(pc9801_sasi_w);
 	DECLARE_READ8_MEMBER(pc9801_a0_r);
@@ -391,8 +397,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9801_gvram_w);
 	DECLARE_READ8_MEMBER(pc9801_mouse_r);
 	DECLARE_WRITE8_MEMBER(pc9801_mouse_w);
-//	DECLARE_READ8_MEMBER(pc9801rs_gvram_r);
-	DECLARE_WRITE8_MEMBER(pc9801rs_gvram_w);
+	DECLARE_READ8_MEMBER(pc9801rs_grcg_r);
+	DECLARE_WRITE8_MEMBER(pc9801rs_grcg_w);
 	DECLARE_READ8_MEMBER(pc9801_opn_r);
 	DECLARE_WRITE8_MEMBER(pc9801_opn_w);
 	DECLARE_READ8_MEMBER(pc9801rs_wram_r);
@@ -533,6 +539,7 @@ public:
 //	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_irq);
 
 	void pc9801_fdc_2hd_update_ready(floppy_image_device *, int);
+	inline UINT32 m_calc_grcg_addr(int i,UINT32 offset);
 };
 
 
@@ -1059,7 +1066,6 @@ READ8_MEMBER(pc9801_state::pc9801_70_r)
 
 WRITE8_MEMBER(pc9801_state::pc9801_70_w)
 {
-
 	if((offset & 1) == 0)
 	{
 		printf("Write to display register [%02x] %02x\n",offset+0x70,data);
@@ -1370,9 +1376,62 @@ WRITE8_MEMBER(pc9801_state::pc9801_gvram_w)
 	m_video_ram_2[offset+0x08000+m_vram_bank*0x20000] = data;
 }
 
-WRITE8_MEMBER(pc9801_state::pc9801rs_gvram_w)
+inline UINT32 pc9801_state::m_calc_grcg_addr(int i,UINT32 offset)
 {
-	m_video_ram_2[offset+0+m_vram_bank*0x20000] = data;
+	return (offset) + (((i+1)*0x8000) & 0x1ffff) + (m_vram_bank*0x20000);
+}
+
+READ8_MEMBER(pc9801_state::pc9801rs_grcg_r)
+{
+	UINT8 res;
+
+	if((m_grcg.mode & 0x80) == 0 || (m_grcg.mode & 0x40))
+		res = m_video_ram_2[offset+0+m_vram_bank*0x20000];
+	else
+	{
+		int i;
+
+		res = 0;
+		for(i=0;i<4;i++)
+		{
+			if((m_grcg.mode & 1 << i) == 0)
+				res |= (m_video_ram_2[m_calc_grcg_addr(i,offset)] ^ m_grcg.tile[i]);
+		}
+
+		res ^= 0xff;
+	}
+
+	return res;
+}
+
+WRITE8_MEMBER(pc9801_state::pc9801rs_grcg_w)
+{
+	if((m_grcg.mode & 0x80) == 0)
+		m_video_ram_2[offset+0+m_vram_bank*0x20000] = data;
+	else
+	{
+		int i;
+
+		if(m_grcg.mode & 0x40) // RMW
+		{
+			for(i=0;i<4;i++)
+			{
+				if((m_grcg.mode & 1 << i) == 0)
+				{
+					m_video_ram_2[m_calc_grcg_addr(i,offset)] &= ~data;
+					m_video_ram_2[m_calc_grcg_addr(i,offset)] |= m_grcg.tile[i] & data;
+				}
+			}
+		}
+		else // TDW
+		{
+			for(i=0;i<4;i++)
+			{
+				if((m_grcg.mode & 1 << i) == 0)
+					m_video_ram_2[m_calc_grcg_addr(i,offset)] = m_grcg.tile[i];
+			}
+		}
+	}
 }
 
 
@@ -1542,6 +1601,43 @@ READ8_MEMBER(pc9801_state::pc9801rs_30_r)
 	return pc9801_30_r(space,offset);
 }
 
+READ8_MEMBER(pc9801_state::pc9801rs_70_r)
+{
+	if(offset == 0xc)
+	{
+		printf("GRCG mode R\n");
+		return 0xff;
+	}
+	else if(offset == 0x0e)
+	{
+		printf("GRCG tile R\n");
+		return 0xff;
+	}
+
+	return 	pc9801_70_r(space,offset);;
+}
+
+WRITE8_MEMBER(pc9801_state::pc9801rs_70_w)
+{
+	if(offset == 0xc)
+	{
+//		printf("%02x GRCG MODE\n",data);
+		m_grcg.mode = data;
+		m_grcg.tile_index = 0;
+		return;
+	}
+	else if(offset == 0x0e)
+	{
+//		printf("%02x GRCG TILE %02x\n",data,m_grcg.tile_index);
+		m_grcg.tile[m_grcg.tile_index] = data;
+		m_grcg.tile_index ++;
+		m_grcg.tile_index &= 3;
+		return;
+	}
+
+	pc9801_70_w(space,offset,data);
+}
+
 READ8_MEMBER(pc9801_state::pc9801rs_memory_r)
 {
 	if(m_gate_a20 == 0)
@@ -1551,6 +1647,7 @@ READ8_MEMBER(pc9801_state::pc9801rs_memory_r)
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { return pc9801_tvram_r(space,offset-0xa0000);        }
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { return pc9801rs_knjram_r(space,offset & 0xfff);     }
 	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { return pc9801_gvram_r(space,offset-0xa8000);        }
+	else if(offset >= 0x000e0000 && offset <= 0x000e7fff)                   { return pc9801rs_grcg_r(space,offset & 0x7fff);      }
 	else if(offset >= 0x000e0000 && offset <= 0x000fffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
 	else if(offset >= 0x00100000 && offset <= 0x00100000+m_ram_size-1)		{ return pc9801rs_ex_wram_r(space,offset-0x00100000); }
 	else if(offset >= 0xfffe0000 && offset <= 0xffffffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
@@ -1569,7 +1666,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_memory_w)
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { pc9801_tvram_w(space,offset-0xa0000,data);           }
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { pc9801rs_knjram_w(space,offset & 0xfff,data);        }
 	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { pc9801_gvram_w(space,offset-0xa8000,data);           }
-	else if(offset >= 0x000e0000 && offset <= 0x000e7fff)                   { pc9801rs_gvram_w(space,offset & 0x7fff,data);        }
+	else if(offset >= 0x000e0000 && offset <= 0x000e7fff)                   { pc9801rs_grcg_w(space,offset & 0x7fff,data);        }
 	else if(offset >= 0x00100000 && offset <= 0x00100000+m_ram_size-1)      { pc9801rs_ex_wram_w(space,offset-0x00100000,data);    }
 	//else
 	//  printf("%08x %08x\n",offset,data);
@@ -1686,25 +1783,23 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_video_ff_w)
 
 	if(offset == 2)
 	{
-		if((data & 0xf8) == 0)
+		m_ex_video_ff[(data & 0xfe) >> 1] = data & 1;
+
+		if(0)
 		{
-			m_ex_video_ff[(data & 0x6) >> 1] = data & 1;
-
-			if(1)
+			static const char *const ex_video_ff_regnames[] =
 			{
-				static const char *const ex_video_ff_regnames[] =
-				{
-					"16 colors mode",	// 0
-					"<unknown>",		// 1
-					"EGC related",		// 2
-					"<unknown>"			// 3
-				};
+				"16 colors mode",	// 0
+				"<unknown>",		// 1
+				"EGC related",		// 2
+				"<unknown>"			// 3
+			};
 
-				printf("Write to extend video FF register %s -> %02x\n",ex_video_ff_regnames[(data & 0x06) >> 1],data & 1);
-			}
-			else
-				printf("Write to extend video FF register %02x\n",data);
+			printf("Write to extend video FF register %s -> %02x\n",ex_video_ff_regnames[(data & 0x06) >> 1],data & 1);
 		}
+		//else
+		//	printf("Write to extend video FF register %02x\n",data);
+
 		return;
 	}
 
@@ -1760,7 +1855,7 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(pc9801_60_r,        pc9801_60_w,        0xffffffff) //upd7220 character ports / <undefined>
 	AM_RANGE(0x0064, 0x0067) AM_WRITE8(pc9801_vrtc_mask_w, 0xffffffff)
 	AM_RANGE(0x0068, 0x006b) AM_WRITE8(pc9801rs_video_ff_w,0xffffffff) //mode FF / <undefined>
-	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(pc9801_70_r,        pc9801_70_w,        0xffffffff) //display registers "GRCG" / i8253 pit
+	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(pc9801rs_70_r,      pc9801rs_70_w,      0xffffffff) //display registers "GRCG" / i8253 pit
 	AM_RANGE(0x0080, 0x0083) AM_READWRITE8(pc9801_sasi_r,      pc9801_sasi_w,      0xffffffff) //HDD SASI interface / <undefined>
 	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,        pc9801rs_a0_w,      0xffffffff) //upd7220 bitmap ports / display registers
@@ -1818,7 +1913,7 @@ static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(pc9801_60_r,        pc9801_60_w,        0xffff) //upd7220 character ports / <undefined>
 	AM_RANGE(0x0064, 0x0067) AM_WRITE8(pc9801_vrtc_mask_w, 0xffff)
 	AM_RANGE(0x0068, 0x006b) AM_WRITE8(pc9801rs_video_ff_w,0xffff) //mode FF / <undefined>
-	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(pc9801_70_r,        pc9801_70_w,        0xffff) //display registers "GRCG" / i8253 pit
+	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(pc9801rs_70_r,      pc9801rs_70_w,      0xffff) //display registers "GRCG" / i8253 pit
 	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffff)
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,        pc9801rs_a0_w,      0xffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(pc9810rs_fdc_ctrl_r,pc9810rs_fdc_ctrl_w,0xffff)
@@ -2089,7 +2184,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(pc9801_60_r,        pc9801_60_w,        0xffffffff) //upd7220 character ports / <undefined>
 	AM_RANGE(0x0064, 0x0067) AM_WRITE8(pc9801_vrtc_mask_w, 0xffffffff)
 	AM_RANGE(0x0068, 0x006b) AM_WRITE8(pc9821_video_ff_w,  0xffffffff) //mode FF / <undefined>
-	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(pc9801_70_r,        pc9801_70_w,        0xffffffff) //display registers "GRCG" / i8253 pit
+	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(pc9801rs_70_r,      pc9801rs_70_w,    0xffffffff) //display registers "GRCG" / i8253 pit
 //  AM_RANGE(0x0080, 0x0083) SASI interface / <undefined>
 	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9821_a0_r,        pc9821_a0_w,        0xffffffff) //upd7220 bitmap ports / display registers
