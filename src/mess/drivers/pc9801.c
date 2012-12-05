@@ -624,7 +624,8 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	pc9801_state *state = device->machine().driver_data<pc9801_state>();
 	int xi,yi;
 	int x;
-	UINT8 char_size,interlace_on;
+	UINT8 char_size;
+//  UINT8 interlace_on;
 	UINT16 tile;
 	UINT8 pcg_sel, pcg_lr;
 	UINT8 kanji_sel;
@@ -632,7 +633,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
 
-	interlace_on = state->m_video_ff[INTERLACE_REG];
+//  interlace_on = state->m_video_ff[INTERLACE_REG];
 	char_size = state->m_video_ff[FONTSEL_REG] ? 16 : 8;
 	tile = 0;
 
