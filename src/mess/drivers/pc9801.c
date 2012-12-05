@@ -5,17 +5,13 @@
     preliminary driver by Angelo Salese
 
     TODO:
-    - floppy interface doesn't seem to work at all with either floppy inserted or not, missing DMA irq?
     - proper 8251 uart hook-up on keyboard
-    - boot is too slow right now, might be due of the floppy / HDD devices
     - investigate on POR bit
-    - Write a PC80S31K device (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
 	- Check for mouse support
-	- .FDI support, should be a standard raw image, but then it mis-match with the Western file format ...
 	- kanji support;
+    - Write a PC80S31K device (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
 
     TODO (PC-9801RS):
-    - floppy disk hook-up;
     - extra features;
     - clean-up duplicate code;
 
@@ -621,16 +617,15 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	int xi,yi;
 	int x;
 	UINT8 char_size,interlace_on;
-	UINT8 kanji_on;
 	UINT16 tile;
 	UINT8 pcg_sel, pcg_lr;
+	UINT8 kanji_sel;
 
 	if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
 
 	interlace_on = state->m_video_ff[INTERLACE_REG];
 	char_size = (interlace_on) ? 16 : 8;
-	kanji_on = 0;
 	tile = 0;
 
 	for(x=0;x<pitch;x++)
@@ -643,31 +638,29 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 		tile_addr = addr+(x*(state->m_video_ff[WIDTH40_REG]+1));
 
-		if(kanji_on)
-			kanji_on--;
-
 		pcg_sel = 0;
+		kanji_sel = 0;
 		pcg_lr = 0;
 
-		if(kanji_on == 0)
+		tile = state->m_video_ram_1[(tile_addr*2) & 0x1fff] & 0xff;
+		knj_tile = state->m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0xff;
+		if((tile == 0x56 || tile == 0x57) && knj_tile)
 		{
-			tile = state->m_video_ram_1[(tile_addr*2) & 0x1fff] & 0x00ff;
-			knj_tile = state->m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0xff;
-			if((tile & 0xe0) == 0 && knj_tile) // kanji select, TODO
-			{
-				tile <<= 8;
-				tile |= (knj_tile & 0x7f);
-				/* annoying kanji bit-swap applied on the address bus ... */
-				tile = BITSWAP16(tile,7,15,14,13,12,11,6,5,10,9,8,4,3,2,1,0);
-				tile &= 0x1fff;
-				kanji_on = 2;
-			}
-			else if((tile == 0x56 || tile == 0x57) && knj_tile)
-			{
-				pcg_sel = 1;
-				tile = knj_tile & 0x7f;
-				pcg_lr = (knj_tile & 0x80) >> 7;
-			}
+			pcg_sel = 1;
+			tile = knj_tile & 0x7f;
+			pcg_lr = (knj_tile & 0x80) >> 7;
+		}
+		else if(knj_tile) // kanji select, TODO
+		{
+			pcg_lr = (knj_tile & 0x80) >> 7;
+			pcg_lr |= (tile & 0x80) >> 7; // Tokimeki Sports Gal 3
+			tile &= 0x7f;
+			tile <<= 8;
+			tile |= (knj_tile & 0x7f);
+			/* annoying kanji bit-swap applied on the address bus ... */
+			tile = BITSWAP16(tile,15,7,14,13,12,11,6,5,10,9,8,4,3,2,1,0);
+//			tile&=0x7fff;
+			kanji_sel = 1;
 		}
 		attr = (state->m_video_ram_1[(tile_addr*2 & 0x1fff) | 0x2000] & 0x00ff);
 
@@ -694,8 +687,8 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 				if(!secret)
 				{
-					if(kanji_on)
-						tile_data = (state->m_kanji_rom[tile*0x20+yi*2+(kanji_on & 1)]);
+					if(kanji_sel)
+						tile_data = (state->m_kanji_rom[tile*0x20+yi*2+pcg_lr]);
 					else if(pcg_sel)
 						tile_data = (state->m_pcg_ram[0xac000*2+tile*0x40+yi*2+pcg_lr]);
 					else
@@ -3478,10 +3471,10 @@ ROM_START( pc9801f )
 	ROM_LOAD("hn613128pac8.bin",0x00800, 0x01000, BAD_DUMP CRC(b5a15b5c) SHA1(e5f071edb72a5e9a8b8b1c23cf94a74d24cb648e) ) //bad dump, 8x16 charset? (it's on the kanji board)
 
 	ROM_REGION( 0x20000, "kanji", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x8000, CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) )
-	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x8000, CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) )
-	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x10000, 0x8000, CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) )
-	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x10001, 0x8000, CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) )
+	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x8000, BAD_DUMP CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) )
+	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x8000, BAD_DUMP CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) )
+	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x10000, 0x8000, BAD_DUMP CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) )
+	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x10001, 0x8000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) )
 ROM_END
 
 /*
@@ -3550,7 +3543,7 @@ ROM_START( pc9801rs )
 	ROM_REGION( 0x50000, "chargen", 0 )
 	ROM_LOAD( "font_rs.rom", 0x00000, 0x46800, BAD_DUMP CRC(da370e7a) SHA1(584d0c7fde8c7eac1f76dc5e242102261a878c5e) )
 
-	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x8000, BAD_DUMP CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) )
 	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x8000, BAD_DUMP CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) )
 	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x10000, 0x8000, BAD_DUMP CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) )
