@@ -100,7 +100,7 @@ ADDRESS_MAP_START( segacd_map, AS_PROGRAM, 16, sega_segacd_device )
 	AM_RANGE(0xff8004 ,0xff8005) AM_DEVREADWRITE("tempcdc",lc89510_temp_device, segacd_cdc_mode_address_r, segacd_cdc_mode_address_w)
 	AM_RANGE(0xff8006 ,0xff8007) AM_DEVREADWRITE("tempcdc",lc89510_temp_device,segacd_cdc_data_r, segacd_cdc_data_w)
 	AM_RANGE(0xff8008, 0xff8009) AM_DEVREAD("tempcdc",lc89510_temp_device, cdc_data_sub_r)
-	AM_RANGE(0xff800a, 0xff800b) AM_DEVREADWRITE("tempcdc",lc89510_temp_device,cdc_dmaaddr_r,cdc_dmaaddr_w) // CDC DMA Address
+	AM_RANGE(0xff800a, 0xff800b) AM_READWRITE(segacd_dmaaddr_r,segacd_dmaaddr_w) // DMA Address (not CDC, used in conjunction with)
 	AM_RANGE(0xff800c, 0xff800d) AM_READWRITE(segacd_stopwatch_timer_r, segacd_stopwatch_timer_w)// Stopwatch timer
 	AM_RANGE(0xff800e ,0xff800f) AM_READWRITE(segacd_comms_flags_r, segacd_comms_flags_subcpu_w)
 	AM_RANGE(0xff8010 ,0xff801f) AM_READWRITE(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
@@ -1678,6 +1678,16 @@ void sega_segacd_device::device_start()
 	// todo register save state stuff
 }
 
+READ16_MEMBER( sega_segacd_device::segacd_dmaaddr_r )
+{
+	return m_dmaaddr;
+}
+
+WRITE16_MEMBER( sega_segacd_device::segacd_dmaaddr_w )
+{
+	COMBINE_DATA(&m_dmaaddr);
+}
+
 void sega_segacd_device::device_reset()
 {
 
@@ -1693,6 +1703,7 @@ void sega_segacd_device::device_reset()
 
 	lc89510_temp = machine().device<lc89510_temp_device>(":segacd:tempcdc");
 	lc89510_temp->reset_cd();
+	m_dmaaddr = 0;
 	scd_dma_timer->adjust(attotime::zero);
 
 	stopwatch_timer = machine().device<timer_device>(":segacd:sw_timer");
@@ -1753,7 +1764,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::scd_dma_timer_callback )
 }
 
 // todo: tidy up, too many CDC internals here
-void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UINT16 &SEGACD_DMA_ADDRESS, UINT16 &dma_addrc, UINT16 &destination )
+void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UINT16 &dma_addrc, UINT16 &destination )
 {
 	int length = dmacount;
 	UINT8 *dest;
@@ -1765,12 +1776,12 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UIN
 
 	if (destination==DMA_PCM)
 	{
-		dstoffset = (SEGACD_DMA_ADDRESS & 0x03FF) << 2;
+		dstoffset = (m_dmaaddr & 0x03FF) << 2;
 		PCM_DMA = true;
 	}
 	else
 	{
-		dstoffset = (SEGACD_DMA_ADDRESS & 0xFFFF) << 3;
+		dstoffset = (m_dmaaddr & 0xFFFF) << 3;
 	}
 
 
@@ -1849,11 +1860,11 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UIN
 
 	if (PCM_DMA)
 	{
-		SEGACD_DMA_ADDRESS += length >> 1;
+		m_dmaaddr += length >> 1;
 	}
 	else
 	{
-		SEGACD_DMA_ADDRESS += length >> 2;
+		m_dmaaddr += length >> 2;
 	}
 }
 

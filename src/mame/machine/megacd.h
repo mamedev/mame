@@ -272,6 +272,9 @@ public:
 	UINT16 segacd_1meg_mode_word_read(int offset, UINT16 mem_mask);
 	void segacd_1meg_mode_word_write(running_machine& machine, int offset, UINT16 data, UINT16 mem_mask, int use_pm);
 
+	DECLARE_READ16_MEMBER( segacd_dmaaddr_r );
+	DECLARE_WRITE16_MEMBER( segacd_dmaaddr_w );
+	UINT16 m_dmaaddr;
 
 
 
@@ -365,7 +368,7 @@ public:
 	READ16_MEMBER( segacd_font_converted_r );
 	TIMER_DEVICE_CALLBACK_MEMBER( scd_dma_timer_callback );
 
-	void SegaCD_CDC_Do_DMA( int &dmacount, UINT8 *CDC_BUFFER, UINT16 &SEGACD_DMA_ADDRESS, UINT16 &dma_addrc, UINT16 &destination );
+	void SegaCD_CDC_Do_DMA( int &dmacount, UINT8 *CDC_BUFFER, UINT16 &dma_addrc, UINT16 &destination );
 	timer_device* scd_dma_timer;
 
 protected:

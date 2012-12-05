@@ -3,7 +3,7 @@
 #include "imagedev/chd_cd.h"
 
 
-typedef device_delegate<void (int&, UINT8*, UINT16&, UINT16&, UINT16&)> segacd_dma_delegate;
+typedef device_delegate<void (int&, UINT8*, UINT16&, UINT16&)> segacd_dma_delegate;
 
 
 
@@ -150,7 +150,7 @@ public:
 
 	// HACK for DMA handling
 	segacd_dma_delegate segacd_dma_callback;
-	void Fake_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UINT16 &SEGACD_DMA_ADDRESS, UINT16 &dma_addrc, UINT16 &destination );
+	void Fake_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UINT16 &dma_addrc, UINT16 &destination );
 	static void set_CDC_Do_DMA(device_t &device,segacd_dma_delegate new_segacd_dma_callback);
 
 	static void set_is_neoCD(device_t &device, bool is_neoCD);
@@ -182,7 +182,6 @@ public:
 	UINT16 CDC_DECODE;
 	UINT16 CDC_REG0;
 	UINT16 CDC_REG1;
-	UINT16 SEGACD_DMA_ADDRESS;
 
 	UINT8 CDC_BUFFER[(32 * 1024 * 2) + SECTOR_SIZE];
 
@@ -245,8 +244,6 @@ public:
 	WRITE16_MEMBER( segacd_cdd_ctrl_w );
 	READ8_MEMBER( segacd_cdd_rx_r );
 	WRITE8_MEMBER( segacd_cdd_tx_w );
-	READ16_MEMBER( cdc_dmaaddr_r );
-	WRITE16_MEMBER( cdc_dmaaddr_w );
 	READ16_MEMBER( segacd_cdfader_r );
 	WRITE16_MEMBER( segacd_cdfader_w );
 
@@ -285,13 +282,7 @@ public:
 
 	bool bNeoCDLoadSector;
 
-	INT32 NeoCDDMAAddress1;
-	INT32 NeoCDDMAAddress2;
-	INT32 NeoCDDMAValue1;
-	INT32 NeoCDDMAValue2;
-	INT32 NeoCDDMACount;
 
-	INT32 NeoCDDMAMode;
 	int nNeoCDIRQVectorAck;
 	int get_nNeoCDIRQVectorAck(void) { return nNeoCDIRQVectorAck; }
 	void set_nNeoCDIRQVectorAck(int val) { nNeoCDIRQVectorAck = val; }
@@ -303,22 +294,15 @@ public:
 	void NeoCDCommsControl(UINT8 clock, UINT8 send);
 	void NeoCDProcessCommand();
 	void LC8951UpdateHeader();
-	char* LC8915InitTransfer();
+	char* LC8915InitTransfer(int NeoCDDMACount);
 	void LC8915EndTransfer();
 	void LC8951Reset();
 	void neocd_cdd_tx_w(UINT8 data);
 	UINT8 neocd_cdd_rx_r();
 	void NeoCDCommsReset();
-	void NeoCDDoDMA();
-	void SekWriteWord(UINT32 a, UINT16 d);
-	void SekWriteByte(UINT32 a, UINT8 d);
-	UINT32 SekReadByte(UINT32 a);
-	UINT32 SekReadWord(UINT32 a);
 
 	INT32 CDEmuLoadSector(INT32 LBA, char* pBuffer);
-	void set_DMA_regs(int offset, UINT16 wordValue);
 	void reset_NeoCd(void);
-	address_space* dma_space;
 
 	void nLC8951_w(UINT16 byteValue);
 	UINT16 nLC8951_r(void);

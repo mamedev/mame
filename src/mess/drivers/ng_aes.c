@@ -87,11 +87,21 @@ public:
 		: neogeo_state(mconfig, type, tag),
 		m_tempcdc(*this,"tempcdc")
 	{
+		NeoCDDMAAddress1 = 0;
+		NeoCDDMAAddress2 = 0;
+		NeoCDDMAValue1   = 0;
+		NeoCDDMAValue2   = 0;
+		NeoCDDMACount    = 0;
+		NeoCDDMAMode = 0;
 
 	}
 
-	required_device<lc89510_temp_device> m_tempcdc;
+	optional_device<lc89510_temp_device> m_tempcdc;
+	
 
+
+	void NeoCDDoDMA();
+	void set_DMA_regs(int offset, UINT16 wordValue);
 
 	UINT8 *m_memcard_data;
 	DECLARE_WRITE8_MEMBER(audio_cpu_clear_nmi_w);
@@ -134,6 +144,16 @@ public:
 	INT32 nActiveTransferArea;
 	INT32 nSpriteTransferBank;
 	INT32 nADPCMTransferBank;
+	INT32 NeoCDDMAAddress1;
+	INT32 NeoCDDMAAddress2;
+	INT32 NeoCDDMAValue1;
+	INT32 NeoCDDMAValue2;
+	INT32 NeoCDDMACount;
+	INT32 NeoCDDMAMode;
+	void SekWriteWord(UINT32 a, UINT16 d);
+	void SekWriteByte(UINT32 a, UINT8 d);
+	UINT32 SekReadByte(UINT32 a);
+	UINT32 SekReadWord(UINT32 a);
 
 	UINT8 nTransferWriteEnable;
 
@@ -655,7 +675,6 @@ void ng_aes_state::neogeoWriteTransfer(UINT32 sekAddress, UINT8 byteValue, int i
 		case 0:							// Sprites
 			address = (nSpriteTransferBank + (sekAddress & 0x0FFFFF));
 
-			// wtf? is this just due to how we decode the sprite gfx or is something bad happening?
 			if ((address&3)==0) NeoSpriteRAM[address] = byteValue;
 			if ((address&3)==1) NeoSpriteRAM[address^3] = byteValue;
 			if ((address&3)==2) NeoSpriteRAM[address^3] = byteValue;
@@ -740,7 +759,7 @@ void ng_aes_state::neogeoWriteWordCDROM(UINT32 sekAddress, UINT16 wordValue)
 			// DMA controller
 		case 0x0060:
 			if (byteValue & 0x40) {
-				m_tempcdc->NeoCDDoDMA();
+				NeoCDDoDMA();
 			}
 			break;
 
@@ -753,7 +772,7 @@ void ng_aes_state::neogeoWriteWordCDROM(UINT32 sekAddress, UINT16 wordValue)
 		case 0x0070:
 		case 0x0072:
 		case 0x007E:
-			m_tempcdc->set_DMA_regs(sekAddress & 0xFFFE, wordValue);
+			set_DMA_regs(sekAddress & 0xFFFE, wordValue);
 			break;
 
 		// upload DMA controller program
@@ -933,6 +952,328 @@ WRITE16_MEMBER(ng_aes_state::neocd_transfer_w)
 
 
 }
+
+
+
+void ng_aes_state::set_DMA_regs(int offset, UINT16 wordValue)
+{
+	switch (offset)
+	{
+		case 0x0064:
+			NeoCDDMAAddress1 &= 0x0000FFFF;
+			NeoCDDMAAddress1 |= wordValue << 16;
+			break;
+		case 0x0066:
+			NeoCDDMAAddress1 &= 0xFFFF0000;
+			NeoCDDMAAddress1 |= wordValue;
+			break;
+		case 0x0068:
+			NeoCDDMAAddress2 &= 0x0000FFFF;
+			NeoCDDMAAddress2 |= wordValue << 16;
+			break;
+		case 0x006A:
+			NeoCDDMAAddress2 &= 0xFFFF0000;
+			NeoCDDMAAddress2 |= wordValue;
+			break;
+		case 0x006C:
+			NeoCDDMAValue1 = wordValue;
+			break;
+		case 0x006E:
+			NeoCDDMAValue2 = wordValue;
+			break;
+		case 0x0070:
+			NeoCDDMACount &= 0x0000FFFF;
+			NeoCDDMACount |= wordValue << 16;
+			break;
+		case 0x0072:
+			NeoCDDMACount &= 0xFFFF0000;
+			NeoCDDMACount |= wordValue;
+			break;
+
+		case 0x007E:
+			NeoCDDMAMode = wordValue;
+//          bprintf(PRINT_NORMAL, _T("  - DMA controller 0x%2X -> 0x%04X (PC: 0x%06X)\n"), sekAddress & 0xFF, wordValue, SekGetPC(-1));
+			break;
+
+	}
+}
+
+
+
+void ng_aes_state::SekWriteWord(UINT32 a, UINT16 d)
+{
+//  printf("write word %08x %04x\n", a, d);
+	curr_space->write_word(a,d);
+}
+
+void ng_aes_state::SekWriteByte(UINT32 a, UINT8 d)
+{
+//  printf("write byte %08x %02x\n", a, d);
+	curr_space->write_byte(a,d);
+}
+
+UINT32 ng_aes_state::SekReadByte(UINT32 a)
+{
+//  printf("read byte %08x\n", a);
+	return curr_space->read_byte(a);
+}
+
+
+UINT32 ng_aes_state::SekReadWord(UINT32 a)
+{
+//  printf("read WORD %08x\n", a);
+	return curr_space->read_word(a);
+}
+
+
+
+static INT32 SekIdle(INT32 nCycles)
+{
+	return nCycles;
+}
+
+
+void ng_aes_state::NeoCDDoDMA()
+{
+
+	// The LC8953 chip has a programmable DMA controller, which is not properly emulated.
+	// Since the software only uses it in a limited way, we can apply a simple heuristic
+	// to determnine the requested operation.
+
+	// Additionally, we don't know how many cycles DMA operations take.
+	// Here, only bus access is used to get a rough approximation --
+	// each read/write takes a single cycle, setup and everything else is ignored.
+
+//  bprintf(PRINT_IMPORTANT, _T("  - DMA controller transfer started (PC: 0x%06X)\n"), SekGetPC(-1));
+
+	switch (NeoCDDMAMode) {
+
+		case 0xCFFD: {
+//          bprintf(PRINT_NORMAL, _T("    adr : 0x%08X - 0x%08X <- address, skip odd bytes\n"), NeoCDDMAAddress1, NeoCDDMAAddress1 + NeoCDDMACount * 8);
+
+			//  - DMA controller 0x7E -> 0xCFFD (PC: 0xC07CE2)
+			//  - DMA controller program[00] -> 0xFCF5 (PC: 0xC07CE8)
+			//  - DMA controller program[02] -> 0xE8DA (PC: 0xC07CEE)
+			//  - DMA controller program[04] -> 0x92DA (PC: 0xC07CF4)
+			//  - DMA controller program[06] -> 0x92DB (PC: 0xC07CFA)
+			//  - DMA controller program[08] -> 0x96DB (PC: 0xC07D00)
+			//  - DMA controller program[10] -> 0x96F6 (PC: 0xC07D06)
+			//  - DMA controller program[12] -> 0x2E02 (PC: 0xC07D0C)
+			//  - DMA controller program[14] -> 0xFDFF (PC: 0xC07D12)
+
+			SekIdle(NeoCDDMACount * 4);
+
+			while (NeoCDDMACount--) {
+				SekWriteWord(NeoCDDMAAddress1 + 0, NeoCDDMAAddress1 >> 24);
+				SekWriteWord(NeoCDDMAAddress1 + 2, NeoCDDMAAddress1 >> 16);
+				SekWriteWord(NeoCDDMAAddress1 + 4, NeoCDDMAAddress1 >>  8);
+				SekWriteWord(NeoCDDMAAddress1 + 6, NeoCDDMAAddress1 >>  0);
+				NeoCDDMAAddress1 += 8;
+			}
+
+			break;
+		}
+
+		case 0xE2DD: {
+//          bprintf(PRINT_NORMAL, _T("    copy: 0x%08X - 0x%08X <- 0x%08X - 0x%08X, skip odd bytes\n"), NeoCDDMAAddress2, NeoCDDMAAddress2 + NeoCDDMACount * 2, NeoCDDMAAddress1, NeoCDDMAAddress1 + NeoCDDMACount * 4);
+
+			//  - DMA controller 0x7E -> 0xE2DD (PC: 0xC0A190)
+			//  - DMA controller program[00] -> 0xFCF5 (PC: 0xC0A192)
+			//  - DMA controller program[02] -> 0x82BE (PC: 0xC0A194)
+			//  - DMA controller program[04] -> 0x93DA (PC: 0xC0A196)
+			//  - DMA controller program[06] -> 0xBE93 (PC: 0xC0A198)
+			//  - DMA controller program[08] -> 0xDABE (PC: 0xC0A19A)
+			//  - DMA controller program[10] -> 0xF62D (PC: 0xC0A19C)
+			//  - DMA controller program[12] -> 0x02FD (PC: 0xC0A19E)
+			//  - DMA controller program[14] -> 0xFFFF (PC: 0xC0A1A0)
+
+			SekIdle(NeoCDDMACount * 1);
+
+			while (NeoCDDMACount--) {
+				SekWriteWord(NeoCDDMAAddress2 + 0, SekReadByte(NeoCDDMAAddress1 + 0));
+				SekWriteWord(NeoCDDMAAddress2 + 2, SekReadByte(NeoCDDMAAddress1 + 1));
+				NeoCDDMAAddress1 += 2;
+				NeoCDDMAAddress2 += 4;
+			}
+
+			break;
+		}
+
+		case 0xFC2D: {
+//          bprintf(PRINT_NORMAL, _T("    copy: 0x%08X - 0x%08X <- LC8951 external buffer, skip odd bytes\n"), NeoCDDMAAddress1, NeoCDDMAAddress1 + NeoCDDMACount * 4);
+
+			//  - DMA controller 0x7E -> 0xFC2D (PC: 0xC0A190)
+			//  - DMA controller program[00] -> 0xFCF5 (PC: 0xC0A192)
+			//  - DMA controller program[02] -> 0x8492 (PC: 0xC0A194)
+			//  - DMA controller program[04] -> 0xDA92 (PC: 0xC0A196)
+			//  - DMA controller program[06] -> 0xDAF6 (PC: 0xC0A198)
+			//  - DMA controller program[08] -> 0x2A02 (PC: 0xC0A19A)
+			//  - DMA controller program[10] -> 0xFDFF (PC: 0xC0A19C)
+			//  - DMA controller program[12] -> 0x48E7 (PC: 0xC0A19E)
+			//  - DMA controller program[14] -> 0xFFFE (PC: 0xC0A1A0)
+
+			char* data = m_tempcdc->LC8915InitTransfer(NeoCDDMACount);
+			if (data == NULL) {
+				break;
+			}
+
+			SekIdle(NeoCDDMACount * 4);
+
+			while (NeoCDDMACount--) {
+				SekWriteByte(NeoCDDMAAddress1 + 0, data[0]);
+				SekWriteByte(NeoCDDMAAddress1 + 2, data[1]);
+				NeoCDDMAAddress1 += 4;
+				data += 2;
+			}
+
+			m_tempcdc->LC8915EndTransfer();
+
+			break;
+		}
+
+		case 0xFE3D:
+
+			//  - DMA controller 0x7E -> 0xFE3D (PC: 0xC0A190)
+			//  - DMA controller program[00] -> 0xFCF5 (PC: 0xC0A192)
+			//  - DMA controller program[02] -> 0x82BF (PC: 0xC0A194)
+			//  - DMA controller program[04] -> 0x93BF (PC: 0xC0A196)
+			//  - DMA controller program[06] -> 0xF629 (PC: 0xC0A198)
+			//  - DMA controller program[08] -> 0x02FD (PC: 0xC0A19A)
+			//  - DMA controller program[10] -> 0xFFFF (PC: 0xC0A19C)
+			//  - DMA controller program[12] -> 0xF17D (PC: 0xC0A19E)
+			//  - DMA controller program[14] -> 0xFCF5 (PC: 0xC0A1A0)
+
+		case 0xFE6D: {
+//          bprintf(PRINT_NORMAL, _T("    copy: 0x%08X - 0x%08X <- 0x%08X - 0x%08X\n"), NeoCDDMAAddress2, NeoCDDMAAddress2 + NeoCDDMACount * 2, NeoCDDMAAddress1, NeoCDDMAAddress1 + NeoCDDMACount * 2);
+
+			//  - DMA controller 0x7E -> 0xFE6D (PC: 0xC0FD7A)
+			//  - DMA controller program[00] -> 0xFCF5 (PC: 0xC0FD7C)
+			//  - DMA controller program[02] -> 0x82BF (PC: 0xC0FD7E)
+			//  - DMA controller program[04] -> 0xF693 (PC: 0xC0FD80)
+			//  - DMA controller program[06] -> 0xBF29 (PC: 0xC0FD82)
+			//  - DMA controller program[08] -> 0x02FD (PC: 0xC0FD84)
+			//  - DMA controller program[10] -> 0xFFFF (PC: 0xC0FD86)
+			//  - DMA controller program[12] -> 0xC515 (PC: 0xC0FD88)
+			//  - DMA controller program[14] -> 0xFCF5 (PC: 0xC0FD8A)
+
+			SekIdle(NeoCDDMACount * 1);
+
+			while (NeoCDDMACount--) {
+				SekWriteWord(NeoCDDMAAddress2, SekReadWord(NeoCDDMAAddress1));
+				NeoCDDMAAddress1 += 2;
+				NeoCDDMAAddress2 += 2;
+			}
+
+if (NeoCDDMAAddress2 == 0x0800)  {
+// MapVectorTable(false);
+//  bprintf(PRINT_ERROR, _T("    RAM vectors mapped (PC = 0x%08X\n"), SekGetPC(0));
+//  extern INT32 bRunPause;
+//  bRunPause = 1;
+}
+			break;
+		}
+
+		case 0xFEF5: {
+//          bprintf(PRINT_NORMAL, _T("    adr : 0x%08X - 0x%08X <- address\n"), NeoCDDMAAddress1, NeoCDDMAAddress1 + NeoCDDMACount * 4);
+
+			//  - DMA controller 0x7E -> 0xFEF5 (PC: 0xC07CE2)
+			//  - DMA controller program[00] -> 0xFCF5 (PC: 0xC07CE8)
+			//  - DMA controller program[02] -> 0x92E8 (PC: 0xC07CEE)
+			//  - DMA controller program[04] -> 0xBE96 (PC: 0xC07CF4)
+			//  - DMA controller program[06] -> 0xF629 (PC: 0xC07CFA)
+			//  - DMA controller program[08] -> 0x02FD (PC: 0xC07D00)
+			//  - DMA controller program[10] -> 0xFFFF (PC: 0xC07D06)
+			//  - DMA controller program[12] -> 0xFC3D (PC: 0xC07D0C)
+			//  - DMA controller program[14] -> 0xFCF5 (PC: 0xC07D12)
+
+			SekIdle(NeoCDDMACount * 2);
+
+			while (NeoCDDMACount--) {
+				SekWriteWord(NeoCDDMAAddress1 + 0, NeoCDDMAAddress1 >> 16);
+				SekWriteWord(NeoCDDMAAddress1 + 2, NeoCDDMAAddress1 >>  0);
+				NeoCDDMAAddress1 += 4;
+			}
+
+			break;
+		}
+
+		case 0xFFC5: {
+//          bprintf(PRINT_NORMAL, _T("    copy: 0x%08X - 0x%08X <- LC8951 external buffer\n"), NeoCDDMAAddress1, NeoCDDMAAddress1 + NeoCDDMACount * 2);
+
+			//  - DMA controller 0x7E -> 0xFFC5 (PC: 0xC0A190)
+			//  - DMA controller program[00] -> 0xFCF5 (PC: 0xC0A192)
+			//  - DMA controller program[02] -> 0xA6F6 (PC: 0xC0A194)
+			//  - DMA controller program[04] -> 0x2602 (PC: 0xC0A196)
+			//  - DMA controller program[06] -> 0xFDFF (PC: 0xC0A198)
+			//  - DMA controller program[08] -> 0xFC2D (PC: 0xC0A19A)
+			//  - DMA controller program[10] -> 0xFCF5 (PC: 0xC0A19C)
+			//  - DMA controller program[12] -> 0x8492 (PC: 0xC0A19E)
+			//  - DMA controller program[14] -> 0xDA92 (PC: 0xC0A1A0)
+
+			char* data = m_tempcdc->LC8915InitTransfer(NeoCDDMACount);
+			if (data == NULL) {
+				break;
+			}
+
+			SekIdle(NeoCDDMACount * 4);
+
+			while (NeoCDDMACount--) {
+				SekWriteByte(NeoCDDMAAddress1 + 0, data[0]);
+				SekWriteByte(NeoCDDMAAddress1 + 1, data[1]);
+				NeoCDDMAAddress1 += 2;
+				data += 2;
+			}
+
+			m_tempcdc->LC8915EndTransfer();
+
+			break;
+		}
+
+		case 0xFFCD:
+
+			//  - DMA controller 0x7E -> 0xFFCD (PC: 0xC0A190)
+			//  - DMA controller program[00] -> 0xFCF5 (PC: 0xC0A192)
+			//  - DMA controller program[02] -> 0x92F6 (PC: 0xC0A194)
+			//  - DMA controller program[04] -> 0x2602 (PC: 0xC0A196)
+			//  - DMA controller program[06] -> 0xFDFF (PC: 0xC0A198)
+			//  - DMA controller program[08] -> 0x7006 (PC: 0xC0A19A)
+			//  - DMA controller program[10] -> 0x6100 (PC: 0xC0A19C)
+			//  - DMA controller program[12] -> 0x2412 (PC: 0xC0A19E)
+			//  - DMA controller program[14] -> 0x13FC (PC: 0xC0A1A0)
+
+		case 0xFFDD: {
+//          bprintf(PRINT_NORMAL, _T("    Fill: 0x%08X - 0x%08X <- 0x%04X\n"), NeoCDDMAAddress1, NeoCDDMAAddress1 + NeoCDDMACount * 2, NeoCDDMAValue1);
+
+			//  - DMA controller 0x7E -> 0xFFDD (PC: 0xC07CE2)
+			//  - DMA controller program[00] -> 0xFCF5 (PC: 0xC07CE8)
+			//  - DMA controller program[02] -> 0x92F6 (PC: 0xC07CEE)
+			//  - DMA controller program[04] -> 0x2602 (PC: 0xC07CF4)
+			//  - DMA controller program[06] -> 0xFDFF (PC: 0xC07CFA)
+			//  - DMA controller program[08] -> 0xFFFF (PC: 0xC07D00)
+			//  - DMA controller program[10] -> 0xFCF5 (PC: 0xC07D06)
+			//  - DMA controller program[12] -> 0x8AF0 (PC: 0xC07D0C)
+			//  - DMA controller program[14] -> 0x1609 (PC: 0xC07D12)
+
+			SekIdle(NeoCDDMACount * 1);
+
+			while (NeoCDDMACount--) {
+				SekWriteWord(NeoCDDMAAddress1, NeoCDDMAValue1);
+				NeoCDDMAAddress1 += 2;
+			}
+
+			break;
+		}
+		default: {
+			//bprintf(PRINT_ERROR, _T("    Unknown transfer type 0x%04X (PC: 0x%06X)\n"), NeoCDDMAMode, SekGetPC(-1));
+			//bprintf(PRINT_NORMAL, _T("    ??? : 0x%08X  0x%08X 0x%04X 0x%04X 0x%08X\n"), NeoCDDMAAddress1, NeoCDDMAAddress2, NeoCDDMAValue1, NeoCDDMAValue2, NeoCDDMACount);
+
+//extern INT32 bRunPause;
+//bRunPause = 1;
+
+		}
+	}
+}
+
 
 /*
  * Handling selectable controller types
@@ -1170,7 +1511,6 @@ MACHINE_RESET_MEMBER(ng_aes_state,neogeo)
 	NeoZ80ROMActive = memregion("audiocpu")->base();
 	NeoTextRAM = memregion("fixed")->base();
 	curr_space = &machine().device("maincpu")->memory().space(AS_PROGRAM);
-	m_tempcdc->dma_space = curr_space;
 
 
 	m_tempcdc->NeoCDCommsReset();
