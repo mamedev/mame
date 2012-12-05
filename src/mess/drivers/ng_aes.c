@@ -719,7 +719,7 @@ UINT16 ng_aes_state::neogeoReadWordCDROM(UINT32 sekAddress)
 		case 0x0100:
 			return m_tempcdc->segacd_cdc_mode_address_r(*curr_space, 0, 0xffff);
 		case 0x0102:
-			return m_tempcdc->nLC8951_r();
+			return m_tempcdc->CDC_Reg_r();
 
 		// CD mechanism communication
 		case 0x0160:

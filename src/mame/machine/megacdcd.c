@@ -553,25 +553,31 @@ UINT16 lc89510_temp_device::CDC_Host_r(running_machine& machine, UINT16 type)
 }
 
 
+
+
 UINT8 lc89510_temp_device::CDC_Reg_r(void)
 {
 	int reg = CDC_REG0 & 0xF;
 	UINT8 ret = 0;
+	
+	
 	UINT16 decoderegs = 0x73F2;
 
 	if ((decoderegs>>reg)&1)
 		CDC_DECODE |= (1 << reg);
 
-	//if (reg!=REG_R_STAT3)
-		CDC_REG0 = (CDC_REG0 & 0xFFF0) | ((reg+1)&0xf);
 
+	CDC_REG0 = (CDC_REG0 & 0xFFF0) | ((reg+1)&0xf);
 
 	switch (reg)
 	{
 		case REG_R_COMIN:  ret = 0/*COMIN*/;						break;
 		case REG_R_IFSTAT: ret = LC8951RegistersR[REG_R_IFSTAT];	break;
 		case REG_R_DBCL:   ret = LC8951RegistersW[REG_W_DBCL];		break;
-		case REG_R_DBCH:   ret = LC8951RegistersW[REG_W_DBCH];		break;
+		case REG_R_DBCH:
+//			LC8951RegistersR[REG_R_DBCH] &=  0x0F; // NeoCD?
+//			LC8951RegistersR[REG_R_DBCH] |=  (LC8951RegistersR[REG_R_IFSTAT] & 0x40) ? 0x00 : 0xF0; // NeoCD?
+			ret = LC8951RegistersW[REG_W_DBCH];		break;
 		case REG_R_HEAD0:  ret = LC8951RegistersR[REG_R_HEAD0];		break;
 		case REG_R_HEAD1:  ret = LC8951RegistersR[REG_R_HEAD1];		break;
 		case REG_R_HEAD2:  ret = LC8951RegistersR[REG_R_HEAD2];		break;
@@ -581,19 +587,25 @@ UINT8 lc89510_temp_device::CDC_Reg_r(void)
 		case REG_R_WAL:    ret = LC8951RegistersW[REG_W_WAL];		break;
 		case REG_R_WAH:    ret = LC8951RegistersW[REG_W_WAH];		break;
 		case REG_R_STAT0:  ret = LC8951RegistersR[REG_R_STAT0];		break;
-		case REG_R_STAT1:  ret = LC8951RegistersR[REG_R_STAT1];		break;
+		case REG_R_STAT1:  ret = LC8951RegistersR[REG_R_STAT1];	
+	//		LC8951RegistersR[REG_R_IFSTAT] |= 0x20;	 // NeoCD? // reset DECI
+			break;
 		case REG_R_STAT2:  ret = LC8951RegistersR[REG_R_STAT2];		break;
 		case REG_R_STAT3:  ret = LC8951RegistersR[REG_R_STAT3];
 
-			LC8951RegistersR[REG_R_IFSTAT] |= 0x20;
-
-			if ((LC8951RegistersW[REG_W_CTRL0] & 0x80) && (LC8951RegistersW[REG_W_IFCTRL] & 0x20))
+			LC8951RegistersR[REG_R_IFSTAT] |= 0x20; // SegaCD? // reset DECI
+			if (!is_neoCD)
 			{
-				if ((CDC_DECODE & decoderegs) == decoderegs)
-				LC8951RegistersR[REG_R_STAT3] = 0x80;
+				if ((LC8951RegistersW[REG_W_CTRL0] & 0x80) && (LC8951RegistersW[REG_W_IFCTRL] & 0x20))
+				{
+					if ((CDC_DECODE & decoderegs) == decoderegs)
+					LC8951RegistersR[REG_R_STAT3] = 0x80;
+				}
 			}
 			break;
+
 	}
+
 
 	return ret;
 }
@@ -1157,7 +1169,7 @@ void lc89510_temp_device::NeoCDCommsControl(UINT8 clock, UINT8 send)
 				if (CDD_TX[0]) {
 					INT32  sum = 0;
 
-						printf("has command %02x\n", CDD_TX[0]);
+					//	printf("has command %02x\n", CDD_TX[0]);
 
 //                  bprintf(PRINT_NORMAL, _T("  - CD mechanism command receive completed : 0x"));
 					for (INT32 i = 0; i < 9; i++) {
@@ -1168,7 +1180,7 @@ void lc89510_temp_device::NeoCDCommsControl(UINT8 clock, UINT8 send)
 //                  bprintf(PRINT_NORMAL, _T(" (CS 0x%X, %s)\n"), CDD_TX[9], (sum == CDD_TX[9]) ? _T("OK") : _T("NG"));
 					if (sum == CDD_TX[9]) {
 
-						printf("request to process command %02x\n", CDD_TX[0]);
+					//		printf("request to process command %02x\n", CDD_TX[0]);
 
 						NeoCDProcessCommand();
 
@@ -1522,25 +1534,6 @@ void lc89510_temp_device::nff0016_set(UINT16 wordValue)
 
 UINT16 lc89510_temp_device::nff0016_r(void) { return nff0016; }
 
-UINT16 lc89510_temp_device::nLC8951_r(void)
-{
-	int regno = CDC_REG0 & 0xf;
-	INT32 reg = LC8951RegistersR[regno];
-
-	switch (regno) {
-		case 0x03:														// DBCH
-			LC8951RegistersR[REG_R_DBCH] &=  0x0F;
-			LC8951RegistersR[REG_R_DBCH] |=  (LC8951RegistersR[REG_R_IFSTAT] & 0x40) ? 0x00 : 0xF0;
-			break;
-		case 0x0D:														// STAT3
-			LC8951RegistersR[REG_R_IFSTAT] |= 0x20;								// reset DECI
-			// bprintf(PRINT_ERROR, _T("  - DECI (PC: 0x%06X)\n"), SekGetPC(-1));
-			break;
-	}
-
-	CDC_REG0 = (regno + 1) & 0x0F;
-	return reg;
-}
 
 void lc89510_temp_device::nLC8951_w(UINT16 byteValue)
 {

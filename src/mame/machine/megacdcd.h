@@ -305,7 +305,6 @@ public:
 	void reset_NeoCd(void);
 
 	void nLC8951_w(UINT16 byteValue);
-	UINT16 nLC8951_r(void);
 	UINT16 nff0016_r(void);
 	void nff0016_set(UINT16 wordValue);
 	void nff0002_set(UINT16 wordValue);
