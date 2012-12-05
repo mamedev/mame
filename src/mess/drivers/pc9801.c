@@ -35,7 +35,7 @@
 	List of per-game TODO:
 	- 4D Boxing: tries to format User Disk;
 	- Absolutely Mahjong: Epson splash screen doesn't appear at all, why?
-	- Dragon Buster: has lots of gfx artifacts;
+	- Dragon Buster: missing bitplanes for the PCG, slight issue with window masking;
 	- Far Side Moon: doesn't detect neither mouse nor sound board;
 	- First Queen: has broken text display;
 	- Flappy Plus: keyboard is unresponsive;
@@ -542,6 +542,7 @@ public:
 
 
 #define WIDTH40_REG 2
+#define FONTSEL_REG 3
 #define INTERLACE_REG 4
 #define MEMSW_REG   6
 #define DISPLAY_REG 7
@@ -625,7 +626,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		return;
 
 	interlace_on = state->m_video_ff[INTERLACE_REG];
-	char_size = (interlace_on) ? 16 : 8;
+	char_size = state->m_video_ff[FONTSEL_REG] ? 16 : 8;
 	tile = 0;
 
 	for(x=0;x<pitch;x++)
@@ -662,7 +663,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 //			tile&=0x7fff;
 			kanji_sel = 1;
 		}
-		attr = (state->m_video_ram_1[(tile_addr*2 & 0x1fff) | 0x2000] & 0x00ff);
+		attr = (state->m_video_ram_1[(tile_addr*2 & 0x1fff) | 0x2000] & 0xff);
 
 		secret = (attr & 1) ^ 1;
 		//blink = attr & 2;
@@ -692,7 +693,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					else if(pcg_sel)
 						tile_data = (state->m_pcg_ram[0xac000*2+tile*0x40+yi*2+pcg_lr]);
 					else
-						tile_data = (state->m_char_rom[tile*char_size+interlace_on*0x800+yi]);
+						tile_data = (state->m_char_rom[tile*char_size+state->m_video_ff[FONTSEL_REG]*0x800+yi]);
 				}
 
 				if(reverse) { tile_data^=0xff; }
