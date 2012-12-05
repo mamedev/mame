@@ -37,6 +37,7 @@
 	- Microsoft Windows 1.0 MSDOS.SYS error (can be bypassed by loading MS-DOS first)
 
 	List of per-game TODO:
+	- Absolutely Mahjong: GRCG doesn't seem to work at all, also Epson splash screen doesn't appear at all;
 	- Dragon Buster: has lots of gfx artifacts;
 	- Far Side Moon: doesn't detect neither mouse nor sound board;
 	- First Queen: has broken text display;
@@ -568,7 +569,7 @@ void pc9801_state::video_start()
 
 UINT32 pc9801_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0, cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	/* graphics */
 	m_hgdc2->screen_update(screen, bitmap, cliprect);
@@ -1394,7 +1395,7 @@ READ8_MEMBER(pc9801_state::pc9801rs_grcg_r)
 		res = 0;
 		for(i=0;i<4;i++)
 		{
-			if((m_grcg.mode & 1 << i) == 0)
+			if((m_grcg.mode & (1 << i)) == 0)
 				res |= (m_video_ram_2[m_calc_grcg_addr(i,offset)] ^ m_grcg.tile[i]);
 		}
 
@@ -1416,7 +1417,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_grcg_w)
 		{
 			for(i=0;i<4;i++)
 			{
-				if((m_grcg.mode & 1 << i) == 0)
+				if((m_grcg.mode & (1 << i)) == 0)
 				{
 					m_video_ram_2[m_calc_grcg_addr(i,offset)] &= ~data;
 					m_video_ram_2[m_calc_grcg_addr(i,offset)] |= m_grcg.tile[i] & data;
@@ -1427,8 +1428,10 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_grcg_w)
 		{
 			for(i=0;i<4;i++)
 			{
-				if((m_grcg.mode & 1 << i) == 0)
+				if((m_grcg.mode & (1 << i)) == 0)
+				{
 					m_video_ram_2[m_calc_grcg_addr(i,offset)] = m_grcg.tile[i];
+				}
 			}
 		}
 	}
