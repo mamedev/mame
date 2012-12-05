@@ -150,7 +150,7 @@ public:
 
 	// HACK for DMA handling
 	segacd_dma_delegate segacd_dma_callback;
-	void Fake_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UINT16 &CDC_DMA_ADDR, UINT16 &CDC_DMA_ADDRC, UINT16 &destination );
+	void Fake_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UINT16 &SEGACD_DMA_ADDRESS, UINT16 &dma_addrc, UINT16 &destination );
 	static void set_CDC_Do_DMA(device_t &device,segacd_dma_delegate new_segacd_dma_callback);
 
 	static void set_is_neoCD(device_t &device, bool is_neoCD);
@@ -180,13 +180,9 @@ public:
 
 
 	UINT16 CDC_DECODE;
-	INT16 CDC_DMACNT; // can go negative
-	UINT16 CDC_DMA_ADDRC;
-	UINT16 CDC_PT;
-	UINT16 CDC_WA;
 	UINT16 CDC_REG0;
 	UINT16 CDC_REG1;
-	UINT16 CDC_DMA_ADDR;
+	UINT16 SEGACD_DMA_ADDRESS;
 
 	UINT8 CDC_BUFFER[(32 * 1024 * 2) + SECTOR_SIZE];
 

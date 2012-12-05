@@ -365,7 +365,7 @@ public:
 	READ16_MEMBER( segacd_font_converted_r );
 	TIMER_DEVICE_CALLBACK_MEMBER( scd_dma_timer_callback );
 
-	void SegaCD_CDC_Do_DMA( int &dmacount, UINT8 *CDC_BUFFER, UINT16 &CDC_DMA_ADDR, UINT16 &CDC_DMA_ADDRC, UINT16 &destination );
+	void SegaCD_CDC_Do_DMA( int &dmacount, UINT8 *CDC_BUFFER, UINT16 &SEGACD_DMA_ADDRESS, UINT16 &dma_addrc, UINT16 &destination );
 	timer_device* scd_dma_timer;
 
 protected:

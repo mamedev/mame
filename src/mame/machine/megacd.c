@@ -1753,7 +1753,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::scd_dma_timer_callback )
 }
 
 // todo: tidy up, too many CDC internals here
-void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UINT16 &CDC_DMA_ADDR, UINT16 &CDC_DMA_ADDRC, UINT16 &destination )
+void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UINT16 &SEGACD_DMA_ADDRESS, UINT16 &dma_addrc, UINT16 &destination )
 {
 	int length = dmacount;
 	UINT8 *dest;
@@ -1765,18 +1765,18 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UIN
 
 	if (destination==DMA_PCM)
 	{
-		dstoffset = (CDC_DMA_ADDR & 0x03FF) << 2;
+		dstoffset = (SEGACD_DMA_ADDRESS & 0x03FF) << 2;
 		PCM_DMA = true;
 	}
 	else
 	{
-		dstoffset = (CDC_DMA_ADDR & 0xFFFF) << 3;
+		dstoffset = (SEGACD_DMA_ADDRESS & 0xFFFF) << 3;
 	}
 
 
 	while (dmacount--)
 	{
-		UINT16 data = (CDC_BUFFER[CDC_DMA_ADDRC+srcoffset]<<8) | CDC_BUFFER[CDC_DMA_ADDRC+srcoffset+1];
+		UINT16 data = (CDC_BUFFER[dma_addrc+srcoffset]<<8) | CDC_BUFFER[dma_addrc+srcoffset+1];
 
 		if (destination==DMA_PRG)
 		{
@@ -1849,11 +1849,11 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UIN
 
 	if (PCM_DMA)
 	{
-		CDC_DMA_ADDR += length >> 1;
+		SEGACD_DMA_ADDRESS += length >> 1;
 	}
 	else
 	{
-		CDC_DMA_ADDR += length >> 2;
+		SEGACD_DMA_ADDRESS += length >> 2;
 	}
 }
 
