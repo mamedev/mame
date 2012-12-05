@@ -33,6 +33,15 @@ lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const ch
 	nNeoCDIRQVector = 0;
 }
 
+enum CDEmuStatusValue { idle = 0, reading, playing, paused, seeking, fastforward, fastreverse };
+CDEmuStatusValue CDEmuStatus;
+
+static inline CDEmuStatusValue CDEmuGetStatus()
+{
+//	printf("CDEmuGetStatus\n");
+	return CDEmuStatus;
+}
+
 
 void lc89510_temp_device::set_CDC_Do_DMA(device_t &device,segacd_dma_delegate new_segacd_dma_callback)
 {
@@ -164,6 +173,12 @@ void lc89510_temp_device::CDD_Stop(running_machine &machine)
 	CDD_STATUS = 0x0000;
 	SET_CDD_DATA_MODE
 	cdda_stop_audio( m_cdda ); //stop any pending CD-DA
+
+	//neocd
+	NeoCDAssyStatus = 0x0E;
+	bNeoCDLoadSector = false;
+
+
 }
 
 
@@ -325,6 +340,12 @@ void lc89510_temp_device::CDD_Play(running_machine &machine)
 	if(!(CURRENT_TRACK_IS_DATA))
 		cdda_start_audio( m_cdda, SCD_CURLBA, end_msf - SCD_CURLBA );
 	SET_CDC_READ
+
+	// neocd
+	CDEmuStatus = seeking;
+	NeoCDAssyStatus = 1;
+	bNeoCDLoadSector = true;
+
 }
 
 
@@ -353,6 +374,12 @@ void lc89510_temp_device::CDD_Pause(running_machine &machine)
 	//segacd.current_frame = cdda_get_audio_lba( machine.device( "cdda" ) );
 	//if(!(CURRENT_TRACK_IS_DATA))
 	cdda_pause_audio( m_cdda, 1 );
+
+
+	NeoCDAssyStatus = 4;
+	bNeoCDLoadSector = false;
+
+
 }
 
 void lc89510_temp_device::CDD_Resume(running_machine &machine)
@@ -367,6 +394,9 @@ void lc89510_temp_device::CDD_Resume(running_machine &machine)
 	SET_CDC_READ
 	//if(!(CURRENT_TRACK_IS_DATA))
 	cdda_pause_audio( m_cdda, 0 );
+
+	NeoCDAssyStatus = 1;
+	bNeoCDLoadSector = true;
 }
 
 
@@ -411,6 +441,10 @@ void lc89510_temp_device::CDD_Default(void)
 {
 	CLEAR_CDD_RESULT
 	CDD_STATUS = SCD_STATUS;
+
+
+	NeoCDAssyStatus = 9;
+	bNeoCDLoadSector = false;
 }
 
 
@@ -452,20 +486,6 @@ void lc89510_temp_device::lc89510_Reset(void)
 	CDC_Reset();
 
 	CDC_REG0 = CDC_REG1 = SCD_STATUS_CDC = CDD_DONE = 0;
-}
-
-void lc89510_temp_device::CDC_End_Transfer(running_machine& machine)
-{
-	STOP_CDC_DMA
-	CDC_REG0 |= 0x8000;
-	CDC_REG0 &= ~0x4000;
-	LC8951RegistersR[REG_R_IFSTAT] |= 0x08;
-
-	if (LC8951RegistersW[REG_W_IFCTRL] & 0x40)
-	{
-		LC8951RegistersR[REG_R_IFSTAT] &= ~0x40;
-		CHECK_SCD_LV5_INTERRUPT
-	}
 }
 
 
@@ -717,17 +737,17 @@ static const char *const CDD_import_cmdnames[] =
 	"Handle TOC",			// 2
 	"Play",					// 3
 	"Seek",					// 4
-	"<undefined>",			// 5
+	"<undefined> (5)",			// 5
 	"Pause",				// 6
 	"Resume",				// 7
 	"FF",					// 8
 	"RWD",					// 9
 	"INIT",					// A
-	"<undefined>",			// B
+	"<undefined> (b)",			// B
 	"Close Tray",			// C
 	"Open Tray",			// D
-	"<undefined>",			// E
-	"<undefined>"			// F
+	"<undefined> (e)",			// E
+	"<undefined> (f)"			// F
 };
 
 void lc89510_temp_device::CDD_Import(running_machine& machine)
@@ -1015,39 +1035,10 @@ machine_config_constructor lc89510_temp_device::device_mconfig_additions() const
 /* Neo CD */
 
 
-enum CDEmuStatusValue { idle = 0, reading, playing, paused, seeking, fastforward, fastreverse };
-CDEmuStatusValue CDEmuStatus;
-
-static inline CDEmuStatusValue CDEmuGetStatus()
-{
-//	printf("CDEmuGetStatus\n");
-	return CDEmuStatus;
-}
 
 
-static void CDEmuStartRead()
-{
-	printf("CDEmuStartRead\n");
-	CDEmuStatus = seeking;
-}
 
-static void CDEmuPause()
-{
-	printf("CDEmuPause\n");
-	CDEmuStatus = paused;
-}
 
-static INT32 CDEmuStop()
-{
-	printf("CDEmuStop\n");
-	return 1;
-}
-
-static INT32 CDEmuPlay(UINT8 M, UINT8 S, UINT8 F)
-{
-	printf("CDEmuPlay\n");
-	return 1;
-}
 
 INT32 lc89510_temp_device::CDEmuLoadSector(INT32 LBA, char* pBuffer)
 {
@@ -1085,97 +1076,8 @@ void lc89510_temp_device::NeoCDCommsReset()
 
 void lc89510_temp_device::NeoCDProcessCommand()
 {
-	memset(CDD_RX,  0, sizeof(CDD_RX));
-
-	if (CDD_TX[0]) {
-		CDD_RX[1] = 15;
-	}
-
-	switch (CDD_TX[0]) {
-		case CMD_STATUS: // CDD_GetStatus();
-			break;
-		case CMD_STOPALL: // CDD_Stop(machine);
-//                              //bprintf(PRINT_ERROR, _T("    CD comms received command %i\n"), CDD_TX[0]);
-			CDEmuStop();
-
-			NeoCDAssyStatus = 0x0E;
-			bNeoCDLoadSector = false;
-			break;
-		case CMD_GETTOC: // CDD_Handle_TOC_Commands();
-//                              //bprintf(PRINT_ERROR, _T("    CD comms received command %i\n"), CDD_TX[0]);
-	
-			CDD_Handle_TOC_Commands();
-			CDD_Export();
-			break;
-
-
-		case CMD_READ: { // CDD_Play(machine); 
-
-			if (LC8951RegistersW[REG_W_CTRL0] & 4) {
-
-				if (CDEmuGetStatus() == playing) {
-					//bprintf(PRINT_ERROR, _T("*** Switching CD mode to CD-ROM while in audio mode!(PC: 0x%06X)\n"), SekGetPC(-1));
-				}
-
-				SCD_CURLBA  = CDD_TX[2] * (10 * CD_FRAMES_MINUTE);
-				SCD_CURLBA += CDD_TX[3] * ( 1 * CD_FRAMES_MINUTE);
-				SCD_CURLBA += CDD_TX[4] * (10 * CD_FRAMES_SECOND);
-				SCD_CURLBA += CDD_TX[5] * ( 1 * CD_FRAMES_SECOND);
-				SCD_CURLBA += CDD_TX[6] * (10                   );
-				SCD_CURLBA += CDD_TX[7] * ( 1                   );
-
-				SCD_CURLBA -= CD_FRAMES_PREGAP;
-
-				CDEmuStartRead();
-//              LC8951RegistersR[REG_R_IFSTAT] |= 0x20;
-			} else {
-
-				if (CDEmuGetStatus() == reading) {
-					//bprintf(PRINT_ERROR, _T("*** Switching CD mode to audio while in CD-ROM mode!(PC: 0x%06X)\n"), SekGetPC(-1));
-				}
-
-				CDEmuPlay((CDD_TX[2] * 10) + CDD_TX[3], (CDD_TX[4] * 10) + CDD_TX[5], (CDD_TX[6] * 10) + CDD_TX[7]);
-			}
-
-			NeoCDAssyStatus = 1;
-			bNeoCDLoadSector = true;
-
-			break;
-		}
-		case CMD_SEEK: // CDD_Seek();	
-//          //bprintf(PRINT_ERROR, _T("    CD comms received command %i\n"), CDD_TX[0]);
-			CDEmuPause();
-			break;
-		case 5:
-//          //bprintf(PRINT_ERROR, _T("    CD comms received command %i\n"), CDD_TX[0]);
-//          NeoCDAssyStatus = 9;
-//          bNeoCDLoadSector = false;
-			break;
-
-		case CMD_STOP: // CDD_Pause(machine);
-//          //bprintf(PRINT_ERROR, _T("    CD comms received command %i\n"), CDD_TX[0]);
-			NeoCDAssyStatus = 4;
-			bNeoCDLoadSector = false;
-			break;
-		case CMD_RESUME: // 	CDD_Resume(machine); 
-//          //bprintf(PRINT_ERROR, _T("    CD comms received command %i\n"), CDD_TX[0]);
-			NeoCDAssyStatus = 1;
-			bNeoCDLoadSector = true;
-			break;
-			 
-		case CMD_FF: // CDD_FF(machine);   
-		case CMD_RW: // CDD_RW(machine);   
-		case CMD_INIT: // CDD_Init();	   
-		case 11:
-		case CMD_CLOSE: // CDD_Close();	
-		case CMD_OPEN: // CDD_Open();     
-		case 14:
-		case 15:
-//          //bprintf(PRINT_ERROR, _T("    CD comms received command %i\n"), CDD_TX[0]);
-			NeoCDAssyStatus = 9;
-			bNeoCDLoadSector = false;
-			break;
-	}
+	CDD_Import(machine());
+	CDD_Export();
 }
 
 void lc89510_temp_device::NeoCDCommsControl(UINT8 clock, UINT8 send)
@@ -1315,6 +1217,20 @@ void lc89510_temp_device::LC8915EndTransfer()
 	}
 }
 
+
+void lc89510_temp_device::CDC_End_Transfer(running_machine& machine)
+{
+	STOP_CDC_DMA
+	CDC_REG0 |= 0x8000;
+	CDC_REG0 &= ~0x4000;
+	LC8951RegistersR[REG_R_IFSTAT] |= 0x08;
+
+	if (LC8951RegistersW[REG_W_IFCTRL] & 0x40)
+	{
+		LC8951RegistersR[REG_R_IFSTAT] &= ~0x40;
+		CHECK_SCD_LV5_INTERRUPT
+	}
+}
 
 
 
