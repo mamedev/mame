@@ -441,6 +441,8 @@ void lc89510_temp_device::CDC_Reset(void)
 	LC8951RegistersW[REG_W_WAL] = wa & 0xff; LC8951RegistersW[REG_W_WAH] = (wa >> 8) &0xff;
 	LC8951RegistersR[REG_R_HEAD0] = 0x01;
 	LC8951RegistersR[REG_R_STAT3] = 0x80;
+
+
 }
 
 
@@ -642,25 +644,47 @@ void lc89510_temp_device::CDC_Reg_w(UINT8 data)
 	case REG_W_DACH: LC8951RegistersW[REG_W_DACH] = data; break;
 
 	case REG_W_DTTRG:
-			if (LC8951RegistersW[REG_W_IFCTRL] & 0x02)
+			if (!is_neoCD)
 			{
+				if (LC8951RegistersW[REG_W_IFCTRL] & 0x02)
+				{
+					LC8951RegistersR[REG_R_IFSTAT] &= ~0x08;
+					SET_CDC_DMA;
+					CDC_REG0 &= ~0x8000;
+				}
+			}
+			else
+			{
+				LC8951RegistersW[REG_W_DTTRG]  = ~0x00;
 				LC8951RegistersR[REG_R_IFSTAT] &= ~0x08;
-				SET_CDC_DMA;
-				CDC_REG0 &= ~0x8000;
 			}
 			break;
 
-	case REG_W_DTACK: LC8951RegistersR[REG_R_IFSTAT] |= 0x40; break;
+	case REG_W_DTACK:
+			//if (!is_neoCD)
+			{
+				LC8951RegistersR[REG_R_IFSTAT] |= 0x40;
+			}
+			//else
+			//{
+			//	LC8951RegistersW[REG_W_DTACK]  = ~0x00;
+			//	LC8951RegistersR[REG_R_IFSTAT] &= ~0x40;
+			//}
+			break;
 	case REG_W_WAL: LC8951RegistersW[REG_W_WAL] = data; break;
 	case REG_W_WAH:	LC8951RegistersW[REG_W_WAH] = data; break;
 	case REG_W_CTRL0: LC8951RegistersW[REG_W_CTRL0] = data; break;
-	case REG_W_CTRL1: LC8951RegistersW[REG_W_CTRL1] = data; break;
+	case REG_W_CTRL1: LC8951RegistersW[REG_W_CTRL1] = data;
+		//LC8951UpdateHeader(); // NeoCD
+		break;
 	case REG_W_PTL: LC8951RegistersW[REG_W_PTL] = data; break;
 	case REG_W_PTH: LC8951RegistersW[REG_W_PTH] = data; break;
 	case REG_W_CTRL2: LC8951RegistersW[REG_W_CTRL2] = data; break;
 	case REG_W_RESET: CDC_Reset();       break;
 	}
 }
+
+
 
 void lc89510_temp_device::CDD_Process(running_machine& machine, int reason)
 {
@@ -947,10 +971,9 @@ void lc89510_temp_device::reset_cd(void)
 
 
 
-	if (segacd.cd)
-		printf("cd found\n");
+//	if (segacd.cd)
+//		printf("cd found\n");
 }
-
 
 
 
@@ -1292,33 +1315,9 @@ void lc89510_temp_device::LC8915EndTransfer()
 	}
 }
 
-void lc89510_temp_device::LC8951Reset()
-{
-	memset(LC8951RegistersR, 0, sizeof(LC8951RegistersR));
-	memset(LC8951RegistersW, 0, sizeof(LC8951RegistersW));
-	LC8951RegistersR[REG_R_IFSTAT] = 0xFF;
-	LC8951RegistersR[REG_R_STAT3] = 0x80;
 
-	LC8951UpdateHeader();
-}
 
-void lc89510_temp_device::reset_NeoCd(void)
-{
-	{
-		cdrom_image_device *cddevice = machine().device<cdrom_image_device>("cdrom");
-		if ( cddevice )
-		{
-			segacd.cd = cddevice->get_cdrom_file();
-			if ( segacd.cd )
-			{
-				printf("found cd\n");
-				segacd.toc = cdrom_get_toc( segacd.cd );
-				cdda_set_cdrom( m_cdda, segacd.cd );
-				cdda_stop_audio( m_cdda ); //stop any pending CD-DA
-			}
-		}
-	}
-}
+
 
 
 /*
@@ -1533,39 +1532,5 @@ void lc89510_temp_device::nff0016_set(UINT16 wordValue)
 }
 
 UINT16 lc89510_temp_device::nff0016_r(void) { return nff0016; }
-
-
-void lc89510_temp_device::nLC8951_w(UINT16 byteValue)
-{
-	int regno = CDC_REG0 & 0xf;
-
-	switch (regno) {
-		case 3:															// DBCH
-			LC8951RegistersW[REG_W_DBCH]  = byteValue & 0x0F;
-			break;
-		case 6:															// DTTRG
-			LC8951RegistersW[REG_W_DTTRG]  = ~0x00;
-			LC8951RegistersR[REG_R_IFSTAT] &= ~0x08;
-			break;
-		case 7:															// DTACK
-			LC8951RegistersW[REG_W_DTACK]  = ~0x00;
-			LC8951RegistersR[REG_R_IFSTAT] &= ~0x40;
-			break;
-//          case 10:
-//              LC8951RegistersW[regno] = byteValue;
-//              bprintf(PRINT_NORMAL, _T("  - CTRL0 -> %02X (PC: 0x%06X)\n"), LC8951RegistersW[regno], byteValue, SekGetPC(-1));
-//              break;
-		case 11:
-			LC8951RegistersW[REG_W_CTRL1]  = byteValue;							// CTRL1
-			LC8951UpdateHeader();
-			break;
-		case 15:
-			LC8951Reset();
-			break;
-		default:
-			LC8951RegistersW[regno] = byteValue;
-	}
-	CDC_REG0 = (regno + 1) & 0x0F;
-}
 
 

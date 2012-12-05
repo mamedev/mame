@@ -296,15 +296,13 @@ public:
 	void LC8951UpdateHeader();
 	char* LC8915InitTransfer(int NeoCDDMACount);
 	void LC8915EndTransfer();
-	void LC8951Reset();
+
 	void neocd_cdd_tx_w(UINT8 data);
 	UINT8 neocd_cdd_rx_r();
 	void NeoCDCommsReset();
 
 	INT32 CDEmuLoadSector(INT32 LBA, char* pBuffer);
-	void reset_NeoCd(void);
 
-	void nLC8951_w(UINT16 byteValue);
 	UINT16 nff0016_r(void);
 	void nff0016_set(UINT16 wordValue);
 	void nff0002_set(UINT16 wordValue);

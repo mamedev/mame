@@ -793,7 +793,7 @@ void ng_aes_state::neogeoWriteWordCDROM(UINT32 sekAddress, UINT16 wordValue)
 			m_tempcdc->segacd_cdc_mode_address_w(*curr_space, 0, byteValue, 0xffff);
 			break;
 		case 0x0102:
-			m_tempcdc->nLC8951_w(byteValue);
+			m_tempcdc->CDC_Reg_w(byteValue);
 			break;
 
 		case 0x0104:
@@ -1465,7 +1465,7 @@ MACHINE_START_MEMBER(ng_aes_state,neocd)
 	// for custom vectors
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(neocd_int_callback);
 
-	m_tempcdc->reset_NeoCd();
+	m_tempcdc->reset_cd();
 	
 }
 
