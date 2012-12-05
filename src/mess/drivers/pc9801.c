@@ -49,7 +49,6 @@
 	- Quarth: should do a split screen effect, it doesn't hence there are broken gfxs
 	- Quarth: uploads a PCG charset
 	- Uchiyama Aki no Chou Bangai: half size gfxs, can't start (needs mouse)?
-	- Xenon 2 - Megablast: copyright isn't shown at device select;
 
 ========================================================================================
 
@@ -605,9 +604,9 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 
 		if(interlace_on)
 		{
-			if(res_y*2+0 < 400)
+			if(device->machine().primary_screen->visible_area().contains(res_x, res_y*2+0))
 				bitmap.pix16(res_y*2+0, res_x) = pen + colors16_mode;
-			if(res_y*2+1 < 400)
+			if(device->machine().primary_screen->visible_area().contains(res_x, res_y*2+1))
 				bitmap.pix16(res_y*2+1, res_x) = pen + colors16_mode;
 		}
 		else
@@ -687,7 +686,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				res_x = (x*8+xi) * (state->m_video_ff[WIDTH40_REG]+1);
 				res_y = y*lr+yi;
 
-				if(res_x > 640 || res_y > char_size*25) //TODO
+				if(!device->machine().primary_screen->visible_area().contains(res_x, res_y))
 					continue;
 
 				tile_data = 0;
@@ -726,7 +725,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 				if(state->m_video_ff[WIDTH40_REG])
 				{
-					if(res_x+1 > 640 || res_y > char_size*25) //TODO
+					if(!device->machine().primary_screen->visible_area().contains(res_x+1, res_y))
 						continue;
 
 					bitmap.pix16(res_y, res_x+1) = pen;
