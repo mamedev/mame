@@ -588,6 +588,7 @@ $(MAMEOBJ)/cinemat.a: \
 	$(DRIVERS)/cinemat.o $(AUDIO)/cinemat.o $(VIDEO)/cinemat.o \
 	$(DRIVERS)/cchasm.o $(MACHINE)/cchasm.o $(AUDIO)/cchasm.o $(VIDEO)/cchasm.o \
 	$(DRIVERS)/dlair.o \
+	$(DRIVERS)/dlair2.o \
 	$(DRIVERS)/embargo.o \
 	$(DRIVERS)/jack.o $(VIDEO)/jack.o \
 	$(DRIVERS)/leland.o $(MACHINE)/leland.o $(AUDIO)/leland.o $(VIDEO)/leland.o \

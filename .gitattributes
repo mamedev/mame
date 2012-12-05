@@ -2675,6 +2675,7 @@ src/mame/drivers/djboy.c svneol=native#text/plain
 src/mame/drivers/djmain.c svneol=native#text/plain
 src/mame/drivers/dkong.c svneol=native#text/plain
 src/mame/drivers/dlair.c svneol=native#text/plain
+src/mame/drivers/dlair2.c svneol=native#text/plain
 src/mame/drivers/dmndrby.c svneol=native#text/plain
 src/mame/drivers/docastle.c svneol=native#text/plain
 src/mame/drivers/dogfgt.c svneol=native#text/plain
