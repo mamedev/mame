@@ -53,6 +53,7 @@ protected:
 private:
 	required_device<amd_29f040_device> m_flash_roml;
 	required_device<amd_29f040_device> m_flash_romh;
+	required_ioport m_jp1;
 
 	UINT8 m_bank;
 	UINT8 m_mode;

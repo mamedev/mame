@@ -96,6 +96,7 @@ c64_easyflash_cartridge_device::c64_easyflash_cartridge_device(const machine_con
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_flash_roml(*this, AM29F040_0_TAG),
 	m_flash_romh(*this, AM29F040_1_TAG),
+	m_jp1(*this, "JP1"),
 	m_bank(0),
 	m_mode(0)
 {
@@ -233,5 +234,5 @@ int c64_easyflash_cartridge_device::c64_exrom_r(offs_t offset, int sphi2, int ba
 
 int c64_easyflash_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
 {
-	return !(BIT(m_mode, 0) | !(BIT(m_mode, 2) | device().ioport("JP1")->read()));
+	return !(BIT(m_mode, 0) | !(BIT(m_mode, 2) | m_jp1->read()));
 }
