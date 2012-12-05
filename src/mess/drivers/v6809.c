@@ -47,10 +47,8 @@ ToDo:
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "video/mc6845.h"
-//#include "imagedev/flopdrv.h"
 //#include "machine/6821pia.h"
 //#include "machine/6850acia.h"
-//#include "machine/wd17xx.h"
 #include "machine/keyboard.h"
 
 

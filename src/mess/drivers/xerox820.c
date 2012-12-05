@@ -448,7 +448,7 @@ WRITE8_MEMBER( xerox820_state::kbpio_pa_w )
 			m_fdc->set_unscaled_clock(m_8n5 ? XTAL_20MHz/10 : XTAL_20MHz/20);
 		}
 
-		m_400_460 = floppy->twosid_r();
+		m_400_460 = !floppy->twosid_r();
 
 		floppy->mon_w(0);
 		
@@ -747,8 +747,9 @@ UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 void xerox820_state::machine_start()
 {
 	// floppy callbacks
-	m_fdc->setup_intrq_cb(fd1771_t::line_cb(FUNC(xerox820_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(fd1771_t::line_cb(FUNC(xerox820_state::fdc_drq_w), this));
+	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(xerox820_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(xerox820_state::fdc_drq_w), this));
+	m_fdc->dden_w(1);
 
 	// state saving
 	save_item(NAME(m_keydata));
@@ -874,7 +875,7 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_Z80PIO_ADD(Z80PIO_KB_TAG, XTAL_20MHz/8, xerox820_kbpio_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_GP_TAG, XTAL_20MHz/8, gppio_intf)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, XTAL_20MHz/8, ctc_intf)
-	MCFG_FD1771x_ADD(FD1771_TAG, XTAL_20MHz/10)
+	MCFG_FD1771x_ADD(FD1771_TAG, XTAL_20MHz/20)
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", xerox820_floppies, "sa400", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":1", xerox820_floppies, "sa400", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)

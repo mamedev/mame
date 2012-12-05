@@ -146,8 +146,8 @@ comx_fd_device::comx_fd_device(const machine_config &mconfig, const char *tag, d
 	m_ds(0),
 	m_q(0),
 	m_addr(0),
-	m_intrq(false),
-	m_drq(false),
+	m_intrq(0),
+	m_drq(0),
 	m_disb(1)
 {
 }
