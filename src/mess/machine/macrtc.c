@@ -251,7 +251,7 @@ void rtc3430042_device::rtc_execute_cmd(int data)
 
 		case 8: case 9: case 10: case 11:	/* RAM address $10-$13 */
 			if (LOG_RTC)
-				printf("PRAM write, address = %X, data = %X\n", (i & 3) + 0x10, (int) m_rtc_data_byte);
+				printf("PRAM write, address = %X, data = %X\n", i, (int) m_rtc_data_byte);
 			m_pram[i] = m_rtc_data_byte;
 			break;
 
@@ -273,7 +273,7 @@ void rtc3430042_device::rtc_execute_cmd(int data)
 		case 24: case 25: case 26: case 27:
 		case 28: case 29: case 30: case 31:
 			if (LOG_RTC)
-				printf("PRAM write, address = %X, data = %X\n", i & 15, (int) m_rtc_data_byte);
+				printf("PRAM write, address = %X, data = %X\n", i, (int) m_rtc_data_byte);
 			m_pram[i] = m_rtc_data_byte;
 			break;
 
@@ -313,7 +313,7 @@ void rtc3430042_device::rtc_execute_cmd(int data)
 
 					case 8: case 9: case 10: case 11:
 						if (LOG_RTC)
-							printf("PRAM read, address = %X data = %x\n", (i & 3) + 0x10, m_pram[(i & 3) + 0x10]);
+							printf("PRAM read, address = %X data = %x\n", i, m_pram[i]);
 						m_rtc_data_byte = m_pram[i];
 						break;
 
@@ -322,7 +322,7 @@ void rtc3430042_device::rtc_execute_cmd(int data)
 					case 24: case 25: case 26: case 27:
 					case 28: case 29: case 30: case 31:
 						if (LOG_RTC)
-							printf("PRAM read, address = %X data = %x\n", i & 15, m_pram[i & 15]);
+							printf("PRAM read, address = %X data = %x\n", i, m_pram[i]);
 						m_rtc_data_byte = m_pram[i];
 						break;
 
