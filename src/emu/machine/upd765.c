@@ -1183,7 +1183,7 @@ void upd765_family_device::start_command(int cmd)
 		floppy_info &fi = flopi[command[1] & 3];
 		main_phase = PHASE_RESULT;
 		result[0] = 0x08;
-		if(fi.ready)
+		if(!fi.ready)
 			result[0] |= 0x20;
 		if(fi.dev)
 			result[0] |=

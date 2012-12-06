@@ -1260,14 +1260,13 @@ READ8_MEMBER(pc9801_state::pc9801_fdc_2hd_r)
 
 void pc9801_state::pc9801_fdc_2hd_update_ready(floppy_image_device *, int)
 {
-	bool ready = m_fdc_2hd_ctrl & 0x40 ? true : false;
+	bool ready = m_fdc_2hd_ctrl & 0x40;
 	floppy_image_device *floppy;
 	floppy = machine().device<floppy_connector>("upd765_2hd:0")->get_device();
-	/* TODO: correct? Was ANDed before, with an OR several programs boots ... */
-	if(floppy || ready)
+	if(floppy && ready)
 		ready = floppy->ready_r();
 	floppy = machine().device<floppy_connector>("upd765_2hd:1")->get_device();
-	if(floppy || ready)
+	if(floppy && ready)
 		ready = floppy->ready_r();
 
 	m_fdc_2hd->ready_w(ready);
