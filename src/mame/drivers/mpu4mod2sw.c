@@ -1270,6 +1270,17 @@ ROM_START( m4atlan )
 	ROM_LOAD( "dat14.bin", 0x0000, 0x010000, CRC(d91fb9b2) SHA1(a06a868a17f84e2a012b0fe28025458e4f899c1d) )
 ROM_END
 
+
+ROM_START( m4tridic )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "trp.bin", 0x0000, 0x010000, CRC(d91fb9b2) SHA1(a06a868a17f84e2a012b0fe28025458e4f899c1d) )
+
+	ROM_REGION( 0x48, "fakechr", 0 )
+	ROM_LOAD( "tdice.chr", 0x0000, 0x000048, CRC(6d28754a) SHA1(beb7724e9f621d315b2f16abfd3bbc6a99077a05) )
+ROM_END
+
+
+
 ROM_START( m4bjc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dbc11.bin", 0x0000, 0x010000, CRC(ce28b677) SHA1(81006768e937b42f051e580f093b7182ad59236a) )
@@ -1370,14 +1381,6 @@ ROM_END
 ROM_START( m4tricol )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dtc25.bin", 0x0000, 0x010000, CRC(d3318dde) SHA1(19194d206deee920a1b0122dddc3d5bc0a7a48c5) )
-ROM_END
-
-ROM_START( m4tridic )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "trp.bin", 0x0000, 0x010000, CRC(d91fb9b2) SHA1(a06a868a17f84e2a012b0fe28025458e4f899c1d) )
-
-	ROM_REGION( 0x48, "fakechr", 0 )
-	ROM_LOAD( "tdice.chr", 0x0000, 0x000048, CRC(6d28754a) SHA1(beb7724e9f621d315b2f16abfd3bbc6a99077a05) )
 ROM_END
 
 ROM_START( m4twilgt )
@@ -1904,6 +1907,7 @@ GAME(199?, m4c999c	,m4c999		,mod2   	,mpu4				, mpu4_state,m4_showstring			,ROT0
 // GEEN TUBES (press Q to open door and 'W' to play anyway, as long as the game works and doesn't report reel errors)
 GAME(199?, m4ambass	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Ambassador (Barcrest) (DAM, Dutch) (MPU4)",GAME_FLAGS )
 GAME(199?, m4atlan	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Atlantis (Barcrest) (DAT, Dutch) (MPU4)",GAME_FLAGS )
+GAME(199?, m4tridic	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Triple Dice (Barcrest) (Dutch) (MPU4)",GAME_FLAGS ) // == Atlantis
 GAME(199?, m4bjc	,0			,mod2   	,mpu4				, mpu4_state,m4default_alt		,ROT0,   "Barcrest","Black Jack Club (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 GAME(199?, m4exprs	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Express (Barcrest) (DXP, Dutch) (MPU4)",GAME_FLAGS )
 GAME(199?, m4brdway	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Broadway (Barcrest) (DBR, Dutch) (MPU4)",GAME_FLAGS )
@@ -1924,7 +1928,6 @@ GAME(199?, m4tbreel	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Ba
 GAME(199?, m4tbrldx	,m4tbreel	,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Turbo Reel (Barcrest) (Dutch) (MPU4) (set 3, Deluxe?)",GAME_FLAGS )
 GAME(199?, m4taj	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Taj Mahal (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 GAME(199?, m4tricol	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Tricolor (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
-GAME(199?, m4tridic	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Triple Dice (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 GAME(199?, m4twilgt	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Twilight (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 GAME(199?, m4wildms	,0			,mod2   	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Wild Mystery (Barcrest) (Dutch) (MPU4)",GAME_FLAGS )
 // these all have reel issues, but test mode produces ay sounds

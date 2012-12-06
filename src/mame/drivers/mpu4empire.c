@@ -582,15 +582,6 @@ ROM_START( m4hauntd )
 	ROM_LOAD( "hhsnd2.bin", 0x080000, 0x080000, CRC(6eb3f52c) SHA1(7b6f7a5bdc5e9937e0b74ce317c951d9ad82425c) )
 ROM_END
 
-ROM_START( m4haunte )
-	ROM_REGION( 0x010000, "maincpu", 0 )
-	ROM_LOAD( "hs3_0i.bin", 0x0000, 0x010000, CRC(c4d06c05) SHA1(e9256e656c698723158f835a32cdf668ed6120c8) )
-
-	ROM_REGION( 0x100000, "msm6376", 0 )
-	ROM_LOAD( "hhsnd1.bin", 0x000000, 0x080000, CRC(a2eff4c6) SHA1(86441371b8efbffb93c6c7d02d45cd5dae73ca45) )
-	ROM_LOAD( "hhsnd2.bin", 0x080000, 0x080000, CRC(6eb3f52c) SHA1(7b6f7a5bdc5e9937e0b74ce317c951d9ad82425c) )
-ROM_END
-
 
 
 ROM_START( m4hisprt )
@@ -893,7 +884,6 @@ GAME(199?, m4haunta,  m4haunt,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Em
 GAME(199?, m4hauntb,  m4haunt,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Empire","Haunted House (Empire) (MPU4, set 3)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4hauntc,  m4haunt,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Empire","Haunted House (Empire) (MPU4, set 4)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4hauntd,  m4haunt,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Empire","Haunted House (Empire) (MPU4, set 5)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4haunte,  m4haunt,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Empire","Haunted House (Empire) (MPU4, set 6)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4hisprt,  0,		mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Empire","High Spirits (Empire) (MPU4, set 1)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4hisprta, m4hisprt,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Empire","High Spirits (Empire) (MPU4, set 2)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4hisprtb, m4hisprt,	mod4oki, mpu4, mpu4_state, m4default, ROT0,   "Empire","High Spirits (Empire) (MPU4, set 3)",   GAME_FLAGS|GAME_NO_SOUND )
