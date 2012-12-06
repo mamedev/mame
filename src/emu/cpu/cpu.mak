@@ -1018,7 +1018,6 @@ CPUOBJS += $(CPUOBJ)/m6502/deco16.o \
            $(CPUOBJ)/m6502/n2a03.o \
            $(CPUOBJ)/m6502/r65c02.o
 DASMOBJS +=
-M6502MAKE += $(BUILDOUT)/m6502make$(BUILD_EXE)
 endif
 
 $(CPUOBJ)/m6502/deco16.o:	$(CPUSRC)/m6502/deco16.c \
@@ -1094,53 +1093,41 @@ $(CPUOBJ)/m6502/r65c02.o:	$(CPUSRC)/m6502/r65c02.c \
 							$(CPUSRC)/m6502/m6502.h
 
 # rule to generate the C files
-$(CPUOBJ)/m6502/deco16.inc: $(M6502MAKE) $(CPUSRC)/m6502/odeco16.lst $(CPUSRC)/m6502/ddeco16.lst
+$(CPUOBJ)/m6502/deco16.inc: $(CPUSRC)/m6502/m6502make.py $(CPUSRC)/m6502/odeco16.lst $(CPUSRC)/m6502/ddeco16.lst
 	@echo Generating DECO16 source file...
-	$(M6502MAKE) deco16_device $(CPUSRC)/m6502/odeco16.lst $(CPUSRC)/m6502/ddeco16.lst $@
+	$(CPUSRC)/m6502/m6502make.py deco16_device $(CPUSRC)/m6502/odeco16.lst $(CPUSRC)/m6502/ddeco16.lst $@
 
-$(CPUOBJ)/m6502/m4510.inc: $(M6502MAKE) $(CPUSRC)/m6502/om4510.lst $(CPUSRC)/m6502/dm4510.lst
+$(CPUOBJ)/m6502/m4510.inc: $(CPUSRC)/m6502/m6502make.py $(CPUSRC)/m6502/om4510.lst $(CPUSRC)/m6502/dm4510.lst
 	@echo Generating M4510 source file...
-	$(M6502MAKE) m4510_device $(CPUSRC)/m6502/om4510.lst $(CPUSRC)/m6502/dm4510.lst $@
+	$(CPUSRC)/m6502/m6502make.py m4510_device $(CPUSRC)/m6502/om4510.lst $(CPUSRC)/m6502/dm4510.lst $@
 
-$(CPUOBJ)/m6502/m6502.inc: $(M6502MAKE) $(CPUSRC)/m6502/om6502.lst $(CPUSRC)/m6502/dm6502.lst
+$(CPUOBJ)/m6502/m6502.inc: $(CPUSRC)/m6502/m6502make.py $(CPUSRC)/m6502/om6502.lst $(CPUSRC)/m6502/dm6502.lst
 	@echo Generating M6502 source file...
-	$(M6502MAKE) m6502_device $(CPUSRC)/m6502/om6502.lst $(CPUSRC)/m6502/dm6502.lst $@
+	$(CPUSRC)/m6502/m6502make.py m6502_device $(CPUSRC)/m6502/om6502.lst $(CPUSRC)/m6502/dm6502.lst $@
 
-$(CPUOBJ)/m6502/m65c02.inc: $(M6502MAKE) $(CPUSRC)/m6502/om65c02.lst $(CPUSRC)/m6502/dm65c02.lst
+$(CPUOBJ)/m6502/m65c02.inc: $(CPUSRC)/m6502/m6502make.py $(CPUSRC)/m6502/om65c02.lst $(CPUSRC)/m6502/dm65c02.lst
 	@echo Generating M65C02 source file...
-	$(M6502MAKE) m65c02_device $(CPUSRC)/m6502/om65c02.lst $(CPUSRC)/m6502/dm65c02.lst $@
+	$(CPUSRC)/m6502/m6502make.py m65c02_device $(CPUSRC)/m6502/om65c02.lst $(CPUSRC)/m6502/dm65c02.lst $@
 
-$(CPUOBJ)/m6502/m65ce02.inc: $(M6502MAKE) $(CPUSRC)/m6502/om65ce02.lst $(CPUSRC)/m6502/dm65ce02.lst
+$(CPUOBJ)/m6502/m65ce02.inc: $(CPUSRC)/m6502/m6502make.py $(CPUSRC)/m6502/om65ce02.lst $(CPUSRC)/m6502/dm65ce02.lst
 	@echo Generating M65CE02 source file...
-	$(M6502MAKE) m65ce02_device $(CPUSRC)/m6502/om65ce02.lst $(CPUSRC)/m6502/dm65ce02.lst $@
+	$(CPUSRC)/m6502/m6502make.py m65ce02_device $(CPUSRC)/m6502/om65ce02.lst $(CPUSRC)/m6502/dm65ce02.lst $@
 
-$(CPUOBJ)/m6502/m6509.inc: $(M6502MAKE) $(CPUSRC)/m6502/om6509.lst $(CPUSRC)/m6502/dm6509.lst
+$(CPUOBJ)/m6502/m6509.inc: $(CPUSRC)/m6502/m6502make.py $(CPUSRC)/m6502/om6509.lst $(CPUSRC)/m6502/dm6509.lst
 	@echo Generating M6509 source file...
-	$(M6502MAKE) m6509_device $(CPUSRC)/m6502/om6509.lst $(CPUSRC)/m6502/dm6509.lst $@
+	$(CPUSRC)/m6502/m6502make.py m6509_device $(CPUSRC)/m6502/om6509.lst $(CPUSRC)/m6502/dm6509.lst $@
 
-$(CPUOBJ)/m6502/m6510.inc: $(M6502MAKE) $(CPUSRC)/m6502/om6510.lst $(CPUSRC)/m6502/dm6510.lst
+$(CPUOBJ)/m6502/m6510.inc: $(CPUSRC)/m6502/m6502make.py $(CPUSRC)/m6502/om6510.lst $(CPUSRC)/m6502/dm6510.lst
 	@echo Generating M6510 source file...
-	$(M6502MAKE) m6510_device $(CPUSRC)/m6502/om6510.lst $(CPUSRC)/m6502/dm6510.lst $@
+	$(CPUSRC)/m6502/m6502make.py m6510_device $(CPUSRC)/m6502/om6510.lst $(CPUSRC)/m6502/dm6510.lst $@
 
-$(CPUOBJ)/m6502/n2a03.inc: $(M6502MAKE) $(CPUSRC)/m6502/on2a03.lst $(CPUSRC)/m6502/dn2a03.lst
+$(CPUOBJ)/m6502/n2a03.inc: $(CPUSRC)/m6502/m6502make.py $(CPUSRC)/m6502/on2a03.lst $(CPUSRC)/m6502/dn2a03.lst
 	@echo Generating N2A03 source file...
-	$(M6502MAKE) n2a03_device $(CPUSRC)/m6502/on2a03.lst $(CPUSRC)/m6502/dn2a03.lst $@
+	$(CPUSRC)/m6502/m6502make.py n2a03_device $(CPUSRC)/m6502/on2a03.lst $(CPUSRC)/m6502/dn2a03.lst $@
 
-$(CPUOBJ)/m6502/r65c02.inc: $(M6502MAKE) $(CPUSRC)/m6502/dr65c02.lst
+$(CPUOBJ)/m6502/r65c02.inc: $(CPUSRC)/m6502/m6502make.py $(CPUSRC)/m6502/dr65c02.lst
 	@echo Generating R65C02 source file...
-	$(M6502MAKE) r65c02_device - $(CPUSRC)/m6502/dr65c02.lst $@
-
-
-# rule to build the generator
-ifneq ($(CROSS_BUILD),1)
-
-BUILD += $(M6502MAKE)
-
-$(M6502MAKE): $(CPUOBJ)/m6502/m6502make.o $(LIBOCORE)
-	@echo Linking $@...
-	$(LD) $(LDFLAGS) $(OSDBGLDFLAGS) $^ $(LIBS) -o $@
-
-endif
+	$(CPUSRC)/m6502/m6502make.py r65c02_device - $(CPUSRC)/m6502/dr65c02.lst $@
 
 
 #-------------------------------------------------
@@ -1843,9 +1830,6 @@ ifneq ($(filter TMS57002,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/tms57002
 CPUOBJS += $(CPUOBJ)/tms57002/tms57002.o $(CPUOBJ)/tms57002/tms57kdec.o
 DASMOBJS += $(CPUOBJ)/tms57002/57002dsm.o
-ifndef TMSMAKE
-TMSMAKE += $(BUILDOUT)/tmsmake$(BUILD_EXE)
-endif
 endif
 
 $(CPUOBJ)/tms57002/tms57002.o:	$(CPUSRC)/tms57002/tms57002.c \
@@ -1860,20 +1844,9 @@ $(CPUOBJ)/tms57002/57002dsm.o:	$(CPUSRC)/tms57002/57002dsm.c \
 								$(CPUOBJ)/tms57002/tms57002.inc
 
 # rule to generate the C file
-$(CPUOBJ)/tms57002/tms57002.inc: $(TMSMAKE) $(CPUSRC)/tms57002/tmsinstr.lst
+$(CPUOBJ)/tms57002/tms57002.inc: $(CPUSRC)/tms57002/tmsmake.py $(CPUSRC)/tms57002/tmsinstr.lst
 	@echo Generating TMS57002 source file...
-	$(TMSMAKE) $(CPUSRC)/tms57002/tmsinstr.lst $@
-
-# rule to build the generator
-ifneq ($(CROSS_BUILD),1)
-
-BUILD += $(TMSMAKE)
-
-$(TMSMAKE): $(CPUOBJ)/tms57002/tmsmake.o $(LIBOCORE)
-	@echo Linking $@...
-	$(LD) $(LDFLAGS) $(OSDBGLDFLAGS) $^ $(LIBS) -o $@
-
-endif
+	$(CPUSRC)/tms57002/tmsmake.py $(CPUSRC)/tms57002/tmsinstr.lst $@
 
 
 #-------------------------------------------------
