@@ -30,7 +30,7 @@
 	floppy issues TODO (certain fail, even with a stock F version)
 	- AdventureLand: "disk offline" error
 	- Microsoft Windows 1.0 MSDOS.SYS error (can be bypassed by loading MS-DOS first)
-	\- these two happens due of a fail in sense drive status ready line (bit 5)
+	\- these two happens due of a fail in sense drive status command, ready line (bit 5)
 
 	- Dokkin Minako Sensei!
 
@@ -1260,13 +1260,14 @@ READ8_MEMBER(pc9801_state::pc9801_fdc_2hd_r)
 
 void pc9801_state::pc9801_fdc_2hd_update_ready(floppy_image_device *, int)
 {
-	bool ready = m_fdc_2hd_ctrl & 0x40;
+	bool ready = m_fdc_2hd_ctrl & 0x40 ? true : false;
 	floppy_image_device *floppy;
 	floppy = machine().device<floppy_connector>("upd765_2hd:0")->get_device();
-	if(floppy && ready)
+	/* TODO: correct? Was ANDed before, with an OR several programs boots ... */
+	if(floppy || ready)
 		ready = floppy->ready_r();
 	floppy = machine().device<floppy_connector>("upd765_2hd:1")->get_device();
-	if(floppy && ready)
+	if(floppy || ready)
 		ready = floppy->ready_r();
 
 	m_fdc_2hd->ready_w(ready);
@@ -3136,6 +3137,8 @@ MACHINE_START_MEMBER(pc9801_state,pc9801rs)
 	state_save_register_global_pointer(machine(), m_work_ram, 0xa0000);
 	state_save_register_global_pointer(machine(), m_ext_work_ram, 0x700000);
 
+	m_ram_size = machine().device<ram_device>(RAM_TAG)->size() - 0xa0000;
+
 	upd765a_device *fdc;
 	fdc = machine().device<upd765a_device>(":upd765_2hd");
 	fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc9801_state::pc9801rs_fdc_irq), this));
@@ -3223,8 +3226,6 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 	m_fdc_ctrl = 3;
 	m_access_ctrl = 0;
 	m_keyb_press = 0xff; // temp kludge, for PC-9821 booting
-
-	m_ram_size = machine().device<ram_device>(RAM_TAG)->size() - 0xa0000;
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9821)
