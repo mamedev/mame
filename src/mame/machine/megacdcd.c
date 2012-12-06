@@ -25,8 +25,7 @@ lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const ch
 	NeoCDCommsWordCount = 0;
 	NeoCDAssyStatus = 0;
 	SCD_CURLBA = 0;
-	for (int i=0;i<2352;i++)
-		NeoCDSectorData[i] = 0;
+
 	bNeoCDLoadSector = false;
 	CDC_REG0 = 0;
 	nNeoCDIRQVectorAck = 0;
@@ -1010,7 +1009,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( lc89510_temp_device::segacd_access_timer_callback 
 			NeoCDIRQUpdate(0);
 
 			if (nff0002 & 0x0500) {
-				Read_LBA_To_Buffer_NeoCD();
+				Read_LBA_To_Buffer(machine());
 			}
 		}
 	}
@@ -1040,17 +1039,6 @@ machine_config_constructor lc89510_temp_device::device_mconfig_additions() const
 
 
 
-INT32 lc89510_temp_device::CDEmuLoadSector(INT32 LBA, char* pBuffer)
-{
-//	printf("CDEmuLoadSector %d\n", LBA);
-	//LBA += 150;
-
-	cdrom_read_data(segacd.cd, LBA, pBuffer, CD_TRACK_MODE1);
-
-	return LBA+1;// - 150;
-}
-
-
 
 
 
@@ -1065,8 +1053,6 @@ void lc89510_temp_device::NeoCDCommsReset()
 	NeoCDCommsWordCount = 0;
 
 	NeoCDAssyStatus = 9;
-
-	memset(NeoCDSectorData, 0, sizeof(NeoCDSectorData));
 
 	bNeoCDLoadSector = false;
 
@@ -1193,12 +1179,14 @@ char* lc89510_temp_device::LC8915InitTransfer(int NeoCDDMACount)
 		//bprintf(PRINT_ERROR, _T("    LC8951 DOUTEN status invalid\n"));
 		return NULL;
 	}
-	if (((LC8951RegistersW[REG_W_DACH] << 8) | LC8951RegistersW[REG_W_DACL]) + (NeoCDDMACount << 1) > 2352) {
+	if (((LC8951RegistersW[REG_W_DACH] << 8) | LC8951RegistersW[REG_W_DACL]) + (NeoCDDMACount << 1) > LC89510_EXTERNAL_BUFFER_SIZE) {
 		//bprintf(PRINT_ERROR, _T("    DMA transfer exceeds current sector in LC8951 external buffer\n"));
+
 		return NULL;
 	}
 
-	return NeoCDSectorData + ((LC8951RegistersW[REG_W_DACH] << 8) | LC8951RegistersW[REG_W_DACL]);
+	char* addr = (char*)CDC_BUFFER + ((LC8951RegistersW[REG_W_DACH] << 8) | LC8951RegistersW[REG_W_DACL]);
+	return  addr;
 }
 
 void lc89510_temp_device::LC8915EndTransfer()
@@ -1236,98 +1224,6 @@ void lc89510_temp_device::CDC_End_Transfer(running_machine& machine)
 
 
 
-/*
- *  CD-ROM / DMA control
- *
- *  DMA
-
-    FF0061  Write 0x40 means start DMA transfer
-    FF0064  Source address (in copy mode), Target address (in filll mode)
-    FF0068  Target address (in copy mode)
-    FF006C  Fill word
-    FF0070  Words count
-    FF007E  \
-    ......   | DMA programming words?   NeoGeoCD uses Sanyo Puppet LC8359 chip to
-    FF008E  /                           interface with CD, and do DMA transfers
-
-    Memory access control
-
-    FF011C  DIP SWITCH (Region code)
-    FF0105  Area Selector (5 = FIX, 0 = SPR, 4 = Z80, 1 = PCM)
-    FF01A1  Sprite bank selector
-    FF01A3  PCM bank selector
-    FF0120  Prepare sprite area for transfer
-    FF0122  Prepare PCM area for transfer
-    FF0126  Prepare Z80 area for transfer
-    FF0128  Prepare Fix area for transfer
-    FF0140  Terminate work on Spr Area  (Sprites must be decoded here)
-    FF0142  Terminate work on Pcm Area
-    FF0146  Terminate work on Z80 Area  (Z80 needs to be reset)
-    FF0148  Terminate work on Fix Area
-
-    CD-ROM:
-    0xff0102 == 0xF0 start cd transfer
-    int m=bcd(fast_r8(0x10f6c8));
-    int s=bcd(fast_r8(0x10f6c9));
-    int f=bcd(fast_r8(0x10f6ca));
-    int seccount=fast_r16(0x10f688);
-
-    inisec=((m*60)+s)*75+f;
-    inisec-=150;
-    dstaddr=0x111204; // this must come from somewhere
-
-    the value @ 0x10f688 is decremented each time a sector is read until it's 0.
-
- *
- */
-
-void lc89510_temp_device::Read_LBA_To_Buffer_NeoCD()
-{
-	if ((nff0002 & 0x0500)) {
-		if (NeoCDAssyStatus == 1 && bNeoCDLoadSector) {
-
-//          if (LC8951RegistersW[REG_W_CTRL0] & 0x80) {
-				SCD_CURLBA++;
-				SCD_CURLBA = CDEmuLoadSector(SCD_CURLBA, NeoCDSectorData + 4) -1;
-//          }
-
-			if (LC8951RegistersW[REG_W_CTRL0] & 0x80) {
-				LC8951UpdateHeader();
-
-				LC8951RegistersR[REG_R_STAT0] = 0x80;										// STAT0
-				LC8951RegistersR[REG_R_STAT1] = 0;											// STAT1
-				LC8951RegistersR[REG_R_STAT2] = 0x10;										// STAT2
-				LC8951RegistersR[REG_R_STAT3] = 0;											// STAT3
-
-//              bprintf(PRINT_IMPORTANT, _T("    Sector %08i (%02i:%02i:%02i) read\n"), SCD_CURLBA, NeoCDSectorMin, NeoCDSectorSec, NeoCDSectorFrm);
-
-// CDZ protection hack? (error correction on the CDC should correct this?)
-#if 1
-				if (NeoCDSectorData[4 + 64] == 'g' && !strncmp(NeoCDSectorData + 4, "Copyright by SNK", 16)) {
-//                  printf(PRINT_ERROR, _T("    simulated CDZ protection error\n"));
-//                  bprintf(PRINT_ERROR, _T("    %.70hs\n"), NeoCDSectorData + 4);
-
-					NeoCDSectorData[4 + 64] = 'f';
-
-					// LC8951RegistersR[REG_R_STATB0] = 0x00;                                 // STAT0
-				}
-#endif
-
-				nIRQAcknowledge &= ~0x20;
-				NeoCDIRQUpdate(0);
-
-				LC8951RegistersR[REG_R_IFSTAT] &= ~0x20;
-
-//              bprintf(PRINT_IMPORTANT, _T("    DECI interrupt triggered\n"));
-			}
-		}
-
-		bNeoCDLoadSector = true;
-//      bNeoCDLoadSector = false;
-	}
-}
-
-
 
 void lc89510_temp_device::scd_ctrl_checks(running_machine& machine)
 {
@@ -1338,7 +1234,20 @@ void lc89510_temp_device::scd_ctrl_checks(running_machine& machine)
 
 	if (LC8951RegistersW[REG_W_IFCTRL] & 0x20)
 	{
-		CHECK_SCD_LV5_INTERRUPT
+	
+		// todo: handle as interrupt callback
+		if (is_neoCD)
+		{
+			nIRQAcknowledge &= ~0x20;
+			NeoCDIRQUpdate(0);
+		}
+		else
+		{
+			CHECK_SCD_LV5_INTERRUPT		
+		}
+
+
+
 		LC8951RegistersR[REG_R_IFSTAT] &= ~0x20;
 		CDC_DECODE = 0;
 	}
@@ -1392,6 +1301,20 @@ int lc89510_temp_device::Read_LBA_To_Buffer(running_machine& machine)
 				CDC_BUFFER[pt+1] = LC8951RegistersR[REG_R_HEAD1];
 				CDC_BUFFER[pt+2] = LC8951RegistersR[REG_R_HEAD2];
 				CDC_BUFFER[pt+3] = LC8951RegistersR[REG_R_HEAD3];
+
+
+				if (is_neoCD)
+				{
+					// This simulates the protection used by the NeoCDZ, a number of games (samsrpg for example)
+					// will not be recognized unless this happens.  Is this part of the CDC error correction
+					// mechanism?
+					char *buffer_hack = (char*)&CDC_BUFFER[pt];
+					if (buffer_hack[4 + 64] == 'g' && !strncmp(buffer_hack + 4, "Copyright by SNK", 16))
+					{
+						buffer_hack[4 + 64] = 'f';
+					}
+				}
+
 			}
 			else
 			{
@@ -1402,6 +1325,8 @@ int lc89510_temp_device::Read_LBA_To_Buffer(running_machine& machine)
 		}
 
 		scd_ctrl_checks(machine);
+
+
 	}
 
 

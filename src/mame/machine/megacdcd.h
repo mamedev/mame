@@ -143,6 +143,8 @@ typedef device_delegate<void (int&, UINT8*, UINT16&, UINT16&)> segacd_dma_delega
 #define SEK_IRQSTATUS_AUTO (0x2000)
 #define SEK_IRQSTATUS_ACK  (0x1000)
 
+#define LC89510_EXTERNAL_BUFFER_SIZE ((32 * 1024 * 2) + SECTOR_SIZE)
+
 class lc89510_temp_device : public device_t
 {
 public:
@@ -171,7 +173,6 @@ public:
 	segacd_t segacd;
 
 	UINT8    SCD_BUFFER[2560];
-	char NeoCDSectorData[2352];
 
 	UINT32   SCD_STATUS;
 	UINT32   SCD_STATUS_CDC;
@@ -183,7 +184,7 @@ public:
 	UINT16 CDC_REG0;
 	UINT16 CDC_REG1;
 
-	UINT8 CDC_BUFFER[(32 * 1024 * 2) + SECTOR_SIZE];
+	UINT8 CDC_BUFFER[LC89510_EXTERNAL_BUFFER_SIZE];
 
 
 	UINT8 CDD_RX[10];
@@ -290,7 +291,6 @@ public:
 	int get_nNeoCDIRQVector(void) { return nNeoCDIRQVector; }
 
 	void NeoCDIRQUpdate(UINT8 byteValue);
-	void Read_LBA_To_Buffer_NeoCD();
 	void NeoCDCommsControl(UINT8 clock, UINT8 send);
 	void NeoCDProcessCommand();
 	void LC8951UpdateHeader();
@@ -301,7 +301,6 @@ public:
 	UINT8 neocd_cdd_rx_r();
 	void NeoCDCommsReset();
 
-	INT32 CDEmuLoadSector(INT32 LBA, char* pBuffer);
 
 	UINT16 nff0016_r(void);
 	void nff0016_set(UINT16 wordValue);

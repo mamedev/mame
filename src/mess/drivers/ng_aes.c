@@ -1033,6 +1033,53 @@ static INT32 SekIdle(INT32 nCycles)
 }
 
 
+
+/*
+ *  CD-ROM / DMA control
+ *
+ *  DMA
+
+    FF0061  Write 0x40 means start DMA transfer
+    FF0064  Source address (in copy mode), Target address (in filll mode)
+    FF0068  Target address (in copy mode)
+    FF006C  Fill word
+    FF0070  Words count
+    FF007E  \
+    ......   | DMA programming words?   NeoGeoCD uses Sanyo Puppet LC8359 chip to
+    FF008E  /                           interface with CD, and do DMA transfers
+
+    Memory access control
+
+    FF011C  DIP SWITCH (Region code)
+    FF0105  Area Selector (5 = FIX, 0 = SPR, 4 = Z80, 1 = PCM)
+    FF01A1  Sprite bank selector
+    FF01A3  PCM bank selector
+    FF0120  Prepare sprite area for transfer
+    FF0122  Prepare PCM area for transfer
+    FF0126  Prepare Z80 area for transfer
+    FF0128  Prepare Fix area for transfer
+    FF0140  Terminate work on Spr Area  (Sprites must be decoded here)
+    FF0142  Terminate work on Pcm Area
+    FF0146  Terminate work on Z80 Area  (Z80 needs to be reset)
+    FF0148  Terminate work on Fix Area
+
+    CD-ROM:
+    0xff0102 == 0xF0 start cd transfer
+    int m=bcd(fast_r8(0x10f6c8));
+    int s=bcd(fast_r8(0x10f6c9));
+    int f=bcd(fast_r8(0x10f6ca));
+    int seccount=fast_r16(0x10f688);
+
+    inisec=((m*60)+s)*75+f;
+    inisec-=150;
+    dstaddr=0x111204; // this must come from somewhere
+
+    the value @ 0x10f688 is decremented each time a sector is read until it's 0.
+
+ *
+ */
+
+
 void ng_aes_state::NeoCDDoDMA()
 {
 
