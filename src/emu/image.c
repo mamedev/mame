@@ -414,7 +414,7 @@ astring &image_info_astring(running_machine &machine, astring &string)
 			/* display supported information, if available */
 			switch(image->supported()) {
 				case SOFTWARE_SUPPORTED_NO : string.catprintf("Not supported\n"); break;
-				case SOFTWARE_SUPPORTED_PARTIAL : string.catprintf("Partialy supported\n"); break;
+				case SOFTWARE_SUPPORTED_PARTIAL : string.catprintf("Partially supported\n"); break;
 				default : break;
 			}
 

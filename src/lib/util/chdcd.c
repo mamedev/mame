@@ -923,7 +923,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 		return chdcd_parse_nero(tocfname, outtoc, outinfo);
 	}
 
-	if (strstr(tocftemp,".iso"))
+	if (strstr(tocftemp,".iso") || strstr(tocftemp,".cdr"))
 	{
 		return chdcd_parse_iso(tocfname, outtoc, outinfo);
 	}
