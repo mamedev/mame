@@ -29,8 +29,11 @@
 
 	floppy issues TODO (certain fail, even with a stock F version)
 	- AdventureLand: "disk offline" error
-	- Dokkin Minako Sensei!
 	- Microsoft Windows 1.0 MSDOS.SYS error (can be bypassed by loading MS-DOS first)
+	\- these two happens due of a fail in sense drive status ready line (bit 5)
+
+	- Dokkin Minako Sensei!
+
 
 	List of per-game TODO:
 	- 4D Boxing: tries to format User Disk;
@@ -2585,6 +2588,11 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( pc9801rs )
 	PORT_INCLUDE( pc9801 )
 
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x80, 0x80, "GDC clock" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, "2.5 MHz" )
+	PORT_DIPSETTING(    0x00, "5 MHz" )
+
 	PORT_MODIFY("ROM_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
@@ -3349,10 +3357,10 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 
 	MCFG_SOUND_ADD("opn", YM2203, 4000000) // unknown clock / divider
 	MCFG_SOUND_CONFIG(pc98_ym2203_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 
 #if 0
@@ -3411,10 +3419,10 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 
 	MCFG_SOUND_ADD("opn", YM2203, 4000000) // unknown clock / divider
 	MCFG_SOUND_CONFIG(pc98_ym2203_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 
 static const unsigned i286_address_mask = 0x00ffffff;
@@ -3474,10 +3482,10 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 
 	MCFG_SOUND_ADD("opn", YM2203, 4000000) // unknown clock / divider
 	MCFG_SOUND_CONFIG(pc98_ym2203_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pc9821v20, pc9821 )
