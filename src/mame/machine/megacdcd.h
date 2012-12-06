@@ -281,8 +281,6 @@ public:
 	INT32 NeoCDAssyStatus;
 
 
-	bool bNeoCDLoadSector;
-
 
 	int nNeoCDIRQVectorAck;
 	int get_nNeoCDIRQVectorAck(void) { return nNeoCDIRQVectorAck; }

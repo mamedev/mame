@@ -26,7 +26,6 @@ lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const ch
 	NeoCDAssyStatus = 0;
 	SCD_CURLBA = 0;
 
-	bNeoCDLoadSector = false;
 	CDC_REG0 = 0;
 	nNeoCDIRQVectorAck = 0;
 	nNeoCDIRQVector = 0;
@@ -175,7 +174,6 @@ void lc89510_temp_device::CDD_Stop(running_machine &machine)
 
 	//neocd
 	NeoCDAssyStatus = 0x0E;
-	bNeoCDLoadSector = false;
 
 
 }
@@ -343,7 +341,6 @@ void lc89510_temp_device::CDD_Play(running_machine &machine)
 	// neocd
 	CDEmuStatus = seeking;
 	NeoCDAssyStatus = 1;
-	bNeoCDLoadSector = true;
 
 }
 
@@ -376,7 +373,6 @@ void lc89510_temp_device::CDD_Pause(running_machine &machine)
 
 
 	NeoCDAssyStatus = 4;
-	bNeoCDLoadSector = false;
 
 
 }
@@ -395,7 +391,6 @@ void lc89510_temp_device::CDD_Resume(running_machine &machine)
 	cdda_pause_audio( m_cdda, 0 );
 
 	NeoCDAssyStatus = 1;
-	bNeoCDLoadSector = true;
 }
 
 
@@ -443,7 +438,6 @@ void lc89510_temp_device::CDD_Default(void)
 
 
 	NeoCDAssyStatus = 9;
-	bNeoCDLoadSector = false;
 }
 
 
@@ -1054,7 +1048,6 @@ void lc89510_temp_device::NeoCDCommsReset()
 
 	NeoCDAssyStatus = 9;
 
-	bNeoCDLoadSector = false;
 
 	nff0016 = 0;
 }
@@ -1100,7 +1093,6 @@ void lc89510_temp_device::NeoCDCommsControl(UINT8 clock, UINT8 send)
 							if (NeoCDAssyStatus == 1) {
 								if (CDEmuGetStatus() == idle) {
 									NeoCDAssyStatus = 0x0E;
-									bNeoCDLoadSector = false;
 								}
 							}
 
