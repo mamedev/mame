@@ -148,6 +148,9 @@ public:
 	int          m_layer_scroll3x_offset;
 	int          m_sprite_base;
 	int          m_sprite_list_end_marker;
+	int          m_sprite_x_offset;
+	UINT16       *m_bootleg_sprite_ram;
+	UINT16       *m_bootleg_work_ram;
 
 	/* devices */
 	cpu_device *m_maincpu;
@@ -232,8 +235,10 @@ public:
 	DECLARE_MACHINE_RESET(fcrash);
 	DECLARE_MACHINE_START(kodb);
 	DECLARE_MACHINE_START(cawingbl);
+	DECLARE_MACHINE_START(sf2mdt);
 	DECLARE_WRITE16_MEMBER(kodb_layer_w);
 	DECLARE_WRITE16_MEMBER(cawingbl_soundlatch_w);
+	DECLARE_WRITE16_MEMBER(sf2mdt_layer_w);
 	UINT32 screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
