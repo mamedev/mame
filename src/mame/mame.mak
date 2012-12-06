@@ -1802,6 +1802,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/gumbo.o $(VIDEO)/gumbo.o \
 	$(DRIVERS)/gunpey.o \
 	$(DRIVERS)/hazelgr.o \
+	$(DRIVERS)/headonb.o \
 	$(DRIVERS)/highvdeo.o \
 	$(DRIVERS)/himesiki.o $(VIDEO)/himesiki.o \
 	$(DRIVERS)/hitpoker.o \

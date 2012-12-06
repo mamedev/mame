@@ -3976,6 +3976,7 @@ sspaceatc		// 139-146 (c)
 sspacaho		// ? epr00001.bin - epr00008.bin
 headon			// 163-167/192-193 (c) Gremlin
 headon1			// 163-167/192-193 (c) Gremlin
+headonb			// bootleg, headonb.c
 headons			// Sidam bootleg
 headonsa		// Sidam bootleg
 supcrash		// bootleg
