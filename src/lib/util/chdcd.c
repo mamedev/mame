@@ -486,13 +486,16 @@ chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 		outtoc.tracks[0].frames = size / 2048;
 		outtoc.tracks[0].datasize = 2048;
 		outinfo.track[0].swap = false;
-	} else {
+	} else if ((size % 2352)==0 ) {
 		// 2352 byte mode 2 raw
 		outtoc.tracks[0].trktype = CD_TRACK_MODE2_RAW;
 		outtoc.tracks[0].frames = size / 2352;
 		outtoc.tracks[0].datasize = 2352;
 		outinfo.track[0].swap = false;
-	}	
+	} else {
+		printf("ERROR: Unrecognized track type\n");
+		return CHDERR_FILE_NOT_FOUND;
+	}
 
 	outtoc.tracks[0].subtype = CD_SUB_NONE;
 	outtoc.tracks[0].subsize = 0;
