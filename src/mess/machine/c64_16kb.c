@@ -121,7 +121,7 @@ void c64_16kb_cartridge_device::device_start()
 
 void c64_16kb_cartridge_device::device_reset()
 {
-	UINT8 mode = device().ioport("SW1")->read();
+	UINT8 mode = ioport("SW1")->read();
 
 	m_exrom = BIT(mode, 0);
 	m_game = BIT(mode, 1);

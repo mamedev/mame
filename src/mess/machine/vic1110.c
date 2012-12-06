@@ -68,7 +68,8 @@ ioport_constructor vic1110_device::device_input_ports() const
 
 vic1110_device::vic1110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, VIC1110, "VIC1110", tag, owner, clock),
-	  device_vic20_expansion_card_interface(mconfig, *this)
+	  device_vic20_expansion_card_interface(mconfig, *this),
+	  m_sw(*this, "SW")
 {
 }
 
@@ -80,7 +81,7 @@ vic1110_device::vic1110_device(const machine_config &mconfig, const char *tag, d
 void vic1110_device::device_start()
 {
 	// allocate memory
-	m_ram = auto_alloc_array(machine(), UINT8, 0x2000);
+	vic20_ram_pointer(machine(), 0x2000);
 }
 
 
@@ -90,7 +91,7 @@ void vic1110_device::device_start()
 
 UINT8 vic1110_device::vic20_cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
-	UINT8 sw = ioport("SW")->read();
+	UINT8 sw = m_sw->read();
 
 	if ((!blk1 && (sw == BLK1)) || (!blk2 && (sw == BLK2)) || (!blk3 && (sw == BLK3)) || (!blk5 && (sw == BLK5)))
 	{
@@ -107,7 +108,7 @@ UINT8 vic1110_device::vic20_cd_r(address_space &space, offs_t offset, UINT8 data
 
 void vic1110_device::vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
-	UINT8 sw = ioport("SW")->read();
+	UINT8 sw = m_sw->read();
 
 	if ((!blk1 && (sw == BLK1)) || (!blk2 && (sw == BLK2)) || (!blk3 && (sw == BLK3)) || (!blk5 && (sw == BLK5)))
 	{

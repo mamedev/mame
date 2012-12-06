@@ -62,7 +62,10 @@ ioport_constructor vp570_device::device_input_ports() const
 
 vp570_device::vp570_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VP570, "VP570", tag, owner, clock),
-	device_vip_expansion_card_interface(mconfig, *this)
+	device_vip_expansion_card_interface(mconfig, *this),
+	m_ram(*this, "ram"),
+	m_base(*this, "BASE"),
+	m_sw1(*this, "SW1")
 {
 }
 
@@ -73,7 +76,7 @@ vp570_device::vp570_device(const machine_config &mconfig, const char *tag, devic
 
 void vp570_device::device_start()
 {
-	m_ram = auto_alloc_array(machine(), UINT8, 0x1000);
+	m_ram.allocate(0x1000);
 }
 
 
@@ -85,7 +88,7 @@ UINT8 vp570_device::vip_program_r(address_space &space, offs_t offset, int cs, i
 {
 	UINT8 data = 0xff;
 
-	offs_t base = ioport("BASE")->read() << 12;
+	offs_t base = m_base->read() << 12;
 
 	if (offset >= base && offset < base + 0x1000)
 	{
@@ -104,13 +107,13 @@ UINT8 vp570_device::vip_program_r(address_space &space, offs_t offset, int cs, i
 
 void vp570_device::vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh)
 {
-	offs_t base = ioport("BASE")->read() << 12;
+	offs_t base = m_base->read() << 12;
 
 	if (offset >= base && offset < base + 0x1000)
 	{
 		*minh = 1;
 
-		if (ioport("SW1")->read())
+		if (m_sw1->read())
 		{
 			m_ram[offset & 0xfff] = data;
 		}

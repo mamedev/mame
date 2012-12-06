@@ -82,7 +82,9 @@ ioport_constructor vp585_device::device_input_ports() const
 
 vp585_device::vp585_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VP585, "VP585", tag, owner, clock),
-	device_vip_expansion_card_interface(mconfig, *this)
+	device_vip_expansion_card_interface(mconfig, *this),
+	m_j1(*this, "J1"),
+	m_j2(*this, "J2")
 {
 }
 
@@ -117,7 +119,7 @@ void vp585_device::vip_io_w(address_space &space, offs_t offset, UINT8 data)
 
 int vp585_device::vip_ef3_r()
 {
-	return BIT(ioport("J1")->read(), m_keylatch) ? CLEAR_LINE : ASSERT_LINE;
+	return BIT(m_j1->read(), m_keylatch) ? CLEAR_LINE : ASSERT_LINE;
 }
 
 
@@ -127,5 +129,5 @@ int vp585_device::vip_ef3_r()
 
 int vp585_device::vip_ef4_r()
 {
-	return BIT(ioport("J2")->read(), m_keylatch) ? CLEAR_LINE : ASSERT_LINE;
+	return BIT(m_j2->read(), m_keylatch) ? CLEAR_LINE : ASSERT_LINE;
 }

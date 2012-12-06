@@ -150,7 +150,10 @@ ioport_constructor vp590_device::device_input_ports() const
 vp590_device::vp590_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VP590, "VP590", tag, owner, clock),
 	device_vip_expansion_card_interface(mconfig, *this),
-	m_cgc(*this, CDP1862_TAG)
+	m_cgc(*this, CDP1862_TAG),
+	m_color_ram(*this, "color_ram"),
+	m_j1(*this, "J1"),
+	m_j2(*this, "J2")
 {
 }
 
@@ -162,10 +165,10 @@ vp590_device::vp590_device(const machine_config &mconfig, const char *tag, devic
 void vp590_device::device_start()
 {
 	// allocate memory
-	m_color_ram = auto_alloc_array(machine(), UINT8, COLOR_RAM_SIZE);
+	m_color_ram.allocate(COLOR_RAM_SIZE);
 
 	// state saving
-	save_pointer(NAME(m_color_ram), COLOR_RAM_SIZE);
+	save_item(NAME(m_a12));
 	save_item(NAME(m_color));
 	save_item(NAME(m_keylatch));
 }
@@ -255,7 +258,7 @@ UINT32 vp590_device::vip_screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 int vp590_device::vip_ef3_r()
 {
-	return BIT(ioport("J1")->read(), m_keylatch) ? CLEAR_LINE : ASSERT_LINE;
+	return BIT(m_j1->read(), m_keylatch) ? CLEAR_LINE : ASSERT_LINE;
 }
 
 
@@ -265,5 +268,5 @@ int vp590_device::vip_ef3_r()
 
 int vp590_device::vip_ef4_r()
 {
-	return BIT(ioport("J2")->read(), m_keylatch) ? CLEAR_LINE : ASSERT_LINE;
+	return BIT(m_j2->read(), m_keylatch) ? CLEAR_LINE : ASSERT_LINE;
 }

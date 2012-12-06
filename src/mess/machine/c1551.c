@@ -195,7 +195,7 @@ READ8_MEMBER( c1551_device::tpi0_pc_r )
 	UINT8 data = 0;
 
 	// JP1
-	data |= ioport("JP1")->read() << 5;
+	data |= m_jp1->read() << 5;
 
 	// SYNC detect line
 	data |= m_ga->sync_r() << 6;
@@ -463,6 +463,7 @@ c1551_device::c1551_device(const machine_config &mconfig, const char *tag, devic
 	  m_pla(*this, PLA_TAG),
 	  m_image(*this, FLOPPY_0),
 	  m_exp(*this, PLUS4_EXPANSION_SLOT_TAG),
+	  m_jp1(*this, "JP1"),
 	  m_tcbm_data(0xff),
 	  m_status(1),
 	  m_dav(1),

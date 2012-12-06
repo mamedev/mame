@@ -56,11 +56,12 @@ protected:
 
 private:
 	required_device<cdp1862_device> m_cgc;
+	optional_shared_ptr<UINT8> m_color_ram;
+	required_ioport m_j1;
+	required_ioport m_j2;
 
 	int m_a12;
-	UINT8 *m_color_ram;
 	UINT8 m_color;
-
 	UINT8 m_keylatch;
 };
 

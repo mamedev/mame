@@ -91,6 +91,7 @@ private:
 	required_device<pls100_device> m_pla;
 	required_device<legacy_floppy_image_device> m_image;
 	required_device<plus4_expansion_slot_device> m_exp;
+	required_ioport m_jp1;
 
 	// TCBM bus
 	UINT8 m_tcbm_data;						// data

@@ -44,6 +44,9 @@ protected:
 	virtual int vip_ef4_r();
 
 private:
+	required_ioport m_j1;
+	required_ioport m_j2;
+
 	UINT8 m_keylatch;
 };
 

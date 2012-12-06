@@ -43,7 +43,9 @@ protected:
 	virtual void vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh);
 
 private:
-	UINT8 *m_ram;
+	optional_shared_ptr<UINT8> m_ram;
+	required_ioport m_base;
+	required_ioport m_sw1;
 };
 
 
