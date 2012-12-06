@@ -113,7 +113,11 @@ typedef device_delegate<void (int&, UINT8*, UINT16&, UINT16&)> segacd_dma_delega
 		machine.device(":segacd:segacd_68k")->execute().set_input_line(4, HOLD_LINE); \
 	} \
 
-
+#define CHECK_SCD_LV4_INTERRUPT_A \
+	if (segacd_irq_mask & 0x10) \
+	{ \
+		machine().device(":segacd:segacd_68k")->execute().set_input_line(4, HOLD_LINE); \
+	} \
 
 
 
@@ -203,11 +207,11 @@ public:
 	inline int to_bcd(int val, bool byte);
 	void set_data_audio_mode(void);
 	void CDD_DoChecksum(void);
-	void CDD_Export(void);
+	bool CDD_Check_TX_Checksum(void);
+	void CDD_Export(bool neocd_hack = false);
 	void scd_ctrl_checks(running_machine& machine);
 	void scd_advance_current_readpos(void);
 	int Read_LBA_To_Buffer(running_machine& machine);
-	void CheckCommand(running_machine& machine);
 	void CDD_GetStatus(void);
 	void CDD_Stop(running_machine &machine);
 	void CDD_GetPos(void);
@@ -238,7 +242,7 @@ public:
 	void CDC_Reg_w(UINT8 data);
 	void CDD_Process(running_machine& machine, int reason);
 	void CDD_Handle_TOC_Commands(void);
-	void CDD_Import(running_machine& machine);
+	bool CDD_Import(running_machine& machine);
 	READ16_MEMBER( segacd_irq_mask_r );
 	WRITE16_MEMBER( segacd_irq_mask_w );
 	READ16_MEMBER( segacd_cdd_ctrl_r );
@@ -274,11 +278,11 @@ public:
 
 
 
-	bool bNeoCDCommsClock, bNeoCDCommsSend;
+	bool bNeoCDCommsClock;
 
 	INT32 NeoCDCommsWordCount;
 
-	INT32 NeoCDAssyStatus;
+	INT32 NeoCD_StatusHack;
 
 
 
@@ -290,7 +294,6 @@ public:
 
 	void NeoCDIRQUpdate(UINT8 byteValue);
 	void NeoCDCommsControl(UINT8 clock, UINT8 send);
-	void NeoCDProcessCommand();
 	void LC8951UpdateHeader();
 	char* LC8915InitTransfer(int NeoCDDMACount);
 	void LC8915EndTransfer();

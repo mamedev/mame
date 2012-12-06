@@ -23,7 +23,7 @@ lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const ch
 	for (int i=0;i<10;i++)
 		CDD_RX[i] = 0;
 	NeoCDCommsWordCount = 0;
-	NeoCDAssyStatus = 0;
+	NeoCD_StatusHack = 0;
 	SCD_CURLBA = 0;
 
 	CDC_REG0 = 0;
@@ -107,16 +107,44 @@ void lc89510_temp_device::CDD_DoChecksum(void)
 		CDD_RX[7] +
 		CDD_RX[8];
 
+	if (is_neoCD) checksum += 0x5; // why??
 	checksum &= 0xf;
 	checksum ^= 0xf;
 
 	CDD_RX[9] = checksum;
 }
 
-// converts our 16-bit working regs to 8-bit regs and checksums them
-void lc89510_temp_device::CDD_Export(void)
+bool lc89510_temp_device::CDD_Check_TX_Checksum(void)
 {
-	CDD_RX[0] = (CDD_STATUS  & 0xff00)>>8;
+	int checksum =
+		CDD_TX[0] +
+		CDD_TX[1] +
+		CDD_TX[2] +
+		CDD_TX[3] +
+		CDD_TX[4] +
+		CDD_TX[5] +
+		CDD_TX[6] +
+		CDD_TX[7] +
+		CDD_TX[8];
+
+	if (is_neoCD) checksum += 0x5; // why??
+	checksum &= 0xf;
+	checksum ^= 0xf;
+
+	if (CDD_TX[9] == checksum)
+		return true;
+
+	return false;
+}
+
+// converts our 16-bit working regs to 8-bit regs and checksums them
+void lc89510_temp_device::CDD_Export(bool neocd_hack)
+{
+	if (!neocd_hack)
+		CDD_RX[0] = (CDD_STATUS  & 0xff00)>>8;
+	else
+		CDD_RX[0] = NeoCD_StatusHack;
+
 	CDD_RX[1] = (CDD_STATUS  & 0x00ff)>>0;
 	CDD_RX[2] = (CDD_MIN  & 0xff00)>>8;
 	CDD_RX[3] = (CDD_MIN  & 0x00ff)>>0;
@@ -136,22 +164,6 @@ void lc89510_temp_device::CDD_Export(void)
 
 
 
-
-void lc89510_temp_device::CheckCommand(running_machine& machine)
-{
-	if (CDD_DONE)
-	{
-		CDD_DONE = 0;
-		CDD_Export();
-		CHECK_SCD_LV4_INTERRUPT
-	}
-
-	if (SCD_READ_ENABLED)
-	{
-		set_data_audio_mode();
-		Read_LBA_To_Buffer(machine);
-	}
-}
 
 
 void lc89510_temp_device::CDD_GetStatus(void)
@@ -173,7 +185,7 @@ void lc89510_temp_device::CDD_Stop(running_machine &machine)
 	cdda_stop_audio( m_cdda ); //stop any pending CD-DA
 
 	//neocd
-	NeoCDAssyStatus = 0x0E;
+	NeoCD_StatusHack = 0x0E;
 
 
 }
@@ -340,7 +352,7 @@ void lc89510_temp_device::CDD_Play(running_machine &machine)
 
 	// neocd
 	CDEmuStatus = seeking;
-	NeoCDAssyStatus = 1;
+	NeoCD_StatusHack = 1;
 
 }
 
@@ -372,7 +384,7 @@ void lc89510_temp_device::CDD_Pause(running_machine &machine)
 	cdda_pause_audio( m_cdda, 1 );
 
 
-	NeoCDAssyStatus = 4;
+	NeoCD_StatusHack = 4;
 
 
 }
@@ -390,7 +402,7 @@ void lc89510_temp_device::CDD_Resume(running_machine &machine)
 	//if(!(CURRENT_TRACK_IS_DATA))
 	cdda_pause_audio( m_cdda, 0 );
 
-	NeoCDAssyStatus = 1;
+	NeoCD_StatusHack = 1;
 }
 
 
@@ -437,7 +449,7 @@ void lc89510_temp_device::CDD_Default(void)
 	CDD_STATUS = SCD_STATUS;
 
 
-	NeoCDAssyStatus = 9;
+	NeoCD_StatusHack = 9;
 }
 
 
@@ -743,8 +755,15 @@ static const char *const CDD_import_cmdnames[] =
 	"<undefined> (f)"			// F
 };
 
-void lc89510_temp_device::CDD_Import(running_machine& machine)
+bool lc89510_temp_device::CDD_Import(running_machine& machine)
 {
+	// don't execute the command if the checksum isn't valid
+	if (!CDD_Check_TX_Checksum())
+	{
+		printf("invalid checksum\n");
+		return false;
+	}
+
 	if(CDD_TX[0] != 2 && CDD_TX[0] != 0)
 		printf("%s\n",CDD_import_cmdnames[CDD_TX[0]]);
 
@@ -766,6 +785,7 @@ void lc89510_temp_device::CDD_Import(running_machine& machine)
 	}
 
 	CDD_DONE = 1;
+	return true;
 }
 
 
@@ -994,19 +1014,28 @@ TIMER_DEVICE_CALLBACK_MEMBER( lc89510_temp_device::segacd_access_timer_callback 
 {
 	if (!is_neoCD)
 	{
-		CheckCommand(machine());
+		if (CDD_DONE)
+		{
+			CDD_DONE = 0;
+			CDD_Export();
+			CHECK_SCD_LV4_INTERRUPT_A
+		}
 	}
 	else
 	{
-		if (nff0002 & 0x0050) {
+		if (nff0002 & 0x0050)
+		{
 			nIRQAcknowledge &= ~0x10;
 			NeoCDIRQUpdate(0);
-
-			if (nff0002 & 0x0500) {
-				Read_LBA_To_Buffer(machine());
-			}
 		}
 	}
+
+	if (SCD_READ_ENABLED) // if (nff0002 & 0x0050) if (nff0002 & 0x0500); 
+	{
+		set_data_audio_mode();
+		Read_LBA_To_Buffer(machine());
+	}
+
 }
 
 
@@ -1038,7 +1067,6 @@ machine_config_constructor lc89510_temp_device::device_mconfig_additions() const
 
 void lc89510_temp_device::NeoCDCommsReset()
 {
-	bNeoCDCommsSend  = false;
 	bNeoCDCommsClock = true;
 
 	memset(CDD_TX, 0, sizeof(CDD_TX));
@@ -1046,18 +1074,14 @@ void lc89510_temp_device::NeoCDCommsReset()
 
 	NeoCDCommsWordCount = 0;
 
-	NeoCDAssyStatus = 9;
+	NeoCD_StatusHack = 9;
 
 
 	nff0016 = 0;
 }
 
 
-void lc89510_temp_device::NeoCDProcessCommand()
-{
-	CDD_Import(machine());
-	CDD_Export();
-}
+
 
 void lc89510_temp_device::NeoCDCommsControl(UINT8 clock, UINT8 send)
 {
@@ -1066,72 +1090,25 @@ void lc89510_temp_device::NeoCDCommsControl(UINT8 clock, UINT8 send)
 		if (NeoCDCommsWordCount >= 10) {
 			NeoCDCommsWordCount = 0;
 
-			if (send) {
+			if (send)
+			{
+				if (CDD_TX[0])
+				{
+					if (!CDD_Import(machine()))
+						return;
 
-				// command receive complete
-
-				if (CDD_TX[0]) {
-					INT32  sum = 0;
-
-					//	printf("has command %02x\n", CDD_TX[0]);
-
-//                  bprintf(PRINT_NORMAL, _T("  - CD mechanism command receive completed : 0x"));
-					for (INT32 i = 0; i < 9; i++) {
-//                      bprintf(PRINT_NORMAL, _T("%X"), CDD_TX[i]);
-						sum += CDD_TX[i];
-					}
-					sum = ~(sum + 5) & 0x0F;
-//                  bprintf(PRINT_NORMAL, _T(" (CS 0x%X, %s)\n"), CDD_TX[9], (sum == CDD_TX[9]) ? _T("OK") : _T("NG"));
-					if (sum == CDD_TX[9]) {
-
-					//		printf("request to process command %02x\n", CDD_TX[0]);
-
-						NeoCDProcessCommand();
-
-						if (CDD_TX[0]) {
-
-							if (NeoCDAssyStatus == 1) {
-								if (CDEmuGetStatus() == idle) {
-									NeoCDAssyStatus = 0x0E;
-								}
-							}
-
-							CDD_RX[0] = NeoCDAssyStatus;
-
-							// compute checksum
-
-							sum = 0;
-
-							for (INT32 i = 0; i < 9; i++) {
-								sum += CDD_RX[i];
-							}
-							CDD_RX[9] = ~(sum + 5) & 0x0F;
+					if (NeoCD_StatusHack == 1) {
+						if (CDEmuGetStatus() == idle) {
+							NeoCD_StatusHack = 0x0E;
 						}
 					}
+
+					CDD_Export(true); // true == neocd hack, 
 				}
-			} else {
 
-				// status send complete
-
-//              if (CDD_RX[0] || CDD_RX[1]) {
-//                  INT32  sum = 0;
-//
-//                  bprintf(PRINT_NORMAL, _T("  - CD mechanism status send completed : 0x"));
-//                  for (INT32 i = 0; i < 9; i++) {
-//                      bprintf(PRINT_NORMAL, _T("%X"), CDD_RX[i]);
-//                      sum += CDD_RX[i];
-//                  }
-//                  sum = ~(sum + 5) & 0x0F;
-//                  bprintf(PRINT_NORMAL, _T(" (CS 0x%X, %s)\n"), CDD_RX[9], (sum == CDD_RX[9]) ? _T("OK") : _T("NG"));
-//              }
-
-//              if (NeoCDAssyStatus == 0xE) {
-//                  NeoCDAssyStatus = 9;
-//              }
 			}
 
 		}
-		bNeoCDCommsSend = send;
 	}
 	bNeoCDCommsClock = clock;
 }
