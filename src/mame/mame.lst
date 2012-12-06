@@ -6271,6 +6271,8 @@ popn6			// GQA16 (c) 2001 (Japan)
 popn7			// GCB00 (c) 2001 (Japan)
 popnanm2        // GEA02 (c) 2001 (Japan)
 popn8           // GQB30 (c) 2002 (Japan)
+bm37th          // GCB07 (c) 2002 (Japan JCA)
+bm3final        // GCC01 (c) 2003 (Japan JCA)
 
 // PowerPC based Konami games
 bujutsu			// G?645 (c)1997

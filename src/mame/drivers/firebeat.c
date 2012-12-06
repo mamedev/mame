@@ -582,7 +582,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 	bitmap.fill(0, cliprect);
 
-	if (mame_strnicmp(screen.machine().system().name, "popn", 4) == 0)
+	if ((mame_strnicmp(screen.machine().system().name, "popn", 4) == 0) || (mame_strnicmp(screen.machine().system().name, "bm3", 3) == 0))
 	{
 		gcu_exec_display_list(screen.machine(), bitmap, cliprect, chip, 0x1f80000);
 	}
@@ -2589,6 +2589,45 @@ ROM_START( ppp11 )
 	DISK_IMAGE_READONLY( "gc977jaa02", 1, SHA1(74ce8c90575fd562807def7d561392d0f91f2bc6) )
 ROM_END
 
+// Beatmania III has a different BIOS and SPU program, and they aren't dumped yet
+ROM_START( bm37th )
+	ROM_REGION32_BE(0x80000, "user1", 0)
+	ROM_LOAD16_WORD_SWAP("a02jaa03.21e", 0x00000, 0x80000, BAD_DUMP CRC(43ecc093) SHA1(637df5b546cf7409dd4752dc471674fe2a046599))
+
+	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
+
+	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
+	ROM_LOAD( "gcb07-jc", 0x000000, 0x0000c0, CRC(16115b6a) SHA1(dcb2a3346973941a946b2cdfd31a5a761f666ca3) ) 
+
+	ROM_REGION(0x80000, "audiocpu", 0)			// SPU 68K program
+	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, BAD_DUMP CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
+
+	DISK_REGION( "scsi0" ) // program CD-ROM
+	DISK_IMAGE_READONLY( "gcb07jca01", 0, SHA1(f906379bdebee314e2ca97c7756259c8c25897fd) )
+
+	DISK_REGION( "scsi1" ) // data HDD
+	DISK_IMAGE_READONLY( "gcb07jca02", 1, SHA1(6b8e17635825a6a43dc8d2721fe2eb0e0f39e940) )
+ROM_END
+
+ROM_START( bm3final )
+	ROM_REGION32_BE(0x80000, "user1", 0)
+	ROM_LOAD16_WORD_SWAP("a02jaa03.21e", 0x00000, 0x80000, BAD_DUMP CRC(43ecc093) SHA1(637df5b546cf7409dd4752dc471674fe2a046599))
+
+	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
+
+	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
+	ROM_LOAD( "gcc01-jc", 0x000000, 0x0000c0, CRC(9c49fed8) SHA1(212b87c1d25763117611ffb2a36ed568d429d2f4) )
+
+	ROM_REGION(0x80000, "audiocpu", 0)			// SPU 68K program
+	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, BAD_DUMP CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
+
+	DISK_REGION( "scsi0" ) // program CD-ROM
+	DISK_IMAGE_READONLY( "gcc01jca01", 0, SHA1(3e7af83670d791591ad838823422959987f7aab9) )
+
+	DISK_REGION( "scsi1" ) // data HDD
+	DISK_IMAGE_READONLY( "gcc01jca02", 1, SHA1(823e29bab11cb67069d822f5ffb2b90b9d3368d2) )
+ROM_END
+
 /*****************************************************************************/
 
 GAME( 2000, ppp,      0,       firebeat,      ppp, firebeat_state,    ppp,      ROT0,   "Konami",  "ParaParaParadise", GAME_NOT_WORKING)
@@ -2604,3 +2643,5 @@ GAME( 2001, popn6, 	  0,       firebeat_spu,  popn, firebeat_state,   ppp,      
 GAME( 2001, popn7,    0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 7", GAME_NOT_WORKING)
 GAME( 2001, popnanm2, 0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music Animelo 2", GAME_NOT_WORKING)
 GAME( 2002, popn8,    0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 8", GAME_NOT_WORKING)
+GAME( 2002, bm37th,   0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Beatmania III Append 7th Mix", GAME_NOT_WORKING)
+GAME( 2003, bm3final, 0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Beatmania III The Final", GAME_NOT_WORKING)
