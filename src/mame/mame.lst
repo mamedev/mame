@@ -13172,7 +13172,6 @@ sc1count	// Count Cash Club (Bellfruit)
 sc1countp
 sc1counta
 sc1countap
-sc1countb
 sc1dago		// Dagobert's Vault (Bellfruit)
 sc1disc		// Discovey (Bellfruit)
 sc1disca
@@ -13351,6 +13350,7 @@ sc2brkfs4	//
 sc2brkfs4p	//
 sc2brkfs5	//
 sc2brkfs5p	//
+sc2brkfs6	//
 sc2brkfsm	//
 sc2brkfsm1	//
 sc2brkfsm2	//
@@ -13445,11 +13445,8 @@ sc2motd5p
 sc2motd6
 sc2motd6p
 sc2motd7
-sc2motd7p
-sc2motd8
 sc2motd8p
 sc2motd9
-sc2motd10p
 sc2easy		// Easy Money (Bellfruit)
 sc2easyp
 sc2easy1
@@ -13457,6 +13454,7 @@ sc2easy1p
 sc2easy2
 sc2easy2p
 sc2majes	// Majestic Bells (Bellfruit)
+sc2majesa
 sc2dels		// Del's Millions (Bellfruit)
 sc2delsp
 sc2dels1

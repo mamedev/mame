@@ -1821,10 +1821,7 @@ ROM_START( sc1countap )
 	ROM_LOAD( "club-count-cash_dat_ac_rnr_ass.bin", 0x8000, 0x8000, CRC(87f68f57) SHA1(fe99c8577a80a7ec791bf87e78cf429eebbc7785) )
 ROM_END
 
-ROM_START( sc1countb )
-	ROM_REGION( 0x10000, "maincpu", 0 )//odds are this needs to be split in two
-	ROM_LOAD( "club-game-show_std_ac_250pnd-25p_ass.bin", 0x0000, 0x010000, CRC(36efa743) SHA1(0f5392f55e42d7ac17e179c966997f41859f925a) )
-ROM_END
+
 
 ROM_START( sc1dago )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3159,7 +3156,6 @@ GAME( 198?, sc1count		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			,
 GAME( 198?, sc1countp		, sc1count	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Count Cash Club (Bellfruit) (set 1, Protocol) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1counta		, sc1count	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Count Cash Club (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1countap		, sc1count	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Count Cash Club (Bellfruit) (set 2, Protocol) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1countb		, sc1count	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Count Cash Club (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1dago			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "ELAM",     "Dagobert's Vault (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1disc			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Discovey (Bellfruit) (Dutch) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1disca		, sc1disc	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Discovey (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )

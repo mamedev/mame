@@ -4237,7 +4237,13 @@ ROM_START( sc2brkfs5p )
 ROM_END
 
 
+ROM_START( sc2brkfs6 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "match-of-the-day_dat_ac_8pnd-20p_ass.bin", 0x0000, 0x010000, CRC(86baaf46) SHA1(acb9c5cad4c35621219380a997ae67accaea4206) ) // wrong name, it's big breakfast
 
+	ROM_REGION( 0x80000, "upd", 0 )
+	ROM_LOAD("bigbreakfastsnd.bin", 0x00000, 0x80000, CRC(bf91aa2b) SHA1(40942165e65ff9b027015d500e5a9726c44ba1c5))
+ROM_END
 
 ROM_START( sc2drwho )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -4916,19 +4922,8 @@ ROM_START( sc2motd7 )
 	sc2_motd_sound
 ROM_END
 
-ROM_START( sc2motd7p )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "match-of-the-day_dat_ms_20p_ass.bin", 0x0000, 0x010000, CRC(77710913) SHA1(709fff877ee863021e958bcecbd5cd58a977ea09) )
 
-	sc2_motd_sound
-ROM_END
 
-ROM_START( sc2motd8 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "match-of-the-day_std_ac_var_uk94.bin", 0x0000, 0x010000, CRC(ae2330f0) SHA1(d309284f0f0333f6e065f30d7ac9416b2fc4ee1f) )
-
-	sc2_motd_sound
-ROM_END
 
 ROM_START( sc2motd8p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -4944,12 +4939,7 @@ ROM_START( sc2motd9 )
 	sc2_motd_sound
 ROM_END
 
-ROM_START( sc2motd10p )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "match-of-the-day_dat_ac_8pnd-20p_ass.bin", 0x0000, 0x010000, CRC(86baaf46) SHA1(acb9c5cad4c35621219380a997ae67accaea4206) )
 
-	sc2_motd_sound
-ROM_END
 
 
 ROM_START( sc2easy )
@@ -4997,6 +4987,12 @@ ROM_END
 ROM_START( sc2majes )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "majestic.p1", 0x0000, 0x010000, CRC(37289a5f) SHA1(a9d86ed16fc2ff2b83b60e48a1704b4e189c3ac7) )
+
+ROM_END
+
+ROM_START( sc2majesa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "match-of-the-day_dat_ms_20p_ass.bin", 0x0000, 0x010000, CRC(77710913) SHA1(709fff877ee863021e958bcecbd5cd58a977ea09) ) // wrong name, it's majestic bells
 
 	ROM_REGION( 0x80000, "upd", 0 )
 	ROM_LOAD( "majesticsnd.bin", 0x0000, 0x080000, CRC(3ee3fee3) SHA1(6a5e72e8a808d870a84a0e3523eebfadfab6d5df) )
@@ -7521,6 +7517,8 @@ GAME( 1994, sc2brkfs4	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfs
 GAME( 1994, sc2brkfs4p	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 5 UK, Arcade, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 1994, sc2brkfs5	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 6 UK, Arcade, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 1994, sc2brkfs5p	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 6 UK, Arcade, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2brkfs6	, sc2brkfs	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Big Breakfast (set 7)", GAME_FLAGS) // was marked motd
+
 
 GAME( 1994, sc2brkfsm	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM/Mazooma",      "The Big Breakfast Casino (set 1) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 1994, sc2brkfsm1	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM/Mazooma",      "The Big Breakfast Casino (set 2) (Scorpion 2/3)", GAME_FLAGS)
@@ -7603,11 +7601,8 @@ GAME( 199?, sc2motd5p	, sc2motd	,  scorpion2		, drwho		, bfm_sc2_state, drwho		,
 GAME( 199?, sc2motd6	, sc2motd	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Match Of The Day (Bellfruit) (set 7, UK, 8GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2motd6p	, sc2motd	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Match Of The Day (Bellfruit) (set 7, UK, 8GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2motd7	, sc2motd	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Match Of The Day (Bellfruit) (set 8, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2motd7p	, sc2motd	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Match Of The Day (Bellfruit) (set 8, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2motd8	, sc2motd	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Match Of The Day (Bellfruit) (set 9, UK) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2motd8p	, sc2motd	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Match Of The Day (Bellfruit) (set 9, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2motd9	, sc2motd	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Match Of The Day (Bellfruit) (set 10, UK, 6GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2motd10p	, sc2motd	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Match Of The Day (Bellfruit) (set 11, UK, 8GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 
 GAME( 199?, sc2easy		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Easy Money (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2easyp	, sc2easy	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Easy Money (Bellfruit) (set 1, Protocol) (Scorpion 2/3)", GAME_FLAGS)
@@ -7616,7 +7611,8 @@ GAME( 199?, sc2easy1p	, sc2easy	,  scorpion2		, drwho		, bfm_sc2_state, drwho		,
 GAME( 199?, sc2easy2	, sc2easy	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Easy Money (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2easy2p	, sc2easy	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Easy Money (Bellfruit) (set 3, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 
-GAME( 199?, sc2majes	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Majestic Bells (Bellfruit) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2majes	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Majestic Bells (Bellfruit) (Scorpion 2/3) (set 1)", GAME_FLAGS)
+GAME( 199?, sc2majesa	, sc2majes	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Majestic Bells (Bellfruit) (Scorpion 2/3) (set 2)", GAME_FLAGS)
 
 GAME( 199?, sc2dels		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Del's Millions (Bellfruit) (set 1, UK, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2delsp	, sc2dels	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Del's Millions (Bellfruit) (set 1, UK, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
