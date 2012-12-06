@@ -459,7 +459,7 @@ static ADDRESS_MAP_START( v1050_io, AS_IO, 8, v1050_state )
 	AM_RANGE(0x8c, 0x8c) AM_DEVREADWRITE(I8251A_SIO_TAG, i8251_device, data_r, data_w)
 	AM_RANGE(0x8d, 0x8d) AM_DEVREADWRITE(I8251A_SIO_TAG, i8251_device, status_r, control_w)
 	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE(I8255A_MISC_TAG, i8255_device, read, write)
-	AM_RANGE(0x94, 0x97) AM_DEVREADWRITE(MB8877_TAG, fd1793_t, read, write)
+	AM_RANGE(0x94, 0x97) AM_DEVREADWRITE(MB8877_TAG, mb8877_t, read, write)
 	AM_RANGE(0x9c, 0x9f) AM_DEVREADWRITE(I8255A_RTC_TAG, i8255_device, read, write)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE(vint_clr_r, vint_clr_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE(dint_clr_r, dint_clr_w)
@@ -999,8 +999,8 @@ void v1050_state::machine_start()
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	// floppy callbacks
-	m_fdc->setup_intrq_cb(fd1793_t::line_cb(FUNC(v1050_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(v1050_state::fdc_drq_w), this));
+	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(v1050_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(v1050_state::fdc_drq_w), this));
 
 	// initialize I8214
 	m_pic->etlg_w(1);
@@ -1087,7 +1087,7 @@ static MACHINE_CONFIG_START( v1050, v1050_state )
 	MCFG_I8255A_ADD(I8255A_M6502_TAG, m6502_ppi_intf)
 	MCFG_I8251_ADD(I8251A_KB_TAG, /*XTAL_16MHz/8,*/ kb_8251_intf)
 	MCFG_I8251_ADD(I8251A_SIO_TAG, /*XTAL_16MHz/8,*/ sio_8251_intf)
-	MCFG_FD1793x_ADD(MB8877_TAG, XTAL_16MHz/16)
+	MCFG_MB8877x_ADD(MB8877_TAG, XTAL_16MHz/16)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", v1050_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", v1050_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", v1050_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)

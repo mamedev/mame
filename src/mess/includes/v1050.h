@@ -7,8 +7,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
 #include "machine/ctronics.h"
 #include "machine/i8214.h"
 #include "machine/i8251.h"
@@ -89,7 +87,7 @@ public:
 	required_device<msm58321_device> m_rtc;
 	required_device<i8251_device> m_uart_kb;
 	required_device<i8251_device> m_uart_sio;
-	required_device<fd1793_t> m_fdc;
+	required_device<mb8877_t> m_fdc;
 	required_device<mc6845_device> m_crtc;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
