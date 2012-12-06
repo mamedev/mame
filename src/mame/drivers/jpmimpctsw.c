@@ -6065,15 +6065,10 @@ ROM_START( j6tbirdsq )
 	j6tbirds_sound
 ROM_END
 
-ROM_START( j6tbirdsr )
-	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "tbirds.b1", 0x000000, 0x020000, CRC(6a034cfd) SHA1(2b79072cd90b40f369f1f00379b6249d1f3578ed) )
-	ROM_LOAD16_BYTE( "tbirds.b2", 0x000001, 0x020000, CRC(45d1343a) SHA1(afbb33aa21d2e9834bdfb7c21124adbe3222b48b) )
-	j6tbirds_sound
-ROM_END
+
 
 // different sound rom..
-ROM_START( j6tbirdss )
+ROM_START( j6tbirdsr )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "tbirdsp.p1", 0x000000, 0x020000, CRC(e59977e3) SHA1(69d7628ec50691f9363685de49013c9303e9bcc6) )
 	ROM_LOAD16_BYTE( "tbirdsp.p2", 0x000001, 0x020000, CRC(7932c4ee) SHA1(c90fc982c433429aeafc4c787905d950209189f7) )
@@ -6089,8 +6084,8 @@ ROM_END
 
 ROM_START( j6tbrdcl )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "tbcl-b_1.bin", 0x000000, 0x020000, CRC(6a034cfd) SHA1(2b79072cd90b40f369f1f00379b6249d1f3578ed) )
-	ROM_LOAD16_BYTE( "tbcl-b_2.bin", 0x000001, 0x020000, CRC(45d1343a) SHA1(afbb33aa21d2e9834bdfb7c21124adbe3222b48b) )
+	ROM_LOAD16_BYTE( "tbcl-b_1.bin", 0x000000, 0x020000, CRC(6a034cfd) SHA1(2b79072cd90b40f369f1f00379b6249d1f3578ed) ) // aka tbirds.b1
+	ROM_LOAD16_BYTE( "tbcl-b_2.bin", 0x000001, 0x020000, CRC(45d1343a) SHA1(afbb33aa21d2e9834bdfb7c21124adbe3222b48b) ) // aka tbirds.b2
 	j6tbrdcl_sound
 ROM_END
 
@@ -8852,7 +8847,6 @@ GAME( 199?, j6tbirdso	, j6tbirds	, impctawp, tbirds, driver_device, 0, ROT0, "JP
 GAME( 199?, j6tbirdsp	, j6tbirds	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Thunderbirds (JPM) (IMPACT) (set 17)", GAME_FLAGS )
 GAME( 199?, j6tbirdsq	, j6tbirds	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Thunderbirds (JPM) (IMPACT) (set 18)", GAME_FLAGS )
 GAME( 199?, j6tbirdsr	, j6tbirds	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Thunderbirds (JPM) (IMPACT) (set 19)", GAME_FLAGS )
-GAME( 199?, j6tbirdss	, j6tbirds	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Thunderbirds (JPM) (IMPACT) (set 20)", GAME_FLAGS )
 
 GAME( 199?, j6tbrdcl	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Thunderbirds Club (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME( 199?, j6tbrdcla	, j6tbrdcl	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Thunderbirds Club (JPM) (IMPACT) (set 2)", GAME_FLAGS )
