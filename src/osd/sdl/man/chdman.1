@@ -4,9 +4,9 @@
 .\"
 .\" Man page created from source and usage information by 
 .\" Ashley T. Howes <debiandev@ashleyhowes.com>, February 2005
-.\" updated by Cesare Falco <cesare.falco@gmail.com>, February 2007
+.\" updated by Cesare Falco <c.falco@ubuntu.com>, February 2007
 .\"
-.TH CHDMAN 1 2012-03-25 0.145u5 "MAME Compressed Hunks of Data (CHD) manager"
+.TH CHDMAN 1 2012-12-01 0.147u3 "MAME Compressed Hunks of Data (CHD) manager"
 .\"
 .\" NAME chapter
 .SH NAME
@@ -25,41 +25,154 @@ It is a tool to manage CHD images.
 .\"
 .\" OPTIONS chapter
 .SH OPTIONS
+Please note that each option allows a set of switches, the meaning of each
+is explained in the \fBSWITCHES\fR section below. Whenever the short form
+for the switch is listed, the long one may be used instead.
 .TP
-.B \info \fIinput\fR.chd
+.B help \fR[\fIoption\fR]
+Print a summary of the available options or, if \fIoption\fR is given, a
+detailed list of the valid switches for the option.
+.TP
+.B info \
+\-i \fIfilename\fR \
+[\fB\-v\fR]
 Dump the header information from a drive image.
 .TP
-.B verify \fIinput\fR.chd
+.B verify \
+\-i \fIfileiname\fR \
+[\fB\-ip \fIfilename\fR]
 Validate the MD5/SHA1 on a drive image.
 .TP
-.B createraw \fIinputhd\fR.raw \fIoutput\fR.chd [\fIinputoffs\fR [\fIhunksize\fR]]
+.B createraw \
+\-o \fIfilename\fR \
+[\fB\-op \fIfilename\fR] \
+[\fB\-f\fR] \
+\fB\-i \fIfilename\fR \
+[\fB\-isb \fIoffset\fR] \
+[\fB\-ish \fIoffset\fR] \
+[\fB\-ib \fIlength\fR] \
+[\fB\-ih \fIlength\fR] \
+\fB\-hs \fIbytes\fR \
+\fB\-us \fIbytes\fR \
+[\fB\-c none\fR|type1[,[...]]] \
+[\fB\-np \fIprocessors\fR]
 Create a new compressed raw image from a raw file.
 .TP
-.B createhd \fIinputhd\fR.raw \fIoutput\fR.chd [\fIinputoffs\fR [\fIcylinders \
-heads sectors \fR[\fIsectorsize\fR [\fIhunksize\fR]]]]
+.B createhd \
+\-o \fIfilename\fR \
+[\fB\-op \fIfilename\fR] \
+[\fB\-f\fR] \
+[\fB\-i \fIfilename\fR] \
+[\fB\-isb \fIoffset\fR] \
+[\fB\-ish \fIoffset\fR] \
+[\fB\-ib \fIlength\fR] \
+[\fB\-ih \fIlength\fR] \
+[\fB\-hs \fIbytes\fR] \
+[\fB\-c none\fR|type1[,[...]]] \
+[\fB\-chs \fIcylinders\fB,\fIheads\fB,\fIsectors\fR] \
+[\fB\-ss \fIbytes\fR] \
+[\fB\-np \fIprocessors\fR]
 Create a new compressed hard disk image from a raw file.
 .TP
-.B createcd \fIinput\fR.toc \fIoutput\fR.chd
+.B createcd \
+\-o \fIfilename\fR \
+[\fB\-op \fIfilename\fR] \
+[\fB\-f\fR] \
+\fB\-i \fIfilename\fR \
+[\fB\-hs \fIbytes\fR] \
+[\fB\-c none\fR|type1[,[...]]] \
+[\fB\-np \fIprocessors\fR]
 Create a new compressed CD image from a raw file.
 .TP
-.B createld \fIinput\fR.toc \fIoutput\fR.chd
+.B createld \
+\-o \fIfilename\fR \
+[\fB\-op \fIfilename\fR] \
+[\fB\-f\fR] \
+\fB\-i \fIfilename\fR \
+[\fB\-isf \fIoffset\fR] \
+[\fB\-if \fIlength\fR] \
+[\fB\-hs \fIbytes\fR] \
+[\fB\-c none\fR|type1[,[...]]] \
+[\fB\-np \fIprocessors\fR]
 Create a new compressed laserdisc image from a raw file.
 .TP
-.B extractraw \fIinput\fR.chd \fIoutput\fR.raw
+.B extractraw \
+\-o \fIfilename\fR \
+[\fB\-f\fR] \
+\fB\-i \fIfilename\fR \
+[\fB\-ip \fIfilename\fR] \
+[\fB\-isb \fIoffset\fR] \
+[\fB\-ish \fIoffset\fR] \
+[\fB\-ib \fIlength\fR] \
+[\fB\-ih \fIlength\fR]
 Extract a raw file from a CHD image.
 .TP
-.B extracthd \fIinput\fR.chd \fIoutput\fR.toc \fIoutput\fR.bin
+.B extracthd \
+\-o \fIfilename\fR \
+[\fB\-f\fR] \
+\fB\-i \fIfilename\fR \
+[\fB\-ip \fIfilename\fR] \
+[\fB\-isb \fIoffset\fR] \
+[\fB\-ish \fIoffset\fR] \
+[\fB\-ib \fIlength\fR] \
+[\fB\-ih \fIlength\fR]
 Extract a hard disk block image from a CHD image.
 .TP
-.B extractcd \fIinput\fR.chd \fIoutput\fR.toc \fIoutput\fR.bin
+.B extractcd \
+\-o \fIfilename\fR \
+[\fB\-ob \fIfilename\fR] \
+[\fB\-f\fR] \
+\fB\-i \fIfilename\fR \
+[\fB\-ip \fIfilename\fR]
 Extract a CDRDAO .toc/.bin, CDRWIN .bin/.cue, or Sega Dreamcast .GDI file from a CHD\-CD image.
 .TP
-.B extractld \fIinput\fR.chd \fIoutput\fR.toc \fIoutput\fR.bin
+.B extractld \
+\-o \fIfilename\fR \
+[\fB\-f\fR] \
+\fB\-i \fIfilename\fR \
+[\fB\-ip \fIfilename\fR] \
+[\fB\-isf \fIoffset\fR] \
+[\fB\-if \fIlength\fR]
 Extract a laserdisc image from a CHD\-LD image.
 .TP
-.B copy \fIinput\fR.chd \fIoutput\fR.chd
+.B copy \
+\-o \fIfilename\fR \
+[\fB\-op \fIfilename\fR] \
+[\fB\-f\fR] \
+\fB\-i \fIfilename\fR \
+[\fB\-ip \fIfilename\fR] \
+[\fB\-isb \fIoffset\fR] \
+[\fB\-ish \fIoffset\fR] \
+[\fB\-ib \fIlength\fR] \
+[\fB\-ih \fIlength\fR] \
+\fB\-hs \fIbytes\fR \
+[\fB\-c none\fR|type1[,[...]]] \
+[\fB\-np \fIprocessors\fR]
 Copy all hunks of data from one CHD file to another. The hunk sizes do not need to match.
 If the source is shorter than the destination, the source data will be padded with 0s.
+.TP
+.B addmeta \
+\fB\-i \fIfilename\fR \
+\fB\-t \fItag\fR \
+[\fB\-ix \fIindex\fR] \
+[\fB\-vt \fItext\fR] \
+[\fB\-vf \fIfilename\fR] \
+[\fB\-nocs\fR]
+Add metadata to the chd.
+.TP
+.B delmeta \
+\fB\-i \fIfilename\fR \
+\fB\-t \fItag\fR \
+[\fB\-ix \fIindex\fR]
+Remove metadata from the chd.
+.TP
+.B dumpmeta \
+\fB\-i \fIfilename\fR \
+[\fB\-o \fIfilename\fR] \
+[\fB\-f\fR] \
+\fB\-t \fItag\fR \
+[\fB\-ix \fIindex\fR]
+Dump metadata from the chd to standard output or to a file.
 .\"
 .\" SWITCHES chapter
 .SH SWITCHES
@@ -67,14 +180,11 @@ If the source is shorter than the destination, the source data will be padded wi
 .B \-\-chs, \-chs \fIcylinders,heads,sectors
 Specifies CHS geometry values for CHD harddisks.
 .TP
-.B \-\-compression, \-c \fInone\fR|\fItype1\fR[,\fItype2\fR[,...]]
+.B \-\-compression, \-c \fInone\fR|\fItype1\fR[,[...]]
 Which compression codecs to use (up to 4).
 .TP
 .B \-\-force, \-f
 Force overwriting an existing file.
-.TP
-.B \-\-help, \-h
-Shows the available switches for an option.
 .TP
 .B \-\-hunksize, \-hs \fIbytes
 Size of each unit, in hunks.
@@ -82,17 +192,17 @@ Size of each unit, in hunks.
 .B \-\-ident, \-id \fIfilename
 Name of ident file to provide CHS information.
 .TP
+.B \-\-index, \-ix \fIindex
+Indexed instance of the metadata tag.
+.TP
 .B \-\-input, \-i \fIfilename
 Input file name.
 .TP
-.B \-\-inputstartbyte, \-isb \fIoffset
-Starting byte offset within the input.
-.TP
-.B \-\-inputstarthunk, \-ish \fIoffset
-Starting hunk offset within the input.
-.TP
 .B \-\-inputbytes, \-ib \fIlength
 Effective length of the input in bytes.
+.TP
+.B \-\-inputframes, \-if \fIlength
+Effective length of the input in frames.
 .TP                              
 .B \-\-inputhunks, \-ih \fIlength
 Effective length of the input in hunks.
@@ -100,14 +210,20 @@ Effective length of the input in hunks.
 .B \-\-inputparent, \-ip \fIfilename
 Parent CHD's input file name.
 .TP
+.B \-\-inputstartbyte, \-isb \fIoffset
+Starting byte offset within the input.
+.TP
+.B \-\-inputstartframe, \-isf \fIoffset
+Starting frame offset within the input.
+.TP
+.B \-\-inputstarthunk, \-ish \fIoffset
+Starting hunk offset within the input.
+.TP
+.B \-\-nochecksum, \-nocs
+Do not include this metadata information in the overall SHA-1.
+.TP
 .B \-\-numprocessors, \-np \fIcount
 Limits the number of processors to use during compression.
-.TP
-.B \-\-sectorsize, \-ss \fIbytes
-size of each hard disk sector.
-.TP
-.B \-\-verbose, \-v
-Output additional information about the operation.
 .TP
 .B \-\-output, \-o \fIfilename
 Output file name.
@@ -118,6 +234,20 @@ Output binary file name for extractcd.
 .B \-\-outputparent, \-op \fIfilename
 Parent CHD's output file name.
 .TP
+.B \-\-sectorsize, \-ss \fIbytes
+Size of each hard disk sector.
+.TP
+.B \-\-tag, \-t \fItag
+4-character tag for metadata.
+.TP
+.B \-\-valuefile, \-vf \fIfilename
+Text file containing data to add.
+.TP
+.B \-\-valuetext, \-vt \fItext
+Text for the metadata.
+.TP
 .B \-\-unitsize, \-us \fIbytes
 Size of each unit, in bytes.
-
+.TP
+.B \-\-verbose, \-v
+Output additional information about the operation.

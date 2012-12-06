@@ -6,14 +6,14 @@
 .\" * commands: see src/emu/clifront.c clifront.h
 .\" * options: core entries, see src/emu/emuopts.c emuopts.h
 .\"            SDL-specific entries, see src/osd/sdl/sdlmain.c osdsdl.h
-.\" Cesare Falco <cesare.falco@gmail.com>, February 2007
+.\" Cesare Falco <c.falco@ubuntu.com>, February 2007
 .\"
 .\" Also, some text borrowed from the xmame 0.106 man page,
 .\" done by Rene Herrmann <rene.herrmann@berlin.de>, September 2000
 .\" and updated by Andrew Burton <burtona@gol.com>, July 2003
 .\"
 .\"
-.TH MAME 1 2012-03-25 0.145u5 "MAME \- The Multiple Arcade Machine Emulator"
+.TH MAME 6 2012-12-01 0.147u3 "MAME \- The Multiple Arcade Machine Emulator"
 .\"
 .\"
 .\" NAME chapter
@@ -56,7 +56,7 @@ the core system rules.
 .\" *******************************************************
 .TP
 .B \-createconfig, \-cc
-Creates the default \fBmame.ini\fP file in the current directory. All the
+Creates the default \fBmame.ini\fR file in the current directory. All the
 configuration options (not commands) described below can be permanently
 changed by editing this configuration file.
 .TP
@@ -65,15 +65,15 @@ Displays the current configuration settings.
 .TP
 .B \-showusage, \-su
 Displays a summary of all the command line options. For options that
-are not mentioned here, the short summary given by
-\fBmame \-showusage\fR is usually sufficient.
+are not mentioned here, the short summary given by \fB\-showusage\fR
+is usually sufficient.
 .\"
 .\" *******************************************************
 .SS Frontend commands
 .\" *******************************************************
-.B NOTE:
-By default, all the '\-list' commands below write info to the screen.
-If you wish to write the info to a textfile instead, use redirection, e.g.
+All the list commands below write info to the screen.
+If you wish to write the info to a textfile instead, use redirection.
+For example,
 .B mame \-listxml > ~/mamelist.xml
 writes the full list of supported game to file \fImamelist.xml\fR in your home
 directory.
@@ -155,8 +155,14 @@ Output the list of available media for the system.
 .B \-listsoftware, \-lsoft
 Output the list of known software for the system.
 .TP
+.B \-verifysoftware, \-vsoft
+Verify known software for the system.
+.TP
 .B \-getsoftlist, \-glist
 Retrieve software list by name.
+.TP
+.B \-verifysoftlist, \-vlist
+Verify software list by name.
 .\"
 .\" *******************************************************
 .SS Configuration options
@@ -204,11 +210,11 @@ Write configuration to \fI[driver]\fR.ini on exit.
 .\" *******************************************************
 .SS Search path options
 .\" *******************************************************
-.B IMPORTANT\fR: Please use the path, directory and file options in
+Be careful to use the path, directory and file options in
 mame.ini \fBONLY\fR. Otherwise, the outcome may be unpredictable and not
 consistent across releases.
 .TP
-.B \-rompath, \-rp, \-biospath, \-bp, \fIpathname
+.B \-rompath, \-rp, \-biospath, \-bp \fIpathname
 Specifies a list of paths within which to find ROM or hard disk images.
 Multiple paths can be specified by separating them with semicolons.
 The default is 'roms' (that is, a directory "roms" in the same directory
@@ -245,7 +251,7 @@ is '.' (that is, search in the same directory as the MAME executable).
 .B \-cheatpath \fIpathname
 Specifies a list of paths within which to find cheat files. Multiple
 paths can be specified by separating them with semicolons. The default
-is 'cheat' (that is, a directory "cheat" in the same directory as
+is 'cheat' (that is, a directory 'cheat' in the same directory as
 the MAME executable).
 .TP
 .B \-crosshairpath \fIpathname
@@ -365,7 +371,7 @@ default is \fI%g/%i\fP, which creates a separate folder for each game,
 and names the snapshots under it starting with 0000 and increasing
 from there.
 .TP
-.B \-snapsize \fIwidth\fPx\fIheight\fP
+.B \-snapsize \fIwidth\fPx\fIheight
 Hard\-codes the size for snapshots and movie recording. By default,
 MAME will create snapshots at the game's current resolution in raw
 pixels, and will create movies at the game's starting resolution in
@@ -374,7 +380,7 @@ snapshots and movies at the size specified, and will bilinear filter
 the result. Note that this size does not automatically rotate if the 
 game is vertically oriented. The default is 'auto'.
 .TP
-.B \-snapview \fIviewname\fP
+.B \-snapview internal\fR|\fBauto\fR|\fIviewname
 Specifies the view to use when rendering snapshots and movies. By
 default, both use a special 'internal' view, which renders a separate
 snapshot per screen or renders movies only of the first screen. By
@@ -505,9 +511,7 @@ use \-autorol to ensure that the game will fill the screen either
 horizontally or vertically in one of the directions you can handle.
 If your screen only pivots counter\-clockwise, use \-autoror.
 .TP
-.B \-[no]flipx
-.TP
-.B \-[no]flipy
+.B \-[no]flipx \-[no]flipy
 Flip (mirror) the game screen either horizontally (\-flipx) or
 vertically (\-flipy). The flips are applied after the \-rotate and
 \-ror/\-rol options are applied. The default for both of these options
@@ -621,9 +625,6 @@ output on some cards.
 .br
 Default is SOFT.
 .TP
-.B \-numscreens
-Reserved for future use.
-.TP
 .B \-[no]window, \-[no]w
 Run MAME in either full screen or a window. This is a fully\-featured window
 mode where the window resizes as necessary to track what the game does.
@@ -730,7 +731,7 @@ Default is ON: turn off (set this to 0) if corruption occurs.
 .B \-gl_glsl
 Enable OpenGL GLSL, if available, for a performance increase.
 .TP
-.B \-gl_glsl_filter
+.B \-gl_glsl_filter \fIvalue
 Enable OpenGL GLSL filtering instead of FF filtering 0=plain, 1=bilinear.
 Default is 1: bilinear.
 .TP
@@ -795,7 +796,7 @@ Split full screen image across monitors.
 .B \-[no]sound
 Enable or disable sound altogether. The default is ON (\-sound).
 .TP
-.B \-samplerate, \-sr \fIvalue
+.B \-samplerate, \-srf \fIvalue
 Sets the audio sample rate. Smaller values (e.g. 11025) cause lower
 audio quality but faster emulation speed. Higher values (e.g. 48000)
 cause higher audio quality but slower emulation speed. The default is
@@ -929,8 +930,8 @@ Enable keymap for non\-QWERTY keyboards. Used in conjuction with
 \fB\-keymap_file\fR.
 .TP
 .B \-keymap_file \fIkeymap_file\fR
-Specifies the full path to the keymap file to be used. Shipped keymap files lie
-in \fB/usr/share/games/mame/keymaps\fR.
+Specifies the full path to the keymap file to be used. A few
+keymap files are available in \fB/usr/share/games/mess/keymaps\fR.
 .TP
 .B \-joy_idx[0\-8] \fIjoystick
 With these options you can assign a joystick to a 
@@ -941,6 +942,9 @@ Default is 'auto'.
 .TP
 .B \-sixaxis
 Use special handling for PS3 Sixaxis controllers.
+.TP
+.B \-lightgun_index[1\-8]
+Map lightgun to specific index in MAME.
 .TP
 .B \-videodriver, \-vd \fIx11\fR|\fIdirectfb\fR|\fIauto\fR
 SDL video driver to use; auto selects SDL default.
@@ -1045,6 +1049,9 @@ Size of RAM (if supported by driver).
 .TP
 .B \-confirm_quit
 Display confirm quit screen on exit.
+.TP
+.B \-ui_mouse
+Display UI mouse cursor.
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .\" SDL specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
