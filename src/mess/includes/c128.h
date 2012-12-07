@@ -21,7 +21,6 @@
 #include "sound/dac.h"
 #include "sound/sid6581.h"
 #include "video/mos6566.h"
-#include "video/vdc8563.h"
 
 #define Z80A_TAG		"u10"
 #define M8502_TAG		"u6"
