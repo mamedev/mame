@@ -470,7 +470,8 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 			{
 				if (data==0x00)
 				{
-					m_tempcdc->NeoCDCommsReset();
+				// not a good idea, causes hangs
+				//	m_tempcdc->NeoCDCommsReset();
 				}
 			}
 			break;
