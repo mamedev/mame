@@ -6373,4 +6373,58 @@
 		</part>
 	</software>
 
+	<software name="turbomst" supported="no">
+		<description>Turbo Master CPU</description>
+		<year>1991</year>
+		<publisher>Schnedler Systems</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="turbo_master" />
+			<feature name="game" value="0" />
+			<feature name="exrom" value="1" />
+
+			<dataarea name="rom" size="0x800">
+				<rom name="turbomst.bin" size="0x8000" status="nodump" offset="0x0000" />
+			</dataarea>
+		</part>
+
+		<!-- Rev. 5/4/91 -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="turbo master cpu.d64" size="174848" crc="3b7de1d4" sha1="40822b53f9db9483c1007799f39ee0c904fd98db" offset="0" />
+			</dataarea>
+		</part>
+
+		<!-- dated 2/18/92 -->
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="turbomst.d64" size="174848" crc="c0464978" sha1="185c98671b08d528d43c0baa88f5693a2955b613" offset="0" />
+			</dataarea>
+		</part>
+
+		<!-- 02/18/1992 version, Master Adapter GEOS REU patches included -->
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="turbomaster.d64" size="174848" crc="1ac1d03f" sha1="a5d29bd073b91acba3543bc72ff2af280a4b5905" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fcc" supported="no">
+		<description>The Final ChessCard</description>
+		<year>1989</year>
+		<publisher>Tasc</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="fcc" />
+			<feature name="exrom" value="1" />
+			<feature name="game" value="1" />
+
+			<dataarea name="roml" size="0x10000">
+				<rom name="fcc_rom1" size="0x8000" crc="2949836a" sha1="9e6283095df9e3f4802ed0c654101f8e37168bf6" offset="0x0000" />
+				<rom name="fcc_rom2" size="0x8000" crc="8fc0f156" sha1="c843729870e7ce59bb64b60ebec028f7200f93d1" offset="0x8000" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
