@@ -31,14 +31,6 @@ lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const ch
 	nNeoCDIRQVector = 0;
 }
 
-enum CDEmuStatusValue { idle = 0, reading, playing, paused, seeking, fastforward, fastreverse };
-CDEmuStatusValue CDEmuStatus;
-
-static inline CDEmuStatusValue CDEmuGetStatus()
-{
-//	printf("CDEmuGetStatus\n");
-	return CDEmuStatus;
-}
 
 
 void lc89510_temp_device::set_CDC_Do_DMA(device_t &device,segacd_dma_delegate new_segacd_dma_callback)
@@ -350,8 +342,7 @@ void lc89510_temp_device::CDD_Play(running_machine &machine)
 		cdda_start_audio( m_cdda, SCD_CURLBA, end_msf - SCD_CURLBA );
 	SET_CDC_READ
 
-	// neocd
-	CDEmuStatus = seeking;
+
 	NeoCD_StatusHack = 1;
 
 }
@@ -1096,12 +1087,6 @@ void lc89510_temp_device::NeoCDCommsControl(UINT8 clock, UINT8 send)
 				{
 					if (!CDD_Import(machine()))
 						return;
-
-					if (NeoCD_StatusHack == 1) {
-						if (CDEmuGetStatus() == idle) {
-							NeoCD_StatusHack = 0x0E;
-						}
-					}
 
 					CDD_Export(true); // true == neocd hack, 
 				}
