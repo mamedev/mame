@@ -933,8 +933,6 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/mos8722.o	\
 	$(MESS_MACHINE)/mos8726.o	\
 	$(MESS_MACHINE)/c2n.o		\
-	$(MESS_VIDEO)/vdc8563.o		\
-	$(MESS_VIDEO)/vic6567.o		\
 	$(MESS_VIDEO)/vic4567.o		\
 	$(MESS_VIDEO)/mos6566.o		\
 	$(MESS_DRIVERS)/c900.o		\
@@ -1284,7 +1282,6 @@ $(MESSOBJ)/luxor.a:				\
 	$(MESS_MACHINE)/abc99.o		\
 	$(MESS_MACHINE)/lux10828.o	\
 	$(MESS_MACHINE)/lux21046.o	\
-	$(MESS_MACHINE)/abc830.o	\
 	$(MESS_MACHINE)/abc890.o	\
 	$(MESS_DRIVERS)/abc1600.o	\
 	$(MESS_MACHINE)/abc1600_bus.o	\
