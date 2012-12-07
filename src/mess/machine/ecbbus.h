@@ -113,8 +113,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( int_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -154,7 +152,6 @@ public:
 	virtual void ecbbus_mem_w(offs_t offset, UINT8 data) { };
 	virtual UINT8 ecbbus_io_r(offs_t offset) { return 0; };
 	virtual void ecbbus_io_w(offs_t offset, UINT8 data) { };
-	virtual UINT32 ecbbus_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return false; }
 
 public:
 	ecbbus_device  *m_ecb;

@@ -224,7 +224,6 @@ ADDRESS_MAP_END
 
 void grip_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 {
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int column, bit;
 
 	for (column = 0; column < x_count; column++)
@@ -237,7 +236,7 @@ void grip_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, c
 			int x = (column * 8) + bit;
 			int color = m_flash ? 0 : BIT(data, bit);
 
-			bitmap.pix32(y, x) = palette[color];
+			bitmap.pix32(y, x) = RGB_MONOCHROME_WHITE[color];
 		}
 	}
 }
@@ -285,7 +284,7 @@ static const speaker_interface speaker_intf =
 
 static const mc6845_interface crtc_intf =
 {
-	":" SCREEN_TAG,
+	SCREEN_TAG,
 	8,
 	NULL,
 	grip_update_row,
@@ -533,6 +532,14 @@ static MACHINE_CONFIG_FRAGMENT( grip )
     MCFG_CPU_PROGRAM_MAP(grip_mem)
     MCFG_CPU_IO_MAP(grip_io)
 
+    // video hardware
+    MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
+    MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
+    MCFG_SCREEN_SIZE(640, 480)
+    MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
@@ -662,7 +669,8 @@ grip_device::grip_device(const machine_config &mconfig, const char *tag, device_
 	m_sti(*this, Z80STI_TAG),
 	m_crtc(*this, MC6845_TAG),
 	m_centronics(*this, CENTRONICS_TAG),
-	m_speaker(*this, SPEAKER_TAG)
+	m_speaker(*this, SPEAKER_TAG),
+	m_video_ram(*this, "video_ram")
 {
 }
 
@@ -675,7 +683,7 @@ void grip_device::device_start()
 	m_ecb = machine().device<ecbbus_device>(ECBBUS_TAG);
 
 	// allocate video RAM
-	m_video_ram = auto_alloc_array(machine(), UINT8, VIDEORAM_SIZE);
+	m_video_ram.allocate(VIDEORAM_SIZE);
 
 	// setup GRIP memory banking
 	membank("videoram")->configure_entries(0, 2, m_video_ram, 0x8000);
@@ -690,7 +698,6 @@ void grip_device::device_start()
 	save_item(NAME(m_vol1));
 	save_item(NAME(m_keydata));
 	save_item(NAME(m_kbf));
-	save_pointer(NAME(m_video_ram), VIDEORAM_SIZE);
 	save_item(NAME(m_lps));
 	save_item(NAME(m_page));
 	save_item(NAME(m_flash));
@@ -932,16 +939,4 @@ void grip_device::ecbbus_io_w(offs_t offset, UINT8 data)
 			m_ppi->pc4_w(1);
 		}
 	}
-}
-
-
-//-------------------------------------------------
-//  ecbbus_screen_update - screen update
-//-------------------------------------------------
-
-UINT32 grip_device::ecbbus_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	m_crtc->screen_update(screen, bitmap, cliprect);
-
-	return false;
 }

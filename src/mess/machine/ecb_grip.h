@@ -73,7 +73,6 @@ protected:
 	// device_ecbbus_card_interface overrides
 	virtual UINT8 ecbbus_io_r(offs_t offset);
 	virtual void ecbbus_io_w(offs_t offset, UINT8 data);
-	virtual UINT32 ecbbus_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
 	required_device<i8255_device> m_ppi;
@@ -93,7 +92,7 @@ private:
 	int m_kbf;				// keyboard buffer full
 
 	// video state
-	UINT8 *m_video_ram;		// video RAM
+	optional_shared_ptr<UINT8> m_video_ram;		// video RAM
 	int m_lps;				// light pen sense
 	int m_page;				// video page
 	int m_flash;			// flash

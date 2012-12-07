@@ -261,26 +261,3 @@ WRITE_LINE_MEMBER( ecbbus_device::nmi_w )
 {
 	m_out_nmi_func(state);
 }
-
-
-//-------------------------------------------------
-//  screen_update -
-//-------------------------------------------------
-
-UINT32 ecbbus_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	bool value = false;
-
-	for (int i = 0; i < MAX_ECBBUS_SLOTS; i++)
-	{
-		if (m_ecbbus_device[i] != NULL)
-		{
-			if (m_ecbbus_device[i]->ecbbus_screen_update(screen, bitmap, cliprect))
-			{
-				value = true;
-			}
-		}
-	}
-
-	return value;
-}
