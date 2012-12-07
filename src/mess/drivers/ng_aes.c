@@ -38,7 +38,6 @@
     Current status:
 		- NeoCDZ runs, the original NeoCD does not
 		   - Might think the tray is open? (check)
-		- CDDA doesn't play
 		- Some unknown / unhandled CD commands, code is still a bit messy
 		- Games using Raster Effects are broken, even non-IRQ based ones like mosyougi
 		   - Are we overloading the CPU with interrupts from the CDC, incorrect masking? or something else?
