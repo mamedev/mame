@@ -33,12 +33,13 @@
 	- Microsoft Windows 1.0 MSDOS.SYS error (can be bypassed by loading MS-DOS first)
 	\- these two happens due of a fail in sense drive status command, ready line (bit 5)
 
-	- Dokkin Minako Sensei!
-
+	- Dokkin Minako Sensei
 
 	List of per-game TODO:
 	- 4D Boxing: tries to format User Disk;
+	- 4D Driving: accesses some undefined ports (guess that it accesses the low part of them with word opcodes ...)
 	- Absolutely Mahjong: Epson splash screen doesn't appear at all, why?
+	- Brandish 2: has some annoying strips at the main menu, also no selection seems to work;
 	- Dragon Buster: missing bitplanes for the PCG, slight issue with window masking;
 	- Far Side Moon: doesn't detect neither mouse nor sound board;
 	- First Queen: has broken text display;
@@ -349,12 +350,15 @@ public:
 		UINT8 r[16],g[16],b[16];
 	}m_analog16;
 	struct {
+		UINT8 pal_entry;
+		UINT8 r[0x100],g[0x100],b[0x100];
+	}m_analog256;
+	struct {
 		UINT8 mode;
 		UINT8 tile[4], tile_index;
 	}m_grcg;
 
 	/* PC9821 specific */
-	UINT8 m_analog256,m_analog256e;
 	UINT8 m_sdip[24], m_sdip_bank;
 	UINT8 *m_ide_rom;
 	UINT8 *m_ide_ram;
@@ -558,7 +562,8 @@ public:
 #define MEMSW_REG   6
 #define DISPLAY_REG 7
 
-#define ANALOG_16 0
+#define ANALOG_16_MODE 0
+#define ANALOG_256_MODE 0x10
 
 void pc9801_state::video_start()
 {
@@ -599,28 +604,48 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 		return;
 
 	interlace_on = state->m_video_ff[INTERLACE_REG];
-	colors16_mode = (state->m_ex_video_ff[0]) ? 16 : 8;
+	colors16_mode = (state->m_ex_video_ff[ANALOG_16_MODE]) ? 16 : 8;
 
-	for(xi=0;xi<8;xi++)
+	if(state->m_ex_video_ff[ANALOG_256_MODE])
 	{
-		res_x = x + xi;
-		res_y = y;
-
-		pen = ((state->m_video_ram_2[(address & 0x7fff) + (0x08000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 1 : 0;
-		pen|= ((state->m_video_ram_2[(address & 0x7fff) + (0x10000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 2 : 0;
-		pen|= ((state->m_video_ram_2[(address & 0x7fff) + (0x18000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 4 : 0;
-		if(state->m_ex_video_ff[0])
-			pen|= ((state->m_video_ram_2[(address & 0x7fff) + (0) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 8 : 0;
-
-		if(interlace_on)
+		for(xi=0;xi<8;xi++)
 		{
-			if(device->machine().primary_screen->visible_area().contains(res_x, res_y*2+0))
-				bitmap.pix32(res_y*2+0, res_x) = palette[pen + colors16_mode];
+			res_x = x + xi;
+			res_y = y;
+
+			if(!device->machine().primary_screen->visible_area().contains(res_x, res_y*2+0))
+				return;
+
+			pen = state->m_ext_gvram[(address*8+xi)+(state->m_vram_disp*0x40000)];
+
+			bitmap.pix32(res_y*2+0, res_x) = palette[pen + 0x20];
 			if(device->machine().primary_screen->visible_area().contains(res_x, res_y*2+1))
-				bitmap.pix32(res_y*2+1, res_x) = palette[pen + colors16_mode];
+				bitmap.pix32(res_y*2+1, res_x) = palette[pen + 0x20];
 		}
-		else
-			bitmap.pix32(res_y, res_x) = palette[pen + colors16_mode];
+	}
+	else
+	{
+		for(xi=0;xi<8;xi++)
+		{
+			res_x = x + xi;
+			res_y = y;
+
+			pen = ((state->m_video_ram_2[(address & 0x7fff) + (0x08000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 1 : 0;
+			pen|= ((state->m_video_ram_2[(address & 0x7fff) + (0x10000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 2 : 0;
+			pen|= ((state->m_video_ram_2[(address & 0x7fff) + (0x18000) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 4 : 0;
+			if(state->m_ex_video_ff[ANALOG_16_MODE])
+				pen|= ((state->m_video_ram_2[(address & 0x7fff) + (0) + (state->m_vram_disp*0x20000)] >> (7-xi)) & 1) ? 8 : 0;
+
+			if(interlace_on)
+			{
+				if(device->machine().primary_screen->visible_area().contains(res_x, res_y*2+0))
+					bitmap.pix32(res_y*2+0, res_x) = palette[pen + colors16_mode];
+				if(device->machine().primary_screen->visible_area().contains(res_x, res_y*2+1))
+					bitmap.pix32(res_y*2+1, res_x) = palette[pen + colors16_mode];
+			}
+			else
+				bitmap.pix32(res_y, res_x) = palette[pen + colors16_mode];
+		}
 	}
 }
 
@@ -1126,11 +1151,12 @@ READ8_MEMBER(pc9801_state::pc9801_a0_r)
 			case 0x00:
 			case 0x02:
 				return m_hgdc2->read(space, (offset & 2) >> 1);
-			/* bitmap palette clut read */
+			/* TODO: double check these two */
 			case 0x04:
 				return m_vram_disp & 1;
 			case 0x06:
 				return m_vram_bank & 1;
+			/* bitmap palette clut read */
 			case 0x08:
 			case 0x0a:
 			case 0x0c:
@@ -1174,10 +1200,11 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 			case 0x02:
 				m_hgdc2->write(space, (offset & 2) >> 1,data);
 				return;
-			case 0x04: m_vram_disp = data & 1; return;
+			case 0x04:
+				m_vram_disp = data & 1;
+				return;
 			case 0x06:
 				m_vram_bank = data & 1;
-				//m_hgdc2->bank_w(space, 0,(data & 1) << 2); //TODO: check me
 				return;
 			/* bitmap palette clut write */
 			case 0x08:
@@ -1804,10 +1831,10 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_2dd_w)
 
 WRITE8_MEMBER(pc9801_state::pc9801rs_video_ff_w)
 {
-
 	if(offset == 2)
 	{
-		m_ex_video_ff[(data & 0xfe) >> 1] = data & 1;
+		if((data & 0xf0) == 0) /* disable any PC-9821 specific HW regs */
+			m_ex_video_ff[(data & 0xfe) >> 1] = data & 1;
 
 		if(0)
 		{
@@ -1833,7 +1860,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_video_ff_w)
 WRITE8_MEMBER(pc9801_state::pc9801rs_a0_w)
 {
 
-	if((offset & 1) == 0 && offset & 8 && m_ex_video_ff[ANALOG_16])
+	if((offset & 1) == 0 && offset & 8 && m_ex_video_ff[ANALOG_16_MODE])
 	{
 		switch(offset)
 		{
@@ -1876,6 +1903,7 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(pc9801_20_r,        pc9801_20_w,        0xffffffff) // RTC / DMA registers (LS244)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffffffff) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(pc9801_40_r,        pc9801_40_w,        0xffffffff) //i8255 printer port / i8251 keyboard
+	AM_RANGE(0x005c, 0x005f) AM_WRITENOP // time-stamp?
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(pc9801_60_r,        pc9801_60_w,        0xffffffff) //upd7220 character ports / <undefined>
 	AM_RANGE(0x0064, 0x0067) AM_WRITE8(pc9801_vrtc_mask_w, 0xffffffff)
 	AM_RANGE(0x0068, 0x006b) AM_WRITE8(pc9801rs_video_ff_w,0xffffffff) //mode FF / <undefined>
@@ -1935,6 +1963,7 @@ static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(pc9801_20_r,        pc9801_20_w,        0xffff) // RTC / DMA registers (LS244)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffff) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(pc9801_40_r,        pc9801_40_w,        0xffff) //i8255 printer port / i8251 keyboard
+	AM_RANGE(0x005c, 0x005f) AM_WRITENOP // time-stamp?
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(pc9801_60_r,        pc9801_60_w,        0xffff) //upd7220 character ports / <undefined>
 	AM_RANGE(0x0064, 0x0067) AM_WRITE8(pc9801_vrtc_mask_w, 0xffff)
 	AM_RANGE(0x0068, 0x006b) AM_WRITE8(pc9801rs_video_ff_w,0xffff) //mode FF / <undefined>
@@ -1961,8 +1990,24 @@ ADDRESS_MAP_END
 READ8_MEMBER(pc9801_state::pc9821_ide_r) { return m_ide_rom[offset]; }
 READ8_MEMBER(pc9801_state::pc9821_unkrom_r) { return m_unk_rom[offset]; }
 
-READ8_MEMBER(pc9801_state::pc9821_vram256_r) { return m_vram256[offset]; }
-WRITE8_MEMBER(pc9801_state::pc9821_vram256_w) {	m_vram256[offset] = data; }
+READ8_MEMBER(pc9801_state::pc9821_vram256_r)
+{
+	if(m_ex_video_ff[ANALOG_256_MODE])
+		return m_vram256[offset];
+
+	return m_pc9801rs_grcg_r(offset & 0x7fff,0);
+}
+
+WRITE8_MEMBER(pc9801_state::pc9821_vram256_w)
+{
+	if(m_ex_video_ff[ANALOG_256_MODE])
+	{
+		m_vram256[offset] = data;
+		return;
+	}
+
+	m_pc9801rs_grcg_w(offset & 0x7fff,0,data);
+}
 
 /* Note: not hooking this up causes "MEMORY ERROR" at POST */
 READ8_MEMBER(pc9801_state::pc9821_ideram_r) { return m_ide_ram[offset]; }
@@ -2032,13 +2077,13 @@ WRITE8_MEMBER(pc9801_state::pc9821_video_ff_w)
 {
 	if(offset == 2)
 	{
-		switch(data & 0xf8)	// pc-9821 specific extended registers
-		{
-			case 0x20: m_analog256 = data & 1; return;
-			case 0x68: m_analog256e = data & 1; return;
-		} // intentional fall-through
+		m_ex_video_ff[(data & 0xfe) >> 1] = data & 1;
+
+		//if((data & 0xfe) == 0x20)
+		//	printf("%02x\n",data & 1);
 	}
 
+	/* Intentional fall-through */
 	pc9801rs_video_ff_w(space,offset,data);
 }
 
@@ -2046,12 +2091,12 @@ READ8_MEMBER(pc9801_state::pc9821_a0_r)
 {
 	if((offset & 1) == 0 && offset & 8)
 	{
-		if(m_analog256)
+		if(m_ex_video_ff[ANALOG_256_MODE])
 		{
 			printf("256 color mode [%02x] R\n",offset);
 			return 0;
 		}
-		else if(m_ex_video_ff[ANALOG_16]) //16 color mode, readback possible there
+		else if(m_ex_video_ff[ANALOG_16_MODE]) //16 color mode, readback possible there
 		{
 			UINT8 res = 0;
 
@@ -2073,9 +2118,20 @@ READ8_MEMBER(pc9801_state::pc9821_a0_r)
 WRITE8_MEMBER(pc9801_state::pc9821_a0_w)
 {
 
-	if((offset & 1) == 0 && offset & 8 && m_analog256)
+	if((offset & 1) == 0 && offset & 8 && m_ex_video_ff[ANALOG_256_MODE])
 	{
-		printf("256 color mode [%02x] %02x W\n",offset,data);
+		switch(offset)
+		{
+			case 0x08: m_analog256.pal_entry = data & 0xff; break;
+			case 0x0a: m_analog256.g[m_analog256.pal_entry] = data & 0xff; break;
+			case 0x0c: m_analog256.r[m_analog256.pal_entry] = data & 0xff; break;
+			case 0x0e: m_analog256.b[m_analog256.pal_entry] = data & 0xff; break;
+		}
+
+		palette_set_color_rgb(machine(), (m_analog256.pal_entry)+0x20,
+											  m_analog256.r[m_analog256.pal_entry],
+											  m_analog256.g[m_analog256.pal_entry],
+											  m_analog256.b[m_analog256.pal_entry]);
 		return;
 	}
 
