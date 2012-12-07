@@ -46,7 +46,6 @@
 		   - might need better handling of the Vector Table Mapping, or better interrupts (see point above)
 		- Softlist are based on an old Tosec set and should be updated to the TruRip set once we can convert CCD
 		  without throwing away gap data etc.
-		- Backup RAM isn't saved?
 
 ****************************************************************************/
 
@@ -1597,6 +1596,24 @@ struct cdrom_interface neocd_cdrom =
 	NULL
 };
 
+
+static NVRAM_HANDLER( neocd )
+{
+	ng_aes_state *state = machine.driver_data<ng_aes_state>();
+	if (read_or_write)
+		file->write(state->m_memcard_data,0x2000);
+	else
+	{
+		if (file)
+			file->read(state->m_memcard_data,0x2000);
+		else
+		{
+		  memset(state->m_memcard_data,0x00,0x2000);
+		}
+	}
+}
+
+
 static MACHINE_CONFIG_DERIVED_CLASS( neocd, neogeo_base, ng_aes_state )
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -1614,7 +1631,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( neocd, neogeo_base, ng_aes_state )
 	MCFG_SET_TYPE3_INTERRUPT_CALLBACK( ng_aes_state, interrupt_callback_type3 )
 
 
-	MCFG_MEMCARD_HANDLER(neogeo_aes)
+	MCFG_NVRAM_HANDLER(neocd)
 
 	MCFG_MACHINE_START_OVERRIDE(ng_aes_state,neocd)
 	MCFG_MACHINE_RESET_OVERRIDE(ng_aes_state,neocd)

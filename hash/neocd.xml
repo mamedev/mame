@@ -248,7 +248,8 @@
 	  </part>
   </software>
 
-  <software name="lastbld2">
+  <!-- Resets after loading? -->
+  <software name="lastbld2" supported="no">
 	  <description>Bakumatsu Roman Daini Maku - Gekka no Kenshi - Tsuki ni Saku Hana, Chiri Yuku Hana (1999)(SNK)(JP)[!][Last Blade 2, The]</description>
 	  <year>199?</year>
 	  <publisher>SNK</publisher>
@@ -340,7 +341,8 @@
 	  </part>
   </software>
 
-  <software name="doubledr">
+  <!-- Hangs during loading due to erasing vectors -->
+  <software name="doubledr" supported="no">
 	  <description>Double Dragon (1995)(SNK)(JP-US)[!][NGCD-082 MT B01, NGCD-082E MT B04]</description>
 	  <year>199?</year>
 	  <publisher>SNK</publisher>
@@ -550,7 +552,8 @@
 	  </part>
   </software>
 
-  <software name="kof98">
+  <!-- sound doesn't work? -->
+  <software name="kof98" supported="no">
 	  <description>King of Fighters '98, The - The Slugfest (1998)(SNK)(JP)[!][King of Fighters '98, The - Dream Match Never Ends][NGCD-2420 MT A04, NGCD-2421]</description>
 	  <year>199?</year>
 	  <publisher>SNK</publisher>
@@ -594,7 +597,8 @@
 	  </part>
   </software>
 
-  <software name="lresort">
+  <!-- sound doesn't work? -->
+  <software name="lresort" supported="no">
 	  <description>Last Resort (1994)(SNK)(JP-US)[!]</description>
 	  <year>199?</year>
 	  <publisher>SNK</publisher>
