@@ -13,6 +13,17 @@ TODO:
   - other unknown writes
   - dipswitch settings
 
+Sounds:
+  - Port 0,20 dot (can use invaders hit sound)
+  - Port 1,40 skid (can use invaders shoot sound)
+  - Port 1,80 crash
+  - Port 1,10 could be car motor sound
+Other outs:
+  - Port 0,FF when coins inserted
+  - Port 2,0 ; 7,0 ; 8,0 unknown
+  - Port 3,1 while game is running
+  - Port 1,0 i assume is silence during attract mode
+
 ***************************************************************************/
 
 #include "emu.h"
