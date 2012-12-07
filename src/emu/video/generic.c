@@ -165,6 +165,12 @@ const rgb_t RGB_MONOCHROME_GREEN[] =
 	MAKE_RGB(0x00, 0xff, 0x00)
 };
 
+const rgb_t RGB_MONOCHROME_GREEN_HIGHLIGHT[] =
+{
+	RGB_BLACK,
+	MAKE_RGB(0x00, 0xc0, 0x00),
+	MAKE_RGB(0x00, 0xff, 0x00)
+};
 
 /*-------------------------------------------------
     monochrome_yellow - 2-color black & yellow

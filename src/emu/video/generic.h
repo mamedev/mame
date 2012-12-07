@@ -49,6 +49,7 @@ PALETTE_INIT( RRRRR_GGGGGG_BBBBB );
 extern const rgb_t RGB_MONOCHROME_WHITE[];
 extern const rgb_t RGB_MONOCHROME_AMBER[];
 extern const rgb_t RGB_MONOCHROME_GREEN[];
+extern const rgb_t RGB_MONOCHROME_GREEN_HIGHLIGHT[];
 extern const rgb_t RGB_MONOCHROME_YELLOW[];
 
 #endif	/* __VIDEO_GENERIC_H__ */
