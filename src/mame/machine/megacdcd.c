@@ -135,7 +135,10 @@ void lc89510_temp_device::CDD_Export(bool neocd_hack)
 	if (!neocd_hack)
 		CDD_RX[0] = (CDD_STATUS  & 0xff00)>>8;
 	else
+	{
+	//	printf("was %02x returning %02x\n", (CDD_STATUS  & 0xff00)>>8, NeoCD_StatusHack);
 		CDD_RX[0] = NeoCD_StatusHack;
+	}
 
 	CDD_RX[1] = (CDD_STATUS  & 0x00ff)>>0;
 	CDD_RX[2] = (CDD_MIN  & 0xff00)>>8;

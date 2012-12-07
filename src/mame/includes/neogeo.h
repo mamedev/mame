@@ -37,7 +37,11 @@ class neogeo_state : public driver_device
 public:
 	neogeo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_save_ram(*this, "save_ram") { }
+		m_save_ram(*this, "save_ram")
+	{
+		m_has_audio_banking = true;
+		m_is_mvs = true;
+	}
 
 	/* memory pointers */
 //  UINT8      *memcard_data;   // this currently uses generic handlers
@@ -222,6 +226,9 @@ public:
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(auto_animation_timer_callback);
 	TIMER_CALLBACK_MEMBER(sprite_line_timer_callback);
+
+	bool m_has_audio_banking;
+	bool m_is_mvs;
 };
 
 
@@ -233,7 +240,8 @@ void neogeo_set_display_counter_lsb(address_space &space, UINT16 data);
 void neogeo_acknowledge_interrupt(running_machine &machine, UINT16 data);
 void neogeo_set_main_cpu_bank_address(address_space &space, UINT32 bank_address);
 DEVICE_IMAGE_LOAD( neo_cartridge );
-
+void neogeo_postload(running_machine &machine);
+void neogeo_audio_cpu_banking_init( running_machine &machine );
 
 /*----------- defined in machine/neocrypt.c -----------*/
 
