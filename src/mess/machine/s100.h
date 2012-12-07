@@ -290,7 +290,7 @@ public:
 	virtual void s100_slave_clr_w(int state) { }
 
 public:
-	s100_device  *m_s100;
+	s100_device  *m_bus;
 	device_s100_card_interface *m_next;
 };
 

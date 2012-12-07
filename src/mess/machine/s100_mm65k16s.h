@@ -46,8 +46,7 @@ protected:
 	virtual void s100_phantom_w(int state);
 
 private:
-	// internal state
-	UINT8* m_ram;
+	optional_shared_ptr<UINT8> m_ram;
 };
 
 

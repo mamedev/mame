@@ -116,7 +116,6 @@ s100_djdma_device::s100_djdma_device(const machine_config &mconfig, const char *
 
 void s100_djdma_device::device_start()
 {
-	m_s100 = machine().device<s100_device>("s100");
 }
 
 

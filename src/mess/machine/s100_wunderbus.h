@@ -40,11 +40,6 @@ public:
 	// not really public
 	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
 	DECLARE_WRITE_LINE_MEMBER( rtc_tp_w );
-	required_device<pic8259_device> m_pic;
-	required_device<ins8250_device> m_ace1;
-	required_device<ins8250_device> m_ace2;
-	required_device<ins8250_device> m_ace3;
-	required_device<upd1990a_device> m_rtc;
 
 protected:
 	// device-level overrides
@@ -62,7 +57,14 @@ protected:
 	virtual void s100_terminal_w(UINT8 data);
 
 private:
-	// internal state
+	required_device<pic8259_device> m_pic;
+	required_device<ins8250_device> m_ace1;
+	required_device<ins8250_device> m_ace2;
+	required_device<ins8250_device> m_ace3;
+	required_device<upd1990a_device> m_rtc;
+	required_ioport m_7c;
+	required_ioport m_10a;
+
 	UINT8 m_group;
 	int m_rtc_tp;
 };

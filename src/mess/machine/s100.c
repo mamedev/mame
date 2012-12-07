@@ -165,6 +165,7 @@ void s100_device::device_reset()
 
 void s100_device::add_s100_card(device_s100_card_interface *card)
 {
+	card->m_bus = this;
 	m_device_list.append(*card);
 }
 

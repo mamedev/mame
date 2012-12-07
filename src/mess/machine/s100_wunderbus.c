@@ -51,7 +51,7 @@ const device_type S100_WUNDERBUS = &device_creator<s100_wunderbus_device>;
 
 WRITE_LINE_MEMBER( s100_wunderbus_device::pic_int_w )
 {
-	m_s100->int_w(state);
+	m_bus->int_w(state);
 }
 
 static struct pic8259_interface pic_intf =
@@ -70,7 +70,7 @@ static INS8250_TRANSMIT( ace1_transmit )
 {
     s100_wunderbus_device *wunderbus = downcast<s100_wunderbus_device *>(device->owner());
 
-    wunderbus->m_s100->terminal_transmit_w(data);
+    wunderbus->m_bus->terminal_transmit_w(data);
 }
 */
 //-------------------------------------------------
@@ -270,7 +270,9 @@ s100_wunderbus_device::s100_wunderbus_device(const machine_config &mconfig, cons
 	m_ace1(*this, INS8250_1_TAG),
 	m_ace2(*this, INS8250_2_TAG),
 	m_ace3(*this, INS8250_3_TAG),
-	m_rtc(*this, UPD1990C_TAG)
+	m_rtc(*this, UPD1990C_TAG),
+	m_7c(*this, "7C"),
+	m_10a(*this, "10A")
 {
 }
 
@@ -281,7 +283,6 @@ s100_wunderbus_device::s100_wunderbus_device(const machine_config &mconfig, cons
 
 void s100_wunderbus_device::device_start()
 {
-	m_s100 = machine().device<s100_device>("s100");
 }
 
 
@@ -292,6 +293,7 @@ void s100_wunderbus_device::device_start()
 void s100_wunderbus_device::device_reset()
 {
 }
+
 
 //-------------------------------------------------
 //  s100_vi0_w - vectored interrupt 0
@@ -329,7 +331,7 @@ void s100_wunderbus_device::s100_vi2_w(int state)
 
 UINT8 s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 {
-	UINT8 address = (ioport("7C")->read() & 0x3e) << 2;
+	UINT8 address = (m_7c->read() & 0x3e) << 2;
 	if ((offset & 0xf8) != address) return 0;
 
 	UINT8 data = 0;
@@ -374,7 +376,7 @@ UINT8 s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 
                 */
 
-				data = BITSWAP8(ioport("10A")->read(),0,1,2,3,4,5,6,7) & 0xfc;
+				data = BITSWAP8(m_10a->read(),0,1,2,3,4,5,6,7) & 0xfc;
 				break;
 
 			case 2: // R.T. Clock IN/RESET CLK. Int.
@@ -415,15 +417,15 @@ UINT8 s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 			break;
 
 		case 1:
-			data = m_ace1->ins8250_r(machine().driver_data()->generic_space(), offset & 0x07);
+			data = m_ace1->ins8250_r(space, offset & 0x07);
 			break;
 
 		case 2:
-			data = m_ace2->ins8250_r(machine().driver_data()->generic_space(), offset & 0x07);
+			data = m_ace2->ins8250_r(space, offset & 0x07);
 			break;
 
 		case 3:
-			data = m_ace3->ins8250_r(machine().driver_data()->generic_space(), offset & 0x07);
+			data = m_ace3->ins8250_r(space, offset & 0x07);
 			break;
 		}
 	}
@@ -438,7 +440,7 @@ UINT8 s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 
 void s100_wunderbus_device::s100_sout_w(address_space &space, offs_t offset, UINT8 data)
 {
-	UINT8 address = (ioport("7C")->read() & 0x3e) << 2;
+	UINT8 address = (m_7c->read() & 0x3e) << 2;
 	if ((offset & 0xf8) != address) return;
 
 	if ((offset & 0x07) == 7)
@@ -503,11 +505,11 @@ void s100_wunderbus_device::s100_sout_w(address_space &space, offs_t offset, UIN
                 */
 
 				m_rtc->data_in_w(BIT(data, 0));
-				m_rtc->clk_w(BIT(data, 0));
-				m_rtc->c0_w(BIT(data, 0));
-				m_rtc->c1_w(BIT(data, 0));
-				m_rtc->c2_w(BIT(data, 0));
-				m_rtc->stb_w(BIT(data, 0));
+				m_rtc->clk_w(BIT(data, 1));
+				m_rtc->c0_w(BIT(data, 2));
+				m_rtc->c1_w(BIT(data, 3));
+				m_rtc->c2_w(BIT(data, 4));
+				m_rtc->stb_w(BIT(data, 5));
 				break;
 
 			case 3: // Par. data OUT
@@ -538,15 +540,15 @@ void s100_wunderbus_device::s100_sout_w(address_space &space, offs_t offset, UIN
 			break;
 
 		case 1:
-			m_ace1->ins8250_w(machine().driver_data()->generic_space(), offset & 0x07, data);
+			m_ace1->ins8250_w(space, offset & 0x07, data);
 			break;
 
 		case 2:
-			m_ace2->ins8250_w(machine().driver_data()->generic_space(), offset & 0x07, data);
+			m_ace2->ins8250_w(space, offset & 0x07, data);
 			break;
 
 		case 3:
-			m_ace3->ins8250_w(machine().driver_data()->generic_space(), offset & 0x07, data);
+			m_ace3->ins8250_w(space, offset & 0x07, data);
 			break;
 		}
 	}

@@ -84,25 +84,25 @@ SLOT_INTERFACE_END
 
 void s100_dj2db_device::fdc_intrq_w(bool state)
 {
-	if (state) m_s100->rdy_w(CLEAR_LINE);
+	if (state) m_bus->rdy_w(CLEAR_LINE);
 
-	switch (ioport("J1A")->read())
+	switch (m_j1a->read())
 	{
-	case 0: m_s100->vi0_w(state); break;
-	case 1: m_s100->vi1_w(state); break;
-	case 2: m_s100->vi2_w(state); break;
-	case 3: m_s100->vi3_w(state); break;
-	case 4: m_s100->vi4_w(state); break;
-	case 5: m_s100->vi5_w(state); break;
-	case 6: m_s100->vi6_w(state); break;
-	case 7: m_s100->vi7_w(state); break;
-	case 8: m_s100->int_w(state); break;
+	case 0: m_bus->vi0_w(state); break;
+	case 1: m_bus->vi1_w(state); break;
+	case 2: m_bus->vi2_w(state); break;
+	case 3: m_bus->vi3_w(state); break;
+	case 4: m_bus->vi4_w(state); break;
+	case 5: m_bus->vi5_w(state); break;
+	case 6: m_bus->vi6_w(state); break;
+	case 7: m_bus->vi7_w(state); break;
+	case 8: m_bus->int_w(state); break;
 	}
 }
 
 void s100_dj2db_device::fdc_drq_w(bool state)
 {
-	if (state) m_s100->rdy_w(CLEAR_LINE);
+	if (state) m_bus->rdy_w(CLEAR_LINE);
 }
 
 
@@ -265,6 +265,9 @@ s100_dj2db_device::s100_dj2db_device(const machine_config &mconfig, const char *
 	m_floppy1(*this, MB8866_TAG":1"),
 	m_floppy2(*this, MB8866_TAG":2"),
 	m_floppy3(*this, MB8866_TAG":3"),
+	m_floppy(NULL),
+	m_j1a(*this, "J1A"),
+	m_ram(*this, "ram"),
 	m_drive(0),
 	m_head(1),
 	m_int_enbl(0),
@@ -281,17 +284,23 @@ s100_dj2db_device::s100_dj2db_device(const machine_config &mconfig, const char *
 
 void s100_dj2db_device::device_start()
 {
-	m_s100 = machine().device<s100_device>("s100");
-
+	// find memory regions
 	m_rom = memregion("dj2db")->base();
-	m_ram = auto_alloc_array(machine(), UINT8, 0x400);
+
+	// allocate memory
+	m_ram.allocate(0x400);
 
 	// floppy callbacks
-	m_fdc->setup_intrq_cb(fd1791_t::line_cb(FUNC(s100_dj2db_device::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(fd1791_t::line_cb(FUNC(s100_dj2db_device::fdc_drq_w), this));
+	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(s100_dj2db_device::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(s100_dj2db_device::fdc_drq_w), this));
 
 	// state saving
-	//save_item(NAME());
+	save_item(NAME(m_drive));
+	save_item(NAME(m_head));
+	save_item(NAME(m_int_enbl));
+	save_item(NAME(m_access_enbl));
+	save_item(NAME(m_board_enbl));
+	save_item(NAME(m_phantom));
 }
 
 
@@ -366,7 +375,7 @@ UINT8 s100_dj2db_device::s100_smemr_r(address_space &space, offs_t offset)
 	}
 	else if ((offset >= 0xfbfc) && (offset < 0xfc00))
 	{
-		m_s100->rdy_w(ASSERT_LINE);
+		m_bus->rdy_w(ASSERT_LINE);
 
 		data = m_fdc->gen_r(offset & 0x03);
 	}
@@ -464,6 +473,7 @@ void s100_dj2db_device::s100_mwrt_w(address_space &space, offs_t offset, UINT8 d
 	}
 	else if (offset == 0xfbfb) // WAIT ENBL
 	{
+		fatalerror("Z80 WAIT not supported by MAME core\n");
 	}
 	else if ((offset >= 0xfbfc) && (offset < 0xfc00))
 	{
