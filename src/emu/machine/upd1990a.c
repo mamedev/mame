@@ -163,8 +163,10 @@ void upd1990a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			{
 				m_time_counter[i]++;
 				if(m_time_counter[i] != 0)
-					return;
+					break;
 			}
+
+			m_data_out = (m_time_counter[4] == 0);
 		}
 		else // parallel
 		{
@@ -174,6 +176,16 @@ void upd1990a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			m_time_counter[2]++;
 			m_time_counter[3]++;
 			m_time_counter[4]++;
+			m_data_out = (m_time_counter[4] == 0);
+			if(0)
+			{
+				int i;
+
+				for(i=0;i<5;i++)
+					printf("%02x ",m_time_counter[i]);
+
+				printf("\n");
+			}
 		}
 
 		break;
