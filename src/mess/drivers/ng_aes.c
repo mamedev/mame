@@ -125,8 +125,8 @@ public:
 	DECLARE_WRITE16_MEMBER(neocd_memcard_w);
 	DECLARE_READ16_MEMBER(neocd_control_r);
 	DECLARE_WRITE16_MEMBER(neocd_control_w);
-	DECLARE_READ16_MEMBER(neocd_transfer_r);
-	DECLARE_WRITE16_MEMBER(neocd_transfer_w);
+	DECLARE_READ8_MEMBER(neocd_transfer_r);
+	DECLARE_WRITE8_MEMBER(neocd_transfer_w);
 	DECLARE_READ16_MEMBER(aes_in0_r);
 	DECLARE_READ16_MEMBER(aes_in1_r);
 	DECLARE_READ16_MEMBER(aes_in2_r);
@@ -271,78 +271,6 @@ static MEMCARD_HANDLER( neogeo_aes )
 
 
 
-UINT8 ng_aes_state::neogeoReadTransfer(UINT32 sekAddress, int is_byte_transfer)
-{
-//  if ((sekAddress & 0x0FFFFF) < 16)
-//      printf(PRINT_NORMAL, _T("  - NGCD port 0x%06X read (byte, PC: 0x%06X)\n"), sekAddress, SekGetPC(-1));
-
-	sekAddress ^= 1;
-
-	switch (nActiveTransferArea) {
-		case 0:							// Sprites
-			return NeoSpriteRAM[nSpriteTransferBank + (sekAddress & 0x0FFFFF)];
-			break;
-		case 1:							// ADPCM
-			return YM2610ADPCMAROM[nADPCMTransferBank + ((sekAddress & 0x0FFFFF) >> 1)];
-			break;
-		case 4:							// Z80
-			if ((sekAddress & 0xfffff) >= 0x20000) break;
-			return NeoZ80ROMActive[(sekAddress & 0x1FFFF) >> 1];
-			break;
-		case 5:							// Text
-			return NeoTextRAM[(sekAddress & 0x3FFFF) >> 1];
-			break;
-	}
-
-	return ~0;
-}
-
-
-void ng_aes_state::neogeoWriteTransfer(UINT32 sekAddress, UINT8 byteValue, int is_byte_transfer)
-{
-//  if ((sekAddress & 0x0FFFFF) < 16)
-//      bprintf(PRINT_NORMAL, _T("  - Transfer: 0x%06X -> 0x%02X (PC: 0x%06X)\n"), sekAddress, byteValue, SekGetPC(-1));
-
-	if (!nTransferWriteEnable) {
-//      return;
-	}
-	int address;
-
-	// why, is our DMA broken?
-	sekAddress ^= 1;
-
-	switch (nActiveTransferArea) {
-		case 0:							// Sprites
-			address = (nSpriteTransferBank + (sekAddress & 0x0FFFFF));
-
-			if ((address&3)==0) NeoSpriteRAM[address] = byteValue;
-			if ((address&3)==1) NeoSpriteRAM[address^3] = byteValue;
-			if ((address&3)==2) NeoSpriteRAM[address^3] = byteValue;
-			if ((address&3)==3) NeoSpriteRAM[address] = byteValue;
-
-			//  NeoCDOBJBankUpdate[nSpriteTransferBank >> 20] = true;
-			break;
-		case 1:							// ADPCM
-			YM2610ADPCMAROM[nADPCMTransferBank + ((sekAddress & 0x0FFFFF) >> 1)] = byteValue;
-			break;
-		case 4:							// Z80
-			if ((sekAddress & 0xfffff) >= 0x20000) break;
-
-			if (!is_byte_transfer)
-			{
-				if (((sekAddress & 0xfffff) >= 0x20000) || nNeoCDZ80ProgWriteWordCancelHack) break;
-				if (sekAddress == 0xe1fdf2) nNeoCDZ80ProgWriteWordCancelHack = 1;
-			}
-
-			NeoZ80ROMActive[(sekAddress & 0x1FFFF) >> 1] = byteValue;
-			break;
-		case 5:							// Text
-			NeoTextRAM[(sekAddress & 0x3FFFF) >> 1] = byteValue;
-//          NeoUpdateTextOne((sekAddress & 0x3FFFF) >> 1, byteValue);
-			break;
-	}
-}
-
 
 
 
@@ -449,9 +377,11 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 
 		case 0x0120:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD OBJ BUSREQ -> 1 (PC: 0x%06X)\n"), SekGetPC(-1));
+			m_has_sprite_bus = false;
 			break;
 		case 0x0122:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD PCM BUSREQ -> 1 (PC: 0x%06X) %x\n"), SekGetPC(-1), byteValue);
+			m_has_ymrom_bus = false;
 			break;
 		case 0x0126:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD Z80 BUSREQ -> 1 (PC: 0x%06X)\n"), SekGetPC(-1));
@@ -460,14 +390,16 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 			break;
 		case 0x0128:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD FIX BUSREQ -> 1 (PC: 0x%06X)\n"), SekGetPC(-1));
+			m_has_text_bus = false;
 			break;
-
 		case 0x0140:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD OBJ BUSREQ -> 0 (PC: 0x%06X)\n"), SekGetPC(-1));
+			m_has_sprite_bus = true;
 			video_reset();
 			break;
 		case 0x0142:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD PCM BUSREQ -> 0 (PC: 0x%06X)\n"), SekGetPC(-1));
+			m_has_ymrom_bus = true;
 			break;
 		case 0x0146:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD Z80 BUSREQ -> 0 (PC: 0x%06X)\n"), SekGetPC(-1));
@@ -476,6 +408,7 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 			break;
 		case 0x0148:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD FIX BUSREQ -> 0 (PC: 0x%06X)\n"), SekGetPC(-1));
+			m_has_text_bus = true;
 			video_reset();
 			break;
 
@@ -524,7 +457,11 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 		}
 		case 0x0182: {
 		//	printf("blah %02x\n", byteValue);
-			if (byteValue == 0x00) m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			if (byteValue == 0x00)
+			{
+				machine().device("ymsnd")->reset();
+				m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			}
 			else m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
 			break;
@@ -553,45 +490,71 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
  */
 
 
-READ16_MEMBER(ng_aes_state::neocd_transfer_r)
+READ8_MEMBER(ng_aes_state::neocd_transfer_r)
 {
-	int is_byte_transfer = 0;
-	if (mem_mask != 0xffff) is_byte_transfer = 1;
+	UINT32 sekAddress = 0xe00000+ (offset);
+	int address;
+	sekAddress ^= 1;
 
-	UINT16 ret = 0x0000;
+	switch (nActiveTransferArea) {
+		case 0:	// Sprites
+			address = (nSpriteTransferBank + (sekAddress & 0x0FFFFF));
 
+			// address is swizzled a bit due to out sprite decoding
+			if ((address&3)==0) return NeoSpriteRAM[address];
+			if ((address&3)==1) return NeoSpriteRAM[address^3];
+			if ((address&3)==2) return NeoSpriteRAM[address^3];
+			if ((address&3)==3) return NeoSpriteRAM[address];
 
-
-	if (mem_mask & 0x00ff)
-	{
-		ret |= neogeoReadTransfer(0xe00000+ (offset*2)+1, is_byte_transfer) & 0xff;
+			return NeoSpriteRAM[nSpriteTransferBank + (sekAddress & 0x0FFFFF)];
+		case 1:							// ADPCM
+			return YM2610ADPCMAROM[nADPCMTransferBank + ((sekAddress & 0x0FFFFF) >> 1)];
+		case 4:							// Z80
+			if ((sekAddress & 0xfffff) >= 0x20000) return ~0;
+			return NeoZ80ROMActive[(sekAddress & 0x1FFFF) >> 1];
+		case 5:							// Text
+			return NeoTextRAM[(sekAddress & 0x3FFFF) >> 1];
 	}
-	if (mem_mask & 0xff00)
-	{
-		ret |= neogeoReadTransfer(0xe00000+ (offset*2), is_byte_transfer) << 8;
-	}
 
-	return ret;
+	return ~0;
 
 }
 
-WRITE16_MEMBER(ng_aes_state::neocd_transfer_w)
+WRITE8_MEMBER(ng_aes_state::neocd_transfer_w)
 {
-	int is_byte_transfer = 0;
-	if (mem_mask != 0xffff) is_byte_transfer = 1;
+	UINT8 byteValue = data;
+	UINT32 sekAddress = 0xe00000+ (offset);
 
-
-	if (mem_mask & 0xff00)
-	{
-		neogeoWriteTransfer(0xe00000+ (offset*2), data>>8, is_byte_transfer);
+	if (!nTransferWriteEnable) {
+//      return;
 	}
+	int address;
 
-	if (mem_mask & 0x00ff)
-	{
-		neogeoWriteTransfer(0xe00000+ (offset*2)+1, data&0xff, is_byte_transfer);
+	sekAddress ^= 1;
+
+	switch (nActiveTransferArea) {
+		case 0:							// Sprites
+			address = (nSpriteTransferBank + (sekAddress & 0x0FFFFF));
+
+			// address is swizzled a bit due to out sprite decoding
+			if ((address&3)==0) NeoSpriteRAM[address] = byteValue;
+			if ((address&3)==1) NeoSpriteRAM[address^3] = byteValue;
+			if ((address&3)==2) NeoSpriteRAM[address^3] = byteValue;
+			if ((address&3)==3) NeoSpriteRAM[address] = byteValue;
+
+			break;
+		case 1:							// ADPCM
+			YM2610ADPCMAROM[nADPCMTransferBank + ((sekAddress & 0x0FFFFF) >> 1)] = byteValue;
+			break;
+		case 4:							// Z80
+			if ((sekAddress & 0xfffff) >= 0x20000) break;
+
+			NeoZ80ROMActive[(sekAddress & 0x1FFFF) >> 1] = byteValue;
+			break;
+		case 5:							// Text
+			NeoTextRAM[(sekAddress & 0x3FFFF) >> 1] = byteValue;
+			break;
 	}
-
-
 }
 
 
@@ -1236,7 +1199,7 @@ static ADDRESS_MAP_START( neocd_main_map, AS_PROGRAM, 16, ng_aes_state )
 	AM_RANGE(0x800000, 0x803fff) AM_READWRITE(neocd_memcard_r, neocd_memcard_w)
 	AM_RANGE(0xc00000, 0xcfffff) AM_ROMBANK(NEOGEO_BANK_BIOS)
 	AM_RANGE(0xd00000, 0xd0ffff) AM_MIRROR(0x0f0000) AM_READ(neogeo_unmapped_r) AM_SHARE("save_ram") //AM_RAM_WRITE(save_ram_w)
-	AM_RANGE(0xe00000, 0xefffff) AM_READWRITE(neocd_transfer_r,neocd_transfer_w)
+	AM_RANGE(0xe00000, 0xefffff) AM_READWRITE8(neocd_transfer_r,neocd_transfer_w, 0xffff)
 	AM_RANGE(0xf00000, 0xfeffff) AM_READ(neogeo_unmapped_r)
 	AM_RANGE(0xff0000, 0xff01ff) AM_READWRITE(neocd_control_r, neocd_control_w) // CDROM / DMA
 	AM_RANGE(0xff0200, 0xffffff) AM_READ(neogeo_unmapped_r)
@@ -1634,48 +1597,56 @@ ROM_START( neocd )
 	ROM_SYSTEM_BIOS( 1, "front",   "Front loading NeoGeo CD" )
 	ROMX_LOAD( "front-sp1.bin",    0x00000, 0x80000, CRC(cac62307) SHA1(53bc1f283cdf00fa2efbb79f2e36d4c8038d743a), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
 
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x100000, "audiobios", ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "ymsnd", ROMREGION_ERASEFF )
+	/* 1MB of Sound RAM */
 
 	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
+	/* 64KB of Z80 RAM */
 
-	ROM_REGION( 0x20000, "zoomy", 0 )
-	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
-
-	ROM_REGION( 0x20000, "fixedbios", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x400000, "ymsnd", ROMREGION_ERASEFF )
-
-//    NO_DELTAT_REGION
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	/* 2MB of 68K RAM */
 
 	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF )
+	/* 4MB of Sprite Tile RAM */
+
+	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
+	/* 128KB of Text Tile RAM */
+
+
+
+	ROM_REGION( 0x20000, "audiobios", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "fixedbios", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "zoomy", 0 )
+	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
 ROM_END
 
 ROM_START( neocdz )
 	ROM_REGION16_BE( 0x100000, "mainbios", 0 )
 	ROM_LOAD16_WORD_SWAP( "neocd.bin",    0x00000, 0x80000, CRC(df9de490) SHA1(7bb26d1e5d1e930515219cb18bcde5b7b23e2eda) )
 
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x20000, "audiobios", ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "ymsnd", ROMREGION_ERASEFF )
+	/* 1MB of Sound RAM */
 
 	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
+	/* 64KB of Z80 RAM */
+
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	/* 2MB of 68K RAM */
+
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF )
+	/* 4MB of Sprite Tile RAM */
+
+	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
+	/* 128KB of Text Tile RAM */
+
+
+
+
+	ROM_REGION( 0x20000, "audiobios", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "fixedbios", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x20000, "zoomy", 0 )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
-
-	ROM_REGION( 0x20000, "fixedbios", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x400000, "ymsnd", ROMREGION_ERASEFF )
-
-//    NO_DELTAT_REGION
-
-	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASEFF )
 ROM_END
 
 /*    YEAR  NAME  PARENT COMPAT MACHINE INPUT  INIT     COMPANY      FULLNAME            FLAGS */

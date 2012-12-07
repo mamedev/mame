@@ -138,8 +138,6 @@
     </part>
   </software>
 
-  <!-- disable most things for now, until I actually get it working -->
-  <!--
   <software name="2020bb">
 	  <description>2020 Super Baseball (1995)(SNK)(JP-US)[!]</description>
 	  <year>199?</year>
@@ -1159,7 +1157,5 @@
 		  </diskarea>
 	  </part>
   </software>
-
-  -->
 
 </softwarelist>

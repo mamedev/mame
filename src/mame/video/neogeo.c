@@ -921,9 +921,9 @@ UINT32 neogeo_state::screen_update_neogeo(screen_device &screen, bitmap_rgb32 &b
 	/* fill with background color first */
 	bitmap.fill(m_pens[0x0fff], cliprect);
 
-	draw_sprites(machine(), bitmap, cliprect.min_y);
+	if (m_has_sprite_bus) draw_sprites(machine(), bitmap, cliprect.min_y);
 
-	draw_fixed_layer(machine(), bitmap, cliprect.min_y);
+	if (m_has_text_bus) draw_fixed_layer(machine(), bitmap, cliprect.min_y);
 
 	return 0;
 }
