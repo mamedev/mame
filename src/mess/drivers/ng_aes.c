@@ -39,8 +39,9 @@
 		- NeoCDZ runs, the original NeoCD does not
 		   - Might think the tray is open? (check)
 		- Some unknown / unhandled CD commands, code is still a bit messy
-		- Games using Raster Effects are broken, even non-IRQ based ones like mosyougi
-		   - Are we overloading the CPU with interrupts from the CDC, incorrect masking? or something else?
+		   - CDDA continues to play during loading, should stop it
+		- Games using Raster Effects are broken without a kludge
+		   - CPU gets overloaded with IRQs from the timer callback...
 		- Double Dragon doesn't load, it erases the IRQ table
 		   - might need better handling of the Vector Table Mapping, or better interrupts (see point above)
 		- Softlist are based on an old Tosec set and should be updated to the TruRip set once we can convert CCD
@@ -133,7 +134,7 @@ public:
 	DECLARE_READ16_MEMBER(aes_in0_r);
 	DECLARE_READ16_MEMBER(aes_in1_r);
 	DECLARE_READ16_MEMBER(aes_in2_r);
-	DECLARE_DRIVER_INIT(neogeo);
+
 	DECLARE_MACHINE_START(neocd);
 	DECLARE_MACHINE_START(neogeo);
 	DECLARE_MACHINE_RESET(neogeo);
@@ -171,7 +172,13 @@ public:
 
 	UINT8 nTransferWriteEnable;
 
-	address_space* curr_space;
+	bool prohibit_cdc_irq; // hack?
+
+	DECLARE_DRIVER_INIT(neogeo);
+
+	DECLARE_DRIVER_INIT(neocdz);
+	DECLARE_DRIVER_INIT(neocdzj);
+
 };
 
 
@@ -472,6 +479,14 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 				{
 				// not a good idea, causes hangs
 				//	m_tempcdc->NeoCDCommsReset();
+					
+					// I doubt this is correct either, but we need something to stop
+					// the interrupts during gameplay and I'm not sure what...
+					prohibit_cdc_irq = true;
+				}
+				else
+				{
+					prohibit_cdc_irq = false;
 				}
 			}
 			break;
@@ -1073,10 +1088,6 @@ MACHINE_START_MEMBER(ng_aes_state,neogeo)
 
 MACHINE_START_MEMBER(ng_aes_state,neocd)
 {
-//	UINT8* ROM = machine().root_device().memregion("mainbios")->base();
-//	UINT8* RAM = machine().root_device().memregion("maincpu")->base();
-//	UINT8* Z80bios = machine().root_device().memregion("audiobios")->base();
-//	int x;
 	m_has_audio_banking = false;
 	m_is_cartsys = false;
 
@@ -1093,19 +1104,12 @@ MACHINE_START_MEMBER(ng_aes_state,neocd)
 	m_memcard_data = auto_alloc_array_clear(machine(), UINT8, 0x2000);
 	save_pointer(NAME(m_memcard_data), 0x2000);
 
-	// copy initial 68k vectors into RAM
-	// memcpy(RAM,ROM,0x80);
-
-
-
-
 	// for custom vectors
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(neocd_int_callback);
 
 	neogeo_set_main_cpu_vector_table_source(machine(), 0); // default to the BIOS vectors
 
 	m_tempcdc->reset_cd();
-	
 }
 
 
@@ -1564,23 +1568,26 @@ void ng_aes_state::NeoCDIRQUpdate(UINT8 byteValue)
 
 	nIRQAcknowledge |= (byteValue & 0x38);
 
-	if ((nIRQAcknowledge & 0x08) == 0) {
-		nNeoCDIRQVector = 0x17;
-		nNeoCDIRQVectorAck = 1;
-		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
-		return;
-	}
-	if ((nIRQAcknowledge & 0x10) == 0) {
-		nNeoCDIRQVector = 0x16;
-		nNeoCDIRQVectorAck = 1;
-		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
-		return;
-	}
-	if ((nIRQAcknowledge & 0x20) == 0) {
-		nNeoCDIRQVector = 0x15;
-		nNeoCDIRQVectorAck = 1;
-		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
-		return;
+	if (!prohibit_cdc_irq)
+	{
+		if ((nIRQAcknowledge & 0x08) == 0) {
+			nNeoCDIRQVector = 0x17;
+			nNeoCDIRQVectorAck = 1;
+			machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+			return;
+		}
+		if ((nIRQAcknowledge & 0x10) == 0) {
+			nNeoCDIRQVector = 0x16;
+			nNeoCDIRQVectorAck = 1;
+			machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+			return;
+		}
+		if ((nIRQAcknowledge & 0x20) == 0) {
+			nNeoCDIRQVector = 0x15;
+			nNeoCDIRQVectorAck = 1;
+			machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+			return;
+		}
 	}
 }
 
@@ -1621,10 +1628,6 @@ MACHINE_CONFIG_END
  *  Driver initalization
  *
  *************************************/
-
-DRIVER_INIT_MEMBER(ng_aes_state,neogeo)
-{
-}
 
 
 ROM_START( aes )
@@ -1707,9 +1710,6 @@ ROM_START( neocdz )
 	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
 	/* 128KB of Text Tile RAM */
 
-
-
-
 	ROM_REGION( 0x20000, "audiobios", ROMREGION_ERASEFF )
 	ROM_REGION( 0x20000, "fixedbios", ROMREGION_ERASEFF )
 
@@ -1717,8 +1717,29 @@ ROM_START( neocdz )
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
 ROM_END
 
+#define rom_neocdzj    rom_neocdz
+
+DRIVER_INIT_MEMBER(ng_aes_state,neogeo)
+{
+}
+
+
 /*    YEAR  NAME  PARENT COMPAT MACHINE INPUT  INIT     COMPANY      FULLNAME            FLAGS */
 CONS( 1990, aes,    0,		0,   aes,      aes, ng_aes_state,   neogeo,  "SNK", "Neo-Geo AES", 0)
 
-CONS( 1996, neocdz, 0,	    0,   neocd,    aes, ng_aes_state,   neogeo,  "SNK", "Neo-Geo CDZ", GAME_NOT_WORKING ) // the CDZ is the newer slot-loading model, faster drive etc.
-CONS( 1994, neocd,  neocdz,	0,   neocd,    aes, ng_aes_state,   neogeo,  "SNK", "Neo-Geo CD", GAME_NOT_WORKING ) // older Top Loading model, ignores disc protections?
+DRIVER_INIT_MEMBER(ng_aes_state,neocdz)
+{
+	NeoSystem = NEOCD_REGION_US;
+}
+
+DRIVER_INIT_MEMBER(ng_aes_state,neocdzj)
+{
+	NeoSystem = NEOCD_REGION_JAPAN;
+}
+
+
+CONS( 1996, neocdz,  0,	     0,   neocd,    aes, ng_aes_state,   neocdz,  "SNK", "Neo-Geo CDZ (US)", 0 ) // the CDZ is the newer model
+CONS( 1996, neocdzj, neocdz, 0,   neocd,    aes, ng_aes_state,   neocdzj,  "SNK", "Neo-Geo CDZ (Japan)", 0 )
+
+
+CONS( 1994, neocd,  neocdz,	0,   neocd,    aes, ng_aes_state,   neogeo,  "SNK", "Neo-Geo CD", GAME_NOT_WORKING ) // older  model, ignores disc protections?

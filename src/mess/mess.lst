@@ -328,6 +328,7 @@ ngpc	  // NeoGeo Pocket Color
 aes	   // NeoGeo AES
 neocd	 // NeoGeo CD
 neocdz	// NeoGeo CDZ
+neocdzj	//
 
 // Philips
 cdimono1  // Philips CD-i (Mono-I board)
