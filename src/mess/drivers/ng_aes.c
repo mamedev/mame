@@ -54,7 +54,15 @@ UINT8 *NeoSpriteRAM, *NeoTextRAM;
 //UINT8* NeoTextROM;
 UINT8* YM2610ADPCMAROM;
 UINT8* NeoZ80ROMActive;
-UINT8 NeoSystem = 6;
+
+// was it actually released in eu / asia?
+#define NEOCD_REGION_ASIA 3 // IronClad runs with a darkened screen (MVS has the same issue)
+#define NEOCD_REGION_EUROPE 2 // ^
+#define NEOCD_REGION_US 1
+#define NEOCD_REGION_JAPAN 0
+
+
+UINT8 NeoSystem = NEOCD_REGION_JAPAN;
 INT32 nNeoCDZ80ProgWriteWordCancelHack = 0;
 
 
@@ -63,16 +71,6 @@ INT32 nNeoCDZ80ProgWriteWordCancelHack = 0;
 
 
 
-static void MapVectorTable(bool bMapBoardROM)
-{
-	/*
-    if (!bMapBoardROM && Neo68KROMActive) {
-        SekMapMemory(Neo68KFix, 0x000000, 0x0003FF, SM_ROM);
-    } else {
-        SekMapMemory(NeoVectorActive, 0x000000, 0x0003FF, SM_ROM);
-    }
-    */
-}
 
 
 class ng_aes_state : public neogeo_state
@@ -99,14 +97,11 @@ public:
 	void set_DMA_regs(int offset, UINT16 wordValue);
 
 	UINT8 *m_memcard_data;
-	DECLARE_WRITE8_MEMBER(audio_cpu_clear_nmi_w);
-	DECLARE_WRITE16_MEMBER(io_control_w);
 	DECLARE_WRITE16_MEMBER(save_ram_w);
 	DECLARE_READ16_MEMBER(memcard_r);
 	DECLARE_WRITE16_MEMBER(memcard_w);
 	DECLARE_READ16_MEMBER(neocd_memcard_r);
 	DECLARE_WRITE16_MEMBER(neocd_memcard_w);
-	DECLARE_WRITE16_MEMBER(main_cpu_bank_select_w);
 	DECLARE_READ16_MEMBER(neocd_control_r);
 	DECLARE_WRITE16_MEMBER(neocd_control_w);
 	DECLARE_READ16_MEMBER(neocd_transfer_r);
@@ -124,8 +119,6 @@ public:
 
 	// neoCD
 
-	UINT16 neogeoReadWordCDROM(UINT32 sekAddress);
-	void neogeoWriteWordCDROM(UINT32 sekAddress, UINT16 wordValue);
 	UINT8 neogeoReadTransfer(UINT32 sekAddress, int is_byte_transfer);
 	void neogeoWriteTransfer(UINT32 sekAddress, UINT8 byteValue, int is_byte_transfer);
 
@@ -197,51 +190,10 @@ static void audio_cpu_irq(device_t *device, int assert)
 
 
 
-WRITE8_MEMBER(ng_aes_state::audio_cpu_clear_nmi_w)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-}
 
 
 
-/*************************************
- *
- *  Input ports / Controllers
- *
- *************************************/
 
-static void select_controller( running_machine &machine, UINT8 data )
-{
-	neogeo_state *state = machine.driver_data<neogeo_state>();
-	state->m_controller_select = data;
-}
-
-
-WRITE16_MEMBER(ng_aes_state::io_control_w)
-{
-	switch (offset)
-	{
-	case 0x00: select_controller(machine(), data & 0x00ff); break;
-//  case 0x18: set_output_latch(machine(), data & 0x00ff); break;
-//  case 0x20: set_output_data(machine(), data & 0x00ff); break;
-	case 0x28: upd4990a_control_16_w(m_upd4990a, space, 0, data, mem_mask); break;
-//  case 0x30: break; // coin counters
-//  case 0x31: break; // coin counters
-//  case 0x32: break; // coin lockout
-//  case 0x33: break; // coui lockout
-
-	default:
-		logerror("PC: %x  Unmapped I/O control write.  Offset: %x  Data: %x\n", space.device().safe_pc(), offset, data);
-		break;
-	}
-}
-
-
-static CUSTOM_INPUT( get_calendar_status )
-{
-	neogeo_state *state = field.machine().driver_data<neogeo_state>();
-	return (upd4990a_databit_r(state->m_upd4990a, state->generic_space(), 0) << 1) | upd4990a_testbit_r(state->m_upd4990a, state->generic_space(), 0);
-}
 
 
 /*************************************
@@ -317,50 +269,6 @@ static MEMCARD_HANDLER( neogeo )
 		file.write(state->m_memcard_data, MEMCARD_SIZE);
 		break;
 	}
-}
-
-/*************************************
- *
- *  Main CPU banking
- *
- *************************************/
-
-WRITE16_MEMBER(ng_aes_state::main_cpu_bank_select_w)
-{
-	UINT32 bank_address;
-	UINT32 len = memregion("maincpu")->bytes();
-
-	if ((len <= 0x100000) && (data & 0x07))
-		logerror("PC %06x: warning: bankswitch to %02x but no banks available\n", space.device().safe_pc(), data);
-	else
-	{
-		bank_address = ((data & 0x07) + 1) * 0x100000;
-
-		if (bank_address >= len)
-		{
-			logerror("PC %06x: warning: bankswitch to empty bank %02x\n", space.device().safe_pc(), data);
-			bank_address = 0x100000;
-		}
-
-		neogeo_set_main_cpu_bank_address(space, bank_address);
-	}
-}
-
-
-static void main_cpu_banking_init( running_machine &machine )
-{
-	ng_aes_state *state = machine.driver_data<ng_aes_state>();
-	address_space &mainspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
-
-	/* create vector banks */
-	state->membank(NEOGEO_BANK_VECTORS)->configure_entry(0, machine.root_device().memregion("mainbios")->base());
-	state->membank(NEOGEO_BANK_VECTORS)->configure_entry(1, machine.root_device().memregion("maincpu")->base());
-
-	/* set initial main CPU bank */
-	if (machine.root_device().memregion("maincpu")->bytes() > 0x100000)
-		neogeo_set_main_cpu_bank_address(mainspace, 0x100000);
-	else
-		neogeo_set_main_cpu_bank_address(mainspace, 0x000000);
 }
 
 
@@ -450,10 +358,12 @@ void ng_aes_state::neogeoWriteTransfer(UINT32 sekAddress, UINT8 byteValue, int i
 
 
 
-UINT16 ng_aes_state::neogeoReadWordCDROM(UINT32 sekAddress)
-{
-//  bprintf(PRINT_NORMAL, _T("  - CDROM: 0x%06X read (word, PC: 0x%06X)\n"), sekAddress, SekGetPC(-1));
 
+
+
+READ16_MEMBER(ng_aes_state::neocd_control_r)
+{
+	UINT32 sekAddress = 0xff0000+ (offset*2);
 
 	switch (sekAddress & 0xFFFF) {
 
@@ -481,8 +391,12 @@ UINT16 ng_aes_state::neogeoReadWordCDROM(UINT32 sekAddress)
 }
 
 
-void ng_aes_state::neogeoWriteWordCDROM(UINT32 sekAddress, UINT16 wordValue)
+WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 {
+
+	UINT32 sekAddress = 0xff0000+ (offset*2);
+	UINT16 wordValue = data;
+
 //  bprintf(PRINT_NORMAL, _T("  - NGCD port 0x%06X -> 0x%04X (PC: 0x%06X)\n"), sekAddress, wordValue, SekGetPC(-1));
 	int byteValue = wordValue & 0xff;
 
@@ -588,8 +502,19 @@ void ng_aes_state::neogeoWriteWordCDROM(UINT32 sekAddress, UINT16 wordValue)
 
 		case 0x016c:
 //          bprintf(PRINT_ERROR, _T("  - NGCD port 0x%06X -> 0x%02X (PC: 0x%06X)\n"), sekAddress, byteValue, SekGetPC(-1));
+			//MapVectorTable(!(byteValue == 0xFF));
+			if (ACCESSING_BITS_0_7)
+			{
+				// even like this doubledr ends up mapping vectors in, then erasing them causing the loading to crash??
+				// is there some way to enable write protection on the RAM vector area or is it some IRQ masking issue?
+				// the games still write to the normal address for this too?
+				// writes 00 / 01 / ff
+				printf("MapVectorTable? %04x %04x\n",data,mem_mask);
 
-			MapVectorTable(!(byteValue == 0xFF));
+				if (!data) neogeo_set_main_cpu_vector_table_source(machine(), 0); // bios vectors
+				else neogeo_set_main_cpu_vector_table_source(machine(), 1); // ram (aka cart) vectors
+
+			}
 
 //extern INT32 bRunPause;
 //bRunPause = 1;
@@ -630,19 +555,6 @@ void ng_aes_state::neogeoWriteWordCDROM(UINT32 sekAddress, UINT16 wordValue)
 		}
 	}
 
-}
-
-
-
-READ16_MEMBER(ng_aes_state::neocd_control_r)
-{
-	return neogeoReadWordCDROM(0xff0000+ (offset*2));
-}
-
-
-WRITE16_MEMBER(ng_aes_state::neocd_control_w)
-{
-	neogeoWriteWordCDROM(0xff0000+ (offset*2), data);
 }
 
 
@@ -1160,7 +1072,7 @@ static void common_machine_start(running_machine &machine)
 	state->membank(NEOGEO_BANK_BIOS)->set_base(state->memregion("mainbios")->base());
 
 	/* set the initial main CPU bank */
-	main_cpu_banking_init(machine);
+	neogeo_main_cpu_banking_init(machine);
 
 	/* set the initial audio CPU ROM banks */
 	neogeo_audio_cpu_banking_init(machine);
@@ -1215,11 +1127,12 @@ MACHINE_START_MEMBER(ng_aes_state,neogeo)
 
 MACHINE_START_MEMBER(ng_aes_state,neocd)
 {
-	UINT8* ROM = machine().root_device().memregion("mainbios")->base();
-	UINT8* RAM = machine().root_device().memregion("maincpu")->base();
+//	UINT8* ROM = machine().root_device().memregion("mainbios")->base();
+//	UINT8* RAM = machine().root_device().memregion("maincpu")->base();
 //	UINT8* Z80bios = machine().root_device().memregion("audiobios")->base();
 //	int x;
 	m_has_audio_banking = false;
+	m_is_cartsys = false;
 
 	common_machine_start(machine());
 	m_is_mvs = false;
@@ -1235,13 +1148,15 @@ MACHINE_START_MEMBER(ng_aes_state,neocd)
 	save_pointer(NAME(m_memcard_data), 0x2000);
 
 	// copy initial 68k vectors into RAM
-	memcpy(RAM,ROM,0x80);
+	// memcpy(RAM,ROM,0x80);
 
 
 
 
 	// for custom vectors
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(neocd_int_callback);
+
+	neogeo_set_main_cpu_vector_table_source(machine(), 0); // default to the BIOS vectors
 
 	m_tempcdc->reset_cd();
 	
@@ -1339,12 +1254,11 @@ ADDRESS_MAP_END
 
 
 
+
 static ADDRESS_MAP_START( neocd_main_map, AS_PROGRAM, 16, ng_aes_state )
-	AM_RANGE(0x000000, 0x00007f) AM_RAMBANK(NEOGEO_BANK_VECTORS)
-	AM_RANGE(0x000080, 0x1fffff) AM_RAM AM_SHARE("neocd_work_ram")
-	/* some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too */
-	AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK(NEOGEO_BANK_CARTRIDGE)
-	AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
+	AM_RANGE(0x000000, 0x00007f) AM_READ_BANK(NEOGEO_BANK_VECTORS) // writes will fall through to area below
+	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_REGION("maincpu", 0x00000)
+
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ff7e) AM_READ(aes_in0_r)
 	AM_RANGE(0x300080, 0x300081) AM_MIRROR(0x01ff7e) AM_READ_PORT("IN4")
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITENOP	// AES has no watchdog
@@ -1424,6 +1338,11 @@ static ADDRESS_MAP_START( neocd_audio_io_map, AS_IO, 8, ng_aes_state )
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_8000_bfff_r)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_WRITE(audio_result_w)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) /* write - NMI disable? (the data written doesn't matter) */
+
+	// ??
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0xff00) AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -1490,7 +1409,7 @@ static const ym2610_interface ym2610_config =
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* having this ACTIVE_HIGH causes you to start with 2 credits using USA bios roms */	\
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* having this ACTIVE_HIGH causes you to start with 2 credits using USA bios roms */	\
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) /* what is this? */								\
-	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_calendar_status, NULL)			\
+	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_calendar_status, NULL)			\
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_audio_result, NULL) \
 
 #define STANDARD_IN4																			\

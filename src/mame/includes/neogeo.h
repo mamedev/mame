@@ -41,6 +41,7 @@ public:
 	{
 		m_has_audio_banking = true;
 		m_is_mvs = true;
+		m_is_cartsys = true;
 	}
 
 	/* memory pointers */
@@ -227,8 +228,9 @@ public:
 	TIMER_CALLBACK_MEMBER(auto_animation_timer_callback);
 	TIMER_CALLBACK_MEMBER(sprite_line_timer_callback);
 
-	bool m_has_audio_banking;
-	bool m_is_mvs;
+	bool m_has_audio_banking; // does the system use Audio Banking (the NeoCD doesn't?)
+	bool m_is_mvs; // is the system an MVS (watchdog, SRAM etc.)
+	bool m_is_cartsys; // does the system use Cartridges? (MVS and AES)
 };
 
 
@@ -242,6 +244,8 @@ void neogeo_set_main_cpu_bank_address(address_space &space, UINT32 bank_address)
 DEVICE_IMAGE_LOAD( neo_cartridge );
 void neogeo_postload(running_machine &machine);
 void neogeo_audio_cpu_banking_init( running_machine &machine );
+void neogeo_main_cpu_banking_init( running_machine &machine );
+void neogeo_set_main_cpu_vector_table_source( running_machine &machine, UINT8 data );
 
 /*----------- defined in machine/neocrypt.c -----------*/
 
