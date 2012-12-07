@@ -854,7 +854,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_20_w)
 			m_rtc->c2_w((data & 0x04) >> 2);
 			m_rtc->stb_w((data & 0x08) >> 3);
 			m_rtc->clk_w((data & 0x10) >> 4);
-			m_rtc->data_in_w((data & 0x20) >> 5);
+			m_rtc->data_in_w(((data & 0x20) >> 5));
 			if(data & 0xc0)
 				printf("RTC write to undefined bits %02x\n",data & 0xc0);
 		}
@@ -3147,7 +3147,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 
 	m_rtc->cs_w(1);
-	m_rtc->oe_w(1);
+	m_rtc->oe_w(0); // TODO: unknown connection, MS-DOS 6.2x wants this low somehow with the test mode
 
 	m_ipl_rom = memregion("ipl")->base();
 }

@@ -11,7 +11,8 @@
 
     TODO:
 
-    - test mode
+    - set tp = 64 Hz when out of test mode
+    - test mode is mostly untested (is used by MS-DOS 6.2x in PC-98xx)
 
 */
 
@@ -97,6 +98,7 @@ void upd1990a_device::device_start()
 	m_timer_clock->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
 	m_timer_tp = timer_alloc(TIMER_TP);
 	m_timer_data_out = timer_alloc(TIMER_DATA_OUT);
+	m_timer_test_mode = timer_alloc(TIMER_TEST_MODE);
 
 	// state saving
 	save_item(NAME(m_time_counter));
@@ -149,6 +151,31 @@ void upd1990a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		if (LOG) logerror("uPD1990A '%s' DATA OUT TICK %u\n", tag(), m_data_out);
 
 		m_out_data_func(m_data_out);
+		break;
+
+	case TIMER_TEST_MODE:
+		if (m_oe)
+		{
+			/* time counter is advanced at 1024 Hz from "Second" counter input */
+			int i;
+
+			for(i=0;i<4;i++)
+			{
+				m_time_counter[i]++;
+				if(m_time_counter[i] != 0)
+					return;
+			}
+		}
+		else // parallel
+		{
+			/* each counter is advanced at 1024 Hz in parallel, overflow carry does not affect next counter */
+			m_time_counter[0]++;
+			m_time_counter[1]++;
+			m_time_counter[2]++;
+			m_time_counter[3]++;
+			m_time_counter[4]++;
+		}
+
 		break;
 	}
 }
@@ -214,6 +241,8 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 			/* enable time counter */
 			m_timer_clock->enable(1);
 
+			m_timer_test_mode->enable(0);
+
 			/* 1 Hz data out pulse */
 			m_data_out = 1;
 			m_timer_data_out->adjust(attotime::zero, 0, attotime::from_hz(1*2));
@@ -230,6 +259,8 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 
 			/* disable data out pulse */
 			m_timer_data_out->enable(0);
+
+			m_timer_test_mode->enable(0);
 
 			/* output LSB of shift register */
 			m_data_out = BIT(m_shift_reg[0], 0);
@@ -248,6 +279,8 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 
 			/* disable data out pulse */
 			m_timer_data_out->enable(0);
+
+			m_timer_test_mode->enable(0);
 
 			/* output LSB of shift register */
 			m_data_out = BIT(m_shift_reg[0], 0);
@@ -271,6 +304,8 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 			/* enable time counter */
 			m_timer_clock->enable(1);
 
+			m_timer_test_mode->enable(0);
+
 			/* load time counter data into shift register */
 			for (int i = 0; i < 5; i++)
 			{
@@ -290,12 +325,16 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 		case MODE_TP_64HZ_SET:
 			if (LOG) logerror("uPD1990A '%s' TP = 64 Hz Set Mode\n", tag());
 
+			m_timer_test_mode->enable(0);
+
 			/* 64 Hz time pulse */
 			m_timer_tp->adjust(attotime::zero, 0, attotime::from_hz(64*2));
 			break;
 
 		case MODE_TP_256HZ_SET:
 			if (LOG) logerror("uPD1990A '%s' TP = 256 Hz Set Mode\n", tag());
+
+			m_timer_test_mode->enable(0);
 
 			/* 256 Hz time pulse */
 			m_timer_tp->adjust(attotime::zero, 0, attotime::from_hz(256*2));
@@ -304,22 +343,24 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 		case MODE_TP_2048HZ_SET:
 			if (LOG) logerror("uPD1990A '%s' TP = 2048 Hz Set Mode\n", tag());
 
+			m_timer_test_mode->enable(0);
+
 			/* 2048 Hz time pulse */
 			m_timer_tp->adjust(attotime::zero, 0, attotime::from_hz(2048*2));
 			break;
 
 		case MODE_TEST:
-			if (LOG) logerror("uPD1990A '%s' Test Mode not supported!\n", tag());
+			if (LOG) logerror("uPD1990A '%s' Test Mode\n", tag());
 
-			if (m_oe)
-			{
-				/* time counter is advanced at 1024 Hz from "Second" counter input */
-			}
-			else
-			{
-				/* each counter is advanced at 1024 Hz in parallel, overflow carry does not affect next counter */
-			}
+			/* disable time counter */
+			m_timer_clock->enable(0);
 
+			/* disable data out pulse */
+			m_timer_data_out->enable(0);
+
+			m_timer_test_mode->enable(1);
+
+			m_timer_test_mode->adjust(attotime::zero, 0, attotime::from_hz(1024));
 			break;
 		}
 	}

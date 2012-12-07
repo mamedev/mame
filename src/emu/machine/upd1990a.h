@@ -94,6 +94,7 @@ private:
 	static const device_timer_id TIMER_CLOCK = 0;
 	static const device_timer_id TIMER_TP = 1;
 	static const device_timer_id TIMER_DATA_OUT = 2;
+	static const device_timer_id TIMER_TEST_MODE = 3;
 
 	devcb_resolved_write_line	m_out_data_func;
 	devcb_resolved_write_line	m_out_tp_func;
@@ -115,6 +116,7 @@ private:
 	emu_timer *m_timer_clock;
 	emu_timer *m_timer_tp;
 	emu_timer *m_timer_data_out;
+	emu_timer *m_timer_test_mode;
 };
 
 
