@@ -14,10 +14,13 @@ lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, LC89510_TEMP, "lc89510_temp_device", tag, owner, clock)
 {
 	segacd_dma_callback =  segacd_dma_delegate(FUNC(lc89510_temp_device::Fake_CDC_Do_DMA), this);
+	type1_interrupt_callback =  interrupt_delegate(FUNC(lc89510_temp_device::dummy_interrupt_callback), this);
+	type2_interrupt_callback =  interrupt_delegate(FUNC(lc89510_temp_device::dummy_interrupt_callback), this);
+	type3_interrupt_callback =  interrupt_delegate(FUNC(lc89510_temp_device::dummy_interrupt_callback), this);
+
 	is_neoCD = false;
 
 	nff0002 = 0;
-	nIRQAcknowledge = ~0;
 	for (int i=0;i<10;i++)
 		CDD_TX[i] = 0;
 	for (int i=0;i<10;i++)
@@ -27,16 +30,35 @@ lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const ch
 	SCD_CURLBA = 0;
 
 	CDC_REG0 = 0;
-	nNeoCDIRQVectorAck = 0;
-	nNeoCDIRQVector = 0;
 }
 
+void lc89510_temp_device::dummy_interrupt_callback(void)
+{
 
+}
 
 void lc89510_temp_device::set_CDC_Do_DMA(device_t &device,segacd_dma_delegate new_segacd_dma_callback)
 {
 	lc89510_temp_device &dev = downcast<lc89510_temp_device &>(device);
 	dev.segacd_dma_callback = new_segacd_dma_callback;
+}
+
+void lc89510_temp_device::set_type1_interrupt_callback(device_t &device,interrupt_delegate interrupt_callback)
+{
+	lc89510_temp_device &dev = downcast<lc89510_temp_device &>(device);
+	dev.type1_interrupt_callback = interrupt_callback;
+}
+
+void lc89510_temp_device::set_type2_interrupt_callback(device_t &device,interrupt_delegate interrupt_callback)
+{
+	lc89510_temp_device &dev = downcast<lc89510_temp_device &>(device);
+	dev.type2_interrupt_callback = interrupt_callback;
+}
+
+void lc89510_temp_device::set_type3_interrupt_callback(device_t &device,interrupt_delegate interrupt_callback)
+{
+	lc89510_temp_device &dev = downcast<lc89510_temp_device &>(device);
+	dev.type3_interrupt_callback = interrupt_callback;
 }
 
 void lc89510_temp_device::set_is_neoCD(device_t &device, bool is_neoCD)
@@ -54,6 +76,10 @@ void lc89510_temp_device::Fake_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UINT
 void lc89510_temp_device::device_start()
 {
 	segacd_dma_callback.bind_relative_to(*owner());
+	type1_interrupt_callback.bind_relative_to(*owner());
+	type2_interrupt_callback.bind_relative_to(*owner());
+	type3_interrupt_callback.bind_relative_to(*owner());
+
 	m_cdda = (cdda_device*)subdevice("cdda");
 }
 
@@ -1019,8 +1045,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( lc89510_temp_device::segacd_access_timer_callback 
 	{
 		if (nff0002 & 0x0050)
 		{
-			nIRQAcknowledge &= ~0x10;
-			NeoCDIRQUpdate(0);
+			type2_interrupt_callback();
 		}
 	}
 
@@ -1192,14 +1217,13 @@ void lc89510_temp_device::scd_ctrl_checks(running_machine& machine)
 	if (LC8951RegistersW[REG_W_IFCTRL] & 0x20)
 	{
 	
-		// todo: handle as interrupt callback
 		if (is_neoCD)
 		{
-			nIRQAcknowledge &= ~0x20;
-			NeoCDIRQUpdate(0);
+			type1_interrupt_callback();
 		}
 		else
 		{
+			// todo: make callback
 			CHECK_SCD_LV5_INTERRUPT		
 		}
 
@@ -1293,31 +1317,7 @@ int lc89510_temp_device::Read_LBA_To_Buffer(running_machine& machine)
 
 
 
-void lc89510_temp_device::NeoCDIRQUpdate(UINT8 byteValue)
-{
-	// do we also need to check the regular interrupts like FBA?
 
-	nIRQAcknowledge |= (byteValue & 0x38);
-
-	if ((nIRQAcknowledge & 0x08) == 0) {
-		nNeoCDIRQVector = 0x17;
-		nNeoCDIRQVectorAck = 1;
-		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
-		return;
-	}
-	if ((nIRQAcknowledge & 0x10) == 0) {
-		nNeoCDIRQVector = 0x16;
-		nNeoCDIRQVectorAck = 1;
-		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
-		return;
-	}
-	if ((nIRQAcknowledge & 0x20) == 0) {
-		nNeoCDIRQVector = 0x15;
-		nNeoCDIRQVectorAck = 1;
-		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
-		return;
-	}
-}
 
 void lc89510_temp_device::nff0002_set(UINT16 wordValue)
 {

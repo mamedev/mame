@@ -5,6 +5,7 @@
 
 typedef device_delegate<void (int&, UINT8*, UINT16&, UINT16&)> segacd_dma_delegate;
 
+typedef device_delegate<void (void)> interrupt_delegate;
 
 
 #define READ_MAIN (0x0200)
@@ -136,6 +137,14 @@ typedef device_delegate<void (int&, UINT8*, UINT16&, UINT16&)> segacd_dma_delega
 #define MCFG_SEGACD_HACK_SET_NEOCD \
 	lc89510_temp_device::set_is_neoCD(*device, true); \
 
+#define MCFG_SET_TYPE1_INTERRUPT_CALLBACK( _class, _method) \
+	lc89510_temp_device::set_type1_interrupt_callback(*device, interrupt_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0)); \
+
+#define MCFG_SET_TYPE2_INTERRUPT_CALLBACK( _class, _method) \
+	lc89510_temp_device::set_type2_interrupt_callback(*device, interrupt_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0)); \
+
+#define MCFG_SET_TYPE3_INTERRUPT_CALLBACK( _class, _method) \
+	lc89510_temp_device::set_type3_interrupt_callback(*device, interrupt_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0)); \
 
 /* neocd */
 
@@ -156,8 +165,18 @@ public:
 
 	// HACK for DMA handling
 	segacd_dma_delegate segacd_dma_callback;
+	interrupt_delegate type1_interrupt_callback;
+	interrupt_delegate type2_interrupt_callback;
+	interrupt_delegate type3_interrupt_callback;
+
 	void Fake_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UINT16 &dma_addrc, UINT16 &destination );
 	static void set_CDC_Do_DMA(device_t &device,segacd_dma_delegate new_segacd_dma_callback);
+	
+	void dummy_interrupt_callback(void);
+	static void set_type1_interrupt_callback(device_t &device,interrupt_delegate interrupt_callback);
+	static void set_type2_interrupt_callback(device_t &device,interrupt_delegate interrupt_callback);
+	static void set_type3_interrupt_callback(device_t &device,interrupt_delegate interrupt_callback);
+
 
 	static void set_is_neoCD(device_t &device, bool is_neoCD);
 
@@ -268,7 +287,6 @@ public:
 	cdda_device* m_cdda;
 
 	/* NeoCD */
-	INT32 nIRQAcknowledge;
 	UINT16 nff0002;
 	UINT16 nff0016;
 
@@ -286,13 +304,7 @@ public:
 
 
 
-	int nNeoCDIRQVectorAck;
-	int get_nNeoCDIRQVectorAck(void) { return nNeoCDIRQVectorAck; }
-	void set_nNeoCDIRQVectorAck(int val) { nNeoCDIRQVectorAck = val; }
-	int nNeoCDIRQVector;
-	int get_nNeoCDIRQVector(void) { return nNeoCDIRQVector; }
 
-	void NeoCDIRQUpdate(UINT8 byteValue);
 	void NeoCDCommsControl(UINT8 clock, UINT8 send);
 	void LC8951UpdateHeader();
 	char* LC8915InitTransfer(int NeoCDDMACount);

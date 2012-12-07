@@ -107,6 +107,9 @@ public:
 		NeoCDDMAValue2   = 0;
 		NeoCDDMACount    = 0;
 		NeoCDDMAMode = 0;
+		nIRQAcknowledge = ~0;
+		nNeoCDIRQVectorAck = 0;
+		nNeoCDIRQVector = 0;
 
 	}
 
@@ -152,6 +155,19 @@ public:
 	INT32 NeoCDDMAValue2;
 	INT32 NeoCDDMACount;
 	INT32 NeoCDDMAMode;
+	INT32 nIRQAcknowledge;
+	int nNeoCDIRQVectorAck;
+	int nNeoCDIRQVector;
+
+	int get_nNeoCDIRQVectorAck(void) { return nNeoCDIRQVectorAck; }
+	void set_nNeoCDIRQVectorAck(int val) { nNeoCDIRQVectorAck = val; }
+	int get_nNeoCDIRQVector(void) { return nNeoCDIRQVector; }
+	void NeoCDIRQUpdate(UINT8 byteValue);
+	
+	// from the CDC
+	void interrupt_callback_type1(void);
+	void interrupt_callback_type2(void);
+	void interrupt_callback_type3(void);
 
 	UINT8 nTransferWriteEnable;
 
@@ -323,7 +339,7 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 			break;
 
 		case 0x000E:
-			m_tempcdc->NeoCDIRQUpdate(wordValue); // irqack
+			NeoCDIRQUpdate(wordValue); // irqack
 			break;
 
 		case 0x0016:
@@ -447,12 +463,16 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 			break;
 
 		case 0x0180: {
-			static UINT8 clara = 0;
-			if (!byteValue && clara) {
-//              bprintf(PRINT_IMPORTANT, _T("  - NGCD CD communication reset (PC: 0x%06X)\n"), SekGetPC(-1));
-//              NeoCDCommsReset();
+			// 1 during CD access, 0 otherwise, written frequently
+			//printf("reset cdc %04x %04x\n",data, mem_mask);
+
+			if (ACCESSING_BITS_0_7)
+			{
+				if (data==0x00)
+				{
+					m_tempcdc->NeoCDCommsReset();
+				}
 			}
-			clara = byteValue;
 			break;
 		}
 		case 0x0182: {
@@ -1509,16 +1529,59 @@ static IRQ_CALLBACK(neocd_int_callback)
 
 	if (irqline==4)
 	{
-		if (state->m_tempcdc->get_nNeoCDIRQVectorAck()) {
-			state->m_tempcdc->set_nNeoCDIRQVectorAck(0);
-			return state->m_tempcdc->get_nNeoCDIRQVector();
+		if (state->get_nNeoCDIRQVectorAck()) {
+			state->set_nNeoCDIRQVectorAck(0);
+			return state->get_nNeoCDIRQVector();
 		}
 	}
 
 	return (0x60+irqline*4)/4;
 }
 
+void ng_aes_state::interrupt_callback_type1(void)
+{
+	nIRQAcknowledge &= ~0x20;
+	NeoCDIRQUpdate(0);
+}
 
+void ng_aes_state::interrupt_callback_type2(void)
+{
+	nIRQAcknowledge &= ~0x10;
+	NeoCDIRQUpdate(0);
+}
+
+void ng_aes_state::interrupt_callback_type3(void)
+{
+	nIRQAcknowledge &= ~0x08;
+	NeoCDIRQUpdate(0);
+}
+
+
+void ng_aes_state::NeoCDIRQUpdate(UINT8 byteValue)
+{
+	// do we also need to check the regular interrupts like FBA?
+
+	nIRQAcknowledge |= (byteValue & 0x38);
+
+	if ((nIRQAcknowledge & 0x08) == 0) {
+		nNeoCDIRQVector = 0x17;
+		nNeoCDIRQVectorAck = 1;
+		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		return;
+	}
+	if ((nIRQAcknowledge & 0x10) == 0) {
+		nNeoCDIRQVector = 0x16;
+		nNeoCDIRQVectorAck = 1;
+		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		return;
+	}
+	if ((nIRQAcknowledge & 0x20) == 0) {
+		nNeoCDIRQVector = 0x15;
+		nNeoCDIRQVectorAck = 1;
+		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		return;
+	}
+}
 
 struct cdrom_interface neocd_cdrom =
 {
@@ -1538,6 +1601,10 @@ static MACHINE_CONFIG_DERIVED_CLASS( neocd, neogeo_base, ng_aes_state )
 	// temporary until things are cleaned up
 	MCFG_DEVICE_ADD("tempcdc", LC89510_TEMP, 0) // cd controller
 	MCFG_SEGACD_HACK_SET_NEOCD
+	MCFG_SET_TYPE1_INTERRUPT_CALLBACK( ng_aes_state, interrupt_callback_type1 )
+	MCFG_SET_TYPE2_INTERRUPT_CALLBACK( ng_aes_state, interrupt_callback_type2 )
+	MCFG_SET_TYPE3_INTERRUPT_CALLBACK( ng_aes_state, interrupt_callback_type3 )
+
 
 	MCFG_MEMCARD_HANDLER(neogeo_aes)
 
