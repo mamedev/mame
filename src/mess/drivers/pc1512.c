@@ -1002,19 +1002,6 @@ void pc1512_state::update_fdc_drq()
 		m_dmac->dreq2_w(0);
 }
 
-static const floppy_interface floppy_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(pc),
-	"floppy_5_25",
-	NULL
-};
-
 WRITE_LINE_MEMBER( pc1512_state::fdc_int_w )
 {
 	m_dint = state;

@@ -54,11 +54,10 @@ protected:
 private:
 	inline void set_irq(int state);
 
-	// internal state
 	required_device<mc6845_device> m_crtc;
+	optional_shared_ptr<UINT16> m_video_ram;
 
 	rgb_t m_palette[16];
-	UINT16 *m_video_ram;
 	UINT8 m_option;
 	UINT16 m_scroll;
 	int m_irq;

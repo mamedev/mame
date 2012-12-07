@@ -374,8 +374,9 @@ INPUT_PORTS_END
 
 /* Video */
 
-UINT32 tiki100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 tiki100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT16 addr = (m_scroll << 7);
 	int sx, y, pixel, mode = (m_mode >> 4) & 0x03;
 
@@ -392,7 +393,7 @@ UINT32 tiki100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 				{
 					int x = (sx * 8) + pixel;
 
-					bitmap.pix16(y, x) = 0;
+					bitmap.pix32(y, x) = palette[0];
 				}
 				break;
 
@@ -402,7 +403,7 @@ UINT32 tiki100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 					int x = (sx * 8) + pixel;
 					int color = BIT(data, 0);
 
-					bitmap.pix16(y, x) = color;
+					bitmap.pix32(y, x) = palette[color];
 
 					data >>= 1;
 				}
@@ -414,8 +415,8 @@ UINT32 tiki100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 					int x = (sx * 8) + (pixel * 2);
 					int color = data & 0x03;
 
-					bitmap.pix16(y, x) = color;
-					bitmap.pix16(y, x + 1) = color;
+					bitmap.pix32(y, x) = palette[color];
+					bitmap.pix32(y, x + 1) = palette[color];
 
 					data >>= 2;
 				}
@@ -427,10 +428,10 @@ UINT32 tiki100_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 					int x = (sx * 8) + (pixel * 4);
 					int color = data & 0x0f;
 
-					bitmap.pix16(y, x) = color;
-					bitmap.pix16(y, x + 1) = color;
-					bitmap.pix16(y, x + 2) = color;
-					bitmap.pix16(y, x + 3) = color;
+					bitmap.pix32(y, x) = palette[color];
+					bitmap.pix32(y, x + 1) = palette[color];
+					bitmap.pix32(y, x + 2) = palette[color];
+					bitmap.pix32(y, x + 3) = palette[color];
 
 					data >>= 4;
 				}
@@ -546,7 +547,7 @@ static const z80_daisy_config tiki100_daisy_chain[] =
 void tiki100_state::machine_start()
 {
 	/* allocate video RAM */
-	m_video_ram = auto_alloc_array(machine(), UINT8, TIKI100_VIDEORAM_SIZE);
+	m_video_ram.allocate(TIKI100_VIDEORAM_SIZE);
 
 	/* setup memory banking */
 	UINT8 *ram = m_ram->pointer();
@@ -565,7 +566,6 @@ void tiki100_state::machine_start()
 	/* register for state saving */
 	save_item(NAME(m_rome));
 	save_item(NAME(m_vire));
-	save_pointer(NAME(m_video_ram), TIKI100_VIDEORAM_SIZE);
 	save_item(NAME(m_scroll));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_palette));
@@ -641,5 +641,5 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY             FULLNAME        FLAGS */
-COMP( 1984, kontiki,	0,			0,		tiki100,	tiki100, driver_device,	0,		"Kontiki Data A/S",	"KONTIKI 100",	GAME_SUPPORTS_SAVE )
-COMP( 1984, tiki100,	kontiki,	0,		tiki100,	tiki100, driver_device,	0,		"Tiki Data A/S",	"TIKI 100",		GAME_SUPPORTS_SAVE )
+COMP( 1984, kontiki,	0,			0,		tiki100,	tiki100, driver_device,	0,		"Kontiki Data A/S",	"KONTIKI 100",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1984, tiki100,	kontiki,	0,		tiki100,	tiki100, driver_device,	0,		"Tiki Data A/S",	"TIKI 100",		GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

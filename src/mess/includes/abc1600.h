@@ -73,7 +73,10 @@ public:
 		  m_bus0i(*this, BUS0I_TAG),
 		  m_bus0x(*this, BUS0X_TAG),
 		  m_bus1(*this, BUS1_TAG),
-		  m_bus2(*this, BUS2_TAG)
+		  m_bus2(*this, BUS2_TAG),
+		  m_segment_ram(*this, "segment_ram"),
+		  m_page_ram(*this, "page_ram"),
+		  m_video_ram(*this, "video_ram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -93,6 +96,9 @@ public:
 	required_device<abc1600bus_slot_device> m_bus0x;
 	required_device<abc1600bus_slot_device> m_bus1;
 	required_device<abc1600bus_slot_device> m_bus2;
+	optional_shared_ptr<UINT8> m_segment_ram;
+	optional_shared_ptr<UINT16> m_page_ram;
+	optional_shared_ptr<UINT16> m_video_ram;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -196,8 +202,6 @@ public:
 	// memory access controller
 	int m_ifc2;
 	UINT8 m_task;
-	UINT8 m_segment_ram[0x400];
-	UINT16 m_page_ram[0x400];
 
 	// DMA
 	UINT8 m_dmamap[8];
@@ -218,7 +222,6 @@ public:
 	const UINT8 *m_wrmsk_rom;	// write mask ROM
 	const UINT8 *m_shinf_rom;	// shifter info ROM
 	const UINT8 *m_drmsk_rom;	// data read mask ROM
-	UINT16 *m_video_ram;		// video RAM
 	int m_endisp;				// enable display
 	int m_clocks_disabled;		// clocks disabled
 	UINT16 m_gmdi;				// video RAM data latch
@@ -244,7 +247,6 @@ public:
 	int m_rmc;					// row match count
 	int m_cmc;					// column match count
 	int m_amm;					// active mover mask
-	UINT32 screen_update_abc1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 

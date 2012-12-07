@@ -31,13 +31,16 @@ public:
 		  m_vis(*this, CDP1869_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_page_ram(*this, "page_ram")
+		  m_page_ram(*this, "page_ram"),
+		  m_color_ram(*this, "color_ram")
 	 { }
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1869_device> m_vis;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	required_shared_ptr<UINT8> m_page_ram;
+	optional_shared_ptr<UINT8> m_color_ram;
 
 	virtual void machine_start();
 
@@ -60,9 +63,7 @@ public:
 	int m_vismac_bkg_latch;		// background color latch
 	int m_blink;				// cursor blink
 
-	required_shared_ptr<UINT8> m_page_ram;			// page memory
-	UINT8 *m_color_ram;			// color memory
-	UINT8 *m_char_rom;			// character generator ROM
+	const UINT8 *m_char_rom;
 
 	// keyboard state
 	int m_keylatch;				// key latch

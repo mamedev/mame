@@ -369,7 +369,7 @@ static const mc6845_interface crtc_intf =
 void pc1640_state::video_start()
 {
 	// allocate memory
-	m_video_ram = auto_alloc_array(machine(), UINT8, 0x20000);
+	m_video_ram.allocate(0x20000);
 }
 
 

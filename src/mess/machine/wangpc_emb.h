@@ -44,7 +44,7 @@ protected:
 	virtual void wangpcbus_aiowc_w(address_space &space, offs_t offset, UINT16 mem_mask, UINT16 data);
 
 private:
-	UINT16 *m_ram;
+	optional_shared_ptr<UINT16> m_ram;
 	UINT16 m_option;
 	int m_parity_error;
 	int m_parity_odd;

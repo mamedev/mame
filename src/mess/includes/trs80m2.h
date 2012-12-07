@@ -51,7 +51,8 @@ public:
 		  m_floppy3(*this, FD1791_TAG":3"),
 		  m_floppy(NULL),
 		  m_ram(*this, RAM_TAG),
-		  m_kb(*this, TRS80M2_KEYBOARD_TAG)
+		  m_kb(*this, TRS80M2_KEYBOARD_TAG),
+		  m_video_ram(*this, "video_ram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -68,6 +69,7 @@ public:
 	floppy_image_device *m_floppy;
 	required_device<ram_device> m_ram;
 	required_device<trs80m2_keyboard_device> m_kb;
+	optional_shared_ptr<UINT8> m_video_ram;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -114,8 +116,7 @@ public:
 	int m_kbirq;
 
 	// video state
-	UINT8 *m_video_ram;
-	UINT8 *m_char_rom;
+	const UINT8 *m_char_rom;
 	int m_blnkvid;
 	int m_80_40_char_en;
 	int m_de;

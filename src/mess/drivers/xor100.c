@@ -159,6 +159,16 @@ WRITE8_MEMBER( xor100_state::i8251_b_data_w )
 	m_terminal->write(space, 0, data);
 }
 
+READ8_MEMBER( xor100_state::fdc_r )
+{
+	return m_fdc->gen_r(offset) ^ 0xff;
+}
+
+WRITE8_MEMBER( xor100_state::fdc_w )
+{
+	m_fdc->gen_w(offset, data ^ 0xff);
+}
+
 READ8_MEMBER( xor100_state::fdc_wait_r )
 {
 	/*
@@ -178,8 +188,8 @@ READ8_MEMBER( xor100_state::fdc_wait_r )
 
 	if (!m_fdc_irq && !m_fdc_drq)
 	{
-		/* TODO: this is really connected to the Z80 _RDY line */
-		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		fatalerror("Z80 WAIT not supported by MAME core\n");
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 	}
 
 	return !m_fdc_irq << 7;
@@ -263,7 +273,7 @@ static ADDRESS_MAP_START( xor100_io, AS_IO, 8, xor100_state )
 	AM_RANGE(0x0a, 0x0a) AM_READ(prom_disable_r)
 	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("DSW0") AM_WRITE(baud_w)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE(WD1795_TAG, fd1795_t, read, write) // TODO inverted data bus
+	AM_RANGE(0xf8, 0xfb) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0xfc, 0xfc) AM_READWRITE(fdc_wait_r, fdc_dcont_w)
 	AM_RANGE(0xfd, 0xfd) AM_WRITE(fdc_dsel_w)
 ADDRESS_MAP_END
@@ -484,8 +494,8 @@ void xor100_state::fdc_intrq_w(bool state)
 
 	if (state)
 	{
-		/* TODO: this is really connected to the Z80 _RDY line */
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		fatalerror("Z80 WAIT not supported by MAME core\n");
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 	}
 }
 
@@ -495,8 +505,8 @@ void xor100_state::fdc_drq_w(bool state)
 
 	if (state)
 	{
-		/* TODO: this is really connected to the Z80 _RDY line */
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		fatalerror("Z80 WAIT not supported by MAME core\n");
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 	}
 }
 

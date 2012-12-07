@@ -36,7 +36,8 @@ const device_type COMX_RAM = &device_creator<comx_ram_device>;
 
 comx_ram_device::comx_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COMX_RAM, "COMX-35 RAM Card", tag, owner, clock),
-	device_comx_expansion_card_interface(mconfig, *this)
+	device_comx_expansion_card_interface(mconfig, *this),
+	m_ram(*this, "ram")
 {
 }
 
@@ -47,10 +48,7 @@ comx_ram_device::comx_ram_device(const machine_config &mconfig, const char *tag,
 
 void comx_ram_device::device_start()
 {
-	m_ram = auto_alloc_array(machine(), UINT8, RAM_SIZE);
-
-	// state saving
-	save_pointer(NAME(m_ram), RAM_SIZE);
+	m_ram.allocate(RAM_SIZE);
 }
 
 
@@ -73,7 +71,7 @@ UINT8 comx_ram_device::comx_mrd_r(address_space &space, offs_t offset, int *extr
 
 	if (offset >= 0xc000 && offset < 0xd000)
 	{
-		data = m_ram[(m_ram_bank << 12) | (offset & 0xfff)];
+		data = m_ram[(m_bank << 12) | (offset & 0xfff)];
 	}
 
 	return data;
@@ -88,7 +86,7 @@ void comx_ram_device::comx_mwr_w(address_space &space, offs_t offset, UINT8 data
 {
 	if (offset >= 0xc000 && offset < 0xd000)
 	{
-		m_ram[(m_ram_bank << 12) | (offset & 0xfff)] = data;
+		m_ram[(m_bank << 12) | (offset & 0xfff)] = data;
 	}
 }
 
@@ -101,6 +99,6 @@ void comx_ram_device::comx_io_w(address_space &space, offs_t offset, UINT8 data)
 {
 	if (offset == 1)
 	{
-		m_ram_bank = (data >> 4) & 0x03;
+		m_bank = (data >> 4) & 0x03;
 	}
 }

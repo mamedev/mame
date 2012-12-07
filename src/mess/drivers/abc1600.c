@@ -1851,14 +1851,16 @@ void abc1600_state::machine_start()
 	// interrupt callback
 	m_maincpu->set_irq_acknowledge_callback(abc1600_int_ack);
 
+	// allocate memory
+	m_segment_ram.allocate(0x400);
+	m_page_ram.allocate(0x400);
+
 	// HACK fill segment RAM with non-zero values or no boot
 	memset(m_segment_ram, 0xcd, 0x400);
 
 	// state saving
 	save_item(NAME(m_ifc2));
 	save_item(NAME(m_task));
-	save_item(NAME(m_segment_ram));
-	save_item(NAME(m_page_ram));
 	save_item(NAME(m_dmamap));
 	save_item(NAME(m_dmadis));
 	save_item(NAME(m_sysscc));

@@ -58,8 +58,7 @@ private:
 	required_device<z80ctc_device> m_ctc0;
 	required_device<z80ctc_device> m_ctc1;
 	required_device<z80dart_device> m_sio;
-
-	UINT8 m_char_ram[256];
+	optional_shared_ptr<UINT8> m_char_ram;
 };
 
 

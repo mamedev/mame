@@ -43,8 +43,9 @@ protected:
 	virtual void comx_io_w(address_space &space, offs_t offset, UINT8 data);
 
 private:
-	UINT8 *m_ram;
-	int m_ram_bank;
+	optional_shared_ptr<UINT8> m_ram;
+	
+	int m_bank;
 };
 
 

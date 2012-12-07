@@ -110,14 +110,12 @@ static CDP1869_INTERFACE( vis_intf )
 void tmc600_state::video_start()
 {
 	// allocate memory
-	m_color_ram = auto_alloc_array(machine(), UINT8, TMC600_PAGE_RAM_SIZE);
+	m_color_ram.allocate(TMC600_PAGE_RAM_SIZE);
 
 	// find memory regions
 	m_char_rom = memregion("chargen")->base();
 
 	// register for state saving
-	save_pointer(NAME(m_color_ram), TMC600_PAGE_RAM_SIZE);
-
 	save_item(NAME(m_vismac_reg_latch));
 	save_item(NAME(m_vismac_color_latch));
 	save_item(NAME(m_vismac_bkg_latch));

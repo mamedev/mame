@@ -265,7 +265,8 @@ wangpc_rtc_device::wangpc_rtc_device(const machine_config &mconfig, const char *
 	m_dmac(*this, AM9517A_TAG),
 	m_ctc0(*this, Z80CTC_0_TAG),
 	m_ctc1(*this, Z80CTC_1_TAG),
-	m_sio(*this, Z80SIO_TAG)
+	m_sio(*this, Z80SIO_TAG),
+	m_char_ram(*this, "char_ram")
 {
 }
 
@@ -276,6 +277,7 @@ wangpc_rtc_device::wangpc_rtc_device(const machine_config &mconfig, const char *
 
 void wangpc_rtc_device::device_start()
 {
+	m_char_ram.allocate(0x100);
 }
 
 

@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "imagedev/flopdrv.h"
 #include "machine/ecbbus.h"
 #include "machine/ecb_grip.h"
 #include "machine/ram.h"
@@ -18,7 +17,6 @@
 #define Z80_TAG			"z1"
 #define UPD765_TAG		"z38"
 #define UPD1990A_TAG	"z43"
-#define SCREEN_TAG		"screen"
 
 // ------------------------------------------------------------------------
 

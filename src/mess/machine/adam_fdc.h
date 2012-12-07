@@ -15,9 +15,6 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "formats/adam_dsk.h"
-#include "formats/hxcmfm_dsk.h"
-#include "formats/mfi_dsk.h"
-#include "imagedev/floppy.h"
 #include "machine/adamnet.h"
 #include "machine/wd_fdc.h"
 
@@ -62,9 +59,9 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<wd2793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
+	floppy_image_device *m_floppy;
 	required_shared_ptr<UINT8> m_ram;
-
-	floppy_image_device *m_image0;
+	required_ioport m_sw3;
 };
 
 

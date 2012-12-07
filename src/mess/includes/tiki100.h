@@ -40,7 +40,8 @@ public:
 		  m_fdc(*this, FD1797_TAG),
 		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FD1797_TAG":0"),
-		  m_floppy1(*this, FD1797_TAG":1")
+		  m_floppy1(*this, FD1797_TAG":1"),
+		  m_video_ram(*this, "video_ram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -49,10 +50,11 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
+	optional_shared_ptr<UINT8> m_video_ram;
 
 	virtual void machine_start();
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( gfxram_r );
 	DECLARE_WRITE8_MEMBER( gfxram_w );
@@ -72,7 +74,6 @@ public:
 	int m_vire;
 
 	/* video state */
-	UINT8 *m_video_ram;
 	UINT8 m_scroll;
 	UINT8 m_mode;
 	UINT8 m_palette;

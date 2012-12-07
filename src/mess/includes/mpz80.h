@@ -27,6 +27,7 @@ public:
 		  m_ram(*this, RAM_TAG),
 		  m_terminal(*this, TERMINAL_TAG),
 		  m_s100(*this, S100_TAG),
+		  m_map_ram(*this, "map_ram"),
 		  m_nmi(1),
 		  m_pint(1),
 		  m_int_pend(0),
@@ -44,6 +45,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<s100_device> m_s100;
+	optional_shared_ptr<UINT8> m_map_ram;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -94,7 +96,6 @@ public:
 	int m_trap_int;
 	int m_trap_stop;
 	int m_trap_aux;
-	UINT8 *m_map_ram;
 	DECLARE_DRIVER_INIT(mpz80);
 };
 

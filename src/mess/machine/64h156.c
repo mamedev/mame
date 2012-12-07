@@ -388,8 +388,9 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
       device_execute_interface(mconfig, *this),
       m_icount(0),
 	  m_image(*this->owner(), FLOPPY_0),
+	  m_track_buffer(*this, "track_buffer"),
+	  m_speed_buffer(*this, "speed_buffer"),
 	  m_side(0),
-	  m_track_buffer(NULL),
 	  m_track_len(0),
 	  m_buffer_pos(0),
 	  m_bit_pos(0),
@@ -429,8 +430,8 @@ void c64h156_device::device_start()
 	m_icountptr = &m_icount;
 
 	// allocate track buffer
-	m_track_buffer = auto_alloc_array(machine(), UINT8, G64_BUFFER_SIZE);
-	m_speed_buffer = auto_alloc_array(machine(), UINT8, G64_SPEED_BLOCK_SIZE);
+	m_track_buffer.allocate(G64_BUFFER_SIZE);
+	m_speed_buffer.allocate(G64_SPEED_BLOCK_SIZE);
 
 	// resolve callbacks
 	m_out_atn_func.resolve(m_out_atn_cb, *this);
@@ -440,8 +441,6 @@ void c64h156_device::device_start()
 	// register for state saving
 	save_item(NAME(m_shift));
 	save_item(NAME(m_side));
-	save_pointer(NAME(m_track_buffer), G64_BUFFER_SIZE);
-	save_pointer(NAME(m_speed_buffer), G64_SPEED_BLOCK_SIZE);
 	save_item(NAME(m_track_len));
 	save_item(NAME(m_buffer_pos));
 	save_item(NAME(m_bit_pos));

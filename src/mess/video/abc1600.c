@@ -1051,7 +1051,7 @@ static const mc6845_interface crtc_intf =
 void abc1600_state::video_start()
 {
 	// allocate video RAM
-	m_video_ram = auto_alloc_array(machine(), UINT16, VIDEORAM_SIZE);
+	m_video_ram.allocate(VIDEORAM_SIZE);
 
 	// find memory regions
 	m_wrmsk_rom = memregion("wrmsk")->base();
@@ -1059,7 +1059,6 @@ void abc1600_state::video_start()
 	m_drmsk_rom = memregion("drmsk")->base();
 
 	// state saving
-	save_pointer(NAME(m_video_ram), VIDEORAM_SIZE);
 	save_item(NAME(m_endisp));
 	save_item(NAME(m_clocks_disabled));
 	save_item(NAME(m_gmdi));

@@ -163,8 +163,8 @@ void comx_fd_device::device_start()
 	m_rom = memregion("c000")->base();
 
 	// initialize floppy controller
-	m_fdc->setup_intrq_cb(wd1770_t::line_cb(FUNC(comx_fd_device::intrq_w), this));
-	m_fdc->setup_drq_cb(wd1770_t::line_cb(FUNC(comx_fd_device::drq_w), this));
+	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(comx_fd_device::intrq_w), this));
+	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(comx_fd_device::drq_w), this));
 	m_fdc->dden_w(1);
 
 	// state saving

@@ -8,7 +8,6 @@
 #define __CRTC_EGA__
 
 #include "emu.h"
-#include "machine/devhelpr.h"
 
 #define CRTC_EGA_INTERFACE(name) \
 	const crtc_ega_interface (name) =

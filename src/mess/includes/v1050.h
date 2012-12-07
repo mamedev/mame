@@ -78,7 +78,8 @@ public:
 		  m_timer_ack(*this, TIMER_ACK_TAG),
 		  m_timer_rst(*this, TIMER_RST_TAG),
 		  m_sasibus(*this, SASIBUS_TAG ":host"),
-		  m_video_ram(*this, "video_ram")
+		  m_video_ram(*this, "video_ram"),
+		  m_attr_ram(*this, "attr_ram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -99,6 +100,8 @@ public:
 	required_device<timer_device> m_timer_ack;
 	required_device<timer_device> m_timer_rst;
 	required_device<scsicb_device> m_sasibus;
+	required_shared_ptr<UINT8> m_video_ram;
+	optional_shared_ptr<UINT8> m_attr_ram;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -164,8 +167,6 @@ public:
 	UINT8 m_bank;				// bank register
 
 	// video state
-	required_shared_ptr<UINT8> m_video_ram; 			// video RAM
-	UINT8 *m_attr_ram;			// attribute RAM
 	UINT8 m_attr;				// attribute latch
 
 	// sasi state

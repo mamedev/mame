@@ -206,7 +206,7 @@ void wangpc_tig_device::device_reset()
 //  screen_update -
 //-------------------------------------------------
 
-UINT32 wangpc_tig_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 wangpc_tig_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_hgdc0->screen_update(screen, bitmap, cliprect);
 	m_hgdc1->screen_update(screen, bitmap, cliprect);

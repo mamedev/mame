@@ -61,12 +61,11 @@ public:
 	required_device<ram_device> m_ram;
 	required_shared_ptr<UINT8> m_video_ram;
 
-
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	virtual void video_start();
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( mmu_r );
 	DECLARE_WRITE8_MEMBER( mmu_w );
@@ -102,7 +101,7 @@ public:
 	const UINT8 *m_key_rom;
 
 	// video state
-	bitmap_ind16 m_bitmap;
+	bitmap_rgb32 m_bitmap;
 	const UINT8 *m_char_rom;
 	int m_llen;
 
@@ -116,7 +115,7 @@ public:
 	int m_recall;
 	int m_dack3;
 	int m_tc;
-	UINT32 screen_update_mm1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_mm1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(kbclk_tick);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };

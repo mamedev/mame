@@ -145,12 +145,12 @@ private:
 	devcb_resolved_write_line	m_out_byte_func;
 
 	required_device<legacy_floppy_image_device> m_image;
+	optional_shared_ptr<UINT8> m_track_buffer;					// track data buffer
+	optional_shared_ptr<UINT8> m_speed_buffer;					// speed block buffer
 
 	// track
 	UINT16 m_shift;
 	int m_side;								// disk side
-	UINT8 *m_track_buffer;					// track data buffer
-	UINT8 *m_speed_buffer;					// speed block buffer
 	int m_track_len;						// track length
 	offs_t m_buffer_pos;					// current byte position within track buffer
 	int m_bit_pos;							// current bit position within track buffer byte

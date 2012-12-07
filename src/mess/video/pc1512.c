@@ -551,7 +551,7 @@ void pc1512_state::video_start()
 	m_char_rom = memregion(AMS40041_TAG)->base();
 
 	// allocate memory
-	m_video_ram = auto_alloc_array(machine(), UINT8, 0x10000);
+	m_video_ram.allocate(0x10000);
 }
 
 

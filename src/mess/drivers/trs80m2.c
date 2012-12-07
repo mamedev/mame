@@ -629,7 +629,7 @@ void trs80m2_state::video_start()
 	m_char_rom = memregion(MC6845_TAG)->base();
 
 	// allocate memory
-	m_video_ram = auto_alloc_array(machine(), UINT8, 0x800);
+	m_video_ram.allocate(0x800);
 }
 
 UINT32 trs80m2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

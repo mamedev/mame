@@ -180,7 +180,7 @@ void abc80_state::video_start()
 	m_vsync_on_timer->adjust(screen->time_until_pos(16, 0), 0, screen->frame_period());
 
 	// allocate memory
-	m_video_ram = auto_alloc_array(machine(), UINT8, 0x400);
+	m_video_ram.allocate(0x400);
 
 	// find memory regions
 	m_char_rom = memregion("chargen")->base();

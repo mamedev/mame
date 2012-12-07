@@ -53,7 +53,6 @@ WRITE8_MEMBER( v1050_state::videoram_w )
 static MC6845_UPDATE_ROW( v1050_update_row )
 {
 	v1050_state *state = device->machine().driver_data<v1050_state>();
-	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
 	int column, bit;
 
@@ -80,7 +79,7 @@ static MC6845_UPDATE_ROW( v1050_update_row )
 			/* display blank */
 			if (attr & V1050_ATTR_BLANK) color = 0;
 
-			bitmap.pix32(y, x) = palette[color];
+			bitmap.pix32(y, x) = RGB_MONOCHROME_GREEN_HIGHLIGHT[color];
 
 			data <<= 1;
 		}
@@ -108,25 +107,15 @@ static const mc6845_interface crtc_intf =
 	NULL
 };
 
-/* Palette */
-
-static PALETTE_INIT( v1050 )
-{
-	palette_set_color(machine, 0, RGB_BLACK); /* black */
-	palette_set_color_rgb(machine, 1, 0x00, 0xc0, 0x00); /* green */
-	palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00); /* bright green */
-}
-
 /* Video Start */
 
 void v1050_state::video_start()
 {
 	/* allocate memory */
-	m_attr_ram = auto_alloc_array(machine(), UINT8, V1050_VIDEORAM_SIZE);
+	m_attr_ram.allocate(V1050_VIDEORAM_SIZE);
 
 	/* register for state saving */
 	save_item(NAME(m_attr));
-	save_pointer(NAME(m_attr_ram), V1050_VIDEORAM_SIZE);
 }
 
 /* Machine Drivers */
@@ -141,7 +130,4 @@ MACHINE_CONFIG_FRAGMENT( v1050_video )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
-
-	MCFG_PALETTE_LENGTH(3)
-    MCFG_PALETTE_INIT(v1050)
 MACHINE_CONFIG_END
