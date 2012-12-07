@@ -889,7 +889,7 @@ WRITE16_MEMBER(neogeo_state::system_control_w)
 								neogeo_set_main_cpu_vector_table_source(machine(), 1);
 						}
 #endif
-						printf("NeoCD: write to regular address? %d\n", bit); // what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?
+						printf("NeoCD: write to regular vector change address? %d\n", bit); // what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?
 					}
 					if (m_has_audio_banking) set_audio_cpu_rom_source(space, bit); /* this is a guess */
 					break;
@@ -1161,6 +1161,7 @@ ADDRESS_MAP_END
 
 
 
+
 /*************************************
  *
  *  Audio CPU memory handlers
@@ -1408,7 +1409,7 @@ DEVICE_IMAGE_LOAD( neo_cartridge )
  *
  *************************************/
 
-static MACHINE_CONFIG_START( neogeo, neogeo_state )
+MACHINE_CONFIG_START( neogeo_base, neogeo_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, NEOGEO_MAIN_CPU_CLOCK)
@@ -1417,12 +1418,7 @@ static MACHINE_CONFIG_START( neogeo, neogeo_state )
 	MCFG_CPU_ADD("audiocpu", Z80, NEOGEO_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
-
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_usec(128762))
-
-	MCFG_NVRAM_ADD_0FILL("saveram")
-	MCFG_MEMCARD_HANDLER(neogeo)
-
+	
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_neogeo)
 
@@ -1444,10 +1440,14 @@ static MACHINE_CONFIG_START( neogeo, neogeo_state )
 	MCFG_UPD4990A_ADD("upd4990a")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mvs, neogeo )
+static MACHINE_CONFIG_DERIVED( neogeo, neogeo_base )
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_usec(128762))
 
+	MCFG_NVRAM_ADD_0FILL("saveram")
 	MCFG_MEMCARD_HANDLER(neogeo)
+MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( mvs, neogeo )
     MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_LOAD(neo_cartridge)
 	MCFG_CARTSLOT_INTERFACE("neo_cart")

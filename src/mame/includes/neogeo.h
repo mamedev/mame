@@ -236,6 +236,7 @@ public:
 
 /*----------- defined in drivers/neogeo.c -----------*/
 
+MACHINE_CONFIG_EXTERN( neogeo_base );
 void neogeo_set_display_position_interrupt_control(running_machine &machine, UINT16 data);
 void neogeo_set_display_counter_msb(address_space &space, UINT16 data);
 void neogeo_set_display_counter_lsb(address_space &space, UINT16 data);
