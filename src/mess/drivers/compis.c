@@ -125,10 +125,11 @@ UINT32 compis_state::screen_update_compis2(screen_device &screen, bitmap_ind16 &
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	compis_state *state = device->machine().driver_data<compis_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 i,gfx = state->m_video_ram[address & 0x1ffff];
 
 	for(i=0; i<8; i++)
-		bitmap.pix16(y, x + i) = BIT((gfx >> i), 0);
+		bitmap.pix32(y, x + i) = palette[BIT((gfx >> i), 0)];
 }
 
 

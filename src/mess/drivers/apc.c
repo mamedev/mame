@@ -103,7 +103,7 @@ public:
 	required_shared_ptr<UINT8> m_video_ram_2;
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 
 	DECLARE_READ8_MEMBER(apc_port_28_r);
@@ -168,7 +168,7 @@ void apc_state::video_start()
 	m_aux_pcg = memregion("aux_pcg")->base();
 }
 
-UINT32 apc_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+UINT32 apc_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
@@ -188,6 +188,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
 	apc_state *state = device->machine().driver_data<apc_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int xi,yi,yi_trans;
 	int x;
 	UINT8 char_size;
@@ -278,7 +279,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					pen = (tile_data >> (xi) & 1) ? color : 0;
 
 				if(pen)
-					bitmap.pix16(res_y, res_x) = pen;
+					bitmap.pix32(res_y, res_x) = palette[pen];
 
 //              if(state->m_video_ff[WIDTH40_REG])
 //              {

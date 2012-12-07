@@ -29,10 +29,10 @@ public:
 	DECLARE_WRITE8_MEMBER(ipds_b1_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
-	bitmap_ind16 m_bitmap;
+	bitmap_rgb32 m_bitmap;
 	virtual void video_start();
 	virtual void machine_reset();
-	UINT32 screen_update_ipds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_ipds(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 READ8_MEMBER( ipds_state::ipds_b0_r )
@@ -88,7 +88,8 @@ static I8275_DISPLAY_PIXELS(ipds_display_pixels)
 {
 	int i;
 	ipds_state *state = device->machine().driver_data<ipds_state>();
-	bitmap_ind16 &bitmap = state->m_bitmap;
+	bitmap_rgb32 &bitmap = state->m_bitmap;
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 *charmap = state->memregion("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 
@@ -102,7 +103,7 @@ static I8275_DISPLAY_PIXELS(ipds_display_pixels)
 		pixels ^= 0xff;
 
 	for(i=0;i<6;i++)
-		bitmap.pix16(y, x + i) = (pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0;
+		bitmap.pix32(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }
 
 const i8275_interface ipds_i8275_interface =
@@ -115,7 +116,7 @@ const i8275_interface ipds_i8275_interface =
 	ipds_display_pixels
 };
 
-UINT32 ipds_state::screen_update_ipds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 ipds_state::screen_update_ipds(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	device_t *devconf = machine().device("i8275");
 	i8275_update( devconf, bitmap, cliprect);

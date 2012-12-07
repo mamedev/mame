@@ -148,6 +148,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
 	dmv_state *state = device->machine().driver_data<dmv_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 * chargen = state->memregion("maincpu")->base() + 0x1000;
 
 	for( int x = 0; x < pitch; x++ )
@@ -174,7 +175,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(res_x > screen_max_x || res_y > screen_max_y)
 					continue;
 
-				bitmap.pix16(res_y, res_x) = pen;
+				bitmap.pix32(res_y, res_x) = palette[pen];
 			}
 		}
 	}

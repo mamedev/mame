@@ -1554,7 +1554,7 @@ WRITE_LINE_MEMBER( upd7220_device::lpen_w )
 //  update_text -
 //-------------------------------------------------
 
-void upd7220_device::update_text(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void upd7220_device::update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 addr, sad;
 	UINT16 len;
@@ -1582,7 +1582,7 @@ void upd7220_device::update_text(bitmap_ind16 &bitmap, const rectangle &cliprect
 //  draw_graphics_line -
 //-------------------------------------------------
 
-void upd7220_device::draw_graphics_line(bitmap_ind16 &bitmap, UINT32 addr, int y, int wd)
+void upd7220_device::draw_graphics_line(bitmap_rgb32 &bitmap, UINT32 addr, int y, int wd)
 {
 	int sx;
 
@@ -1600,7 +1600,7 @@ void upd7220_device::draw_graphics_line(bitmap_ind16 &bitmap, UINT32 addr, int y
 //  update_graphics -
 //-------------------------------------------------
 
-void upd7220_device::update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect, int force_bitmap)
+void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &cliprect, int force_bitmap)
 {
 	UINT32 addr, sad;
 	UINT16 len;
@@ -1653,7 +1653,7 @@ void upd7220_device::update_graphics(bitmap_ind16 &bitmap, const rectangle &clip
 //  update_screen -
 //-------------------------------------------------
 
-UINT32 upd7220_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 upd7220_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_de)
 	{

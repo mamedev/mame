@@ -87,6 +87,7 @@ public:
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	a5105_state *state = device->machine().driver_data<a5105_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 
 	int xi,gfx;
 	UINT8 pen;
@@ -97,13 +98,14 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	{
 		pen = ((gfx >> xi) & 1) ? 7 : 0;
 
-		bitmap.pix16(y, x + xi) = pen;
+		bitmap.pix32(y, x + xi) = palette[pen];
 	}
 }
 
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
 	a5105_state *state = device->machine().driver_data<a5105_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int x;
 	int xi,yi;
 	int tile,color;
@@ -134,7 +136,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				if(res_x > screen_max_x || res_y > screen_max_y)
 					continue;
 
-				bitmap.pix16(res_y, res_x) = pen;
+				bitmap.pix32(res_y, res_x) = palette[pen];
 			}
 		}
 	}

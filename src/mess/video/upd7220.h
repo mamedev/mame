@@ -64,11 +64,11 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef void (*upd7220_display_pixels_func)(device_t *device, bitmap_ind16 &bitmap, int y, int x, UINT32 address);
-#define UPD7220_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_ind16 &bitmap, int y, int x, UINT32 address)
+typedef void (*upd7220_display_pixels_func)(device_t *device, bitmap_rgb32 &bitmap, int y, int x, UINT32 address);
+#define UPD7220_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_rgb32 &bitmap, int y, int x, UINT32 address)
 
-typedef void (*upd7220_draw_text_line)(device_t *device, bitmap_ind16 &bitmap, UINT32 addr, int y, int wd, int pitch,int screen_min_x,int screen_min_y,int screen_max_x, int screen_max_y,int lr, int cursor_on, int cursor_addr);
-#define UPD7220_DRAW_TEXT_LINE(name) void name(device_t *device, bitmap_ind16 &bitmap, UINT32 addr, int y, int wd, int pitch,int screen_min_x,int screen_min_y,int screen_max_x, int screen_max_y,int lr, int cursor_on, int cursor_addr)
+typedef void (*upd7220_draw_text_line)(device_t *device, bitmap_rgb32 &bitmap, UINT32 addr, int y, int wd, int pitch,int screen_min_x,int screen_min_y,int screen_max_x, int screen_max_y,int lr, int cursor_on, int cursor_addr);
+#define UPD7220_DRAW_TEXT_LINE(name) void name(device_t *device, bitmap_rgb32 &bitmap, UINT32 addr, int y, int wd, int pitch,int screen_min_x,int screen_min_y,int screen_max_x, int screen_max_y,int lr, int cursor_on, int cursor_addr)
 
 
 // ======================> upd7220_interface
@@ -109,7 +109,7 @@ public:
     DECLARE_READ8_MEMBER( vram_r );
     DECLARE_WRITE8_MEMBER( vram_w );
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual const rom_entry *device_rom_region() const;
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
@@ -150,9 +150,9 @@ private:
 	void draw_char(int x, int y);
 	int translate_command(UINT8 data);
 	void process_fifo();
-	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_graphics_line(bitmap_ind16 &bitmap, UINT32 addr, int y, int wd);
-	void update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect, int force_bitmap);
+	void update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_graphics_line(bitmap_rgb32 &bitmap, UINT32 addr, int y, int wd);
+	void update_graphics(bitmap_rgb32 &bitmap, const rectangle &cliprect, int force_bitmap);
 
 	devcb_resolved_write_line	m_out_drq_func;
 	devcb_resolved_write_line	m_out_hsync_func;

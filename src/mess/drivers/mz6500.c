@@ -36,6 +36,7 @@ public:
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	mz6500_state *state = device->machine().driver_data<mz6500_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int gfx[3];
 	UINT8 i,pen;
 
@@ -47,7 +48,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	{
 		pen = (BIT(gfx[0], i)) | (BIT(gfx[1], i) << 1) | (BIT(gfx[2], i) << 2);
 
-		bitmap.pix16(y, x + i) = pen;
+		bitmap.pix32(y, x + i) = palette[pen];
 	}
 }
 

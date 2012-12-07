@@ -85,7 +85,7 @@ public:
 	//required_shared_ptr<UINT8> m_video_ram;
 	UINT8 *m_video_ram;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -154,6 +154,7 @@ public:
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	qx10_state *state = device->machine().driver_data<qx10_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int xi,gfx[3];
 	UINT8 pen;
 
@@ -176,13 +177,14 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 		pen|= ((gfx[1] >> (7-xi)) & 1) ? 2 : 0;
 		pen|= ((gfx[2] >> (7-xi)) & 1) ? 4 : 0;
 
-		bitmap.pix16(y, x + xi) = pen;
+		bitmap.pix32(y, x + xi) = palette[pen];
 	}
 }
 
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
 	qx10_state *state = device->machine().driver_data<qx10_state>();
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int x;
 	int xi,yi;
 	int tile;
@@ -227,13 +229,13 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					continue;
 
 				if(pen)
-					bitmap.pix16(res_y, res_x) = pen;
+					bitmap.pix32(res_y, res_x) = palette[pen];
 			}
 		}
 	}
 }
 
-UINT32 qx10_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+UINT32 qx10_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	bitmap.fill(get_black_pen(machine()), cliprect);
 

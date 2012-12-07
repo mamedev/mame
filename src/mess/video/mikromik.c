@@ -3,18 +3,6 @@
 
 
 //-------------------------------------------------
-//  PALETTE_INIT( mm1 )
-//-------------------------------------------------
-
-PALETTE_INIT_MEMBER(mm1_state,mm1)
-{
-	palette_set_color(machine(), 0, RGB_BLACK); /* black */
-	palette_set_color_rgb(machine(), 1, 0x00, 0xc0, 0x00); /* green */
-	palette_set_color_rgb(machine(), 2, 0x00, 0xff, 0x00); /* bright green */
-}
-
-
-//-------------------------------------------------
 //  i8275_interface crtc_intf
 //-------------------------------------------------
 
@@ -41,7 +29,7 @@ static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 
 		int color = hlt_in ? 2 : (video_in ^ compl_in);
 
-		state->m_bitmap.pix16(y, x + i) = color;
+		state->m_bitmap.pix32(y, x + i) = RGB_MONOCHROME_GREEN_HIGHLIGHT[color];
 	}
 }
 
@@ -77,7 +65,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 
 	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(data, i)) bitmap.pix16(y, x + i) = 1;
+		if (BIT(data, i)) bitmap.pix32(y, x + i) = RGB_MONOCHROME_GREEN_HIGHLIGHT[1];
 	}
 }
 
@@ -109,7 +97,7 @@ void mm1_state::video_start()
 //  SCREEN_UPDATE_IND16( mm1 )
 //-------------------------------------------------
 
-UINT32 mm1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 mm1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* text */
 	i8275_update(m_crtc, bitmap, cliprect);
@@ -161,8 +149,6 @@ MACHINE_CONFIG_FRAGMENT( mm1m6_video )
 	//MCFG_SCREEN_RAW_PARAMS(XTAL_18_720MHz, ...)
 
 	MCFG_GFXDECODE(mm1)
-	MCFG_PALETTE_LENGTH(3)
-	MCFG_PALETTE_INIT_OVERRIDE(mm1_state,mm1)
 
 	MCFG_I8275_ADD(I8275_TAG, crtc_intf)
 	MCFG_UPD7220_ADD(UPD7220_TAG, XTAL_18_720MHz/8, hgdc_intf, mm1_upd7220_map)

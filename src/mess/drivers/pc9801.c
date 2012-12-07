@@ -303,7 +303,7 @@ public:
 	required_device<upd7220_device> m_hgdc2;
 
 	virtual void video_start();
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_shared_ptr<UINT8> m_video_ram_1;
 	required_shared_ptr<UINT8> m_video_ram_2;
@@ -575,7 +575,7 @@ void pc9801_state::video_start()
 	state_save_register_global_pointer(machine(), m_pcg_ram, 0x200000);
 }
 
-UINT32 pc9801_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
@@ -588,6 +588,7 @@ UINT32 pc9801_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	pc9801_state *state = device->machine().driver_data<pc9801_state>();
+    const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int xi;
 	int res_x,res_y;
 	UINT8 pen;
@@ -614,18 +615,19 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 		if(interlace_on)
 		{
 			if(device->machine().primary_screen->visible_area().contains(res_x, res_y*2+0))
-				bitmap.pix16(res_y*2+0, res_x) = pen + colors16_mode;
+				bitmap.pix32(res_y*2+0, res_x) = palette[pen + colors16_mode];
 			if(device->machine().primary_screen->visible_area().contains(res_x, res_y*2+1))
-				bitmap.pix16(res_y*2+1, res_x) = pen + colors16_mode;
+				bitmap.pix32(res_y*2+1, res_x) = palette[pen + colors16_mode];
 		}
 		else
-			bitmap.pix16(res_y, res_x) = pen + colors16_mode;
+			bitmap.pix32(res_y, res_x) = palette[pen + colors16_mode];
 	}
 }
 
 static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 {
 	pc9801_state *state = device->machine().driver_data<pc9801_state>();
+    const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	int xi,yi;
 	int x;
 	UINT8 char_size;
@@ -728,14 +730,14 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					pen = (tile_data >> (7-xi) & 1) ? color : 0;
 
 				if(pen)
-					bitmap.pix16(res_y, res_x) = pen;
+					bitmap.pix32(res_y, res_x) = palette[pen];
 
 				if(state->m_video_ff[WIDTH40_REG])
 				{
 					if(!device->machine().primary_screen->visible_area().contains(res_x+1, res_y))
 						continue;
 
-					bitmap.pix16(res_y, res_x+1) = pen;
+					bitmap.pix32(res_y, res_x+1) = palette[pen];
 				}
 			}
 		}

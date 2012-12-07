@@ -39,12 +39,12 @@ public:
 	DECLARE_WRITE8_MEMBER(sm1800_8255_portc_w);
 	DECLARE_READ8_MEMBER(sm1800_8255_porta_r);
 	DECLARE_READ8_MEMBER(sm1800_8255_portc_r);
-	bitmap_ind16 m_bitmap;
+	bitmap_rgb32 m_bitmap;
 	UINT8 m_irq_state;
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
-	UINT32 screen_update_sm1800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_sm1800(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sm1800_vblank_interrupt);
 };
 
@@ -85,7 +85,7 @@ void sm1800_state::video_start()
 
 }
 
-UINT32 sm1800_state::screen_update_sm1800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 sm1800_state::screen_update_sm1800(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	device_t *devconf = machine().device("i8275");
 	i8275_update( devconf, bitmap, cliprect);
@@ -103,7 +103,8 @@ static I8275_DISPLAY_PIXELS(sm1800_display_pixels)
 {
 	int i;
 	sm1800_state *state = device->machine().driver_data<sm1800_state>();
-	bitmap_ind16 &bitmap = state->m_bitmap;
+	bitmap_rgb32 &bitmap = state->m_bitmap;
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 *charmap = state->memregion("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp)
@@ -116,7 +117,7 @@ static I8275_DISPLAY_PIXELS(sm1800_display_pixels)
 		pixels ^= 0xff;
 
 	for(i=0;i<8;i++)
-		bitmap.pix16(y, x + i) = (pixels >> (7-i)) & 1 ? (hlgt ? 2 : 1) : 0;
+		bitmap.pix32(y, x + i) = palette[(pixels >> (7-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 }
 
 const i8275_interface sm1800_i8275_interface = {
