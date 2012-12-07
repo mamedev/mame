@@ -24,7 +24,6 @@
 
 #include "emu.h"
 #include "z8536.h"
-#include "machine/devhelpr.h"
 
 
 // device type definition

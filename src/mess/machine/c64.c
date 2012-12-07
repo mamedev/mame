@@ -20,7 +20,6 @@
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
 #include "machine/cbmiec.h"
-#include "video/vic6567.h"
 
 #include "includes/cbm.h"
 #include "includes/c64_legacy.h"

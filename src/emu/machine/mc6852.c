@@ -24,7 +24,6 @@
 
 #include "emu.h"
 #include "mc6852.h"
-#include "machine/devhelpr.h"
 
 
 // device type definition

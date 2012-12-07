@@ -17,7 +17,6 @@
 
 #include "emu.h"
 #include "cdp1862.h"
-#include "machine/devhelpr.h"
 
 
 // device type definition

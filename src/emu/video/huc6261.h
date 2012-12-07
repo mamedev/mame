@@ -9,7 +9,6 @@
 #define __HUC6261_H_
 
 #include "emu.h"
-#include "machine/devhelpr.h"
 #include "video/huc6270.h"
 
 

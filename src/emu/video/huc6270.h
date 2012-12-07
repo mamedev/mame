@@ -8,7 +8,6 @@
 #define __HUC6270_H_
 
 #include "emu.h"
-#include "machine/devhelpr.h"
 
 
 enum huc6270_v_state {

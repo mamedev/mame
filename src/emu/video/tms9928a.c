@@ -25,7 +25,6 @@
 
 #include "emu.h"
 #include "tms9928a.h"
-#include "machine/devhelpr.h"
 
 
 const device_type TMS9928A = &device_creator<tms9928a_device>;

@@ -37,7 +37,6 @@
 
 #include "emu.h"
 #include "mc6845.h"
-#include "machine/devhelpr.h"
 
 
 #define LOG		(0)

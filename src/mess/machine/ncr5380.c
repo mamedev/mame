@@ -21,7 +21,6 @@
 
 #include "emu.h"
 #include "ncr5380.h"
-#include "machine/devhelpr.h"
 
 #define VERBOSE	(0)
 

@@ -35,7 +35,6 @@
 
 #include "emu.h"
 #include "6840ptm.h"
-#include "devhelpr.h"
 
 
 #define PTMVERBOSE 0

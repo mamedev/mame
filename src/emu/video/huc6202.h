@@ -8,7 +8,6 @@
 #define __HUC6202_H_
 
 #include "emu.h"
-#include "machine/devhelpr.h"
 
 
 #define MCFG_HUC6202_ADD( _tag, _intrf )	\

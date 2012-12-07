@@ -27,7 +27,6 @@
 #define __TMS9928A_H__
 
 #include "emu.h"
-#include "machine/devhelpr.h"
 
 
 #define TMS9928A_PALETTE_SIZE				16

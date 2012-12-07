@@ -12,7 +12,6 @@
 
 #include "emu.h"
 #include "machine/msm6242.h"
-#include "machine/devhelpr.h"
 
 
 enum

@@ -47,7 +47,6 @@
 #include "emu.h"
 #include "mc68901.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/devhelpr.h"
 
 
 // device type definition

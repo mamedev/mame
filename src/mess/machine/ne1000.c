@@ -1,6 +1,5 @@
 #include "emu.h"
 #include "machine/ne1000.h"
-#include "machine/devhelpr.h"
 
 static const dp8390_interface ne1000_dp8390_interface = {
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ne1000_device, ne1000_irq_w),

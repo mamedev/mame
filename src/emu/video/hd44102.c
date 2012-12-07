@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "hd44102.h"
-#include "machine/devhelpr.h"
 
 
 

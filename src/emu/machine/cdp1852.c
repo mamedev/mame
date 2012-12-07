@@ -8,7 +8,6 @@
 **********************************************************************/
 
 #include "cdp1852.h"
-#include "machine/devhelpr.h"
 
 
 // device type definition

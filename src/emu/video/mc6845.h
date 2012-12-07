@@ -11,7 +11,6 @@
 #define __MC6845__
 
 #include "emu.h"
-#include "machine/devhelpr.h"
 
 
 #define MC6845_INTERFACE(name) \

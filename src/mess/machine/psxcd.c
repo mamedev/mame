@@ -1,7 +1,6 @@
 #include "emu.h"
 #include "includes/psx.h"
 #include "psxcd.h"
-#include "machine/devhelpr.h"
 #include "sound/spu.h"
 #include "debugger.h"
 

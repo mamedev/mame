@@ -24,7 +24,6 @@
 */
 #include "emu.h"
 #include "fm_scsi.h"
-#include "machine/devhelpr.h"
 #include "debugger.h"
 
 /*

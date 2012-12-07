@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "ds2404.h"
 #include <time.h>
-#include "devhelpr.h"
 
 
 //**************************************************************************

@@ -1,6 +1,5 @@
 #include "emu.h"
 #include "machine/3c503.h"
-#include "machine/devhelpr.h"
 
 #define SADDR 0xcc000
 

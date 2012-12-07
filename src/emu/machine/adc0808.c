@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "adc0808.h"
-#include "machine/devhelpr.h"
 
 
 

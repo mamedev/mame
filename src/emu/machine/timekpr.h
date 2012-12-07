@@ -17,7 +17,6 @@
 #define __TIMEKPR_H__
 
 #include "emu.h"
-#include "devhelpr.h"
 
 
 

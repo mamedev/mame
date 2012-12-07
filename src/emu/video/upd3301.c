@@ -22,7 +22,6 @@
 
 #include "emu.h"
 #include "upd3301.h"
-#include "machine/devhelpr.h"
 
 
 // device type definition

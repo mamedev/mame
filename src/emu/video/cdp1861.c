@@ -9,7 +9,6 @@
 
 #include "emu.h"
 #include "cdp1861.h"
-#include "machine/devhelpr.h"
 
 
 
