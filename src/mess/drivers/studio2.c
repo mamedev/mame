@@ -88,11 +88,16 @@ Notes: (all chips shown above)
                      A2 |7       18| D5
                      A3 |8       17| D6
                      A4 |9       16| D7
-                     A5 |10      15| CE (LOW)
-                     A6 |11      14| ? (unknown, leave NC?)
-                    GND |12      13| OE (LOW)
+                     A5 |10      15| E0 (measured LOW)
+                     A6 |11      14| E1 (NC?)
+                    GND |12      13| E2 (measured LOW)
                         |----------|
 
+      E0 - E2 are Programmable Chip Select Inputs
+      TMM331 is compatible with AMI S6831A, AMD AM9217,
+      Intel 2316A/8316A, MOSTEK MK31000, GI RO-3-8316,
+      NATIONAL/NEC/SYNERTEK 2316A etc
+      
 */
 
 /*
