@@ -552,6 +552,8 @@ public:
 
 	void pc9801_fdc_2hd_update_ready(floppy_image_device *, int);
 	inline UINT32 m_calc_grcg_addr(int i,UINT32 offset);
+
+	DECLARE_DRIVER_INIT(pc9801_kanji);
 };
 
 
@@ -698,7 +700,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 			tile <<= 8;
 			tile |= (knj_tile & 0x7f);
 			/* annoying kanji bit-swap applied on the address bus ... */
-			tile = BITSWAP16(tile,15,7,14,13,12,11,6,5,10,9,8,4,3,2,1,0);
+//			tile = BITSWAP16(tile,15,7,14,13,12,11,6,5,10,9,8,4,3,2,1,0);
 //			tile&=0x7fff;
 			kanji_sel = 1;
 		}
@@ -1184,7 +1186,8 @@ READ8_MEMBER(pc9801_state::pc9801_a0_r)
 
 				//printf("%08x = %04x %04x %04x\n",pcg_offset,m_font_addr,m_font_line,m_font_lr);
 
-				pcg_offset = BITSWAP16(m_font_addr,15,7,14,13,12,11,6,5,10,9,8,4,3,2,1,0) << 5; // TODO
+//				pcg_offset = BITSWAP16(m_font_addr,15,7,14,13,12,11,6,5,10,9,8,4,3,2,1,0) << 5; // TODO
+				pcg_offset = m_font_addr << 5;
 				pcg_offset|= m_font_line;
 				pcg_offset|= m_font_lr;
 
@@ -1303,11 +1306,10 @@ void pc9801_state::pc9801_fdc_2hd_update_ready(floppy_image_device *, int)
 	bool ready = m_fdc_2hd_ctrl & 0x40;
 	floppy_image_device *floppy;
 	floppy = machine().device<floppy_connector>("upd765_2hd:0")->get_device();
-	/* TODO: hack, needs to be removed */
-	if(floppy || ready)
+	if(floppy && ready)
 		ready = floppy->ready_r();
 	floppy = machine().device<floppy_connector>("upd765_2hd:1")->get_device();
-	if(floppy || ready)
+	if(floppy && ready)
 		ready = floppy->ready_r();
 
 	m_fdc_2hd->ready_w(ready);
@@ -2773,10 +2775,25 @@ static const gfx_layout charset_16x16 =
 	16*16
 };
 
+#if 0
+static const gfx_layout charset_8x8alt =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7, STEP8(16*8,1) },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
+	16*16
+};
+#endif
+
 static GFXDECODE_START( pc9801 )
 	GFXDECODE_ENTRY( "chargen", 0x00000, charset_8x8,     0x000, 0x01 )
 	GFXDECODE_ENTRY( "chargen", 0x00800, charset_8x16,    0x000, 0x01 )
 	GFXDECODE_ENTRY( "kanji",   0x00000, charset_16x16,   0x000, 0x01 )
+	GFXDECODE_ENTRY( "raw_kanji",   0x00000, charset_16x16,   0x000, 0x01 )
+//	GFXDECODE_ENTRY( "chargen",   0x01800, charset_8x8alt,   0x000, 0x01 )
 GFXDECODE_END
 
 /****************************************
@@ -3625,11 +3642,25 @@ MACHINE_CONFIG_END
 	ROM_LOAD( "ide.rom",  0x00000, 0x02000, NO_DUMP ) \
 	ROM_FILL( 0x0000, 0x2000, 0xcb ) \
 
-// pnp?
+// pnp, soundrom actually?
 #define LOAD_UNK_ROM \
 	ROM_REGION( 0x4000, "unkrom", ROMREGION_ERASEFF ) \
 	ROM_LOAD( "unk.rom",  0x00000, 0x04000, NO_DUMP ) \
 	ROM_FILL( 0x0000, 0x4000, 0xcb ) \
+
+// all of these are half size :/
+#define KANJI_ROMS \
+	ROM_REGION( 0x80000, "raw_kanji", ROMREGION_ERASEFF ) \
+	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x4000, BAD_DUMP CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) ) \
+	ROM_CONTINUE(                      0x20000, 0x4000  ) \
+	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x4000, BAD_DUMP CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) ) \
+	ROM_CONTINUE(                      0x20001, 0x4000  ) \
+	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x40000, 0x4000, BAD_DUMP CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) ) \
+	ROM_CONTINUE(                      0x60000, 0x4000  ) \
+	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x40001, 0x4000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) ) \
+	ROM_CONTINUE(                      0x60001, 0x4000  ) \
+	ROM_REGION( 0x80000, "kanji", ROMREGION_ERASEFF ) \
+
 
 /*
 F - 8086 5
@@ -3664,11 +3695,7 @@ ROM_START( pc9801f )
 	ROM_LOAD( "d23128c-17.bin", 0x00000, 0x00800, BAD_DUMP CRC(eea57180) SHA1(4aa037c684b72ad4521212928137d3369174eb1e) ) //original is a bad dump, this is taken from i386 model
 	ROM_LOAD("hn613128pac8.bin",0x00800, 0x01000, BAD_DUMP CRC(b5a15b5c) SHA1(e5f071edb72a5e9a8b8b1c23cf94a74d24cb648e) ) //bad dump, 8x16 charset? (it's on the kanji board)
 
-	ROM_REGION( 0x20000, "kanji", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x8000, BAD_DUMP CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) )
-	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x8000, BAD_DUMP CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) )
-	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x10000, 0x8000, BAD_DUMP CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) )
-	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x10001, 0x8000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) )
+	KANJI_ROMS
 ROM_END
 
 /*
@@ -3686,8 +3713,7 @@ ROM_START( pc9801ux )
 	ROM_REGION( 0x50000, "chargen", 0 )
     ROM_LOAD( "font_ux.rom",     0x000000, 0x046800, BAD_DUMP CRC(19a76eeb) SHA1(96a006e8515157a624599c2b53a581ae0dd560fd) )
 
-	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
-	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
+	KANJI_ROMS
 ROM_END
 
 /*
@@ -3705,8 +3731,7 @@ ROM_START( pc9801rx )
 	ROM_REGION( 0x50000, "chargen", 0 )
     ROM_LOAD( "font_rx.rom",     0x000000, 0x046800, CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
 
-	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
-	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
+	KANJI_ROMS
 ROM_END
 
 /*
@@ -3737,11 +3762,7 @@ ROM_START( pc9801rs )
 	ROM_REGION( 0x50000, "chargen", 0 )
 	ROM_LOAD( "font_rs.rom", 0x00000, 0x46800, BAD_DUMP CRC(da370e7a) SHA1(584d0c7fde8c7eac1f76dc5e242102261a878c5e) )
 
-	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x8000, BAD_DUMP CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) )
-	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x8000, BAD_DUMP CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) )
-	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x10000, 0x8000, BAD_DUMP CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) )
-	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x10001, 0x8000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) )
+	KANJI_ROMS
 ROM_END
 
 /*
@@ -3761,8 +3782,7 @@ ROM_START( pc9801vm )
 	ROM_REGION( 0x50000, "chargen", 0 )
     ROM_LOAD( "font_vm.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
 
-	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
-	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
+	KANJI_ROMS
 ROM_END
 
 /*
@@ -3785,11 +3805,7 @@ ROM_START( pc9821 )
 	ROM_REGION( 0x50000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
-	ROM_REGION( 0x20000, "kanji", ROMREGION_ERASEFF )// taken from pc9801f
-	ROM_LOAD16_BYTE( "24256c-x01.bin", 0x00000, 0x8000, BAD_DUMP CRC(28ec1375) SHA1(9d8e98e703ce0f483df17c79f7e841c5c5cd1692) )
-	ROM_LOAD16_BYTE( "24256c-x02.bin", 0x00001, 0x8000, BAD_DUMP CRC(90985158) SHA1(78fb106131a3f4eb054e87e00fe4f41193416d65) )
-	ROM_LOAD16_BYTE( "24256c-x03.bin", 0x10000, 0x8000, BAD_DUMP CRC(d4893543) SHA1(eb8c1bee0f694e1e0c145a24152222d4e444e86f) )
-	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x10001, 0x8000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) )
+	KANJI_ROMS
 ROM_END
 
 /*
@@ -3810,8 +3826,7 @@ ROM_START( pc9821as )
 	ROM_REGION( 0x50000, "chargen", 0 )
     ROM_LOAD( "font_as.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
 
-	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
-	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
+	KANJI_ROMS
 ROM_END
 
 
@@ -3833,8 +3848,7 @@ ROM_START( pc9821ne )
 	ROM_REGION( 0x50000, "chargen", 0 )
 	ROM_LOAD( "font_ne.rom", 0x00000, 0x46800, BAD_DUMP CRC(fb213757) SHA1(61525826d62fb6e99377b23812faefa291d78c2e) )
 
-	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
-	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
+	KANJI_ROMS
 ROM_END
 
 /*
@@ -3855,8 +3869,7 @@ ROM_START( pc486mu )
 	ROM_REGION( 0x50000, "chargen", 0 )
 	ROM_LOAD( "font_486mu.rom", 0x0000, 0x46800, CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff))
 
-	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
-	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
+	KANJI_ROMS
 ROM_END
 
 /*
@@ -3877,8 +3890,7 @@ ROM_START( pc9821ce2 )
 	ROM_REGION( 0x50000, "chargen", 0 )
     ROM_LOAD( "font_ce2.rom",     0x000000, 0x046800, CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
 
-	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
-	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
+	KANJI_ROMS
 ROM_END
 
 /*
@@ -3899,8 +3911,7 @@ ROM_START( pc9821xs )
 	ROM_REGION( 0x50000, "chargen", 0 )
     ROM_LOAD( "font_xs.rom",     0x000000, 0x046800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
 
-	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
-	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
+	KANJI_ROMS
 ROM_END
 
 
@@ -3922,8 +3933,7 @@ ROM_START( pc9821v13 )
 	ROM_REGION( 0x50000, "chargen", 0 )
 	ROM_LOAD( "font_a.rom", 0x00000, 0x46800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
 
-	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
-	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
+	KANJI_ROMS
 ROM_END
 
 /*
@@ -3944,23 +3954,40 @@ ROM_START( pc9821v20 )
 	ROM_REGION( 0x50000, "chargen", 0 )
     ROM_LOAD( "font_v20.rom",     0x000000, 0x046800, BAD_DUMP CRC(6244c4c0) SHA1(9513cac321e89b4edb067b30e9ecb1adae7e7be7) )
 
-	ROM_REGION( 0x45000, "kanji", ROMREGION_ERASEFF )
-	//ROM_COPY("chargen", 0x1800, 0x0000, 0x45000 )
+	KANJI_ROMS
 ROM_END
 
+/* Convert the ROM bitswap here */
+DRIVER_INIT_MEMBER(pc9801_state,pc9801_kanji)
+{
+	UINT32 i,j;
+	UINT32 pcg_tile;
+	UINT8 *kanji = machine().root_device().memregion("kanji")->base();
+	UINT8 *raw_kanji = machine().root_device().memregion("raw_kanji")->base();
+
+	for(i=0;i<0x40000/0x20;i++)
+	{
+		for(j=0;j<0x20;j++)
+		{
+			pcg_tile = BITSWAP16(i,15,14,13,12,11,7,6,5,10,9,8,4,3,2,1,0) << 5;
+			kanji[j+(i << 5)] = raw_kanji[j+pcg_tile];
+		}
+	}
+}
+
 /* Genuine dumps */
-COMP( 1983, pc9801f,   0,       0,     pc9801,   pc9801, driver_device,   0, "Nippon Electronic Company",   "PC-9801F",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1983, pc9801f,   0,       0,     pc9801,   pc9801,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9801F",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
 
 /* TODO: ANYTHING below there needs REDUMPING! */
-COMP( 1989, pc9801rs,  0,       0,     pc9801rs, pc9801rs, driver_device, 0, "Nippon Electronic Company",   "PC-9801RS", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND) //TODO: not sure about the exact model
-COMP( 1985, pc9801vm,  pc9801rs,0,     pc9801rs, pc9801rs, driver_device, 0, "Nippon Electronic Company",   "PC-9801VM", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
-COMP( 1987, pc9801ux,  pc9801rs,0,     pc9801ux, pc9801rs, driver_device, 0, "Nippon Electronic Company",   "PC-9801UX", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
-COMP( 1988, pc9801rx,  pc9801rs,0,     pc9801ux, pc9801rs, driver_device, 0, "Nippon Electronic Company",   "PC-9801RX", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
-COMP( 1994, pc9821,    0,       0,     pc9821,   pc9821, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND) //TODO: not sure about the exact model
-COMP( 1993, pc9821as,  pc9821,  0,     pc9821,   pc9821, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98MATE A)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
-COMP( 1994, pc9821xs,  pc9821,  0,     pc9821,   pc9821, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98MATE Xs)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
-COMP( 1994, pc9821ce2, pc9821,  0,     pc9821,   pc9821, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98MULTi Ce2)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
-COMP( 1994, pc9821ne,  pc9821,  0,     pc9821,   pc9821, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98NOTE)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
-COMP( 1994, pc486mu,   pc9821,  0,     pc9821,   pc9821, driver_device, 0, "Epson",                       "PC-486MU",  GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1998, pc9821v13, pc9821,  0,     pc9821,   pc9821, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98MATE VALUESTAR 13)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
-COMP( 1998, pc9821v20, pc9821,  0,     pc9821v20,pc9821, driver_device, 0, "Nippon Electronic Company",   "PC-9821 (98MATE VALUESTAR 20)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1989, pc9801rs,  0,       0,     pc9801rs, pc9801rs, pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9801RS", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND) //TODO: not sure about the exact model
+COMP( 1985, pc9801vm,  pc9801rs,0,     pc9801rs, pc9801rs, pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9801VM", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1987, pc9801ux,  pc9801rs,0,     pc9801ux, pc9801rs, pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9801UX", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1988, pc9801rx,  pc9801rs,0,     pc9801ux, pc9801rs, pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9801RX", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1994, pc9821,    0,       0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND) //TODO: not sure about the exact model
+COMP( 1993, pc9821as,  pc9821,  0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98MATE A)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1994, pc9821xs,  pc9821,  0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98MATE Xs)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1994, pc9821ce2, pc9821,  0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98MULTi Ce2)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1994, pc9821ne,  pc9821,  0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98NOTE)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1994, pc486mu,   pc9821,  0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Epson",                       "PC-486MU",  GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1998, pc9821v13, pc9821,  0,     pc9821,   pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98MATE VALUESTAR 13)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
+COMP( 1998, pc9821v20, pc9821,  0,     pc9821v20,pc9821,   pc9801_state, pc9801_kanji, "Nippon Electronic Company",   "PC-9821 (98MATE VALUESTAR 20)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
