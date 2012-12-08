@@ -375,7 +375,8 @@
 	  </part>
   </software>
 
-  <software name="fatfury3">
+  <!-- Copy protection failure, select demo mode and leave it for a few cycles to see -->
+  <software name="fatfury3" supported="no">
 	  <description>Fatal Fury 3 - Road to the Final Victory (1995)(SNK)(JP-US)[!][Garou Densetsu 3 - Harukanaru Tatakai][NGCD-069, NGCD-069E MT B02]</description>
 	  <year>199?</year>
 	  <publisher>SNK</publisher>
@@ -386,7 +387,8 @@
 	  </part>
   </software>
 
-  <software name="fatfury3a" cloneof="fatfury3">
+  <!-- Copy protection failure, select demo mode and leave it for a few cycles to see -->
+  <software name="fatfury3a" cloneof="fatfury3" supported="no">
 	  <description>Fatal Fury 3 - Road to the Final Victory (1995)(SNK)(US)[!][Garou Densetsu 3 - Harukanaru Tatakai][NGCD-069E MT B03]</description>
 	  <year>199?</year>
 	  <publisher>SNK</publisher>
