@@ -2214,7 +2214,7 @@ const int wd_fdc_t::fd176x_step_times[4] = { 12000, 24000, 40000, 60000 };
 fd1791_t::fd1791_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1791x, "FD1791", tag, owner, clock)
 {
 	step_times = fd179x_step_times;
-	delay_register_commit = 16;
+	delay_register_commit = 4;
 	delay_command_commit = 12;
 	disable_mfm = false;
 	inverted_bus = true;
@@ -2228,7 +2228,7 @@ fd1791_t::fd1791_t(const machine_config &mconfig, const char *tag, device_t *own
 fd1792_t::fd1792_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1792x, "FD1792", tag, owner, clock)
 {
 	step_times = fd179x_step_times;
-	delay_register_commit = 16;
+	delay_register_commit = 4;
 	delay_command_commit = 12;
 	disable_mfm = true;
 	inverted_bus = true;
@@ -2242,7 +2242,7 @@ fd1792_t::fd1792_t(const machine_config &mconfig, const char *tag, device_t *own
 fd1793_t::fd1793_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1793x, "FD1793", tag, owner, clock)
 {
 	step_times = fd179x_step_times;
-	delay_register_commit = 16;
+	delay_register_commit = 4;
 	delay_command_commit = 12;
 	disable_mfm = false;
 	inverted_bus = false;
@@ -2256,7 +2256,7 @@ fd1793_t::fd1793_t(const machine_config &mconfig, const char *tag, device_t *own
 fd1794_t::fd1794_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1794x, "FD1794", tag, owner, clock)
 {
 	step_times = fd179x_step_times;
-	delay_register_commit = 16;
+	delay_register_commit = 4;
 	delay_command_commit = 12;
 	disable_mfm = true;
 	inverted_bus = false;
@@ -2270,7 +2270,7 @@ fd1794_t::fd1794_t(const machine_config &mconfig, const char *tag, device_t *own
 fd1795_t::fd1795_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1795x, "FD1795", tag, owner, clock)
 {
 	step_times = fd179x_step_times;
-	delay_register_commit = 16;
+	delay_register_commit = 4;
 	delay_command_commit = 12;
 	disable_mfm = false;
 	inverted_bus = true;
@@ -2292,7 +2292,7 @@ int fd1795_t::calc_sector_size(UINT8 size, UINT8 command) const
 fd1797_t::fd1797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, FD1797x, "FD1797", tag, owner, clock)
 {
 	step_times = fd179x_step_times;
-	delay_register_commit = 16;
+	delay_register_commit = 4;
 	delay_command_commit = 12;
 	disable_mfm = false;
 	inverted_bus = false;
@@ -2314,7 +2314,7 @@ int fd1797_t::calc_sector_size(UINT8 size, UINT8 command) const
 mb8866_t::mb8866_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, MB8866x, "MB8866", tag, owner, clock)
 {
 	step_times = fd179x_step_times;
-	delay_register_commit = 16;
+	delay_register_commit = 4;
 	delay_command_commit = 12;
 	disable_mfm = false;
 	inverted_bus = true;
@@ -2328,7 +2328,7 @@ mb8866_t::mb8866_t(const machine_config &mconfig, const char *tag, device_t *own
 mb8876_t::mb8876_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, MB8876x, "MB8876", tag, owner, clock)
 {
 	step_times = fd179x_step_times;
-	delay_register_commit = 16;
+	delay_register_commit = 4;
 	delay_command_commit = 12;
 	disable_mfm = false;
 	inverted_bus = true;
@@ -2342,7 +2342,7 @@ mb8876_t::mb8876_t(const machine_config &mconfig, const char *tag, device_t *own
 mb8877_t::mb8877_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : wd_fdc_analog_t(mconfig, MB8877x, "MB8877", tag, owner, clock)
 {
 	step_times = fd179x_step_times;
-	delay_register_commit = 16;
+	delay_register_commit = 4;
 	delay_command_commit = 12;
 	disable_mfm = false;
 	inverted_bus = false;
