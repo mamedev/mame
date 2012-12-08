@@ -730,7 +730,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					if(kanji_sel)
 						tile_data = (state->m_kanji_rom[tile*0x20+yi*2+pcg_lr]);
 					else if(pcg_sel)
-						tile_data = (state->m_pcg_ram[0xac000*2+tile*0x40+yi*2+pcg_lr]);
+						tile_data = (state->m_pcg_ram[0xac000+tile*0x20+yi*2+pcg_lr]);
 					else
 						tile_data = (state->m_char_rom[tile*char_size+state->m_video_ff[FONTSEL_REG]*0x800+yi]);
 				}
@@ -1174,13 +1174,21 @@ READ8_MEMBER(pc9801_state::pc9801_a0_r)
 			{
 				UINT32 pcg_offset;
 
-				pcg_offset = m_font_addr << 6;
+				pcg_offset = m_font_addr << 5;
 				pcg_offset|= m_font_line;
 				pcg_offset|= m_font_lr;
 				if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
+				{
 					return m_pcg_ram[pcg_offset];
+				}
 
-				return machine().rand(); // TODO, kanji ROM
+				//printf("%08x = %04x %04x %04x\n",pcg_offset,m_font_addr,m_font_line,m_font_lr);
+
+				pcg_offset = BITSWAP16(m_font_addr,15,7,14,13,12,11,6,5,10,9,8,4,3,2,1,0) << 5; // TODO
+				pcg_offset|= m_font_line;
+				pcg_offset|= m_font_lr;
+
+				return m_kanji_rom[pcg_offset]; // TODO, kanji ROM
 			}
 		}
 
@@ -1248,12 +1256,14 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 			{
 				UINT32 pcg_offset;
 
-				pcg_offset = m_font_addr << 6;
+				pcg_offset = m_font_addr << 5;
 				pcg_offset|= m_font_line;
 				pcg_offset|= m_font_lr;
 				//printf("%04x %02x %02x %08x\n",m_font_addr,m_font_line,m_font_lr,pcg_offset);
 				if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
+				{
 					m_pcg_ram[pcg_offset] = data;
+				}
 				return;
 			}
 		}
@@ -1293,10 +1303,11 @@ void pc9801_state::pc9801_fdc_2hd_update_ready(floppy_image_device *, int)
 	bool ready = m_fdc_2hd_ctrl & 0x40;
 	floppy_image_device *floppy;
 	floppy = machine().device<floppy_connector>("upd765_2hd:0")->get_device();
-	if(floppy && ready)
+	/* TODO: hack, needs to be removed */
+	if(floppy || ready)
 		ready = floppy->ready_r();
 	floppy = machine().device<floppy_connector>("upd765_2hd:1")->get_device();
-	if(floppy && ready)
+	if(floppy || ready)
 		ready = floppy->ready_r();
 
 	m_fdc_2hd->ready_w(ready);
@@ -2267,7 +2278,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0064, 0x0067) AM_WRITE8(pc9801_vrtc_mask_w, 0xffffffff)
 	AM_RANGE(0x0068, 0x006b) AM_WRITE8(pc9821_video_ff_w,  0xffffffff) //mode FF / <undefined>
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE8(pc9801rs_70_r,      pc9801rs_70_w,    0xffffffff) //display registers "GRCG" / i8253 pit
-//  AM_RANGE(0x0080, 0x0083) SASI interface / <undefined>
+	AM_RANGE(0x0080, 0x0083) AM_READWRITE8(pc9801_sasi_r,      pc9801_sasi_w,      0xffffffff) //HDD SASI interface / <undefined>
 	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9821_a0_r,        pc9821_a0_w,        0xffffffff) //upd7220 bitmap ports / display registers
 //  AM_RANGE(0x00b0, 0x00b3) PC9861k (serial port?)
@@ -2301,7 +2312,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 //  AM_RANGE(0x0cc0, 0x0cc7) SCSI interface / <undefined>
 //  AM_RANGE(0x0cfc, 0x0cff) PCI bus
 	AM_RANGE(0x3fd8, 0x3fdf) AM_READWRITE8(pc9821_pit_r,        pc9821_pit_w,        0xffffffff) // <undefined> / pit mirror ports
-	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,pc9801_mouse_w,0xffffffff) // <undefined> / mouse ppi8255 ports
+	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,      pc9801_mouse_w,      0xffffffff) // <undefined> / mouse ppi8255 ports
 	AM_RANGE(0x841c, 0x841f) AM_READWRITE8(sdip_0_r,sdip_0_w,0xffffffff)
 	AM_RANGE(0x851c, 0x851f) AM_READWRITE8(sdip_1_r,sdip_1_w,0xffffffff)
 	AM_RANGE(0x861c, 0x861f) AM_READWRITE8(sdip_2_r,sdip_2_w,0xffffffff)
@@ -2450,10 +2461,10 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_START("KEY7") // 0x38 - 0x3f
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(" un 1-1") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_state, key_stroke, 0x38)
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_DEL) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_state, key_stroke, 0x39)
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_state, key_stroke, 0x3a)
-	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_state, key_stroke, 0x3b)
-	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_state, key_stroke, 0x3c)
-	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_state, key_stroke, 0x3d)
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_state, key_stroke, 0x3a)
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT) PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_state, key_stroke, 0x3b)
+	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT) PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_state, key_stroke, 0x3c)
+	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_state, key_stroke, 0x3d)
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CLS") PORT_CODE(KEYCODE_HOME) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_state, key_stroke, 0x3e)
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(" un 1-8") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_state, key_stroke, 0x3f)
 
