@@ -164,12 +164,18 @@ protected:
 	bool motor_control;
 	bool ready_hooked;
 	int clock_ratio;
+	const int *step_times;
+	int delay_register_commit;
+	int delay_command_commit;
+
+	static const int fd179x_step_times[4];
+	static const int fd176x_step_times[4];
 
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-	virtual int step_time(int mode) const;
+	virtual int calc_sector_size(UINT8 size, UINT8 command) const;
 	virtual int settle_time() const;
 
 	virtual void pll_reset(bool fm, attotime when) = 0;
@@ -429,6 +435,8 @@ public:
 	wd_fdc_digital_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
+	static const int wd_digital_step_times[4];
+
 	virtual void pll_reset(bool fm, attotime when);
 	virtual void pll_start_writing(attotime tm);
 	virtual void pll_commit(floppy_image_device *floppy, attotime tm);
@@ -469,11 +477,17 @@ private:
 class fd1771_t : public wd_fdc_analog_t {
 public:
 	fd1771_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual int calc_sector_size(UINT8 size, UINT8 command) const;
 };
 
 class fd1781_t : public wd_fdc_analog_t {
 public:
 	fd1781_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual int calc_sector_size(UINT8 size, UINT8 command) const;
 };
 
 class fd1791_t : public wd_fdc_analog_t {
@@ -499,11 +513,17 @@ public:
 class fd1795_t : public wd_fdc_analog_t {
 public:
 	fd1795_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual int calc_sector_size(UINT8 size, UINT8 command) const;
 };
 
 class fd1797_t : public wd_fdc_analog_t {
 public:
 	fd1797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual int calc_sector_size(UINT8 size, UINT8 command) const;
 };
 
 class mb8866_t : public wd_fdc_analog_t {
@@ -534,11 +554,17 @@ public:
 class fd1765_t : public wd_fdc_analog_t {
 public:
 	fd1765_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual int calc_sector_size(UINT8 size, UINT8 command) const;
 };
 
 class fd1767_t : public wd_fdc_analog_t {
 public:
 	fd1767_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual int calc_sector_size(UINT8 size, UINT8 command) const;
 };
 
 class wd2791_t : public wd_fdc_analog_t {
@@ -554,11 +580,17 @@ public:
 class wd2795_t : public wd_fdc_analog_t {
 public:
 	wd2795_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual int calc_sector_size(UINT8 size, UINT8 command) const;
 };
 
 class wd2797_t : public wd_fdc_analog_t {
 public:
 	wd2797_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual int calc_sector_size(UINT8 size, UINT8 command) const;
 };
 
 class wd1770_t : public wd_fdc_digital_t {
@@ -571,7 +603,6 @@ public:
 	wd1772_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	virtual int step_time(int mode) const;
 	virtual int settle_time() const;
 };
 
