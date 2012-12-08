@@ -1038,7 +1038,7 @@ void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
 	if(floppy && ready_1)
 		ready_1 = floppy->ready_r();
 
-	m_fdc->ready_w(ready_0 || ready_1);
+	m_fdc->ready_w(ready_0 && ready_1);
 }
 
 WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)
