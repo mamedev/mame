@@ -1024,21 +1024,19 @@ TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_motor_start_1)
 	m_fdc_motor_status[1] = 1;
 }
 
-/* TODO: double check schematics */
 void pc88va_state::pc88va_fdc_update_ready(floppy_image_device *, int)
 {
-	bool ready_0 = m_fdc_ctrl_2 & 0x20;
-	bool ready_1 = m_fdc_ctrl_2 & 0x40;
+	bool ready = m_fdc_ctrl_2 & 0x40;
 
 	floppy_image_device *floppy;
 	floppy = machine().device<floppy_connector>("upd765:0")->get_device();
-	if(floppy && ready_0)
-		ready_0 = floppy->ready_r();
+	if(floppy && ready)
+		ready = floppy->ready_r();
 	floppy = machine().device<floppy_connector>("upd765:1")->get_device();
-	if(floppy && ready_1)
-		ready_1 = floppy->ready_r();
+	if(floppy && ready)
+		ready = floppy->ready_r();
 
-	m_fdc->ready_w(ready_0 && ready_1);
+	m_fdc->ready_w(ready);
 }
 
 WRITE8_MEMBER(pc88va_state::pc88va_fdc_w)

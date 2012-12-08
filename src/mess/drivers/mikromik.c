@@ -250,8 +250,6 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 		if (LOG) logerror("MOTOR %u\n", d);
 		m_floppy0->mon_w(!d);
 		m_floppy1->mon_w(!d);
-
-		if (ioport("T5")->read()) m_fdc->ready_w(d);
 		break;
 	}
 }
@@ -744,9 +742,6 @@ void mm1_state::machine_reset()
 
 	// reset LS259
 	for (i = 0; i < 8; i++) ls259_w(program, i, 0);
-
-	// set FDC ready
-	if (!ioport("T5")->read()) m_fdc->ready_w(true);
 
 	// reset FDC
 	m_fdc->reset();
