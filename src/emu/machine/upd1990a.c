@@ -171,13 +171,18 @@ void upd1990a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		}
 		else // parallel
 		{
+			int i;
 			/* each counter is advanced at 1024 Hz in parallel, overflow carry does not affect next counter */
 			m_time_counter[0]++;
 			m_time_counter[1]++;
 			m_time_counter[2]++;
 			m_time_counter[3]++;
 			m_time_counter[4]++;
-			m_data_out = (m_time_counter[4] == 0);
+
+			m_data_out = 0;
+
+			for(i=0;i<5;i++)
+				m_data_out |= (m_time_counter[i] == 0);
 		}
 
 		break;
