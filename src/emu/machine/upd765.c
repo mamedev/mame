@@ -1182,16 +1182,16 @@ void upd765_family_device::start_command(int cmd)
 	case C_SENSE_DRIVE_STATUS: {
 		floppy_info &fi = flopi[command[1] & 3];
 		main_phase = PHASE_RESULT;
-		result[0] = 0x08;
-		if(!fi.ready)
-			result[0] |= 0x20;
+		result[0] = ST3_TS;
+		if(fi.ready)
+			result[0] |= ST3_RY;
 		if(fi.dev)
 			result[0] |=
-				(fi.dev->wpt_r() ? 0x40 : 0x00) |
-				(fi.dev->trk00_r() ? 0x00 : 0x10) |
+				(fi.dev->wpt_r() ? ST3_WP : 0x00) |
+				(fi.dev->trk00_r() ? 0x00 : ST3_T0) |
 				(fi.dev->ss_r() ? 0x04 : 0x00) |
 				(command[1] & 3);
-		logerror("%s: command sense drive status (%02x)\n", tag(), result[0]);
+		logerror("%s: command sense drive status %d (%02x)\n", tag(), fi.id, result[0]);
 		result_pos = 1;
 		break;
 	}

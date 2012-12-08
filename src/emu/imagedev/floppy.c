@@ -293,7 +293,7 @@ bool floppy_image_device::call_load()
 	if (!cur_load_cb.isnull())
 		return cur_load_cb(this);
 
-	if(motor_always_on || !mon)
+	if(!mon)
 		ready_counter = 2;
 
 	return IMAGE_INIT_PASS;
