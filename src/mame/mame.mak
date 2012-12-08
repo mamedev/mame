@@ -1955,7 +1955,8 @@ $(DRIVERS)/30test.o:	$(LAYOUT)/30test.lh
 
 $(DRIVERS)/8080bw.o:	$(LAYOUT)/cosmicm.lh \
 			$(LAYOUT)/galactic.lh \
-			$(LAYOUT)/shuttlei.lh
+			$(LAYOUT)/shuttlei.lh \
+			$(LAYOUT)/spacecom.lh
 
 $(DRIVERS)/ace.o:		$(LAYOUT)/ace.lh
 
