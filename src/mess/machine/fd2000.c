@@ -226,7 +226,8 @@ fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, co
     : device_t(mconfig, type, name, tag, owner, clock),
 	  device_cbm_iec_interface(mconfig, *this),
 	  m_maincpu(*this, M6502_TAG),
-	  m_floppy0(*this, DP8473_TAG":0")
+	  m_floppy0(*this, DP8473_TAG":0"),
+	  m_variant(variant)
 {
 }
 
