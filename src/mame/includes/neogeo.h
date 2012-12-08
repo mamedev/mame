@@ -45,6 +45,7 @@ public:
 		m_has_sprite_bus = true;
 		m_has_text_bus = true;
 		m_has_ymrom_bus = true;
+		m_has_z80_bus = true;
 	}
 
 	/* memory pointers */
@@ -239,6 +240,7 @@ public:
 	bool m_has_sprite_bus;
 	bool m_has_text_bus;
 	bool m_has_ymrom_bus;
+	bool m_has_z80_bus;
 };
 
 

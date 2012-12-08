@@ -394,7 +394,10 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 
 		case 0x0104:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD 0xE00000 area -> 0x%02X (PC: 0x%06X)\n"), byteValue, SekGetPC(-1));
-			nActiveTransferArea = byteValue;
+			if (ACCESSING_BITS_0_7)
+			{
+				nActiveTransferArea = byteValue;
+			}
 			break;
 
 		case 0x0120:
@@ -407,6 +410,7 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 			break;
 		case 0x0126:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD Z80 BUSREQ -> 1 (PC: 0x%06X)\n"), SekGetPC(-1));
+			m_has_z80_bus = false;
 			space.machine().scheduler().synchronize();
 			m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			break;
@@ -425,6 +429,7 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 			break;
 		case 0x0146:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD Z80 BUSREQ -> 0 (PC: 0x%06X)\n"), SekGetPC(-1));
+			m_has_z80_bus = true;
 			space.machine().scheduler().synchronize();
 			m_audiocpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			break;
@@ -582,9 +587,21 @@ WRITE8_MEMBER(ng_aes_state::neocd_transfer_w)
 			YM2610ADPCMAROM[nADPCMTransferBank + ((sekAddress & 0x0FFFFF) >> 1)] = byteValue;
 			break;
 		case 4:							// Z80
-			if ((sekAddress & 0xfffff) >= 0x20000) break;
 
-			NeoZ80ROMActive[(sekAddress & 0x1FFFF) >> 1] = byteValue;
+			// kof98 and lresort attempt to write here when the system still has the z80 bank
+			// it seems they attempt to write regular samples (not even deltat) maybe there is
+			// some kind of fall-through behavior, or it shouldn't be allowed to select a
+			// transfer area without the bus? - this should really be checked on hw
+			if (m_has_z80_bus)
+			{
+				YM2610ADPCMAROM[nADPCMTransferBank + ((sekAddress & 0x0FFFFF) >> 1)] = byteValue;
+			}
+			else
+			{
+		//	printf("sekAddress %08x %02x\n", sekAddress, data);
+				if ((sekAddress & 0xfffff) >= 0x20000) break;
+				NeoZ80ROMActive[(sekAddress & 0x1FFFF) >> 1] = byteValue;
+			}
 			break;
 		case 5:							// Text
 			NeoTextRAM[(sekAddress & 0x3FFFF) >> 1] = byteValue;

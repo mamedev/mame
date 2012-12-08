@@ -552,8 +552,7 @@
 	  </part>
   </software>
 
-  <!-- sound doesn't work? -->
-  <software name="kof98" supported="no">
+  <software name="kof98">
 	  <description>King of Fighters '98, The - The Slugfest (1998)(SNK)(JP)[!][King of Fighters '98, The - Dream Match Never Ends][NGCD-2420 MT A04, NGCD-2421]</description>
 	  <year>199?</year>
 	  <publisher>SNK</publisher>
@@ -597,8 +596,7 @@
 	  </part>
   </software>
 
-  <!-- sound doesn't work? -->
-  <software name="lresort" supported="no">
+  <software name="lresort">
 	  <description>Last Resort (1994)(SNK)(JP-US)[!]</description>
 	  <year>199?</year>
 	  <publisher>SNK</publisher>
