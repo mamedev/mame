@@ -197,7 +197,7 @@ bool upd765_family_device::get_ready(int fid)
 {
 	if(ready_connected)
 		return flopi[fid].dev ? !flopi[fid].dev->ready_r() : false;
-	return external_ready;
+	return !external_ready;
 }
 
 void upd765_family_device::set_floppy(floppy_image_device *flop)
