@@ -636,7 +636,9 @@ INPUT_PORTS_END
 
 /*******************************************************/
 /*                                                     */
-/* bootleg "Space Combat"                              */
+/* bootleg "Space Combat", 1979                        */
+/*  8080A + 18MHz XTAL, SN76477, 10MHz XTAL            */
+/*  8*2KB RAM(!), 8*1KB ROM, maybe some PROMs          */
 /*                                                     */
 /*  Preliminary emulation. PCB was working fine, but   */
 /*  it's not certain that this is a good dump          */
@@ -644,7 +646,7 @@ INPUT_PORTS_END
 /*******************************************************/
 
 static INPUT_PORTS_START( spacecom )
-	PORT_START("IN0")
+	PORT_START("IN0") // 5-pos dipsw at ic79 (row F) - means 3 bits are for something else, which?
 	PORT_DIPUNKNOWN( 0x01, 0x01 )
 	PORT_DIPUNKNOWN( 0x02, 0x02 )
 	PORT_DIPUNKNOWN( 0x04, 0x04 )
@@ -4088,7 +4090,7 @@ GAMEL(1979, cosmicm2,   invaders, invaders,  cosmicmo,  driver_device, 0, ROT270
 GAMEL(1980?,sinvzen,    invaders, invaders,  spaceatt,  driver_device, 0, ROT270, "Taito / Zenitone-Microsec Ltd.", "Super Invaders (Zenitone-Microsec)", GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1978, spaceatt,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg (Video Games GmbH)", "Space Attack (bootleg of Space Invaders)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1980, spaceat2,   invaders, invaders,  spaceatt,  driver_device, 0, ROT270, "bootleg (Video Games UK)", "Space Attack II (bootleg of Super Invaders)", GAME_SUPPORTS_SAVE, layout_invaders ) // bootleg of Zenitone-Microsec Super Invaders
-GAMEL(1978, spacecom,   invaders, spacecom,  spacecom,  driver_device, 0, ROT270, "bootleg", "Space Combat (bootleg of Space Invaders)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_spacecom ) // not working: need to investigate it more, could be bad dump?
+GAMEL(1979, spacecom,   invaders, spacecom,  spacecom,  driver_device, 0, ROT270, "bootleg", "Space Combat (bootleg of Space Invaders)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_spacecom ) // not working: need to investigate it more, could be bad dump?
 GAME( 1978, spacerng,   invaders, spacerng,  sitv,      driver_device, 0, ROT90,  "bootleg (Leisure Time Electronics)", "Space Ranger (bootleg of Space Invaders)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // many modifications
 GAMEL(19??, invasion,   invaders, invaders,  invasion,  driver_device, 0, ROT270, "bootleg (Sidam)", "Invasion (Sidam)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, invasiona,  invaders, invaders,  invasion,  driver_device, 0, ROT270, "bootleg", "Invasion (bootleg set 1, normal graphics)", GAME_SUPPORTS_SAVE, layout_invaders ) // has Sidam replaced with 'Ufo Monster Attack' and standard GFX
