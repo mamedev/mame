@@ -159,6 +159,7 @@ Cadillacs: Kyouryuu Shin Seiki* (Japan 930201)                     91634B-?   CD
 The Punisher* (World 930422)                                 1993  91635B-2   PS63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 The Punisher* (USA 930422)                                         91635B-2   PS63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 The Punisher* (Japan 930422)                                       91634B-2   PS63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
+The Punisher* (Hispanic 930422)                                    9163??-?   PS63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 
 Saturday Night Slam Masters* (World 930713)                  1993  91635B-2   MB63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 Saturday Night Slam Masters* (USA 930713)                          91635B-2   MB63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
@@ -1410,6 +1411,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"punisher",    CPS_B_21_QS3, mapper_PS63B },
 	{"punisheru",   CPS_B_21_QS3, mapper_PS63B },
 	{"punisherj",   CPS_B_21_QS3, mapper_PS63B },
+	{"punisherh",   CPS_B_21_QS3, mapper_PS63B },
 	{"punipic",     CPS_B_21_QS3, mapper_PS63B },
 	{"punipic2",    CPS_B_21_QS3, mapper_PS63B },
 	{"punipic3",    CPS_B_21_QS3, mapper_PS63B },
