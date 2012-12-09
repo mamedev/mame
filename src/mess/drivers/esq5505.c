@@ -100,9 +100,6 @@
 #include "machine/wd_fdc.h"
 #include "machine/hd63450.h"    // compatible with MC68450, which is what these really have
 #include "formats/esq16_dsk.h"
-#include "formats/mfi_dsk.h"
-#include "formats/dfi_dsk.h"
-#include "formats/ipf_dsk.h"
 
 #include "machine/esqvfd.h"
 

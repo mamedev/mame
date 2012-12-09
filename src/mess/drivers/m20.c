@@ -43,7 +43,6 @@ EI1     Vectored interrupt error
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
-#include "imagedev/flopdrv.h"
 #include "formats/m20_dsk.h"
 
 #include "machine/keyboard.h"
@@ -448,19 +447,6 @@ static const i8251_interface tty_i8251_intf =
 	DEVCB_NULL          // syndet
 };
 
-static const floppy_interface m20_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(m20),
-	NULL,
-	NULL
-};
-
 static unsigned char kbxlat[] =
 {
 	0x00, '\\', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
@@ -565,7 +551,6 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_I8251_ADD("i8251_2", tty_i8251_intf)
 	MCFG_PIT8253_ADD("pit8253", pit8253_intf)
 	MCFG_PIC8259_ADD("i8259", pic_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(m20_floppy_interface)
 
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END

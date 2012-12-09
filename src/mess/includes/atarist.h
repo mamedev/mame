@@ -8,7 +8,6 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6800/m6800.h"
 #include "imagedev/cartslot.h"
-#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/6850acia.h"
 #include "machine/8530scc.h"

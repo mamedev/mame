@@ -43,9 +43,7 @@
 /* devices */
 #include "imagedev/cassette.h"
 #include "formats/tzx_cas.h"
-#include "imagedev/flopdrv.h"
 #include "formats/coupedsk.h"
-#include "formats/mfi_dsk.h"
 #include "machine/ram.h"
 
 /***************************************************************************

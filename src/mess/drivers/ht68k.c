@@ -26,9 +26,6 @@ X (. to escape)
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/68681.h"
-#include "formats/hxcmfm_dsk.h"
-#include "formats/mfi_dsk.h"
-#include "imagedev/flopdrv.h"
 #include "machine/wd_fdc.h"
 #include "machine/terminal.h"
 

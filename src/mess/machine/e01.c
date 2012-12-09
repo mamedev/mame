@@ -216,29 +216,11 @@ static const via6522_interface via_intf =
 
 
 //-------------------------------------------------
-//  floppy_interface e01_floppy_interface
-//-------------------------------------------------
-
-static const floppy_interface e01_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_3_5_DSDD, // NEC FD1036 A
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
-	NULL
-};
-
-
-//-------------------------------------------------
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( e01_floppies )
-	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
+	SLOT_INTERFACE( "35dd", FLOPPY_35_DD ) // NEC FD1036 A
 SLOT_INTERFACE_END
 
 void e01_device::fdc_irq_w(bool state)

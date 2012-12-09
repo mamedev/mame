@@ -47,9 +47,6 @@
 #include "machine/6522via.h"
 #include "machine/wd_fdc.h"
 #include "formats/esq8_dsk.h"
-#include "formats/mfi_dsk.h"
-#include "formats/dfi_dsk.h"
-#include "formats/ipf_dsk.h"
 #include "sound/es5503.h"
 
 #include "mirage.lh"

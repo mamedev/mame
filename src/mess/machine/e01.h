@@ -14,7 +14,6 @@
 
 #include "emu.h"
 #include "cpu/m6502/m65c02.h"
-#include "imagedev/flopdrv.h"
 #include "machine/6522via.h"
 #include "machine/ctronics.h"
 #include "machine/econet.h"
