@@ -715,6 +715,7 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_VIDEO)/nubus_radiustpd.o \
     $(MESS_VIDEO)/nubus_m2video.o \
 	$(MESS_MACHINE)/nubus_asntmc3b.o \
+	$(MESS_MACHINE)/nubus_image.o \
 	$(MESS_VIDEO)/nubus_wsportrait.o \
     $(MESS_VIDEO)/pds30_cb264.o \
     $(MESS_VIDEO)/pds30_procolor816.o \

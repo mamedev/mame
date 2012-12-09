@@ -68,6 +68,7 @@
 #include "video/nubus_radiustpd.h"
 #include "video/nubus_wsportrait.h"
 #include "machine/nubus_asntmc3b.h"
+#include "machine/nubus_image.h"
 #include "video/nubus_m2video.h"
 #include "video/pds30_cb264.h"
 #include "video/pds30_procolor816.h"
@@ -853,6 +854,7 @@ static SLOT_INTERFACE_START(mac_nubus_cards)
 	SLOT_INTERFACE("824gc", NUBUS_824GC)	/* Apple 8*24 Graphics Card */
 	SLOT_INTERFACE("cb264", NUBUS_CB264)	/* RasterOps ColorBoard 264 */
 	SLOT_INTERFACE("vikbw", NUBUS_VIKBW)	/* Moniterm Viking board */
+	SLOT_INTERFACE("image", NUBUS_IMAGE)	/* Disk Image Pseudo-Card */
 	SLOT_INTERFACE("specpdq", NUBUS_SPECPDQ)	/* SuperMac Spectrum PDQ */
 	SLOT_INTERFACE("m2hires", NUBUS_M2HIRES)	/* Apple Macintosh II Hi-Resolution Card */
 	SLOT_INTERFACE("spec8s3", NUBUS_SPEC8S3)	/* SuperMac Spectrum/8 Series III */
@@ -869,6 +871,9 @@ static SLOT_INTERFACE_START(mac_pds030_cards)
     SLOT_INTERFACE("lview", PDS030_LVIEW)       // Sigma Designs L-View
     SLOT_INTERFACE("30hr",  PDS030_XCEED30HR)   // Micron/XCEED Technology Color 30HR
     SLOT_INTERFACE("mc30",  PDS030_XCEEDMC30)   // Micron/XCEED Technology MacroColor 30
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START(mac_lcpds_cards)
 SLOT_INTERFACE_END
 
 /***************************************************************************
@@ -1148,6 +1153,9 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MCFG_NUBUS_SLOT_REMOVE("nbd")
 	MCFG_NUBUS_SLOT_REMOVE("nbe")
 	MCFG_NUBUS_BUS_REMOVE("nubus")
+
+	MCFG_NUBUS_BUS_ADD("pds", "maincpu", nubus_intf)
+	MCFG_NUBUS_SLOT_ADD("pds","lcpds", mac_lcpds_cards, NULL, NULL)
 
 	MCFG_ASC_REPLACE("asc", C15M, ASC_TYPE_V8, mac_asc_irq)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
