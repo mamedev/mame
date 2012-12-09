@@ -142,7 +142,7 @@ MACHINE_CONFIG_END
 
 ROM_START( image )
 	ROM_REGION(0x2000, IMAGE_ROM_REGION, 0)
-	ROM_LOAD( "nb_fake.bin",   0x000000, 0x002000, CRC(b6c46215) SHA1(5dc805658c1731d189e2cb289c611539680b87f4) )
+	ROM_LOAD( "nb_fake.bin",  0x000000, 0x002000, CRC(4d77159e) SHA1(45339a63a79ae9b809e559427d12707795961eae) )
 ROM_END
 
 //**************************************************************************
