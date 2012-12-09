@@ -414,9 +414,15 @@ void sega_315_5195_mapper_device::map_as_rom(UINT32 offset, UINT32 length, offs_
 		m_banks[m_curregion].set(bank, info.start, romend, rgnoffset, memptr);
 	}
 
-	// install a write handler if provided
+	// either install a write handler if provided or unmap the region
+	//
+	// shdancer relies on this behaviour to prevent a write to ROM from
+	// falling through to the memory-mapping registers and crashing the
+	// game during stage 2-4 (see PC:$18a98). Protection maybe?
 	if (!whandler.isnull())
 		m_space->install_write_handler(info.start, info.end, 0, info.mirror, whandler);
+	else
+		m_space->unmap_write(info.start, info.end, 0, info.mirror);
 }
 
 
