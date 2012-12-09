@@ -13,6 +13,7 @@
 
 	- IEC
 	- VIA
+	- DP8473/PC8477A command extensions to upd765
 	- D1M/D2M/D4M image format (http://ist.uwaterloo.ca/~schepers/formats/D2M-DNP.TXT)
 
 */
@@ -92,27 +93,121 @@ const rom_entry *fd2000_device::device_rom_region() const
 static ADDRESS_MAP_START( fd2000_mem, AS_PROGRAM, 8, fd2000_device )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0xbf0) AM_DEVREADWRITE(M6522_TAG, via6522_device, read, write)
-	AM_RANGE(0x4e00, 0x4e07) AM_MIRROR(0x1f8) AM_DEVICE(DP8473_TAG, upd765a_device, map)
+	AM_RANGE(0x4e00, 0x4e07) AM_MIRROR(0x1f8) AM_DEVICE(DP8473_TAG, dp8473_device, map)
 	AM_RANGE(0x5000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
 ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  via6522_interface via1_intf
+//  ADDRESS_MAP( fd4000_mem )
 //-------------------------------------------------
+
+static ADDRESS_MAP_START( fd4000_mem, AS_PROGRAM, 8, fd4000_device )
+	AM_RANGE(0x0000, 0x3fff) AM_RAM
+	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0xbf0) AM_DEVREADWRITE(M6522_TAG, via6522_device, read, write)
+	AM_RANGE(0x4e00, 0x4e07) AM_MIRROR(0x1f8) AM_DEVICE(PC8477AV1_TAG, pc8477a_device, map)
+	AM_RANGE(0x5000, 0x7fff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  via6522_interface via_intf
+//-------------------------------------------------
+
+READ8_MEMBER( fd2000_device::via_pa_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       
+	    1       
+	    2       
+	    3       
+	    4       
+	    5       
+	    6       
+	    7       
+	
+	*/
+
+	return 0;
+}
+
+WRITE8_MEMBER( fd2000_device::via_pa_w )
+{
+	/*
+	
+	    bit     description
+	
+	    0       
+	    1       
+	    2       
+	    3       
+	    4       
+	    5       FAST DIR
+	    6       
+	    7       
+	
+	*/
+}
+
+READ8_MEMBER( fd2000_device::via_pb_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       
+	    1       
+	    2       
+	    3       
+	    4       
+	    5       
+	    6       
+	    7       FDC INTRQ
+	
+	*/
+
+	UINT8 data = 0;
+
+	// FDC interrupt
+	data |= m_fdc->get_irq() << 7;
+
+	return data;
+}
+
+WRITE8_MEMBER( fd2000_device::via_pb_w )
+{
+	/*
+	
+	    bit     description
+	
+	    0       
+	    1       
+	    2       
+	    3       
+	    4       
+	    5       LED
+	    6       LED
+	    7       
+	
+	*/
+}
 
 static const via6522_interface via_intf =
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, fd2000_device, via_pa_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, fd2000_device, via_pb_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, fd2000_device, via_pa_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, fd2000_device, via_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -144,7 +239,7 @@ static MACHINE_CONFIG_FRAGMENT( fd2000 )
 	MCFG_CPU_PROGRAM_MAP(fd2000_mem)
 
 	MCFG_VIA6522_ADD(M6522_TAG, 2000000, via_intf)
-	MCFG_UPD765A_ADD(DP8473_TAG, true, true)
+	MCFG_DP8473_ADD(DP8473_TAG)
 
 	MCFG_FLOPPY_DRIVE_ADD(DP8473_TAG":0", fd2000_floppies, "35hd", 0, floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
 MACHINE_CONFIG_END
@@ -156,12 +251,12 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( fd4000 )
 	MCFG_CPU_ADD(M6502_TAG, M65C02, 2000000)
-	MCFG_CPU_PROGRAM_MAP(fd2000_mem)
+	MCFG_CPU_PROGRAM_MAP(fd4000_mem)
 
 	MCFG_VIA6522_ADD(M6522_TAG, 2000000, via_intf)
-	MCFG_UPD765A_ADD(DP8473_TAG, true, true)
+	MCFG_PC8477A_ADD(PC8477AV1_TAG)
 
-	MCFG_FLOPPY_DRIVE_ADD(DP8473_TAG":0", fd4000_floppies, "35ed", 0, floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(PC8477AV1_TAG":0", fd4000_floppies, "35ed", 0, floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -217,6 +312,7 @@ fd2000_device::fd2000_device(const machine_config &mconfig, const char *tag, dev
     : device_t(mconfig, FD2000, "FD-2000", tag, owner, clock),
 	  device_cbm_iec_interface(mconfig, *this),
 	  m_maincpu(*this, M6502_TAG),
+	  m_fdc(*this, DP8473_TAG),
 	  m_floppy0(*this, DP8473_TAG":0"),
 	  m_variant(TYPE_FD2000)
 {
@@ -226,7 +322,8 @@ fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, co
     : device_t(mconfig, type, name, tag, owner, clock),
 	  device_cbm_iec_interface(mconfig, *this),
 	  m_maincpu(*this, M6502_TAG),
-	  m_floppy0(*this, DP8473_TAG":0"),
+	  m_fdc(*this, PC8477AV1_TAG),
+	  m_floppy0(*this, PC8477AV1_TAG":0"),
 	  m_variant(variant)
 {
 }

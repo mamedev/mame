@@ -53,6 +53,11 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
+	DECLARE_READ8_MEMBER( via_pa_r );
+	DECLARE_WRITE8_MEMBER( via_pa_w );
+	DECLARE_READ8_MEMBER( via_pb_r );
+	DECLARE_WRITE8_MEMBER( via_pb_w );
+
 	//DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
@@ -68,6 +73,7 @@ protected:
 	void cbm_iec_reset(int state);
 
 	required_device<m65c02_device> m_maincpu;
+	required_device<upd765_family_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 
 	int m_variant;
