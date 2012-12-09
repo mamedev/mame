@@ -64,6 +64,7 @@ WRITE16_MEMBER(cps_state::cawingbl_soundlatch_w)
 	{
 		state->soundlatch_byte_w(space, 0, data  >> 8);
 		state->m_audiocpu->set_input_line(0, HOLD_LINE);
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); /* boost the interleave or some voices get dropped */
 	}
 }
 
@@ -120,6 +121,8 @@ static WRITE8_HANDLER( fcrash_msm5205_1_data_w )
 	state->m_sample_buffer2 = data;
 }
 
+/* not verified */
+#define CPS1_ROWSCROLL_OFFS     (0x20/2)    /* base of row scroll offsets in other RAM */
 
 WRITE16_MEMBER(cps_state::kodb_layer_w)
 {
@@ -140,7 +143,10 @@ WRITE16_MEMBER(cps_state::sf2mdt_layer_w)
 {
 	cps_state *state = space.machine().driver_data<cps_state>();
 	
-	/* layer enable and scroll registers are written here - passing them to m_cps_b_regs and m_cps_a_regs for now for drawing routines */
+	/* layer enable and scroll registers are written here - passing them to m_cps_b_regs and m_cps_a_regs for now for drawing routines
+	the scroll layers aren't buttery smooth, due to the lack of using the row scroll address tables in the rendering code, this is also
+	supported by the fact that the game doesn't write the table address anywhere */
+	
 	if (offset == 0x0086)
 		state->m_cps_a_regs[0x14 / 2] = data + 0xffce; /* scroll 3x */
 	else
@@ -148,15 +154,14 @@ WRITE16_MEMBER(cps_state::sf2mdt_layer_w)
 		state->m_cps_a_regs[0x16 / 2] = data; /* scroll 3y */
 	else
 	if (offset == 0x0088)
-		state->m_cps_a_regs[0x10 / 2] = data + 0xffcd; /* scroll 2x */
+		state->m_cps_a_regs[0x10 / 2] = data + 0xffce; /* scroll 2x */
 	else
 	if (offset == 0x0089)
 		state->m_cps_a_regs[0x0c / 2] = data + 0xffca; /* scroll 1x */
 	else
 	if (offset == 0x008a) { 
 		state->m_cps_a_regs[0x12 / 2] = data; /* scroll 2y */
-		state->m_cps_a_regs[0x20 / 2] = data; /* row scroll start */
-		state->m_cps_a_regs[0x08 / 2] = m_bootleg_work_ram[0x802e / 2]; /* pretty gross hack?, but the row scroll table address isn't written anywhere else */
+		state->m_cps_a_regs[CPS1_ROWSCROLL_OFFS] = data; /* row scroll start */
 	} else	
 	if (offset == 0x008b)
 		state->m_cps_a_regs[0x0e / 2] = data; /* scroll 1y */
@@ -165,9 +170,37 @@ WRITE16_MEMBER(cps_state::sf2mdt_layer_w)
 		state->m_cps_b_regs[m_layer_enable_reg / 2] = data;
 }
 
+WRITE16_MEMBER(cps_state::sf2mdta_layer_w)
+{
+	cps_state *state = space.machine().driver_data<cps_state>();
+	
+	/* layer enable and scroll registers are written here - passing them to m_cps_b_regs and m_cps_a_regs for now for drawing routines
+	the scroll layers aren't buttery smooth, due to the lack of using the row scroll address tables in the rendering code, this is also
+	supported by the fact that the game doesn't write the table address anywhere */
+	
+	if (offset == 0x0086)
+		state->m_cps_a_regs[0x0c / 2] = data + 0xffbe; /* scroll 1x */
+	else
+	if (offset == 0x0087)
+		state->m_cps_a_regs[0x0e / 2] = data; /* scroll 1y */
+	else
+	if (offset == 0x0088)
+		state->m_cps_a_regs[0x14 / 2] = data + 0xffce; /* scroll 3x */
+	else
+	if (offset == 0x0089) {
+		state->m_cps_a_regs[0x12 / 2] = data; /* scroll 2y */
+		state->m_cps_a_regs[CPS1_ROWSCROLL_OFFS] = data; /* row scroll start */
+	} else
+	if (offset == 0x008a)
+		state->m_cps_a_regs[0x10 / 2] = data + 0xffce; /* scroll 2x */
+	else
+	if (offset == 0x008b)
+		state->m_cps_a_regs[0x16 / 2] = data; /* scroll 3y */
+	else
+	if (offset == 0x00a6)
+		state->m_cps_b_regs[m_layer_enable_reg / 2] = data;
+}
 
-/* not verified */
-#define CPS1_ROWSCROLL_OFFS     (0x20/2)    /* base of row scroll offsets in other RAM */
 
 static void fcrash_update_transmasks( running_machine &machine )
 {
@@ -928,7 +961,7 @@ MACHINE_START_MEMBER(cps_state, sf2mdt)
 	m_layer_scroll3x_offset = 0;
 	m_sprite_base = 0x1000;
 	m_sprite_list_end_marker = 0x8000;
-	m_sprite_x_offset = 3;
+	m_sprite_x_offset = 2;
 
 	save_item(NAME(m_sample_buffer1));
 	save_item(NAME(m_sample_buffer2));
@@ -1296,18 +1329,12 @@ ROM_START( sf2mdta )
 	ROM_LOAD16_BYTE( "4.mdta", 0x100001, 0x20000, CRC(bd98ff15) SHA1(ed902d949b0b5c5beaaea78a4b418ffa6db9e1df) )
 
 	ROM_REGION( 0x600000, "gfx", 0 )
-	ROMX_LOAD( "pf4 sh058.ic89", 0x000000, 0x80000, BAD_DUMP CRC(40fdf624) SHA1(cb928602744bf36e6851527f00d90da29de751e6), ROM_GROUPWORD | ROM_SKIP(6) )
-	ROM_CONTINUE(                0x000002, 0x80000)
-	ROMX_LOAD( "pf7 sh072.ic92", 0x000004, 0x80000, CRC(fb78022e) SHA1(b8974387056dd52db96b01cc4648edc814398c7e), ROM_GROUPWORD | ROM_SKIP(6) )
-	ROM_CONTINUE(                0x000006, 0x80000)
-	ROMX_LOAD( "pf5 sh036.ic90", 0x200000, 0x80000, CRC(0a6be48b) SHA1(b7e72c94d4e3eb4a6bba6608d9b9a093c8901ad9), ROM_GROUPWORD | ROM_SKIP(6) )
-	ROM_CONTINUE(                0x200002, 0x80000)
-	ROMX_LOAD( "pf8 sh074.ic93", 0x200004, 0x80000, CRC(6258c7cf) SHA1(4cd7519245c0aa816934a43e6743160f715d7dc2), ROM_GROUPWORD | ROM_SKIP(6) )
-	ROM_CONTINUE(                0x200006, 0x80000)
-	ROMX_LOAD( "pf6 sh070.ic88", 0x400000, 0x80000, CRC(9b5b09d7) SHA1(698a6aab41e495bd0c37a19aee16a84f04d15797), ROM_GROUPWORD | ROM_SKIP(6) )
-	ROM_CONTINUE(                0x400002, 0x80000)
-	ROMX_LOAD( "pf9 sh001.ic91", 0x400004, 0x80000, CRC(9f25090e) SHA1(12ff0431ef6550db446985c8914ac7d78eec6b6d), ROM_GROUPWORD | ROM_SKIP(6) )
-	ROM_CONTINUE(                0x400006, 0x80000)
+	ROMX_LOAD( "pf4 sh058.ic89", 0x000000, 0x100000, BAD_DUMP CRC(40fdf624) SHA1(cb928602744bf36e6851527f00d90da29de751e6), ROM_GROUPWORD | ROM_SKIP(2) )
+	ROMX_LOAD( "pf7 sh072.ic92", 0x000002, 0x100000, CRC(fb78022e) SHA1(b8974387056dd52db96b01cc4648edc814398c7e), ROM_GROUPWORD | ROM_SKIP(2) )
+	ROMX_LOAD( "pf5 sh036.ic90", 0x200000, 0x100000, CRC(0a6be48b) SHA1(b7e72c94d4e3eb4a6bba6608d9b9a093c8901ad9), ROM_GROUPWORD | ROM_SKIP(2) )
+	ROMX_LOAD( "pf8 sh074.ic93", 0x200002, 0x100000, CRC(6258c7cf) SHA1(4cd7519245c0aa816934a43e6743160f715d7dc2), ROM_GROUPWORD | ROM_SKIP(2) )
+	ROMX_LOAD( "pf6 sh070.ic88", 0x400000, 0x100000, CRC(9b5b09d7) SHA1(698a6aab41e495bd0c37a19aee16a84f04d15797), ROM_GROUPWORD | ROM_SKIP(2) )
+	ROMX_LOAD( "pf9 sh001.ic91", 0x400002, 0x100000, CRC(9f25090e) SHA1(12ff0431ef6550db446985c8914ac7d78eec6b6d), ROM_GROUPWORD | ROM_SKIP(2) )
 
 	ROM_REGION( 0x30000, "soundcpu", 0 ) /* Sound program + samples  */
 	ROM_LOAD( "1.ic28",    0x00000, 0x20000, CRC(d5bee9cc) SHA1(e638cb5ce7a22c18b60296a7defe8b03418da56c) )
@@ -1406,10 +1433,27 @@ DRIVER_INIT_MEMBER(cps_state, sf2mdt)
 	
 	/* bootleg sprite ram */
 	m_bootleg_sprite_ram = (UINT16*)machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x700000, 0x703fff);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram); /* both of these need to be mapped */
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram); /* both of these need to be mapped - see the "Magic Delta Turbo" text on the title screen  */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x70c106, 0x70c107, write16_delegate(FUNC(cps_state::cawingbl_soundlatch_w),this));
 	
-	m_bootleg_work_ram = (UINT16*)machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0xff0000, 0xffffff);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x800030, 0x800031); /* coin lockout doesn't work (unmap it) */
+
+	DRIVER_INIT_CALL(cps1);
+}
+
+DRIVER_INIT_MEMBER(cps_state, sf2mdta)
+{
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x70c018, 0x70c01f, read16_delegate(FUNC(cps_state::cps1_dsw_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x708000, 0x708fff, write16_delegate(FUNC(cps_state::sf2mdta_layer_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x70c000, 0x70c001, "IN1");
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x70c008, 0x70c009, "IN2");
+	
+	/* bootleg sprite ram */
+	m_bootleg_sprite_ram = (UINT16*)machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x700000, 0x703fff);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram); /* both of these need to be mapped - see the "Magic Delta Turbo" text on the title screen */
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x70c106, 0x70c107, write16_delegate(FUNC(cps_state::cawingbl_soundlatch_w),this));
+	
+	m_bootleg_work_ram = (UINT16*)machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0xfc0000, 0xfcffff); /* this has moved */
 	
 	machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x800030, 0x800031); /* coin lockout doesn't work (unmap it) */
 
@@ -1421,6 +1465,6 @@ GAME( 1990, fcrash,    ffight,  fcrash,    fcrash,   cps_state, cps1,     ROT0, 
 GAME( 1991, kodb,      kod,     kodb,      kodb,     cps_state, kodb,     ROT0,   "bootleg (Playmark)", "The King of Dragons (bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )	// 910731  "ETC"
 GAME( 1990, cawingbl,  cawing,  cawingbl,  cawingbl, cps_state, cawingbl, ROT0,   "bootleg", "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM205 set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1990, cawingb2,  cawing,  cawingbl,  cawingbl, cps_state, cawingbl, ROT0,   "bootleg", "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM205 set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1992, sf2mdt,    sf2ce,   sf2mdt,    sf2mdt,   cps_state, sf2mdt,   ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 1)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )	// 920313 - based on (heavily modified) World version
-GAME( 1992, sf2mdta,   sf2ce,   sf2mdt,    sf2mdt,   cps_state, sf2mdt,   ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 2)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )	// 920313 - based on World version
+GAME( 1992, sf2mdt,    sf2ce,   sf2mdt,    sf2mdt,   cps_state, sf2mdt,   ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )	// 920313 - based on (heavily modified) World version
+GAME( 1992, sf2mdta,   sf2ce,   sf2mdt,    sf2mdt,   cps_state, sf2mdta,  ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 2)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )	// 920313 - based on World version
 GAME( 199?, sgyxz,     wof,     sgyxz,     fcrash,   cps_state, cps1,     ROT0,   "bootleg (All-In Electronic)", "Warriors of Fate ('sgyxz' bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND )

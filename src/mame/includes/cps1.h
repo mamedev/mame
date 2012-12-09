@@ -170,7 +170,6 @@ public:
 	DECLARE_READ16_MEMBER(qsound_sharedram2_r);
 	DECLARE_WRITE16_MEMBER(qsound_sharedram2_w);
 	DECLARE_WRITE8_MEMBER(qsound_banksw_w);
-	DECLARE_READ16_MEMBER(sf2mdt_r);
 	DECLARE_READ16_MEMBER(sf2rb_prot_r);
 	DECLARE_READ16_MEMBER(sf2rb2_prot_r);
 	DECLARE_READ16_MEMBER(cps1_dsw_r);
@@ -198,7 +197,6 @@ public:
 	DECLARE_DRIVER_INIT(pang3);
 	DECLARE_DRIVER_INIT(sf2ee);
 	DECLARE_DRIVER_INIT(cps1);
-	DECLARE_DRIVER_INIT(sf2mdt);
 	DECLARE_DRIVER_INIT(dino);
 	DECLARE_DRIVER_INIT(punisher);
 	DECLARE_DRIVER_INIT(wof);
@@ -231,6 +229,8 @@ public:
 	/* fcrash handlers */
 	DECLARE_DRIVER_INIT(kodb);
 	DECLARE_DRIVER_INIT(cawingbl);
+	DECLARE_DRIVER_INIT(sf2mdt);
+	DECLARE_DRIVER_INIT(sf2mdta);
 	DECLARE_MACHINE_START(fcrash);
 	DECLARE_MACHINE_RESET(fcrash);
 	DECLARE_MACHINE_START(kodb);
@@ -239,6 +239,7 @@ public:
 	DECLARE_WRITE16_MEMBER(kodb_layer_w);
 	DECLARE_WRITE16_MEMBER(cawingbl_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(sf2mdt_layer_w);
+	DECLARE_WRITE16_MEMBER(sf2mdta_layer_w);
 	UINT32 screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
