@@ -81,6 +81,7 @@ public:
 	UINT32 m_vram_ymask;
 	DECLARE_WRITE16_MEMBER(int1_ack_w);
 	DECLARE_READ16_MEMBER(trackball_r);
+	DECLARE_READ16_MEMBER(trackball_p2_r);
 	DECLARE_READ32_MEMBER(trackball32_8bit_r);
 	DECLARE_READ32_MEMBER(trackball32_4bit_p1_r);
 	DECLARE_READ32_MEMBER(trackball32_4bit_p2_r);
@@ -148,6 +149,7 @@ public:
 	DECLARE_DRIVER_INIT(sftm);
 	DECLARE_DRIVER_INIT(drivedge);
 	DECLARE_DRIVER_INIT(wcbowl);
+	DECLARE_DRIVER_INIT(wcbowlj);
 	DECLARE_DRIVER_INIT(aamat);
 	DECLARE_DRIVER_INIT(bloodstm);
 	DECLARE_DRIVER_INIT(aama);
