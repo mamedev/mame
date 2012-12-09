@@ -136,7 +136,7 @@ READ8_MEMBER(tvc_hbf_device::io_read)
 		case 0x00:
 			return m_fdc->read(space, offset & 3);
 		case 0x01:
-			return (m_fdc->drq_r()<<7) | m_fdc->intrq_r();
+			return (m_fdc->drq_r()<<7) | (m_fdc->intrq_r() ? 0x01 : 0x00);
 		default:
 			return 0x00;
 	}

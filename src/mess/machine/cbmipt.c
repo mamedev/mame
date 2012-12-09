@@ -18,6 +18,7 @@
 
 #include "emu.h"
 #include "machine/cbmipt.h"
+#include "machine/c64_neoram.h"
 
 
 /***************************** Commodore 64 ****************************************

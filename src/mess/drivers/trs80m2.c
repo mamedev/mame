@@ -734,7 +734,7 @@ READ8_MEMBER( trs80m2_state::pio_pa_r )
 	UINT8 data = 0;
 
 	// floppy interrupt
-	data |= m_fdc->intrq_r();
+	data |= (m_fdc->intrq_r() ? 0x01 : 0x00);
 
 	// 2-sided diskette
 	data |= (m_floppy ? m_floppy->twosid_r() : 1) << 1;

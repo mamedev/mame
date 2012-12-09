@@ -216,7 +216,7 @@ WRITE_LINE_MEMBER( luxor_55_21046_device::dma_int_w )
 	m_dma_irq = state;
 
 	// FDC and DMA interrupts are wire-ORed to the Z80
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_fdc_irq | m_dma_irq);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_fdc_irq || m_dma_irq);
 }
 
 static UINT8 memory_read_byte(address_space &space, offs_t address, UINT8 mem_mask) { return space.read_byte(address); }
