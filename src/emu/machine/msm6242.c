@@ -3,6 +3,7 @@
     MSM6242 / Epson RTC 62421 / 62423 Real Time Clock
 
     TODO:
+    - Stop timer callbacks on every single tick
     - HOLD mechanism
     - IRQs are grossly mapped
     - STOP / RESET mechanism
@@ -13,6 +14,10 @@
 #include "emu.h"
 #include "machine/msm6242.h"
 
+
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
 
 enum
 {
@@ -34,6 +39,10 @@ enum
 	MSM6242_REG_CF
 };
 
+#define TIMER_RTC_CALLBACK		1
+
+
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -47,7 +56,7 @@ const device_type msm6242 = &device_creator<msm6242_device>;
 //**************************************************************************
 
 //-------------------------------------------------
-//  xxx_device - constructor
+//  msm6242_device - constructor
 //-------------------------------------------------
 
 msm6242_device::msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -55,6 +64,12 @@ msm6242_device::msm6242_device(const machine_config &mconfig, const char *tag, d
 {
 
 }
+
+
+
+//-------------------------------------------------
+//  rtc_timer_callback
+//-------------------------------------------------
 
 void msm6242_device::rtc_timer_callback()
 {
@@ -109,10 +124,23 @@ void msm6242_device::rtc_timer_callback()
 	}
 }
 
-TIMER_CALLBACK( msm6242_device::rtc_inc_callback )
+
+
+//-------------------------------------------------
+//  device_timer - handle timer callbacks
+//-------------------------------------------------
+
+void msm6242_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	reinterpret_cast<msm6242_device *>(ptr)->rtc_timer_callback();
+	switch(id)
+	{
+		case TIMER_RTC_CALLBACK:
+			rtc_timer_callback();
+			break;
+	}
 }
+
+
 
 //-------------------------------------------------
 //  device_validity_check - perform validity checks
@@ -123,6 +151,8 @@ void msm6242_device::device_validity_check(validity_checker &valid) const
 {
 }
 
+
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -131,12 +161,15 @@ void msm6242_device::device_start()
 {
 	m_out_int_func.resolve( m_out_int_cb, *this );
 
-	/* let's call the timer callback every second */
-	machine().scheduler().timer_pulse(attotime::from_hz(clock()), FUNC(rtc_inc_callback), 0, (void *)this);
+	// let's call the timer callback every tick
+	m_timer = timer_alloc(TIMER_RTC_CALLBACK);
+	m_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 
+	// get real time from system
 	system_time systime;
 	machine().base_datetime(systime);
 
+	// ...and set the RTC time
 	m_rtc.day = (systime.local_time.mday);
 	m_rtc.month = (systime.local_time.month+1);
 	m_rtc.wday = (systime.local_time.weekday);
@@ -148,11 +181,12 @@ void msm6242_device::device_start()
 	m_irq_flag = 0;
 	m_irq_type = 0;
 
-	/* TODO: skns writes 0x4 to D then expects E == 6 and F == 4, perhaps those are actually saved in the RTC CMOS? */
+	// TODO: skns writes 0x4 to D then expects E == 6 and F == 4, perhaps those are actually saved in the RTC CMOS?
 	m_reg[0] = 0;
 	m_reg[1] = 0x6;
 	m_reg[2] = 0x4;
 }
+
 
 
 //-------------------------------------------------
@@ -164,6 +198,7 @@ void msm6242_device::device_reset()
 	if ( !m_out_int_func.isnull() )
 		m_out_int_func( CLEAR_LINE );
 }
+
 
 
 //-------------------------------------------------
@@ -178,7 +213,7 @@ void msm6242_device::device_config_complete()
 
 	if ( intf != NULL )
 	{
-		*static_cast<msm6242_interface *>(this) = *intf;
+		m_out_int_cb = intf->m_out_int_cb;
 	}
 	else
 	{
@@ -186,15 +221,19 @@ void msm6242_device::device_config_complete()
 	}
 }
 
+
+
 //**************************************************************************
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
+//-------------------------------------------------
+//  read
+//-------------------------------------------------
+
 READ8_MEMBER( msm6242_device::read )
 {
 	rtc_regs_t cur_time;
-
-	//cur_time = (m_reg[0] & 1) ? m_hold : m_rtc;
 
 	cur_time = m_rtc;
 
@@ -244,51 +283,39 @@ READ8_MEMBER( msm6242_device::read )
 	return 0;
 }
 
+
+
+//-------------------------------------------------
+//  write
+//-------------------------------------------------
+
 WRITE8_MEMBER( msm6242_device::write )
 {
 	switch(offset)
 	{
 		case MSM6242_REG_CD:
 		{
-			/*
-            x--- 30s ADJ
-            -x-- IRQ FLAG
-            --x- BUSY
-            ---x HOLD
-            */
+            //	x--- 30s ADJ
+            //	-x-- IRQ FLAG
+            //	--x- BUSY
+            //	---x HOLD
 
 			m_reg[0] = data & 0x0f;
-
-			#if 0
-			if (data & 1)	/* was Hold set? */
-			{
-				m_hold.day = m_rtc.day;
-				m_hold.month = m_rtc.month;
-				m_hold.hour = m_rtc.hour;
-				m_hold.day = m_rtc.day;
-				m_hold.month = m_rtc.month;
-				m_hold.year = m_rtc.year;
-				m_hold.wday = m_rtc.wday;
-			}
-			#endif
 
 			return;
 		}
 
 		case MSM6242_REG_CE:
 		{
-			/*
-            xx-- t0,t1 (timing irq)
-            --x- STD
-            ---x MASK
-            */
+            //	xx-- t0,t1 (timing irq)
+            //	--x- STD
+            //	---x MASK
 
 			m_reg[1] = data & 0x0f;
 			if((data & 3) == 0) // MASK & STD = 0
 			{
 				m_irq_flag = 1;
 				m_irq_type = (data & 0xc) >> 2;
-				//m_std_timer->adjust(attotime::from_msec(timer_param[(data & 0xc) >> 2]), 0, attotime::from_msec(timer_param[(data & 0xc) >> 2]));
 			}
 			else
 			{
@@ -302,14 +329,12 @@ WRITE8_MEMBER( msm6242_device::write )
 
 		case MSM6242_REG_CF:
 		{
-			/*
-            x--- TEST
-            -x-- 24/12
-            --x- STOP
-            ---x RESET
-            */
+            //	x--- TEST
+            //	-x-- 24/12
+            //	--x- STOP
+            //	---x RESET
 
-			/* the 12/24 mode bit can only be changed when RESET does a 1 -> 0 transition */
+			// the 12/24 mode bit can only be changed when RESET does a 1 -> 0 transition
 			if (((data & 0x01) == 0x00) && (m_reg[2] & 0x01))
 				m_reg[2] = (m_reg[2] & ~0x04) | (data & 0x04);
 			else
@@ -321,9 +346,3 @@ WRITE8_MEMBER( msm6242_device::write )
 
 	logerror("%s: MSM6242 unmapped offset %02x written with %02x\n", machine().describe_context(), offset, data);
 }
-
-
-
-
-
-

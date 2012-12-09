@@ -56,18 +56,20 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	static TIMER_CALLBACK( rtc_inc_callback );
 
 private:
-	UINT8 m_reg[3];
-	UINT8 m_irq_flag;
-	UINT8 m_irq_type;
-	UINT16 m_tick;
+	UINT8						m_reg[3];
+	UINT8						m_irq_flag;
+	UINT8						m_irq_type;
+	UINT16						m_tick;
 
-	rtc_regs_t m_rtc;
-	rtc_regs_t m_hold;
+	rtc_regs_t					m_rtc;
+	rtc_regs_t					m_hold;
 	devcb_resolved_write_line	m_out_int_func;
+	emu_timer *					m_timer;
 };
 
 
