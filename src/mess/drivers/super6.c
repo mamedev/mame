@@ -189,6 +189,7 @@ READ8_MEMBER( super6_state::fdc_r )
 
     */
 
+    fatalerror("Z80 WAIT not supported by MAME core\n");
 	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 
 	return !m_fdc->intrq_r() << 7;

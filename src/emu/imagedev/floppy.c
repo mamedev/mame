@@ -826,7 +826,7 @@ void ui_menu_control_floppy_image::handle()
 }
 
 floppy_3_ssdd::floppy_3_ssdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_3_SSDD, "3\" double sided floppy drive", tag, owner, clock)
+	floppy_image_device(mconfig, FLOPPY_3_SSDD, "3\" single sided floppy drive", tag, owner, clock)
 {
 }
 
@@ -838,7 +838,7 @@ void floppy_3_ssdd::setup_characteristics()
 {
 	form_factor = floppy_image::FF_3;
 	tracks = 42;
-	sides = 2;
+	sides = 1;
 	set_rpm(300);
 }
 
@@ -849,7 +849,7 @@ void floppy_3_ssdd::handled_variants(UINT32 *variants, int &var_count) const
 }
 
 floppy_3_dsdd::floppy_3_dsdd(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	floppy_image_device(mconfig, FLOPPY_3_DSDD, "3\" single sided floppy drive", tag, owner, clock)
+	floppy_image_device(mconfig, FLOPPY_3_DSDD, "3\" double sided floppy drive", tag, owner, clock)
 {
 }
 
@@ -861,7 +861,7 @@ void floppy_3_dsdd::setup_characteristics()
 {
 	form_factor = floppy_image::FF_3;
 	tracks = 42;
-	sides = 1;
+	sides = 2;
 	set_rpm(300);
 }
 

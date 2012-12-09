@@ -3,17 +3,18 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "formats/sc3000_bit.h"
+#include "formats/sf7000_dsk.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
-#include "machine/ram.h"
 #include "imagedev/printer.h"
-#include "formats/sc3000_bit.h"
 #include "machine/ctronics.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
+#include "machine/ram.h"
 #include "machine/upd765.h"
-#include "video/tms9928a.h"
 #include "sound/sn76496.h"
+#include "video/tms9928a.h"
 #include "crsshair.h"
 
 #define SCREEN_TAG		"screen"
@@ -100,7 +101,7 @@ public:
 		: sc3000_state(mconfig, type, tag),
 		  m_fdc(*this, UPD765_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
-		  m_floppy0(*this, UPD765_TAG ":0:525hd")
+		  m_floppy0(*this, UPD765_TAG ":0:3ssdd")
 	{ }
 
 	required_device<upd765a_device> m_fdc;
@@ -112,13 +113,8 @@ public:
 
 	DECLARE_READ8_MEMBER( ppi_pa_r );
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
-	DECLARE_WRITE_LINE_MEMBER(sf7000_fdc_index_callback);
 
-	void fdc_intrq_w(bool state);
-
-	/* floppy state */
-	int m_fdc_irq;
-	int m_fdc_index;
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 #endif

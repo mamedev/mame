@@ -65,7 +65,6 @@ Notes:
 
 
 #include "includes/sg1000.h"
-#include "formats/mfi_dsk.h"
 
 
 /***************************************************************************
@@ -896,9 +895,9 @@ READ8_MEMBER( sf7000_state::ppi_pa_r )
 
 	UINT8 data = 0;
 
-	data |= m_fdc_irq;
+	data |= m_fdc->get_irq();
 	data |= m_centronics->busy_r() << 1;
-	data |= m_fdc_index << 2;
+	data |= m_floppy0->idx_r() << 2;
 
 	return data;
 }
@@ -917,6 +916,11 @@ WRITE8_MEMBER( sf7000_state::ppi_pc_w )
         PC6     /ROM SEL (switch between IPL ROM and RAM)
         PC7     /STROBE to Centronics printer
     */
+
+    if (!BIT(data, 0)) 
+    	m_fdc->set_floppy(m_floppy0);
+    else 
+    	m_fdc->set_floppy(NULL);
 
 	/* floppy motor */
 	m_floppy0->mon_w(BIT(data, 1));
@@ -951,26 +955,16 @@ static I8255_INTERFACE( sf7000_ppi_intf )
     upd765_interface sf7000_upd765_interface
 -------------------------------------------------*/
 
-void sf7000_state::fdc_intrq_w(bool state)
-{
-	m_fdc_irq = state;
-}
-
-/*-------------------------------------------------
-    sf7000_fdc_index_callback -
--------------------------------------------------*/
-
-WRITE_LINE_MEMBER(sf7000_state::sf7000_fdc_index_callback)
-{
-	m_fdc_index = state;
-}
+FLOPPY_FORMATS_MEMBER( sf7000_state::floppy_formats )
+	FLOPPY_SF7000_FORMAT
+FLOPPY_FORMATS_END
 
 /*-------------------------------------------------
     floppy_interface sf7000_floppy_interface
 -------------------------------------------------*/
 
 static SLOT_INTERFACE_START( sf7000_floppies )
-	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
+	SLOT_INTERFACE( "3ssdd", FLOPPY_3_SSDD )
 SLOT_INTERFACE_END
 
 /*-------------------------------------------------
@@ -1045,12 +1039,8 @@ void sf7000_state::machine_start()
 	membank("bank1")->configure_entry(1, m_ram->pointer());
 	membank("bank2")->configure_entry(0, m_ram->pointer());
 
-	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(sf7000_state::fdc_intrq_w), this));
-
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
-	save_item(NAME(m_fdc_irq));
-	save_item(NAME(m_fdc_index));
 }
 
 /*-------------------------------------------------
@@ -1187,8 +1177,8 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 	MCFG_I8255_ADD(UPD9255_0_TAG, sc3000_ppi_intf)
 	MCFG_I8255_ADD(UPD9255_1_TAG, sf7000_ppi_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, default_i8251_interface)
-	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sf7000_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sf7000_floppies, "3ssdd", 0, sf7000_state::floppy_formats)
 //  MCFG_PRINTER_ADD("sp400") /* serial printer */
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, sc3000_cassette_interface)
