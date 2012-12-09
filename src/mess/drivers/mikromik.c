@@ -714,6 +714,10 @@ void mm1_state::fdc_drq(bool state)
 
 void mm1_state::machine_start()
 {
+	// floppy callbacks
+	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(mm1_state::fdc_irq), this));
+	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(mm1_state::fdc_drq), this));
+
 	// find memory regions
 	m_mmu_rom = memregion("address")->base();
 	m_key_rom = memregion("keyboard")->base();
