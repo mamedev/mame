@@ -643,30 +643,32 @@ INPUT_PORTS_END
 /*  Preliminary emulation. PCB was working fine, but   */
 /*  it's not certain that this is a good dump          */
 /*                                                     */
-/*  Ports 41 and 48 output 0 at start, not used again  */
-/*  Sounds could be memory-mapped?                     */
-/*  Seems to be no watchdog reset line                 */
-/*  Diplocs need confirming                            */
-/*  Couldn't confirm 2500 for extra life, game too hard*/
-/* Always in cocktail mode but flipscreen bit not found*/
+/* TODO:                                               */
+/*  - port $41 write is unknown, $44 read is unknown,  */
+/*    port $48 no function/unused?                     */
+/*  - dip settings/locs need confirming                */
+/*  - it doesn't have a mb14241 video shifter?         */
+/*  - using space invaders audio as placeholder until  */
+/*    more is known about the sound hw                 */
+/*  - always in cocktail mode but flipscreen not found */
 /*                                                     */
 /*******************************************************/
 
 static INPUT_PORTS_START( spacecom )
-	PORT_START("IN0") // 5-pos dipsw at ic79 (row F) - means 3 bits are for something else, which?
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_START("IN0") // 5-pos dipsw at ic79 (row F)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x04, "5" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "2500" ) // not confirmed
 	PORT_DIPSETTING(    0x08, "1500" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -690,9 +692,8 @@ INPUT_PORTS_END
 
 static ADDRESS_MAP_START( spacecom_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x41, 0x41) AM_READ_PORT("IN0")
-	AM_RANGE(0x42, 0x42) AM_READ_PORT("IN1") AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
-	AM_RANGE(0x44, 0x44) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
-	//AM_RANGE(0x48, 0x48) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x42, 0x42) AM_READ_PORT("IN1") AM_WRITE(invaders_audio_1_w)
+	AM_RANGE(0x44, 0x44) AM_READNOP AM_WRITE(invaders_audio_2_w)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_DERIVED_CLASS( spacecom, invaders, _8080bw_state )
@@ -700,9 +701,19 @@ MACHINE_CONFIG_DERIVED_CLASS( spacecom, invaders, _8080bw_state )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(spacecom_io_map)
+	
+	// assume there is no watchdog
 	MCFG_WATCHDOG_VBLANK_INIT(0)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_usec(0))
 MACHINE_CONFIG_END
+
+DRIVER_INIT_MEMBER(_8080bw_state, spacecom)
+{
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+
+	// bad byte: should be push a at RST 10h
+	ROM[0x10] = 0xf5;
+}
 
 
 
@@ -2933,7 +2944,7 @@ ROM_END
 
 ROM_START( spacecom )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1f.ic67",      0x0000, 0x0400, CRC(703f2cbe) SHA1(b183f9fbedd8658399555c0ba21ecab6370e86cb) )
+	ROM_LOAD( "1f.ic67",      0x0000, 0x0400, BAD_DUMP CRC(703f2cbe) SHA1(b183f9fbedd8658399555c0ba21ecab6370e86cb) )
 	ROM_LOAD( "2g.ic82",      0x0400, 0x0400, CRC(7269b719) SHA1(6fd5879a6f2a5b1d38c7f00996037418df9491d3) )
 	ROM_LOAD( "3f.ic68",      0x0800, 0x0400, CRC(6badac4f) SHA1(7b998d8fb21d143f26d605fe2a7dbbe1cf65210f) )
 	ROM_LOAD( "4g.ic83",      0x0c00, 0x0400, CRC(75b59ea7) SHA1(e00eb4a9cf662c84e18fc9efc29cedebf0c5af67) )
@@ -2941,7 +2952,6 @@ ROM_START( spacecom )
 	ROM_LOAD( "6g.ic84",      0x1400, 0x0400, CRC(de383625) SHA1(7ec0d7171e771c4b43e026f3f50a88d8ab2236bb) )
 	ROM_LOAD( "7f.ic70",      0x1800, 0x0400, CRC(5a23dbc8) SHA1(4d193bb7b38fb7ccd57d2c72463a3fe123dbca58) )
 	ROM_LOAD( "8g.ic85",      0x1c00, 0x0400, CRC(a5a467e3) SHA1(ef591059e55d21f14baa8af1f1324a9bc2ada8c4) )
-	ROM_FILL(0x10, 1, 0xF5) // fix bad byte
 ROM_END
 
 ROM_START( sinvzen )
@@ -4110,7 +4120,7 @@ GAMEL(1979, cosmicm2,   invaders, invaders,  cosmicmo,  driver_device, 0, ROT270
 GAMEL(1980?,sinvzen,    invaders, invaders,  spaceatt,  driver_device, 0, ROT270, "Taito / Zenitone-Microsec Ltd.", "Super Invaders (Zenitone-Microsec)", GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1978, spaceatt,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg (Video Games GmbH)", "Space Attack (bootleg of Space Invaders)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1980, spaceat2,   invaders, invaders,  spaceatt,  driver_device, 0, ROT270, "bootleg (Video Games UK)", "Space Attack II (bootleg of Super Invaders)", GAME_SUPPORTS_SAVE, layout_invaders ) // bootleg of Zenitone-Microsec Super Invaders
-GAMEL(1979, spacecom,   invaders, spacecom,  spacecom,  driver_device, 0, ROT270, "bootleg", "Space Combat (bootleg of Space Invaders)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_spacecom ) // not working: need to investigate it more, could be bad dump?
+GAMEL(1979, spacecom,   invaders, spacecom,  spacecom,  _8080bw_state, spacecom, ROT270, "bootleg", "Space Combat (bootleg of Space Invaders)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_spacecom )
 GAME( 1978, spacerng,   invaders, spacerng,  sitv,      driver_device, 0, ROT90,  "bootleg (Leisure Time Electronics)", "Space Ranger (bootleg of Space Invaders)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // many modifications
 GAMEL(19??, invasion,   invaders, invaders,  invasion,  driver_device, 0, ROT270, "bootleg (Sidam)", "Invasion (Sidam)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, invasiona,  invaders, invaders,  invasion,  driver_device, 0, ROT270, "bootleg", "Invasion (bootleg set 1, normal graphics)", GAME_SUPPORTS_SAVE, layout_invaders ) // has Sidam replaced with 'Ufo Monster Attack' and standard GFX

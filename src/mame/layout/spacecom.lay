@@ -6,15 +6,15 @@
 			<color red="0.1" green="1" blue="0.2" />
 		</rect>
 		<rect>
-			<bounds left="0" top="52" right="224" bottom="210" />
+			<bounds left="0" top="54" right="224" bottom="212" />
 			<color red="1" green="0.1" blue="0.1" />
 		</rect>
 		<rect>
-			<bounds left="0" top="86" right="224" bottom="180" />
+			<bounds left="0" top="88" right="224" bottom="182" />
 			<color red="1" green="1" blue="0.1" />
 		</rect>
 		<rect>
-			<bounds left="0" top="118" right="224" bottom="150" />
+			<bounds left="0" top="120" right="224" bottom="152" />
 			<color red="0.1" green="0.2" blue="1" />
 		</rect>
 	</element>

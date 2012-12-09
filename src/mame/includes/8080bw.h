@@ -86,6 +86,7 @@ public:
 	DECLARE_WRITE8_MEMBER(invmulti_bank_w);
 
 	DECLARE_DRIVER_INIT(invmulti);
+	DECLARE_DRIVER_INIT(spacecom);
 	DECLARE_DRIVER_INIT(vortex);
 
 	DECLARE_MACHINE_START(extra_8080bw);
