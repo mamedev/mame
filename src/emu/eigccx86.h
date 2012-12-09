@@ -692,17 +692,17 @@ _atomic_decrement32(INT32 volatile *ptr)
 #define get_profile_ticks _get_profile_ticks
 
 #ifndef __x86_64__
-INLINE INT64 ATTR_UNUSED ATTR_FORCE_INLINE _get_profile_ticks(void)
+INLINE UINT64 ATTR_UNUSED ATTR_FORCE_INLINE _get_profile_ticks(void)
 {
     UINT64 result;
     __asm__ __volatile__ (
             "rdtsc"
             : "=A" (result)
     );
-    return (INT64) (result & U64(0x7fffffffffffffff));
+    return result;
 }
 #else
-INLINE INT64 ATTR_UNUSED ATTR_FORCE_INLINE _get_profile_ticks(void)
+INLINE UINT64 ATTR_UNUSED ATTR_FORCE_INLINE _get_profile_ticks(void)
 {
 	_x86_union r;
     __asm__ __volatile__ (
@@ -710,7 +710,7 @@ INLINE INT64 ATTR_UNUSED ATTR_FORCE_INLINE _get_profile_ticks(void)
             : "=a" (r.u32.l), "=d" (r.u32.h)
     );
 
-    return (INT64) (r.u64 & U64(0x7fffffffffffffff));
+    return (UINT64) r.u64;
 }
 #endif
 

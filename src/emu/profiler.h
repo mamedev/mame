@@ -55,6 +55,8 @@
 #ifndef __PROFILER_H__
 #define __PROFILER_H__
 
+#include "attotime.h"
+
 
 
 //**************************************************************************
@@ -111,37 +113,76 @@ DECLARE_ENUM_OPERATORS(profile_type);
 
 class real_profiler_state
 {
-	friend class profile_scope;
-
 public:
 	// construction/destruction
 	real_profiler_state();
 
 	// getters
-	bool enabled() const { return m_enabled; }
-	const char *text(running_machine &machine, astring &string);
+	bool enabled() const { return m_filoptr != NULL; }
+	const char *text(running_machine &machine);
 
 	// enable/disable
 	void enable(bool state = true)
 	{
-		if (state != m_enabled)
+		if (state != enabled())
 		{
-			m_enabled = state;
-			if (m_enabled)
-			{
-				m_dataready = false;
-				m_filoindex = m_dataindex = 0;
-			}
+			reset(state);
 		}
 	}
 
 	// start/stop
-	void start(profile_type type) { if (m_enabled) real_start(type); }
-	void stop() { if (m_enabled) real_stop(); }
+	void start(profile_type type) { if (enabled()) real_start(type); }
+	void stop() { if (enabled()) real_stop(); }
 
 private:
-	void real_start(profile_type type);
-	void real_stop();
+	void reset(bool enabled);
+	void update_text(running_machine &machine);
+
+	//-------------------------------------------------
+	//  real_start - mark the beginning of a
+	//  profiler entry
+	//-------------------------------------------------
+	ATTR_FORCE_INLINE void real_start(profile_type type)
+	{
+		// fail if we overflow
+		if (m_filoptr >= &m_filo[ARRAY_LENGTH(m_filo) - 1])
+			throw emu_fatalerror("Profiler FILO overflow (type = %d)\n", type);
+
+		// get current tick count
+		osd_ticks_t curticks = get_profile_ticks();
+
+		// update previous entry
+		m_data[m_filoptr->type] += curticks - m_filoptr->start;
+
+		// move to next entry
+		m_filoptr++;
+
+		// fill in this entry
+		m_filoptr->type = type;
+		m_filoptr->start = curticks;
+	}
+
+	//-------------------------------------------------
+	//  real_stop - mark the end of a profiler entry
+	//-------------------------------------------------
+	ATTR_FORCE_INLINE void real_stop()
+	{
+		// degenerate scenario
+		if (UNEXPECTED(m_filoptr <= m_filo))
+			return;
+
+		// get current tick count
+		osd_ticks_t curticks = get_profile_ticks();
+
+		// account for the time taken
+		m_data[m_filoptr->type] += curticks - m_filoptr->start;
+
+		// move back an entry
+		m_filoptr--;
+
+		// reset previous entry start time
+		m_filoptr->start = curticks;
+	}
 
 	// an entry in the FILO
 	struct filo_entry
@@ -150,20 +191,12 @@ private:
 		osd_ticks_t		start;						// start time
 	};
 
-	// item in the array of recent states
-	struct history_data
-	{
-		UINT32			context_switches;			// number of context switches seen
-		osd_ticks_t		duration[PROFILER_TOTAL];	// duration spent in each entry
-	};
-
 	// internal state
-	bool				m_enabled;					// are we enabled?
-	bool				m_dataready;				// are we to display the data yet?
-	UINT8				m_filoindex;				// current FILO index
-	UINT8				m_dataindex;				// current data index
-	filo_entry			m_filo[16];					// array of FILO entries
-	history_data		m_data[16];					// array of data
+	filo_entry *		m_filoptr;					// current FILO index
+	astring				m_text;						// profiler text
+	attotime			m_text_time;				// profiler text last update
+	filo_entry			m_filo[32];					// array of FILO entries
+	osd_ticks_t			m_data[PROFILER_TOTAL + 1];	// array of data
 };
 
 
@@ -177,7 +210,7 @@ public:
 
 	// getters
 	bool enabled() const { return false; }
-	const char *text(running_machine &machine, astring &string) { return string.cpy(""); }
+	const char *text(running_machine &machine) { return ""; }
 
 	// enable/disable
 	void enable(bool state = true) { }

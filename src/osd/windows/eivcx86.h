@@ -519,8 +519,8 @@ INLINE osd_ticks_t _get_profile_ticks(void)
 
 INLINE osd_ticks_t _get_profile_ticks(void)
 {
-	INT64 result;
-	INT64 *presult = &result;
+	UINT64 result;
+	UINT64 *presult = &result;
 
 	__asm {
 		__asm _emit 0Fh __asm _emit 031h	// rdtsc

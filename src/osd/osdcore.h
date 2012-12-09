@@ -355,8 +355,8 @@ int osd_is_absolute_path(const char *path);
     TIMING INTERFACES
 ***************************************************************************/
 
-/* a osd_ticks_t is a 64-bit integer that is used as a core type in timing interfaces */
-typedef INT64 osd_ticks_t;
+/* a osd_ticks_t is a 64-bit unsigned integer that is used as a core type in timing interfaces */
+typedef UINT64 osd_ticks_t;
 
 
 /*-----------------------------------------------------------------------------

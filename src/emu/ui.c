@@ -1377,9 +1377,8 @@ static UINT32 handler_ingame(running_machine &machine, render_container *contain
 	/* draw the profiler if visible */
 	if (show_profiler)
 	{
-		astring profilertext;
-		g_profiler.text(machine, profilertext);
-		ui_draw_text_full(container, profilertext, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+		const char *text = g_profiler.text(machine);
+		ui_draw_text_full(container, text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 	}
 
 	/* if we're single-stepping, pause now */

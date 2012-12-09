@@ -76,6 +76,14 @@ profiler_state g_profiler;
 
 
 //**************************************************************************
+//  CONSTANTS
+//**************************************************************************
+
+#define TEXT_UPDATE_TIME		0.5
+
+
+
+//**************************************************************************
 //  DUMMY PROFILER STATE
 //**************************************************************************
 
@@ -98,84 +106,69 @@ dummy_profiler_state::dummy_profiler_state()
 //-------------------------------------------------
 
 real_profiler_state::real_profiler_state()
-	: m_enabled(false),
-	  m_dataready(false),
-	  m_filoindex(0),
-	  m_dataindex(0)
 {
 	memset(m_filo, 0, sizeof(m_filo));
 	memset(m_data, 0, sizeof(m_data));
+	reset(false);
 }
 
 
+
 //-------------------------------------------------
-//  real_start - mark the beginning of a
-//  profiler entry
+//  reset - initializes state
 //-------------------------------------------------
 
-void real_profiler_state::real_start(profile_type type)
+void real_profiler_state::reset(bool enabled)
 {
-	osd_ticks_t curticks = get_profile_ticks();
+	m_text_time = attotime::never;
 
-	// track context switches
-	history_data &data = m_data[m_dataindex];
-	if (type >= PROFILER_DEVICE_FIRST && type <= PROFILER_DEVICE_MAX)
-		data.context_switches++;
-
-	// we're starting a new bucket, begin now
-	int index = m_filoindex++;
-	filo_entry &entry = m_filo[index];
-
-	// fail if we overflow
-	if (index > ARRAY_LENGTH(m_filo))
-		throw emu_fatalerror("Profiler FILO overflow (type = %d)\n", type);
-
-	// if we're nested, stop the previous entry
-	if (index > 0)
+	if (enabled)
 	{
-		filo_entry &preventry = m_filo[index - 1];
-		data.duration[preventry.type] += curticks - preventry.start;
+		// we're enabled now
+		m_filoptr = m_filo;
+
+		// set up dummy entry
+		m_filoptr->start = 0;
+		m_filoptr->type = PROFILER_TOTAL;
 	}
-
-	// fill in this entry
-	entry.type = type;
-	entry.start = curticks;
-}
-
-
-//-------------------------------------------------
-//  real_stop - mark the end of a profiler entry
-//-------------------------------------------------
-
-void real_profiler_state::real_stop()
-{
-	osd_ticks_t curticks = get_profile_ticks();
-
-	// we're ending an existing bucket, update the time
-	if (m_filoindex > 0)
+	else
 	{
-		int index = --m_filoindex;
-		filo_entry &entry = m_filo[index];
-
-		// account for the time taken
-		history_data &data = m_data[m_dataindex];
-		data.duration[entry.type] += curticks - entry.start;
-
-		// if we have a previous entry, restart his time now
-		if (index != 0)
-		{
-			filo_entry &preventry = m_filo[index - 1];
-			preventry.start = curticks;
-		}
+		// magic value to indicate disabled
+		m_filoptr = NULL;
 	}
 }
+
 
 
 //-------------------------------------------------
 //  text - return the current text in an astring
 //-------------------------------------------------
 
-const char *real_profiler_state::text(running_machine &machine, astring &string)
+const char *real_profiler_state::text(running_machine &machine)
+{
+	start(PROFILER_PROFILER);
+
+	// get the current time
+	attotime current_time = machine.scheduler().time();
+
+	// we only want to update the text periodically
+	if ((m_text_time == attotime::never) || ((current_time - m_text_time).as_double() >= TEXT_UPDATE_TIME))
+	{
+		update_text(machine);
+		m_text_time = current_time;
+	}
+
+	stop();
+	return m_text;
+}
+
+
+
+//-------------------------------------------------
+//  update_text - update the current astring
+//-------------------------------------------------
+
+void real_profiler_state::update_text(running_machine &machine)
 {
 	static const profile_string names[] =
 	{
@@ -208,28 +201,23 @@ const char *real_profiler_state::text(running_machine &machine, astring &string)
 		{ PROFILER_IDLE,             "Idle" }
 	};
 
-	g_profiler.start(PROFILER_PROFILER);
-
 	// compute the total time for all bits, not including profiler or idle
 	UINT64 computed = 0;
 	profile_type curtype;
 	for (curtype = PROFILER_DEVICE_FIRST; curtype < PROFILER_PROFILER; curtype++)
-		for (int curmem = 0; curmem < ARRAY_LENGTH(m_data); curmem++)
-			computed += m_data[curmem].duration[curtype];
+		computed += m_data[curtype];
 
 	// save that result in normalize, and continue adding the rest
 	UINT64 normalize = computed;
 	for ( ; curtype < PROFILER_TOTAL; curtype++)
-		for (int curmem = 0; curmem < ARRAY_LENGTH(m_data); curmem++)
-			computed += m_data[curmem].duration[curtype];
+		computed += m_data[curtype];
 
 	// this becomes the total; if we end up with 0 for anything, we were just started, so return empty
 	UINT64 total = computed;
-	string.reset();
+	m_text.reset();
 	if (total == 0 || normalize == 0)
 	{
-		g_profiler.stop();
-		return string;
+		return;
 	}
 
 	// loop over all types and generate the string
@@ -237,53 +225,34 @@ const char *real_profiler_state::text(running_machine &machine, astring &string)
 	for (curtype = PROFILER_DEVICE_FIRST; curtype < PROFILER_TOTAL; curtype++)
 	{
 		// determine the accumulated time for this type
-		computed = 0;
-		for (int curmem = 0; curmem < ARRAY_LENGTH(m_data); curmem++)
-			computed += m_data[curmem].duration[curtype];
+		computed = m_data[curtype];
 
 		// if we have non-zero data and we're ready to display, do it
-		if (m_dataready && computed != 0)
+		if (computed != 0)
 		{
 			// start with the un-normalized percentage
-			string.catprintf("%02d%% ", (int)((computed * 100 + total/2) / total));
+			m_text.catprintf("%02d%% ", (int)((computed * 100 + total/2) / total));
 
 			// followed by the normalized percentage for everything but profiler and idle
 			if (curtype < PROFILER_PROFILER)
-				string.catprintf("%02d%% ", (int)((computed * 100 + normalize/2) / normalize));
+				m_text.catprintf("%02d%% ", (int)((computed * 100 + normalize/2) / normalize));
 
 			// and then the text
 			if (curtype >= PROFILER_DEVICE_FIRST && curtype <= PROFILER_DEVICE_MAX)
-				string.catprintf("'%s'", iter.byindex(curtype - PROFILER_DEVICE_FIRST)->tag());
+				m_text.catprintf("'%s'", iter.byindex(curtype - PROFILER_DEVICE_FIRST)->tag());
 			else
 				for (int nameindex = 0; nameindex < ARRAY_LENGTH(names); nameindex++)
 					if (names[nameindex].type == curtype)
 					{
-						string.cat(names[nameindex].string);
+						m_text.cat(names[nameindex].string);
 						break;
 					}
 
 			// followed by a carriage return
-			string.cat("\n");
+			m_text.cat("\n");
 		}
 	}
 
-	// followed by context switches
-	if (m_dataready)
-	{
-		int switches = 0;
-		for (int curmem = 0; curmem < ARRAY_LENGTH(m_data); curmem++)
-			switches += m_data[curmem].context_switches;
-		string.catprintf("%d CPU switches\n", switches / (int) ARRAY_LENGTH(m_data));
-	}
-
-	// advance to the next dataset and reset it to 0
-	m_dataindex = (m_dataindex + 1) % ARRAY_LENGTH(m_data);
-	memset(&m_data[m_dataindex], 0, sizeof(m_data[m_dataindex]));
-
-	// we are ready once we have wrapped around
-	if (m_dataindex == 0)
-		m_dataready = true;
-
-	g_profiler.stop();
-	return string;
+	// reset data set to 0
+	memset(m_data, 0, sizeof(m_data));
 }
