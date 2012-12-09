@@ -644,8 +644,6 @@ INPUT_PORTS_END
 /*  it's not certain that this is a good dump          */
 /*                                                     */
 /* TODO:                                               */
-/*  - port $41 write is unknown, $44 read is unknown,  */
-/*    port $48 no function/unused?                     */
 /*  - dip settings/locs need confirming                */
 /*  - it doesn't have a mb14241 video shifter?         */
 /*  - using space invaders audio as placeholder until  */
@@ -657,11 +655,11 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( spacecom )
 	PORT_START("IN0") // 5-pos dipsw at ic79 (row F)
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x04, "5" )
@@ -669,8 +667,8 @@ static INPUT_PORTS_START( spacecom )
 	PORT_DIPSETTING(    0x00, "2500" ) // not confirmed
 	PORT_DIPSETTING(    0x08, "1500" )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
@@ -685,6 +683,10 @@ static INPUT_PORTS_START( spacecom )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unused?
+
 	PORT_START(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -693,7 +695,7 @@ INPUT_PORTS_END
 static ADDRESS_MAP_START( spacecom_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x41, 0x41) AM_READ_PORT("IN0")
 	AM_RANGE(0x42, 0x42) AM_READ_PORT("IN1") AM_WRITE(invaders_audio_1_w)
-	AM_RANGE(0x44, 0x44) AM_READNOP AM_WRITE(invaders_audio_2_w)
+	AM_RANGE(0x44, 0x44) AM_READ_PORT("IN2") AM_WRITE(invaders_audio_2_w)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_DERIVED_CLASS( spacecom, invaders, _8080bw_state )
