@@ -48,7 +48,6 @@ public:
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
-	void rtc_timer_callback();
 
 protected:
 	// device-level overrides
@@ -57,8 +56,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-
-	static TIMER_CALLBACK( rtc_inc_callback );
 
 private:
 	UINT8						m_reg[3];
@@ -70,6 +67,8 @@ private:
 	rtc_regs_t					m_hold;
 	devcb_resolved_write_line	m_out_int_func;
 	emu_timer *					m_timer;
+
+	void rtc_timer_callback();
 };
 
 
