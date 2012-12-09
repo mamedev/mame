@@ -3217,6 +3217,48 @@ Note:
 
 */
 
+// The following is temporary - new code is on the way
+
+static ADDRESS_MAP_START( sf2mdt_z80map, AS_PROGRAM, 8, cps_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xd7ff) AM_RAM
+	AM_RANGE(0xd800, 0xd801) AM_DEVREADWRITE("2151", ym2151_device, read, write)
+	AM_RANGE(0xdc00, 0xdc00) AM_READ(soundlatch_byte_r)
+ADDRESS_MAP_END
+
+static void m5205_int1( device_t *device )
+{
+	cps_state *state = device->machine().driver_data<cps_state>();
+
+	msm5205_data_w(device, state->m_sample_buffer1 & 0x0f);
+	state->m_sample_buffer1 >>= 4;
+	state->m_sample_select1 ^= 1;
+	if (state->m_sample_select1 == 0)
+		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
+static void m5205_int2( device_t *device )
+{
+	cps_state *state = device->machine().driver_data<cps_state>();
+
+	msm5205_data_w(device, state->m_sample_buffer2 & 0x0f);
+	state->m_sample_buffer2 >>= 4;
+	state->m_sample_select2 ^= 1;
+}
+
+static const msm5205_interface msm5205_interface1 =
+{
+	m5205_int1, /* interrupt function */
+	MSM5205_S96_4B /* 4KHz 4-bit */
+};
+
+static const msm5205_interface msm5205_interface2 =
+{
+	m5205_int2, /* interrupt function */
+	MSM5205_S96_4B /* 4KHz 4-bit */
+};
+
+
 static MACHINE_CONFIG_START( knightsb, cps_state )
 
 	/* basic machine hardware */
@@ -3225,7 +3267,7 @@ static MACHINE_CONFIG_START( knightsb, cps_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  cps1_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 29821000 / 8)
-//	MCFG_CPU_PROGRAM_MAP(sf2mdt_z80map)
+	MCFG_CPU_PROGRAM_MAP(sf2mdt_z80map)
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state,common)
 
@@ -3253,11 +3295,11 @@ static MACHINE_CONFIG_START( knightsb, cps_state )
 
 	/* has 2x MSM5205 instead of OKI6295 */
 	MCFG_SOUND_ADD("msm1", MSM5205, 24000000/64)	/* ? */
-//	MCFG_SOUND_CONFIG(msm5205_interface1)
+	MCFG_SOUND_CONFIG(msm5205_interface1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 24000000/64)	/* ? */
-//	MCFG_SOUND_CONFIG(msm5205_interface2)
+	MCFG_SOUND_CONFIG(msm5205_interface2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
