@@ -13,7 +13,6 @@
 #include "machine/upd765.h"
 #include "machine/8237dma.h"
 #include "video/upd7220.h"
-#include "formats/mfi_dsk.h"
 #include "dmv.lh"
 
 class dmv_state : public driver_device

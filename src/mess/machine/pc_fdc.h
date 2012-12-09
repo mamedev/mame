@@ -8,7 +8,6 @@
 #define PC_FDC_H
 
 #include "emu.h"
-#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 
 #define MCFG_PC_FDC_XT_ADD(_tag) \

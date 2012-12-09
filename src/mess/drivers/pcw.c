@@ -98,14 +98,12 @@
 #include "machine/i8243.h"
 // upd765 interface
 #include "machine/upd765.h"
-#include "imagedev/flopdrv.h"
 // pcw video hardware
 #include "includes/pcw.h"
 // pcw/pcw16 beeper
 #include "sound/beep.h"
 #include "machine/ram.h"
 #include "formats/pc_dsk.h"
-#include "formats/mfi_dsk.h"
 
 #include "pcw.lh"
 

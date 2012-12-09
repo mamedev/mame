@@ -61,10 +61,6 @@
 #include "machine/upd1990a.h"
 #include "machine/nvram.h"
 #include "video/upd7220.h"
-#include "imagedev/flopdrv.h"
-#include "formats/mfi_dsk.h"
-#include "formats/d88_dsk.h"
-#include "formats/imd_dsk.h"
 
 //#include "sound/ay8910.h"
 

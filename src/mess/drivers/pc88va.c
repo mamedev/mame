@@ -31,9 +31,7 @@
 #include "machine/pit8253.h"
 #include "machine/upd765.h"
 #include "sound/2203intf.h"
-#include "formats/mfi_dsk.h"
 #include "formats/xdf_dsk.h"
-#include "formats/d88_dsk.h"
 #include "machine/upd71071.h"
 
 /* Note: for the time being, just disable FDC CPU, it's for PC-8801 compatibility mode anyway ... */

@@ -269,10 +269,7 @@
 #include "sound/beep.h"
 #include "sound/2203intf.h"
 #include "video/upd7220.h"
-#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
-#include "formats/mfi_dsk.h"
-#include "formats/d88_dsk.h"
 #include "formats/pc98fdi_dsk.h"
 
 #define UPD1990A_TAG "upd1990a"

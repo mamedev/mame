@@ -5,7 +5,6 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
-#include "imagedev/flopdrv.h"
 #include "imagedev/harddriv.h"
 #include "machine/ctronics.h"
 #include "machine/i8255.h"

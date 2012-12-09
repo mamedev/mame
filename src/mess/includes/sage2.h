@@ -1,7 +1,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "imagedev/flopdrv.h"
 #include "machine/ctronics.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"

@@ -5,7 +5,6 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "imagedev/flopdrv.h"
 #include "machine/nscsi_bus.h"
 #include "machine/mccs1850.h"
 #include "machine/8530scc.h"

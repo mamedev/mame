@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "imagedev/flopdrv.h"
 #include "machine/am9517a.h"
 #include "machine/i8212.h"
 #include "machine/pit8253.h"

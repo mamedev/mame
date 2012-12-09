@@ -152,7 +152,6 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
 #include "formats/tzx_cas.h"
-#include "formats/mfi_dsk.h"
 
 /* +3 hardware */
 #include "machine/upd765.h"

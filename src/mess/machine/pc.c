@@ -41,9 +41,6 @@
 
 #include "machine/ram.h"
 
-#include "imagedev/cassette.h"
-#include "machine/pit8253.h"
-#include "machine/pcshare.h"
 #include "coreutil.h"
 
 #define VERBOSE_PIO 0	/* PIO (keyboard controller) */

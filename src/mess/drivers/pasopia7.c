@@ -22,7 +22,6 @@
 #include "machine/upd765.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
-#include "formats/mfi_dsk.h"
 #include "rendlay.h"
 #include "includes/pasopia.h"
 

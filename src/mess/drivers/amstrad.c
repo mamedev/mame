@@ -101,7 +101,6 @@ Some bugs left :
 #include "machine/ctronics.h"
 
 /* Devices */
-#include "formats/mfi_dsk.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"

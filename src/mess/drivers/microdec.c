@@ -9,9 +9,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/upd765.h"
-#include "imagedev/flopdrv.h"
 #include "machine/terminal.h"
-#include "formats/mfi_dsk.h"
 
 
 class microdec_state : public driver_device

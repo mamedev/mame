@@ -102,9 +102,7 @@
 #include "machine/mc146818.h"	/* for NC200 real time clock */
 #include "machine/rp5c01.h"	/* for NC100 real time clock */
 #include "machine/upd765.h"		/* for NC200 disk drive interface */
-#include "imagedev/flopdrv.h"	/* for NC200 disk image */
 #include "formats/pc_dsk.h"		/* for NC200 disk image */
-#include "formats/mfi_dsk.h"
 #include "imagedev/cartslot.h"
 #include "sound/beep.h"
 #include "machine/ram.h"

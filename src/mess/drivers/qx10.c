@@ -41,9 +41,6 @@
 #include "video/upd7220.h"
 #include "machine/upd765.h"
 #include "machine/ram.h"
-#include "formats/mfi_dsk.h"
-#include "formats/d88_dsk.h"
-#include "formats/imd_dsk.h"
 
 #define MAIN_CLK	15974400
 

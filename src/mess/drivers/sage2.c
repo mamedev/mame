@@ -304,8 +304,8 @@ READ8_MEMBER( sage2_state::ppi1_pb_r )
 	data = m_fdc->get_irq();
 
 	// floppy write protected
-	if (!m_sl0) data |= floppy_wpt_r(m_floppy0) << 1;
-	if (!m_sl1) data |= floppy_wpt_r(m_floppy1) << 1;
+	if (!m_sl0) data |= m_floppy0->wpt_r() << 1;
+	if (!m_sl1) data |= m_floppy1->wpt_r() << 1;
 
 	// RS-232 ring indicator
 

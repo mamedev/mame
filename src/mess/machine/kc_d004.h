@@ -10,7 +10,6 @@
 #include "machine/upd765.h"
 #include "machine/idectrl.h"
 #include "formats/basicdsk.h"
-#include "imagedev/flopdrv.h"
 #include "imagedev/harddriv.h"
 
 

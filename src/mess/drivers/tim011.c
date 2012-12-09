@@ -8,9 +8,6 @@
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
-#include "formats/hxcmfm_dsk.h"
-#include "formats/imd_dsk.h"
-#include "formats/mfi_dsk.h"
 #include "machine/upd765.h"
 
 #define FDC9266_TAG "u43"

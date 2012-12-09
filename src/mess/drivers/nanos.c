@@ -13,7 +13,6 @@
 #include "machine/z80sio.h"
 #include "machine/z80ctc.h"
 #include "machine/upd765.h"
-#include "formats/mfi_dsk.h"
 #include "formats/nanos_dsk.h"
 #include "machine/ram.h"
 

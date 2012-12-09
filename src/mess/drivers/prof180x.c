@@ -26,7 +26,6 @@
 #include "machine/ram.h"
 #include "machine/ctronics.h"
 #include "machine/upd765.h"
-#include "formats/mfi_dsk.h"
 #include "includes/prof180x.h"
 
 UINT32 prof180x_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

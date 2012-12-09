@@ -102,8 +102,6 @@ TODO:
 
 /* Devices */
 #include "formats/pc_dsk.h"
-#include "formats/mfi_dsk.h"
-#include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 
 // interrupt counter

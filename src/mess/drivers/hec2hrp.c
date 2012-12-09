@@ -78,8 +78,6 @@
 #include "sound/wave.h"      /* for K7 sound*/
 #include "sound/discrete.h"  /* for 1 Bit sound*/
 #include "machine/upd765.h"	/* for floppy disc controller */
-#include "imagedev/flopdrv.h"
-#include "formats/mfi_dsk.h"
 #include "cpu/z80/z80.h"
 #include "formats/hect_dsk.h"
 #include "includes/hec2hrp.h"

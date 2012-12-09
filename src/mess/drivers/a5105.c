@@ -22,7 +22,6 @@ ToDo:
 #include "video/upd7220.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
-#include "formats/mfi_dsk.h"
 #include "formats/a5105_dsk.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"

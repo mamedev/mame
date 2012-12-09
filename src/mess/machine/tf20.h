@@ -20,10 +20,6 @@
 #include "machine/upd765.h"
 #include "machine/upd7201.h"
 #include "machine/epson_sio.h"
-#include "imagedev/flopdrv.h"
-#include "formats/mfi_dsk.h"
-#include "formats/hxcmfm_dsk.h"
-#include "formats/d88_dsk.h"
 
 
 //**************************************************************************

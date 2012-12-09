@@ -25,10 +25,8 @@
 #include "machine/i8251.h"
 
 /* Devices */
-#include "imagedev/flopdrv.h"
 #include "imagedev/cassette.h"
 #include "formats/tzx_cas.h"
-#include "formats/mfi_dsk.h"
 #include "machine/ram.h"
 
 
