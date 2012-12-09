@@ -342,7 +342,7 @@ void gime_base_device::device_reset(void)
 
 
 //-------------------------------------------------
-//  device_pre_save - device-specific pre save
+//  device_timer - handle timer callbacks
 //-------------------------------------------------
 
 void gime_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
