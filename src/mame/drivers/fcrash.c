@@ -31,8 +31,28 @@ from 2.bin to 9.bin program eproms
 ---
 
 kodb has various graphical issues, mainly with old info not being cleared away.
-Also, when you are hit, you should flash, but you go invisible instead.
+Also, it should be using a vblank irq value of 4. This triggers the following bootleg read/writes;
+ - IN1 is read at 0x992000
+ - IN0 is read of 0x992008
+ - dips continue to be read at 0x80001a
+ - sound command is wrote at 0x992006
+ - scroll 1Y is wrote at 0x980000
+ - scroll 1X is wrote at 0x980002
+ - scroll 2Y is wrote at 0x980004
+ - scroll 2X is wrote at 0x980006
+ - scroll 3Y is wrote at 0x980008
+ - scroll 3X is wrote at 0x98000a
+ - the layer enable and layer mask writes continue at 0x98000c and 0x980020-2
+ 
+These read/writes are identical to those used by a Knights of the Round bootleg which uses the all sf2mdt sound
+hardware. This set is currently non-working in cps1.c but I will move it here soon.
 
+This also prevents the game from toggling the sprite address at m_cps_a_regs[0], similar to other bootlegs.
+Currently the game is working somewhat, but only using the code left over from the original. If anyone wants to
+do any development work on the set, (eg, find the sprite clearing issue), then this should be changed as the game
+likely won't write any sprite clearing values otherwise.
+
+None of this is hooked up currently due to issues with row scroll on the scroll2 layer.
 */
 
 #include "emu.h"
@@ -920,7 +940,7 @@ MACHINE_START_MEMBER(cps_state,kodb)
 	m_layer_scroll1x_offset = 0;
 	m_layer_scroll2x_offset = 0;
 	m_layer_scroll3x_offset = 0;
-	m_sprite_base = 0x50c8;
+	m_sprite_base = 0x1000;
 	m_sprite_list_end_marker = 0xffff;
 	m_sprite_x_offset = 0;
 }
@@ -1396,6 +1416,11 @@ DRIVER_INIT_MEMBER(cps_state, kodb)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x800018, 0x80001f, read16_delegate(FUNC(cps_state::cps1_dsw_r),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x800180, 0x800187, write16_delegate(FUNC(cps_state::cps1_soundlatch_w),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x980000, 0x98002f, write16_delegate(FUNC(cps_state::kodb_layer_w),this));
+	
+	/* the original game alternates between 2 sprite ram areas to achieve flashing sprites - the bootleg doesn't do the write to the register to achieve this
+	mapping both sprite ram areas to the same bootleg sprite ram - similar to how sf2mdt works */
+	m_bootleg_sprite_ram = (UINT16*)machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x900000, 0x902fff);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x904000, 0x906fff, m_bootleg_sprite_ram); /* both of these need to be mapped */
 
 	DRIVER_INIT_CALL(cps1);
 }
