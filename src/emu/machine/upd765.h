@@ -46,6 +46,9 @@
 #define MCFG_PC8477A_ADD(_tag)	\
 	MCFG_DEVICE_ADD(_tag, PC8477A, 0)
 
+#define MCFG_WD37C65C_ADD(_tag)	\
+	MCFG_DEVICE_ADD(_tag, WD37C65C, 0)
+
 /* Interface required for PC ISA wrapping */
 class pc_fdc_interface : public device_t {
 public:
@@ -451,6 +454,13 @@ public:
 	virtual DECLARE_ADDRESS_MAP(map, 8);
 };
 
+class wd37c65c_device : public upd765_family_device {
+public:
+	wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual DECLARE_ADDRESS_MAP(map, 8);
+};
+
 extern const device_type UPD765A;
 extern const device_type UPD765B;
 extern const device_type I8272A;
@@ -460,5 +470,6 @@ extern const device_type N82077AA;
 extern const device_type PC_FDC_SUPERIO;
 extern const device_type DP8473;
 extern const device_type PC8477A;
+extern const device_type WD37C65C;
 
 #endif

@@ -11,6 +11,7 @@ const device_type N82077AA = &device_creator<n82077aa_device>;
 const device_type PC_FDC_SUPERIO = &device_creator<pc_fdc_superio_device>;
 const device_type DP8473 = &device_creator<dp8473_device>;
 const device_type PC8477A = &device_creator<pc8477a_device>;
+const device_type WD37C65C = &device_creator<wd37c65c_device>;
 
 DEVICE_ADDRESS_MAP_START(map, 8, upd765a_device)
 	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
@@ -78,6 +79,11 @@ DEVICE_ADDRESS_MAP_START(map, 8, pc8477a_device)
 	AM_RANGE(0x4, 0x4) AM_READWRITE(msr_r, dsr_w)
 	AM_RANGE(0x5, 0x5) AM_READWRITE(fifo_r, fifo_w)
 	AM_RANGE(0x7, 0x7) AM_READWRITE(dir_r, ccr_w)
+ADDRESS_MAP_END
+
+DEVICE_ADDRESS_MAP_START(map, 8, wd37c65c_device)
+	AM_RANGE(0x0, 0x0) AM_READ(msr_r)
+	AM_RANGE(0x1, 0x1) AM_READWRITE(fifo_r, fifo_w)
 ADDRESS_MAP_END
 
 
@@ -2235,6 +2241,14 @@ dp8473_device::dp8473_device(const machine_config &mconfig, const char *tag, dev
 pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "PC FDC SUPERIO", tag, owner, clock)
 {
 	m_shortname = "pc8477a";
+	ready_polled = false;
+	ready_connected = false;
+	select_connected = true;
+}
+
+wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "PC FDC SUPERIO", tag, owner, clock)
+{
+	m_shortname = "wd37c65c";
 	ready_polled = false;
 	ready_connected = false;
 	select_connected = true;
