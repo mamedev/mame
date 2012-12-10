@@ -80,8 +80,8 @@ void msm6242_device::rtc_timer_callback()
 
 	if(m_irq_flag == 1 && m_irq_type == 0 && ((m_tick % 0x200) == 0)) // 1/64 of second
 	{
-		if ( !m_out_int_func.isnull() )
-			m_out_int_func( ASSERT_LINE );
+		if ( !m_res_out_int_func.isnull() )
+			m_res_out_int_func( ASSERT_LINE );
 	}
 
 	if(m_tick & 0x8000) // 32,768 KHz == 0x8000 ticks
@@ -90,22 +90,22 @@ void msm6242_device::rtc_timer_callback()
 		m_rtc.sec++;
 
 		if(m_irq_flag == 1 && m_irq_type == 1) // 1 second clock
-			if ( !m_out_int_func.isnull() )
-				m_out_int_func(ASSERT_LINE);
+			if ( !m_res_out_int_func.isnull() )
+				m_res_out_int_func(ASSERT_LINE);
 
 		if(m_rtc.sec >= 60)
 		{
 			m_rtc.min++; m_rtc.sec = 0;
 			if(m_irq_flag == 1 && m_irq_type == 2) // 1 minute clock
-				if ( !m_out_int_func.isnull() )
-					m_out_int_func(ASSERT_LINE);
+				if ( !m_res_out_int_func.isnull() )
+					m_res_out_int_func(ASSERT_LINE);
 		}
 		if(m_rtc.min >= 60)
 		{
 			m_rtc.hour++; m_rtc.min = 0;
 			if(m_irq_flag == 1 && m_irq_type == 3) // 1 hour clock
-				if ( !m_out_int_func.isnull() )
-					m_out_int_func(ASSERT_LINE);
+				if ( !m_res_out_int_func.isnull() )
+					m_res_out_int_func(ASSERT_LINE);
 		}
 		if(m_rtc.hour >= 24)			{ m_rtc.day++; m_rtc.wday++; m_rtc.hour = 0; }
 		if(m_rtc.wday >= 6)				{ m_rtc.wday = 1; }
@@ -143,23 +143,14 @@ void msm6242_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 
 //-------------------------------------------------
-//  device_validity_check - perform validity checks
-//  on this device
-//-------------------------------------------------
-
-void msm6242_device::device_validity_check(validity_checker &valid) const
-{
-}
-
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void msm6242_device::device_start()
 {
-	m_out_int_func.resolve( m_out_int_cb, *this );
+	const msm6242_interface *intf = reinterpret_cast<const msm6242_interface *>(static_config());
+	if (intf != NULL)
+		m_res_out_int_func.resolve(intf->m_out_int_func, *this);
 
 	// let's call the timer callback every tick
 	m_timer = timer_alloc(TIMER_RTC_CALLBACK);
@@ -185,6 +176,19 @@ void msm6242_device::device_start()
 	m_reg[0] = 0;
 	m_reg[1] = 0x6;
 	m_reg[2] = 0x4;
+
+	// save states
+	save_item(NAME(m_reg));
+	save_item(NAME(m_irq_flag));
+	save_item(NAME(m_irq_type));
+	save_item(NAME(m_tick));
+	save_item(NAME(m_rtc.sec));
+	save_item(NAME(m_rtc.min));
+	save_item(NAME(m_rtc.hour));
+	save_item(NAME(m_rtc.wday));
+	save_item(NAME(m_rtc.day));
+	save_item(NAME(m_rtc.month));
+	save_item(NAME(m_rtc.year));
 }
 
 
@@ -195,30 +199,8 @@ void msm6242_device::device_start()
 
 void msm6242_device::device_reset()
 {
-	if ( !m_out_int_func.isnull() )
-		m_out_int_func( CLEAR_LINE );
-}
-
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void msm6242_device::device_config_complete()
-{
-	const msm6242_interface *intf = reinterpret_cast<const msm6242_interface *>(static_config());
-
-	if ( intf != NULL )
-	{
-		m_out_int_cb = intf->m_out_int_cb;
-	}
-	else
-	{
-		memset(&m_out_int_cb, 0, sizeof(m_out_int_cb));
-	}
+	if ( !m_res_out_int_func.isnull() )
+		m_res_out_int_func( CLEAR_LINE );
 }
 
 
@@ -320,8 +302,8 @@ WRITE8_MEMBER( msm6242_device::write )
 			else
 			{
 				m_irq_flag = 0;
-				if ( !m_out_int_func.isnull() )
-					m_out_int_func( CLEAR_LINE );
+				if ( !m_res_out_int_func.isnull() )
+					m_res_out_int_func( CLEAR_LINE );
 			}
 
 			return;
