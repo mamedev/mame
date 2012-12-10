@@ -50,6 +50,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(claybust_gun_on_r);
 
 	DECLARE_READ8_MEMBER(indianbt_r);
+	DECLARE_READ8_MEMBER(polaris_port00_r);
 	DECLARE_WRITE8_MEMBER(steelwkr_sh_port_3_w);
 	DECLARE_WRITE8_MEMBER(invadpt2_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(invadpt2_sh_port_2_w);

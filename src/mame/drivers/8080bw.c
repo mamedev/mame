@@ -1566,6 +1566,13 @@ MACHINE_START_MEMBER(_8080bw_state,polaris)
 	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
+READ8_MEMBER( _8080bw_state::polaris_port00_r )
+{
+	UINT8 data = ioport("IN0")->read();
+	if (m_c8080bw_flip_screen) return data;
+	return (data & 7) | (ioport("IN1")->read() & 0xf8);
+}
+
 // Port 5 is used to reset the watchdog timer.
 // This port is also written to when the boss plane is going up and down.
 // If you write this value to a note ciruit similar to the music,
@@ -1573,7 +1580,7 @@ MACHINE_START_MEMBER(_8080bw_state,polaris)
 // It sounds better then the actual circuit used.
 // Probably an unfinished feature.
 static ADDRESS_MAP_START( polaris_io_map, AS_IO, 8, _8080bw_state )
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
+	AM_RANGE(0x00, 0x00) AM_READ(polaris_port00_r) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(polaris_sh_port_1_w)
 	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE_LEGACY("mb14241", mb14241_shift_result_r, mb14241_shift_data_w)
