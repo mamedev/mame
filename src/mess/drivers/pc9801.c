@@ -317,7 +317,7 @@ public:
 	int m_dack;
 
 	UINT8 m_vrtc_irq_mask;
-	UINT8 m_video_ff[8];
+	UINT8 m_video_ff[8],m_gfx_ff;
 	UINT8 m_video_reg[6];
 	UINT8 m_pal_clut[4];
 
@@ -1051,10 +1051,33 @@ WRITE8_MEMBER(pc9801_state::pc9801_vrtc_mask_w)
 
 WRITE8_MEMBER(pc9801_state::pc9801_video_ff_w)
 {
-
 	if((offset & 1) == 0)
 	{
-		m_video_ff[(data & 0x0e) >> 1] = data & 1;
+		/*
+		TODO: this is my best bet so far. Register 4 is annoying, the pattern always is:
+		Write to video FF register Graphic -> 00
+		Write to video FF register 200 lines -> 0x
+		Write to video FF register 200 lines -> 00
+
+		where x is the current mode.
+		*/
+		switch((data & 0x0e) >> 1)
+		{
+			case 1:
+				m_gfx_ff = 1;
+				if(data & 1)
+					printf("Graphic f/f actually enabled!\n");
+				break;
+			case 4:
+				if(m_gfx_ff)
+				{
+					m_video_ff[(data & 0x0e) >> 1] = data & 1;
+					m_gfx_ff = 0;
+				}
+				break;
+			default: m_video_ff[(data & 0x0e) >> 1] = data & 1; break;
+		}
+
 
 		if(1)
 		{
