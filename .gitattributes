@@ -5923,6 +5923,7 @@ src/mess/drivers/mk90.c svneol=native#text/plain
 src/mess/drivers/mmd1.c svneol=native#text/plain
 src/mess/drivers/mmodular.c svneol=native#text/plain
 src/mess/drivers/mod8.c svneol=native#text/plain
+src/mess/drivers/modellot.c svneol=native#text/plain
 src/mess/drivers/mpf1.c svneol=native#text/plain
 src/mess/drivers/mpz80.c svneol=native#text/plain
 src/mess/drivers/ms0515.c svneol=native#text/plain

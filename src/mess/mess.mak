@@ -2030,6 +2030,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/mk14.o		\
 	$(MESS_DRIVERS)/mmd1.o		\
 	$(MESS_DRIVERS)/mod8.o		\
+	$(MESS_DRIVERS)/modellot.o	\
 	$(MESS_DRIVERS)/ms0515.o	\
 	$(MESS_DRIVERS)/mstation.o	\
 	$(MESS_DRIVERS)/mycom.o		\
