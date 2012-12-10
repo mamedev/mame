@@ -430,11 +430,8 @@ UINT32 _8080bw_state::screen_update_shuttlei(screen_device &screen, bitmap_rgb32
 
 		for (i = 0; i < 8; i++)
 		{
-			pen_t pen = (data & 0x80) ? RGB_WHITE : RGB_BLACK;
-			bitmap.pix32(y, x) = pen;
-
-			x = x + 1;
-			data = data << 1;
+			bitmap.pix32(y, x|i) = pens[BIT(data, 7)];
+			data <<= 1;
 		}
 	}
 
@@ -466,3 +463,43 @@ UINT32 _8080bw_state::screen_update_sflush(screen_device &screen, bitmap_rgb32 &
 
 	return 0;
 }
+
+UINT32 _8080bw_state::screen_update_spacecom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	pen_t pens[2] = { RGB_BLACK, RGB_WHITE };
+	offs_t offs;
+	UINT8 x,y,data;
+
+	for (offs = 0; offs < 0x1c00; offs++)
+	{
+		y = offs >> 5;
+		x = (offs << 3)+4; //((m_invaders_flip_screen) ? 8 : 4);
+
+		data = m_main_ram[offs+0x400];
+
+		if (m_invaders_flip_screen)
+		{
+			bitmap.pix32(y, x++) = pens[BIT(data, 7)];
+			bitmap.pix32(y, x++) = pens[BIT(data, 6)];
+			bitmap.pix32(y, x++) = pens[BIT(data, 5)];
+			bitmap.pix32(y, x++) = pens[BIT(data, 4)];
+			bitmap.pix32(y, x++) = pens[BIT(data, 3)];
+			bitmap.pix32(y, x++) = pens[BIT(data, 2)];
+			bitmap.pix32(y, x++) = pens[BIT(data, 1)];
+			bitmap.pix32(y, x++) = pens[BIT(data, 0)];
+		}
+		else
+		{
+			bitmap.pix32(y, x++) = pens[BIT(data, 0)];
+			bitmap.pix32(y, x++) = pens[BIT(data, 1)];
+			bitmap.pix32(y, x++) = pens[BIT(data, 2)];
+			bitmap.pix32(y, x++) = pens[BIT(data, 3)];
+			bitmap.pix32(y, x++) = pens[BIT(data, 4)];
+			bitmap.pix32(y, x++) = pens[BIT(data, 5)];
+			bitmap.pix32(y, x++) = pens[BIT(data, 6)];
+			bitmap.pix32(y, x++) = pens[BIT(data, 7)];
+		}
+	}
+	return 0;
+}
+

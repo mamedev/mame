@@ -1252,7 +1252,7 @@ WRITE8_MEMBER(_8080bw_state::shuttlei_sh_port_2_w)
 
 WRITE8_MEMBER( _8080bw_state::darthvdr_00_w )
 {
-	m_c8080bw_flip_screen = BIT(data, 0) & BIT(ioport(CABINET_PORT_TAG)->read(), 0);
+	m_invaders_flip_screen = BIT(data, 0) & BIT(ioport(CABINET_PORT_TAG)->read(), 0);
 }
 
 WRITE8_MEMBER( _8080bw_state::darthvdr_08_w )

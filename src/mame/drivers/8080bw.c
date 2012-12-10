@@ -688,7 +688,7 @@ static INPUT_PORTS_START( spacecom )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // unused?
 
 	PORT_START(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -707,6 +707,10 @@ MACHINE_CONFIG_DERIVED_CLASS( spacecom, invaders, _8080bw_state )
 	// assume there is no watchdog
 	MCFG_WATCHDOG_VBLANK_INIT(0)
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_usec(0))
+
+	// video
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_spacecom)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(_8080bw_state, spacecom)
@@ -2271,6 +2275,10 @@ static MACHINE_CONFIG_DERIVED_CLASS( darthvdr, mw8080bw_root, _8080bw_state )
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
+
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invaders)
 MACHINE_CONFIG_END
 
 
