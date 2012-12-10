@@ -85,6 +85,7 @@ struct z8000_state
 	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	address_space *data;
 	direct_read_data *direct;
 	address_space *io;
 	int icount;
@@ -133,7 +134,7 @@ INLINE UINT32 addr_sub(z8000_state *cpustate, UINT32 addr, UINT32 subtrahend)
 
 INLINE UINT16 RDOP(z8000_state *cpustate)
 {
-	UINT16 res = cpustate->direct->read_decrypted_word(cpustate->pc);
+	UINT16 res = cpustate->program->read_word(cpustate->pc);
     cpustate->pc += 2;
     return res;
 }
@@ -148,7 +149,7 @@ INLINE UINT32 get_operand (z8000_state *cpustate, int opnum)
 
     if (! (cpustate->op_valid & (1 << opnum)))
     {
-        cpustate->op[opnum] = cpustate->direct->read_decrypted_word(cpustate->pc);
+        cpustate->op[opnum] = cpustate->program->read_word(cpustate->pc);
         cpustate->pc += 2;
         cpustate->op_valid |= (1 << opnum);
     }
@@ -165,13 +166,13 @@ INLINE UINT32 get_addr_operand (z8000_state *cpustate, int opnum)
 
     if (! (cpustate->op_valid & (1 << opnum)))
     {
-        UINT32 seg = cpustate->direct->read_decrypted_word(cpustate->pc);
+        UINT32 seg = cpustate->program->read_word(cpustate->pc);
         cpustate->pc += 2;
         if (segmented_mode(cpustate))
         {
             if (seg & 0x8000)
             {
-                cpustate->op[opnum] = ((seg & 0x7f00) << 8) | cpustate->direct->read_decrypted_word(cpustate->pc);
+                cpustate->op[opnum] = ((seg & 0x7f00) << 8) | cpustate->program->read_word(cpustate->pc);
                 cpustate->pc += 2;
             }
             else
@@ -194,13 +195,13 @@ INLINE UINT32 get_raw_addr_operand (z8000_state *cpustate, int opnum)
 
     if (! (cpustate->op_valid & (1 << opnum)))
     {
-        UINT32 seg = cpustate->direct->read_decrypted_word(cpustate->pc);
+        UINT32 seg = cpustate->program->read_word(cpustate->pc);
         cpustate->pc += 2;
         if (segmented_mode(cpustate))
         {
             if (seg & 0x8000)
             {
-                cpustate->op[opnum] = (seg << 16) | cpustate->direct->read_decrypted_word(cpustate->pc);
+                cpustate->op[opnum] = (seg << 16) | cpustate->program->read_word(cpustate->pc);
                 cpustate->pc += 2;
             }
             else
@@ -213,46 +214,89 @@ INLINE UINT32 get_raw_addr_operand (z8000_state *cpustate, int opnum)
     return cpustate->op[opnum];
 }
 
-INLINE UINT8 RDMEM_B(z8000_state *cpustate, UINT32 addr)
+INLINE UINT32 adjust_addr_for_nonseg_mode(z8000_state *cpustate, UINT32 addr)
 {
-	return cpustate->program->read_byte(addr);
+	if (cpustate->device->type() == Z8001 && !(cpustate->fcw & F_SEG))
+		/*return (addr & 0xffff) | (cpustate->pc & 0xffff0000);*/
+		return (addr & 0xffff) | (cpustate->pc & 0x7f0000);
+	else
+		return addr;
 }
 
-INLINE UINT16 RDMEM_W(z8000_state *cpustate, UINT32 addr)
+INLINE UINT8 RDMEM_B(z8000_state *cpustate, address_spacenum spacenum, UINT32 addr)
 {
+	addr = adjust_addr_for_nonseg_mode(cpustate, addr);
+	if (spacenum == AS_PROGRAM)
+		return cpustate->program->read_byte(addr);
+	else
+		return cpustate->data->read_byte(addr);
+}
+
+INLINE UINT16 RDMEM_W(z8000_state *cpustate, address_spacenum spacenum, UINT32 addr)
+{
+	addr = adjust_addr_for_nonseg_mode(cpustate, addr);
 	addr &= ~1;
     /* hack for m20 driver: BIOS accesses 0x7f0000 and expects a segmentation violation */
     if (addr >= 0x7f0000) {
         cpustate->irq_req = Z8000_SEGTRAP;
         return 0xffff;
     }
-	return cpustate->program->read_word(addr);
+	if (spacenum == AS_PROGRAM)
+		return cpustate->program->read_word(addr);
+	else
+		return cpustate->data->read_word(addr);
 }
 
-INLINE UINT32 RDMEM_L(z8000_state *cpustate, UINT32 addr)
+INLINE UINT32 RDMEM_L(z8000_state *cpustate, address_spacenum spacenum, UINT32 addr)
 {
 	UINT32 result;
+	addr = adjust_addr_for_nonseg_mode(cpustate, addr);
 	addr &= ~1;
-	result = cpustate->program->read_word(addr) << 16;
-	return result + cpustate->program->read_word(addr_add(cpustate, addr, 2));
+	if (spacenum == AS_PROGRAM)
+	{
+		result = cpustate->program->read_word(addr) << 16;
+		return result + cpustate->program->read_word(addr_add(cpustate, addr, 2));
+	}
+	else
+	{
+		result = cpustate->data->read_word(addr) << 16;
+		return result + cpustate->data->read_word(addr_add(cpustate, addr, 2));
+	}
 }
 
-INLINE void WRMEM_B(z8000_state *cpustate, UINT32 addr, UINT8 value)
+INLINE void WRMEM_B(z8000_state *cpustate, address_spacenum spacenum, UINT32 addr, UINT8 value)
 {
-	cpustate->program->write_byte(addr, value);
+	addr = adjust_addr_for_nonseg_mode(cpustate, addr);
+	if (spacenum == AS_PROGRAM)
+		cpustate->program->write_byte(addr, value);
+	else
+		cpustate->data->write_byte(addr, value);
 }
 
-INLINE void WRMEM_W(z8000_state *cpustate, UINT32 addr, UINT16 value)
+INLINE void WRMEM_W(z8000_state *cpustate, address_spacenum spacenum, UINT32 addr, UINT16 value)
 {
+	addr = adjust_addr_for_nonseg_mode(cpustate, addr);
 	addr &= ~1;
-	cpustate->program->write_word(addr, value);
+	if (spacenum == AS_PROGRAM)
+		cpustate->program->write_word(addr, value);
+	else
+		cpustate->data->write_word(addr, value);
 }
 
-INLINE void WRMEM_L(z8000_state *cpustate, UINT32 addr, UINT32 value)
+INLINE void WRMEM_L(z8000_state *cpustate, address_spacenum spacenum, UINT32 addr, UINT32 value)
 {
+	addr = adjust_addr_for_nonseg_mode(cpustate, addr);
 	addr &= ~1;
-	cpustate->program->write_word(addr, value >> 16);
-	cpustate->program->write_word(addr_add(cpustate, addr, 2), value & 0xffff);
+	if (spacenum == AS_PROGRAM)
+	{
+		cpustate->program->write_word(addr, value >> 16);
+		cpustate->program->write_word(addr_add(cpustate, addr, 2), value & 0xffff);
+	}
+	else
+	{
+		cpustate->data->write_word(addr, value >> 16);
+		cpustate->data->write_word(addr_add(cpustate, addr, 2), value & 0xffff);
+	}
 }
 
 INLINE UINT8 RDPORT_B(z8000_state *cpustate, int mode, UINT16 addr)
@@ -382,9 +426,9 @@ if (cpustate->device->type() == Z8001) \
     PUSHW(cpustate, SP, cpustate->pc);        /* save current cpustate->pc */ \
 } while (0)
 
-#define GET_PC(VEC) (cpustate->device->type() == Z8001 ? segmented_addr(RDMEM_L(cpustate, VEC + 4)) : RDMEM_W(cpustate, VEC + 2))
-#define GET_FCW(VEC) (cpustate->device->type() == Z8001 ? RDMEM_W(cpustate, VEC + 2) : RDMEM_W(cpustate, VEC))
-
+#define GET_PC(VEC) (cpustate->device->type() == Z8001 ? segmented_addr(RDMEM_L(cpustate, AS_PROGRAM, VEC + 4)) : RDMEM_W(cpustate, AS_PROGRAM, VEC + 2))
+#define GET_FCW(VEC) (cpustate->device->type() == Z8001 ? RDMEM_W(cpustate, AS_PROGRAM, VEC + 2) : RDMEM_W(cpustate, AS_PROGRAM, VEC))
+#define F_SEG_Z8001 (cpustate->device->type() == Z8001 ? F_SEG : 0)
 
 INLINE void Interrupt(z8000_state *cpustate)
 {
@@ -405,7 +449,7 @@ INLINE void Interrupt(z8000_state *cpustate)
     /* trap ? */
     if (cpustate->irq_req & Z8000_EPU)
     {
-        CHANGE_FCW(cpustate, fcw | F_S_N);/* swap to system stack */
+        CHANGE_FCW(cpustate, fcw | F_S_N | F_SEG_Z8001);/* switch to segmented (on Z8001) system mode */
         PUSH_PC();
         PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
         PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
@@ -418,7 +462,7 @@ INLINE void Interrupt(z8000_state *cpustate)
     else
     if (cpustate->irq_req & Z8000_TRAP)
     {
-        CHANGE_FCW(cpustate, fcw | F_S_N);/* swap to system stack */
+        CHANGE_FCW(cpustate, fcw | F_S_N | F_SEG_Z8001);/* switch to segmented (on Z8001) system mode */
         PUSH_PC();
         PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
         PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
@@ -431,7 +475,7 @@ INLINE void Interrupt(z8000_state *cpustate)
     else
     if (cpustate->irq_req & Z8000_SYSCALL)
     {
-        CHANGE_FCW(cpustate, fcw | F_S_N);/* swap to system stack */
+        CHANGE_FCW(cpustate, fcw | F_S_N | F_SEG_Z8001);/* switch to segmented (on Z8001) system mode */
         PUSH_PC();
         PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
         PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
@@ -444,7 +488,7 @@ INLINE void Interrupt(z8000_state *cpustate)
     else
     if (cpustate->irq_req & Z8000_SEGTRAP)
     {
-        CHANGE_FCW(cpustate, fcw | F_S_N);/* swap to system stack */
+        CHANGE_FCW(cpustate, fcw | F_S_N | F_SEG_Z8001);/* switch to segmented (on Z8001) system mode */
         PUSH_PC();
         PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
         PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
@@ -457,12 +501,12 @@ INLINE void Interrupt(z8000_state *cpustate)
     else
     if (cpustate->irq_req & Z8000_NMI)
     {
-        CHANGE_FCW(cpustate, fcw | F_S_N);/* swap to system stack */
+        CHANGE_FCW(cpustate, fcw | F_S_N | F_SEG_Z8001);/* switch to segmented (on Z8001) system mode */
         PUSH_PC();
         PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
         PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
         cpustate->irq_srv = cpustate->irq_req;
-        cpustate->pc = RDMEM_W(cpustate,  NMI);
+        cpustate->pc = RDMEM_W(cpustate, AS_PROGRAM, NMI);
         cpustate->irq_req &= ~Z8000_NMI;
         CHANGE_FCW(cpustate, GET_FCW(NMI));
         cpustate->pc = GET_PC(NMI);
@@ -471,12 +515,12 @@ INLINE void Interrupt(z8000_state *cpustate)
     else
     if ((cpustate->irq_req & Z8000_NVI) && (cpustate->fcw & F_NVIE))
     {
-        CHANGE_FCW(cpustate, fcw | F_S_N);/* swap to system stack */
+        CHANGE_FCW(cpustate, fcw | F_S_N | F_SEG_Z8001);/* switch to segmented (on Z8001) system mode */
         PUSH_PC();
         PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
         PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
         cpustate->irq_srv = cpustate->irq_req;
-        cpustate->pc = GET_PC(NVI); //RDMEM_W(cpustate,  NVI + 2);
+        cpustate->pc = GET_PC(NVI);
         cpustate->irq_req &= ~Z8000_NVI;
         CHANGE_FCW(cpustate, GET_FCW(NVI));
         LOG(("Z8K '%s' NVI $%04x\n", cpustate->device->tag(), cpustate->pc));
@@ -484,15 +528,15 @@ INLINE void Interrupt(z8000_state *cpustate)
     else
     if ((cpustate->irq_req & Z8000_VI) && (cpustate->fcw & F_VIE))
     {
-        CHANGE_FCW(cpustate, fcw | F_S_N);/* swap to system stack */
+        CHANGE_FCW(cpustate, fcw | F_S_N | F_SEG_Z8001);/* switch to segmented (on Z8001) system mode */
         PUSH_PC();
         PUSHW(cpustate, SP, fcw);       /* save current cpustate->fcw */
         PUSHW(cpustate, SP, cpustate->irq_req);   /* save interrupt/trap type tag */
         cpustate->irq_srv = cpustate->irq_req;
 		if (cpustate->device->type() == Z8001)
-			cpustate->pc =  segmented_addr(RDMEM_L(cpustate, VEC00 + 4 * (cpustate->irq_req & 0xff)));
+			cpustate->pc =  segmented_addr(RDMEM_L(cpustate, AS_PROGRAM, VEC00 + 4 * (cpustate->irq_req & 0xff)));
 		else
-			cpustate->pc = RDMEM_W(cpustate, VEC00 + 2 * (cpustate->irq_req & 0xff));
+			cpustate->pc = RDMEM_W(cpustate, AS_PROGRAM, VEC00 + 2 * (cpustate->irq_req & 0xff));
         cpustate->irq_req &= ~Z8000_VI;
         CHANGE_FCW(cpustate, GET_FCW(VI));
         //printf ("z8k VI (vec 0x%x)\n", cpustate->irq_req & 0xff);
@@ -504,9 +548,17 @@ static CPU_INIT( z8001 )
 {
 	z8000_state *cpustate = get_safe_token(device);
 
+	memset(cpustate, 0, sizeof(*cpustate));
+
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = &device->space(AS_PROGRAM);
+	/* If the system decodes STn lines to distinguish between data and program memory fetches,
+	   install the data space. If it doesn't, install the program memory into data memory space. */
+	if (device->has_space(AS_DATA))
+		cpustate->data = &device->space(AS_DATA);
+	else
+		cpustate->data = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = &device->space(AS_IO);
 
@@ -519,9 +571,17 @@ static CPU_INIT( z8002 )
 {
 	z8000_state *cpustate = get_safe_token(device);
 
+	memset(cpustate, 0, sizeof(*cpustate));
+
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = &device->space(AS_PROGRAM);
+	/* If the system decodes STn lines to distinguish between data and program memory fetches,
+	   install the data space. If it doesn't, install the program memory into data memory space. */
+	if (device->has_space(AS_DATA))
+		cpustate->data = &device->space(AS_DATA);
+	else
+		cpustate->data = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = &device->space(AS_IO);
 
@@ -534,21 +594,14 @@ static CPU_RESET( z8001 )
 {
 	z8000_state *cpustate = get_safe_token(device);
 
-	device_irq_acknowledge_callback save_irqcallback = cpustate->irq_callback;
-	memset(cpustate, 0, sizeof(*cpustate));
-	cpustate->irq_callback = save_irqcallback;
-	cpustate->device = device;
-	cpustate->program = &device->space(AS_PROGRAM);
-	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = &device->space(AS_IO);
-	cpustate->fcw = RDMEM_W(cpustate,  2); /* get reset cpustate->fcw */
+	cpustate->fcw = RDMEM_W(cpustate, AS_PROGRAM, 2); /* get reset cpustate->fcw */
 	if(cpustate->fcw & F_SEG)
 	{
-		cpustate->pc = ((RDMEM_W(cpustate,  4) & 0x0700) << 8) | (RDMEM_W(cpustate, 6) & 0xffff); /* get reset cpustate->pc  */
+		cpustate->pc = ((RDMEM_W(cpustate, AS_PROGRAM, 4) & 0x0700) << 8) | (RDMEM_W(cpustate, AS_PROGRAM, 6) & 0xffff); /* get reset cpustate->pc  */
 	}
 	else
 	{
-		cpustate->pc = RDMEM_W(cpustate,  4); /* get reset cpustate->pc  */
+		cpustate->pc = RDMEM_W(cpustate, AS_PROGRAM, 4); /* get reset cpustate->pc  */
 	}
 }
 
@@ -556,15 +609,8 @@ static CPU_RESET( z8002 )
 {
 	z8000_state *cpustate = get_safe_token(device);
 
-	device_irq_acknowledge_callback save_irqcallback = cpustate->irq_callback;
-	memset(cpustate, 0, sizeof(*cpustate));
-	cpustate->irq_callback = save_irqcallback;
-	cpustate->device = device;
-	cpustate->program = &device->space(AS_PROGRAM);
-	cpustate->direct = &cpustate->program->direct();
-	cpustate->io = &device->space(AS_IO);
-	cpustate->fcw = RDMEM_W(cpustate,  2); /* get reset cpustate->fcw */
-	cpustate->pc = RDMEM_W(cpustate,  4); /* get reset cpustate->pc  */
+	cpustate->fcw = RDMEM_W(cpustate, AS_PROGRAM, 2); /* get reset cpustate->fcw */
+	cpustate->pc = RDMEM_W(cpustate, AS_PROGRAM, 4); /* get reset cpustate->pc  */
 }
 
 static CPU_EXIT( z8000 )
@@ -591,6 +637,7 @@ static CPU_EXECUTE( z8000 )
         else
         {
             Z8000_exec *exec;
+
             cpustate->op[0] = RDOP(cpustate);
             cpustate->op_valid = 1;
             exec = &z8000_exec[cpustate->op[0]];
@@ -839,6 +886,8 @@ CPU_GET_INFO( z8001 )
 	{
 		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 20;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA: info->i = 20;					break;
 		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 16;					break;
 

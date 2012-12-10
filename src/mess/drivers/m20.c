@@ -290,6 +290,7 @@ WRITE_LINE_MEMBER( m20_state::timer_tick_w )
          3   Screen bitmap
          4   Diagnostics and Bootstrap
 */
+#if 0
 static ADDRESS_MAP_START(m20_mem, AS_PROGRAM, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00000, 0x01fff ) AM_RAM AM_SHARE("mainram")
@@ -308,6 +309,107 @@ static ADDRESS_MAP_START(m20_mem, AS_PROGRAM, 16, m20_state)
     AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM
     AM_RANGE( 0xc0000, 0xc3fff ) AM_RAM
 //  AM_RANGE( 0x34000, 0x37fff ) AM_RAM //extra vram for color mode
+ADDRESS_MAP_END
+#endif
+
+static ADDRESS_MAP_START(m20_program_mem, AS_PROGRAM, 16, m20_state)
+	ADDRESS_MAP_UNMAP_HIGH
+  AM_RANGE( 0x00000, 0x03fff ) AM_RAM AM_SHARE("dram0_4000") //AM_SHARE("mainram")
+  AM_RANGE( 0x04000, 0x07fff ) AM_RAM AM_SHARE("dram0_8000")
+  AM_RANGE( 0x08000, 0x0bfff ) AM_RAM AM_SHARE("dram0_c000")
+  AM_RANGE( 0x0c000, 0x0ffff ) AM_RAM AM_SHARE("dram0_10000")
+
+  AM_RANGE( 0x10000, 0x13fff ) AM_RAM AM_SHARE("dram0_8000")
+  AM_RANGE( 0x14000, 0x17fff ) AM_RAM AM_SHARE("dram0_c000")
+  AM_RANGE( 0x18000, 0x1bfff ) AM_RAM AM_SHARE("dram0_10000")
+//AM_RANGE( 0x1c000, 0x1ffff ) AM_RAM AM_SHARE("dram0_10000")
+
+  AM_RANGE( 0x20000, 0x23fff ) AM_RAM AM_SHARE("dram0_14000")
+  AM_RANGE( 0x24000, 0x27fff ) AM_RAM AM_SHARE("dram0_18000")
+  AM_RANGE( 0x28000, 0x2bfff ) AM_RAM AM_SHARE("dram0_1c000")
+  AM_RANGE( 0x2c000, 0x2ffff ) AM_RAM AM_SHARE("dram1_0000")
+
+  AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")
+
+AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
+//AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_SHARE("maincpu")
+
+  AM_RANGE( 0x60000, 0x63fff ) AM_RAM AM_SHARE("dram0_8000")
+  AM_RANGE( 0x64000, 0x67fff ) AM_RAM AM_SHARE("dram0_c000")
+  AM_RANGE( 0x68000, 0x6bfff ) AM_RAM AM_SHARE("dram0_10000")
+
+  AM_RANGE( 0x80000, 0x83fff ) AM_RAM AM_SHARE("dram0_8000")
+  AM_RANGE( 0x84000, 0x87fff ) AM_RAM AM_SHARE("dram0_c000")
+  AM_RANGE( 0x88000, 0x8bfff ) AM_RAM AM_SHARE("dram1_4000")
+  AM_RANGE( 0x8c000, 0x8ffff ) AM_RAM AM_SHARE("dram2_0000")
+
+  AM_RANGE( 0x90000, 0x93fff ) AM_RAM AM_SHARE("dram0_18000")
+  AM_RANGE( 0x94000, 0x97fff ) AM_RAM AM_SHARE("dram0_1c000")
+  AM_RANGE( 0x98000, 0x9bfff ) AM_RAM AM_SHARE("dram2_4000")
+  AM_RANGE( 0x9c000, 0x9ffff ) AM_RAM AM_SHARE("dram3_0000")
+
+  AM_RANGE( 0xa0000, 0xa3fff ) AM_RAM AM_SHARE("dram0_8000")
+  AM_RANGE( 0xa4000, 0xa7fff ) AM_RAM AM_SHARE("dram0_c000")
+  AM_RANGE( 0xa8000, 0xabfff ) AM_RAM AM_SHARE("dram1_4000")
+  AM_RANGE( 0xac000, 0xaffff ) AM_RAM AM_SHARE("dram2_0000")
+
+  AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM AM_SHARE("dram3_4000")
+
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(m20_data_mem, AS_DATA, 16, m20_state)
+	ADDRESS_MAP_UNMAP_HIGH
+
+  AM_RANGE( 0x00000, 0x03fff ) AM_RAM AM_SHARE("dram0_4000")
+  AM_RANGE( 0x04000, 0x07fff ) AM_RAM AM_SHARE("dram1_4000")
+  AM_RANGE( 0x08000, 0x0bfff ) AM_RAM AM_SHARE("dram2_0000")
+  AM_RANGE( 0x0c000, 0x0ffff ) AM_RAM AM_SHARE("dram2_4000")
+
+  AM_RANGE( 0x10000, 0x13fff ) AM_RAM AM_SHARE("dram0_14000")
+  AM_RANGE( 0x14000, 0x17fff ) AM_RAM AM_SHARE("dram0_18000")
+  AM_RANGE( 0x18000, 0x1bfff ) AM_RAM AM_SHARE("dram0_1c000")
+  AM_RANGE( 0x1c000, 0x1ffff ) AM_RAM AM_SHARE("dram1_0000")
+
+  AM_RANGE( 0x20000, 0x23fff ) AM_RAM AM_SHARE("dram0_14000")
+  AM_RANGE( 0x24000, 0x27fff ) AM_RAM AM_SHARE("dram0_18000")
+  AM_RANGE( 0x28000, 0x2bfff ) AM_RAM AM_SHARE("dram0_1c000")
+  AM_RANGE( 0x2c000, 0x2ffff ) AM_RAM AM_SHARE("dram1_0000")
+
+  AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")
+
+//AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_SHARE("maincpu")
+  AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
+
+  AM_RANGE( 0x44000, 0x47fff ) AM_RAM AM_SHARE("dram3_0000")
+  AM_RANGE( 0x48000, 0x4bfff ) AM_RAM AM_SHARE("dram3_4000")
+
+  AM_RANGE( 0x50000, 0x53fff ) AM_RAM AM_SHARE("dram0_8000")
+  AM_RANGE( 0x54000, 0x57fff ) AM_RAM AM_SHARE("dram0_c000")
+  AM_RANGE( 0x58000, 0x5bfff ) AM_RAM AM_SHARE("dram0_10000")
+
+  AM_RANGE( 0x60000, 0x63fff ) AM_RAM AM_SHARE("dram0_8000")
+  AM_RANGE( 0x64000, 0x67fff ) AM_RAM AM_SHARE("dram0_c000")
+  AM_RANGE( 0x68000, 0x6bfff ) AM_RAM AM_SHARE("dram0_10000")
+
+  AM_RANGE( 0x80000, 0x83fff ) AM_RAM AM_SHARE("dram0_18000")
+  AM_RANGE( 0x84000, 0x87fff ) AM_RAM AM_SHARE("dram0_1c000")
+  AM_RANGE( 0x88000, 0x8bfff ) AM_RAM AM_SHARE("dram2_4000")
+  AM_RANGE( 0x8c000, 0x8ffff ) AM_RAM AM_SHARE("dram3_0000")
+
+  AM_RANGE( 0x90000, 0x93fff ) AM_RAM AM_SHARE("dram0_18000")
+  AM_RANGE( 0x94000, 0x97fff ) AM_RAM AM_SHARE("dram0_1c000")
+  AM_RANGE( 0x98000, 0x9bfff ) AM_RAM AM_SHARE("dram2_4000")
+  AM_RANGE( 0x9c000, 0x9ffff ) AM_RAM AM_SHARE("dram3_0000")
+
+  AM_RANGE( 0xa0000, 0xa3fff ) AM_RAM AM_SHARE("dram0_8000")
+  AM_RANGE( 0xa4000, 0xa7fff ) AM_RAM AM_SHARE("dram0_c000")
+  AM_RANGE( 0xa8000, 0xabfff ) AM_RAM AM_SHARE("dram1_4000")
+  AM_RANGE( 0xac000, 0xaffff ) AM_RAM AM_SHARE("dram2_0000")
+
+  AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM AM_SHARE("dram3_4000")
+
+  AM_RANGE( 0xc0000, 0xc3fff ) AM_RAM AM_SHARE("dram3_4000")
+
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
@@ -373,9 +475,10 @@ void m20_state::machine_start()
 void m20_state::machine_reset()
 {
 	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	UINT8 *RAM = (UINT8 *)machine().root_device().memshare("mainram")->ptr();
+        //	UINT8 *RAM = (UINT8 *)machine().root_device().memshare("mainram")->ptr();
+	UINT8 *RAM = (UINT8 *)machine().root_device().memshare("dram0_4000")->ptr();
 
-    ROM += 0x10000; // don't know why they load at an offset, but let's go with it
+        //ROM += 0x10000; // don't know why they load at an offset, but let's go with it
 
 	m_port21 = 0xff;
 
@@ -521,7 +624,8 @@ FLOPPY_FORMATS_END
 static MACHINE_CONFIG_START( m20, m20_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z8001, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(m20_mem)
+	MCFG_CPU_PROGRAM_MAP(m20_program_mem)
+	MCFG_CPU_DATA_MAP(m20_data_mem)
 	MCFG_CPU_IO_MAP(m20_io)
 
 #if 0
@@ -556,7 +660,21 @@ static MACHINE_CONFIG_START( m20, m20_state )
 MACHINE_CONFIG_END
 
 ROM_START(m20)
-	ROM_REGION(0x12000,"maincpu", 0)
+	ROM_REGION(0x2000,"maincpu", 0)
+//ROM_REGION(0x12000,"maincpu", 0)
+	ROM_SYSTEM_BIOS( 0, "m20", "M20 1.0" )
+	ROMX_LOAD("m20.bin", 0x0000, 0x2000, CRC(5c93d931) SHA1(d51025e087a94c55529d7ee8fd18ff4c46d93230), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "m20-20d", "M20 2.0d" )
+	ROMX_LOAD("m20-20d.bin", 0x0000, 0x2000, CRC(cbe265a6) SHA1(c7cb9d9900b7b5014fcf1ceb2e45a66a91c564d0), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 2, "m20-20f", "M20 2.0f" )
+	ROMX_LOAD("m20-20f.bin", 0x0000, 0x2000, CRC(db7198d8) SHA1(149d8513867081d31c73c2965dabb36d5f308041), ROM_BIOS(3))
+
+ROM_END
+
+#if 0
+ROM_START(m20)
+	ROM_REGION(0x2000,"maincpu", 0)
+//ROM_REGION(0x12000,"maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "m20", "M20 1.0" )
 	ROMX_LOAD("m20.bin", 0x10000, 0x2000, CRC(5c93d931) SHA1(d51025e087a94c55529d7ee8fd18ff4c46d93230), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "m20-20d", "M20 2.0d" )
@@ -567,6 +685,7 @@ ROM_START(m20)
 	ROM_REGION(0x4000,"apb_bios", 0) // Processor board with 8086
 	ROM_LOAD( "apb-1086-2.0.bin", 0x0000, 0x4000, CRC(8c05be93) SHA1(2bb424afd874cc6562e9642780eaac2391308053))
 ROM_END
+#endif
 
 ROM_START(m40)
 	ROM_REGION(0x14000,"maincpu", 0)
