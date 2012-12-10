@@ -29,15 +29,15 @@
     - Dies on ARTIC check;
     - Presumably one ROM is undumped?
 
-	floppy issues TODO (certain fail, even with a stock F version)
-	- Bokosuka Wars (perhaps not 2hd?)
+	floppy issues TODO (certain fail)
+	- Bokosuka Wars
 	- Dokkin Minako Sensei (2dd image)
 
 	List of per-game TODO:
-	- 4D Boxing: tries to format User Disk;
+	- 4D Boxing: inputs are unresponsive
 	- 4D Driving: accesses some undefined ports (guess that it accesses the low part of them with word opcodes ...)
-	- Absolutely Mahjong: Epson splash screen doesn't appear at all, why?
-	- Brandish 2: has some annoying strips at the main menu, also no selection seems to work;
+	- Absolutely Mahjong: Kanji data doesn't appear at the Epson logo. Transitions are too fast.
+	- Brandish 2: Intro needs some window masking effects;
 	- Dragon Buster: missing bitplanes for the PCG, slight issue with window masking;
 	- Far Side Moon: doesn't detect neither mouse nor sound board;
 	- First Queen: has broken text display;
@@ -397,6 +397,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9801_gvram_w);
 	DECLARE_READ8_MEMBER(pc9801_mouse_r);
 	DECLARE_WRITE8_MEMBER(pc9801_mouse_w);
+	DECLARE_WRITE8_MEMBER(pc9801rs_mouse_freq_w);
 	inline UINT8 m_pc9801rs_grcg_r(UINT32 offset,int vbank);
 	inline void m_pc9801rs_grcg_w(UINT32 offset,int vbank,UINT8 data);
 	DECLARE_READ8_MEMBER(pc9801_opn_r);
@@ -542,6 +543,8 @@ public:
 		UINT8 control;
 		UINT8 lx;
 		UINT8 ly;
+		UINT8 freq_reg;
+		UINT8 freq_index;
 	}m_mouse;
 	TIMER_DEVICE_CALLBACK_MEMBER( mouse_irq_cb );
 
@@ -553,6 +556,7 @@ public:
 
 
 
+#define ATTRSEL_REG 0
 #define WIDTH40_REG 2
 #define FONTSEL_REG 3
 #define INTERLACE_REG 4
@@ -707,6 +711,9 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		u_line = attr & 8;
 		v_line = attr & 0x10;
 		color = (attr & 0xe0) >> 5;
+
+		if(state->m_video_ff[ATTRSEL_REG])
+			v_line = 0;
 
 		for(yi=0;yi<lr;yi++)
 		{
@@ -1077,7 +1084,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_video_ff_w)
 		}
 
 
-		if(1)
+		if(0)
 		{
 			static const char *const video_ff_regnames[] =
 			{
@@ -1096,7 +1103,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_video_ff_w)
 	}
 	else // odd
 	{
-		printf("Write to undefined port [%02x] <- %02x\n",offset+0x68,data);
+		//printf("Write to undefined port [%02x] <- %02x\n",offset+0x68,data);
 	}
 }
 
@@ -1130,8 +1137,8 @@ WRITE8_MEMBER(pc9801_state::pc9801_70_w)
 	{
 		if(offset < 0x08)
 			pit8253_w(machine().device("pit8253"), space, (offset & 6) >> 1, data);
-		else
-			printf("Write to undefined port [%02x] <- %02x\n",offset+0x70,data);
+		//else
+		//	printf("Write to undefined port [%02x] <- %02x\n",offset+0x70,data);
 	}
 }
 
@@ -1289,7 +1296,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 			}
 		}
 
-		printf("Write to undefined port [%02x] <- %02x\n",offset+0xa0,data);
+		//printf("Write to undefined port [%02x] <- %02x\n",offset+0xa0,data);
 	}
 }
 
@@ -1925,6 +1932,16 @@ WRITE8_MEMBER( pc9801_state::pc9801rs_access_ctrl_w )
 		m_access_ctrl = data;
 }
 
+WRITE8_MEMBER( pc9801_state::pc9801rs_mouse_freq_w )
+{
+	/* TODO: bit 3 used */
+	if(offset == 3)
+	{
+		m_mouse.freq_reg = data & 3;
+		m_mouse.freq_index = 0;
+	}
+}
+
 static ADDRESS_MAP_START( pc9801rs_map, AS_PROGRAM, 32, pc9801_state )
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE8(pc9801rs_memory_r,pc9801rs_memory_w,0xffffffff)
 ADDRESS_MAP_END
@@ -1949,6 +1966,7 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffffffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank
 	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,     pc9801_mouse_w,     0xffffffff) // <undefined> / mouse ppi8255 ports
+	AM_RANGE(0xbfd8, 0xbfdf) AM_WRITE8(pc9801rs_mouse_freq_w, 0xffffffff)
 ADDRESS_MAP_END
 
 READ8_MEMBER(pc9801_state::pc980ux_memory_r)
@@ -2716,7 +2734,8 @@ static INPUT_PORTS_START( pc9801 )
 
 	PORT_START("MOUSE_B")
 	PORT_BIT(0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Middle Button")
+	/* TODO: Brandish 2 apparently needs both bits 7 & 5 to be active, to enter into a main menu sub-item. */
+	PORT_BIT(0x20, IP_ACTIVE_LOW,  IPT_UNUSED )// PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Middle Button")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Right Button")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Left Button")
 
@@ -3328,6 +3347,8 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 
 	m_nmi_ff = 0;
 	m_mouse.control = 0xff;
+	m_mouse.freq_reg = 0;
+	m_mouse.freq_index = 0;
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9801f)
@@ -3438,8 +3459,16 @@ TIMER_DEVICE_CALLBACK_MEMBER( pc9801_state::mouse_irq_cb )
 {
 	if((m_mouse.control & 0x10) == 0)
 	{
-		pic8259_ir5_w(machine().device("pic8259_slave"), 0);
-		pic8259_ir5_w(machine().device("pic8259_slave"), 1);
+		m_mouse.freq_index ++;
+
+//		printf("%02x\n",m_mouse.freq_index);
+		if(m_mouse.freq_index > m_mouse.freq_reg)
+		{
+//			printf("irq %02x\n",m_mouse.freq_reg);
+			m_mouse.freq_index = 0;
+			pic8259_ir5_w(machine().device("pic8259_slave"), 0);
+			pic8259_ir5_w(machine().device("pic8259_slave"), 1);
+		}
 	}
 }
 
