@@ -2241,7 +2241,7 @@ dp8473_device::dp8473_device(const machine_config &mconfig, const char *tag, dev
 pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "PC FDC SUPERIO", tag, owner, clock)
 {
 	m_shortname = "pc8477a";
-	ready_polled = false;
+	ready_polled = true;
 	ready_connected = false;
 	select_connected = true;
 }
@@ -2249,7 +2249,7 @@ pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, d
 wd37c65c_device::wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : upd765_family_device(mconfig, PC_FDC_SUPERIO, "PC FDC SUPERIO", tag, owner, clock)
 {
 	m_shortname = "wd37c65c";
-	ready_polled = false;
+	ready_polled = true;
 	ready_connected = false;
 	select_connected = true;
 }
