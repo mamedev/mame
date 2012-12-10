@@ -2519,6 +2519,7 @@ int gte::docop2( UINT32 pc, int gteop )
 			return 1;
 		}
 		break;
+
 	case 0x13:
 		if( gteop == 0x0e80413 )
 		{
@@ -2558,6 +2559,7 @@ int gte::docop2( UINT32 pc, int gteop )
 			return 1;
 		}
 		break;
+
 	case 0x14:
 		if( gteop == 0x1280414 )
 		{
@@ -2591,6 +2593,7 @@ int gte::docop2( UINT32 pc, int gteop )
 			return 1;
 		}
 		break;
+
 	case 0x16:
 		if( gteop == 0x0f80416 )
 		{
@@ -2633,6 +2636,7 @@ int gte::docop2( UINT32 pc, int gteop )
 			return 1;
 		}
 		break;
+
 	case 0x1b:
 		if( gteop == 0x108041b || gteop == 0x118041b )
 		{
@@ -2672,6 +2676,7 @@ int gte::docop2( UINT32 pc, int gteop )
 			return 1;
 		}
 		break;
+
 	case 0x1c:
 		if( gteop == 0x138041c )
 		{
@@ -2705,6 +2710,7 @@ int gte::docop2( UINT32 pc, int gteop )
 			return 1;
 		}
 		break;
+
 	case 0x1e:
 		if( gteop == 0x0c8041e )
 		{
@@ -2738,6 +2744,7 @@ int gte::docop2( UINT32 pc, int gteop )
 			return 1;
 		}
 		break;
+
 	case 0x20:
 		if( gteop == 0x0d80420 )
 		{
@@ -2790,7 +2797,34 @@ int gte::docop2( UINT32 pc, int gteop )
 		IR3 = Lm_B3( MAC3, lm );
 		return 1;
 
-	// DCPL 0x29
+	case 0x29:
+		if( gteop == 0x0680029 )
+		{
+			GTELOG( pc, "%08x DCPL", gteop );
+			FLAG = 0;
+
+			MAC1 = A1( ( ( ( (INT64) R << 4 ) * IR1 ) + ( IR0 * Lm_B1( RFC - ( ( R * IR1 ) >> 8 ), 0 ) ) ) >> 12 );
+			MAC2 = A2( ( ( ( (INT64) G << 4 ) * IR2 ) + ( IR0 * Lm_B2( GFC - ( ( G * IR2 ) >> 8 ), 0 ) ) ) >> 12 );
+			MAC3 = A3( ( ( ( (INT64) B << 4 ) * IR3 ) + ( IR0 * Lm_B3( BFC - ( ( B * IR3 ) >> 8 ), 0 ) ) ) >> 12 );
+			IR1 = Lm_B1( MAC1, 1 );
+			IR2 = Lm_B2( MAC2, 1 );
+			IR3 = Lm_B3( MAC3, 1 );
+			CD0 = CD1;
+			CD1 = CD2;
+			CD2 = CODE;
+			R0 = R1;
+			R1 = R2;
+			R2 = Lm_C1( MAC1 >> 4 );
+			G0 = G1;
+			G1 = G2;
+			G2 = Lm_C2( MAC2 >> 4 );
+			B0 = B1;
+			B1 = B2;
+			B2 = Lm_C3( MAC3 >> 4 );
+			return 1;
+		}
+		break;
+
 	case 0x2a:
 		if( gteop == 0x0f8002a )
 		{
@@ -2871,6 +2905,7 @@ int gte::docop2( UINT32 pc, int gteop )
 			return 1;
 		}
 		break;
+
 	case 0x3d:
 		if( GTE_OP( gteop ) == 0x09 ||
 			GTE_OP( gteop ) == 0x19 )
@@ -2900,6 +2935,7 @@ int gte::docop2( UINT32 pc, int gteop )
 			return 1;
 		}
 		break;
+
 	case 0x3e:
 		if( GTE_OP( gteop ) == 0x1a )
 		{
@@ -2928,6 +2964,7 @@ int gte::docop2( UINT32 pc, int gteop )
 			return 1;
 		}
 		break;
+
 	case 0x3f:
 		if( gteop == 0x108043f ||
 			gteop == 0x118043f )
