@@ -1209,12 +1209,9 @@ READ8_MEMBER(pc9801_state::pc9801_a0_r)
 					return m_pcg_ram[pcg_offset];
 				}
 
-				//printf("%08x = %04x %04x %04x\n",pcg_offset,m_font_addr,m_font_line,m_font_lr);
-
-//				pcg_offset = BITSWAP16(m_font_addr,15,7,14,13,12,11,6,5,10,9,8,4,3,2,1,0) << 5; // TODO
-				pcg_offset = m_font_addr << 5;
-				pcg_offset|= m_font_line;
-				pcg_offset|= m_font_lr;
+				/* TODO: Brandish 2 accesses a 0008a561 kanji address, obviously causing a crash. */
+				if(pcg_offset >= 0x80000)
+					return 0;
 
 				return m_kanji_rom[pcg_offset]; // TODO, kanji ROM
 			}
