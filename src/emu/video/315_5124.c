@@ -290,6 +290,7 @@ void sega315_5124_device::device_timer(emu_timer &timer, device_timer_id id, int
 		break;
 
 	case TIMER_DRAW:
+		update_palette();
 		draw_scanline( SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH, param, m_screen->vpos() - param );
 		break;
 
@@ -469,7 +470,7 @@ void sega315_5124_device::process_line_timer()
 		/* Draw middle of the border */
 		/* We need to do this through the regular drawing function so it will */
 		/* be included in the gamegear scaling functions */
-		select_sprites( vpos_limit, vpos - vpos_limit );
+		select_sprites( vpos_limit + m_frame_timing[TOP_BORDER], vpos - (vpos_limit + m_frame_timing[TOP_BORDER]) );
 		draw_scanline( SEGA315_5124_LBORDER_START + SEGA315_5124_LBORDER_WIDTH, vpos_limit + m_frame_timing[TOP_BORDER], vpos - (vpos_limit + m_frame_timing[TOP_BORDER]) );
 		return;
 	}
