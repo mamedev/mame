@@ -6,7 +6,7 @@ The Hitachi hcd62121 is the custom cpu which was used in the Casio
 CFX-9850 (and maybe some other things too).
 
 This CPU core is based on the information provided by Martin Poupe.
-Martin Poupe's site can be found at http://prg.rkk.cz/~mpoupe/
+Martin Poupe's site can be found at http://martin.poupe.org/casio/
 
 **********************************************************************/
 
