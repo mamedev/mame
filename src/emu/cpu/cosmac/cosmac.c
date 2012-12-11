@@ -199,7 +199,7 @@ cosmac_device::cosmac_device(const machine_config &mconfig, const char *tag, dev
 	  m_direct(NULL)
 {
 	for (int i = 0; i < 4; i++)
-		EF[i] = 0;
+		EF[i] = CLEAR_LINE;
 }
 
 

@@ -256,11 +256,7 @@ int comx_eb_device::comx_ef4_r()
 	{
 		if (m_expansion_slot[slot] != NULL)
 		{
-			if (m_expansion_slot[slot]->ef4_r() == ASSERT_LINE)
-			{
-				state = ASSERT_LINE;
-				break;
-			}
+			state |= m_expansion_slot[slot]->ef4_r();
 		}
 	}
 
@@ -276,7 +272,7 @@ void comx_eb_device::comx_q_w(int state)
 {
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
-		if (BIT(m_select, slot) && m_expansion_slot[slot] != NULL)
+		if (m_expansion_slot[slot] != NULL)
 		{
 			m_expansion_slot[slot]->q_w(state);
 		}

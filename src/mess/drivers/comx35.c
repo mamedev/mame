@@ -251,7 +251,7 @@ INPUT_PORTS_END
 
 void comx35_state::check_interrupt()
 {
-	m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, m_cr1 | m_int);
+	m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, m_cr1 || m_int);
 }
 
 READ_LINE_MEMBER( comx35_state::clear_r )
@@ -457,7 +457,7 @@ void comx35_state::machine_start()
 {
 	// clear the RAM since DOS card will go crazy if RAM is not all zeroes
 	UINT8 *ram = m_ram->pointer();
-	memset(ram, 0, 0x8000);
+	memset(ram, 0, m_ram->size());
 
 	// find memory regions
 	m_rom = memregion(CDP1802_TAG)->base();

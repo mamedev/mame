@@ -94,16 +94,6 @@ static SLOT_INTERFACE_START( comx_fd_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-void comx_fd_device::intrq_w(bool state)
-{
-	m_intrq = state;
-}
-
-void comx_fd_device::drq_w(bool state)
-{
-	m_drq = state;
-}
-
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( comx_fd )
@@ -143,11 +133,8 @@ comx_fd_device::comx_fd_device(const machine_config &mconfig, const char *tag, d
 	m_fdc(*this, WD1770_TAG),
 	m_floppy0(*this, WD1770_TAG":0"),
 	m_floppy1(*this, WD1770_TAG":1"),
-	m_ds(0),
 	m_q(0),
 	m_addr(0),
-	m_intrq(0),
-	m_drq(0),
 	m_disb(1)
 {
 }
@@ -163,16 +150,12 @@ void comx_fd_device::device_start()
 	m_rom = memregion("c000")->base();
 
 	// initialize floppy controller
-	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(comx_fd_device::intrq_w), this));
-	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(comx_fd_device::drq_w), this));
 	m_fdc->dden_w(1);
 
 	// state saving
 	save_item(NAME(m_ds));
 	save_item(NAME(m_q));
 	save_item(NAME(m_addr));
-	save_item(NAME(m_intrq));
-	save_item(NAME(m_drq));
 	save_item(NAME(m_disb));
 }
 
@@ -183,7 +166,11 @@ void comx_fd_device::device_start()
 
 void comx_fd_device::device_reset()
 {
+	m_fdc->set_floppy(NULL);
 	m_fdc->reset();
+
+	m_addr = 0;
+	m_disb = 1;
 }
 
 
@@ -197,7 +184,7 @@ int comx_fd_device::comx_ef4_r()
 
 	if (m_ds && !m_disb)
 	{
-		state = m_drq ? ASSERT_LINE : CLEAR_LINE;
+		state = !m_fdc->drq_r();
 	}
 
 	return state;
@@ -248,11 +235,13 @@ UINT8 comx_fd_device::comx_io_r(address_space &space, offs_t offset)
 	{
 		if (m_q)
 		{
-			data = m_intrq ? 1 : 0;
+			data = 0xfe | m_fdc->intrq_r();
+			logerror("%s FDC intrq read %02x\n", machine().describe_context(), data);
 		}
 		else
 		{
 			data = m_fdc->gen_r(m_addr);
+			logerror("%s FDC read %u:%02x\n", machine().describe_context(), m_addr,data);
 		}
 	}
 

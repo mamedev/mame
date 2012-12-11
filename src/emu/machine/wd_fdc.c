@@ -104,6 +104,7 @@ void wd_fdc_t::device_reset()
 	intrq = false;
 	drq = false;
 	hld = false;
+	intrq_cond = 0;
 	live_abort();
 }
 

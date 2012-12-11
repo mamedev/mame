@@ -37,17 +37,13 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 
-	// not really public
-	void intrq_w(bool state);
-	void drq_w(bool state);
-
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete() { m_shortname = "comx_fd"; }
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "comx_fd"; }
 
 	// device_comx_expansion_card_interface overrides
 	virtual int comx_ef4_r();
@@ -57,20 +53,15 @@ protected:
 	virtual void comx_io_w(address_space &space, offs_t offset, UINT8 data);
 
 private:
-	inline void update_ef4();
-
 	// internal state
 	required_device<wd1770_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 
 	// floppy state
-	int m_ds;               // device select
-	UINT8 *m_rom;
+	const UINT8 *m_rom;
 	int m_q;                // FDC register select
 	int m_addr;             // FDC address
-	bool m_intrq;           // interrupt request
-	bool m_drq;             // data request
 	int m_disb;             // data request disable
 };
 
