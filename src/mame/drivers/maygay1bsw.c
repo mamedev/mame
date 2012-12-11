@@ -4,7 +4,15 @@
  the MSM6376 is on the ROM board, so some games might not have it
  the YM2149F is on the MAIN board
 
- the AY is where?
+ some of the sound roms we have look more like uPD7749 ones? did some
+ ROM boards use that instead?
+
+ typically games with a single sound rom appear to be uPD7749 whereas
+ the ones with a u2/u3 combo are MSM6376
+
+ the AY is where? was that another alt sound option on some rom boards
+ or an alt motherboard revision?
+
  */
 
 #include "emu.h"
@@ -37,7 +45,7 @@ GAME( 199?, m1blkhol	,0			,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay
    (sound rom is wrong?)
 ******************************************************************************************************************************************************************************************************/
 
-// I don't think this is correct, or at least it's not OKI, no header.
+// uPD7759 rom?
 #define m1_bargn_sound \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
 	ROM_LOAD( "bgsnd", 0x0000, 0x020000, CRC(abe7c01d) SHA1(21caadcd149772dfd79a9d30ebc1d8da91ff36f4) )\
@@ -53,21 +61,16 @@ GAME( 1990, m1bargnc	,m1bargn	,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Ma
 GAME( 1990, m1bargncp	,m1bargn	,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Casino Bar-gain (Maygay) v5.1 (Protocol)(M1A/B)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
-  Bounty Hunter
-   (sound roms?)
-******************************************************************************************************************************************************************************************************/
-
-ROM_START( m1bounty )	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00  )	ROM_LOAD( "bhun004", 0x0000, 0x020000, CRC(c3ee9bb1) SHA1(f0a15411486a5dd9a906c2200813c38545f76b3f) ) ROM_END_M1A_MCU
-
-GAME( 1996, m1bounty	,0			,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bounty Hunter (Maygay) (M1A/B)",GAME_FLAGS )
-
-/*******************************************************************************************************************************************************************************************************
   Bounty Hunter Club
-   (sound roms?)
 ******************************************************************************************************************************************************************************************************/
 
-ROM_START( m1bountc )	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )	ROM_LOAD( "sc4-107.bin", 0x0000, 0x010000, CRC(0bdf41b3) SHA1(ce3564433a708ba50ca4099a26b1f75cf3cec947) ) ROM_END_M1A_MCU //1.3
-ROM_START( m1bountcp )	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )	ROM_LOAD( "sc4-108.bin", 0x0000, 0x010000, CRC(adf7139f) SHA1(5b2bd367df31e3c76d9fac2a71a90800d95c4719) ) ROM_END_M1A_MCU //1.3P
+// uPD7759 rom?
+#define m1_bounty_sound \
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
+	ROM_LOAD( "bgsnd", 0x0000, 0x020000, CRC(abe7c01d) SHA1(21caadcd149772dfd79a9d30ebc1d8da91ff36f4) )\
+	
+ROM_START( m1bountc )	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )	ROM_LOAD( "sc4-107.bin", 0x0000, 0x010000, CRC(0bdf41b3) SHA1(ce3564433a708ba50ca4099a26b1f75cf3cec947) ) m1_bounty_sound ROM_END_M1A_MCU //1.3
+ROM_START( m1bountcp )	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )	ROM_LOAD( "sc4-108.bin", 0x0000, 0x010000, CRC(adf7139f) SHA1(5b2bd367df31e3c76d9fac2a71a90800d95c4719) ) m1_bounty_sound ROM_END_M1A_MCU //1.3P
 
 GAME( 199?, m1bountc	,0			,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bounty Hunter Club (Maygay) v1.3 (M1A/B)",GAME_FLAGS )
 GAME( 199?, m1bountcp	,m1bountc	,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Bounty Hunter Club (Maygay) v1.3 (Protocol) (M1A/B)",GAME_FLAGS )
@@ -76,6 +79,7 @@ GAME( 199?, m1bountcp	,m1bountc	,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "
   Criss Cross Club (Dutch)
 ******************************************************************************************************************************************************************************************************/
 
+// uPD7759 rom?
 #define m1_criss_sound \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
 	ROM_LOAD( "ccsound.bin", 0x0000, 0x040000, CRC(8742981e) SHA1(1ba33c59ec5f878ebab111a77551213aad4b0993) ) \
@@ -344,6 +348,7 @@ GAME( 1997, m1cik11np	,m1cik		,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Ma
   Deluxe Monopoly
 ******************************************************************************************************************************************************************************************************/
 
+// uPD7759 rom?
 #define m1_dxmono_sound\
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  )\
 	ROM_LOAD( "delmonopolysound.bin", 0x0000, 0x040000, CRC(8742981e) SHA1(1ba33c59ec5f878ebab111a77551213aad4b0993) )\
@@ -1021,6 +1026,7 @@ ROM_START( m1itsko8 )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
   Monopoly
 ******************************************************************************************************************************************************************************************************/
 
+// uPD7759 rom?
 #define m1_mono_sound \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
 	ROM_LOAD( "monopolysnd.bin", 0x0000, 0x020000, CRC(f93ef281) SHA1(b2c2bf361c44499a13731d494af66d2aa45ccebd) ) \
@@ -1240,6 +1246,7 @@ ROM_START( m1jbondq ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LO
   Pink Panther
 ******************************************************************************************************************************************************************************************************/
 
+// uPD7759 rom?
 #define m1_pinkp_sound \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
 	ROM_LOAD("digi16.bin", 0x0000, 0x040000, CRC(ee8bc3ea) SHA1(b58fad236055db30a75bb12946e8ad76638865a0) ) \
@@ -1775,6 +1782,7 @@ ROM_START( m1manhat ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  ) ROM_L
   Monopoly (Dutch)
 ******************************************************************************************************************************************************************************************************/
 
+// uPD7759 rom?
 #define m1_monodt_sound \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
 	ROM_LOAD( "monopolysnddutch.bin", 0x0000, 0x040000, CRC(8742981e) SHA1(1ba33c59ec5f878ebab111a77551213aad4b0993) ) \
@@ -1785,6 +1793,7 @@ ROM_START( m1monodt ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  ) ROM_L
   Pink Panther (Dutch)
 ******************************************************************************************************************************************************************************************************/
 
+// uPD7759 rom?
 #define m1_ppdt_sound \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
 	ROM_LOAD( "ppsound.bin", 0x0000, 0x040000, CRC(8742981e) SHA1(1ba33c59ec5f878ebab111a77551213aad4b0993) ) \
@@ -1795,6 +1804,7 @@ ROM_START( m1ppdt )	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  ) ROM_LOA
   Supernova
 ******************************************************************************************************************************************************************************************************/
 
+// uPD7759 rom?
 #define m1_sprnov_sound \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
 	ROM_LOAD( "supernovasnd.bin", 0x0000, 0x020000, CRC(f91e2c05) SHA1(e189c14214f4637d6a803893d79a41ad0fc8ebba) ) \
@@ -1955,6 +1965,7 @@ ROM_START( m1winencc ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
   Money Game Club
 ******************************************************************************************************************************************************************************************************/
 
+// uPD7759 rom?
 #define m1_mongam_sound \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
 	ROM_LOAD( "mgamesnd", 0x0000, 0x040000, CRC(80ea7b3d) SHA1(a26dbc55ba205fc94c9b224c549516ba149627d7) ) \
@@ -1967,6 +1978,7 @@ ROM_START( m1mongamb ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
   Monopoly Classic
 ******************************************************************************************************************************************************************************************************/
 
+// uPD7759 rom?
 #define m1_moncls_sound \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
 	ROM_LOAD( "classicmonopoly(maygay)soundromdig1-027.bin", 0x0000, 0x040000, CRC(d5243b51) SHA1(c7e3a61071c566e8ea9c8842839b70242ca67308) ) \
@@ -1981,9 +1993,10 @@ ROM_START( m1monclsd ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
   Return Of The Pink Panther
 ******************************************************************************************************************************************************************************************************/
 
+// uPD7759 rom?
 #define m1_retpp_sound \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
-	ROM_LOAD( "rotppsnd.bin", 0x0000, 0x002000, CRC(a8c8ff9a) SHA1(8069cf08f3a8481ebc589ad0c25887ea316facd5) ) /* looks like a bad dump of rom below */ \
+	/* ROM_LOAD( "rotppsnd.bin", 0x0000, 0x002000, CRC(a8c8ff9a) SHA1(8069cf08f3a8481ebc589ad0c25887ea316facd5) ) */ /* bad dump of rom below */ \
 	ROM_LOAD( "roppsnd.bin", 0x0000, 0x040000, CRC(9f3484b3) SHA1(9d454644c967b22cf6583335807a0ed8495492cb) ) \
 
 ROM_START( m1retpp )  ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("pinkpstd.bin",	0x0000, 0x010000, CRC(92bb56d8) SHA1(e033578c693f0faf1e91b76392106f0e6850d0dc) ) m1_retpp_sound ROM_END_M1A_MCU  GAME( 199?, m1retpp   ,0       ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Return Of The Pink Panther (Maygay) (M1A/B) (set 1)",GAME_FLAGS )
@@ -1996,6 +2009,7 @@ ROM_START( m1retppd ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_LO
   That's Life
 ******************************************************************************************************************************************************************************************************/
 
+// uPD7759 rom?
 #define m1_thatlf_sound \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
 	ROM_LOAD( "thatslifesound", 0x0000, 0x040000, CRC(5ac3a1f6) SHA1(5be73deb23d58fdc27dd41d210702b627e7ed324) ) \
@@ -2154,6 +2168,7 @@ ROM_START( m1thrillc ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_L
   Star Trekking
 ******************************************************************************************************************************************************************************************************/
 
+// uPD7759 rom?
 #define m1_startr_sound \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
 	ROM_LOAD( "mdmstartrekkingsound.rom", 0x0000, 0x040000, CRC(4b673184) SHA1(dd90719ebc8644b4aa50091dc9ddd79f5d0f3395) ) \
@@ -2181,6 +2196,7 @@ ROM_START( m1startrr ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) ROM_L
   Tick Tock Cash
 ******************************************************************************************************************************************************************************************************/
 
+// M6295 rom? (wrong or unique due to being an empire game?)
 #define m1_ttcash_sound \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
 	ROM_LOAD( "ttcsnd.bin", 0x0000, 0x080000, CRC(a191218e) SHA1(d89c33538d1f1804b2f5acac713e760d089fbac0) ) \
