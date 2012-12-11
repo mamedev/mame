@@ -322,7 +322,20 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="boulderdash i &amp; ii [b].img" size="368640" crc="ad364736" sha1="3e8481aed213abcb9ec918889ba24d2100676c49" offset="0" status="baddump"/>
+				<rom name="boulderdash i &amp; ii [b].img" size="368640" crc="ad364736" sha1="3e8481aed213abcb9ec918889ba24d2100676c49" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bdasha" cloneof="bdash">
+		<description>Boulderdash I &amp; II (Alt)</description>
+		<year>1985</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="First Star Software" />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="boulderdash i &amp; ii (alt).img" size="327680" crc="f16bb596" sha1="1888b78c03c945d61f512a3e5b54b2f195b6fedf" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -809,6 +822,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="gameovr2a" cloneof="gameovr2">
+		<description>Game Over II (Alt)</description>
+		<year>198?</year>
+		<publisher>Dinamic</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="game over2 (alt).img" size="368640" crc="575b20a3" sha1="8ae01513d14c544f97b97508effdb4e4664ea8f9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ghostbst">
 		<description>Ghostbusters</description>
 		<year>1986</year>
@@ -1207,6 +1232,19 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="msadvent">
+		<description>Microsoft Adventure</description>
+		<year>1981</year>
+		<publisher>IBM</publisher>
+		<info name="developer" value="Microsoft" />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="microsoft adventure.img" size="184320" crc="99cb1401" sha1="7afc3014d15737a43287d24d35cbc233b18692b5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msadventcr" cloneof="msadvent">
 		<description>Microsoft Adventure [cr]</description>
 		<year>1981</year>
 		<publisher>IBM</publisher>
@@ -1215,7 +1253,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="cracked" value="demonlord" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="184320">
-				<rom name="microsoft adventure.img" size="184320" crc="7148422b" sha1="4d0704af33186890a7579a60f88e1576b718886d" offset="0" />
+				<rom name="microsoft adventure [cr].img" size="184320" crc="7148422b" sha1="4d0704af33186890a7579a60f88e1576b718886d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1448,6 +1486,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="narco police disk 2.img" size="368640" crc="0c9c1fdb" sha1="96775fafabaf29266baa23a1a27355f550f923e0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="npinbal">
+		<description>Night Mission Pinball (CGA)</description>
+		<year>1982</year>
+		<publisher>SubLogic Corporation</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="night mission pinball (cga).img" size="368640" crc="c1198119" sha1="69bc6e8749d9c102e026abd4ad3ccfca5eaf2614" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1756,6 +1806,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="silentsra" cloneof="silentsr">
+		<description>Silent Service (Alt)</description>
+		<year>1986</year>
+		<publisher>Microprose</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="silent service (alt).img" size="327680" crc="4cbe0758" sha1="7ef3d8ea15f1e3e802dd1059767b73dac2cd2fb9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sidwindr">
 		<description>SideWinder</description>
 		<year>1988</year>
@@ -1763,7 +1825,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
-				<rom name="sidewinder.img" size="368640" crc="06977b96" sha1="c5b78ae793867a7597fe062b373da3a640bf858a" offset="0" status="baddump" />
+				<rom name="sidewinder.img" size="368640" crc="53434425" sha1="3c53513051861849feb7cac1591c474139b7e6f3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1873,6 +1935,18 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="summer games 2.img" size="368640" crc="a9ebb8f5" sha1="78f5300488c37f858681b856ff53e6eeadf01d53" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sumgame2a" cloneof="sumgame2">
+		<description>Summer Games II (Alt)</description>
+		<year>1986</year>
+		<publisher>Epyx</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="summer games 2 (alt).img" size="368640" crc="a210eb97" sha1="0ebd22d9d4543c4cdc37c9e21959de27f254c3bd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2419,8 +2493,8 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 
 	<!-- OS -->
 
-	<software name="cpm86">
-		<description>CP/M-86 for the IBM Personal Computer</description>
+	<software name="cpm8610">
+		<description>CP/M-86 for the IBM Personal Computer (Version 1.0)</description>
 		<year>1982</year>
 		<publisher>Digital Research</publisher>
 		<info name="version" value="1.0" />
@@ -2431,8 +2505,32 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="cpm8611">
+		<description>CP/M-86 for the IBM Personal Computer (Version 1.1)</description>
+		<year>1982</year>
+		<publisher>Digital Research</publisher>
+		<info name="version" value="1.1" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="109434">
+				<rom name="cpm8611.td0" size="109434" crc="c1b7a3f9" sha1="28c3e3edc9698680a63e0fa9ce6d58d6829fdc68" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ibmdos10">
+		<description>IBM Personal Computer DOS (Version 1.00)</description>
+		<year>1981</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="1.10" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="163840">
+				<rom name="ibmdos 1.00.img" size="163840" crc="2df1c1c8" sha1="7d3e3a807ad2144315b3c3b90751ff691d3895db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ibmdos11">
-		<description>IBM Personal Computer DOS Version 1.10</description>
+		<description>IBM Personal Computer DOS (Version 1.10)</description>
 		<year>1982</year>
 		<publisher>IBM</publisher>
 		<info name="version" value="1.10" />
@@ -2444,7 +2542,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 	</software>
 
 	<software name="ibmdos2">
-		<description>IBM Personal Computer DOS Version 2.0</description>
+		<description>IBM Personal Computer DOS (Version 2.0)</description>
 		<year>1983</year>
 		<publisher>IBM</publisher>
 		<info name="version" value="2.0" />
@@ -2455,8 +2553,25 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="ibmdos2a">
+		<description>IBM Personal Computer DOS (Version 2.0, Alt)</description>
+		<year>1983</year>
+		<publisher>IBM</publisher>
+		<info name="version" value="2.0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="ibmdos 2 (disk 1).img" size="184320" crc="b8f8ce15" sha1="e4478aeece1aa1627ac595e5fca96fbd8ad562c7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="184320">
+				<rom name="ibmdos 2 (disk 2).img" size="184320" crc="cf37729c" sha1="4f6fcc26d4382a8fed950bfaa8961669d513f93b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ibmdos3">
-		<description>IBM Personal Computer DOS Version 3.0</description>
+		<description>IBM Personal Computer DOS (Version 3.0)</description>
 		<year>1984</year>
 		<publisher>IBM</publisher>
 		<info name="version" value="2.0" />
