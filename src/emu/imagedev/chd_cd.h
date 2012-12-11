@@ -47,7 +47,7 @@ public:
 	virtual bool must_be_loaded() const { return 0; }
 	virtual bool is_reset_on_load() const { return 0; }
 	virtual const char *image_interface() const { return m_interface; }
-	virtual const char *file_extensions() const { return "chd"; }
+	virtual const char *file_extensions() const { return m_extension_list; }
 	virtual const option_guide *create_option_guide() const;
 
 	// specific implementation
@@ -61,6 +61,7 @@ protected:
 	chd_file	m_self_chd;
 	cdrom_file	*m_cdrom_handle;
 	image_device_format m_format;
+	const char	*m_extension_list;
 };
 
 // device type definition

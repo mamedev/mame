@@ -58,12 +58,14 @@ void cdrom_image_device::device_config_complete()
     	memset(&m_interface, 0, sizeof(m_interface));
 		memset(&m_device_displayinfo, 0, sizeof(m_device_displayinfo));
 	}
+	
+	m_extension_list = "chd,cue,toc,nrg,gdi,iso,cdr";
 
 	image_device_format *format = global_alloc_clear(image_device_format);;
 	format->m_index 	  = 0;
 	format->m_name        = "chdcd";
 	format->m_description = "CD-ROM drive";
-	format->m_extensions  = "chd,cue,toc,nrg,gdi,iso,cdr";
+	format->m_extensions  = m_extension_list;
 	format->m_optspec     = cd_option_spec;
 	format->m_next		  = NULL;
 
