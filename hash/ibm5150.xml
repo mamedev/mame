@@ -2521,7 +2521,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<description>IBM Personal Computer DOS (Version 1.00)</description>
 		<year>1981</year>
 		<publisher>IBM</publisher>
-		<info name="version" value="1.10" />
+		<info name="version" value="1.00" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
 				<rom name="ibmdos 1.00.img" size="163840" crc="2df1c1c8" sha1="7d3e3a807ad2144315b3c3b90751ff691d3895db" offset="0" />
