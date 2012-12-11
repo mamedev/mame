@@ -8,32 +8,13 @@ To investigate:
 
 Undumped:
 - 102 Dalmatas Cachorros Al Rescate CGB-B99S-ESP
-- Bionic Command CGB-AV4P-AUS
-- Caterpillar Construction Zone DMG-AR4P-EUU? [unclear pic]
-- Daffy Duck - Fowl Play DMG-AD7P-UKV
-- Elmo's 123s DMG-AE3P-EUR
 - Elmo's ABCs DMG-AEAP-EUR
-- Hot Wheels - Stunt Track Driver DMG-AHEP-EUR
-- Joust &amp; Defender DMG-AAOP-EUR
-- The Lion King - Simba's Mighty Adventure CGB-BLKP-UKV
 - Mary-Kate and Ashley - Crush Course CGB-BCVP-UKV
 - Mary-Kate and Ashley - Pocket Planner DMG-BMAP-EUR
-- Mickey's Racing Adventure CGB-ARNP-EUR
-- NHL 2000 DMG-ANRP-EUR
 - Rocket Power - Gettin' Air CGB-BRUP-EUR
 - San Francisco Rush 2049 (Euro, fr/de/nl) [small pic]
-- Sesame Street Sports (Euro) [small pic]
-- Shaun Palmer's Pro Snowboarder CGB-B3SP-AUS
-- Space Invaders DMG-AIVP-(EUR/NOE)
-- Spider-Man 2 - The Sinister Six CGB-B2SP-EUR
-- TOCA Touring Car Championship CGB-BTCP-EUR
-- Toy Story Racer CGB-BTBP-EUR? [unclear pic]
-- Yoda Stories DMG-AYDP-EUR
 
 nointro guys also list the following
-- 1942 (Euro)
-- Mega Man Xtreme (Euro)
-- Moon Patrol &amp; Spy Hunter (Euro)
 - The New Adventures of Mary-Kate &amp; Ashley (Euro)
 
 Undumped GBC protos:
@@ -133,10 +114,10 @@ Undumped Pirates:
 
 	<software name="1942">
 		<!-- Notes: GBC only -->
-		<description>1942 (USA)</description>
+		<description>1942 (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>Capcom</publisher>
-		<info name="serial" value="CGB-AQ4E-USA"/>
+		<info name="serial" value="CGB-AQ4E-USA, CGB-AQ4P-???"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="1048576">
@@ -652,10 +633,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="arcadejd">
-		<description>Arcade Hits - Joust &amp; Defender (USA)</description>
+		<description>Arcade Hits - Joust &amp; Defender (Euro, USA)</description>
 		<year>1999</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="DMG-AADE-USA"/>
+		<info name="serial" value="DMG-AADE-USA, DMG-AADP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="1048576">
@@ -665,10 +646,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="arcadems">
-		<description>Arcade Hits - Moon Patrol &amp; Spy Hunter (USA)</description>
+		<description>Arcade Hits - Moon Patrol &amp; Spy Hunter (Euro, USA)</description>
 		<year>1999</year>
 		<publisher>Midway</publisher>
-		<info name="serial" value="DMG-ADUE-USA"/>
+		<info name="serial" value="DMG-ADUE-USA, DMG-ADUP-???"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="1048576">
@@ -1826,10 +1807,10 @@ Undumped Pirates:
 
 	<software name="bionicc">
 		<!-- Notes: GBC only -->
-		<description>Bionic Commando - Elite Forces (USA)</description>
+		<description>Bionic Commando - Elite Forces (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="CGB-AV4E-USA"/>
+		<info name="serial" value="CGB-AV4E-USA, CGB-AV4P-AUS"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<!-- cartridge ram -->
@@ -2725,10 +2706,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="caterpil">
-		<description>Caterpillar Construction Zone (USA)</description>
+		<description>Caterpillar Construction Zone (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>Mattel Media</publisher>
-		<info name="serial" value="DMG-AR4E-USA"/>
+		<info name="serial" value="DMG-AR4E-USA, DMG-AR4P-EUU?"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="1048576">
@@ -3354,10 +3335,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="daffyfow">
-		<description>Daffy Duck - Fowl Play (USA)</description>
+		<description>Daffy Duck - Fowl Play (Euro, USA)</description>
 		<year>1999</year>
 		<publisher>Sunsoft</publisher>
-		<info name="serial" value="DMG-AD7E-USA"/>
+		<info name="serial" value="DMG-AD7E-USA, DMG-AD7P-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="1048576">
@@ -5206,6 +5187,19 @@ Undumped Pirates:
 	</software>
 
 	<software name="elmo123">
+		<description>Elmo's 123s (Euro)</description>
+		<year>1999</year>
+		<publisher>NewKidCo</publisher>
+		<info name="serial" value="DMG-AE3P-EUR"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<dataarea name="rom" size="262144">
+				<rom name="elmo123ae3p.bin" size="262144" crc="a69f75d8" sha1="e005bdc3a30e76894f8ab9c43cb2e54817b4df56" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elmo123u" cloneof="elmo123">
 		<description>Elmo's 123s (USA)</description>
 		<year>1999</year>
 		<publisher>NewKidCo</publisher>
@@ -7751,10 +7745,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="hotwheel">
-		<description>Hot Wheels - Stunt Track Driver (USA)</description>
+		<description>Hot Wheels - Stunt Track Driver (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>Mattel Media</publisher>
-		<info name="serial" value="DMG-AHEE-USA"/>
+		<info name="serial" value="DMG-AHEE-USA, DMG-AHEP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="1048576">
@@ -9841,10 +9835,10 @@ Undumped Pirates:
 
 	<software name="lionking">
 		<!-- Notes: GBC only -->
-		<description>The Lion King - Simba's Mighty Adventure (USA)</description>
+		<description>The Lion King - Simba's Mighty Adventure (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CGB-BLKE-USA"/>
+		<info name="serial" value="CGB-BLKE-USA, CGB-BLKP-UKV"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="1048576">
@@ -11378,10 +11372,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="megamnx">
-		<description>Mega Man Xtreme (USA)</description>
+		<description>Mega Man Xtreme (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Capcom</publisher>
-		<info name="serial" value="DMG-BM6E-USA"/>
+		<info name="serial" value="DMG-BM6E-USA, DMG-BM6P-EUR?"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<!-- cartridge ram -->
@@ -11670,10 +11664,10 @@ Undumped Pirates:
 
 	<software name="mickeyra">
 		<!-- Notes: GBC only -->
-		<description>Mickey's Racing Adventure (USA)</description>
+		<description>Mickey's Racing Adventure (Euro, USA)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="CGB-ARNE-USA"/>
+		<info name="serial" value="CGB-ARNE-USA, CGB-ARNP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<!-- cartridge ram -->
@@ -13187,10 +13181,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="nhl2k">
-		<description>NHL 2000 (USA)</description>
+		<description>NHL 2000 (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="DMG-ANRE-USA"/>
+		<info name="serial" value="DMG-ANRE-USA, DMG-ANRP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="1048576">
@@ -15465,6 +15459,21 @@ Undumped Pirates:
 		</part>
 	</software>
 
+	<software name="profoot" cloneof="goldgoal">
+		<description>Pro:Foot (Fra)</description>
+		<year>1999</year>
+		<publisher>Take-Two Interactive</publisher>
+		<info name="serial" value="DMG-AAFF-FAH"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="1048576">
+				<rom name="profootaaff.bin" size="1048576" crc="a9905932" sha1="c43daa82286d3a910a6a922d4ea722c594a2cde0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="propool">
 		<!-- Notes: GBC only -->
 		<description>Pro Pool (Euro)</description>
@@ -17178,6 +17187,20 @@ Undumped Pirates:
 
 	<software name="sesamesp">
 		<!-- Notes: GBC only -->
+		<description>Sesame Street Sports (Euro)</description>
+		<year>2001</year>
+		<publisher>NewKidCo</publisher>
+		<info name="serial" value="CGB-BSQP-???"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sesamestsbsqp.bin" size="1048576" crc="55be1a6e" sha1="2cf168dbaa51c1a0d49e6ab776872a0d2d5ced42" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sesamespu" cloneof="sesamesp">
+		<!-- Notes: GBC only -->
 		<description>Sesame Street Sports (USA)</description>
 		<year>2001</year>
 		<publisher>NewKidCo</publisher>
@@ -17360,10 +17383,10 @@ Undumped Pirates:
 
 	<software name="shaunsnw">
 		<!-- Notes: GBC only -->
-		<description>Shaun Palmer's Pro Snowboarder (USA)</description>
+		<description>Shaun Palmer's Pro Snowboarder (Aus, USA)</description>
 		<year>2001</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CGB-B3SE-USA"/>
+		<info name="serial" value="CGB-B3SE-USA, CGB-B3SP-AUS"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="2097152">
@@ -17789,10 +17812,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="spaceinv">
-		<description>Space Invaders (USA)</description>
+		<description>Space Invaders (Euro, USA)</description>
 		<year>1999</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="DMG-AIVE-USA"/>
+		<info name="serial" value="DMG-AIVE-USA, DMG-AIVP-(EUR/NOE)"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="1048576">
@@ -17993,10 +18016,10 @@ Undumped Pirates:
 
 	<software name="spiderm2">
 		<!-- Notes: GBC only -->
-		<description>Spider-Man 2 - The Sinister Six (USA)</description>
+		<description>Spider-Man 2 - The Sinister Six (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CGB-B2SE-USA"/>
+		<info name="serial" value="CGB-B2SE-USA, CGB-B2SP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="1048576">
@@ -19296,10 +19319,10 @@ Undumped Pirates:
 
 	<software name="toca">
 		<!-- Notes: GBC only -->
-		<description>TOCA Touring Car Championship (USA)</description>
+		<description>TOCA Touring Car Championship (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="CGB-BTCE-USA"/>
+		<info name="serial" value="CGB-BTCE-USA, CGB-BTCP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="1048576">
@@ -19925,10 +19948,10 @@ Undumped Pirates:
 
 	<software name="toystracu" cloneof="toystrac">
 		<!-- Notes: GBC only -->
-		<description>Toy Story Racer (USA)</description>
+		<description>Toy Story Racer (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>Activision</publisher>
-		<info name="serial" value="CGB-BT5E-USA"/>
+		<info name="serial" value="CGB-BT5E-USA, CGB-BT5P-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="2097152">
@@ -21363,10 +21386,10 @@ Undumped Pirates:
 	</software>
 
 	<software name="yodastor">
-		<description>Yoda Stories (USA)</description>
+		<description>Yoda Stories (Euro, USA)</description>
 		<year>1999</year>
 		<publisher>THQ</publisher>
-		<info name="serial" value="DMG-AYDE-USA"/>
+		<info name="serial" value="DMG-AYDE-USA, DMG-AYDP-EUR"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="1048576">
@@ -22053,6 +22076,51 @@ Undumped Pirates:
 
 <!-- Other Asian Pirate dumps -->
 
+	<software name="zzx3">
+		<description>Zhi Zhu Xia III (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="蜘蛛侠3-电影版 ~ Zhi Zhu Xia 3 - Dian Ying Ban (Spiderman 3 Movie Version)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="zhi zhu xia iii (chi)(unl) [raw dump].bin" size="2097152" crc="d311efcc" sha1="9eb0c468d5f898ef7b4d6ff74d7ff497b8c7818d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zzx3h" cloneof="zzx3">
+		<description>Zhi Zhu Xia III (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="蜘蛛侠3-电影版 ~ Zhi Zhu Xia 3 - Dian Ying Ban (Spiderman 3 Movie Version)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="zhi zhu xia iii (chi)(unl) [fixed].bin" size="4194304" crc="66442e7d" sha1="2775044c3a8547b13e2d934418045ab7eeb70906" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xfsb">
+		<description>Xin Feng Shen Bang (Chi, Ripped from 12 in 1 multicart)</description>
+		<year>2001</year>
+		<publisher>V.Fame</publisher>
+		<info name="alt_title" value="新封神榜"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />   <!-- This should be 8k even if the internal header says 2k -->
+			<dataarea name="rom" size="2097152">
+				<rom name="xin feng shen bang (multicart rip) (unl).bin" size="2097152" crc="cf8bd780" sha1="99344231bfe3f73dfb95766e0d02a43fbf2e4acc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="digisaph" supported="no">
 		<description>2003 Digitmon Sapphire (Chi)</description>
 		<year>20??</year>
@@ -22337,7 +22405,7 @@ Undumped Pirates:
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MBC5" />
 			<!-- cartridge ram -->
-			<feature name="battery_backed" value="yes" />
+			<feature name="battery_backed" value="yes" />   <!-- This should be 8k even if the internal header says 2k -->
 			<dataarea name="rom" size="2097152">
 				<rom name="shi kong xing shou (multicart rip) (unl) [c].bin" size="2097152" crc="ec970863" sha1="bc43036da01bb1aef4daa9e7316907193285011f" offset="000000" />
 			</dataarea>
@@ -22765,6 +22833,34 @@ Undumped Pirates:
 			<feature name="mapper" value="MBC1" />
 			<dataarea name="rom" size="262144">
 				<rom name="donkey kong 5 (bad).bin" size="262144" crc="e097ce67" sha1="e9670cac5a943f75e0e0a3ffd31f1eb6d94d7008" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkong5ts" supported="no">
+		<description>Donkey Kong 5 - The Journey of Over Time and Space (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="donkey kong 5 (unl)(english) [raw dump].bin" size="2097152" crc="1a369dd5" sha1="1ff1ac88dea7431866016970c4f4ae049302201b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkong5tsh" cloneof="dkong5ts" supported="no">
+		<description>Donkey Kong 5 - The Journey of Over Time and Space (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="donkey kong 5 (unl)(english) [fixed].bin" size="4194304" crc="f27a687e" sha1="afed3d2389c92ea4f1246cc5f918275e7ebd7ab9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

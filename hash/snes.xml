@@ -13158,7 +13158,7 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="kengriff">
+	<software name="kengriff1" cloneof="kengriff">
 		<description>Ken Griffey Jr. Presents Major League Baseball (USA)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
@@ -33939,7 +33939,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="deathretu" cloneof="deathret">
+	<software name="deathretu1" cloneof="deathret">
 		<description>The Death and Return of Superman (USA)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
@@ -33947,6 +33947,18 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="death and return of superman, the (usa).sfc" size="2097152" crc="a567957c" sha1="a509da90497b3c29c8763fdefd4808e55ea4b35c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deathretu" cloneof="deathret">
+		<description>The Death and Return of Superman (USA, Rev. A?)</description>
+		<year>1994</year>
+		<publisher>Sunsoft</publisher>
+		<info name="release" value="199408xx" />
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="death and return of superman, the (ntsc)(eng)(1.1).sfc" size="2097152" crc="012ef33d" sha1="a789268ab40a5bbc35f58743c936a87e0cbcda5c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40714,6 +40726,22 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="keiba eight special (japan).sfc" size="1048576" crc="a5faefaa" sha1="af2e7ace9edc1d1d6d109ee0e28c8a61bdd22b0e" offset="0x000000" />
+			</dataarea>
+			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kengriff">
+		<description>Ken Griffey Jr. Presents Major League Baseball (USA, Rev. A?)</description>
+		<year>1994</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="SNS-JR-USA" />
+		<info name="release" value="199403xx" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="ken griffey jr. presents major league baseball (ntsc)(eng)(1.1).sfc" size="2097152" crc="12b592f2" sha1="3be613d0173682711e1da59252cb91e839551633" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
 			</dataarea>
