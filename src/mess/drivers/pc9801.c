@@ -42,7 +42,6 @@
 	- Quarth: fails loading in PC-9801RS only ("packed file is corrupt"). Maybe a 386 core bug?
 
 	List of per-game TODO:
-	- 31 - Iwayuru Hitotsu no Chou Lovely na Bouken Katsugeki: missing text? (it appears if you press a button)
 	- 4D Boxing: inputs are unresponsive
 	- Absolutely Mahjong: Kanji data doesn't appear at the Epson logo. Transitions are too fast.
 	- Brandish 2: Intro needs some window masking effects;
@@ -1172,6 +1171,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_sasi_w)
 	}
 }
 
+
 READ8_MEMBER(pc9801_state::pc9801_a0_r)
 {
 
@@ -1217,7 +1217,7 @@ READ8_MEMBER(pc9801_state::pc9801_a0_r)
 				if(pcg_offset >= 0x80000)
 					return 0;
 
-				return m_kanji_rom[pcg_offset]; // TODO, kanji ROM
+				return m_kanji_rom[pcg_offset];
 			}
 		}
 
@@ -1609,18 +1609,28 @@ READ8_MEMBER(pc9801_state::pc9801rs_ipl_r) { return m_ipl_rom[(offset & 0x1ffff)
 /* TODO: having this non-linear makes the system to boot in BASIC for PC-9821. Perhaps it stores settings? How to change these? */
 READ8_MEMBER(pc9801_state::pc9801rs_knjram_r)
 {
+	UINT32 pcg_offset;
+
+	pcg_offset = m_font_addr << 5;
+	pcg_offset|= offset & 0x1e;
+	pcg_offset|= m_font_lr;
+
 	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
-		return m_pcg_ram[((m_font_addr & 0x7f7f) << 5) | m_font_lr | ((offset >> 1) & 0x0f)];
+		return m_pcg_ram[pcg_offset];
 
-	printf("RS knjram %08x\n",offset);
-
-	return machine().rand();
+	return m_kanji_rom[pcg_offset];
 }
 
 WRITE8_MEMBER(pc9801_state::pc9801rs_knjram_w)
 {
+	UINT32 pcg_offset;
+
+	pcg_offset = m_font_addr << 5;
+	pcg_offset|= offset & 0x1e;
+	pcg_offset|= m_font_lr;
+
 	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
-		m_pcg_ram[((m_font_addr & 0x7f7f) << 5) | m_font_lr | ((offset >> 1) & 0x0f)] = data;
+		m_pcg_ram[pcg_offset] = data;
 }
 
 /* FF-based */
