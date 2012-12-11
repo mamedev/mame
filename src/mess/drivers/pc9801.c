@@ -44,6 +44,7 @@
 
 	List of per-game TODO:
 	- 4D Boxing: inputs are unresponsive
+	(A Midsummer ...)
 	- Absolutely Mahjong: Kanji data doesn't appear at the Epson logo. Transitions are too fast.
 	- Brandish 2: Intro needs some window masking effects;
 	- Dragon Buster: missing bitplanes for the PCG (or not?), slight issue with window masking;
@@ -312,7 +313,6 @@ public:
 	UINT8 *m_ext_work_ram;
 	UINT8 *m_char_rom;
 	UINT8 *m_kanji_rom;
-	UINT8 *m_pcg_ram;
 
 	UINT8 m_portb_tmp;
 	UINT8 m_dma_offset[4];
@@ -579,10 +579,6 @@ void pc9801_state::video_start()
 	// find memory regions
 	m_char_rom = memregion("chargen")->base();
 	m_kanji_rom = memregion("kanji")->base();
-
-	m_pcg_ram = auto_alloc_array(machine(), UINT8, 0x200000);
-
-	state_save_register_global_pointer(machine(), m_pcg_ram, 0x200000);
 }
 
 UINT32 pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -663,7 +659,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	UINT8 char_size;
 //  UINT8 interlace_on;
 	UINT16 tile;
-	UINT8 pcg_sel, pcg_lr;
+	UINT8 kanji_lr;
 	UINT8 kanji_sel;
 
 	if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
@@ -684,28 +680,18 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 		tile_addr = addr+(x*(state->m_video_ff[WIDTH40_REG]+1));
 
-		pcg_sel = 0;
 		kanji_sel = 0;
-		pcg_lr = 0;
+		kanji_lr = 0;
 
 		tile = state->m_video_ram_1[(tile_addr*2) & 0x1fff] & 0xff;
 		knj_tile = state->m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0xff;
-		if((tile == 0x56 || tile == 0x57) && knj_tile)
+		if(knj_tile)
 		{
-			pcg_sel = 1;
-			tile = knj_tile & 0x7f;
-			pcg_lr = (knj_tile & 0x80) >> 7;
-		}
-		else if(knj_tile) // kanji select, TODO
-		{
-			pcg_lr = (knj_tile & 0x80) >> 7;
-			pcg_lr |= (tile & 0x80) >> 7; // Tokimeki Sports Gal 3
+			kanji_lr = (knj_tile & 0x80) >> 7;
+			kanji_lr |= (tile & 0x80) >> 7; // Tokimeki Sports Gal 3
 			tile &= 0x7f;
 			tile <<= 8;
 			tile |= (knj_tile & 0x7f);
-			/* annoying kanji bit-swap applied on the address bus ... */
-//			tile = BITSWAP16(tile,15,7,14,13,12,11,6,5,10,9,8,4,3,2,1,0);
-//			tile&=0x7fff;
 			kanji_sel = 1;
 		}
 		attr = (state->m_video_ram_1[(tile_addr*2 & 0x1fff) | 0x2000] & 0xff);
@@ -758,9 +744,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 						tile_data = ((tile >> gfx_bit) & 1) ? 0xff : 0x00;
 					}
 					else if(kanji_sel)
-						tile_data = (state->m_kanji_rom[tile*0x20+yi*2+pcg_lr]);
-					else if(pcg_sel)
-						tile_data = (state->m_pcg_ram[0xac000+tile*0x20+yi*2+pcg_lr]);
+						tile_data = (state->m_kanji_rom[tile*0x20+yi*2+kanji_lr]);
 					else
 						tile_data = (state->m_char_rom[tile*char_size+state->m_video_ff[FONTSEL_REG]*0x800+yi]);
 				}
@@ -774,13 +758,6 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 				if(yi >= char_size)
 					pen = 0;
-				else if(pcg_sel)
-				{
-					pen = 0;
-					if(color & 1) pen |= ((tile_data >> (7-xi) & 1) ? 1 : 0);
-					if(color & 2) pen |= ((tile_data >> (7-xi) & 1) ? 2 : 0);
-					if(color & 4) pen |= ((tile_data >> (7-xi) & 1) ? 4 : 0);
-				}
 				else
 					pen = (tile_data >> (7-xi) & 1) ? color : 0;
 
@@ -1231,10 +1208,6 @@ READ8_MEMBER(pc9801_state::pc9801_a0_r)
 				pcg_offset = m_font_addr << 5;
 				pcg_offset|= m_font_line;
 				pcg_offset|= m_font_lr;
-				if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
-				{
-					return m_pcg_ram[pcg_offset];
-				}
 
 				/* TODO: Brandish 2 accesses a 0008a561 kanji address, obviously causing a crash. */
 //				if(pcg_offset >= 0x80000)
@@ -1314,7 +1287,8 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 				//printf("%04x %02x %02x %08x\n",m_font_addr,m_font_line,m_font_lr,pcg_offset);
 				if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
 				{
-					m_pcg_ram[pcg_offset] = data;
+					m_kanji_rom[pcg_offset] = data;
+					machine().gfx[2]->mark_dirty(pcg_offset >> 5);
 				}
 				return;
 			}
@@ -1638,8 +1612,9 @@ READ8_MEMBER(pc9801_state::pc9801rs_knjram_r)
 	pcg_offset|= offset & 0x1e;
 	pcg_offset|= m_font_lr;
 
+	/* TODO: investigate on this difference */
 	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
-		return m_pcg_ram[pcg_offset];
+		return m_kanji_rom[pcg_offset];
 
 	pcg_offset = m_font_addr << 5;
 	pcg_offset|= offset & 0x1f;
@@ -1657,7 +1632,10 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_knjram_w)
 	pcg_offset|= m_font_lr;
 
 	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
-		m_pcg_ram[pcg_offset] = data;
+	{
+		m_kanji_rom[pcg_offset] = data;
+		machine().gfx[2]->mark_dirty(pcg_offset >> 5);
+	}
 }
 
 /* FF-based */
