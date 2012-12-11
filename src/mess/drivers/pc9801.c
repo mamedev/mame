@@ -680,6 +680,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		UINT8 attr,pen;
 		UINT32 tile_addr;
 		UINT8 knj_tile;
+		UINT8 gfx_mode;
 
 		tile_addr = addr+(x*(state->m_video_ff[WIDTH40_REG]+1));
 
@@ -713,11 +714,9 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		//blink = attr & 2;
 		reverse = attr & 4;
 		u_line = attr & 8;
-		v_line = attr & 0x10;
+		v_line = (state->m_video_ff[ATTRSEL_REG]) ? 0 : attr & 0x10;
+		gfx_mode = (state->m_video_ff[ATTRSEL_REG]) ? attr & 0x10 : 0;
 		color = (attr & 0xe0) >> 5;
-
-		if(state->m_video_ff[ATTRSEL_REG])
-			v_line = 0;
 
 		for(yi=0;yi<lr;yi++)
 		{
@@ -735,7 +734,30 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 				if(!secret)
 				{
-					if(kanji_sel)
+					/* TODO: priority */
+					if(gfx_mode)
+					{
+						int gfx_bit;
+						tile_data = 0;
+
+						/*
+							gfx strip mode:
+
+							number refers to the bit number in the tile data.
+							This mode is identical to the one seen in PC-8801
+							00004444
+							11115555
+							22226666
+							33337777
+						*/
+
+						gfx_bit = (xi & 4);
+						gfx_bit+= (yi & (2 << (char_size == 16)))>>(1+(char_size == 16));
+						gfx_bit+= (yi & (4 << (char_size == 16)))>>(1+(char_size == 16));
+
+						tile_data = ((tile >> gfx_bit) & 1) ? 0xff : 0x00;
+					}
+					else if(kanji_sel)
 						tile_data = (state->m_kanji_rom[tile*0x20+yi*2+pcg_lr]);
 					else if(pcg_sel)
 						tile_data = (state->m_pcg_ram[0xac000+tile*0x20+yi*2+pcg_lr]);
