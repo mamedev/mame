@@ -2,14 +2,9 @@
 
     Luxor ABC 1600
 
-    Skeleton driver
-*/
-
-/*
-
     How to create HDD image:
     ------------------------
-    chdman -createblankhd necd5126a.chd 615 4 17 512
+    chdman createhd -chs 615,4,17 -ss 512 -o necd5126a.chd
 
     How to format HDD:
     ------------------
@@ -42,8 +37,6 @@
         sega19 0 task 0
         sega 000 segd 00 pga 008 pgd 4058 virtual 02c730 (should be 004730)
 
-    - floppy
-        - internal floppy is really drive 2, but wd17xx.c doesn't like having NULL drives
     - short/long reset (RSTBUT)
     - CIO
         - optimize timers!
@@ -262,7 +255,7 @@ UINT8 abc1600_state::read_internal_io(offs_t offset)
 		switch (A10_A9_A8)
 		{
 		case FLP:
-			data = wd17xx_r(m_fdc, program, A2_A1);
+			data = m_fdc->gen_r(A2_A1);
 			break;
 
 		case CRT:
@@ -516,7 +509,7 @@ void abc1600_state::write_internal_io(offs_t offset, UINT8 data)
 		switch (A10_A9_A8)
 		{
 		case FLP:
-			wd17xx_w(m_fdc, program, A2_A1, data);
+			m_fdc->gen_w(A2_A1, data);
 			break;
 
 		case CRT:
@@ -1116,7 +1109,7 @@ inline void abc1600_state::update_drdy0()
 	if (m_sysfs)
 	{
 		// floppy
-		m_dma0->rdy_w(!wd17xx_drq_r(m_fdc));
+		m_dma0->rdy_w(!m_fdc->drq_r());
 	}
 	else
 	{
@@ -1278,12 +1271,16 @@ WRITE8_MEMBER( abc1600_state::fw0_w )
 	if (LOG) logerror("FW0 %02x\n", data);
 
 	// drive select
-	if (BIT(data, 0)) wd17xx_set_drive(m_fdc, 0);
-	if (BIT(data, 1)) wd17xx_set_drive(m_fdc, 1);
-	if (BIT(data, 2)) wd17xx_set_drive(m_fdc, 2);
+	floppy_image_device *floppy = NULL;
+	
+	if (BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) floppy = m_floppy1->get_device();
+	if (BIT(data, 2)) floppy = m_floppy2->get_device();
+	
+	m_fdc->set_floppy(floppy);
 
 	// floppy motor
-	floppy_mon_w(m_floppy, !BIT(data, 3));
+	if (floppy) floppy->mon_w(!BIT(data, 3));
 }
 
 
@@ -1311,10 +1308,10 @@ WRITE8_MEMBER( abc1600_state::fw1_w )
 	if (LOG) logerror("FW1 %02x\n", data);
 
 	// FDC master reset
-	wd17xx_mr_w(m_fdc, BIT(data, 0));
+	if (!BIT(data, 0)) m_fdc->reset();
 
 	// density select
-	wd17xx_dden_w(m_fdc, BIT(data, 1));
+	m_fdc->dden_w(BIT(data, 1));
 }
 
 
@@ -1613,7 +1610,7 @@ READ8_MEMBER( abc1600_state::cio_pb_r )
 	data |= !m_sysfs << 6;
 
 	// floppy interrupt
-	data |= wd17xx_intrq_r(m_fdc) << 7;
+	data |= m_fdc->intrq_r() << 7;
 
 	return data;
 }
@@ -1707,7 +1704,7 @@ static Z8536_INTERFACE( cio_intf )
 //-------------------------------------------------
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
-
+/*
 static LEGACY_FLOPPY_OPTIONS_START( abc1600 )
 	LEGACY_FLOPPY_OPTION(abc1600, "dsk", "Luxor ABC 1600", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([2])
@@ -1716,32 +1713,21 @@ static LEGACY_FLOPPY_OPTIONS_START( abc1600 )
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
 LEGACY_FLOPPY_OPTIONS_END
+*/
 
-static const floppy_interface abc1600_floppy_interface =
+static SLOT_INTERFACE_START( abc1600_floppies )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
+SLOT_INTERFACE_END
+
+void abc1600_state::fdc_intrq_w(bool state)
 {
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    FLOPPY_STANDARD_5_25_DSQD,
-    LEGACY_FLOPPY_OPTIONS_NAME(abc1600),
-    "floppy_5_25",
-	NULL
-};
+	m_cio->pb7_w(state);
+}
 
-WRITE_LINE_MEMBER( abc1600_state::drq_w )
+void abc1600_state::fdc_drq_w(bool state)
 {
 	update_drdy0();
 }
-
-static const wd17xx_interface fdc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(Z8536B1_TAG, z8536_device, pb7_w),
-	DEVCB_DRIVER_LINE_MEMBER(abc1600_state, drq_w),
-	{ FLOPPY_0, NULL, NULL, NULL } // TODO should be { NULL, NULL, FLOPPY_2, NULL }
-};
 
 
 //-------------------------------------------------
@@ -1851,6 +1837,10 @@ void abc1600_state::machine_start()
 	// interrupt callback
 	m_maincpu->set_irq_acknowledge_callback(abc1600_int_ack);
 
+	// floppy callbacks
+	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(abc1600_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(abc1600_state::fdc_drq_w), this));
+
 	// allocate memory
 	m_segment_ram.allocate(0x400);
 	m_page_ram.allocate(0x400);
@@ -1932,8 +1922,10 @@ static MACHINE_CONFIG_START( abc1600, abc1600_state )
 	MCFG_Z8536_ADD(Z8536B1_TAG, XTAL_64MHz/16, cio_intf)
 	MCFG_NMC9306_ADD(NMC9306_TAG)
 	MCFG_E0516_ADD(E050_C16PC_TAG, XTAL_32_768kHz)
-	MCFG_FD1797_ADD(SAB1797_02P_TAG, fdc_intf)
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, abc1600_floppy_interface)
+	MCFG_FD1797x_ADD(SAB1797_02P_TAG, XTAL_64MHz/64)
+	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":0", abc1600_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":1", abc1600_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(SAB1797_02P_TAG":2", abc1600_floppies, "525qd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_ABC99_ADD(abc99_intf)
 
 	MCFG_ABC1600BUS_SLOT_ADD("bus0i", bus0i_intf, abc1600bus_cards, NULL, NULL)
