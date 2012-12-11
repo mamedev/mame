@@ -7,10 +7,14 @@
     TODO:
     - proper 8251 uart hook-up on keyboard
     - investigate on POR bit
-	- Check for mouse support
 	- kanji support;
     - Write a PC80S31K device (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
 	- Finish DIP-Switches support
+	- text scrolling
+	- GRCG+
+	- EGC
+	- rewrite using slot devices
+	- some games put "Invalid command byte 05"
 
     TODO (PC-9801RS):
     - extra features;
@@ -22,6 +26,7 @@
     - "cache error"
     - undumped IDE ROM, kludged to work
 	- slave PIC never enables floppy IRQ (PC=0xffd08)
+	- Compatibility is untested;
 
     TODO: (PC-486MU)
     - Tries to read port C of i8255_sys (-> 0x35) at boot without setting up the control
@@ -32,23 +37,22 @@
 	floppy issues TODO (certain fail)
 	- Bokosuka Wars
 	- Dokkin Minako Sensei (2dd image)
+	- Jangou 2: floppy fails to load after the title screen;
+	- Okuman Chouja 2: fails loading in PC-9801RS only ("packed file is corrupt"). Maybe a 386 core bug?
+	- Quarth: fails loading in PC-9801RS only ("packed file is corrupt"). Maybe a 386 core bug?
 
 	List of per-game TODO:
+	- 31 - Iwayuru Hitotsu no Chou Lovely na Bouken Katsugeki: missing text? (it appears if you press a button)
 	- 4D Boxing: inputs are unresponsive
-	- 4D Driving: accesses some undefined ports (guess that it accesses the low part of them with word opcodes ...)
 	- Absolutely Mahjong: Kanji data doesn't appear at the Epson logo. Transitions are too fast.
 	- Brandish 2: Intro needs some window masking effects;
-	- Dragon Buster: missing bitplanes for the PCG, slight issue with window masking;
-	- Far Side Moon: doesn't detect neither mouse nor sound board;
-	- First Queen: has broken text display;
-	- Flappy Plus: keyboard is unresponsive;
-	- Jan Borg Suzume: error text isn't shown;
-	- Jangou 2: floppy fails to load after the title screen;
+	- Dragon Buster: missing bitplanes for the PCG (or not?), slight issue with window masking;
+	- Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)
+	- Jan Borg Suzume: gets stuck at a pic8259 read;
 	- Lovely Horror: Doesn't show kanji, tries to read it thru the 0xa9 port;
-	- Okuman Chouja 2: needs 16 colors support;
 	- Quarth: should do a split screen effect, it doesn't hence there are broken gfxs
 	- Quarth: uploads a PCG charset
-	- Uchiyama Aki no Chou Bangai: half size gfxs, can't start (needs mouse)?
+	- Uchiyama Aki no Chou Bangai: keyboard irq is fussy (sometimes it doesn't register a key press);
 
 ========================================================================================
 
@@ -1606,7 +1610,9 @@ READ8_MEMBER(pc9801_state::pc9801rs_ipl_r) { return m_ipl_rom[(offset & 0x1ffff)
 READ8_MEMBER(pc9801_state::pc9801rs_knjram_r)
 {
 	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
-		return m_pcg_ram[((m_font_addr & 0x7f7f) << 4) | m_font_lr | ((offset >> 1) & 0x0f)];
+		return m_pcg_ram[((m_font_addr & 0x7f7f) << 5) | m_font_lr | ((offset >> 1) & 0x0f)];
+
+	printf("RS knjram %08x\n",offset);
 
 	return machine().rand();
 }
@@ -1614,7 +1620,7 @@ READ8_MEMBER(pc9801_state::pc9801rs_knjram_r)
 WRITE8_MEMBER(pc9801_state::pc9801rs_knjram_w)
 {
 	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
-		m_pcg_ram[((m_font_addr & 0x7f7f) << 4) | m_font_lr | ((offset >> 1) & 0x0f)] = data;
+		m_pcg_ram[((m_font_addr & 0x7f7f) << 5) | m_font_lr | ((offset >> 1) & 0x0f)] = data;
 }
 
 /* FF-based */
@@ -1958,6 +1964,7 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,        pc9801rs_a0_w,      0xffffffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(pc9810rs_fdc_ctrl_r,pc9810rs_fdc_ctrl_w,0xffffffff)
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
+//	AM_RANGE(0x00ec, 0x00ef) PC-9801-86 sound board
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
 	AM_RANGE(0x0188, 0x018b) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffffffff)
@@ -2730,11 +2737,10 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_RESET PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
 
 	PORT_START("MOUSE_B")
-	PORT_BIT(0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	/* TODO: Brandish 2 apparently needs both bits 7 & 5 to be active, to enter into a main menu sub-item. */
-	PORT_BIT(0x20, IP_ACTIVE_LOW,  IPT_UNUSED )// PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Middle Button")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Right Button")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Left Button")
+	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Middle Button")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Right Button")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Left Button")
 
 	PORT_START("ROM_LOAD")
 	PORT_CONFNAME( 0x01, 0x01, "Load floppy 2hd BIOS" )
@@ -2882,38 +2888,46 @@ static const struct pic8259_interface pic8259_slave_config =
 *
 ****************************************/
 
-static const struct pit8253_config pit8253_config =
+/* basically, PC-98xx series has two xtals.
+   My guess is that both are on the PCB, and they clocks the various system components.
+   PC-9801RS needs X1 for the pit, otherwise Uchiyama Aki no Chou Bangai has sound pitch bugs
+   PC-9821 definitely needs X2, otherwise there's a timer error at POST. Unless it needs a different clock anyway ...
+   */
+#define MAIN_CLOCK_X1 XTAL_1_9968MHz
+#define MAIN_CLOCK_X2 XTAL_2_4576MHz
+
+static const struct pit8253_config pc9801_pit8253_config =
 {
 	{
 		{
-			1996800,              /* heartbeat IRQ */
+			MAIN_CLOCK_X1,              /* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir0_w)
 		}, {
-			1996800,              /* Memory Refresh */
+			MAIN_CLOCK_X1,              /* Memory Refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			1996800,              /* RS-232c */
+			MAIN_CLOCK_X1,              /* RS-232c */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}
 	}
 };
 
-static const struct pit8253_config pc9801rs_pit8253_config =
+static const struct pit8253_config pc9821_pit8253_config =
 {
 	{
 		{
-			16000000/4,				/* heartbeat IRQ */
+			MAIN_CLOCK_X2,				/* heartbeat IRQ */
 			DEVCB_NULL,
 			DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir0_w)
 		}, {
-			16000000/4,				/* Memory Refresh */
+			MAIN_CLOCK_X2,				/* Memory Refresh */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}, {
-			16000000/4,				/* RS-232c */
+			MAIN_CLOCK_X2,				/* RS-232c */
 			DEVCB_NULL,
 			DEVCB_NULL
 		}
@@ -3119,12 +3133,12 @@ READ8_MEMBER(pc9801_state::ppi_mouse_portc_r) { return machine().root_device().i
 
 WRITE8_MEMBER(pc9801_state::ppi_mouse_porta_w)
 {
-	printf("A %02x\n",data);
+//	printf("A %02x\n",data);
 }
 
 WRITE8_MEMBER(pc9801_state::ppi_mouse_portb_w)
 {
-	printf("B %02x\n",data);
+//	printf("B %02x\n",data);
 }
 
 WRITE8_MEMBER(pc9801_state::ppi_mouse_portc_w)
@@ -3485,7 +3499,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801f)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801f)
 
-	MCFG_PIT8253_ADD( "pit8253", pit8253_config )
+	MCFG_PIT8253_ADD( "pit8253", pc9801_pit8253_config )
 	MCFG_I8237_ADD("i8237", 5000000, dmac_intf) // unknown clock
 	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
@@ -3546,7 +3560,7 @@ MACHINE_CONFIG_END
 #endif
 
 static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
-	MCFG_CPU_ADD("maincpu", I386, 16000000)
+	MCFG_CPU_ADD("maincpu", I386, MAIN_CLOCK_X1*8) // unknown clock.
 	MCFG_CPU_PROGRAM_MAP(pc9801rs_map)
 	MCFG_CPU_IO_MAP(pc9801rs_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
@@ -3554,8 +3568,8 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9801rs)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9801rs)
 
-	MCFG_PIT8253_ADD( "pit8253", pc9801rs_pit8253_config )
-	MCFG_I8237_ADD("i8237", 16000000, pc9801rs_dmac_intf) // unknown clock
+	MCFG_PIT8253_ADD( "pit8253", pc9801_pit8253_config )
+	MCFG_I8237_ADD("i8237", MAIN_CLOCK_X1*8, pc9801rs_dmac_intf) // unknown clock
 	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
 	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
@@ -3609,7 +3623,7 @@ static MACHINE_CONFIG_DERIVED( pc9801ux, pc9801rs )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pc9821, pc9801_state )
-	MCFG_CPU_ADD("maincpu", I486, 16000000)
+	MCFG_CPU_ADD("maincpu", I486, 16000000) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9821_map)
 	MCFG_CPU_IO_MAP(pc9821_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc9801_state, pc9801_vrtc_irq)
@@ -3617,7 +3631,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_MACHINE_START_OVERRIDE(pc9801_state,pc9821)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801_state,pc9821)
 
-	MCFG_PIT8253_ADD( "pit8253", pc9801rs_pit8253_config )
+	MCFG_PIT8253_ADD( "pit8253", pc9821_pit8253_config )
 	MCFG_I8237_ADD("i8237", 16000000, pc9801rs_dmac_intf) // unknown clock
 	MCFG_PIC8259_ADD( "pic8259_master", pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", pic8259_slave_config )
