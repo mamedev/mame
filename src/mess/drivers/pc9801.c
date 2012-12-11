@@ -14,7 +14,8 @@
 	- GRCG+
 	- EGC
 	- rewrite using slot devices
-	- some games put "Invalid command byte 05"
+	- some later SWs put "Invalid command byte 05" (Absolutely Mahjong on Epson logo)
+	- Basic games are mostly untested, but I think that upd7220 fails on those (Adventureland, Xevious)
 
     TODO (PC-9801RS):
     - extra features;
@@ -36,6 +37,7 @@
 
 	floppy issues TODO (certain fail)
 	- 46 Okunen Monogatari - The Shinkaron
+	- AD&D Champions of Krynn
 	- Bokosuka Wars
 	- Dokkin Minako Sensei (2dd image)
 	- Jangou 2: floppy fails to load after the title screen;
@@ -44,15 +46,18 @@
 
 	List of per-game TODO:
 	- 4D Boxing: inputs are unresponsive
-	(A Midsummer ...)
+	- A Ressha de Ikou 2: missing text (PC-9801RS only);
 	- Absolutely Mahjong: Kanji data doesn't appear at the Epson logo. Transitions are too fast.
+	- Agumix Selects!: needs GDC = 5 MHz, interlace doesn't apply there;
 	- Brandish 2: Intro needs some window masking effects;
 	- Dragon Buster: missing bitplanes for the PCG (or not?), slight issue with window masking;
 	- Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)
 	- Jan Borg Suzume: gets stuck at a pic8259 read;
+	- Jump Hero: right status display isn't shown during gameplay (changes the mode dynamically?)
 	- Lovely Horror: Doesn't show kanji, tries to read it thru the 0xa9 port;
 	- Quarth: should do a split screen effect, it doesn't hence there are broken gfxs
 	- Quarth: uploads a PCG charset
+	- Runner's High: wrong double height on the title screen;
 	- Uchiyama Aki no Chou Bangai: keyboard irq is fussy (sometimes it doesn't register a key press);
 
 ========================================================================================
@@ -270,7 +275,9 @@
 #include "machine/upd1990a.h"
 #include "machine/i8251.h"
 #include "sound/beep.h"
+#include "sound/speaker.h"
 #include "sound/2203intf.h"
+#include "sound/2608intf.h"
 #include "video/upd7220.h"
 #include "machine/ram.h"
 #include "formats/pc98fdi_dsk.h"
@@ -291,6 +298,8 @@ public:
 		m_sio(*this, UPD8251_TAG),
 		m_hgdc1(*this, "upd7220_chr"),
 		m_hgdc2(*this, "upd7220_btm"),
+		m_opn(*this, "opn"),
+//		m_opna(*this, "opna"),
 		m_video_ram_1(*this, "video_ram_1"),
 		m_video_ram_2(*this, "video_ram_2"){ }
 
@@ -302,12 +311,15 @@ public:
 	required_device<i8251_device> m_sio;
 	required_device<upd7220_device> m_hgdc1;
 	required_device<upd7220_device> m_hgdc2;
+	required_device<ym2203_device> m_opn;
+//	optional_device<ym2608_device> m_opna;
+
+	required_shared_ptr<UINT8> m_video_ram_1;
+	required_shared_ptr<UINT8> m_video_ram_2;
 
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	required_shared_ptr<UINT8> m_video_ram_1;
-	required_shared_ptr<UINT8> m_video_ram_2;
 	UINT8 *m_ipl_rom;
 	UINT8 *m_work_ram;
 	UINT8 *m_ext_work_ram;
@@ -356,6 +368,7 @@ public:
 		UINT8 mode;
 		UINT8 tile[4], tile_index;
 	}m_grcg;
+	UINT8 m_has_opna;
 
 	/* PC9821 specific */
 	UINT8 m_sdip[24], m_sdip_bank;
@@ -443,6 +456,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9821_vram256_w);
 	DECLARE_READ8_MEMBER(opn_porta_r);
 	DECLARE_WRITE8_MEMBER(opn_portb_w);
+	DECLARE_READ8_MEMBER(pc9801_ext_opna_r);
+	DECLARE_WRITE8_MEMBER(pc9801_ext_opna_w);
 
 	DECLARE_READ8_MEMBER(sdip_0_r);
 	DECLARE_READ8_MEMBER(sdip_1_r);
@@ -1517,7 +1532,12 @@ inline void pc9801_state::m_pc9801rs_grcg_w(UINT32 offset,int vbank,UINT8 data)
 READ8_MEMBER(pc9801_state::pc9801_opn_r)
 {
 	if((offset & 1) == 0)
-		return ym2203_r(machine().device("opn"),space, offset >> 1);
+	{
+		//if(m_has_opna)
+		//	return ym2608_r(m_opna, space, offset >> 1);
+
+		return offset & 4 ? 0xff : ym2203_r(m_opn,space, offset >> 1);
+	}
 	else // odd
 	{
 		printf("Read to undefined port [%02x]\n",offset+0x188);
@@ -1528,7 +1548,13 @@ READ8_MEMBER(pc9801_state::pc9801_opn_r)
 WRITE8_MEMBER(pc9801_state::pc9801_opn_w)
 {
 	if((offset & 1) == 0)
-		ym2203_w(machine().device("opn"),space, offset >> 1,data);
+	{
+		/*if(m_has_opna)
+			ym2608_w(m_opna,space, offset >> 1,data);
+		else */
+		if((offset & 4) == 0)
+			ym2203_w(m_opn,space, offset >> 1,data);
+	}
 	else // odd
 	{
 		printf("Write to undefined port [%02x] %02x\n",offset+0x188,data);
@@ -1960,6 +1986,18 @@ WRITE8_MEMBER( pc9801_state::pc9801rs_mouse_freq_w )
 	}
 }
 
+READ8_MEMBER( pc9801_state::pc9801_ext_opna_r )
+{
+	printf("OPNA EXT read ID [%02x]\n",offset);
+	return 0;
+}
+
+WRITE8_MEMBER( pc9801_state::pc9801_ext_opna_w )
+{
+	printf("OPNA EXT write mask %02x -> [%02x]\n",data,offset);
+}
+
+
 static ADDRESS_MAP_START( pc9801rs_map, AS_PROGRAM, 32, pc9801_state )
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE8(pc9801rs_memory_r,pc9801rs_memory_w,0xffffffff)
 ADDRESS_MAP_END
@@ -1981,10 +2019,11 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
 //	AM_RANGE(0x00ec, 0x00ef) PC-9801-86 sound board
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
-	AM_RANGE(0x0188, 0x018b) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
+	AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffffffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank
 	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,     pc9801_mouse_w,     0xffffffff) // <undefined> / mouse ppi8255 ports
+	AM_RANGE(0xa460, 0xa463) AM_READWRITE8(pc9801_ext_opna_r,  pc9801_ext_opna_w,  0xffffffff)
 	AM_RANGE(0xbfd8, 0xbfdf) AM_WRITE8(pc9801rs_mouse_freq_w, 0xffffffff)
 ADDRESS_MAP_END
 
@@ -2041,10 +2080,11 @@ static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(pc9810rs_fdc_ctrl_r,pc9810rs_fdc_ctrl_w,0xffff)
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffff)
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffff)
-	AM_RANGE(0x0188, 0x018b) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffff) //ym2203 opn / <undefined>
+	AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffff) //ym2203 opn / <undefined>
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffff) //ROM/RAM bank
 	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,     pc9801_mouse_w,     0xffff) // <undefined> / mouse ppi8255 ports
+	AM_RANGE(0xa460, 0xa463) AM_READWRITE8(pc9801_ext_opna_r,  pc9801_ext_opna_w,  0xffff)
 
 ADDRESS_MAP_END
 
@@ -2345,7 +2385,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
 //  AM_RANGE(0x00d8, 0x00df) AMD98 (sound?) board
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
-	AM_RANGE(0x0188, 0x018b) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
+	AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
 //  AM_RANGE(0x018c, 0x018f) YM2203 OPN extended ports / <undefined>
 //  AM_RANGE(0x0430, 0x0430) IDE bank register
 //  AM_RANGE(0x0432, 0x0432) IDE bank register (mirror)
@@ -2382,6 +2422,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x8d1c, 0x8d1f) AM_READWRITE8(sdip_9_r,sdip_9_w,0xffffffff)
 	AM_RANGE(0x8e1c, 0x8e1f) AM_READWRITE8(sdip_a_r,sdip_a_w,0xffffffff)
 	AM_RANGE(0x8f1c, 0x8f1f) AM_READWRITE8(sdip_b_r,sdip_b_w,0xffffffff)
+	AM_RANGE(0xa460, 0xa463) AM_READWRITE8(pc9801_ext_opna_r,  pc9801_ext_opna_w,  0xffffffff)
 //  AM_RANGE(0xa460, 0xa46f) cs4231 PCM extended port / <undefined>
 //  AM_RANGE(0xbfdb, 0xbfdb) mouse timing port
 //  AM_RANGE(0xc0d0, 0xc0d3) MIDI port, option 0 / <undefined>
@@ -2781,6 +2822,11 @@ static INPUT_PORTS_START( pc9801rs )
 
 	PORT_MODIFY("ROM_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
+
+//	PORT_START("SOUND_CONFIG")
+//	PORT_CONFNAME( 0x01, 0x00, "Sound Type" )
+//	PORT_CONFSETTING(    0x00, "YM2203 (OPN)" )
+//	PORT_CONFSETTING(    0x01, "YM2608 (OPNA)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc9821 )
@@ -3419,6 +3465,7 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 	m_fdc_ctrl = 3;
 	m_access_ctrl = 0;
 	m_keyb_press = 0xff; // temp kludge, for PC-9821 booting
+//	m_has_opna = machine().root_device().ioport("SOUND_CONFIG")->read() & 1;
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9821)
@@ -3470,12 +3517,27 @@ static const ym2203_interface pc98_ym2203_intf =
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
 		DEVCB_DRIVER_MEMBER(pc9801_state,opn_porta_r),
-		DEVCB_NULL,//(pc8801_state,opn_portb_r),
+		DEVCB_NULL,//(pc9801_state,opn_portb_r),
 		DEVCB_NULL,//(pc9801_state,opn_porta_w),
 		DEVCB_DRIVER_MEMBER(pc9801_state,opn_portb_w),
 	},
 	DEVCB_LINE(pc9801_sound_irq)
 };
+
+#if 0
+static const ym2608_interface pc98_ym2608_intf =
+{
+	{
+		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_DRIVER_MEMBER(pc9801_state,opn_porta_r),
+		DEVCB_NULL,//(pc9801_state,opn_portb_r),
+		DEVCB_NULL,//(pc9801_state,opn_porta_w),
+		DEVCB_DRIVER_MEMBER(pc9801_state,opn_portb_w),
+	},
+	pc9801_sound_irq
+};
+#endif
 
 FLOPPY_FORMATS_MEMBER( pc9801_state::floppy_formats )
 	FLOPPY_PC98FDI_FORMAT
@@ -3557,7 +3619,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("opn", YM2203, 4000000) // unknown clock / divider
+	MCFG_SOUND_ADD("opn", YM2203, MAIN_CLOCK_X1*2) // unknown clock / divider
 	MCFG_SOUND_CONFIG(pc98_ym2203_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
@@ -3619,9 +3681,13 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("opn", YM2203, 4000000) // unknown clock / divider
+	MCFG_SOUND_ADD("opn", YM2203, MAIN_CLOCK_X1*2) // unknown clock / divider
 	MCFG_SOUND_CONFIG(pc98_ym2203_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+//	MCFG_SOUND_ADD("opna", YM2608, MAIN_CLOCK_X1*4) // unknown clock / divider
+//	MCFG_SOUND_CONFIG(pc98_ym2608_intf)
+//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
@@ -3682,9 +3748,13 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("opn", YM2203, 4000000) // unknown clock / divider
+	MCFG_SOUND_ADD("opn", YM2203, MAIN_CLOCK_X1*2) // unknown clock / divider
 	MCFG_SOUND_CONFIG(pc98_ym2203_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+//	MCFG_SOUND_ADD("opna", YM2608, MAIN_CLOCK_X1*4) // unknown clock / divider
+//	MCFG_SOUND_CONFIG(pc98_ym2608_intf)
+//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
@@ -3722,6 +3792,8 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF ) \
 	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF ) \
 
+#define OPNA_LOAD \
+	ROM_REGION( 0x100000, "opna", ROMREGION_ERASE00 ) \
 
 /*
 F - 8086 5
@@ -3775,6 +3847,7 @@ ROM_START( pc9801ux )
     ROM_LOAD( "font_ux.rom",     0x000000, 0x046800, BAD_DUMP CRC(19a76eeb) SHA1(96a006e8515157a624599c2b53a581ae0dd560fd) )
 
 	KANJI_ROMS
+	OPNA_LOAD
 ROM_END
 
 /*
@@ -3793,6 +3866,7 @@ ROM_START( pc9801rx )
     ROM_LOAD( "font_rx.rom",     0x000000, 0x046800, CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
 
 	KANJI_ROMS
+	OPNA_LOAD
 ROM_END
 
 /*
@@ -3824,6 +3898,7 @@ ROM_START( pc9801rs )
 	ROM_LOAD( "font_rs.rom", 0x00000, 0x46800, BAD_DUMP CRC(da370e7a) SHA1(584d0c7fde8c7eac1f76dc5e242102261a878c5e) )
 
 	KANJI_ROMS
+	OPNA_LOAD
 ROM_END
 
 /*
@@ -3844,6 +3919,7 @@ ROM_START( pc9801vm )
     ROM_LOAD( "font_vm.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
 
 	KANJI_ROMS
+	OPNA_LOAD
 ROM_END
 
 /*
@@ -3867,6 +3943,7 @@ ROM_START( pc9821 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
 	KANJI_ROMS
+	OPNA_LOAD
 ROM_END
 
 /*
@@ -3888,6 +3965,7 @@ ROM_START( pc9821as )
     ROM_LOAD( "font_as.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
 
 	KANJI_ROMS
+	OPNA_LOAD
 ROM_END
 
 
@@ -3910,6 +3988,7 @@ ROM_START( pc9821ne )
 	ROM_LOAD( "font_ne.rom", 0x00000, 0x46800, BAD_DUMP CRC(fb213757) SHA1(61525826d62fb6e99377b23812faefa291d78c2e) )
 
 	KANJI_ROMS
+	OPNA_LOAD
 ROM_END
 
 /*
@@ -3931,6 +4010,7 @@ ROM_START( pc486mu )
 	ROM_LOAD( "font_486mu.rom", 0x0000, 0x46800, CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff))
 
 	KANJI_ROMS
+	OPNA_LOAD
 ROM_END
 
 /*
@@ -3952,6 +4032,7 @@ ROM_START( pc9821ce2 )
     ROM_LOAD( "font_ce2.rom",     0x000000, 0x046800, CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
 
 	KANJI_ROMS
+	OPNA_LOAD
 ROM_END
 
 /*
@@ -3973,6 +4054,7 @@ ROM_START( pc9821xs )
     ROM_LOAD( "font_xs.rom",     0x000000, 0x046800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
 
 	KANJI_ROMS
+	OPNA_LOAD
 ROM_END
 
 
@@ -3995,6 +4077,7 @@ ROM_START( pc9821v13 )
 	ROM_LOAD( "font_a.rom", 0x00000, 0x46800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
 
 	KANJI_ROMS
+	OPNA_LOAD
 ROM_END
 
 /*
@@ -4016,6 +4099,7 @@ ROM_START( pc9821v20 )
     ROM_LOAD( "font_v20.rom",     0x000000, 0x046800, BAD_DUMP CRC(6244c4c0) SHA1(9513cac321e89b4edb067b30e9ecb1adae7e7be7) )
 
 	KANJI_ROMS
+	OPNA_LOAD
 ROM_END
 
 
@@ -4077,6 +4161,7 @@ DRIVER_INIT_MEMBER(pc9801_state,pc9801_kanji)
 			copy_kanji_strip(src_1+0x60,dst_1+0x40,1);
 		}
 	}
+	#undef copy_kanji_strip
 }
 
 /* Genuine dumps */
