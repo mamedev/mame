@@ -60,7 +60,8 @@ const device_type msm6242 = &device_creator<msm6242_device>;
 //-------------------------------------------------
 
 msm6242_device::msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, msm6242, "msm6242", tag, owner, clock)
+	: device_t(mconfig, msm6242, "msm6242", tag, owner, clock),
+	  device_rtc_interface(mconfig, *this)
 {
 
 }
@@ -86,41 +87,57 @@ void msm6242_device::rtc_timer_callback()
 
 	if(m_tick & 0x8000) // 32,768 KHz == 0x8000 ticks
 	{
+		int sec = get_clock_register(RTC_SECOND);
+		int minute = get_clock_register(RTC_MINUTE);
+		int hour = get_clock_register(RTC_HOUR);
+		int day = get_clock_register(RTC_DAY);
+		int month = get_clock_register(RTC_MONTH);
+		int weekday = get_clock_register(RTC_DAY_OF_WEEK);
+		int year = get_clock_register(RTC_YEAR);
+
 		m_tick = 0;
-		m_rtc.sec++;
+		sec++;
 
 		if(m_irq_flag == 1 && m_irq_type == 1) // 1 second clock
 			if ( !m_res_out_int_func.isnull() )
 				m_res_out_int_func(ASSERT_LINE);
 
-		if(m_rtc.sec >= 60)
+		if(sec >= 60)
 		{
-			m_rtc.min++; m_rtc.sec = 0;
+			minute++; sec = 0;
 			if(m_irq_flag == 1 && m_irq_type == 2) // 1 minute clock
 				if ( !m_res_out_int_func.isnull() )
 					m_res_out_int_func(ASSERT_LINE);
 		}
-		if(m_rtc.min >= 60)
+		if(minute >= 60)
 		{
-			m_rtc.hour++; m_rtc.min = 0;
+			hour++; minute = 0;
 			if(m_irq_flag == 1 && m_irq_type == 3) // 1 hour clock
 				if ( !m_res_out_int_func.isnull() )
 					m_res_out_int_func(ASSERT_LINE);
 		}
-		if(m_rtc.hour >= 24)			{ m_rtc.day++; m_rtc.wday++; m_rtc.hour = 0; }
-		if(m_rtc.wday >= 6)				{ m_rtc.wday = 1; }
+		if(hour >= 24)			{ day++; weekday++; hour = 0; }
+		if(weekday >= 6)				{ weekday = 1; }
 
 		/* TODO: crude leap year support */
-		dpm_count = (m_rtc.month)-1;
+		dpm_count = (month)-1;
 
-		if(((m_rtc.year % 4) == 0) && m_rtc.month == 2)
+		if(((year % 4) == 0) && month == 2)
 		{
-			if((m_rtc.day) >= dpm[dpm_count]+1+1)
-				{ m_rtc.month++; m_rtc.day = 0x01; }
+			if((day) >= dpm[dpm_count]+1+1)
+				{ month++; day = 0x01; }
 		}
-		else if(m_rtc.day >= dpm[dpm_count]+1)		{ m_rtc.month++; m_rtc.day = 0x01; }
-		if(m_rtc.month >= 0x13)						{ m_rtc.year++; m_rtc.month = 1; }
-		if(m_rtc.year >= 100)						{ m_rtc.year = 0; } //1900-1999 possible timeframe
+		else if(day >= dpm[dpm_count]+1)		{ month++; day = 0x01; }
+		if(month >= 0x13)						{ year++; month = 1; }
+		if(year >= 100)						{ year = 0; } //1900-1999 possible timeframe
+
+		set_clock_register(RTC_SECOND, sec);
+		set_clock_register(RTC_MINUTE, minute);
+		set_clock_register(RTC_HOUR, hour);
+		set_clock_register(RTC_DAY, day);
+		set_clock_register(RTC_MONTH, month);
+		set_clock_register(RTC_DAY_OF_WEEK, weekday);
+		set_clock_register(RTC_YEAR, year);
 	}
 }
 
@@ -157,17 +174,9 @@ void msm6242_device::device_start()
 	m_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 
 	// get real time from system
-	system_time systime;
-	machine().base_datetime(systime);
+	set_current_time(machine());
 
-	// ...and set the RTC time
-	m_rtc.day = (systime.local_time.mday);
-	m_rtc.month = (systime.local_time.month+1);
-	m_rtc.wday = (systime.local_time.weekday);
-	m_rtc.year = (systime.local_time.year % 100);
-	m_rtc.hour = (systime.local_time.hour);
-	m_rtc.min = (systime.local_time.minute);
-	m_rtc.sec = (systime.local_time.second);
+	// set up registers
 	m_tick = 0;
 	m_irq_flag = 0;
 	m_irq_type = 0;
@@ -182,13 +191,6 @@ void msm6242_device::device_start()
 	save_item(NAME(m_irq_flag));
 	save_item(NAME(m_irq_type));
 	save_item(NAME(m_tick));
-	save_item(NAME(m_rtc.sec));
-	save_item(NAME(m_rtc.min));
-	save_item(NAME(m_rtc.hour));
-	save_item(NAME(m_rtc.wday));
-	save_item(NAME(m_rtc.day));
-	save_item(NAME(m_rtc.month));
-	save_item(NAME(m_rtc.year));
 }
 
 
@@ -215,20 +217,23 @@ void msm6242_device::device_reset()
 
 READ8_MEMBER( msm6242_device::read )
 {
-	rtc_regs_t cur_time;
-
-	cur_time = m_rtc;
+	int sec = get_clock_register(RTC_SECOND);
+	int minute = get_clock_register(RTC_MINUTE);
+	int hour = get_clock_register(RTC_HOUR);
+	int day = get_clock_register(RTC_DAY);
+	int month = get_clock_register(RTC_MONTH);
+	int weekday = get_clock_register(RTC_DAY_OF_WEEK);
+	int year = get_clock_register(RTC_YEAR);
 
 	switch(offset)
 	{
-		case MSM6242_REG_S1: return (cur_time.sec % 10) & 0xf;
-		case MSM6242_REG_S10: return (cur_time.sec / 10) & 0xf;
-		case MSM6242_REG_MI1: return (cur_time.min % 10) & 0xf;
-		case MSM6242_REG_MI10: return (cur_time.min / 10) & 0xf;
+		case MSM6242_REG_S1: return (sec % 10) & 0xf;
+		case MSM6242_REG_S10: return (sec / 10) & 0xf;
+		case MSM6242_REG_MI1: return (minute % 10) & 0xf;
+		case MSM6242_REG_MI10: return (minute / 10) & 0xf;
 		case MSM6242_REG_H1:
 		case MSM6242_REG_H10:
 		{
-			int	hour = cur_time.hour;
 			int pm = 0;
 
 			/* check for 12/24 hour mode */
@@ -249,13 +254,13 @@ READ8_MEMBER( msm6242_device::read )
 			return (hour / 10) | (pm <<2);
 		}
 
-		case MSM6242_REG_D1: return (cur_time.day % 10) & 0xf;
-		case MSM6242_REG_D10: return (cur_time.day / 10) & 0xf;
-		case MSM6242_REG_MO1: return (cur_time .month % 10) & 0xf;
-		case MSM6242_REG_MO10: return (cur_time.month / 10) & 0xf;
-		case MSM6242_REG_Y1: return (cur_time.year % 10) & 0xf;
-		case MSM6242_REG_Y10: return ((cur_time.year / 10) % 10) & 0xf;
-		case MSM6242_REG_W: return cur_time.wday;
+		case MSM6242_REG_D1: return (day % 10) & 0xf;
+		case MSM6242_REG_D10: return (day / 10) & 0xf;
+		case MSM6242_REG_MO1: return (month % 10) & 0xf;
+		case MSM6242_REG_MO10: return (month / 10) & 0xf;
+		case MSM6242_REG_Y1: return (year % 10) & 0xf;
+		case MSM6242_REG_Y10: return ((year / 10) % 10) & 0xf;
+		case MSM6242_REG_W: return weekday;
 		case MSM6242_REG_CD: return m_reg[0];
 		case MSM6242_REG_CE: return m_reg[1];
 		case MSM6242_REG_CF: return m_reg[2];

@@ -13,6 +13,7 @@
 #define __MSM6242DEV_H__
 
 #include "emu.h"
+#include "dirtc.h"
 
 
 #define MCFG_MSM6242_ADD(_tag, _config) \
@@ -29,16 +30,10 @@ struct msm6242_interface
 	devcb_write_line	m_out_int_func;
 };
 
-struct rtc_regs_t
-{
-	UINT8 sec, min, hour, day, wday, month;
-	UINT16 year;
-};
-
 
 // ======================> msm6242_device
 
-class msm6242_device :	public device_t
+class msm6242_device :	public device_t, public device_rtc_interface
 {
 public:
 	// construction/destruction
@@ -60,7 +55,6 @@ private:
 	UINT8						m_irq_flag;
 	UINT8						m_irq_type;
 	UINT16						m_tick;
-	rtc_regs_t					m_rtc;
 
 	// incidentals
 	devcb_resolved_write_line	m_res_out_int_func;
