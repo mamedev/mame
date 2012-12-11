@@ -35,6 +35,7 @@
     - Presumably one ROM is undumped?
 
 	floppy issues TODO (certain fail)
+	- 46 Okunen Monogatari - The Shinkaron
 	- Bokosuka Wars
 	- Dokkin Minako Sensei (2dd image)
 	- Jangou 2: floppy fails to load after the title screen;
@@ -1214,8 +1215,8 @@ READ8_MEMBER(pc9801_state::pc9801_a0_r)
 				}
 
 				/* TODO: Brandish 2 accesses a 0008a561 kanji address, obviously causing a crash. */
-				if(pcg_offset >= 0x80000)
-					return 0;
+//				if(pcg_offset >= 0x80000)
+//					return 0;
 
 				return m_kanji_rom[pcg_offset];
 			}
@@ -1617,6 +1618,10 @@ READ8_MEMBER(pc9801_state::pc9801rs_knjram_r)
 
 	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
 		return m_pcg_ram[pcg_offset];
+
+	pcg_offset = m_font_addr << 5;
+	pcg_offset|= offset & 0x1f;
+//	pcg_offset|= m_font_lr;
 
 	return m_kanji_rom[pcg_offset];
 }
@@ -3714,7 +3719,7 @@ MACHINE_CONFIG_END
 	ROM_CONTINUE(                      0x60000, 0x4000  ) \
 	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x40001, 0x4000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) ) \
 	ROM_CONTINUE(                      0x60001, 0x4000  ) \
-	ROM_REGION( 0x80000, "kanji", ROMREGION_ERASEFF ) \
+	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF ) \
 	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF ) \
 
 
@@ -4032,7 +4037,7 @@ DRIVER_INIT_MEMBER(pc9801_state,pc9801_kanji)
 	UINT8 *chargen = machine().root_device().memregion("chargen")->base();
 
 	/* Convert the ROM bitswap here from the original structure */
-	/* TODO: kanji bitswap should be completely wrong */
+	/* TODO: kanji bitswap should be completely wrong, will check it out once that a dump is remade. */
 	for(i=0;i<0x80000/0x20;i++)
 	{
 		for(j=0;j<0x20;j++)
@@ -4053,15 +4058,25 @@ DRIVER_INIT_MEMBER(pc9801_state,pc9801_kanji)
 	}
 
 	/* now copy the data from the fake roms into our kanji struct */
-	copy_kanji_strip(0x800,   -1,0); copy_kanji_strip(0x820,   -1,0); copy_kanji_strip(0x840,   -1,0); copy_kanji_strip(0x860,   -1,0);
-	copy_kanji_strip(0x900,   -1,0); copy_kanji_strip(0x920,0x3c0,1); copy_kanji_strip(0x940,0x3e0,1); copy_kanji_strip(0x960,0x400,1);
-	copy_kanji_strip(0xa00,   -1,0); copy_kanji_strip(0xa20,0x420,1); copy_kanji_strip(0xa40,0x440,1); copy_kanji_strip(0xa60,0x460,1);
-	copy_kanji_strip(0xb00,   -1,0); copy_kanji_strip(0xb20,0x480,1); copy_kanji_strip(0xb40,0x4a0,1); copy_kanji_strip(0xb60,0x4c0,1);
-	copy_kanji_strip(0xc00,   -1,0); copy_kanji_strip(0xc20,0x4e0,1); copy_kanji_strip(0xc40,0x500,1); copy_kanji_strip(0xc60,0x520,1);
-	copy_kanji_strip(0xd00,   -1,0); copy_kanji_strip(0xd20,0x540,1); copy_kanji_strip(0xd40,0x560,1); copy_kanji_strip(0xd60,0x580,1);
-	copy_kanji_strip(0xe00,   -1,0); copy_kanji_strip(0xe20,   -1,0); copy_kanji_strip(0xe40,   -1,0); copy_kanji_strip(0xe60,   -1,0);
-	copy_kanji_strip(0xf00,   -1,0); copy_kanji_strip(0xf20,   -1,0); copy_kanji_strip(0xf40,   -1,0); copy_kanji_strip(0xf60,   -1,0);
+	copy_kanji_strip(0x0800,   -1,0); copy_kanji_strip(0x0820,   -1,0); copy_kanji_strip(0x0840,   -1,0); copy_kanji_strip(0x0860,   -1,0);
+	copy_kanji_strip(0x0900,   -1,0); copy_kanji_strip(0x0920,0x3c0,1); copy_kanji_strip(0x0940,0x3e0,1); copy_kanji_strip(0x0960,0x400,1);
+	copy_kanji_strip(0x0a00,   -1,0); copy_kanji_strip(0x0a20,0x420,1); copy_kanji_strip(0x0a40,0x440,1); copy_kanji_strip(0x0a60,0x460,1);
+	copy_kanji_strip(0x0b00,   -1,0); copy_kanji_strip(0x0b20,0x480,1); copy_kanji_strip(0x0b40,0x4a0,1); copy_kanji_strip(0x0b60,0x4c0,1);
+	copy_kanji_strip(0x0c00,   -1,0); copy_kanji_strip(0x0c20,0x4e0,1); copy_kanji_strip(0x0c40,0x500,1); copy_kanji_strip(0x0c60,0x520,1);
+	copy_kanji_strip(0x0d00,   -1,0); copy_kanji_strip(0x0d20,0x540,1); copy_kanji_strip(0x0d40,0x560,1); copy_kanji_strip(0x0d60,0x580,1);
+	copy_kanji_strip(0x0e00,   -1,0); copy_kanji_strip(0x0e20,   -1,0); copy_kanji_strip(0x0e40,   -1,0); copy_kanji_strip(0x0e60,   -1,0);
+	copy_kanji_strip(0x0f00,   -1,0); copy_kanji_strip(0x0f20,   -1,0); copy_kanji_strip(0x0f40,   -1,0); copy_kanji_strip(0x0f60,   -1,0);
+	{
+		int src_1,dst_1;
 
+		for(src_1=0x1000,dst_1=0x660;src_1<0x8000;src_1+=0x100,dst_1+=0x60)
+		{
+			copy_kanji_strip(src_1,             -1,0);
+			copy_kanji_strip(src_1+0x20,dst_1+0x00,1);
+			copy_kanji_strip(src_1+0x40,dst_1+0x20,1);
+			copy_kanji_strip(src_1+0x60,dst_1+0x40,1);
+		}
+	}
 }
 
 /* Genuine dumps */
