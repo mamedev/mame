@@ -2517,6 +2517,23 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="ecpm8611">
+		<description>Eagle CP/M-86 (Version 1.1B)</description>
+		<year>1983</year>
+		<publisher>Digital Research</publisher>
+		<info name="version" value="1.1B" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="cpm86-disk1.dsk" size="327680" crc="585295a0" sha1="4d026fcc175c79ffff190dce3182815944c122f3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="cpm86-disk2.dsk" size="327680" crc="c780f765" sha1="9a4eafd6f6b7d01d1a39f63d245e0653263de189" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ibmdos10">
 		<description>IBM Personal Computer DOS (Version 1.00)</description>
 		<year>1981</year>
