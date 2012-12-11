@@ -270,7 +270,7 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_21046 )
 	MCFG_CPU_IO_MAP(luxor_55_21046_io)
 
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
-	MCFG_FD1793x_ADD(SAB1793_TAG, XTAL_16MHz/16)
+	MCFG_FD1793x_ADD(SAB1793_TAG, XTAL_16MHz/8)
 
 	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":0", abc_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(SAB1793_TAG":1", abc_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
@@ -405,6 +405,10 @@ luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, cons
 
 void luxor_55_21046_device::device_start()
 {
+	// floppy callbacks
+	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(luxor_55_21046_device::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(luxor_55_21046_device::fdc_drq_w), this));
+
 	// state saving
 	save_item(NAME(m_cs));
 	save_item(NAME(m_status));
@@ -628,8 +632,8 @@ WRITE8_MEMBER( luxor_55_21046_device::_9b_w )
 	// drive select
     m_floppy = NULL;
 
-	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
-	if (BIT(data, 1)) m_floppy = m_floppy1->get_device();
+	if (!BIT(data, 0)) m_floppy = m_floppy0->get_device();
+	if (!BIT(data, 1)) m_floppy = m_floppy1->get_device();
 
 	m_fdc->set_floppy(m_floppy);
 

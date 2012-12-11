@@ -608,8 +608,8 @@ void bw2_state::palette_init()
 void bw2_state::machine_start()
 {
 	// floppy callbacks
-	m_fdc->setup_intrq_cb(wd2797_t::line_cb(FUNC(bw2_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(wd2797_t::line_cb(FUNC(bw2_state::fdc_drq_w), this));
+	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(bw2_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(bw2_state::fdc_drq_w), this));
 
 	// register for state saving
 	save_item(NAME(m_kb));

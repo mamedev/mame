@@ -435,6 +435,10 @@ luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, cons
 
 void luxor_55_10828_device::device_start()
 {
+	// floppy callbacks
+	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(luxor_55_10828_device::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(luxor_55_10828_device::fdc_drq_w), this));
+
 	// state saving
 	save_item(NAME(m_cs));
 	save_item(NAME(m_status));
