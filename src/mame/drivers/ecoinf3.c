@@ -426,40 +426,71 @@ ROM_START( ec_sphin )
 	// z80 ROMS but truncated, seem to just contain garbage at the end tho, so probably OK
 	ROM_LOAD( "sphinx8c.bin", 0x0000, 0x00e000, CRC(f8e110fc) SHA1(4f55b5de87151f9127b84ffcf7f6f2e3ce34469f) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 )
-	ROM_LOAD( "spx10cv2.bin", 0x0000, 0x00e000, CRC(e2bf11a0) SHA1(f267385dbb06b2be8bcad7ae5e5804f5bb467f6d) )
-
 	ROM_REGION( 0x010000, "subcpu", 0 )
 	// like Pyramid this looks more like half a 16-bit pair (68k?) ROM...
 	// actually the end of the code (last 0x2000) bytes look like some 6xxx ROM, is the rest just unused space? the end part is same on Pyramid and Sphinx
 	ROM_LOAD( "spnx5p", 0x0000, 0x010000, CRC(b4b49259) SHA1(a26172b659b739564b25dcc0f3f31f131a144d52) )
 ROM_END
 
+ROM_START( ec_sphina )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "spx10cv2.bin", 0x0000, 0x00e000, CRC(e2bf11a0) SHA1(f267385dbb06b2be8bcad7ae5e5804f5bb467f6d) )
+
+	ROM_REGION( 0x010000, "subcpu", ROMREGION_ERASE00 )
+	/* missing? */
+ROM_END
+
 ROM_START( ec_penni )
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	// Z80 code, contains scandisk / windows garbage at the end
 	ROM_LOAD( "pfh_8c.bin", 0x0000, 0x010000, CRC(282a42d8) SHA1(f985d238c72577e755090ce0f04dcc7850af6f3b) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 )
+	ROM_REGION( 0x010000, "subcpu", ROMREGION_ERASE00 )
+	/* missing? */
+ROM_END
+
+ROM_START( ec_pennia )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "pfh_v6.bin", 0x0000, 0x00e000, CRC(febb3fce) SHA1(f8df085a563405ea5adcd15a4162a7ba56bcfad7) ) // this set is truncated, but that area just seems to be garbage anyway, so should be fine
 
 	ROM_REGION( 0x010000, "subcpu", ROMREGION_ERASE00 )
-	// no strange rom in this set
+	/* missing? */
 ROM_END
+
+
+
+ROM_START( ec_stair )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD("sth5.4",		0x0000, 0x010000, CRC(879c8dcb) SHA1(358d9bb567da4b7913434d29dcd8a81c51c5fe2e) )
+
+	ROM_REGION( 0x010000, "subcpu", ROMREGION_ERASE00 )
+	/* missing? */
+ROM_END
+
+ROM_START( ec_staira )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD("sth5.8c",	0x0000, 0x010000, CRC(7ce6b760) SHA1(c828689481d7e187c504dd072bd6714222888d33) )
+
+	ROM_REGION( 0x010000, "subcpu", ROMREGION_ERASE00 )
+	/* missing? */
+ROM_END
+
 
 
 ROM_START( ec_laby ) // no header info with these
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	/* one revision */
 	ROM_LOAD( "lab1v8.bin", 0x0000, 0x008000, CRC(16f0eeac) SHA1(9e28a6ae9176f730234dd8a7a8e50bad2904b611) )
 	ROM_LOAD( "lab2v8.bin", 0x8000, 0x008000, CRC(14d7c58b) SHA1(e6b19523d96c9c1f39b743f8c52791465ab79637) )
 
-	ROM_REGION( 0x200000, "altrevs", 0 )
-	/* another, larger rom size */
+	ROM_REGION( 0x010000, "subcpu", ROMREGION_ERASE00 )
+	/* missing? */
+ROM_END
+
+ROM_START( ec_labya ) // no header info with these
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "laby10", 0x0000, 0x010000, CRC(a8b58fc3) SHA1(16e940b04fa85ff85a29197b4e45c8a39f5cad19) )
 
 	ROM_REGION( 0x010000, "subcpu", ROMREGION_ERASE00 )
-	// no strange rom in this set
+	/* missing? */
 ROM_END
 
 ROM_START( ec_secrt )
@@ -479,7 +510,12 @@ DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3)
 // another hw type (similar to stuff in ecoinf2.c) (watchdog on port 58?)
 GAME( 19??, ec_pyram,   0		 , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,	ROT0,  "Electrocoin", "Pyramid (v6) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 19??, ec_sphin,   0		 , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,	ROT0,  "Electrocoin", "Sphinx (v1) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_sphina,  ec_sphin , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,	ROT0,  "Electrocoin", "Sphinx (v?) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 19??, ec_penni,   0		 , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,	ROT0,  "Electrocoin", "Pennies From Heaven (v1) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_pennia,  ec_penni , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,	ROT0,  "Electrocoin", "Pennies From Heaven (v?) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_stair,   0		 , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,	ROT0,  "Electrocoin", "Stairway To Heaven (Electrocoin) (set 1)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_staira,  ec_stair , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,	ROT0,  "Electrocoin", "Stairway To Heaven (Electrocoin) (set 2)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 19??, ec_laby,    0		 , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,	ROT0,  "Electrocoin", "Labyrinth (v8) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_labya,   ec_laby  , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,	ROT0,  "Electrocoin", "Labyrinth (v10) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 19??, ec_secrt,   0		 , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,	ROT0,  "Electrocoin", "Secret Castle (v1) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 

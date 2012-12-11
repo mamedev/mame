@@ -542,6 +542,9 @@ $(MAMEOBJ)/bfm.a: \
 	$(DRIVERS)/bfm_sc4.o \
 	$(DRIVERS)/bfm_sc4h.o \
 	$(DRIVERS)/bfm_sc5.o \
+	$(DRIVERS)/bfm_sc5sw.o \
+	$(DRIVERS)/bfm_ad5.o \
+	$(DRIVERS)/bfm_ad5sw.o \
 	$(DRIVERS)/bfm_swp.o \
 	$(DRIVERS)/bfmsys83.o \
 	$(DRIVERS)/bfmsys85.o \
@@ -977,6 +980,7 @@ $(MAMEOBJ)/konami.a: \
 
 $(MAMEOBJ)/maygay.a: \
 	$(DRIVERS)/maygay1b.o \
+	$(DRIVERS)/maygay1bsw.o \
 	$(DRIVERS)/maygayv1.o \
 	$(DRIVERS)/maygayep.o \
 	$(DRIVERS)/maygaysw.o \

@@ -3447,13 +3447,87 @@ ROM_END
 
 ROM_START( j6indya )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+    ROM_LOAD16_BYTE( "6812.bin", 0x000000, 0x020000, CRC(8c679b52) SHA1(781ddd1a1cbfe96f0a7100a9aaa7a8d4641295fd) )
+	ROM_LOAD16_BYTE( "6811.bin", 0x000001, 0x020000, CRC(6efc0ce8) SHA1(2f1bc1dfd6d1df019f180e6477e524811bf7295c) )
+	j6indy_sound
+ROM_END
+
+ROM_START( j6indyb )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+    ROM_LOAD16_BYTE( "6814.bin", 0x000000, 0x020000, CRC(6bb4615b) SHA1(df46a5fe7a4a24feb0422dcb9ca6c8a4a1d57cd2) )
+	ROM_LOAD16_BYTE( "6811.bin", 0x000001, 0x020000, CRC(6efc0ce8) SHA1(2f1bc1dfd6d1df019f180e6477e524811bf7295c) )
+	j6indy_sound
+ROM_END
+
+ROM_START( j6indyc )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+    ROM_LOAD16_BYTE( "6823.bin", 0x000000, 0x020000, CRC(c0cf1be5) SHA1(0cd5189e896f2e000c9ce3a7a1d85cd17efc5f84) )
+    ROM_LOAD16_BYTE( "6824.bin", 0x000001, 0x020000, CRC(191bf6c9) SHA1(d33c330eb6b7bdb3fef98a97a9a6af8ec6910a62) )
+	j6indy_sound
+ROM_END
+
+ROM_START( j6indyd )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+    ROM_LOAD16_BYTE( "6825.bin", 0x000000, 0x020000, CRC(2b514fdd) SHA1(732ce399720a7e4e2bc0daf226eb8a1d5a229531) )
+    ROM_LOAD16_BYTE( "6824.bin", 0x000001, 0x020000, CRC(191bf6c9) SHA1(d33c330eb6b7bdb3fef98a97a9a6af8ec6910a62) )
+	j6indy_sound
+ROM_END
+
+ROM_START( j6indye )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+    ROM_LOAD16_BYTE( "7038.bin", 0x000000, 0x020000, CRC(6e209529) SHA1(a134eb4f4a20f3ec5e71c1fc6d0fdef7a7358f4c) )
+    ROM_LOAD16_BYTE( "7039.bin", 0x000001, 0x020000, CRC(32e6bfe4) SHA1(71e9030b0c2752df4a78d6f561549c3da6ce3ea3) )
+	j6indy_sound
+ROM_END
+
+ROM_START( j6indyf )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+    ROM_LOAD16_BYTE( "7040.bin", 0x000000, 0x020000, CRC(85bec111) SHA1(f259553c226cfbf43ab9d35a6e82a19db82405ce) )
+    ROM_LOAD16_BYTE( "7039.bin", 0x000001, 0x020000, CRC(32e6bfe4) SHA1(71e9030b0c2752df4a78d6f561549c3da6ce3ea3) )
+	j6indy_sound
+ROM_END
+
+ROM_START( j6indyg )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+    ROM_LOAD16_BYTE( "7041.bin", 0x000000, 0x020000, CRC(3ce45548) SHA1(670c9e1a07db72510cd713f10639624334b3f386) )
+    ROM_LOAD16_BYTE( "7039.bin", 0x000001, 0x020000, CRC(32e6bfe4) SHA1(71e9030b0c2752df4a78d6f561549c3da6ce3ea3) )
+	j6indy_sound
+ROM_END
+
+ROM_START( j6indyh )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+    ROM_LOAD16_BYTE( "7256.bin", 0x000000, 0x020000, CRC(626d3b18) SHA1(78ab605a755b63b95be5c2b4b48aa4eb282aeb69) )
+    ROM_LOAD16_BYTE( "7039.bin", 0x000001, 0x020000, CRC(32e6bfe4) SHA1(71e9030b0c2752df4a78d6f561549c3da6ce3ea3) )
+	j6indy_sound
+ROM_END
+
+ROM_START( j6indyi )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "7493.bin", 0x000000, 0x020000, CRC(21ca4ac6) SHA1(37c78df9dcace53eeab72ea37a49d27056d35043) )
 	ROM_LOAD16_BYTE( "7494.bin", 0x000001, 0x020000, CRC(4ddf626b) SHA1(4bbfd86530cd1a8b7b4da4e9b36d0e1d61e5d120) )
 	j6indy_sound
 ROM_END
 
+ROM_START( j6indyj )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7495.bin", 0x000000, 0x020000, CRC(ca541efe) SHA1(9de0f2c2b486efc6283b11aafdf72c14f0c96eb7) )
+	ROM_LOAD16_BYTE( "7494.bin", 0x000001, 0x020000, CRC(4ddf626b) SHA1(4bbfd86530cd1a8b7b4da4e9b36d0e1d61e5d120) )
+	j6indy_sound
+ROM_END
 
-ROM_START( j6indyg )
+ROM_START( j6indyk )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "7496.bin", 0x000000, 0x020000, CRC(730e8aa7) SHA1(5dd684c8066c94b3bd25d71b7e0e4f11f4e9a9ac) )
+	ROM_LOAD16_BYTE( "7494.bin", 0x000001, 0x020000, CRC(4ddf626b) SHA1(4bbfd86530cd1a8b7b4da4e9b36d0e1d61e5d120) )
+	j6indy_sound
+ROM_END
+       
+     		
+		
+       
+
+
+ROM_START( j6indyge )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "indy04020.p1", 0x00000, 0x10000, CRC(52ca267c) SHA1(7cd90b536d974afd504620f12868c5efe83ef9dd) )
 	ROM_LOAD16_BYTE( "indy04020.p2", 0x00001, 0x10000, CRC(d96e3937) SHA1(902bb6021f5e1fa7471bce9de207e4df5f071fc4) )
@@ -4629,6 +4703,13 @@ ROM_START( j6pogb )
 ROM_END
 
 ROM_START( j6pogc )
+	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "pog5.3p1",       0x000000, 0x020000, CRC(62ea507f) SHA1(ea1e2057f3b51ab3f13c7b91467ed3142c64b76a) )
+	ROM_LOAD16_BYTE( "potofgold2.bin", 0x000001, 0x020000, CRC(40584378) SHA1(eeda580d65226feb642c541d1f16f2ff7b909098) )
+	j6pog_sound
+ROM_END
+
+ROM_START( j6pogd )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ace pog v3a1 (27c010)", 0x000000, 0x020000, CRC(5b37fafc) SHA1(0aa7d0d813832f99150521d97ed754fa1f5f5fc6) )
 	ROM_LOAD16_BYTE( "ace pog v3-2 (27c010)", 0x000001, 0x020000, CRC(28a2a74c) SHA1(c95a6a0a89cf942ba2460c46185e782f0445df2f) )
@@ -8430,7 +8511,17 @@ GAME( 199?, j6impulsf	, j6impuls	, impctawp, tbirds, driver_device, 0, ROT0, "JP
 
 GAME( 199?, j6indy		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME( 199?, j6indya		, j6indy	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 2)", GAME_FLAGS )
-GAME( 199?, j6indyg		, j6indy	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT, German)", GAME_FLAGS ) // was marked as Sys5 'Indy 500' but is clearly IMPACT and has Indiana Jones / Holy Grail strings (might be a different game to the english set)
+GAME( 199?, j6indyb		, j6indy	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 3)", GAME_FLAGS )
+GAME( 199?, j6indyc		, j6indy	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 199?, j6indyd		, j6indy	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 5)", GAME_FLAGS )
+GAME( 199?, j6indye		, j6indy	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 6)", GAME_FLAGS )
+GAME( 199?, j6indyf		, j6indy	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 7)", GAME_FLAGS )
+GAME( 199?, j6indyg		, j6indy	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 8)", GAME_FLAGS )
+GAME( 199?, j6indyh		, j6indy	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 9)", GAME_FLAGS )
+GAME( 199?, j6indyi		, j6indy	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 10)", GAME_FLAGS )
+GAME( 199?, j6indyj		, j6indy	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 11)", GAME_FLAGS )
+GAME( 199?, j6indyk		, j6indy	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT) (set 12)", GAME_FLAGS )
+GAME( 199?, j6indyge	, j6indy	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Indiana Jones (JPM) (IMPACT, German)", GAME_FLAGS ) // was marked as Sys5 'Indy 500' but is clearly IMPACT and has Indiana Jones / Holy Grail strings (might be a different game to the english set)
 
 GAME( 199?, j6showtm	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "It's Showtime (JPM) (IMPACT) (set 1)", GAME_FLAGS )
 GAME( 199?, j6showtma	, j6showtm	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "It's Showtime (JPM) (IMPACT) (set 2)", GAME_FLAGS )
@@ -8616,6 +8707,7 @@ GAME( 199?, j6pog		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Ace", "Pot
 GAME( 199?, j6poga		, j6pog		, impctawp, tbirds, driver_device, 0, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 2)", GAME_FLAGS )
 GAME( 199?, j6pogb		, j6pog		, impctawp, tbirds, driver_device, 0, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 3)", GAME_FLAGS )
 GAME( 199?, j6pogc		, j6pog		, impctawp, tbirds, driver_device, 0, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 4)", GAME_FLAGS )
+GAME( 199?, j6pogd		, j6pog		, impctawp, tbirds, driver_device, 0, ROT0, "Ace", "Pot Of Gold (Ace) (IMPACT) (set 5)", GAME_FLAGS )
 
 
 GAME( 199?, j6pogcls	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Pot Of Gold Classic (JPM) (IMPACT) (set 1)", GAME_FLAGS )

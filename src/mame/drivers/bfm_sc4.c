@@ -1172,42 +1172,42 @@ ROM_START( sc4blast )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95412330.odd", 0x00001, 0x080000, CRC(9be05578) SHA1(ca51be09995523d959f646e142dc76b79bda9973) )
 	ROM_LOAD16_BYTE( "95412331.evn", 0x00000, 0x080000, CRC(b9dd2235) SHA1(7c5b11cdc1f2fdd3118fc495dfb4ceb0bd6acd5b) )
-	sc_blast_others
+	sc_roksc_others
 ROM_END
 
 ROM_START( sc4blasta )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95412332.odd", 0x00001, 0x080000, CRC(3571f826) SHA1(7bb18370bd70d71c4049a40f0676b363b1917467) )
 	ROM_LOAD16_BYTE( "95412333.evn", 0x00000, 0x080000, CRC(0a3fc7a1) SHA1(483c7ef030ac48f42538df8cd51d3192b9582ca0) )
-	sc_blast_others
+	sc_roksc_others
 ROM_END
 
 ROM_START( sc4blastb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95413330.odd", 0x00001, 0x080000, CRC(789c06d3) SHA1(ad46c911e6525033c549953e1b45acd0a8512378) )
 	ROM_LOAD16_BYTE( "95413331.evn", 0x00000, 0x080000, CRC(6a5fecd4) SHA1(a13012664065c1e9e0f02c76da0dfffe7077d3e9) )
-	sc_blast_others
+	sc_roksc_others
 ROM_END
 
 ROM_START( sc4blastc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95413332.odd", 0x00001, 0x080000, CRC(474fa683) SHA1(3ebe087be82e2c9cf3f1addd7cc19c8a6a07f772) )
 	ROM_LOAD16_BYTE( "95413333.evn", 0x00000, 0x080000, CRC(c3cbc622) SHA1(3410b0b8e8d9cc3abcb396775c127a33fffbe73d) )
-	sc_blast_others
+	sc_roksc_others
 ROM_END
 
 ROM_START( sc4blastd )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95414620.odd", 0x00001, 0x080000, CRC(2de2f00b) SHA1(f214fe86e7f9a131e0370a4efc724c402c4dfb63) )
 	ROM_LOAD16_BYTE( "95414621.evn", 0x00000, 0x080000, CRC(c8309fe3) SHA1(e7e3e81d55ccced33569e3dd3e8f27a075402b49) )
-	sc_blast_others
+	sc_roksc_others
 ROM_END
 
 ROM_START( sc4blaste )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95415620.odd", 0x00001, 0x080000, CRC(0d72fde7) SHA1(bbf353792cf8f57a0fa8a7265b027cf102a9ca5f) )
 	ROM_LOAD16_BYTE( "95415621.evn", 0x00000, 0x080000, CRC(fde3ad57) SHA1(42120f78c86b051eb904d0c3ee7c7de3d53ae1ad) )
-	sc_blast_others
+	sc_roksc_others
 ROM_END
 
 
@@ -7660,14 +7660,14 @@ ROM_START( sc4hyper )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95406308.lo", 0x00001, 0x080000, CRC(027e5d34) SHA1(68812625408bcd4ece0be429974f3a767c9f6b6b) )
 	ROM_LOAD16_BYTE( "95406309.hi", 0x00000, 0x080000, CRC(2ac47aae) SHA1(a44a66e50d649cefd070d12ae5c1aa96926376c0) )
-	sc_hyper_others
+	sc_onup_others
 ROM_END
 
 ROM_START( sc4hypera )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95407162.lo", 0x00001, 0x080000, CRC(e751dc77) SHA1(da52a96b4d32d8c8efeea82b28d4c6abf9afc298) )
 	ROM_LOAD16_BYTE( "95407163.hi", 0x00000, 0x080000, CRC(309e2d9e) SHA1(e692251d7a1aa24d080da9bb8f1d7134fdea31be) )
-	sc_hyper_others
+	sc_onup_others
 ROM_END
 
 
@@ -10498,7 +10498,7 @@ ROM_START( sc4nudit )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95408000.lo", 0x00001, 0x080000, CRC(20f44215) SHA1(17c4424edcae989c9d3fbd9a6fbf61d808882bda) )
 	ROM_LOAD16_BYTE( "95408001.hi", 0x00000, 0x080000, CRC(dbf69b04) SHA1(dfa4aa0e00ab24436b682c760f5734697bc1b110) )
-	sc_nudit_others
+	sc_nudit_wild_others
 ROM_END
 
 
@@ -11301,14 +11301,14 @@ ROM_START( sc4pwrbq )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95400945.lo", 0x00001, 0x080000, CRC(8b7067a6) SHA1(df5aaa774cc0021e99e98abc1ac13edb92e68e6e) )
 	ROM_LOAD16_BYTE( "95400946.hi", 0x00000, 0x080000, CRC(02804a36) SHA1(9fc1f69f0ed73ca9ee4fb2df3a0b477a9379cf52) )
-	sc_pwrbq_others
+	MAZOOMA_POWERBALL_SOUNDS
 ROM_END
 
 ROM_START( sc4pwrbqa )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95401945.lo", 0x00001, 0x080000, CRC(ca34aba7) SHA1(2890dbaff083f98ea76bb22d6f453c8bd62591eb) )
 	ROM_LOAD16_BYTE( "95401946.hi", 0x00000, 0x080000, CRC(9164fb91) SHA1(5a8b44bc342f483794cdb977ae60f32c905da347) )
-	sc_pwrbq_others
+	MAZOOMA_POWERBALL_SOUNDS
 ROM_END
 
 
@@ -21221,6 +21221,13 @@ ROM_START( sc4mhpn )
    sc_mhp_others
 ROM_END
 
+ROM_START( sc4mhpo )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95418854.lo", 0x000001, 0x080000, CRC(fa81d1e1) SHA1(f26c45d1fffc52a10f2b08fc2f607f63f94413b6) )
+	ROM_LOAD16_BYTE( "95418855.hi", 0x000000, 0x080000, CRC(3e7fbc1d) SHA1(0f82fa92f9e08161e3b74e1890b88a4fdcb23d12) )
+	sc_mhp_others
+ROM_END
+
 
 ROM_START( sc4mmb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -23521,6 +23528,18 @@ ROM_START( sc4boomba )
     ROM_LOAD16_BYTE( "95427489.hi", 0x00000, 0x080000, CRC(6dc23ad0) SHA1(5318dfffca7211600e0f64ea0ef1f45701f57401) )
     ROM_LOAD16_BYTE( "95427488.lo", 0x00001, 0x080000, CRC(5ac5adbd) SHA1(a4cf828eb3d5d8e2603a1921e6f63e04348beb26) )
     sc_mobob_others
+ROM_END
+
+
+#define sc4milro_sound \
+	ROM_REGION( 0x100000, "ymz", ROMREGION_ERASE00 ) \
+	ROM_LOAD( "millionaires row s16 sound (8meg)", 0x000000, 0x100000, CRC(4086df3f) SHA1(7fd358d901db48d1f8edc4b22789c73b5fb84874) ) \
+
+ROM_START( sc4milro )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "millionaires row s16 v1-0 lo (4meg)", 0x00001, 0x080000, CRC(8436aab9) SHA1(815000121e93c9a8e4f6c6d6d12a06c4484eb50c) )
+	ROM_LOAD16_BYTE( "millionaires row s16 v1-0 hi (4meg)", 0x00000, 0x080000, CRC(6b879665) SHA1(79fa91721375f0f968ecbd07fe9e9695344b7cd6) )
+	sc4milro_sound
 ROM_END
 
 
@@ -27775,6 +27794,34 @@ GAME( 200?, sc4rokscb	,sc4roksc,	sc4, sc4, sc4_state, sc4roksc, ROT0, "Qps","Roc
 GAME( 200?, sc4roksca	,sc4roksc,	sc4, sc4, sc4_state, sc4roksc, ROT0, "Qps","Rocket Science (011) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4rokscc	,sc4roksc,	sc4, sc4, sc4_state, sc4roksc, ROT0, "Qps","Rocket Science (011) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
 
+static const stepper_interface* sc4blast_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	&starpointrm20_interface_48step,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4blast)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4blast_reel_configs;
+}
+
+// only starts 2nd time (requires valid ram?)
+// PR2539 BLAST OFF011         ROCKETSCIENCESND            BLAST  OFF
+GAME( 200?, sc4blast	,0,			sc4, sc4, sc4_state, sc4blast, ROT0, "Qps","Blast Off (011) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4blastb	,sc4blast,	sc4, sc4, sc4_state, sc4blast, ROT0, "Qps","Blast Off (011) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+// PR2539 BLAST OFF041         ROCKETSCIENCESND            BLAST  OFF
+GAME( 200?, sc4blasta	,sc4blast,	sc4, sc4, sc4_state, sc4blast, ROT0, "Qps","Blast Off (041) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4blastc	,sc4blast,	sc4, sc4, sc4_state, sc4blast, ROT0, "Qps","Blast Off (041) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+// PR2539 BLAST OFF 042         ROCKETSCIENCESND            BLAST  OFF
+GAME( 200?, sc4blastd	,sc4blast,	sc4, sc4, sc4_state, sc4blast, ROT0, "Qps","Blast Off (042) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4blaste	,sc4blast,	sc4, sc4, sc4_state, sc4blast, ROT0, "Qps","Blast Off (042) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+
+
 
 static const stepper_interface* sc4rogds_reel_configs[6] =
 {
@@ -27830,6 +27877,31 @@ GAME( 200?, sc4rta		,sc4rt,		sc4, sc4, sc4_state, sc4rt, ROT0, "Mazooma","Rollin
 GAME( 200?, sc4rtb		,sc4rt,		sc4, sc4, sc4_state, sc4rt, ROT0, "Mazooma","Rolling Thunder (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4rtc		,sc4rt,		sc4, sc4, sc4_state, sc4rt, ROT0, "Mazooma","Rolling Thunder (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING )
 GAME( 200?, sc4rtd		,sc4rt,		sc4, sc4, sc4_state, sc4rt, ROT0, "Mazooma","Rolling Thunder (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING )
+
+static const stepper_interface* sc4broll_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	0,
+	&starpoint_interface_200step_reel,
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4broll)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4broll_reel_configs;
+}
+
+
+// missing sound roms, doesn't play, same game code and sound ident as Rolling Thunder?
+// PR2034 BANK ROLL         ROL SOUNDS          BANK ROLL
+GAME( 200?, sc4broll	,0,			sc4, sc4, sc4_state, sc4broll, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4brolla	,sc4broll,	sc4, sc4, sc4_state, sc4broll, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4brollb	,sc4broll,	sc4, sc4, sc4_state, sc4broll, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4brollc	,sc4broll,	sc4, sc4, sc4_state, sc4broll, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
+
 
 
 static const stepper_interface* sc4rbank_reel_configs[6] =
@@ -29169,6 +29241,27 @@ DRIVER_INIT_MEMBER(sc4_state,sc4onup)
 //  PR2076 ON THE UP         HYPE SOUNDS         ON THE UP
 GAME( 200?, sc4onup		,0,			sc4, sc4, sc4_state, sc4onup, ROT0, "BFM","On The Up (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
 GAME( 200?, sc4onupa	,sc4onup,	sc4, sc4, sc4_state, sc4onup, ROT0, "BFM","On The Up (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+
+static const stepper_interface* sc4hyper_reel_configs[6] =
+{
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step,
+	&starpointrm20_interface_48step, // or 200 ?
+	0,
+};
+
+DRIVER_INIT_MEMBER(sc4_state,sc4hyper)
+{
+	DRIVER_INIT_CALL(sc4);
+	m_reel_setup = sc4hyper_reel_configs;
+}
+
+//  PR2053 HYPERACTIVEL         HYPE SOUNDS         HYPERACTIVE
+GAME( 200?, sc4hyper	,0,			sc4, sc4, sc4_state, sc4hyper, ROT0, "Mazooma","Hyperactive (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4hypera	,sc4hyper,	sc4, sc4, sc4_state, sc4hyper, ROT0, "Mazooma","Hyperactive (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+
 
 static const stepper_interface* sc4pglcl_reel_configs[6] =
 {
@@ -31525,6 +31618,7 @@ GAME( 200?, sc4mhpk		,sc4mhp,	sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly
 GAME( 200?, sc4mhpl	    ,sc4mhp,	sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 13)", GAME_NOT_WORKING ) // 411
 GAME( 200?, sc4mhpm	    ,sc4mhp,	sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 14)", GAME_NOT_WORKING ) // 272
 GAME( 200?, sc4mhpn	    ,sc4mhp,	sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 15)", GAME_NOT_WORKING ) // 272
+GAME( 200?, sc4mhpo		,sc4mhp,	sc4, sc4, sc4_state, sc4mhp, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 16)", GAME_NOT_WORKING )
 
 static const stepper_interface* sc4mmb_reel_configs[6] =
 {
@@ -32899,6 +32993,11 @@ GAME( 200?, sc4feverh	,sc4fever,	sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fev
 GAME( 200?, sc4feverk	,sc4fever,	sc4, sc4, sc4_state, sc4fever, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 10)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 
+// PR7054 POWER BALL         POWERBALL SOUNDS
+GAME( 200?, sc4pwrbq	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Qps","Power Ball (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
+GAME( 200?, sc4pwrbqa	,sc4pwrbq,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Power Ball (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+
+
 /**********************************************************************************************************************************/
 /*  Games below are Dutch versions, and seem to be build on very different code even when titles match other games                */
 /*   they will all alarm for a while complaining about the battery but will then init NVRAM                                       */
@@ -33530,6 +33629,9 @@ GAME( 200?, sc4wrnlt	,sc4wernr,	sc4, sc4, sc4_state, sc4wernr, ROT0, "Nova","Wer
 /*  Games below don't do enough to add real configs yet                                                                           */
 /**********************************************************************************************************************************/
 
+// not sure this is SC4, it crashes MAME and the addresses it accesses look strange
+GAME( 200?, sc4milro	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Millionaires Row (Scorpion 4?)", GAME_NOT_WORKING )
+
 // PAY UNIT ERR 17
 //  PR1611 AWP ANT AND DECS         PR1611 ANT AND DECS  SOUNDS11     ANT AND DECS  S.SITE
 GAME( 200?, sc4adsnt	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Ant & Dec's Saturday Night Takeaway (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING )
@@ -33697,36 +33799,12 @@ GAME( 200?, sc4abrad	,sc4abra,	sc4, sc4, sc4_state, sc4abra, ROT0, "Qps","Abraca
 GAME( 200?, sc4abrae	,sc4abra,	sc4, sc4, sc4_state, sc4abra, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 6, 014)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 
-// missing sound roms, can't boot past the sound rom error?
+// bad / missing sound roms
 // PR7068 ALADDIN'S CAVE         CAVE SOUNDS
 GAME( 200?, sc4alad		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Aladdin's Cave (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4alada	,sc4alad,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Aladdin's Cave (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 
-
-static const stepper_interface* sc4broll_reel_configs[6] =
-{
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	0,
-	&starpoint_interface_200step_reel,
-	0,
-};
-
-DRIVER_INIT_MEMBER(sc4_state,sc4broll)
-{
-	DRIVER_INIT_CALL(sc4);
-	m_reel_setup = sc4broll_reel_configs;
-}
-
-
-// missing sound roms, doesn't play
-// PR2034 BANK ROLL         ROL SOUNDS          BANK ROLL
-GAME( 200?, sc4broll	,0,			sc4, sc4, sc4_state, sc4broll, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4brolla	,sc4broll,	sc4, sc4, sc4_state, sc4broll, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4brollb	,sc4broll,	sc4, sc4, sc4_state, sc4broll, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4brollc	,sc4broll,	sc4, sc4, sc4_state, sc4broll, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 
 static const stepper_interface* sc4bigdl_reel_configs[6] =
@@ -33752,32 +33830,6 @@ GAME( 200?, sc4bigdla	,sc4bigdl,	sc4, sc4, sc4_state, sc4bigdl, ROT0, "Qps","Big
 
 
 
-static const stepper_interface* sc4blast_reel_configs[6] =
-{
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	&starpointrm20_interface_48step,
-	0,
-	&starpointrm20_interface_48step,
-	0,
-};
-
-DRIVER_INIT_MEMBER(sc4_state,sc4blast)
-{
-	DRIVER_INIT_CALL(sc4);
-	m_reel_setup = sc4blast_reel_configs;
-}
-
-// no sound roms, only starts 2nd time (requires valid ram?)
-// PR2539 BLAST OFF011         ROCKETSCIENCESND            BLAST  OFF
-GAME( 200?, sc4blast	,0,			sc4, sc4, sc4_state, sc4blast, ROT0, "Qps","Blast Off (011) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4blastb	,sc4blast,	sc4, sc4, sc4_state, sc4blast, ROT0, "Qps","Blast Off (011) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
-// PR2539 BLAST OFF041         ROCKETSCIENCESND            BLAST  OFF
-GAME( 200?, sc4blasta	,sc4blast,	sc4, sc4, sc4_state, sc4blast, ROT0, "Qps","Blast Off (041) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4blastc	,sc4blast,	sc4, sc4, sc4_state, sc4blast, ROT0, "Qps","Blast Off (041) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
-// PR2539 BLAST OFF 042         ROCKETSCIENCESND            BLAST  OFF
-GAME( 200?, sc4blastd	,sc4blast,	sc4, sc4, sc4_state, sc4blast, ROT0, "Qps","Blast Off (042) (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4blaste	,sc4blast,	sc4, sc4, sc4_state, sc4blast, ROT0, "Qps","Blast Off (042) (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 // no sound roms, doesn't init properly (doesn't even attempt reel test)
 // PR7011 BLUE RINSE         BRINSE SOUNDS
@@ -33880,6 +33932,11 @@ GAME( 200?, sc4cconxb	,sc4cconx,	sc4, sc4, sc4_state, sc4cconx, ROT0, "Mazooma",
 GAME( 200?, sc4cconxc	,sc4cconx,	sc4, sc4, sc4_state, sc4cconx, ROT0, "Mazooma","Cash Connexion (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4cconxd	,sc4cconx,	sc4, sc4, sc4_state, sc4cconxd, ROT0, "Mazooma","Cash Connexion (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND ) // this one won't init without a 200 step reel
 
+// PR7029 MONEY TO MONEY         MTOM SOUNDS
+GAME( 200?, sc4m2m		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Money To Money (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 200?, sc4m2ma		,sc4m2m,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Money To Money (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
+
+
 static const stepper_interface* sc4ccrus_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
@@ -33896,7 +33953,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4ccrus)
 	m_reel_setup = sc4ccrus_reel_configs;
 }
 
-// no sound roms
+// no sound roms (probably doesn't want cashanova, but check)
 // PR2006 CASH CRUSADERS         CASH SOUNDS            CASH CRUSADERS
 GAME( 200?, sc4ccrus	,0,			sc4, sc4, sc4_state, sc4ccrus, ROT0, "Mazooma","Cash Crusaders (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4ccrusa	,sc4ccrus,	sc4, sc4, sc4_state, sc4ccrus, ROT0, "Mazooma","Cash Crusaders (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
@@ -34165,6 +34222,7 @@ GAME( 200?, sc4wthnga	,sc4wthng,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Thi
 GAME( 200?, sc4wthngb	,sc4wthng,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Thing (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4wthngc	,sc4wthng,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Wild Thing (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
+// does NOT want 'WILD SOUNDS' from 'PR7065 WET 'N' WILD'
 // PR7060CASINO WILDTHING         WILD THING  ARCADE  WILD SOUNDS         WILD THING
 GAME( 200?, sc4wthnm	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino Arcade (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4wthnma	,sc4wthnm,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Thing Casino Arcade (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
@@ -34377,6 +34435,7 @@ GAME( 200?, sc4tpshte	,sc4tpsht,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Top 
 GAME( 200?, sc4tpshtf	,sc4tpsht,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4tpshtg	,sc4tpsht,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
+// does not want the 'COTL SOUNDS' from Cash On The Lash
 // PR2118 ADRENALIN         COTL SOUNDS         ADRENALIN
 GAME( 200?, sc4adren	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4adrena	,sc4adren,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
@@ -34384,6 +34443,7 @@ GAME( 200?, sc4adrenb	,sc4adren,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Adre
 GAME( 200?, sc4adrenc	,sc4adren,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 
+// check if Side Splitter sound is correct
 // RNG ERROR 99
 // PR21xx BINGO BELLE         SSPT SOUNDS         BINGO BELLE
 GAME( 200?, sc4bingb	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Bingo Belle (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
@@ -34419,7 +34479,7 @@ GAME( 200?, sc4casryb	,sc4casry,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Casi
 GAME( 200?, sc4clucl	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Cluedo Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4clucla	,sc4clucl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Cluedo Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
-// we have a sound rom with the right header string, but it doesn't like it?
+// half size sound rom, or missing a rom
 //  PR2058 COUNT YER CASH         PR2058 COUNT YER CASH SOUNDS11
 GAME( 200?, sc4cyc		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4cyca		,sc4cyc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
@@ -34427,14 +34487,14 @@ GAME( 200?, sc4cycb		,sc4cyc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Count Y
 GAME( 200?, sc4cycc		,sc4cyc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4cycd		,sc4cyc,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 5)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
-// we have a sound rom with the right header string, but it doesn't like it?
+// half size sound rom, or missing a rom
 // PR2092 CLUB COUNT YER CASH         COUNT YER CASH  CLUB  CLCC SOUNDS
 GAME( 200?, sc4cyccl	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4cyccla	,sc4cyccl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4cycclb	,sc4cyccl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4cycclc	,sc4cyccl,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
-// doesn't like sound rom
+// half size sound rom, or missing a rom
 // PR7017 THREE LIONS         LION SOUNDS
 GAME( 200?, sc4lions	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Three Lions (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4lionsa	,sc4lions,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Three Lions (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
@@ -34445,9 +34505,6 @@ GAME( 200?, sc4lionse	,sc4lions,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Thre
 GAME( 200?, sc4lionsf	,sc4lions,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Three Lions (Mazooma) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 
-// PR7029 MONEY TO MONEY         MTOM SOUNDS
-GAME( 200?, sc4m2m		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Money To Money (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4m2ma		,sc4m2m,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Money To Money (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 // PR6984 VIVA MEXICO 1.30         95008095 VIVA MEXICO PR6984
 GAME( 200?, sc4vmnv		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Nova","Viva Mexico (Nova) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
@@ -34465,7 +34522,7 @@ GAME( 200?, sc4tempte	,sc4tempt,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptati
 GAME( 200?, sc4temptf	,sc4tempt,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4temptg	,sc4tempt,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Temptation (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
-// doesn't like the sound rom
+// half size sound rom, or missing a rom
 // PR7016 TAKE THE PISTE         PISTE SOUNDS
 GAME( 200?, sc4ttp		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Take The Piste (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4ttpa		,sc4ttp,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Take The Piste (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
@@ -34523,15 +34580,12 @@ GAME( 200?, sc4hydea	,sc4hyde,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hyde &
 GAME( 200?, sc4hydeb	,sc4hyde,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hyde & Streak (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4hydec	,sc4hyde,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hyde & Streak (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
-//  PR2053 HYPERACTIVEL         HYPE SOUNDS         HYPERACTIVE
-GAME( 200?, sc4hyper	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hyperactive (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4hypera	,sc4hyper,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hyperactive (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
-
-// doesn't like the sound roms we have (wrong header)
-// PR2043 NUDGE IT         WILD SOUNDS             NUDGE IT
+// // does NOT want 'WILD SOUNDS' from 'PR7065 WET 'N' WILD'
+// PR2043 NUDGE IT         WILD SOUNDS             NUDGE IT  
 GAME( 200?, sc4nudit	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Nudge It (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4nudita	,sc4nudit,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Nudge It (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4nuditb	,sc4nudit,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Nudge It (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
+// PR2043 NUDGE IT         NGIT SOUNDS             NUDGE IT
+GAME( 200?, sc4nudita	,sc4nudit,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Nudge It (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
+GAME( 200?, sc4nuditb	,sc4nudit,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Nudge It (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING )
 
 // PR6908  OUTLAW          PR6908 OUTLAW SOUNDS11
 GAME( 200?, sc4outlw	,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Outlaw (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
@@ -34560,7 +34614,7 @@ GAME( 200?, sc4rtclba	,sc4rtclb,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Roll
 GAME( 200?, sc4rmo		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Roll Me Over Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4rmoa		,sc4rmo,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Roll Me Over Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND)
 
-// doesn't like the sound rom
+// doesn't like the sound rom (not sure why, they look OK and have correct header)
 // PR7044 GERMAN JIGGERY POKERY         PR7044SND
 GAME( 200?, sc4jiggn	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Nova","Jiggery Pockery (German) (Nova) (Scorpion 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
@@ -34571,7 +34625,7 @@ GAME( 200?, sc4jiggra	,sc4jiggr,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jigg
 GAME( 200?, sc4jiggrb	,sc4jiggr,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jiggery Pokery (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4jiggrc	,sc4jiggr,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Jiggery Pokery (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
-// doesn't like the sound roms we have
+// doesn't like the sound roms we have (WILDJACK SOUNDS)
 // PR0000 WILD JACKPOTS         WJPT SOUNDS         WILD JACKPOTS
 GAME( 200?, sc4wldjk	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4wldjka	,sc4wldjk,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Wild Jackpots (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
@@ -34631,10 +34685,6 @@ GAME( 200?, sc4pwcrzd	,sc4pwcrz,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Power Cr
 GAME( 200?, sc4pwcrzh	,sc4pwcrz,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Power Crazy SP98 (Bellfruit) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4pwcrzi	,sc4pwcrz,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Power Crazy SP98 (Bellfruit) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
-// PR7054 POWER BALL         POWERBALL SOUNDS
-GAME( 200?, sc4pwrbq	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Qps","Powerball (Qps) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 200?, sc4pwrbqa	,sc4pwrbq,	sc4, sc4, sc4_state, sc4, ROT0, "Qps","Powerball (Qps) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
-
 // PR1191 QUARTERBACK         QBCK SOUNDS            QUARTERBACK
 GAME( 200?, sc4quart	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Quaterback (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4quarta	,sc4quart,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Quaterback (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
@@ -34673,7 +34723,6 @@ GAME( 200?, sc4r2ra		,sc4r2r,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Reel To
 GAME( 200?, sc4r2rb		,sc4r2r,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Reel To Reel (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4r2rc		,sc4r2r,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Reel To Reel (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
-// doesn't like the sound rom  (REVO SOUNDS instead of REV SOUNDS)
 // PR2020 REVOLVER         REV SOUNDS               REVOLVER
 GAME( 200?, sc4revo		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Revolver (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4revoa	,sc4revo,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Revolver (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
@@ -34685,7 +34734,7 @@ GAME( 200?, sc4revoe	,sc4revo,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Revolv
 // PR7076 GERMAN SINBAD2001         PR7076,German SINBAD2001,         PR7076 SOUNDS V1
 GAME( 200?, sc4s2k		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Nova","Sinbad 2000 (German) (Nova) (Scorpion 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
-// bad (or wrong game/hw type) sound roms
+// half size sound roms
 // PR6905 SKY'S THE LIMIT         PR6905 SKY'S THE LIMIT SOUNDS11
 GAME( 200?, sc4stl		,0,			sc4, sc4, sc4_state, sc4, ROT0, "BFM","Sky's The Limit, The (Bellfruit) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4stla		,sc4stl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Sky's The Limit, The (Bellfruit) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
@@ -34696,7 +34745,7 @@ GAME( 200?, sc4stle		,sc4stl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Sky's The L
 GAME( 200?, sc4stlf		,sc4stl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Sky's The Limit, The (Bellfruit) (Scorpion 4) (set 7)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4stlg		,sc4stl,	sc4, sc4, sc4_state, sc4, ROT0, "BFM","Sky's The Limit, The (Bellfruit) (Scorpion 4) (set 8)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
-// bad (or wrong game/hw type) sound roms
+// half size sound roms
 // PR2145 SOME LIKE IT HOT         SLIH SOUNDS         SOME LIKE IT HOT
 GAME( 200?, sc4slih		,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Some Like It Hot (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 200?, sc4sliha	,sc4slih,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Some Like It Hot (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND )
