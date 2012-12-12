@@ -38,6 +38,7 @@
 	floppy issues TODO (certain fail)
 	- 46 Okunen Monogatari - The Shinkaron
 	- AD&D Champions of Krynn
+	- Aoki Ookami no Shiroki Mejika - Gengis Khan
 	- Bokosuka Wars
 	- Dokkin Minako Sensei (2dd image)
 	- Jangou 2: floppy fails to load after the title screen;
@@ -56,6 +57,8 @@
 	- Animahjong V3: accesses port 0x88, tile selection pointer has a gfx clearance bug;
 	- Anniversary - Memories of Summer: thinks that a button is pressed, has window masking bugs during intro;
 	- Another Genesis: fails loading;
+	- Apple Club 1: how to pass?
+	(Applesauce Pirates)
 
 	- Brandish 2: Intro needs some window masking effects;
 	- Dragon Buster: missing bitplanes for the PCG (or not?), slight issue with window masking;
@@ -68,6 +71,9 @@
 	- Runner's High: wrong double height on the title screen;
 	- Uchiyama Aki no Chou Bangai: keyboard irq is fussy (sometimes it doesn't register a key press);
 	- Uno: uses EGC
+
+	Notes:
+	- Apple Club 1/2 needs data disks to load properly;
 
 ========================================================================================
 
@@ -341,7 +347,7 @@ public:
 
 	UINT8 m_vrtc_irq_mask;
 	UINT8 m_video_ff[8],m_gfx_ff;
-	UINT8 m_video_reg[6];
+	UINT8 m_txt_scroll_reg[8];
 	UINT8 m_pal_clut[4];
 
 	UINT8 *m_tvram;
@@ -739,7 +745,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				int res_x,res_y;
 
 				res_x = (x*8+xi) * (state->m_video_ff[WIDTH40_REG]+1);
-				res_y = y*lr+yi;
+				res_y = y*lr+yi - (state->m_txt_scroll_reg[3] & 0xf);
 
 				if(!device->machine().primary_screen->visible_area().contains(res_x, res_y))
 					continue;
@@ -1162,8 +1168,10 @@ WRITE8_MEMBER(pc9801_state::pc9801_70_w)
 {
 	if((offset & 1) == 0)
 	{
-		printf("Write to display register [%02x] %02x\n",offset+0x70,data);
-		m_video_reg[offset >> 1] = data;
+//		printf("Write to display register [%02x] %02x\n",offset+0x70,data);
+		m_txt_scroll_reg[offset >> 1] = data;
+
+		//popmessage("%02x %02x %02x %02x",m_txt_scroll_reg[0],m_txt_scroll_reg[1],m_txt_scroll_reg[2],m_txt_scroll_reg[3]);
 	}
 	else // odd
 	{
