@@ -140,7 +140,7 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( mz6500, mz6500_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, 4000000) //unk clock
+	MCFG_CPU_ADD("maincpu", I8086, 8000000) //unk clock
 	MCFG_CPU_PROGRAM_MAP(mz6500_map)
 	MCFG_CPU_IO_MAP(mz6500_io)
 
@@ -155,7 +155,7 @@ static MACHINE_CONFIG_START( mz6500, mz6500_state )
 	MCFG_PALETTE_LENGTH(8)
 
 	/* Devices */
-	MCFG_UPD7220_ADD("upd7220", 4000000, hgdc_intf, upd7220_map)
+	MCFG_UPD7220_ADD("upd7220", 8000000/6, hgdc_intf, upd7220_map) // unk clock
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", mz6500_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", mz6500_floppies, "525hd", 0, floppy_image_device::default_floppy_formats)

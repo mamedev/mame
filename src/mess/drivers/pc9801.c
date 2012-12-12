@@ -54,12 +54,11 @@
 	   "can't use (this) on a vanilla PC-9801, a PC-9801E nor a PC-9801U. Please turn off the computer and turn it on again."
 	- Alice no Yakata: wants a "DSW 1-8" on.
 	- Animahjong V3: accesses port 0x88;
-	- Anniversary - Memories of Summer: thinks that a button is pressed, has window masking bugs during intro;
+	- Anniversary - Memories of Summer: thinks that a button is pressed;
 	- Another Genesis: fails loading;
 	- Apple Club 1: how to pass an hand?
 	(Applesauce Pirates)
 
-	- Brandish 2: Intro needs some window masking effects (or not?);
 	- Dragon Buster: slight issue with window masking;
 	- Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)
 	- Jan Borg Suzume: gets stuck at a pic8259 read;
@@ -721,7 +720,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		knj_tile = state->m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0xff;
 		if(knj_tile)
 		{
-			/* Note: lr doesn't really count, if a kanji is enabled then the successive tile is always the second part of it.
+			/* Note: bit 7 doesn't really count, if a kanji is enabled then the successive tile is always the second part of it.
 			   Trusted with Alice no Yakata, Animahjong V3, Aki no Tsukasa no Fushigi no Kabe, Apros ...
 			*/
 			//kanji_lr = (knj_tile & 0x80) >> 7;

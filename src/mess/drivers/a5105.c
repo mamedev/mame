@@ -130,12 +130,18 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				res_x = x * 8 + xi;
 				res_y = y * lr + yi;
 
-				if(!device->machine().primary_screen->visible_area().contains(res_x, res_y))
-					continue;
-
 				if(yi >= 8) { pen = 0; }
 
-				bitmap.pix32(res_y, res_x) = palette[pen];
+				/* TODO: pitch is currently 40, this should actually go in the upd7220 device */
+				if(!device->machine().primary_screen->visible_area().contains(res_x*2+0, res_y))
+					continue;
+
+				bitmap.pix32(res_y, res_x*2+0) = palette[pen];
+
+				if(!device->machine().primary_screen->visible_area().contains(res_x*2+1, res_y))
+					continue;
+
+				bitmap.pix32(res_y, res_x*2+1) = palette[pen];
 			}
 		}
 	}
@@ -599,7 +605,7 @@ static MACHINE_CONFIG_START( a5105, a5105_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_UPD7220_ADD("upd7220", XTAL_15MHz, hgdc_intf, upd7220_map)
+	MCFG_UPD7220_ADD("upd7220", XTAL_15MHz / 16, hgdc_intf, upd7220_map) // unk clock
 	MCFG_Z80CTC_ADD( "z80ctc", XTAL_15MHz / 4, a5105_ctc_intf )
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_15MHz / 4, a5105_pio_intf )
 

@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( compis, compis_state )
 	MCFG_PIC8259_ADD( "pic8259_master", compis_pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", compis_pic8259_slave_config )
 	MCFG_I8255_ADD( "ppi8255", compis_ppi_interface )
-	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz, hgdc_intf, upd7220_map) //unknown clock
+	MCFG_UPD7220_ADD("upd7220", XTAL_4_433619MHz/2, hgdc_intf, upd7220_map) //unknown clock
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 	MCFG_I8251_ADD("uart", compis_usart_interface)
 	MCFG_MM58274C_ADD("mm58274c", compis_mm58274c_interface)
@@ -416,7 +416,7 @@ static MACHINE_CONFIG_START( compis2, compis_state )
 	MCFG_PIC8259_ADD( "pic8259_master", compis_pic8259_master_config )
 	MCFG_PIC8259_ADD( "pic8259_slave", compis_pic8259_slave_config )
 	MCFG_I8255_ADD( "ppi8255", compis_ppi_interface )
-	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz, hgdc_intf, upd7220_map) //unknown clock
+	MCFG_UPD7220_ADD("upd7220", XTAL_4_433619MHz/2, hgdc_intf, upd7220_map) //unknown clock
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 	MCFG_I8251_ADD("uart", compis_usart_interface)
 	MCFG_MM58274C_ADD("mm58274c", compis_mm58274c_interface)

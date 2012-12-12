@@ -1042,8 +1042,8 @@ static MACHINE_CONFIG_START( apc, apc_state )
 
 	MCFG_GFXDECODE(apc)
 
-	MCFG_UPD7220_ADD("upd7220_chr", 5000000/2, hgdc_1_intf, upd7220_1_map)
-	MCFG_UPD7220_ADD("upd7220_btm", 5000000/2, hgdc_2_intf, upd7220_2_map)
+	MCFG_UPD7220_ADD("upd7220_chr", XTAL_3_579545MHz, hgdc_1_intf, upd7220_1_map) // unk clock
+	MCFG_UPD7220_ADD("upd7220_btm", XTAL_3_579545MHz, hgdc_2_intf, upd7220_2_map) // unk clock
 
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT_OVERRIDE(apc_state,apc)

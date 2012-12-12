@@ -1040,7 +1040,7 @@ static MACHINE_CONFIG_START( qx10, qx10_state )
 	MCFG_I8255_ADD("i8255", qx10_i8255_interface)
 	MCFG_I8237_ADD("8237dma_1", MAIN_CLK/4, qx10_dma8237_1_interface)
 	MCFG_I8237_ADD("8237dma_2", MAIN_CLK/4, qx10_dma8237_2_interface)
-	MCFG_UPD7220_ADD("upd7220", MAIN_CLK/4, hgdc_intf, upd7220_map)
+	MCFG_UPD7220_ADD("upd7220", MAIN_CLK/6, hgdc_intf, upd7220_map) // unk clock
 	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", qx10_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)

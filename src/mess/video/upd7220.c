@@ -27,7 +27,8 @@
     - QX-10 diagnostic test has positioning bugs with the bitmap display test;
     - QX-10 diagnostic test misses the zooming factor (external pin);
     - compis2 SAD address for bitmap is 0x20000 for whatever reason (presumably missing banking);
-    - A5105 has a FIFO bug with the RDAT, should be a lot larger when it scrolls up;
+    - A5105 has a FIFO bug with the RDAT, should be a lot larger when it scrolls up.
+      The problem is that DMA-ing with RDAT/WDAT shouldn't be instant;
 
     - honor visible area
     - wide mode (32-bit access)
@@ -391,7 +392,9 @@ inline void upd7220_device::update_blank_timer(int state)
 
 inline void upd7220_device::recompute_parameters()
 {
-	int horiz_pix_total = (m_hs + m_hbp + m_aw + m_hfp) * 8;
+	/* TODO: assume that the pitch also controls number of horizontal pixels in a single cell */
+	int horiz_mult = ((m_pitch == 40) ? 16 : 8);
+	int horiz_pix_total = (m_hs + m_hbp + m_aw + m_hfp) * horiz_mult;
 	int vert_pix_total = m_vs + m_vbp + m_al + m_vfp;
 
 	//printf("%d %d %d %d\n",m_hs,m_hbp,m_aw,m_hfp);
@@ -400,20 +403,21 @@ inline void upd7220_device::recompute_parameters()
 	if (horiz_pix_total == 0 || vert_pix_total == 0) //bail out if screen params aren't valid
 		return;
 
-	attoseconds_t refresh = HZ_TO_ATTOSECONDS(60); //HZ_TO_ATTOSECONDS(clock() * 8) * horiz_pix_total * vert_pix_total;
+	attoseconds_t refresh = HZ_TO_ATTOSECONDS(clock() * horiz_mult) * horiz_pix_total * vert_pix_total;
 
 	rectangle visarea;
 
 	visarea.min_x = 0; //(m_hs + m_hbp) * 8;
 	visarea.min_y = 0; //m_vs + m_vbp;
-	visarea.max_x = m_aw * 8 - 1;//horiz_pix_total - (m_hfp * 8) - 1;
+	visarea.max_x = m_aw * horiz_mult - 1;//horiz_pix_total - (m_hfp * 8) - 1;
 	visarea.max_y = m_al - 1;//vert_pix_total - m_vfp - 1;
 
 
-	if (LOG)
+	if (0)
 	{
 		printf("uPD7220 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 		printf("Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+		printf("%d %d %d %d %d\n",m_hs,m_hbp,m_aw,m_hfp,m_pitch);
 		printf("%d %d %d %d\n",m_vs,m_vbp,m_al,m_vfp);
 	}
 

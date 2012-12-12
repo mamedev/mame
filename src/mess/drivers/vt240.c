@@ -181,7 +181,7 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE(vt240)
 
-	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz, hgdc_intf, upd7220_map) //unknown clock
+	MCFG_UPD7220_ADD("upd7220", XTAL_4MHz / 4, hgdc_intf, upd7220_map) //unknown clock
 MACHINE_CONFIG_END
 
 /* ROM definition */
