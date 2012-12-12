@@ -4802,12 +4802,20 @@ ROM_START( sc2gsclb6 )
 	sc2_gsclb_sound
 ROM_END
 
-ROM_START( sc2gsclb7p )
+ROM_START( sc2gsclb6p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-game-show_dat_ac_250pnd-25p_ass.bin", 0x0000, 0x010000, CRC(299b89f3) SHA1(eb78378410ca2380ec564e8268a51309dc8044ce) )
 
 	sc2_gsclb_sound
 ROM_END
+
+ROM_START( sc2gsclb7 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gsho1_3", 0x0000, 0x010000, CRC(783ee8cb) SHA1(b509f167fddc71e313ffbff0a3e1ce7d387c424e) )
+
+	sc2_gsclb_sound
+ROM_END
+
 
 ROM_START( sc2cpg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7283,11 +7291,7 @@ ROM_START( sc2groulp )
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( sc2gldsh )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gsho1_3", 0x0000, 0x010000, CRC(783ee8cb) SHA1(b509f167fddc71e313ffbff0a3e1ce7d387c424e) )
-	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
-ROM_END
+
 
 ROM_START( sc2gtr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7637,19 +7641,32 @@ GAME( 199?, sc2eggsp	, sc2eggs	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 
 GAME( 199?, sc2eggs1	, sc2eggs	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Eggs On Legs Tour (Bellfruit) (set 2, UK, Arcade, 10GBP Jackpot?) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2eggs1p	, sc2eggs	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Eggs On Legs Tour (Bellfruit) (set 2, UK, Arcade, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 
-GAME( 199?, sc2gsclb	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 1, UK, Arcade, p65)(Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2gsclbp	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 1, UK, Arcade, p65, Protocol)(Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2gsclb1	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 2, UK, Arcade, 250GBP Jackpot, p65)(Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2gsclb1p	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 2, UK, Arcade, 250GBP Jackpot, p65, Protocol)(Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2gsclb2	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 3, UK, Arcade)(Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2gsclb2p	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 3, UK, Arcade, Protocol)(Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2gsclb3	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 4, UK, Arcade)(Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2gsclb3p	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 4, UK, Arcade, Protocol)(Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2gsclb4	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 5, UK, Arcade)(Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2gsclb4p	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 5, UK, Arcade, Protocol)(Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2gsclb5	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 6, UK)(Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2gsclb6	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 7, UK)(Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2gsclb7p	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 8, UK, Protocol)(Scorpion 2/3)", GAME_FLAGS)
+
+
+// PROJECT NUMBER PR6431  THE GAME SHOW - 28-FEB-1995 11:51:15
+GAME( 199?, sc2gsclb5	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-362
+// PROJECT NUMBER PR6431  THE GAME SHOW  - 9-JUN-1995 12:16:14
+GAME( 199?, sc2gsclb7	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",		 "The Game Show Club (Bellfruit) (set 2, UK) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-424
+// PROJECT NUMBER PR6431  THE GAME SHOW - 14-DEC-1995 16:10:08
+GAME( 199?, sc2gsclb2	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 3, UK, Arcade) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-587
+GAME( 199?, sc2gsclb2p	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 3, UK, Arcade, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-587
+// PROJECT NUMBER PR6431  THE GAME SHOW FIXED 65% - 23-JAN-1996 11:56:38
+GAME( 199?, sc2gsclb	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 4, UK, Arcade, p65) (Scorpion 2/3)", GAME_FLAGS)			 // GAME No 95-750-588
+GAME( 199?, sc2gsclbp	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 4, UK, Arcade, p65, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-588
+// PROJECT NUMBER PR6431  THE GAME SHOW SEALINK VERSION - 23-JAN-1996 11:58:58
+GAME( 199?, sc2gsclb3	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 5, UK, Arcade) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-589
+GAME( 199?, sc2gsclb3p	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 5, UK, Arcade, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-589
+// PROJECT NUMBER PR6431  THE GAME SHOW FAST FILL CASHPOT - 23-JAN-1996 12:17:04
+GAME( 199?, sc2gsclb4	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 6, UK, Arcade) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-590
+GAME( 199?, sc2gsclb4p	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 6, UK, Arcade, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-590
+// PROJECT NUMBER PR6575  THE GAME SHOW FIXED 65% 25P PLAY - 11-APR-1996 14:46:58
+GAME( 199?, sc2gsclb1	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 7, UK, Arcade, 250GBP Jackpot, p65) (Scorpion 2/3)", GAME_FLAGS)			 // GAME No 95-750-667
+GAME( 199?, sc2gsclb1p	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 7, UK, Arcade, 250GBP Jackpot, p65, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-667
+// PROJECT NUMBER PR6575  THE GAME SHOW 25P PLAY - 20-AUG-1996 10:03:25
+GAME( 199?, sc2gsclb6	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 8, UK) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-844
+GAME( 199?, sc2gsclb6p	, sc2gsclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Game Show Club (Bellfruit) (set 8, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-844
+
+
 
 GAME( 199?, sc2cpg		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Pharaoh's Gold Club (Bellfruit) (set 1, UK, 250GBP Jackpot)(Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2cpgp		, sc2cpg	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Pharaoh's Gold Club (Bellfruit) (set 1, UK, 250GBP Jackpot, Protocol)(Scorpion 2/3)", GAME_FLAGS)
@@ -7967,7 +7984,7 @@ GAME( 199?, sc2gcclb3	, sc2gcclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		
 GAME( 199?, sc2groul	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Golden Roulette (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2groulp	, sc2groul	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Golden Roulette (Bellfruit) (set 2, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 
-GAME( 199?, sc2gldsh	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Golden Shot (Bellfruit) (Scorpion 2/3)", GAME_FLAGS)
+
 GAME( 199?, sc2gtr		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Great Train Robbery (Bellfruit) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2heypr	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Hey Presto (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2heyprp	, sc2heypr	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Hey Presto (Bellfruit) (set 1, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
@@ -7984,6 +8001,7 @@ GAME( 199?, sc2kcclb1	, sc2kcclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		
 GAME( 199?, sc2kcclb1p	, sc2kcclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "King Cash Club (Bellfruit) (set 2, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 
 GAME( 199?, sc2maina	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Main Attraction (Bellfruit) (Scorpion 2/3)", GAME_FLAGS)
+
 GAME( 199?, sc2olgld	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Olympic Gold (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2olgldp	, sc2olgld	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Olympic Gold (Bellfruit) (set 1, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2olgld1	, sc2olgld	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Olympic Gold (Bellfruit) (set 2, UK, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
