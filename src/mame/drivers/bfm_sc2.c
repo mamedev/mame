@@ -2187,6 +2187,80 @@ static MACHINE_CONFIG_START( scorpion2_vid, bfm_sc2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+
+
+int sc2_find_project_string(running_machine &machine )
+{
+	// search for the title
+	const int strlength = 14;
+	char title_string[] = "PROJECT NUMBER";
+	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
+	int size = machine.root_device().memregion( "maincpu" )->bytes();
+
+	for (int i=0;i<size-strlength;i++)
+	{
+		int j;
+		int found = 1;
+		for (j=0;j<strlength;j+=1)
+		{
+			UINT8 rom = src[(i+j)];
+			UINT8 chr = title_string[j];
+
+			if (rom != chr)
+			{
+				found = 0;
+				break;
+			}
+		}
+
+		if (found!=0)
+		{
+
+			int end=0;
+			int count = 0;
+			int blankcount = 0;
+			printf("ID String @ %08x\n", i);
+
+			while (!end)
+			{
+				UINT8 rom;
+				int addr;
+
+				addr = (i+count);
+
+				if (addr<size)
+				{
+					rom = src[addr];
+			
+					if ((rom>=0x20) && (rom<0x7f))
+					{
+						printf("%c", rom);
+						blankcount = 0;
+					}
+					else
+					{
+						blankcount++;
+						if (blankcount<10) printf(" ");
+					}
+
+					count++;
+				}
+				else
+					end = 1;
+
+				if (count>=0x100)
+					end = 1;
+			}
+			printf("\n");
+
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+
 static void sc2_common_init(running_machine &machine, int decrypt)
 {
 	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
@@ -3809,11 +3883,11 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,bbrkfst)
 	Scorpion2_SetSwitchState(machine(),6,2, 0);
 	Scorpion2_SetSwitchState(machine(),6,3, 1);
 
+	sc2_find_project_string(machine());
 }
 
 DRIVER_INIT_MEMBER(bfm_sc2_state,drwho_common)
 {
-
 	MechMtr_config(machine(),8);
 
 	m_has_hopper = 0;
@@ -3826,6 +3900,8 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,drwho_common)
 	Scorpion2_SetSwitchState(machine(),7,1, 0);	  /* 20P High Level Switch */
 	Scorpion2_SetSwitchState(machine(),7,2, 0);	  /* Token Front High Level Switch */
 	Scorpion2_SetSwitchState(machine(),7,3, 0);	  /* Token Rear High Level Switch */
+
+	sc2_find_project_string(machine());
 }
 
 DRIVER_INIT_MEMBER(bfm_sc2_state,drwho)
@@ -3845,6 +3921,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,focus)
 {
 	sc2awp_common_init(machine(),6, 1);
 	MechMtr_config(machine(),5);
+	sc2_find_project_string(machine());
 }
 
 DRIVER_INIT_MEMBER(bfm_sc2_state,cpeno1)
@@ -3889,6 +3966,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,cpeno1)
 	m_sc2_door_state  = 0x31;
 
 	m_has_hopper = 0;
+	sc2_find_project_string(machine());
 }
 
 DRIVER_INIT_MEMBER(bfm_sc2_state,ofah)
@@ -3906,7 +3984,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,ofah)
 	Scorpion2_SetSwitchState(machine(),6,3,1);
 
 	MechMtr_config(machine(),3);
-
+	sc2_find_project_string(machine());
 }
 
 DRIVER_INIT_MEMBER(bfm_sc2_state,prom)
@@ -3924,7 +4002,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,prom)
 	Scorpion2_SetSwitchState(machine(),6,3,1);
 
 	MechMtr_config(machine(),3);
-
+	sc2_find_project_string(machine());
 }
 
 DRIVER_INIT_MEMBER(bfm_sc2_state,bfmcgslm)
@@ -3932,6 +4010,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,bfmcgslm)
 	sc2awp_common_init(machine(),6, 1);
 	MechMtr_config(machine(),8);
 	m_has_hopper = 0;
+	sc2_find_project_string(machine());
 }
 
 DRIVER_INIT_MEMBER(bfm_sc2_state,luvjub)
@@ -3958,6 +4037,7 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,luvjub)
 	Scorpion2_SetSwitchState(machine(),7,1,0);
 	Scorpion2_SetSwitchState(machine(),7,2,0);
 	Scorpion2_SetSwitchState(machine(),7,3,0);
+	sc2_find_project_string(machine());
 }
 
 
@@ -7975,9 +8055,13 @@ GAME( 199?, sc2cops4	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah	
 GAME( 199?, sc2cops5	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 6)  (Scorpion 2/3)", GAME_FLAGS)
 
 //Shows Nudge Now animation on bootup - using right ROMS?
+// PROJECT NUMBER 6622  BINGO COPS N ROBBERS #8/#10 ALL CASH  GAME No 95-750-814 - 9-JUL-1996 17:08:15
 GAME( 199?, sc2copsc	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
+// PROJECT NUMBER 6622  BINGO COPS N ROBBERS #8/#10 ALL CASH  GAME No 95-751-814 - 9-JUL-1996 17:08:15
 GAME( 199?, sc2copscp	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 1, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
+// PROJECT NUMBER 6622  BINGO COPS N ROBBERS SWITCHABLE BINGO/ARCADE  GAME No 95-750-816 - 9-JUL-1996 17:12:33
 GAME( 199?, sc2copsc1	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)
+// PROJECT NUMBER 6622  BINGO COPS N ROBBERS SWITCHABLE BINGO/ARCADE  GAME No 95-751-816 - 9-JUL-1996 17:12:33  (sc2copsc1p / sc2copsc2 are the same set with different matrix rom??)
 GAME( 199?, sc2copsc1p	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 2, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2copsc2	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS)
 
