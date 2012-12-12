@@ -47,8 +47,16 @@
 	List of per-game TODO:
 	- 4D Boxing: inputs are unresponsive
 	- A Ressha de Ikou 2: missing text (PC-9801RS only);
-	- Absolutely Mahjong: Kanji data doesn't appear at the Epson logo. Transitions are too fast.
-	- Agumix Selects!: needs GDC = 5 MHz, interlace doesn't apply there;
+	- Absolutely Mahjong: Transitions are too fast.
+	- Agumix Selects!: needs GDC = 5 MHz, interlace doesn't work properly;
+	- Aki no Tsukasa no Fushigi no Kabe: moans with a kanji error
+	   "can't use (this) on a vanilla PC-9801, a PC-9801E nor a PC-9801U. Please turn off the computer and turn it on again."
+	   display of this kanji error is wrong on PC-9801RS;
+	- Alice no Yakata: wants a "DSW 1-8" on.
+	- Animahjong V3: accesses port 0x88, tile selection pointer has a gfx clearance bug;
+	- Anniversary - Memories of Summer: thinks that a button is pressed, has window masking bugs during intro;
+	- Another Genesis: fails loading;
+
 	- Brandish 2: Intro needs some window masking effects;
 	- Dragon Buster: missing bitplanes for the PCG (or not?), slight issue with window masking;
 	- Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)
@@ -59,6 +67,7 @@
 	- Quarth: uploads a PCG charset
 	- Runner's High: wrong double height on the title screen;
 	- Uchiyama Aki no Chou Bangai: keyboard irq is fussy (sometimes it doesn't register a key press);
+	- Uno: uses EGC
 
 ========================================================================================
 
@@ -351,6 +360,7 @@ public:
 
 	/* PC9801RS specific */
 	UINT8 m_gate_a20; //A20 line
+	UINT8 m_nmi_enable;
 	UINT8 m_access_ctrl; // DMA related
 	UINT8 m_rom_bank;
 	UINT8 m_fdc_ctrl;
@@ -458,6 +468,8 @@ public:
 	DECLARE_WRITE8_MEMBER(opn_portb_w);
 	DECLARE_READ8_MEMBER(pc9801_ext_opna_r);
 	DECLARE_WRITE8_MEMBER(pc9801_ext_opna_w);
+	DECLARE_WRITE8_MEMBER(pc9801rs_nmi_w);
+	DECLARE_READ8_MEMBER(pc9801rs_midi_r);
 
 	DECLARE_READ8_MEMBER(sdip_0_r);
 	DECLARE_READ8_MEMBER(sdip_1_r);
@@ -688,7 +700,8 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	{
 		UINT8 tile_data,secret,reverse,u_line,v_line;
 		UINT8 color;
-		UINT8 attr,pen;
+		UINT8 attr;
+		int pen;
 		UINT32 tile_addr;
 		UINT8 knj_tile;
 		UINT8 gfx_mode;
@@ -772,11 +785,11 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					tile_data^=0xff;
 
 				if(yi >= char_size)
-					pen = 0;
+					pen = -1;
 				else
-					pen = (tile_data >> (7-xi) & 1) ? color : 0;
+					pen = (tile_data >> (7-xi) & 1) ? color : -1;
 
-				if(pen)
+				if(pen != -1)
 					bitmap.pix32(res_y, res_x) = palette[pen];
 
 				if(state->m_video_ff[WIDTH40_REG])
@@ -784,7 +797,8 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					if(!device->machine().primary_screen->visible_area().contains(res_x+1, res_y))
 						continue;
 
-					bitmap.pix32(res_y, res_x+1) = palette[pen];
+					if(pen != -1)
+						bitmap.pix32(res_y, res_x+1) = palette[pen];
 				}
 			}
 		}
@@ -1695,9 +1709,9 @@ READ8_MEMBER(pc9801_state::pc9801rs_f0_r)
 {
 
 	if(offset == 0x02)
-		return (m_gate_a20 ^ 1) | 0x2e;
+		return (m_gate_a20 ^ 1) | 0xfe;
 	else if(offset == 0x06)
-		return (m_gate_a20 ^ 1) | 0x5e;
+		return (m_gate_a20 ^ 1) | (m_nmi_enable << 1);
 
 	return 0x00;
 }
@@ -1928,10 +1942,10 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_video_ff_w)
 				"<unknown>"			// 3
 			};
 
-			printf("Write to extend video FF register %s -> %02x\n",ex_video_ff_regnames[(data & 0x06) >> 1],data & 1);
+			printf("Write to extended video FF register %s -> %02x\n",ex_video_ff_regnames[(data & 0x06) >> 1],data & 1);
 		}
 		//else
-		//	printf("Write to extend video FF register %02x\n",data);
+		//	printf("Write to extended video FF register %02x\n",data);
 
 		return;
 	}
@@ -1941,7 +1955,6 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_video_ff_w)
 
 WRITE8_MEMBER(pc9801_state::pc9801rs_a0_w)
 {
-
 	if((offset & 1) == 0 && offset & 8 && m_ex_video_ff[ANALOG_16_MODE])
 	{
 		switch(offset)
@@ -1988,15 +2001,42 @@ WRITE8_MEMBER( pc9801_state::pc9801rs_mouse_freq_w )
 
 READ8_MEMBER( pc9801_state::pc9801_ext_opna_r )
 {
-	printf("OPNA EXT read ID [%02x]\n",offset);
-	return 0;
+	if(offset == 0)
+	{
+		printf("OPNA EXT read ID [%02x]\n",offset);
+		return 0xff;
+	}
+
+	printf("OPNA EXT read unk [%02x]\n",offset);
+	return 0xff;
 }
 
 WRITE8_MEMBER( pc9801_state::pc9801_ext_opna_w )
 {
-	printf("OPNA EXT write mask %02x -> [%02x]\n",data,offset);
+	if(offset == 0)
+	{
+		printf("OPNA EXT write mask %02x -> [%02x]\n",data,offset);
+		return;
+	}
+
+	printf("OPNA EXT write unk %02x -> [%02x]\n",data,offset);
 }
 
+
+WRITE8_MEMBER( pc9801_state::pc9801rs_nmi_w )
+{
+	if(offset == 0)
+		m_nmi_enable = 0;
+
+	if(offset == 2)
+		m_nmi_enable = 1;
+}
+
+READ8_MEMBER( pc9801_state::pc9801rs_midi_r )
+{
+	/* unconnect, needed by Amaranth KH to boot */
+	return 0xff;
+}
 
 static ADDRESS_MAP_START( pc9801rs_map, AS_PROGRAM, 32, pc9801_state )
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE8(pc9801rs_memory_r,pc9801rs_memory_w,0xffffffff)
@@ -2007,6 +2047,7 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(pc9801_20_r,        pc9801_20_w,        0xffffffff) // RTC / DMA registers (LS244)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffffffff) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(pc9801_40_r,        pc9801_40_w,        0xffffffff) //i8255 printer port / i8251 keyboard
+	AM_RANGE(0x0050, 0x0053) AM_WRITE8(pc9801rs_nmi_w, 0xffffffff)
 	AM_RANGE(0x005c, 0x005f) AM_WRITENOP // time-stamp?
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(pc9801_60_r,        pc9801_60_w,        0xffffffff) //upd7220 character ports / <undefined>
 	AM_RANGE(0x0064, 0x0067) AM_WRITE8(pc9801_vrtc_mask_w, 0xffffffff)
@@ -2025,6 +2066,7 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,     pc9801_mouse_w,     0xffffffff) // <undefined> / mouse ppi8255 ports
 	AM_RANGE(0xa460, 0xa463) AM_READWRITE8(pc9801_ext_opna_r,  pc9801_ext_opna_w,  0xffffffff)
 	AM_RANGE(0xbfd8, 0xbfdf) AM_WRITE8(pc9801rs_mouse_freq_w, 0xffffffff)
+	AM_RANGE(0xe0d0, 0xe0d3) AM_READ8(pc9801rs_midi_r, 0xffffffff)
 ADDRESS_MAP_END
 
 READ8_MEMBER(pc9801_state::pc980ux_memory_r)
@@ -2370,6 +2412,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(pc9801_20_r,        pc9801_20_w,        0xffffffff) // RTC / DMA registers (LS244)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffffffff) //i8251 RS232c / i8255 system port
 	AM_RANGE(0x0040, 0x0047) AM_READWRITE8(pc9801_40_r,        pc9801_40_w,        0xffffffff) //i8255 printer port / i8251 keyboard
+	AM_RANGE(0x0050, 0x0053) AM_WRITE8(pc9801rs_nmi_w, 0xffffffff)
 	AM_RANGE(0x005c, 0x005f) AM_READ(pc9821_timestamp_r) AM_WRITENOP
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(pc9801_60_r,        pc9801_60_w,        0xffffffff) //upd7220 character ports / <undefined>
 	AM_RANGE(0x0064, 0x0067) AM_WRITE8(pc9801_vrtc_mask_w, 0xffffffff)
@@ -2671,7 +2714,7 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x00, "DSW5" )
+	PORT_DIPNAME( 0x01, 0x00, "DSW5" ) // goes into basic with this off
 	PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
@@ -3406,7 +3449,7 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 		int i;
 		static const UINT8 default_memsw_data[0x10] =
 		{
-			0xe1, 0x48, 0xe1, 0x05, 0xe1, 0x04, 0xe1, 0x00, 0xe1, 0x01, 0xe1, 0x00, 0xe1, 0x00, 0xe1, 0x00
+			0xe1, 0x48, 0xe1, 0x05, 0xe1, 0x04, 0xe1, 0x00, 0xe1, 0x01, 0xe1, 0x00, 0xe1, 0x00, 0xe1, 0x6e
 //          0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff, 0xe1, 0xff
 		};
 
