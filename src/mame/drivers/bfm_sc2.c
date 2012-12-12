@@ -2192,68 +2192,73 @@ MACHINE_CONFIG_END
 int sc2_find_project_string(running_machine &machine )
 {
 	// search for the title
-	const int strlength = 14;
-	char title_string[] = "PROJECT NUMBER";
+	char title_string[2][16] = { "PROJECT NUMBER", "PROJECT PR" };
 	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
 	int size = machine.root_device().memregion( "maincpu" )->bytes();
 
-	for (int i=0;i<size-strlength;i++)
+	for (int search=0;search<2;search++)
 	{
-		int j;
-		int found = 1;
-		for (j=0;j<strlength;j+=1)
+
+		int strlength = strlen(title_string[search]);
+
+		for (int i=0;i<size-strlength;i++)
 		{
-			UINT8 rom = src[(i+j)];
-			UINT8 chr = title_string[j];
-
-			if (rom != chr)
+			int j;
+			int found = 1;
+			for (j=0;j<strlength;j+=1)
 			{
-				found = 0;
-				break;
-			}
-		}
+				UINT8 rom = src[(i+j)];
+				UINT8 chr = title_string[search][j];
 
-		if (found!=0)
-		{
-
-			int end=0;
-			int count = 0;
-			int blankcount = 0;
-			printf("ID String @ %08x\n", i);
-
-			while (!end)
-			{
-				UINT8 rom;
-				int addr;
-
-				addr = (i+count);
-
-				if (addr<size)
+				if (rom != chr)
 				{
-					rom = src[addr];
-			
-					if ((rom>=0x20) && (rom<0x7f))
+					found = 0;
+					break;
+				}
+			}
+
+			if (found!=0)
+			{
+
+				int end=0;
+				int count = 0;
+				int blankcount = 0;
+				printf("ID String @ %08x\n", i);
+
+				while (!end)
+				{
+					UINT8 rom;
+					int addr;
+
+					addr = (i+count);
+
+					if (addr<size)
 					{
-						printf("%c", rom);
-						blankcount = 0;
+						rom = src[addr];
+			
+						if ((rom>=0x20) && (rom<0x7f))
+						{
+							printf("%c", rom);
+							blankcount = 0;
+						}
+						else
+						{
+							blankcount++;
+							if (blankcount<10) printf(" ");
+						}
+
+						count++;
 					}
 					else
-					{
-						blankcount++;
-						if (blankcount<10) printf(" ");
-					}
+						end = 1;
 
-					count++;
+					if (count>=0x100)
+						end = 1;
 				}
-				else
-					end = 1;
+				printf("\n");
 
-				if (count>=0x100)
-					end = 1;
+				return 1;
 			}
-			printf("\n");
-
-			return 1;
 		}
 	}
 
@@ -8045,14 +8050,23 @@ GAME( 199?, sc2ptytm	, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0
 GAME( 199?, sc2ptytm1	, sc2ptytm	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Party Time (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2ptytm1p	, sc2ptytm	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Party Time (Bellfruit) (set 2, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 
-GAME( 199?, sc2cops		, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copsp	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 1, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cops1p	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 2, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cops2	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS)
+// PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (SINGLE SITE 5P/10P/20P)  GAME No 95-750-577 - 4-DEC-1995 10:52:08
 GAME( 199?, sc2cops3	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 4)  (Scorpion 2/3)", GAME_FLAGS)
+// PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (SINGLE SITE 5P/10P/20P)  GAME No 95-751-577 - 4-DEC-1995 10:52:08
 GAME( 199?, sc2cops3p	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 4, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
+// PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (ARCADE 5P/10P/20P)  GAME No 95-751-578 - 4-DEC-1995 10:53:58
+GAME( 199?, sc2copsp	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 1, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
+// PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (IRISH ALL CASH 5P/10P/20P)  GAME No 95-750-645 - 7-MAR-1996 15:07:40
 GAME( 199?, sc2cops4	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 5) (Scorpion 2/3)", GAME_FLAGS)
+// PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (#10 ALL CASH 20P/25P)  GAME No 95-750-652 - 15-MAR-1996 11:52:02
+GAME( 199?, sc2cops		, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
+// PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (#10 ALL CASH 20P/25P)  GAME No 95-751-652 - 15-MAR-1996 11:52:02
+GAME( 199?, sc2cops1p	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 2, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
+
+// PROJECT NUMBER 6012  COPS & ROBBERS #3/#6  GAME No 95-750-044 - 29-DEC-1992 21:26:28
 GAME( 199?, sc2cops5	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 6)  (Scorpion 2/3)", GAME_FLAGS)
+// PROJECT NUMBER 6012  COPS AND ROBBERS S+P 10P  GAME No 95-750-110 - 7-JUL-1993 10:17:18
+GAME( 199?, sc2cops2	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS)
 
 //Shows Nudge Now animation on bootup - using right ROMS?
 // PROJECT NUMBER 6622  BINGO COPS N ROBBERS #8/#10 ALL CASH  GAME No 95-750-814 - 9-JUL-1996 17:08:15
