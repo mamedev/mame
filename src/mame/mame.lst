@@ -13688,7 +13688,7 @@ sc2mam3
 sc2mam3p
 sc2mam4
 sc2mam4p
-sc2mam5
+sc2mam3a
 sc2mamcl	// Make A Million Club (Bellfruit)
 sc2mamclp
 sc2mamcl1
@@ -13715,7 +13715,6 @@ sc2sstar2
 sc2sstar2p
 sc2sstar3
 sc2sstar3p
-sc2sstar4
 sc2pe1g		// Public Enemy No1 (Bellfruit) [German]
 sc2wwcl		// Wild West Club (Bellfruit)
 sc2wwclp
@@ -13748,7 +13747,7 @@ sc2cnile	// Cash On The Nile Club (Bellfruit)
 sc2cnile1
 sc2cnile2
 sc2cnile2p
-sc2cnile3p
+sc2cnilep
 sc2casr		// Casino Royale (Bellfruit)
 sc2casrp
 sc2casr1
@@ -25291,6 +25290,7 @@ m4ssclas__b	//
 m4ssclas__c	//
 m4ssclas__d	//
 m4ssclas__e	//
+m4ssclas__f	//
 m4sure		// Sure Thing (Bwb)
 m4sure__a	//
 m4sure__b	//

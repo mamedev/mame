@@ -2358,6 +2358,7 @@ ROM_START( m4sunsetc )
 ROM_END
 
 
+
 /* Barcrest */
 GAME( 198?, m4tst,        0, mod2    ,   mpu4, mpu4_state,       m4tst,   ROT0, "Barcrest","MPU4 Unit Test (Program 4)",GAME_MECHANICAL )
 GAME( 198?, m4tst2,       0, mod2    ,   mpu4, mpu4_state,       m4tst2,  ROT0, "Barcrest","MPU4 Unit Test (Program 2)",GAME_MECHANICAL )
@@ -2724,3 +2725,4 @@ GAME( 199?, m4goldnn	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "
 GAME(199?, m4sunseta	,m4sunset	,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 1)",GAME_FLAGS )
 GAME(199?, m4sunsetb	,m4sunset	,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 2)",GAME_FLAGS )
 GAME(199?, m4sunsetc	,m4sunset	,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (OSB 0.2)",GAME_FLAGS ) // might be a mod 2
+

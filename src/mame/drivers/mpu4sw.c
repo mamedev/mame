@@ -5217,6 +5217,10 @@ M4SSCLAS_SET( 199?, m4ssclas__b,	m4ssclas,	"cs__x_dx.6_0", 0x0000, 0x010000, CRC
 M4SSCLAS_SET( 199?, m4ssclas__c,	m4ssclas,	"cs__xa_x.6_0", 0x0000, 0x010000, CRC(6657e810) SHA1(0860076cf01c732f419483876991fb42a838622a), "Bwb / Barcrest","Super Streak Classic (Barcrest) (MPU4) (set 4)" )
 M4SSCLAS_SET( 199?, m4ssclas__d,	m4ssclas,	"cs__xb_x.5_0", 0x0000, 0x010000, CRC(a5f46ff5) SHA1(a068029f774bc6ed2e76acc2eb509bc6e2490945), "Bwb / Barcrest","Super Streak Classic (Barcrest) (MPU4) (set 5)" )
 M4SSCLAS_SET( 199?, m4ssclas__e,	m4ssclas,	"cs__xb_x.6_0", 0x0000, 0x010000, CRC(801d543c) SHA1(f0905947312fb2a526765d17cde01af5095ef923), "Bwb / Barcrest","Super Streak Classic (Barcrest) (MPU4) (set 6)" )
+// was in SC2 Super Star set, but seems to fit here, ident hacked to "BILL    BIXBY" and "V1   0.1"
+M4SSCLAS_SET( 199?, m4ssclas__f,	m4ssclas,	"supst20.15",   0x0000, 0x010000, CRC(c3446ec4) SHA1(3c1ad27385547a33993a839b53873d8b92214ade), "hack","Super Streak Classic (Barcrest) (MPU4) (hack)" )
+
+
 
 
 

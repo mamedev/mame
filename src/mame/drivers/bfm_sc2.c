@@ -2191,12 +2191,12 @@ MACHINE_CONFIG_END
 
 int sc2_find_project_string(running_machine &machine )
 {
-	// search for the title
-	char title_string[3][16] = { "PROJECT NUMBER", "PROJECT PR", "PROJECT " };
+	// search for the project string to find the title (usually just at ff00)
+	char title_string[4][32] = { "PROJECT NUMBER", "PROJECT PR", "PROJECT ", "CASH ON THE NILE 2" };
 	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
 	int size = machine.root_device().memregion( "maincpu" )->bytes();
 
-	for (int search=0;search<3;search++)
+	for (int search=0;search<4;search++)
 	{
 
 		int strlength = strlen(title_string[search]);
@@ -6447,7 +6447,7 @@ ROM_START( sc2mam4p )
 	sc2_mam_sound
 ROM_END
 
-ROM_START( sc2mam5 )
+ROM_START( sc2mam3a )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mam8arc.bin", 0x0000, 0x010000, CRC(91ee99ca) SHA1(8e7e26e0ab518e55784b91b5d8c9780eb1f72525) )
 	sc2_mam_sound
@@ -6611,11 +6611,7 @@ ROM_START( sc2sstar3p )
 	sc2_sstar_sound
 ROM_END
 
-ROM_START( sc2sstar4 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "supst20.15", 0x0000, 0x010000, CRC(c3446ec4) SHA1(3c1ad27385547a33993a839b53873d8b92214ade) )
-	sc2_sstar_sound
-ROM_END
+
 
 ROM_START( sc2pe1g )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7032,7 +7028,7 @@ ROM_START( sc2cnile2p )
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( sc2cnile3p )
+ROM_START( sc2cnilep )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cash-on-the-nile_dat_ac_var_250pnd_rot_ass.bin", 0x0000, 0x010000, CRC(42d0a11d) SHA1(b38fa1360f0b8d465bb0e0759f73e0b98a545ad3) )
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
@@ -7877,8 +7873,116 @@ GAME( 1996, sc2gslam1p	, sc2gslam	,  scorpion2		, bfmcgslm	, bfm_sc2_state, bfmc
 GAME( 1996, sc2gslam	, 0			,  scorpion2		, bfmcgslm	, bfm_sc2_state, bfmcgslm	, 0,		 "BFM",      "Club Grand Slam (UK, set 2) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-752-056
 GAME( 1996, sc2gslamp	, sc2gslam	,  scorpion2		, bfmcgslm	, bfm_sc2_state, bfmcgslm	, 0,		 "BFM",      "Club Grand Slam (UK, set 2, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-753-056
 
+/********************************************************************************************************************************************************************************************************************
+ Make A Million
+  check sc2mam3 / sc2mam3a, they claim to be the same version
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT NUMBER 6553  MAKE A MILLION #4/#8 - 18-SEP-1995 13:54:26
+GAME( 199?, sc2mam4		, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-483
+GAME( 199?, sc2mam4p	, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 1, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-483
+// PROJECT NUMBER 6553  MAKE A MILLION ARCADE #4/#8 - 18-SEP-1995 14:51:08
+GAME( 199?, sc2mam3		, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 2, UK) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-484
+GAME( 199?, sc2mam3a	, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 2, UK, alt) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-484
+GAME( 199?, sc2mam3p	, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 2, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-484
+// PROJECT NUMBER 6553  MAKE A MILLION #8 ALL CASH - 19-SEP-1995 12:11:36
+GAME( 199?, sc2mam2		, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 3, UK, 8GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-485
+GAME( 199?, sc2mam2p	, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 3, UK, 8GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-485
+// PROJECT NUMBER 6780  MAKE A MILLION #10 10/25P - 24-MAY-1996 16:15:11
+GAME( 199?, sc2mam		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 4, UK, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-731
+GAME( 199?, sc2mamp		, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 4, UK, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-731
+// PROJECT NUMBER 6780  MAKE A MILLION #10 10/25P - 24-MAY-1996 16:18:45
+GAME( 199?, sc2mam1		, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 5, UK, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-732
+GAME( 199?, sc2mam1p	, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 5, UK, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-732 
 
 
+/********************************************************************************************************************************************************************************************************************
+ Make A Million Club
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT NUMBER 6546  CLUB MAKE A MILLION CASHPOT/JACKPOT -  7-AUG-1996 12:35:19
+GAME( 199?, sc2mamcl3	, sc2mamcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million Club (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-849
+// PROJECT NUMBER 6546  CLUB MAKE A MILLION CASHPOT/JACKPOT -  8-JAN-1997 16:59:29
+GAME( 199?, sc2mamcl2	, sc2mamcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million Club (Bellfruit) (set 2, UK) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-916
+GAME( 199?, sc2mamcl2p	, sc2mamcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million Club (Bellfruit) (set 2, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-916
+// PROJECT NUMBER 6546  CLUB MAKE A MILLION CPOT/JPOT 20P #250 - 15-JAN-1997 15:03:44
+GAME( 199?, sc2mamcl	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million Club (Bellfruit) (set 3, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-914
+GAME( 199?, sc2mamclp	, sc2mamcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million Club (Bellfruit) (set 3, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-914
+// PROJECT NUMBER 6546  CLUB MAKE A MILLION CASHPOT/JACKPOT 65% - 31-JAN-1997 11:32:37
+GAME( 199?, sc2mamcl1	, sc2mamcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million Club (Bellfruit) (set 4, UK) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-915
+GAME( 199?, sc2mamcl1p	, sc2mamcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million Club (Bellfruit) (set 4, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-915
+
+
+/********************************************************************************************************************************************************************************************************************
+ Instant Jackpot
+  the set with V2 in the header is the earliest one, is there an earlier V1, or was it on earlier hw (SC1?)
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT NUMBER 6517  INSTANT JACKPOTS V2 - 22-AUG-1995 14:36:22
+GAME( 199?, sc2inst5	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-463
+// PROJECT NUMBER 6517  INSTANT JACKPOTS VAR STAKE/JACKPOT - 19-SEP-1995 10:15:02
+GAME( 199?, sc2inst6	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 2, UK) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-473
+// PROJECT NUMBER 6517  INSTANT JACKPOTS VAR STAKE/JACKPOT - 16-OCT-1995 15:03:51
+GAME( 199?, sc2inst4	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 3, UK) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-521
+GAME( 199?, sc2inst4p	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 3, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-521
+// PROJECT NUMBER 6517  INSTANT JACKPOTS VAR STAKE/JPOT ARCADE - 16-OCT-1995 15:31:35
+GAME( 199?, sc2inst2	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 4, UK) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-522
+GAME( 199?, sc2inst2p	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 4, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-522
+// PROJECT NUMBER 6517  INSTANT JACKPOTS #8 ALL CASH   - 12-JAN-1996 10:15:03
+GAME( 199?, sc2inst3	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 5, UK, 8GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-605
+GAME( 199?, sc2inst3p	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 5, UK, 8GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-605
+// PROJECT NUMBER 6517  INSTANT JACKPOTS DE-REG - 15-MAY-1996 15:29:07
+GAME( 199?, sc2inst		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 6, UK, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-715
+GAME( 199?, sc2instp	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 6, UK, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-715
+// PROJECT NUMBER 6517  INSTANT JACKPOTS WHITBREAD #10 ALL CASH 20P PLAY - 15-MAY-1996 15:30:35
+GAME( 199?, sc2inst1	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 7, UK, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-716
+GAME( 199?, sc2inst1p	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 7, UK, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-716
+
+/********************************************************************************************************************************************************************************************************************
+ Cash On The Nile
+  the 9 APR set lacks a properly headered 'PROJECT' string (even the one for the earlier sets is badly formed compared to other games)
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT 6060 CASH ON THE NILE  CASH ON THE NILE 12RM #150 - 12-JAN-1993 12:27:05
+GAME( 199?, sc2cnile1	, sc2cnile	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM", 	 "Cash On The Nile Club (Bellfruit) (set 1 UK, 150GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-047
+// PROJECT 6060 CASH ON THE NILE  CASH ON THE NILE 12RM #150 - 10-FEB-1993 14:42:56
+GAME( 199?, sc2cnile	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM", 	 "Cash On The Nile Club (Bellfruit) (set 2 UK, 150GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-049
+GAME( 199?, sc2cnilep	, sc2cnile	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM", 	 "Cash On The Nile Club (Bellfruit) (set 2 UK, 150GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-049
+// CASH ON THE NILE 200 POUND JACKPOT  CASH ON THE NILE 12RM #200 J/P - 9-APR-1993 10:33:22
+GAME( 199?, sc2cnile2	, sc2cnile	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM", 	 "Cash On The Nile Club (Bellfruit) (set 3 UK, 200GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-071
+GAME( 199?, sc2cnile2p	, sc2cnile	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM", 	 "Cash On The Nile Club (Bellfruit) (set 3 UK, 200GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-071
+
+
+/********************************************************************************************************************************************************************************************************************
+ Football Club
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT NUMBER PR6707  FOOTBALL CLUB CASHPOT/JACKPOT - 16-DEC-1996 15:24:47
+GAME( 199?, sc2foot2	, sc2foot	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Football Club (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-905
+GAME( 199?, sc2foot2p	, sc2foot	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Football Club (Bellfruit) (set 1, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS) //  GAME No 95-751-905
+// PROJECT NUMBER PR6707  FOOTBALL CLUB CASHPOT/JACKPOT 20P !250 - 20-DEC-1996 12:35:37
+GAME( 199?, sc2foot		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Football Club (Bellfruit) (set 2, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-909
+GAME( 199?, sc2footp	, sc2foot	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Football Club (Bellfruit) (set 2, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-909
+// PROJECT NUMBER PR6707  FOOTBALL CLUB CASHPOT/JACKPOT 5p #100 - 31-JAN-1997 12:24:35
+GAME( 199?, sc2foot1	, sc2foot	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Football Club (Bellfruit) (set 3, UK, 100GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-908
+GAME( 199?, sc2foot1p	, sc2foot	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Football Club (Bellfruit) (set 3, UK, 100GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-908
+
+/********************************************************************************************************************************************************************************************************************
+ Super Star
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT NUMBER 6609  SUPER STAR - 15-JUL-1996 13:33:17
+GAME( 199?, sc2sstar1	, sc2sstar	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Super Star (Bellfruit) (set 1, UK, 2nd Triennial) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-822
+GAME( 199?, sc2sstar1p	, sc2sstar	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Super Star (Bellfruit) (set 1, UK, 2nd Triennial, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-822
+// PROJECT NUMBER 6609  SUPER STAR TRIDENT 3 - 17-JUL-1996 15:00:38
+GAME( 199?, sc2sstar	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Super Star (Bellfruit) (set 2, UK, 3rd Triennial) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-824
+GAME( 199?, sc2sstarp	, sc2sstar	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Super Star (Bellfruit) (set 2, UK, 3rd Triennial, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-824
+// PROJECT NUMBER 6609  SUPER STAR WHITBREAD - 19-JUL-1996 12:30:57
+GAME( 199?, sc2sstar3	, sc2sstar	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Super Star (Bellfruit) (set 3, UK, 2nd Triennial) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-826
+GAME( 199?, sc2sstar3p	, sc2sstar	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Super Star (Bellfruit) (set 3, UK, 2nd Triennial, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-826
+// PROJECT NUMBER 6609  SUPER STAR IRISH -  7-AUG-1996 12:39:04
+GAME( 199?, sc2sstar2	, sc2sstar	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Super Star (Bellfruit) (set 4, UK, 2nd Triennial) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-829
+GAME( 199?, sc2sstar2p	, sc2sstar	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Super Star (Bellfruit) (set 4, UK, 2nd Triennial, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-829
 
 
 
@@ -7954,38 +8058,9 @@ GAME( 199?, sc2majesa	, sc2majes	,  scorpion2		, drwho		, bfm_sc2_state, drwho		
 
 
 
-GAME( 199?, sc2inst		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 1, UK, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2instp	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 1, UK, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2inst1	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 2, UK, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2inst1p	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 2, UK, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2inst2	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 3, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2inst2p	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 3, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2inst3	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 4, UK, 8GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2inst3p	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 4, UK, 8GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2inst4	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 5, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2inst4p	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 5, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2inst5	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 6, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2inst6	, sc2inst	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Instant Jackpot (Bellfruit) (set 7, UK) (Scorpion 2/3)", GAME_FLAGS)
 
-GAME( 199?, sc2mam		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 1, UK, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2mamp		, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 1, UK, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2mam1		, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 2, UK, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2mam1p	, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 2, UK, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2mam2		, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 3, UK, 8GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2mam2p	, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 3, UK, 8GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2mam3		, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 4, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2mam3p	, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 4, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2mam4		, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 5, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2mam4p	, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 5, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2mam5		, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 6, UK) (Scorpion 2/3)", GAME_FLAGS)
 
-GAME( 199?, sc2mamcl	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million Club (Bellfruit) (set 1, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2mamclp	, sc2mamcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million Club (Bellfruit) (set 1, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2mamcl1	, sc2mamcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million Club (Bellfruit) (set 2, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2mamcl1p	, sc2mamcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million Club (Bellfruit) (set 2, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2mamcl2	, sc2mamcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million Club (Bellfruit) (set 3, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2mamcl2p	, sc2mamcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million Club (Bellfruit) (set 3, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2mamcl3	, sc2mamcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million Club (Bellfruit) (set 4, UK) (Scorpion 2/3)", GAME_FLAGS)
+
 
 GAME( 199?, sc2showt	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Showtime Spectacular (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2showtp	, sc2showt	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Showtime Spectacular (Bellfruit) (set 1, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
@@ -7998,15 +8073,9 @@ GAME( 199?, sc2showt3p	, sc2showt	,  scorpion2		, drwho		, bfm_sc2_state, drwho	
 GAME( 199?, sc2showt4	, sc2showt	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Showtime Spectacular (Bellfruit) (set 5, UK) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2showt4p	, sc2showt	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Showtime Spectacular (Bellfruit) (set 5, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 
-GAME( 199?, sc2sstar	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Superstar (Bellfruit) (set 1, UK, 3rd Triennial) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2sstarp	, sc2sstar	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Superstar (Bellfruit) (set 1, UK, 3rd Triennial, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2sstar1	, sc2sstar	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Superstar (Bellfruit) (set 2, UK, 2nd Triennial) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2sstar1p	, sc2sstar	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Superstar (Bellfruit) (set 2, UK, 2nd Triennial, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2sstar2	, sc2sstar	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Superstar (Bellfruit) (set 3, UK, 2nd Triennial) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2sstar2p	, sc2sstar	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Superstar (Bellfruit) (set 3, UK, 2nd Triennial, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2sstar3	, sc2sstar	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Superstar (Bellfruit) (set 4, UK, 2nd Triennial) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2sstar3p	, sc2sstar	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Superstar (Bellfruit) (set 4, UK, 2nd Triennial, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2sstar4	, sc2sstar	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Superstar (Bellfruit) (set 5, UK) (Scorpion 2/3)", GAME_FLAGS)
+
+
+
 
 
 GAME( 199?, sc2wwcl		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Wild West Club (Bellfruit) (set 1, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
@@ -8023,11 +8092,9 @@ GAME( 199?, sc2payr		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		
 
 
 GAME( 199?, sc2cgc		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM", 	 "Carrot Gold Club (Bellfruit) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cnile	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM", 	 "Cash On The Nile Club (Bellfruit) (set 1 UK, 150GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cnile1	, sc2cnile	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM", 	 "Cash On The Nile Club (Bellfruit) (set 2 UK, 150GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cnile2	, sc2cnile	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM", 	 "Cash On The Nile Club (Bellfruit) (set 2 UK, 200GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cnile2p	, sc2cnile	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM", 	 "Cash On The Nile Club (Bellfruit) (set 2 UK, 150GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cnile3p	, sc2cnile	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM", 	 "Cash On The Nile Club (Bellfruit) (set 3 UK, 150GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
+
+
+
 
 GAME( 199?, sc2casr		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM", 	 "Casino Royale (Bellfruit) (set 1, UK, 10GBP Jackpot, 3rd Triennial) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2casrp	, sc2casr	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM", 	 "Casino Royale (Bellfruit) (set 1, UK, 10GBP Jackpot, 3rd Triennial, Protocol) (Scorpion 2/3)", GAME_FLAGS)
@@ -8062,12 +8129,7 @@ GAME( 199?, sc2flaca2	, sc2flaca	,  scorpion2		, drwho		, bfm_sc2_state, drwho		
 GAME( 199?, sc2flaca2p	, sc2flaca	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Flash Cash (Bellfruit) (set 3, UK, 10GBP Jackpot, 2nd Triennial, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 
 
-GAME( 199?, sc2foot		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Football Club (Bellfruit) (set 1, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2footp	, sc2foot	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Football Club (Bellfruit) (set 1, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2foot1	, sc2foot	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Football Club (Bellfruit) (set 2, UK, 100GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2foot1p	, sc2foot	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Football Club (Bellfruit) (set 2, UK, 100GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2foot2	, sc2foot	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Football Club (Bellfruit) (set 3, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2foot2p	, sc2foot	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Football Club (Bellfruit) (set 3, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
+
 
 
 GAME( 199?, sc2gcclb	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Golden Casino Club (Bellfruit) (set 1, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
