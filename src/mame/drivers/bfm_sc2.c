@@ -5155,7 +5155,7 @@ ROM_START( sc2luvv4 )
 	sc2_luvv_sound
 ROM_END
 
-ROM_START( sc2luvv5p )
+ROM_START( sc2luvvp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "luvvley-jubbley_dat_ac_10pnd-25p_ass.bin", 0x0000, 0x010000, CRC(355210a0) SHA1(c03e1109ee1a419fc4ebdcf861d5220303a9c587) )
 
@@ -5175,7 +5175,7 @@ ROM_START( sc2luvv6p )
 	sc2_luvv_sound
 ROM_END
 
-ROM_START( sc2luvv7p )
+ROM_START( sc2luvv4p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "luvvley-jubbley_dat_ac_4pnd-5p_ass.bin", 0x0000, 0x010000, CRC(4b3155b8) SHA1(aaba2e3d54a2b099b63ee4f5d3560d8eb562c4f1) )
 
@@ -5456,7 +5456,7 @@ ROM_START( sc2cpe4 )
 	sc2_cpe_sound_alt2
 ROM_END
 
-ROM_START( sc2cpe5p )
+ROM_START( sc2cpe4p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-public-enemy-no1_dat_fe_ac_200pnd_p65_rot_ass.bin", 0x0000, 0x010000, CRC(8d5ff953) SHA1(bdf6b5e014c46f6abac792a5913e98cb897b2a73) )
 
@@ -5595,7 +5595,7 @@ ROM_START( sc2copsc1p )
 	sc2_cops_sound
 ROM_END
 
-ROM_START( sc2copsc2 )
+ROM_START( sc2copsc1pa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "casino-cops-and-robbers_dat_ms_to_8pnd_ass.bin", 0x0000, 0x010000, CRC(361ad99f) SHA1(444f2aeef404b087d49e2283bb36bde5e4e673ee) )
 
@@ -8038,27 +8038,111 @@ GAME( 199?, sc2cvega4p	, sc2cvega	,  scorpion2		, drwho		, bfm_sc2_state, drwho	
 
 // Games with Dot Matrix Displays */
 
-GAME( 1996, sc2luvv		, 0			,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (UK Multisite 10/25p, Game Card 95-750-808) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2luvv1	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 2, UK, Arcade, 10GBP Jackpot) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2luvv1p	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 2, UK, Arcade, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2luvv2	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 3, UK, Multisite) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2luvv2p	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 3, UK, Multisite, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2luvv4	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 4, UK, Arcade) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2luvv5p	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 5, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2luvv6p	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 6, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2luvv7p	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 7, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
+/********************************************************************************************************************************************************************************************************************
+ Luvvly Jubbly
+  are there earlier versions with game code 6224?
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT NUMBER 6569 (6224)  LUVVLY JUBBLY GALA S+P 95 - 30-JAN-1996 11:12:00
+GAME( 1996, sc2luvv6p	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 1, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-621
+// PROJECT NUMBER 6569 (6224)  LUVVLY JUBBLY MULTISITE S+P 95 - 30-JAN-1996 11:14:05
+GAME( 1996, sc2luvv2	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 2, UK, Multisite) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)			  // GAME No 95-750-622
+GAME( 1996, sc2luvv2p	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 2, UK, Multisite, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-622
+// PROJECT NUMBER 6569 (6224)  LUVVLY JUBBLY MULTISITE #10/25P - 2-JUL-1996 16:32:17
+GAME( 1996, sc2luvv		, 0			,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 3, UK, Multisite 10GBP/25p) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)			// GAME No 95-750-808
+GAME( 1996, sc2luvvp	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 3, UK, Multisite 10GBP/25p, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-808
+// PROJECT NUMBER 6569 (6224)  LUVVLY JUBBLY MULTISITE #4/5P PLAY - 4-JUL-1996 10:56:24
+GAME( 1996, sc2luvv4	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 4, UK, Multisite 4GBP/5p) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)			  // GAME No 95-750-810
+GAME( 1996, sc2luvv4p	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 4, UK, Multisite 4GBP/5p, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-810
+// PROJECT NUMBER 6569 (6224)  LUVVLY JUBBLY MULTISITE #10/20P - 12-SEP-1996 14:07:57
+GAME( 1996, sc2luvv1	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 3, UK, Multisite 10GBP/20p) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)			// GAME No 95-750-866
+GAME( 1996, sc2luvv1p	, sc2luvv	,  scorpion2_dm01	, luvjub	, bfm_sc2_state, luvjub	, 0,		 "BFM",      "Luvvly Jubbly (set 3, UK, Multisite 10GBP/20p, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-866
 
 
-GAME( 1996, sc2cpe		, 0			,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (UK, Game Card 95-750-846) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2cpep		, sc2cpe	,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 2, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2cpe1		, sc2cpe	,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 3, UK) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2cpe1p	, sc2cpe	,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 3, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2cpe2		, sc2cpe	,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 4, UK) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2cpe2p	, sc2cpe	,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 4, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2cpe3		, sc2cpe	,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 5, UK) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2cpe3p	, sc2cpe	,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 5, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2cpe4		, sc2cpe	,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 6, UK) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
-GAME( 1996, sc2cpe5p	, sc2cpe	,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 7, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
+/********************************************************************************************************************************************************************************************************************
+ Club Public Enemy No.1
+  game code changes from 6331 to 6574 for the 1996 release?
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT NUMBER PR6331  PUBLIC ENEMY NO.1 - 26-JUL-1994 09:24:19
+GAME( 1996, sc2cpe3		, sc2cpe	,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 1, UK) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)			// GAME No 95-750-257
+GAME( 1996, sc2cpe3p	, sc2cpe	,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 1, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-257
+// PROJECT NUMBER PR6331  PUBLIC ENEMY NO.1 FIXED 65% - 10-AUG-1994 11:26:30
+GAME( 1996, sc2cpe4		, sc2cpe	,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 2, UK) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)			// GAME No 95-750-273
+GAME( 1996, sc2cpe4p	, sc2cpe	,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 2, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-273
+// PROJECT NUMBER PR6574  PUBLIC ENEMY NO.1 S+P 25P/#250 STENA SEALINK - 3-JAN-1996 12:17:33
+GAME( 1996, sc2cpe2		, sc2cpe	,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 3, UK) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)			// GAME No 95-750-597
+GAME( 1996, sc2cpe2p	, sc2cpe	,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 3, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-597
+// PROJECT NUMBER PR6574  PUBLIC ENEMY NO.1 S+P 25P/#250 FIXED 65% - 3-JAN-1996 12:19:01
+GAME( 1996, sc2cpe1		, sc2cpe	,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 4, UK) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)			// GAME No 95-750-598
+GAME( 1996, sc2cpe1p	, sc2cpe	,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 4, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-598
+// PROJECT NUMBER PR6574  PUBLIC ENEMY NO.1 S+P 25P/#250 - 20-AUG-1996 10:05:21
+GAME( 1996, sc2cpe		, 0			,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 5, UK) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)			// GAME No 95-750-846
+GAME( 1996, sc2cpep		, sc2cpe	,  scorpion2_dm01	, cpeno1	, bfm_sc2_state, cpeno1	, 0,		 "BFM",      "Club Public Enemy No.1 (set 5, UK, Protocol) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL) // GAME No 95-751-846
+
+/********************************************************************************************************************************************************************************************************************
+ Cops 'n' Robbers
+  game code changes from 6012 to 6589 for the 1995 release?
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT NUMBER 6012  COPS & ROBBERS #3/#6 - 29-DEC-1992 21:26:28
+GAME( 199?, sc2cops5	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 1)  (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-044
+// PROJECT NUMBER 6012  COPS AND ROBBERS S+P 10P - 7-JUL-1993 10:17:18
+GAME( 199?, sc2cops2	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-110
+// PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (SINGLE SITE 5P/10P/20P) - 4-DEC-1995 10:52:08
+GAME( 199?, sc2cops3	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 3)  (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-577
+GAME( 199?, sc2cops3p	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 3, Protocol)  (Scorpion 2/3)", GAME_FLAGS)	// GAME No 95-751-577
+// PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (ARCADE 5P/10P/20P) - 4-DEC-1995 10:53:58
+GAME( 199?, sc2copsp	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 4, Protocol)  (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-578
+// PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (IRISH ALL CASH 5P/10P/20P) - 7-MAR-1996 15:07:40
+GAME( 199?, sc2cops4	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 5) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-645
+// PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (#10 ALL CASH 20P/25P) - 15-MAR-1996 11:52:02
+GAME( 199?, sc2cops		, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 6) (Scorpion 2/3)", GAME_FLAGS)				// GAME No 95-750-652
+GAME( 199?, sc2cops1p	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 6, Protocol)  (Scorpion 2/3)", GAME_FLAGS)	// GAME No 95-751-652
+
+
+/********************************************************************************************************************************************************************************************************************
+  Casino Cops 'n' Robbers
+   note, sc2copsc1p & sc2copsc1pa are the same set with a different matrix rom
+         I don't think the matrix roms being used a correct, everything except sc2copsc1pa boots up with 'Nudge Now'
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT NUMBER 6622  BINGO COPS N ROBBERS #8/#10 ALL CASH - 9-JUL-1996 17:08:15
+GAME( 199?, sc2copsc	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)			  // GAME No 95-750-814
+GAME( 199?, sc2copscp	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 1, Protocol)  (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-814
+// PROJECT NUMBER 6622  BINGO COPS N ROBBERS SWITCHABLE BINGO/ARCADE - 9-JUL-1996 17:12:33
+GAME( 199?, sc2copsc1	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)							  // GAME No 95-750-816
+GAME( 199?, sc2copsc1p	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 2, Protocol) (Scorpion 2/3)", GAME_FLAGS)				  // GAME No 95-751-816
+GAME( 199?, sc2copsc1pa	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 2, Protocol) (Scorpion 2/3) (alt matrix rom)", GAME_FLAGS) // GAME No 95-751-816
+
+
+/********************************************************************************************************************************************************************************************************************
+  Cops 'n' Robbers Club Deluxe
+   game code changes from 6332 to 6588 between the 2 17-NOV-1995 versions?
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT PR6332  CLUB COPS AND ROBBERS DELUXE - 17-NOV-1995 12:36:04
+GAME( 199?, sc2copdc5	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 1, UK, 200GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)			  // GAME No 95-750-561
+GAME( 199?, sc2copdc5p	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 1, UK, 200GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-561
+// PROJECT PR6588  CLUB COPS AND ROBBERS DELUXE 25P/#250 - 17-NOV-1995 13:18:57
+GAME( 199?, sc2copdc6	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 2, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)			  // GAME No 95-750-562
+// PROJECT PR6588  CLUB COPS AND ROBBERS DELUXE 25P/#250 65% - 30-NOV-1995 16:14:25
+GAME( 199?, sc2copdc1	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 3, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)			  // GAME No 95-750-574
+GAME( 199?, sc2copdc1p	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 3, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-574
+// PROJECT NUMBER 6588  CLUB COPS AND ROBBERS DELUXE 20P/#250 - 25-MAR-1996 13:57:23
+GAME( 199?, sc2copdc2	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 4, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)		      // GAME No 95-750-658
+GAME( 199?, sc2copdc2p	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 4, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-658
+// PROJECT PR6588  CLUB COPS AND ROBBERS DELUXE 25P/#250 - 13-AUG-1996 14:01:25
+GAME( 199?, sc2copdc3	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 5, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)		      // GAME No 95-750-842
+GAME( 199?, sc2copdc3p	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 5, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-842
+// PROJECT PR6588  CLUB COPS AND ROBBERS DELUXE 25P/#250 63% - 25-SEP-1997 08:30:05
+GAME( 199?, sc2copdc4	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 6, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)			  // GAME No 95-750-993
+GAME( 199?, sc2copdc4p	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 6, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-993
+// PROJECT PR6588  CLUB COPS AND ROBBERS DELUXE 25P/#250 67% - 25-SEP-1997 08:33:14
+GAME( 199?, sc2copdc	, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 7, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)			  // GAME No 95-750-992
+GAME( 199?, sc2copdcp	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 7, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-992
+
+
 
 GAME( 199?, sc2town		, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2townp	, sc2town	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 1, Protocol) (Scorpion 2/3)", GAME_FLAGS)
@@ -8080,48 +8164,13 @@ GAME( 199?, sc2ptytm	, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0
 GAME( 199?, sc2ptytm1	, sc2ptytm	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Party Time (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2ptytm1p	, sc2ptytm	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Party Time (Bellfruit) (set 2, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 
-// PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (SINGLE SITE 5P/10P/20P)  GAME No 95-750-577 - 4-DEC-1995 10:52:08
-GAME( 199?, sc2cops3	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 4)  (Scorpion 2/3)", GAME_FLAGS)
-// PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (SINGLE SITE 5P/10P/20P)  GAME No 95-751-577 - 4-DEC-1995 10:52:08
-GAME( 199?, sc2cops3p	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 4, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
-// PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (ARCADE 5P/10P/20P)  GAME No 95-751-578 - 4-DEC-1995 10:53:58
-GAME( 199?, sc2copsp	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 1, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
-// PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (IRISH ALL CASH 5P/10P/20P)  GAME No 95-750-645 - 7-MAR-1996 15:07:40
-GAME( 199?, sc2cops4	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 5) (Scorpion 2/3)", GAME_FLAGS)
-// PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (#10 ALL CASH 20P/25P)  GAME No 95-750-652 - 15-MAR-1996 11:52:02
-GAME( 199?, sc2cops		, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
-// PROJECT NUMBER 6589 (6012)  COPS & ROBBERS (#10 ALL CASH 20P/25P)  GAME No 95-751-652 - 15-MAR-1996 11:52:02
-GAME( 199?, sc2cops1p	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 2, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
 
-// PROJECT NUMBER 6012  COPS & ROBBERS #3/#6  GAME No 95-750-044 - 29-DEC-1992 21:26:28
-GAME( 199?, sc2cops5	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 6)  (Scorpion 2/3)", GAME_FLAGS)
-// PROJECT NUMBER 6012  COPS AND ROBBERS S+P 10P  GAME No 95-750-110 - 7-JUL-1993 10:17:18
-GAME( 199?, sc2cops2	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS)
 
-//Shows Nudge Now animation on bootup - using right ROMS?
-// PROJECT NUMBER 6622  BINGO COPS N ROBBERS #8/#10 ALL CASH  GAME No 95-750-814 - 9-JUL-1996 17:08:15
-GAME( 199?, sc2copsc	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
-// PROJECT NUMBER 6622  BINGO COPS N ROBBERS #8/#10 ALL CASH  GAME No 95-751-814 - 9-JUL-1996 17:08:15
-GAME( 199?, sc2copscp	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 1, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
-// PROJECT NUMBER 6622  BINGO COPS N ROBBERS SWITCHABLE BINGO/ARCADE  GAME No 95-750-816 - 9-JUL-1996 17:12:33
-GAME( 199?, sc2copsc1	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)
-// PROJECT NUMBER 6622  BINGO COPS N ROBBERS SWITCHABLE BINGO/ARCADE  GAME No 95-751-816 - 9-JUL-1996 17:12:33  (sc2copsc1p / sc2copsc2 are the same set with different matrix rom??)
-GAME( 199?, sc2copsc1p	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 2, Protocol)  (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copsc2	, sc2cops	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Casino Cops 'n' Robbers (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS)
 
-GAME( 199?, sc2copdc	, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 1, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copdcp	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 1, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copdc1	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 2, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copdc1p	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 2, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copdc2	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 3, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copdc2p	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 3, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copdc3	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 4, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copdc3p	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 4, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copdc4	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 5, UK, 200GBP Jackpot?) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copdc4p	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 5, UK, 200GBP Jackpot?, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copdc5	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 6, UK, 200GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copdc5p	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 6, UK, 200GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copdc6	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 7, UK) (Scorpion 2/3)", GAME_FLAGS)
+
+
+
+
 
 GAME( 199?, sc2prom		, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Along The Prom (Bellfruit) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2prem		, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 1, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)

@@ -13845,9 +13845,9 @@ sc2luvv1p
 sc2luvv2
 sc2luvv2p
 sc2luvv4
-sc2luvv5p
+sc2luvvp
 sc2luvv6p
-sc2luvv7p
+sc2luvv4p
 sc2cpe		// Club Public Enemy No.1 (UK, Game Card 95-750-846)
 sc2cpep
 sc2cpe1
@@ -13857,7 +13857,7 @@ sc2cpe2p
 sc2cpe3
 sc2cpe3p
 sc2cpe4
-sc2cpe5p
+sc2cpe4p
 sc2town		// Round The Town (Bellfruit)
 sc2townp
 sc2town1
@@ -13887,7 +13887,7 @@ sc2copsc // Casino Cops 'n' Robbers (Bellfruit)
 sc2copscp
 sc2copsc1
 sc2copsc1p
-sc2copsc2
+sc2copsc1pa
 sc2copcl	//
 sc2copclp
 sc2copcl1
