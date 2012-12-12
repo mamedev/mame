@@ -127,13 +127,13 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				int res_x,res_y;
 				int pen = (tile_data >> xi) & 1 ? color : 0;
 
-				if(yi >= 8) { pen = 0; }
-
 				res_x = x * 8 + xi;
 				res_y = y * lr + yi;
 
-				if(res_x > screen_max_x || res_y > screen_max_y)
+				if(!device->machine().primary_screen->visible_area().contains(res_x, res_y))
 					continue;
+
+				if(yi >= 8) { pen = 0; }
 
 				bitmap.pix32(res_y, res_x) = palette[pen];
 			}

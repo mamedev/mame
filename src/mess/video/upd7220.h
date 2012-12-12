@@ -67,8 +67,8 @@
 typedef void (*upd7220_display_pixels_func)(device_t *device, bitmap_rgb32 &bitmap, int y, int x, UINT32 address);
 #define UPD7220_DISPLAY_PIXELS(name) void name(device_t *device, bitmap_rgb32 &bitmap, int y, int x, UINT32 address)
 
-typedef void (*upd7220_draw_text_line)(device_t *device, bitmap_rgb32 &bitmap, UINT32 addr, int y, int wd, int pitch,int screen_min_x,int screen_min_y,int screen_max_x, int screen_max_y,int lr, int cursor_on, int cursor_addr);
-#define UPD7220_DRAW_TEXT_LINE(name) void name(device_t *device, bitmap_rgb32 &bitmap, UINT32 addr, int y, int wd, int pitch,int screen_min_x,int screen_min_y,int screen_max_x, int screen_max_y,int lr, int cursor_on, int cursor_addr)
+typedef void (*upd7220_draw_text_line)(device_t *device, bitmap_rgb32 &bitmap, UINT32 addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr);
+#define UPD7220_DRAW_TEXT_LINE(name) void name(device_t *device, bitmap_rgb32 &bitmap, UINT32 addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr)
 
 
 // ======================> upd7220_interface

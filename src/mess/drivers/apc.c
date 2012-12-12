@@ -231,7 +231,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				res_x = (x*8+xi) * (1);
 				res_y = y*lr+yi;
 
-				if(res_x > 640 || res_y > 494) //TODO
+				if(!device->machine().primary_screen->visible_area().contains(res_x, res_y))
 					continue;
 
 				/*

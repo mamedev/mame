@@ -412,8 +412,9 @@ inline void upd7220_device::recompute_parameters()
 
 	if (LOG)
 	{
-		logerror("uPD7220 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
-		logerror("uPD7220 '%s' Visible Area: (%u, %u) - (%u, %u)\n", tag(), visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+		printf("uPD7220 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+		printf("Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+		printf("%d %d %d %d\n",m_vs,m_vbp,m_al,m_vfp);
 	}
 
 	if (m_m)
@@ -1570,7 +1571,7 @@ void upd7220_device::update_text(bitmap_rgb32 &bitmap, const rectangle &cliprect
 			addr = sad + (y * m_pitch);
 
 			if (m_draw_text_cb)
-				m_draw_text_cb(this, bitmap, addr, y, wd, m_pitch, 0, 0, m_aw * 8 - 1, m_al - 1, m_lr, m_dc, m_ead);
+				m_draw_text_cb(this, bitmap, addr, y, wd, m_pitch, m_lr, m_dc, m_ead);
 		}
 
 		sy = y + 1;
@@ -1637,7 +1638,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 					addr = (sad & 0x3ffff) + ((y / m_lr) * m_pitch);
 
 					if (m_draw_text_cb)
-						m_draw_text_cb(this, bitmap, addr, (y + tsy) / m_lr, wd, m_pitch, 0, 0, m_aw * 8 - 1, len + bsy - 1, m_lr, m_dc, m_ead);
+						m_draw_text_cb(this, bitmap, addr, (y + tsy) / m_lr, wd, m_pitch, m_lr, m_dc, m_ead);
 				}
 			}
 		}

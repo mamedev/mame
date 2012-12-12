@@ -59,8 +59,8 @@
 	- Apple Club 1: how to pass an hand?
 	(Applesauce Pirates)
 
-	- Brandish 2: Intro needs some window masking effects;
-	- Dragon Buster: missing bitplanes for the PCG (or not?), slight issue with window masking;
+	- Brandish 2: Intro needs some window masking effects (or not?);
+	- Dragon Buster: slight issue with window masking;
 	- Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)
 	- Jan Borg Suzume: gets stuck at a pic8259 read;
 	- Jump Hero: right status display isn't shown during gameplay (changes the mode dynamically?)
@@ -2855,7 +2855,8 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_RESET PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
 
 	PORT_START("MOUSE_B")
-	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Middle Button")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Right Button")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Left Button")
@@ -3234,7 +3235,7 @@ READ8_MEMBER(pc9801_state::ppi_mouse_porta_r)
 	UINT8 isporthi;
 	const char *const mousenames[] = { "MOUSE_X", "MOUSE_Y" };
 
-	res = ioport("MOUSE_B")->read() & 0xe0;
+	res = ioport("MOUSE_B")->read() & 0xf0;
 	isporthi = ((m_mouse.control & 0x20) >> 5)*4;
 
 	if((m_mouse.control & 0x80) == 0)
