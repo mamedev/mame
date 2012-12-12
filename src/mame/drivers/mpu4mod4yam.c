@@ -216,12 +216,6 @@ ROM_START( m4graffd )
 	ROM_LOAD( "grafittisound2.bin", 0x0000, 0x010000, CRC(c06c5517) SHA1(9e11f93638d37ba6f7b34a78eea043821ca4e188) )
 ROM_END
 
-ROM_START( m4vivasx )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "vlvs.p1", 0x0000, 0x010000, CRC(b7fb3e19) SHA1(c6cc4175f8c100fc37e6e7014b0744054b4e547a) )
-	ROM_REGION( 0x48, "fakechr", 0 )
-	ROM_LOAD( "vlvs.chr", 0x0000, 0x000048, CRC(31acf949) SHA1(d622ea1caee968b786f3183ca44355f9db190081) )
-ROM_END
 
 ROM_START( m4voodoo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -598,6 +592,8 @@ M4FASTFW_SET( 199?, m4fastfw__f,	m4fastfw,	"fastf206",		0x0000, 0x010000, CRC(a8
 #define M4VIVALV_EXTRA_ROMS \
 	ROM_REGION( 0x080000, "msm6376", 0 ) \
 	ROM_LOAD( "vivalasvegas4.bin", 0x0000, 0x080000, CRC(76971425) SHA1(0974a9dce51cc3dd4e26cec11a948c9c8021fde4) ) \
+	ROM_REGION( 0x48, "fakechr", 0 ) /* from viva last vegas 'six' set */ \
+	ROM_LOAD( "vlvs.chr", 0x0000, 0x000048, CRC(31acf949) SHA1(d622ea1caee968b786f3183ca44355f9db190081) ) \
 
 #define M4VIVALV_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -644,7 +640,6 @@ M4VIVALV_SET( 199?, m4vivalv__7,	m4vivalv,	"vv_10a__.3_3",					0x0000, 0x010000,
 M4VIVALV_SET( 199?, m4vivalv__8,	m4vivalv,	"vvi05___.3_3",					0x0000, 0x010000, CRC(a5829d5c) SHA1(4cd1a2185579898db7be75f8c3f565043f0691b6), "Barcrest","Viva Las Vegas (Barcrest) (MPU4) (set 36)" )
 
 
-GAME(199?, m4vivasx	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Viva Las Vegas Six (Barcrest) (MPU4)",GAME_FLAGS)
 GAME(199?, m4stc	,0			,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","unknown MPU4 'STC 0.1' (Barcrest) (MPU4)",GAME_FLAGS)
 GAME(199?, m4sstrek	,m4supst	,mod4yam    ,mpu4				, mpu4_state,m4default			,ROT0,   "bootleg","Super Streak (bootleg) (MPU4)",GAME_FLAGS)
 GAME(199?, m4joljokd,m4joljok	,mod4yam	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Jolly Joker (Barcrest) [Dutch] (MPU4) (DJJ)",GAME_FLAGS)
