@@ -884,7 +884,17 @@ READ8_MEMBER(sms_state::sms_sscope_r)
 
 WRITE8_MEMBER(sms_state::sms_sscope_w)
 {
+	screen_device *screen = machine().first_screen();
+	
 	m_sscope_state = data;
+
+	// There are occurrences when Sega Scope's state changes after VBLANK, or at
+	// active screen. Most cases are solid-color frames of scene transitions, but
+	// one exception is the first frame of Zaxxon 3-D's title screen. In that
+	// case, this method is enough for setting the intended state for the frame.
+	// No information found about a minimum time need for switch open/closed lens.
+	if (screen->vpos() < (screen->height() >> 1))
+		m_frame_sscope_state = m_sscope_state;
 }
 
 
@@ -2035,6 +2045,7 @@ MACHINE_RESET_MEMBER(sms_state,sms)
 	m_lphaser_2_latch = 0;
 
 	m_sscope_state = 0;
+	m_frame_sscope_state = 0;
 }
 
 READ8_MEMBER(sms_state::sms_store_cart_select_r)
@@ -2177,6 +2188,23 @@ VIDEO_START_MEMBER(sms_state,sms1)
 	save_item(NAME(m_prevright_bitmap));
 }
 
+
+void sms_state::screen_vblank_sms1(screen_device &screen, bool state)
+{
+	// on falling edge
+	if (!state)
+	{
+		// Most of the 3-D games usually set Sega Scope's state for next frame
+		// soon after the active area of current frame was drawn, but before
+		// it is displayed by the screen update function. That function needs to
+		// check the state used at the time of frame drawing, to display it on
+		// the correct side. So here, when the frame is about to be drawn, the
+		// Sega Scope's state is stored, to be checked by that function.
+		m_frame_sscope_state = m_sscope_state;
+	}
+}
+
+
 UINT32 sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT8 sscope = 0;
@@ -2188,18 +2216,19 @@ UINT32 sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap
 		sscope = machine().root_device().ioport("SEGASCOPE")->read_safe(0x00);
 		if (!sscope)
 		{
+			// without SegaScope, both LCDs for glasses go black
 			occluded_view = 1;
 		}
 		else if (&screen == m_left_lcd)
 		{
-			// with SegaScope, sscope_state 0 = left screen OFF, right screen ON
-			if (!(m_sscope_state & 0x01))
+			// with SegaScope, state 0 = left screen OFF, right screen ON
+			if (!(m_frame_sscope_state & 0x01))
 				occluded_view = 1;
 		}
 		else // it's right LCD
 		{
-			// with SegaScope, sscope_state 1 = left screen ON, right screen OFF
-			if (m_sscope_state & 0x01)
+			// with SegaScope, state 1 = left screen ON, right screen OFF
+			if (m_frame_sscope_state & 0x01)
 				occluded_view = 1;
 		}
 	}
@@ -2273,20 +2302,17 @@ VIDEO_START_MEMBER(sms_state,gamegear)
 
 UINT32 sms_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int width = screen.width();
-	int height = screen.height();
 	int x, y;
-
 	bitmap_rgb32 &vdp_bitmap = m_vdp->get_bitmap();
 
 	// HACK: fake LCD persistence effect
 	// (it would be better to generalize this in the core, to be used for all LCD systems)
-	for (y = 0; y < height; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		UINT32 *linedst = &bitmap.pix32(y);
 		UINT32 *line0 = &vdp_bitmap.pix32(y);
 		UINT32 *line1 = &m_prev_bitmap.pix32(y);
-		for (x = 0; x < width; x++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			UINT32 color0 = line0[x];
 			UINT32 color1 = line1[x];

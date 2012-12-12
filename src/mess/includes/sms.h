@@ -104,6 +104,7 @@ public:
 
 	/* Data needed for SegaScope (3D glasses) */
 	UINT8 m_sscope_state;
+	UINT8 m_frame_sscope_state;
 
 	/* Cartridge slot info */
 	UINT8 m_current_cartridge;
@@ -184,6 +185,7 @@ public:
 	UINT32 screen_update_gamegear(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_sms(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_vblank_sms1(screen_device &screen, bool state);
 	DECLARE_INPUT_CHANGED_MEMBER(lgun1_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(lgun2_changed);
 	TIMER_CALLBACK_MEMBER(rapid_fire_callback);
