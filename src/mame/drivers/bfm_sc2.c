@@ -7429,11 +7429,11 @@ ROM_END
 
 
 /* was in an SC4 set, is it meant to link with the SC4 units? */
-ROM_START( sc2bar7x )
+ROM_START( sc2cb7p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "95751960.p1", 0x0000, 0x010000, CRC(9f944d0c) SHA1(feb8fe4ce0a8f5c4a034aafec0f5aae29a834e8d) ) \
 
-	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
+	sc2_cb7_sound
 ROM_END
 
 
@@ -7444,13 +7444,7 @@ ROM_START( sc2cb7 )
 	sc2_cb7_sound
 ROM_END
 
-ROM_START( sc2cb7p )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bar7protocol.bin", 0x8000, 0x008000, CRC(e9c022ed) SHA1(e93b4506830a2f098eceb0b419d648bf3a9d02a4) ) // half size?
-	//It might be that the first half of bar7 needs to be included here?
 
-	sc2_cb7_sound
-ROM_END
 
 ROM_START( sc2cb71 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -8014,12 +8008,7 @@ GAME( 199?, sc2relgm1p	, sc2relgm	,  scorpion2		, drwho		, bfm_sc2_state, drwho	
 GAME( 199?, sc2topwk	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Top Wack (Bellfruit) (set 1, UK, 10GBP Jackpot, 1st Triennial) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2topwkp	, sc2topwk	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Top Wack (Bellfruit) (set 1, UK, 10GBP Jackpot, 1st Triennial, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 
-GAME( 199?, sc2cb7		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Casino Bar 7 (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cb7p		, sc2cb7	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Casino Bar 7 (Bellfruit) (set 1, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cb71		, sc2cb7	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Casino Bar 7 (Bellfruit) (set 2, UK, All Cash) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cb72		, sc2cb7	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Casino Bar 7 (Bellfruit) (set 3, UK, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cb72p	, sc2cb7	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Casino Bar 7 (Bellfruit) (set 3, UK, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2bar7x	, sc2cb7	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Casino Bar 7 (Bellfruit) (Scorpion 2/3)", GAME_FLAGS) // from an SC4 set, check sound rom
+
 
 
 GAME( 199?, sc2cgcas	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Club Grand Casino (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS)
@@ -8036,7 +8025,32 @@ GAME( 199?, sc2cvega3	, sc2cvega	,  scorpion2		, drwho		, bfm_sc2_state, drwho		
 GAME( 199?, sc2cvega3p	, sc2cvega	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Cash Vegas (Bellfruit) (set 4, UK, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2cvega4p	, sc2cvega	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Cash Vegas (Bellfruit) (set 5, UK, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 
-// Games with Dot Matrix Displays */
+
+/********************************************************************************************************************************************************************************************************************
+ Super Bar 7 Casino
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT NUMBER 6625  SUPER BAR SEVEN CASINO ALL CASH - 22-AUG-1996 16:22:26
+GAME( 199?, sc2cb71		, sc2cb7	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Super Bar 7 Casino (Bellfruit) (set 1, UK, All Cash) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-853
+// PROJECT NUMBER 6625  SUPER BAR SEVEN CASINO ALL CASH - 7-OCT-1996 11:08:33
+GAME( 199?, sc2cb72		, sc2cb7	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Super Bar 7 Casino (Bellfruit) (set 2, UK, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)		    // GAME No 95-750-872
+GAME( 199?, sc2cb72p	, sc2cb7	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Super Bar 7 Casino (Bellfruit) (set 2, UK, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-872
+// PROJECT NUMBER 6625  SUPER BAR SEVEN CASINO NEW STATS - 8-MAY-1997 11:17:30
+GAME( 199?, sc2cb7		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Super Bar 7 Casino (Bellfruit) (set 3, UK) (Scorpion 2/3)", GAME_FLAGS)			 // GAME No 95-750-960
+GAME( 199?, sc2cb7p	    , sc2cb7	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Super Bar 7 Casino (Bellfruit) (set 3, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-960
+
+/********************************************************************************************************************************************************************************************************************
+*********************************************************************************************************************************************************************************************************************
+*********************************************************************************************************************************************************************************************************************
+
+ Games with Dot Matrix Displays
+  (DMD<->set rom pairings still need to be checked for all)
+
+
+*********************************************************************************************************************************************************************************************************************
+*********************************************************************************************************************************************************************************************************************
+********************************************************************************************************************************************************************************************************************/
+
 
 /********************************************************************************************************************************************************************************************************************
  Luvvly Jubbly

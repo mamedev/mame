@@ -1460,6 +1460,13 @@ ROM_START( sc1cexpd )
 	ROM_LOAD( "cashexpl.bin", 0x8000, 0x008000, CRC(83c6196c) SHA1(931fb5223c3ebc52ca2bd232d71000b8af4397e1) )
 ROM_END
 
+
+ROM_START( sc1cb7p )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bar7protocol.bin", 0x8000, 0x008000, CRC(e9c022ed) SHA1(e93b4506830a2f098eceb0b419d648bf3a9d02a4) )
+	ROM_REGION( 0x20000, "upd", ROMREGION_ERASEFF )
+ROM_END
+
 ROM_START( sc1cexpl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cashxpl2.bin", 0x0000, 0x8000, CRC(0199136c) SHA1(bed1df64ecc0d7ef951a59717e219e6fe7ebf99c) )
@@ -3326,6 +3333,8 @@ GAME( 199?, sc1wud			,0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0
 GAME( 199?, sc1goldw		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Golden Winner (Bellfruit) (Scorpion ?)", GAME_FLAGS) // bad dump (from sc4 set)
 GAME( 199?, sc1druby		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Diamonds & Rubys (Bellfruit) (Scorpion ?) (set 1)", GAME_FLAGS) // from sc4 set.. incomplete, or not sc1/2 (uses sc1/2 crypt tho)
 GAME( 199?, sc1drubya		, sc1druby	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Diamonds & Rubys (Bellfruit) (Scorpion ?) (set 2)", GAME_FLAGS) // from sc4 set.. incomplete, or not sc1/2 (uses sc1/2 crypt tho)
+
+GAME( 199?, sc1cb7p		, 0	,  scorpion1		, scorpion1		, bfm_sc1_state, lotse		, 0,		 "BFM",   "Bar Seven (Bellfruit) (Protocol) (Scorpion 1)", GAME_FLAGS)
 
 
 //Adder 2

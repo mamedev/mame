@@ -13480,6 +13480,7 @@ sc1wud		// What's Up Dr
 sc1goldw
 sc1druby
 sc1drubya
+sc1cb7p
 
 // Scorpion 2 / 3
 
@@ -13809,10 +13810,10 @@ sc2relgm1p
 sc2topwk	// Top Wack (Bellfruit)
 sc2topwkp
 sc2cb7		// Casino Bar 7 (Bellfruit)
-sc2cb7p
 sc2cb71
 sc2cb72
 sc2cb72p
+sc2cb7p	
 sc2cgcas	// Club Grand Casino
 sc2cgcasp
 sc2cgcas1
@@ -13835,7 +13836,7 @@ sc2scshxgman // Gamesman hardware
 sc2scshxstar // Starpoint hardware
 sc2scshxcas // Super Casino Cash X (Concept)
 
-sc2bar7x	// from an SC4 set
+
 
 // Scorpion 2 + Dot Matrix Display
 
