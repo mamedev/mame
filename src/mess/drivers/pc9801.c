@@ -52,12 +52,11 @@
 	- Agumix Selects!: needs GDC = 5 MHz, interlace doesn't work properly;
 	- Aki no Tsukasa no Fushigi no Kabe: moans with a kanji error
 	   "can't use (this) on a vanilla PC-9801, a PC-9801E nor a PC-9801U. Please turn off the computer and turn it on again."
-	   display of this kanji error is wrong on PC-9801RS;
 	- Alice no Yakata: wants a "DSW 1-8" on.
-	- Animahjong V3: accesses port 0x88, tile selection pointer has a gfx clearance bug;
+	- Animahjong V3: accesses port 0x88;
 	- Anniversary - Memories of Summer: thinks that a button is pressed, has window masking bugs during intro;
 	- Another Genesis: fails loading;
-	- Apple Club 1: how to pass?
+	- Apple Club 1: how to pass an hand?
 	(Applesauce Pirates)
 
 	- Brandish 2: Intro needs some window masking effects;
@@ -694,6 +693,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	UINT16 tile;
 	UINT8 kanji_lr;
 	UINT8 kanji_sel;
+	UINT8 x_step;
 
 	if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
@@ -702,7 +702,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 	char_size = state->m_video_ff[FONTSEL_REG] ? 16 : 8;
 	tile = 0;
 
-	for(x=0;x<pitch;x++)
+	for(x=0;x<pitch;x+=x_step)
 	{
 		UINT8 tile_data,secret,reverse,u_line,v_line;
 		UINT8 color;
@@ -721,13 +721,21 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		knj_tile = state->m_video_ram_1[(tile_addr*2+1) & 0x1fff] & 0xff;
 		if(knj_tile)
 		{
-			kanji_lr = (knj_tile & 0x80) >> 7;
-			kanji_lr |= (tile & 0x80) >> 7; // Tokimeki Sports Gal 3
+			/* Note: lr doesn't really count, if a kanji is enabled then the successive tile is always the second part of it.
+			   Trusted with Alice no Yakata, Animahjong V3, Aki no Tsukasa no Fushigi no Kabe, Apros ...
+			*/
+			//kanji_lr = (knj_tile & 0x80) >> 7;
+			//kanji_lr |= (tile & 0x80) >> 7; // Tokimeki Sports Gal 3
 			tile &= 0x7f;
 			tile <<= 8;
 			tile |= (knj_tile & 0x7f);
 			kanji_sel = 1;
+			x_step = 2;
+//			kanji_lr = 0;
 		}
+		else
+			x_step = 1;
+
 		attr = (state->m_video_ram_1[(tile_addr*2 & 0x1fff) | 0x2000] & 0xff);
 
 		secret = (attr & 1) ^ 1;
@@ -738,73 +746,76 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		gfx_mode = (state->m_video_ff[ATTRSEL_REG]) ? attr & 0x10 : 0;
 		color = (attr & 0xe0) >> 5;
 
-		for(yi=0;yi<lr;yi++)
+		for(kanji_lr=0;kanji_lr<x_step;kanji_lr++)
 		{
-			for(xi=0;xi<8;xi++)
+			for(yi=0;yi<lr;yi++)
 			{
-				int res_x,res_y;
-
-				res_x = (x*8+xi) * (state->m_video_ff[WIDTH40_REG]+1);
-				res_y = y*lr+yi - (state->m_txt_scroll_reg[3] & 0xf);
-
-				if(!device->machine().primary_screen->visible_area().contains(res_x, res_y))
-					continue;
-
-				tile_data = 0;
-
-				if(!secret)
+				for(xi=0;xi<8;xi++)
 				{
-					/* TODO: priority */
-					if(gfx_mode)
-					{
-						int gfx_bit;
-						tile_data = 0;
+					int res_x,res_y;
 
-						/*
-							gfx strip mode:
+					res_x = ((x+kanji_lr)*8+xi) * (state->m_video_ff[WIDTH40_REG]+1);
+					res_y = y*lr+yi - (state->m_txt_scroll_reg[3] & 0xf);
 
-							number refers to the bit number in the tile data.
-							This mode is identical to the one seen in PC-8801
-							00004444
-							11115555
-							22226666
-							33337777
-						*/
-
-						gfx_bit = (xi & 4);
-						gfx_bit+= (yi & (2 << (char_size == 16)))>>(1+(char_size == 16));
-						gfx_bit+= (yi & (4 << (char_size == 16)))>>(1+(char_size == 16));
-
-						tile_data = ((tile >> gfx_bit) & 1) ? 0xff : 0x00;
-					}
-					else if(kanji_sel)
-						tile_data = (state->m_kanji_rom[tile*0x20+yi*2+kanji_lr]);
-					else
-						tile_data = (state->m_char_rom[tile*char_size+state->m_video_ff[FONTSEL_REG]*0x800+yi]);
-				}
-
-				if(reverse) { tile_data^=0xff; }
-				if(u_line && yi == 7) { tile_data = 0xff; }
-				if(v_line)	{ tile_data|=8; }
-
-				if(cursor_on && cursor_addr == tile_addr && device->machine().primary_screen->frame_number() & 0x10)
-					tile_data^=0xff;
-
-				if(yi >= char_size)
-					pen = -1;
-				else
-					pen = (tile_data >> (7-xi) & 1) ? color : -1;
-
-				if(pen != -1)
-					bitmap.pix32(res_y, res_x) = palette[pen];
-
-				if(state->m_video_ff[WIDTH40_REG])
-				{
-					if(!device->machine().primary_screen->visible_area().contains(res_x+1, res_y))
+					if(!device->machine().primary_screen->visible_area().contains(res_x, res_y))
 						continue;
 
+					tile_data = 0;
+
+					if(!secret)
+					{
+						/* TODO: priority */
+						if(gfx_mode)
+						{
+							int gfx_bit;
+							tile_data = 0;
+
+							/*
+								gfx strip mode:
+
+								number refers to the bit number in the tile data.
+								This mode is identical to the one seen in PC-8801
+								00004444
+								11115555
+								22226666
+								33337777
+							*/
+
+							gfx_bit = (xi & 4);
+							gfx_bit+= (yi & (2 << (char_size == 16)))>>(1+(char_size == 16));
+							gfx_bit+= (yi & (4 << (char_size == 16)))>>(1+(char_size == 16));
+
+							tile_data = ((tile >> gfx_bit) & 1) ? 0xff : 0x00;
+						}
+						else if(kanji_sel)
+							tile_data = (state->m_kanji_rom[tile*0x20+yi*2+kanji_lr]);
+						else
+							tile_data = (state->m_char_rom[tile*char_size+state->m_video_ff[FONTSEL_REG]*0x800+yi]);
+					}
+
+					if(reverse) { tile_data^=0xff; }
+					if(u_line && yi == 7) { tile_data = 0xff; }
+					if(v_line)	{ tile_data|=8; }
+
+					if(cursor_on && cursor_addr == tile_addr && device->machine().primary_screen->frame_number() & 0x10)
+						tile_data^=0xff;
+
+					if(yi >= char_size)
+						pen = -1;
+					else
+						pen = (tile_data >> (7-xi) & 1) ? color : -1;
+
 					if(pen != -1)
-						bitmap.pix32(res_y, res_x+1) = palette[pen];
+						bitmap.pix32(res_y, res_x) = palette[pen];
+
+					if(state->m_video_ff[WIDTH40_REG])
+					{
+						if(!device->machine().primary_screen->visible_area().contains(res_x+1, res_y))
+							continue;
+
+						if(pen != -1)
+							bitmap.pix32(res_y, res_x+1) = palette[pen];
+					}
 				}
 			}
 		}
