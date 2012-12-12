@@ -4196,6 +4196,13 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,luvjub)
 #define sc2_gcclb_sound\
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )\
 	ROM_LOAD( "gold_cas.snd", 0x0000, 0x080000, CRC(d93d39fb) SHA1(ce0c0c1430a6136ce39ffae018b009e629cbad61) )\
+	ROM_REGION( 0x80000, "altupd", 0 )/* looks bad */ \
+	ROM_LOAD( "95004065.p1", 0x0000, 0x080000, CRC(2670726b) SHA1(0f8045c68131191fceea5728e14c901d159bfb57) ) \
+
+#define sc2_gcclb_matrix \
+	ROM_REGION( 0x20000, "matrix", 0 ) \
+	ROM_LOAD( "95000589.p1", 0x0000, 0x010000, CRC(36400074) SHA1(611b48650e59b52f661be2730afaef2e5772607c) ) \
+
 
 // The below file also matches superstarsnd.bin
 #define sc2_cb7_sound \
@@ -7228,51 +7235,52 @@ ROM_START( sc2foot2p )
 ROM_END
 
 
+
+
 ROM_START( sc2gcclb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-golden-casino_std_ac_250pnd-20p_ass.bin", 0x0000, 0x010000, CRC(5f7fc343) SHA1(264c5bba36c820440c2ed97c04d4dd3592e111da) )
-
-	ROM_REGION( 0x80000, "altrevs", 0 )//Wrong hardware?
-	ROM_LOAD( "95004065.p1", 0x0000, 0x080000, CRC(2670726b) SHA1(0f8045c68131191fceea5728e14c901d159bfb57) )
-
+	sc2_gcclb_matrix
 	sc2_gcclb_sound
 ROM_END
 
 ROM_START( sc2gcclbp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-golden-casino_dat_ac_250pnd-20p_ass.bin", 0x0000, 0x010000, CRC(b4dee6d2) SHA1(856672fb4767f66e976619392fc8e659fbca3c2e) )
+	sc2_gcclb_matrix
 	sc2_gcclb_sound
 ROM_END
 
 ROM_START( sc2gcclb1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-golden-casino_std_ac_100pnd-5p_ass.bin", 0x0000, 0x010000, CRC(bf7b9ff1) SHA1(890a6b96592e9d2e890bea95e711b890c1cda7ad) )
+	sc2_gcclb_matrix
 	sc2_gcclb_sound
 ROM_END
 
 ROM_START( sc2gcclb1p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-golden-casino_dat_ac_100pnd-5p_ass.bin", 0x0000, 0x010000, CRC(1f5c2a2b) SHA1(facaab47716ae3c4a10839523f3249074ae8abb1) )
+	sc2_gcclb_matrix
 	sc2_gcclb_sound
 ROM_END
 
 ROM_START( sc2gcclb2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-golden-casino_std_ac_var_ass.bin", 0x0000, 0x010000, CRC(2de27b80) SHA1(57f1c40ceeb6ab82e9bac547aa00d8c1c1c07dab) )
+	sc2_gcclb_matrix
 	sc2_gcclb_sound
 ROM_END
 
 ROM_START( sc2gcclb2p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-golden-casino_dat_ac_var_ass.bin", 0x0000, 0x010000, CRC(2ad9647e) SHA1(d423c060996417f3f7f1b61e911b6e523ad08e7a) )
+	sc2_gcclb_matrix
 	sc2_gcclb_sound
 ROM_END
 
-ROM_START( sc2gcclb3 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "95000589.p1", 0x0000, 0x010000, CRC(36400074) SHA1(611b48650e59b52f661be2730afaef2e5772607c) )
-	sc2_gcclb_sound
-ROM_END
+
+
 
 ROM_START( sc2groul )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -8132,13 +8140,6 @@ GAME( 199?, sc2flaca2p	, sc2flaca	,  scorpion2		, drwho		, bfm_sc2_state, drwho	
 
 
 
-GAME( 199?, sc2gcclb	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Golden Casino Club (Bellfruit) (set 1, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2gcclbp	, sc2gcclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Golden Casino Club (Bellfruit) (set 1, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2gcclb1	, sc2gcclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Golden Casino Club (Bellfruit) (set 2, UK, 100GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2gcclb1p	, sc2gcclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Golden Casino Club (Bellfruit) (set 2, UK, 100GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2gcclb2	, sc2gcclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Golden Casino Club (Bellfruit) (set 3, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2gcclb2p	, sc2gcclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Golden Casino Club (Bellfruit) (set 3, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2gcclb3	, sc2gcclb	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Golden Casino Club (Bellfruit) (set 4, UK) (Scorpion 2/3)", GAME_FLAGS)
 
 GAME( 199?, sc2groul	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Golden Roulette (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2groulp	, sc2groul	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",   "Golden Roulette (Bellfruit) (set 2, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
@@ -8381,6 +8382,21 @@ GAME( 199?, sc2prem		, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0
 // PROJECT NUMBER PR6432  PREMIER CLUB MANAGER - 20-AUG-1996 10:06:44
 GAME( 199?, sc2prem1	, sc2prem	,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 3, UK) (Scorpion 2/3)", GAME_FLAGS)			  // GAME No 95-750-847
 GAME( 199?, sc2prem1p	, sc2prem	,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 3, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-847
+
+/********************************************************************************************************************************************************************************************************************
+  Golden Casino Club
+   also there is a (bad?) dump of a sound rom too, maybe it can be repaired, it differs from the one we're using
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT NUMBER 6632  GOLDEN CASINO VAR STAKE/JACKPOT - 12-FEB-1997 15:54:10
+GAME( 199?, sc2gcclb2	, sc2gcclb	,  scorpion2_dm01		, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",   "Golden Casino Club (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-927
+GAME( 199?, sc2gcclb2p	, sc2gcclb	,  scorpion2_dm01		, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",   "Golden Casino Club (Bellfruit) (set 1, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-927
+// PROJECT NUMBER 6632  GOLDEN CASINO 20P STAKE/#250 JACKPOT - 12-FEB-1997 15:56:05
+GAME( 199?, sc2gcclb	, 0			,  scorpion2_dm01		, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",   "Golden Casino Club (Bellfruit) (set 2, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-928
+GAME( 199?, sc2gcclbp	, sc2gcclb	,  scorpion2_dm01		, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",   "Golden Casino Club (Bellfruit) (set 2, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-928
+// PROJECT NUMBER 6632  GOLDEN CASINO 5P STAKE/#100 JACKPOT - 12-FEB-1997 15:57:23
+GAME( 199?, sc2gcclb1	, sc2gcclb	,  scorpion2_dm01		, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",   "Golden Casino Club (Bellfruit) (set 3, UK, 100GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-929
+GAME( 199?, sc2gcclb1p	, sc2gcclb	,  scorpion2_dm01		, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",   "Golden Casino Club (Bellfruit) (set 3, UK, 100GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-929
 
 
 /********************************************************************************************************************************************************************************************************************
