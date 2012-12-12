@@ -2192,11 +2192,11 @@ MACHINE_CONFIG_END
 int sc2_find_project_string(running_machine &machine )
 {
 	// search for the title
-	char title_string[2][16] = { "PROJECT NUMBER", "PROJECT PR" };
+	char title_string[3][16] = { "PROJECT NUMBER", "PROJECT PR", "PROJECT " };
 	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
 	int size = machine.root_device().memregion( "maincpu" )->bytes();
 
-	for (int search=0;search<2;search++)
+	for (int search=0;search<3;search++)
 	{
 
 		int strlength = strlen(title_string[search]);
@@ -5713,7 +5713,11 @@ ROM_START( sc2copcl11p )
 	sc2_copcl_sound
 ROM_END
 
-
+ROM_START( sc2copcl12 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "premier-club-manager_dat_ac_250pnd-25p_ass.bin", 0x0000, 0x010000, CRC(6446176c) SHA1(17cccc00d443ffde11943ebda112ef1e79134455) ) // filename is wrong, this is a club cops n robbers
+	sc2_copcl_sound
+ROM_END
 
 ROM_START( sc2copdc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -6108,15 +6112,6 @@ ROM_END
 ROM_START( sc2prem )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "premier-club-manager_std_ac_250pnd-25p_ass.bin", 0x0000, 0x010000, CRC(404716ed) SHA1(57916fb70621c96eccb0e5bbee821ca2133aaa5f) )
-
-	ROM_REGION( 0x20000, "matrix", 0 )
-	ROM_LOAD( "95000571.p1", 0x0000, 0x010000, CRC(4b4bdb8b) SHA1(de9b52da600629e680fd96f0d82a9f76fbc84bdf) )//premier-club-manager_mtx_250pnd-25p_ass.bin
-	sc2_prem_sound
-ROM_END
-
-ROM_START( sc2premp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "premier-club-manager_dat_ac_250pnd-25p_ass.bin", 0x0000, 0x010000, CRC(6446176c) SHA1(17cccc00d443ffde11943ebda112ef1e79134455) )
 
 	ROM_REGION( 0x20000, "matrix", 0 )
 	ROM_LOAD( "95000571.p1", 0x0000, 0x010000, CRC(4b4bdb8b) SHA1(de9b52da600629e680fd96f0d82a9f76fbc84bdf) )//premier-club-manager_mtx_250pnd-25p_ass.bin
@@ -7586,10 +7581,10 @@ GAMEL( 1994, sc2drwho13	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho
 GAMEL( 1994, sc2drwho14	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 15, UK, Arcade) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
 GAMEL( 1994, sc2drwho15	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 16, UK, Arcade) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
 GAMEL( 1994, sc2drwho16	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 17) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho17	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwhon	, 0,		 "BFM",      "Dr.Who The Timelord (set 18, not encrypted) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho18	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwhon	, 0,		 "BFM/Mazooma",      "Dr.Who The Timelord (set 19) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL | GAME_NOT_WORKING,layout_drwho) // error 99
-GAMEL( 1994, sc2drwho19	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwhon	, 0,		 "BFM/Mazooma",      "Dr.Who The Timelord (set 20) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL | GAME_NOT_WORKING,layout_drwho) // error 99
-GAMEL( 1994, sc2drwho20	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwhon	, 0,		 "BFM",      "Dr.Who The Timelord Deluxe (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, sc2drwho17	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwhon		, 0,		 "BFM",      "Dr.Who The Timelord (set 18, not encrypted) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
+GAMEL( 1994, sc2drwho18	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM/Mazooma",      "Dr.Who The Timelord (set 19) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL | GAME_NOT_WORKING,layout_drwho) // error 99
+GAMEL( 1994, sc2drwho19	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM/Mazooma",      "Dr.Who The Timelord (set 20) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL | GAME_NOT_WORKING,layout_drwho) // error 99
+GAMEL( 1994, sc2drwho20	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord Deluxe (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
 
 GAME( 1994, sc2brkfs	, 0			,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 1 UK, Game Card 95-750-524) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 1994, sc2brkfsp	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 1, Protocol) (Scorpion 2/3)", GAME_FLAGS)
@@ -7901,25 +7896,42 @@ GAME( 199?, sc2casr4p	, sc2casr	,  scorpion2		, drwho		, bfm_sc2_state, drwho		,
 GAME( 199?, sc2cmbt		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",		 "Cat & Mouse & Bonzo Too (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2cmbtp	, sc2cmbt	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",		 "Cat & Mouse & Bonzo Too (Bellfruit) (set 1, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 
-GAME( 199?, sc2copcl	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 1, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copclp	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 1, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copcl1	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 2, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copcl1p	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 2, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copcl2	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 3, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copcl3	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 4, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copcl3p	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 4, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copcl4	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 5, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copcl5	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 6, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copcl6	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 7, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copcl6p	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 7, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copcl7	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 8, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copcl8	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 9, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copcl8p	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 9, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copcl9	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 10, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copcl9p	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 10, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copcl10	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 11, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copcl11	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 12, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2copcl11p	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 12, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
+
+// PROJECT PR6231  CLUB COPS AND ROBBERS - 20-JUL-1993 15:15:32
+GAME( 199?, sc2copcl11	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-118
+// PROJECT PR6231  CLUB COPS AND ROBBERS 150 POUND JACKPOT - 16-NOV-1993 12:34:10
+GAME( 199?, sc2copcl1	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 2, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-154
+GAME( 199?, sc2copcl1p	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 2, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)	// GAME No 95-751-154
+// PROJECT NUMBER PR6231  CLUB COPS AND ROBBERS FIXED 65% - 16-NOV-1993 12:35:38
+GAME( 199?, sc2copcl4	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 3, UK) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-156
+// PROJECT PR6231  CLUB COPS AND ROBBERS - 16-NOV-1993 12:39:31
+GAME( 199?, sc2copcl6	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 4, UK) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-153
+GAME( 199?, sc2copcl6p	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 4, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)	// GAME No 95-751-153
+// PROJECT PR6231  CLUB COPS AND ROBBERS GENEROUS 5P - 20-JAN-1994 11:13:45
+GAME( 199?, sc2copcl7	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 5, UK) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-190
+// PROJECT PR6231  CLUB COPS AND ROBBERS - 4-AUG-1994 16:23:21
+GAME( 199?, sc2copcl10	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 6, UK) (Scorpion 2/3)", GAME_FLAGS) //  GAME No 95-750-268
+// PROJECT PR6231  CLUB COPS AND ROBBERS SEALINK VERSION - 22-MAY-1995 11:47:58
+GAME( 199?, sc2copcl9	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 7, UK) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-409
+GAME( 199?, sc2copcl9p	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 7, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)  // GAME No 95-751-409
+// PROJECT NUMBER 6231  CLUB COPS AND ROBBERS GENEROUS 5P NPO - 2-FEB-1996 12:39:22
+GAME( 199?, sc2copcl8	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 8, UK) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-628
+GAME( 199?, sc2copcl8p	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 8, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)	// GAME No 95-751-628
+// PROJECT NUMBER PR6231  CLUB COPS AND ROBBERS 25P/#250 - 2-SEP-1996 17:17:50
+GAME( 199?, sc2copcl	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 9, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-859
+GAME( 199?, sc2copclp	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 9, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)	// GAME No 95-751-859
+// PROJECT NUMBER PR6231  CLUB COPS AND ROBBERS 20P/#250 - 2-SEP-1996 17:26:44
+GAME( 199?, sc2copcl2	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 10, UK) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-858
+GAME( 199?, sc2copcl12	, sc2copcl	,  scorpion2     	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 10, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-858
+// PROJECT PR6231  CLUB COPS AND ROBBERS NPO 63% SEALINK VERSION - 5-JAN-1998 11:53:49
+GAME( 199?, sc2copcl5	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 11, UK) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-752-015
+GAME( 199?, sc2copcl11p	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 11, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)	// GAME No 95-753-015
+// PROJECT PR6231  CLUB COPS AND ROBBERS NPO 67% SEALINK VERSION - 5-JAN-1998 11:56:01
+GAME( 199?, sc2copcl3	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 12, UK) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-752-014
+GAME( 199?, sc2copcl3p	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 12, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-753-014
+
+
+
 
 
 
@@ -8095,7 +8107,6 @@ GAME( 199?, sc2copdc6	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofa
 
 GAME( 199?, sc2prom		, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Along The Prom (Bellfruit) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2prem		, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 1, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2premp	, sc2prem	,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 1, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2prem1	, sc2prem	,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 2, UK) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2prem1p	, sc2prem	,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 2, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2prem2	, sc2prem	,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 3, UK) (Scorpion 2/3)", GAME_FLAGS)

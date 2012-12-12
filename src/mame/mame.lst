@@ -13907,6 +13907,7 @@ sc2copcl9p
 sc2copcl10
 sc2copcl11
 sc2copcl11p
+sc2copcl12
 sc2copdc	// Cops 'n' Robbers Club Deluxe (Bellfruit)
 sc2copdcp
 sc2copdc1
@@ -13921,7 +13922,6 @@ sc2copdc5
 sc2copdc5p
 sc2copdc6
 sc2prem		// Premier Club Manager (Bellfruit)
-sc2premp
 sc2prem1
 sc2prem1p
 sc2prem2
