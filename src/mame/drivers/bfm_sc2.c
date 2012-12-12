@@ -5207,7 +5207,7 @@ ROM_START( sc2ptytm1 )
 	ROM_LOAD( "partysnd1.bin", 0x0000, 0x020000, CRC(b5a5cc9e) SHA1(c9b132ad0d1ce9ff6b56ebde89d5006a5cf7dff6) )
 ROM_END
 
-ROM_START( sc2ptytm1p )
+ROM_START( sc2ptytmp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "party-time_dat_ac_4pnd-10p_ass.bin", 0x0000, 0x010000, CRC(a33a6d08) SHA1(cf93f42971978b00a15e17d4da6bb6e16e8f1fab) )
 
@@ -8143,38 +8143,72 @@ GAME( 199?, sc2copdc	, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0
 GAME( 199?, sc2copdcp	, sc2copdc	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Cops 'n' Robbers Club Deluxe (Bellfruit) (set 7, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-992
 
 
+/********************************************************************************************************************************************************************************************************************
+  Round The Town
+   game code changes from 6201 to 6620 between the 1995 release?
+********************************************************************************************************************************************************************************************************************/
 
-GAME( 199?, sc2town		, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2townp	, sc2town	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 1, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2town1	, sc2town	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2town1p	, sc2town	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 2, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2town2	, sc2town	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2town3	, sc2town	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 4) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2town3p	, sc2town	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 4, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2town4	, sc2town	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 5) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2town5	, sc2town	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 6) (Scorpion 2/3)", GAME_FLAGS)
-
-GAME( 199?, sc2ofool	, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2ofool1	, sc2ofool	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2ofool2	, sc2ofool	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2ofool3	, sc2ofool	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 4) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2ofool4	, sc2ofool	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 5) (Scorpion 2/3)", GAME_FLAGS)
-
-GAME( 199?, sc2ptytm	, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Party Time (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2ptytm1	, sc2ptytm	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Party Time (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2ptytm1p	, sc2ptytm	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Party Time (Bellfruit) (set 2, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-
-
+// PROJECT NUMBER 6201  ROUND THE TOWN - 4-MAR-1993 11:05:07
+GAME( 199?, sc2town4	, sc2town	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-052
+// PROJECT NUMBER 6201  ROUND THE TOWN IRISH ALL CASH - 1-APR-1993 14:44:50
+GAME( 199?, sc2town2	, sc2town	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-069
+// PROJECT NUMBER 6620 (6201)  ROUND THE TOWN S&P - 15-DEC-1995 14:50:50
+GAME( 199?, sc2town3	, sc2town	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-591
+GAME( 199?, sc2town3p	, sc2town	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 3, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-591
+// PROJECT NUMBER 6620 (6201)  ROUND THE TOWN (ARCADE/HIGH TOKEN) - 18-DEC-1995 15:59:22
+GAME( 199?, sc2town1	, sc2town	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 4) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-592
+GAME( 199?, sc2town1p	, sc2town	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 4, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-592
+// PROJECT NUMBER 6620 (6201)  ROUND THE TOWN S&P IRISH AC - 5-MAR-1996 12:05:06
+GAME( 199?, sc2town5	, sc2town	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 5) (Scorpion 2/3)", GAME_FLAGS) //  GAME No 95-750-642
+// PROJECT NUMBER 6620 (6201)  ROUND THE TOWN #10 AC - 15-MAR-1996 12:07:18
+GAME( 199?, sc2town		, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 6) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-654
+GAME( 199?, sc2townp	, sc2town	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Round The Town (Bellfruit) (set 6, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-654
 
 
+/********************************************************************************************************************************************************************************************************************
+  Only Fools & Horses
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT NUMBER 6207  ONLY FOOLS AND HORSES - 14-OCT-1993 15:28:16
+GAME( 199?, sc2ofool1	, sc2ofool	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-147
+// PROJECT NUMBER 6207  ONLY FOOLS AND HORSES ALL CASH - 29-OCT-1993 13:00:02
+GAME( 199?, sc2ofool3	, sc2ofool	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-151
+// PROJECT NUMBER 6207  ONLY FOOLS AND HORSES - 18-NOV-1993 14:32:21
+GAME( 199?, sc2ofool	, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 3) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-159
+// PROJECT NUMBER 6207  ONLY FOOLS AND HORSES ALL CASH - 18-NOV-1993 16:12:34
+GAME( 199?, sc2ofool2	, sc2ofool	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 4) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-162
+// PROJECT NUMBER 6207  ONLY FOOLS AND HORSES ARCADE 10P PLAY - 14-DEC-1993 14:51:34
+GAME( 199?, sc2ofool4	, sc2ofool	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Only Fools & Horses (Bellfruit) (set 5) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-177
 
 
+/********************************************************************************************************************************************************************************************************************
+  Party Time
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT NUMBER 6221  PARTY TIME BINGO SCORPION 2 - 10-JUN-1993 14:26:26
+GAME( 199?, sc2ptytm1	, sc2ptytm	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Party Time (Bellfruit) (set 1) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-092
+// PROJECT NUMBER 6221  PARTY TIME BINGO SCORPION 2 #4 ALL CASH 10P PLAY - 1-JUL-1996 12:02:22
+GAME( 199?, sc2ptytm	, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Party Time (Bellfruit) (set 2) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-806
+GAME( 199?, sc2ptytmp	, sc2ptytm	,  scorpion2_dm01	, drwho		, bfm_sc2_state, ofah		, 0,		 "BFM",      "Party Time (Bellfruit) (set 2, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-806
 
 
+/********************************************************************************************************************************************************************************************************************
+  Along The Prom
+********************************************************************************************************************************************************************************************************************/
 
-GAME( 199?, sc2prom		, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Along The Prom (Bellfruit) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2prem		, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 1, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2prem1	, sc2prem	,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 2, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2prem1p	, sc2prem	,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 2, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2prem2	, sc2prem	,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 3, UK) (Scorpion 2/3)", GAME_FLAGS)
+// PROJECT NUMBER 6172  ALONG THE PROM  SINGLE SITE - 30-MAR-1993 12:03:27
+GAME( 199?, sc2prom		, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Along The Prom (Bellfruit) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-062
+
+
+/********************************************************************************************************************************************************************************************************************
+  Premier Club Manager
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT NUMBER PR6432  PREMIER CLUB MANAGER - 26-JAN-1996 11:52:43
+GAME( 199?, sc2prem2	, sc2prem	,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-616
+// PROJECT NUMBER PR6432  PREMIER CLUB MANAGER 25P !250 - 13-AUG-1996 14:05:05
+GAME( 199?, sc2prem		, 0			,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 2, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-848
+// PROJECT NUMBER PR6432  PREMIER CLUB MANAGER - 20-AUG-1996 10:06:44
+GAME( 199?, sc2prem1	, sc2prem	,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 3, UK) (Scorpion 2/3)", GAME_FLAGS)			  // GAME No 95-750-847
+GAME( 199?, sc2prem1p	, sc2prem	,  scorpion2_dm01	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Premier Club Manager (Bellfruit) (set 3, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-847
 
