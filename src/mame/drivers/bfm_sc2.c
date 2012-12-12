@@ -4339,7 +4339,7 @@ ROM_START( sc2drwho )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho1 )
+ROM_START( sc2drwho7 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("95750661.p1",	0x00000, 0x10000, CRC(4b5b50eb) SHA1(fe2b820c214b3e967348b99ccff30a4bfe0251dc) )
 
@@ -4347,7 +4347,7 @@ ROM_START( sc2drwho1 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho2 )
+ROM_START( sc2drwho1p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("dr-who-time-lord_dat_ac_ass.bin",	0x00000, 0x10000, CRC(5a467a44) SHA1(d5a3dcdf50e07e36187350072b5d82d620f8f1d8) )
 
@@ -4355,7 +4355,7 @@ ROM_START( sc2drwho2 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho3 )
+ROM_START( sc2drwhop )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("dr-who-time-lord_dat_ss_20p_ass.bin",	0x00000, 0x10000, CRC(8ce06af9) SHA1(adb58507b2b6aae59857384748d59485f1739eaf) )
 
@@ -4363,7 +4363,7 @@ ROM_START( sc2drwho3 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho4 )
+ROM_START( sc2drwho1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("dr-who-time-lord_std_ac_ass.bin",	0x00000, 0x10000, CRC(053313cc) SHA1(2a52b7edae0ce676255eb347bba17a2e48c1707a) )
 
@@ -4371,7 +4371,7 @@ ROM_START( sc2drwho4 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho5 )
+ROM_START( sc2drwho2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("dr-who-time-lord_std_var_20p_ass.bin",	0x00000, 0x10000, CRC(35f4e6ab) SHA1(5e5e35889adb7d3384aae663c667b0251d39aeee) )
 
@@ -4379,7 +4379,7 @@ ROM_START( sc2drwho5 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho6 )
+ROM_START( sc2drwho4p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("time-lord_dat_20p_uk94_ass.bin",	0x00000, 0x10000, CRC(e65717c2) SHA1(9b8db0bcac9fd996de29527440d6af3592102120) )
 
@@ -4387,7 +4387,7 @@ ROM_START( sc2drwho6 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho7 )
+ROM_START( sc2drwho7p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("time-lord_dat_ac_10pnd-20p-25p_ass.bin",	0x00000, 0x10000, CRC(9a27ac6d) SHA1(d1b0e85d41198c5d2cd1b492e53359a5dc1ac474) )
 
@@ -4395,7 +4395,7 @@ ROM_START( sc2drwho7 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho8 )
+ROM_START( sc2drwho5p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("time-lord_dat_ac_8pnd-20p_ass.bin",	0x00000, 0x10000, CRC(b6629b5e) SHA1(d20085b4ab9a0786063eb063f7d1df2a6814f40c) )
 
@@ -4403,7 +4403,7 @@ ROM_START( sc2drwho8 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho9 )
+ROM_START( sc2drwho6p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("time-lord_dat_ar_10p_ass.bin",	0x00000, 0x10000, CRC(04653c3b) SHA1(0c23f939103772fac628342074de820ec6b472ce) )
 
@@ -4411,7 +4411,7 @@ ROM_START( sc2drwho9 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho10 )
+ROM_START( sc2drwho3p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("time-lord_dat_ar_20p_uk94_ass.bin",	0x00000, 0x10000, CRC(40aaa98f) SHA1(80705e24e419558d8a7b1f886bfc2b3ce5465446) )
 
@@ -4419,7 +4419,7 @@ ROM_START( sc2drwho10 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho11 )
+ROM_START( sc2drwho2p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("time-lord_dat_var_no-jp-spin_ass.bin",	0x00000, 0x10000, CRC(bf087547) SHA1(f4b7289a76e814af5fb3affc360a9ac659c09bbe) )
 
@@ -4427,7 +4427,7 @@ ROM_START( sc2drwho11 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho12 )
+ROM_START( sc2drwho4 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("time-lord_std_20p_uk94_ass.bin",	0x00000, 0x10000, CRC(278f559e) SHA1(d4396df02a5e24b3684c26fcaa57c8e499789332) )
 
@@ -4435,7 +4435,7 @@ ROM_START( sc2drwho12 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho13 )
+ROM_START( sc2drwho5 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("time-lord_std_ac_8pnd-20p_ass.bin",	0x00000, 0x10000, CRC(0b2850c8) SHA1(5fac64f35a6b6158d8c15f41e82574768b1c3617) )
 
@@ -4443,7 +4443,7 @@ ROM_START( sc2drwho13 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho14 )
+ROM_START( sc2drwho6 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("time-lord_std_ar_10p_ass.bin",	0x00000, 0x10000, CRC(f716a21d) SHA1(340df4cdea3309bfebeba7c419057f1bf5ed5024) )
 
@@ -4451,7 +4451,7 @@ ROM_START( sc2drwho14 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho15 )
+ROM_START( sc2drwho3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("time-lord_std_ar_20p_uk94_ass.bin",	0x00000, 0x10000, CRC(8dd0f908) SHA1(2eca748874cc061f9a8145b081d2c097a40e1e47) )
 
@@ -4459,7 +4459,7 @@ ROM_START( sc2drwho15 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho16 )
+ROM_START( sc2drwhodx )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("tmld5pa",	0x00000, 0x10000, CRC(b9ddfd0d) SHA1(915afd83eab330a0e70635c35f031f2041b9f5ad) )
 
@@ -4467,7 +4467,7 @@ ROM_START( sc2drwho16 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho18 )
+ROM_START( sc2drwhomzp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "98401002.bin", 0x0000, 0x010000, CRC(e7c23331) SHA1(f6823fa206d28f53a13ef44c9e4cf37d6b8aa758) )
 
@@ -4475,7 +4475,7 @@ ROM_START( sc2drwho18 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho19 )
+ROM_START( sc2drwhomz )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "98400002.bin", 0x0000, 0x010000, CRC(40cc7d8b) SHA1(05f98e29bb92b3581691ee6df8ff5ae73e351d40) )
 
@@ -4483,7 +4483,7 @@ ROM_START( sc2drwho19 )
 	ROM_LOAD("timelordsnd.bin", 0x00000, 0x80000, CRC(57fdaf3a) SHA1(f7cbaddb7f2ab8e1c7b17f187bab263e0dde463b))
 ROM_END
 
-ROM_START( sc2drwho20 )
+ROM_START( sc2drwhodx1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tlrdx56c", 0x0000, 0x010000, CRC(80da4ba0) SHA1(0c725da5eead9371d895ca9650fbbec8aa1509b2) )
 
@@ -4493,7 +4493,7 @@ ROM_END
 
 
 /* not encrypted, bootleg? */
-ROM_START( sc2drwho17 )
+ROM_START( sc2drwhou )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("drwho.bin",	0x00000, 0x10000, CRC(9e53a1f7) SHA1(60c6aa226c96678a6e487fbf0f32554fd85ebd66) )
 
@@ -7562,45 +7562,88 @@ GAMEL( 1997, gldncrwn, 0,		  scorpion2_vid, gldncrwn, bfm_sc2_state,  gldncrwn, 
 
 /* Non-Video */
 
-GAMEL( 1994, sc2drwho	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 1, UK, Single Site, Game Card 95-750-288) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho1	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 2, UK, Game Card 95-750-661) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho2	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 3, UK, Arcade, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho3	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 4, UK Single Site, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho4	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 5, UK, Arcade) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho5	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 6, UK) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho6	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 7, UK, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho7	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 8, UK, Arcade, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho8	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 9, UK, Arcade, 8GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho9	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 10, UK, Arcade, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho10	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 11, UK, Arcade, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho11	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 12, UK, no Jackpot spin, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho12	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 13, UK) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho13	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 14, UK, Arcade, 8GBP Jackpot) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho14	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 15, UK, Arcade) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho15	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 16, UK, Arcade) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho16	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 17) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho17	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwhon		, 0,		 "BFM",      "Dr.Who The Timelord (set 18, not encrypted) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-GAMEL( 1994, sc2drwho18	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM/Mazooma",      "Dr.Who The Timelord (set 19) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL | GAME_NOT_WORKING,layout_drwho) // error 99
-GAMEL( 1994, sc2drwho19	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM/Mazooma",      "Dr.Who The Timelord (set 20) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL | GAME_NOT_WORKING,layout_drwho) // error 99
-GAMEL( 1994, sc2drwho20	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord Deluxe (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
-
-GAME( 1994, sc2brkfs	, 0			,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 1 UK, Game Card 95-750-524) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 1994, sc2brkfsp	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 1, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 1994, sc2brkfs1	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 2 UK, Single Site) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 1994, sc2brkfs1p	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 2 UK, Single Site, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 1994, sc2brkfs2	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 3 UK, Arcade, 8GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 1994, sc2brkfs3	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 4 UK, Arcade, 8GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 1994, sc2brkfs3p	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 4 UK, Arcade, 8GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 1994, sc2brkfs4	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 5 UK, Arcade, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 1994, sc2brkfs4p	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 5 UK, Arcade, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 1994, sc2brkfs5	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 6 UK, Arcade, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 1994, sc2brkfs5p	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 6 UK, Arcade, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2brkfs6	, sc2brkfs	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Big Breakfast (set 7)", GAME_FLAGS) // was marked motd
 
 
-GAME( 1994, sc2brkfsm	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM/Mazooma",      "The Big Breakfast Casino (set 1) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 1994, sc2brkfsm1	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM/Mazooma",      "The Big Breakfast Casino (set 2) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 1994, sc2brkfsm2	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM/Mazooma",      "The Big Breakfast Casino (set 3) (Scorpion 2/3)", GAME_FLAGS)
+
+/********************************************************************************************************************************************************************************************************************
+ Dr.Who The Timelord
+  (also Dr.Who The Timelord Deluxe)
+  the Mazooma release doesn't boot, gives error 99
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT NUMBER 6305  DR WHO TIMELORD - 28-SEP-1994 11:14:58
+GAMEL( 1994, sc2drwho	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 1, UK, Single Site) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-288
+GAMEL( 1994, sc2drwhou	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwhon		, 0,		 "BFM",      "Dr.Who The Timelord (set 1, UK, Single Site) (Scorpion 2/3) (not encrypted)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) //  GAME No 95-750-288 (unencrypted bootleg?)
+GAMEL( 1994, sc2drwhop	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 1, UK, Single Site Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-751-288
+// PROJECT NUMBER 6305  DR WHO TIMELORD IRISH ALL CASH   - 28-SEP-1994 11:20:17
+GAMEL( 1994, sc2drwho1	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 2, UK, Arcade) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-290
+GAMEL( 1994, sc2drwho1p	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 2, UK, Arcade, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-751-290
+// PROJECT NUMBER 6305  DR WHO TIMELORD NO JP SPIN - 17-NOV-1994 09:34:50
+GAMEL( 1994, sc2drwho2	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 3, UK, no Jackpot spin) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-309
+GAMEL( 1994, sc2drwho2p	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 3, UK, no Jackpot spin, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-751-309
+// PROJECT NUMBER 6305  DR WHO TIMELORD ARCADE - 24-OCT-1995 16:12:44
+GAMEL( 1994, sc2drwho3	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 4, UK, Arcade) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-536
+GAMEL( 1994, sc2drwho3p	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 4, UK, Arcade, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-751-536
+// PROJECT NUMBER 6305  DR WHO TIMELORD 4/8 - 24-OCT-1995 16:14:30
+GAMEL( 1994, sc2drwho4	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 5, UK) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-535
+GAMEL( 1994, sc2drwho4p	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 5, UK, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-751-535
+// PROJECT NUMBER 6305  DR WHO TIMELORD IRISH ALL CASH 4/8 - 25-OCT-1995 09:50:12
+GAMEL( 1994, sc2drwho5	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 6, UK, Arcade, 8GBP Jackpot) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-531
+GAMEL( 1994, sc2drwho5p	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 6, UK, Arcade, 8GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-751-531
+// PROJECT NUMBER 6305  TIMELORD ARCADE 10P PLAY 4/8 - 25-OCT-1995 09:53:06
+GAMEL( 1994, sc2drwho6	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 7, UK, Arcade) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-533
+GAMEL( 1994, sc2drwho6p	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 7, UK, Arcade, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-751-533
+// PROJECT NUMBER 6305  DR WHO TIMELORD 10 POUNDS - 28-MAR-1996 13:21:58
+GAMEL( 1994, sc2drwho7	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 8, UK, Arcade, 10GBP Jackpot) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-661
+GAMEL( 1994, sc2drwho7p	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord (set 8, UK, Arcade, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-751-661
+// PROJECT NUMBER 6419  DR WHO TIMELORD DELUXE - 8-MAR-1995 15:37:53
+GAMEL( 1994, sc2drwhodx	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord Deluxe (set 1) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-370
+// PROJECT NUMBER 6419  TIMELORD DELUXE MULTI-SITE ALL CASH - 4-DEC-1995 10:48:34
+GAMEL( 1994, sc2drwhodx1, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Dr.Who The Timelord Deluxe (set 2) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho) // GAME No 95-750-572
+// PROJECT NUMBER 6999  TIMELORD AT PLAYMAKER 5P/10p  500P - 15-SEP-1997 10:02:47
+GAMEL( 1994, sc2drwhomz	, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM/Mazooma",      "Dr.Who The Timelord (Mazooma) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL | GAME_NOT_WORKING,layout_drwho) // GAME No TLVMAZ12_N, error 99
+// PROJECT NUMBER TLP12  TIMELORD AT PLAYMAKER 5P/10p  500P - 15-SEP-1997 10:03:49
+GAMEL( 1994, sc2drwhomzp, sc2drwho	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM/Mazooma",      "Dr.Who The Timelord (Mazooma, Protocol) (Scorpion 2/3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL | GAME_NOT_WORKING,layout_drwho) // GAME No TLVMAZ12_P,  error 99
+
+/********************************************************************************************************************************************************************************************************************
+ The Big Breakfast
+  project number jumps between 640X and 6514, why?
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT NUMBER 640X  BIG BREAKFAST VAR STAKE/JACKPOT - 16-OCT-1995 14:57:47
+GAME( 1994, sc2brkfs1	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 1 UK, Single Site) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-523
+GAME( 1994, sc2brkfs1p	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 1 UK, Single Site, Protocol) (Scorpion 2/3)", GAME_FLAGS)  // GAME No 95-751-523
+// PROJECT NUMBER 6514  BIG BREAKFAST ARCADE VAR STAKE/JACKPOT  - 16-OCT-1995 14:59:52
+GAME( 1994, sc2brkfs	, 0			,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 2) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-524
+GAME( 1994, sc2brkfsp	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 2, Protocol) (Scorpion 2/3)", GAME_FLAGS)  // GAME No 95-751-524
+// PROJECT NUMBER 640X  BIG BREAKFAST VAR STAKE #6 CASH JACKPOT - 20-OCT-1995 11:59:24
+GAME( 1994, sc2brkfs3	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 3) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-517
+GAME( 1994, sc2brkfs6	, sc2brkfs	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "The Big Breakfast (set 3, Protocol) (Scorpion 2/3)", GAME_FLAGS)  // GAME No 95-751-517
+// PROJECT NUMBER 6514  BIG BREAKFAST VAR STAKE #8 CASH JACKPOT - 12-JAN-1996 12:52:36
+GAME( 1994, sc2brkfs2	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 4 UK, Arcade, 8GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-604
+GAME( 1994, sc2brkfs3p	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 4 UK, Arcade, 8GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-604
+// PROJECT NUMBER 6514  BIG BREAKFAST VAR STAKE !10 CASH JACKPOT - 16-MAY-1996 11:52:49
+GAME( 1994, sc2brkfs4	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 5 UK, Arcade, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)			 // GAME No 95-750-709
+GAME( 1994, sc2brkfs4p	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 5 UK, Arcade, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-709
+// PROJECT NUMBER 6514  BIG BREAKFAST WHITBREAD #10 ALL CASH 20P PLAY - 16-MAY-1996 12:16:31
+GAME( 1994, sc2brkfs5	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 6 UK, Arcade, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)			 // GAME No 95-750-710
+GAME( 1994, sc2brkfs5p	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast (set 6 UK, Arcade, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-710
+
+
+/********************************************************************************************************************************************************************************************************************
+ The Big Breakfast Casino
+  alpha seems different to others, unless it should be a DMD?
+********************************************************************************************************************************************************************************************************************/
+
+// PROJECT NUMBER 6621  BIG BREAKFAST CASINO GALA TOKEN - 19-AUG-1997 09:21:25
+GAME( 1994, sc2brkfsm	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM",      "The Big Breakfast Casino (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-986
+// PROJECT NUMBER 7013  BIG BREAKFAST CASINO AT MAZOOMA 5P - 23-JAN-1998 11:29:13
+GAME( 1994, sc2brkfsm1	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM/Mazooma",      "The Big Breakfast Casino (Mazooma, set 1) (Scorpion 2/3)", GAME_FLAGS) // GAME No BBCVM51
+// PROJECT NUMBER 7013  BIG BREAKFAST CASINO AT MAZOOMA 5P - 14-MAY-1998 10:05:23
+GAME( 1994, sc2brkfsm2	, sc2brkfs	,  scorpion2		, bbrkfst	, bfm_sc2_state, bbrkfst	, 0,		 "BFM/Mazooma",      "The Big Breakfast Casino (Mazooma, set 2) (Scorpion 2/3)", GAME_FLAGS) // GAME No BBCVM52
+
+
+
 
 GAME( 1995, sc2focus	, 0			,  scorpion3		, scorpion3	, bfm_sc2_state, focus		, 0,		 "BFM/ELAM", "Focus (Dutch, Game Card 95-750-347) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
 GAME( 1996, sc2gslam	, 0			,  scorpion2		, bfmcgslm	, bfm_sc2_state, bfmcgslm	, 0,		 "BFM",      "Grandslam Club (UK, set 1, Game Card 95-750-843) (Scorpion 2/3)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)

@@ -13500,26 +13500,26 @@ sc2brkfsm	//
 sc2brkfsm1	//
 sc2brkfsm2	//
 sc2drwho	// Dr.Who The Timelord
+sc2drwho7	//
+sc2drwho1p	//
+sc2drwhop	//
 sc2drwho1	//
 sc2drwho2	//
-sc2drwho3	//
+sc2drwho4p	//
+sc2drwho7p	//
+sc2drwho5p	//
+sc2drwho6p	//
+sc2drwho3p	//
+sc2drwho2p	//
 sc2drwho4	//
 sc2drwho5	//
 sc2drwho6	//
-sc2drwho7	//
-sc2drwho8	//
-sc2drwho9	//
-sc2drwho10	//
-sc2drwho11	//
-sc2drwho12	//
-sc2drwho13	//
-sc2drwho14	//
-sc2drwho15	//
-sc2drwho16	//
-sc2drwho17	//
-sc2drwho18	// (Mazooma set)
-sc2drwho19	// (Mazooma set)
-sc2drwho20	// (Deluxe)
+sc2drwho3	//
+sc2drwhodx	//
+sc2drwhou	//
+sc2drwhomzp	// (Mazooma set)
+sc2drwhomz	// (Mazooma set)
+sc2drwhodx1	// (Deluxe)
 sc2focus	// Focus (Dutch, Game Card 95-750-347)
 sc2gslam	// Club Grandslam (UK, Game Card 95-750-843)
 sc2gslamp
