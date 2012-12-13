@@ -310,6 +310,7 @@ void wd_fdc_t::seek_continue()
 			break;
 
 		case SEEK_DONE:
+			status |= S_HLD;
 			if(command & 0x04) {
 				if(!is_ready()) {
 					status |= S_RNF;
