@@ -15,11 +15,8 @@
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
 #include "formats/rk_cas.h"
-#include "formats/smx_dsk.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "machine/ram.h"
 
 
@@ -30,7 +27,7 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_ppi(*this, "ppi8255"),
-	m_fdc(*this, "wd1793"),
+	m_fdc(*this, "fd1793"),
 	m_dac(*this, "dac"),
 	m_cass(*this, CASSETTE_TAG),
 	m_ram(*this, RAM_TAG),
@@ -73,11 +70,12 @@ public:
 	UINT8 m_RC_register;
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8255_device> m_ppi;
-	optional_device<fd1793_device> m_fdc;
+	optional_device<fd1793_t> m_fdc;
 	optional_device<dac_device> m_dac;
 	optional_device<cassette_image_device> m_cass;
 	optional_device<ram_device> m_ram;
 	optional_shared_ptr<UINT8> m_p_videoram;
+	int m_drive;
 	DECLARE_DRIVER_INIT(erik);
 	DECLARE_DRIVER_INIT(special);
 	DECLARE_MACHINE_RESET(special);
@@ -96,6 +94,7 @@ public:
 	UINT32 screen_update_specimx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(special_reset);
 	TIMER_CALLBACK_MEMBER(setup_pit8253_gates);
+	void fdc_drq(bool state);	
 };
 
 

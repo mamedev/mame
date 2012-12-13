@@ -226,9 +226,10 @@ WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
 	if (m_b2m_drive!=drive) {
 		m_b2m_drive = drive;
 	}
-	floppy->ss_w(side);
+	
 	if (m_b2m_side!=side) {
 		m_b2m_side = side;
+		floppy->ss_w(side);	
 	}
 	/*
 		When bit 5 is set CPU is in HALT state and stay there until

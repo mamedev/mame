@@ -221,6 +221,8 @@ const struct pit8253_config specimx_pit8253_intf =
 MACHINE_START_MEMBER(special_state,specimx)
 {
 	m_specimx_audio = machine().device("custom");
+	m_drive = 0;
+	m_fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(special_state::fdc_drq), this));
 }
 
 TIMER_CALLBACK_MEMBER(special_state::setup_pit8253_gates)
@@ -236,9 +238,6 @@ MACHINE_RESET_MEMBER(special_state,specimx)
 {
 	specimx_set_bank(2, 0); // Initiali load ROM disk
 	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(special_state::setup_pit8253_gates),this));
-	device_t *fdc = machine().device("wd1793");
-	wd17xx_set_pause_time(fdc,12);
-	wd17xx_dden_w(fdc, 0);
 }
 
 READ8_MEMBER( special_state::specimx_disk_ctrl_r )
@@ -246,15 +245,35 @@ READ8_MEMBER( special_state::specimx_disk_ctrl_r )
 	return 0xff;
 }
 
+void special_state::fdc_drq(bool state)
+{
+	/* Clears HALT state of CPU when data is ready to read */
+	if(state) {
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	}
+}
+
 WRITE8_MEMBER( special_state::specimx_disk_ctrl_w )
 {
+	static const char *names[] = { "fd0", "fd1"};
+	floppy_image_device *floppy = NULL;
+	floppy_connector *con = machine().device<floppy_connector>(names[m_drive & 1]);
+	if(con)
+		floppy = con->get_device();
+
+	m_fdc->set_floppy(floppy);
+	floppy->mon_w(0);
+
 	switch(offset)
 	{
+		case 0 : 
+				m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+				break;
 		case 2 :
-				wd17xx_set_side(m_fdc, data & 1);
+				floppy->ss_w(data & 1);
 				break;
 		case 3 :
-				wd17xx_set_drive(m_fdc, data & 1);
+				m_drive = data & 1;
 				break;
 	}
 }
@@ -380,10 +399,11 @@ READ8_MEMBER( special_state::erik_disk_reg_r )
 
 WRITE8_MEMBER( special_state::erik_disk_reg_w )
 {
+/*
 	wd17xx_set_side (m_fdc,data & 1);
 	wd17xx_set_drive(m_fdc,(data >> 1) & 1);
 	wd17xx_dden_w(m_fdc, BIT(data, 2));
 	floppy_mon_w(floppy_get_device(machine(), BIT(data, 1)), 0);
 	floppy_mon_w(floppy_get_device(machine(), BIT(data, 1) ^ 1), 1);
-	floppy_drive_set_ready_state(floppy_get_device(machine(), BIT(data, 1)), 1, 1);
+	floppy_drive_set_ready_state(floppy_get_device(machine(), BIT(data, 1)), 1, 1);*/
 }

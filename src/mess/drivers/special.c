@@ -44,10 +44,7 @@ static ADDRESS_MAP_START( erik_io_map, AS_IO, 8, special_state )
 	AM_RANGE(0xf1, 0xf1) AM_READWRITE(erik_rr_reg_r, erik_rr_reg_w)
 	AM_RANGE(0xf2, 0xf2) AM_READWRITE(erik_rc_reg_r, erik_rc_reg_w)
 	AM_RANGE(0xf3, 0xf3) AM_READWRITE(erik_disk_reg_r, erik_disk_reg_w)
-	AM_RANGE(0xf4, 0xf4) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_status_r, wd17xx_command_w)
-	AM_RANGE(0xf5, 0xf5) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_track_r, wd17xx_track_w)
-	AM_RANGE(0xf6, 0xf6) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_sector_r, wd17xx_sector_w)
-	AM_RANGE(0xf7, 0xf7) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("fd1793", fd1793_t, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(specimx_mem, AS_PROGRAM, 8, special_state )
@@ -58,10 +55,7 @@ static ADDRESS_MAP_START(specimx_mem, AS_PROGRAM, 8, special_state )
 	AM_RANGE( 0xffc0, 0xffdf ) AM_RAMBANK("bank4")
 	AM_RANGE( 0xffe0, 0xffe3 ) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE( 0xffe4, 0xffe7 ) AM_RAM //external 8255
-	AM_RANGE( 0xffe8, 0xffe8 ) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_status_r,wd17xx_command_w)
-	AM_RANGE( 0xffe9, 0xffe9 ) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_track_r,wd17xx_track_w)
-	AM_RANGE( 0xffea, 0xffea ) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_sector_r,wd17xx_sector_w)
-	AM_RANGE( 0xffea, 0xffeb ) AM_DEVREADWRITE_LEGACY("wd1793", wd17xx_data_r,wd17xx_data_w)
+	AM_RANGE( 0xffe8, 0xffeb ) AM_DEVREADWRITE("fd1793", fd1793_t, read, write)
 	AM_RANGE( 0xffec, 0xffef ) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE( 0xfff0, 0xfff3 ) AM_READWRITE(specimx_disk_ctrl_r, specimx_disk_ctrl_w)
 	AM_RANGE( 0xfff8, 0xfff8 ) AM_READWRITE(specimx_video_color_r,specimx_video_color_w)
@@ -385,18 +379,9 @@ static const cassette_interface special_cassette_interface =
 	NULL
 };
 
-static const floppy_interface specimx_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(specimx),
-	NULL,
-	NULL
-};
+static SLOT_INTERFACE_START( specimx_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
 
 /* Machine driver */
 static MACHINE_CONFIG_START( special, special_state )
@@ -459,8 +444,10 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* Devices */
-	MCFG_FD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(specimx_floppy_interface)
+	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
+
+	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -495,9 +482,11 @@ static MACHINE_CONFIG_START( erik, special_state )
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, special_cassette_interface )
-	MCFG_FD1793_ADD("wd1793", default_wd17xx_interface_2_drives )
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(specimx_floppy_interface)
 	MCFG_I8255_ADD( "ppi8255", specialist_ppi8255_interface )
+	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
+
+	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)	
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
