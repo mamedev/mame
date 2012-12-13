@@ -32,7 +32,9 @@
 
   VIDEO : 1x Unknown 64-legs VDP (seems to be from V9938/58 family).
 
-  XTAL  : 1x 21477.27KHz
+  XTAL  : 1x 21477.27 kHz.
+          1x 384 kHz. blue resonator (CSB 384 P) surely for the M5202.
+
 
   1x Texas Instruments RC4558P (Dual General-Purpose Operational Amplifier, DIP8)
   1x Fairchild MB3712 (5,7 Watt Audio Power Amplifier, SIP8).
@@ -62,7 +64,6 @@
 
   TODO:
 
-  - Graphics banking (or figure out how to load them).
   - Audio CPU interrupts and connections/latches.
   - M5205 ADPCM system.
   - Hook up AY8910 output ports.
@@ -95,7 +96,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(kurukuru_interrupt);
 };
 
-#define MAIN_CLOCK XTAL_21_4772MHz
+#define MAIN_CLOCK		XTAL_21_4772MHz
+#define M5205_CLOCK		XTAL_384kHz
 
 #define VDP_MEM            0x30000
 
