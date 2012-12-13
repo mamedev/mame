@@ -412,13 +412,12 @@ inline void upd7220_device::recompute_parameters()
 	visarea.max_x = m_aw * horiz_mult - 1;//horiz_pix_total - (m_hfp * 8) - 1;
 	visarea.max_y = m_al - 1;//vert_pix_total - m_vfp - 1;
 
-
 	if (LOG)
 	{
-		printf("uPD7220 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
-		printf("Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
-		printf("%d %d %d %d %d\n",m_hs,m_hbp,m_aw,m_hfp,m_pitch);
-		printf("%d %d %d %d\n",m_vs,m_vbp,m_al,m_vfp);
+		logerror("uPD7220 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+		logerror("Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+		logerror("%d %d %d %d %d\n",m_hs,m_hbp,m_aw,m_hfp,m_pitch);
+		logerror("%d %d %d %d\n",m_vs,m_vbp,m_al,m_vfp);
 	}
 
 	if (m_m)
