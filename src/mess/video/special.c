@@ -12,6 +12,8 @@
 
 VIDEO_START_MEMBER(special_state,special)
 {
+	palette_set_color(machine(),0,RGB_BLACK); /* black */
+	palette_set_color(machine(),1,RGB_WHITE); /* white */
 }
 
 UINT32 special_state::screen_update_special(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

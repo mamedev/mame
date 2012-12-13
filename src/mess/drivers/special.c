@@ -414,7 +414,6 @@ static MACHINE_CONFIG_START( special, special_state )
 	MCFG_VIDEO_START_OVERRIDE(special_state,special)
 	MCFG_SCREEN_UPDATE_DRIVER(special_state, screen_update_special)
 	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
