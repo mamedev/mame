@@ -524,7 +524,7 @@ WRITE8_MEMBER( tiki100_state::video_scroll_w )
 
 static const ay8910_interface ay8910_intf =
 {
-	AY8910_LEGACY_OUTPUT,
+	AY8910_SINGLE_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,

@@ -62,7 +62,6 @@ const char *tiki100_format::extensions() const
 }
 
 // Unverified gap sizes
-// physical disks have 2:1 sector interleave
 // double sided disks have t0s0,t0s1,t1s0,t1s1... format
 const tiki100_format::format tiki100_format::formats[] = {
 	{   //  90K 5 1/4 inch single density single sided
@@ -71,15 +70,15 @@ const tiki100_format::format tiki100_format::formats[] = {
 	},
 	{   //  200K 5 1/4 inch double density single sided
 		floppy_image::FF_525, floppy_image::SSDD,
-    2000, 10, 40, 1, 512, {}, 1, {}, 80, 22, 20
+        2000, 10, 40, 1, 512, {}, -1, { 1,6,2,7,3,8,4,9,5,10 }, 80, 22, 20
 	},
 	{   //  400K 5 1/4 inch double density
 		floppy_image::FF_525, floppy_image::DSDD,
-    2000, 10, 40, 2, 512, {}, 1, {}, 80, 22, 20
+        2000, 10, 40, 2, 512, {}, -1, { 1,6,2,7,3,8,4,9,5,10 }, 80, 22, 20
 	},
 	{   //  800K 5 1/4 inch quad density
 		floppy_image::FF_525, floppy_image::DSQD,
-    2000, 10, 80, 2, 512, {}, 1, {}, 80, 22, 20
+        2000, 10, 80, 2, 512, {}, -1, { 1,6,2,7,3,8,4,9,5,10 }, 80, 22, 20
 	},
 	{}
 };
