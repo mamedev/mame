@@ -13320,12 +13320,13 @@ sc1cl2k		// Club 2000 (Bellfruit)
 sc1cl2k1	// Club 2001 (Bellfruit)
 sc1cl65		// Club 65 Special (Bellfruit)
 sc1cl65a
-sc1cl65ap
+sc1cl65cp
 sc1cl65b
 sc1cl65bp
 sc1cl65c
 sc1cl65d
 sc1cl65dp
+sc1cl65ap
 sc1clbdm	// Club Diamond (Bellfruit)
 sc1clbxp	// Club Explosion (Bellfruit)
 sc1clbrn	// Club Runner (Bellfruit)
@@ -13348,6 +13349,7 @@ sc1disc		// Discovey (Bellfruit)
 sc1disca
 sc1dblch	// Double Chance (Bellfruit)
 sc1dblcha
+sc1dblchb
 sc1dream	// Dream Machine (Bellfruit)
 sc1final	// Final Touch (Bellfruit)
 sc1flash	// Flash (Bellfruit)

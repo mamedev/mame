@@ -7,6 +7,9 @@
 
 ******************************************************************************************
 
+ sound roms don't seem to actually get used in many sets, playing through the AY only?
+ ---
+
      04-2011: J Wallace: Fixed watchdog to match actual circuit, also fixed lamping code.
   20-01-2007: J Wallace: Tidy up of coding
   30-12-2006: J Wallace: Fixed init routines.
@@ -1317,27 +1320,8 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,clatt)
 	ROM_LOAD( "ctowsnd1.bin", 0x00000, 0x010000, CRC(faf28e18) SHA1(0586a905f944bcc990d4a1b400629412a69fc160) )\
 	ROM_LOAD( "ctowsnd2.bin", 0x10000, 0x010000, CRC(f4f9c1a4) SHA1(af5aff58b3e362a14e26a5e8cae83affda905819) )\
 
-#define sc1_cl65_sound \
-	ROM_REGION( 0x20000, "upd", 0 )\
-	ROM_LOAD( "65sndp1.bin", 0x000000, 0x010000, CRC(e532fcf5) SHA1(7de3bd4a3efae7d1cfeee23c008efbff39ce46f8) )\
-	ROM_LOAD( "65sndp2.bin", 0x010000, 0x010000, CRC(2703ea2d) SHA1(a4876a10d8d4b1de01dfab76e4ee21cb120aa783) )\
 
-/* This is in the set too, for now I'm storing it separately in the club sets that it appeared to come from, but it may need to be compared*/
 
-#define sc1_cl65_sound_alt  \
-	ROM_REGION( 0x20000, "upd", 0 )\
-	ROM_LOAD( "club-six-five-special_snd_a.bin", 0x0000, 0x010000, CRC(915802cd) SHA1(5bca3a80199a6534e084a5cf4337da4e9c48f45c) )\
-	ROM_LOAD( "club-six-five-special_snd_b.bin", 0x0000, 0x010000, CRC(b3b230d8) SHA1(022e95f38b14922137222805c0bec7498c5956cc) )\
-
-#define sc1_clbw_sound \
-	ROM_REGION( 0x20000, "upd", 0 )\
-	ROM_LOAD( "wisesnd1.bin", 0x0000, 0x010000, CRC(204605a6) SHA1(193a60878ed46f122e5d2d8f35fc6ea967b8734f) )\
-	ROM_LOAD( "wisesnd2.bin", 0x010000, 0x010000, CRC(6aa66166) SHA1(2e7cc67afdce2febb541bb1d0e7c107876d4233d) )\
-
-#define sc1_dblch_sound \
-	ROM_REGION( 0x40000, "upd", 0 )\
-	ROM_LOAD( "doublechancesnd1.bin", 0x0000, 0x010000, CRC(bee6af3e) SHA1(334fe491a00f58a2142f65344674b26c766a7c5b) )\
-	ROM_LOAD( "doublechancesnd2.bin", 0x0000, 0x010000, CRC(bbadc876) SHA1(902e387ea9bcd833cf75a6f049b5b2822ec6dc2a) )\
 
 #define sc1_funh_sound \
 	ROM_REGION( 0x40000, "upd", 0 )\
@@ -1377,18 +1361,6 @@ ROM_START( sc1roul )
 ROM_END
 
 /////////////////////////////////////////////////////////////////////////////////////
-
-ROM_START( sc1clatt )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "39370196.2",   0x0000, 0x8000,  CRC(c809c22d) SHA1(fca7515bc84d432150ffe5e32fccc6aed458b8b0))
-	ROM_LOAD( "39370196.1",   0x8000, 0x8000,  CRC(4c2e465f) SHA1(101939d37d9c033f6d1dfb83b4beb54e4061aec2))
-ROM_END
-
-ROM_START( sc1clatta )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "club attraction 393717553 prom b.bin", 0x0000, 0x8000, CRC(06f41627) SHA1(0e54314147a5f0d833d83f6f0ee828bd1c875f3e) )
-	ROM_LOAD( "club attraction 393717552 prom a.bin", 0x8000, 0x8000, CRC(795e93cf) SHA1(017fa5ea3d9ad1f7a7a619d88a5892a9ffe6f3bc) )
-ROM_END
 
 
 
@@ -1432,25 +1404,7 @@ ROM_START( sc1bartk )
 	ROM_LOAD( "bartreksnd2.bin", 0x010000, 0x010000, CRC(4ff8201c) SHA1(859378b4bb8fc5d3497a53c9218302410884e091) )
 ROM_END
 
-ROM_START( sc1barcd )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "95740352 b.bin", 0x0000, 0x8000, CRC(6dc3cfd3) SHA1(d71d433ae560ac4db345630ee7f04a7cfb7e933e) )
-	ROM_LOAD( "95740351 a.bin", 0x8000, 0x8000, CRC(0891350b) SHA1(ea1295768738b9b89eac19d04411220a8c9d10c7) )
 
-	ROM_REGION( 0x20000, "upd", 0 )
-	ROM_LOAD( "barsnd1.bin", 0x00000, 0x10000, CRC(c9de8ff4) SHA1(c3e77e84d4ecc1c779929a96d1c445a1af24865b) )
-	ROM_LOAD( "barsnd2.bin", 0x10000, 0x10000, CRC(56af984a) SHA1(aebd30f3ca767dc5fc77fb01765833ee627a5aee) )
-ROM_END
-
-ROM_START( sc1barcda )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "barcode 5_10p b.bin", 0x0000, 0x8000, CRC(69d4d0b2) SHA1(bb73b917cf414623dcd239c5daeeccb4e0ccc2ed) )
-	ROM_LOAD( "barcode 5_10p a.bin", 0x8000, 0x8000, CRC(e864aba1) SHA1(b3f707b6d5f3d7236e4a5e9ed78c61a78c3e8196) )
-
-	ROM_REGION( 0x20000, "upd", 0 )
-	ROM_LOAD( "barsnd1.bin", 0x00000, 0x10000, CRC(c9de8ff4) SHA1(c3e77e84d4ecc1c779929a96d1c445a1af24865b) )
-	ROM_LOAD( "barsnd2.bin", 0x10000, 0x10000, CRC(56af984a) SHA1(aebd30f3ca767dc5fc77fb01765833ee627a5aee) )
-ROM_END
 
 ROM_START( sc1barcdb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1648,77 +1602,6 @@ ROM_START( sc1cl2k1 )
 	ROM_LOAD( "club2001.bin", 0x00000, 0x10000, CRC(4bb26aca) SHA1(41a896be314f2fefdaba962b44e9562aaf0642b1) )
 ROM_END
 
-ROM_START( sc1cl65 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "65spp2", 0x0000, 0x8000, CRC(11332a28) SHA1(76f9eee54351e0d8dc4b620ec92661538929e75d) )
-	ROM_LOAD( "65spp1", 0x8000, 0x8000, CRC(2c4cb63b) SHA1(5d09b575cf80beecd83c07286b74af29de7ec553) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 )
-	ROM_LOAD( "39370694.p2", 0x0000, 0x008000, CRC(3371dc55) SHA1(52d75a90933acc7a03821e5c2821df6126c72a6c) )
-	ROM_LOAD( "39370714.p2", 0x0000, 0x008000, CRC(cb9f944f) SHA1(49955a968264f3d963317f5c772629d9bbdd33f7) )
-	ROM_LOAD( "39370858.p2", 0x0000, 0x008000, CRC(ff0e35c0) SHA1(0d3d46b541e188200cb4b9cc65eb60eac913dc2b) )
-	ROM_LOAD( "39370859.p2", 0x0000, 0x008000, CRC(f04065a0) SHA1(d63ba578931b2f4f156ca875da9cf69cf283a27c) )
-	ROM_LOAD( "club-six-five-special_dat_ac_rot_20po_ass.bin", 0x0000, 0x008000, CRC(028ff7b2) SHA1(500b6f8d85678e99ae804600099fe78b542ad6a3) )
-
-	sc1_cl65_sound
-ROM_END
-
-ROM_START( sc1cl65a )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "club-six-five-special_std_ac_200pnd_rot_20po_bss.bin", 0x0000, 0x8000, CRC(ff0e35c0) SHA1(0d3d46b541e188200cb4b9cc65eb60eac913dc2b) )
-	ROM_LOAD( "club-six-five-special_std_ac_200pnd_rot_20po_ass.bin", 0x8000, 0x8000, CRC(dd188272) SHA1(d6b7f7b060e632bd3eacc7f7721399a1c8349698) )
-
-	sc1_cl65_sound_alt
-ROM_END
-
-ROM_START( sc1cl65ap )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "club-six-five-special_std_ac_200pnd_rot_20po_bss.bin", 0x0000, 0x8000, CRC(ff0e35c0) SHA1(0d3d46b541e188200cb4b9cc65eb60eac913dc2b) )
-	ROM_LOAD( "club-six-five-special_dat_ac_200pnd_rot_20po_ass.bin", 0x8000, 0x8000, CRC(83a0253f) SHA1(a9b463e2aa87a736f88c5e71f233ff9d6a8b25b4) )
-
-	sc1_cl65_sound_alt
-ROM_END
-
-ROM_START( sc1cl65b )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "club-six-five-special_std_ac_200pnd_rot_10po_bss.bin", 0x0000, 0x8000, CRC(f04065a0) SHA1(d63ba578931b2f4f156ca875da9cf69cf283a27c) )
-	ROM_LOAD( "club-six-five-special_std_ac_200pnd_rot_10po_ass.bin", 0x8000, 0x8000, CRC(eedd9fa1) SHA1(6233e8304ac94798cfb908b2ba31ec6c98808ce8) )
-
-	sc1_cl65_sound_alt
-ROM_END
-
-ROM_START( sc1cl65bp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "club-six-five-special_std_ac_200pnd_rot_10po_bss.bin", 0x0000, 0x8000, CRC(f04065a0) SHA1(d63ba578931b2f4f156ca875da9cf69cf283a27c) )
-	ROM_LOAD( "club-six-five-special_dat_ac_200pnd_rot_10po_ass.bin", 0x8000, 0x8000, CRC(836e65d8) SHA1(931e5831b0b64e7ce29fb497435d486e40dce839) )
-
-	sc1_cl65_sound_alt
-ROM_END
-
-ROM_START( sc1cl65c )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "club-six-five-special_std_ac_b.bin", 0x0000, 0x8000, CRC(cb9f944f) SHA1(49955a968264f3d963317f5c772629d9bbdd33f7) )
-	ROM_LOAD( "club-six-five-special_std_ac_a.bin", 0x8000, 0x8000, CRC(8bd817f8) SHA1(6ae91a29a6263c085f6254a049fb3c2ba9cac662) )
-
-	sc1_cl65_sound_alt
-ROM_END
-
-ROM_START( sc1cl65d )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "club-six-five-special_std_ac_rot_10po_bss.bin", 0x0000, 0x8000, CRC(3371dc55) SHA1(52d75a90933acc7a03821e5c2821df6126c72a6c) )
-	ROM_LOAD( "club-six-five-special_std_ac_rot_10po_ass.bin", 0x8000, 0x8000, CRC(cf48ba99) SHA1(5da4321ff349964e903f1bebd3e5ddd0799fc478) )
-
-	sc1_cl65_sound_alt
-ROM_END
-
-ROM_START( sc1cl65dp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "club-six-five-special_std_ac_rot_10po_bss.bin", 0x0000, 0x8000, CRC(3371dc55) SHA1(52d75a90933acc7a03821e5c2821df6126c72a6c) )
-	ROM_LOAD( "club-six-five-special_dat_ac_rot_10po_ass.bin", 0x8000, 0x8000, CRC(77ddf81d) SHA1(522d9f84ab6e31586f371548e2f146ac193f06f5) )
-
-	sc1_cl65_sound_alt
-ROM_END
-
 ROM_START( sc1clbdm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "clubdiamond.bin", 0x8000, 0x8000, CRC(7e6a569e) SHA1(ba15478ae0312d3e9c21546aa676b4ab95ae944c) )
@@ -1773,20 +1656,6 @@ ROM_START( sc1clbtmb )
 	ROM_REGION( 0x40000, "upd", 0 )
 	ROM_LOAD( "tempsnd1.bin", 0x00000, 0x10000, CRC(168e2a18) SHA1(db97acf9131b1a54efe1cd375aecae1679bab19e) )
 	ROM_LOAD( "tempsnd2.bin", 0x00000, 0x10000, CRC(b717f347) SHA1(189c82318d622f18580a23eed48b17c0c34dedd5) )
-ROM_END
-
-ROM_START( sc1clbw )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "clbwzp2", 0x0000, 0x8000, CRC(44bb7e16) SHA1(d3c258ea286be18dc667df6a7138280462db661b) )
-	ROM_LOAD( "clbwzp1", 0x8000, 0x8000, CRC(c61dd4eb) SHA1(e1756f8841dabe1bc002aadba6b224a558096a96) )
-	sc1_clbw_sound
-ROM_END
-
-ROM_START( sc1clbwa )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "club wise 95717551b.bin", 0x0000, 0x8000, CRC(0528a718) SHA1(27f4225c948d93ce1c833679f97e045f3b7a6aac) ) // aka cwise_b.bin
-	ROM_LOAD( "club wise 95717550a.bin", 0x8000, 0x8000, CRC(5b305f11) SHA1(592ea71fcb72eaa90fd421e3bd3761cfd686b019) ) // aka cwise_a.bin
-	sc1_clbw_sound
 ROM_END
 
 
@@ -1880,25 +1749,7 @@ ROM_START( sc1disca )
 ROM_END
 
 
-ROM_START( sc1dblch )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "doublechancegame2.bin", 0x0000, 0x008000, CRC(d4f49454) SHA1(53b97f941a4abfeb3e498b4295f98e80bd182b7e) )
-	ROM_LOAD( "doublechancegame1.bin", 0x8000, 0x008000, CRC(9e24e0e3) SHA1(fff1fe9219c052750709d13c06148c7926a22910) )
 
-	ROM_REGION( 0x40000, "altrevs", 0 )//orphans?
-	ROM_LOAD( "95717787 10p20p.bin", 0x0000, 0x008000, CRC(69ba126c) SHA1(f59aa5a632d0bc5102c206f986f86b6c7c1352fb) )
-	ROM_LOAD( "95717789 10p.bin", 0x0000, 0x008000, CRC(fc338d38) SHA1(65457f2611ffa22ac35f1e7ad10c290c01b9c3ac) )
-	ROM_LOAD( "95717790 5p.bin", 0x0000, 0x008000, CRC(c82e57f9) SHA1(456ce5290db322292170412a00f0252b86743ed0) )
-
-	sc1_dblch_sound
-ROM_END
-
-ROM_START( sc1dblcha )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "95717417_dc_std.b", 0x0000, 0x8000, CRC(51e5459b) SHA1(b6ffbcff63fd3543226778c61fbe2246f40635dd) )
-	ROM_LOAD( "95717416_dc_std.a", 0x8000, 0x8000, CRC(949726ed) SHA1(6ecebd20387aa73b0404ab4b7342e2b39d77b37f) )
-	sc1_dblch_sound
-ROM_END
 
 ROM_START( sc1dream )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3160,6 +3011,20 @@ GAME( 198?, sc1cshat		, 0			, scorpion1			, scorpion1 , bfm_sc1_state, lotse		, 
 
 
 /********************************************************************************************************************************************************************************************************************
+ Club Attraction
+  sc1clatta fails the rom check, likely one rom is bad
+********************************************************************************************************************************************************************************************************************/
+
+ROM_START( sc1clatt )  ROM_REGION( 0x10000, "maincpu", 0 )  ROM_LOAD( "39370196.2",           0x0000, 0x8000,          CRC(c809c22d) SHA1(fca7515bc84d432150ffe5e32fccc6aed458b8b0) ) ROM_LOAD( "39370196.1",           0x8000, 0x8000,          CRC(4c2e465f) SHA1(101939d37d9c033f6d1dfb83b4beb54e4061aec2) ) ROM_END
+ROM_START( sc1clatta ) ROM_REGION( 0x10000, "maincpu", 0 ) 	ROM_LOAD( "393717553 prom b.bin", 0x0000, 0x8000, BAD_DUMP CRC(06f41627) SHA1(0e54314147a5f0d833d83f6f0ee828bd1c875f3e) ) ROM_LOAD( "393717552 prom a.bin", 0x8000, 0x8000, BAD_DUMP CRC(795e93cf) SHA1(017fa5ea3d9ad1f7a7a619d88a5892a9ffe6f3bc) ) ROM_END
+
+// PROJECT NUMBER 5527  CLUB ATTRACTION DUAL #1 - 3-APR-1990 17:17:23
+GAME( 1990, sc1clatt		, 0			, scorpion1			, clatt		, bfm_sc1_state, clatt			, 0,       "BFM",      "Club Attraction (UK, Game Card 39-370-196)", GAME_FLAGS ) // GAME No 39-370-196
+// PROJECT NUMBER 5527  CLUB ATTRACTION DUAL #1 - 22-NOV-1990 16:26:05
+GAME( 1990, sc1clatta		, sc1clatt	, scorpion1			, clatt		, bfm_sc1_state, clatt			, 0,       "BFM",      "Club Attraction (set 2)", GAME_FLAGS ) // GAME No 39-370-266
+
+
+/********************************************************************************************************************************************************************************************************************
  Cash Wise
   sc1cshwzd has no appropriate rom to map at 0x0000
  ********************************************************************************************************************************************************************************************************************/
@@ -3185,18 +3050,123 @@ GAME( 198?, sc1cshwzf		, sc1cshwz	, scorpion1			, scorpion1	, bfm_sc1_state, lot
 GAME( 198?, sc1cshwzd		, sc1cshwz	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Wise (Bellfruit) (set 4, Protocol) (Scorpion 1)", GAME_FLAGS ) //  GAME No 39-371-104
 
 
+/********************************************************************************************************************************************************************************************************************
+ Club Wise
+  the 1-JUN-1990 set has an odd game code
+ ********************************************************************************************************************************************************************************************************************/
+
+ #define sc1_clbw_sound \
+	ROM_REGION( 0x20000, "upd", 0 )\
+	ROM_LOAD( "wisesnd1.bin", 0x0000, 0x010000, CRC(204605a6) SHA1(193a60878ed46f122e5d2d8f35fc6ea967b8734f) )\
+	ROM_LOAD( "wisesnd2.bin", 0x010000, 0x010000, CRC(6aa66166) SHA1(2e7cc67afdce2febb541bb1d0e7c107876d4233d) )\
+
+ROM_START( sc1clbw )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "clbwzp2",                 0x0000, 0x8000, CRC(44bb7e16) SHA1(d3c258ea286be18dc667df6a7138280462db661b) ) ROM_LOAD( "clbwzp1",                 0x8000, 0x8000, CRC(c61dd4eb) SHA1(e1756f8841dabe1bc002aadba6b224a558096a96) ) sc1_clbw_sound ROM_END
+ROM_START( sc1clbwa ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "club wise 95717551b.bin", 0x0000, 0x8000, CRC(0528a718) SHA1(27f4225c948d93ce1c833679f97e045f3b7a6aac) ) ROM_LOAD( "club wise 95717550a.bin", 0x8000, 0x8000, CRC(5b305f11) SHA1(592ea71fcb72eaa90fd421e3bd3761cfd686b019) ) sc1_clbw_sound ROM_END
+
+// PROJECT NUMBER 5731  V1 5/10/20p PLAY - 21-NOV-1990 12:00:09
+GAME( 198?, sc1clbwa		, sc1clbw	, scorpion1			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club Wise (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-265
+// PROJECT NUMBER 5731  V1 5/10/20p PLAY - 1-JUN-1990 12:03:09
+GAME( 198?, sc1clbw			, 0			, scorpion1			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club Wise (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS ) // GAME No PR5731S11.HEX
+
+
+/********************************************************************************************************************************************************************************************************************
+ Barcode
+ ********************************************************************************************************************************************************************************************************************/
+
+#define sc1barcd_sound \
+ 	ROM_REGION( 0x20000, "upd", 0 ) \
+	ROM_LOAD( "barsnd1.bin", 0x00000, 0x10000, CRC(c9de8ff4) SHA1(c3e77e84d4ecc1c779929a96d1c445a1af24865b) ) \
+	ROM_LOAD( "barsnd2.bin", 0x10000, 0x10000, CRC(56af984a) SHA1(aebd30f3ca767dc5fc77fb01765833ee627a5aee) ) \
+
+ROM_START( sc1barcd ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "95740352 b.bin",      0x0000, 0x8000, CRC(6dc3cfd3) SHA1(d71d433ae560ac4db345630ee7f04a7cfb7e933e) ) ROM_LOAD( "95740351 a.bin",      0x8000, 0x8000, CRC(0891350b) SHA1(ea1295768738b9b89eac19d04411220a8c9d10c7) ) sc1barcd_sound ROM_END
+ROM_START( sc1barcda )ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "barcode 5_10p b.bin", 0x0000, 0x8000, CRC(69d4d0b2) SHA1(bb73b917cf414623dcd239c5daeeccb4e0ccc2ed) ) ROM_LOAD( "barcode 5_10p a.bin", 0x8000, 0x8000, CRC(e864aba1) SHA1(b3f707b6d5f3d7236e4a5e9ed78c61a78c3e8196) ) sc1barcd_sound ROM_END
+
+// PROJECT NUMBER 5907  BARCODE 20P PAYOUT - 8-JAN-1992 15:34:28
+GAME( 198?, sc1barcd		, 0			, scorpion1_viper	, clatt		, bfm_sc1_state, lotse			, 0,       "BFM",      "Barcode (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-502
+// PROJECT NUMBER 6380  BARCODE 5P 10P PLAY- 17-FEB-1994 09:23:56
+GAME( 198?, sc1barcda		, sc1barcd	, scorpion1_viper	, clatt		, bfm_sc1_state, lotse			, 0,       "BFM",      "Barcode (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS ) //  GAME No 39-370-959
+
+/********************************************************************************************************************************************************************************************************************
+ Double Chance
+  sc1dblcha has a severe fixed bits problem, it's almost not worth keeping
+  sc1dblchb also seem like bad dumps (both halves identical) BUT they contain alpha strings for the 'Double Chance' game where the parent set doesn't
+            is it a different game or roms for some kind of extra display hardware?
+ 
+ Sound roms don't seem to get used?
+********************************************************************************************************************************************************************************************************************/
+
+#define sc1_dblch_sound \
+	ROM_REGION( 0x40000, "upd", 0 )\
+	ROM_LOAD( "doublechancesnd1.bin", 0x00000, 0x010000, CRC(bee6af3e) SHA1(334fe491a00f58a2142f65344674b26c766a7c5b) )\
+	ROM_LOAD( "doublechancesnd2.bin", 0x10000, 0x010000, CRC(bbadc876) SHA1(902e387ea9bcd833cf75a6f049b5b2822ec6dc2a) )\
+
+ROM_START( sc1dblch )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "doublechancegame2.bin", 0x0000, 0x8000,          CRC(d4f49454) SHA1(53b97f941a4abfeb3e498b4295f98e80bd182b7e) ) ROM_LOAD( "doublechancegame1.bin", 0x8000, 0x8000,          CRC(9e24e0e3) SHA1(fff1fe9219c052750709d13c06148c7926a22910) ) sc1_dblch_sound ROM_END
+ROM_START( sc1dblcha ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "95717417_dc_std.b",     0x0000, 0x8000, BAD_DUMP CRC(51e5459b) SHA1(b6ffbcff63fd3543226778c61fbe2246f40635dd) ) ROM_LOAD( "95717416_dc_std.a",     0x8000, 0x8000, BAD_DUMP CRC(949726ed) SHA1(6ecebd20387aa73b0404ab4b7342e2b39d77b37f) ) sc1_dblch_sound ROM_END
+
+// WHAT are these? they contain Double Change game strings, unlike our actual Double Chance set
+ROM_START( sc1dblchb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "95717789 10p.bin", 0x8000, 0x8000, CRC(fc338d38) SHA1(65457f2611ffa22ac35f1e7ad10c290c01b9c3ac) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "95717790 5p.bin", 0x8000, 0x8000, CRC(c82e57f9) SHA1(456ce5290db322292170412a00f0252b86743ed0) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "95717787 10p20p.bin", 0x8000, 0x8000, CRC(69ba126c) SHA1(f59aa5a632d0bc5102c206f986f86b6c7c1352fb) ) // 1ST AND 2ND HALF IDENTICAL
+ROM_END
+
+// PROJECT NUMBER 5599  DOUBLE CHANCE 20P - 6-APR-1990 11:02:09
+GAME( 198?, sc1dblch		, 0			, scorpion1_viper			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Double Chance (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-203
+// too bad to get PROJECT identification
+GAME( 198?, sc1dblcha		, sc1dblch	, scorpion1_viper			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Double Chance (Bellfruit) (set 2, bad) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1dblchb		, sc1dblch	, scorpion1_viper			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Double Chance (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS )
+
+
+/********************************************************************************************************************************************************************************************************************
+ Club 65 Special
+  2 sets of sound roms, they start off roughly the same, but end up different midway through the first rom, maybe they relate to the 2 different project codes?
+
+  Sound roms don't seem to get used?
+********************************************************************************************************************************************************************************************************************/
+
+#define sc1_cl65_sound \
+	ROM_REGION( 0x20000, "upd", 0 )\
+	ROM_LOAD( "65sndp1.bin", 0x000000, 0x010000, CRC(e532fcf5) SHA1(7de3bd4a3efae7d1cfeee23c008efbff39ce46f8) )\
+	ROM_LOAD( "65sndp2.bin", 0x010000, 0x010000, CRC(2703ea2d) SHA1(a4876a10d8d4b1de01dfab76e4ee21cb120aa783) )\
+
+#define sc1_cl65_sound_alt  \
+	ROM_REGION( 0x20000, "upd", 0 )\
+	ROM_LOAD( "club-six-five-special_snd_a.bin", 0x0000, 0x010000, CRC(915802cd) SHA1(5bca3a80199a6534e084a5cf4337da4e9c48f45c) )\
+	ROM_LOAD( "club-six-five-special_snd_b.bin", 0x0000, 0x010000, CRC(b3b230d8) SHA1(022e95f38b14922137222805c0bec7498c5956cc) )\
+	
+ROM_START( sc1cl65 )   ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "65spp2",      0x0000, 0x8000, CRC(11332a28) SHA1(76f9eee54351e0d8dc4b620ec92661538929e75d) ) ROM_LOAD( "65spp1",                                               0x8000, 0x8000, CRC(2c4cb63b) SHA1(5d09b575cf80beecd83c07286b74af29de7ec553) ) sc1_cl65_sound     ROM_END
+ROM_START( sc1cl65d )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "39370694.p2", 0x0000, 0x8000, CRC(3371dc55) SHA1(52d75a90933acc7a03821e5c2821df6126c72a6c) ) ROM_LOAD( "club-six-five-special_std_ac_rot_10po_ass.bin",        0x8000, 0x8000, CRC(cf48ba99) SHA1(5da4321ff349964e903f1bebd3e5ddd0799fc478) ) sc1_cl65_sound_alt ROM_END
+ROM_START( sc1cl65dp ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "39370694.p2", 0x0000, 0x8000, CRC(3371dc55) SHA1(52d75a90933acc7a03821e5c2821df6126c72a6c) ) ROM_LOAD( "club-six-five-special_dat_ac_rot_10po_ass.bin",        0x8000, 0x8000, CRC(77ddf81d) SHA1(522d9f84ab6e31586f371548e2f146ac193f06f5) ) sc1_cl65_sound_alt ROM_END
+ROM_START( sc1cl65c )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "39370714.p2", 0x0000, 0x8000, CRC(cb9f944f) SHA1(49955a968264f3d963317f5c772629d9bbdd33f7) ) ROM_LOAD( "club-six-five-special_std_ac_a.bin",                   0x8000, 0x8000, CRC(8bd817f8) SHA1(6ae91a29a6263c085f6254a049fb3c2ba9cac662) ) sc1_cl65_sound_alt ROM_END
+ROM_START( sc1cl65cp ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "39370714.p2", 0x0000, 0x8000, CRC(cb9f944f) SHA1(49955a968264f3d963317f5c772629d9bbdd33f7) ) ROM_LOAD( "club-six-five-special_dat_ac_200pnd_rot_20po_ass.bin", 0x8000, 0x8000, CRC(83a0253f) SHA1(a9b463e2aa87a736f88c5e71f233ff9d6a8b25b4) ) sc1_cl65_sound_alt ROM_END
+ROM_START( sc1cl65b )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "39370859.p2", 0x0000, 0x8000, CRC(f04065a0) SHA1(d63ba578931b2f4f156ca875da9cf69cf283a27c) ) ROM_LOAD( "club-six-five-special_std_ac_200pnd_rot_10po_ass.bin", 0x8000, 0x8000, CRC(eedd9fa1) SHA1(6233e8304ac94798cfb908b2ba31ec6c98808ce8) ) sc1_cl65_sound_alt ROM_END
+ROM_START( sc1cl65bp ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "39370859.p2", 0x0000, 0x8000, CRC(f04065a0) SHA1(d63ba578931b2f4f156ca875da9cf69cf283a27c) ) ROM_LOAD( "club-six-five-special_dat_ac_200pnd_rot_10po_ass.bin", 0x8000, 0x8000, CRC(836e65d8) SHA1(931e5831b0b64e7ce29fb497435d486e40dce839) ) sc1_cl65_sound_alt ROM_END
+ROM_START( sc1cl65a )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "39370858.p2", 0x0000, 0x8000, CRC(ff0e35c0) SHA1(0d3d46b541e188200cb4b9cc65eb60eac913dc2b) ) ROM_LOAD( "club-six-five-special_std_ac_200pnd_rot_20po_ass.bin", 0x8000, 0x8000, CRC(dd188272) SHA1(d6b7f7b060e632bd3eacc7f7721399a1c8349698) ) sc1_cl65_sound_alt ROM_END
+ROM_START( sc1cl65ap ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "39370858.p2", 0x0000, 0x8000, CRC(ff0e35c0) SHA1(0d3d46b541e188200cb4b9cc65eb60eac913dc2b) ) ROM_LOAD( "club-six-five-special_dat_ac_rot_20po_ass.bin",        0x8000, 0x8000, CRC(028ff7b2) SHA1(500b6f8d85678e99ae804600099fe78b542ad6a3) ) sc1_cl65_sound_alt ROM_END
+
+// PROJECT NUMBER 5732  SIX FIVE SPECIAL -  6-SEP-1990 14:55:09
+GAME( 198?, sc1cl65			, 0			, scorpion1_viper			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-240
+// PROJECT NUMBER 5732  SIX FIVE SPECIAL -  5-OCT-1992 16:23:33
+GAME( 198?, sc1cl65d		, sc1cl65	, scorpion1_viper			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-694
+GAME( 198?, sc1cl65dp		, sc1cl65	, scorpion1_viper			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 2, Protocol) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-371-694
+// PROJECT NUMBER 5732  SIX FIVE SPECIAL 20P PAYOUT - 13-OCT-1992 12:18:09
+GAME( 198?, sc1cl65c		, sc1cl65	, scorpion1_viper			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-714
+GAME( 198?, sc1cl65cp		, sc1cl65	, scorpion1_viper			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 3, Protocol) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-371-714
+// PROJECT NUMBER 6124  SIX FIVE SPECIAL 200 POUND JP - 21-APR-1993 14:43:38
+GAME( 198?, sc1cl65b		, sc1cl65	, scorpion1_viper			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 4) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-859
+GAME( 198?, sc1cl65bp		, sc1cl65	, scorpion1_viper			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 4, Protocol) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-371-859
+// PROJECT NUMBER 6124 20P PAYOUT  SIX FIVE SPECIAL #200/20P PAYOUT - 21-APR-1993 14:46:20
+GAME( 198?, sc1cl65a		, sc1cl65	, scorpion1_viper			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 5) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-858
+GAME( 198?, sc1cl65ap		, sc1cl65	, scorpion1_viper			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 5, Protocol) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-371-858 
 
 
 GAME( 1988, sc1lotus		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Lotus SE (Dutch) (set 1)", GAME_FLAGS )
 GAME( 1988, sc1lotusa		, sc1lotus	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Lotus SE (Dutch) (set 2)", GAME_FLAGS )
-GAME( 1988, sc1roul			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, rou029		, 0,       "BFM/ELAM", "Roulette (Dutch, Game Card 39-360-129?)", GAME_FLAGS )
-GAME( 1990, sc1clatt		, 0			, scorpion1			, clatt		, bfm_sc1_state, clatt			, 0,       "BFM",      "Club Attraction (UK, Game Card 39-370-196)", GAME_FLAGS )
-GAME( 1990, sc1clatta		, sc1clatt	, scorpion1			, clatt		, bfm_sc1_state, clatt			, 0,       "BFM",      "Club Attraction (set 2)", GAME_FLAGS )
-GAME( 198?, sc1actv8		, 0			, scorpion1_viper	, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM",      "Active 8 (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+GAME( 1988, sc1roul			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, rou029	       	, 0,       "BFM/ELAM", "Roulette (Dutch, Game Card 39-360-129?)", GAME_FLAGS )
+GAME( 198?, sc1actv8		, 0			, scorpion1_viper	, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Active 8 (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1armad		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Armada (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1bartk		, 0			, scorpion1_viper	, clatt		, bfm_sc1_state, lotse			, 0,       "BFM",      "Bar Trek (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1barcd		, 0			, scorpion1_viper	, clatt		, bfm_sc1_state, lotse			, 0,       "BFM",      "Barcode (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1barcda		, sc1barcd	, scorpion1_viper	, clatt		, bfm_sc1_state, lotse			, 0,       "BFM",      "Barcode (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1bigmt		, 0			, scorpion1_viper	, clatt		, bfm_sc1_state, nocrypt		, 0,       "BFM",      "The Big Match (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1calyp		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Calypso (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1carro		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt_bank0	, 0,       "BFM/ELAM", "Carrousel (Bellfruit) (Scorpion 1)", GAME_FLAGS )
@@ -3204,7 +3174,7 @@ GAME( 198?, sc1carro		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt_b
 GAME( 198?, sc1cshcd		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Cash Card (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1cshcda		, sc1cshcd	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",	   "Cash Card (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1cshcdb		, sc1cshcd	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Card (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1ccoin		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Coin (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1ccoin		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Cash Coin (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1cexpd		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Cash Explosion (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1cexpl		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Explosion (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1cexpla		, sc1cexpl	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Explosion (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
@@ -3222,14 +3192,6 @@ GAME( 198?, sc1cwcl			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			,
 GAME( 198?, sc1clown		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Clown Around (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1cl2k			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Club 2000 (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1cl2k1		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Club 2001 (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1cl65			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1cl65a		, sc1cl65	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1cl65ap		, sc1cl65	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 2, Protocol) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1cl65b		, sc1cl65	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1cl65bp		, sc1cl65	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 3, Protocol) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1cl65c		, sc1cl65	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 4) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1cl65d		, sc1cl65	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 5) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1cl65dp		, sc1cl65	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 5, Protocol) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1clbdm		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club Diamond (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1clbxp		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club Explosion (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1clbrn		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club Runner (Bellfruit) (Scorpion 1)", GAME_FLAGS )
@@ -3237,8 +3199,6 @@ GAME( 198?, sc1clbsp		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			,
 GAME( 198?, sc1clbtm		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club Temptation (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1clbtma		, sc1clbtm	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club Temptation (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
 GAME( 199?, sc1clbtmb		, sc1clbtm	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Club Temptation (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS)
-GAME( 198?, sc1clbw			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club Wise (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1clbwa		, sc1clbw	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club Wise (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1cops			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cops 'n' Robbers (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1copsa		, sc1cops	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cops 'n' Robbers (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1copdd		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Cops 'n' Robbers Deluxe (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
@@ -3250,8 +3210,6 @@ GAME( 198?, sc1countap		, sc1count	, scorpion1			, scorpion1	, bfm_sc1_state, lo
 GAME( 198?, sc1dago			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "ELAM",     "Dagobert's Vault (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1disc			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Discovey (Bellfruit) (Dutch) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1disca		, sc1disc	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Discovey (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1dblch		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Double Chance (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1dblcha		, sc1dblch	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Double Chance (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1dream		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Dream Machine (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1final		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Final Touch (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1flash		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Flash (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
