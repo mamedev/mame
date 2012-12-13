@@ -13280,10 +13280,14 @@ sc1btclkb
 sc1calyp
 sc1carro
 sc1cdmp
-sc1cshat
+sc1cshat	// Cash Attraction
 sc1cshata
 sc1cshatb
 sc1cshatc
+sc1cshatf
+sc1cshatg
+sc1cshath
+sc1cshati
 sc1cshcd
 sc1cshcda
 sc1cshcdb
@@ -13296,6 +13300,10 @@ sc1cexpld
 sc1cshwz	// Cash Wise (Bellfruit)
 sc1cshwza
 sc1cshwzb
+sc1cshwzc
+sc1cshwzd
+sc1cshwze
+sc1cshwzf
 sc1cshin	// Cashino (Bellfruit) (Dutch)
 sc1china	// China Town Club (Bellfruit)
 sc1chinap
@@ -18400,7 +18408,6 @@ sc5mhpi		//
 sc5mhpj		//
 sc5mhpk		// 
 sc5mhpl		//
-sc5mhpm		//
 sc5mmb		// Monopoly Money Bags (Bellfruit)
 sc5mmba		//
 sc5mmbb		//

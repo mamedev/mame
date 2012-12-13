@@ -9862,19 +9862,12 @@ ROM_END
 
 ROM_START( sc5mhpk )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95418852.lo", 0x000001, 0x080000, CRC(855566d3) SHA1(95f13a71c25bb8b3f98755bd911ed4adf5df5b82) )
-	ROM_LOAD16_BYTE( "95418853.hi", 0x000000, 0x080000, CRC(afaa558c) SHA1(1b2034aab323c0ed0c3ee039630dd32d580f96df) )
-	sc_mhp_others
-ROM_END
-
-ROM_START( sc5mhpl )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95426092.lo", 0x000001, 0x080000, CRC(0595fa9b) SHA1(baa2d5ccd138673a19a501830736d3517e52fc25) )
 	ROM_LOAD16_BYTE( "95426093.hi", 0x000000, 0x080000, CRC(918194ea) SHA1(fd957592347434585dd38e39418c83da92746331) )
 	sc_mhp_others
 ROM_END
 
-ROM_START( sc5mhpm )
+ROM_START( sc5mhpl )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95427092.lo", 0x000001, 0x080000, CRC(a1a3ca1d) SHA1(c62a51eb7b791473bbd8e9dff9f7ea100ba191bf) )
 	ROM_LOAD16_BYTE( "95427093.hi", 0x000000, 0x080000, CRC(22d953ab) SHA1(6c5a405c67270350ae3ff0c2ff8fed3c606e9aa1) )
@@ -14498,7 +14491,6 @@ GAME( 200?, sc5mhpi		,sc5mhp,	bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM",
 GAME( 200?, sc5mhpj		,sc5mhp,	bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 5) (set 11)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc5mhpk		,sc5mhp,	bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 5) (set 12)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc5mhpl		,sc5mhp,	bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 5) (set 13)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc5mhpm		,sc5mhp,	bfm_sc5, bfm_sc5, bfm_sc5_state, sc5, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 5) (set 14)", GAME_IS_SKELETON_MECHANICAL )
 
 
 // PR3413 AWP MONOPOLY MONEYBAGS S5         PR3413 MONEYBAGS SOUNDS11         MONEYBAGS S.SITE
