@@ -38,6 +38,7 @@
 	floppy issues TODO (certain fail)
 	- 46 Okunen Monogatari - The Shinkaron
 	- AD&D Champions of Krynn
+	- AI Shougi (asserts upon loading)
 	- Aoki Ookami no Shiroki Mejika - Gengis Khan
 	- Bokosuka Wars
 	- Dokkin Minako Sensei (2dd image)
@@ -1256,10 +1257,6 @@ READ8_MEMBER(pc9801_state::pc9801_a0_r)
 				pcg_offset|= m_font_line;
 				pcg_offset|= m_font_lr;
 
-				/* TODO: Brandish 2 accesses a 0008a561 kanji address, obviously causing a crash. */
-//				if(pcg_offset >= 0x80000)
-//					return 0;
-
 				return m_kanji_rom[pcg_offset];
 			}
 		}
@@ -1314,10 +1311,10 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 		switch((offset & 0xe) + 1)
 		{
 			case 0x01:
-				m_font_addr = (data & 0xff) | (m_font_addr & 0xff00);
+				m_font_addr = (data & 0xff) | (m_font_addr & 0x7f00);
 				return;
 			case 0x03:
-				m_font_addr = (data << 8) | (m_font_addr & 0xff);
+				m_font_addr = ((data & 0x7f) << 8) | (m_font_addr & 0xff);
 				return;
 			case 0x05:
 				//printf("%02x\n",data);
