@@ -17,6 +17,7 @@
 	- some later SWs put "Invalid command byte 05" (Absolutely Mahjong on Epson logo)
 	- Basic games are mostly untested, but I think that upd7220 fails on those (Adventureland, Xevious)
     - investigate on POR bit
+	- PC-9801RS+ should support uPD4990 RTC
 
     TODO (PC-9801RS):
     - extra features;
@@ -37,7 +38,7 @@
     - Presumably one ROM is undumped?
 
 	floppy issues TODO (certain fail)
-	- Unsupported disk types: *.dsk, *.nfd, *.fdd
+	- Unsupported disk types: *.dsk, *.nfd, *.fdd, *.nhd
 	- 46 Okunen Monogatari - The Shinkaron
 	- AD&D Champions of Krynn
 	- AI Shougi (asserts upon loading)
@@ -45,6 +46,7 @@
 	- Arcshu
 	- Arcus 2
 	- Art Jigsaw
+	- Atlantia (disk swap?)
 	- Bokosuka Wars
 	- Dokkin Minako Sensei (2dd image)
 	- Jangou 2: floppy fails to load after the title screen;
@@ -58,7 +60,7 @@
 	- Agumix Selects!: needs GDC = 5 MHz, interlace doesn't work properly;
 	- Aki no Tsukasa no Fushigi no Kabe: moans with a kanji error
 	   "can't use (this) on a vanilla PC-9801, a PC-9801E nor a PC-9801U. Please turn off the computer and turn it on again."
-	- Alice no Yakata: wants a "DSW 1-8" on.
+	- Alice no Yakata: doesn't set bitmap interlace properly, can't do disk swaps via the File Manager;
 	- Animahjong V3: accesses port 0x88;
 	- Anniversary - Memories of Summer: thinks that a button is pressed;
 	- Another Genesis: fails loading;
@@ -68,6 +70,7 @@
 	- Armored Flagship Atragon: needs HDD install
 	- Arquephos: needs extra sound board(s)?
 	- Asoko no Koufuku: black screen with BGM, waits at 0x225f6;
+	- Aura Battler Dumbine: upd7220: unimplemented FIGD, has layer clearance bugs on gameplay;
 
 	- Dragon Buster: slight issue with window masking;
 	- Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)
@@ -1490,7 +1493,6 @@ READ8_MEMBER(pc9801_state::pc9801_tvram_r)
 
 WRITE8_MEMBER(pc9801_state::pc9801_tvram_w)
 {
-
 	if(offset < (0x3fe2) || m_video_ff[MEMSW_REG])
 		m_tvram[offset] = data;
 
@@ -2897,6 +2899,11 @@ static INPUT_PORTS_START( pc9801rs )
 	PORT_DIPSETTING(    0x04, "V30" )
 	PORT_DIPSETTING(    0x00, "I386" )
 
+	PORT_MODIFY("DSW5")
+	PORT_DIPNAME( 0x08, 0x00, "Graphic Function" ) // DSW 1-8
+	PORT_DIPSETTING(      0x08, "Basic (8 Colors)" )
+	PORT_DIPSETTING(      0x00, "Expanded (16/4096 Colors)"  )
+
 	PORT_MODIFY("ROM_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -3203,6 +3210,7 @@ static I8255A_INTERFACE( ppi_system_intf )
 	DEVCB_DRIVER_MEMBER(pc9801_state,ppi_sys_portc_w)					/* Port C write */
 };
 
+/* TODO: check this one */
 static I8255A_INTERFACE( ppi_printer_intf )
 {
 	DEVCB_NULL,					/* Port A read */
