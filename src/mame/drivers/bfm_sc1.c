@@ -2007,32 +2007,6 @@ ROM_START( sc1str4a )
 	ROM_LOAD( "strike4.bin", 0x8000, 0x8000, CRC(1abcfb49) SHA1(f13891a38e260a72ffe841862ed73532c94f6c44) )
 ROM_END
 
-ROM_START( sc1sir )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "s.i.rich 2p 2.40 p2 9.3.90 1a96.bin", 0x0000, 0x8000, CRC(618841ca) SHA1(2e690ca91da0a1ff36245a6f1e2ad681a6ed4f32) )
-	ROM_LOAD( "s.i.rich 2p 2.40 p1 9.3.90 0b49.bin", 0x8000, 0x8000, CRC(c54703f8) SHA1(9ac3af9021cf5012562b0ab057a30e11e01eef65) )
-
-	ROM_REGION( 0x40000, "altrevs", 0 )
-	ROM_LOAD( "rich2_1.rom", 0x0000, 0x008000, CRC(ee75ebcb) SHA1(968b8a0bff9779681b16456f9399b0d122b1796c) )
-ROM_END
-
-ROM_START( sc1sira )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "95717078 proto.bin", 0x0000, 0x8000, CRC(7a83b794) SHA1(8befa43c7afa37a296b309730d5cdfd32dfc363d) )
-	ROM_LOAD( "95717077 proto.bin", 0x8000, 0x8000, CRC(38691d92) SHA1(17f33f74d221ac37249a04846670a1a1c0ee618e) )
-ROM_END
-
-ROM_START( sc1sirb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "s.i.rich 5p 2.40 p2 9.3.90.bin", 0x0000, 0x8000, CRC(cd3df765) SHA1(798d051afbba5a474b1b619621e4425f5ff7f8db) )
-	ROM_LOAD( "s.i.rich 5p 2.40 p1 9.3.90.bin", 0x8000, 0x8000, CRC(6a37f38d) SHA1(1e7640446ecb6e00d57a92ab3592c389a172f257) )
-ROM_END
-
-ROM_START( sc1sirc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "strike it rich a.bin", 0x0000, 0x008000, CRC(92ddbbca) SHA1(d888e663d0965d99dbfa68e3aed995e31411f2ba) )//right way round?
-	ROM_LOAD( "strike it rich b.bin", 0x8000, 0x008000, CRC(bdafc4c9) SHA1(5ffc46088818f0e89eb840e039296945905ca4f3) )
-ROM_END
 
 
 ROM_START( sc1sups )
@@ -3124,6 +3098,36 @@ GAME( 198?, sc1countap		, sc1count	, scorpion1_viper			, clatt	, bfm_sc1_state, 
 GAME( 198?, sc1count		, 0			, scorpion1_viper			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Count Cash Club (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-855
 GAME( 198?, sc1countp		, sc1count	, scorpion1_viper			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Count Cash Club (Bellfruit) (set 2, Protocol) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-371-855
 
+/********************************************************************************************************************************************************************************************************************
+ Strike It Rich
+********************************************************************************************************************************************************************************************************************/
+
+
+ROM_START( sc1sir )	 ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "s.i.rich 2p 2.40 p2 9.3.90 1a96.bin", 0x0000, 0x8000, CRC(618841ca) SHA1(2e690ca91da0a1ff36245a6f1e2ad681a6ed4f32) ) ROM_LOAD( "s.i.rich 2p 2.40 p1 9.3.90 0b49.bin", 0x8000, 0x8000, CRC(c54703f8) SHA1(9ac3af9021cf5012562b0ab057a30e11e01eef65) ) ROM_END
+ROM_START( sc1sirb ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "s.i.rich 5p 2.40 p2 9.3.90.bin",      0x0000, 0x8000, CRC(cd3df765) SHA1(798d051afbba5a474b1b619621e4425f5ff7f8db) ) ROM_LOAD( "s.i.rich 5p 2.40 p1 9.3.90.bin",      0x8000, 0x8000, CRC(6a37f38d) SHA1(1e7640446ecb6e00d57a92ab3592c389a172f257) ) ROM_END
+
+/* these are both bad dumps, similar to each other, but not to the sets we support */
+
+ROM_START( sc1sira )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "95717078 proto.bin", 0x0000, 0x8000, BAD_DUMP CRC(7a83b794) SHA1(8befa43c7afa37a296b309730d5cdfd32dfc363d) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "95717077 proto.bin", 0x8000, 0x8000, BAD_DUMP CRC(38691d92) SHA1(17f33f74d221ac37249a04846670a1a1c0ee618e) ) // 1ST AND 2ND HALF IDENTICAL
+ROM_END
+
+ROM_START( sc1sirc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "strike it rich a.bin", 0x0000, 0x8000, BAD_DUMP CRC(92ddbbca) SHA1(d888e663d0965d99dbfa68e3aed995e31411f2ba) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "strike it rich b.bin", 0x8000, 0x8000, BAD_DUMP CRC(bdafc4c9) SHA1(5ffc46088818f0e89eb840e039296945905ca4f3) ) // 1ST AND 2ND HALF IDENTICAL
+ROM_END
+
+// PROJECT NUMBER 5773  STRIKE IT RICH - 2P - 7-MAR-1990 15:24:32
+GAME( 198?, sc1sir			, 0			, scorpion1			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Strike It Rich (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-180
+// PROJECT NUMBER 5773  STRIKE IT RICH - 5P - 9-MAR-1990 10:48:23
+GAME( 198?, sc1sirb			, sc1sir	, scorpion1			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Strike It Rich (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS ) //  GAME No 39-370-184
+// 2nd half with the ident strings is missing
+GAME( 198?, sc1sira			, sc1sir	, scorpion1			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Strike It Rich (Bellfruit) (set 3, bad) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1sirc			, sc1sir	, scorpion1			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Strike It Rich (Bellfruit) (set 4, bad) (Scorpion 1)", GAME_FLAGS )
+
 
 
 
@@ -3205,10 +3209,6 @@ GAME( 198?, sc1spit			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			,
 GAME( 198?, sc1ster			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Sterling (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1str4			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Strike 4 (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1str4a		, sc1str4	, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Strike 4 (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1sir			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Strike It Rich (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1sira			, sc1sir	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Strike It Rich (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1sirb			, sc1sir	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Strike It Rich (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1sirc			, sc1sir	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Strike It Rich (Bellfruit) (set 4) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1sups			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Superstar (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1torn			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Tornado (Bellfruit) (Dutch) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1torna		, sc1torn	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Tornado (Bellfruit) (Dutch) (set 2) (Scorpion 1)", GAME_FLAGS )
