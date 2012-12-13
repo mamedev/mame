@@ -413,7 +413,7 @@ inline void upd7220_device::recompute_parameters()
 	visarea.max_y = m_al - 1;//vert_pix_total - m_vfp - 1;
 
 
-	if (1)
+	if (LOG)
 	{
 		printf("uPD7220 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 		printf("Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);

@@ -40,6 +40,7 @@
 	- AD&D Champions of Krynn
 	- AI Shougi (asserts upon loading)
 	- Aoki Ookami no Shiroki Mejika - Gengis Khan
+	- Arcshu
 	- Bokosuka Wars
 	- Dokkin Minako Sensei (2dd image)
 	- Jangou 2: floppy fails to load after the title screen;
@@ -58,7 +59,7 @@
 	- Anniversary - Memories of Summer: thinks that a button is pressed;
 	- Another Genesis: fails loading;
 	- Apple Club 1: how to pass an hand?
-	(Applesauce Pirates)
+	- Arctic: keyboard doesn't work?
 
 	- Dragon Buster: slight issue with window masking;
 	- Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)

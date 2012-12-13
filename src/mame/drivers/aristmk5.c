@@ -420,13 +420,20 @@ static const i2cmem_interface i2cmem_interface =
 };
 #endif
 
+/* TODO: this isn't supposed to access a keyboard ... */
+static AAKART_INTERFACE( kart_interface )
+{
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
 	MCFG_CPU_ADD("maincpu", ARM, 12000000)
 	MCFG_CPU_PROGRAM_MAP(aristmk5_drame_map)
     MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))	/* 1.6 - 2 seconds */
 
 //  MCFG_I2CMEM_ADD("i2cmem",i2cmem_interface)
-//	MCFG_AAKART_ADD("kart", 12000000) // TODO: frequency
+	MCFG_AAKART_ADD("kart", 12000000/128, kart_interface) // TODO: frequency
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
