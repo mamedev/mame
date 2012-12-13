@@ -648,6 +648,13 @@ ROM_START( b85koca )
 ROM_END
 
 
+ROM_START( b85disc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ds2.bin", 0x0000, 0x008000, CRC(fa549c55) SHA1(93a31e4f847dcd326760d17753c994f6210fb6ed) )
+	ROM_LOAD( "ds1.bin", 0x8000, 0x008000, CRC(22f6ce92) SHA1(5db8f54bc83e963687ebe2f13769e3f2f678d356) )
+ROM_END
+
+
 DRIVER_INIT_MEMBER(bfmsys85_state,decode)
 {
 	bfm_decode_mainrom(machine(),"maincpu", m_codec_data);
@@ -683,3 +690,6 @@ GAME( 1988, b85sngam	, 0			, bfmsys85, bfmsys85, bfmsys85_state,		decode	,	  0, 
 GAME( 199?, b85cops		, 0			, bfmsys85, bfmsys85, driver_device,       0		,	  0,	   "BFM",   "Cops 'n' Robbers (Bellfruit) (Dutch) (System 85)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 199?, b85koc		, 0			, bfmsys85, bfmsys85, bfmsys85_state,		decode	,	  0,	   "BFM",   "King of Clubs (Bellfruit) (System 85, set 1)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
 GAME( 199?, b85koca		, b85koc	, bfmsys85, bfmsys85, bfmsys85_state,		decode	,	  0,	   "BFM",   "King of Clubs (Bellfruit) (System 85, set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
+
+// PROJECT NUMBER 5596  DISCOVERY 85 - 06-APR-1990 08:57:39
+GAME( 198?, b85disc		, 0	        , bfmsys85			, bfmsys85	, bfmsys85_state, decode			, 0,       "BFM/ELAM", "Discovey (Bellfruit) (System 85)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL ) // GAME No 39-350-251

@@ -1613,11 +1613,6 @@ ROM_START( sc1disc )
 	ROM_LOAD( "disc-88.a", 0x8000, 0x008000, CRC(1ac052d0) SHA1(a37cc2896fb884af7e922289d7fda1e7d26fc387) )
 ROM_END
 
-ROM_START( sc1disca )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ds2.bin", 0x0000, 0x008000, CRC(fa549c55) SHA1(93a31e4f847dcd326760d17753c994f6210fb6ed) )
-	ROM_LOAD( "ds1.bin", 0x8000, 0x008000, CRC(22f6ce92) SHA1(5db8f54bc83e963687ebe2f13769e3f2f678d356) )
-ROM_END
 
 
 
@@ -3186,7 +3181,6 @@ GAME( 198?, sc1copdd		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			,
 
 
 GAME( 198?, sc1disc			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Discovey (Bellfruit) (Dutch) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1disca		, sc1disc	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Discovey (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1dream		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Dream Machine (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1final		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Final Touch (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1flash		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Flash (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )

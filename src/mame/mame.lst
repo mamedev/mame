@@ -13264,6 +13264,7 @@ b85sngam
 b85cops		// Cops 'n' Robbers (Bellfruit) [Dutch]
 b85koc
 b85koca
+b85disc
 
 // Scorpion 1 games
 
@@ -13346,7 +13347,6 @@ sc1counta
 sc1countap
 sc1dago		// Dagobert's Vault (Bellfruit)
 sc1disc		// Discovey (Bellfruit)
-sc1disca
 sc1dblch	// Double Chance (Bellfruit)
 sc1dblcha
 sc1dblchb
