@@ -17,7 +17,7 @@
 #include "machine/wd_fdc.h"
 #include "machine/ram.h"
 #include "includes/b2m.h"
-
+#include "formats/smx_dsk.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(b2m_mem, AS_PROGRAM, 8, b2m_state )
@@ -170,19 +170,13 @@ static INPUT_PORTS_START( b2m )
 	PORT_CONFSETTING(	0x01, "Color")
 	PORT_CONFSETTING(	0x00, "B/W")
 INPUT_PORTS_END
-/*
-static LEGACY_FLOPPY_OPTIONS_START(b2m)
-    LEGACY_FLOPPY_OPTION(b2m, "cpm", "Bashkiria-2M disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-        HEADS([2])
-        TRACKS([80])
-        SECTORS([5])
-        SECTOR_LENGTH([1024])
-        FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
-*/
+
+FLOPPY_FORMATS_MEMBER( b2m_state::b2m_floppy_formats )
+	FLOPPY_SMX_FORMAT
+FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( b2m_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
 
@@ -226,8 +220,8 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
 
-	MCFG_FLOPPY_DRIVE_ADD("fd0", b2m_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", b2m_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", b2m_floppies, "525qd", 0, b2m_state::b2m_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", b2m_floppies, "525qd", 0, b2m_state::b2m_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

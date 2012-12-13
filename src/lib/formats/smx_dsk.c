@@ -58,7 +58,7 @@ const char *smx_format::description() const
 
 const char *smx_format::extensions() const
 {
-	return "odi";
+	return "odi,cpm";
 }
 
 // Unverified gap sizes
