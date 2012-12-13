@@ -37,6 +37,7 @@
     - Presumably one ROM is undumped?
 
 	floppy issues TODO (certain fail)
+	- Unsupported disk types: *.dsk, *.nfd, *.fdd
 	- 46 Okunen Monogatari - The Shinkaron
 	- AD&D Champions of Krynn
 	- AI Shougi (asserts upon loading)
@@ -66,6 +67,7 @@
 	- Arcus 3: moans with a JP message "not enough memory (needs 640kb to start)";
 	- Armored Flagship Atragon: needs HDD install
 	- Arquephos: needs extra sound board(s)?
+	- Asoko no Koufuku: black screen with BGM, waits at 0x225f6;
 
 	- Dragon Buster: slight issue with window masking;
 	- Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)
@@ -342,6 +344,7 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	UINT8 *m_ipl_rom;
+	UINT8 *m_sound_bios;
 	UINT8 *m_work_ram;
 	UINT8 *m_ext_work_ram;
 	UINT8 *m_char_rom;
@@ -454,6 +457,7 @@ public:
 	DECLARE_READ8_MEMBER(pc9801rs_30_r);
 	DECLARE_READ8_MEMBER(pc9801rs_memory_r);
 	DECLARE_WRITE8_MEMBER(pc9801rs_memory_w);
+	DECLARE_READ8_MEMBER(m_pc9801rs_soundrom_r);
 	DECLARE_READ8_MEMBER(pc9810rs_fdc_ctrl_r);
 	DECLARE_WRITE8_MEMBER(pc9810rs_fdc_ctrl_w);
 	DECLARE_READ8_MEMBER(pc9801rs_2hd_r);
@@ -1803,6 +1807,11 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_70_w)
 	pc9801_70_w(space,offset,data);
 }
 
+READ8_MEMBER(pc9801_state::m_pc9801rs_soundrom_r)
+{
+	return m_sound_bios[offset];
+}
+
 READ8_MEMBER(pc9801_state::pc9801rs_memory_r)
 {
 	if(m_gate_a20 == 0)
@@ -1814,6 +1823,7 @@ READ8_MEMBER(pc9801_state::pc9801rs_memory_r)
 	else if(offset >= 0x000a8000 && offset <= 0x000affff)                   { return m_pc9801rs_grcg_r(offset & 0x7fff,1);        }
 	else if(offset >= 0x000b0000 && offset <= 0x000b7fff)                   { return m_pc9801rs_grcg_r(offset & 0x7fff,2);        }
 	else if(offset >= 0x000b8000 && offset <= 0x000bffff)                   { return m_pc9801rs_grcg_r(offset & 0x7fff,3);        }
+	else if(offset >= 0x000cc000 && offset <= 0x000cffff)					{ return m_pc9801rs_soundrom_r(space,offset & 0x3fff);}
 	else if(offset >= 0x000e0000 && offset <= 0x000e7fff)                   { return m_pc9801rs_grcg_r(offset & 0x7fff,0);        }
 	else if(offset >= 0x000e0000 && offset <= 0x000fffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
 	else if(offset >= 0x00100000 && offset <= 0x00100000+m_ram_size-1)		{ return pc9801rs_ex_wram_r(space,offset-0x00100000); }
@@ -3399,6 +3409,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 	m_rtc->oe_w(0); // TODO: unknown connection, MS-DOS 6.2x wants this low somehow with the test mode
 
 	m_ipl_rom = memregion("ipl")->base();
+	m_sound_bios = memregion("sound_bios")->base();
 }
 
 MACHINE_START_MEMBER(pc9801_state,pc9801f)
@@ -3907,7 +3918,7 @@ ROM_START( pc9801ux )
 	ROM_LOAD( "itf_ux.rom",  0x18000, 0x08000, CRC(c7942563) SHA1(61bb210d64c7264be939b11df1e9cd14ffeee3c9) )
     ROM_LOAD( "bios_ux.rom", 0x28000, 0x18000, BAD_DUMP CRC(97375ca2) SHA1(bfe458f671d90692104d0640730972ca8dc0a100) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "sound_bios", 0 )
     ROM_LOAD( "sound_ux.rom", 0x0000, 0x4000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
@@ -3926,7 +3937,7 @@ ROM_START( pc9801rx )
 	ROM_LOAD( "itf_rs.rom",  0x18000, 0x08000, BAD_DUMP CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
     ROM_LOAD( "bios_rx.rom", 0x28000, 0x018000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "sound_bios", 0 )
     ROM_LOAD( "sound_rx.rom",    0x000000, 0x004000, CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
@@ -3958,7 +3969,7 @@ ROM_START( pc9801rs )
 	ROM_LOAD( "f0000.rom", 0xf0000, 0x8000, CRC(4da85a6c) SHA1(18dccfaf6329387c0c64cc4c91b32c25cde8bd5a) )
 	ROM_LOAD( "f8000.rom", 0xf8000, 0x8000, CRC(2b1e45b1) SHA1(1fec35f17d96b2e2359e3c71670575ad9ff5007e) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
@@ -3979,7 +3990,7 @@ ROM_START( pc9801vm )
 	ROM_LOAD( "itf_rs.rom",  0x18000, 0x08000, CRC(c1815325) SHA1(a2fb11c000ed7c976520622cfb7940ed6ddc904e) )
     ROM_LOAD( "bios_vm.rom", 0x28000, 0x018000, CRC(2e2d7cee) SHA1(159549f845dc70bf61955f9469d2281a0131b47f) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "sound_bios", 0 )
     ROM_LOAD( "sound_vm.rom",    0x000000, 0x004000, CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
@@ -4003,7 +4014,7 @@ ROM_START( pc9821 )
 	LOAD_IDE_ROM
 	LOAD_UNK_ROM
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
@@ -4025,7 +4036,7 @@ ROM_START( pc9821as )
 	LOAD_IDE_ROM
 	LOAD_UNK_ROM
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "sound_bios", 0 )
     ROM_LOAD( "sound_as.rom",    0x000000, 0x004000, CRC(fe9f57f2) SHA1(d5dbc4fea3b8367024d363f5351baecd6adcd8ef) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
@@ -4048,7 +4059,7 @@ ROM_START( pc9821ne )
 	LOAD_IDE_ROM
 	LOAD_UNK_ROM
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound_ne.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
@@ -4070,7 +4081,7 @@ ROM_START( pc486mu )
 	LOAD_IDE_ROM
 	LOAD_UNK_ROM
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound_486mu.rom", 0x0000, 0x4000, CRC(6cdfa793) SHA1(4b8250f9b9db66548b79f961d61010558d6d6e1c))
 
 	ROM_REGION( 0x80000, "chargen", 0 )
@@ -4092,7 +4103,7 @@ ROM_START( pc9821ce2 )
 	LOAD_IDE_ROM
 	LOAD_UNK_ROM
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "sound_bios", 0 )
     ROM_LOAD( "sound_ce2.rom",    0x000000, 0x004000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
@@ -4137,7 +4148,7 @@ ROM_START( pc9821v13 )
 	LOAD_IDE_ROM
 	LOAD_UNK_ROM
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "sound_bios", 0 )
 	ROM_LOAD( "sound_v13.rom", 0x0000, 0x4000, CRC(a21ef796) SHA1(34137c287c39c44300b04ee97c1e6459bb826b60) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
@@ -4159,7 +4170,7 @@ ROM_START( pc9821v20 )
 	LOAD_IDE_ROM
 	LOAD_UNK_ROM
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_REGION( 0x10000, "sound_bios", 0 )
     ROM_LOAD( "sound_v20.rom",    0x000000, 0x004000, CRC(80eabfde) SHA1(e09c54152c8093e1724842c711aed6417169db23) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
