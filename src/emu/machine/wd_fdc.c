@@ -361,7 +361,7 @@ bool wd_fdc_t::sector_matches() const
 
 	if(cur_live.idbuf[0] != track || cur_live.idbuf[2] != sector)
 		return false;
-	if(!side_compare || (command & 2))
+	if(!side_compare || ((command & 2)==0))
 		return true;
 	if(command & 8)
 		return cur_live.idbuf[1] & 1;
