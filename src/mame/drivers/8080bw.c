@@ -3812,6 +3812,30 @@ ROM_START( schaser )
 	ROM_LOAD( "rt06.ic2",     0x0000, 0x0400, CRC(950cf973) SHA1(d22df09b325835a0057ccd0d54f827b374254ac6) )
 ROM_END
 
+ROM_START( schasera )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rt13.bin",     0x0000, 0x0800, CRC(7b0bfeed) SHA1(832fe90430653d03cd0e7ea1b046524a2ca292ea) )
+	ROM_LOAD( "rt15.bin",     0x0800, 0x0800, CRC(825fc8ac) SHA1(176ff0f4d0cd55be30efb184bd5bef62b92d0333) )
+	ROM_LOAD( "rt17.bin",     0x1000, 0x0800, CRC(de9d3f85) SHA1(13a71fdd889023cfc65ed2c0a65236884b79b1f0) )
+	ROM_LOAD( "rt19.bin",     0x1800, 0x0800, CRC(c0adab87) SHA1(4bb8e4ccfb5eaa052584555bfa03fecf19ab8a29) )
+	ROM_LOAD( "rt21.bin",     0x4000, 0x0800, CRC(a3b31070) SHA1(af0108e1446a2be66cfc00d0b837fa91ab882441) )
+
+	ROM_REGION( 0x0400, "proms", 0 )		/* background color map */
+	ROM_LOAD( "rt06.ic2",     0x0000, 0x0400, CRC(950cf973) SHA1(d22df09b325835a0057ccd0d54f827b374254ac6) )
+ROM_END
+
+ROM_START( schaserb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rt33.bin",     0x0000, 0x0800, CRC(eec6b032) SHA1(da14fcd862d6b80531cd3b858034bc5a120ed8ae) )
+	ROM_LOAD( "rt34.bin",     0x0800, 0x0800, CRC(13a73701) SHA1(48ddbc10dec458070274c9fabbb0c420e2a07c96) )
+	ROM_LOAD( "rt35.bin",     0x1000, 0x0800, CRC(de9d3f85) SHA1(13a71fdd889023cfc65ed2c0a65236884b79b1f0) )
+	ROM_LOAD( "rt36.bin",     0x1800, 0x0800, CRC(521ec25e) SHA1(ce53e882c11a4c36f3edc3b389d3f5ad0e0ec151) )
+	ROM_LOAD( "rt37.bin",     0x4000, 0x0800, CRC(44f65f19) SHA1(ee97d7987f54c9c26f5a20c72bdae04c46f94dc4) )
+
+	ROM_REGION( 0x0400, "proms", 0 )		/* background color map */
+	ROM_LOAD( "rt06.ic2",     0x0000, 0x0400, CRC(950cf973) SHA1(d22df09b325835a0057ccd0d54f827b374254ac6) )
+ROM_END
+
 ROM_START( sflush )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "fr05.sc2",     0xd800, 0x800, CRC(c4f08f9f) SHA1(997f216f5244942fc1a19f5c1988adbfadc301fc) )
@@ -4174,9 +4198,11 @@ GAME( 1979, grescue,    lrescue,  lrescue,   lrescue,   driver_device, 0, ROT270
 GAME( 1980, mlander,    lrescue,  lrescue,   lrescue,   driver_device, 0, ROT270, "bootleg (Leisure Time Electronics)", "Moon Lander (bootleg of Lunar Rescue)", GAME_SUPPORTS_SAVE )
 GAME( 1978, lrescuem,   lrescue,  lrescue,   lrescue,   driver_device, 0, ROT270, "bootleg (Model Racing)", "Lunar Rescue (Model Racing bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, desterth,   lrescue,  lrescue,   lrescue,   driver_device, 0, ROT270, "bootleg", "Destination Earth (bootleg of Lunar Rescue)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAME( 1979, schaser,    0,        schaser,   schaser,   driver_device, 0, ROT270, "Taito", "Space Chaser", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
+GAME( 1979, schaser,    0,        schaser,   schaser,   driver_device, 0, ROT270, "Taito", "Space Chaser (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1979, schasera,   schaser,  schaser,   schaser,   driver_device, 0, ROT270, "Taito", "Space Chaser (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1979, schaserb,   schaser,  schaser,   schaser,   driver_device, 0, ROT270, "Taito", "Space Chaser (set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1979, schasercv,  schaser,  schasercv, schasercv, driver_device, 0, ROT270, "Taito", "Space Chaser (CV version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
-GAME( 1979, sflush,     0,        sflush,    sflush,    driver_device, 0, ROT270, "Taito", "Straight Flush",GAME_SUPPORTS_SAVE | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL)
+GAME( 1979, sflush,     0,        sflush,    sflush,    driver_device, 0, ROT270, "Taito", "Straight Flush", GAME_SUPPORTS_SAVE | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL)
 GAME( 1980, lupin3,     0,        lupin3,    lupin3,    driver_device, 0, ROT270, "Taito", "Lupin III (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, lupin3a,    lupin3,   lupin3a,   lupin3a,   driver_device, 0, ROT270, "Taito", "Lupin III (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, polaris,    0,        polaris,   polaris,   driver_device, 0, ROT270, "Taito", "Polaris (Latest version)", GAME_SUPPORTS_SAVE )
