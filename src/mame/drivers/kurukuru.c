@@ -51,13 +51,34 @@
   The game name could be translated as "Croak Croak Hop Hop"
   Kuru is the frog sound, and Pyon is the sound of jumps.
 
-  The game is playable, even when you can't see some graphics.
+  The game is playable, even when you can't hear all sounds.
 
   Coin 1 (key 5) is not working properly and could hang the system.
+  Once pressed, the game spits a message that means "Jammed Medal". 
   For now, use Coin 2 (key 6) and Service (key 8) for credits...
 
   If you pressed Coin 1 and the game is not responding anymore, press RESET
   (key 0) and the game will reset to default values.
+
+
+  In the Book Keeping, you can find the statistics...
+
+  1st screen...
+
+  - OMAKE:  Extra/Bonus.
+
+  2nd screen...
+
+  - TATE:   Vertical.
+  - YOKO:   Horizontal.
+  - NANAME: Diagonal.
+
+  ...for each character (BOTE, OUME, PYOKO, KUNIO & PP).
+
+  Also...
+
+  - AKA:    Red.
+  - KURO:   Black.
 
 
 ***************************************************************************
@@ -67,7 +88,7 @@
   - Audio CPU interrupts and connections/latches.
   - M5205 ADPCM system.
   - Hook up AY8910 output ports.
-  - Find why the use of coin 1 hangs the game.
+  - Find why the use of coin 1 always jams. Hopper?
 
 
 ***************************************************************************/
@@ -147,14 +168,15 @@ static ADDRESS_MAP_START( kurukuru_map, AS_PROGRAM, 8, kurukuru_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("nvram")
-//	AM_RANGE(0xe400, 0xefff) AM_RAM
+	AM_RANGE(0xe400, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITENOP //seems for switch cpu... or irq?
+//	AM_RANGE(0x00, 0x00) AM_WRITENOP // seems for switch cpu... or irq?
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")
+//	AM_RANGE(0x20, 0x20) AM_WRITE    // trigger the m5205 sample number.
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
 	AM_RANGE(0x90, 0x90) AM_WRITE(kurukuru_bankswitch_w)
 	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN0")
@@ -163,6 +185,17 @@ static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
 	AM_RANGE(0xc8, 0xc8) AM_READ_PORT("DSW2")
 	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 ADDRESS_MAP_END
+
+/*
+  0x00 Writes... 2nd cpu related.
+                 01 when coin 1 (jams)
+				 20 when coin 2
+				 40 when payout (jams) ...check
+
+  0x20 Writes... # sample to trigger
+                 00, 08, 03, 04, 05 for bets 1-2-3-4-5 respectively.
+                 0d while reels are running.
+*/
 
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, kurukuru_state )
@@ -189,11 +222,11 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( kurukuru )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("1st")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("2nd")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("3rd")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V) PORT_NAME("4th")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("5th")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("1st (BOTE)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("2nd (OUME)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("3rd (PYOKO)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V) PORT_NAME("4th (KUNIO)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("5th (PP)")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_N) PORT_NAME("unknown N")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_M) PORT_NAME("unknown M")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
@@ -204,9 +237,9 @@ static INPUT_PORTS_START( kurukuru )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Reset Button")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_A) PORT_NAME("Unknown 1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )   // coin 1 not incrementing and hang the game
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE (2)								// coin 1 is not incrementing the credits and jams
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_S) PORT_NAME("Unknown 2")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )											// payout write the pulses, but jams.
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x03, "Coinage A (100 Y)" )	PORT_DIPLOCATION("DSW1:1,2,3")
