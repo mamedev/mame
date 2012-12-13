@@ -235,7 +235,6 @@ TIMER_CALLBACK_MEMBER(special_state::setup_pit8253_gates)
 MACHINE_RESET_MEMBER(special_state,specimx)
 {
 	specimx_set_bank(2, 0); // Initiali load ROM disk
-	m_specimx_color = 0x70;
 	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(special_state::setup_pit8253_gates),this));
 	device_t *fdc = machine().device("wd1793");
 	wd17xx_set_pause_time(fdc,12);
