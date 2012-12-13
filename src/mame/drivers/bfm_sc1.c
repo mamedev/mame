@@ -1317,10 +1317,6 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,clatt)
 
 
 
-#define sc1_funh_sound \
-	ROM_REGION( 0x40000, "upd", 0 )\
-	ROM_LOAD( "fhsesnd1.bin", 0x0000, 0x010000, CRC(bf371dbf) SHA1(0c9bc0d0964a858fba5324080a2cf5da119bf3db) )\
-	ROM_LOAD( "fhsesnd2.bin", 0x0000, 0x010000, CRC(c51415e3) SHA1(f0e4eb5ce38faaef336a5b69e598985ea2486ceb) )\
 
 	#define sc1_pwrl_sound \
 	ROM_REGION( 0x40000, "upd", 0 )\
@@ -1688,34 +1684,8 @@ ROM_START( sc1frtln )
 ROM_END
 
 
-ROM_START( sc1funh )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "club-fun-house_std_ac_b.bin", 0x0000, 0x8000, CRC(1a838f0d) SHA1(747153e1bb9fc4fc28451e828fa2473f2e6d5e0e) )
-	ROM_LOAD( "club-fun-house_std_ac_a.bin", 0x8000, 0x8000, CRC(f81dff1b) SHA1(4c205b3901f683d3679af9d311813ad912ecb436) )
-	sc1_funh_sound
-ROM_END
 
-ROM_START( sc1funhp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "club-fun-house_dat_ac_rot_bss.bin", 0x0000, 0x008000, CRC(1a838f0d) SHA1(747153e1bb9fc4fc28451e828fa2473f2e6d5e0e) )
-	ROM_LOAD( "club-fun-house_dat_ac_rot_ass.bin", 0x8000, 0x00781f,  BAD_DUMP CRC(9a24dc71) SHA1(bb19ef26d6d46605107c8b53c6d9b4f08ed4c721) )
-	sc1_funh_sound
-ROM_END
 
-ROM_START( sc1funha )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "funhop2", 0x0000, 0x8000, CRC(2454e295) SHA1(9785d278afe05c632e1ab326d1b8fbabcc591fb6) )
-	ROM_LOAD( "funhop1", 0x8000, 0x8000, CRC(282d5651) SHA1(bd8c0985143d8fb5c8e0a2bfedea248569c8cf98) )
-
-	sc1_funh_sound
-ROM_END
-
-ROM_START( sc1funhb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "funhouse.bin", 0x00000, 0x10000, CRC(4e342025) SHA1(288125ff5e3da7249d89dfcc3cd0915f791f7d43) )
-
-	sc1_funh_sound
-ROM_END
 
 
 ROM_START( sc1gtime )
@@ -3102,7 +3072,6 @@ GAME( 198?, sc1countp		, sc1count	, scorpion1_viper			, clatt	, bfm_sc1_state, l
  Strike It Rich
 ********************************************************************************************************************************************************************************************************************/
 
-
 ROM_START( sc1sir )	 ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "s.i.rich 2p 2.40 p2 9.3.90 1a96.bin", 0x0000, 0x8000, CRC(618841ca) SHA1(2e690ca91da0a1ff36245a6f1e2ad681a6ed4f32) ) ROM_LOAD( "s.i.rich 2p 2.40 p1 9.3.90 0b49.bin", 0x8000, 0x8000, CRC(c54703f8) SHA1(9ac3af9021cf5012562b0ab057a30e11e01eef65) ) ROM_END
 ROM_START( sc1sirb ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "s.i.rich 5p 2.40 p2 9.3.90.bin",      0x0000, 0x8000, CRC(cd3df765) SHA1(798d051afbba5a474b1b619621e4425f5ff7f8db) ) ROM_LOAD( "s.i.rich 5p 2.40 p1 9.3.90.bin",      0x8000, 0x8000, CRC(6a37f38d) SHA1(1e7640446ecb6e00d57a92ab3592c389a172f257) ) ROM_END
 
@@ -3128,6 +3097,24 @@ GAME( 198?, sc1sirb			, sc1sir	, scorpion1			, clatt	, bfm_sc1_state, lotse			, 
 GAME( 198?, sc1sira			, sc1sir	, scorpion1			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Strike It Rich (Bellfruit) (set 3, bad) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1sirc			, sc1sir	, scorpion1			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Strike It Rich (Bellfruit) (set 4, bad) (Scorpion 1)", GAME_FLAGS )
 
+/********************************************************************************************************************************************************************************************************************
+ Fun House Club
+********************************************************************************************************************************************************************************************************************/
+
+#define sc1_funh_sound \
+	ROM_REGION( 0x40000, "upd", 0 )\
+	ROM_LOAD( "fhsesnd1.bin", 0x000000, 0x010000, CRC(bf371dbf) SHA1(0c9bc0d0964a858fba5324080a2cf5da119bf3db) )\
+	ROM_LOAD( "fhsesnd2.bin", 0x010000, 0x010000, CRC(c51415e3) SHA1(f0e4eb5ce38faaef336a5b69e598985ea2486ceb) )\
+
+ROM_START( sc1funh )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "club-fun-house_std_ac_b.bin"      , 0x0000, 0x8000, CRC(1a838f0d) SHA1(747153e1bb9fc4fc28451e828fa2473f2e6d5e0e) ) ROM_LOAD( "club-fun-house_std_ac_a.bin",       0x8000, 0x8000,           CRC(f81dff1b) SHA1(4c205b3901f683d3679af9d311813ad912ecb436) ) sc1_funh_sound ROM_END
+ROM_START( sc1funhp ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "club-fun-house_dat_ac_rot_bss.bin", 0x0000, 0x8000, CRC(1a838f0d) SHA1(747153e1bb9fc4fc28451e828fa2473f2e6d5e0e) ) ROM_LOAD( "club-fun-house_dat_ac_rot_ass.bin", 0x8000, 0x781f,  BAD_DUMP CRC(9a24dc71) SHA1(bb19ef26d6d46605107c8b53c6d9b4f08ed4c721) ) sc1_funh_sound ROM_END
+ROM_START( sc1funha ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "funhop2",                           0x0000, 0x8000, CRC(2454e295) SHA1(9785d278afe05c632e1ab326d1b8fbabcc591fb6) ) ROM_LOAD( "funhop1",                           0x8000, 0x8000,           CRC(282d5651) SHA1(bd8c0985143d8fb5c8e0a2bfedea248569c8cf98) ) sc1_funh_sound ROM_END
+
+// PROJECT NUMBER 5944  FUN HOUSE - 18-FEB-1992 16:16:01
+GAME( 198?, sc1funh			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Fun House Club (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-530
+GAME( 198?, sc1funhp		, sc1funh	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Fun House Club (Bellfruit) (set 1, Protocol, bad) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-371-530
+// PROJECT NUMBER 5944  FUN HOUSE - 9-OCT-1991 14:08:13
+GAME( 198?, sc1funha		, sc1funh	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Fun House Club (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-432
 
 
 
@@ -3172,10 +3159,7 @@ GAME( 198?, sc1final		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			,
 GAME( 198?, sc1flash		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Flash (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1fruit		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Fruit Lines (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1frtln		, sc1fruit	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Fruit Lines (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1funh			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Fun House Club (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1funhp		, sc1funh	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Fun House Club (Bellfruit) (set 1, Protocol) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1funha		, sc1funh	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Fun House Club (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1funhb		, sc1funh	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Fun House Club (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS )
+
 GAME( 198?, sc1gtime		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Good Times (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1tiara		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt       , 0,       "ELAM",     "Tiara (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1gprix		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Grand Prix (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )

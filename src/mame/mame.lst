@@ -13359,7 +13359,6 @@ sc1frtln	// Fruitlines (Bellfruit)
 sc1funh		// Fun House Club (Bellfruit)
 sc1funhp
 sc1funha
-sc1funhb
 sc1gtime	// Good Times (Bellfruit)
 sc1tiara	// Tiara (Elam)
 sc1gprix	// Grand Prix (Bellfruit)
@@ -26615,6 +26614,7 @@ m4milrou	// Millennium Roulette
 m4milrou__a	//
 m4kingg		// King George
 m4kingg__a	//
+m4funh		// Fun House
 
 // MPU5
 

@@ -2357,6 +2357,11 @@ ROM_START( m4sunsetc )
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( m4funh )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "funhouse.bin", 0x00000, 0x10000, CRC(4e342025) SHA1(288125ff5e3da7249d89dfcc3cd0915f791f7d43) )
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) // no idea if it uses an OKI
+ROM_END
 
 
 /* Barcrest */
@@ -2720,6 +2725,7 @@ GAME( 199?, m4goldnn	, 0			,  mod4oki		, mpu4		, mpu4_state, m4default		, 0,		 "
 
 
 
+GAME( 198?, m4funh		, 0	        , mod4oki			, mpu4	, mpu4_state, m4default			, 0,       "unknown",      "Fun House (unknown) (MPU4)", GAME_FLAGS ) // TUNE ALARM  (was in the SC1 Fun House set)
 
 
 GAME(199?, m4sunseta	,m4sunset	,mod4oki	,mpu4				, mpu4_state,m4default			,ROT0,   "Barcrest","Sunset Boulevard (Barcrest) (MPU4) (B25 1.2, set 1)",GAME_FLAGS )
