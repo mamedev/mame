@@ -15,6 +15,7 @@
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "imagedev/cassette.h"
+#include "formats/smx_dsk.h"
 #include "formats/rk_cas.h"
 #include "machine/wd_fdc.h"
 #include "machine/ram.h"
@@ -95,6 +96,7 @@ public:
 	TIMER_CALLBACK_MEMBER(special_reset);
 	TIMER_CALLBACK_MEMBER(setup_pit8253_gates);
 	void fdc_drq(bool state);	
+	DECLARE_FLOPPY_FORMATS( specimx_floppy_formats );
 };
 
 

@@ -2,17 +2,27 @@
 
     formats/smx_dsk.h
 
-    SVI318 disk images
+    Specialist MX disk images
 
 *********************************************************************/
 
-#ifndef SMX_DSK_H
-#define SMX_DSK_H
+#ifndef SMX_DSK_H_
+#define SMX_DSK_H_
 
-#include "flopimg.h"
+#include "wd177x_dsk.h"
 
-/**************************************************************************/
+class smx_format : public wd177x_format {
+public:
+	smx_format();
 
-LEGACY_FLOPPY_OPTIONS_EXTERN(specimx);
+	virtual const char *name() const;
+	virtual const char *description() const;
+	virtual const char *extensions() const;
 
-#endif /* SVI_DSK_H */
+private:
+	static const format formats[];
+};
+
+extern const floppy_format_type FLOPPY_SMX_FORMAT;
+
+#endif
