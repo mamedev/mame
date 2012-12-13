@@ -384,7 +384,7 @@ FLOPPY_FORMATS_MEMBER( special_state::specimx_floppy_formats )
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( specimx_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
 /* Machine driver */
@@ -450,8 +450,8 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 	/* Devices */
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
 
-	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525dd", 0, special_state::specimx_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525dd", 0, special_state::specimx_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525qd", 0, special_state::specimx_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525qd", 0, special_state::specimx_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -489,8 +489,8 @@ static MACHINE_CONFIG_START( erik, special_state )
 	MCFG_I8255_ADD( "ppi8255", specialist_ppi8255_interface )
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
 
-	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525dd", 0, special_state::specimx_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525dd", 0, special_state::specimx_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525qd", 0, special_state::specimx_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525qd", 0, special_state::specimx_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
