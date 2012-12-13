@@ -708,10 +708,10 @@ static INPUT_PORTS_START( hanamomo )
 
 	/* This DIPSW is fake. Type A is common, Type B is rare */
 	PORT_START("FONTTYPE")
-	PORT_CONFNAME(    0x01, 0x00, "Font Type" )
-	PORT_CONFSETTING( 0x00,       "Type-A" )
-	PORT_CONFSETTING( 0x01,       "Type-B" )
-	PORT_BIT(         0xfe,       IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x01, 0x00, "Font Type" )
+	PORT_CONFSETTING(    0x00, "Type-A" )
+	PORT_CONFSETTING(    0x01, "Type-B" )
+	PORT_BIT(            0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END

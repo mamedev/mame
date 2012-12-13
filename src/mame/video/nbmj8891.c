@@ -230,6 +230,10 @@ WRITE8_MEMBER(nbmj8891_state::nbmj8891_taiwanmb_mcu_w)
 		nbmj8891_gfxdraw(machine());
 	}
 
+//  m_blitter_direction_x = 0;                // for debug
+//  m_blitter_direction_y = 0;                // for debug
+	m_dispflag = 1;					// for debug
+
 	m_param_cnt++;
 }
 
@@ -373,9 +377,9 @@ static void nbmj8891_gfxdraw(running_machine &machine)
 			color = GFX[gfxaddr++];
 
 			// for hanamomo font type
-			if ((state->ioport("FONTTYPE")->read()) == 0)
+			if (nb1413m3_type == NB1413M3_HANAMOMO)
 			{
-				if (nb1413m3_type == NB1413M3_HANAMOMO)
+				if ((state->ioport("FONTTYPE")->read()) == 0x00)
 				{
 					if ((gfxaddr >= 0x20000) && (gfxaddr < 0x28000))
 					{
