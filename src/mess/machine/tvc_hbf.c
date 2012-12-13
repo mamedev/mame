@@ -21,7 +21,7 @@ static SLOT_INTERFACE_START( tvc_hbf_floppies )
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_FRAGMENT(tvc_hbf)
-	MCFG_FD1793x_ADD("fdc", XTAL_16MHz / 16 * 8)		// real clock is 16MHz / 16
+	MCFG_FD1793x_ADD("fdc", XTAL_16MHz / 16)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", tvc_hbf_floppies, "525qd", NULL, tvc_hbf_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", tvc_hbf_floppies, "525qd", NULL, tvc_hbf_device::floppy_formats)
 MACHINE_CONFIG_END
