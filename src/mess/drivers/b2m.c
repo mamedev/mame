@@ -38,7 +38,7 @@ static ADDRESS_MAP_START( b2m_io, AS_IO, 8, b2m_state )
 	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE_LEGACY("pic8259", pic8259_r, pic8259_w )
 	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
 	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("wd1793", wd1773_t, read, write)
+	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("fd1793", fd1793_t, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( b2m_rom_io, AS_IO, 8, b2m_state )
@@ -224,7 +224,7 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 	/* uart */
 	MCFG_I8251_ADD("uart", default_i8251_interface)
 
-	MCFG_WD1773x_ADD("wd1793", XTAL_8MHz )
+	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
 
 	MCFG_FLOPPY_DRIVE_ADD("fd0", b2m_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", b2m_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
