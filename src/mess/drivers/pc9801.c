@@ -47,6 +47,8 @@
 	- Arcus 2
 	- Art Jigsaw
 	- Atlantia (disk swap?)
+	- Azusa 108 Jimusho
+	- Bacta 2
 	- Bokosuka Wars
 	- Dokkin Minako Sensei (2dd image)
 	- Jangou 2: floppy fails to load after the title screen;
@@ -71,6 +73,7 @@
 	- Arquephos: needs extra sound board(s)?
 	- Asoko no Koufuku: black screen with BGM, waits at 0x225f6;
 	- Aura Battler Dumbine: upd7220: unimplemented FIGD, has layer clearance bugs on gameplay;
+	- Bakasuka Wars: drawing seems busted (either mouse or upd7220)
 
 	- Dragon Buster: slight issue with window masking;
 	- Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)
@@ -2890,12 +2893,12 @@ static INPUT_PORTS_START( pc9801rs )
 	PORT_INCLUDE( pc9801 )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x80, 0x80, "GDC clock" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "GDC clock" ) PORT_DIPLOCATION("SW1:8") // DSW 2-8
 	PORT_DIPSETTING(    0x80, "2.5 MHz" )
 	PORT_DIPSETTING(    0x00, "5 MHz" )
 
 	PORT_MODIFY("DSW4")
-	PORT_DIPNAME( 0x04, 0x00, "CPU Type" ) PORT_DIPLOCATION("SW4:8")
+	PORT_DIPNAME( 0x04, 0x00, "CPU Type" ) PORT_DIPLOCATION("SW4:8") // DSW 3-8
 	PORT_DIPSETTING(    0x04, "V30" )
 	PORT_DIPSETTING(    0x00, "I386" )
 
