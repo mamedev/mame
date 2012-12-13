@@ -1318,9 +1318,14 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,clatt)
 
 
 
-	#define sc1_pwrl_sound \
-	ROM_REGION( 0x40000, "upd", 0 )\
+#define sc1_pwrl_sound \
+	ROM_REGION( 0x40000, "upd", 0 ) \
 	ROM_LOAD( "powl_snd.bin", 0x00000, 0x40000, CRC(e87af436) SHA1(fc853eca052fe13babde5f4579e202321ecb8f7e) )\
+	ROM_REGION( 0x40000, "altupd", 0 ) \
+	ROM_LOAD( "95000013.bin", 0x00000, 0x8000, CRC(80573db9) SHA1(34e028d1d01328719f6260aafb58f40d664ab7ea) ) \
+	ROM_LOAD( "95000014.bin", 0x08000, 0x8000, CRC(cad7c87b) SHA1(052324bbad28b67d23a018d61a03783dd4dfd9cf) ) \
+	ROM_LOAD( "95000015.bin", 0x10000, 0x8000, CRC(c46911ca) SHA1(a270d0708574a549b88f13f9cde1d7dcdfc624a9) ) \
+
 
 #define sc1_winst_sound \
 	ROM_REGION( 0x80000, "upd", 0 )\
@@ -1817,19 +1822,10 @@ ROM_START( sc1pwrl )
 	ROM_LOAD( "powlineb.bin", 0x0000, 0x8000, CRC(9d13e39e) SHA1(2df1f402fb49aacc3fc1fecdf536ea1dcee5521f) )
 	ROM_LOAD( "powlinea.bin", 0x8000, 0x8000, CRC(6d03d6ce) SHA1(4a932b87e44e37fed44ff80da542228f2d4b9876) )
 
-	ROM_REGION( 0x40000, "altrevs", 0 ) // check with set below, this is either an alternate (datapak) rom or we're missing one
-	ROM_LOAD( "95000013.bin", 0x0000, 0x008000, CRC(80573db9) SHA1(34e028d1d01328719f6260aafb58f40d664ab7ea) )
-
 	sc1_pwrl_sound
 ROM_END
 
-ROM_START( sc1pwrla ) // or something else?
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "95000015.bin", 0x0000, 0x008000, CRC(c46911ca) SHA1(a270d0708574a549b88f13f9cde1d7dcdfc624a9) )
-	ROM_LOAD( "95000014.bin", 0x0000, 0x008000, CRC(cad7c87b) SHA1(052324bbad28b67d23a018d61a03783dd4dfd9cf) )
 
-	sc1_pwrl_sound
-ROM_END
 
 
 
@@ -1921,7 +1917,7 @@ ROM_END
 
 ROM_START( sc1spcta )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "spec5pa", 0x0000, 0x010000, CRC(65fa549c) SHA1(68fd5a11eb89088f87a727e9c3bb621a4235adf4) )
+	ROM_LOAD( "spec5pa", 0x0000, 0x010000, BAD_DUMP CRC(65fa549c) SHA1(68fd5a11eb89088f87a727e9c3bb621a4235adf4) ) // 1ST AND 2ND HALF IDENTICAL
 
 	ROM_REGION( 0x20000, "upd", 0 )
 	ROM_LOAD( "spectre_snd_1.bin", 0x000000, 0x010000, CRC(ecdf085b) SHA1(117c63f7672112308bfe64527148ee66f8c26c12) )
@@ -2081,86 +2077,8 @@ ROM_END
 
 ROM_START( sc1winsta )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "95719110b ws 78%.bin", 0x0000, 0x8000, CRC(5871aad0) SHA1(6677c94b74a2e2dcece3fdcd730fbc8034833a7d) )
-	ROM_LOAD( "95719109a ws 78%.bin", 0x0000, 0x8000, CRC(cea7ff32) SHA1(ce20742bcad1eea450affab81822cfdaaf927984) )
-
-	sc1_winst_sound
-ROM_END
-
-//the following may well be different hardware
-ROM_START( sc1winstb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "winning-streak_std_ac_var_8-10pnd_ass.bin", 0x00000, 0x10000, CRC(f2d16bd5) SHA1(bd6a9da9da24459b14917386c64ecbc46c8adfda) )
-
-	sc1_winst_sound
-ROM_END
-
-ROM_START( sc1winstbp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "winning-streak_dat_ac_var_8-10pnd_ass.bin", 0x00000, 0x10000, CRC(351560f4) SHA1(b33c6bdeadeabbe5a4231b8bd5b134f9ea402133) )
-
-	sc1_winst_sound
-ROM_END
-
-ROM_START( sc1winstc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "winning-streak_std_ar_var_8pnd_ass.bin", 0x00000, 0x10000, CRC(d7a10aeb) SHA1(7346c83df7fd3de57a1b6f0ce498daabacb11491) )
-
-	sc1_winst_sound
-ROM_END
-
-ROM_START( sc1winstcp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "winning-streak_dat_ar_var_8pnd_ass.bin", 0x00000, 0x10000, CRC(a83633ef) SHA1(66caadd3127a424249fe78918ff99be833b81fad) )
-
-	sc1_winst_sound
-ROM_END
-
-ROM_START( sc1winstd )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "winning-streak_std_ss_var_ass.bin", 0x00000, 0x10000, CRC(c88f9a6e) SHA1(19a2b708f90a53a8dcfe69d2f6c683362867daba) )
-
-	sc1_winst_sound
-ROM_END
-
-ROM_START( sc1winstdp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "winning-streak_dat_ss_var_ass.bin", 0x0000, 0x010000, CRC(311550dd) SHA1(17dc789cba542e7c3c137a7e6a2a2d8869c84a7a) )
-
-	sc1_winst_sound
-ROM_END
-
-ROM_START( sc1winste )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "winning-streak_std_wi_ac_10pnd-20p_ass.bin", 0x00000, 0x10000, CRC(ecbb7707) SHA1(ea064149c515e39b17e851bcd39092ea3ae999a0) )
-
-	sc1_winst_sound
-ROM_END
-
-ROM_START( sc1winstep )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "winning-streak_dat_wi_ac_10pnd-20p_ass.bin", 0x00000, 0x10000, CRC(ae418733) SHA1(f63c63232056929760742fcf7f8beda387f5c597) )
-
-	sc1_winst_sound
-ROM_END
-
-ROM_START( sc1winstf )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "winning-streak_std_wi_ac_10pnd-20p_tri3_ass.bin", 0x00000, 0x10000, CRC(eb9ee9ae) SHA1(3150aec95039aa65a9126a0326e4dd10829347b2) )
-
-	sc1_winst_sound
-ROM_END
-
-ROM_START( sc1winstfp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "winning-streak_dat_wi_ac_10pnd-20p_tri3_ass.bin", 0x00000, 0x10000, CRC(39ac4021) SHA1(bd5f4d8800a794fdca8abee15acc3ea8d30c538a) )
-
-	sc1_winst_sound
-ROM_END
-
-ROM_START( sc1winstg )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "winning-streak_std_ac_tri3_ass.bin", 0x00000, 0x10000, CRC(b3e2b2d6) SHA1(0008e9d329327b4aecae5d861303c486942ef694) )
+	ROM_LOAD( "95719110b ws 78%.bin", 0x0000, 0x8000, BAD_DUMP CRC(5871aad0) SHA1(6677c94b74a2e2dcece3fdcd730fbc8034833a7d) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "95719109a ws 78%.bin", 0x8000, 0x8000, BAD_DUMP CRC(cea7ff32) SHA1(ce20742bcad1eea450affab81822cfdaaf927984) ) // 1ST AND 2ND HALF IDENTICAL
 
 	sc1_winst_sound
 ROM_END
@@ -2218,21 +2136,8 @@ ROM_START( sc1cscla )
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
 ROM_END
 
-//The names of these imply they may be Maygay M1 or MMM sets, need further investigation (they have standard MAYGAY 1990 strings)
-ROM_START( sc1csclb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cash classic sa1-082 5p.bin", 0x0000, 0x010000, CRC(42d68675) SHA1(ed191e03bc7b42ae1884657b4559588eeedbdf31) )
-
-	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
-ROM_END
 
 
-ROM_START( sc1csclc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cash classic 2p sa1-083.bin", 0x0000, 0x010000, CRC(36a45c0d) SHA1(51eb91e42297894ae575502903833e219ac5add9) )
-
-	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
-ROM_END
 
 ROM_START( sc1driv )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2450,8 +2355,8 @@ ROM_END
 
 ROM_START( sc1clinsb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "clines proto b.bin", 0x0000, 0x8000, CRC(fca396e1) SHA1(3304a58a30fd0c79e8d1decd4bd8792d3acbad3e) )
-	ROM_LOAD( "clines proto a.bin", 0x8000, 0x8000, CRC(0977e287) SHA1(e937a3787d4cd056c5f9944bca1532b84ed335f6) )//95718066
+	ROM_LOAD( "95717067b.bin", 0x0000, 0x8000, CRC(fca396e1) SHA1(3304a58a30fd0c79e8d1decd4bd8792d3acbad3e) )
+	ROM_LOAD( "95718066a.bin", 0x8000, 0x8000, CRC(0977e287) SHA1(e937a3787d4cd056c5f9944bca1532b84ed335f6) )
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2459,7 +2364,6 @@ ROM_START( sc1clinsc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "39370028b.bin", 0x0000, 0x8000, CRC(fca396e1) SHA1(3304a58a30fd0c79e8d1decd4bd8792d3acbad3e) )
 	ROM_LOAD( "39370028a.bin", 0x8000, 0x8000, CRC(e0250ea4) SHA1(01cc9013c37bc22f5ab69565d453ece99f739e6b) )
-//  ROM_LOAD( "95717067b.bin", 0x0000, 0x008000, CRC(fca396e1) SHA1(3304a58a30fd0c79e8d1decd4bd8792d3acbad3e) )
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
 ROM_END
 
@@ -2515,7 +2419,7 @@ ROM_END
 
 ROM_START( sc1frpusa )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "95752025.p1", 0x00000, 0x10000, CRC(0d223a7d) SHA1(7b110989b988f5fc57eac2b21b9f0cdb326174a0) )
+	ROM_LOAD( "95752025.p1", 0x00000, 0x10000, BAD_DUMP CRC(0d223a7d) SHA1(7b110989b988f5fc57eac2b21b9f0cdb326174a0) ) // 1ST AND 2ND HALF IDENTICAL
 
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
 ROM_END
@@ -2747,16 +2651,14 @@ ROM_START( sc1goldw )
 	ROM_LOAD( "958402.12 10p no enrich.bin", 0x8000, 0x8000, BAD_DUMP CRC(51af0108) SHA1(e6333e2879f7b2b3b558b6909e177f3101f503e6) ) // 1ST AND 2ND HALF IDENTICAL
 ROM_END
 
-
-
 ROM_START( sc1druby )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "95730028.bin", 0x8000, 0x8000, CRC(015f3760) SHA1(74dfd188f4a7ad057fda45a349e684be37a3f6bc) ) \
+	ROM_LOAD( "95730028.bin", 0x8000, 0x8000, BAD_DUMP CRC(015f3760) SHA1(74dfd188f4a7ad057fda45a349e684be37a3f6bc) ) // 1ST AND 2ND HALF IDENTICAL
 ROM_END
 
 ROM_START( sc1drubya )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "95730068.bin", 0x8000, 0x8000, CRC(2bcbcf0d) SHA1(30dbb5ec3be34520ad89aedead42e1eda7841b63) ) \
+	ROM_LOAD( "95730068.bin", 0x8000, 0x8000, BAD_DUMP CRC(2bcbcf0d) SHA1(30dbb5ec3be34520ad89aedead42e1eda7841b63) ) // 1ST AND 2ND HALF IDENTICAL
 ROM_END
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -3141,8 +3043,70 @@ GAME( 198?, sc1copsa		, sc1cops	, scorpion1			, scorpion1	, bfm_sc1_state, lotse
 // PROJECT NUMBER 6218  COPS & ROBBERS PHOENIX1 HIGH TOKEN - 31-AUG-1993 09:49:28
 GAME( 198?, sc1copdx		, sc1cops	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cops 'n' Robbers (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-916
 
+// PROJECT NUMBER 6207  OFAH - PHOENIX 1 - 18-APR-1994 10:44:57
+GAME( 199?, sc1ofs56		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Only Fools and Horses (Bellfruit) (Scorpion 1?)", GAME_FLAGS) // GAME No 39-370-974
+
+GAME( 198?, sc1linx			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Linx (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS ) // bad rom
+GAME( 198?, sc1linxa		, sc1linx	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Linx (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1linxp		, sc1linx	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Linx (Bellfruit) (set 3, Protocol) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1pwrl			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Power Lines (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1spct			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Spectre (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1spcta		, sc1spct	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Spectre (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS ) // bad rom
+
+// different inputs, hold ALT to run
+GAME( 198?, sc1typ			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Typhoon Club (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1typp			, sc1typ	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Typhoon Club (Bellfruit) (set 1, Protocol) (Scorpion 1)", GAME_FLAGS )
+
+
+GAME( 198?, sc1winst		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1winstp		, sc1winst	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 1, Protocol) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1winsta		, sc1winst	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS ) // bad rom
+
+// the first 2 sets are (unusually) licensed
+GAME( 199?, sc1clins		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM/PCP",  "Cash Lines (Bellfruit) (Scorpion 1) (set 1)", GAME_FLAGS)
+GAME( 199?, sc1clinsa		, sc1clins	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM/PCP",  "Cash Lines (Bellfruit) (Scorpion 1) (set 2)", GAME_FLAGS)
+GAME( 199?, sc1clinsb		, sc1clins	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 3)", GAME_FLAGS)
+GAME( 199?, sc1clinsc		, sc1clins	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 4)", GAME_FLAGS)
+GAME( 199?, sc1clinsd		, sc1clins	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 5)", GAME_FLAGS)
+GAME( 199?, sc1clinse		, sc1clins	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 6)", GAME_FLAGS) // bad rom
+
+GAME( 199?, sc1hipt			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "High Point (Bellfruit) (Scorpion 1) (set 1)", GAME_FLAGS)
+GAME( 199?, sc1hipta		, sc1hipt	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "High Point (Bellfruit) (Scorpion 1) (set 2)", GAME_FLAGS)
+
+// just alarms
+GAME( 199?, sc1frpus		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Fruit Pursuit (Bellfruit) (set 1) (Scorpion 1?)", GAME_FLAGS)
+GAME( 199?, sc1frpusa		, sc1frpus	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Fruit Pursuit (Bellfruit) (set 2) (Scorpion 1?)", GAME_FLAGS) // bad rom?
+
+GAME( 199?, sc1chain		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Chain Reaction (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS)
+GAME( 199?, sc1chainp		, sc1chain	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Chain Reaction (Bellfruit) (set 1, Protocol) (Scorpion 1)", GAME_FLAGS)
+GAME( 199?, sc1chaina		, sc1chain	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Chain Reaction (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS)
+
+
+GAME( 199?, sc1potp			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Pick Of The Pack (Bellfruit) (Scorpion 1)", GAME_FLAGS) //was mixed with the sc4/5 potp roms..  System status 98
+GAME( 199?, sc1potpa		, sc1potp	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Double Dealer (Bellfruit) (Scorpion 1)", GAME_FLAGS) // ^ with above.. seems the same game, but different name
+
+
+GAME( 199?, sc1goldw		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Golden Winner (Bellfruit) (Scorpion ?)", GAME_FLAGS) /// bad rom
+
+GAME( 199?, sc1druby		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Diamonds & Rubys (Bellfruit) (Scorpion ?) (set 1)", GAME_FLAGS) // bad rom
+GAME( 199?, sc1drubya		, sc1druby	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Diamonds & Rubys (Bellfruit) (Scorpion ?) (set 2)", GAME_FLAGS) // bad rom
+
+GAME( 199?, sc1cb7p		    , 0	        , scorpion1		    , scorpion1 , bfm_sc1_state, lotse	     	, 0,	   "BFM",   "Bar Seven (Bellfruit) (Protocol) (Scorpion 1)", GAME_FLAGS)
+
+
+/********************************************************************************************************************************************************************************************************************
+*********************************************************************************************************************************************************************************************************************
+*********************************************************************************************************************************************************************************************************************
+********************************************************************************************************************************************************************************************************************/
 
 /* The BFM / ELAM Dutch releases are NOT the same games as the English ones with the same name */
+
+/********************************************************************************************************************************************************************************************************************
+*********************************************************************************************************************************************************************************************************************
+*********************************************************************************************************************************************************************************************************************
+********************************************************************************************************************************************************************************************************************/
 
 GAME( 1988, sc1lotus		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Lotus SE (Dutch) (set 1)", GAME_FLAGS )
 GAME( 1988, sc1lotusa		, sc1lotus	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Lotus SE (Dutch) (set 2)", GAME_FLAGS )
@@ -3179,114 +3143,146 @@ GAME( 198?, sc1clbdm		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		
 
 GAME( 198?, sc1copdd		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Cops 'n' Robbers Deluxe (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
+GAME( 198?, sc1disc			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Discovey (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
-GAME( 198?, sc1disc			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Discovey (Bellfruit) (Dutch) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1dream		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Dream Machine (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1final		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Final Touch (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1flash		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Flash (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1fruit		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Fruit Lines (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1frtln		, sc1fruit	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Fruit Lines (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1dream		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Dream Machine (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
-GAME( 198?, sc1gtime		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Good Times (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1tiara		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt       , 0,       "ELAM",     "Tiara (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1gprix		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Grand Prix (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1gslam		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM",      "Grand Slam (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1happy		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM",      "Happy Hour (Bellfruit - Elam) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1impc			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Impact (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1kings		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse_bank0	, 0,       "BFM/ELAM", "Kings Club (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1linx			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Linx (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1linxa		, sc1linx	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Linx (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1linxp		, sc1linx	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Linx (Bellfruit) (set 3, Protocol) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1magc			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Magic Circle (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1manha		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse_bank0	, 0,       "BFM/ELAM", "Manhattan (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1mast			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Master Club (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1quat			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Quatro (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1mist			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse_bank0	, 0,       "BFM/ELAM", "Mistral (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1olym			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Olympia (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1orac			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Oracle (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1pwrl			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Power Lines (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1pwrla		, sc1pwrl	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Power Lines (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1rain			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Rainbow (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1re			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Reel Cash (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1rese			, sc1re		, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Reel Cash SE (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS ) // doesn't say 'SE'
-GAME( 198?, sc1revo			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Revolution (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1rose			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Rose 'n' Crown (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1sant			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Santana (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1sat			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Satellite (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1shan			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Shanghai (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1spct			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Spectre (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1spcta		, sc1spct	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Spectre (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1spit			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Spitfire (Elam) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1ster			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Sterling (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1str4			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Strike 4 (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1str4a		, sc1str4	, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Strike 4 (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1sups			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Superstar (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1torn			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Tornado (Bellfruit) (Dutch) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1torna		, sc1torn	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Tornado (Bellfruit) (Dutch) (set 2) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1typ			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Typhoon Club (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1typp			, sc1typ	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Typhoon Club (Bellfruit) (set 1, Protocol) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1ult			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Ultimate (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1vent			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Ventura (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1vict			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Victory (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1voy			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "ELAM",     "Voyager (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1voya			, sc1voy	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "ELAM",     "Voyager (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1flash		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Flash (Dutch) (Bellfruit)  (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1fruit		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Fruit Lines (Dutch) (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1frtln		, sc1fruit	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Fruit Lines (Dutch) (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1gtime		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Good Times (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1tiara		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt        , 0,       "BFM/ELAM", "Tiara (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1gprix		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Grand Prix (Dutch) (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1gslam		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Grand Slam (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1happy		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Happy Hour (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1impc			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Impact (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1kings		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse_bank0	, 0,       "BFM/ELAM", "Kings Club (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1magc			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Magic Circle (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1manha		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse_bank0	, 0,       "BFM/ELAM", "Manhattan (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1mast			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Master Club (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1quat			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Quatro (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1mist			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse_bank0	, 0,       "BFM/ELAM", "Mistral (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1olym			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Olympia (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1orac			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Oracle (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1rain			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Rainbow (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1re			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Reel Cash (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1rese			, sc1re		, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Reel Cash SE (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS ) // doesn't say 'SE'
+
+GAME( 198?, sc1revo			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Revolution (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1rose			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Rose 'n' Crown (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1sant			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Santana (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1sat			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Satellite (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 199?, sc1satse		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM/ELAM", "Satellite SE (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS) // different game?
+
+GAME( 198?, sc1shan			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Shanghai (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1ster			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Sterling (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1str4			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Strike 4 (Dutch) (Bellfruit) (Scorpion 1) (set 1)", GAME_FLAGS )
+GAME( 198?, sc1str4a		, sc1str4	, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Strike 4 (Dutch) (Bellfruit) (Scorpion 1) (set 2)", GAME_FLAGS )
+
+GAME( 198?, sc1torn			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Tornado (Dutch) (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1torna		, sc1torn	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Tornado (Dutch) (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1ult			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Ultimate (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 198?, sc1vent			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Ventura (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1vict			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Victory (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
 GAME( 198?, sc1winfl		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Winfalls (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1winst		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1winstp		, sc1winst	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 1, Protocol) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1winsta		, sc1winst	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1winstb		, sc1winst	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1winstbp		, sc1winst	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 3, Protocol) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1winstc		, sc1winst	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 4) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1winstcp		, sc1winst	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 4, Protocol) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1winstd		, sc1winst	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 5) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1winstdp		, sc1winst	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 5, Protocol) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1winste		, sc1winst	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 6) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1winstep		, sc1winst	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 6, Protocol) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1winstf		, sc1winst	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 7) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1winstfp		, sc1winst	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 7, Protocol) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1winstg		, sc1winst	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 8) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1zep			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "ELAM",     "Zeppelin (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1wthn			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "Eurocoin", "Wild Thing (Eurocoin) (Scorpion 1)", GAME_FLAGS )
-GAME( 199?, sc1moonl		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "Bwb",      "Moon Lite (Bwb)", GAME_FLAGS)
-GAME( 199?, sc1ltdv			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "Pcp",      "Little Devil (Pcp)", GAME_FLAGS)
-GAME( 198?, sc1t1k			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "Eurocoin", "Top 1000 (Eurocoin) (Scorpion 1)", GAME_FLAGS )
+
+GAME( 199?, sc1clb3			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM/ELAM", "Club 3000 (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS)
+
+GAME( 199?, sc1strk			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM/ELAM", "Strike (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS)
+
+GAME( 199?, sc1supfl		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM/ELAM", "Super Flush (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS)
+
+
+
+
+
+/********************************************************************************************************************************************************************************************************************
+*********************************************************************************************************************************************************************************************************************
+*********************************************************************************************************************************************************************************************************************
+********************************************************************************************************************************************************************************************************************/
+
+/* 3rd Party stuff */
+
+/********************************************************************************************************************************************************************************************************************
+*********************************************************************************************************************************************************************************************************************
+*********************************************************************************************************************************************************************************************************************
+********************************************************************************************************************************************************************************************************************/
+
+
+/* ELAM, but not BFM, no BFM headers */
+
+GAME( 198?, sc1dago			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "ELAM",     "Dagobert's Vault (Dutch) (Elam) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1spit			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "ELAM",     "Spitfire (Dutch) (Elam) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1voy			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "ELAM",     "Voyager (Dutch) (Elam) (set 1) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1voya			, sc1voy	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "ELAM",     "Voyager (Dutch) (Elam) (set 2) (Scorpion 1)", GAME_FLAGS )
+
+/* ELAM, but not BFM, BFM style header */
+
+GAME( 198?, sc1zep			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "ELAM",     "Zeppelin (Dutch) (Elam) (Scorpion 1)", GAME_FLAGS )
+
+/* 3rd Party Games without BFM headers, many manufacturers are unknown / unconfirmed */
+
+// has ELAM and Barcrest strings, but I think that's just relating to hardware it can hook up to
+// has GOEDGEKEURD DOOR HET IJKWEZEN ONDER NR. TK-0000 near the end, like several other games we've seen
+GAME( 198?, sc1final		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "<unknown>", "Final Touch (Dutch) (unknown) (Scorpion 1)", GAME_FLAGS ) // PAL ERROR
+GAME( 198?, sc1sups			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "<unknown>", "Superstar (Dutch) (unknown) (Scorpion 1)", GAME_FLAGS ) // PAL ERROR
+GAME( 198?, sc1wthn			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "Eurocoin",  "Wild Thing (Eurocoin) (Scorpion 1)", GAME_FLAGS ) // PAL ERROR
+GAME( 199?, sc1reply		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,	   "Eurocoin",  "Replay (Eurocoin) (Scorpion 1)", GAME_FLAGS) // PAL ERROR
+// similar, but different error
+GAME( 198?, sc1t1k			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "Eurocoin",  "Top 1000 (Dutch) (Eurocoin) (Scorpion 1)", GAME_FLAGS ) // BATTERIJ DEFECT
+GAME( 199?, sc1czbrk		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "<unknown>", "Crazy Break (Dutch) (unknown) (Scorpion 1)", GAME_FLAGS)  // BATTERIJ DEFECT
+GAME( 199?, sc1energ		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "<unknown>", "Energy (Dutch) (unknown) (Scorpion 1)", GAME_FLAGS) // BATTERIJ DEFECT
+GAME( 199?, sc1dip			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,	   "Eurocoin",  "Diplomat (Eurocoin) (Scorpion 1)", GAME_FLAGS) // BATTERIJ DEFECT (no sound)
+GAME( 199?, sc1lamb			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,	   "Eurocoin",  "Lambada (Eurocoin) (Scorpion 1)", GAME_FLAGS) // BATTERIJ DEFECT
+
+
+// Misc 3rd Party
+
 GAME( 199?, sc1smoke		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,	   "Mdm",      "Smokey Vs The Bandit (Mdm) (set 1) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME( 199?, sc1smokea		, sc1smoke	, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,	   "Mdm",      "Smokey Vs The Bandit (Mdm) (set 2) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+
 GAME( 199?, sc1ccroc		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,	   "Mdm",      "Crazy Crocs (Mdm) (set 1) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME( 199?, sc1ccroca		, sc1ccroc	, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,	   "Mdm",      "Crazy Crocs (Mdm) (set 2) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME( 199?, sc1ccrocb		, sc1ccroc	, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,	   "Mdm",      "Crazy Crocs (Mdm) (set 3) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME( 199?, sc1ccrocc		, sc1ccroc	, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,	   "Mdm",      "Crazy Crocs (Mdm) (set 4) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+
 GAME( 199?, sc1crocr		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,	   "Mdm",      "Croc And Roll (Mdm) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
+
 GAME( 199?, sc1btclk		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,	   "Mdm",      "Beat The Clock (Mdm) (set 1) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME( 199?, sc1btclka		, sc1btclk	, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,	   "Mdm",      "Beat The Clock (Mdm) (set 2) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
 GAME( 199?, sc1btclkb		, sc1btclk	, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,	   "Mdm",      "Beat The Clock (Mdm) (set 3) (Scorpion 2/3?)",   GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_NO_SOUND )
-GAME( 199?, sc1clins		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM/PCP",  "Cash Lines (Bellfruit) (Scorpion 1) (set 1)", GAME_FLAGS)
-GAME( 199?, sc1clinsa		, sc1clins	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM/PCP",  "Cash Lines (Bellfruit) (Scorpion 1) (set 2)", GAME_FLAGS)
-GAME( 199?, sc1clinsb		, sc1clins	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 3)", GAME_FLAGS)
-GAME( 199?, sc1clinsc		, sc1clins	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 4)", GAME_FLAGS)
-GAME( 199?, sc1clinsd		, sc1clins	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 5)", GAME_FLAGS)
-GAME( 199?, sc1clinse		, sc1clins	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 6)", GAME_FLAGS)
-GAME( 199?, sc1clb3			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Club 3000 (Bellfruit) (Scorpion 1)", GAME_FLAGS)
-GAME( 199?, sc1czbrk		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Crazy Break (Bellfruit) (Scorpion 1)", GAME_FLAGS) // Battery Defect
-GAME( 199?, sc1energ		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Energy (Bellfruit) (Scorpion 1)", GAME_FLAGS) // Battery Defect
-GAME( 199?, sc1hipt			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "High Point (Bellfruit) (Scorpion 1) (set 1)", GAME_FLAGS)
-GAME( 199?, sc1hipta		, sc1hipt	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "High Point (Bellfruit) (Scorpion 1) (set 2)", GAME_FLAGS)
-GAME( 199?, sc1satse		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM/ELAM", "Satellite SE (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS)
-GAME( 199?, sc1strk			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM/ELAM", "Strike (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS)
-GAME( 199?, sc1supfl		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM/ELAM", "Super Flush (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS)
-// are they really SC1?
-GAME( 199?, sc1btbc			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Beat The Bank Club (Bellfruit) (Scorpion 1?)", GAME_FLAGS) // behaves like sc1clbdya, but then locks up
-GAME( 199?, sc1frpus		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Fruit Pursuit (Bellfruit) (set 1) (Scorpion 1?)", GAME_FLAGS)
-GAME( 199?, sc1frpusa		, sc1frpus	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Fruit Pursuit (Bellfruit) (set 2) (Scorpion 1?)", GAME_FLAGS)
-GAME( 199?, sc1ofs56		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "unknown 'ofs56cp' (Bellfruit) (Scorpion 1?)", GAME_FLAGS) // OFAH - Phoenix 1 - Only Fools and Horses?
-GAME( 199?, sc1boncl		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Bonanza Club (Bellfruit) (Scorpion 1)", GAME_FLAGS)
-// are these really SC1? they do more here than in SC2 at least!
+
 GAME( 199?, sc1days			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "Global",   "All In A Days Work (Global) (set 1)", GAME_FLAGS)
 GAME( 199?, sc1daysa		, sc1days	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "Global",   "All In A Days Work (Global) (set 2)", GAME_FLAGS)
+
 GAME( 199?, sc1cscl			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "Global",   "Cash Classic (Global) (set 1)", GAME_FLAGS)
 GAME( 199?, sc1cscla		, sc1cscl	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "Global",   "Cash Classic (Global) (set 2)", GAME_FLAGS)
-GAME( 199?, sc1csclb		, sc1cscl	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "Maygay?",  "Cash Classic (Maygay/Global?) (set 3)", GAME_FLAGS)
-GAME( 199?, sc1csclc		, sc1cscl	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "Maygay",   "Cash Classic (Maygay/Global?) (set 4)", GAME_FLAGS)
 
 GAME( 199?, sc1driv			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "Global",   "Driving School (Global) (set 1)", GAME_FLAGS)
 GAME( 199?, sc1driva		, sc1driv	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "Global",   "Driving School (Global) (set 2)", GAME_FLAGS)
@@ -3298,19 +3294,14 @@ GAME( 199?, sc1vsd			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 
 GAME( 199?, sc1wof			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse		    , 0,	   "Global",   "Wheel Of Fortune (Global) (set 1)", GAME_FLAGS)
 GAME( 199?, sc1wofa			, sc1wof	, scorpion1			, scorpion1	, bfm_sc1_state, lotse		    , 0,	   "Global",   "Wheel Of Fortune (Global) (set 2)", GAME_FLAGS)
 GAME( 199?, sc1wofb			, sc1wof	, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt	    , 0,	   "Global",   "Wheel Of Fortune (Global) (set 3)", GAME_FLAGS)
+
 GAME( 199?, sc1crzyc		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse	        , 0,	   "Global",   "Crazy Cash (Global) (set 1)", GAME_FLAGS)
 GAME( 199?, sc1crzyca		, sc1crzyc	, scorpion1			, scorpion1	, bfm_sc1_state, lotse	        , 0,	   "Global",   "Crazy Cash (Global) (set 2)", GAME_FLAGS)
+
 GAME( 199?, sc1clbdy		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse	        , 0,	   "Global",   "Club Dynamite (Global) (set 1)", GAME_FLAGS)
 GAME( 199?, sc1clbdya		, sc1clbdy	, scorpion1			, scorpion1	, bfm_sc1_state, lotse	        , 0,	   "Global",   "Club Dynamite (Global) (set 2)", GAME_FLAGS)
+
 GAME( 199?, sc1chqfl		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse	        , 0,	   "Global",   "Chequered Flag (Global)", GAME_FLAGS)
-GAME( 1992, sc1s1000		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse	        , 0,	   "Deltasoft","Super 1000 (Deltasoft)", GAME_FLAGS) // JT/Deltasoft Nov 1992
-
-
-
-
-GAME( 199?, sc1dip			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,	   "Eurocoin", "Diplomat (Eurocoin) (Scorpion 1)", GAME_FLAGS) // 53 RY error
-GAME( 199?, sc1lamb			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,	   "Eurocoin", "Lambada (Eurocoin) (Scorpion 1)", GAME_FLAGS) //
-GAME( 199?, sc1reply		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,	   "Eurocoin", "Replay (Eurocoin) (Scorpion 1)", GAME_FLAGS) //
 
 GAME( 199?, sc1cdm			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse_bank0	, 0,	   "Crystal",  "Club Diamond (Crystal) (set 1) (Scorpion 1)", GAME_FLAGS)
 GAME( 199?, sc1cdmp			, sc1cdm	, scorpion1			, scorpion1	, bfm_sc1_state, lotse_bank0	, 0,	   "Crystal",  "Club Diamond (Crystal) (set 1, Protocol) (Scorpion 1)", GAME_FLAGS)
@@ -3318,33 +3309,22 @@ GAME( 199?, sc1cdmp			, sc1cdm	, scorpion1			, scorpion1	, bfm_sc1_state, lotse_
 GAME( 199?, sc1hfcc			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse_bank0	, 0,	   "Crystal",  "Hi Flyer Club (Crystal) (set 1) (Scorpion 1)", GAME_FLAGS)
 GAME( 199?, sc1hfccp		, sc1hfcc	, scorpion1			, scorpion1	, bfm_sc1_state, lotse_bank0	, 0,	   "Crystal",  "Hi Flyer Club (Crystal) (set 1, Protocol) (Scorpion 1)", GAME_FLAGS)
 
+GAME( 199?, sc1moonl		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "Bwb",      "Moon Lite (Bwb)", GAME_FLAGS)
+
+GAME( 199?, sc1ltdv			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "Pcp",      "Little Devil (Pcp)", GAME_FLAGS)
+
 GAME( 199?, sc1twice		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse_bank0	, 0,	   "Associated Leisure",   "Twice As Nice (Associated Leisure) (Scorpion 1)", GAME_FLAGS) // this has valid strings in it BEFORE the bfm decode, but decodes to valid code, does it use some funky mapping, or did they just fill unused space with valid looking data?
-GAME( 199?, sc1chain		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Chain Reaction (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS)
-GAME( 199?, sc1chainp		, sc1chain	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Chain Reaction (Bellfruit) (set 1, Protocol) (Scorpion 1)", GAME_FLAGS)
-GAME( 199?, sc1chaina		, sc1chain	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Chain Reaction (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS)
 
-GAME( 199?, sc1potp			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Pick Of The Pack (Bellfruit) (Scorpion 1)", GAME_FLAGS) //was mixed with the sc4/5 potp roms..  System status 98
-GAME( 199?, sc1potpa		, sc1potp	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Double Dealer (Bellfruit) (Scorpion 1)", GAME_FLAGS) // ^ with above.. seems the same game, but different name
+GAME( 1992, sc1s1000		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse	        , 0,	   "Deltasoft","Super 1000 (Deltasoft)", GAME_FLAGS) // JT/Deltasoft Nov 1992
 
+// these 2 are both the same manufacturer
+GAME( 198?, sc1clbrn		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "<unknown>",      "Club Runner (Dutch) (unknown) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1clbsp		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "<unknown>",      "Club Spinner (Dutch) (unknown) (Scorpion 1)", GAME_FLAGS )
 
-GAME( 199?, sc1scunk		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "<unknown>",      "unknown Scorpion 1 'Super ?' (Bellfruit) (Scorpion 1)", GAME_FLAGS) // ^ with above.. seems the same game, but different name
+GAME( 199?, sc1scunk		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "<unknown>",      "unknown Scorpion 1 'Super ?' (Bellfruit) (Scorpion 1)", GAME_FLAGS) // ?
 
 GAME( 199?, sc1wud			,0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "<unknown>",      "What's Up Dr (Scorpion 1?)", GAME_FLAGS) // was in maygayep.c whats up doc set
 
-GAME( 199?, sc1goldw		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Golden Winner (Bellfruit) (Scorpion ?)", GAME_FLAGS) // bad dump (from sc4 set)
-GAME( 199?, sc1druby		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Diamonds & Rubys (Bellfruit) (Scorpion ?) (set 1)", GAME_FLAGS) // from sc4 set.. incomplete, or not sc1/2 (uses sc1/2 crypt tho)
-GAME( 199?, sc1drubya		, sc1druby	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Diamonds & Rubys (Bellfruit) (Scorpion ?) (set 2)", GAME_FLAGS) // from sc4 set.. incomplete, or not sc1/2 (uses sc1/2 crypt tho)
+GAME( 199?, sc1btbc			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "<unknown>",      "Beat The Bank Club (unknown) (Scorpion 1?)", GAME_FLAGS) // behaves like sc1clbdya, but then locks up
 
-GAME( 199?, sc1cb7p		, 0	,  scorpion1		, scorpion1		, bfm_sc1_state, lotse		, 0,		 "BFM",   "Bar Seven (Bellfruit) (Protocol) (Scorpion 1)", GAME_FLAGS)
-
-
-/* ELAM, but not BFM, no BFM headers */
-
-GAME( 198?, sc1dago			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "ELAM",     "Dagobert's Vault (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
-
-
-/* 3rd Party Games without BFM headers, many manufacturers are unknown / unconfirmed */
-
-// these are both the same manufacturer
-GAME( 198?, sc1clbrn		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt			, 0,       "unknown",      "Club Runner (Dutch) (unknown) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1clbsp		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt			, 0,       "unknown",      "Club Spinner (Dutch) (unknown) (Scorpion 1)", GAME_FLAGS )
+GAME( 199?, sc1boncl		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "<unknown>",      "Bonanza Club (unknown) (Scorpion 1)", GAME_FLAGS) // just alarms

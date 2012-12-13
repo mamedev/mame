@@ -13378,7 +13378,6 @@ sc1mist		// Mistral (Bellfruit)
 sc1olym		// Olympia (Bellfruit)
 sc1orac		// Oracle (Bellfruit)
 sc1pwrl		// Power Lines (Bellfruit)
-sc1pwrla
 sc1rain		// Rainbow (Bellfruit)
 sc1re		// Reel Cash (Bellfruit)
 sc1rese		// Reel Cash SE (Bellfruit)
@@ -13416,25 +13415,23 @@ sc1winfl	// Winfalls (Bellfruit)
 sc1winst	// Winning Streak (Bellfruit)
 sc1winstp
 sc1winsta
-sc1winstb
-sc1winstbp
-sc1winstc
-sc1winstcp
-sc1winstd
-sc1winstdp
-sc1winste
-sc1winstep
-sc1winstf
-sc1winstfp
-sc1winstg
+sc2winstb
+sc2winstbp
+sc2winst
+sc2winstp
+sc2winstd
+sc2winstdp
+sc2winste
+sc2winstep
+sc2winstf
+sc2winstfp
+sc2winstg
 sc1zep		// Zeppelin (Bellfruit)
 sc1wthn		// Wild Thing (Eurocoin)
 sc1days		// All In A Days Work (Global)
 sc1daysa
 sc1cscl		// Cash Classic (Global)
 sc1cscla
-sc1csclb	//Maygay?
-sc1csclc	//Maygay?
 sc1driv		// Driving School (Global)
 sc1driva
 sc1drivb
@@ -20057,6 +20054,8 @@ m1luxor		// Luxor Casino
 m1luxora
 m1luxorb
 m1luxorc
+m1cashc		// Cash Classic
+m1cashca
 m1atunk
 
 // Maygay MV1 hardware

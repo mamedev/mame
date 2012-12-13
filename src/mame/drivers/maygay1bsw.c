@@ -2576,6 +2576,21 @@ ROM_START( m1luxorb ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LO
 ROM_START( m1luxorc ) ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 ) ROM_LOAD("lux_pound15",		0x0000, 0x020000, CRC(94e8d1c2) SHA1(7a50477cf2d4bb404d2e33dd545c51e62bf4031d) ) m1_luxor_sound ROM_END_M1A_MCU  GAME( 1994, m1luxorc  ,m1luxor ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Gemini", "Luxor Casino (Gemini) (M1A/B) (set 4)",GAME_FLAGS )//2_1
 
 /*******************************************************************************************************************************************************************************************************
+  Cash Classic
+******************************************************************************************************************************************************************************************************/
+
+#define m1_cashc_sound \
+	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00  ) \
+	/* missing or different sound system? */
+
+
+ROM_START( m1cashc )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "cash classic sa1-082 5p.bin", 0x0000, 0x010000, CRC(42d68675) SHA1(ed191e03bc7b42ae1884657b4559588eeedbdf31) ) m1_cashc_sound ROM_END
+ROM_START( m1cashca ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "cash classic 2p sa1-083.bin", 0x0000, 0x010000, CRC(36a45c0d) SHA1(51eb91e42297894ae575502903833e219ac5add9) ) m1_cashc_sound ROM_END
+
+GAME( 1994, m1cashc    ,0       ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Luxor Casino (Maygay) (M1A/B) (set 1)",GAME_FLAGS )
+GAME( 1994, m1cashca   ,m1cashc ,maygay_m1,maygay_m1, maygay1b_state,m1, ROT0, "Maygay", "Luxor Casino (Maygay) (M1A/B) (set 2)",GAME_FLAGS )
+
+/*******************************************************************************************************************************************************************************************************
   Greek Skill
    this might not be M1A/B
 ******************************************************************************************************************************************************************************************************/

@@ -8327,6 +8327,47 @@ GAME( 1995, sc2focus	, 0			,  scorpion3		, scorpion3	, bfm_sc2_state, focus		, 0
 // PROJECT NUMBER 6489  PUBLIC ENEMY No1 - 22-MAY-1995 09:24:05
 GAME( 199?, sc2pe1g		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwhon	, 0,		 "BFM",      "Public Enemy No.1 (Bellfruit) [German] (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-415
 
+
+/********************************************************************************************************************************************************************************************************************
+ Winning Streak
+********************************************************************************************************************************************************************************************************************/
+
+// taken from the sc1 set, might be wrong here
+#define sc2_winst_sound \
+	ROM_REGION( 0x80000, "upd", 0 )\
+	ROM_LOAD( "winningstreaksnd.bin", 0x0000, 0x080000, CRC(ba30cb97) SHA1(e7f5ca36ca993ad14b3a348868e73d7ba02be7c5) )\
+
+ROM_START( sc2winstb )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "winning-streak_std_ac_var_8-10pnd_ass.bin",       0x00000, 0x10000, CRC(f2d16bd5) SHA1(bd6a9da9da24459b14917386c64ecbc46c8adfda) ) sc2_winst_sound ROM_END
+ROM_START( sc2winstbp ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "winning-streak_dat_ac_var_8-10pnd_ass.bin",       0x00000, 0x10000, CRC(351560f4) SHA1(b33c6bdeadeabbe5a4231b8bd5b134f9ea402133) ) sc2_winst_sound ROM_END
+ROM_START( sc2winst )   ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "winning-streak_std_ar_var_8pnd_ass.bin",          0x00000, 0x10000, CRC(d7a10aeb) SHA1(7346c83df7fd3de57a1b6f0ce498daabacb11491) ) sc2_winst_sound ROM_END
+ROM_START( sc2winstp )  ROM_REGION( 0x10000, "maincpu", 0 )	ROM_LOAD( "winning-streak_dat_ar_var_8pnd_ass.bin",          0x00000, 0x10000, CRC(a83633ef) SHA1(66caadd3127a424249fe78918ff99be833b81fad) ) sc2_winst_sound ROM_END
+ROM_START( sc2winstd )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "winning-streak_std_ss_var_ass.bin",               0x00000, 0x10000, CRC(c88f9a6e) SHA1(19a2b708f90a53a8dcfe69d2f6c683362867daba) ) sc2_winst_sound ROM_END
+ROM_START( sc2winstdp ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "winning-streak_dat_ss_var_ass.bin",               0x00000, 0x10000, CRC(311550dd) SHA1(17dc789cba542e7c3c137a7e6a2a2d8869c84a7a) ) sc2_winst_sound ROM_END
+ROM_START( sc2winste )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "winning-streak_std_wi_ac_10pnd-20p_ass.bin",      0x00000, 0x10000, CRC(ecbb7707) SHA1(ea064149c515e39b17e851bcd39092ea3ae999a0) ) sc2_winst_sound ROM_END
+ROM_START( sc2winstep ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "winning-streak_dat_wi_ac_10pnd-20p_ass.bin",      0x00000, 0x10000, CRC(ae418733) SHA1(f63c63232056929760742fcf7f8beda387f5c597) ) sc2_winst_sound ROM_END
+ROM_START( sc2winstf )  ROM_REGION( 0x10000, "maincpu", 0 )	ROM_LOAD( "winning-streak_std_wi_ac_10pnd-20p_tri3_ass.bin", 0x00000, 0x10000, CRC(eb9ee9ae) SHA1(3150aec95039aa65a9126a0326e4dd10829347b2) ) sc2_winst_sound ROM_END
+ROM_START( sc2winstfp ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "winning-streak_dat_wi_ac_10pnd-20p_tri3_ass.bin", 0x00000, 0x10000, CRC(39ac4021) SHA1(bd5f4d8800a794fdca8abee15acc3ea8d30c538a) ) sc2_winst_sound ROM_END
+ROM_START( sc2winstg )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "winning-streak_std_ac_tri3_ass.bin",              0x00000, 0x10000, CRC(b3e2b2d6) SHA1(0008e9d329327b4aecae5d861303c486942ef694) ) sc2_winst_sound ROM_END
+
+// PROJECT NUMBER PR6605  WINNING STREAK T2,ARCADE,#8,5/10/20 - 8-MAY-1996 10:31:16
+GAME( 198?, sc2winst		, 0	        , scorpion2			, drwho	, bfm_sc2_state, drwho			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 1) (Scorpion 2)", GAME_FLAGS ) // GAME No 95-750-702
+GAME( 198?, sc2winstp		, sc2winst	, scorpion2			, drwho	, bfm_sc2_state, drwho			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 1, Protocol) (Scorpion 2)", GAME_FLAGS ) // GAME No 95-751-702
+// PROJECT NUMBER PR6605  WINNING STREAK T2,8PD TOK,5/10/20 - 8-MAY-1996 10:36:21
+GAME( 198?, sc2winstd		, sc2winst	, scorpion2			, drwho	, bfm_sc2_state, drwho			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 2) (Scorpion 2)", GAME_FLAGS ) // GAME No 95-750-700
+GAME( 198?, sc2winstdp		, sc2winst	, scorpion2			, drwho	, bfm_sc2_state, drwho			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 2, Protocol) (Scorpion 2)", GAME_FLAGS ) // GAME No 95-751-700
+// PROJECT NUMBER PR6605  WINNING STREAK T2,#8/#10 CASH 5/10/20/25P - 13-JUN-1996 12:27:29
+GAME( 198?, sc2winstb		, sc2winst	, scorpion2			, drwho	, bfm_sc2_state, drwho			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 3) (Scorpion 2)", GAME_FLAGS ) // GAME No 95-750-766
+GAME( 198?, sc2winstbp		, sc2winst	, scorpion2			, drwho	, bfm_sc2_state, drwho			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 3, Protocol) (Scorpion 2)", GAME_FLAGS ) // GAME No 95-751-766
+// PROJECT NUMBER PR6605  WINNING STREAK T2,WHITBREAD,#10 CASH,20p - 13-JUN-1996 12:30:20
+GAME( 198?, sc2winste		, sc2winst	, scorpion2			, drwho	, bfm_sc2_state, drwho			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 4) (Scorpion 2)", GAME_FLAGS ) // GAME No 95-750-767
+GAME( 198?, sc2winstep		, sc2winst	, scorpion2			, drwho	, bfm_sc2_state, drwho			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 4, Protocol) (Scorpion 2)", GAME_FLAGS ) // GAME No 95-751-767
+// PROJECT NUMBER PR6691  WINNING STREAK T3 HOPPERS #8/10 5-25P - 13-JUN-1996 16:28:02
+GAME( 198?, sc2winstg		, sc2winst	, scorpion2			, drwho	, bfm_sc2_state, drwho			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 5) (Scorpion 2)", GAME_FLAGS ) // GAME No 95-750-777
+// PROJECT NUMBER PR6691  WINNING STREAK T3,WHITBREAD,#10 CASH,20p - 13-JUN-1996 16:31:36
+GAME( 198?, sc2winstf		, sc2winst	, scorpion2			, drwho	, bfm_sc2_state, drwho			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 6) (Scorpion 2)", GAME_FLAGS ) // GAME No 95-750-778
+GAME( 198?, sc2winstfp		, sc2winst	, scorpion2			, drwho	, bfm_sc2_state, drwho			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 6, Protocol) (Scorpion 2)", GAME_FLAGS ) // GAME No 95-751-778
+
+
 /********************************************************************************************************************************************************************************************************************
 *********************************************************************************************************************************************************************************************************************
 *********************************************************************************************************************************************************************************************************************
