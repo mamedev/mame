@@ -7889,7 +7889,6 @@ raident			// (c) 1990 Seibu Kaihatsu + Liang HWA Electronics license
 raidenu			// (c) 1990 Seibu Kaihatsu + Fabtek license
 raidenua		// (c) 1990 Seibu Kaihatsu + Fabtek license
 sdgndmps		// (c) Banpresto / Bandai (Japan)
-dcon			// (c) 1992 Success
 sengokmj		// (c) 1991 Sigma
 totmejan		// (c) 1991 Seibu/Tecmo
 goodejan		// (c) 1991 Seibu/Tecmo
@@ -8632,7 +8631,6 @@ ikki			// TVG17 (c) 1985 Sun Electronics (Japan)
 farmer			// TVG17 (c) 1985 Sun Electronics
 shanghai		// (c) 1988 Sunsoft (Sun Electronics)
 shangha2		// (c) 1989 Sunsoft (Sun Electronics)
-kothello		// (c) 1990 Success
 shangha3		// (c) 1993 Sunsoft
 heberpop		// (c) 1994 Sunsoft / Atlus
 blocken			// (c) 1994 KID / Visco
@@ -9796,13 +9794,18 @@ dynadice		// ?
 atamanot		// (c) 1983 Yachiyo Denki / Uni Enterprize
 ssingles		// Yachiyo?
 tcl				// (c) 1995 Uniwang
-othello			// (c) 1984 Success
-sothello		// (c) 1986 Success / Fujiwara
-tonton			// 199?, Success.
 quake			// (c) 19?? Lazer-Tron / iD Software
 majorpkr		// (c) 1994 PAL System.
 su2000			// (c) 1993 Virtuality
 boonggab		// (c) 2001 Taff System
+
+// Success
+tonton			// (c) 199? Success / Taiyo Jidoki.
+kurukuru		// (c) 199? Success / Taiyo Jidoki.
+othello			// (c) 1984 Success.
+sothello		// (c) 1986 Success / Fujiwara.
+kothello		// (c) 1990 Success.
+dcon			// (c) 1992 Success.
 
 // Nexus 3D
 acheart
@@ -30336,3 +30339,4 @@ fruitstb
 // HP Automaten
 bingoman
 bingomana
+

@@ -2940,6 +2940,7 @@ src/mame/drivers/kopunch.c svneol=native#text/plain
 src/mame/drivers/ksayakyu.c svneol=native#text/plain
 src/mame/drivers/ksys573.c svneol=native#text/plain
 src/mame/drivers/kungfur.c svneol=native#text/plain
+src/mame/drivers/kurukuru.c svneol=native#text/plain
 src/mame/drivers/kyugo.c svneol=native#text/plain
 src/mame/drivers/labyrunr.c svneol=native#text/plain
 src/mame/drivers/ladybug.c svneol=native#text/plain
