@@ -26,10 +26,12 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define M6502_TAG		"m6502"
-#define M6522_TAG		"m6522"
-#define DP8473_TAG		"dp8473"
+#define G65SC02PI2_TAG	"m6502"
+#define R65C02P4_TAG	"m6502"
+#define G65SC22P2_TAG	"m6522"
+#define DP8473V_TAG		"dp8473"
 #define PC8477AV1_TAG	"pc8477av1"
+#define DS1216E_TAG		"ds1216e"
 
 
 
@@ -46,7 +48,7 @@ const device_type FD4000 = &device_creator<fd4000_device>;
 //-------------------------------------------------
 
 ROM_START( fd2000 )
-	ROM_REGION( 0x8000, M6502_TAG, 0 )
+	ROM_REGION( 0x8000, G65SC02PI2_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v140" )
 	ROM_SYSTEM_BIOS( 0, "v134", "Version 1.34" )
 	ROMX_LOAD( "cmd fd-2000 dos v1.34 fd-350026.bin", 0x0000, 0x8000, CRC(859a5edc) SHA1(487fa82a7977e5208d5088f3580f34e8c89560d1), ROM_BIOS(1) )
@@ -60,7 +62,7 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( fd4000 )
-	ROM_REGION( 0x8000, M6502_TAG, 0 )
+	ROM_REGION( 0x8000, R65C02P4_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v140" )
 	ROM_SYSTEM_BIOS( 0, "v134", "Version 1.34" )
 	ROMX_LOAD( "cmd fd-4000 dos v1.34 fd-350022.bin", 0x0000, 0x8000, CRC(1f4820c1) SHA1(7a2966662e7840fd9377549727ccba62e4349c6f), ROM_BIOS(1) )
@@ -92,10 +94,10 @@ const rom_entry *fd2000_device::device_rom_region() const
 
 static ADDRESS_MAP_START( fd2000_mem, AS_PROGRAM, 8, fd2000_device )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0xbf0) AM_DEVREADWRITE(M6522_TAG, via6522_device, read, write)
-	AM_RANGE(0x4e00, 0x4e07) AM_MIRROR(0x1f8) AM_DEVICE(DP8473_TAG, dp8473_device, map)
+	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0xbf0) AM_DEVREADWRITE(G65SC22P2_TAG, via6522_device, read, write)
+	AM_RANGE(0x4e00, 0x4e07) AM_MIRROR(0x1f8) AM_DEVICE(DP8473V_TAG, dp8473_device, map)
 	AM_RANGE(0x5000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(G65SC02PI2_TAG, 0)
 ADDRESS_MAP_END
 
 
@@ -105,10 +107,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fd4000_mem, AS_PROGRAM, 8, fd4000_device )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0xbf0) AM_DEVREADWRITE(M6522_TAG, via6522_device, read, write)
+	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0xbf0) AM_DEVREADWRITE(G65SC22P2_TAG, via6522_device, read, write)
 	AM_RANGE(0x4e00, 0x4e07) AM_MIRROR(0x1f8) AM_DEVICE(PC8477AV1_TAG, pc8477a_device, map)
 	AM_RANGE(0x5000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(R65C02P4_TAG, 0)
 ADDRESS_MAP_END
 
 
@@ -217,11 +219,11 @@ static const via6522_interface via_intf =
 };
 
 static SLOT_INTERFACE_START( fd2000_floppies )
-	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
+	SLOT_INTERFACE( "35hd", FLOPPY_35_HD ) // TEAC FD-235HF
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START( fd4000_floppies )
-	SLOT_INTERFACE( "35ed", FLOPPY_35_ED )
+	SLOT_INTERFACE( "35ed", FLOPPY_35_ED ) // TEAC FD-235J
 SLOT_INTERFACE_END
 /*
 FLOPPY_FORMATS_MEMBER( fd2000_device::floppy_formats )
@@ -235,13 +237,13 @@ FLOPPY_FORMATS_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( fd2000 )
-	MCFG_CPU_ADD(M6502_TAG, M65C02, 2000000)
+	MCFG_CPU_ADD(G65SC02PI2_TAG, M65C02, XTAL_24MHz/12)
 	MCFG_CPU_PROGRAM_MAP(fd2000_mem)
 
-	MCFG_VIA6522_ADD(M6522_TAG, 2000000, via_intf)
-	MCFG_DP8473_ADD(DP8473_TAG)
+	MCFG_VIA6522_ADD(G65SC22P2_TAG, XTAL_24MHz/12, via_intf)
+	MCFG_DP8473_ADD(DP8473V_TAG)
 
-	MCFG_FLOPPY_DRIVE_ADD(DP8473_TAG":0", fd2000_floppies, "35hd", 0, floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(DP8473V_TAG":0", fd2000_floppies, "35hd", 0, floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -250,10 +252,10 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( fd4000 )
-	MCFG_CPU_ADD(M6502_TAG, M65C02, 2000000)
+	MCFG_CPU_ADD(R65C02P4_TAG, M65C02, XTAL_24MHz/6)
 	MCFG_CPU_PROGRAM_MAP(fd4000_mem)
 
-	MCFG_VIA6522_ADD(M6522_TAG, 2000000, via_intf)
+	MCFG_VIA6522_ADD(G65SC22P2_TAG, XTAL_24MHz/12, via_intf)
 	MCFG_PC8477A_ADD(PC8477AV1_TAG)
 
 	MCFG_FLOPPY_DRIVE_ADD(PC8477AV1_TAG":0", fd4000_floppies, "35ed", 0, floppy_image_device::default_floppy_formats)//fd2000_device::floppy_formats)
@@ -311,9 +313,9 @@ void fd2000_device::device_config_complete()
 fd2000_device::fd2000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, FD2000, "FD-2000", tag, owner, clock),
 	  device_cbm_iec_interface(mconfig, *this),
-	  m_maincpu(*this, M6502_TAG),
-	  m_fdc(*this, DP8473_TAG),
-	  m_floppy0(*this, DP8473_TAG":0"),
+	  m_maincpu(*this, G65SC02PI2_TAG),
+	  m_fdc(*this, DP8473V_TAG),
+	  m_floppy0(*this, DP8473V_TAG":0"),
 	  m_variant(TYPE_FD2000)
 {
 }
@@ -321,7 +323,7 @@ fd2000_device::fd2000_device(const machine_config &mconfig, const char *tag, dev
 fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
     : device_t(mconfig, type, name, tag, owner, clock),
 	  device_cbm_iec_interface(mconfig, *this),
-	  m_maincpu(*this, M6502_TAG),
+	  m_maincpu(*this, R65C02P4_TAG),
 	  m_fdc(*this, PC8477AV1_TAG),
 	  m_floppy0(*this, PC8477AV1_TAG":0"),
 	  m_variant(variant)
