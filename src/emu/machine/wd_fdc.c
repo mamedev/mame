@@ -240,8 +240,10 @@ void wd_fdc_t::seek_continue()
 			return;
 
 		case SPINUP_DONE:
-			if(main_state == RESTORE && floppy && !floppy->trk00_r())
-				sub_state = SEEK_DONE;
+			if(main_state == RESTORE && floppy && !floppy->trk00_r()) {
+				sub_state = SEEK_WAIT_STEP_TIME;
+				delay_cycles(t_gen, step_times[command & 3]);
+			}
 
 			if(main_state == SEEK && track == data)
 				sub_state = SEEK_DONE;
