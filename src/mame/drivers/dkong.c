@@ -3203,7 +3203,7 @@ GAME( 1981, dkongjo1, dkong,    dkong2b,  dkong, driver_device,          0,  ROT
 GAME( 2004, dkongf,   dkong,    dkong2b,  dkongf, driver_device,         0,  ROT90, "hack", "Donkey Kong Foundry (hack)", GAME_SUPPORTS_SAVE ) /* from Jeff's Romhack */
 GAME( 2006, dkongx,   dkong,    braze,    dkongx, dkong_state,    dkongx,  ROT90, "hack (Braze Technologies)", "Donkey Kong II - Jumpman Returns (V1.2) (hack)", GAME_SUPPORTS_SAVE )
 GAME( 2006, dkongx11, dkong,    braze,    dkongx, dkong_state,    dkongx,  ROT90, "hack (Braze Technologies)", "Donkey Kong II - Jumpman Returns (V1.1) (hack)", GAME_SUPPORTS_SAVE )
-GAME( 1981, dking,    dkong,    dkong2b,  dkong, driver_device,          0,  ROT90, "hack", "Donkey King", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1981, dking,    dkong,    dkong2b,  dkong, driver_device,          0,  ROT90, "bootleg", "Donkey King", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 GAME( 1982, dkongjr,  0,        dkongjr,  dkongjr, driver_device,        0,  ROT90, "Nintendo of America", "Donkey Kong Junior (US)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dkongjrj, dkongjr,  dkongjr,  dkongjr, driver_device,        0,  ROT90, "Nintendo", "Donkey Kong Jr. (Japan)", GAME_SUPPORTS_SAVE )
