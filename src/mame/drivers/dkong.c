@@ -2134,36 +2134,6 @@ ROM_START( dkongx11 )
 	ROM_LOAD( "v-5e.bpr",     0x0200, 0x0100, CRC(b869b8f5) SHA1(c2bdccbf2654b64ea55cd589fd21323a9178a660) ) /* character color codes on a per-column basis */
 ROM_END
 
-ROM_START( dking )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "d11.2r",       0x0800, 0x0800, CRC(f7cace41) SHA1(981dbb1cddd66a0cbc8fe147172ffe7eb5b7fa21) )
-	ROM_CONTINUE             (0x0000, 0x0800)
-	ROM_LOAD( "d7.1n",        0x1000, 0x1000, CRC(fe89dea4) SHA1(c39372ebe9950808ebc1ff7909c291496b206026) )
-	ROM_LOAD( "d9.2m",        0x2000, 0x1000, CRC(b9c34e14) SHA1(dcfe45dede6aef52a2989978762df9c5463bbbf2) )
-	ROM_LOAD( "d10.2n",       0x3000, 0x1000, CRC(243e458d) SHA1(de98fc90915913069b6802d5c662db18f56c36be) )
-	ROM_LOAD( "d8.1r",        0x4000, 0x1000, CRC(7c66fb5c) SHA1(5eda9b0037f958433d96bc945c1273b66ef9cac5) )
-
-	ROM_REGION( 0x2000, "soundcpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "d5.1k",        0x0000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
-	ROM_LOAD( "d6.1m",        0x1000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
-
-	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "d2.6k",        0x0000, 0x1000, CRC(b62a0367) SHA1(8c285cbc714d7e6589bd63b3cef7c841ed1c2a4e) )
-	ROM_LOAD( "d4.6n",        0x1000, 0x1000, CRC(a8916dc8) SHA1(472520aae3837e6026f2a7577d3b2aff371a316c) )
-	ROM_LOAD( "d1.6h",        0x2000, 0x1000, CRC(61122c5e) SHA1(978b6dbec35f3adc651fddf332db17625099a92e) )
-	ROM_LOAD( "d3.6l",        0x3000, 0x1000, CRC(cd3b5dde) SHA1(2319a2be04d70989b01f4fc703756ba6e1c1f388) )
-
-	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "d12.6a",       0x0000, 0x0800, CRC(80eb517d) SHA1(fef4111f656c58b28e7eac5aa5b5cc7e07ccb2fd) )
-	ROM_LOAD( "d13.6c",       0x0800, 0x0800, CRC(f67c80f1) SHA1(d1fbcce1b6242f810e106ff50812636e3168ebc1) )
-
-	ROM_REGION( 0x0400, "proms", 0 )
-	ROM_LOAD( "82s123.1t",    0x0000, 0x0020, CRC(b4e827a5) SHA1(31a5a5ad54417a474d22bb16c473415d99a2b6f1) )
-	ROM_LOAD( "82s123.1u",    0x0100, 0x0020, CRC(ab1940fa) SHA1(8d98e05cbaa6f55770c12e0a9a8ed9c73cc54423) )
-	ROM_LOAD( "82s123.1v",    0x0200, 0x0020, CRC(751c3325) SHA1(edce2bc883996c1d72dc6c1c9f62799b162d415a) )
-	ROM_LOAD( "82s129.5g",    0x0300, 0x0100, CRC(9e11550d) SHA1(b8cba8e16e10e23fba1f11551102ab77b680bdf0) ) // looks like a colour prom
-ROM_END
-
 ROM_START( dkongjr )
     ROM_REGION( 0x10000, "maincpu", 0 )
     ROM_LOAD( "dkj.5b",       0x0000, 0x1000, CRC(dea28158) SHA1(08baf84ae6f9b40a2c743fe1d8c158c74a40e95a) )
@@ -3203,7 +3173,6 @@ GAME( 1981, dkongjo1, dkong,    dkong2b,  dkong, driver_device,          0,  ROT
 GAME( 2004, dkongf,   dkong,    dkong2b,  dkongf, driver_device,         0,  ROT90, "hack", "Donkey Kong Foundry (hack)", GAME_SUPPORTS_SAVE ) /* from Jeff's Romhack */
 GAME( 2006, dkongx,   dkong,    braze,    dkongx, dkong_state,    dkongx,  ROT90, "hack (Braze Technologies)", "Donkey Kong II - Jumpman Returns (V1.2) (hack)", GAME_SUPPORTS_SAVE )
 GAME( 2006, dkongx11, dkong,    braze,    dkongx, dkong_state,    dkongx,  ROT90, "hack (Braze Technologies)", "Donkey Kong II - Jumpman Returns (V1.1) (hack)", GAME_SUPPORTS_SAVE )
-GAME( 1981, dking,    dkong,    dkong2b,  dkong, driver_device,          0,  ROT90, "bootleg", "Donkey King", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 GAME( 1982, dkongjr,  0,        dkongjr,  dkongjr, driver_device,        0,  ROT90, "Nintendo of America", "Donkey Kong Junior (US)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dkongjrj, dkongjr,  dkongjr,  dkongjr, driver_device,        0,  ROT90, "Nintendo", "Donkey Kong Jr. (Japan)", GAME_SUPPORTS_SAVE )
