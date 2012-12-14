@@ -1457,11 +1457,7 @@ ROM_START( sc1cexpd )
 ROM_END
 
 
-ROM_START( sc1cb7p )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "bar7protocol.bin", 0x8000, 0x008000, CRC(e9c022ed) SHA1(e93b4506830a2f098eceb0b419d648bf3a9d02a4) )
-	ROM_REGION( 0x20000, "upd", ROMREGION_ERASEFF )
-ROM_END
+
 
 ROM_START( sc1cexpl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2592,21 +2588,6 @@ ROM_START( sc1chainp )
 ROM_END
 
 
-ROM_START( sc1potp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "potp 95715159 2x1.bin", 0x6000, 0x2000, CRC(b47cd8f3) SHA1(bf26fdc440a111dc1326b200281c2dff5c517c67) )
-	ROM_LOAD( "potp 95717908 2x1.bin", 0x8000, 0x8000, CRC(953c3e78) SHA1(f14ab2c4337e93605be4baac51b8ad3b9bf0e155) )
-
-	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
-ROM_END
-
-ROM_START( sc1potpa )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "potp 95715146.bin", 0x6000, 0x2000, CRC(9557ebc4) SHA1(a9d3b2d901875b9d53ac9500acdb9b725b4edcb5) )
-	ROM_LOAD( "potp 95350166.bin", 0x8000, 0x8000, CRC(45f0effa) SHA1(afd7aabac7da04b5960c2cc55863b917a2692c4f) )
-
-	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
-ROM_END
 
 // these mostly look like the same thing, and clearly have the BFM address scramble, but might be
 // bad dumps / missing the first half (in all cases it's either 0xff or a mirror of the 2nd half)
@@ -3102,14 +3083,6 @@ GAME( 199?, sc1druby		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			,
 // no header data due to bad rom
 GAME( 199?, sc1drubya		, sc1druby	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Diamonds & Rubys (Bellfruit) (Scorpion ?) (set 2)", GAME_FLAGS) // bad rom
 
-// corrupt alpha, check it isn't s85
-// PROJECT NUMBER 5425  BAR SEVEN ARCADE  GAME No 39-341-236 -   11-APR-1988 11:30:33
-GAME( 199?, sc1cb7p		    , 0	        , scorpion1		    , scorpion1 , bfm_sc1_state, lotse	     	, 0,	   "BFM",   "Bar Seven (Bellfruit) (Protocol) (Scorpion 1)", GAME_FLAGS)
-
-// this might be system 85, the rom config is 0x2000 + 0x8000, and it writes to the AY address we map on S85 for the alarm
-// however it still gives the same error message, has offset alpha text and appears to attempt to communicate with something we don't map, maybe it's some video based board / game with bits missing?
-GAME( 199?, sc1potp			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Pick Of The Pack (Bellfruit) (Scorpion 1)", GAME_FLAGS) //was mixed with the sc4/5 potp roms..  System status 98
-GAME( 199?, sc1potpa		, sc1potp	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Double Dealer (Bellfruit) (Scorpion 1)", GAME_FLAGS) // ^ with above.. seems the same game, but different name
 
 
 /********************************************************************************************************************************************************************************************************************
