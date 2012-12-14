@@ -1369,6 +1369,10 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			mfm_w(buffer, offset, 8, head);
 			break;
 
+		case HEAD_ID_SWAP:
+			mfm_w(buffer, offset, 8, !head);
+			break;
+
 		case TRACK_HEAD_ID_GCR6:
 			raw_w(buffer, offset, 8, gcr6fw_tb[(track & 0x40 ? 1 : 0) | (head ? 0x20 : 0)]);
 			break;

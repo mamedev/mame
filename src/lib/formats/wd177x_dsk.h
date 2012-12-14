@@ -39,7 +39,7 @@ public:
 	virtual bool save(io_generic *io, floppy_image *image);
 	virtual bool supports_save() const;
 
-private:
+protected:
 	const format *formats;
 	int find_size(io_generic *io, UINT32 form_factor);
 	int compute_track_size(const format &f) const;

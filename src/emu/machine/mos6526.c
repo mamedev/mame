@@ -935,6 +935,32 @@ READ8_MEMBER( mos6526_device::read )
 	return data;
 }
 
+READ8_MEMBER( mos8520_device::read )
+{
+	UINT8 data = 0;
+
+	switch (offset)
+	{
+	case TOD_MIN:
+		if (!m_tod_latched)
+		{
+			m_tod_latched = true;
+			m_tod_latch = m_tod;
+		}
+
+		data = read_tod(2);
+		break;
+
+	case TOD_HR:
+		data = read_tod(3);
+		break;
+
+	default:
+		data = mos6526_device::read(space, offset);
+	}
+
+	return data;
+}
 
 //-------------------------------------------------
 //  write -
@@ -1066,6 +1092,25 @@ WRITE8_MEMBER( mos6526_device::write )
 
 	case CRB:
 		set_crb(data);
+		break;
+	}
+}
+
+WRITE8_MEMBER( mos8520_device::write )
+{
+	switch (offset)
+	{
+	default:
+		mos6526_device::write(space, offset, data);
+		break;
+
+	case TOD_MIN:
+		m_tod_stopped = true;
+		write_tod(2, data);
+		break;
+
+	case TOD_HR:
+		write_tod(3, data);
 		break;
 	}
 }

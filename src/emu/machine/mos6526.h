@@ -247,8 +247,8 @@ class mos8520_device : public mos6526_device
 public:
 	mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	//DECLARE_READ8_MEMBER( read );
-	//DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
 protected:
 	inline void clock_tod();

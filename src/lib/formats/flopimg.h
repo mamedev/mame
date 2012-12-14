@@ -308,6 +308,7 @@ protected:
 		TRACK_ID,               //!< Track id byte, mfm-encoded
 		TRACK_ID_GCR6,          //!< Track id low 6 bits, gcr6-encoded
 		HEAD_ID,                //!< Head id byte, mfm-encoded
+		HEAD_ID_SWAP,           //!< Head id byte swapped (0->1, 1->0), mfm-encoded
 		TRACK_HEAD_ID_GCR6,     //!< Track id 7th bit + head, gc6-encoded
 		SECTOR_ID,              //!< Sector id byte, mfm-encoded
 		SECTOR_ID_GCR6,         //!< Sector id byte, gcr6-encoded

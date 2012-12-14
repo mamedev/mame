@@ -15,11 +15,10 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "imagedev/flopdrv.h"
 #include "formats/d81_dsk.h"
 #include "machine/cbmiec.h"
 #include "machine/mos6526.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 
 
 
@@ -27,7 +26,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define C1581_TAG			"c1581"
+#define C1581_TAG           "c1581"
 
 
 
@@ -38,12 +37,12 @@
 // ======================> base_c1581_device
 
 class base_c1581_device :  public device_t,
-						   public device_cbm_iec_interface
+							public device_cbm_iec_interface
 {
 
 public:
-    // construction/destruction
-    base_c1581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+	// construction/destruction
+	base_c1581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
 
 	enum
 	{
@@ -63,10 +62,12 @@ public:
 	DECLARE_READ8_MEMBER( cia_pb_r );
 	DECLARE_WRITE8_MEMBER( cia_pb_w );
 
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
 protected:
-    // device-level overrides
-    virtual void device_config_complete();
-    virtual void device_start();
+	// device-level overrides
+	virtual void device_config_complete();
+	virtual void device_start();
 	virtual void device_reset();
 
 	// device_cbm_iec_interface overrides
@@ -75,19 +76,18 @@ protected:
 	virtual void cbm_iec_data(int state);
 	virtual void cbm_iec_reset(int state);
 
-	inline void set_iec_data();
-	inline void set_iec_srq();
+	void update_iec();
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6526_device> m_cia;
-	required_device<wd1770_device> m_fdc;
-	required_device<legacy_floppy_image_device> m_image;
+	required_device<wd1772_t> m_fdc;
+	required_device<floppy_image_device> m_floppy;
 
-	int m_data_out;				// serial data out
-	int m_atn_ack;				// attention acknowledge
-	int m_fast_ser_dir;			// fast serial direction
-	int m_sp_out;				// fast serial data out
-	int m_cnt_out;				// fast serial clock out
+	int m_data_out;             // serial data out
+	int m_atn_ack;              // attention acknowledge
+	int m_fast_ser_dir;         // fast serial direction
+	int m_sp_out;               // fast serial data out
+	int m_cnt_out;              // fast serial clock out
 
 	int m_variant;
 };
@@ -98,8 +98,8 @@ protected:
 class c1563_device :  public base_c1581_device
 {
 public:
-    // construction/destruction
-    c1563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	c1563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -108,8 +108,8 @@ public:
 class c1581_device :  public base_c1581_device
 {
 public:
-    // construction/destruction
-    c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

@@ -2,20 +2,29 @@
 
     formats/d81_dsk.h
 
-    Floppy format code for Commodore 1581 disk images
+    Commodore 1581 disk image format
 
 *********************************************************************/
 
-#ifndef __D81_DSK__
-#define __D81_DSK__
+#ifndef D81_DSK_H_
+#define D81_DSK_H_
 
-#include "flopimg.h"
+#include "wd177x_dsk.h"
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
+class d81_format : public wd177x_format {
+public:
+	d81_format();
 
-FLOPPY_IDENTIFY( d81_dsk_identify );
-FLOPPY_CONSTRUCT( d81_dsk_construct );
+	virtual const char *name() const;
+	virtual const char *description() const;
+	virtual const char *extensions() const;
+
+	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
+
+private:
+	static const format formats[];
+};
+
+extern const floppy_format_type FLOPPY_D81_FORMAT;
 
 #endif
