@@ -8369,6 +8369,30 @@ GAME( 198?, sc2winstfp		, sc2winst	, scorpion2			, drwho	, bfm_sc2_state, drwho	
 
 
 /********************************************************************************************************************************************************************************************************************
+ Cash Explosion
+********************************************************************************************************************************************************************************************************************/
+
+#define sc2_cexpl_sound \
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )\
+
+ROM_START( sc2cexpl )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "cash_explosion_dat_ac_8_10pnd_20p_a.bin",  0x0000, 0x010000, CRC(1d155799) SHA1(4e76328a4d093d1f9c64c633c3558db2dce4e219) ) sc2_cexpl_sound ROM_END
+ROM_START( sc2cexpla ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "cash_explosion_dat_ac_var_8pnd_a.bin",     0x0000, 0x010000, CRC(4aa53121) SHA1(cf0510e224de62b837915d39c2fe3559cfe8c85f) ) sc2_cexpl_sound ROM_END
+ROM_START( sc2cexplb ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "cash_explosion_dat_wi_ac_10pnd_20p_a.bin", 0x0000, 0x010000, CRC(889eb206) SHA1(91b23a2cc475e68470d01976b88b9ea7aa0afed9) ) sc2_cexpl_sound ROM_END
+ROM_START( sc2cexplc ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "cash_explosion_std_ac_8_10pnd_20p_a.bin",  0x0000, 0x010000, CRC(de6bbee2) SHA1(3c321fa442b25a27c3f14b7ac94255f020056663) ) sc2_cexpl_sound ROM_END
+ROM_START( sc2cexpld ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "cash_explosion_std_ac_var_8pnd_a.bin",     0x0000, 0x010000, CRC(e8a21401) SHA1(479edd734ca949e344fb7e17ed7af7c8c9604efc) ) sc2_cexpl_sound ROM_END
+ROM_START( sc2cexple ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "cash_explosion_std_wi_ac_10pnd_20p_a.bin", 0x0000, 0x010000, CRC(2901a315) SHA1(c9733488894ccead7a69b161f2afacdb3f892b89) ) sc2_cexpl_sound ROM_END
+
+// PROJECT NUMBER 6518  CASH EXPLOSION 5/10/20P #8 IRISH ALL CASH - 12-JAN-1996 10:12:16
+GAME( 198?, sc2cexpld		, sc2cexpl  , scorpion2			, drwho	, bfm_sc2_state, drwho			, 0,       "BFM",      "Cash Explosion (Bellfruit) (set 1) (Scorpion 2)", GAME_FLAGS ) // GAME No 95-750-606
+GAME( 198?, sc2cexpla		, sc2cexpl  , scorpion2			, drwho	, bfm_sc2_state, drwho			, 0,       "BFM",      "Cash Explosion (Bellfruit) (set 1, Protocol) (Scorpion 2)", GAME_FLAGS ) // GAME No 95-751-606
+// PROJECT NUMBER 6776  CASH EXPLOSION DE-REG - 21-MAY-1996 12:38:53
+GAME( 198?, sc2cexplc		, sc2cexpl  , scorpion2			, drwho	, bfm_sc2_state, drwho			, 0,       "BFM",      "Cash Explosion (Bellfruit) (set 2) (Scorpion 2)", GAME_FLAGS ) // GAME No 95-750-723
+GAME( 198?, sc2cexpl		, 0	        , scorpion2			, drwho	, bfm_sc2_state, drwho			, 0,       "BFM",      "Cash Explosion (Bellfruit) (set 2, Protocol) (Scorpion 2)", GAME_FLAGS ) // GAME No 95-751-723
+// PROJECT NUMBER 6776  CASH EXPLOSION DE-REG WHITBREAD - 21-MAY-1996 12:40:20
+GAME( 198?, sc2cexple		, sc2cexpl  , scorpion2			, drwho	, bfm_sc2_state, drwho			, 0,       "BFM",      "Cash Explosion (Bellfruit) (set 3) (Scorpion 2)", GAME_FLAGS ) // GAME No 95-750-728
+GAME( 198?, sc2cexplb		, sc2cexpl  , scorpion2			, drwho	, bfm_sc2_state, drwho			, 0,       "BFM",      "Cash Explosion (Bellfruit) (set 3, Protocol) (Scorpion 2)", GAME_FLAGS ) // GAME No 95-751-728
+
+/********************************************************************************************************************************************************************************************************************
 *********************************************************************************************************************************************************************************************************************
 *********************************************************************************************************************************************************************************************************************
 

@@ -1467,14 +1467,6 @@ ROM_START( sc1cexpl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cashxpl2.bin", 0x0000, 0x8000, CRC(0199136c) SHA1(bed1df64ecc0d7ef951a59717e219e6fe7ebf99c) )
 	ROM_LOAD( "cashxpl1.bin", 0x8000, 0x8000, CRC(0fe62ead) SHA1(bd56a216292e9bf2b7753616a6cd25b37e22095f) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 ) // i think some of this is on different hw (SC2?)
-	ROM_LOAD( "cash_explosion_dat_ac_8_10pnd_20p_a.bin", 0x0000, 0x010000, CRC(1d155799) SHA1(4e76328a4d093d1f9c64c633c3558db2dce4e219) )
-	ROM_LOAD( "cash_explosion_dat_ac_var_8pnd_a.bin", 0x0000, 0x010000, CRC(4aa53121) SHA1(cf0510e224de62b837915d39c2fe3559cfe8c85f) )
-	ROM_LOAD( "cash_explosion_dat_wi_ac_10pnd_20p_a.bin", 0x0000, 0x010000, CRC(889eb206) SHA1(91b23a2cc475e68470d01976b88b9ea7aa0afed9) )
-	ROM_LOAD( "cash_explosion_std_ac_8_10pnd_20p_a.bin", 0x0000, 0x010000, CRC(de6bbee2) SHA1(3c321fa442b25a27c3f14b7ac94255f020056663) )
-	ROM_LOAD( "cash_explosion_std_ac_var_8pnd_a.bin", 0x0000, 0x010000, CRC(e8a21401) SHA1(479edd734ca949e344fb7e17ed7af7c8c9604efc) )
-	ROM_LOAD( "cash_explosion_std_wi_ac_10pnd_20p_a.bin", 0x0000, 0x010000, CRC(2901a315) SHA1(c9733488894ccead7a69b161f2afacdb3f892b89) )
 ROM_END
 
 ROM_START( sc1cexpla )
@@ -2298,8 +2290,6 @@ ROM_START( sc1btclk )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "bc6-4_0b.bin", 0x0000, 0x8000, CRC(106265c8) SHA1(6465f7e868c5b04776fee69295a52197abb45ad0) )
 	ROM_LOAD( "bc6-4_0a.bin", 0x8000, 0x8000, CRC(750645e7) SHA1(65eee2a00a1914bb8dc989b131eaa39d2881105d) )
-
-//  ROM_REGION( 0x80000, "altrevs", 0 )
 
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
 ROM_END

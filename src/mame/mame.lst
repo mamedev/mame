@@ -13419,17 +13419,6 @@ sc1winfl	// Winfalls (Bellfruit)
 sc1winst	// Winning Streak (Bellfruit)
 sc1winstp
 sc1winsta
-sc2winstb
-sc2winstbp
-sc2winst
-sc2winstp
-sc2winstd
-sc2winstdp
-sc2winste
-sc2winstep
-sc2winstf
-sc2winstfp
-sc2winstg
 sc1zep		// Zeppelin (Bellfruit)
 sc1wthn		// Wild Thing (Eurocoin)
 sc1days		// All In A Days Work (Global)
@@ -13937,6 +13926,23 @@ sc2prem		// Premier Club Manager (Bellfruit)
 sc2prem1
 sc2prem1p
 sc2prem2
+sc2winstb	// Winning Streak
+sc2winstbp
+sc2winst
+sc2winstp
+sc2winstd
+sc2winstdp
+sc2winste
+sc2winstep
+sc2winstf
+sc2winstfp
+sc2winstg
+sc2cexpl	// Cash Explosion
+sc2cexpla
+sc2cexplb
+sc2cexplc
+sc2cexpld
+sc2cexple
 
 
 // Scorpion 4 (& 5 & Adder 5)
