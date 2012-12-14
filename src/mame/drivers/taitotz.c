@@ -67,6 +67,88 @@ IC26    TM TECH  UA4464V T224162B-28J
 IC7 Panasonic MN1020819DA E68-01
 20.000 oscillator near IC7
 
+
+
+Rizing Ping Pong
+Taito 2002
+
+This game runs on Taito Type Zero hardware.
+
+PCB Layout
+----------
+
+TYPE ZERO MOTHER PCB
+K11X0878A
+J1100365A
+K11X0951A (Sticker)
+|-----------------------------------------------------------|
+|   D4811650 D4811650 D4811650 D4811650 D4811650  E87-02.IC6|
+|   D4811650 D4811650 D4811650                              |
+|                                                           |
+|G                                     M54V25632            |
+|                        |-----------|            E87-01.IC5|
+|   AD8073               | TAITO     |                      |
+|                        | TCG020AGP | M54V25632            |
+|        HY57V161610     |           |                      |
+|   ADV7120KP30          |           |                      |
+|        HY57V161610     |           |                      |
+|        HY57V161610     |-----------|                      |
+|        HY57V161610      V54C365164                        |
+|                         V54C365164                        |
+|                                                           |
+|                                PAL16V8                    |
+|               QS5V991          (E68-06)                   |
+|            66.6667MHz                                     |
+|                                  |-------|M51955A         |
+|                                  |       |      |-------| |
+|                                  |IDT7024|      |PPC603E| |
+|                                  |       |      |       | |
+|                                  |-------|      |-------| |
+|                                                           |
+|-----------------------------------------------------------|
+
+
+TYPE ZERO DAUGHTER PCB
+K9100745A
+J9100491A
+RIZINGPINGPONG K91J0905A (Sticker)
+RIZINGPINGPONG M43J0775A (Sticker)
+|-----------------------------------------------------------|
+|RESET_SW  5.5V        RTC64613                             |
+|          SUPERCAP  MB3790               F14-02.IC15       |
+|DS14C239              LC3564                               |
+|                                         F14-01.IC14       |
+|        IDC40       LC321664                               |
+|TD62064                                               20MHz|
+|          TOSHIBA            IDT7133         MN1020819     |
+|          TMP95C063                          (E68-01)      |
+|                     PAL16V8                               |
+|                     (E68-03)  25MHz XC9572                |
+|                                             HY5118164     |
+|             3.686MHz                                      |
+|                                                           |
+|C        SN74S1057                                         |
+|                                                           |
+|                                                           |
+|                                 ZOOM      ZOOM            |
+|                      V53C16258  ZFX-2     ZSG-2           |
+|                                                           |
+|                 MC3418          GM71C17403  GM71C17403    |
+|           LA2650     LC78834M                             |
+|                                 GM71C17403  GM71C17403    |
+|                                                           |
+|-----------------------------------------------------------|
+Notes:
+      Connectors C (daughter) and G (main) join to filter board
+      IDC40 - IDE HDD connector for Quantum Fireball LCT 4.3AT LA04A011 Rev 01-A
+              Serial number 691934013492 DGPXX
+              Sticker on HDD reads.....
+              4.3GB QUANTUM
+              QML04300LA-A
+              RIZING PING PONG EXP
+              M9005557A VER. 2.01O  (note '01O' is slightly scratched and could be incorrect)
+                
+      
 */
 
 #define ADDRESS_MAP_MODERN
@@ -521,6 +603,7 @@ public:
 	DECLARE_DRIVER_INIT(pwrshovl);
 	DECLARE_DRIVER_INIT(batlgear);
 	DECLARE_DRIVER_INIT(landhigh);
+	DECLARE_DRIVER_INIT(raizpin);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
@@ -1276,7 +1359,7 @@ void taitotz_renderer::render_displaylist(running_machine &machine, const rectan
 		else
 		{
 #if LOG_DISPLAY_LIST
-			printf("%08X (unknown)\n", cmd);
+			printf("%08X: %08X (unknown)\n", index, cmd);
 #endif
 			end = 1;
 		}
@@ -2541,6 +2624,9 @@ static const char BATLGR2_HDD_SERIAL[] =			// "            05412842"
 static const char BATLGR2A_HDD_SERIAL[] =			// "            05411645"
 	{ 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x30, 0x35, 0x34, 0x31, 0x31, 0x36, 0x34, 0x35 };
 
+static const char RAIZPIN_HDD_SERIAL[] =			// "691934013492        "
+	{ 0x36, 0x39, 0x31, 0x39, 0x33, 0x34, 0x30, 0x31, 0x33, 0x34, 0x39, 0x32, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
+
 DRIVER_INIT_MEMBER(taitotz_state,landhigh)
 {
 
@@ -2603,21 +2689,32 @@ DRIVER_INIT_MEMBER(taitotz_state,pwrshovl)
 	m_displist_addr = 0x4a989c;
 }
 
+DRIVER_INIT_MEMBER(taitotz_state,raizpin)
+{
+	init_taitotz_152(machine());
+
+	m_hdd_serial_number = RAIZPIN_HDD_SERIAL;
+
+	m_scr_base = 0x1c0000;
+
+	m_displist_addr = 0x33480c;
+}
+
 
 // Type-Zero System v1.52
-#define TAITOTZ_BIOS	\
+#define TAITOTZ_BIOS_V152	\
 	ROM_LOAD32_WORD_SWAP( "e68-05-1.ic6", 0x000000, 0x080000, CRC(6ad9b006) SHA1(f05a0ae26b6abaeda9c7944aee96c72b08fff7a5) )	\
 	ROM_LOAD32_WORD_SWAP( "e68-04-1.ic5", 0x000002, 0x080000, CRC(c7c2dc6b) SHA1(bf88c818166c285130c5c73d6982f009da26e143) )
 
 // Type-Zero System v1.11a (This was obtained from Battle Gear harddisk. An exact copy is also included in pwrshovl harddisk.)
-#define TAITOTZ_BIOS_OLD	\
+#define TAITOTZ_BIOS_V111A	\
 	ROM_LOAD32_WORD_SWAP( "ic6", 0x000000, 0x080000, CRC(29654245) SHA1(aaa34ff363eb96cf4a785fa6f9f7fc650b5ee93d) )	\
 	ROM_LOAD32_WORD_SWAP( "ic5", 0x000002, 0x080000, CRC(8784804a) SHA1(fe9eed5289dcc89f2bc98cb752895b13e44b6097) )
 
 
 ROM_START( taitotz )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
-	TAITOTZ_BIOS
+	TAITOTZ_BIOS_V152
 
 	ROM_REGION( 0x40000, "io_cpu", ROMREGION_ERASE00 )
 	ROM_REGION( 0x10000, "sound_cpu", ROMREGION_ERASE00 ) /* Internal ROM :( */
@@ -2627,7 +2724,7 @@ ROM_END
 
 ROM_START( landhigh )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
-	TAITOTZ_BIOS
+	TAITOTZ_BIOS_V152
 
 	ROM_REGION( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e82-03.ic14", 0x000000, 0x020000, CRC(0de65b4d) SHA1(932316f7435259b723a29843d58b2e3dca92e7b7) )
@@ -2647,7 +2744,7 @@ ROM_END
 
 ROM_START( batlgear )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
-	TAITOTZ_BIOS_OLD
+	TAITOTZ_BIOS_V111A
 
 	ROM_REGION( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e68-07.ic14",  0x000000, 0x020000, CRC(554c6fd7) SHA1(9f203dead81c7ccf73d7fd462cab147cd17f890f) )
@@ -2662,7 +2759,7 @@ ROM_END
 
 ROM_START( batlgr2 )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
-	TAITOTZ_BIOS
+	TAITOTZ_BIOS_V152
 
 	ROM_REGION( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e87-03.ic14",  0x000000, 0x020000, CRC(49ae7cd0) SHA1(15f07a6bb2044a85a2139481f1dc95a44520c929) )
@@ -2677,7 +2774,7 @@ ROM_END
 
 ROM_START( batlgr2a )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
-	TAITOTZ_BIOS
+	TAITOTZ_BIOS_V152
 
 	ROM_REGION( 0x40000, "io_cpu", 0 )
 	ROM_LOAD16_BYTE( "e87-03.ic14",  0x000000, 0x020000, CRC(49ae7cd0) SHA1(15f07a6bb2044a85a2139481f1dc95a44520c929) )
@@ -2692,7 +2789,7 @@ ROM_END
 
 ROM_START( pwrshovl )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
-	TAITOTZ_BIOS_OLD
+	TAITOTZ_BIOS_V111A
 
 	ROM_REGION( 0x40000, "io_cpu", 0 )
     ROM_LOAD16_BYTE( "e74-04.ic14",   0x000000, 0x020000, CRC(ef21a261) SHA1(7398826dbf48014b9c7e9454f978f3e419ebc64b) )
@@ -2705,10 +2802,26 @@ ROM_START( pwrshovl )
 	DISK_IMAGE( "pwrshovl", 0, SHA1(360f63b39f645851c513b4644fb40601b9ba1412) )
 ROM_END
 
+ROM_START( raizpin )
+	ROM_REGION64_BE( 0x100000, "user1", 0 )
+	TAITOTZ_BIOS_V152
+
+	ROM_REGION( 0x40000, "io_cpu", 0 )
+	ROM_LOAD16_BYTE( "f14-01.ic14",  0x000000, 0x020000, CRC(f86a184d) SHA1(46abd11430c08d4f384fb79a5a3a39e54f83b8d8) )
+	ROM_LOAD16_BYTE( "f14-02.ic15",  0x000001, 0x020000, CRC(bd2d0dee) SHA1(652f810702598184551de9fd69436862d48c1608) )
+
+	ROM_REGION( 0x10000, "sound_cpu", 0 ) /* Internal ROM :( */
+	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
+
+	DISK_REGION( "drive_0" )
+	DISK_IMAGE( "raizpin", 0, SHA1(883ebcda03026df31da1cdb95af521e100c171ed) )
+ROM_END
+
 GAME( 1999, taitotz,  0, taitotz, taitotz, driver_device, 0, ROT0, "Taito", "Type Zero BIOS", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT)
 GAME( 1999, landhigh, taitotz, landhigh, landhigh, taitotz_state, landhigh, ROT0, "Taito", "Landing High Japan", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1999, batlgear, taitotz, taitotz,  batlgr2, taitotz_state,  batlgear, ROT0, "Taito", "Battle Gear", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1999, pwrshovl, taitotz, taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2000, batlgr2,  taitotz, taitotz,  batlgr2, taitotz_state,  batlgr2,  ROT0, "Taito", "Battle Gear 2 (v2.04J)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2000, batlgr2a, batlgr2, taitotz,  batlgr2, taitotz_state,  batlgr2a, ROT0, "Taito", "Battle Gear 2 (v2.01J)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2002, raizpin,  taitotz, taitotz,  taitotz, taitotz_state,  raizpin,  ROT0, "Taito", "Raizin Ping Pong", GAME_NOT_WORKING | GAME_NO_SOUND )
 
