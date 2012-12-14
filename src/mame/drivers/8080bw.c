@@ -135,11 +135,11 @@
       2. If "Hard" mode is selected, numerous bugs appear which
          seems to be an emulation fault. Every revision we have
          shows the problem, whereas the real hardware works fine.
-	 - You start with 9000 points (instead of 0).
+         - You start with 9000 points (instead of 0).
          - On the screen where you are awarded your Bonus, you will
            instead get (or sometimes lose) a random amount.
          - At the end, if you got the High Score, it could be changed
-	   to something else.
+           to something else.
          All these bugs can be cured by a simple 1-byte patch:
          ROM_FILL( 0x47e5, 1, 0xc3), but why is it necessary?
 
@@ -1160,7 +1160,7 @@ static INPUT_PORTS_START( schaser )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_DIPNAME( 0x60, 0x00, "Hard Starting Level" )		PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x60, 0x00, "Hard Starting Level" )	PORT_DIPLOCATION("SW1:5,7")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x40, "5" )
