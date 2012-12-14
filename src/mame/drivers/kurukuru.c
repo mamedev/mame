@@ -23,8 +23,8 @@
 
   CPU   : 2x Sharp LH0080A Z80A
   
-  MEM   : 1x Sharp LH5116H-10 (2KB SRAM) + battery
-          1x Fairchild 8464A-10L (8KB SRAM)
+  MEM   : 1x Sharp LH5116H-10 (2KB SRAM)
+          1x Fairchild 8464A-10L (8KB SRAM) + battery
           6x Sharp LH2464-15 (192KB Video DRAM total)
 
   SOUND : 1x Yamaha YM2149F
@@ -87,7 +87,7 @@
 
   - Audio CPU interrupts and connections/latches.
   - M5205 ADPCM system.
-  - Hook up AY8910 output ports.
+  - Hook up AY8910 output ports. Or unused?
   - Find why the use of coin 1 always jams. Hopper?
 
 
@@ -174,9 +174,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_samples_w)
 static ADDRESS_MAP_START( kurukuru_map, AS_PROGRAM, 8, kurukuru_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe400, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share")
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
@@ -207,7 +205,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, kurukuru_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share")
+	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_io, AS_IO, 8, kurukuru_state )
@@ -235,8 +233,8 @@ ADDRESS_MAP_END
   0090    out ($50),a
   0092    ret
   0093    out ($40),a
-  0095    in a,($70)
-  0097    in a,($60)
+  0095    in a,($70)    ; maybe irqack?
+  0097    in a,($60)    ; soundlatch?
   0099    cp $0e
   009b    jr nc,$00aa
   009d    ld ($f800),a
@@ -250,16 +248,7 @@ ADDRESS_MAP_END
   28h:
 
   0028    jp $0097
-  0097    in a,($60)
-  0099    cp $0e
-  009b    jr nc,$00aa
-  009d    ld ($f800),a
-  00a0    call $008e
-  00a3    ld sp,$0000
-  00a6    ld hl,$0033
-  00a9    push hl
-  00aa    ei
-  00ab    reti
+  0097    -> see above
 
   30h:
 
@@ -361,7 +350,6 @@ void kurukuru_state::machine_start()
 
 void kurukuru_state::machine_reset()
 {
-	//membank("bank1")->set_entry(2);
 }
 
 
