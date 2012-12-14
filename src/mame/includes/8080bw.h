@@ -74,6 +74,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lupin3_00_w);
 	DECLARE_WRITE8_MEMBER(lupin3_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(lupin3_sh_port_2_w);
+	DECLARE_READ8_MEMBER(schasercv_02_r);
 	DECLARE_WRITE8_MEMBER(schasercv_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(schasercv_sh_port_2_w);
 	DECLARE_WRITE8_MEMBER(yosakdon_sh_port_1_w);

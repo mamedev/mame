@@ -897,14 +897,14 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_1_w)
 			if (!m_schaser_effect_555_is_low)
 			{
 				m_schaser_effect_555_time_remain = m_schaser_effect_555_timer->time_left();
-            		m_schaser_effect_555_time_remain_savable = m_schaser_effect_555_time_remain.as_double();
+				m_schaser_effect_555_time_remain_savable = m_schaser_effect_555_time_remain.as_double();
 				m_schaser_effect_555_timer->adjust(attotime::never);
 			}
 		}
 		m_schaser_last_effect = effect;
 	}
 
-	m_schaser_explosion = (data >> 5) & 0x01;
+	m_schaser_explosion = BIT(data, 5);
 	if (m_schaser_explosion)
 	{
 		sn76477_amplitude_res_w(m_sn, 1.0 / (1.0/RES_K(200) + 1.0/RES_K(68)));
@@ -929,17 +929,17 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_2_w)
 
 	//printf( "schaser_sh_port_2_w: %02x\n", data );
 
-	discrete_sound_w(m_discrete, space, SCHASER_MUSIC_BIT, data & 0x01);
+	discrete_sound_w(m_discrete, space, SCHASER_MUSIC_BIT, BIT(data, 0));
 
-	discrete_sound_w(m_discrete, space, SCHASER_SND_EN, data & 0x02);
-	machine().sound().system_enable(data & 0x02);
+	discrete_sound_w(m_discrete, space, SCHASER_SND_EN, BIT(data, 1));
+	machine().sound().system_enable(BIT(data, 1));
 
-	coin_lockout_global_w(machine(), data & 0x04);
+	coin_lockout_global_w(machine(), BIT(data, 2));
 
-	m_schaser_background_disable = (data >> 3) & 0x01;
-	m_schaser_background_select = (data >> 4) & 0x01;
+	m_schaser_background_disable = BIT(data, 3);
+	m_schaser_background_select = BIT(data, 4);
 
-	m_c8080bw_flip_screen = (data & 0x20) && (ioport(CABINET_PORT_TAG)->read() & 0x01);
+	m_c8080bw_flip_screen = BIT(data, 5) & BIT(ioport("IN2")->read(), 6);
 
 	m_port_2_last_extra = data;
 }

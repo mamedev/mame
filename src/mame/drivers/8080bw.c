@@ -1176,14 +1176,10 @@ static INPUT_PORTS_START( schaser )
 	// Name Reset - if name of high scorer was rude, owner can press this button
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Name Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_DIPNAME( 0x40, 0x00, "Number of Controllers" )	PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPNAME( 0x40, 0x00, "Cabinet" )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x00, "Upright" )
+	PORT_DIPSETTING(    0x40, "Cocktail" )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	// port 3 (all 8 bits) connected to custom chip MB14241 driven by out port 2 and 4
-	// To get cocktail mode, turn this on, and choose 2 controllers.
-	INVADERS_CAB_TYPE_PORT	/* Dummy port for cocktail mode */
 
 	PORT_START("VR1")
 	PORT_ADJUSTER( 70, "VR1 - Music Volume" )
@@ -1247,10 +1243,19 @@ MACHINE_CONFIG_END
 /*                                                     */
 /*******************************************************/
 
+
+READ8_MEMBER( _8080bw_state::schasercv_02_r )
+{
+	UINT8 data = ioport("IN2")->read();
+	if (m_c8080bw_flip_screen) return data;
+	UINT8 in1 = ioport("IN1")->read();
+	return (data & 0x89) | (in1 & 0x70) | (BIT(in1, 3) << 1) | (BIT(in1, 7) << 2);
+}
+
 static ADDRESS_MAP_START( schasercv_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
+	AM_RANGE(0x02, 0x02) AM_READ(schasercv_02_r) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
 	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r) AM_WRITE(schasercv_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(schasercv_sh_port_2_w)
