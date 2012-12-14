@@ -53,20 +53,24 @@ const char *smx_format::name() const
 
 const char *smx_format::description() const
 {
-	return "Specialist MX disk image";
+	return "Specialist MX/Orion/B2M disk image";
 }
 
 const char *smx_format::extensions() const
 {
-	return "odi,cpm";
+	return "odi,cpm,img";
 }
 
 // Unverified gap sizes
 const smx_format::format smx_format::formats[] =
 {
-	{   //  720K 5.25 inch
+	{   //  Specialist MX/Orion/B2M disk image
 		floppy_image::FF_525,  floppy_image::DSQD,
 		2000, 5, 80, 2, 1024, {}, 1, {}, 100, 22, 20
+	},
+	{   //  Lucksian Key Orion disk image
+		floppy_image::FF_525,  floppy_image::DSQD,
+		2000, 9, 80, 2, 512, {}, 1, {}, 100, 22, 20
 	},
 	{}
 };

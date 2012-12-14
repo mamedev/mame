@@ -7,6 +7,7 @@
 #ifndef ORION_H_
 #define ORION_H_
 
+#include "machine/wd_fdc.h"
 #include "includes/radio86.h"
 #include "machine/i8255.h"
 
@@ -14,7 +15,9 @@ class orion_state : public radio86_state
 {
 public:
 	orion_state(const machine_config &mconfig, device_type type, const char *tag)
-		: radio86_state(mconfig, type, tag) { }
+		: radio86_state(mconfig, type, tag),
+		  m_fdc(*this, "fd1793")
+		{ }
 
 	UINT8 m_orion128_video_mode;
 	UINT8 m_orion128_video_page;
@@ -34,6 +37,9 @@ public:
 	UINT8 m_orionpro_128_page;
 	UINT8 m_orionpro_rom2_segment;
 	UINT8 m_orionpro_dispatcher;
+
+	required_device<fd1793_t> m_fdc;
+
 	DECLARE_READ8_MEMBER(orion128_system_r);
 	DECLARE_WRITE8_MEMBER(orion128_system_w);
 	DECLARE_READ8_MEMBER(orion128_romdisk_r);
@@ -67,6 +73,7 @@ public:
 	DECLARE_READ8_MEMBER(orion_romdisk_porta_r);
 	DECLARE_WRITE8_MEMBER(orion_romdisk_portb_w);
 	DECLARE_WRITE8_MEMBER(orion_romdisk_portc_w);
+	DECLARE_FLOPPY_FORMATS( orion_floppy_formats );
 };
 
 /*----------- defined in machine/orion.c -----------*/

@@ -12,7 +12,6 @@
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
 #include "machine/mc146818.h"
-#include "machine/wd17xx.h"
 #include "sound/speaker.h"
 #include "sound/ay8910.h"
 #include "includes/orion.h"
@@ -165,44 +164,45 @@ MACHINE_RESET_MEMBER(orion_state,orion128)
 
 WRITE8_MEMBER(orion_state::orion_disk_control_w)
 {
-	device_t *fdc = machine().device("wd1793");
+	static const char *names[] = { "fd0", "fd1", "fd2", "fd3"};
+	floppy_image_device *floppy = NULL;
+	floppy_connector *con = machine().device<floppy_connector>(names[data & 3]);
+	if(con)
+		floppy = con->get_device();
 
-	wd17xx_set_side(fdc,((data & 0x10) >> 4) ^ 1);
-	wd17xx_set_drive(fdc,data & 3);
+	m_fdc->set_floppy(floppy);
+	floppy->mon_w(0);
+	floppy->ss_w(((data & 0x10) >> 4) ^ 1);	
 }
 
 READ8_MEMBER(orion_state::orion128_floppy_r)
 {
-	device_t *fdc = machine().device("wd1793");
-
 	switch(offset)
 	{
 		case 0x0	:
-		case 0x10 : return wd17xx_status_r(fdc,space, 0);
+		case 0x10 : return m_fdc->status_r(space, 0);
 		case 0x1	:
-		case 0x11 : return wd17xx_track_r(fdc,space, 0);
+		case 0x11 : return m_fdc->track_r(space, 0);
 		case 0x2  :
-		case 0x12 : return wd17xx_sector_r(fdc,space, 0);
+		case 0x12 : return m_fdc->sector_r(space, 0);
 		case 0x3  :
-		case 0x13 : return wd17xx_data_r(fdc,space, 0);
+		case 0x13 : return m_fdc->data_r(space, 0);
 	}
 	return 0xff;
 }
 
 WRITE8_MEMBER(orion_state::orion128_floppy_w)
 {
-	device_t *fdc = machine().device("wd1793");
-
 	switch(offset)
 	{
 		case 0x0	:
-		case 0x10 : wd17xx_command_w(fdc,space, 0,data); break;
+		case 0x10 : m_fdc->cmd_w(space, 0,data); break;
 		case 0x1	:
-		case 0x11 : wd17xx_track_w(fdc,space, 0,data);break;
+		case 0x11 : m_fdc->track_w(space, 0,data);break;
 		case 0x2  :
-		case 0x12 : wd17xx_sector_w(fdc,space, 0,data);break;
+		case 0x12 : m_fdc->sector_w(space, 0,data);break;
 		case 0x3  :
-		case 0x13 : wd17xx_data_w(fdc,space, 0,data);break;
+		case 0x13 : m_fdc->data_w(space, 0,data);break;
 		case 0x4  :
 		case 0x14 :
 		case 0x20 : orion_disk_control_w(space, offset, data);break;
@@ -541,8 +541,6 @@ MACHINE_RESET_MEMBER(orion_state,orionpro)
 
 READ8_MEMBER(orion_state::orionpro_io_r)
 {
-	device_t *fdc = machine().device("wd1793");
-
 	switch (offset & 0xff)
 	{
 		case 0x00 : return 0x56;
@@ -552,10 +550,10 @@ READ8_MEMBER(orion_state::orionpro_io_r)
 		case 0x08 : return m_orionpro_page;
 		case 0x09 : return m_orionpro_rom2_segment;
 		case 0x0a : return m_orionpro_dispatcher;
-		case 0x10 : return wd17xx_status_r(fdc,space, 0);
-		case 0x11 : return wd17xx_track_r(fdc,space, 0);
-		case 0x12 : return wd17xx_sector_r(fdc,space, 0);
-		case 0x13 : return wd17xx_data_r(fdc,space, 0);
+		case 0x10 : return m_fdc->status_r(space, 0);
+		case 0x11 : return m_fdc->track_r(space, 0);
+		case 0x12 : return m_fdc->sector_r(space, 0);
+		case 0x13 : return m_fdc->data_r(space, 0);
 		case 0x18 :
 		case 0x19 :
 		case 0x1a :
@@ -575,8 +573,6 @@ READ8_MEMBER(orion_state::orionpro_io_r)
 
 WRITE8_MEMBER(orion_state::orionpro_io_w)
 {
-	device_t *fdc = machine().device("wd1793");
-
 	switch (offset & 0xff)
 	{
 		case 0x04 : m_orionpro_ram0_segment = data; orionpro_bank_switch(machine()); break;
@@ -585,10 +581,10 @@ WRITE8_MEMBER(orion_state::orionpro_io_w)
 		case 0x08 : m_orionpro_page = data;		  orionpro_bank_switch(machine()); break;
 		case 0x09 : m_orionpro_rom2_segment = data; orionpro_bank_switch(machine()); break;
 		case 0x0a : m_orionpro_dispatcher = data;   orionpro_bank_switch(machine()); break;
-		case 0x10 : wd17xx_command_w(fdc,space, 0,data); break;
-		case 0x11 : wd17xx_track_w(fdc,space, 0,data);break;
-		case 0x12 : wd17xx_sector_w(fdc,space, 0,data);break;
-		case 0x13 : wd17xx_data_w(fdc,space, 0,data);break;
+		case 0x10 : m_fdc->cmd_w(space, 0,data); break;
+		case 0x11 : m_fdc->track_w(space, 0,data);break;
+		case 0x12 : m_fdc->sector_w(space, 0,data);break;
+		case 0x13 : m_fdc->data_w(space, 0,data);break;
 		case 0x14 : orion_disk_control_w(space, 9, data);break;
 		case 0x18 :
 		case 0x19 :

@@ -15,11 +15,9 @@
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "machine/mc146818.h"
-#include "machine/wd17xx.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
 #include "imagedev/cassette.h"
 #include "imagedev/cartslot.h"
+#include "formats/smx_dsk.h"
 #include "formats/rk_cas.h"
 #include "includes/orion.h"
 #include "machine/ram.h"
@@ -87,41 +85,13 @@ static const cassette_interface orion_cassette_interface =
 	NULL
 };
 
-static LEGACY_FLOPPY_OPTIONS_START(orion)
-	LEGACY_FLOPPY_OPTION(orion, "odi,img", "Orion disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([5])
-		SECTOR_LENGTH([1024])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION(orion_lk, "odi,img", "Lucksian Key Orion disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([9])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-LEGACY_FLOPPY_OPTIONS_END
+FLOPPY_FORMATS_MEMBER( orion_state::orion_floppy_formats )
+	FLOPPY_SMX_FORMAT
+FLOPPY_FORMATS_END
 
-static const wd17xx_interface orion_wd17xx_interface =
-{
-	DEVCB_LINE_VCC,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	{ FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3 }
-};
-
-static const floppy_interface orion_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(orion),
-	NULL,
-	NULL
-};
+static SLOT_INTERFACE_START( orion_floppies )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
+SLOT_INTERFACE_END
 
 /* Machine driver */
 static MACHINE_CONFIG_START( orion128, orion_state )
@@ -155,9 +125,12 @@ static MACHINE_CONFIG_START( orion128, orion_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, orion_cassette_interface )
 
-	MCFG_FD1793_ADD("wd1793", orion_wd17xx_interface )
+	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(orion_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd2", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd3", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
 
 	MCFG_CARTSLOT_ADD("cart")
 
@@ -218,9 +191,12 @@ static MACHINE_CONFIG_START( orionz80, orion_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, orion_cassette_interface )
 
-	MCFG_FD1793_ADD("wd1793", orion_wd17xx_interface )
+	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(orion_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd2", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd3", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
 
 	MCFG_CARTSLOT_ADD("cart")
 
@@ -271,9 +247,12 @@ static MACHINE_CONFIG_START( orionpro, orion_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, orion_cassette_interface )
 
-	MCFG_FD1793_ADD("wd1793", orion_wd17xx_interface )
+	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
 
-	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(orion_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd2", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd3", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
 
 	MCFG_CARTSLOT_ADD("cart")
 
