@@ -1689,18 +1689,17 @@ Dip Switch - Donkey King
 +----------------+-----+-----+-----+-----+-----+-----+-----+-----+ */
 
 
+
+
 ROM_START( dking )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "d11.r2",       0x0800, 0x0800, CRC(f7cace41) SHA1(981dbb1cddd66a0cbc8fe147172ffe7eb5b7fa21) )
 	ROM_CONTINUE( 0x0000, 0x800 )
-	ROM_LOAD( "falcon8",      0x1000, 0x1000, CRC(88b83ff7) SHA1(4afc494cc264aaa4614da6aed02ce062d9c20850) ) // d7.1n
-	ROM_LOAD( "falcon9",      0x2000, 0x1000, CRC(cff2af47) SHA1(1757428cefad13855a623162101ec01c04006c94) ) // d9.2n
-	ROM_LOAD( "falcon10",     0x3000, 0x1000, CRC(6b2ecf23) SHA1(75098de72f9b2966534b5c3d4bfaf4893c22150a) ) // d10.2n
+	ROM_LOAD( "d7.1n",      0x1000, 0x1000, CRC(fe89dea4) SHA1(c39372ebe9950808ebc1ff7909c291496b206026) ) 
+	ROM_LOAD( "d9.2m",      0x2000, 0x1000, CRC(b9c34e14) SHA1(dcfe45dede6aef52a2989978762df9c5463bbbf2) )
+	ROM_LOAD( "d10.2n",     0x3000, 0x1000, CRC(243e458d) SHA1(de98fc90915913069b6802d5c662db18f56c36be) )
 	ROM_LOAD( "d8.1r",        0x4800, 0x0800, CRC(7c66fb5c) SHA1(5eda9b0037f958433d96bc945c1273b66ef9cac5) )
 	ROM_CONTINUE( 0x4000, 0x800 )
-
-// d8.1r and d11.r2 share parts of original falcon11 and falcon7 from ckong parent set.  Assuming the extra prom is a
-// decryption table this would likely get sorted out at driver init or might require some different mapping.
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "falcon6",      0x0000, 0x1000, CRC(a8916dc8) SHA1(472520aae3837e6026f2a7577d3b2aff371a316c) ) // d4.6n
@@ -2275,11 +2274,13 @@ DRIVER_INIT_MEMBER(cclimber_state,dking)
 {
 	UINT8 *rom = memregion( "maincpu" )->base();
 	int i;
-	for (i=0x0500;i<0x0800;i++)  rom[i] ^=0xff;
-	for (i=0x0d00;i<0x1000;i++)  rom[i] ^=0xff;
+	int j;
 
-	for (i=0x4500;i<0x4800;i++)  rom[i] ^=0xff;
-	for (i=0x4d00;i<0x5000;i++)  rom[i] ^=0xff;
+	for (j=0;j<0x5000;j+=0x1000)
+	{
+		for (i=0x0500;i<0x0800;i++)  rom[i+j] ^=0xff;
+		for (i=0x0d00;i<0x1000;i++)  rom[i+j] ^=0xff;
+	}
 
 }
 
