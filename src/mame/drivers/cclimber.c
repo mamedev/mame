@@ -1691,11 +1691,13 @@ Dip Switch - Donkey King
 
 ROM_START( dking )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "d8.1r",        0x0000, 0x1000, CRC(7c66fb5c) SHA1(5eda9b0037f958433d96bc945c1273b66ef9cac5) )
+	ROM_LOAD( "d11.r2",       0x0800, 0x0800, CRC(f7cace41) SHA1(981dbb1cddd66a0cbc8fe147172ffe7eb5b7fa21) )
+	ROM_CONTINUE( 0x0000, 0x800 )
 	ROM_LOAD( "falcon8",      0x1000, 0x1000, CRC(88b83ff7) SHA1(4afc494cc264aaa4614da6aed02ce062d9c20850) ) // d7.1n
 	ROM_LOAD( "falcon9",      0x2000, 0x1000, CRC(cff2af47) SHA1(1757428cefad13855a623162101ec01c04006c94) ) // d9.2n
 	ROM_LOAD( "falcon10",     0x3000, 0x1000, CRC(6b2ecf23) SHA1(75098de72f9b2966534b5c3d4bfaf4893c22150a) ) // d10.2n
-	ROM_LOAD( "d11.r2",       0x4000, 0x1000, CRC(f7cace41) SHA1(981dbb1cddd66a0cbc8fe147172ffe7eb5b7fa21) )
+	ROM_LOAD( "d8.1r",        0x4800, 0x0800, CRC(7c66fb5c) SHA1(5eda9b0037f958433d96bc945c1273b66ef9cac5) )
+	ROM_CONTINUE( 0x4000, 0x800 )
 
 // d8.1r and d11.r2 share parts of original falcon11 and falcon7 from ckong parent set.  Assuming the extra prom is a
 // decryption table this would likely get sorted out at driver init or might require some different mapping.
@@ -2269,6 +2271,18 @@ DRIVER_INIT_MEMBER(cclimber_state,toprollr)
 	toprollr_decode(machine(), "maincpu", "user1");
 }
 
+DRIVER_INIT_MEMBER(cclimber_state,dking)
+{
+	UINT8 *rom = memregion( "maincpu" )->base();
+	int i;
+	for (i=0x0500;i<0x0800;i++)  rom[i] ^=0xff;
+	for (i=0x0d00;i<0x1000;i++)  rom[i] ^=0xff;
+
+	for (i=0x4500;i<0x4800;i++)  rom[i] ^=0xff;
+	for (i=0x4d00;i<0x5000;i++)  rom[i] ^=0xff;
+
+}
+
 
 GAME( 1980, cclimber,    0,        cclimber, cclimber, cclimber_state, cclimber, ROT0,   "Nichibutsu", "Crazy Climber (US)", 0 )
 GAME( 1980, cclimberj,   cclimber, cclimber, cclimberj, cclimber_state,cclimberj,ROT0,   "Nichibutsu", "Crazy Climber (Japan)", 0 )
@@ -2281,7 +2295,7 @@ GAME( 1980, ccboot2,     cclimber, cclimber, cclimber, cclimber_state, cclimberj
 GAME( 1981, ckong,       0,        cclimber, ckong, driver_device,    0,        ROT270, "Kyoei / Falcon", "Crazy Kong", 0 ) // on a Falcon FCK-01 PCB, but doesn't display any Falcon copyright
 GAME( 1981, ckongalc,    ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)", 0 )
 GAME( 1981, monkeyd,     ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg", "Monkey Donkey", 0 )
-GAME( 1981, dking,       ckong   , cclimber, ckong, driver_device,    0,        ROT270, "bootleg", "Donkey King", 0 )
+GAME( 1981, dking,       ckong   , cclimber, ckong, cclimber_state,    dking,    ROT270, "bootleg", "Donkey King", 0 )
 
 /* these sets have correct colours, and also contain the graphics used for the extra attract screen in the BG roms, but it is unused
  - the Falcon logo in the text roms is still unused
