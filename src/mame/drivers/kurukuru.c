@@ -110,6 +110,7 @@ public:
 	required_device<v9938_device> m_v9938;
 
 	DECLARE_WRITE8_MEMBER(kurukuru_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(kurukuru_samples_w);
 	DECLARE_WRITE8_MEMBER(kurukuru_outport_w);
 
 	virtual void machine_start();
@@ -160,6 +161,12 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_outport_w)
 }
 
 
+WRITE8_MEMBER(kurukuru_state::kurukuru_samples_w)
+{
+	popmessage("triggered sample: %02X", data);
+}
+
+
 /*************************************************
 *                  Memory Map                    *
 *************************************************/
@@ -176,7 +183,7 @@ static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //	AM_RANGE(0x00, 0x00) AM_WRITENOP // seems for switch cpu... or irq?
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")
-//	AM_RANGE(0x20, 0x20) AM_WRITE    // trigger the m5205 sample number.
+	AM_RANGE(0x20, 0x20) AM_WRITE(kurukuru_samples_w)    // trigger the m5205 sample number.
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
 	AM_RANGE(0x90, 0x90) AM_WRITE(kurukuru_bankswitch_w)
 	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN0")
@@ -210,9 +217,58 @@ static ADDRESS_MAP_START( audio_io, AS_IO, 8, kurukuru_state )
 ADDRESS_MAP_END
 
 /*
-  0x50 Write 0x0b
+  0x40 Write
+  0x50 Write (0x0b)
   0x60 Read
   0x70 Read
+*/
+
+/*
+   Interrupts for audio CPU
+   Vectors for IM0
+   20h - 28h - 30h
+
+  20h:
+
+  0020    jp $0093
+  008e    ld a,$0b
+  0090    out ($50),a
+  0092    ret
+  0093    out ($40),a
+  0095    in a,($70)
+  0097    in a,($60)
+  0099    cp $0e
+  009b    jr nc,$00aa
+  009d    ld ($f800),a
+  00a0    call $008e
+  00a3    ld sp,$0000
+  00a6    ld hl,$0033
+  00a9    push hl
+  00aa    ei
+  00ab    reti
+
+  28h:
+
+  0028    jp $0097
+  0097    in a,($60)
+  0099    cp $0e
+  009b    jr nc,$00aa
+  009d    ld ($f800),a
+  00a0    call $008e
+  00a3    ld sp,$0000
+  00a6    ld hl,$0033
+  00a9    push hl
+  00aa    ei
+  00ab    reti
+
+  30h:
+
+  0030    jp $00ad
+  00ad    out ($40),a
+  00af    in a,($70)
+  00b1    ei
+  00b2    reti
+
 */
 
 
