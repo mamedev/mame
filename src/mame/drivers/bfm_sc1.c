@@ -1175,11 +1175,11 @@ static void sc1_common_init(running_machine &machine, int reels, int decrypt, in
 int sc1_find_project_string(running_machine &machine )
 {
 	// search for the project string to find the title (usually just at ff00)
-	char title_string[6][32] = { "PROJECT NUMBER", "PROJECT PR", "PROJECT ", "CASH ON THE NILE 2", "PR6121", "CHINA TOWN\x0d\x0a" };
+	char title_string[7][32] = { "PROJECT NUMBER", "PROJECT PR", "PROJECT ", "CASH ON THE NILE 2", "PR6121", "CHINA TOWN\x0d\x0a", "PROJECTNUMBER" };
 	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
 	int size = machine.root_device().memregion( "maincpu" )->bytes();
 
-	for (int search=0;search<6;search++)
+	for (int search=0;search<7;search++)
 	{
 
 		int strlength = strlen(title_string[search]);
@@ -2601,14 +2601,6 @@ ROM_START( sc1chainp )
 	/* Missing? */
 ROM_END
 
-ROM_START( sc1chaina )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "95717211.bin", 0x0000, 0x8000, CRC(ed781e00) SHA1(67ebb58beda5123f061a22dacd008f1feb75b8d9) )
-	ROM_LOAD( "95717210.bin", 0x8000, 0x8000, CRC(102d2bc8) SHA1(8ed5f44e6014e21f677762e40076d648901d1ff2) )
-
-	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
-	/* Missing? */
-ROM_END
 
 ROM_START( sc1potp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2715,7 +2707,6 @@ GAME( 1990, sc1clatta		, sc1clatt	, scorpion1			, clatt		, bfm_sc1_state, clatt	
 
 /********************************************************************************************************************************************************************************************************************
  Cash Wise
-  sc1cshwzd has no appropriate rom to map at 0x0000
  ********************************************************************************************************************************************************************************************************************/
 
 ROM_START( sc1cshwza ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "95727206b 74-78 adj.bin", 0x0000, 0x8000, CRC(2b0ea9dc) SHA1(a9099abe2cf4cdf119a00e5a218507798d410eff) ) ROM_LOAD( "95727205a 74-78 adj.bin",       0x8000, 0x8000, CRC(7c7ddabc) SHA1(b4c7a9ee929b5635091366948257f273a21d7818) ) ROM_END
@@ -2724,7 +2715,10 @@ ROM_START( sc1cshwz )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "95717206b 
 ROM_START( sc1cshwzc ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "95717206b std.bin",       0x0000, 0x8000, CRC(2478530f) SHA1(be82a4e36a3c076b9e94fa2364904ca463b6b4ed) ) ROM_LOAD( "95718205a std ptel.bin",        0x8000, 0x8000, CRC(c88f476c) SHA1(a5d8f12ade77bdb100ece5f2eecec35ae09f3b0e) ) ROM_END
 ROM_START( sc1cshwzb ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "95727211b 74-78 sw.bin",  0x0000, 0x8000, CRC(e20ee4d3) SHA1(3440ad647f8e009a13de6ff9797a47c636a50123) ) ROM_LOAD( "95727210a 74-78 sw.bin",        0x8000, 0x8000, CRC(6276ee67) SHA1(cc9b794f0add6d68677858719831e10afbdbc699) ) ROM_END
 ROM_START( sc1cshwzf ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "95727211b 74-78 sw.bin",  0x0000, 0x8000, CRC(e20ee4d3) SHA1(3440ad647f8e009a13de6ff9797a47c636a50123) ) ROM_LOAD( "95728210a 74-78 proto.bin",     0x8000, 0x8000, CRC(5c502423) SHA1(4fc93de9dd3aff7a8a8f828760d8b095b7a13630) ) ROM_END
-ROM_START( sc1cshwzd ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "sc1cshwzd_romb.bin",      0x0000, 0x8000, NO_DUMP )                                                      ROM_LOAD( "95718210a proto var.bin",       0x8000, 0x8000, CRC(0997c4e9) SHA1(1013a12803796d3926cceeb671c7c07cc66d418e) ) ROM_END
+ROM_START( sc1cshwzg ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "95717211.bin",            0x0000, 0x8000, CRC(ed781e00) SHA1(67ebb58beda5123f061a22dacd008f1feb75b8d9) ) ROM_LOAD( "95717210.bin",                  0x8000, 0x8000, CRC(102d2bc8) SHA1(8ed5f44e6014e21f677762e40076d648901d1ff2) ) ROM_END
+ROM_START( sc1cshwzd ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "95717211.bin",            0x0000, 0x8000, CRC(ed781e00) SHA1(67ebb58beda5123f061a22dacd008f1feb75b8d9) ) ROM_LOAD( "95718210a proto var.bin",       0x8000, 0x8000, CRC(0997c4e9) SHA1(1013a12803796d3926cceeb671c7c07cc66d418e) ) ROM_END
+
+
 
 // PROJECT NUMBER 5423  CASH WISE - 13-MAY-1989 14:46:29
 GAME( 198?, sc1cshwza		, sc1cshwz	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Wise (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-380-100
@@ -2736,6 +2730,7 @@ GAME( 198?, sc1cshwzc		, sc1cshwz	, scorpion1			, scorpion1	, bfm_sc1_state, lot
 GAME( 198?, sc1cshwzb		, sc1cshwz	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Wise (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-380-104
 GAME( 198?, sc1cshwzf		, sc1cshwz	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Wise (Bellfruit) (set 3, Protocol) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-381-104
 // PROJECT NUMBER 5423  CASH WISE  VARIABLE % - 2-JUN-1989 13:24:44
+GAME( 199?, sc1cshwzg		, sc1cshwz	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Cash Wise (Bellfruit) (set 4) (Scorpion 1)", GAME_FLAGS) // GAME No 39-370-104
 GAME( 198?, sc1cshwzd		, sc1cshwz	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Wise (Bellfruit) (set 4, Protocol) (Scorpion 1)", GAME_FLAGS ) //  GAME No 39-371-104
 
 
@@ -3025,13 +3020,16 @@ GAME( 198?, sc1bartk		, 0			, scorpion1_viper	, clatt		, bfm_sc1_state, lotse			
 
 
 
-
+// PROJECT NUMBER 5146  CASH CARD  GAME No 39-370-064 -   17-NOV-1988 11:06:39
 GAME( 198?, sc1cshcda		, sc1cshcd	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",	   "Cash Card (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
+// PROJECT NUMBER 5146  CASH CARD VERSION 2  GAME No 39-372-052 -   17-OCT-1988 15:24:53
 GAME( 198?, sc1cshcdb		, sc1cshcd	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Card (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
 
-
+// PROJECT NUMBER 5415  CASH EXPLOSION VERSION 8  GAME No 39-370-063 -   17-NOV-1988 11:59:28
 GAME( 198?, sc1cexpl		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Explosion (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
+// PROJECT NUMBER 5415  CASH EXPLOSION FIXED 78%  GAME No 39-373-042 -   12-AUG-1988 13:36:16
 GAME( 198?, sc1cexpla		, sc1cexpl	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Explosion (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
+// PROJECT NUMBER 5415  CASH EXPLOSION VERSION 2  GAME No 39-370-042 -   12-AUG-1988 13:47:56
 GAME( 198?, sc1cexplb		, sc1cexpl	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Cash Explosion (Bellfruit) (set 3) (Scorpion 1)", GAME_FLAGS )
 
 
@@ -3046,54 +3044,82 @@ GAME( 198?, sc1copdx		, sc1cops	, scorpion1			, scorpion1	, bfm_sc1_state, lotse
 // PROJECT NUMBER 6207  OFAH - PHOENIX 1 - 18-APR-1994 10:44:57
 GAME( 199?, sc1ofs56		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Only Fools and Horses (Bellfruit) (Scorpion 1?)", GAME_FLAGS) // GAME No 39-370-974
 
+// PROJECT NUMBER 5420  AWP10 VERSION 1 FIXED 78%  GAME No 39-373-069 -   04-JAN-1989 10:16:18
 GAME( 198?, sc1linx			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Linx (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS ) // bad rom
+// PROJECT NUMBER 5613  LINX 20P PLAY VARIABLE %  GAME No 39-370-154 -  1-FEB-1990 08:35:47
 GAME( 198?, sc1linxa		, sc1linx	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Linx (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
+// PROJECT NUMBER 5420  AWP10 VERSION 1  GAME No 39-370-078 -   28-FEB-1989 17:10:59
 GAME( 198?, sc1linxp		, sc1linx	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Linx (Bellfruit) (set 3, Protocol) (Scorpion 1)", GAME_FLAGS )
 
+// PROJECT NUMBER 5493  20P POWERLINES  VARIABLE %  GAME No 39-370-130 - 13-DEC-1989 16:21:27
 GAME( 198?, sc1pwrl			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Power Lines (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
 
+// PROJECT NUMBER 6104  SPECTRE #6/#3  GAME No 39-370-765 - 11-JAN-1993 13:52:50
 GAME( 198?, sc1spct			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Spectre (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
+// PROJECT NUMBER 6104  SPECTRE #6/#3 5P/10P PLAY 10P/20P P/O  GAME No 39-370-966 - 10-MAR-1994 07:57:48
 GAME( 198?, sc1spcta		, sc1spct	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Spectre (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS ) // bad rom
 
 // different inputs, hold ALT to run
+// PROJECT NUMBER 6171  TYPHOON PHOENIX1 #200  GAME No 39-370-944 -  5-NOV-1993 12:02:03
 GAME( 198?, sc1typ			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Typhoon Club (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
+// PROJECT NUMBER 6171  TYPHOON PHOENIX1 #200  GAME No 39-371-944 -  5-NOV-1993 12:02:03
 GAME( 198?, sc1typp			, sc1typ	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Typhoon Club (Bellfruit) (set 1, Protocol) (Scorpion 1)", GAME_FLAGS )
 
-
+// PROJECT NUMBER 5417  WINNING STREAK  GAME No 39-370-055 -   10-NOV-1988 09:31:58
 GAME( 198?, sc1winst		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
+// PROJECT NUMBER 5417  WINNING STREAK  GAME No 39-371-055 -   10-NOV-1988 09:31:58
 GAME( 198?, sc1winstp		, sc1winst	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 1, Protocol) (Scorpion 1)", GAME_FLAGS )
+// no header data due to bad rom
 GAME( 198?, sc1winsta		, sc1winst	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM",      "Winning Streak (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS ) // bad rom
 
 // the first 2 sets are (unusually) licensed
+// PROJECT NUMBER 5774  5P PLAY CASH LINES  GAME No 39-370-183 -  9-MAR-1990 10:45:33
 GAME( 199?, sc1clins		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM/PCP",  "Cash Lines (Bellfruit) (Scorpion 1) (set 1)", GAME_FLAGS)
+// PROJECT NUMBER 5774  2P PLAY CASH LINES  GAME No 39-370-181 -  7-MAR-1990 15:27:24
 GAME( 199?, sc1clinsa		, sc1clins	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM/PCP",  "Cash Lines (Bellfruit) (Scorpion 1) (set 2)", GAME_FLAGS)
+// PROJECT NUMBER 5159  CASH LINES  GAME No 39-371-028 -   28-MAR-1988 07:34:28
 GAME( 199?, sc1clinsb		, sc1clins	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 3)", GAME_FLAGS)
+// PROJECT NUMBER 5159  CASH LINES  GAME No 39-370-028 -   28-MAR-1988 07:34:28
 GAME( 199?, sc1clinsc		, sc1clins	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 4)", GAME_FLAGS)
+// PROJECT NUMBER 5159  ALL CASH CASH LINES  GAME No 39-370-098 -  9-MAY-1989 14:40:54
 GAME( 199?, sc1clinsd		, sc1clins	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 5)", GAME_FLAGS)
+// PROJECT NUMBER 5159  CASH LINES  GAME No 39-370-056 -   17-NOV-1988 09:55:47
 GAME( 199?, sc1clinse		, sc1clins	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",	   "Cash Lines (Bellfruit) (Scorpion 1) (set 6)", GAME_FLAGS) // bad rom
 
+// PROJECT NUMBER 6108  HIGH POINT 20P PAYOUT S+P #3/#6  GAME No 39-370-787 - 22-FEB-1993 16:00:23
 GAME( 199?, sc1hipt			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "High Point (Bellfruit) (Scorpion 1) (set 1)", GAME_FLAGS)
+// PROJECT NUMBER 6108  HIGH POINT 10P PAYOUT S+P #3/#6  GAME No 39-370-793 - 24-FEB-1993 16:58:57
 GAME( 199?, sc1hipta		, sc1hipt	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "High Point (Bellfruit) (Scorpion 1) (set 2)", GAME_FLAGS)
 
-// just alarms
+// just alarms (part of a video game maybe?)
+// PROJECT NUMBER 6842  Fruit Pursuit  GAME No PR6842S12 -  3-DEC-1997 16:45:49
 GAME( 199?, sc1frpus		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Fruit Pursuit (Bellfruit) (set 1) (Scorpion 1?)", GAME_FLAGS)
+// no header data due to bad rom
 GAME( 199?, sc1frpusa		, sc1frpus	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Fruit Pursuit (Bellfruit) (set 2) (Scorpion 1?)", GAME_FLAGS) // bad rom?
 
+// PROJECT NUMBER 5422  CHAIN REACTION VARIABLE %  GAME No 39-370-084 -   30-MAR-1989 16:17:14
 GAME( 199?, sc1chain		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Chain Reaction (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS)
+// PROJECT NUMBER 5422  CHAIN REACTION VARIABLE %  GAME No 39-371-084 -   30-MAR-1989 16:17:14
 GAME( 199?, sc1chainp		, sc1chain	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Chain Reaction (Bellfruit) (set 1, Protocol) (Scorpion 1)", GAME_FLAGS)
-GAME( 199?, sc1chaina		, sc1chain	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Chain Reaction (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS)
 
 
-GAME( 199?, sc1potp			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Pick Of The Pack (Bellfruit) (Scorpion 1)", GAME_FLAGS) //was mixed with the sc4/5 potp roms..  System status 98
-GAME( 199?, sc1potpa		, sc1potp	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Double Dealer (Bellfruit) (Scorpion 1)", GAME_FLAGS) // ^ with above.. seems the same game, but different name
 
-
+// no header data due to bad rom
 GAME( 199?, sc1goldw		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Golden Winner (Bellfruit) (Scorpion ?)", GAME_FLAGS) /// bad rom
 
+// no header data due to bad rom
 GAME( 199?, sc1druby		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Diamonds & Rubys (Bellfruit) (Scorpion ?) (set 1)", GAME_FLAGS) // bad rom
+// no header data due to bad rom
 GAME( 199?, sc1drubya		, sc1druby	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Diamonds & Rubys (Bellfruit) (Scorpion ?) (set 2)", GAME_FLAGS) // bad rom
 
+// corrupt alpha, check it isn't s85
+// PROJECT NUMBER 5425  BAR SEVEN ARCADE  GAME No 39-341-236 -   11-APR-1988 11:30:33
 GAME( 199?, sc1cb7p		    , 0	        , scorpion1		    , scorpion1 , bfm_sc1_state, lotse	     	, 0,	   "BFM",   "Bar Seven (Bellfruit) (Protocol) (Scorpion 1)", GAME_FLAGS)
+
+// this might be system 85, the rom config is 0x2000 + 0x8000, and it writes to the AY address we map on S85 for the alarm
+// however it still gives the same error message, has offset alpha text and appears to attempt to communicate with something we don't map, maybe it's some video based board / game with bits missing?
+GAME( 199?, sc1potp			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Pick Of The Pack (Bellfruit) (Scorpion 1)", GAME_FLAGS) //was mixed with the sc4/5 potp roms..  System status 98
+GAME( 199?, sc1potpa		, sc1potp	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM",      "Double Dealer (Bellfruit) (Scorpion 1)", GAME_FLAGS) // ^ with above.. seems the same game, but different name
 
 
 /********************************************************************************************************************************************************************************************************************
@@ -3108,114 +3134,182 @@ GAME( 199?, sc1cb7p		    , 0	        , scorpion1		    , scorpion1 , bfm_sc1_stat
 *********************************************************************************************************************************************************************************************************************
 ********************************************************************************************************************************************************************************************************************/
 
-GAME( 1988, sc1lotus		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Lotus SE (Dutch) (set 1)", GAME_FLAGS )
-GAME( 1988, sc1lotusa		, sc1lotus	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Lotus SE (Dutch) (set 2)", GAME_FLAGS )
+/* PROM ERROR 3 */
 
-GAME( 1988, sc1roul			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, rou029	       	, 0,       "BFM/ELAM", "Roulette (Dutch, Game Card 39-360-129?)", GAME_FLAGS )
-
+// PROJECT NUMBER 6757  ACTIVE 8 SCORP I  GAME No 95-752-019 - 08-JAN-1998 14:46:17
 GAME( 198?, sc1actv8		, 0			, scorpion1_viper	, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Active 8 (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
-GAME( 198?, sc1armad		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Armada (Dutch) (Bellfruit)  (Scorpion 1)", GAME_FLAGS )
-
+// PROJECT NUMBER 6541  BIG MATCH SCORP I  GAME No 39-372-084 - 27-JUN-1996 15:56:53
 GAME( 198?, sc1bigmt		, 0			, scorpion1_viper	, clatt		, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "The Big Match (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
-GAME( 198?, sc1calyp		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Calypso (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1carro		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt_bank0	, 0,       "BFM/ELAM", "Carrousel (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1cshcd		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Cash Card (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
+// PROJECT NUMBER 1051  CASHCOIN SCORP I  GAME No 95100005 - 05-OCT-1998 13:44:52
 GAME( 198?, sc1ccoin		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Cash Coin (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
-GAME( 198?, sc1cexpd		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Cash Explosion (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1cshin		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Cashino (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1class		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Classic (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1clown		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Clown Around (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1cl2k			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Club 2000 (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1cl2k1		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Club 2001 (Dutch (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1clbdm		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Club Diamond (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1copdd		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Cops 'n' Robbers Deluxe (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1disc			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Discovey (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
+// PROJECT NUMBER 6883  DREAM MACHINE  GAME No 95-752-021 - 08-JAN-1998 14:25:32
 GAME( 198?, sc1dream		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Dream Machine (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
-GAME( 198?, sc1flash		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Flash (Dutch) (Bellfruit)  (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1fruit		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Fruit Lines (Dutch) (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1frtln		, sc1fruit	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Fruit Lines (Dutch) (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
-
+// PROJECT NUMBER 1113  GOODTIMES SCORP I  GAME No 95-100-020 - 23-FEB-1999 11:02:32
 GAME( 198?, sc1gtime		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Good Times (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
+// PROJECT NUMBER 1112  TIARA SCORP I  GAME No 95-100-014 - 16-DEC-1998 10:37:21
 GAME( 198?, sc1tiara		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt        , 0,       "BFM/ELAM", "Tiara (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
-GAME( 198?, sc1gprix		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Grand Prix (Dutch) (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
+// PROJECT NUMBER 6363  GRAND SLAM SCORP I  GAME No 39-372-041 - 14-SEP-1995 14:01:04
 GAME( 198?, sc1gslam		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Grand Slam (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
+// PROJECT NUMBER 1096  HAPPY HOUR  GAME No 95-100-025 - 15-JUL-1999 16:25:41
 GAME( 198?, sc1happy		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Happy Hour (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
-GAME( 198?, sc1impc			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Impact (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1kings		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse_bank0	, 0,       "BFM/ELAM", "Kings Club (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1magc			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Magic Circle (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1manha		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse_bank0	, 0,       "BFM/ELAM", "Manhattan (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
+// PROJECT NUMBER 6764  MASTER CLUB SCORP I  GAME No 95-750-971 - 26-MAY-1997 14:48:32
 GAME( 198?, sc1mast			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Master Club (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
-GAME( 198?, sc1quat			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Quatro (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1mist			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse_bank0	, 0,       "BFM/ELAM", "Mistral (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1olym			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Olympia (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1orac			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Oracle (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1rain			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Rainbow (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1re			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Reel Cash (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1rese			, sc1re		, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Reel Cash SE (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS ) // doesn't say 'SE'
-
-GAME( 198?, sc1revo			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Revolution (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1rose			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Rose 'n' Crown (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1sant			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Santana (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1sat			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Satellite (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 199?, sc1satse		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM/ELAM", "Satellite SE (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS) // different game?
-
-GAME( 198?, sc1shan			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Shanghai (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1ster			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Sterling (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1str4			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Strike 4 (Dutch) (Bellfruit) (Scorpion 1) (set 1)", GAME_FLAGS )
-GAME( 198?, sc1str4a		, sc1str4	, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Strike 4 (Dutch) (Bellfruit) (Scorpion 1) (set 2)", GAME_FLAGS )
-
-GAME( 198?, sc1torn			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Tornado (Dutch) (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1torna		, sc1torn	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Tornado (Dutch) (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
-
+// PROJECT NUMBER 6881  ULTIMATE SCORP I  GAME No 95-752-020 - 08-JAN-1998 12:12:12
 GAME( 198?, sc1ult			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Ultimate (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 
-GAME( 198?, sc1vent			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Ventura (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1vict			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Victory (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
-GAME( 198?, sc1winfl		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Winfalls (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-
+// PROJECT NUMBER 6763  CLUB 3000 SCORP I  GAME No 95-750-920 - 05-FEB-1997 14:38:48
 GAME( 199?, sc1clb3			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM/ELAM", "Club 3000 (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS)
 
+/********************************************************************************************************************************************************************************************************************
+*********************************************************************************************************************************************************************************************************************
+*********************************************************************************************************************************************************************************************************************
+********************************************************************************************************************************************************************************************************************/
+
+/* All these boot */
+
+// PROJECT NUMBER 6642  LOTUS                GAME No 95-750-911 - 07-JAN-1997 14:48:18
+GAME( 1988, sc1lotus		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Lotus SE (Dutch) (set 1)", GAME_FLAGS )
+// PROJECT NUMBER 6642  LOTUS                GAME No 95-750-911 - 07-JAN-1997 14:48:18
+GAME( 1988, sc1lotusa		, sc1lotus	, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Lotus SE (Dutch) (set 2)", GAME_FLAGS )
+
+// PROJECT NUMBER 5142  DUTCH ROULETTE  GAME No 39-360-029 - 18-APR-1989 16:03:00
+GAME( 1988, sc1roul			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, rou029	       	, 0,       "BFM/ELAM", "Roulette (Dutch, Game Card 39-360-129?)", GAME_FLAGS )
+
+// PROJECT NUMBER 6045       ARMADA          GAME No 39-370-729  - 28-AUG-1992 14:37:00
+GAME( 198?, sc1armad		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Armada (Dutch) (Bellfruit)  (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 6043       CALYPSO         GAME No 39-370-754  - 08-DEC-1992 13:20:00
+GAME( 198?, sc1calyp		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Calypso (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 6041  CARROUSEL TOPBOX  GAME No 95-750-801 - 02-JUL-1996 10:43:35
+GAME( 198?, sc1carro		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt_bank0	, 0,       "BFM/ELAM", "Carrousel (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5514  DUTCH 6 V1 1989  GAME No 39-370-650 - 29-JUL-1992 15:51:26
+GAME( 198?, sc1cshcd		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Cash Card (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5512  DUTCH CASH EXPLOSION  GAME No 39-360-036 - 15-SEP-1989 15:04:00
+GAME( 198?, sc1cexpd		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Cash Explosion (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5725  DUTCH 5 V1 1989  GAME No 39-370-608 - 18-JUN-1992 09:20:55
+GAME( 198?, sc1cshin		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Cashino (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5729    CLASSIC     GAME No 39-370-606 - 18-JUN-1992 08:32:02
+GAME( 198?, sc1class		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Classic (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 6046  CLOWN AROUND  GAME No 95-750-786 - 19-JUN-1996 13:59:25
+GAME( 198?, sc1clown		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Clown Around (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 6641  DUTCH CLUB 2000 SPECIAL EDITION  GAME No 95-750-912 - 07-JAN-1997 13:10:21
+GAME( 198?, sc1cl2k			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Club 2000 (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 6050  CLUB 2001  GAME No 39-370-865 - 30-APR-1993 10:41:43
+GAME( 198?, sc1cl2k1		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Club 2001 (Dutch (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5724  DUTCH CLUB DIAMOND  GAME No 39-360-097 - 13-JUL-1992 15:12:03
+GAME( 198?, sc1clbdm		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Club Diamond (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 6250  COPS N ROBBERS  GAME No 95-750-835 - 05-AUG-1996 16:33:34
+GAME( 198?, sc1copdd		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Cops 'n' Robbers Deluxe (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5399  DUTCH 2 V1 1989  GAME No 39-370-651 - 29-JUL-1992 15:25:57
+GAME( 198?, sc1disc			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Discovey (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5956  FLASH      GAME No 95-750-771 - 17-JUN-1996 09:30:53
+GAME( 198?, sc1flash		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Flash (Dutch) (Bellfruit)  (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5391  FRUIT LINES  GAME No 39-370-653 - 30-JUL-1992 09:31:10
+GAME( 198?, sc1fruit		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Fruit Lines (Dutch) (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
+// PROJECT NUMBER 5391  FRUIT LINES  GAME No 39-370-653 - 30-JUL-1992 09:31:10
+GAME( 198?, sc1frtln		, sc1fruit	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Fruit Lines (Dutch) (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 6048  GRAND PRIX  GAME No 39-370-805 - 26-MAR-1993 11:26:08
+GAME( 198?, sc1gprix		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Grand Prix (Dutch) (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5957  Impact  GAME No 95-750-769 - 02-JUL-1996 12:10:32
+GAME( 198?, sc1impc			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Impact (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 6246  KINGS CLUB           GAME No 95-750-757  - 14-JUN-1996 14:06:15
+GAME( 198?, sc1kings		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse_bank0	, 0,       "BFM/ELAM", "Kings Club (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5467  DUTCH MAGIC CIRCLE  GAME No 39-360-031 - 19-APR-1989 16:59:00
+GAME( 198?, sc1magc			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Magic Circle (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECTNUMBER 5726  DUTCH MANHATTAN  GAME No 39-370-368 - 05-JUL-1991 15:01:00
+GAME( 198?, sc1manha		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse_bank0	, 0,       "BFM/ELAM", "Manhattan (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5398  DUTCH QUATRO  GAME No 39-360-032 - 24-APR-1989 13:46:00
+GAME( 198?, sc1quat			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Quatro (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5728  DUTCH MISTRAL  GAME No 95-750-796 - 20-JUN-1996 13:39:32
+GAME( 198?, sc1mist			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse_bank0	, 0,       "BFM/ELAM", "Mistral (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5727  PHOENIX OLYMPIA  GAME No 39-372-031 - 28-APR-1995
+GAME( 198?, sc1olym			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Olympia (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 6247  ORACLE  GAME No 95-750-803 - 01-JUL-1996 11:31:21
+GAME( 198?, sc1orac			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Oracle (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 6645  RAINBOW  GAME No RBA8GMV6 - 21-OCT-1999 20:11:02
+GAME( 198?, sc1rain			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Rainbow (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5511  DUTCH REEL CASH  GAME No 39-360-035 - 20-JUN-1989 09:01:00
+GAME( 198?, sc1re			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Reel Cash (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+// PROJECT NUMBER 5511  DUTCH REEL CASH 90 SPECIAL EDITION  GAME No 95-750-837 - 09-AUG-1996 16:14:43
+GAME( 198?, sc1rese			, sc1re		, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Reel Cash SE (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS ) // doesn't say 'SE'
+
+// PROJECT NUMBER 5390  DUTCH REVOLUTION  GAME No 39-360-020 - 23-FEB-1989 10:49:00
+GAME( 198?, sc1revo			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Revolution (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 6354  ROSE N CROWN 90 TOPBOX  GAME No 95-750-802 - 03-JUL-1996 14:29:11
+GAME( 198?, sc1rose			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Rose 'n' Crown (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 6245  SANTANA              GAME No 95-750-793 - 20-JUN-1996 13:01:14
+GAME( 198?, sc1sant			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Santana (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5515  SATELLITE  GAME No 39-360-038 - 03-NOV-1989 14:27:00@
+GAME( 198?, sc1sat			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Satellite (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 1052  SATELLITE  GAME No 95100000   - 16-MAR-1998  9:05:08
+GAME( 199?, sc1satse		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM/ELAM", "Satellite SE (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS) // different game?
+
+// PROJECT NUMBER 5959  SHANGHAI  GAME No 39-370-626 - 26-JUN-1992 14:04:06
+GAME( 198?, sc1shan			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Shanghai (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5952  STERLING  GAME No 95-750-787 - 19-JUN-1996 13:16:41
+GAME( 198?, sc1ster			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Sterling (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5367  DUTCH STRIKE 4  GAME No 01-ST8-0A1 - 30-AUG-1991 13:13:27
+GAME( 198?, sc1str4			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Strike 4 (Dutch) (Bellfruit) (Scorpion 1) (set 1)", GAME_FLAGS )
+// PROJECT NUMBER 5367  DUTCH STRIKE 4  GAME No 39-360-009 - 14-MRT-1988 16:40:00
+GAME( 198?, sc1str4a		, sc1str4	, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Strike 4 (Dutch) (Bellfruit) (Scorpion 1) (set 2)", GAME_FLAGS )
+
+// PROJECT NUMBER 6244  TORNADO  GAME No 39-370-930 - 19-OCT-1993 12:16:25
+GAME( 198?, sc1torn			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Tornado (Dutch) (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
+// PROJECT NUMBER 6244  TORNADO  GAME No 95-750-792 - 24-JUN-1996 12:16:25
+GAME( 198?, sc1torna		, sc1torn	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Tornado (Dutch) (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5517  DUTCH 8 V1 1989  GAME No 39-370-939 -  3-NOV-1993 15:24:36
+GAME( 198?, sc1vent			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Ventura (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 5721  DUTCH VICTORY  GAME No 39-360-043 - 05-APR-1990 16:30:00@
+GAME( 198?, sc1vict			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Victory (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 6241  WINFALLS             GAME No 39-370-809  - 17-MRT-1993 13:30:02
+GAME( 198?, sc1winfl		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Winfalls (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+
+// PROJECT NUMBER 6882  STRIKE  SCORP I  GAME No 95-752-023 - 02-FEB-1998 11:23:13
 GAME( 199?, sc1strk			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM/ELAM", "Strike (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS)
 
+// PROJECT NUMBER 6766  SUPERFLUSH  GAME No 95-750-926 - 11-FEB-1997 16:28:47
 GAME( 199?, sc1supfl		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,	   "BFM/ELAM", "Super Flush (Dutch) (Bellfruit) (Scorpion 1)", GAME_FLAGS)
 
 
@@ -3238,12 +3332,15 @@ GAME( 199?, sc1supfl		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			,
 /* ELAM, but not BFM, no BFM headers */
 
 GAME( 198?, sc1dago			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "ELAM",     "Dagobert's Vault (Dutch) (Elam) (Scorpion 1)", GAME_FLAGS )
+
 GAME( 198?, sc1spit			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "ELAM",     "Spitfire (Dutch) (Elam) (Scorpion 1)", GAME_FLAGS )
+
 GAME( 198?, sc1voy			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "ELAM",     "Voyager (Dutch) (Elam) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1voya			, sc1voy	, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "ELAM",     "Voyager (Dutch) (Elam) (set 2) (Scorpion 1)", GAME_FLAGS )
 
 /* ELAM, but not BFM, BFM style header */
 
+// PROJECT NUMBER 1005  ZEPPELIN  GAME No ZPA8GMV8 - 21-OCT-1999 20:30:55
 GAME( 198?, sc1zep			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "ELAM",     "Zeppelin (Dutch) (Elam) (Scorpion 1)", GAME_FLAGS )
 
 /* 3rd Party Games without BFM headers, many manufacturers are unknown / unconfirmed */
