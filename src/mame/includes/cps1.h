@@ -93,6 +93,7 @@ public:
 	UINT16 *     m_cps2_buffered_obj;
 	// game-specific
 	UINT16 *     m_gigaman2_dummyqsound_ram;
+	UINT16 *     m_ganbare_shared_ram;
 
 	/* video-related */
 	tilemap_t      *m_bg_tilemap[3];
@@ -176,6 +177,8 @@ public:
 	DECLARE_WRITE16_MEMBER(cps1_coinctrl_w);
 	DECLARE_READ16_MEMBER(qsound_sharedram1_r);
 	DECLARE_WRITE16_MEMBER(qsound_sharedram1_w);
+	DECLARE_READ16_MEMBER(ganbare_ram_r);
+	DECLARE_WRITE16_MEMBER(ganbare_ram_w);
 	DECLARE_WRITE16_MEMBER(cps1_cps_a_w);
 	DECLARE_READ16_MEMBER(cps1_cps_b_r);
 	DECLARE_WRITE16_MEMBER(cps1_cps_b_w);
@@ -200,6 +203,7 @@ public:
 	DECLARE_DRIVER_INIT(dino);
 	DECLARE_DRIVER_INIT(punisher);
 	DECLARE_DRIVER_INIT(wof);
+	DECLARE_DRIVER_INIT(ganbare);
 	DECLARE_DRIVER_INIT(cps2_video);
 	DECLARE_DRIVER_INIT(cps2);
 	DECLARE_DRIVER_INIT(cps2crpt);
@@ -218,12 +222,15 @@ public:
 	DECLARE_MACHINE_START(cps2);
 	DECLARE_VIDEO_START(cps2);
 	DECLARE_MACHINE_START(qsound);
+	DECLARE_MACHINE_START(ganbare);
 	DECLARE_MACHINE_RESET(cps);
 	DECLARE_VIDEO_START(cps);
 	UINT32 screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_cps1(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(cps1_interrupt);
 	INTERRUPT_GEN_MEMBER(cps1_qsound_interrupt);
+	INTERRUPT_GEN_MEMBER(ganbare_interrupt);
+	TIMER_CALLBACK_MEMBER(ganbare_interrupt4);
 	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
 	
 	/* fcrash handlers */

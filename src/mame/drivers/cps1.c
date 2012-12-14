@@ -192,6 +192,11 @@ Stephh's notes (based on the games M68000 code and some tests) :
     For example, magic power will be increased at the end of level 1 but you won't notice
     it before level 3, and sword power will be increased at the end of level 2 but you
     won't notice it before level 4.
+	
+6) 'ganbare'
+
+  - Using the payout setting dip switch results in some occasional hopper errors, if this
+    happens, then the clear ram dip switch needs to be used. This needs to be resolved.
 
 TO DO (2006.09.20) :
 
@@ -239,6 +244,7 @@ Stephh's log (2006.09.20) :
 #include "sound/okim6295.h"
 #include "sound/qsound.h"
 #include "sound/msm5205.h"
+#include "machine/timekpr.h"
 
 #include "includes/cps1.h"       /* External CPS1 definitions */
 
@@ -330,6 +336,19 @@ INTERRUPT_GEN_MEMBER(cps_state::cps1_interrupt)
 {
 	/* Strider also has a IRQ4 handler. It is input port related, but the game */
 	/* works without it. It is the *only* CPS1 game to have that. */
+	device.execute().set_input_line(2, HOLD_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(cps_state::ganbare_interrupt4)
+{
+	/* not sure on the timing or source of this - the game needs it once per frame, */
+	/* otherwise you get a "HARD ERROR" after boot */
+	m_maincpu->set_input_line(4, HOLD_LINE);
+}
+
+INTERRUPT_GEN_MEMBER(cps_state::ganbare_interrupt)
+{
+	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(150000 - 500), timer_expired_delegate(FUNC(cps_state::ganbare_interrupt4),this));
 	device.execute().set_input_line(2, HOLD_LINE);
 }
 
@@ -2900,6 +2919,94 @@ static INPUT_PORTS_START( wofhfh )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Coin 3 (P3 Button 3 in-game)")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ganbare )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) /* definitely read here in test mode, coin lock prevents it though */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, "Medal Setup" )					PORT_DIPLOCATION("SW(A):1")
+	PORT_DIPSETTING(    0x01, "1 Medal 1 Credit" )
+	PORT_DIPSETTING(    0x00, "Don't use" )
+	PORT_DIPNAME( 0x02, 0x02, "Coin Setup" )					PORT_DIPLOCATION("SW(A):2")
+	PORT_DIPSETTING(    0x02, "100 Yen" )
+	PORT_DIPSETTING(    0x00, "10 Yen" )
+	PORT_DIPNAME( 0x1c, 0x1c, "Change Setup" )					PORT_DIPLOCATION("SW(A):3,4,5")
+	PORT_DIPSETTING(    0x04, "12" )
+	PORT_DIPSETTING(    0x00, "11" )
+	PORT_DIPSETTING(    0x1c, "10" )
+	PORT_DIPSETTING(    0x18, "8" )
+	PORT_DIPSETTING(    0x14, "7" )
+	PORT_DIPSETTING(    0x10, "6" )
+	PORT_DIPSETTING(    0x0c, "5" )
+	PORT_DIPSETTING(    0x08, "No change" )
+	PORT_DIPNAME( 0x60, 0x60, "10 Yen Setup" )					PORT_DIPLOCATION("SW(A):6,7")
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x00, "Don't use" )
+	PORT_DIPNAME( 0x80, 0x80, "Payout Setup" )					PORT_DIPLOCATION("SW(A):8")
+	PORT_DIPSETTING(    0x80, "Credit Mode" )
+	PORT_DIPSETTING(    0x00, "Payout Mode" )
+	
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x07, 0x07, "Payout Rate Setup" )				PORT_DIPLOCATION("SW(B):1,2,3")
+	PORT_DIPSETTING(    0x01, "90%" )
+	PORT_DIPSETTING(    0x00, "85%" )
+	PORT_DIPSETTING(    0x07, "80%" )
+	PORT_DIPSETTING(    0x06, "75%" )
+	PORT_DIPSETTING(    0x05, "70%" )
+	PORT_DIPSETTING(    0x04, "65%" )
+	PORT_DIPSETTING(    0x03, "60%" )
+	PORT_DIPSETTING(    0x02, "55%" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW(B):4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW(B):5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW(B):6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW(B):7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW(B):8" )
+
+	PORT_START("DSWC")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Demo_Sounds ) )			PORT_DIPLOCATION("SW(C):1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, "Every second sound" )
+	PORT_DIPSETTING(    0x01, "Every third sound" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW(C):3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW(C):4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW(C):5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW(C):6" )
+	PORT_DIPNAME( 0x40, 0x40, "Clear RAM" )						PORT_DIPLOCATION("SW(C):7")
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, "Tes Mode Display" )				PORT_DIPLOCATION("SW(C):8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( sfzch )
 	PORT_START("IN0")     /* IN0 */
@@ -3133,6 +3240,15 @@ static MACHINE_CONFIG_DERIVED( qsound, cps1_12MHz )
 	MCFG_SOUND_ADD("qsound", QSOUND, QSOUND_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( ganbare, cps1_10MHz )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  ganbare_interrupt)
+
+	MCFG_M48T35_ADD("m48t35")
 MACHINE_CONFIG_END
 
 /* bootlegs with PIC */
@@ -10723,6 +10839,45 @@ ROM_START( rockmanj )
 	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
 ROM_END
 
+/* B-Board 91634B-2 */
+ROM_START( ganbare )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "mrnj_23d.8f", 0x00000, 0x80000, CRC(f929be72) SHA1(d175bdcace469277479ef85bf4e1b9d5a63cffde) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROMX_LOAD( "mrnj_01.3a",  0x000000, 0x80000, CRC(3f878020) SHA1(b18faa50d88c76d19db1af73cf4b3095e928f51f) , ROM_GROUPWORD | ROM_SKIP(6) )	// == kd-5m.4a
+	ROMX_LOAD( "mrnj_02.4a",  0x000002, 0x80000, CRC(3e5624d8) SHA1(502e4897916af1c9e121b096de1369d06f1ffe87) , ROM_GROUPWORD | ROM_SKIP(6) )	// == kd-7m.6a
+	ROMX_LOAD( "mrnj_03.5a",  0x000004, 0x80000, CRC(d1e61f96) SHA1(5f6dee8adbf83c697416e440fbdd3a84a6e698da) , ROM_GROUPWORD | ROM_SKIP(6) )	// == kd-1m.3a
+	ROMX_LOAD( "mrnj_04.6a",  0x000006, 0x80000, CRC(d241971b) SHA1(b641740b40a043affbb79ea91ba12f821a259bad) , ROM_GROUPWORD | ROM_SKIP(6) )	// == kd-3m.5a
+	ROMX_LOAD( "mrnj_05.7a",  0x200000, 0x80000, CRC(c0a14562) SHA1(2fb6cf98fed83ac92c33df9526102a101454e276) , ROM_GROUPWORD | ROM_SKIP(6) )	// == kd-6m.4c
+	ROMX_LOAD( "mrnj_06.8a",  0x200002, 0x80000, CRC(e6a71dfc) SHA1(67178b020f87fb28ef35292d008ce9b80e02a2db) , ROM_GROUPWORD | ROM_SKIP(6) )	// == kd-8m.6c
+	ROMX_LOAD( "mrnj_07.9a",  0x200004, 0x80000, CRC(99afb6c7) SHA1(5caead2b71cd54f6b53765f09829cc9e92e1e2d6) , ROM_GROUPWORD | ROM_SKIP(6) )	// == kd-2m.3c
+	ROMX_LOAD( "mrnj_08.10a", 0x200006, 0x80000, CRC(52882c20) SHA1(5e3fca6da3470aeb78534f01e1575d8c0e067c0e) , ROM_GROUPWORD | ROM_SKIP(6) )	// == kd-4m.5c
+
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "mrnj_09.12c",  0x00000, 0x08000, CRC(62470d72) SHA1(1de357a20f794defb49ed01af5b95ad00e2aa1d9) )	// == kd_9.12a
+	ROM_CONTINUE(           0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
+	ROM_LOAD( "mrnj_18.11c",  0x00000, 0x20000, CRC(08e13940) SHA1(5c7dd7ff6a66f100b59cf9244e78f2c8702faca1) )
+	ROM_LOAD( "mrnj_19.12c",  0x20000, 0x20000, CRC(5fa59927) SHA1(f05246cf566c214b008a91816c71e7c03b7cc218) )
+	
+	ROM_REGION( 0x8000, "timekeeper", 0) /* Timekeeper internal RAM was dumped (but game overwrites it - should I keep this here or remove it?) */
+	ROM_LOAD( "m48t35y.9n", 0x00000, 0x8000, CRC(96107b4a) SHA1(be9149736030e06c96083dcac73b5be3dbc318ac) )
+
+	ROM_REGION( 0x0200, "aboardplds", 0 )
+	ROM_LOAD( "buf1",         0x0000, 0x0117, CRC(eb122de7) SHA1(b26b5bfe258e3e184f069719f9fd008d6b8f6b9b) )
+	ROM_LOAD( "ioa1",         0x0000, 0x0117, CRC(59c7ee3b) SHA1(fbb887c5b4f5cb8df77cec710eaac2985bc482a6) )
+	ROM_LOAD( "prg1",         0x0000, 0x0117, CRC(f1129744) SHA1(a5300f301c1a08a7da768f0773fa0fe3f683b237) )
+	ROM_LOAD( "rom1",         0x0000, 0x0117, CRC(41dc73b9) SHA1(7d4c9f1693c821fbf84e32dd6ef62ddf14967845) )
+	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
+
+	ROM_REGION( 0x0200, "bboardplds", 0 )
+	ROM_LOAD( "gbp.1a",       0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "iob1.12e",     0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "bprg1.11e",    0x0000, 0x0117, NO_DUMP )
+ROM_END
+
 /* Home 'CPS Changer' Unit - For MESS */
 
 /* B-Board 91635B-2 */
@@ -11030,6 +11185,39 @@ DRIVER_INIT_MEMBER(cps_state,pang3)
 	DRIVER_INIT_CALL(pang3b);
 }
 
+READ16_MEMBER(cps_state::ganbare_ram_r)
+{
+	device_t *device = machine().device("m48t35");
+	UINT16 result = 0xffff;
+	
+	if ((mem_mask & 0x00ff) != 0)
+		result = (result & ~0x00ff) | timekeeper_r(device, space, offset);
+	if ((mem_mask & 0xff00) != 0)
+		result = (result & ~0xff00) | (m_ganbare_shared_ram[offset] << 8);
+	
+	return result;
+}
+
+WRITE16_MEMBER(cps_state::ganbare_ram_w)
+{
+	device_t *device = machine().device("m48t35");
+
+	if ((mem_mask & 0x00ff) != 0)
+		timekeeper_w(device, space, offset, data & 0xff);
+	if ((mem_mask & 0xff00) != 0)
+		m_ganbare_shared_ram[offset] = data >> 8;
+}
+
+DRIVER_INIT_MEMBER(cps_state, ganbare)
+{
+	DRIVER_INIT_CALL(cps1);
+	
+	/* ram is shared between the CPS work ram and the timekeeper ram */
+	m_ganbare_shared_ram = auto_alloc_array(machine(), UINT16, 0x10000 / 2);
+	save_pointer(NAME(m_ganbare_shared_ram), 0x10000 / 2);
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xff0000, 0xffffff, read16_delegate(FUNC(cps_state::ganbare_ram_r),this), write16_delegate(FUNC(cps_state::ganbare_ram_w),this));
+}
+
 DRIVER_INIT_MEMBER(cps_state,dinohunt)
 {
 	// is this shared with the new sound hw?
@@ -11201,6 +11389,7 @@ GAME( 1995, qtono2j,     0,        cps1_12MHz, qtono2j,  cps_state,   cps1,     
 GAME( 1995, megaman,     0,        cps1_12MHz, megaman,  cps_state,   cps1,     ROT0,   "Capcom", "Mega Man: The Power Battle (CPS1, USA 951006)", GAME_SUPPORTS_SAVE )
 GAME( 1995, megamana,    megaman,  cps1_12MHz, megaman,  cps_state,   cps1,     ROT0,   "Capcom", "Mega Man: The Power Battle (CPS1, Asia 951006)", GAME_SUPPORTS_SAVE )
 GAME( 1995, rockmanj,    megaman,  cps1_12MHz, rockmanj, cps_state,   cps1,     ROT0,   "Capcom", "Rockman: The Power Battle (CPS1, Japan 950922)", GAME_SUPPORTS_SAVE )
+GAME( 2000, ganbare,     0,        ganbare,    ganbare,  cps_state,   ganbare,  ROT0,   "Capcom", "Ganbare Marin-kun (Marine 2K0411 JPN)", GAME_SUPPORTS_SAVE )
 
 /* Games released on CPS-1 hardware by Mitchell */
 
