@@ -105,17 +105,27 @@ class kurukuru_state : public driver_device
 public:
 	kurukuru_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_v9938(*this, "v9938") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_v9938(*this, "v9938")
+	{ }
 
+	required_device<cpu_device> m_audiocpu;
 	required_device<v9938_device> m_v9938;
-
+	
+	UINT8 m_sound_irq_cause;
+	UINT8 m_sound_irq_mask;
+	
 	DECLARE_WRITE8_MEMBER(kurukuru_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(kurukuru_samples_w);
-	DECLARE_WRITE8_MEMBER(kurukuru_outport_w);
+	DECLARE_WRITE8_MEMBER(kurukuru_soundlatch_w);
+	DECLARE_READ8_MEMBER(kurukuru_soundlatch_r);
+	DECLARE_WRITE8_MEMBER(kurukuru_sound_irqmask_w);
+	DECLARE_READ8_MEMBER(kurukuru_sound_timer_irqack_r);
 
+	void update_sound_irq(UINT8 cause);
 	virtual void machine_start();
 	virtual void machine_reset();
-	TIMER_DEVICE_CALLBACK_MEMBER(kurukuru_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(kurukuru_vdp_scanline);
+	INTERRUPT_GEN_MEMBER(kurukuru_sound_timer_irq);
 };
 
 #define MAIN_CLOCK		XTAL_21_4772MHz
@@ -132,44 +142,67 @@ public:
 
 
 /*************************************************
-*                Video Hardware                  *
+*                  Interrupts                    *
 *************************************************/
 
-static void kurukuru_vdp0_interrupt(device_t *, v99x8_device &device, int i)
+static void kurukuru_vdp_interrupt(device_t *, v99x8_device &device, int i)
 {
-	device.machine().device("maincpu")->execute().set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
+	device.machine().device("maincpu")->execute().set_input_line(0, (i ? ASSERT_LINE : CLEAR_LINE));
+}
+
+
+TIMER_DEVICE_CALLBACK_MEMBER(kurukuru_state::kurukuru_vdp_scanline)
+{
+	m_v9938->set_resolution(0);
+	m_v9938->interrupt();
+}
+
+
+void kurukuru_state::update_sound_irq(UINT8 cause)
+{
+	m_sound_irq_cause = cause & 3;
+	UINT8 mask = m_sound_irq_cause & m_sound_irq_mask;
+	if (mask)
+	{
+		// use bit 0 for latch irq, and bit 1 for timer irq
+		// latch irq vector is $ef (rst $28)
+		// timer irq vector is $f7 (rst $30)
+		// if both are asserted, the vector becomes $f7 AND $ef = $e7 (rst $20)
+		const UINT8 irq_vector[4] = { 0x00, 0xef, 0xf7, 0xe7 };
+		m_audiocpu->set_input_line_and_vector(0, ASSERT_LINE, irq_vector[mask]);
+	}
+	else
+	{
+		m_audiocpu->set_input_line(0, CLEAR_LINE);
+	}
+}
+
+
+INTERRUPT_GEN_MEMBER(kurukuru_state::kurukuru_sound_timer_irq)
+{
+	update_sound_irq(m_sound_irq_cause | 2);
 }
 
 
 /*************************************************
-*                     I/O                        *
+*               Memory Map / I/O                 *
 *************************************************/
+
+// Main CPU
 
 WRITE8_MEMBER(kurukuru_state::kurukuru_bankswitch_w)
 {
 	// d4,d5: bank
+	// other bits: ?
 	membank("bank1")->set_entry(data >> 4 & 3);
-	
-	// d3: ?
-	// other bits: always set
 }
 
-
-WRITE8_MEMBER(kurukuru_state::kurukuru_outport_w)
+WRITE8_MEMBER(kurukuru_state::kurukuru_soundlatch_w)
 {
-//		logerror("%02x\n", data);
+	soundlatch_byte_w(space, 0, data);
+	update_sound_irq(m_sound_irq_cause | 1);
 }
 
-
-WRITE8_MEMBER(kurukuru_state::kurukuru_samples_w)
-{
-	popmessage("triggered sample: %02X", data);
-}
-
-
-/*************************************************
-*                  Memory Map                    *
-*************************************************/
 
 static ADDRESS_MAP_START( kurukuru_map, AS_PROGRAM, 8, kurukuru_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -179,9 +212,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x00, 0x00) AM_WRITENOP // seems for switch cpu... or irq?
+//	AM_RANGE(0x00, 0x00) AM_WRITENOP // seems for switch cpu... or irq? or hopper?
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")
-	AM_RANGE(0x20, 0x20) AM_WRITE(kurukuru_samples_w)    // trigger the m5205 sample number.
+	AM_RANGE(0x20, 0x20) AM_WRITE(kurukuru_soundlatch_w)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
 	AM_RANGE(0x90, 0x90) AM_WRITE(kurukuru_bankswitch_w)
 	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN0")
@@ -203,6 +236,30 @@ ADDRESS_MAP_END
 */
 
 
+// Audio CPU
+
+WRITE8_MEMBER(kurukuru_state::kurukuru_sound_irqmask_w)
+{
+	// d0: sound latch irq enable
+	// d1: sound timer irq enable
+	// other bits: ?
+	m_sound_irq_mask = data;
+	update_sound_irq(m_sound_irq_cause);
+}
+
+READ8_MEMBER(kurukuru_state::kurukuru_soundlatch_r)
+{
+	update_sound_irq(m_sound_irq_cause & ~1);
+	return soundlatch_byte_r(space, 0);
+}
+
+READ8_MEMBER(kurukuru_state::kurukuru_sound_timer_irqack_r)
+{
+	update_sound_irq(m_sound_irq_cause & ~2);
+	return 0;
+}
+
+
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, kurukuru_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
@@ -210,55 +267,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_io, AS_IO, 8, kurukuru_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x00, 0x00) seems for switch cpu... or irqack?
-//	AM_RANGE(0xff, 0xff) AM_WRITE(kurukuru_outport_w)
+//	AM_RANGE(0x40, 0x40) AM_WRITENOP
+	AM_RANGE(0x50, 0x50) AM_WRITE(kurukuru_sound_irqmask_w)
+	AM_RANGE(0x60, 0x60) AM_READ(kurukuru_soundlatch_r)
+	AM_RANGE(0x70, 0x70) AM_READ(kurukuru_sound_timer_irqack_r)
 ADDRESS_MAP_END
-
-/*
-  0x40 Write
-  0x50 Write (0x0b)
-  0x60 Read
-  0x70 Read
-*/
-
-/*
-   Interrupts for audio CPU
-   Vectors for IM0
-   20h - 28h - 30h
-
-  20h:
-
-  0020    jp $0093
-  008e    ld a,$0b
-  0090    out ($50),a
-  0092    ret
-  0093    out ($40),a
-  0095    in a,($70)    ; maybe irqack?
-  0097    in a,($60)    ; soundlatch?
-  0099    cp $0e
-  009b    jr nc,$00aa
-  009d    ld ($f800),a
-  00a0    call $008e
-  00a3    ld sp,$0000
-  00a6    ld hl,$0033
-  00a9    push hl
-  00aa    ei
-  00ab    reti
-
-  28h:
-
-  0028    jp $0097
-  0097    -> see above
-
-  30h:
-
-  0030    jp $00ad
-  00ad    out ($40),a
-  00af    in a,($70)
-  00b1    ei
-  00b2    reti
-
-*/
 
 
 /*************************************************
@@ -350,17 +363,8 @@ void kurukuru_state::machine_start()
 
 void kurukuru_state::machine_reset()
 {
-}
-
-
-/*************************************************
-*      R/W Handlers and Interrupt Routines       *
-*************************************************/
-
-TIMER_DEVICE_CALLBACK_MEMBER(kurukuru_state::kurukuru_interrupt)
-{
-	m_v9938->set_resolution(0);
-	m_v9938->interrupt();
+	m_sound_irq_mask = 0;
+	update_sound_irq(0);
 }
 
 
@@ -389,21 +393,20 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(kurukuru_map)
 	MCFG_CPU_IO_MAP(kurukuru_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kurukuru_state, kurukuru_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kurukuru_state, kurukuru_vdp_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, MAIN_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_io)
-	// need interrupts...
+	MCFG_CPU_PERIODIC_INT_DRIVER(kurukuru_state, kurukuru_sound_timer_irq, 4*60) // from M5205? need to fix that
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM)
-	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(kurukuru_vdp0_interrupt)
+	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(kurukuru_vdp_interrupt)
 
 	MCFG_SCREEN_ADD("screen",RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
