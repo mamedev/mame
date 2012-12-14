@@ -133,12 +133,23 @@
          a real PCB to find the difference.
          Currently it beeps every time a player eats a dot.  Seems right.
       2. If "Hard" mode is selected, numerous bugs appear which
-         could be either an emulation fault or a bad rom. Some
-         bugs are:
-         a. Graphic error halfway up the left side
-         b. Score adds or subtracts random amounts
-         c. Score not cleared when starting a new game
-         d. Game begins on the wrong level
+         seems to be an emulation fault. Every revision we have
+         shows the problem, whereas the real hardware works fine.
+	 - You start with 9000 points (instead of 0).
+         - On the screen where you are awarded your Bonus, you will
+           instead get (or sometimes lose) a random amount.
+         - At the end, if you got the High Score, it could be changed
+	   to something else.
+         All these bugs can be cured by a simple 1-byte patch:
+         ROM_FILL( 0x47e5, 1, 0xc3), but why is it necessary?
+
+    - Space Chaser (schasercv)
+         These cheats exist in this game:
+         1. Hold down 2P DOWN (the F key) while it says INSERT COIN. Then
+            insert a coin and play. You will have 2 extra ships.
+         2. In the Hard difficulty setting, you normally start at level 4.
+            Hold down the 1P START (the 1 key) while it says INSERT COIN.
+            Then insert a coin and play. You will start at level 5.
 
     - Space War (Sanritsu)
       * I seem to recall that the flashing ufo had its own sample
@@ -1149,8 +1160,11 @@ static INPUT_PORTS_START( schaser )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW1:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW1:7" )
+	PORT_DIPNAME( 0x60, 0x00, "Hard Starting Level" )		PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPSETTING(    0x40, "5" )
+	PORT_DIPSETTING(    0x60, "6" )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
