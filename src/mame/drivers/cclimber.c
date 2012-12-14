@@ -1396,6 +1396,8 @@ ROM_START( ckongpt2b )
 	ROM_LOAD( "13.5p",        0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) )
 ROM_END
 
+
+
 /* Sets below are 'Crazy Kong' without the extra Falcon screen or Pt. 2 subtitle, they also have worse colours */
 
 ROM_START( ckong )
@@ -1547,6 +1549,176 @@ ROM_START( monkeyd )
 	ROM_REGION( 0x2000, "samples", 0 )	/* samples */
 	ROM_LOAD( "cc13j.bin",    0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) )
 	ROM_LOAD( "ck12.bin",     0x1000, 0x1000, CRC(2eb23b60) SHA1(c9e7dc584562aceb374193655fbacb7df6c9c731) )
+ROM_END
+
+
+/* Donkey King
+1981 (bootleg)
+
+This game runs on dedicated hardware.
+
+CPU Board
+---------
+
+MTD-2
+|-----------------------------------------|
+|C1181  VOL             D5.1K   D7.1N     |
+|      LM3900               D6.1M   D8.1R |
+|                                         |
+|                       6116    D10.2N    |
+|                           D9.2M   D11.2R|
+|   4066                                  |
+|         AY3-8910                        |
+|                                  PAL12L6|
+|                                         |
+|1                                        |
+|8               2114 2114                |
+|W                                        |
+|A                                        |
+|Y                                        |
+|                                         |
+|                                         |
+|                    Z80A                 |
+|                                         |
+|                                         |
+|                                         |
+|   DSW(8)    82S129.5G                   |
+|                                         |
+|-----------------------------------------|
+Notes:
+      Z80 clock - 3.072MHz [18.432/6]
+      AY3-8910 clock - 1.536MHz [18.432/12]
+      HSync - 15.5065kHz
+      VSync - 60.5608Hz
+
+
+Video Board
+-----------
+
+MTD-2B
+|-----------------------------------------|
+| 18.432MHz                  82S123.1T    |
+|          2114                82S123.1U  |
+|          2114                  82S123.1V|
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|                                         |
+|2101 2101    2114 2114                   |
+|                                         |
+|D12.6A      D1.6H D3.6L    2115 2115 2115|
+|   D13.6C      D2.6K  D4.6N              |
+|                                         |
+|                                         |
+|                           2115 2115 2125|
+|                                         |
+|-----------------------------------------|
+
+
+18-way Pinout
+-------------
+
+Parts          Solder
+-------------------------
+GND      1     GND
+GND      2     GND
+GND      3     GND
+SPK-     4     SPK+
++12V     5     +12V
+         6     P1 UP
+         7     P2 UP
+         8     VIDEO GND
++5V      9     +5V
+P1 DOWN  10
+P2 DOWN  11
+         12    P2 START
+COIN     13    P1 START
+P1 JUMP  14    P1 RIGHT
+RED      15    P1 LEFT
+P2 RIGHT 16    BLUE
+P2 LEFT  17    GREEN
+P2 JUMP  18    SYNC
+
+
+Dip Switch - Donkey King
++----------------+-----+-----+-----+-----+-----+-----+-----+-----+
+|                |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |
++----------------+-----+-----+-----+-----+-----+-----+-----+-----+
+|Life          3 | OFF | OFF |     |     |     |     |     |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|              4 | ON  | OFF |     |     |     |     |     |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|              5 | OFF | ON  |     |     |     |     |     |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|              6 | ON  | ON  |     |     |     |     |     |     |
++----------------+-----+-----+-----+-----+-----+-----+-----+-----+
+|Bonus      7000 |     |     | OFF | OFF |     |     |     |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          10000 |     |     | ON  | OFF |     |     |     |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          15000 |     |     | OFF | ON  |     |     |     |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          20000 |     |     | ON  | ON  |     |     |     |     |
++----------------+-----+-----+-----+-----+-----+-----+-----+-----+
+|Credit    1C 1P |     |     |     |     | OFF | OFF | OFF |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          1C 2P |     |     |     |     | OFF | ON  | OFF |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          1C 3P |     |     |     |     | OFF | OFF | ON  |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          1C 4P |     |     |     |     | OFF | ON  | ON  |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          2C 1P |     |     |     |     | ON  | OFF | OFF |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          3C 1P |     |     |     |     | ON  | ON  | OFF |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          4C 1P |     |     |     |     | ON  | OFF | ON  |     |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|          5C 1P |     |     |     |     | ON  | ON  | ON  |     |
++----------------+-----+-----+-----+-----+-----+-----+-----+-----+
+|Screen    Table |     |     |     |     |     |     |     | OFF |
+|                +-----+-----+-----+-----+-----+-----+-----+-----+
+|        Upright |     |     |     |     |     |     |     | ON  |
++----------------+-----+-----+-----+-----+-----+-----+-----+-----+ */
+
+
+ROM_START( dking )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "d8.1r",        0x0000, 0x1000, CRC(7c66fb5c) SHA1(5eda9b0037f958433d96bc945c1273b66ef9cac5) )
+	ROM_LOAD( "falcon8",      0x1000, 0x1000, CRC(88b83ff7) SHA1(4afc494cc264aaa4614da6aed02ce062d9c20850) ) // d7.1n
+	ROM_LOAD( "falcon9",      0x2000, 0x1000, CRC(cff2af47) SHA1(1757428cefad13855a623162101ec01c04006c94) ) // d9.2n
+	ROM_LOAD( "falcon10",     0x3000, 0x1000, CRC(6b2ecf23) SHA1(75098de72f9b2966534b5c3d4bfaf4893c22150a) ) // d10.2n
+	ROM_LOAD( "d11.r2",       0x4000, 0x1000, CRC(f7cace41) SHA1(981dbb1cddd66a0cbc8fe147172ffe7eb5b7fa21) )
+
+// d8.1r and d11.r2 share parts of original falcon11 and falcon7 from ckong parent set.  Assuming the extra prom is a
+// decryption table this would likely get sorted out at driver init or might require some different mapping.
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "falcon6",      0x0000, 0x1000, CRC(a8916dc8) SHA1(472520aae3837e6026f2a7577d3b2aff371a316c) ) // d4.6n
+	ROM_LOAD( "falcon5",      0x1000, 0x1000, CRC(cd3b5dde) SHA1(2319a2be04d70989b01f4fc703756ba6e1c1f388) ) // d3.6l
+	ROM_LOAD( "falcon4",      0x2000, 0x1000, CRC(b62a0367) SHA1(8c285cbc714d7e6589bd63b3cef7c841ed1c2a4e) ) // d2.6k
+	ROM_LOAD( "falcon3",      0x3000, 0x1000, CRC(61122c5e) SHA1(978b6dbec35f3adc651fddf332db17625099a92e) ) // d1.6h
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "falcon2",  0x0000, 0x0800, CRC(f67c80f1) SHA1(d1fbcce1b6242f810e106ff50812636e3168ebc1) ) // d12.6a
+	ROM_LOAD( "falcon1",  0x0800, 0x0800, CRC(80eb517d) SHA1(fef4111f656c58b28e7eac5aa5b5cc7e07ccb2fd) ) // d13.6c
+
+	ROM_REGION( 0x0160, "proms", 0 )
+	ROM_LOAD( "ck6v.bin",     0x0000, 0x0020, CRC(751c3325) SHA1(edce2bc883996c1d72dc6c1c9f62799b162d415a) ) // 82s123.1v
+	ROM_LOAD( "ck6u.bin",     0x0020, 0x0020, CRC(ab1940fa) SHA1(8d98e05cbaa6f55770c12e0a9a8ed9c73cc54423) ) // 82s123.1u
+	ROM_LOAD( "ck6t.bin",     0x0040, 0x0020, CRC(b4e827a5) SHA1(31a5a5ad54417a474d22bb16c473415d99a2b6f1) ) // 82s123.1t
+	ROM_LOAD( "82s129.5g",    0x0060, 0x0100, CRC(9e11550d) SHA1(b8cba8e16e10e23fba1f11551102ab77b680bdf0) ) // Decryption Table?
+
+	ROM_REGION( 0x2000, "samples", 0 )	/* samples */
+	ROM_LOAD( "falcon13",    0x0000, 0x1000, CRC(5f0bcdfb) SHA1(7f79bf6de117348f606696ed7ea1937bbf926612) ) // d6.1m
+	ROM_LOAD( "falcon12",    0x1000, 0x1000, CRC(9003ffbd) SHA1(fd016056aabc23957643f37230f03842294f795e) ) // d5.1k
 ROM_END
 
 
@@ -2109,6 +2281,7 @@ GAME( 1980, ccboot2,     cclimber, cclimber, cclimber, cclimber_state, cclimberj
 GAME( 1981, ckong,       0,        cclimber, ckong, driver_device,    0,        ROT270, "Kyoei / Falcon", "Crazy Kong", 0 ) // on a Falcon FCK-01 PCB, but doesn't display any Falcon copyright
 GAME( 1981, ckongalc,    ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg (Alca)", "Crazy Kong (Alca bootleg)", 0 )
 GAME( 1981, monkeyd,     ckong,    cclimber, ckong, driver_device,    0,        ROT270, "bootleg", "Monkey Donkey", 0 )
+GAME( 1981, dking,       ckong   , cclimber, ckong, driver_device,    0,        ROT270, "bootleg", "Donkey King", 0 )
 
 /* these sets have correct colours, and also contain the graphics used for the extra attract screen in the BG roms, but it is unused
  - the Falcon logo in the text roms is still unused
