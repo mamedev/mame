@@ -617,6 +617,33 @@ static MACHINE_CONFIG_DERIVED( ct486, at386 )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_START( k286i, at_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I80286, XTAL_12MHz/2 /*6000000*/)
+	MCFG_CPU_PROGRAM_MAP(at16_map)
+	MCFG_CPU_IO_MAP(at16_io)
+	MCFG_CPU_CONFIG(i286_address_mask)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	MCFG_FRAGMENT_ADD( at_motherboard )
+	MCFG_ISA16_BUS_ADD("isabus", "maincpu", isabus_intf)
+	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, "cga", NULL, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa2", pc_isa16_cards, "fdc", NULL, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa3", pc_isa16_cards, "comat", NULL, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa4", pc_isa16_cards, NULL, NULL, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa5", pc_isa16_cards, NULL, NULL, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa6", pc_isa16_cards, NULL, NULL, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa7", pc_isa16_cards, NULL, NULL, false)
+	MCFG_ISA16_SLOT_ADD("isabus","isa8", pc_isa16_cards, NULL, NULL, false)
+
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M,16M")
+MACHINE_CONFIG_END
+
+
 const struct i82439tx_interface tx_config =
 {
 	"maincpu",
@@ -1397,6 +1424,11 @@ ROM_START( pc2386 )
 	ROM_LOAD( "40211.ic801", 0x000, 0x1000, CRC(4440d981) SHA1(a76006a929f26c178e09908c66f28abc92e7744c) )
 ROM_END
 
+ROM_START( k286i )
+	ROM_REGION(0x1000000,"maincpu", 0)
+	ROM_LOAD16_BYTE( "81_1598", 0xf8000, 0x4000, CRC(e25a1e43) SHA1(d00b976ac94323f3867b1c256e315839c906dd5a) )
+	ROM_LOAD16_BYTE( "81_1599", 0xf8001, 0x4000, CRC(08e2a17b) SHA1(a86ef116e82eb9240e60b52f76e5e510cdd393fd) )
+ROM_END
 
 /***************************************************************************
 
@@ -1452,4 +1484,5 @@ COMP ( 1990, c386sx16, ibm5170, 0,       c386sx16,  atvga, at_state,      atvga,
 COMP ( 1988, cmdpc30,  ibm5170, 0,       ibm5162,   atcga, at_state,      atcga,  "Commodore Business Machines",  "PC 30 III", GAME_NOT_WORKING )
 COMP ( 1995, ficpio2,  ibm5170, 0,       at486,     atvga, at_state,      atvga,  "FIC", "486-PIO-2", GAME_NOT_WORKING )
 COMP ( 1997, ficvt503, ibm5170, 0,       at586,     atvga, driver_device,      0,      "FIC", "VT-503", GAME_NOT_WORKING )
+COMP ( 1985, k286i,    ibm5170, 0,       k286i,     atcga, at_state,      atcga,  "Kaypro",   "286i", GAME_NOT_WORKING )
 COMP ( 1991, t2000sx,  ibm5170, 0,       c386sx16,  atvga, at_state,      atvga,  "Toshiba",  "T2000SX", GAME_NOT_WORKING )
