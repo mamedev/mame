@@ -19,8 +19,6 @@ class b2m_state : public driver_device
 public:
 	b2m_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_first_start(1),
-		  m_cnt(3),
 		  m_maincpu(*this, "maincpu") { }
 
 	UINT8 m_b2m_8255_porta;
@@ -37,8 +35,6 @@ public:
 	UINT8 m_b2m_color[4];
 	UINT8 m_b2m_localmachine;
 	UINT8 m_vblank_state;
-	int  m_first_start;
-	int m_cnt;
 	required_device<cpu_device> m_maincpu;
 
 	/* devices */

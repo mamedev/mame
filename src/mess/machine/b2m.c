@@ -203,9 +203,8 @@ I8255A_INTERFACE( b2m_ppi8255_interface_1 )
 void b2m_state::b2m_fdc_drq(bool state)
 {
 	/* Clears HALT state of CPU when data is ready to read */
-	if(state==1) {
+	if (state)
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-	}
 }
 
 
@@ -222,7 +221,6 @@ WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
 
 	floppy->mon_w(0);
 	m_fdc->set_floppy(floppy);
-	m_fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(b2m_state::b2m_fdc_drq), this));
 	if (m_b2m_drive!=drive) {
 		m_b2m_drive = drive;
 	}
@@ -235,12 +233,10 @@ WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
 		When bit 5 is set CPU is in HALT state and stay there until
 		DRQ is triggered from floppy side
 	*/
-	if (BIT(data,5) && m_first_start==0 && m_cnt <=0) { 
+	
+	if ((data & 0xf0)==0x20) { 
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
-	m_first_start = 0;
-	if (BIT(data,5)) m_cnt--;
-
 }
 
 I8255A_INTERFACE( b2m_ppi8255_interface_2 )
@@ -334,6 +330,8 @@ void b2m_state::machine_start()
 	m_fdc = machine().device<fd1793_t>("fd1793");
 	m_speaker = machine().device(SPEAKER_TAG);
 
+	m_fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(b2m_state::b2m_fdc_drq), this));
+
 	/* register for state saving */
 	save_item(NAME(m_b2m_8255_porta));
 	save_item(NAME(m_b2m_video_scroll));
@@ -377,6 +375,4 @@ void b2m_state::machine_reset()
 
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(b2m_irq_callback);
 	b2m_set_bank(machine(), 7);
-	m_first_start = 1;
-	m_cnt = 2;
 }
