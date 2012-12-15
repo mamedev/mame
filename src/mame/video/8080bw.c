@@ -414,33 +414,6 @@ UINT32 _8080bw_state::screen_update_indianbt(screen_device &screen, bitmap_rgb32
 }
 
 
-UINT32 _8080bw_state::screen_update_shuttlei(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	pen_t pens[2] = { RGB_BLACK, RGB_WHITE };
-	offs_t offs;
-
-	for (offs = 0; offs < m_main_ram.bytes(); offs++)
-	{
-		int i;
-
-		UINT8 y = offs >> 5;
-		UINT8 x = offs << 3;
-
-		UINT8 data = m_main_ram[offs];
-
-		for (i = 0; i < 8; i++)
-		{
-			bitmap.pix32(y, x|i) = pens[BIT(data, 7)];
-			data <<= 1;
-		}
-	}
-
-	clear_extra_columns(machine(), bitmap, pens, 0);
-
-	return 0;
-}
-
-
 UINT32 _8080bw_state::screen_update_sflush(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[NUM_PENS];
@@ -464,42 +437,54 @@ UINT32 _8080bw_state::screen_update_sflush(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
+
+UINT32 _8080bw_state::screen_update_shuttlei(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	pen_t pens[2] = { RGB_BLACK, RGB_WHITE };
+	offs_t offs;
+
+	for (offs = 0; offs < m_main_ram.bytes(); offs++)
+	{
+		int i;
+
+		UINT8 y = offs >> 5;
+		UINT8 x = offs << 3;
+
+		UINT8 data = m_main_ram[offs];
+
+		for (i = 0; i < 8; i++)
+		{
+			bitmap.pix32(y, x|i) = pens[BIT(data, 7)];
+			data <<= 1;
+		}
+	}
+
+	return 0;
+}
+
+
 UINT32 _8080bw_state::screen_update_spacecom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[2] = { RGB_BLACK, RGB_WHITE };
 	offs_t offs;
-	UINT8 x,y,data;
 
 	for (offs = 0; offs < 0x1c00; offs++)
 	{
-		y = offs >> 5;
-		x = (offs << 3)+4; //((m_invaders_flip_screen) ? 8 : 4);
+		int i;
 
-		data = m_main_ram[offs+0x400];
+		UINT8 y = offs >> 5;
+		UINT8 x = offs << 3;
+		UINT8 flipx = m_invaders_flip_screen ? 7 : 0;
 
-		if (m_invaders_flip_screen)
+		UINT8 data = m_main_ram[offs+0x400];
+
+		for (i = 0; i < 8; i++)
 		{
-			bitmap.pix32(y, x++) = pens[BIT(data, 7)];
-			bitmap.pix32(y, x++) = pens[BIT(data, 6)];
-			bitmap.pix32(y, x++) = pens[BIT(data, 5)];
-			bitmap.pix32(y, x++) = pens[BIT(data, 4)];
-			bitmap.pix32(y, x++) = pens[BIT(data, 3)];
-			bitmap.pix32(y, x++) = pens[BIT(data, 2)];
-			bitmap.pix32(y, x++) = pens[BIT(data, 1)];
-			bitmap.pix32(y, x++) = pens[BIT(data, 0)];
-		}
-		else
-		{
-			bitmap.pix32(y, x++) = pens[BIT(data, 0)];
-			bitmap.pix32(y, x++) = pens[BIT(data, 1)];
-			bitmap.pix32(y, x++) = pens[BIT(data, 2)];
-			bitmap.pix32(y, x++) = pens[BIT(data, 3)];
-			bitmap.pix32(y, x++) = pens[BIT(data, 4)];
-			bitmap.pix32(y, x++) = pens[BIT(data, 5)];
-			bitmap.pix32(y, x++) = pens[BIT(data, 6)];
-			bitmap.pix32(y, x++) = pens[BIT(data, 7)];
+			bitmap.pix32(y, x | (i^flipx)) = pens[data & 1];
+			data >>= 1;
 		}
 	}
+
 	return 0;
 }
 

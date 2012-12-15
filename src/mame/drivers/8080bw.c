@@ -649,7 +649,7 @@ INPUT_PORTS_END
 /*                                                     */
 /* bootleg "Space Combat", 1979                        */
 /*  8080A + 18MHz XTAL, SN76477, 10MHz XTAL            */
-/*  8*2KB RAM(!), 8*1KB ROM, maybe some PROMs          */
+/*  8*8116 2KB RAM(!), 8*1KB ROM, maybe some PROMs     */
 /*                                                     */
 /*  Preliminary emulation. PCB was working fine, but   */
 /*  it's not certain that this is a good dump          */
@@ -703,25 +703,37 @@ static INPUT_PORTS_START( spacecom )
 INPUT_PORTS_END
 
 
+static ADDRESS_MAP_START( spacecom_map, AS_PROGRAM, 8, _8080bw_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("main_ram") // other RAM not hooked up?
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( spacecom_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x41, 0x41) AM_READ_PORT("IN0")
 	AM_RANGE(0x42, 0x42) AM_READ_PORT("IN1") AM_WRITE(invaders_audio_1_w)
 	AM_RANGE(0x44, 0x44) AM_READ_PORT("IN2") AM_WRITE(invaders_audio_2_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED_CLASS( spacecom, invaders, _8080bw_state )
+MACHINE_CONFIG_START( spacecom, _8080bw_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18MHz / 10) // divider guessed
+	MCFG_CPU_PROGRAM_MAP(spacecom_map)
 	MCFG_CPU_IO_MAP(spacecom_io_map)
-	
-	// assume there is no watchdog
-	MCFG_WATCHDOG_VBLANK_INIT(0)
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_usec(0))
 
-	// video
-	MCFG_SCREEN_MODIFY("screen")
+	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state, mw8080bw)
+	MCFG_MACHINE_RESET_OVERRIDE(mw8080bw_state, mw8080bw)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_spacecom)
+
+	/* sound hardware */
+	MCFG_FRAGMENT_ADD(invaders_audio)
 MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(_8080bw_state, spacecom)
@@ -2176,16 +2188,21 @@ static ADDRESS_MAP_START( shuttlei_io_map, AS_IO, 8, _8080bw_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( shuttlei, mw8080bw_root, _8080bw_state )
+MACHINE_CONFIG_START( shuttlei, _8080bw_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_ADD("maincpu", I8080, XTAL_18MHz / 10) // divider guessed
 	MCFG_CPU_PROGRAM_MAP(shuttlei_map)
 	MCFG_CPU_IO_MAP(shuttlei_io_map)
-	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
+
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, extra_8080bw)
+	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_shuttlei)
 
@@ -4177,6 +4194,7 @@ GAMEL(1978, spceking,   invaders, invaders,  sicv,      driver_device, 0, ROT270
 GAMEL(1979, cosmicmo,   invaders, invaders,  cosmicmo,  driver_device, 0, ROT270, "Taito / Universal", "Cosmic Monsters", GAME_SUPPORTS_SAVE, layout_cosmicm ) // unclassified, licensed or bootleg?
 GAMEL(1979, cosmicm2,   invaders, invaders,  cosmicmo,  driver_device, 0, ROT270, "Taito / Universal", "Cosmic Monsters 2", GAME_SUPPORTS_SAVE, layout_cosmicm ) // unclassified, licensed or bootleg?
 GAMEL(1980?,sinvzen,    invaders, invaders,  spaceatt,  driver_device, 0, ROT270, "Taito / Zenitone-Microsec Ltd.", "Super Invaders (Zenitone-Microsec)", GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
+GAMEL(1980, ultrainv,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "Taito / Konami", "Ultra Invaders", GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1978, spaceatt,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg (Video Games GmbH)", "Space Attack (bootleg of Space Invaders)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1980, spaceat2,   invaders, invaders,  spaceatt,  driver_device, 0, ROT270, "bootleg (Video Games UK)", "Space Attack II (bootleg of Super Invaders)", GAME_SUPPORTS_SAVE, layout_invaders ) // bootleg of Zenitone-Microsec Super Invaders
 GAMEL(1979, spacecom,   invaders, spacecom,  spacecom,  _8080bw_state, spacecom, ROT270, "bootleg", "Space Combat (bootleg of Space Invaders)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_spacecom )
@@ -4199,7 +4217,6 @@ GAMEL(1978, spacewr3,   invaders, spcewars,  sicv,      driver_device, 0, ROT270
 GAMEL(1978, invader4,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg", "Space Invaders Part Four", GAME_SUPPORTS_SAVE, layout_invaders )
 GAME( 1978, darthvdr,   invaders, darthvdr,  darthvdr,  driver_device, 0, ROT270, "bootleg", "Darth Vader (bootleg of Space Invaders)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAMEL(19??, tst_invd,   invaders, invaders,  sicv,      driver_device, 0, ROT0,   "<unknown>", "Space Invaders Test ROM", GAME_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1980, ultrainv,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "Konami", "Ultra Invaders", GAME_SUPPORTS_SAVE, layout_invaders )
 
 // other Taito
 GAME( 1979, invadpt2,   0,        invadpt2,  invadpt2,  driver_device, 0, ROT270, "Taito", "Space Invaders Part II (Taito)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
@@ -4207,8 +4224,8 @@ GAME( 1979, invadpt2br, invadpt2, invadpt2,  invadpt2,  driver_device, 0, ROT270
 GAME( 1980, invaddlx,   invadpt2, invaders,  invadpt2,  driver_device, 0, ROT270, "Taito (Midway license)", "Space Invaders Deluxe", GAME_SUPPORTS_SAVE )
 GAME( 1979, moonbase,   invadpt2, invadpt2,  invadpt2,  driver_device, 0, ROT270, "Taito / Nichibutsu", "Moon Base (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // this has a 'Taito Corp' string hidden away in the rom - how do you get it to display?
 GAME( 1979, moonbasea,  invadpt2, invadpt2,  invadpt2,  driver_device, 0, ROT270, "Taito / Nichibutsu", "Moon Base (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // this has the same string replaced with Nichibutsu, no other differences
-GAME( 1980, spclaser,   0,        invadpt2,  spclaser,  driver_device, 0, ROT270, "Taito (Game Plan license?)", "Space Laser", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1980, intruder,   spclaser, invadpt2,  spclaser,  driver_device, 0, ROT270, "Taito (Game Plan license?)", "Intruder", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1980, spclaser,   0,        invadpt2,  spclaser,  driver_device, 0, ROT270, "Taito", "Space Laser", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1980, intruder,   spclaser, invadpt2,  spclaser,  driver_device, 0, ROT270, "Taito (Game Plan license)", "Intruder", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, laser,      spclaser, invadpt2,  spclaser,  driver_device, 0, ROT270, "bootleg (Leisure Time Electronics Inc.)", "Astro Laser (bootleg of Space Laser)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1979, spcewarl,   spclaser, invadpt2,  spclaser,  driver_device, 0, ROT270, "Leijac Corporation", "Space War (Leijac Corporation)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) // Taito's version is actually a spin-off of this?
 GAME( 1979, lrescue,    0,        lrescue,   lrescue,   driver_device, 0, ROT270, "Taito", "Lunar Rescue", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )

@@ -2,7 +2,7 @@
 <mamelayout version="2">
 	<element name="overlay">
 		<rect>
-			<bounds left="0" top="0" right="224" bottom="260" />
+			<bounds left="0" top="0" right="224" bottom="256" />
 			<color red="0.1" green="1" blue="0.2" />
 		</rect>
 		<rect>
