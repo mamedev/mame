@@ -154,7 +154,7 @@ Soundboard:
 GUN CHAMP
 Same pcb as Super Shot, but with gun hardware as 8080bw Gun Champ, no xy pots
 Mainboard:  CS249
-Soundboard: CS240 - couple of undumped PROMs on this one
+Soundboard: CS240
 Given CS numbers this is released after the other GunChamp
 
 */
@@ -359,7 +359,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START( sshot )
-	ROM_REGION(0x2000, "maincpu", 0)
+	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "ss_1m.a6",  0x0000, 0x0400, CRC(9f1625db) SHA1(734156d9858d696ac1f00706ba7716e5f818a3c5) )
 	ROM_LOAD( "ss_2m.a7",  0x0400, 0x0400, CRC(09f0295d) SHA1(7b4f996e9200fd178e295b1613aad8d10b19bc78) )
 	ROM_LOAD( "ss_3m.a9",  0x0800, 0x0400, CRC(88b54d54) SHA1(4f6e792276f2615d4df1867fcdb0d18f55f72b3a) )
@@ -369,26 +369,30 @@ ROM_START( sshot )
 	ROM_LOAD( "ss_7m.a13", 0x1800, 0x0400, CRC(650dada4) SHA1(8a4274792952b33b87ef7d160e1a1e038041761b) )
 	ROM_LOAD( "ss_8m.a15", 0x1c00, 0x0400, CRC(32bc8424) SHA1(a7b75b2c0fe6ff80148e2ba62ac2ff59ed03e09a) )
 
-	ROM_REGION(0x0800, "gfx", 0)
+	ROM_REGION( 0x0800, "gfx", 0 )
 	ROM_LOAD( "ss_a.b9",   0x0000, 0x0400, CRC(ad3413e0) SHA1(ea4c2728755fe52a00fdceddca0b641965045005) )
 	ROM_LOAD( "ss_b.b10",  0x0400, 0x0400, CRC(ba70e619) SHA1(df39512de881df26ccc7fa74f6bae82d92cd9008) )
 ROM_END
 
 ROM_START( gunchamps )
-	ROM_REGION(0x2000, "maincpu", 0)
-	ROM_LOAD( "gc-1.a6",  0x0000, 0x0400, CRC(dcafc54b) SHA1(a83adbee5fc6125f90078e233af258120ae14a4d) )
-	ROM_LOAD( "gc-2.a7",  0x0400, 0x0400, CRC(8b087128) SHA1(c49934dc29d24d94dda0a2b9d425abf1580a5038) )
-	ROM_LOAD( "gc-3.a9",  0x0800, 0x0400, CRC(ca517d50) SHA1(ccb18b66070d02082a367ca78f9095395e997bdd) )
-	ROM_LOAD( "gc-4.a10", 0x0c00, 0x0400, CRC(6a5b258c) SHA1(6a8349f4d785517877531100b3c30e02a54b98e2) )
-	ROM_LOAD( "gc-5.a11", 0x1000, 0x0400, CRC(3f25c50d) SHA1(718687f421bf3ac2471b9cae7ff4514344912ef5) )
-	ROM_LOAD( "gc-6.a12", 0x1400, 0x0400, CRC(85a62b89) SHA1(0a5dc97820f49a9100c99c129b4eebc649391a07) )
-	ROM_LOAD( "gc-7.a13", 0x1800, 0x0400, CRC(0a6fde47) SHA1(cc596dd8c85701e1df0f513527125b006a7e1bd7) )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "gc-1.a6",   0x0000, 0x0400, CRC(dcafc54b) SHA1(a83adbee5fc6125f90078e233af258120ae14a4d) )
+	ROM_LOAD( "gc-2.a7",   0x0400, 0x0400, CRC(8b087128) SHA1(c49934dc29d24d94dda0a2b9d425abf1580a5038) )
+	ROM_LOAD( "gc-3.a9",   0x0800, 0x0400, CRC(ca517d50) SHA1(ccb18b66070d02082a367ca78f9095395e997bdd) )
+	ROM_LOAD( "gc-4.a10",  0x0c00, 0x0400, CRC(6a5b258c) SHA1(6a8349f4d785517877531100b3c30e02a54b98e2) )
+	ROM_LOAD( "gc-5.a11",  0x1000, 0x0400, CRC(3f25c50d) SHA1(718687f421bf3ac2471b9cae7ff4514344912ef5) )
+	ROM_LOAD( "gc-6.a12",  0x1400, 0x0400, CRC(85a62b89) SHA1(0a5dc97820f49a9100c99c129b4eebc649391a07) )
+	ROM_LOAD( "gc-7.a13",  0x1800, 0x0400, CRC(0a6fde47) SHA1(cc596dd8c85701e1df0f513527125b006a7e1bd7) )
 
-	ROM_REGION(0x0800, "gfx", 0)
-	ROM_LOAD( "gc-a.b9",  0x0000, 0x0400, CRC(c07f290e) SHA1(760ce12f4f5cadbd846d361c615f5026356a6fe2) )
-	ROM_LOAD( "gc-b.b10", 0x0400, 0x0400, CRC(10ce709b) SHA1(e6f194aa26cd0e01ba0de3909948cc8595031d4d) )
+	ROM_REGION( 0x0800, "gfx", 0 )
+	ROM_LOAD( "gc-a.b9",   0x0000, 0x0400, CRC(c07f290e) SHA1(760ce12f4f5cadbd846d361c615f5026356a6fe2) )
+	ROM_LOAD( "gc-b.b10",  0x0400, 0x0400, CRC(10ce709b) SHA1(e6f194aa26cd0e01ba0de3909948cc8595031d4d) )
+
+	ROM_REGION( 0x0120, "proms", 0 ) // proms on the sound board
+	ROM_LOAD( "snd82s129.a5",  0x0000, 0x0100, CRC(1d74dc30) SHA1(b956d8c6564cc3cc1b5f5f55b05ad4aa13f247e6) )
+	ROM_LOAD( "snd82s23.b7",   0x0100, 0x0020, CRC(f4fa91d4) SHA1(0e0903532c8609c2d42491c2013647a42d13749a) )
 ROM_END
 
 
 GAME( 1979, sshot,     0,        supershot, supershot, driver_device, 0, ROT0, "Model Racing", "Super Shot", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1979, gunchamps, gunchamp, supershot, supershot, driver_device, 0, ROT0, "Model Racing", "Gun Champ (newer, Super Shot hardware)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 1980, gunchamps, gunchamp, supershot, supershot, driver_device, 0, ROT0, "Model Racing", "Gun Champ (newer, Super Shot hardware)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
