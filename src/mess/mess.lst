@@ -443,6 +443,7 @@ ivelultr  // Ivasim Ivel Ultra
 agat7	 // Agat-7
 agat9	 // Agat-9
 space84 // 1985 IBS/ComputerTechnik Space 84
+am64	// 1985 ASEM AM 64 (motherboard is marked AM-100 but it boots as "AM 64")
 
 //  Lisa   January    1983
 //  Lisa 2   January  1984

@@ -1090,6 +1090,21 @@ ROM_START(space84)
     ROM_LOAD( "space84_f.bin", 0x3000, 0x1000, CRC(4e741069) SHA1(ca1f16da9fb40e966ee4a899964cd6a7e140ab50))
 ROM_END
 
+ROM_START(am64)
+	ROM_REGION(0x2000,"gfx1",0)
+    ROM_LOAD( "gm-2716.bin",  0x0000, 0x0800, CRC(863e657f) SHA1(cc954204c503bc545ec0d08862483aaad83805d5) ) 
+
+	ROM_REGION(0x4700,"maincpu",0)
+    ROM_LOAD( "am64-27128.bin", 0x0000, 0x4000, CRC(f25cdc7b) SHA1(235e72b77695938a9df8781f5bea3cbbbe1f4c76) ) 
+
+    ROM_REGION(0x2000, "spares", 0)
+    // parallel card ROM
+    ROM_LOAD( "ap-2716.bin",  0x0000, 0x0800, CRC(c6990f08) SHA1(e7daf63639234e46738a4d78a49287d11ccaf537) ) 
+    // i8048 keyboard MCU ROM
+    ROM_LOAD( "tk10.bin",     0x0800, 0x0800, CRC(a06c5b78) SHA1(27c5160b913e0f62120f384026d24b9f1acb6970) ) 
+ROM_END
+
+
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT      COMPANY            FULLNAME */
 COMP( 1977, apple2,   0,        0,        apple2,      apple2, driver_device,   0,        "Apple Computer",    "Apple ][", GAME_SUPPORTS_SAVE )
 COMP( 1979, apple2p,  apple2,   0,        apple2p,	   apple2p, driver_device,  0,        "Apple Computer",    "Apple ][+", GAME_SUPPORTS_SAVE )
@@ -1115,4 +1130,5 @@ COMP( 1984, ivelultr, apple2,   0,        apple2p,     apple2p, driver_device,  
 COMP( 1983, agat7,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Agat",              "Agat-7", GAME_NOT_WORKING) // disk controller ROM JSRs to $FCA8 which is a delay on apple II, illegal instruction crash here :(
 COMP( 1984, agat9,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Agat",              "Agat-9", GAME_NOT_WORKING)
 COMP( 1985, space84,  apple2,   0,        space84,	   apple2p, driver_device,  0,        "ComputerTechnik/IBS",  "Space 84",	GAME_NOT_WORKING )
+COMP( 1985, am64,     apple2,   0,        space84,	   apple2p, driver_device,  0,        "ASEM",              "AM 64",	GAME_SUPPORTS_SAVE )
 
