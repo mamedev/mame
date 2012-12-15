@@ -691,6 +691,7 @@ pc		 // 1987 PC with CGA
 pcega    // 1987 PC with EGA
 bw230	// 1985 Bondwell (CGA)
 europc	// 1988 Schneider Euro PC (CGA or Hercules)
+compc1  // 1984 Commodore PC-1
 pc7000  // 1985 Sharp PC-7000
 pcd		// Siemens PC-D
 olypeopl // Olympia People PC

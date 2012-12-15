@@ -2252,10 +2252,18 @@ ROM_START( sx16 )
     ROM_REGION(0x100000,"maincpu", 0)
 	ROM_LOAD( "tmm27128ad.bin",0xfc000, 0x4000, CRC(f8543362) SHA1(fef625e260ca89ba02174584bdc12db609f0780e))
 	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x2000,"gfx1", 0)
+	ROM_REGION(0x2000,"gfx1", 0)	
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
+ROM_START( compc1 )
+    ROM_REGION(0x100000,"maincpu", 0)
+	ROM_LOAD( "compc1.bin",0xfc000, 0x4000, CRC(75135d37) SHA1(177283642240fee191ba2d87e1d0c2a377c78ccb))
+	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
+	ROM_REGION(0x2000,"gfx1", 0)
+	// Need dump of it's own integrated graphics
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
+ROM_END
 /***************************************************************************
 
   Game driver(s)
@@ -2266,6 +2274,7 @@ ROM_END
 COMP( 1984, dgone,      ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Data General", "Data General/One" , GAME_NOT_WORKING)/* CGA, 2x 3.5" disk drives */
 COMP( 1985, bw230,      ibm5150,    0,          pccga,      bondwell, pc_state,   bondwell,   "Bondwell Holding", "BW230 (PRO28 Series)", 0 )
 COMP( 1988, europc,     ibm5150,    0,          europc,     europc, pc_state,     europc,     "Schneider Rdf. AG", "EURO PC", GAME_NOT_WORKING)
+COMP( 1984, compc1,     ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Commodore Business Machines", "Commodore PC-1" , GAME_NOT_WORKING)
 
 // pcjr (better graphics, better sound)
 COMP( 1983, ibmpcjr,    ibm5150,    0,          ibmpcjr,    tandy1t, pc_state,    pcjr,       "International Business Machines", "IBM PC Jr", GAME_IMPERFECT_COLORS )
