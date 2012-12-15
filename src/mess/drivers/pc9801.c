@@ -49,6 +49,12 @@
 	- Atlantia (disk swap?)
 	- Azusa 108 Jimusho
 	- Bacta 2
+	- BattleTech (disk swap?)
+	- Bay City Elegy (disk swap?)
+	- Beast (keeps reading command sense)
+	- Beast 2
+	- Bells Avenue (disk swap?)
+
 	- Bokosuka Wars
 	- Dokkin Minako Sensei (2dd image)
 	- Jangou 2: floppy fails to load after the title screen;
@@ -74,6 +80,8 @@
 	- Asoko no Koufuku: black screen with BGM, waits at 0x225f6;
 	- Aura Battler Dumbine: upd7220: unimplemented FIGD, has layer clearance bugs on gameplay;
 	- Bakasuka Wars: drawing seems busted (either mouse or upd7220)
+	- Band-Kun: (how to run this without installing?)
+	- Battle Chess: wants some dip-switches to be on in DSW4, too slow during IA thinking?
 
 	- Dragon Buster: slight issue with window masking;
 	- Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)
@@ -86,8 +94,13 @@
 	- Uchiyama Aki no Chou Bangai: keyboard irq is fussy (sometimes it doesn't register a key press);
 	- Uno: uses EGC
 
+	per-game TODO (PC-9821):
+	- Battle Skin Panic: gfx bugs at the Gainax logo, it crashes after it;
+	- Policenauts: EMS error at boot;
+
 	Notes:
 	- Apple Club 1/2 needs data disks to load properly;
+	- Beast Lord: needs a titan.fnt, in MS-DOS
 
 ========================================================================================
 
@@ -1178,8 +1191,9 @@ READ8_MEMBER(pc9801_state::pc9801_70_r)
 {
 	if((offset & 1) == 0)
 	{
-		printf("Read to display register [%02x]\n",offset+0x70);
-		return 0xff;
+		//printf("Read to display register [%02x]\n",offset+0x70);
+		/* TODO: ok? */
+		return m_txt_scroll_reg[offset >> 1];
 	}
 	else // odd
 	{
@@ -1270,7 +1284,7 @@ READ8_MEMBER(pc9801_state::pc9801_a0_r)
 			{
 				UINT32 pcg_offset;
 
-				pcg_offset = m_font_addr << 5;
+				pcg_offset = (m_font_addr & 0x7f7f) << 5;
 				pcg_offset|= m_font_line;
 				pcg_offset|= m_font_lr;
 
@@ -1335,7 +1349,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 				return;
 			case 0x05:
 				//printf("%02x\n",data);
-				m_font_line = ((data & 0x1f) << 1);
+				m_font_line = ((data & 0x0f) << 1);
 				m_font_lr = ((data & 0x20) >> 5) ^ 1;
 				return;
 			case 0x09: //cg window font write
@@ -2513,7 +2527,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 //  AM_RANGE(0xd4d0, 0xd4d3) MIDI port, option 5 / <undefined>
 //  AM_RANGE(0xd8d0, 0xd8d3) MIDI port, option 6 / <undefined>
 //  AM_RANGE(0xdcd0, 0xdcd3) MIDI port, option 7 / <undefined>
-//  AM_RANGE(0xe0d0, 0xe0d3) MIDI port, option 8 / <undefined>
+	AM_RANGE(0xe0d0, 0xe0d3) AM_READ8(pc9801rs_midi_r, 0xffffffff) // MIDI port, option 8 / <undefined>
 //  AM_RANGE(0xe4d0, 0xe4d3) MIDI port, option 9 / <undefined>
 //  AM_RANGE(0xe8d0, 0xe8d3) MIDI port, option A / <undefined>
 //  AM_RANGE(0xecd0, 0xecd3) MIDI port, option B / <undefined>
