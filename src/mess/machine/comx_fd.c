@@ -235,7 +235,7 @@ UINT8 comx_fd_device::comx_io_r(address_space &space, offs_t offset)
 	{
 		if (m_q)
 		{
-			data = 0xfe | m_fdc->intrq_r();
+			data = 0xfe | (m_fdc->intrq_r() ? 1 : 0);
 			logerror("%s FDC intrq read %02x\n", machine().describe_context(), data);
 		}
 		else
