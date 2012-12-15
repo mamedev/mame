@@ -159,7 +159,7 @@
 
   There are 14 samples in the system.
 
-  00: (this one should be related to "bote")
+  00: "boterin" (?)
   01: 
   02: "hakase" ("professor")
   03: "pyokorin"
