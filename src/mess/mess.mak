@@ -1108,6 +1108,7 @@ $(MESSOBJ)/ensoniq.a:			\
 	$(MESS_DRIVERS)/esq1.o		\
 	$(MESS_DRIVERS)/mirage.o    \
 	$(MESS_DRIVERS)/esq5505.o   \
+	$(MESS_DRIVERS)/esqkt.o     \
     $(MESS_MACHINE)/esqvfd.o    \
 
 $(MESSOBJ)/entex.a:				\
