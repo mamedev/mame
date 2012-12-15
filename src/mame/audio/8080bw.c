@@ -1015,10 +1015,17 @@ WRITE8_MEMBER(_8080bw_state::invrvnge_sh_port_1_w)
 
 WRITE8_MEMBER(_8080bw_state::invrvnge_sh_port_2_w)
 {
-	m_screen_red = data & 0x10;
-	m_c8080bw_flip_screen = (data & 0x20) && (ioport(CABINET_PORT_TAG)->read() & 0x01);
+	/*
+        00 - normal play
+        0A, 0E - alternate during play/attract at about once per second (invrvngegw only) purpose unknown
+        01 - briefly at boot time
+        10 - different colour map (or screen red) when you die
+        20 - flip screen */
 
-	// no sound-related writes?
+	m_screen_red = BIT(data, 4);
+	m_c8080bw_flip_screen = BIT(data, 5) & BIT(ioport(CABINET_PORT_TAG)->read(), 0);
+
+        // no sound-related writes?
 }
 
 

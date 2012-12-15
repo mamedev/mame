@@ -69,6 +69,7 @@ public:
 	DECLARE_WRITE8_MEMBER(schaser_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(schaser_sh_port_2_w);
 	DECLARE_WRITE8_MEMBER(rollingc_sh_port_w);
+	DECLARE_READ8_MEMBER(invrvnge_02_r);
 	DECLARE_WRITE8_MEMBER(invrvnge_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(invrvnge_sh_port_2_w);
 	DECLARE_WRITE8_MEMBER(lupin3_00_w);
