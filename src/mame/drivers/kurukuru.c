@@ -155,6 +155,28 @@
 
 ***************************************************************************
 
+  Samples....
+
+  There are 14 samples in the system.
+
+  00: (this one should be related to "bote")
+  01: 
+  02: "hakase" ("professor")
+  03: "pyokorin"
+  04: "kunio"
+  05: "pyon pyon"
+  06:
+  07:
+  08: "oume"
+  09: "haipaa" ("hyper")
+  10: "ichi ni tsuite" ("on your marks")
+  11: "youi" ("get ready")
+  12: bang sound for the tadpoles landing in the right panel
+  13: sound for reels when running
+
+
+***************************************************************************
+
   TODO:
 
   - Audio CPU interrupts and connections/latches.
