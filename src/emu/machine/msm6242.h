@@ -47,9 +47,21 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_pre_save();
+	virtual void device_post_load();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
+	// rtc overrides
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second);
+
 private:
+	static const int RTC_TICKS = ~0;
+
+	static const UINT8 IRQ_64THSECOND = 0;
+	static const UINT8 IRQ_SECOND = 1;
+	static const UINT8 IRQ_MINUTE = 2;
+	static const UINT8 IRQ_HOUR = 3;
+
 	// state
 	UINT8						m_reg[3];
 	UINT8						m_irq_flag;
@@ -59,9 +71,16 @@ private:
 	// incidentals
 	devcb_resolved_write_line	m_res_out_int_func;
 	emu_timer *					m_timer;
+	UINT64						m_last_update_time;	// last update time, in clock cycles
 
-	// callbacks
+	// methods
 	void rtc_timer_callback();
+	UINT64 current_time();
+	void irq(UINT8 irq_type);
+	UINT64 bump(int rtc_register, UINT64 delta, UINT64 register_min, UINT64 register_range);
+	void update_rtc_registers();
+	void update_timer();
+	UINT8 get_clock_nibble(int rtc_register, bool high);
 };
 
 

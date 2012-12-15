@@ -62,6 +62,7 @@ protected:
 
 	void advance_seconds();
 	void advance_minutes();
+	void advance_days();
 	void adjust_seconds();
 
 	// derived class overrides

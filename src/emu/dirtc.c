@@ -157,7 +157,7 @@ void device_rtc_interface::advance_seconds()
 
 
 //-------------------------------------------------
-//  advance_clock -
+//  advance_minutes
 //-------------------------------------------------
 
 void device_rtc_interface::advance_minutes()
@@ -173,9 +173,19 @@ void device_rtc_interface::advance_minutes()
 	if (m_register[RTC_HOUR] == 24)
 	{
 		m_register[RTC_HOUR] = 0;
-		m_register[RTC_DAY]++;
-		m_register[RTC_DAY_OF_WEEK]++;
+		advance_days();
 	}
+}
+
+
+//-------------------------------------------------
+//  advance_days
+//-------------------------------------------------
+
+void device_rtc_interface::advance_days()
+{
+	m_register[RTC_DAY]++;
+	m_register[RTC_DAY_OF_WEEK]++;
 
 	if (m_register[RTC_DAY_OF_WEEK] == 8)
 	{
