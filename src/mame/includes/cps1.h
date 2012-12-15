@@ -64,6 +64,7 @@ class cps_state : public driver_device
 public:
 	cps_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_mainram(*this, "mainram"),
 		m_gfxram(*this, "gfxram"),
 		m_cps_a_regs(*this, "cps_a_regs"),
 		m_cps_b_regs(*this, "cps_b_regs"),
@@ -71,10 +72,12 @@ public:
 		m_qsound_sharedram2(*this, "qsound_ram2"),
 		m_objram1(*this, "objram1"),
 		m_objram2(*this, "objram2"),
-		m_output(*this, "output") { }
+		m_output(*this, "output")
+	{ }
 
 	/* memory pointers */
 	// cps1
+	optional_shared_ptr<UINT16> m_mainram;
 	required_shared_ptr<UINT16> m_gfxram;
 	required_shared_ptr<UINT16> m_cps_a_regs;
 	required_shared_ptr<UINT16> m_cps_b_regs;
@@ -93,7 +96,6 @@ public:
 	UINT16 *     m_cps2_buffered_obj;
 	// game-specific
 	UINT16 *     m_gigaman2_dummyqsound_ram;
-	UINT16 *     m_ganbare_shared_ram;
 
 	/* video-related */
 	tilemap_t      *m_bg_tilemap[3];
@@ -228,9 +230,7 @@ public:
 	UINT32 screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_cps1(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(cps1_interrupt);
-	INTERRUPT_GEN_MEMBER(cps1_qsound_interrupt);
-	INTERRUPT_GEN_MEMBER(ganbare_interrupt);
-	TIMER_CALLBACK_MEMBER(ganbare_interrupt4);
+	TIMER_DEVICE_CALLBACK_MEMBER(ganbare_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
 	
 	/* fcrash handlers */

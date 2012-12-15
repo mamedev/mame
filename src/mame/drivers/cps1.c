@@ -336,21 +336,18 @@ INTERRUPT_GEN_MEMBER(cps_state::cps1_interrupt)
 {
 	/* Strider also has a IRQ4 handler. It is input port related, but the game */
 	/* works without it. It is the *only* CPS1 game to have that. */
+	/* ...until we found out that ganbare relies on it, see below */
 	device.execute().set_input_line(2, HOLD_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(cps_state::ganbare_interrupt4)
+TIMER_DEVICE_CALLBACK_MEMBER(cps_state::ganbare_interrupt)
 {
 	/* not sure on the timing or source of this - the game needs it once per frame, */
 	/* otherwise you get a "HARD ERROR" after boot */
-	m_maincpu->set_input_line(4, HOLD_LINE);
+	if (param == 0)
+		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(cps_state::ganbare_interrupt)
-{
-	machine().scheduler().timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(150000 - 500), timer_expired_delegate(FUNC(cps_state::ganbare_interrupt4),this));
-	device.execute().set_input_line(2, HOLD_LINE);
-}
 
 /********************************************************************
 *
@@ -358,13 +355,6 @@ INTERRUPT_GEN_MEMBER(cps_state::ganbare_interrupt)
 *  =======
 *
 ********************************************************************/
-
-
-INTERRUPT_GEN_MEMBER(cps_state::cps1_qsound_interrupt)
-{
-	device.execute().set_input_line(2, HOLD_LINE);
-}
-
 
 READ16_MEMBER(cps_state::qsound_rom_r)
 {
@@ -568,7 +558,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x800180, 0x800187) AM_WRITE(cps1_soundlatch_w)	/* Sound command */
 	AM_RANGE(0x800188, 0x80018f) AM_WRITE(cps1_soundlatch2_w)	/* Sound timer fade */
 	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_SHARE("gfxram")	/* SF2CE executes code from here */
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
 /*
@@ -621,7 +611,7 @@ static ADDRESS_MAP_START( qsound_main_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0xf1c004, 0xf1c005) AM_WRITE(cpsq_coinctrl2_w)		/* Coin control2 (later games) */
 	AM_RANGE(0xf1c006, 0xf1c007) AM_READ_PORT("EEPROMIN") AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0xf1e000, 0xf1ffff) AM_READWRITE(qsound_sharedram2_r, qsound_sharedram2_w)  /* Q RAM */
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("mainram")
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START( qsound_sub_map, AS_PROGRAM, 8, cps_state )	// used by cps2.c too
@@ -3164,7 +3154,7 @@ static MACHINE_CONFIG_START( cps1_10MHz, cps_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz )	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  cps1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state, cps1_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
@@ -3202,7 +3192,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( cps1_12MHz, cps1_10MHz )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK( XTAL_12MHz )	/* verified on pcb */
 MACHINE_CONFIG_END
@@ -3210,21 +3199,28 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( pang3, cps1_12MHz )
 
 	/* basic machine hardware */
-
 	MCFG_EEPROM_ADD("eeprom", pang3_eeprom_interface)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( ganbare, cps1_10MHz )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cps_state, ganbare_interrupt, "screen", 0, 1) // need to investigate more
+
+	MCFG_M48T35_ADD("m48t35")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( qsound, cps1_12MHz )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_12MHz )	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(qsound_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  cps1_qsound_interrupt)  /* ??? interrupts per frame */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state, cps1_interrupt)
 
 	MCFG_CPU_REPLACE("audiocpu", Z80, XTAL_8MHz)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(qsound_sub_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cps_state, irq0_line_hold,  250)	/* ?? */
+	MCFG_CPU_PERIODIC_INT_DRIVER(cps_state, irq0_line_hold, 250)	/* ?? */
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state,qsound)
 
@@ -3242,15 +3238,6 @@ static MACHINE_CONFIG_DERIVED( qsound, cps1_12MHz )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ganbare, cps1_10MHz )
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  ganbare_interrupt)
-
-	MCFG_M48T35_ADD("m48t35")
-MACHINE_CONFIG_END
-
 /* bootlegs with PIC */
 
 static MACHINE_CONFIG_START( cpspicb, cps_state )
@@ -3258,7 +3245,7 @@ static MACHINE_CONFIG_START( cpspicb, cps_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  cps1_qsound_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state, cps1_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", PIC16C57, 12000000)
 	MCFG_DEVICE_DISABLE() /* no valid dumps .. */
@@ -3289,7 +3276,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( wofhfh, cps1_12MHz )
 
 	/* basic machine hardware */
-
 	MCFG_EEPROM_ADD("eeprom", qsound_eeprom_interface)
 MACHINE_CONFIG_END
 
@@ -3380,7 +3366,7 @@ static MACHINE_CONFIG_START( knightsb, cps_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 24000000 / 2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  cps1_interrupt)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state, cps1_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 29821000 / 8)
 	MCFG_CPU_PROGRAM_MAP(sf2mdt_z80map)
@@ -11187,25 +11173,22 @@ DRIVER_INIT_MEMBER(cps_state,pang3)
 
 READ16_MEMBER(cps_state::ganbare_ram_r)
 {
-	device_t *device = machine().device("m48t35");
 	UINT16 result = 0xffff;
 	
-	if ((mem_mask & 0x00ff) != 0)
-		result = (result & ~0x00ff) | timekeeper_r(device, space, offset);
-	if ((mem_mask & 0xff00) != 0)
-		result = (result & ~0xff00) | (m_ganbare_shared_ram[offset] << 8);
+	if (ACCESSING_BITS_0_7)
+		result = (result & ~0x00ff) | timekeeper_r(machine().device("m48t35"), space, offset);
+	if (ACCESSING_BITS_8_15)
+		result = (result & ~0xff00) | (m_mainram[offset] & 0xff00);
 	
 	return result;
 }
 
 WRITE16_MEMBER(cps_state::ganbare_ram_w)
 {
-	device_t *device = machine().device("m48t35");
+	COMBINE_DATA(&m_mainram[offset]);
 
-	if ((mem_mask & 0x00ff) != 0)
-		timekeeper_w(device, space, offset, data & 0xff);
-	if ((mem_mask & 0xff00) != 0)
-		m_ganbare_shared_ram[offset] = data >> 8;
+	if (ACCESSING_BITS_0_7)
+		timekeeper_w(machine().device("m48t35"), space, offset, data & 0xff);
 }
 
 DRIVER_INIT_MEMBER(cps_state, ganbare)
@@ -11213,8 +11196,6 @@ DRIVER_INIT_MEMBER(cps_state, ganbare)
 	DRIVER_INIT_CALL(cps1);
 	
 	/* ram is shared between the CPS work ram and the timekeeper ram */
-	m_ganbare_shared_ram = auto_alloc_array(machine(), UINT16, 0x10000 / 2);
-	save_pointer(NAME(m_ganbare_shared_ram), 0x10000 / 2);
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xff0000, 0xffffff, read16_delegate(FUNC(cps_state::ganbare_ram_r),this), write16_delegate(FUNC(cps_state::ganbare_ram_w),this));
 }
 
