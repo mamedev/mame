@@ -885,7 +885,7 @@ void device_scheduler::execute_timers()
 	while (m_basetime >= m_quantum_list.first()->m_expire)
 		m_quantum_allocator.reclaim(m_quantum_list.detach_head());
 
-	LOG(("timer_set_global_time: new=%s head->expire=%s\n", m_basetime.as_string(), m_timer_list->m_expire.as_string()));
+	LOG(("execute_timers: new=%s head->expire=%s\n", m_basetime.as_string(), m_timer_list->m_expire.as_string()));
 
 	// now process any timers that are overdue
 	while (m_timer_list->m_expire <= m_basetime)
@@ -907,9 +907,15 @@ void device_scheduler::execute_timers()
 			g_profiler.start(PROFILER_TIMER_CALLBACK);
 
 			if (timer.m_device != NULL)
+			{
+				LOG(("execute_timers: timer device %s timer %d\n", timer.m_device->name(), timer.m_id));
 				timer.m_device->timer_expired(timer, timer.m_id, timer.m_param, timer.m_ptr);
+			}
 			else if (!timer.m_callback.isnull())
+			{
+				LOG(("execute_timers: timer callback %s\n", timer.m_callback.name()));
 				timer.m_callback(timer.m_ptr, timer.m_param);
+			}
 
 			g_profiler.stop();
 		}
