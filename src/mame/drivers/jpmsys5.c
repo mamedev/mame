@@ -536,7 +536,7 @@ static const ptm6840_interface ptm_intf =
 
 WRITE_LINE_MEMBER(jpmsys5_state::acia_irq)
 {
-	machine().device("maincpu")->execute().set_input_line(INT_6850ACIA, state ? CLEAR_LINE : ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(INT_6850ACIA, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* Clocks are incorrect */
