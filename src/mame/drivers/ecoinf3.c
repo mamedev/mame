@@ -6,7 +6,7 @@
 // assuming this is like the other hardware EC produced the IO devices should probably
 // be several 8255s on 4-byte boundaries
 
-// what is the sound hardware on this one?
+// what is the sound hardware on this one? (should there be sound roms, or does the main CPU drive it directly?)
 
 // 2 of the sets contain program scrambled roms (where the last 0x2000 bytes match between games) why, badly dumped?
 
@@ -19,16 +19,132 @@ class ecoinf3_state : public driver_device
 {
 public:
 	ecoinf3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+	{ 
+		strobe_amount = 0;
+		strobe_addr = 0;
+	}
 
+	required_device<z180_device> m_maincpu;
 
-
+	UINT16 m_lamps[16];
 	UINT16 m_chars[14];
 	void update_display();
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_a);
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_b);
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_c);
+	int strobe_addr;
+	int strobe_amount;
+
+	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_a_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_a_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_a_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+
+	DECLARE_READ8_MEMBER(ppi8255_intf_b_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_b_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_b_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+
+	DECLARE_READ8_MEMBER(ppi8255_intf_c_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_c_(used)read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_c_read_b) { int ret = 0xff; logerror("%04x - ppi8255_intf_c_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; } // changing to 00 gives coin tamper
+	DECLARE_READ8_MEMBER(ppi8255_intf_c_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_c_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+
+	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_d_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_d_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; } // changing goes from reel 1 error to running something in sphinx
+	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_d_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+
+	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; } // changing gives no % key error in sphinx
+	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+
+	DECLARE_READ8_MEMBER(ppi8255_intf_f_read_a) { int ret = 0xff; logerror("%04x - ppi8255_intf_f_(used)read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_f_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_f_read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_f_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_f_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+
+	DECLARE_READ8_MEMBER(ppi8255_intf_g_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_g_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_g_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_g_read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_g_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_g_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+
+	DECLARE_READ8_MEMBER(ppi8255_intf_h_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_h_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_h_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_h_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_h_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_h_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+
+	void update_lamps(void)
+	{
+		for (int i=0; i<16; i++)
+		{
+			for (int bit=0;bit<16;bit++)
+			{
+				int data = ((m_lamps[i] << bit)&0x8000)>>15;
+	
+				output_set_indexed_value("lamp", (i*16)+bit, data );
+			}
+		}
+
+	}
+
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_a)
+	{
+	//	logerror("%04x - ppi8255_intf_a_(used)write_a %02x (STROBEDAT?)\n", machine().device("maincpu")->safe_pcbase(), data);
+		if (strobe_amount)
+		{
+			m_lamps[strobe_addr] = (m_lamps[strobe_addr] &0xff00) | (data & 0x00ff);
+			strobe_amount--;
+		}
+	}
+	
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_b)
+	{
+	//	logerror("%04x - ppi8255_intf_a_(used)write_b %02x (STROBEDAT?)\n", machine().device("maincpu")->safe_pcbase(), data);
+		if (strobe_amount)
+		{
+			m_lamps[strobe_addr] = (m_lamps[strobe_addr] &0x00ff) | (data << 8);
+			strobe_amount--;
+		}
+	}
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_c)
+	{
+		if ((data>=0xf0) && (data<=0xff))
+		{
+		//	logerror("%04x - ppi8255_intf_a_(used)write_c %02x (STROBE?)\n", machine().device("maincpu")->safe_pcbase(), data);
+			strobe_addr = data & 0xf;
+		
+			// hack, it writes values for the lamps, then writes 0x00 afterwards, probably giving the bulbs power, then removing the power
+			// before switching the strobe to the next line?
+			strobe_amount = 2;
+		
+			update_lamps();
+		}
+		else logerror("%04x - ppi8255_intf_a_(used)write_c %02x (UNUSUAL?)\n", machine().device("maincpu")->safe_pcbase(), data);
+	}
+
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_b_write_a) { logerror("%04x - ppi8255_intf_b_(used)write_a %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_b_write_b) { logerror("%04x - ppi8255_intf_b_(used)write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_b_write_c) { logerror("%04x - ppi8255_intf_b_(used)write_c %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_c_write_a) { logerror("%04x - ppi8255_intf_c_(used)write_a %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_c_write_b) { logerror("%04x - ppi8255_intf_c_(used)write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_c_write_c) { logerror("%04x - ppi8255_intf_c_(used)write_c %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_a) { logerror("%04x - ppi8255_intf_d_(used)write_a %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_b) { logerror("%04x - ppi8255_intf_d_(used)write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_c) { logerror("%04x - ppi8255_intf_d_(used)write_c %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_a_alpha_display);
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_b) { logerror("%04x - ppi8255_intf_e_write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_c) { logerror("%04x - ppi8255_intf_e_write_c %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_f_write_a) { logerror("%04x - ppi8255_intf_f_write_a %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_f_write_b) { logerror("%04x - ppi8255_intf_f_write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_f_write_c) { logerror("%04x - ppi8255_intf_f_write_c %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_g_write_a) { logerror("%04x - ppi8255_intf_g_write_a %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_g_write_b) { logerror("%04x - ppi8255_intf_g_write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_g_write_c) { logerror("%04x - ppi8255_intf_g_write_c %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_h_write_a) { logerror("%04x - ppi8255_intf_h_(used)write_a %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_h_write_b) { logerror("%04x - ppi8255_intf_h_(used)write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_h_write_c) { logerror("%04x - ppi8255_intf_h_(used)write_c %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+
+
 	DECLARE_DRIVER_INIT(ecoinf3);
 	DECLARE_DRIVER_INIT(ecoinf3_swap);
 };
@@ -36,42 +152,42 @@ public:
 
 static I8255_INTERFACE (ppi8255_intf_a)
 {
-	DEVCB_NULL,						/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_NULL						/* Port C write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_read_a),			/* Port A read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_write_a),			/* Port A write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_read_b),			/* Port B read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_write_b),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_read_b),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_write_c)			/* Port C write */
 };
 
 static I8255_INTERFACE (ppi8255_intf_b)
 {
-	DEVCB_NULL,						/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_NULL						/* Port C write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_b_read_a),			/* Port A read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_b_write_a),			/* Port A write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_b_read_b),			/* Port B read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_b_write_b),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_b_read_b),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_b_write_c)			/* Port C write */
 };
 
 static I8255_INTERFACE (ppi8255_intf_c)
 {
-	DEVCB_NULL,						/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_NULL						/* Port C write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_c_read_a),			/* Port A read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_c_write_a),			/* Port A write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_c_read_b),			/* Port B read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_c_write_b),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_c_read_b),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_c_write_c)			/* Port C write */
 };
 
 static I8255_INTERFACE (ppi8255_intf_d)
 {
-	DEVCB_NULL,						/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_NULL						/* Port C write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_read_a),			/* Port A read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_write_a),			/* Port A write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_read_b),			/* Port B read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_write_b),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_read_b),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_write_c)			/* Port C write */
 };
 
 // this is a copy of roc10937charset for now, I don't know what chip we're meant be using here
@@ -160,7 +276,7 @@ void ecoinf3_state::update_display()
 }
 
 
-WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a)
+WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a_alpha_display)
 {
 	static UINT8 send_buffer = 0;
 	static int count = 0;
@@ -222,53 +338,45 @@ WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a)
 
 }
 
-WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_b)
-{
-}
-
-WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_c)
-{
-	// not written at an appropriate time for it to be a 'send' address for the text
-}
 
 static I8255_INTERFACE (ppi8255_intf_e)
 {
-	DEVCB_NULL,						/* Port A read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_write_a),						/* Port A write */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_write_b),						/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_write_c)						/* Port C write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_read_a),						/* Port A read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_write_a_alpha_display),		/* Port A write */ /* alpha display characters*/
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_read_b),						/* Port B read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_write_b),						/* Port B write */ 	// not written at an appropriate time for it to be a 'send' address for the text
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_read_c),						/* Port C read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_write_c)						/* Port C write */ 	// not written at an appropriate time for it to be a 'send' address for the text
 };
 
 static I8255_INTERFACE (ppi8255_intf_f)
 {
-	DEVCB_NULL,						/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_NULL						/* Port C write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_f_read_a),			/* Port A read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_f_write_a),			/* Port A write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_f_read_b),			/* Port B read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_f_write_b),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_f_read_b),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_f_write_c)			/* Port C write */
 };
 
 static I8255_INTERFACE (ppi8255_intf_g)
 {
-	DEVCB_NULL,						/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_NULL						/* Port C write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_g_read_a),			/* Port A read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_g_write_a),			/* Port A write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_g_read_b),			/* Port B read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_g_write_b),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_g_read_b),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_g_write_c)			/* Port C write */
 };
 
 static I8255_INTERFACE (ppi8255_intf_h)
 {
-	DEVCB_NULL,						/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_NULL,						/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_NULL						/* Port C write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_h_read_a),			/* Port A read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_h_write_a),			/* Port A write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_h_read_b),			/* Port B read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_h_write_b),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_h_read_b),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_h_write_c)			/* Port C write */
 };
 
 
