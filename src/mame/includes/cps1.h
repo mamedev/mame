@@ -2,6 +2,7 @@
 #define _CPS1_H_
 
 #include "sound/msm5205.h"
+#include "sound/qsound.h"
 
 struct gfx_range
 {
@@ -124,6 +125,9 @@ public:
 	int          m_dial[2];		// forgottn
 	int          m_readpaddle;	// pzloop2
 	int          m_cps2networkpresent;
+	int          m_cps2digitalvolumelevel;
+	int          m_cps2disabledigitalvolume;
+	emu_timer    *m_digital_volume_timer;
 
 	/* fcrash sound hw */
 	int          m_sample_buffer1;
@@ -211,6 +215,7 @@ public:
 	DECLARE_DRIVER_INIT(cps2crpt);
 	DECLARE_DRIVER_INIT(ssf2tb);
 	DECLARE_DRIVER_INIT(pzloop2);
+	DECLARE_DRIVER_INIT(singbrd);
 	DECLARE_DRIVER_INIT(gigaman2);
 	TILEMAP_MAPPER_MEMBER(tilemap0_scan);
 	TILEMAP_MAPPER_MEMBER(tilemap1_scan);
@@ -232,6 +237,7 @@ public:
 	INTERRUPT_GEN_MEMBER(cps1_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ganbare_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
+	TIMER_CALLBACK_MEMBER(cps2_update_digital_volume);
 	
 	/* fcrash handlers */
 	DECLARE_DRIVER_INIT(kodb);

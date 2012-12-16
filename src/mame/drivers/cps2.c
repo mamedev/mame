@@ -764,19 +764,50 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
  *  Sound ?
  *
  *************************************/
+ 
+ TIMER_CALLBACK_MEMBER(cps_state::cps2_update_digital_volume)
+ {
+	int vol_button_state;
+
+	vol_button_state = ioport("DIGITALVOL")->read();
+
+	if (vol_button_state & 0x01) m_cps2digitalvolumelevel -= 1;
+	if (vol_button_state & 0x02) m_cps2digitalvolumelevel += 1;
+	
+	if (m_cps2digitalvolumelevel > 39) m_cps2digitalvolumelevel = 39;
+	if (m_cps2digitalvolumelevel < 0) m_cps2digitalvolumelevel = 0;
+	
+	machine().device<qsound_device>("qsound")->set_output_gain(0, m_cps2digitalvolumelevel / 39.0);
+	machine().device<qsound_device>("qsound")->set_output_gain(1, m_cps2digitalvolumelevel / 39.0);
+ }
 
 static READ16_HANDLER( cps2_qsound_volume_r )
 {
 	cps_state *state = space.machine().driver_data<cps_state>();
-
+	
+	UINT16 cps2_vol_states[40] =
+	{
+		0xf010, 0xf008, 0xf004, 0xf002, 0xf001, 0xe810, 0xe808, 0xe804, 0xe802, 0xe801,
+		0xe410, 0xe408, 0xe404, 0xe402, 0xe401, 0xe210, 0xe208, 0xe204, 0xe202, 0xe201,
+		0xe110, 0xe108, 0xe104, 0xe102, 0xe101, 0xe090, 0xe088, 0xe084, 0xe082, 0xe081,
+		0xe050, 0xe048, 0xe044, 0xe042, 0xe041, 0xe030, 0xe028, 0xe024, 0xe022, 0xe021
+	};
+	
+	UINT16 result;
+	
+	result = cps2_vol_states[state->m_cps2digitalvolumelevel];
+	
 	/* Extra adapter memory (0x660000-0x663fff) available when bit 14 = 0 */
 	/* Network adapter (ssf2tb) present when bit 15 = 0 */
 	/* Only game known to use both these so far is SSF2TB */
 
 	if (state->m_cps2networkpresent)
-		return 0x2021;
+		return 0x2021; /* SSF2TB doesn't have a digital slider in the test screen */
 	else
-		return 0xe021;
+	if (state->m_cps2disabledigitalvolume)
+		return 0xd000; /* digital display isn't shown in test mode */
+	else
+		return result;
 }
 
 
@@ -928,6 +959,11 @@ static INPUT_PORTS_START( cps2_4p4b )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, write_bit)
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_clock_line)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
+	
+	/* fake inputs for digital volume buttons */
+	PORT_START( "DIGITALVOL" )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_VOLUME_UP )
 INPUT_PORTS_END
 
 /* 4 players and 3 buttons */
@@ -8162,6 +8198,18 @@ ROM_END
  *
  *************************************/
 
+ static void init_digital_volume(running_machine &machine)
+ {
+	cps_state *state = machine.driver_data<cps_state>();
+	
+	state->m_cps2digitalvolumelevel = 39; /* maximum */
+	state->m_cps2disabledigitalvolume = 0;
+	
+	/* create a timer to update our volume state from the fake switches - read it every 6 frames or so to enable some granularity */
+	state->m_digital_volume_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(cps_state::cps2_update_digital_volume),state));
+	state->m_digital_volume_timer->adjust(attotime::from_msec(100), 0, attotime::from_msec(100));
+ }
+ 
 DRIVER_INIT_MEMBER(cps_state,cps2)
 {
 
@@ -8172,7 +8220,9 @@ DRIVER_INIT_MEMBER(cps_state,cps2)
 	DRIVER_INIT_CALL(cps2_video);
 
 	m_cps2networkpresent = 0;
-
+	
+	init_digital_volume(machine());
+	
 	machine().device("maincpu")->set_clock_scale(0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
@@ -8199,6 +8249,15 @@ DRIVER_INIT_MEMBER(cps_state,pzloop2)
 	save_item(NAME(m_readpaddle));
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x804000, 0x804001, FUNC(joy_or_paddle_r));
+}
+
+DRIVER_INIT_MEMBER(cps_state,singbrd)
+{
+	DRIVER_INIT_CALL(cps2);
+	
+	/* the single board games don't have a digital volume switch */
+	m_cps2disabledigitalvolume = 1;
+	m_digital_volume_timer->adjust(attotime::never, 0, attotime::never);
 }
 
 static READ16_HANDLER( gigaman2_dummyqsound_r )
@@ -8246,6 +8305,9 @@ DRIVER_INIT_MEMBER(cps_state,gigaman2)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x618000, 0x619fff, FUNC(gigaman2_dummyqsound_r), FUNC(gigaman2_dummyqsound_w)); // no qsound..
 	space.set_decrypted_region(0x000000, (length) - 1, &rom[length/4]);
 	m68k_set_encrypted_opcode_range(machine().device("maincpu"), 0, length);
+	
+	/* no digital volume switches on this? */
+	m_digital_volume_timer->adjust(attotime::never, 0, attotime::never);
 }
 
 
@@ -8447,7 +8509,7 @@ GAME( 1998, mvscu,      mvsc,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   
 GAME( 1998, mvscur1,    mvsc,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (USA 971222)", GAME_SUPPORTS_SAVE )
 GAME( 1998, mvscj,      mvsc,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Japan 980123)", GAME_SUPPORTS_SAVE )
 GAME( 1998, mvscjr1,    mvsc,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Japan 980112)", GAME_SUPPORTS_SAVE )
-GAME( 1998, mvscjsing,  mvsc,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Japan 980123) (Single PCB)", GAME_SUPPORTS_SAVE )
+GAME( 1998, mvscjsing,  mvsc,     cps2, cps2_2p6b, cps_state, singbrd,  ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Japan 980123) (Single PCB)", GAME_SUPPORTS_SAVE )
 GAME( 1998, mvsca,      mvsc,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Asia 980123)", GAME_SUPPORTS_SAVE )
 GAME( 1998, mvscar1,    mvsc,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Asia 980112)", GAME_SUPPORTS_SAVE )
 GAME( 1998, mvsch,      mvsc,     cps2, cps2_2p6b, cps_state, cps2,     ROT0,   "Capcom", "Marvel Vs. Capcom: Clash of Super Heroes (Hispanic 980123)", GAME_SUPPORTS_SAVE )
