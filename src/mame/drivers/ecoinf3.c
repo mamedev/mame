@@ -16,6 +16,7 @@
 #include "ecoinf3.lh"
 #include "machine/steppers.h" // stepper motor
 #include "video/awpvid.h" // drawing reels
+#include "sound/sn76496.h"
 
 class ecoinf3_state : public driver_device
 {
@@ -39,7 +40,13 @@ public:
 	int m_optic_pattern;
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_a_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_a_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_b)
+	{
+		int ret = ioport("IN1")->read();
+		logerror("%04x - ppi8255_intf_a_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
+		return ret;
+	}
+
 	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_a_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_b_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
@@ -47,7 +54,12 @@ public:
 	DECLARE_READ8_MEMBER(ppi8255_intf_b_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_c_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_c_(used)read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_c_read_b) { int ret = 0xff; logerror("%04x - ppi8255_intf_c_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; } // changing to 00 gives coin tamper
+	DECLARE_READ8_MEMBER(ppi8255_intf_c_read_b)
+	{
+		int ret = ioport("IN2")->read();
+		logerror("%04x - ppi8255_intf_c_(used)read_b %02x (COINS+TEST)\n", machine().device("maincpu")->safe_pcbase(), ret);
+		return ret;
+	} // changing to 00 gives coin tamper
 	DECLARE_READ8_MEMBER(ppi8255_intf_c_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_c_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_d_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
@@ -55,7 +67,7 @@ public:
 	{
 		// guess, what are the bottom 4 bits, if anything?
 
-		int ret = m_optic_pattern | 0x0f;
+		int ret = m_optic_pattern | (ioport("IN0")->read() & 0xf);
 		
 		// | 0x80 = reel 4 fault
 		// | 0x40 = reel 3 fault
@@ -71,10 +83,22 @@ public:
 	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_d_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; } // changing gives no % key error in sphinx
+	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_b)
+	{   // changing gives no % key error in sphinx
+		int ret = ioport("IN3")->read();
+		logerror("%04x - ppi8255_intf_e_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
+		return ret;
+	}
+	
 	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_f_read_a) { int ret = 0xff; logerror("%04x - ppi8255_intf_f_(used)read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_f_read_a)
+	{
+		int ret = ioport("IN4")->read();
+		logerror("%04x - ppi8255_intf_f_(used)read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
+		return ret;
+	}
+
 	DECLARE_READ8_MEMBER(ppi8255_intf_f_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_f_read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 	DECLARE_READ8_MEMBER(ppi8255_intf_f_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_f_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 
@@ -83,7 +107,12 @@ public:
 	DECLARE_READ8_MEMBER(ppi8255_intf_g_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_g_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_h_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_h_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_h_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_h_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_h_read_b)
+	{
+		int ret = ioport("IN5")->read();
+		logerror("%04x - ppi8255_intf_h_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
+		return ret;
+	}
 	DECLARE_READ8_MEMBER(ppi8255_intf_h_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_h_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 
 	void update_lamps(void)
@@ -448,13 +477,11 @@ static ADDRESS_MAP_START( pyramid_portmap, AS_IO, 8, ecoinf3_state )
 	AM_RANGE(0x58, 0x5b) AM_DEVREADWRITE("ppi8255_g", i8255_device, read, write)
 	AM_RANGE(0x5c, 0x5f) AM_DEVREADWRITE("ppi8255_h", i8255_device, read, write)
 	// frequently accesses DB after 5B, mirror? bug?
+	AM_RANGE(0xDB, 0xDB) AM_DEVWRITE("sn1", sn76489_device, write)  // no idea what the sound chip is, this sounds terrible
+	
+	
 ADDRESS_MAP_END
 
-/*
-static ADDRESS_MAP_START( pyramid_submap, AS_PROGRAM, 8, ecoinf3_state )
-    AM_RANGE(0xe000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-*/
 
 
 
@@ -472,18 +499,6 @@ static INPUT_PORTS_START( ecoinf3 )
 	PORT_DIPNAME( 0x08, 0x08, "IN0:08" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "IN0:10" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "IN0:20" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "IN0:40" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "IN0:80" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x01, 0x01, "IN1:01" )
@@ -498,7 +513,7 @@ static INPUT_PORTS_START( ecoinf3 )
 	PORT_DIPNAME( 0x08, 0x08, "IN1:08" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "IN1:10" )
+	PORT_DIPNAME( 0x10, 0x10, "Meter Connection (leave on)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "IN1:20" )
@@ -512,21 +527,11 @@ static INPUT_PORTS_START( ecoinf3 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "IN2:01" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "IN2:02" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "IN2:04" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "IN2:08" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "IN2:10" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN5 )
 	PORT_DIPNAME( 0x20, 0x20, "IN2:20" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
@@ -538,28 +543,34 @@ static INPUT_PORTS_START( ecoinf3 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN3")
-	PORT_DIPNAME( 0x01, 0x01, "IN3:01" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "IN3:02" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "IN3:04" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "IN3:08" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "IN3:10" )
+	PORT_DIPNAME( 0x0f, 0x00, "% Key?" )
+	PORT_DIPSETTING(    0x00, "0x00" )
+	PORT_DIPSETTING(    0x01, "0x01" )
+	PORT_DIPSETTING(    0x02, "0x02" )
+	PORT_DIPSETTING(    0x03, "0x03" )
+	PORT_DIPSETTING(    0x04, "0x04" )
+	PORT_DIPSETTING(    0x05, "0x05" )
+	PORT_DIPSETTING(    0x06, "0x06" )
+	PORT_DIPSETTING(    0x07, "0x07" )
+	PORT_DIPSETTING(    0x08, "0x08" )
+	PORT_DIPSETTING(    0x09, "0x09" )
+	PORT_DIPSETTING(    0x0a, "0x0a" )
+	PORT_DIPSETTING(    0x0b, "0x0b" )
+	PORT_DIPSETTING(    0x0c, "0x0c" )
+	PORT_DIPSETTING(    0x0d, "0x0d" )
+	PORT_DIPSETTING(    0x0e, "0x0e" )
+	PORT_DIPSETTING(    0x0f, "None" )
+
+	PORT_DIPNAME( 0x10, 0x00, "IN3:10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "IN3:20" )
+	PORT_DIPNAME( 0x20, 0x00, "IN3:20" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "IN3:40" )
+	PORT_DIPNAME( 0x40, 0x00, "IN3:40" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "IN3:80" )
+	PORT_DIPNAME( 0x80, 0x00, "IN3:80" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -614,7 +625,7 @@ static INPUT_PORTS_START( ecoinf3 )
 	PORT_DIPNAME( 0x80, 0x80, "IN5:80" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
+#if 0
 	PORT_START("IN6")
 	PORT_DIPNAME( 0x01, 0x01, "IN6:01" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -666,6 +677,7 @@ static INPUT_PORTS_START( ecoinf3 )
 	PORT_DIPNAME( 0x80, 0x80, "IN7:80" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+#endif
 INPUT_PORTS_END
 
 MACHINE_START_MEMBER(ecoinf3_state,ecoinf3)
@@ -676,9 +688,15 @@ MACHINE_START_MEMBER(ecoinf3_state,ecoinf3)
 	}
 }
 
+static const sn76496_config psg_intf =
+{
+    DEVCB_NULL
+};
+
+
 static MACHINE_CONFIG_START( ecoinf3_pyramid, ecoinf3_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180,2000000) // certainly not a plain z80 at least, invalid opcodes for that
+	MCFG_CPU_ADD("maincpu", Z180,8000000) // certainly not a plain z80 at least, invalid opcodes for that
 	
 	MCFG_CPU_PROGRAM_MAP(pyramid_memmap)
 	MCFG_CPU_IO_MAP(pyramid_portmap)
@@ -687,6 +705,12 @@ static MACHINE_CONFIG_START( ecoinf3_pyramid, ecoinf3_state )
 
 	MCFG_MACHINE_START_OVERRIDE(ecoinf3_state, ecoinf3 )
 
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+
+	MCFG_SOUND_ADD("sn1", SN76489, 4000000) // no idea what the sound chip is, this sounds terrible
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_CONFIG(psg_intf)
 
 	MCFG_I8255_ADD( "ppi8255_a", ppi8255_intf_a )
 	MCFG_I8255_ADD( "ppi8255_b", ppi8255_intf_b )
