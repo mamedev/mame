@@ -47,6 +47,7 @@ extern const stepper_interface starpoint_interface_48step;
 extern const stepper_interface starpointrm20_interface_48step;
 
 extern const stepper_interface starpoint_interface_200step_reel;
+extern const stepper_interface ecoin_interface_200step_reel;
 
 void stepper_config(running_machine &machine, int which, const stepper_interface *intf);
 

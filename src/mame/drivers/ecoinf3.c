@@ -14,6 +14,8 @@
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
 #include "ecoinf3.lh"
+#include "machine/steppers.h" // stepper motor
+#include "video/awpvid.h" // drawing reels
 
 class ecoinf3_state : public driver_device
 {
@@ -34,6 +36,7 @@ public:
 
 	int strobe_addr;
 	int strobe_amount;
+	int m_optic_pattern;
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_a_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_a_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
@@ -48,7 +51,23 @@ public:
 	DECLARE_READ8_MEMBER(ppi8255_intf_c_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_c_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_d_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
-	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_d_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; } // changing goes from reel 1 error to running something in sphinx
+	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_b)
+	{
+		// guess, what are the bottom 4 bits, if anything?
+
+		int ret = m_optic_pattern | 0x0f;
+		
+		// | 0x80 = reel 4 fault
+		// | 0x40 = reel 3 fault
+		// | 0x20 = reel 2 fault
+		// | 0x10 = reel 1 fault
+
+		logerror("%04x - ppi8255_intf_d_(used)read_b %02x (Reel Optics)\n", machine().device("maincpu")->safe_pcbase(), ret);
+		
+		return ret;
+	
+	
+	} // changing goes from reel 1 error to running something in sphinx
 	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_d_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
@@ -81,7 +100,7 @@ public:
 
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_a)
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_a_strobedat0)
 	{
 	//	logerror("%04x - ppi8255_intf_a_(used)write_a %02x (STROBEDAT?)\n", machine().device("maincpu")->safe_pcbase(), data);
 		if (strobe_amount)
@@ -91,7 +110,7 @@ public:
 		}
 	}
 	
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_b)
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_b_strobedat1)
 	{
 	//	logerror("%04x - ppi8255_intf_a_(used)write_b %02x (STROBEDAT?)\n", machine().device("maincpu")->safe_pcbase(), data);
 		if (strobe_amount)
@@ -100,7 +119,7 @@ public:
 			strobe_amount--;
 		}
 	}
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_c)
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_c_strobe)
 	{
 		if ((data>=0xf0) && (data<=0xff))
 		{
@@ -124,9 +143,38 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_c_write_b) { logerror("%04x - ppi8255_intf_c_(used)write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_c_write_c) { logerror("%04x - ppi8255_intf_c_(used)write_c %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_a) { logerror("%04x - ppi8255_intf_d_(used)write_a %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_b) { logerror("%04x - ppi8255_intf_d_(used)write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_c) { logerror("%04x - ppi8255_intf_d_(used)write_c %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_a_reel01)
+	{
+//		logerror("%04x - ppi8255_intf_d_(used)write_a %02x\n", machine().device("maincpu")->safe_pcbase(), data);
+		stepper_update(0, data&0x0f);
+		stepper_update(1, (data>>4)&0x0f);
+
+		if ( stepper_optic_state(0) ) m_optic_pattern |=  0x10;
+		else                          m_optic_pattern &= ~0x10;
+		if ( stepper_optic_state(1) ) m_optic_pattern |=  0x20;
+		else                          m_optic_pattern &= ~0x20;
+
+		awp_draw_reel(0);
+		awp_draw_reel(1);
+	}
+
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_a_reel23)
+	{
+//		logerror("%04x - ppi8255_intf_d_(used)write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data);
+	
+		stepper_update(2, data&0x0f);
+		stepper_update(3, (data>>4)&0x0f);
+
+		if ( stepper_optic_state(2) ) m_optic_pattern |=  0x40;
+		else                          m_optic_pattern &= ~0x40;
+		if ( stepper_optic_state(3) ) m_optic_pattern |=  0x80;
+		else                          m_optic_pattern &= ~0x80;
+
+		awp_draw_reel(2);
+		awp_draw_reel(3);
+	}
+
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_c) { logerror("%04x - ppi8255_intf_d_(used)write_c %02x\n", machine().device("maincpu")->safe_pcbase(), data);}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_a_alpha_display);
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_b) { logerror("%04x - ppi8255_intf_e_write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
@@ -147,17 +195,19 @@ public:
 
 	DECLARE_DRIVER_INIT(ecoinf3);
 	DECLARE_DRIVER_INIT(ecoinf3_swap);
+	DECLARE_MACHINE_START(ecoinf3);
+
 };
 
 
 static I8255_INTERFACE (ppi8255_intf_a)
 {
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_read_a),			/* Port A read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_write_a),			/* Port A write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_write_a_strobedat0),			/* Port A write */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_read_b),			/* Port B read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_write_b),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_write_b_strobedat1),			/* Port B write */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_read_b),			/* Port C read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_write_c)			/* Port C write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_write_c_strobe)			/* Port C write */
 };
 
 static I8255_INTERFACE (ppi8255_intf_b)
@@ -183,9 +233,9 @@ static I8255_INTERFACE (ppi8255_intf_c)
 static I8255_INTERFACE (ppi8255_intf_d)
 {
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_read_a),			/* Port A read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_write_a),			/* Port A write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_write_a_reel01),			/* Port A write */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_read_b),			/* Port B read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_write_b),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_write_a_reel23),			/* Port B write */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_read_b),			/* Port C read */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_write_c)			/* Port C write */
 };
@@ -618,16 +668,25 @@ static INPUT_PORTS_START( ecoinf3 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-
+MACHINE_START_MEMBER(ecoinf3_state,ecoinf3)
+{
+	for ( int n = 0; n < 4; n++ )
+	{
+		stepper_config(machine(), n, &ecoin_interface_200step_reel);
+	}
+}
 
 static MACHINE_CONFIG_START( ecoinf3_pyramid, ecoinf3_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180,16000000) // certainly not a plain z80 at least, invalid opcodes for that
+	MCFG_CPU_ADD("maincpu", Z180,2000000) // certainly not a plain z80 at least, invalid opcodes for that
 	
 	MCFG_CPU_PROGRAM_MAP(pyramid_memmap)
 	MCFG_CPU_IO_MAP(pyramid_portmap)
 
 	MCFG_DEFAULT_LAYOUT(layout_ecoinf3)
+
+	MCFG_MACHINE_START_OVERRIDE(ecoinf3_state, ecoinf3 )
+
 
 	MCFG_I8255_ADD( "ppi8255_a", ppi8255_intf_a )
 	MCFG_I8255_ADD( "ppi8255_b", ppi8255_intf_b )

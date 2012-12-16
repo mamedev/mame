@@ -94,6 +94,17 @@ const stepper_interface starpoint_interface_200step_reel =
 	0x09,
 	7
 };
+// guess
+const stepper_interface ecoin_interface_200step_reel =
+{
+	ECOIN_200STEP_REEL,
+	12,
+	24,
+	0x09,
+	7
+};
+
+
 
 ///////////////////////////////////////////////////////////////////////////
 void stepper_config(running_machine &machine, int which, const stepper_interface *intf)
