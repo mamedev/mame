@@ -1141,10 +1141,6 @@ static INPUT_PORTS_START( rollingc )
 
 	PORT_MODIFY("IN2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:4" )
-
-	/* Dummy port for cocktail mode (not used) */
-	PORT_MODIFY(CABINET_PORT_TAG)
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( rollingc, mw8080bw_root, _8080bw_state )
