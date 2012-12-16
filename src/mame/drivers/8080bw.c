@@ -718,6 +718,7 @@ MACHINE_CONFIG_START( spacecom, _8080bw_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18MHz / 10) // divider guessed
+	// TODO: move irq handling away from mw8080.c, this game runs on custom hardware
 	MCFG_CPU_PROGRAM_MAP(spacecom_map)
 	MCFG_CPU_IO_MAP(spacecom_io_map)
 
@@ -752,7 +753,7 @@ DRIVER_INIT_MEMBER(_8080bw_state, spacecom)
 /*                                                     */
 /*******************************************************/
 
-READ8_MEMBER( _8080bw_state::invrvnge_02_r )
+READ8_MEMBER(_8080bw_state::invrvnge_02_r)
 {
 	UINT8 data = ioport("IN2")->read();
 	if (m_c8080bw_flip_screen) return data;
@@ -877,7 +878,8 @@ static INPUT_PORTS_START( spclaser )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	// TODO: figure out where dipswitch is read, it's not IN0 or IN2 in the current implementation
+	// TODO: figure out where dipswitch is read, it's not IN0 or IN2 in the current implementation.
+	// ROM disassembly doesn't show any dipswitch reads on portmapped I/O, maybe the manual is for a different ROM set? (that we don't have the dump for)
 #if 0
 	// these are the settings according to Gameplan Intruder manual
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:1,2")
@@ -1293,7 +1295,7 @@ MACHINE_CONFIG_END
 /*******************************************************/
 
 
-READ8_MEMBER( _8080bw_state::schasercv_02_r )
+READ8_MEMBER(_8080bw_state::schasercv_02_r)
 {
 	UINT8 data = ioport("IN2")->read();
 	if (m_c8080bw_flip_screen) return data;
@@ -1620,7 +1622,7 @@ MACHINE_START_MEMBER(_8080bw_state,polaris)
 	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
-READ8_MEMBER( _8080bw_state::polaris_port00_r )
+READ8_MEMBER(_8080bw_state::polaris_port00_r)
 {
 	UINT8 data = ioport("IN0")->read();
 	if (m_c8080bw_flip_screen) return data;
@@ -1645,9 +1647,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( polaris )
-	PORT_INCLUDE( schaser )
-
-	PORT_MODIFY("IN0")
+	PORT_START("IN0")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "SW?:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "SW?:2" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1657,7 +1657,7 @@ static INPUT_PORTS_START( polaris )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 
-	PORT_MODIFY("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
@@ -1667,7 +1667,12 @@ static INPUT_PORTS_START( polaris )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 
-	PORT_MODIFY("IN2")
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
 	/* 0x04 should be Cabinet - Upright/Cocktail,
        but until the cocktail hack is changed,
        this will have to do. */
@@ -1688,13 +1693,16 @@ static INPUT_PORTS_START( polaris )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_MODIFY("VR1")
+	/* Dummy port for cocktail mode */
+	INVADERS_CAB_TYPE_PORT
+
+	PORT_START("VR1")
 	PORT_ADJUSTER( 80, "Sub Volume VR1" )
 
-	PORT_MODIFY("VR2")
+	PORT_START("VR2")
 	PORT_ADJUSTER( 70, "Sub Volume VR2" )
 
-	PORT_MODIFY("VR3")
+	PORT_START("VR3")
 	PORT_ADJUSTER( 90, "Sub Volume VR3" )
 INPUT_PORTS_END
 
@@ -2212,14 +2220,14 @@ static INPUT_PORTS_START( skylove )
 	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
-READ8_MEMBER( _8080bw_state::shuttlei_ff_r )
+READ8_MEMBER(_8080bw_state::shuttlei_ff_r)
 {
 	UINT8 data = ioport("INPUTS")->read();
 	if (!m_c8080bw_flip_screen) return data;
 	return (data & 0x3b) | ioport("P2")->read();
 }
 
-WRITE8_MEMBER( _8080bw_state::shuttlei_ff_w )
+WRITE8_MEMBER(_8080bw_state::shuttlei_ff_w)
 {
         /* bit 0 goes high when first coin inserted
            bit 1 also goes high when subsequent coins are inserted
@@ -2248,6 +2256,7 @@ MACHINE_CONFIG_START( shuttlei, _8080bw_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_18MHz / 10) // divider guessed
+	// TODO: move irq handling away from mw8080.c, this game runs on custom hardware
 	MCFG_CPU_PROGRAM_MAP(shuttlei_map)
 	MCFG_CPU_IO_MAP(shuttlei_io_map)
 
