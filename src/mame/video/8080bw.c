@@ -454,7 +454,13 @@ UINT32 _8080bw_state::screen_update_shuttlei(screen_device &screen, bitmap_rgb32
 
 		for (i = 0; i < 8; i++)
 		{
-			bitmap.pix32(y, x|i) = pens[BIT(data, 7)];
+			if (m_c8080bw_flip_screen)
+			{
+				if (y < 192)
+					bitmap.pix32(191-y, 255-(x|i)) = pens[BIT(data, 7)];
+			}
+			else
+				bitmap.pix32(y, x|i) = pens[BIT(data, 7)];
 			data <<= 1;
 		}
 	}
