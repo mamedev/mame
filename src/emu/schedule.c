@@ -301,7 +301,7 @@ void emu_timer::register_save()
 //  period
 //-------------------------------------------------
 
-void emu_timer::schedule_next_period()
+inline void emu_timer::schedule_next_period()
 {
 	// advance by one period
 	m_start = m_expire;
@@ -400,7 +400,7 @@ bool device_scheduler::can_save() const
 {
 	// if any live temporary timers exit, fail
 	for (emu_timer *timer = m_timer_list; timer != NULL; timer = timer->next())
-		if (timer->m_temporary && timer->expire() != attotime::never)
+		if (timer->m_temporary && timer->expire().is_never())
 		{
 			logerror("Failed save state attempt due to anonymous timers:\n");
 			dump_timers();
@@ -679,7 +679,7 @@ void device_scheduler::postload()
 		emu_timer &timer = *m_timer_list;
 
 		// temporary timers go away entirely (except our special never-expiring one)
-		if (timer.m_temporary && timer.expire() != attotime::never)
+		if (timer.m_temporary && timer.expire().is_never())
 			m_timer_allocator.reclaim(timer.release());
 
 		// permanent ones get added to our private list
@@ -756,7 +756,7 @@ void device_scheduler::rebuild_execute_list()
 		attotime min_quantum = machine().config().m_minimum_quantum;
 
 		// if none specified default to 60Hz
-		if (min_quantum == attotime::zero)
+		if (min_quantum.is_zero())
 			min_quantum = attotime::from_hz(60);
 
 		// if the configuration specifies a device to make perfect, pick that as the minimum
@@ -879,7 +879,7 @@ emu_timer &device_scheduler::timer_list_remove(emu_timer &timer)
 //  scheduling quanta
 //-------------------------------------------------
 
-void device_scheduler::execute_timers()
+inline void device_scheduler::execute_timers()
 {
 	// if the current quantum has expired, find a new one
 	while (m_basetime >= m_quantum_list.first()->m_expire)
@@ -893,7 +893,7 @@ void device_scheduler::execute_timers()
 		// if this is a one-shot timer, disable it now
 		emu_timer &timer = *m_timer_list;
 		bool was_enabled = timer.m_enabled;
-		if (timer.m_period == attotime::zero || timer.m_period == attotime::never)
+		if (timer.m_period.is_zero() || timer.m_period.is_never())
 			timer.m_enabled = false;
 
 		// set the global state of which callback we're in
