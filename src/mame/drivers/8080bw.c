@@ -2361,6 +2361,8 @@ MACHINE_CONFIG_END
  * see below for decryption function (A0, A3, A9 invert)
  * It uses its own I/O function since A9 is inverted (and A9 mirrors A1 for I/O)
  *
+ * Hold down fire button to activate thrust.
+ *
  *************************************/
 
 static ADDRESS_MAP_START( vortex_io_map, AS_IO, 8, _8080bw_state )
@@ -2397,15 +2399,6 @@ static INPUT_PORTS_START( vortex )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
