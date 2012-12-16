@@ -760,7 +760,10 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 			tile <<= 8;
 			tile |= (knj_tile & 0x7f);
 			kanji_sel = 1;
-			x_step = 2;
+			if((tile & 0x7c00) == 0x0800) // 8x16 charset selector
+				x_step = 1;
+			else
+				x_step = 2;
 //			kanji_lr = 0;
 		}
 		else
