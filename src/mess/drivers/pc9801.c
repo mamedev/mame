@@ -812,8 +812,8 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 							*/
 
 							gfx_bit = (xi & 4);
-							gfx_bit+= (yi & (2 << (char_size == 16)))>>(1+(char_size == 16));
-							gfx_bit+= (yi & (4 << (char_size == 16)))>>(1+(char_size == 16));
+							gfx_bit+= (yi & (2 << (char_size == 16 ? 0x01 : 0x00)))>>(1+(char_size == 16));
+							gfx_bit+= (yi & (4 << (char_size == 16 ? 0x01 : 0x00)))>>(1+(char_size == 16));
 
 							tile_data = ((tile >> gfx_bit) & 1) ? 0xff : 0x00;
 						}
