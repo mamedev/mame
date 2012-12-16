@@ -13,6 +13,7 @@
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
+#include "ecoinf3.lh"
 
 class ecoinf3_state : public driver_device
 {
@@ -21,6 +22,9 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 
+
+	UINT16 m_chars[14];
+	void update_display();
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_a);
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_b);
@@ -70,6 +74,92 @@ static I8255_INTERFACE (ppi8255_intf_d)
 	DEVCB_NULL						/* Port C write */
 };
 
+// this is a copy of roc10937charset for now, I don't know what chip we're meant be using here
+// it is some kind of 14 digit, 16 seg display tho
+static const UINT16 ecoin_charset[]=
+{            // FEDC BA98 7654 3210
+	0x507F, // 0101 0000 0111 1111 @.
+	0x44CF, // 0100 0100 1100 1111 A.
+	0x153F, // 0001 0101 0011 1111 B.
+	0x00F3, // 0000 0000 1111 0011 C.
+	0x113F, // 0001 0001 0011 1111 D.
+	0x40F3, // 0100 0000 1111 0011 E.
+	0x40C3, // 0100 0000 1100 0011 F.
+	0x04FB, // 0000 0100 1111 1011 G.
+	0x44CC, // 0100 0100 1100 1100 H.
+	0x1133, // 0001 0001 0011 0011 I.
+	0x007C, // 0000 0000 0111 1100 J.
+	0x4AC0, // 0100 1010 1100 0000 K.
+	0x00F0, // 0000 0000 1111 0000 L.
+	0x82CC, // 1000 0010 1100 1100 M.
+	0x88CC, // 1000 1000 1100 1100 N.
+	0x00FF, // 0000 0000 1111 1111 O.
+	0x44C7, // 0100 0100 1100 0111 P.
+	0x08FF, // 0000 1000 1111 1111 Q.
+	0x4CC7, // 0100 1100 1100 0111 R.
+	0x44BB, // 0100 0100 1011 1011 S.
+	0x1103, // 0001 0001 0000 0011 T.
+	0x00FC, // 0000 0000 1111 1100 U.
+	0x22C0, // 0010 0010 1100 0000 V.
+	0x28CC, // 0010 1000 1100 1100 W.
+	0xAA00, // 1010 1010 0000 0000 X.
+	0x9200, // 1001 0010 0000 0000 Y.
+	0x2233, // 0010 0010 0011 0011 Z.
+	0x00E1, // 0000 0000 1110 0001 [.
+	0x8800, // 1000 1000 0000 0000 \.
+	0x001E, // 0000 0000 0001 1110 ].
+	0x2800, // 0010 1000 0000 0000 ^.
+	0x0030, // 0000 0000 0011 0000 _.
+	0x0000, // 0000 0000 0000 0000 dummy.
+	0x8121, // 1000 0001 0010 0001 !.
+	0x0180, // 0000 0001 1000 0000 ".
+	0x553C, // 0101 0101 0011 1100 #.
+	0x55BB, // 0101 0101 1011 1011 $.
+	0x7799, // 0111 0111 1001 1001 %.
+	0xC979, // 1100 1001 0111 1001 &.
+	0x0200, // 0000 0010 0000 0000 '.
+	0x0A00, // 0000 1010 0000 0000 (.
+	0xA050, // 1010 0000 0000 0000 ).
+	0xFF00, // 1111 1111 0000 0000 *.
+	0x5500, // 0101 0101 0000 0000 +.
+	0x0000, // 0000 0000 0000 0000 ;. (Set separately)
+	0x4400, // 0100 0100 0000 0000 --.
+	0x0000, // 0000 0000 0000 0000 . .(Set separately)
+	0x2200, // 0010 0010 0000 0000 /.
+	0x22FF, // 0010 0010 1111 1111 0.
+	0x1100, // 0001 0001 0000 0000 1.
+	0x4477, // 0100 0100 0111 0111 2.
+	0x443F, // 0100 0100 0011 1111 3.
+	0x448C, // 0100 0100 1000 1100 4.
+	0x44BB, // 0100 0100 1011 1011 5.
+	0x44FB, // 0100 0100 1111 1011 6.
+	0x000F, // 0000 0000 0000 1111 7.
+	0x44FF, // 0100 0100 1111 1111 8.
+	0x44BF, // 0100 0100 1011 1111 9.
+	0x0021, // 0000 0000 0010 0001 -
+	        //                     -.
+	0x2001, // 0010 0000 0000 0001 -
+		    //                     /.
+	0x2430, // 0010 0100 0011 0000 <.
+	0x4430, // 0100 0100 0011 0000 =.
+	0x8830, // 1000 1000 0011 0000 >.
+	0x1407, // 0001 0100 0000 0111 ?.
+};
+
+static UINT32 set_display(UINT32 segin)
+{
+	return BITSWAP32(segin, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,11,9,15,13,12,8,10,14,7,6,5,4,3,2,1,0);
+}
+
+void ecoinf3_state::update_display()
+{
+	for (int i =0; i<14; i++)
+	{
+		output_set_indexed_value("vfd", i, set_display(m_chars[i]) );
+	}
+}
+
+
 WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a)
 {
 	static UINT8 send_buffer = 0;
@@ -94,16 +184,30 @@ WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a)
 		{
 			if ((send_buffer>=0x20) && (send_buffer<0x5b))
 			{
-				printf("%c", send_buffer);
+				if (count<14)
+				{
+					int chr = send_buffer & 0x3f;
+
+					if (chr>0 && chr<0x3f)
+						m_chars[count] =  ecoin_charset[chr];
+
+				}
+				//printf("%c", send_buffer);
 			}
 			else
 			{
-				printf(" (%02x) ", send_buffer);
+				// control characters?
+				//printf(" (%02x) ", send_buffer);
 				count = -1;
 			}
 
 			count++;
-			if (count%14 == 0) printf("\n");
+			if (count%14 == 0)
+			{
+				//printf("\n");
+				count = 0;
+
+			}
 
 
 			send_buffer = 0x00;
@@ -114,7 +218,7 @@ WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a)
 		send_buffer = data;
 	}
 
-
+	update_display();
 
 }
 
@@ -407,11 +511,15 @@ static INPUT_PORTS_START( ecoinf3 )
 INPUT_PORTS_END
 
 
+
 static MACHINE_CONFIG_START( ecoinf3_pyramid, ecoinf3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180,16000000) // certainly not a plain z80 at least, invalid opcodes for that
+	
 	MCFG_CPU_PROGRAM_MAP(pyramid_memmap)
 	MCFG_CPU_IO_MAP(pyramid_portmap)
+
+	MCFG_DEFAULT_LAYOUT(layout_ecoinf3)
 
 	MCFG_I8255_ADD( "ppi8255_a", ppi8255_intf_a )
 	MCFG_I8255_ADD( "ppi8255_b", ppi8255_intf_b )

@@ -2079,6 +2079,8 @@ $(DRIVERS)/dlair.o:		$(LAYOUT)/dlair.lh
 
 $(DRIVERS)/dragrace.o:	$(LAYOUT)/dragrace.lh
 
+$(DRIVERS)/ecoinf3.o:	$(LAYOUT)/ecoinf3.lh
+
 $(DRIVERS)/firebeat.o:	$(LAYOUT)/firebeat.lh
 
 $(DRIVERS)/firetrk.o:	$(LAYOUT)/superbug.lh
