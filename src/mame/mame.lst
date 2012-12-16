@@ -28614,8 +28614,10 @@ ec_sumnc	// Casino Super Multi Nudger (Concept/Electrocoin)
 // Pyramid PCB
 
 ec_pyram	// Pyramid (Electrocoin)
+ec_pyrama	//
 ec_sphin	// Sphinx (Electrocoin)
 ec_sphina	//
+ec_sphinb	//
 ec_penni	// Pennies From Heaven (Electrocoin)
 ec_pennia	//
 ec_stair	// Stairway to Heaven
