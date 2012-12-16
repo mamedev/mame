@@ -9,6 +9,11 @@
 			<color red="1.0" green="0.0" blue="0.0" />
 		</led14segsc>
 	</element>
+	<element name="ldigit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
 	<element name="diag" defstate="0">
 		<led7seg>
 			<color red="1.0" green="0.0" blue="1.0" />
@@ -139,10 +144,10 @@
 		<bezel name="digit60" element="diag">
 			<bounds left="142" top="345" right="176" bottom="380" />
 		</bezel>
-		<bezel name="digit0" element="digit">
+		<bezel name="digit0" element="ldigit">
 			<bounds left="186" top="345" right="220" bottom="384" />
 		</bezel>
-		<bezel name="digit8" element="digit">
+		<bezel name="digit8" element="ldigit">
 			<bounds left="230" top="345" right="264" bottom="384" />
 		</bezel>
 		<bezel element="P0"><bounds left="200" right="258" top="330" bottom="342" /></bezel>

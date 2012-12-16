@@ -7,8 +7,9 @@
 
 
 ToDo:
-- Determine what drives the background sound (atm it's a guess)
+- Background music is slow in High Speed
 - Can coin up but not start
+- Doesn't react to the Advance button very well
 
 *****************************************************************************************/
 
@@ -58,12 +59,14 @@ public:
 	DECLARE_WRITE8_MEMBER(pia2c_pb_w);
 	DECLARE_WRITE8_MEMBER(pia34_pa_w);
 	DECLARE_WRITE8_MEMBER(pia34_pb_w);
+	DECLARE_WRITE_LINE_MEMBER(pia34_cb2_w);
 	DECLARE_WRITE8_MEMBER(pia40_pa_w);
 	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
 	DECLARE_READ_LINE_MEMBER(pias_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
+	DECLARE_READ8_MEMBER(pia28_w7_r);
 	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
@@ -208,7 +211,10 @@ static INPUT_PORTS_START( s11 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, s11_state, audio_nmi, 1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, s11_state, main_nmi, 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Advance") PORT_CODE(KEYCODE_0)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_9) PORT_TOGGLE
+	PORT_CONFNAME( 0x10, 0x00, "Language" )
+	PORT_CONFSETTING( 0x00, "German" )
+	PORT_CONFSETTING( 0x10, "English" )
 INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER( s11_state, s11 )
@@ -289,12 +295,12 @@ static const pia6821_interface pia24_intf =
 
 READ_LINE_MEMBER( s11_state::pia28_ca1_r )
 {
-	return BIT(ioport("DIAGS")->read(), 2); // advance button
+	return BIT(ioport("DIAGS")->read(), 2) ? 1 : 0; // advance button
 }
 
 READ_LINE_MEMBER( s11_state::pia28_cb1_r )
 {
-	return BIT(ioport("DIAGS")->read(), 3); // up/down switch
+	return BIT(ioport("DIAGS")->read(), 3) ? 1 : 0; // up/down switch
 }
 
 WRITE8_MEMBER( s11_state::dig0_w )
@@ -318,9 +324,16 @@ WRITE8_MEMBER( s11_state::dig1_w )
 	}
 }
 
+READ8_MEMBER( s11_state::pia28_w7_r)
+{
+	if(BIT(ioport("DIAGS")->read(), 4))  // W7 Jumper
+		return 0x00;
+	return 0x80;
+}
+
 static const pia6821_interface pia28_intf =
 {
-	DEVCB_NULL,		/* port A in */
+	DEVCB_DRIVER_MEMBER(s11_state, pia28_w7_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
 	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia28_ca1_r),		/* line CA1 in */
 	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia28_cb1_r),		/* line CB1 in */
@@ -413,6 +426,14 @@ WRITE8_MEMBER( s11_state::pia34_pa_w )
 
 WRITE8_MEMBER( s11_state::pia34_pb_w )
 {
+	m_pia40->portb_w(data);
+	m_pia40->cb1_w(1);
+	m_pia40->cb1_w(0);
+}
+
+WRITE_LINE_MEMBER( s11_state::pia34_cb2_w )
+{
+
 }
 
 static const pia6821_interface pia34_intf =
@@ -426,7 +447,7 @@ static const pia6821_interface pia34_intf =
 	DEVCB_DRIVER_MEMBER(s11_state, pia34_pa_w),		/* port A out */
 	DEVCB_DRIVER_MEMBER(s11_state, pia34_pb_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia34_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),	/* IRQA */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
@@ -493,7 +514,7 @@ WRITE_LINE_MEMBER( s11_state::ym2151_irq_w)
 static const pia6821_interface pia40_intf =
 {
 	DEVCB_NULL,		/* port A in */
-	DEVCB_DRIVER_MEMBER(s11_state, dac_r),		/* port B in */
+	DEVCB_NULL,//_DRIVER_MEMBER(s11_state, dac_r),		/* port B in */
 	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca1_r),		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_LINE_VCC,		/* line CA2 in */
@@ -530,7 +551,7 @@ static MACHINE_CONFIG_START( s11, s11_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 4000000)
 	MCFG_CPU_PROGRAM_MAP(s11_main_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s11_state, irq, attotime::from_hz(250))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s11_state, irq, attotime::from_hz(500))
 	MCFG_MACHINE_RESET_OVERRIDE(s11_state, s11)
 
 	/* Video */
