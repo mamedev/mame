@@ -339,6 +339,10 @@ cdimono1  // Philips CD-i (Mono-I board)
 // Yamaha
 mu100	// 1997 MU-100
 
+// Roland
+mt32
+cm32l
+
 //***************COMPUTERS**************************************************
 
 // Acorn

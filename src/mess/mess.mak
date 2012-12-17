@@ -362,6 +362,7 @@ DRVLIBS += \
 	$(MESSOBJ)/rm.a \
 	$(MESSOBJ)/robotron.a \
 	$(MESSOBJ)/rockwell.a \
+	$(MESSOBJ)/roland.a \
 	$(MESSOBJ)/samcoupe.a \
 	$(MESSOBJ)/samsung.a \
 	$(MESSOBJ)/sanyo.a \
@@ -1576,6 +1577,9 @@ $(MESSOBJ)/robotron.a:			\
 	$(MESS_DRIVERS)/rt1715.o	\
 	$(MESS_DRIVERS)/z1013.o		\
 	$(MESS_DRIVERS)/z9001.o		\
+
+$(MESSOBJ)/roland.a:			\
+	$(MESS_DRIVERS)/rmt32.o		\
 
 $(MESSOBJ)/rockwell.a:			\
 	$(MESS_MACHINE)/aim65.o		\
