@@ -150,7 +150,7 @@ public:
 	}
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_c_strobe)
 	{
-		if ((data>=0xf0) && (data<=0xff))
+		if (data>=0xf0)
 		{
 		//  logerror("%04x - ppi8255_intf_a_(used)write_c %02x (STROBE?)\n", machine().device("maincpu")->safe_pcbase(), data);
 			strobe_addr = data & 0xf;
