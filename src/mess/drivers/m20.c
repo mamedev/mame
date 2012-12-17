@@ -475,7 +475,7 @@ void m20_state::machine_start()
 void m20_state::machine_reset()
 {
 	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-        //	UINT8 *RAM = (UINT8 *)machine().root_device().memshare("mainram")->ptr();
+        //  UINT8 *RAM = (UINT8 *)machine().root_device().memshare("mainram")->ptr();
 	UINT8 *RAM = (UINT8 *)machine().root_device().memshare("dram0_4000")->ptr();
 
         //ROM += 0x10000; // don't know why they load at an offset, but let's go with it

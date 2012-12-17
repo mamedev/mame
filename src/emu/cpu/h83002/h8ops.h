@@ -1908,12 +1908,12 @@ static void h8_group6(h83xx_state *h8, UINT16 opcode)
 				h8_bset8(h8, (udata16 >> 4) & 0x7, udata8);
 				h8_mem_write8(address24, udata8);
 			}
-			else if ((udata16 & 0xff00) == 0x6300) 
+			else if ((udata16 & 0xff00) == 0x6300)
 			{
 				h8_btst8(h8, h8_getreg8(h8, (udata16 >> 4) & 0xf), udata8);
 				h8_mem_write8(address24, udata8);
 			}
-			else if ((udata16 & 0xff0f) == 0x6000) 
+			else if ((udata16 & 0xff0f) == 0x6000)
 			{
 				h8_bset8(h8, h8_getreg8(h8, (udata16 >> 4) & 0xf), udata8);
 				h8_mem_write8(address24, udata8);

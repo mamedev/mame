@@ -22,7 +22,7 @@
   (c)SUCCESS / CABINET :TAIYO JIDOKI
 
   CPU   : 2x Sharp LH0080A Z80A
-  
+
   MEM   : 1x Sharp LH5116H-10 (2KB SRAM)
           1x Fairchild 8464A-10L (8KB SRAM) + battery
           6x Sharp LH2464-15 (192KB Video DRAM total)
@@ -71,7 +71,7 @@
   |  | LH2464-15 |  | SN74LS08N  |  | SN74LS125AN |    |                 |      |                 |  |
   |  '-----------'  '------------'  '-------------'    '-----------------'      '-----------------'  |
   |    IC19           IC20            IC21           IC22                         IC23               |
-  |  .-----------.  .------------.  .------------. .--------------------------. .-----------------.  |    
+  |  .-----------.  .------------.  .------------. .--------------------------. .-----------------.  |
   |  | LH2464-15 |  | SN74LS174N |  | SN74LS174N | | LH0080A Z80A-CPU-D       | |                 |  |
   |  '-----------'  '------------'  '------------' | SHARP JAPAN              | |    E M P T Y    |  |
   |                                   X2           |                          | |   S O C K E T   |  |
@@ -126,7 +126,7 @@
   The game is playable, even when you can't hear all sounds.
 
   Coin 1 (key 5) is not working properly and could hang the system.
-  Once pressed, the game spits a message that means "Jammed Medal". 
+  Once pressed, the game spits a message that means "Jammed Medal".
   For now, use Coin 2 (key 6) and Service (key 8) for credits...
 
   If you pressed Coin 1 and the game is not responding anymore, press RESET
@@ -160,7 +160,7 @@
   There are 14 samples in the system.
 
   00: "boterin" (?)
-  01: 
+  01:
   02: "hakase" ("professor")
   03: "pyokorin"
   04: "kunio"
@@ -205,10 +205,10 @@ public:
 
 	required_device<cpu_device> m_audiocpu;
 	required_device<v9938_device> m_v9938;
-	
+
 	UINT8 m_sound_irq_cause;
 	UINT8 m_sound_irq_mask;
-	
+
 	DECLARE_WRITE8_MEMBER(kurukuru_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(kurukuru_soundlatch_w);
 	DECLARE_READ8_MEMBER(kurukuru_soundlatch_r);
@@ -306,7 +306,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x00, 0x00) AM_WRITENOP // seems for switch cpu... or irq? or hopper?
+//  AM_RANGE(0x00, 0x00) AM_WRITENOP // seems for switch cpu... or irq? or hopper?
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")
 	AM_RANGE(0x20, 0x20) AM_WRITE(kurukuru_soundlatch_w)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
@@ -321,8 +321,8 @@ ADDRESS_MAP_END
 /*
   0x00 Writes... 2nd cpu related.
                  01 when coin 1 (jams)
-				 20 when coin 2
-				 40 when payout (jams) ...check
+                 20 when coin 2
+                 40 when payout (jams) ...check
 
   0x20 Writes... # sample to trigger
                  00, 08, 03, 04, 05 for bets 1-2-3-4-5 respectively.
@@ -361,7 +361,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_io, AS_IO, 8, kurukuru_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x40, 0x40) AM_WRITENOP
+//  AM_RANGE(0x40, 0x40) AM_WRITENOP
 	AM_RANGE(0x50, 0x50) AM_WRITE(kurukuru_sound_irqmask_w)
 	AM_RANGE(0x60, 0x60) AM_READ(kurukuru_soundlatch_r)
 	AM_RANGE(0x70, 0x70) AM_READ(kurukuru_sound_timer_irqack_r)

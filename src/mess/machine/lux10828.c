@@ -676,7 +676,7 @@ READ8_MEMBER( luxor_55_10828_device::fdc_r )
 	if (!m_wait_enable && !m_fdc_irq && !m_fdc_drq)
 	{
 		fatalerror("Z80 WAIT not supported by MAME core\n");
-		
+
 		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
 	}
 

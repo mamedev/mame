@@ -683,7 +683,7 @@ if(machine().input().code_pressed_once(KEYCODE_T))
 		}
 	}
 
-//	if (m_mjsikaku_dispflag)
+//  if (m_mjsikaku_dispflag)
 	{
 		int scrolly;
 		if (m_mjsikaku_flipscreen) scrolly =   m_mjsikaku_scrolly;
@@ -692,8 +692,8 @@ if(machine().input().code_pressed_once(KEYCODE_T))
 		copybitmap(bitmap, *m_mjsikaku_tmpbitmap, 0, 0, 0, scrolly,       cliprect);
 		copybitmap(bitmap, *m_mjsikaku_tmpbitmap, 0, 0, 0, scrolly - 256, cliprect);
 	}
-//	else
-//		bitmap.fill(0);
+//  else
+//      bitmap.fill(0);
 
 	return 0;
 }

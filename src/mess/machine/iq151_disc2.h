@@ -24,7 +24,7 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const rom_entry *device_rom_region() const;
-	
+
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:

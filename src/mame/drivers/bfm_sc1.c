@@ -1171,7 +1171,7 @@ static void sc1_common_init(running_machine &machine, int reels, int decrypt, in
 
 }
 
-	
+
 int sc1_find_project_string(running_machine &machine )
 {
 	// search for the project string to find the title (usually just at ff00)
@@ -1218,7 +1218,7 @@ int sc1_find_project_string(running_machine &machine )
 					if (addr<size)
 					{
 						rom = src[addr];
-			
+
 						if ((rom>=0x20) && (rom<0x7f))
 						{
 							printf("%c", rom);
@@ -2668,7 +2668,7 @@ GAME( 198?, sc1cshat		, 0			, scorpion1			, scorpion1 , bfm_sc1_state, lotse		, 
 ********************************************************************************************************************************************************************************************************************/
 
 ROM_START( sc1clatt )  ROM_REGION( 0x10000, "maincpu", 0 )  ROM_LOAD( "39370196.2",           0x0000, 0x8000,          CRC(c809c22d) SHA1(fca7515bc84d432150ffe5e32fccc6aed458b8b0) ) ROM_LOAD( "39370196.1",           0x8000, 0x8000,          CRC(4c2e465f) SHA1(101939d37d9c033f6d1dfb83b4beb54e4061aec2) ) ROM_END
-ROM_START( sc1clatta ) ROM_REGION( 0x10000, "maincpu", 0 ) 	ROM_LOAD( "393717553 prom b.bin", 0x0000, 0x8000, BAD_DUMP CRC(06f41627) SHA1(0e54314147a5f0d833d83f6f0ee828bd1c875f3e) ) ROM_LOAD( "393717552 prom a.bin", 0x8000, 0x8000, BAD_DUMP CRC(795e93cf) SHA1(017fa5ea3d9ad1f7a7a619d88a5892a9ffe6f3bc) ) ROM_END
+ROM_START( sc1clatta ) ROM_REGION( 0x10000, "maincpu", 0 )	ROM_LOAD( "393717553 prom b.bin", 0x0000, 0x8000, BAD_DUMP CRC(06f41627) SHA1(0e54314147a5f0d833d83f6f0ee828bd1c875f3e) ) ROM_LOAD( "393717552 prom a.bin", 0x8000, 0x8000, BAD_DUMP CRC(795e93cf) SHA1(017fa5ea3d9ad1f7a7a619d88a5892a9ffe6f3bc) ) ROM_END
 
 // PROJECT NUMBER 5527  CLUB ATTRACTION DUAL #1 - 3-APR-1990 17:17:23
 GAME( 1990, sc1clatt		, 0			, scorpion1			, clatt		, bfm_sc1_state, clatt			, 0,       "BFM",      "Club Attraction (UK, Game Card 39-370-196)", GAME_FLAGS ) // GAME No 39-370-196
@@ -2729,7 +2729,7 @@ GAME( 198?, sc1clbw			, 0			, scorpion1			, clatt	, bfm_sc1_state, lotse			, 0, 
  ********************************************************************************************************************************************************************************************************************/
 
 #define sc1barcd_sound \
- 	ROM_REGION( 0x20000, "upd", 0 ) \
+	ROM_REGION( 0x20000, "upd", 0 ) \
 	ROM_LOAD( "barsnd1.bin", 0x00000, 0x10000, CRC(c9de8ff4) SHA1(c3e77e84d4ecc1c779929a96d1c445a1af24865b) ) \
 	ROM_LOAD( "barsnd2.bin", 0x10000, 0x10000, CRC(56af984a) SHA1(aebd30f3ca767dc5fc77fb01765833ee627a5aee) ) \
 
@@ -2746,7 +2746,7 @@ GAME( 198?, sc1barcda		, sc1barcd	, scorpion1_viper	, clatt		, bfm_sc1_state, lo
   sc1dblcha has a severe fixed bits problem, it's almost not worth keeping
   sc1dblchb also seem like bad dumps (both halves identical) BUT they contain alpha strings for the 'Double Chance' game where the parent set doesn't
             is it a different game or roms for some kind of extra display hardware?
- 
+
  Sound roms don't seem to get used?
 ********************************************************************************************************************************************************************************************************************/
 
@@ -2789,7 +2789,7 @@ GAME( 198?, sc1dblchb		, sc1dblch	, scorpion1_viper			, clatt	, bfm_sc1_state, l
 	ROM_REGION( 0x20000, "upd", 0 )\
 	ROM_LOAD( "club-six-five-special_snd_a.bin", 0x0000, 0x010000, CRC(915802cd) SHA1(5bca3a80199a6534e084a5cf4337da4e9c48f45c) )\
 	ROM_LOAD( "club-six-five-special_snd_b.bin", 0x0000, 0x010000, CRC(b3b230d8) SHA1(022e95f38b14922137222805c0bec7498c5956cc) )\
-	
+
 ROM_START( sc1cl65 )   ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "65spp2",      0x0000, 0x8000, CRC(11332a28) SHA1(76f9eee54351e0d8dc4b620ec92661538929e75d) ) ROM_LOAD( "65spp1",                                               0x8000, 0x8000, CRC(2c4cb63b) SHA1(5d09b575cf80beecd83c07286b74af29de7ec553) ) sc1_cl65_sound     ROM_END
 ROM_START( sc1cl65d )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "39370694.p2", 0x0000, 0x8000, CRC(3371dc55) SHA1(52d75a90933acc7a03821e5c2821df6126c72a6c) ) ROM_LOAD( "club-six-five-special_std_ac_rot_10po_ass.bin",        0x8000, 0x8000, CRC(cf48ba99) SHA1(5da4321ff349964e903f1bebd3e5ddd0799fc478) ) sc1_cl65_sound_alt ROM_END
 ROM_START( sc1cl65dp ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "39370694.p2", 0x0000, 0x8000, CRC(3371dc55) SHA1(52d75a90933acc7a03821e5c2821df6126c72a6c) ) ROM_LOAD( "club-six-five-special_dat_ac_rot_10po_ass.bin",        0x8000, 0x8000, CRC(77ddf81d) SHA1(522d9f84ab6e31586f371548e2f146ac193f06f5) ) sc1_cl65_sound_alt ROM_END
@@ -2813,7 +2813,7 @@ GAME( 198?, sc1cl65b		, sc1cl65	, scorpion1_viper			, clatt	, bfm_sc1_state, lot
 GAME( 198?, sc1cl65bp		, sc1cl65	, scorpion1_viper			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 4, Protocol) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-371-859
 // PROJECT NUMBER 6124 20P PAYOUT  SIX FIVE SPECIAL #200/20P PAYOUT - 21-APR-1993 14:46:20
 GAME( 198?, sc1cl65a		, sc1cl65	, scorpion1_viper			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 5) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-370-858
-GAME( 198?, sc1cl65ap		, sc1cl65	, scorpion1_viper			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 5, Protocol) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-371-858 
+GAME( 198?, sc1cl65ap		, sc1cl65	, scorpion1_viper			, clatt	, bfm_sc1_state, lotse			, 0,       "BFM",      "Club 65 Special (Bellfruit) (set 5, Protocol) (Scorpion 1)", GAME_FLAGS ) // GAME No 39-371-858
 
 /********************************************************************************************************************************************************************************************************************
  China Town
@@ -2847,7 +2847,7 @@ GAME( 198?, sc1chinabp		, sc1china	, scorpion1_viper	, scorpion1	, bfm_sc1_state
 
 /*
 ROM_LOAD( "temp11a.bin", 0x8000, 0x8000, CRC(37c8b73e) SHA1(f718572d170be7b582c3818df7163309cea232b5) ) // FIXED BITS (xxxxxx1x)
-appears to be a bad dump of 
+appears to be a bad dump of
 ROM_LOAD( "95717692a.bin", 0x8000, 0x8000, CRC(f9fe7b9a) SHA1(0e3fe5da9fc837726d08f02a2c6ed782f016c982) )
 */
 
@@ -3145,7 +3145,7 @@ GAME( 1988, sc1lotus		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			,
 GAME( 1988, sc1lotusa		, sc1lotus	, scorpion1			, scorpion1	, bfm_sc1_state, nocrypt		, 0,       "BFM/ELAM", "Lotus SE (Dutch) (set 2)", GAME_FLAGS )
 
 // PROJECT NUMBER 5142  DUTCH ROULETTE  GAME No 39-360-029 - 18-APR-1989 16:03:00
-GAME( 1988, sc1roul			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, rou029	       	, 0,       "BFM/ELAM", "Roulette (Dutch, Game Card 39-360-129?)", GAME_FLAGS )
+GAME( 1988, sc1roul			, 0			, scorpion1			, scorpion1	, bfm_sc1_state, rou029	    	, 0,       "BFM/ELAM", "Roulette (Dutch, Game Card 39-360-129?)", GAME_FLAGS )
 
 // PROJECT NUMBER 6045       ARMADA          GAME No 39-370-729  - 28-AUG-1992 14:37:00
 GAME( 198?, sc1armad		, 0			, scorpion1			, scorpion1	, bfm_sc1_state, lotse			, 0,       "BFM/ELAM", "Armada (Dutch) (Bellfruit)  (Scorpion 1)", GAME_FLAGS )

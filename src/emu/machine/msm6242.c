@@ -294,7 +294,7 @@ void msm6242_device::update_timer()
 	if (!m_res_out_int_func.isnull() && m_irq_flag == 1)
 	{
 		switch(m_irq_type)
-		{		
+		{
 			case IRQ_HOUR:
 				callback_ticks += (59 - get_clock_register(RTC_MINUTE)) * (0x8000 * 60);
 				// fall through
@@ -471,17 +471,17 @@ WRITE8_MEMBER( msm6242_device::write )
 	switch(offset)
 	{
 		case MSM6242_REG_CD:
-            //	x--- 30s ADJ
-            //	-x-- IRQ FLAG
-            //	--x- BUSY
-            //	---x HOLD
+            //  x--- 30s ADJ
+            //  -x-- IRQ FLAG
+            //  --x- BUSY
+            //  ---x HOLD
 			m_reg[0] = data & 0x0f;
 			break;
 
 		case MSM6242_REG_CE:
-            //	xx-- t0,t1 (timing irq)
-            //	--x- STD
-            //	---x MASK
+            //  xx-- t0,t1 (timing irq)
+            //  --x- STD
+            //  ---x MASK
 			m_reg[1] = data & 0x0f;
 			if((data & 3) == 0) // MASK & STD = 0
 			{
@@ -497,10 +497,10 @@ WRITE8_MEMBER( msm6242_device::write )
 			break;
 
 		case MSM6242_REG_CF:
-            //	x--- TEST
-            //	-x-- 24/12
-            //	--x- STOP
-            //	---x RESET
+            //  x--- TEST
+            //  -x-- 24/12
+            //  --x- STOP
+            //  ---x RESET
 
 			// the 12/24 mode bit can only be changed when RESET does a 1 -> 0 transition
 			if (((data & 0x01) == 0x00) && (m_reg[2] & 0x01))

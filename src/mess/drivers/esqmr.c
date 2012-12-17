@@ -3,16 +3,16 @@
     esqmr.c - Ensoniq MR-61, MR-76, and MR-Rack
 
     Skeleton driver by R. Belmont
- 
+
     Hardware:
-    	CPU: 68340 MCU
-    	Sound: 2xES5506
-		Effects: ES5511
+        CPU: 68340 MCU
+        Sound: 2xES5506
+        Effects: ES5511
 
     Memory map:
- 
-    0x000000-0x0FFFFF	OS ROM
- 
+
+    0x000000-0x0FFFFF   OS ROM
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -45,8 +45,8 @@ void esqmr_state::machine_reset()
 
 static ADDRESS_MAP_START( mr_map, AS_PROGRAM, 32, esqmr_state )
     AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("maincpu", 0)
-//	AM_RANGE(0x200000, 0x20003f) AM_DEVREADWRITE8_LEGACY("ensoniq", es5506_r, es5506_w, 0xffffffff)
-//	AM_RANGE(0x240000, 0x24003f) AM_DEVREADWRITE8_LEGACY("ensoniq2", es5506_r, es5506_w, 0xffffffff)
+//  AM_RANGE(0x200000, 0x20003f) AM_DEVREADWRITE8_LEGACY("ensoniq", es5506_r, es5506_w, 0xffffffff)
+//  AM_RANGE(0x240000, 0x24003f) AM_DEVREADWRITE8_LEGACY("ensoniq2", es5506_r, es5506_w, 0xffffffff)
 //    AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
@@ -101,8 +101,8 @@ INPUT_PORTS_END
 
 ROM_START( mrrack )
     ROM_REGION(0x100000, "maincpu", 0)
-	ROM_LOAD16_BYTE( "mr-rack-150-lo.bin", 0x000001, 0x080000, CRC(b29988a1) SHA1(986c2def11de27fa2b9be55ac32f7fec0c414bca) ) 
-	ROM_LOAD16_BYTE( "mr-rack-150-up.bin", 0x000000, 0x080000, CRC(71511692) SHA1(54744f16f1db1ac5abb2f70b6e04aebf1e0e029d) ) 
+	ROM_LOAD16_BYTE( "mr-rack-150-lo.bin", 0x000001, 0x080000, CRC(b29988a1) SHA1(986c2def11de27fa2b9be55ac32f7fec0c414bca) )
+	ROM_LOAD16_BYTE( "mr-rack-150-up.bin", 0x000000, 0x080000, CRC(71511692) SHA1(54744f16f1db1ac5abb2f70b6e04aebf1e0e029d) )
 
     ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
     ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00)

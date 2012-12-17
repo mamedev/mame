@@ -43,7 +43,7 @@ Also, it should be using a vblank irq value of 4. This triggers the following bo
  - scroll 3Y is wrote at 0x980008
  - scroll 3X is wrote at 0x98000a
  - the layer enable and layer mask writes continue at 0x98000c and 0x980020-2
- 
+
 These read/writes are identical to those used by a Knights of the Round bootleg which uses the all sf2mdt sound
 hardware. This set is currently non-working in cps1.c but I will move it here soon.
 
@@ -79,7 +79,7 @@ static WRITE16_HANDLER( fcrash_soundlatch_w )
 WRITE16_MEMBER(cps_state::cawingbl_soundlatch_w)
 {
 	cps_state *state = space.machine().driver_data<cps_state>();
-	
+
 	if (ACCESSING_BITS_8_15)
 	{
 		state->soundlatch_byte_w(space, 0, data  >> 8);
@@ -147,7 +147,7 @@ static WRITE8_HANDLER( fcrash_msm5205_1_data_w )
 WRITE16_MEMBER(cps_state::kodb_layer_w)
 {
 	cps_state *state = space.machine().driver_data<cps_state>();
-	
+
 	/* layer enable and mask 1&2 registers are written here - passing them to m_cps_b_regs for now for drawing routines */
 	if (offset == 0x06)
 		state->m_cps_b_regs[m_layer_enable_reg / 2] = data;
@@ -162,11 +162,11 @@ WRITE16_MEMBER(cps_state::kodb_layer_w)
 WRITE16_MEMBER(cps_state::sf2mdt_layer_w)
 {
 	cps_state *state = space.machine().driver_data<cps_state>();
-	
+
 	/* layer enable and scroll registers are written here - passing them to m_cps_b_regs and m_cps_a_regs for now for drawing routines
-	the scroll layers aren't buttery smooth, due to the lack of using the row scroll address tables in the rendering code, this is also
-	supported by the fact that the game doesn't write the table address anywhere */
-	
+    the scroll layers aren't buttery smooth, due to the lack of using the row scroll address tables in the rendering code, this is also
+    supported by the fact that the game doesn't write the table address anywhere */
+
 	if (offset == 0x0086)
 		state->m_cps_a_regs[0x14 / 2] = data + 0xffce; /* scroll 3x */
 	else
@@ -179,10 +179,10 @@ WRITE16_MEMBER(cps_state::sf2mdt_layer_w)
 	if (offset == 0x0089)
 		state->m_cps_a_regs[0x0c / 2] = data + 0xffca; /* scroll 1x */
 	else
-	if (offset == 0x008a) { 
+	if (offset == 0x008a) {
 		state->m_cps_a_regs[0x12 / 2] = data; /* scroll 2y */
 		state->m_cps_a_regs[CPS1_ROWSCROLL_OFFS] = data; /* row scroll start */
-	} else	
+	} else
 	if (offset == 0x008b)
 		state->m_cps_a_regs[0x0e / 2] = data; /* scroll 1y */
 	else
@@ -193,11 +193,11 @@ WRITE16_MEMBER(cps_state::sf2mdt_layer_w)
 WRITE16_MEMBER(cps_state::sf2mdta_layer_w)
 {
 	cps_state *state = space.machine().driver_data<cps_state>();
-	
+
 	/* layer enable and scroll registers are written here - passing them to m_cps_b_regs and m_cps_a_regs for now for drawing routines
-	the scroll layers aren't buttery smooth, due to the lack of using the row scroll address tables in the rendering code, this is also
-	supported by the fact that the game doesn't write the table address anywhere */
-	
+    the scroll layers aren't buttery smooth, due to the lack of using the row scroll address tables in the rendering code, this is also
+    supported by the fact that the game doesn't write the table address anywhere */
+
 	if (offset == 0x0086)
 		state->m_cps_a_regs[0x0c / 2] = data + 0xffbe; /* scroll 1x */
 	else
@@ -256,16 +256,16 @@ static void fcrash_render_sprites( running_machine &machine, bitmap_ind16 &bitma
 	//  on kodb, it might still be, unless that's just a leftover and it writes somewhere else too
 //  if (state->m_cps_a_regs[0] & 0x00ff) base = 0x10c8/2;
 //  printf("cps1_cps_a_regs %04x\n", state->m_cps_a_regs[0]);
-	
+
 	/* if we have separate sprite ram, use it */
 	if (state->m_bootleg_sprite_ram) sprite_ram = state->m_bootleg_sprite_ram;
-	
+
 	/* get end of sprite list marker */
 	for (pos = 0x1ffc; pos >= 0x0000; pos -= 4)
 	{
 		if (sprite_ram[base + pos - 1] == state->m_sprite_list_end_marker) last_sprite_offset = pos;
 	}
-	
+
 	for (pos = last_sprite_offset; pos >= 0x0000; pos -= 4)
 	{
 		int tileno;
@@ -283,7 +283,7 @@ static void fcrash_render_sprites( running_machine &machine, bitmap_ind16 &bitma
 		colour = sprite_ram[base + pos + 1] & 0x1f;
 		ypos   = 256 - ypos;
 		xpos  += state->m_sprite_x_offset;
-		
+
 		pdrawgfx_transpen(bitmap, cliprect, machine.gfx[2], tileno, colour, flipx, flipy, xpos + 49, ypos - 16, machine.priority_bitmap, 0x02, 15);
 
 	}
@@ -329,10 +329,10 @@ static void fcrash_build_palette( running_machine &machine )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 	int offset;
-	
+
 	// all the bootlegs seem to write the palette offset as usual
 	int palettebase = (state->m_cps_a_regs[0x0a / 2] << 8) & 0x1ffff;
-	
+
 	for (offset = 0; offset < 32 * 6 * 16; offset++)
 	{
 		int palette = state->m_gfxram[palettebase / 2 + offset];
@@ -645,7 +645,7 @@ static INPUT_PORTS_START( cawingbl )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -834,7 +834,7 @@ static INPUT_PORTS_START( sf2mdt )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Jab Punch") PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Strong Punch") PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 Fierce Punch") PORT_PLAYER(2)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )	
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")      /* Extra buttons */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 Short Kick") PORT_PLAYER(1)
@@ -908,7 +908,7 @@ MACHINE_START_MEMBER(cps_state,fcrash)
 	m_audiocpu = machine().device<cpu_device>("soundcpu");
 	m_msm_1 = machine().device<msm5205_device>("msm1");
 	m_msm_2 = machine().device<msm5205_device>("msm2");
-	
+
 	m_layer_enable_reg = 0x20;
 	m_layer_mask_reg[0] = 0x26;
 	m_layer_mask_reg[1] = 0x30;
@@ -931,7 +931,7 @@ MACHINE_START_MEMBER(cps_state,kodb)
 {
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("soundcpu");
-	
+
 	m_layer_enable_reg = 0x20;
 	m_layer_mask_reg[0] = 0x2e;
 	m_layer_mask_reg[1] = 0x2c;
@@ -948,7 +948,7 @@ MACHINE_START_MEMBER(cps_state,kodb)
 MACHINE_START_MEMBER(cps_state, cawingbl)
 {
 	MACHINE_START_CALL_MEMBER(fcrash);
-	
+
 	m_layer_enable_reg = 0x0c;
 	m_layer_mask_reg[0] = 0x0a;
 	m_layer_mask_reg[1] = 0x08;
@@ -970,7 +970,7 @@ MACHINE_START_MEMBER(cps_state, sf2mdt)
 	m_audiocpu = machine().device<cpu_device>("soundcpu");
 	m_msm_1 = machine().device<msm5205_device>("msm1");
 	m_msm_2 = machine().device<msm5205_device>("msm2");
-	
+
 	m_layer_enable_reg = 0x26;
 	m_layer_mask_reg[0] = 0x28;
 	m_layer_mask_reg[1] = 0x2a;
@@ -1052,7 +1052,7 @@ static MACHINE_CONFIG_DERIVED( cawingbl, fcrash )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  irq6_line_hold) /* needed to write to scroll values */
-	
+
 	MCFG_MACHINE_START_OVERRIDE(cps_state, cawingbl)
 MACHINE_CONFIG_END
 
@@ -1247,7 +1247,7 @@ ROM_START( cawingbl )
 	ROMX_LOAD( "caw6.bin", 0x000001, 0x80000, CRC(61192f7c) SHA1(86643c62653a62a5c7541d50cfdecae9b607440d) , ROM_SKIP(3) )
 	ROMX_LOAD( "caw5.bin", 0x000002, 0x80000, CRC(30dd78db) SHA1(e0295001d6f5fb4a9276c432f971e88f73c5e39a) , ROM_SKIP(3) )
 	ROMX_LOAD( "caw4.bin", 0x000003, 0x80000, CRC(4937fc41) SHA1(dac179715be483a521df8e515afc1fb7a2cd8f13) , ROM_SKIP(3) )
-	
+
 	ROM_REGION( 0x30000, "soundcpu", 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "caw3.bin",  0x00000, 0x20000, CRC(ffe16cdc) SHA1(8069ea69f0b89d61c35995c8040a4989d7be9c1f) )
 	ROM_RELOAD(            0x10000, 0x20000 )
@@ -1263,7 +1263,7 @@ ROM_START( cawingb2 )
 	ROM_LOAD16_BYTE( "2.2",    0x80001, 0x20000, CRC(736c1835) SHA1(a91f479fab30603a111304adc0478d430faa80fc) )
 	ROM_LOAD16_BYTE( "5.5",    0xc0000, 0x20000, CRC(76458083) SHA1(cbb4ef5f7615c834b2ee1ad3c86e7262f2f62c01) )
 	ROM_LOAD16_BYTE( "1.1",    0xc0001, 0x20000, CRC(d3523f34) SHA1(005ea378c2b78782f85ecc591946c027ca2ca023) )
-	
+
 	ROM_REGION( 0x200000, "gfx", 0 )
 	ROMX_LOAD( "17.17",     0x000000, 0x20000, CRC(0b538062) SHA1(ac6e5dc82efdca311adfe6e6cdda160ad4a0d04d) , ROM_SKIP(3) )
 	ROMX_LOAD( "19.19",     0x000001, 0x20000, CRC(3ad62311) SHA1(1c132696b55191d16af30ebd36d2320d979eab36) , ROM_SKIP(3) )
@@ -1281,7 +1281,7 @@ ROM_START( cawingb2 )
 	ROMX_LOAD( "12.12",     0x180001, 0x20000, CRC(490440b2) SHA1(2597bf16340308f84b32cfa048c426db571b4a35) , ROM_SKIP(3) )
 	ROMX_LOAD( "14.14",     0x180002, 0x20000, CRC(344a8270) SHA1(fdb588a7ba60783225e3b5c72446f79625de4f9c) , ROM_SKIP(3) )
 	ROMX_LOAD( "16.16",     0x180003, 0x20000, CRC(b991ad91) SHA1(5c59131ddf068cb54d23f8836293360fbc967d58) , ROM_SKIP(3) )
-	
+
 	ROM_REGION( 0x30000, "soundcpu", 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "5.a",       0x00000, 0x20000, CRC(ffe16cdc) SHA1(8069ea69f0b89d61c35995c8040a4989d7be9c1f) )
 	ROM_RELOAD(            0x10000, 0x20000 )
@@ -1416,9 +1416,9 @@ DRIVER_INIT_MEMBER(cps_state, kodb)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x800018, 0x80001f, read16_delegate(FUNC(cps_state::cps1_dsw_r),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x800180, 0x800187, write16_delegate(FUNC(cps_state::cps1_soundlatch_w),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x980000, 0x98002f, write16_delegate(FUNC(cps_state::kodb_layer_w),this));
-	
+
 	/* the original game alternates between 2 sprite ram areas to achieve flashing sprites - the bootleg doesn't do the write to the register to achieve this
-	mapping both sprite ram areas to the same bootleg sprite ram - similar to how sf2mdt works */
+    mapping both sprite ram areas to the same bootleg sprite ram - similar to how sf2mdt works */
 	m_bootleg_sprite_ram = (UINT16*)machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x900000, 0x902fff);
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x904000, 0x906fff, m_bootleg_sprite_ram); /* both of these need to be mapped */
 
@@ -1450,17 +1450,17 @@ DRIVER_INIT_MEMBER(cps_state, sf2mdt)
 		rom[i + 3] = rom[i + 6];
 		rom[i + 6] = tmp;
 	}
-	
+
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x70c018, 0x70c01f, read16_delegate(FUNC(cps_state::cps1_dsw_r),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x708000, 0x708fff, write16_delegate(FUNC(cps_state::sf2mdt_layer_w),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x70c000, 0x70c001, "IN1");
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x70c008, 0x70c009, "IN2");
-	
+
 	/* bootleg sprite ram */
 	m_bootleg_sprite_ram = (UINT16*)machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x700000, 0x703fff);
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram); /* both of these need to be mapped - see the "Magic Delta Turbo" text on the title screen  */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x70c106, 0x70c107, write16_delegate(FUNC(cps_state::cawingbl_soundlatch_w),this));
-	
+
 	machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x800030, 0x800031); /* coin lockout doesn't work (unmap it) */
 
 	DRIVER_INIT_CALL(cps1);
@@ -1472,14 +1472,14 @@ DRIVER_INIT_MEMBER(cps_state, sf2mdta)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x708000, 0x708fff, write16_delegate(FUNC(cps_state::sf2mdta_layer_w),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x70c000, 0x70c001, "IN1");
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x70c008, 0x70c009, "IN2");
-	
+
 	/* bootleg sprite ram */
 	m_bootleg_sprite_ram = (UINT16*)machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x700000, 0x703fff);
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x704000, 0x707fff, m_bootleg_sprite_ram); /* both of these need to be mapped - see the "Magic Delta Turbo" text on the title screen */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x70c106, 0x70c107, write16_delegate(FUNC(cps_state::cawingbl_soundlatch_w),this));
-	
+
 	m_bootleg_work_ram = (UINT16*)machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0xfc0000, 0xfcffff); /* this has moved */
-	
+
 	machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x800030, 0x800031); /* coin lockout doesn't work (unmap it) */
 
 	DRIVER_INIT_CALL(cps1);

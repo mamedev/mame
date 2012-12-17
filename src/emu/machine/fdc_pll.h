@@ -11,12 +11,12 @@
 class fdc_pll_t {
 public:
 	attotime ctime, period, min_period, max_period, period_adjust_base, phase_adjust;
-  
+
 	attotime write_start_time;
 	attotime write_buffer[32];
 	int write_position;
 	int freq_hist;
-  
+
 	void set_clock(attotime period);
 	void reset(attotime when);
 	int get_next_bit(attotime &tm, floppy_image_device *floppy, attotime limit);

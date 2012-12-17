@@ -172,7 +172,7 @@ WRITE8_MEMBER(orion_state::orion_disk_control_w)
 
 	m_fdc->set_floppy(floppy);
 	floppy->mon_w(0);
-	floppy->ss_w(((data & 0x10) >> 4) ^ 1);	
+	floppy->ss_w(((data & 0x10) >> 4) ^ 1);
 }
 
 READ8_MEMBER(orion_state::orion128_floppy_r)

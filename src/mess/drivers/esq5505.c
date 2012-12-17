@@ -28,21 +28,21 @@
     5505 interrupts are on normal autovector IRQ 1
 
     VFX / VFX-SD / SD-1 / SD-1 32 panel button codes:
-	2 = PROGRAM CONTROL
-	3 = WRITE
-	4 = WAVE 
-	5 = SELECT VOICE
-	6 = MIXER/SHAPER 
+    2 = PROGRAM CONTROL
+    3 = WRITE
+    4 = WAVE
+    5 = SELECT VOICE
+    6 = MIXER/SHAPER
     7 =  EFFECT
     8 = COMPARE
-	9 = COPY EFFECTS PARAMETERS 
-	10 = LFO 
-	11 = PITCH 
-	12 = ENV1 
-	13 = PITCH MOD
-	14 = ENV2 
-	15 = FILTER 
-	16 = ENV3 
+    9 = COPY EFFECTS PARAMETERS
+    10 = LFO
+    11 = PITCH
+    12 = ENV1
+    13 = PITCH MOD
+    14 = ENV2
+    15 = FILTER
+    16 = ENV3
     17 = OUTPUT
     18 = ERROR 20 (VFX) / SEQ. CONTROL
     19 = ?
@@ -50,23 +50,23 @@
     21 = STORAGE
     22 = ERROR 129 (VFX-SD w/Seq. loaded)
     23 = ERROR 129 (VFX-SD w/Seq. loaded)
-	24 = MIDI 
-	25 = BUTTON 9 
-	26 = PSEL 
-	27 = STAT 
-	28 = EFFECT 
-	29 = SEQ?  (toggles INT0 / TRAX display)
-	30 = TRACKS 1-6
+    24 = MIDI
+    25 = BUTTON 9
+    26 = PSEL
+    27 = STAT
+    28 = EFFECT
+    29 = SEQ?  (toggles INT0 / TRAX display)
+    30 = TRACKS 1-6
     31 = TRACKS 7-12
     32 = ERROR 20 (VFX) / CLICK-REC
     33 = ERROR 20 (VFX) / LOCATE
-	34 = BUTTON 8
-	35 = BUTTON 7
-	36 = VOLUME
-	37 = PAN 
-	38 = TIMBRE
-	39 = KEY ZONE 
-	40 = TRANSPOSE 
+    34 = BUTTON 8
+    35 = BUTTON 7
+    36 = VOLUME
+    37 = PAN
+    38 = TIMBRE
+    39 = KEY ZONE
+    40 = TRANSPOSE
     41 = RELEASE
     42 = SOFT TOP CENTER
     43 = SOFT TOP RIGHT
@@ -90,7 +90,7 @@
     61 = ERROR 20 (VFX) / EDIT TRACK
     62 = DATA INCREMENT
     63 = DATA DECREMENT
- 
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -165,7 +165,7 @@ private:
     UINT32  es5510_gpr_latch;
     UINT8   es5510_ram_sel;
 
-	UINT16 	*m_rom, *m_ram;
+	UINT16	*m_rom, *m_ram;
 
 public:
 	DECLARE_DRIVER_INIT(eps);
@@ -193,7 +193,7 @@ void esq5505_state::machine_reset()
 
 READ16_MEMBER(esq5505_state::es5510_dsp_r)
 {
-//	printf("%06x: DSP read offset %04x (data is %04x)\n",space.device().safe_pc(),offset,es5510_dsp_ram[offset]);
+//  printf("%06x: DSP read offset %04x (data is %04x)\n",space.device().safe_pc(),offset,es5510_dsp_ram[offset]);
 
 	// VFX hack
 	if (mame_stricmp(space.machine().system().name, "vfx") == 0)
@@ -447,7 +447,7 @@ static UINT8 duart_input(device_t *device)
 		if (floppy)
 		{
 			// ready_r returns true if the drive is *not* ready, false if it is
-//			if (!floppy->ready_r())
+//          if (!floppy->ready_r())
 			{
 				result |= 1;
 			}
@@ -465,22 +465,22 @@ static void duart_output(device_t *device, UINT8 data)
 
     state->m_duart_io = data;
 
-	/* 
-	    EPS:
-	    bit 2 = SSEL
-	 
-	    VFX:
-	    bits 0/1/2 = analog sel
-	    bit 6 = ESPHALT
-	    bit 7 = SACK (?)
-	 
-	    VFX-SD & SD-1 (32):
-	    bits 0/1/2 = analog sel
-	    bit 3 = SSEL (disk side)
-	    bit 4 = DSEL (drive select?)
-	    bit 6 = ESPHALT
-	    bit 7 = SACK (?)
-	*/
+	/*
+        EPS:
+        bit 2 = SSEL
+
+        VFX:
+        bits 0/1/2 = analog sel
+        bit 6 = ESPHALT
+        bit 7 = SACK (?)
+
+        VFX-SD & SD-1 (32):
+        bits 0/1/2 = analog sel
+        bit 3 = SSEL (disk side)
+        bit 4 = DSEL (drive select?)
+        bit 6 = ESPHALT
+        bit 7 = SACK (?)
+    */
 
     if (floppy)
     {
@@ -830,11 +830,11 @@ ROM_START( vfx )
     ROM_LOAD16_BYTE( "vfx210b-high.bin", 0x000001, 0x010000, CRC(59853be8) SHA1(8e07f69d53f80885d15f624e0b912aeaf3212ee4) )
 
     ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
-    ROM_LOAD16_BYTE( "u14.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) ) 
-    ROM_LOAD16_BYTE( "u15.bin", 0x100001, 0x080000, CRC(c0055975) SHA1(5a22f1d5e437c6277eb0cfb1ff1b3f8dcdea1cc6) ) 
+    ROM_LOAD16_BYTE( "u14.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) )
+    ROM_LOAD16_BYTE( "u15.bin", 0x100001, 0x080000, CRC(c0055975) SHA1(5a22f1d5e437c6277eb0cfb1ff1b3f8dcdea1cc6) )
 
     ROM_REGION(0x80000, "nibbles", ROMREGION_ERASE00)
-    ROM_LOAD( "u16.bin", 0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) ) 
+    ROM_LOAD( "u16.bin", 0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) )
 ROM_END
 
 ROM_START( vfxsd )
@@ -843,13 +843,13 @@ ROM_START( vfxsd )
     ROM_LOAD16_BYTE( "vfxsd_200_upper.bin", 0x000001, 0x010000, CRC(9a40efa2) SHA1(e38a2a4514519c1573361cb1526139bfcf94e45a) )
 
     ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
-    ROM_LOAD16_BYTE( "u57.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) ) 
-    ROM_LOAD16_BYTE( "u58.bin", 0x100001, 0x080000, CRC(c0055975) SHA1(5a22f1d5e437c6277eb0cfb1ff1b3f8dcdea1cc6) ) 
+    ROM_LOAD16_BYTE( "u57.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) )
+    ROM_LOAD16_BYTE( "u58.bin", 0x100001, 0x080000, CRC(c0055975) SHA1(5a22f1d5e437c6277eb0cfb1ff1b3f8dcdea1cc6) )
 
     ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00)
 
     ROM_REGION(0x80000, "nibbles", 0)
-    ROM_LOAD( "u60.bin", 0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) ) 
+    ROM_LOAD( "u60.bin", 0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) )
 ROM_END
 
 ROM_START( sd1 )
@@ -858,15 +858,15 @@ ROM_START( sd1 )
     ROM_LOAD16_BYTE( "sd1_410_hi.bin", 0x000001, 0x010000, CRC(618c0aa8) SHA1(74acf458aa1d04a0a7a0cd5855c49e6855dbd301) )
 
     ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)  // BS=0 region (12-bit)
-    ROM_LOAD16_BYTE( "u34.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) ) 
-    ROM_LOAD16_BYTE( "u35.bin", 0x100001, 0x080000, CRC(c0055975) SHA1(5a22f1d5e437c6277eb0cfb1ff1b3f8dcdea1cc6) ) 
+    ROM_LOAD16_BYTE( "u34.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) )
+    ROM_LOAD16_BYTE( "u35.bin", 0x100001, 0x080000, CRC(c0055975) SHA1(5a22f1d5e437c6277eb0cfb1ff1b3f8dcdea1cc6) )
 
     ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00) // BS=1 region (16-bit)
-	ROM_LOAD16_WORD_SWAP( "u38.bin", 0x000000, 0x100000, CRC(a904190e) SHA1(e4fd4e1130906086fb4182dcb8b51269969e2836) ) 
-	ROM_LOAD16_WORD_SWAP( "u37.bin", 0x100000, 0x100000, CRC(d706cef3) SHA1(24ba35248509e9ca45110e2402b8085006ea0cfc) ) 
+	ROM_LOAD16_WORD_SWAP( "u38.bin", 0x000000, 0x100000, CRC(a904190e) SHA1(e4fd4e1130906086fb4182dcb8b51269969e2836) )
+	ROM_LOAD16_WORD_SWAP( "u37.bin", 0x100000, 0x100000, CRC(d706cef3) SHA1(24ba35248509e9ca45110e2402b8085006ea0cfc) )
 
     ROM_REGION(0x80000, "nibbles", 0)
-    ROM_LOAD( "u36.bin", 0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) ) 
+    ROM_LOAD( "u36.bin", 0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) )
 ROM_END
 
 ROM_START( sd132 )
@@ -875,15 +875,15 @@ ROM_START( sd132 )
     ROM_LOAD16_BYTE( "sd1_32_402_hi.bin", 0x000001, 0x010000, CRC(fc45c210) SHA1(23b81ebd9176112e6eae0c7c75b39fcb1656c953) )
 
     ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)  // BS=0 region (12-bit)
-    ROM_LOAD16_BYTE( "u34.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) ) 
-    ROM_LOAD16_BYTE( "u35.bin", 0x100001, 0x080000, CRC(c0055975) SHA1(5a22f1d5e437c6277eb0cfb1ff1b3f8dcdea1cc6) ) 
+    ROM_LOAD16_BYTE( "u34.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) )
+    ROM_LOAD16_BYTE( "u35.bin", 0x100001, 0x080000, CRC(c0055975) SHA1(5a22f1d5e437c6277eb0cfb1ff1b3f8dcdea1cc6) )
 
     ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00) // BS=1 region (16-bit)
-	ROM_LOAD16_WORD_SWAP( "u38.bin", 0x000000, 0x100000, CRC(a904190e) SHA1(e4fd4e1130906086fb4182dcb8b51269969e2836) ) 
-	ROM_LOAD16_WORD_SWAP( "u37.bin", 0x100000, 0x100000, CRC(d706cef3) SHA1(24ba35248509e9ca45110e2402b8085006ea0cfc) ) 
+	ROM_LOAD16_WORD_SWAP( "u38.bin", 0x000000, 0x100000, CRC(a904190e) SHA1(e4fd4e1130906086fb4182dcb8b51269969e2836) )
+	ROM_LOAD16_WORD_SWAP( "u37.bin", 0x100000, 0x100000, CRC(d706cef3) SHA1(24ba35248509e9ca45110e2402b8085006ea0cfc) )
 
     ROM_REGION(0x80000, "nibbles", ROMREGION_ERASE00)
-    ROM_LOAD( "u36.bin", 0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) ) 
+    ROM_LOAD( "u36.bin", 0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) )
 ROM_END
 
 

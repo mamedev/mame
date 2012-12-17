@@ -396,7 +396,7 @@ inline UINT32 tms3203x_device::RMEM(offs_t addr)
 {
 	if (m_mcbl_mode && addr < 0x1000)
 		return m_bootrom[addr];
-		
+
 	return m_program->read_dword(addr << 2);
 }
 

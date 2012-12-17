@@ -469,7 +469,7 @@ chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 	memset(&outtoc, 0, sizeof(outtoc));
 	outinfo.reset();
 
-	fseek(infile, 0, SEEK_END);	
+	fseek(infile, 0, SEEK_END);
 	long size = ftell(infile);
 	fclose(infile);
 
@@ -501,7 +501,7 @@ chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 	outtoc.tracks[0].subsize = 0;
 
 	outtoc.tracks[0].pregap = 0;
-	
+
 	outtoc.tracks[0].postgap = 0;
 	outtoc.tracks[0].pgtype = 0;
 	outtoc.tracks[0].pgsub = CD_SUB_NONE;

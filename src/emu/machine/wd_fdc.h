@@ -35,7 +35,7 @@
  * wd2793 normal   n     y    n   y   n     y   y   1/2MHz y    y  analog
  * wd2795 inverted y     n    y   y   n     y   y   1/2MHz n    y  analog
  * wd2797 normal   y     n    y   y   n     y   y   1/2MHz n    y  analog
-   
+
  * wd1770 normal   n     n    n   n   y     n   y   8Mhz   n    n  digital
  * wd1772 normal   n     n    n   n   y     n   y   8MHz   n    n  digital
  * wd1773 normal   n     y    n   n   n     y   y   8MHz   n    n  digital

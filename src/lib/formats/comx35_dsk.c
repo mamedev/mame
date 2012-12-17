@@ -80,9 +80,9 @@ const comx35_format::format comx35_format::formats[] = {
 		2000, 16, 35, 2, 128, {}, 0, {}, 100, 22, 84
 	},
 	/*{   //  140K 5 1/4 inch quad density single sided 70 tracks
-	    floppy_image::FF_525, floppy_image::SSQD,
-	    2000, 16, 70, 1, 128, {}, 0, {}, 100, 22, 84
-	},*/
+        floppy_image::FF_525, floppy_image::SSQD,
+        2000, 16, 70, 1, 128, {}, 0, {}, 100, 22, 84
+    },*/
 	{}
 };
 

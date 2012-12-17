@@ -192,7 +192,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
     For example, magic power will be increased at the end of level 1 but you won't notice
     it before level 3, and sword power will be increased at the end of level 2 but you
     won't notice it before level 4.
-	
+
 6) 'ganbare'
 
   - Using the payout setting dip switch results in some occasional hopper errors, if this
@@ -2919,7 +2919,7 @@ static INPUT_PORTS_START( ganbare )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -2962,7 +2962,7 @@ static INPUT_PORTS_START( ganbare )
 	PORT_DIPNAME( 0x80, 0x80, "Payout Setup" )					PORT_DIPLOCATION("SW(A):8")
 	PORT_DIPSETTING(    0x80, "Credit Mode" )
 	PORT_DIPSETTING(    0x00, "Payout Mode" )
-	
+
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x07, 0x07, "Payout Rate Setup" )				PORT_DIPLOCATION("SW(B):1,2,3")
 	PORT_DIPSETTING(    0x01, "90%" )
@@ -6644,7 +6644,7 @@ ROM_START( sf2stt )
 	/* do not move this outside comments, this is only for testing purpose
     ROM_LOAD16_BYTE( "12.bin",   0x00000, 0x40000, CRC(a258b4d5) SHA1(3433b6493794c98bb35c1b27cc65bb5f13d52e9b) )
     ROM_LOAD16_BYTE( "09.bin",   0x00001, 0x40000, CRC(59ccd474) SHA1(7bb28c28ee722435fdbb18eb73e52bd65b419103) )
-	*/
+    */
 	ROM_LOAD16_BYTE( "prg part 1.stt", 0x00000, 0x40000, NO_DUMP )
 	ROM_LOAD16_BYTE( "prg part 2.stt", 0x00001, 0x40000, NO_DUMP )
 	/* missing first part of program roms, so it can not boot */
@@ -10847,7 +10847,7 @@ ROM_START( ganbare )
 	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
 	ROM_LOAD( "mrnj_18.11c",  0x00000, 0x20000, CRC(08e13940) SHA1(5c7dd7ff6a66f100b59cf9244e78f2c8702faca1) )
 	ROM_LOAD( "mrnj_19.12c",  0x20000, 0x20000, CRC(5fa59927) SHA1(f05246cf566c214b008a91816c71e7c03b7cc218) )
-	
+
 	ROM_REGION( 0x8000, "timekeeper", 0) /* Timekeeper internal RAM was dumped (but game overwrites it - should I keep this here or remove it?) */
 	ROM_LOAD( "m48t35y.9n", 0x00000, 0x8000, CRC(96107b4a) SHA1(be9149736030e06c96083dcac73b5be3dbc318ac) )
 
@@ -11174,12 +11174,12 @@ DRIVER_INIT_MEMBER(cps_state,pang3)
 READ16_MEMBER(cps_state::ganbare_ram_r)
 {
 	UINT16 result = 0xffff;
-	
+
 	if (ACCESSING_BITS_0_7)
 		result = (result & ~0x00ff) | timekeeper_r(machine().device("m48t35"), space, offset);
 	if (ACCESSING_BITS_8_15)
 		result = (result & ~0xff00) | (m_mainram[offset] & 0xff00);
-	
+
 	return result;
 }
 
@@ -11194,7 +11194,7 @@ WRITE16_MEMBER(cps_state::ganbare_ram_w)
 DRIVER_INIT_MEMBER(cps_state, ganbare)
 {
 	DRIVER_INIT_CALL(cps1);
-	
+
 	/* ram is shared between the CPS work ram and the timekeeper ram */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xff0000, 0xffffff, read16_delegate(FUNC(cps_state::ganbare_ram_r),this), write16_delegate(FUNC(cps_state::ganbare_ram_w),this));
 }

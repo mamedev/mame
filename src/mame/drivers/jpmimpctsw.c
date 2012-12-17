@@ -18,8 +18,8 @@ INPUT_PORTS_EXTERN( tbirds );
 //  ROM_LOAD16_BYTE( "fce.p1", 0x00000, 0x020000, CRC(57220618) SHA1(7bd717e438e2bf230179b0f5bb358888a3501c59) )
 //  ROM_LOAD16_BYTE( "fce.p2", 0x00001, 0x020000, CRC(16d20bc6) SHA1(0e8ac586ccf3d02189e24bdd2ed88052491aceb6) )
 //  j6cas5
-//	ROM_LOAD16_BYTE( "c-1.bin", 0x000000, 0x020000, CRC(fc45950a) SHA1(8721758e8f2ac41f26700965ed942cd1a311bb22) )
-//	ROM_LOAD16_BYTE( "c-2.bin", 0x000001, 0x020000, CRC(e36aaf42) SHA1(c9da129f85c7b8ce27ea8cb9f090ae647eeac10d) )
+//  ROM_LOAD16_BYTE( "c-1.bin", 0x000000, 0x020000, CRC(fc45950a) SHA1(8721758e8f2ac41f26700965ed942cd1a311bb22) )
+//  ROM_LOAD16_BYTE( "c-2.bin", 0x000001, 0x020000, CRC(e36aaf42) SHA1(c9da129f85c7b8ce27ea8cb9f090ae647eeac10d) )
 
 
 // the 68k dies on many sets, but this seems to be due to our emulation, not a problem with the sets
@@ -366,7 +366,7 @@ ROM_START( j6bigbnko ) // are the numbers correct?
 	j6bigbnk_sound
 ROM_END
 
-ROM_START( j6bigbnkp ) 
+ROM_START( j6bigbnkp )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "bbv4p18c", 0x000000, 0x020000, CRC(793d3d36) SHA1(d62e2ee62ed4f3a19c05edae1ea092679a57e8a5) ) // aka bb841ac
 	ROM_LOAD16_BYTE( "bbv48p2",  0x000001, 0x020000, CRC(96a9f1f5) SHA1(2b8b4f06edbe35f5b73d25bac8a973feeaa77b47) )
@@ -1010,70 +1010,70 @@ ROM_START( j6cshvgsi )
 	ROM_LOAD16_BYTE( "cvs-11.bin", 0x000000, 0x020000, CRC(895e45db) SHA1(15e2c51a08827322ed34220178476d87cce0b615) )
 	ROM_LOAD16_BYTE( "cvs-12.bin", 0x000001, 0x020000, CRC(97aa7764) SHA1(d9a9db1112ccd2721a52ab45de9c0dc85ba027a1) )
 	j6cshvgs_sound
-ROM_END	
+ROM_END
 
 ROM_START( j6cshvgsj )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cvs-1a1.bin", 0x000000, 0x020000, CRC(db9a85ba) SHA1(9f459629aebcb4842e726c6c55427cd253e5eca8) )
 	ROM_LOAD16_BYTE( "cvs-12.bin", 0x000001, 0x020000, CRC(97aa7764) SHA1(d9a9db1112ccd2721a52ab45de9c0dc85ba027a1) )
 	j6cshvgs_sound
-ROM_END	
+ROM_END
 
 ROM_START( j6cshvgsk )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cvs-1n1.bin", 0x000000, 0x020000, CRC(b868fd1f) SHA1(3aefc4f96ea4dc386f98dd2fd70626c1b7e49c54) )
 	ROM_LOAD16_BYTE( "cvs-12.bin", 0x000001, 0x020000, CRC(97aa7764) SHA1(d9a9db1112ccd2721a52ab45de9c0dc85ba027a1) )
 	j6cshvgs_sound
-ROM_END	
+ROM_END
 
 ROM_START( j6cshvgsl )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cvs-1np1.bin", 0x000000, 0x020000, CRC(53f6a927) SHA1(6ba558699a3e64c7f785d963174e114dc208c253) )
 	ROM_LOAD16_BYTE( "cvs-12.bin", 0x000001, 0x020000, CRC(97aa7764) SHA1(d9a9db1112ccd2721a52ab45de9c0dc85ba027a1) )
 	j6cshvgs_sound
-ROM_END	
+ROM_END
 
 ROM_START( j6cshvgsm )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cvs-1p1.bin", 0x000000, 0x020000, CRC(62c011e3) SHA1(6d075f07583588f57ba9b21404e4dc292ebac1db) )
 	ROM_LOAD16_BYTE( "cvs-12.bin", 0x000001, 0x020000, CRC(97aa7764) SHA1(d9a9db1112ccd2721a52ab45de9c0dc85ba027a1) )
 	j6cshvgs_sound
-ROM_END	
+ROM_END
 
 ROM_START( j6cshvgsn )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cvs-41.bin", 0x000000, 0x020000, CRC(48c01ca7) SHA1(17d961b43cf7dc65fc67f3991ecd8839314885bc) )
 	ROM_LOAD16_BYTE( "cvs-42.bin", 0x000001, 0x020000, CRC(d30d313c) SHA1(f3b3195e376702d9239d520e1bfe5733c91f9164) )
 	j6cshvgs_sound
-ROM_END	
+ROM_END
 
 ROM_START( j6cshvgso )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cvs-4a1.bin", 0x000000, 0x020000, CRC(1a04dcc6) SHA1(6a1134aaa86ef37b4a092b8e6893f34d88a313a7) )
 	ROM_LOAD16_BYTE( "cvs-42.bin", 0x000001, 0x020000, CRC(d30d313c) SHA1(f3b3195e376702d9239d520e1bfe5733c91f9164) )
 	j6cshvgs_sound
-ROM_END	
+ROM_END
 
 ROM_START( j6cshvgsp )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cvs-4l1.bin", 0x000000, 0x020000, CRC(79f6a463) SHA1(5d48edc10dba3e4db3dad260bdc038aeeeababeb) )
 	ROM_LOAD16_BYTE( "cvs-42.bin", 0x000001, 0x020000, CRC(d30d313c) SHA1(f3b3195e376702d9239d520e1bfe5733c91f9164) )
 	j6cshvgs_sound
-ROM_END	
+ROM_END
 
 ROM_START( j6cshvgsq )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cvs-4lp1.bin", 0x000000, 0x020000, CRC(9268f05b) SHA1(d2fb3ce71943fd07f16887c414e3313b3fe2094e) )
 	ROM_LOAD16_BYTE( "cvs-42.bin", 0x000001, 0x020000, CRC(d30d313c) SHA1(f3b3195e376702d9239d520e1bfe5733c91f9164) )
 	j6cshvgs_sound
-ROM_END	
+ROM_END
 
 ROM_START( j6cshvgsr )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cvs-4p1.bin", 0x000000, 0x020000, CRC(a35e489f) SHA1(f652e1380a5b8a5c7953d88d1bcc51e94bb05f98) )
 	ROM_LOAD16_BYTE( "cvs-42.bin", 0x000001, 0x020000, CRC(d30d313c) SHA1(f3b3195e376702d9239d520e1bfe5733c91f9164) )
 	j6cshvgs_sound
-ROM_END	
+ROM_END
 
 #define j6cas5_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
@@ -1424,56 +1424,56 @@ ROM_END
 ROM_START( j6casclaf )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cccc-c1.bin", 0x000000, 0x020000, CRC(959e802d) SHA1(73d32ad724da30131d3d7125bdb6b74a49e6e29e) )
-	ROM_LOAD16_BYTE( "cccc-c2.bin", 0x000001, 0x020000, CRC(c91c14ce) SHA1(a0aea950f45e0e110b5a8ff5e12590dd5822f31b) ) 
+	ROM_LOAD16_BYTE( "cccc-c2.bin", 0x000001, 0x020000, CRC(c91c14ce) SHA1(a0aea950f45e0e110b5a8ff5e12590dd5822f31b) )
 	j6cascla_sound
 ROM_END
 
 ROM_START( j6casclag )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cccc-cb1.bin", 0x000000, 0x020000, CRC(8148727e) SHA1(022d44edc60a8df6874f34973734515f5a4b180b) )
-	ROM_LOAD16_BYTE( "cccc-c2.bin", 0x000001, 0x020000, CRC(c91c14ce) SHA1(a0aea950f45e0e110b5a8ff5e12590dd5822f31b) ) 
+	ROM_LOAD16_BYTE( "cccc-c2.bin", 0x000001, 0x020000, CRC(c91c14ce) SHA1(a0aea950f45e0e110b5a8ff5e12590dd5822f31b) )
 	j6cascla_sound
 ROM_END
 
 ROM_START( j6casclah )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cccc-ce1.bin", 0x000000, 0x020000, CRC(8d05dc4f) SHA1(9308f51e64415688a87185b9258d70ae82045f2e) )
-	ROM_LOAD16_BYTE( "cccc-c2.bin", 0x000001, 0x020000, CRC(c91c14ce) SHA1(a0aea950f45e0e110b5a8ff5e12590dd5822f31b) ) 
+	ROM_LOAD16_BYTE( "cccc-c2.bin", 0x000001, 0x020000, CRC(c91c14ce) SHA1(a0aea950f45e0e110b5a8ff5e12590dd5822f31b) )
 	j6cascla_sound
 ROM_END
 
 ROM_START( j6casclai )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cccc-cf1.bin", 0x000000, 0x020000, CRC(5144633d) SHA1(c52c512adddc90821aac85743f12acae34c82320) )
-	ROM_LOAD16_BYTE( "cccc-c2.bin", 0x000001, 0x020000, CRC(c91c14ce) SHA1(a0aea950f45e0e110b5a8ff5e12590dd5822f31b) ) 
+	ROM_LOAD16_BYTE( "cccc-c2.bin", 0x000001, 0x020000, CRC(c91c14ce) SHA1(a0aea950f45e0e110b5a8ff5e12590dd5822f31b) )
 	j6cascla_sound
 ROM_END
 
 ROM_START( j6casclaj )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cccc-cn1.bin", 0x000000, 0x020000, CRC(f7f3f1a5) SHA1(ebbff1909e91ce708a97f4ed2b5811c47951d27a) )
-	ROM_LOAD16_BYTE( "cccc-c2.bin", 0x000001, 0x020000, CRC(c91c14ce) SHA1(a0aea950f45e0e110b5a8ff5e12590dd5822f31b) ) 
+	ROM_LOAD16_BYTE( "cccc-c2.bin", 0x000001, 0x020000, CRC(c91c14ce) SHA1(a0aea950f45e0e110b5a8ff5e12590dd5822f31b) )
 	j6cascla_sound
 ROM_END
 
 ROM_START( j6casclak )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cccc-cp1.bin", 0x000000, 0x020000, CRC(7e00d415) SHA1(d2f08457cd638479bb7c3c7a2673894b59e727c3) )
-	ROM_LOAD16_BYTE( "cccc-c2.bin", 0x000001, 0x020000, CRC(c91c14ce) SHA1(a0aea950f45e0e110b5a8ff5e12590dd5822f31b) ) 
+	ROM_LOAD16_BYTE( "cccc-c2.bin", 0x000001, 0x020000, CRC(c91c14ce) SHA1(a0aea950f45e0e110b5a8ff5e12590dd5822f31b) )
 	j6cascla_sound
 ROM_END
 
 ROM_START( j6casclal )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cccccnp1.bin", 0x000000, 0x020000, CRC(1c6da59d) SHA1(ab77a898e000c2fecf8ef266390f1aea399d763d) )
-	ROM_LOAD16_BYTE( "cccc-c2.bin", 0x000001, 0x020000, CRC(c91c14ce) SHA1(a0aea950f45e0e110b5a8ff5e12590dd5822f31b) ) 
+	ROM_LOAD16_BYTE( "cccc-c2.bin", 0x000001, 0x020000, CRC(c91c14ce) SHA1(a0aea950f45e0e110b5a8ff5e12590dd5822f31b) )
 	j6cascla_sound
 ROM_END
 
 ROM_START( j6casclam )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cccccep1.bin", 0x000000, 0x020000, CRC(669b8877) SHA1(48372a46ff03d361e3f04bd224ce887c84689aaf) )
-	ROM_LOAD16_BYTE( "cccc-c2.bin", 0x000001, 0x020000, CRC(c91c14ce) SHA1(a0aea950f45e0e110b5a8ff5e12590dd5822f31b) ) 
+	ROM_LOAD16_BYTE( "cccc-c2.bin", 0x000001, 0x020000, CRC(c91c14ce) SHA1(a0aea950f45e0e110b5a8ff5e12590dd5822f31b) )
 	j6cascla_sound
 ROM_END
 
@@ -3035,14 +3035,14 @@ ROM_END
 ROM_START( j6hapyhr )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "20426.bin", 0x000000, 0x020000, CRC(58f6ceb5) SHA1(5ca6861d1532ede848f672fe08152dcd0f65be95) )
-	ROM_LOAD16_BYTE( "20427.bin", 0x000001, 0x020000, CRC(3de94b07) SHA1(ce1a712845ccc5fa9ef92b3d07f8872afeec88f8) ) 
+	ROM_LOAD16_BYTE( "20427.bin", 0x000001, 0x020000, CRC(3de94b07) SHA1(ce1a712845ccc5fa9ef92b3d07f8872afeec88f8) )
 	j6hapyhr_sound
 ROM_END
 
 ROM_START( j6hapyhra )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "20428.bin", 0x000000, 0x020000, CRC(b3689a8d) SHA1(4f690ec96f1b5e0ed30023016de767c132356430) )
-	ROM_LOAD16_BYTE( "20427.bin", 0x000001, 0x020000, CRC(3de94b07) SHA1(ce1a712845ccc5fa9ef92b3d07f8872afeec88f8) ) 
+	ROM_LOAD16_BYTE( "20427.bin", 0x000001, 0x020000, CRC(3de94b07) SHA1(ce1a712845ccc5fa9ef92b3d07f8872afeec88f8) )
 	j6hapyhr_sound
 ROM_END
 
@@ -3394,42 +3394,42 @@ ROM_START( j6impulsa )
 	ROM_LOAD16_BYTE( "imp6p1", 0x000000, 0x020000, CRC(2abd3397) SHA1(36d6286d6de6c1b205ca1e593118bf5ef15e108b) )
 	ROM_LOAD16_BYTE( "imp6p2", 0x000001, 0x020000, CRC(6d8ae792) SHA1(9e703f3e4c6e74866f8a6c187851c416905dc076) )
 	j6impuls_sound
-ROM_END	
-	
+ROM_END
+
 ROM_START( j6impulsb )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "impu6p1a", 0x000000, 0x020000, CRC(7879f3f6) SHA1(a7e5e55946ed63bf7fd84ac8cce46102a850bae4) )
 	ROM_LOAD16_BYTE( "imp6p2", 0x000001, 0x020000, CRC(6d8ae792) SHA1(9e703f3e4c6e74866f8a6c187851c416905dc076) )
 	j6impuls_sound
-ROM_END	
+ROM_END
 
 ROM_START( j6impulsc )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "impu-7s1.bin", 0x000000, 0x020000, CRC(93033ab0) SHA1(6b94c72ba09a2b3bf343f199a61871f18b67ed10) )
 	ROM_LOAD16_BYTE( "impu-7s2.bin", 0x000001, 0x020000, CRC(cead0007) SHA1(f5d701bd2f1d85fd907666d0fbe217dbeaae1ba7) )
 	j6impuls_sound
-ROM_END	
+ROM_END
 
 ROM_START( j6impulsd )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "impu-7a1.bin", 0x000000, 0x020000, CRC(c1c7fad1) SHA1(a28db0949be931192ebacf6dc67a1b652fd048c2) )
 	ROM_LOAD16_BYTE( "impu-7s2.bin", 0x000001, 0x020000, CRC(cead0007) SHA1(f5d701bd2f1d85fd907666d0fbe217dbeaae1ba7) )
 	j6impuls_sound
-ROM_END	
+ROM_END
 
 ROM_START( j6impulse )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "impu-7p1.bin", 0x000000, 0x020000, CRC(789d6e88) SHA1(0b65f00b6fed5fbdd89d9ba06ebe7d17a97344d6) )
 	ROM_LOAD16_BYTE( "impu-7s2.bin", 0x000001, 0x020000, CRC(cead0007) SHA1(f5d701bd2f1d85fd907666d0fbe217dbeaae1ba7) )
 	j6impuls_sound
-ROM_END	
+ROM_END
 
 ROM_START( j6impulsf )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "impu-7wp.bin", 0x000000, 0x020000, CRC(1af01f00) SHA1(0d3fcaa1105a5dd00d4154027dcdac6b35eb2342) )
 	ROM_LOAD16_BYTE( "impu-7s2.bin", 0x000001, 0x020000, CRC(cead0007) SHA1(f5d701bd2f1d85fd907666d0fbe217dbeaae1ba7) )
 	j6impuls_sound
-ROM_END	
+ROM_END
 
 
 #define j6indy_sound \
@@ -3521,10 +3521,10 @@ ROM_START( j6indyk )
 	ROM_LOAD16_BYTE( "7494.bin", 0x000001, 0x020000, CRC(4ddf626b) SHA1(4bbfd86530cd1a8b7b4da4e9b36d0e1d61e5d120) )
 	j6indy_sound
 ROM_END
-       
-     		
-		
-       
+
+
+
+
 
 
 ROM_START( j6indyge )
@@ -4504,14 +4504,14 @@ ROM_START( j6phxgldf )
 	ROM_LOAD16_BYTE( "pg30sl_02_1.b8", 0x000000, 0x020000, CRC(0fc9de3d) SHA1(590f581f144344947b17ff05345f46ce240572bb) )
 	ROM_LOAD16_BYTE( "pg30sl_02_2.b8", 0x000001, 0x020000, CRC(85702a38) SHA1(014ed2f9c25f6f9d35288cbe99b2cab1fac3569b) )
 	j6phxgld_sound
-ROM_END	
+ROM_END
 
 ROM_START( j6phxgldg )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "pg75cz1_1.b8", 0x000000, 0x020000, CRC(8f2b8818) SHA1(f4d1247f6b42741513dc698a19ff48032a05b8fb) )
 	ROM_LOAD16_BYTE( "pg75cz1_2.b8", 0x000001, 0x020000, CRC(a6cacbd9) SHA1(bc253ce246d4fe6396efc1f163032e288da4bfec) )
 	j6phxgld_sound
-ROM_END	
+ROM_END
 
 
 ROM_START( j6pnxgd )
@@ -4994,35 +4994,35 @@ ROM_START( j6redarwf )
 	ROM_LOAD16_BYTE( "rear-7_1.bin", 0x000000, 0x020000, CRC(6d36f687) SHA1(d07a2058fc0f7a7f1cac6398c46f6fc2fb676484) )
 	ROM_LOAD16_BYTE( "rear-7_2.bin", 0x000001, 0x020000, CRC(962c6cac) SHA1(dc5fb331df921ef7b94d2c0d3e7d0bb299e728a3) )
 	j6redarw_sound
-ROM_END	
-	
+ROM_END
+
 ROM_START( j6redarwg )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rear-7a1.bin", 0x000000, 0x020000, CRC(3ff236e6) SHA1(f0c42885b6f908ffdcf41ae3b6789bfa95c8f36f) )
 	ROM_LOAD16_BYTE( "rear-7_2.bin", 0x000001, 0x020000, CRC(962c6cac) SHA1(dc5fb331df921ef7b94d2c0d3e7d0bb299e728a3) )
 	j6redarw_sound
-ROM_END	
+ROM_END
 
 ROM_START( j6redarwh )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rear-7n1.bin", 0x000000, 0x020000, CRC(5c004e43) SHA1(eb4dfdb35efc5226df366cd3f2cdcd486098ba53) )
 	ROM_LOAD16_BYTE( "rear-7_2.bin", 0x000001, 0x020000, CRC(962c6cac) SHA1(dc5fb331df921ef7b94d2c0d3e7d0bb299e728a3) )
 	j6redarw_sound
-ROM_END	
+ROM_END
 
 ROM_START( j6redarwi )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rear-7p1.bin", 0x000000, 0x020000, CRC(86a8a2bf) SHA1(1c7301c3e5a3ff1d791b21e617d50875c06a7463) )
 	ROM_LOAD16_BYTE( "rear-7_2.bin", 0x000001, 0x020000, CRC(962c6cac) SHA1(dc5fb331df921ef7b94d2c0d3e7d0bb299e728a3) )
 	j6redarw_sound
-ROM_END	
+ROM_END
 
 ROM_START( j6redarwj )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rear7np1.bin", 0x000000, 0x020000, CRC(b79e1a7b) SHA1(806ae7180dbee9b605bd8d923179a2323a7d38ee) )
 	ROM_LOAD16_BYTE( "rear-7_2.bin", 0x000001, 0x020000, CRC(962c6cac) SHA1(dc5fb331df921ef7b94d2c0d3e7d0bb299e728a3) )
 	j6redarw_sound
-ROM_END	
+ROM_END
 
 ROM_START( j6redarww )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -5304,14 +5304,14 @@ ROM_END
 ROM_START( j6robina )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "9427.bin", 0x000000, 0x020000, CRC(e001c8bb) SHA1(084182d27ddd4146e75ec5cdc9c20e09f4bb390b) )
-	ROM_LOAD16_BYTE( "9426.bin", 0x000001, 0x020000, CRC(a85c6c19) SHA1(eab10967642f801dcd25dcdd4dfe95ac3b3491bf) ) 
+	ROM_LOAD16_BYTE( "9426.bin", 0x000001, 0x020000, CRC(a85c6c19) SHA1(eab10967642f801dcd25dcdd4dfe95ac3b3491bf) )
 	j6robin_sound
 ROM_END
 
 ROM_START( j6robinb )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "9428.bin", 0x000000, 0x020000, CRC(595b5ce2) SHA1(276290e86454b2f1fc73b2cc3e545b6c60363535) )
-	ROM_LOAD16_BYTE( "9426.bin", 0x000001, 0x020000, CRC(a85c6c19) SHA1(eab10967642f801dcd25dcdd4dfe95ac3b3491bf) ) 
+	ROM_LOAD16_BYTE( "9426.bin", 0x000001, 0x020000, CRC(a85c6c19) SHA1(eab10967642f801dcd25dcdd4dfe95ac3b3491bf) )
 	j6robin_sound
 ROM_END
 
@@ -5885,14 +5885,14 @@ ROM_START( j6strk10j )
 	ROM_LOAD16_BYTE( "prom2_7.bin", 0x000001, 0x020000, CRC(deab0a4e) SHA1(aeba0182906332996efe79dfc56a14fdd087940e) )
 	j6strk10_sound
 ROM_END
-		
+
 ROM_START( j6strk10k )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "prom1p_7.bin", 0x000000, 0x020000, CRC(1ccee61d) SHA1(dcd4942bc66d3109ea540fed50148c0e355b803d) )
 	ROM_LOAD16_BYTE( "prom2_7.bin", 0x000001, 0x020000, CRC(deab0a4e) SHA1(aeba0182906332996efe79dfc56a14fdd087940e) )
 	j6strk10_sound
 ROM_END
-	
+
 
 #define j6supbrk_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
@@ -6821,7 +6821,7 @@ ROM_START( j6svndb )
 	ROM_LOAD16_BYTE( "ace.evn", 0x000000, 0x020000, CRC(0078e610) SHA1(545f3aa30154e7a75d72bc4621010177f7b1b441) )
 	ROM_LOAD16_BYTE( "ace.odd", 0x000001, 0x020000, CRC(422268c4) SHA1(defaab4476aad6ad17ff917fa795a6a5a1828090) )
 
-//	ROM_LOAD( "ace.bin", 0x000000, 0x040000, CRC(272070fd) SHA1(cd5f06106f0379b2769515193aee61dea04c1f1e) ) // this is just a combined rom of the above
+//  ROM_LOAD( "ace.bin", 0x000000, 0x040000, CRC(272070fd) SHA1(cd5f06106f0379b2769515193aee61dea04c1f1e) ) // this is just a combined rom of the above
 
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
 	/* missing? */
@@ -7166,7 +7166,7 @@ ROM_END
 #define j6ccc_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
 	/* missing? */ \
- 
+
 ROM_START( j6ccc )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "ccb1.bin", 0x00000, 0x020000, CRC(38a9b16e) SHA1(2ee0e1c67064e537b4459a69dc9ebf8be89f9051) )
@@ -7809,7 +7809,7 @@ ROM_START( j6slagne )
 	ROM_LOAD16_BYTE(  "salft1p2.bin", 0x00001, 0x020000, CRC(e7ce4c21) SHA1(b6571c028710f5797607f871c7c2cb87df749131) )
 	j6slagn_sound
 ROM_END
-	
+
 ROM_START( j6slagnf )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "snakes&ladders-crystal-p1.bin", 0x0000, 0x020000, CRC(4f27b6c7) SHA1(cd457f4a4e7d518d4d19f6860d6e07207afff4c6) )
@@ -8295,7 +8295,7 @@ GAME( 199?, j6dmnjkr	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "D
 GAME( 199?, j6dmnjkra	, j6dmnjkr	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Demon Jokers (JPM) (IMPACT) (set 2)", GAME_FLAGS )
 GAME( 199?, j6dmnjkrb	, j6dmnjkr	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Demon Jokers (JPM) (IMPACT) (set 3)", GAME_FLAGS )
 GAME( 199?, j6dmnjkrc	, j6dmnjkr	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Demon Jokers (JPM) (IMPACT) (set 4)", GAME_FLAGS )
-// GAME( 199?, j6gldday	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Golden Day (JPM) (IMPACT)", GAME_FLAGS ) // this is the same as j6dmnjkra
+// GAME( 199?, j6gldday , 0         , impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Golden Day (JPM) (IMPACT)", GAME_FLAGS ) // this is the same as j6dmnjkra
  GAME( 199?, j6reddmn	, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Red Demon (JPM) (IMPACT)", GAME_FLAGS ) // the same as Demon Jokers but with a different sound rom?
 
 
@@ -9231,7 +9231,7 @@ GAME( 199?, j6tqustc	, j6tqust	, impctawp, tbirds, driver_device, 0, ROT0, "Crys
 
 GAME( 199?, j6gldpl		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "Qps", "Golden Palace (Qps) (IMPACT)", GAME_FLAGS )
 
-GAME( 199?, j6shoot		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM / Whitbread", "ShootOut (JPM / Whitbread) (IMPACT)", GAME_FLAGS ) 
+GAME( 199?, j6shoot		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM / Whitbread", "ShootOut (JPM / Whitbread) (IMPACT)", GAME_FLAGS )
 
 GAME( 199?, j6milln		, 0			, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Millionaire (JPM) (IMPACT) (set 1)", GAME_FLAGS ) // was marked as SWP, should this be a video game? - Apparently it's just a link box using the same hardware, but for 3 PC based units which aren't dumped
 GAME( 199?, j6millna	, j6milln	, impctawp, tbirds, driver_device, 0, ROT0, "JPM", "Millionaire (JPM) (IMPACT) (set 2)", GAME_FLAGS )

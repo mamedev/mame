@@ -989,15 +989,15 @@ MACHINE_CONFIG_END
 
 /* This doesn't work for some reason.
 static MACHINE_CONFIG_DERIVED( socrates_pal, socrates )
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_26_601712MHz/8)
-	MCFG_SCREEN_REPLACE("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(264, 256) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
-	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 256) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
-	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
-	MCFG_SOUND_REPLACE("soc_snd", SOCRATES, XTAL_26_601712MHz/(512+256)) // this is correct, as strange as it sounds.
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+    MCFG_CPU_REPLACE("maincpu", Z80, XTAL_26_601712MHz/8)
+    MCFG_SCREEN_REPLACE("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(50)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+    MCFG_SCREEN_SIZE(264, 256) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
+    MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 256) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
+    MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
+    MCFG_SOUND_REPLACE("soc_snd", SOCRATES, XTAL_26_601712MHz/(512+256)) // this is correct, as strange as it sounds.
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 */
 /******************************************************************************

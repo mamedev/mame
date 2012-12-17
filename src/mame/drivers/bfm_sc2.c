@@ -2235,7 +2235,7 @@ int sc2_find_project_string(running_machine &machine )
 					if (addr<size)
 					{
 						rom = src[addr];
-			
+
 						if ((rom>=0x20) && (rom<0x7f))
 						{
 							printf("%c", rom);
@@ -6932,8 +6932,8 @@ ROM_START( sc2scshx )
 	ROM_LOAD( "scx1v3.bin", 0x0000, 0x010000, CRC(711a0f93) SHA1(5b3efda6a01663655ec614feab9e1d0c857e823e) )
 	ROM_LOAD( "scx1v6hi.bin", 0x0000, 0x010000, CRC(cae3fd0b) SHA1(1fe2ab0037c5a0be58378e95f72dc2782325fb71) )
 	ROM_LOAD( "scx1v6lo.bin", 0x0000, 0x010000, CRC(ca5fdbca) SHA1(60079aeb4904e42a4a45feb7f31cf6c71b611845) )
-//	ROM_LOAD( "scx1v7hi.bin", 0x0000, 0x010000, CRC(b8ae7542) SHA1(22230e9a67c0f8408d6ba7adafd581cd3d62c5ad) ) // in sc2scshxcas
-//	ROM_LOAD( "scx1v7lo.bin", 0x0000, 0x010000, CRC(1ed97ef6) SHA1(1aaf911369dc814ee2edf5d59baa2961bfc73168) ) // in sc2scshxcas
+//  ROM_LOAD( "scx1v7hi.bin", 0x0000, 0x010000, CRC(b8ae7542) SHA1(22230e9a67c0f8408d6ba7adafd581cd3d62c5ad) ) // in sc2scshxcas
+//  ROM_LOAD( "scx1v7lo.bin", 0x0000, 0x010000, CRC(1ed97ef6) SHA1(1aaf911369dc814ee2edf5d59baa2961bfc73168) ) // in sc2scshxcas
 	ROM_LOAD( "scx1v8hi.bin", 0x0000, 0x010000, CRC(06e35b38) SHA1(0a48489aee24066526da2cf56775f805d9603995) )
 	ROM_LOAD( "scx1v8lo.bin", 0x0000, 0x010000, CRC(82bc1820) SHA1(301775e0e32e44d5cbe43c0cb83d94cf2aab9a50) )
 	ROM_LOAD( "scxsp10.bin", 0x0000, 0x010000, CRC(e006d449) SHA1(73acc9c729e73d3a262d1a21fe89e00047eabdb2) )
@@ -7703,7 +7703,7 @@ GAME( 199?, sc2wembl1p	, sc2wembl	,  scorpion2		, drwho		, bfm_sc2_state, drwho	
 GAME( 199?, sc2wembl2	, sc2wembl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Match Of The Day - Road To Wembley (Bellfruit) (set 7, UK) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-653
 GAME( 199?, sc2wembl2p	, sc2wembl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Match Of The Day - Road To Wembley (Bellfruit) (set 7, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-653
 // PROJECT NUMBER 6781  ROAD TO WEMBLEY #10 ALL CASH 15RM - 28-MAR-1996 14:01:40
-GAME( 199?, sc2wembl	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Match Of The Day - Road To Wembley (Bellfruit) (set 8, UK, 10GBP Jackpot, 15RM motor) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-659 
+GAME( 199?, sc2wembl	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Match Of The Day - Road To Wembley (Bellfruit) (set 8, UK, 10GBP Jackpot, 15RM motor) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-659
 GAME( 199?, sc2wemblp	, sc2wembl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Match Of The Day - Road To Wembley (Bellfruit) (set 8, UK, 10GBP Jackpot, 15RM motor, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-659
 // PROJECT NUMBER 7005  ROAD TO WEMBLEY !5 ALL CASH 16RM  GAME No RWVMAZ12_N - 22-OCT-1997 20:03:46
 GAME( 199?, sc2wemblm	, sc2wembl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM/Mazooma",      "Match Of The Day - Road To Wembley (Bellfruit/Mazooma) (Scorpion 2/3)", GAME_FLAGS) // error 99
@@ -7767,7 +7767,7 @@ GAME( 199?, sc2copcl	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		
 GAME( 199?, sc2copclp	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 9, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)	// GAME No 95-751-859
 // PROJECT NUMBER PR6231  CLUB COPS AND ROBBERS 20P/#250 - 2-SEP-1996 17:26:44
 GAME( 199?, sc2copcl2	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 10, UK) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-750-858
-GAME( 199?, sc2copcl12	, sc2copcl	,  scorpion2     	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 10, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-858
+GAME( 199?, sc2copcl12	, sc2copcl	,  scorpion2    	, drwho		, bfm_sc2_state, prom		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 10, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-858
 // PROJECT PR6231  CLUB COPS AND ROBBERS NPO 63% SEALINK VERSION - 5-JAN-1998 11:53:49
 GAME( 199?, sc2copcl5	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 11, UK) (Scorpion 2/3)", GAME_FLAGS)			// GAME No 95-752-015
 GAME( 199?, sc2copcl11p	, sc2copcl	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Cops 'n' Robbers Club (Bellfruit) (set 11, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)	// GAME No 95-753-015
@@ -7822,7 +7822,7 @@ GAME( 199?, sc2dels1	, sc2dels	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 
 GAME( 199?, sc2dels1p	, sc2dels	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Del's Millions (Bellfruit) (set 10, UK, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-820
 
 // the Mazooma versioning is different, N/P should be protocol / non-protocol, but the builds are minutes apart, so 11/12/13/14 can't really be version numbers
-// PROJECT NUMBER P7003  DELS MILLIONS  !5 ALL CASH  
+// PROJECT NUMBER P7003  DELS MILLIONS  !5 ALL CASH
 GAME( 199?, sc2delsm	, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM/Mazooma",  "Del's Millions (Bellfruit/Mazooma) (DMVMAZ11_N) (Scorpion 2/3)", GAME_FLAGS) // GAME No DMVMAZ11_N - 15-SEP-1997 11:52:00
 GAME( 199?, sc2delsm2	, sc2delsm	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM/Mazooma",  "Del's Millions (Bellfruit/Mazooma) (DMVMAZ11_P) (Scorpion 2/3)", GAME_FLAGS) // GAME No DMVMAZ11_P - 15-SEP-1997 11:53:06
 GAME( 199?, sc2delsmp	, sc2delsm	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM/Mazooma",  "Del's Millions (Bellfruit/Mazooma) (DMVMAZ12_N) (Scorpion 2/3)", GAME_FLAGS) // GAME No DMVMAZ12_N - 15-SEP-1997 11:54:08
@@ -7901,7 +7901,7 @@ GAME( 199?, sc2mam		, 0			,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 
 GAME( 199?, sc2mamp		, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 4, UK, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-731
 // PROJECT NUMBER 6780  MAKE A MILLION #10 10/25P - 24-MAY-1996 16:18:45
 GAME( 199?, sc2mam1		, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 5, UK, 10GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-732
-GAME( 199?, sc2mam1p	, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 5, UK, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-732 
+GAME( 199?, sc2mam1p	, sc2mam	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM",      "Make A Million (Bellfruit) (set 5, UK, 10GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-732
 
 
 /********************************************************************************************************************************************************************************************************************
@@ -8007,7 +8007,7 @@ GAME( 199?, sc2cgcas1p	, sc2cgcas	,  scorpion2		, drwho		, bfm_sc2_state, drwho	
  Casino Royale
 ********************************************************************************************************************************************************************************************************************/
 
-// PROJECT NUMBER 6603  CASINO ROYALE (T2 - 5/10/20P) -  7-MAY-1996 17:02:50 
+// PROJECT NUMBER 6603  CASINO ROYALE (T2 - 5/10/20P) -  7-MAY-1996 17:02:50
 GAME( 199?, sc2casr3	, sc2casr	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM", 	 "Casino Royale (Bellfruit) (set 1, UK, 8GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-750-704
 GAME( 199?, sc2casr3p	, sc2casr	,  scorpion2		, drwho		, bfm_sc2_state, drwho		, 0,		 "BFM", 	 "Casino Royale (Bellfruit) (set 1, UK, 8GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS) // GAME No 95-751-704
 // PROJECT NUMBER 6603  CASINO ROYALE (T2) DE-REG -  5-JUN-1996 15:03:27

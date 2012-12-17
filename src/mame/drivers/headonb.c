@@ -6,7 +6,7 @@
 
   It's on much cheaper hardware than the original: 8080 instead of Z80,
   and less RAM needed with the gfx tiles being on ROM.
-  
+
 TODO:
   - Sound is unknown, probably simple and discrete
   - wrong coin handling, it writes to port $01 to reset coin status?

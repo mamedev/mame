@@ -485,7 +485,7 @@ static floperr_t floppy_readwrite_sector(floppy_image_legacy *floppy, int head, 
 			if ((offset > 0) || (buffer_len < sector_length))
 			{
 				/* we will be doing an partial read/write; in other words we
-				 * will not be reading/writing a full sector */
+                 * will not be reading/writing a full sector */
 				if (alloc_buf) free(alloc_buf);
 				alloc_buf = (UINT8*)malloc(sector_length);
 				if (!alloc_buf)

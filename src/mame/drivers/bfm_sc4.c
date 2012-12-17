@@ -14,25 +14,25 @@
 
     note: default Jackpot keys should be set to whatever value the game
           mentions it should be using with none present, many games accept
-		  multiple keys.  A number of Mazooma games will attempt to use
-		  invalid settings by default with no key.
+          multiple keys.  A number of Mazooma games will attempt to use
+          invalid settings by default with no key.
 
     Reel configs have been done to allow games to boot past the initial
-	spin up tests where possible*, some reels probably still aren't correct
-	and as a result several games will end up with reels erroring or
-	spinning endlessly ingame, once the correct reel types are identified
-	the details in the config structures should be replaced.
+    spin up tests where possible*, some reels probably still aren't correct
+    and as a result several games will end up with reels erroring or
+    spinning endlessly ingame, once the correct reel types are identified
+    the details in the config structures should be replaced.
 
-	* a handful of games still don't
+    * a handful of games still don't
 
-	----------------
+    ----------------
 
-	General Info
+    General Info
 
-	Whitbread licensed sets were designed for use in Whitbread owned
-	establishments, they tend to have much 'flatter' profiles than the
-	regular sets meaning they pay out small prizes with a regular frequency
-	rather than saving up for larger (multi) jackpot payments etc.
+    Whitbread licensed sets were designed for use in Whitbread owned
+    establishments, they tend to have much 'flatter' profiles than the
+    regular sets meaning they pay out small prizes with a regular frequency
+    rather than saving up for larger (multi) jackpot payments etc.
 
 */
 
@@ -6679,7 +6679,7 @@ ROM_END
 
 ROM_START( sc4goldoc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	// why do we only have a combined rom for this one? (is it same as sc4gocasa once split?) 
+	// why do we only have a combined rom for this one? (is it same as sc4gocasa once split?)
 	ROM_LOAD( "95401643.bin", 0x0000, 0x100000, CRC(3a85490e) SHA1(e1e4765785d631a7ec4e5daa33d1ce4fbdaee446) ) // TODO SPLIT THIS
 	sc4goldo_others
 ROM_END
@@ -25511,7 +25511,7 @@ GAME( 200?, sc4gxcasa	,sc4bonbx,	sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Ba
 GAME( 200?, sc4gxcasb	,sc4bonbx,	sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 3)", GAME_NOT_WORKING )
 GAME( 200?, sc4gxcasc	,sc4bonbx,	sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 4)", GAME_NOT_WORKING )
 GAME( 200?, sc4gxcasd	,sc4bonbx,	sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 5)", GAME_NOT_WORKING )
-// PR7036GOLDEN X         BARX SOUNDS         GOLDEN 
+// PR7036GOLDEN X         BARX SOUNDS         GOLDEN
 GAME( 200?, sc4gxcase	,sc4bonbx,	sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 6)", GAME_NOT_WORKING )
 GAME( 200?, sc4gxcasf	,sc4bonbx,	sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 7)", GAME_NOT_WORKING )
 GAME( 200?, sc4gxa		,sc4bonbx,	sc4, sc4, sc4_state, sc4gx, ROT0, "Mazooma","Bar X (Mazooma) (Scorpion 4) (BARX, set 8)", GAME_NOT_WORKING ) // wasn't marked as Casino
@@ -26122,7 +26122,7 @@ static const stepper_interface* sc4jolly_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	&starpoint_interface_200step_reel,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4jolly)
@@ -26144,7 +26144,7 @@ static const stepper_interface* sc4juicy_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4juicy)
@@ -26184,7 +26184,7 @@ static const stepper_interface* sc4jjf_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	0,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4jjf)
@@ -26218,7 +26218,7 @@ static const stepper_interface* sc4kalei_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	0,
 	&starpointrm20_interface_48step,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4kalei)
@@ -26244,7 +26244,7 @@ static const stepper_interface* sc4lir_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	0,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4lir)
@@ -26273,7 +26273,7 @@ static const stepper_interface* sc4lined_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	0,
 	0,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4lined)
@@ -26318,7 +26318,7 @@ static const stepper_interface* sc4ldvcl_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4ldvcl)
@@ -26337,7 +26337,7 @@ static const stepper_interface* sc4lockb_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	0,
 	&starpointrm20_interface_48step,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4lockb)
@@ -26363,7 +26363,7 @@ static const stepper_interface* sc4lkbcl_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4lkbcl)
@@ -26402,7 +26402,7 @@ static const stepper_interface* sc4lotrf_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	0,
 	&starpointrm20_interface_48step,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4lotrf)
@@ -27000,7 +27000,7 @@ GAME( 200?, sc4mcas0	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopo
 GAME( 200?, sc4mcas1	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 16)", GAME_NOT_WORKING )// ^^
 GAME( 200?, sc4mcas2	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 17)", GAME_NOT_WORKING )// ^^
 GAME( 200?, sc4mcas3	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2354) (Mazooma) (Scorpion 4) (GMBU, set 18)", GAME_NOT_WORKING )// ^^
-// these have a different internal code compared to the PR2056 sets above which strongly indicates they're for the 'GMBU' sets above 
+// these have a different internal code compared to the PR2056 sets above which strongly indicates they're for the 'GMBU' sets above
 GAME( 200?, sc4mcask	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2056) (Mazooma) (Scorpion 4) (GMTB, Top Box, set 1)", GAME_NOT_WORKING ) // PR2056  MONOP  TRIPLE         MONO SOUNDS         MONOP TRIPLE
 GAME( 200?, sc4mcasu	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2056) (Mazooma) (Scorpion 4) (GMTB, Top Box, set 2)", GAME_NOT_WORKING ) // ^^
 GAME( 200?, sc4mcas4	,sc4mcas,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly Casino (PR2056) (Mazooma) (Scorpion 4) (GMTB, Top Box, set 3)", GAME_NOT_WORKING ) // ^^
@@ -27349,9 +27349,9 @@ static const stepper_interface* sc4pipe_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
-	0, 
+	0,
 	&starpointrm20_interface_48step,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4pipe)
@@ -27372,7 +27372,7 @@ static const stepper_interface* sc4plumb_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4plumb)
@@ -27400,7 +27400,7 @@ static const stepper_interface* sc4polem_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	0,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4polem)
@@ -27427,7 +27427,7 @@ static const stepper_interface* sc4polic_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4polic)
@@ -27452,7 +27452,7 @@ static const stepper_interface* sc4potsh_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	0,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4potsh)
@@ -27474,7 +27474,7 @@ static const stepper_interface* sc4pogbl_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4pogbl)
@@ -27498,7 +27498,7 @@ static const stepper_interface* sc4pwrsg_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	&starpoint_interface_200step_reel,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4pwrsg)
@@ -27521,7 +27521,7 @@ static const stepper_interface* sc4pir_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	&starpoint_interface_200step_reel,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4pir)
@@ -27554,7 +27554,7 @@ static const stepper_interface* sc4pen1_reel_configs[6] =
 
 DRIVER_INIT_MEMBER(sc4_state,sc4pen1)
 {
-//	BFM_dm01_config(machine(), &dm01_interface);
+//  BFM_dm01_config(machine(), &dm01_interface);
 	DRIVER_INIT_CALL(sc4);
 	m_reel_setup = sc4pen1_reel_configs;
 }
@@ -27715,7 +27715,7 @@ static const stepper_interface* sc4rich_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	&starpoint_interface_200step_reel,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4rich)
@@ -27745,9 +27745,9 @@ static const stepper_interface* sc4rttt_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
-	0, 
+	0,
 	&starpointrm20_interface_48step,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4rttt)
@@ -27776,9 +27776,9 @@ static const stepper_interface* sc4roksc_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
-	0, 
+	0,
 	&starpointrm20_interface_48step,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4roksc)
@@ -27830,7 +27830,7 @@ static const stepper_interface* sc4rogds_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	0,
 	&starpoint_interface_200step_reel,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4rogds)
@@ -33329,7 +33329,7 @@ DRIVER_INIT_MEMBER(sc4_state,sc4rio)
 // PR1222    RIO GRANDE         95004309 RIO GRANDE SOUNDS11
 GAME( 200?, sc4rio		,0,			sc4, sc4, sc4_state, sc4rio, ROT0, "BFM","Rio Grande (Dutch) (Bellfruit) (Scorpion 4)", GAME_NOT_WORKING )
 
-	
+
 static const stepper_interface* sc4strbr_reel_configs[6] =
 {
 	&starpointrm20_interface_48step,
@@ -33570,7 +33570,7 @@ static const stepper_interface* sc4polen_reel_configs[6] =
 	&starpointrm20_interface_48step,
 	&starpointrm20_interface_48step,
 	0,
-	0, 
+	0,
 };
 
 DRIVER_INIT_MEMBER(sc4_state,sc4polen)
@@ -34581,7 +34581,7 @@ GAME( 200?, sc4hydeb	,sc4hyde,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hyde &
 GAME( 200?, sc4hydec	,sc4hyde,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Hyde & Streak (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 // // does NOT want 'WILD SOUNDS' from 'PR7065 WET 'N' WILD'
-// PR2043 NUDGE IT         WILD SOUNDS             NUDGE IT  
+// PR2043 NUDGE IT         WILD SOUNDS             NUDGE IT
 GAME( 200?, sc4nudit	,0,			sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Nudge It (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND )
 // PR2043 NUDGE IT         NGIT SOUNDS             NUDGE IT
 GAME( 200?, sc4nudita	,sc4nudit,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Nudge It (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING )
@@ -34661,7 +34661,7 @@ GAME( 200?, sc4monotb	,sc4monot,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Mono
 GAME( 200?, sc4monotc	,sc4monot,  sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Monopoly TTT (PR2133) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PR2133MONOPOLY TTT         MONOPOLY TTT  ARCADE  MONL SOUNDS         MONOPOLY
 
 // WRONG SOUNDS, PAY UNIT ERR 17
-GAME( 200?, sc4cmon		,0,    	    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Casino Monopoly (PR2133) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PR2133 CASINO MONOPOLY             MONOPOLY      ARCADE  MONL SOUNDS             MONOPOLY
+GAME( 200?, sc4cmon		,0, 	    sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Casino Monopoly (PR2133) (Mazooma) (Scorpion 4) (set 1)", GAME_NOT_WORKING | GAME_NO_SOUND ) // PR2133 CASINO MONOPOLY             MONOPOLY      ARCADE  MONL SOUNDS             MONOPOLY
 GAME( 200?, sc4cmona	,sc4cmon,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Casino Monopoly (PR2133) (Mazooma) (Scorpion 4) (set 2)", GAME_NOT_WORKING | GAME_NO_SOUND ) // ^^
 GAME( 200?, sc4cmonb	,sc4cmon,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Casino Monopoly (PR2133) (Mazooma) (Scorpion 4) (set 3)", GAME_NOT_WORKING | GAME_NO_SOUND ) // ^^
 GAME( 200?, sc4cmonc	,sc4cmon,	sc4, sc4, sc4_state, sc4, ROT0, "Mazooma","Casino Monopoly (PR2133) (Mazooma) (Scorpion 4) (set 4)", GAME_NOT_WORKING | GAME_NO_SOUND ) // ^^

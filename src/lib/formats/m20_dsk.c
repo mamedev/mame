@@ -269,7 +269,7 @@ bool m20_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			else
 				build_wd_track_fm(track, head, image, 50000, 16, sects, 24, 16, 11);
 		}
-				
+
 	return true;
 }
 

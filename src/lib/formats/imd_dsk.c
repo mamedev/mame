@@ -361,14 +361,14 @@ int imd_format::identify(io_generic *io, UINT32 form_factor)
 		for(int i=0; i != 30; i++)
 			if(h[i] >= '0' && h[i] <= '9')		\
 				h[i] = '0';
-		
+
 		fixnum(h+ 9, h+11);
 		fixnum(h+12, h+14);
 		fixnum(h+15, h+19);
 		fixnum(h+20, h+22);
 		fixnum(h+23, h+25);
 		fixnum(h+26, h+28);
-		
+
 		if(!strcmp(h, "IMD 0.0: 00/00/0000 00:00:00\015\012"))
 			return 100;
 	} else {
@@ -376,14 +376,14 @@ int imd_format::identify(io_generic *io, UINT32 form_factor)
 		for(int i=0; i != 31; i++)
 			if(h[i] >= '0' && h[i] <= '9')		\
 				h[i] = '0';
-		
+
 		fixnum(h+10, h+12);
 		fixnum(h+13, h+15);
 		fixnum(h+16, h+20);
 		fixnum(h+21, h+23);
 		fixnum(h+24, h+26);
 		fixnum(h+27, h+29);
-		
+
 		if(!strcmp(h, "IMD 0.00: 00/00/0000 00:00:00\015\012"))
 			return 100;
 	}
@@ -447,7 +447,7 @@ bool imd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 			if(stype == 0 || stype > 8) {
 				sects[i].data = NULL;
-				
+
 			} else {
 				sects[i].deleted = stype == 3 || stype == 4 || stype == 7 || stype == 8;
 				sects[i].bad_crc = stype == 5 || stype == 6 || stype == 7 || stype == 8;

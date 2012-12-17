@@ -50,65 +50,65 @@ TODO:
     - Keyboard
     - Analog filters and VCA on the back end of the 5503
     - SQ-80 support (additional banking, FDC)
- 
-NOTES: 
-	Commands from KPC are all 2 bytes 
- 
-	first byte: command code, bit 7 is 1 = press, 0 = release
-	second byte is source: 00 = panel  01 = internal keyboard
-	 
-	04 SEQ
-	05 CART A 
-	06 CART B 
-	07 INT
-	08 1 / SEQ 1
-	09 2 / SEQ 2
-	0A 3 / SEQ 3
-	0B 4 / SONG
-	0C COMPARE 
-	0D DATA UP 
-	0E DATA DOWN 
-	0F WRITE 
-	10 = UPPER 1 (buttons above display)
-	11 = UPPER 2 
-	12 = UPPER 3 
-	13 = UPPER 4 
-	14 = UPPER 5 
-	15 = LOWER 1 (buttons below display)
-	16 = LOWER 2 
-	17 = LOWER 3 
-	18 = LOWER 4 
-	19 = LOWER 5 
-	1a = LFO 1 
-	1b = ENV 2 
-	1c = MASTER 
-	1d = CREATE / ERASE 
-	1e = SELECT 
-	1f = RECORD 
-	20 = STORAGE 
-	21 = EDIT
-	22 = MIX 
-	23 = STOP / CONT 
-	24 = MIDI 
-	25 = CONTROL 
-	26 = LOCATE 
-	27 = PLAY 
-	28 = OSC 1 
-	29 = OSC 2 
-	2A = OSC 3 
-	2B = ENV 1 
-	2C = DCA 1 
-	2D = DCA 2 
-	2E = DCA 3 
-	2F = LFO 2 
-	30 = LFO 3 
-	31 = FILTER 
-	32 = ENV 4 
-	33 = ENV 3 
-	34 = DCA 4 
-	35 = MODES 
-	36 = SPLIT / LAYER 
- 
+
+NOTES:
+    Commands from KPC are all 2 bytes
+
+    first byte: command code, bit 7 is 1 = press, 0 = release
+    second byte is source: 00 = panel  01 = internal keyboard
+
+    04 SEQ
+    05 CART A
+    06 CART B
+    07 INT
+    08 1 / SEQ 1
+    09 2 / SEQ 2
+    0A 3 / SEQ 3
+    0B 4 / SONG
+    0C COMPARE
+    0D DATA UP
+    0E DATA DOWN
+    0F WRITE
+    10 = UPPER 1 (buttons above display)
+    11 = UPPER 2
+    12 = UPPER 3
+    13 = UPPER 4
+    14 = UPPER 5
+    15 = LOWER 1 (buttons below display)
+    16 = LOWER 2
+    17 = LOWER 3
+    18 = LOWER 4
+    19 = LOWER 5
+    1a = LFO 1
+    1b = ENV 2
+    1c = MASTER
+    1d = CREATE / ERASE
+    1e = SELECT
+    1f = RECORD
+    20 = STORAGE
+    21 = EDIT
+    22 = MIX
+    23 = STOP / CONT
+    24 = MIDI
+    25 = CONTROL
+    26 = LOCATE
+    27 = PLAY
+    28 = OSC 1
+    29 = OSC 2
+    2A = OSC 3
+    2B = ENV 1
+    2C = DCA 1
+    2D = DCA 2
+    2E = DCA 3
+    2F = LFO 2
+    30 = LFO 3
+    31 = FILTER
+    32 = ENV 4
+    33 = ENV 3
+    34 = DCA 4
+    35 = MODES
+    36 = SPLIT / LAYER
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -220,7 +220,7 @@ static ADDRESS_MAP_START( esq1_map, AS_PROGRAM, 8, esq1_state )
 	AM_RANGE(0x4000, 0x5fff) AM_RAM					// SEQRAM
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_device, read, write)
 	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE_LEGACY("duart", duart68681_r, duart68681_w)
-	AM_RANGE(0x6800, 0x68ff) AM_NOP	
+	AM_RANGE(0x6800, 0x68ff) AM_NOP
 
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("osbank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("osrom", 0x8000)	// OS "high" ROM is always mapped here

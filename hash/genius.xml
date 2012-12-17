@@ -8,20 +8,20 @@
 <!-- First chunk of dumps, compatible with: Notebook Fun, e-Power X, 5005 X, 6600 CX, 8008 CX, Black Magic CX
 
 +--------------+-----------------------------+------------+-----------------
-| CARTRIDGE ID |          GAME NAME          |  EPROM-ID  |  EPROM-TYPE   | 
+| CARTRIDGE ID |          GAME NAME          |  EPROM-ID  |  EPROM-TYPE   |
 +--------------+-----------------------------+------------+-----------------
-|              |                             |            |               | 
-| 80-28071     | Englisch f¸r Anf‰nger       | 27-6386-00 |   LH5V1RN5    | 
-| 80-28072     | L‰nder-Menschen-Umwelt      | 27-6386-00 |   LH5V1RN5    | 
-| 80-28073     | Sport-Wissen-Geschichte     | 27-6388-00 |   LH5V1RN5    | 
-| 80-28074     | Allgemeinwissen             | 27-6388-00 |   LH5V1RN5    | 
-| 80-28075     | Naturwissenschaften         |            |               | 
-| 80-          | Schreibmaschinenkurs        | 27-6431-00 |   LH5V1RN5    | 
+|              |                             |            |               |
+| 80-28071     | Englisch f¸r Anf‰nger       | 27-6386-00 |   LH5V1RN5    |
+| 80-28072     | L‰nder-Menschen-Umwelt      | 27-6386-00 |   LH5V1RN5    |
+| 80-28073     | Sport-Wissen-Geschichte     | 27-6388-00 |   LH5V1RN5    |
+| 80-28074     | Allgemeinwissen             | 27-6388-00 |   LH5V1RN5    |
+| 80-28075     | Naturwissenschaften         |            |               |
+| 80-          | Schreibmaschinenkurs        | 27-6431-00 |   LH5V1RN5    |
 |              | Superspeicher               |            |GM76V8128CLFW70| (RAM Module)
 
 the LH5V1RN6 flash-rom is pin compatible to an LH531V00 which is compatible to an D27C010 eprom!
-VTECH burned two games on one flash-rom, with setting the highest adressline HIGH or LOW, they choosed the game, 
-but if you wanted to play both games, you had to buy both cartridges! 
+VTECH burned two games on one flash-rom, with setting the highest adressline HIGH or LOW, they choosed the game,
+but if you wanted to play both games, you had to buy both cartridges!
 On one was the highest adressline set to HIGH, on the other one this adressline was set to LOW.
 
 -->

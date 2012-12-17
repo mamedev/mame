@@ -97,7 +97,7 @@ Notes: (all chips shown above)
       TMM331 is compatible with AMI S6831A, AMD AM9217,
       Intel 2316A/8316A, MOSTEK MK31000, GI RO-3-8316,
       NATIONAL/NEC/SYNERTEK 2316A etc
-      
+
 */
 
 /*

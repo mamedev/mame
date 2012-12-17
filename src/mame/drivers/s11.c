@@ -514,7 +514,7 @@ WRITE_LINE_MEMBER( s11_state::ym2151_irq_w)
 static const pia6821_interface pia40_intf =
 {
 	DEVCB_NULL,		/* port A in */
-	DEVCB_NULL,//_DRIVER_MEMBER(s11_state, dac_r),		/* port B in */
+	DEVCB_NULL,//_DRIVER_MEMBER(s11_state, dac_r),      /* port B in */
 	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca1_r),		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_LINE_VCC,		/* line CA2 in */

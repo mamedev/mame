@@ -147,8 +147,8 @@ Notes:
               QML04300LA-A
               RIZING PING PONG EXP
               M9005557A VER. 2.01O  (note '01O' is slightly scratched and could be incorrect)
-                
-      
+
+
 */
 
 #define ADDRESS_MAP_MODERN

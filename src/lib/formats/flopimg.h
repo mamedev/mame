@@ -227,33 +227,33 @@ public:
 	virtual ~floppy_image_format_t();
 
 	/*! @brief Identify an image.
-	  The identify function tests if the image is valid
-	  for this particular format.
-	  @param io buffer containing the image data.
-	  @param form_factor Physical form factor of disk, from the enum
-	  in floppy_image
-	  @return 1 if image valid, 0 otherwise.
-	*/
+      The identify function tests if the image is valid
+      for this particular format.
+      @param io buffer containing the image data.
+      @param form_factor Physical form factor of disk, from the enum
+      in floppy_image
+      @return 1 if image valid, 0 otherwise.
+    */
 	virtual int identify(io_generic *io, UINT32 form_factor) = 0;
 
 	/*! @brief Load an image.
-	  The load function opens an image file and converts it to the
-	  internal MESS floppy representation.
-	  @param io source buffer containing the image data.
-	  @param form_factor Physical form factor of disk, from the enum
-	  in floppy_image
-	  @param image output buffer for data in MESS internal format.
-	  @return true on success, false otherwise.
-	*/
+      The load function opens an image file and converts it to the
+      internal MESS floppy representation.
+      @param io source buffer containing the image data.
+      @param form_factor Physical form factor of disk, from the enum
+      in floppy_image
+      @param image output buffer for data in MESS internal format.
+      @return true on success, false otherwise.
+    */
 	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image) = 0;
 
 	/*! @brief Save an image.
-	  The save function writes back an image from the MESS internal
-	  floppy representation to the appropriate format on disk.
-	  @param io output buffer for the data in the on-disk format.
-	  @param image source buffer containing data in MESS internal format.
-	  @return true on success, false otherwise.
-	*/
+      The save function writes back an image from the MESS internal
+      floppy representation to the appropriate format on disk.
+      @param io output buffer for the data in the on-disk format.
+      @param image source buffer containing data in MESS internal format.
+      @return true on success, false otherwise.
+    */
 	virtual bool save(io_generic *io, floppy_image *image);
 
 	//! @returns string containing name of format.
@@ -347,40 +347,40 @@ protected:
 
 
 	/*! @brief Generate one track according to the description vector.
-	    @param desc track data description
-	    @param track
-	    @param head
-	    @param sect a vector indexed by sector id.
-	    @param sect_count number of sectors.
-	    @param track_size in _cells_, i.e. 100000 for a usual 2us-per-cell track at 300rpm.
-	    @param image
-	*/
+        @param desc track data description
+        @param track
+        @param head
+        @param sect a vector indexed by sector id.
+        @param sect_count number of sectors.
+        @param track_size in _cells_, i.e. 100000 for a usual 2us-per-cell track at 300rpm.
+        @param image
+    */
 	void generate_track(const desc_e *desc, int track, int head, const desc_s *sect, int sect_count, int track_size, floppy_image *image);
 
 	/*! @brief Generate a track from cell binary values, MSB-first.
-	    @param track
-	    @param head
-	    @param trackbuf track input buffer.
-	    @param track_size in cells, not bytes.
-	    @param image
-	*/
+        @param track
+        @param head
+        @param trackbuf track input buffer.
+        @param track_size in cells, not bytes.
+        @param image
+    */
 	void generate_track_from_bitstream(int track, int head, const UINT8 *trackbuf, int track_size, floppy_image *image);
 
 	//! @brief Generate a track from cell level values (0/1/W/D/N).
 
 	/*! Note that this function needs to be able to split cells in two,
-	    so no time value should be less than 2, and even values are a
-	    good idea.
-	*/
+        so no time value should be less than 2, and even values are a
+        good idea.
+    */
 	/*! @param track
-	    @param head
-	    @param trackbuf track input buffer.
-	    @param track_size in cells, not bytes.
-	    @param splice_pos is the position of the track splice.  For normal
-	    formats, use -1.  For protected formats, you're supposed to
-	    know. trackbuf may be modified at that position or after.
-	    @param image
-	*/
+        @param head
+        @param trackbuf track input buffer.
+        @param track_size in cells, not bytes.
+        @param splice_pos is the position of the track splice.  For normal
+        formats, use -1.  For protected formats, you're supposed to
+        know. trackbuf may be modified at that position or after.
+        @param image
+    */
 	void generate_track_from_levels(int track, int head, UINT32 *trackbuf, int track_size, int splice_pos, floppy_image *image);
 
 	//! Normalize the times in a cell buffer to sum up to 200000000
@@ -422,43 +422,43 @@ protected:
 	// **** Writer helpers ****
 
 	/*! @brief Rebuild a cell bitstream for a track.
-	    Takes the cell standard
-	    angular size as a parameter, gives out a msb-first bitstream.
+        Takes the cell standard
+        angular size as a parameter, gives out a msb-first bitstream.
 
-	    Beware that fuzzy bits will always give out the same value.
-	    @param track
-	    @param head
-	    @param cell_size
-	    @param trackbuf Output buffer size should be 34% more than the nominal number
-	    of cells (the dpll tolerates a cell size down to 75% of the
-	    nominal one, with gives a cell count of 1/0.75=1.333... times
-	    the nominal one).
-	    @param track_size Output size is given in bits (cells).
-	    @param image
-	*/
+        Beware that fuzzy bits will always give out the same value.
+        @param track
+        @param head
+        @param cell_size
+        @param trackbuf Output buffer size should be 34% more than the nominal number
+        of cells (the dpll tolerates a cell size down to 75% of the
+        nominal one, with gives a cell count of 1/0.75=1.333... times
+        the nominal one).
+        @param track_size Output size is given in bits (cells).
+        @param image
+    */
 	/*! @verbatim
-	 Computing the standard angular size of a cell is
-	 simple. Noting:
-	   d = standard cell duration in microseconds
-	   r = motor rotational speed in rpm
-	 then:
-	   a = r * d * 10 / 3.
-	 Some values:
-	   Type           Cell    RPM    Size
+     Computing the standard angular size of a cell is
+     simple. Noting:
+       d = standard cell duration in microseconds
+       r = motor rotational speed in rpm
+     then:
+       a = r * d * 10 / 3.
+     Some values:
+       Type           Cell    RPM    Size
 
-	 C1541 tr  1-17   3.25    300    3250
-	 C1541 tr 18-24   3.50    300    3500
-	 C1541 tr 25-30   3.75    300    3750
-	 C1541 tr 31+     4.00    300    4000
-	 5.25" SD         4       300    4000
-	 5.25" DD         2       300    2000
-	 5.25" HD         1       360    1200
-	 3.5" SD          4       300    4000
-	 3.5" DD          2       300    2000
-	 3.5" HD          1       300    1000
-	 3.5" ED          0.5     300     500
-	 @endverbatim
-	 */
+     C1541 tr  1-17   3.25    300    3250
+     C1541 tr 18-24   3.50    300    3500
+     C1541 tr 25-30   3.75    300    3750
+     C1541 tr 31+     4.00    300    4000
+     5.25" SD         4       300    4000
+     5.25" DD         2       300    2000
+     5.25" HD         1       360    1200
+     3.5" SD          4       300    4000
+     3.5" DD          2       300    2000
+     3.5" HD          1       300    1000
+     3.5" ED          0.5     300     500
+     @endverbatim
+     */
 
 	void generate_bitstream_from_track(int track, int head, int cell_size,  UINT8 *trackbuf, int &track_size, floppy_image *image);
 
@@ -656,10 +656,10 @@ public:
 
 	//! floppy_image constructor
 	/*!
-	  @param _tracks number of tracks.
-	  @param _heads number of heads.
-	  @param _form_factor form factor of drive (from enum)
-	*/
+      @param _tracks number of tracks.
+      @param _heads number of heads.
+      @param _form_factor form factor of drive (from enum)
+    */
 	floppy_image(int tracks, int heads, UINT32 form_factor);
 	virtual ~floppy_image();
 
@@ -671,17 +671,17 @@ public:
 	void set_variant(UINT32 v) { variant = v; }
 
 	/*!
-	  @param track
-	  @param head
-	  @param size size of this track
-	*/
+      @param track
+      @param head
+      @param size size of this track
+    */
 	void set_track_size(int track, int head, UINT32 size) { track_size[track][head] = size; ensure_alloc(track, head); }
 
 	/*!
-	  @param track track number
-	  @param head head number
-	  @return a pointer to the data buffer for this track and head
-	*/
+      @param track track number
+      @param head head number
+      @return a pointer to the data buffer for this track and head
+    */
 	UINT32 *get_buffer(int track, int head) { return cell_data[track][head]; }
 	//! @return the track size
 	//! @param track
@@ -696,9 +696,9 @@ public:
 	//! representation is the angular position relative to the index.
 
 	/*! @param track
-	    @param head
-	    @param pos the position
-	*/
+        @param head
+        @param pos the position
+    */
 	void set_write_splice_position(int track, int head, UINT32 pos) { write_splice[track][head] = pos; }
 	//! @return the current write splice position.
 	UINT32 get_write_splice_position(int track, int head) const { return write_splice[track][head]; }

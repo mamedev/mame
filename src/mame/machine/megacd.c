@@ -133,7 +133,7 @@ static MACHINE_CONFIG_FRAGMENT( segacd_fragment )
 
 	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(segacd_map)
-	
+
 	MCFG_DEVICE_ADD("cdc", LC89510, 0) // cd controller
 
 	// temporary until things are cleaned up
@@ -145,7 +145,7 @@ static MACHINE_CONFIG_FRAGMENT( segacd_fragment )
 	MCFG_TIMER_DRIVER_ADD("stamp_timer", sega_segacd_device, segacd_gfx_conversion_timer_callback)
 	MCFG_TIMER_DRIVER_ADD("scd_dma_timer", sega_segacd_device, scd_dma_timer_callback)
 
-	
+
 
 	MCFG_DEFAULT_LAYOUT( layout_megacd )
 
@@ -1758,7 +1758,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::scd_dma_timer_callback )
 
 	// timed reset of flags
 	scd_mode_dmna_ret_flags |= 0x0021;
-	
+
 	scd_dma_timer->adjust(attotime::from_hz(megadriv_framerate) / megadrive_total_scanlines);
 
 }

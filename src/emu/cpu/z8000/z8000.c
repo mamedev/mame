@@ -554,7 +554,7 @@ static CPU_INIT( z8001 )
 	cpustate->device = device;
 	cpustate->program = &device->space(AS_PROGRAM);
 	/* If the system decodes STn lines to distinguish between data and program memory fetches,
-	   install the data space. If it doesn't, install the program memory into data memory space. */
+       install the data space. If it doesn't, install the program memory into data memory space. */
 	if (device->has_space(AS_DATA))
 		cpustate->data = &device->space(AS_DATA);
 	else
@@ -577,7 +577,7 @@ static CPU_INIT( z8002 )
 	cpustate->device = device;
 	cpustate->program = &device->space(AS_PROGRAM);
 	/* If the system decodes STn lines to distinguish between data and program memory fetches,
-	   install the data space. If it doesn't, install the program memory into data memory space. */
+       install the data space. If it doesn't, install the program memory into data memory space. */
 	if (device->has_space(AS_DATA))
 		cpustate->data = &device->space(AS_DATA);
 	else

@@ -171,7 +171,7 @@ public:
 
 	void Fake_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UINT16 &dma_addrc, UINT16 &destination );
 	static void set_CDC_Do_DMA(device_t &device,segacd_dma_delegate new_segacd_dma_callback);
-	
+
 	void dummy_interrupt_callback(void);
 	static void set_type1_interrupt_callback(device_t &device,interrupt_delegate interrupt_callback);
 	static void set_type2_interrupt_callback(device_t &device,interrupt_delegate interrupt_callback);

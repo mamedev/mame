@@ -206,7 +206,7 @@ void nubus_image_device::device_start()
 	slotspace = get_slotspace();
 	superslotspace = get_super_slotspace();
 
-//	printf("[image %p] slotspace = %x, super = %x\n", this, slotspace, superslotspace);
+//  printf("[image %p] slotspace = %x, super = %x\n", this, slotspace, superslotspace);
 
 	m_nubus->install_device(slotspace, slotspace+3, read32_delegate(FUNC(nubus_image_device::image_r), this), write32_delegate(FUNC(nubus_image_device::image_w), this));
 	m_nubus->install_device(slotspace+4, slotspace+7, read32_delegate(FUNC(nubus_image_device::image_status_r), this), write32_delegate(FUNC(nubus_image_device::image_status_w), this));
@@ -263,6 +263,6 @@ READ32_MEMBER( nubus_image_device::image_super_r )
 {
 	UINT32 *image = (UINT32*)m_image->data;
 	UINT32 data = image[offset];
-	return ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24); 
+	return ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 }
 

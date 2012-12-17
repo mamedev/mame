@@ -162,7 +162,7 @@ void lc89510_temp_device::CDD_Export(bool neocd_hack)
 		CDD_RX[0] = (CDD_STATUS  & 0xff00)>>8;
 	else
 	{
-	//	printf("was %02x returning %02x\n", (CDD_STATUS  & 0xff00)>>8, NeoCD_StatusHack);
+	//  printf("was %02x returning %02x\n", (CDD_STATUS  & 0xff00)>>8, NeoCD_StatusHack);
 		CDD_RX[0] = NeoCD_StatusHack;
 	}
 
@@ -546,7 +546,7 @@ void lc89510_temp_device::CDC_Do_DMA(running_machine& machine, int rate)
 
 	// HACK
 	segacd_dma_callback(dmacount, CDC_BUFFER, dma_addrc, destination );
-	
+
 
 	dma_addrc += length*2;
 	LC8951RegistersW[REG_W_DACL] = dma_addrc & 0xff; LC8951RegistersW[REG_W_DACH] = (dma_addrc >> 8) & 0xff;
@@ -606,8 +606,8 @@ UINT8 lc89510_temp_device::CDC_Reg_r(void)
 {
 	int reg = CDC_REG0 & 0xF;
 	UINT8 ret = 0;
-	
-	
+
+
 	UINT16 decoderegs = 0x73F2;
 
 	if ((decoderegs>>reg)&1)
@@ -622,8 +622,8 @@ UINT8 lc89510_temp_device::CDC_Reg_r(void)
 		case REG_R_IFSTAT: ret = LC8951RegistersR[REG_R_IFSTAT];	break;
 		case REG_R_DBCL:   ret = LC8951RegistersW[REG_W_DBCL];		break;
 		case REG_R_DBCH:
-//			LC8951RegistersR[REG_R_DBCH] &=  0x0F; // NeoCD?
-//			LC8951RegistersR[REG_R_DBCH] |=  (LC8951RegistersR[REG_R_IFSTAT] & 0x40) ? 0x00 : 0xF0; // NeoCD?
+//          LC8951RegistersR[REG_R_DBCH] &=  0x0F; // NeoCD?
+//          LC8951RegistersR[REG_R_DBCH] |=  (LC8951RegistersR[REG_R_IFSTAT] & 0x40) ? 0x00 : 0xF0; // NeoCD?
 			ret = LC8951RegistersW[REG_W_DBCH];		break;
 		case REG_R_HEAD0:  ret = LC8951RegistersR[REG_R_HEAD0];		break;
 		case REG_R_HEAD1:  ret = LC8951RegistersR[REG_R_HEAD1];		break;
@@ -634,8 +634,8 @@ UINT8 lc89510_temp_device::CDC_Reg_r(void)
 		case REG_R_WAL:    ret = LC8951RegistersW[REG_W_WAL];		break;
 		case REG_R_WAH:    ret = LC8951RegistersW[REG_W_WAH];		break;
 		case REG_R_STAT0:  ret = LC8951RegistersR[REG_R_STAT0];		break;
-		case REG_R_STAT1:  ret = LC8951RegistersR[REG_R_STAT1];	
-	//		LC8951RegistersR[REG_R_IFSTAT] |= 0x20;	 // NeoCD? // reset DECI
+		case REG_R_STAT1:  ret = LC8951RegistersR[REG_R_STAT1];
+	//      LC8951RegistersR[REG_R_IFSTAT] |= 0x20;  // NeoCD? // reset DECI
 			break;
 		case REG_R_STAT2:  ret = LC8951RegistersR[REG_R_STAT2];		break;
 		case REG_R_STAT3:  ret = LC8951RegistersR[REG_R_STAT3];
@@ -712,8 +712,8 @@ void lc89510_temp_device::CDC_Reg_w(UINT8 data)
 			}
 			//else
 			//{
-			//	LC8951RegistersW[REG_W_DTACK]  = ~0x00;
-			//	LC8951RegistersR[REG_R_IFSTAT] &= ~0x40;
+			//  LC8951RegistersW[REG_W_DTACK]  = ~0x00;
+			//  LC8951RegistersR[REG_R_IFSTAT] &= ~0x40;
 			//}
 			break;
 	case REG_W_WAL: LC8951RegistersW[REG_W_WAL] = data; break;
@@ -944,7 +944,7 @@ UINT8 lc89510_temp_device::neocd_cdd_rx_r()
 	if (bNeoCDCommsClock) {
 		ret |= 0x10;
 	}
-	
+
 	return ret;
 }
 
@@ -1024,8 +1024,8 @@ void lc89510_temp_device::reset_cd(void)
 
 
 
-//	if (segacd.cd)
-//		printf("cd found\n");
+//  if (segacd.cd)
+//      printf("cd found\n");
 }
 
 
@@ -1049,7 +1049,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( lc89510_temp_device::segacd_access_timer_callback 
 		}
 	}
 
-	if (SCD_READ_ENABLED) // if (nff0002 & 0x0050) if (nff0002 & 0x0500); 
+	if (SCD_READ_ENABLED) // if (nff0002 & 0x0050) if (nff0002 & 0x0500);
 	{
 		set_data_audio_mode();
 		Read_LBA_To_Buffer(machine());
@@ -1116,7 +1116,7 @@ void lc89510_temp_device::NeoCDCommsControl(UINT8 clock, UINT8 send)
 					if (!CDD_Import(machine()))
 						return;
 
-					CDD_Export(true); // true == neocd hack, 
+					CDD_Export(true); // true == neocd hack,
 				}
 
 			}
@@ -1216,7 +1216,7 @@ void lc89510_temp_device::scd_ctrl_checks(running_machine& machine)
 
 	if (LC8951RegistersW[REG_W_IFCTRL] & 0x20)
 	{
-	
+
 		if (is_neoCD)
 		{
 			type1_interrupt_callback();
@@ -1224,7 +1224,7 @@ void lc89510_temp_device::scd_ctrl_checks(running_machine& machine)
 		else
 		{
 			// todo: make callback
-			CHECK_SCD_LV5_INTERRUPT		
+			CHECK_SCD_LV5_INTERRUPT
 		}
 
 

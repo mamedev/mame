@@ -452,7 +452,7 @@ ROM_START( taxidriv )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "8.ic4",        0x0000, 0x2000, CRC(9f9a3865) SHA1(908cf4f2cc68c088649241997276ea25c27d9718) )
-//	ROM_LOAD( "8.ic4",        0x0000, 0x2000, CRC(9835d517) SHA1(845f3efc54b64837c22dd06683c2950f2b8b03cb) ) // 0x1b5f = 0x04 instead of 0x03 from another set
+//  ROM_LOAD( "8.ic4",        0x0000, 0x2000, CRC(9835d517) SHA1(845f3efc54b64837c22dd06683c2950f2b8b03cb) ) // 0x1b5f = 0x04 instead of 0x03 from another set
 	ROM_LOAD( "9.ic5",        0x2000, 0x2000, CRC(b28b766c) SHA1(21e08ef1e2671c8540380e3fa0858e8a4d821945) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )

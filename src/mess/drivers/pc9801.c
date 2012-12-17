@@ -7,17 +7,17 @@
     TODO:
     - proper 8251 uart hook-up on keyboard
     - SASI /SCSI support;
-	- kanji support;
+    - kanji support;
     - Write a PC80S31K device (also used on PC-8801 and PC-88VA, it's the FDC + Z80 sub-system);
-	- Finish DIP-Switches support
-	- text scrolling
-	- GRCG+
-	- EGC
-	- rewrite using slot devices
-	- some later SWs put "Invalid command byte 05" (Absolutely Mahjong on Epson logo)
-	- Basic games are mostly untested, but I think that upd7220 fails on those (Adventureland, Xevious)
+    - Finish DIP-Switches support
+    - text scrolling
+    - GRCG+
+    - EGC
+    - rewrite using slot devices
+    - some later SWs put "Invalid command byte 05" (Absolutely Mahjong on Epson logo)
+    - Basic games are mostly untested, but I think that upd7220 fails on those (Adventureland, Xevious)
     - investigate on POR bit
-	- PC-9801RS+ should support uPD4990 RTC
+    - PC-9801RS+ should support uPD4990 RTC
 
     TODO (PC-9801RS):
     - extra features;
@@ -28,8 +28,8 @@
     - fix CPU for some clones;
     - "cache error"
     - undumped IDE ROM, kludged to work
-	- slave PIC never enables floppy IRQ (PC=0xffd08)
-	- Compatibility is untested;
+    - slave PIC never enables floppy IRQ (PC=0xffd08)
+    - Compatibility is untested;
 
     TODO: (PC-486MU)
     - Tries to read port C of i8255_sys (-> 0x35) at boot without setting up the control
@@ -37,70 +37,70 @@
     - Dies on ARTIC check;
     - Presumably one ROM is undumped?
 
-	floppy issues TODO (certain fail)
-	- Unsupported disk types: *.dsk, *.nfd, *.fdd, *.nhd
-	- 46 Okunen Monogatari - The Shinkaron
-	- AD&D Champions of Krynn
-	- AI Shougi (asserts upon loading)
-	- Aoki Ookami no Shiroki Mejika - Gengis Khan
-	- Arcshu
-	- Arcus 2
-	- Art Jigsaw
-	- Atlantia (disk swap?)
-	- Azusa 108 Jimusho
-	- Bacta 2
-	- BattleTech (disk swap?)
-	- Bay City Elegy (disk swap?)
-	- Beast (keeps reading command sense)
-	- Beast 2
-	- Bells Avenue (disk swap?)
+    floppy issues TODO (certain fail)
+    - Unsupported disk types: *.dsk, *.nfd, *.fdd, *.nhd
+    - 46 Okunen Monogatari - The Shinkaron
+    - AD&D Champions of Krynn
+    - AI Shougi (asserts upon loading)
+    - Aoki Ookami no Shiroki Mejika - Gengis Khan
+    - Arcshu
+    - Arcus 2
+    - Art Jigsaw
+    - Atlantia (disk swap?)
+    - Azusa 108 Jimusho
+    - Bacta 2
+    - BattleTech (disk swap?)
+    - Bay City Elegy (disk swap?)
+    - Beast (keeps reading command sense)
+    - Beast 2
+    - Bells Avenue (disk swap?)
 
-	- Bokosuka Wars
-	- Dokkin Minako Sensei (2dd image)
-	- Jangou 2: floppy fails to load after the title screen;
-	- Okuman Chouja 2: fails loading in PC-9801RS only ("packed file is corrupt"). Maybe a 386 core bug?
-	- Quarth: fails loading in PC-9801RS only ("packed file is corrupt"). Maybe a 386 core bug?
+    - Bokosuka Wars
+    - Dokkin Minako Sensei (2dd image)
+    - Jangou 2: floppy fails to load after the title screen;
+    - Okuman Chouja 2: fails loading in PC-9801RS only ("packed file is corrupt"). Maybe a 386 core bug?
+    - Quarth: fails loading in PC-9801RS only ("packed file is corrupt"). Maybe a 386 core bug?
 
-	List of per-game TODO:
-	- 4D Boxing: inputs are unresponsive
-	- A Ressha de Ikou 2: missing text (PC-9801RS only);
-	- Absolutely Mahjong: Transitions are too fast.
-	- Agumix Selects!: needs GDC = 5 MHz, interlace doesn't work properly;
-	- Aki no Tsukasa no Fushigi no Kabe: moans with a kanji error
-	   "can't use (this) on a vanilla PC-9801, a PC-9801E nor a PC-9801U. Please turn off the computer and turn it on again."
-	- Alice no Yakata: doesn't set bitmap interlace properly, can't do disk swaps via the File Manager;
-	- Animahjong V3: accesses port 0x88;
-	- Anniversary - Memories of Summer: thinks that a button is pressed;
-	- Another Genesis: fails loading;
-	- Apple Club 1: how to pass an hand?
-	- Arctic: keyboard doesn't work?
-	- Arcus 3: moans with a JP message "not enough memory (needs 640kb to start)";
-	- Armored Flagship Atragon: needs HDD install
-	- Arquephos: needs extra sound board(s)?
-	- Asoko no Koufuku: black screen with BGM, waits at 0x225f6;
-	- Aura Battler Dumbine: upd7220: unimplemented FIGD, has layer clearance bugs on gameplay;
-	- Bakasuka Wars: drawing seems busted (either mouse or upd7220)
-	- Band-Kun: (how to run this without installing?)
-	- Battle Chess: wants some dip-switches to be on in DSW4, too slow during IA thinking?
+    List of per-game TODO:
+    - 4D Boxing: inputs are unresponsive
+    - A Ressha de Ikou 2: missing text (PC-9801RS only);
+    - Absolutely Mahjong: Transitions are too fast.
+    - Agumix Selects!: needs GDC = 5 MHz, interlace doesn't work properly;
+    - Aki no Tsukasa no Fushigi no Kabe: moans with a kanji error
+       "can't use (this) on a vanilla PC-9801, a PC-9801E nor a PC-9801U. Please turn off the computer and turn it on again."
+    - Alice no Yakata: doesn't set bitmap interlace properly, can't do disk swaps via the File Manager;
+    - Animahjong V3: accesses port 0x88;
+    - Anniversary - Memories of Summer: thinks that a button is pressed;
+    - Another Genesis: fails loading;
+    - Apple Club 1: how to pass an hand?
+    - Arctic: keyboard doesn't work?
+    - Arcus 3: moans with a JP message "not enough memory (needs 640kb to start)";
+    - Armored Flagship Atragon: needs HDD install
+    - Arquephos: needs extra sound board(s)?
+    - Asoko no Koufuku: black screen with BGM, waits at 0x225f6;
+    - Aura Battler Dumbine: upd7220: unimplemented FIGD, has layer clearance bugs on gameplay;
+    - Bakasuka Wars: drawing seems busted (either mouse or upd7220)
+    - Band-Kun: (how to run this without installing?)
+    - Battle Chess: wants some dip-switches to be on in DSW4, too slow during IA thinking?
 
-	- Dragon Buster: slight issue with window masking;
-	- Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)
-	- Jan Borg Suzume: gets stuck at a pic8259 read;
-	- Jump Hero: right status display isn't shown during gameplay (changes the mode dynamically?)
-	- Lovely Horror: Doesn't show kanji, tries to read it thru the 0xa9 port;
-	- Quarth: should do a split screen effect, it doesn't hence there are broken gfxs
-	- Quarth: uploads a PCG charset
-	- Runner's High: wrong double height on the title screen;
-	- Uchiyama Aki no Chou Bangai: keyboard irq is fussy (sometimes it doesn't register a key press);
-	- Uno: uses EGC
+    - Dragon Buster: slight issue with window masking;
+    - Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)
+    - Jan Borg Suzume: gets stuck at a pic8259 read;
+    - Jump Hero: right status display isn't shown during gameplay (changes the mode dynamically?)
+    - Lovely Horror: Doesn't show kanji, tries to read it thru the 0xa9 port;
+    - Quarth: should do a split screen effect, it doesn't hence there are broken gfxs
+    - Quarth: uploads a PCG charset
+    - Runner's High: wrong double height on the title screen;
+    - Uchiyama Aki no Chou Bangai: keyboard irq is fussy (sometimes it doesn't register a key press);
+    - Uno: uses EGC
 
-	per-game TODO (PC-9821):
-	- Battle Skin Panic: gfx bugs at the Gainax logo, it crashes after it;
-	- Policenauts: EMS error at boot;
+    per-game TODO (PC-9821):
+    - Battle Skin Panic: gfx bugs at the Gainax logo, it crashes after it;
+    - Policenauts: EMS error at boot;
 
-	Notes:
-	- Apple Club 1/2 needs data disks to load properly;
-	- Beast Lord: needs a titan.fnt, in MS-DOS
+    Notes:
+    - Apple Club 1/2 needs data disks to load properly;
+    - Beast Lord: needs a titan.fnt, in MS-DOS
 
 ========================================================================================
 
@@ -341,7 +341,7 @@ public:
 		m_hgdc1(*this, "upd7220_chr"),
 		m_hgdc2(*this, "upd7220_btm"),
 		m_opn(*this, "opn"),
-//		m_opna(*this, "opna"),
+//      m_opna(*this, "opna"),
 		m_video_ram_1(*this, "video_ram_1"),
 		m_video_ram_2(*this, "video_ram_2"){ }
 
@@ -354,7 +354,7 @@ public:
 	required_device<upd7220_device> m_hgdc1;
 	required_device<upd7220_device> m_hgdc2;
 	required_device<ym2203_device> m_opn;
-//	optional_device<ym2608_device> m_opna;
+//  optional_device<ym2608_device> m_opna;
 
 	required_shared_ptr<UINT8> m_video_ram_1;
 	required_shared_ptr<UINT8> m_video_ram_2;
@@ -481,8 +481,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9810rs_fdc_ctrl_w);
 	DECLARE_READ8_MEMBER(pc9801rs_2hd_r);
 	DECLARE_WRITE8_MEMBER(pc9801rs_2hd_w);
-//	DECLARE_READ8_MEMBER(pc9801rs_2dd_r);
-//	DECLARE_WRITE8_MEMBER(pc9801rs_2dd_w);
+//  DECLARE_READ8_MEMBER(pc9801rs_2dd_r);
+//  DECLARE_WRITE8_MEMBER(pc9801rs_2dd_w);
 	DECLARE_WRITE8_MEMBER(pc9801rs_video_ff_w);
 	DECLARE_WRITE8_MEMBER(pc9801rs_a0_w);
 	DECLARE_READ8_MEMBER(pc980ux_memory_r);
@@ -597,7 +597,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_2hd_drq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_irq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_drq);
-//	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_irq);
+//  DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_irq);
 
 	DECLARE_READ8_MEMBER(ppi_mouse_porta_r);
 	DECLARE_READ8_MEMBER(ppi_mouse_portb_r);
@@ -752,8 +752,8 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		if(knj_tile)
 		{
 			/* Note: bit 7 doesn't really count, if a kanji is enabled then the successive tile is always the second part of it.
-			   Trusted with Alice no Yakata, Animahjong V3, Aki no Tsukasa no Fushigi no Kabe, Apros ...
-			*/
+               Trusted with Alice no Yakata, Animahjong V3, Aki no Tsukasa no Fushigi no Kabe, Apros ...
+            */
 			//kanji_lr = (knj_tile & 0x80) >> 7;
 			//kanji_lr |= (tile & 0x80) >> 7; // Tokimeki Sports Gal 3
 			tile &= 0x7f;
@@ -764,7 +764,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 				x_step = 1;
 			else
 				x_step = 2;
-//			kanji_lr = 0;
+//          kanji_lr = 0;
 		}
 		else
 			x_step = 1;
@@ -804,15 +804,15 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 							tile_data = 0;
 
 							/*
-								gfx strip mode:
+                                gfx strip mode:
 
-								number refers to the bit number in the tile data.
-								This mode is identical to the one seen in PC-8801
-								00004444
-								11115555
-								22226666
-								33337777
-							*/
+                                number refers to the bit number in the tile data.
+                                This mode is identical to the one seen in PC-8801
+                                00004444
+                                11115555
+                                22226666
+                                33337777
+                            */
 
 							gfx_bit = (xi & 4);
 							gfx_bit+= (yi & (2 << (char_size == 16 ? 0x01 : 0x00)))>>(1+(char_size == 16));
@@ -976,7 +976,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_20_w)
 	}
 	else // odd
 	{
-//		printf("Write to DMA bank register %d %02x\n",((offset >> 1)+1) & 3,data);
+//      printf("Write to DMA bank register %d %02x\n",((offset >> 1)+1) & 3,data);
 		m_dma_offset[((offset >> 1)+1) & 3] = data & 0x0f;
 	}
 }
@@ -1141,13 +1141,13 @@ WRITE8_MEMBER(pc9801_state::pc9801_video_ff_w)
 	if((offset & 1) == 0)
 	{
 		/*
-		TODO: this is my best bet so far. Register 4 is annoying, the pattern seems to be:
-		Write to video FF register Graphic -> 00
-		Write to video FF register 200 lines -> 0x
-		Write to video FF register 200 lines -> 00
+        TODO: this is my best bet so far. Register 4 is annoying, the pattern seems to be:
+        Write to video FF register Graphic -> 00
+        Write to video FF register 200 lines -> 0x
+        Write to video FF register 200 lines -> 00
 
-		where x is the current mode.
-		*/
+        where x is the current mode.
+        */
 		switch((data & 0x0e) >> 1)
 		{
 			case 1:
@@ -1213,7 +1213,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_70_w)
 {
 	if((offset & 1) == 0)
 	{
-//		printf("Write to display register [%02x] %02x\n",offset+0x70,data);
+//      printf("Write to display register [%02x] %02x\n",offset+0x70,data);
 		m_txt_scroll_reg[offset >> 1] = data;
 
 		//popmessage("%02x %02x %02x %02x",m_txt_scroll_reg[0],m_txt_scroll_reg[1],m_txt_scroll_reg[2],m_txt_scroll_reg[3]);
@@ -1223,7 +1223,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_70_w)
 		if(offset < 0x08)
 			pit8253_w(machine().device("pit8253"), space, (offset & 6) >> 1, data);
 		//else
-		//	printf("Write to undefined port [%02x] <- %02x\n",offset+0x70,data);
+		//  printf("Write to undefined port [%02x] <- %02x\n",offset+0x70,data);
 	}
 }
 
@@ -1596,7 +1596,7 @@ READ8_MEMBER(pc9801_state::pc9801_opn_r)
 	if((offset & 1) == 0)
 	{
 		//if(m_has_opna)
-		//	return ym2608_r(m_opna, space, offset >> 1);
+		//  return ym2608_r(m_opna, space, offset >> 1);
 
 		return offset & 4 ? 0xff : ym2203_r(m_opn,space, offset >> 1);
 	}
@@ -1612,8 +1612,8 @@ WRITE8_MEMBER(pc9801_state::pc9801_opn_w)
 	if((offset & 1) == 0)
 	{
 		/*if(m_has_opna)
-			ym2608_w(m_opna,space, offset >> 1,data);
-		else */
+            ym2608_w(m_opna,space, offset >> 1,data);
+        else */
 		if((offset & 4) == 0)
 			ym2203_w(m_opn,space, offset >> 1,data);
 	}
@@ -1706,7 +1706,7 @@ READ8_MEMBER(pc9801_state::pc9801rs_knjram_r)
 
 	pcg_offset = m_font_addr << 5;
 	pcg_offset|= offset & 0x1f;
-//	pcg_offset|= m_font_lr;
+//  pcg_offset|= m_font_lr;
 
 	return m_kanji_rom[pcg_offset];
 }
@@ -1805,21 +1805,21 @@ READ8_MEMBER(pc9801_state::pc9801rs_70_r)
 		return 0xff;
 	}
 
-	return 	pc9801_70_r(space,offset);;
+	return	pc9801_70_r(space,offset);;
 }
 
 WRITE8_MEMBER(pc9801_state::pc9801rs_70_w)
 {
 	if(offset == 0xc)
 	{
-//		printf("%02x GRCG MODE\n",data);
+//      printf("%02x GRCG MODE\n",data);
 		m_grcg.mode = data;
 		m_grcg.tile_index = 0;
 		return;
 	}
 	else if(offset == 0x0e)
 	{
-//		printf("%02x GRCG TILE %02x\n",data,m_grcg.tile_index);
+//      printf("%02x GRCG TILE %02x\n",data,m_grcg.tile_index);
 		m_grcg.tile[m_grcg.tile_index] = data;
 		m_grcg.tile_index ++;
 		m_grcg.tile_index &= 3;
@@ -1851,7 +1851,7 @@ READ8_MEMBER(pc9801_state::pc9801rs_memory_r)
 	else if(offset >= 0x00100000 && offset <= 0x00100000+m_ram_size-1)		{ return pc9801rs_ex_wram_r(space,offset-0x00100000); }
 	else if(offset >= 0xfffe0000 && offset <= 0xffffffff)                   { return pc9801rs_ipl_r(space,offset & 0x1ffff);      }
 
-//	printf("%08x\n",offset);
+//  printf("%08x\n",offset);
 	return 0x00;
 }
 
@@ -1886,14 +1886,14 @@ WRITE8_MEMBER(pc9801_state::pc9810rs_fdc_ctrl_w)
     ---- ---x select irq
     */
 
-//	machine().device<floppy_connector>("upd765_2hd:0")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
-//	machine().device<floppy_connector>("upd765_2hd:1")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
+//  machine().device<floppy_connector>("upd765_2hd:0")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
+//  machine().device<floppy_connector>("upd765_2hd:1")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
 
 	machine().device<upd765a_device>("upd765_2hd")->set_rate(data & 0x02 ? 500000 : 250000);
 
 	m_fdc_ctrl = data;
 	//if(data & 0xfc)
-	//	printf("FDC ctrl called with %02x\n",data);
+	//  printf("FDC ctrl called with %02x\n",data);
 }
 
 READ8_MEMBER(pc9801_state::pc9801rs_2hd_r)
@@ -1929,8 +1929,8 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_2hd_w)
 				machine().device<floppy_connector>("upd765_2hd:0")->get_device()->mon_w(data & 0x40 ? ASSERT_LINE : CLEAR_LINE);
 				machine().device<floppy_connector>("upd765_2hd:1")->get_device()->mon_w(data & 0x40 ? ASSERT_LINE : CLEAR_LINE);
 
-//				machine().device<floppy_connector>("upd765_2hd:0")->get_device()->mon_w(data & 0x08 ? ASSERT_LINE : CLEAR_LINE);
-//				machine().device<floppy_connector>("upd765_2hd:1")->get_device()->mon_w(data & 0x08 ? ASSERT_LINE : CLEAR_LINE);
+//              machine().device<floppy_connector>("upd765_2hd:0")->get_device()->mon_w(data & 0x08 ? ASSERT_LINE : CLEAR_LINE);
+//              machine().device<floppy_connector>("upd765_2hd:1")->get_device()->mon_w(data & 0x08 ? ASSERT_LINE : CLEAR_LINE);
 				return;
 		}
 	}
@@ -1999,7 +1999,7 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_video_ff_w)
 			printf("Write to extended video FF register %s -> %02x\n",ex_video_ff_regnames[(data & 0x06) >> 1],data & 1);
 		}
 		//else
-		//	printf("Write to extended video FF register %02x\n",data);
+		//  printf("Write to extended video FF register %02x\n",data);
 
 		return;
 	}
@@ -2112,7 +2112,7 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,        pc9801rs_a0_w,      0xffffffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(pc9810rs_fdc_ctrl_r,pc9810rs_fdc_ctrl_w,0xffffffff)
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
-//	AM_RANGE(0x00ec, 0x00ef) PC-9801-86 sound board
+//  AM_RANGE(0x00ec, 0x00ef) PC-9801-86 sound board
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
 	AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffffffff)
@@ -2232,7 +2232,7 @@ READ8_MEMBER(pc9801_state::pc9821_memory_r)
 	/* TODO: window bank at 0xa0000 - 0xbffff */
 
 	if	   (                        offset <= 0x0009ffff)                   { return pc9801rs_wram_r(space,offset);               }
-//	else if(offset >= 0x00080000 && offset <= 0x0009ffff)					{ return pc9821_winram_r(space,offset & 0x1ffff);     }
+//  else if(offset >= 0x00080000 && offset <= 0x0009ffff)                   { return pc9821_winram_r(space,offset & 0x1ffff);     }
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { return pc9801_tvram_r(space,offset-0xa0000);        }
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { return pc9801rs_knjram_r(space,offset & 0xfff);     }
 	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { return pc9801_gvram_r(space,offset-0xa8000);        }
@@ -2261,7 +2261,7 @@ WRITE8_MEMBER(pc9801_state::pc9821_memory_w)
 	/* TODO: window bank at 0xa0000 - 0xbffff */
 
 	if	   (                        offset <= 0x0009ffff)                   { pc9801rs_wram_w(space,offset,data);                  }
-//	else if(offset >= 0x00080000 && offset <= 0x0009ffff)					{ pc9821_winram_w(space,offset & 0x1ffff,data);        }
+//  else if(offset >= 0x00080000 && offset <= 0x0009ffff)                   { pc9821_winram_w(space,offset & 0x1ffff,data);        }
 	else if(offset >= 0x000a0000 && offset <= 0x000a3fff)                   { pc9801_tvram_w(space,offset-0xa0000,data);           }
 	else if(offset >= 0x000a4000 && offset <= 0x000a4fff)                   { pc9801rs_knjram_w(space,offset & 0xfff,data);        }
 	else if(offset >= 0x000a8000 && offset <= 0x000bffff)                   { pc9801_gvram_w(space,offset-0xa8000,data);           }
@@ -2273,7 +2273,7 @@ WRITE8_MEMBER(pc9801_state::pc9821_memory_w)
 	else if(offset >= 0x00100000 && offset <= 0x00100000+m_ram_size-1)      { pc9801rs_ex_wram_w(space,offset-0x00100000,data);    }
 	else if(offset >= 0x00f00000 && offset <= 0x00f9ffff)					{ pc9821_ext_gvram_w(space,offset-0x00f00000,data);    }
 	//else
-	//	printf("%08x %08x\n",offset,data);
+	//  printf("%08x %08x\n",offset,data);
 
 }
 
@@ -2284,7 +2284,7 @@ WRITE8_MEMBER(pc9801_state::pc9821_video_ff_w)
 		m_ex_video_ff[(data & 0xfe) >> 1] = data & 1;
 
 		//if((data & 0xfe) == 0x20)
-		//	printf("%02x\n",data & 1);
+		//  printf("%02x\n",data & 1);
 	}
 
 	/* Intentional fall-through */
@@ -2927,10 +2927,10 @@ static INPUT_PORTS_START( pc9801rs )
 	PORT_MODIFY("ROM_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
 
-//	PORT_START("SOUND_CONFIG")
-//	PORT_CONFNAME( 0x01, 0x00, "Sound Type" )
-//	PORT_CONFSETTING(    0x00, "YM2203 (OPN)" )
-//	PORT_CONFSETTING(    0x01, "YM2608 (OPNA)" )
+//  PORT_START("SOUND_CONFIG")
+//  PORT_CONFNAME( 0x01, 0x00, "Sound Type" )
+//  PORT_CONFSETTING(    0x00, "YM2203 (OPN)" )
+//  PORT_CONFSETTING(    0x01, "YM2608 (OPNA)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc9821 )
@@ -3120,7 +3120,7 @@ WRITE_LINE_MEMBER(pc9801_state::pc9801_tc_w )
 	m_fdc_2hd->tc_w(state);
 	// TODO: 2dd?
 
-//	printf("TC %02x\n",state);
+//  printf("TC %02x\n",state);
 }
 
 READ8_MEMBER(pc9801_state::pc9801_dma_read_byte)
@@ -3128,7 +3128,7 @@ READ8_MEMBER(pc9801_state::pc9801_dma_read_byte)
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
 
-//	printf("%08x\n",addr);
+//  printf("%08x\n",addr);
 
 	return program.read_byte(addr);
 }
@@ -3139,7 +3139,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_dma_write_byte)
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
 
-//	printf("%08x %02x\n",addr,data);
+//  printf("%08x %02x\n",addr,data);
 
 	program.write_byte(addr, data);
 }
@@ -3290,7 +3290,7 @@ READ8_MEMBER(pc9801_state::ppi_mouse_porta_r)
 			res |= (m_mouse.lx >> isporthi) & 0xf;
 	}
 
-//	printf("A\n");
+//  printf("A\n");
 	return res;
 }
 
@@ -3299,12 +3299,12 @@ READ8_MEMBER(pc9801_state::ppi_mouse_portc_r) { return machine().root_device().i
 
 WRITE8_MEMBER(pc9801_state::ppi_mouse_porta_w)
 {
-//	printf("A %02x\n",data);
+//  printf("A %02x\n",data);
 }
 
 WRITE8_MEMBER(pc9801_state::ppi_mouse_portb_w)
 {
-//	printf("B %02x\n",data);
+//  printf("B %02x\n",data);
 }
 
 WRITE8_MEMBER(pc9801_state::ppi_mouse_portc_w)
@@ -3340,13 +3340,13 @@ SLOT_INTERFACE_END
 
 void pc9801_state::fdc_2hd_irq(bool state)
 {
-//	printf("IRQ 2HD %d\n",state);
+//  printf("IRQ 2HD %d\n",state);
 	pic8259_ir3_w(machine().device("pic8259_slave"), state);
 }
 
 void pc9801_state::fdc_2hd_drq(bool state)
 {
-//	printf("%02x DRQ\n",state);
+//  printf("%02x DRQ\n",state);
 	m_dmac->dreq2_w(state ^ 1);
 }
 
@@ -3362,7 +3362,7 @@ void pc9801_state::fdc_2dd_irq(bool state)
 
 void pc9801_state::fdc_2dd_drq(bool state)
 {
-//	printf("%02x DRQ\n",state);
+//  printf("%02x DRQ\n",state);
 	m_dmac->dreq3_w(state ^ 1);
 }
 
@@ -3380,7 +3380,7 @@ void pc9801_state::pc9801rs_fdc_irq(bool state)
 
 void pc9801_state::pc9801rs_fdc_drq(bool state)
 {
-//	printf("DRQ %d\n",state);
+//  printf("DRQ %d\n",state);
 
 	if(m_fdc_ctrl & 1)
 		m_dmac->dreq2_w(state ^ 1);
@@ -3571,7 +3571,7 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 	m_fdc_ctrl = 3;
 	m_access_ctrl = 0;
 	m_keyb_press = 0xff; // temp kludge, for PC-9821 booting
-//	m_has_opna = machine().root_device().ioport("SOUND_CONFIG")->read() & 1;
+//  m_has_opna = machine().root_device().ioport("SOUND_CONFIG")->read() & 1;
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9821)
@@ -3589,13 +3589,13 @@ INTERRUPT_GEN_MEMBER(pc9801_state::pc9801_vrtc_irq)
 		pic8259_ir2_w(machine().device("pic8259_master"), 1);
 		m_vrtc_irq_mask = 0; // TODO: this irq auto-masks?
 	}
-//	else
-//		pic8259_ir2_w(machine().device("pic8259_master"), 0);
+//  else
+//      pic8259_ir2_w(machine().device("pic8259_master"), 0);
 }
 
 static void pc9801_sound_irq( device_t *device, int irq )
 {
-//	pc9801_state *state = device->machine().driver_data<pc9801_state>();
+//  pc9801_state *state = device->machine().driver_data<pc9801_state>();
 
 	/* TODO: seems to die very often */
 	pic8259_ir4_w(device->machine().device("pic8259_slave"), irq);
@@ -3609,8 +3609,8 @@ READ8_MEMBER(pc9801_state::opn_porta_r)
 	if(m_joy_sel == 0xc0)
 		return machine().root_device().ioport("OPN_PA2")->read();
 
-//	0x81?
-//	printf("%02x\n",m_joy_sel);
+//  0x81?
+//  printf("%02x\n",m_joy_sel);
 	return 0xff;
 }
 
@@ -3655,10 +3655,10 @@ TIMER_DEVICE_CALLBACK_MEMBER( pc9801_state::mouse_irq_cb )
 	{
 		m_mouse.freq_index ++;
 
-//		printf("%02x\n",m_mouse.freq_index);
+//      printf("%02x\n",m_mouse.freq_index);
 		if(m_mouse.freq_index > m_mouse.freq_reg)
 		{
-//			printf("irq %02x\n",m_mouse.freq_reg);
+//          printf("irq %02x\n",m_mouse.freq_reg);
 			m_mouse.freq_index = 0;
 			pic8259_ir5_w(machine().device("pic8259_slave"), 0);
 			pic8259_ir5_w(machine().device("pic8259_slave"), 1);
@@ -3791,9 +3791,9 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_SOUND_CONFIG(pc98_ym2203_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-//	MCFG_SOUND_ADD("opna", YM2608, MAIN_CLOCK_X1*4) // unknown clock / divider
-//	MCFG_SOUND_CONFIG(pc98_ym2608_intf)
-//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+//  MCFG_SOUND_ADD("opna", YM2608, MAIN_CLOCK_X1*4) // unknown clock / divider
+//  MCFG_SOUND_CONFIG(pc98_ym2608_intf)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
@@ -3858,9 +3858,9 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_SOUND_CONFIG(pc98_ym2203_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-//	MCFG_SOUND_ADD("opna", YM2608, MAIN_CLOCK_X1*4) // unknown clock / divider
-//	MCFG_SOUND_CONFIG(pc98_ym2608_intf)
-//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+//  MCFG_SOUND_ADD("opna", YM2608, MAIN_CLOCK_X1*4) // unknown clock / divider
+//  MCFG_SOUND_CONFIG(pc98_ym2608_intf)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)

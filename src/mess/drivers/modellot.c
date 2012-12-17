@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         General Processor Modello T
 
         10/12/2012 Skeleton driver.
@@ -22,9 +22,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_video_ram;
 	UINT32 screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	virtual void machine_reset();
-	
+
 	DECLARE_READ8_MEMBER(modellot_77);
 	DECLARE_READ8_MEMBER(modellot_ff);
 };
@@ -70,7 +70,7 @@ const gfx_layout modellot_charlayout =
 	1,				/* 1 bits per pixel */
 	{0},				/* no bitplanes; 1 bit per pixel */
 	{0,1,2,3,4,5,6,7},
-	{0, 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8,  
+	{0, 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8,
 	 0x400*8, 0x401*8, 0x402*8, 0x403*8, 0x404*8, 0x405*8, 0x406*8, 0x407*8},
 	8*8				/* space between characters */
 };
@@ -99,8 +99,8 @@ static MACHINE_CONFIG_START( modellot, modellot_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(modellot_mem)
-	MCFG_CPU_IO_MAP(modellot_io)	
-	
+	MCFG_CPU_IO_MAP(modellot_io)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -108,7 +108,7 @@ static MACHINE_CONFIG_START( modellot, modellot_state )
 	MCFG_SCREEN_SIZE(64*8, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(modellot_state, screen_update_modellot)
-	
+
 	MCFG_GFXDECODE( modellot )
 
 	MCFG_PALETTE_LENGTH(2)

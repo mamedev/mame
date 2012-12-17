@@ -1965,7 +1965,7 @@ READ16_MEMBER(dynax_state::ultrchmp_protection2_r)
 }
 WRITE16_MEMBER(dynax_state::ultrchmp_protection2_w)
 {
-//	COMBINE_DATA(m_protection2);
+//  COMBINE_DATA(m_protection2);
 	m_oki->set_bank_base((data & 0xf) * 0x40000);
 }
 

@@ -114,8 +114,8 @@ public:
 	DECLARE_WRITE8_MEMBER(apc_irq_ack_w);
 	DECLARE_READ8_MEMBER(apc_rtc_r);
 	DECLARE_WRITE8_MEMBER(apc_rtc_w);
-//	DECLARE_READ8_MEMBER(aux_pcg_r);
-//	DECLARE_WRITE8_MEMBER(aux_pcg_w);
+//  DECLARE_READ8_MEMBER(aux_pcg_r);
+//  DECLARE_WRITE8_MEMBER(aux_pcg_w);
 
 	struct {
 		UINT8 status; //status
@@ -235,21 +235,21 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					continue;
 
 				/*
-				Addr bus:   C BA98 7654 3210
-				            | |||| |\\\ \\\\- character number bits 0-6
-				            | |||| \--------- y' bit 0
-				            | |||\----------- y' bit 1
-				            | ||\------------ y' bit 2
-				            | |\------------- y' bit 3
-				            | \-------------- character number bit 7
-				            \---------------- y' bit 4
+                Addr bus:   C BA98 7654 3210
+                            | |||| |\\\ \\\\- character number bits 0-6
+                            | |||| \--------- y' bit 0
+                            | |||\----------- y' bit 1
+                            | ||\------------ y' bit 2
+                            | |\------------- y' bit 3
+                            | \-------------- character number bit 7
+                            \---------------- y' bit 4
 
-				y to y' (assumed; this needs hardware tests since there could be one more 'blank' line between all char rows):
-				y  =  0 1 2 3 ... 16 17 18
-				y' = 18 0 1 2 ... 15 16 17
+                y to y' (assumed; this needs hardware tests since there could be one more 'blank' line between all char rows):
+                y  =  0 1 2 3 ... 16 17 18
+                y' = 18 0 1 2 ... 15 16 17
 
-				Data bus: 76543210 = pixels, in left->01234567->right order
-				*/
+                Data bus: 76543210 = pixels, in left->01234567->right order
+                */
 				if(tile_sel == 0x89)// Aux character RAM select TODO: correct triggering?
 				{
 					if(yi & 0x10)
@@ -464,9 +464,9 @@ RTC write bits: 76543210
 static ADDRESS_MAP_START( apc_map, AS_PROGRAM, 16, apc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
 	AM_RANGE(0xa0000, 0xa0fff) AM_RAM AM_SHARE("cmos")
-//	AM_RANGE(0xc0000, 0xcffff) standard character ROM
+//  AM_RANGE(0xc0000, 0xcffff) standard character ROM
 	AM_RANGE(0xd8000, 0xd9fff) AM_RAM AM_REGION("aux_pcg", 0) // AUX character RAM
-//	AM_RANGE(0xe0000, 0xeffff) Special Character RAM
+//  AM_RANGE(0xe0000, 0xeffff) Special Character RAM
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
@@ -487,7 +487,7 @@ static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE8_LEGACY("upd1771c", upd1771_r, upd1771_w, 0x00ff )
 //  AM_RANGE(0x68, 0x6f) i8255 , printer port (A: status (R) B: data (W) C: command (W))
 //  AM_DEVREADWRITE8("upd7220_btm", upd7220_device, read, write, 0x00ff)
-//	0x92, 0x9a, 0xa2, 0xaa is for a Hard Disk (unknown type)
+//  0x92, 0x9a, 0xa2, 0xaa is for a Hard Disk (unknown type)
 ADDRESS_MAP_END
 
 /* TODO: key repeat, remove port impulse! */
@@ -561,7 +561,7 @@ static INPUT_PORTS_START( apc )
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("] / }") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x5d)
 	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("(up score) / ^") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x5e)
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("- / _") PORT_CODE(KEYCODE_MINUS) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x5f)
-//	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("unk6") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x26)
+//  PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("unk6") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x26)
 
 	PORT_START("KEY6")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ') PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x20)
@@ -579,46 +579,46 @@ static INPUT_PORTS_START( apc )
 ; Special table for screwed-up keys.  Scan codes are converted.
 ;
 SPECTBL:
-	BYTE	0X2D,0X3D
-	BYTE	0X40,0X60
-	BYTE	0X3A,0X3B
-	BYTE	0X3B,0X27
-SPECTLN	==	(.-SPECTBL)/2		; length of table
+    BYTE    0X2D,0X3D
+    BYTE    0X40,0X60
+    BYTE    0X3A,0X3B
+    BYTE    0X3B,0X27
+SPECTLN ==  (.-SPECTBL)/2       ; length of table
 ;
 ; Shift case table
 ;
 CASETBL:
-	BYTE	"1!"
-	BYTE	"2@"
-	BYTE	"3#"
-	BYTE	"4$"
-	BYTE	"5%"
-	BYTE	"6",0XD0
-	BYTE	"7&"
-	BYTE	"8*"
-	BYTE	"9("
-	BYTE	"0)"
-	BYTE	"-_"
-	BYTE	"=+"
-	BYTE	"`~"
-	BYTE	"[{"
-	BYTE	"]}"
-	BYTE	"\\|"
-	BYTE	",<"
-	BYTE	".>"
-	BYTE	"/?"
-	BYTE	";:"
-	BYTE	0X27,0X22
-	BYTE	0X18,"^"
+    BYTE    "1!"
+    BYTE    "2@"
+    BYTE    "3#"
+    BYTE    "4$"
+    BYTE    "5%"
+    BYTE    "6",0XD0
+    BYTE    "7&"
+    BYTE    "8*"
+    BYTE    "9("
+    BYTE    "0)"
+    BYTE    "-_"
+    BYTE    "=+"
+    BYTE    "`~"
+    BYTE    "[{"
+    BYTE    "]}"
+    BYTE    "\\|"
+    BYTE    ",<"
+    BYTE    ".>"
+    BYTE    "/?"
+    BYTE    ";:"
+    BYTE    0X27,0X22
+    BYTE    0X18,"^"
 */
 
 /*
-	BYTE	0X18			; 5E - Control-X
-	BYTE	"-"			; 5F
+    BYTE    0X18            ; 5E - Control-X
+    BYTE    "-"         ; 5F
 */
 
 /*
-	#REPEAT	0X96-0X80		; 80 to 95 - function keys
+    #REPEAT 0X96-0X80       ; 80 to 95 - function keys
 */
 	PORT_START("KEY_PF1")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF1")  PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x80)
@@ -649,22 +649,22 @@ CASETBL:
 	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF22")  PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x95)
 
 /*
-	BYTE	"*"			; 6A
-	BYTE	"+"			; 6B
-	BYTE	0XFF		; 6C - undefined code
-	BYTE	"-"			; 6D
-	BYTE	"."			; 6E
-	BYTE	"/"			; 6F
-	BYTE	"0"			; 70
-	BYTE	"1"			; 71
-	BYTE	"2"			; 72
-	BYTE	"3"			; 73
-	BYTE	"4"			; 74
-	BYTE	"5"			; 75
-	BYTE	"6"			; 76
-	BYTE	"7"			; 77
-	BYTE	"8"			; 78
-	BYTE	"9"			; 79
+    BYTE    "*"         ; 6A
+    BYTE    "+"         ; 6B
+    BYTE    0XFF        ; 6C - undefined code
+    BYTE    "-"         ; 6D
+    BYTE    "."         ; 6E
+    BYTE    "/"         ; 6F
+    BYTE    "0"         ; 70
+    BYTE    "1"         ; 71
+    BYTE    "2"         ; 72
+    BYTE    "3"         ; 73
+    BYTE    "4"         ; 74
+    BYTE    "5"         ; 75
+    BYTE    "6"         ; 76
+    BYTE    "7"         ; 77
+    BYTE    "8"         ; 78
+    BYTE    "9"         ; 79
 */
 
 	PORT_START("KEY_PAD1")
@@ -688,13 +688,13 @@ CASETBL:
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("9 (PAD)") PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('9') PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x79)
 
 
-/*	BYTE	0X00			; 96 - break stop
-	BYTE	0X0D			; 97 - return
-	BYTE	0X09			; 98 - tab/back tab
-	BYTE	0XFF			; 99 - undefined code
-	BYTE	0X1E			; 9A - home/clear
-	BYTE	0XFF			; 9B - undefined code
-	BYTE	0X08			; 9C - back space
+/*  BYTE    0X00            ; 96 - break stop
+    BYTE    0X0D            ; 97 - return
+    BYTE    0X09            ; 98 - tab/back tab
+    BYTE    0XFF            ; 99 - undefined code
+    BYTE    0X1E            ; 9A - home/clear
+    BYTE    0XFF            ; 9B - undefined code
+    BYTE    0X08            ; 9C - back space
 */
 	PORT_START("KEY_S1")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CHAR(0x00) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x96)
@@ -707,13 +707,13 @@ CASETBL:
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ESC") PORT_CHAR(0x1b) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0x1b)
 
 /*
-	BYTE	0X0B			; F7 - up arrow
-	BYTE	0X0A			; F8 - down arrow
-	BYTE	0X0C			; F9 - right arrow
-	BYTE	0X08			; FA - left arrow
-	BYTE	0XFF (?)		; FB - ins
-	BYTE	0X7F			; FC - del
-	BYTE	0X0D			; FD - enter
+    BYTE    0X0B            ; F7 - up arrow
+    BYTE    0X0A            ; F8 - down arrow
+    BYTE    0X0C            ; F9 - right arrow
+    BYTE    0X08            ; FA - left arrow
+    BYTE    0XFF (?)        ; FB - ins
+    BYTE    0X7F            ; FC - del
+    BYTE    0X0D            ; FD - enter
 */
 	PORT_START("KEY_S2")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP) PORT_CHAR(0x0b) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, apc_state, key_stroke, 0xf7)
@@ -755,7 +755,7 @@ void apc_state::machine_start()
 	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(apc_state::fdc_drq), this));
 
 	m_rtc->cs_w(1);
-//	m_rtc->oe_w(1);
+//  m_rtc->oe_w(1);
 }
 
 void apc_state::machine_reset()
@@ -821,7 +821,7 @@ static GFXDECODE_START( apc )
 	GFXDECODE_ENTRY( "gfx", 0x0800, charset_8x16, 0, 128 )
 	GFXDECODE_ENTRY( "gfx", 0x1000, charset_8x16, 0, 128 )
 	GFXDECODE_ENTRY( "gfx", 0x1800, charset_8x16, 0, 128 )
-//	GFXDECODE_ENTRY( "aux_pcg", 0x0000, charset_pcg, 0, 128 )
+//  GFXDECODE_ENTRY( "aux_pcg", 0x0000, charset_pcg, 0, 128 )
 GFXDECODE_END
 
 
@@ -881,7 +881,7 @@ ir7 APU
 WRITE_LINE_MEMBER(apc_state::apc_master_set_int_line)
 {
 	//printf("%02x\n",interrupt);
-//	printf("irq %d\n",state);
+//  printf("irq %d\n",state);
 	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
@@ -927,7 +927,7 @@ WRITE_LINE_MEMBER( apc_state::apc_tc_w )
 	/* floppy terminal count */
 	m_fdc->tc_w(state);
 
-//	printf("TC %02x\n",state);
+//  printf("TC %02x\n",state);
 }
 
 READ8_MEMBER(apc_state::apc_dma_read_byte)
@@ -935,7 +935,7 @@ READ8_MEMBER(apc_state::apc_dma_read_byte)
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	offs_t addr = (m_dma_offset[m_dack] << 16) | offset;
 
-//	printf("%08x\n",addr);
+//  printf("%08x\n",addr);
 
 	return program.read_byte(addr);
 }

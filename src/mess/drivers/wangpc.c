@@ -1216,7 +1216,7 @@ void wangpc_state::on_disk0_unload(floppy_image_device *image)
 int wangpc_state::on_disk1_load(floppy_image_device *image)
 {
 	on_disk1_unload(image);
-	
+
 	return IMAGE_INIT_PASS;
 }
 

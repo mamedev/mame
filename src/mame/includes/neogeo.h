@@ -235,7 +235,7 @@ public:
 	bool m_has_audio_banking; // does the system use Audio Banking (the NeoCD doesn't?)
 	bool m_is_mvs; // is the system an MVS (watchdog, SRAM etc.)
 	bool m_is_cartsys; // does the system use Cartridges? (MVS and AES)
-	
+
 	// the NeoCD can steal the bus during uploads
 	bool m_has_sprite_bus;
 	bool m_has_text_bus;

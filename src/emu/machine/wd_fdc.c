@@ -900,7 +900,7 @@ void wd_fdc_t::do_cmd_w()
 void wd_fdc_t::cmd_w(UINT8 val)
 {
 	if (inverted_bus) val ^= 0xff;
-	
+
 	if(intrq && !(intrq_cond & I_IMM)) {
 		intrq = false;
 		if(!intrq_cb.isnull())
@@ -955,7 +955,7 @@ UINT8 wd_fdc_t::status_r()
 
 	UINT8 val = status;
 	if (inverted_bus) val ^= 0xff;
-	
+
 	return val;
 }
 
@@ -981,7 +981,7 @@ UINT8 wd_fdc_t::track_r()
 {
 	UINT8 val = track;
 	if (inverted_bus) val ^= 0xff;
-	
+
 	return val;
 }
 
@@ -994,7 +994,7 @@ void wd_fdc_t::do_sector_w()
 void wd_fdc_t::sector_w(UINT8 val)
 {
 	if (inverted_bus) val ^= 0xff;
-	
+
 	// No more than one write in flight
 	if(sector_buffer != -1)
 		return;
@@ -1007,14 +1007,14 @@ UINT8 wd_fdc_t::sector_r()
 {
 	UINT8 val = sector;
 	if (inverted_bus) val ^= 0xff;
-	
+
 	return val;
 }
 
 void wd_fdc_t::data_w(UINT8 val)
 {
 	if (inverted_bus) val ^= 0xff;
-	
+
 	data = val;
 	drop_drq();
 }
@@ -1025,7 +1025,7 @@ UINT8 wd_fdc_t::data_r()
 
 	UINT8 val = data;
 	if (inverted_bus) val ^= 0xff;
-	
+
 	return val;
 }
 
@@ -1231,12 +1231,12 @@ void wd_fdc_t::live_sync()
 {
 	if(!cur_live.tm.is_never()) {
 		if(cur_live.tm > machine().time()) {
-			//			fprintf(stderr, "%s: Rolling back and replaying (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
+			//          fprintf(stderr, "%s: Rolling back and replaying (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
 			rollback();
 			live_run(machine().time());
 			pll_commit(floppy, cur_live.tm);
 		} else {
-			//			fprintf(stderr, "%s: Committing (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
+			//          fprintf(stderr, "%s: Committing (%s)\n", ttsn().cstr(), tts(cur_live.tm).cstr());
 			pll_commit(floppy, cur_live.tm);
 			if(cur_live.next_state != -1) {
 				cur_live.state = cur_live.next_state;
@@ -1440,7 +1440,7 @@ void wd_fdc_t::live_run(attotime limit)
 			if(cur_live.bit_counter & 15)
 				break;
 			int slot = (cur_live.bit_counter >> 4)-1;
-			//			fprintf(stderr, "%s: slot[%d] = %02x  crc = %04x\n", tts(cur_live.tm).cstr(), slot, cur_live.data_reg, cur_live.crc);
+			//          fprintf(stderr, "%s: slot[%d] = %02x  crc = %04x\n", tts(cur_live.tm).cstr(), slot, cur_live.data_reg, cur_live.crc);
 			cur_live.idbuf[slot] = cur_live.data_reg;
 			if(slot == 5) {
 				live_delay(IDLE);

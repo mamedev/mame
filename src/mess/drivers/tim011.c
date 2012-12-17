@@ -23,7 +23,7 @@ public:
 		  m_floppy1(*this, FDC9266_TAG ":1:35dd"),
 		  m_floppy2(*this, FDC9266_TAG ":2:35dd"),
 		  m_floppy3(*this, FDC9266_TAG ":3:35dd") { }
-		  
+
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_tim011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -31,23 +31,23 @@ public:
 	DECLARE_WRITE8_MEMBER(scroll_w);
 	DECLARE_WRITE8_MEMBER(fdc_dma_w);
 	DECLARE_READ8_MEMBER(print_r);
-	DECLARE_READ8_MEMBER(scroll_r);	
+	DECLARE_READ8_MEMBER(scroll_r);
 	void irq_w(bool state);
 	void drq_w(bool state);
 	UINT8 m_scroll;
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 	required_device<floppy_image_device> m_floppy2;
-	required_device<floppy_image_device> m_floppy3;	
+	required_device<floppy_image_device> m_floppy3;
 };
 
 
 static ADDRESS_MAP_START(tim011_mem, AS_PROGRAM, 8, tim011_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x01fff) AM_ROM AM_MIRROR(0x3e000)	
+	AM_RANGE(0x00000, 0x01fff) AM_ROM AM_MIRROR(0x3e000)
 	AM_RANGE(0x40000, 0x7ffff) AM_RAM // 256KB RAM  8 * 41256 DRAM
 ADDRESS_MAP_END
 
@@ -57,7 +57,7 @@ static ADDRESS_MAP_START(tim011_io, AS_IO, 8, tim011_state)
 	AM_RANGE(0x0080, 0x009f) AM_DEVICE(FDC9266_TAG, upd765a_device, map)
 	//AM_RANGE(0x00a0, 0x00a0) AM_MIRROR(0x001f)  AM_WRITE(fdc_dma_w)
 	//AM_RANGE(0x00c0, 0x00c1) AM_MIRROR(0x000e)  AM_READWRITE(print_r,print_w)
-	//AM_RANGE(0x00d0, 0x00d0) AM_MIRROR(0x000f)  AM_READWRITE(scroll_r,scroll_w)	
+	//AM_RANGE(0x00d0, 0x00d0) AM_MIRROR(0x000f)  AM_READWRITE(scroll_r,scroll_w)
 	AM_RANGE(0x8000, 0xffff) AM_RAM // Video RAM 43256 SRAM  (32KB)
 ADDRESS_MAP_END
 
@@ -82,9 +82,9 @@ void tim011_state::machine_reset()
 	m_floppy1->mon_w(0);
 	m_floppy2->mon_w(0);
 	m_floppy3->mon_w(0);
-	
+
 	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(tim011_state::irq_w), this));
-	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(tim011_state::drq_w), this));	
+	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(tim011_state::drq_w), this));
 }
 
 void tim011_state::video_start()
@@ -140,7 +140,7 @@ static MACHINE_CONFIG_START( tim011,tim011_state )
 	MCFG_CPU_IO_MAP(tim011_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tim011_state, irq0_line_hold)
 
-//	MCFG_CPU_ADD("keyboard",COSMAC, XTAL_1_75MHz) // CDP1802, uknown clock
+//  MCFG_CPU_ADD("keyboard",COSMAC, XTAL_1_75MHz) // CDP1802, uknown clock
 
 	// FDC9266 location U43 XTAL_8MHz
 	MCFG_UPD765A_ADD(FDC9266_TAG, true, true)
@@ -149,7 +149,7 @@ static MACHINE_CONFIG_START( tim011,tim011_state )
 	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":1", tim011_floppies, "35dd", 0, tim011_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":2", tim011_floppies, "35dd", 0, tim011_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC9266_TAG ":3", tim011_floppies, "35dd", 0, tim011_floppy_formats)
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)

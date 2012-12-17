@@ -261,16 +261,16 @@ void comx_fd_device::comx_io_w(address_space &space, offs_t offset, UINT8 data)
 		{
 			/*
 
-			    bit     description
+                bit     description
 
-			    0       FDC A0
-			    1       FDC A1
-			    2       DRIVE0
-			    3       DRIVE1
-			    4       F9 DISB
-			    5       SIDE SELECT
+                0       FDC A0
+                1       FDC A1
+                2       DRIVE0
+                3       DRIVE1
+                4       F9 DISB
+                5       SIDE SELECT
 
-			*/
+            */
 
 			// latch data to F3
 			m_addr = data & 0x03;

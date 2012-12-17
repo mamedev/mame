@@ -17,27 +17,27 @@
     e800-e803: WD1770 FDC
     ec00-ecef: ES5503 "DOC" sound chip
     f000-ffff: boot ROM
- 
+
     NMI: IRQ from WD1772
     IRQ: DRQ from WD1772 wire-ORed with IRQ from ES5503 wire-ORed with IRQ from VIA6522
     FIRQ: IRQ from 6850 UART
- 
+
     LED / switch matrix:
- 
-    		A           B           C             D         E         F         G        DP
+
+            A           B           C             D         E         F         G        DP
     ROW 0:  LOAD UPPER  LOAD LOWER  SAMPLE UPPER  PLAY SEQ  LOAD SEQ  SAVE SEQ  REC SEQ  SAMPLE LOWER
     ROW 1:  3           6           9             5         8         0         2        Enter
     ROW 2:  1           4           7             up arrow  PARAM     dn arrow  VALUE    CANCEL
     L. AN:  SEG A       SEG B       SEG C         SEG D     SEG E     SEG F     SEG G    SEG DP (decimal point)
     R. AN:  SEG A       SEG B       SEG C         SEG D     SEG E     SEG F     SEG G    SEG DP
- 
+
     Column number in VIA port A bits 0-2 is converted to discrete lines by a 74LS145.
     Port A bit 3 is right anode, bit 4 is left anode
     ROW 0 is read on VIA port A bit 5, ROW 1 in port A bit 6, and ROW 2 in port A bit 7.
- 
+
     Keyboard models talk to the R6500 through the VIA shifter: CA2 is handshake, CB1 is shift clock, CB2 is shift data.
     This is unconnected on the rackmount version.
- 
+
 ***************************************************************************/
 
 
@@ -162,7 +162,7 @@ WRITE8_MEMBER(mirage_state::mirage_via_write_porta)
 		16, 8, 32, 2, 1, 64, 128, 4
 	};
 
-//	printf("PA: %02x (PC=%x)\n", data, m_maincpu->pc());
+//  printf("PA: %02x (PC=%x)\n", data, m_maincpu->pc());
 
 	// left LED selected?
 	if ((data & 0x10) == 0x10)
@@ -180,7 +180,7 @@ WRITE8_MEMBER(mirage_state::mirage_via_write_porta)
 
 		m_l_hi = seg;
 		output_set_digit_value(0, m_l_segs);
-//		printf("L LED: seg %d (hi %d conv %02x, %02x)\n", seg, m_l_hi, segconv[seg], m_l_segs);
+//      printf("L LED: seg %d (hi %d conv %02x, %02x)\n", seg, m_l_hi, segconv[seg], m_l_segs);
 	}
 	// right LED selected?
 	if ((data & 0x08) == 0x08)
@@ -198,7 +198,7 @@ WRITE8_MEMBER(mirage_state::mirage_via_write_porta)
 
 		m_r_hi = seg;
 		output_set_digit_value(1, m_r_segs);
-//		printf("R LED: seg %d (hi %d conv %02x, %02x)\n", seg, m_r_hi, segconv[seg], m_r_segs);
+//      printf("R LED: seg %d (hi %d conv %02x, %02x)\n", seg, m_r_hi, segconv[seg], m_r_segs);
 	}
 }
 

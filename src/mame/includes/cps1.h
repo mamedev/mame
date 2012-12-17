@@ -146,7 +146,7 @@ public:
 	int          m_stars_rom_size;
 	UINT8        m_empty_tile[32*32];
 	int          m_cps_version;
-	
+
 	/* fcrash video config */
 	UINT8        m_layer_enable_reg;
 	UINT8        m_layer_mask_reg[4];
@@ -238,7 +238,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(ganbare_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
 	TIMER_CALLBACK_MEMBER(cps2_update_digital_volume);
-	
+
 	/* fcrash handlers */
 	DECLARE_DRIVER_INIT(kodb);
 	DECLARE_DRIVER_INIT(cawingbl);

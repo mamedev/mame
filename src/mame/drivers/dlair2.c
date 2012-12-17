@@ -8,7 +8,7 @@ http://www.dragons-lair-project.com/tech/pages/dl2.asp
 
 * Service Mode:
   Press and hold the "Sword" button and "Service switch"
-  (located inside coin door) - Release both buttons 
+  (located inside coin door) - Release both buttons
 
 * Rom version determines LD Image to use:
   ROM revision 2.xx works only with a Dragon's Lair II disc, serial number
@@ -124,17 +124,17 @@ INPUT_PORTS_END
 /*
 static const gfx_layout charlayout =
 {
-	8,8,
-	RGN_FRAC(1,1),
-	1,
-	{ RGN_FRAC(0,1) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
+    8,8,
+    RGN_FRAC(1,1),
+    1,
+    { RGN_FRAC(0,1) },
+    { 0, 1, 2, 3, 4, 5, 6, 7 },
+    { 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+    8*8
 };
 
 static GFXDECODE_START( dlair2 )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
+    GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 */
 
@@ -164,7 +164,7 @@ static MACHINE_CONFIG_START( dlair2, dlair2_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-//	MCFG_GFXDECODE(dlair2)
+//  MCFG_GFXDECODE(dlair2)
 
 	MCFG_PALETTE_LENGTH(256)
 

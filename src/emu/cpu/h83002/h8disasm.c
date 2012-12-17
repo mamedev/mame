@@ -1301,8 +1301,8 @@ static UINT32 h8disasm_6(UINT32 address, UINT32 opcode, char *buffer, const UINT
 			else
 			{
 				sprintf(buffer, "%4.4x ???", opcode);
-			}   	 
-			size = 6;   		  
+			}
+			size = 6;
 			break;
 		case 0x2:
 			data32=h8_mem_read32(2);

@@ -1272,11 +1272,11 @@ WRITE8_MEMBER( abc1600_state::fw0_w )
 
 	// drive select
 	floppy_image_device *floppy = NULL;
-	
+
 	if (BIT(data, 0)) floppy = m_floppy0->get_device();
 	if (BIT(data, 1)) floppy = m_floppy1->get_device();
 	if (BIT(data, 2)) floppy = m_floppy2->get_device();
-	
+
 	m_fdc->set_floppy(floppy);
 
 	// floppy motor
@@ -1706,12 +1706,12 @@ static Z8536_INTERFACE( cio_intf )
 //-------------------------------------------------
 /*
 static LEGACY_FLOPPY_OPTIONS_START( abc1600 )
-	LEGACY_FLOPPY_OPTION(abc1600, "dsk", "Luxor ABC 1600", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
+    LEGACY_FLOPPY_OPTION(abc1600, "dsk", "Luxor ABC 1600", basicdsk_identify_default, basicdsk_construct_default, NULL,
+        HEADS([2])
+        TRACKS([80])
+        SECTORS([16])
+        SECTOR_LENGTH([256])
+        FIRST_SECTOR_ID([1]))
 LEGACY_FLOPPY_OPTIONS_END
 */
 

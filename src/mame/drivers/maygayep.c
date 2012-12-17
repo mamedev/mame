@@ -21,9 +21,9 @@
     SOME OF THESE GAMES USED HDDS, ONLY ONE IS DUMPED
     -------------------------------------------------
 
-	Even where we have sound rom dumps they probably shouldn't be trusted, the source of them
-	had many badly dumped Scorpion 4 sound roms (0x080000 bytes where they should be double that)
-	and many of these sound roms are that size...
+    Even where we have sound rom dumps they probably shouldn't be trusted, the source of them
+    had many badly dumped Scorpion 4 sound roms (0x080000 bytes where they should be double that)
+    and many of these sound roms are that size...
 
     Some games have EPOCH NEVADA in the header, others have EPOCH APOLLO, is there a difference?
 

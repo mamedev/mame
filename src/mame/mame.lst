@@ -13815,7 +13815,7 @@ sc2cb7		// Casino Bar 7 (Bellfruit)
 sc2cb71
 sc2cb72
 sc2cb72p
-sc2cb7p	
+sc2cb7p
 sc2cgcas	// Club Grand Casino
 sc2cgcasp
 sc2cgcas1
@@ -17523,7 +17523,7 @@ sc5mopl		// Monopoly Property Ladder (Bellfruit)
 sc5mopla	//
 sc5moplb	//
 sc5moplc	//
-sc5mopld	//	
+sc5mopld	//
 sc5mople	//
 sc5moplf	//
 sc5moplg	//
@@ -17558,7 +17558,7 @@ sc5potsm	// Pots Of Luck (Mazooma)
 sc5potsma	//
 sc5cpen1	// Public Enemy No1 Club (Bellfruit)
 sc5cpen1a	//
-sc5cpen1b	//	
+sc5cpen1b	//
 sc5cpen1c	//
 sc5qual		// Quality Streak (Bellfruit)
 sc5quala	//
@@ -18218,7 +18218,7 @@ sc5fguyb	//
 sc5fguyc	//
 sc5fguyd	//
 sc5fguye	//
-sc5fguyf	//	
+sc5fguyf	//
 sc5fguyg	//
 sc5fbspn	// Fat Boy Spin (Bellfruit)
 sc5fbspna	//
@@ -18418,7 +18418,7 @@ sc5mhpg		//
 sc5mhph		//
 sc5mhpi		//
 sc5mhpj		//
-sc5mhpk		// 
+sc5mhpk		//
 sc5mhpl		//
 sc5mmb		// Monopoly Money Bags (Bellfruit)
 sc5mmba		//
@@ -18974,7 +18974,7 @@ ad5rsrra	//
 
 
 
-		
+
 
 /* Maygay Machines Ltd. */
 
@@ -19435,7 +19435,7 @@ m1gresco
 m1grescp
 m1grescq
 m1guvnor	// The Guvnor (Maygay)
-m1guvnora	
+m1guvnora
 m1guvnorb
 m1guvnorc
 m1guvnord
@@ -19730,7 +19730,7 @@ m1monstra
 m1monstrb
 m1monstrc
 m1nhp		// Noel's House Party (Maygay)
-m1nhpa	
+m1nhpa
 m1nhpb
 m1nhpc
 m1nhpd
@@ -19744,7 +19744,7 @@ m1nhpk
 m1nhpl
 m1nhpm
 m1nudbnk	// Nudge Banker (Maygay)
-m1nudbnka	
+m1nudbnka
 m1nudbnkb
 m1nudbnkc
 m1nudbnkd
@@ -19901,7 +19901,7 @@ m1thatlfb
 m1thatlfc
 m1thatlfd
 m1topten	// Top Tenner (Maygay)
-m1toptena	
+m1toptena
 m1trivia	// Trivial Pursuit (Maygay)
 m1triviaa
 m1triviab
@@ -20012,9 +20012,9 @@ m1lcaa
 m1lcab
 m1lcac
 m1mb		// Monkey Business (Global)
-m1mba		
-m1mbb		
-m1mbc		
+m1mba
+m1mbb
+m1mbc
 m1mbclb		// Monkey Business Club (Global)
 m1sycc		// Stake Yer Claim Club (Global)
 m1sycca

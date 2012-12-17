@@ -722,7 +722,7 @@ int b85_find_project_string(running_machine &machine )
 					if (addr<size)
 					{
 						rom = src[addr];
-			
+
 						if ((rom>=0x20) && (rom<0x7f))
 						{
 							printf("%c", rom);

@@ -8,10 +8,10 @@
 **********************************************************************/
 
 /*
-	
-	TODO:
 
-	- wd_fdc drops the busy bit too soon, c1581 aborts reading the sector ID after the first CRC byte @CD17
+    TODO:
+
+    - wd_fdc drops the busy bit too soon, c1581 aborts reading the sector ID after the first CRC byte @CD17
 
 */
 
@@ -146,18 +146,18 @@ READ8_MEMBER( base_c1581_device::cia_pa_r )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    PA0
-	    PA1     /RDY
-	    PA2
-	    PA3     DEV# SEL (SW1)
-	    PA4     DEV# SEL (SW1)
-	    PA5
-	    PA6
-	    PA7     /DISK CHNG
+        PA0
+        PA1     /RDY
+        PA2
+        PA3     DEV# SEL (SW1)
+        PA4     DEV# SEL (SW1)
+        PA5
+        PA6
+        PA7     /DISK CHNG
 
-	*/
+    */
 
 	UINT8 data = 0;
 
@@ -177,18 +177,18 @@ WRITE8_MEMBER( base_c1581_device::cia_pa_w )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    PA0     SIDE0
-	    PA1
-	    PA2     /MOTOR
-	    PA3
-	    PA4
-	    PA5     POWER LED
-	    PA6     ACT LED
-	    PA7
+        PA0     SIDE0
+        PA1
+        PA2     /MOTOR
+        PA3
+        PA4
+        PA5     POWER LED
+        PA6     ACT LED
+        PA7
 
-	*/
+    */
 
 	// side select
 	m_floppy->ss_w(BIT(data, 0));
@@ -207,18 +207,18 @@ READ8_MEMBER( base_c1581_device::cia_pb_r )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    PB0     DATA IN
-	    PB1
-	    PB2     CLK IN
-	    PB3
-	    PB4
-	    PB5
-	    PB6     /WPRT
-	    PB7     ATN IN
+        PB0     DATA IN
+        PB1
+        PB2     CLK IN
+        PB3
+        PB4
+        PB5
+        PB6     /WPRT
+        PB7     ATN IN
 
-	*/
+    */
 
 	UINT8 data = 0;
 
@@ -241,18 +241,18 @@ WRITE8_MEMBER( base_c1581_device::cia_pb_w )
 {
 	/*
 
-	    bit     description
+        bit     description
 
-	    PB0
-	    PB1     DATA OUT
-	    PB2
-	    PB3     CLK OUT
-	    PB4     ATN ACK
-	    PB5     FAST SER DIR
-	    PB6
-	    PB7
+        PB0
+        PB1     DATA OUT
+        PB2
+        PB3     CLK OUT
+        PB4     ATN ACK
+        PB5     FAST SER DIR
+        PB6
+        PB7
 
-	*/
+    */
 
 	// data out
 	m_data_out = BIT(data, 1);

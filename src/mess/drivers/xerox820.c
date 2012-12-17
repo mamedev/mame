@@ -10,14 +10,14 @@
 
     TODO:
 
-	- Xerox 820
-		- floppy (wd1772.c FM support)
+    - Xerox 820
+        - floppy (wd1772.c FM support)
     - Xerox 820-II
-    	- floppy (read/write to FDC triggers Z80 WAIT)
-		- Winchester
-			- Shugart SA1004 (chs=256,4,40 ss=256)
-			- Shugart SA606 (chs=160,6, ss=256)
-			- Shugart SA1403D controller
+        - floppy (read/write to FDC triggers Z80 WAIT)
+        - Winchester
+            - Shugart SA1004 (chs=256,4,40 ss=256)
+            - Shugart SA606 (chs=160,6, ss=256)
+            - Shugart SA1403D controller
     - Xerox 16/8
     - Emerald Microware X120 board
     - type in Monitor v1.0 from manual
@@ -444,14 +444,14 @@ WRITE8_MEMBER( xerox820_state::kbpio_pa_w )
 		if (m_8n5 != _8n5)
 		{
 			m_8n5 = _8n5;
-			
+
 			m_fdc->set_unscaled_clock(m_8n5 ? XTAL_20MHz/10 : XTAL_20MHz/20);
 		}
 
 		m_400_460 = !floppy->twosid_r();
 
 		floppy->mon_w(0);
-		
+
 		floppy->ss_w(BIT(data, 2));
 	}
 
@@ -531,19 +531,19 @@ static Z80PIO_INTERFACE( gppio_intf )
 READ8_MEMBER( xerox820ii_state::rdpio_pb_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       NBSY
-	    1       NMSG
-	    2       NC/D
-	    3       NREQ
-	    4       NI/O
-	    5       
-	    6       LS74 Q
-	    7       
-	
-	*/
+
+        bit     description
+
+        0       NBSY
+        1       NMSG
+        2       NC/D
+        3       NREQ
+        4       NI/O
+        5
+        6       LS74 Q
+        7
+
+    */
 
 	UINT8 data = 0;
 
@@ -559,19 +559,19 @@ READ8_MEMBER( xerox820ii_state::rdpio_pb_r )
 WRITE8_MEMBER( xerox820ii_state::rdpio_pb_w )
 {
 	/*
-	
-	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       NSEL
-	    6       
-	    7       NRST
-	
-	*/
+
+        bit     description
+
+        0
+        1
+        2
+        3
+        4
+        5       NSEL
+        6
+        7       NRST
+
+    */
 
 	m_sasibus->scsi_sel_w(!BIT(data, 5));
 	m_sasibus->scsi_rst_w(!BIT(data, 7));
@@ -788,30 +788,30 @@ void xerox820ii_state::machine_reset()
 }
 /*
 static LEGACY_FLOPPY_OPTIONS_START( xerox820 )
-	LEGACY_FLOPPY_OPTION( sssd8, "dsk", "8\" SSSD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([77])
-		SECTORS([26])
-		SECTOR_LENGTH([128])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION( ssdd8, "dsk", "8\" SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([77])
-		SECTORS([26])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION( sssd5, "dsk", "5.25\" SSSD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([40])
-		SECTORS([18])
-		SECTOR_LENGTH([128])
-		FIRST_SECTOR_ID([1]))
-	LEGACY_FLOPPY_OPTION( ssdd5, "dsk", "5.25\" SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([40])
-		SECTORS([18])
-		SECTOR_LENGTH([128])
-		FIRST_SECTOR_ID([1]))
+    LEGACY_FLOPPY_OPTION( sssd8, "dsk", "8\" SSSD", basicdsk_identify_default, basicdsk_construct_default, NULL,
+        HEADS([1])
+        TRACKS([77])
+        SECTORS([26])
+        SECTOR_LENGTH([128])
+        FIRST_SECTOR_ID([1]))
+    LEGACY_FLOPPY_OPTION( ssdd8, "dsk", "8\" SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
+        HEADS([1])
+        TRACKS([77])
+        SECTORS([26])
+        SECTOR_LENGTH([256])
+        FIRST_SECTOR_ID([1]))
+    LEGACY_FLOPPY_OPTION( sssd5, "dsk", "5.25\" SSSD", basicdsk_identify_default, basicdsk_construct_default, NULL,
+        HEADS([1])
+        TRACKS([40])
+        SECTORS([18])
+        SECTOR_LENGTH([128])
+        FIRST_SECTOR_ID([1]))
+    LEGACY_FLOPPY_OPTION( ssdd5, "dsk", "5.25\" SSDD", basicdsk_identify_default, basicdsk_construct_default, NULL,
+        HEADS([2])
+        TRACKS([40])
+        SECTORS([18])
+        SECTOR_LENGTH([128])
+        FIRST_SECTOR_ID([1]))
 LEGACY_FLOPPY_OPTIONS_END
 */
 
@@ -927,7 +927,7 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", xerox820_floppies, "sa450", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", xerox820_floppies, "sa450", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_COM8116_ADD(COM8116_TAG, XTAL_5_0688MHz, com8116_intf)
-	
+
 	// SASI bus
 	MCFG_SCSIBUS_ADD(SASIBUS_TAG)
 	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", SA1403D, SCSI_ID_0)
@@ -961,7 +961,7 @@ MACHINE_CONFIG_END
 ROM_START( bigboard )
 	ROM_REGION( 0x1000, "monitor", 0 )
 	ROM_LOAD( "bigboard.u67", 0x0000, 0x0800, CRC(5a85a228) SHA1(d51a2cbd0aae80315bda9530275aabfe8305364e))
-	
+
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "bigboard.u73", 0x0000, 0x0800, CRC(10bf0d81) SHA1(7ec73670a4d9d6421a5d6a4c4edc8b7c87923f6c) )
 ROM_END
@@ -1036,9 +1036,9 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME        FLAGS */
-COMP( 1980, bigboard,   0,          0,      bigboard,   xerox820, driver_device,   0,      "Digital Research Computers",   "Big Board",    	GAME_IMPERFECT_KEYBOARD )
-COMP( 1981, x820,   	bigboard,   0,      xerox820,   xerox820, driver_device,   0,      "Xerox",                        "Xerox 820",    	GAME_IMPERFECT_KEYBOARD | GAME_NO_SOUND_HW )
-COMP( 1982, mk82,   	bigboard,   0,      bigboard,   xerox820, driver_device,   0,      "Scomar",                       "MK-82",    		GAME_IMPERFECT_KEYBOARD )
-COMP( 1983, x820ii, 	0,   		0,      xerox820ii, xerox820, driver_device,   0,      "Xerox",                        "Xerox 820-II", 	GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
-COMP( 1983, x168,   	x820ii, 	0,      xerox168,   xerox820, driver_device,   0,      "Xerox",                        "Xerox 16/8",   	GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
-COMP( 1983, mk83,       x820ii, 	0,      mk83,       xerox820, driver_device,   0,      "Scomar",                       "MK-83",        	GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD | GAME_NO_SOUND_HW )
+COMP( 1980, bigboard,   0,          0,      bigboard,   xerox820, driver_device,   0,      "Digital Research Computers",   "Big Board", 	GAME_IMPERFECT_KEYBOARD )
+COMP( 1981, x820,   	bigboard,   0,      xerox820,   xerox820, driver_device,   0,      "Xerox",                        "Xerox 820", 	GAME_IMPERFECT_KEYBOARD | GAME_NO_SOUND_HW )
+COMP( 1982, mk82,   	bigboard,   0,      bigboard,   xerox820, driver_device,   0,      "Scomar",                       "MK-82", 		GAME_IMPERFECT_KEYBOARD )
+COMP( 1983, x820ii, 	0,  		0,      xerox820ii, xerox820, driver_device,   0,      "Xerox",                        "Xerox 820-II",	GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
+COMP( 1983, x168,   	x820ii, 	0,      xerox168,   xerox820, driver_device,   0,      "Xerox",                        "Xerox 16/8",	GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD )
+COMP( 1983, mk83,       x820ii, 	0,      mk83,       xerox820, driver_device,   0,      "Scomar",                       "MK-83",     	GAME_NOT_WORKING | GAME_IMPERFECT_KEYBOARD | GAME_NO_SOUND_HW )

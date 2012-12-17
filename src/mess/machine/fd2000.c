@@ -9,12 +9,12 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- IEC
-	- VIA
-	- DP8473/PC8477A command extensions to upd765
-	- D1M/D2M/D4M image format (http://ist.uwaterloo.ca/~schepers/formats/D2M-DNP.TXT)
+    - IEC
+    - VIA
+    - DP8473/PC8477A command extensions to upd765
+    - D1M/D2M/D4M image format (http://ist.uwaterloo.ca/~schepers/formats/D2M-DNP.TXT)
 
 */
 
@@ -81,7 +81,7 @@ const rom_entry *fd2000_device::device_rom_region() const
 	{
 	default:
 		return ROM_NAME( fd2000 );
-	
+
 	case TYPE_FD4000:
 		return ROM_NAME( fd4000 );
 	}
@@ -121,19 +121,19 @@ ADDRESS_MAP_END
 READ8_MEMBER( fd2000_device::via_pa_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       
-	    7       
-	
-	*/
+
+        bit     description
+
+        0
+        1
+        2
+        3
+        4
+        5
+        6
+        7
+
+    */
 
 	return 0;
 }
@@ -141,37 +141,37 @@ READ8_MEMBER( fd2000_device::via_pa_r )
 WRITE8_MEMBER( fd2000_device::via_pa_w )
 {
 	/*
-	
-	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       FAST DIR
-	    6       
-	    7       
-	
-	*/
+
+        bit     description
+
+        0
+        1
+        2
+        3
+        4
+        5       FAST DIR
+        6
+        7
+
+    */
 }
 
 READ8_MEMBER( fd2000_device::via_pb_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       
-	    7       FDC INTRQ
-	
-	*/
+
+        bit     description
+
+        0
+        1
+        2
+        3
+        4
+        5
+        6
+        7       FDC INTRQ
+
+    */
 
 	UINT8 data = 0;
 
@@ -184,19 +184,19 @@ READ8_MEMBER( fd2000_device::via_pb_r )
 WRITE8_MEMBER( fd2000_device::via_pb_w )
 {
 	/*
-	
-	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       LED
-	    6       LED
-	    7       
-	
-	*/
+
+        bit     description
+
+        0
+        1
+        2
+        3
+        4
+        5       LED
+        6       LED
+        7
+
+    */
 }
 
 static const via6522_interface via_intf =
@@ -227,8 +227,8 @@ static SLOT_INTERFACE_START( fd4000_floppies )
 SLOT_INTERFACE_END
 /*
 FLOPPY_FORMATS_MEMBER( fd2000_device::floppy_formats )
-	FLOPPY_D81_FORMAT
-	FLOPPY_D2M_FORMAT
+    FLOPPY_D81_FORMAT
+    FLOPPY_D2M_FORMAT
 FLOPPY_FORMATS_END
 */
 
@@ -273,7 +273,7 @@ machine_config_constructor fd2000_device::device_mconfig_additions() const
 	{
 	default:
 		return MACHINE_CONFIG_NAME( fd2000 );
-	
+
 	case TYPE_FD4000:
 		return MACHINE_CONFIG_NAME( fd4000 );
 	}
@@ -293,7 +293,7 @@ void fd2000_device::device_config_complete()
 	default:
 		m_shortname = "fd2000";
 		break;
-	
+
 	case TYPE_FD4000:
 		m_shortname = "fd4000";
 		break;

@@ -405,13 +405,13 @@ WRITE16_MEMBER(geniusiq_state::gfx_idx_w)
 READ16_MEMBER( geniusiq_state::input_r )
 {
 	/*
-	    this is guesswork and may not be correct
+        this is guesswork and may not be correct
 
-	    xxxx xxx- ---- ----     unknown
-	    ---- ---x ---- ----     used for indicate if the data read is valid (if not set the other bits are discarded)
-	    ---- ---- x--- ----     if set indicates a KeyUp otherwise a KeyDown
-	    ---- ---- -xxx xxxx     this is the scan code
-	*/
+        xxxx xxx- ---- ----     unknown
+        ---- ---x ---- ----     used for indicate if the data read is valid (if not set the other bits are discarded)
+        ---- ---- x--- ----     if set indicates a KeyUp otherwise a KeyDown
+        ---- ---- -xxx xxxx     this is the scan code
+    */
 
 	UINT16 data = 0;
 

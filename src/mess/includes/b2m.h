@@ -63,7 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER(b2m_romdisk_portb_w);
 	DECLARE_WRITE8_MEMBER(b2m_romdisk_portc_w);
 	DECLARE_WRITE_LINE_MEMBER(b2m_pic_set_int_line);
-	void b2m_fdc_drq(bool state);	
+	void b2m_fdc_drq(bool state);
 	DECLARE_FLOPPY_FORMATS( b2m_floppy_formats );
 };
 

@@ -917,9 +917,9 @@ WRITE8_MEMBER( sf7000_state::ppi_pc_w )
         PC7     /STROBE to Centronics printer
     */
 
-    if (!BIT(data, 0)) 
+    if (!BIT(data, 0))
     	m_fdc->set_floppy(m_floppy0);
-    else 
+    else
     	m_fdc->set_floppy(NULL);
 
 	/* floppy motor */

@@ -506,7 +506,7 @@ MACHINE_CONFIG_END
     The DPM01 supposedly has its own processor and roms.
  * vt125 - 1982? base model (stock vt100 firmware plus extra gfx board
    firmware and processor) vt100 with the ReGIS graphical language board
-   (aka GPO) installed (almost literally a vk100-on-a-board, but with added 
+   (aka GPO) installed (almost literally a vk100-on-a-board, but with added
    backwards compatibility mode for vt105/WG, and 2 bits per pixel color),
    AVO optional; Includes a custom 'dumb' STP board.
  * vt131 - 1982 cost reduced version of vt132, no longer has the vt100

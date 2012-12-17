@@ -696,7 +696,7 @@ void neogeo_main_cpu_banking_init( running_machine &machine )
 	/* create vector banks */
 	state->membank(NEOGEO_BANK_VECTORS)->configure_entry(0, machine.root_device().memregion("mainbios")->base());
 	state->membank(NEOGEO_BANK_VECTORS)->configure_entry(1, machine.root_device().memregion("maincpu")->base());
-	
+
 	if (state->m_is_cartsys)
 	{
 
@@ -732,7 +732,7 @@ static void set_audio_cpu_banking( running_machine &machine )
 static void audio_cpu_bank_select( address_space &space, int region, UINT8 bank )
 {
 	neogeo_state *state = space.machine().driver_data<neogeo_state>();
-	
+
 	if (!state->m_has_audio_banking) return;
 
 	if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: audio_cpu_bank_select: Region: %d   Bank: %02x\n", space.device().safe_pc(), region, bank);
@@ -1418,7 +1418,7 @@ MACHINE_CONFIG_START( neogeo_base, neogeo_state )
 	MCFG_CPU_ADD("audiocpu", Z80, NEOGEO_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
-	
+
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_neogeo)
 

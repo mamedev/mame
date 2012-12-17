@@ -17,8 +17,8 @@
       hooked up by the current z80 core
     - PC-88VA stock version has two bogus opcodes. One is at 0xf0b15, another at 0xf0b31.
       Making a patch for the latter makes the system to jump into a "DIP-Switch" display.
-	- unemulated upd71071 demand mode.
-	- Fix floppy motor hook-up;
+    - unemulated upd71071 demand mode.
+    - Fix floppy motor hook-up;
 
 ********************************************************************************************/
 
@@ -137,13 +137,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pc88va_pic_irq);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_pit_out0_changed);
-//	DECLARE_WRITE_LINE_MEMBER(pc88va_upd765_interrupt);
+//  DECLARE_WRITE_LINE_MEMBER(pc88va_upd765_interrupt);
 	UINT8 m_fdc_ctrl_2;
 	TIMER_CALLBACK_MEMBER(pc88va_fdc_timer);
 	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_0);
 	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_1);
-//	UINT16 m_fdc_dma_r(running_machine &machine);
-//	void m_fdc_dma_w(running_machine &machine, UINT16 data);
+//  UINT16 m_fdc_dma_r(running_machine &machine);
+//  void m_fdc_dma_w(running_machine &machine, UINT16 data);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_hlda_w);
 	DECLARE_WRITE_LINE_MEMBER(pc88va_tc_w);
 
@@ -1777,7 +1777,7 @@ WRITE_LINE_MEMBER(pc88va_state::pc88va_hlda_w)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
-//	m_dmac->hack_w(state);
+//  m_dmac->hack_w(state);
 
 //  printf("%02x HLDA\n",state);
 }
@@ -1787,7 +1787,7 @@ WRITE_LINE_MEMBER( pc88va_state::pc88va_tc_w )
 	/* floppy terminal count */
 	m_fdc->tc_w(state);
 
-//	printf("TC %02x\n",state);
+//  printf("TC %02x\n",state);
 }
 
 

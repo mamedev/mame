@@ -44,7 +44,7 @@ protected:
 
 private:
 	optional_shared_ptr<UINT8> m_ram;
-	
+
 	int m_bank;
 };
 

@@ -686,7 +686,7 @@ FLOPPY_FORMATS_MEMBER( mm1_state::floppy_formats )
 FLOPPY_FORMATS_END
 /*
 FLOPPY_FORMATS_MEMBER( mm2_state::floppy_formats )
-	FLOPPY_MM2_FORMAT
+    FLOPPY_MM2_FORMAT
 FLOPPY_FORMATS_END
 */
 static SLOT_INTERFACE_START( mm1_floppies )

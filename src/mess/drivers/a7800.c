@@ -21,7 +21,7 @@
     2012/12/05 Robert Tuccitto  Implemented proper IRE and phase
                value to the palette
 
-    2012/12/14 Robert Tuccitto  Adjusted colorburst/tint/hue of entire 
+    2012/12/14 Robert Tuccitto  Adjusted colorburst/tint/hue of entire
                palette to closer reflect default hardware configuration
                setting of ~180 degrees.  Palette settings now correspond
                documented and calculated settings as follows:

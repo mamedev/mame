@@ -44,8 +44,8 @@
     ---x      Data to Mac
 
     The T1 line is "Option".
- 
-	There is a later M0110 keyboard version which uses a GI PIC1657; we do not have a dump of that version.
+
+    There is a later M0110 keyboard version which uses a GI PIC1657; we do not have a dump of that version.
 */
 
 

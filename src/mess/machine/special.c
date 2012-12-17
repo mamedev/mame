@@ -266,7 +266,7 @@ WRITE8_MEMBER( special_state::specimx_disk_ctrl_w )
 
 	switch(offset)
 	{
-		case 0 : 
+		case 0 :
 				m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 				break;
 		case 2 :
@@ -400,10 +400,10 @@ READ8_MEMBER( special_state::erik_disk_reg_r )
 WRITE8_MEMBER( special_state::erik_disk_reg_w )
 {
 /*
-	wd17xx_set_side (m_fdc,data & 1);
-	wd17xx_set_drive(m_fdc,(data >> 1) & 1);
-	wd17xx_dden_w(m_fdc, BIT(data, 2));
-	floppy_mon_w(floppy_get_device(machine(), BIT(data, 1)), 0);
-	floppy_mon_w(floppy_get_device(machine(), BIT(data, 1) ^ 1), 1);
-	floppy_drive_set_ready_state(floppy_get_device(machine(), BIT(data, 1)), 1, 1);*/
+    wd17xx_set_side (m_fdc,data & 1);
+    wd17xx_set_drive(m_fdc,(data >> 1) & 1);
+    wd17xx_dden_w(m_fdc, BIT(data, 2));
+    floppy_mon_w(floppy_get_device(machine(), BIT(data, 1)), 0);
+    floppy_mon_w(floppy_get_device(machine(), BIT(data, 1) ^ 1), 1);
+    floppy_drive_set_ready_state(floppy_get_device(machine(), BIT(data, 1)), 1, 1);*/
 }

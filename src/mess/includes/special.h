@@ -95,7 +95,7 @@ public:
 	UINT32 screen_update_specimx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(special_reset);
 	TIMER_CALLBACK_MEMBER(setup_pit8253_gates);
-	void fdc_drq(bool state);	
+	void fdc_drq(bool state);
 	DECLARE_FLOPPY_FORMATS( specimx_floppy_formats );
 };
 

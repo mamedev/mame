@@ -970,12 +970,12 @@ void v1050_state::fdc_drq_w(bool state)
 
 /*
 static LEGACY_FLOPPY_OPTIONS_START( v1050 )
-	LEGACY_FLOPPY_OPTION( v1050, "dsk", "Visual 1050 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([1])
-		TRACKS([80])
-		SECTORS([10])
-		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
+    LEGACY_FLOPPY_OPTION( v1050, "dsk", "Visual 1050 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+        HEADS([1])
+        TRACKS([80])
+        SECTORS([10])
+        SECTOR_LENGTH([512])
+        FIRST_SECTOR_ID([1]))
 LEGACY_FLOPPY_OPTIONS_END
 */
 

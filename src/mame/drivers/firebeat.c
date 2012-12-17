@@ -2450,7 +2450,7 @@ ROM_START( popn4 )
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
-	ROM_LOAD( "gq986-ja", 0x000000, 0x0000c0, CRC(6f8aa811) SHA1(fc970f6b4ada58eee361b3477abe503019b5dfda) ) 
+	ROM_LOAD( "gq986-ja", 0x000000, 0x0000c0, CRC(6f8aa811) SHA1(fc970f6b4ada58eee361b3477abe503019b5dfda) )
 
 	ROM_REGION(0x80000, "audiocpu", 0)			// SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
@@ -2458,7 +2458,7 @@ ROM_START( popn4 )
 	DISK_REGION( "scsi0" )	// program CD-ROM
 	DISK_IMAGE_READONLY( "gq986jaa01", 0, SHA1(e5368ac029b0bdf29943ae66677b5521ae1176e1) )
 
-	DISK_REGION( "scsi1" ) 	// data DVD-ROM
+	DISK_REGION( "scsi1" )	// data DVD-ROM
 	DISK_IMAGE( "gq986jaa02", 1, SHA1(53367d3d5f91422fe386c42716492a0ae4332390) )
 ROM_END
 
@@ -2469,7 +2469,7 @@ ROM_START( popn5 )
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
-	ROM_LOAD( "gca04-ja", 0x000000, 0x0000c0, CRC(7724fdbf) SHA1(b1b2d838d1938d9dc15151b7834502c1668bd31b) ) 
+	ROM_LOAD( "gca04-ja", 0x000000, 0x0000c0, CRC(7724fdbf) SHA1(b1b2d838d1938d9dc15151b7834502c1668bd31b) )
 
 	ROM_REGION(0x80000, "audiocpu", 0)			// SPU 68K program
 	ROM_LOAD16_WORD_SWAP( "a02jaa04.3q",  0x000000, 0x080000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683) )
@@ -2496,7 +2496,7 @@ ROM_START( popn6 )
 	DISK_REGION( "scsi0" )	// program CD-ROM
 	DISK_IMAGE_READONLY( "gqa16jaa01", 0, SHA1(7a7e475d06c74a273f821fdfde0743b33d566e4c) )
 
-	DISK_REGION( "scsi1" ) 	// data DVD-ROM
+	DISK_REGION( "scsi1" )	// data DVD-ROM
 	DISK_IMAGE( "gqa16jaa02", 1, SHA1(e39067300e9440ff19cb98c1abc234fa3d5b26d1) )
 ROM_END
 
@@ -2597,7 +2597,7 @@ ROM_START( bm37th )
 	ROM_REGION(0x400000, "ymz", ROMREGION_ERASE00)
 
 	ROM_REGION(0xc0, "user2", ROMREGION_ERASE00)	// Security dongle
-	ROM_LOAD( "gcb07-jc", 0x000000, 0x0000c0, CRC(16115b6a) SHA1(dcb2a3346973941a946b2cdfd31a5a761f666ca3) ) 
+	ROM_LOAD( "gcb07-jc", 0x000000, 0x0000c0, CRC(16115b6a) SHA1(dcb2a3346973941a946b2cdfd31a5a761f666ca3) )
 
 	ROM_REGION(0x80000, "audiocpu", 0)			// SPU 68K program
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, BAD_DUMP CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
@@ -2637,9 +2637,9 @@ GAME( 2000, ppp1mp,   ppp,     firebeat,      ppp, firebeat_state,    ppp,      
 GAMEL(2000, kbm,      0,       firebeat2,     kbm, firebeat_state,    kbm,    ROT270,   "Konami",  "Keyboardmania", GAME_NOT_WORKING, layout_firebeat)
 GAMEL(2000, kbm2nd,   0,       firebeat2,     kbm, firebeat_state,    kbm,    ROT270,   "Konami",  "Keyboardmania 2nd Mix", GAME_NOT_WORKING, layout_firebeat)
 GAMEL(2001, kbm3rd,   0,       firebeat2,     kbm, firebeat_state,    kbm,    ROT270,   "Konami",  "Keyboardmania 3rd Mix", GAME_NOT_WORKING, layout_firebeat)
-GAME( 2000, popn4, 	  0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 4", GAME_NOT_WORKING)
+GAME( 2000, popn4,	  0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 4", GAME_NOT_WORKING)
 GAME( 2000, popn5,    0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 5", GAME_NOT_WORKING)
-GAME( 2001, popn6, 	  0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 6", GAME_NOT_WORKING)
+GAME( 2001, popn6,	  0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 6", GAME_NOT_WORKING)
 GAME( 2001, popn7,    0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 7", GAME_NOT_WORKING)
 GAME( 2001, popnanm2, 0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music Animelo 2", GAME_NOT_WORKING)
 GAME( 2002, popn8,    0,       firebeat_spu,  popn, firebeat_state,   ppp,      ROT0,   "Konami",  "Pop'n Music 8", GAME_NOT_WORKING)

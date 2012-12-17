@@ -247,17 +247,17 @@ void cmd_hd_device::cbm_iec_reset(int state)
 WRITE8_MEMBER( cmd_hd_device::led_w )
 {
 	/*
-	
-	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       
-	    7       
-	
-	*/
+
+        bit     description
+
+        0
+        1
+        2
+        3
+        4
+        5
+        6
+        7
+
+    */
 }

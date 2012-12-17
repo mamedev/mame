@@ -3,22 +3,22 @@
     esqkt.c - Ensoniq KT-76, KT-88, and E-Prime
 
     Driver by R. Belmont
- 
+
     Hardware:
-    	CPU: 68EC020-16 CPU
-    	Serial/timers: SCN2681 (MC68681 clone)
-    	Sound: 2xES5506
-		Effects: ES5510
+        CPU: 68EC020-16 CPU
+        Serial/timers: SCN2681 (MC68681 clone)
+        Sound: 2xES5506
+        Effects: ES5510
 
     Memory map:
- 
-    0x000000-0x07FFFF	OS ROM
-    0x200000-0x20003F	Master ES5506
-    0x240000-0x24003F	Slave ES5506
-    0x280000-0x2801FF	ES5510
-    0x300000-0x30000F	68681 DUART
-    0xFF0000-0xFFFFFF	OS RAM
- 
+
+    0x000000-0x07FFFF   OS ROM
+    0x200000-0x20003F   Master ES5506
+    0x240000-0x24003F   Slave ES5506
+    0x280000-0x2801FF   ES5510
+    0x300000-0x30000F   68681 DUART
+    0xFF0000-0xFFFFFF   OS RAM
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -75,7 +75,7 @@ private:
     UINT32  es5510_gpr_latch;
     UINT8   es5510_ram_sel;
 
-	UINT32 	*m_rom, *m_ram;
+	UINT32	*m_rom, *m_ram;
 
 public:
 	DECLARE_DRIVER_INIT(kt);
@@ -84,18 +84,18 @@ public:
 
 void esqkt_state::machine_reset()
 {
-//	m_rom = (UINT32 *)machine().root_device().memregion("osrom")->base();
-//	m_ram = (UINT32 *)machine().root_device().memshare("osram")->ptr();
+//  m_rom = (UINT32 *)machine().root_device().memregion("osrom")->base();
+//  m_ram = (UINT32 *)machine().root_device().memshare("osram")->ptr();
 
-//	memcpy(m_ram, m_rom, 8);
-//	m_maincpu->reset();
+//  memcpy(m_ram, m_rom, 8);
+//  m_maincpu->reset();
 
 	m_bCalibSecondByte = false;
 }
 
 READ16_MEMBER(esqkt_state::es5510_dsp_r)
 {
-//	printf("%06x: DSP read offset %04x (data is %04x)\n",space.device().safe_pc(),offset,es5510_dsp_ram[offset]);
+//  printf("%06x: DSP read offset %04x (data is %04x)\n",space.device().safe_pc(),offset,es5510_dsp_ram[offset]);
 
 	switch(offset)
 	{
@@ -523,8 +523,8 @@ INPUT_PORTS_END
 
 ROM_START( kt76 )
     ROM_REGION(0x80000, "osrom", 0)
-	ROM_LOAD32_WORD( "kt76_162_lo.bin", 0x000000, 0x020000, CRC(1a1ab910) SHA1(dcc80db2297fd25993e090c2e5bb7f947319a8bf) ) 
-	ROM_LOAD32_WORD( "kt76_162_hi.bin", 0x000002, 0x040000, CRC(de16d236) SHA1(c55fca86453e90e8c34a048bed45817063237370) ) 
+	ROM_LOAD32_WORD( "kt76_162_lo.bin", 0x000000, 0x020000, CRC(1a1ab910) SHA1(dcc80db2297fd25993e090c2e5bb7f947319a8bf) )
+	ROM_LOAD32_WORD( "kt76_162_hi.bin", 0x000002, 0x040000, CRC(de16d236) SHA1(c55fca86453e90e8c34a048bed45817063237370) )
 
     ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
     ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00)

@@ -885,7 +885,7 @@ READ8_MEMBER(sms_state::sms_sscope_r)
 WRITE8_MEMBER(sms_state::sms_sscope_w)
 {
 	screen_device *screen = machine().first_screen();
-	
+
 	m_sscope_state = data;
 
 	// There are occurrences when Sega Scope's state changes after VBLANK, or at

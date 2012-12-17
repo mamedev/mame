@@ -2232,7 +2232,7 @@ WRITE8_MEMBER(_8080bw_state::shuttlei_ff_w)
         /* bit 0 goes high when first coin inserted
            bit 1 also goes high when subsequent coins are inserted
               These may be for indicator lamps under the start buttons.
-           bit 2 goes high while player 2 is playing	 */
+           bit 2 goes high while player 2 is playing     */
 
 	m_c8080bw_flip_screen = BIT(data, 2) & BIT(ioport(CABINET_PORT_TAG)->read(), 0);
 }

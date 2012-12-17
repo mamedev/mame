@@ -83,7 +83,7 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  read_byte - 
+//  read_byte -
 //-------------------------------------------------
 
 inline UINT8 msm6255_device::read_byte(UINT16 ma, UINT8 ra)
@@ -460,6 +460,6 @@ UINT32 msm6255_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	{
 		bitmap.fill(0, cliprect);
 	}
-	
+
 	return 0;
 }

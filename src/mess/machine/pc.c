@@ -1182,7 +1182,7 @@ WRITE8_MEMBER(pc_state::pcjr_fdc_dor_w)
 	UINT8 pdor = m_pcjr_dor;
 	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
 	floppy_image_device *floppy = machine().device<floppy_connector>("upd765:0")->get_device();
-	m_pcjr_dor = data; 
+	m_pcjr_dor = data;
 
 	if(floppy)
 		floppy->mon_w(!(m_pcjr_dor & 1));
@@ -1194,7 +1194,7 @@ WRITE8_MEMBER(pc_state::pcjr_fdc_dor_w)
 
 	if((pdor^m_pcjr_dor) & 0x80)
 		fdc->reset();
-	
+
 	if(m_pcjr_dor & 0x20) {
 		if((pdor & 0x40) && !(m_pcjr_dor & 0x40))
 			m_pcjr_watchdog->adjust(attotime::from_seconds(3));
@@ -1468,7 +1468,7 @@ MACHINE_START_MEMBER(pc_state,pcjr)
 	m_maincpu->set_irq_acknowledge_callback(pc_irq_callback);
 
 	machine().device<upd765a_device>("upd765")->set_ready_line_connected(false);
-	
+
 
 	m_pic8259 = machine().device("pic8259");
 	m_dma8237 = NULL;

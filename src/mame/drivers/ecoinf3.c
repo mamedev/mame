@@ -24,7 +24,7 @@ public:
 	ecoinf3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
-	{ 
+	{
 		strobe_amount = 0;
 		strobe_addr = 0;
 	}
@@ -68,17 +68,17 @@ public:
 		// guess, what are the bottom 4 bits, if anything?
 
 		int ret = m_optic_pattern | (ioport("IN0")->read() & 0xf);
-		
+
 		// | 0x80 = reel 4 fault
 		// | 0x40 = reel 3 fault
 		// | 0x20 = reel 2 fault
 		// | 0x10 = reel 1 fault
 
 		logerror("%04x - ppi8255_intf_d_(used)read_b %02x (Reel Optics)\n", machine().device("maincpu")->safe_pcbase(), ret);
-		
+
 		return ret;
-	
-	
+
+
 	} // changing goes from reel 1 error to running something in sphinx
 	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_d_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 
@@ -89,7 +89,7 @@ public:
 		logerror("%04x - ppi8255_intf_e_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
 		return ret;
 	}
-	
+
 	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_f_read_a)
@@ -122,7 +122,7 @@ public:
 			for (int bit=0;bit<16;bit++)
 			{
 				int data = ((m_lamps[i] << bit)&0x8000)>>15;
-	
+
 				output_set_indexed_value("lamp", (i*16)+bit, data );
 			}
 		}
@@ -131,17 +131,17 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_a_strobedat0)
 	{
-	//	logerror("%04x - ppi8255_intf_a_(used)write_a %02x (STROBEDAT?)\n", machine().device("maincpu")->safe_pcbase(), data);
+	//  logerror("%04x - ppi8255_intf_a_(used)write_a %02x (STROBEDAT?)\n", machine().device("maincpu")->safe_pcbase(), data);
 		if (strobe_amount)
 		{
 			m_lamps[strobe_addr] = (m_lamps[strobe_addr] &0xff00) | (data & 0x00ff);
 			strobe_amount--;
 		}
 	}
-	
+
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_a_write_b_strobedat1)
 	{
-	//	logerror("%04x - ppi8255_intf_a_(used)write_b %02x (STROBEDAT?)\n", machine().device("maincpu")->safe_pcbase(), data);
+	//  logerror("%04x - ppi8255_intf_a_(used)write_b %02x (STROBEDAT?)\n", machine().device("maincpu")->safe_pcbase(), data);
 		if (strobe_amount)
 		{
 			m_lamps[strobe_addr] = (m_lamps[strobe_addr] &0x00ff) | (data << 8);
@@ -152,13 +152,13 @@ public:
 	{
 		if ((data>=0xf0) && (data<=0xff))
 		{
-		//	logerror("%04x - ppi8255_intf_a_(used)write_c %02x (STROBE?)\n", machine().device("maincpu")->safe_pcbase(), data);
+		//  logerror("%04x - ppi8255_intf_a_(used)write_c %02x (STROBE?)\n", machine().device("maincpu")->safe_pcbase(), data);
 			strobe_addr = data & 0xf;
-		
+
 			// hack, it writes values for the lamps, then writes 0x00 afterwards, probably giving the bulbs power, then removing the power
 			// before switching the strobe to the next line?
 			strobe_amount = 2;
-		
+
 			update_lamps();
 		}
 		else logerror("%04x - ppi8255_intf_a_(used)write_c %02x (UNUSUAL?)\n", machine().device("maincpu")->safe_pcbase(), data);
@@ -174,7 +174,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_a_reel01)
 	{
-//		logerror("%04x - ppi8255_intf_d_(used)write_a %02x\n", machine().device("maincpu")->safe_pcbase(), data);
+//      logerror("%04x - ppi8255_intf_d_(used)write_a %02x\n", machine().device("maincpu")->safe_pcbase(), data);
 		stepper_update(0, data&0x0f);
 		stepper_update(1, (data>>4)&0x0f);
 
@@ -189,8 +189,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_a_reel23)
 	{
-//		logerror("%04x - ppi8255_intf_d_(used)write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data);
-	
+//      logerror("%04x - ppi8255_intf_d_(used)write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data);
+
 		stepper_update(2, data&0x0f);
 		stepper_update(3, (data>>4)&0x0f);
 
@@ -370,7 +370,7 @@ WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a_alpha_display)
 
 	// Sphinx - Writes "No % Key"  -- depends on port 0x51, writes "SPHINX  V- 1" if it's happy with that .. after that you get COIN TAMPER,  a count down with COINS TRIM and a reboot
 	// Pennies from Heaven - same behavior as Sphinx
-	
+
 	// typically writes a letter (sometimes twice) then 0x00, usually twice
 
 	if (data==0x00)
@@ -423,9 +423,9 @@ static I8255_INTERFACE (ppi8255_intf_e)
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_read_a),						/* Port A read */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_write_a_alpha_display),		/* Port A write */ /* alpha display characters*/
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_read_b),						/* Port B read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_write_b),						/* Port B write */ 	// not written at an appropriate time for it to be a 'send' address for the text
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_write_b),						/* Port B write */	// not written at an appropriate time for it to be a 'send' address for the text
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_read_c),						/* Port C read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_write_c)						/* Port C write */ 	// not written at an appropriate time for it to be a 'send' address for the text
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_e_write_c)						/* Port C write */	// not written at an appropriate time for it to be a 'send' address for the text
 };
 
 static I8255_INTERFACE (ppi8255_intf_f)
@@ -478,8 +478,8 @@ static ADDRESS_MAP_START( pyramid_portmap, AS_IO, 8, ecoinf3_state )
 	AM_RANGE(0x5c, 0x5f) AM_DEVREADWRITE("ppi8255_h", i8255_device, read, write)
 	// frequently accesses DB after 5B, mirror? bug?
 	AM_RANGE(0xDB, 0xDB) AM_DEVWRITE("sn1", sn76489_device, write)  // no idea what the sound chip is, this sounds terrible
-	
-	
+
+
 ADDRESS_MAP_END
 
 
@@ -697,7 +697,7 @@ static const sn76496_config psg_intf =
 static MACHINE_CONFIG_START( ecoinf3_pyramid, ecoinf3_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180,8000000) // certainly not a plain z80 at least, invalid opcodes for that
-	
+
 	MCFG_CPU_PROGRAM_MAP(pyramid_memmap)
 	MCFG_CPU_IO_MAP(pyramid_portmap)
 
@@ -742,7 +742,7 @@ ROM_START( ec_pyrama )
 ROM_END
 
 ROM_START( ec_sphin ) /* the last 0x2000 bytes (unmapped?) are the same as on the ec_pyram set */
-	ROM_REGION( 0x200000, "maincpu", 0 ) 	
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "spnx5p", 0x0000, 0x010000, CRC(b4b49259) SHA1(a26172b659b739564b25dcc0f3f31f131a144d52) )
 ROM_END
 
@@ -803,16 +803,16 @@ DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3)
 DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3_swap)
 {
 	// not all sets have this, are they just badly dumped?
-	UINT8 table[] = 
+	UINT8 table[] =
 	{
-		0x48, 0x4c, 0x49, 0x4d, 0x40, 0x44, 0x41, 0x45,     0x68, 0x78, 0x60, 0x70, 0x6a, 0x7a, 0x62, 0x72,   
-		0x08, 0x0c, 0x09, 0x0d, 0x00, 0x04, 0x01, 0x05,		0x6c, 0x7c, 0x64, 0x74, 0x6e, 0x7e, 0x66, 0x76, 
+		0x48, 0x4c, 0x49, 0x4d, 0x40, 0x44, 0x41, 0x45,     0x68, 0x78, 0x60, 0x70, 0x6a, 0x7a, 0x62, 0x72,
+		0x08, 0x0c, 0x09, 0x0d, 0x00, 0x04, 0x01, 0x05,		0x6c, 0x7c, 0x64, 0x74, 0x6e, 0x7e, 0x66, 0x76,
 		0x58, 0x5c, 0x59, 0x5d, 0x50, 0x54, 0x51, 0x55,	    0x28, 0x38, 0x20, 0x30, 0x2a, 0x3a, 0x22, 0x32,
 		0x18, 0x1c, 0x19, 0x1d, 0x10, 0x14, 0x11, 0x15,	    0x2c, 0x3c, 0x24, 0x34, 0x2e, 0x3e, 0x26, 0x36,
 		0x56, 0x52, 0x57, 0x53, 0x5e, 0x5a, 0x5f, 0x5b,		0x75, 0x65, 0x7d, 0x6d, 0x77, 0x67, 0x7f ,0x6f,
-		0x16, 0x12, 0x17, 0x13, 0x1e, 0x1a, 0x1f, 0x1b,	   	0x71, 0x61, 0x79, 0x69, 0x73, 0x63, 0x7b, 0x6b,	
-		0x46, 0x42, 0x47, 0x43, 0x4e, 0x4a, 0x4f, 0x4b,     0x35, 0x25, 0x3d, 0x2d, 0x37, 0x27, 0x3f ,0x2f, 
-	    0x06, 0x02, 0x07, 0x03, 0x0e, 0x0a, 0x0f, 0x0b,     0x31, 0x21, 0x39, 0x29, 0x33, 0x23, 0x3b, 0x2b, 
+		0x16, 0x12, 0x17, 0x13, 0x1e, 0x1a, 0x1f, 0x1b,		0x71, 0x61, 0x79, 0x69, 0x73, 0x63, 0x7b, 0x6b,
+		0x46, 0x42, 0x47, 0x43, 0x4e, 0x4a, 0x4f, 0x4b,     0x35, 0x25, 0x3d, 0x2d, 0x37, 0x27, 0x3f ,0x2f,
+	    0x06, 0x02, 0x07, 0x03, 0x0e, 0x0a, 0x0f, 0x0b,     0x31, 0x21, 0x39, 0x29, 0x33, 0x23, 0x3b, 0x2b,
 	};
 
 	UINT8*	buffer = auto_alloc_array(machine(), UINT8, 0x10000);
@@ -832,7 +832,7 @@ DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3_swap)
 
 // another hw type (similar to stuff in ecoinf2.c) (watchdog on port 58?)
 GAME( 19??, ec_pyram,   0		 , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3_swap,	ROT0,  "Electrocoin", "Pyramid (v1) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 19??, ec_pyrama,  ec_pyram , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,     	ROT0,  "Electrocoin", "Pyramid (v6) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 19??, ec_pyrama,  ec_pyram , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,    	ROT0,  "Electrocoin", "Pyramid (v6) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 19??, ec_sphin,   0		 , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3_swap,	ROT0,  "Electrocoin", "Sphinx (v2) (Electrocoin) (set 1)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 19??, ec_sphina,  ec_sphin , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,		ROT0,  "Electrocoin", "Sphinx (v2) (Electrocoin) (set 2)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 GAME( 19??, ec_sphinb,  ec_sphin , ecoinf3_pyramid,   ecoinf3, ecoinf3_state,   ecoinf3,		ROT0,  "Electrocoin", "Sphinx (v1) (Electrocoin)"		, GAME_NO_SOUND|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)

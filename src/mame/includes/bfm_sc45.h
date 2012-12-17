@@ -480,8 +480,8 @@ public:
 	DECLARE_DRIVER_INIT(sc4corotb);
 	DECLARE_DRIVER_INIT(sc4hyper);
 
-	
-	
+
+
 	DECLARE_MACHINE_START(sc4);
 	DECLARE_MACHINE_RESET(sc4);
 };
@@ -3436,7 +3436,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_bgold_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	
+
 #define sc_cconx_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "mtom sounds", 0x000000, 0x100000, NO_DUMP ) \
@@ -3614,7 +3614,7 @@ INPUT_PORTS_EXTERN( sc4_base );
 #define sc_revo_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "rev sounds", 0x0000, 0x100000, NO_DUMP ) \
-	
+
 #define sc_wild_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	\

@@ -21,7 +21,7 @@
 
     Current status:
         - Cartridges run.
-		- Riding Hero runs in slow-mo (probably related to comms HW / IO port handling)
+        - Riding Hero runs in slow-mo (probably related to comms HW / IO port handling)
 
     ToDo :
         - Change input code to allow selection of the mahjong panel in PORT_CATEGORY.
@@ -30,22 +30,22 @@
 
     Neo-Geo CD hardware
 
-	Thanks to:
-	    * The FBA team (Barry Harris) for much of the CDC / CDD code and system details.
-		  ( http://www.barryharris.me.uk/ )
-		* Mirko Buffoni for a commented disassembly of the NeoCD bios rom.
+    Thanks to:
+        * The FBA team (Barry Harris) for much of the CDC / CDD code and system details.
+          ( http://www.barryharris.me.uk/ )
+        * Mirko Buffoni for a commented disassembly of the NeoCD bios rom.
 
     Current status:
-		- NeoCDZ runs, the original NeoCD does not
-		   - Might think the tray is open? (check)
-		- Some unknown / unhandled CD commands, code is still a bit messy
-		   - CDDA continues to play during loading, should stop it
-		- Games using Raster Effects are broken without a kludge
-		   - CPU gets overloaded with IRQs from the timer callback...
-		- Double Dragon doesn't load, it erases the IRQ table
-		   - might need better handling of the Vector Table Mapping, or better interrupts (see point above)
-		- Softlist are based on an old Tosec set and should be updated to the TruRip set once we can convert CCD
-		  without throwing away gap data etc.
+        - NeoCDZ runs, the original NeoCD does not
+           - Might think the tray is open? (check)
+        - Some unknown / unhandled CD commands, code is still a bit messy
+           - CDDA continues to play during loading, should stop it
+        - Games using Raster Effects are broken without a kludge
+           - CPU gets overloaded with IRQs from the timer callback...
+        - Double Dragon doesn't load, it erases the IRQ table
+           - might need better handling of the Vector Table Mapping, or better interrupts (see point above)
+        - Softlist are based on an old Tosec set and should be updated to the TruRip set once we can convert CCD
+          without throwing away gap data etc.
 
 ****************************************************************************/
 
@@ -114,7 +114,7 @@ public:
 	}
 
 	optional_device<lc89510_temp_device> m_tempcdc;
-	
+
 
 
 	void NeoCDDoDMA(address_space& curr_space);
@@ -163,7 +163,7 @@ public:
 	void set_nNeoCDIRQVectorAck(int val) { nNeoCDIRQVectorAck = val; }
 	int get_nNeoCDIRQVector(void) { return nNeoCDIRQVector; }
 	void NeoCDIRQUpdate(UINT8 byteValue);
-	
+
 	// from the CDC
 	void interrupt_callback_type1(void);
 	void interrupt_callback_type2(void);
@@ -482,8 +482,8 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 				if (data==0x00)
 				{
 				// not a good idea, causes hangs
-				//	m_tempcdc->NeoCDCommsReset();
-					
+				//  m_tempcdc->NeoCDCommsReset();
+
 					// I doubt this is correct either, but we need something to stop
 					// the interrupts during gameplay and I'm not sure what...
 					prohibit_cdc_irq = true;
@@ -496,7 +496,7 @@ WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 			break;
 		}
 		case 0x0182: {
-		//	printf("blah %02x\n", byteValue);
+		//  printf("blah %02x\n", byteValue);
 			if (byteValue == 0x00)
 			{
 				machine().device("ymsnd")->reset();
@@ -598,7 +598,7 @@ WRITE8_MEMBER(ng_aes_state::neocd_transfer_w)
 			}
 			else
 			{
-		//	printf("sekAddress %08x %02x\n", sekAddress, data);
+		//  printf("sekAddress %08x %02x\n", sekAddress, data);
 				if ((sekAddress & 0xfffff) >= 0x20000) break;
 				NeoZ80ROMActive[(sekAddress & 0x1FFFF) >> 1] = byteValue;
 			}
@@ -1526,7 +1526,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED_CLASS( aes, neogeo_base, ng_aes_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(aes_main_map) // some different input handling, probably also responsible for Riding Hero not running properly
-	
+
 	MCFG_MEMCARD_HANDLER(neogeo_aes)
 
 	MCFG_MACHINE_START_OVERRIDE(ng_aes_state, neogeo)
