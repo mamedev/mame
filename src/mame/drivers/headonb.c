@@ -203,4 +203,4 @@ ROM_START( headonb )
 ROM_END
 
 
-GAME( 1979, headonb, 0, headonb, headonb, driver_device, 0, ROT0, "bootleg (EFG Sanremo)", "Head On (bootleg on dedicated hardware)", GAME_NO_SOUND )
+GAME( 1979, headonb, headon, headonb, headonb, driver_device, 0, ROT0, "bootleg (EFG Sanremo)", "Head On (bootleg on dedicated hardware)", GAME_NO_SOUND )
