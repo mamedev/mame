@@ -1,8 +1,9 @@
 /*********************************************************************
 
-    mc6847.h
+    gime.h
 
-    Implementation of Motorola 6847 video hardware chip
+    Implementation of CoCo GIME (Graphics Interrupt Memory Enhancement)
+    video chip.
 
 ***************************************************************************/
 
@@ -40,7 +41,7 @@ struct gime_interface
 	/* if specified, this gets called for every change of the FIRQ pin */
 	devcb_write_line			m_out_firq_func;
 
-	/* if specified, this reads from the floating bugs */
+	/* if specified, this reads from the floating bus */
 	devcb_read8					m_in_floating_bus_func;
 };
 
