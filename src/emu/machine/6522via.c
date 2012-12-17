@@ -118,17 +118,6 @@ inline void via6522_device::set_irq_line(int state)
 	}
 }
 
-attotime via6522_device::cycles_to_time(int c)
-{
-	return attotime::from_hz(clock()) * c;
-}
-
-
-UINT32 via6522_device::time_to_cycles(attotime t)
-{
-	return (t * clock()).as_double();
-}
-
 
 UINT16 via6522_device::get_counter1_value()
 {
@@ -136,11 +125,11 @@ UINT16 via6522_device::get_counter1_value()
 
 	if(m_t1_active)
 	{
-		val = time_to_cycles(m_t1->remaining()) - IFR_DELAY;
+		val = attotime_to_clocks(m_t1->remaining()) - IFR_DELAY;
 	}
 	else
 	{
-		val = 0xffff - time_to_cycles(machine().time() - m_time1);
+		val = 0xffff - attotime_to_clocks(machine().time() - m_time1);
 	}
 
 	return val;
@@ -369,9 +358,9 @@ void via6522_device::shift()
 		if (m_shift_counter)
 		{
 			if (SO_O2_CONTROL(m_acr)) {
-				m_shift_timer->adjust(cycles_to_time(2));
+				m_shift_timer->adjust(clocks_to_attotime(2));
 			} else {
-				m_shift_timer->adjust(cycles_to_time((m_t2ll + 2)*2));
+				m_shift_timer->adjust(clocks_to_attotime((m_t2ll + 2)*2));
 			}
 		}
 		else
@@ -419,9 +408,9 @@ void via6522_device::shift()
 		if (m_shift_counter)
 		{
 			if (SI_O2_CONTROL(m_acr)) {
-				m_shift_timer->adjust(cycles_to_time(2));
+				m_shift_timer->adjust(clocks_to_attotime(2));
 			} else {
-				m_shift_timer->adjust(cycles_to_time((m_t2ll + 2)*2));
+				m_shift_timer->adjust(clocks_to_attotime((m_t2ll + 2)*2));
 			}
 		}
 		else
@@ -472,7 +461,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				{
 					m_out_b ^= 0x80;
 				}
-				m_t1->adjust(cycles_to_time(TIMER1_VALUE + IFR_DELAY));
+				m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
 			}
 			else
 			{
@@ -570,10 +559,14 @@ READ8_MEMBER( via6522_device::read )
 					logerror("%s:6522VIA chip %s: Port A is being read but has no handler\n", machine().describe_context(), tag());
 				}
 			}
-		}
 
-		/* combine input and output values */
-		val = (m_out_a & m_ddr_a) + (m_in_a & ~m_ddr_a);
+			/* combine input and output values */
+			val = (m_out_a & m_ddr_a) + (m_in_a & ~m_ddr_a);
+		}
+		else
+		{
+			val = m_in_a;
+		}
 
 		CLR_PA_INT();
 
@@ -585,7 +578,7 @@ READ8_MEMBER( via6522_device::read )
 			m_out_ca2_func(0);
 			m_out_ca2 = 0;
 
-			m_ca2_timer->adjust(cycles_to_time(1));
+			m_ca2_timer->adjust(clocks_to_attotime(1));
 		}
 		/* If CA2 is configured as output and in pulse or handshake mode,
            CA2 is set now */
@@ -650,7 +643,7 @@ READ8_MEMBER( via6522_device::read )
 		clear_int(INT_T2);
 		if (m_t2_active)
 		{
-			val = time_to_cycles(m_t2->remaining()) & 0xff;
+			val = attotime_to_clocks(m_t2->remaining()) & 0xff;
 		}
 		else
 		{
@@ -660,7 +653,7 @@ READ8_MEMBER( via6522_device::read )
 			}
 			else
 			{
-				val = (0x10000 - (time_to_cycles(machine().time() - m_time2) & 0xffff) - 1) & 0xff;
+				val = (0x10000 - (attotime_to_clocks(machine().time() - m_time2) & 0xffff) - 1) & 0xff;
 			}
 		}
 		break;
@@ -668,7 +661,7 @@ READ8_MEMBER( via6522_device::read )
 	case VIA_T2CH:
 		if (m_t2_active)
 		{
-			val = time_to_cycles(m_t2->remaining()) >> 8;
+			val = attotime_to_clocks(m_t2->remaining()) >> 8;
 		}
 		else
 		{
@@ -678,7 +671,7 @@ READ8_MEMBER( via6522_device::read )
 			}
 			else
 			{
-				val = (0x10000 - (time_to_cycles(machine().time() - m_time2) & 0xffff) - 1) >> 8;
+				val = (0x10000 - (attotime_to_clocks(machine().time() - m_time2) & 0xffff) - 1) >> 8;
 			}
 		}
 		break;
@@ -689,11 +682,11 @@ READ8_MEMBER( via6522_device::read )
 		clear_int(INT_SR);
 		if (SI_O2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(cycles_to_time(2));
+			m_shift_timer->adjust(clocks_to_attotime(2));
 		}
 		if (SI_T2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(cycles_to_time((m_t2ll + 2)*2));
+			m_shift_timer->adjust(clocks_to_attotime((m_t2ll + 2)*2));
 		}
 		break;
 
@@ -775,7 +768,7 @@ WRITE8_MEMBER( via6522_device::write )
 			m_out_ca2_func(0);
 			m_out_ca2 = 0;
 
-			m_ca2_timer->adjust(cycles_to_time(1));
+			m_ca2_timer->adjust(clocks_to_attotime(1));
 		}
 		else if (CA2_AUTO_HS(m_pcr))
 		{
@@ -856,7 +849,7 @@ WRITE8_MEMBER( via6522_device::write )
 				m_out_b_func(0, write_data);
 			}
 		}
-		m_t1->adjust(cycles_to_time(TIMER1_VALUE + IFR_DELAY));
+		m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + IFR_DELAY));
 		m_t1_active = 1;
 		break;
 
@@ -872,12 +865,12 @@ WRITE8_MEMBER( via6522_device::write )
 
 		if (!T2_COUNT_PB6(m_acr))
 		{
-			m_t2->adjust(cycles_to_time(TIMER2_VALUE + IFR_DELAY));
+			m_t2->adjust(clocks_to_attotime(TIMER2_VALUE + IFR_DELAY));
 			m_t2_active = 1;
 		}
 		else
 		{
-			m_t2->adjust(cycles_to_time(TIMER2_VALUE));
+			m_t2->adjust(clocks_to_attotime(TIMER2_VALUE));
 			m_t2_active = 1;
 			m_time2 = machine().time();
 		}
@@ -889,11 +882,11 @@ WRITE8_MEMBER( via6522_device::write )
 		clear_int(INT_SR);
 		if (SO_O2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(cycles_to_time(2));
+			m_shift_timer->adjust(clocks_to_attotime(2));
 		}
 		if (SO_T2_CONTROL(m_acr))
 		{
-			m_shift_timer->adjust(cycles_to_time((m_t2ll + 2)*2));
+			m_shift_timer->adjust(clocks_to_attotime((m_t2ll + 2)*2));
 		}
 		break;
 
@@ -941,7 +934,7 @@ WRITE8_MEMBER( via6522_device::write )
 			}
 			if (T1_CONTINUOUS(data))
 			{
-				m_t1->adjust(cycles_to_time(counter1 + IFR_DELAY));
+				m_t1->adjust(clocks_to_attotime(counter1 + IFR_DELAY));
 				m_t1_active = 1;
 			}
 		}

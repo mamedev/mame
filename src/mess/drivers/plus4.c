@@ -4,7 +4,6 @@
 
     - cassette motor is turned on only for a moment while LOADing
     - c16 function ROM test fails
-    - c1551 won't load anything
     - clean up keyboard handling
     - clean up TED
     - dump PLA
@@ -910,7 +909,7 @@ static MACHINE_CONFIG_START( ntsc, plus4_state )
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, plus4_datassette_devices, "c1531", NULL)
 	MCFG_CBM_IEC_ADD(iec_intf, NULL)
-	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_14_31818MHz/16, expansion_intf, plus4_expansion_cards, NULL, NULL)
+	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_14_31818MHz/16, expansion_intf, plus4_expansion_cards, "c1551", NULL)
 	MCFG_PLUS4_USER_PORT_ADD(PLUS4_USER_PORT_TAG, plus4_user_port_cards, NULL, NULL)
 
 	// internal ram
@@ -950,7 +949,7 @@ static MACHINE_CONFIG_START( pal, plus4_state )
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, plus4_datassette_devices, "c1531", NULL)
 	MCFG_CBM_IEC_ADD(iec_intf, NULL)
-	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_17_73447MHz/20, expansion_intf, plus4_expansion_cards, NULL, NULL)
+	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_17_73447MHz/20, expansion_intf, plus4_expansion_cards, "c1551", NULL)
 	MCFG_PLUS4_USER_PORT_ADD(PLUS4_USER_PORT_TAG, plus4_user_port_cards, NULL, NULL)
 
 	// internal ram

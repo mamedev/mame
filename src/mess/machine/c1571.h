@@ -71,6 +71,8 @@ public:
 	DECLARE_WRITE8_MEMBER( via0_pb_w );
 	DECLARE_READ_LINE_MEMBER( atn_in_r );
 	DECLARE_READ_LINE_MEMBER( wprt_r );
+	DECLARE_READ8_MEMBER( via1_r );
+	DECLARE_WRITE8_MEMBER( via1_w );
 	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
 	DECLARE_READ8_MEMBER( via1_pb_r );
 	DECLARE_WRITE8_MEMBER( via1_pb_w );
@@ -80,7 +82,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cia_sp_w );
 	DECLARE_READ8_MEMBER( cia_pb_r );
 	DECLARE_WRITE8_MEMBER( cia_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( atn_w );
 	DECLARE_WRITE_LINE_MEMBER( byte_w );
 	DECLARE_WRITE_LINE_MEMBER( wpt_w );
 
@@ -100,8 +101,7 @@ protected:
 	virtual void parallel_data_w(UINT8 data);
 	virtual void parallel_strobe_w(int state);
 
-	inline void set_iec_data();
-	inline void set_iec_srq();
+	void update_iec();
 
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via0;

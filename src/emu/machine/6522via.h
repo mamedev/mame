@@ -121,8 +121,6 @@ private:
 	static const device_timer_id TIMER_T2 = 2;
 	static const device_timer_id TIMER_CA2 = 3;
 
-    attotime cycles_to_time(int c);
-    UINT32 time_to_cycles(attotime t);
     UINT16 get_counter1_value();
 
 	inline void set_irq_line(int state);

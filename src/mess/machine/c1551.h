@@ -53,6 +53,8 @@ public:
 
 	DECLARE_READ8_MEMBER( tcbm_data_r );
 	DECLARE_WRITE8_MEMBER( tcbm_data_w );
+	DECLARE_READ8_MEMBER( tpi0_r );
+	DECLARE_WRITE8_MEMBER( tpi0_w );
 	DECLARE_READ8_MEMBER( yb_r );
 	DECLARE_WRITE8_MEMBER( yb_w );
 	DECLARE_READ8_MEMBER( tpi0_pc_r );

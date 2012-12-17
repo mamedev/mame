@@ -110,6 +110,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( accl_w );
 	DECLARE_READ_LINE_MEMBER( sync_r );
 	DECLARE_READ_LINE_MEMBER( byte_r );
+	DECLARE_WRITE_LINE_MEMBER( ted_w );
 	DECLARE_WRITE_LINE_MEMBER( mtr_w );
 	DECLARE_WRITE_LINE_MEMBER( oe_w );
 	DECLARE_WRITE_LINE_MEMBER( soe_w );
@@ -165,7 +166,7 @@ private:
 	// signals
 	int m_accl;								// 1/2 MHz select
 	int m_ds;								// density select
-	int m_soe;								// s? output enable
+	int m_soe;								// serial output enable
 	int m_oe;								// output enable (0 = write, 1 = read)
 
 	// IEC
@@ -176,12 +177,14 @@ private:
 	int m_last_bit_sync;
 	int m_bit_sync;
 	int m_byte_sync;
+	int m_accl_byte_sync;
 	int m_block_sync;
 	int m_ue7;
 	int m_ue7_tc;
 	int m_uf4;
 	int m_uf4_qb;
 	UINT8 m_ud2;
+	UINT8 m_accl_yb;
 	int m_u4a;
 	int m_u4b;
 	int m_ue3;

@@ -11,9 +11,8 @@
 
     TODO:
 
-    - fast serial
+	- refactor to use wd_fdc and modern floppy
     - 1541/1571 Alignment shows drive speed as 266 rpm, should be 310
-    - CP/M disks
 
 */
 
@@ -164,7 +163,7 @@ const rom_entry *base_c1571_device::device_rom_region() const
 static ADDRESS_MAP_START( c1571_mem, AS_PROGRAM, 8, base_c1571_device )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x03f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
-	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x03f0) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
+	AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x03f0) AM_READWRITE(via1_r, via1_w)
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE_LEGACY(WD1770_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x3ff0) AM_DEVREADWRITE(M6526_TAG, mos6526_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
@@ -227,6 +226,12 @@ WRITE8_MEMBER( base_c1571_device::via0_pa_w )
 
     */
 
+	// fast serial direction
+	m_ser_dir = BIT(data, 1);
+
+	// side select
+	m_ga->set_side(BIT(data, 2));
+
 	// 1/2 MHz
 	int clock_1_2 = BIT(data, 5);
 
@@ -243,25 +248,10 @@ WRITE8_MEMBER( base_c1571_device::via0_pa_w )
 		m_1_2mhz = clock_1_2;
 	}
 
-	// fast serial direction
-	int ser_dir = BIT(data, 1);
-
-	if (m_ser_dir != ser_dir)
-	{
-		m_ser_dir = ser_dir;
-
-		set_iec_data();
-		set_iec_srq();
-
-		m_cia->cnt_w(m_ser_dir || m_bus->srq_r());
-		m_cia->sp_w(m_ser_dir || m_bus->data_r());
-	}
-
-	// side select
-	m_ga->set_side(BIT(data, 2));
-
 	// attention out
 	m_bus->atn_w(this, !BIT(data, 6));
+
+	update_iec();
 }
 
 READ8_MEMBER( base_c1571_device::via0_pb_r )
@@ -318,11 +308,13 @@ WRITE8_MEMBER( base_c1571_device::via0_pb_w )
 	// data out
 	m_data_out = BIT(data, 1);
 
+	// clock out
+	m_bus->clk_w(this, !BIT(data, 3));
+
 	// attention acknowledge
 	m_ga->atna_w(BIT(data, 4));
 
-	// clock out
-	m_bus->clk_w(this, !BIT(data, 3));
+	update_iec();
 }
 
 READ_LINE_MEMBER( base_c1571_device::atn_in_r )
@@ -358,6 +350,24 @@ static const via6522_interface via0_intf =
 //-------------------------------------------------
 //  via6522_interface via1_intf
 //-------------------------------------------------
+
+READ8_MEMBER( base_c1571_device::via1_r )
+{
+	UINT8 data = m_via1->read(space, offset);
+	
+	m_ga->ted_w(!m_1_2mhz);
+	m_ga->ted_w(1);
+
+	return data;
+}
+
+WRITE8_MEMBER( base_c1571_device::via1_w )
+{
+	m_via1->write(space, offset, data);
+
+	m_ga->ted_w(!m_1_2mhz);
+	m_ga->ted_w(1);
+}
 
 WRITE_LINE_MEMBER( base_c1571_device::via1_irq_w )
 {
@@ -465,16 +475,14 @@ WRITE_LINE_MEMBER( base_c1571_device::cia_pc_w )
 
 WRITE_LINE_MEMBER( base_c1571_device::cia_cnt_w )
 {
-	// fast serial clock out
 	m_cnt_out = state;
-	set_iec_srq();
+	update_iec();
 }
 
 WRITE_LINE_MEMBER( base_c1571_device::cia_sp_w )
 {
-	// fast serial data out
 	m_sp_out = state;
-	set_iec_data();
+	update_iec();
 }
 
 READ8_MEMBER( base_c1571_device::cia_pb_r )
@@ -507,21 +515,15 @@ static MOS6526_INTERFACE( cia_intf )
 //  C64H156_INTERFACE( ga_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( base_c1571_device::atn_w )
-{
-	set_iec_data();
-}
-
 WRITE_LINE_MEMBER( base_c1571_device::byte_w )
 {
-	m_maincpu->set_input_line(M6502_SET_OVERFLOW, state);
-
 	m_via1->write_ca1(state);
+	m_maincpu->set_input_line(M6502_SET_OVERFLOW, state);
 }
 
 static C64H156_INTERFACE( ga_intf )
 {
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c1571_device, atn_w),
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c1571_device, byte_w)
 };
@@ -673,41 +675,6 @@ machine_config_constructor base_c1571_device::device_mconfig_additions() const
 
 
 //**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  base_c1571_device - constructor
-//-------------------------------------------------
-
-inline void base_c1571_device::set_iec_data()
-{
-	int data = !m_data_out && !m_ga->atn_r();
-
-	// fast serial data
-	if (m_ser_dir) data &= m_sp_out;
-
-	m_bus->data_w(this, data);
-}
-
-
-//-------------------------------------------------
-//  base_c1571_device - constructor
-//-------------------------------------------------
-
-inline void base_c1571_device::set_iec_srq()
-{
-	int srq = 1;
-
-	// fast serial clock
-	if (m_ser_dir) srq &= m_cnt_out;
-
-	m_bus->srq_w(this, srq);
-}
-
-
-
-//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -809,10 +776,9 @@ void base_c1571_device::device_reset()
 	wd17xx_mr_w(m_fdc, 1);
 
 	m_sp_out = 1;
-	set_iec_data();
-
 	m_cnt_out = 1;
-	set_iec_srq();
+
+	update_iec();
 }
 
 
@@ -822,7 +788,7 @@ void base_c1571_device::device_reset()
 
 void base_c1571_device::cbm_iec_srq(int state)
 {
-	m_cia->cnt_w(m_ser_dir || state);
+	update_iec();
 }
 
 
@@ -832,10 +798,7 @@ void base_c1571_device::cbm_iec_srq(int state)
 
 void base_c1571_device::cbm_iec_atn(int state)
 {
-	m_via0->write_ca1(!state);
-	m_ga->atni_w(!state);
-
-	set_iec_data();
+	update_iec();
 }
 
 
@@ -845,7 +808,7 @@ void base_c1571_device::cbm_iec_atn(int state)
 
 void base_c1571_device::cbm_iec_data(int state)
 {
-	m_cia->sp_w(m_ser_dir || state);
+	update_iec();
 }
 
 
@@ -892,4 +855,29 @@ void base_c1571_device::on_disk_change(device_image_interface &image)
 
     int wp = floppy_wpt_r(image);
 	c1571->m_ga->on_disk_changed(wp);
+}
+
+
+//-------------------------------------------------
+//  update_iec -
+//-------------------------------------------------
+
+void base_c1571_device::update_iec()
+{
+	m_cia->cnt_w(m_ser_dir || m_bus->srq_r());
+	m_cia->sp_w(m_ser_dir || m_bus->data_r());
+
+	int atn = m_bus->atn_r();
+	m_via0->write_ca1(!atn);
+	m_ga->atni_w(!atn);
+
+	// serial data
+	int data = !m_data_out && !m_ga->atn_r();
+	if (m_ser_dir) data &= m_sp_out;
+	m_bus->data_w(this, data);
+
+	// fast clock
+	int srq = 1;
+	if (m_ser_dir) srq &= m_cnt_out;
+	m_bus->srq_w(this, srq);
 }

@@ -7,15 +7,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - byte latching does not match hardware behavior
-      (CPU skips data bytes if implemented per schematics)
-
-*/
-
 #include "c1551.h"
 
 
@@ -118,11 +109,11 @@ WRITE8_MEMBER( c1551_device::port_w )
 
     */
 
-	// spindle motor
-	m_ga->mtr_w(BIT(data, 2));
-
 	// stepper motor
 	m_ga->stp_w(data & 0x03);
+
+	// spindle motor
+	m_ga->mtr_w(BIT(data, 2));
 
 	// activity LED
 	output_set_led_value(LED_ACT, BIT(data, 3));
@@ -173,6 +164,24 @@ WRITE8_MEMBER( c1551_device::tcbm_data_w )
     */
 
 	m_tcbm_data = data;
+}
+
+READ8_MEMBER( c1551_device::tpi0_r )
+{
+	UINT8 data = m_tpi0->read(space, offset);
+	
+	m_ga->ted_w(0);
+	m_ga->ted_w(1);
+
+	return data;
+}
+
+WRITE8_MEMBER( c1551_device::tpi0_w )
+{
+	m_tpi0->write(space, offset, data);
+
+	m_ga->ted_w(0);
+	m_ga->ted_w(1);
 }
 
 READ8_MEMBER( c1551_device::tpi0_pc_r )
@@ -340,7 +349,7 @@ static const tpi6525_interface tpi1_intf =
 
 static ADDRESS_MAP_START( c1551_mem, AS_PROGRAM, 8, c1551_device )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_RAM
-	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_DEVREADWRITE_LEGACY(M6523_0_TAG, tpi6525_r, tpi6525_w)
+	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_READWRITE(tpi0_r, tpi0_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(M6510T_TAG, 0)
 ADDRESS_MAP_END
 
@@ -353,7 +362,7 @@ static C64H156_INTERFACE( ga_intf )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(C64H156_TAG, c64h156_device, atni_w)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, c64h156_device, atni_w)
 };
 
 
@@ -569,7 +578,7 @@ UINT8 c1551_device::plus4_cd_r(address_space &space, offs_t offset, UINT8 data, 
 
 	if (tpi1_selected(offset))
 	{
-		data = tpi6525_r(m_tpi1, space, offset & 0x07);
+		data = m_tpi1->read(space, offset & 0x07);
 	}
 
 	return data;
@@ -584,7 +593,7 @@ void c1551_device::plus4_cd_w(address_space &space, offs_t offset, UINT8 data, i
 {
 	if (tpi1_selected(offset))
 	{
-		tpi6525_w(m_tpi1, space, offset & 0x07, data);
+		m_tpi1->write(space, offset & 0x07, data);
 	}
 
 	m_exp->cd_w(space, offset, data, ba, cs0, c1l, c2l, cs1, c1h, c2h);

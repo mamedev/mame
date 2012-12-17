@@ -453,23 +453,19 @@ void base_c1581_device::cbm_iec_reset(int state)
 
 void base_c1581_device::update_iec()
 {
-	int atn = m_bus->atn_r();
-
 	m_cia->cnt_w(m_fast_ser_dir || m_bus->srq_r());
 	m_cia->sp_w(m_fast_ser_dir || m_bus->data_r());
+
+	int atn = m_bus->atn_r();
 	m_cia->flag_w(atn);
 
 	// serial data
 	int data = !m_data_out && !(m_atn_ack && !atn);
-
 	if (m_fast_ser_dir) data &= m_sp_out;
-
 	m_bus->data_w(this, data);
 
 	// fast clock
 	int srq = 1;
-
 	if (m_fast_ser_dir) srq &= m_cnt_out;
-
 	m_bus->srq_w(this, srq);
 }

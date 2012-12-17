@@ -329,7 +329,7 @@ inline void c64h156_device::decode_bit()
 
 	int byte_sync = !(uc1b && m_soe && !uf4_qb);
 
-	if (LOG) logerror("BYTE %u SOE %u\n", m_byte_sync, m_soe);
+	if (LOG) logerror("BYTE %u SOE %u\n", byte_sync, m_soe);
 
 	// UD3
 
@@ -365,7 +365,20 @@ inline void c64h156_device::decode_bit()
 	if (m_byte_sync != byte_sync)
 	{
 		m_byte_sync = byte_sync;
-		m_out_byte_func(m_byte_sync);
+
+		if (m_accl)
+		{
+			if (!byte_sync)
+			{
+				m_accl_yb = m_ud2;
+				m_accl_byte_sync = byte_sync;
+				m_out_byte_func(m_accl_byte_sync);
+			}
+		}
+		else
+		{
+			m_out_byte_func(m_byte_sync);
+		}
 	}
 
 	m_uf4_qb = uf4_qb;
@@ -405,12 +418,14 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 	  m_last_bit_sync(0),
 	  m_bit_sync(0),
 	  m_byte_sync(1),
+	  m_accl_byte_sync(1),
 	  m_block_sync(1),
 	  m_ue7(0),
 	  m_ue7_tc(0),
 	  m_uf4(0),
 	  m_uf4_qb(0),
 	  m_ud2(0),
+	  m_accl_yb(0),
 	  m_u4a(0),
 	  m_u4b(0),
 	  m_ue3(0),
@@ -458,12 +473,14 @@ void c64h156_device::device_start()
 	save_item(NAME(m_last_bit_sync));
 	save_item(NAME(m_bit_sync));
 	save_item(NAME(m_byte_sync));
+	save_item(NAME(m_accl_byte_sync));
 	save_item(NAME(m_block_sync));
 	save_item(NAME(m_ue7));
 	save_item(NAME(m_ue7_tc));
 	save_item(NAME(m_uf4));
 	save_item(NAME(m_uf4_qb));
 	save_item(NAME(m_ud2));
+	save_item(NAME(m_accl_yb));
 	save_item(NAME(m_u4a));
 	save_item(NAME(m_u4b));
 	save_item(NAME(m_ue3));
@@ -504,10 +521,17 @@ READ8_MEMBER( c64h156_device::yb_r )
 
 	if (m_soe)
 	{
-		data = m_ud2;
+		if (m_accl)
+		{
+			data = m_accl_yb;
+		}
+		else
+		{
+			data = m_ud2;
+		}
 	}
 
-	if (LOG) logerror("YB read %02x:%02x\n", m_ud2, data);
+	if (LOG) logerror("%s YB read %02x:%02x\n", machine().describe_context(), m_ud2, data);
 
 	return data;
 }
@@ -558,7 +582,32 @@ READ_LINE_MEMBER( c64h156_device::sync_r )
 
 READ_LINE_MEMBER( c64h156_device::byte_r )
 {
-	return m_byte_sync;
+	int state = 1;
+
+	if (m_accl)
+	{
+		state = m_accl_byte_sync;
+	}
+	else
+	{
+		state = m_byte_sync;
+	}
+
+	return state;
+}
+
+
+//-------------------------------------------------
+//  ted_w -
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( c64h156_device::ted_w )
+{
+	if (m_accl && !m_accl_byte_sync && !state)
+	{
+		m_accl_byte_sync = 1;
+		m_out_byte_func(m_accl_byte_sync);
+	}
 }
 
 
