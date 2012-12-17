@@ -2269,6 +2269,17 @@ ROM_START( pc10iii )
 	ROM_REGION(0x8000,"gfx1", 0)
 	ROM_LOAD("pc10iii_char.bin", 0x00000, 0x8000, CRC(b406651c) SHA1(856f58353391a74a06ebb8ec9f8333d7d69e5fd6))
 ROM_END
+
+ROM_START( mbc16 )
+    ROM_REGION(0x100000,"maincpu", 0)
+	ROM_LOAD( "mbc16.bin", 0xfc000, 0x4000, CRC(f3e0934a) SHA1(e4b91c3d395be0414e20f23ad4919b8ac52639b2))
+	ROM_REGION(0x2000,"gfx1", 0)
+	//ATI Graphics Solution SR (graphics card, need to make it ISA card)
+	ROM_LOAD( "atigssr.bin", 0x0000, 0x2000, CRC(aca81498) SHA1(0d84c89487ee7a6ac4c9e73fdb30c5fd8aa595f8))
+	// override for now with IBM CGA card
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -2318,3 +2329,4 @@ COMP( 1985, pc7000,     ibm5150,    0,          pccga,      pccga, pc_state,    
 COMP( 198?, pcd,        ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Siemens", "PC-D", GAME_NOT_WORKING)
 COMP( 198?, olypeopl,   ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Olympia", "People PC", GAME_NOT_WORKING)
 COMP( 1988, sx16,       ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Sanyo", "SX-16", GAME_NOT_WORKING)
+COMP( 198?, mbc16,      ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Sanyo", "MBC-16" , GAME_NOT_WORKING)
