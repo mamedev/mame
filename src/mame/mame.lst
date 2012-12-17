@@ -139,6 +139,7 @@ pengob			// bootleg
 penta			// bootleg
 jrpacmbl		// bootleg on Pengo HW
 jrpacman		// (c) 1983 Midway
+jrpacmanf		// speedup hack
 
 // Epos games
 megadon			// (c) 1982
