@@ -34,6 +34,7 @@ CPUS += V30MZ
 CPUS += V60
 CPUS += MCS48
 CPUS += MCS51
+CPUS += MCS96
 CPUS += M6800
 CPUS += M6805
 CPUS += HD6309
@@ -2120,7 +2121,7 @@ $(MESS_DRIVERS)/mac.o:		$(MESSSRC)/drivers/mac.c \
 				$(MESSSRC)/includes/mac.h $(MESSSRC)/machine/egret.h $(MESSSRC)/machine/cuda.h
 
 $(MESS_MACHINE)/egret.o:	$(MESSSRC)/machine/egret.c\
-                        	$(MESSSRC)/machine/egret.h
+				$(MESSSRC)/machine/egret.h
 
 $(MESS_DRIVERS)/apple2.o:   $(MESSSRC)/includes/apple2.h
 $(MESS_MACHINE)/apple2.o:   $(MESSSRC)/includes/apple2.h

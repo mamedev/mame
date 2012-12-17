@@ -702,6 +702,43 @@ $(CPUOBJ)/mcs51/mcs51.o:	$(CPUSRC)/mcs51/mcs51.c \
 							$(CPUSRC)/mcs51/mcs51ops.c
 
 #-------------------------------------------------
+# Intel MCS-96
+#-------------------------------------------------
+
+ifneq ($(filter MCS96,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/mcs96
+CPUOBJS += $(CPUOBJ)/mcs96/mcs96.o \
+           $(CPUOBJ)/mcs96/i8x9x.o \
+           $(CPUOBJ)/mcs96/i8xc196.o
+endif
+
+$(CPUOBJ)/mcs96/mcs96.o:	$(CPUOBJ)/mcs96/mcs96.inc \
+                            $(CPUSRC)/mcs96/mcs96.c   \
+							$(CPUSRC)/mcs96/mcs96.h
+
+$(CPUOBJ)/mcs96/i8x9x.o:	$(CPUOBJ)/mcs96/i8x9x.inc \
+                            $(CPUSRC)/mcs96/i8x9x.c   \
+							$(CPUSRC)/mcs96/i8x9x.h   \
+							$(CPUSRC)/mcs96/mcs96.h
+
+$(CPUOBJ)/mcs96/i8xc196.o:	$(CPUOBJ)/mcs96/i8xc196.inc \
+                            $(CPUSRC)/mcs96/i8xc196.c   \
+                            $(CPUSRC)/mcs96/i8xc196.c   \
+							$(CPUSRC)/mcs96/mcs96.h
+
+$(CPUOBJ)/mcs96/mcs96.inc:   $(CPUSRC)/mcs96/mcs96make.py $(CPUSRC)/mcs96/mcs96ops.lst
+	@echo Generating i8x9x source file...
+	$(PYTHON) $(CPUSRC)/mcs96/mcs96make.py mcs96 $(CPUSRC)/mcs96/mcs96ops.lst $@
+
+$(CPUOBJ)/mcs96/i8x9x.inc:   $(CPUSRC)/mcs96/mcs96make.py $(CPUSRC)/mcs96/mcs96ops.lst
+	@echo Generating i8x9x source file...
+	$(PYTHON) $(CPUSRC)/mcs96/mcs96make.py i8x9x $(CPUSRC)/mcs96/mcs96ops.lst $@
+
+$(CPUOBJ)/mcs96/i8xc196.inc: $(CPUSRC)/mcs96/mcs96make.py $(CPUSRC)/mcs96/mcs96ops.lst
+	@echo Generating i8x9x source file...
+	$(PYTHON) $(CPUSRC)/mcs96/mcs96make.py i8xc196 $(CPUSRC)/mcs96/mcs96ops.lst $@
+
+#-------------------------------------------------
 # Intel 80x86 series
 #-------------------------------------------------
 
