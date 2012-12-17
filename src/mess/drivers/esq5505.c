@@ -11,21 +11,27 @@
 
     Memory map:
 
-    0x000000-0x00ffff   work RAM low
-    0x200000-0x20001f   OTTO(5505) regs
+    0x000000-0x007fff   work RAM low (64k for SQ-1 and later)
+    0x200000-0x20001f   OTIS (5505) regs
     0x240000-0x2400ff   DMAC (68450) regs (EPS/EPS-16)
     0x260000-0x2601ff   ESP (5510) regs
     0x280000-0x28001f   DUART (68681) regs
     0x2C0000-0x2C0003   Floppy (WD1772) regs (VFX-SD, SD-1, and EPS/EPS-16)
-    0x2E0000-0x2FFFFF   Expansion cartridge (VFX, unknown other models)
+    0x2e0000-0x2fffff   Expansion cartridge (VFX, VFX-SD, SD-1, SD-1 32 voice)
     0x300000-0x300003   EPS/EPS-16 SCSI (WD33C93, register at 300001, data at 300003)
+    0x330000-0x37ffff   VFX-SD / SD-1 sequencer RAM
     0x340000-0x3bffff   EPS/EPS-16 sample RAM
     0xc00000-0xc3ffff   OS ROM
-    0xff0000-0xffffff   work RAM hi (may or may not be mirrored with work RAM low)
-
+    0xff8000-0xffffff   work RAM hi (64k for SQ-1 and later)
+ 
+    Note from es5700.pdf PLA equations:
+	RAM if (A23/22/21 = 000 and FC is not 6) or (A23/22/21 = 111 and FC is not 7)
+	ROM if (A23/22/21 = 110) or (A23/22/21 = 000 & FC is 6) 
+ 
     Interrupts:
-    68681 uses custom vector 0x40 (address 0x100)
     5505 interrupts are on normal autovector IRQ 1
+    DMAC interrupts (EPS only) are on autovector IRQ 2
+    68681 uses custom vector 0x40 (address 0x100) level 3
 
     VFX / VFX-SD / SD-1 / SD-1 32 panel button codes:
     2 = PROGRAM CONTROL
@@ -45,11 +51,11 @@
     16 = ENV3
     17 = OUTPUT
     18 = ERROR 20 (VFX) / SEQ. CONTROL
-    19 = ?
+    19 = RECORD
     20 = MASTER
     21 = STORAGE
-    22 = ERROR 129 (VFX-SD w/Seq. loaded)
-    23 = ERROR 129 (VFX-SD w/Seq. loaded)
+    22 = STOP/CONT
+    23 = PLAY
     24 = MIDI
     25 = BUTTON 9
     26 = PSEL
@@ -295,7 +301,7 @@ READ16_MEMBER(esq5505_state::lower_r)
 
 	if (offset < 0x4000)
 	{
-		if (m68k_get_fc(m_maincpu) == 0x6)	// supervisor mode, ROM
+		if (m68k_get_fc(m_maincpu) == 0x6)	// supervisor mode = ROM
 		{
 			return m_rom[offset];
 		}
@@ -320,6 +326,10 @@ WRITE16_MEMBER(esq5505_state::lower_w)
 		{
 			COMBINE_DATA(&m_ram[offset]);
 		}
+		else
+		{
+			logerror("Write to ROM: %x @ %x (fc=%x)\n", data, offset, m68k_get_fc(m_maincpu));
+		}
 	}
 	else
 	{
@@ -328,7 +338,7 @@ WRITE16_MEMBER(esq5505_state::lower_w)
 }
 
 static ADDRESS_MAP_START( vfx_map, AS_PROGRAM, 16, esq5505_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_READWRITE(lower_r, lower_w)
+	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
 	AM_RANGE(0x260000, 0x2601ff) AM_READWRITE(es5510_dsp_r, es5510_dsp_w)
     AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff)
@@ -337,7 +347,7 @@ static ADDRESS_MAP_START( vfx_map, AS_PROGRAM, 16, esq5505_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vfxsd_map, AS_PROGRAM, 16, esq5505_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_READWRITE(lower_r, lower_w)
+	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
 	AM_RANGE(0x260000, 0x2601ff) AM_READWRITE(es5510_dsp_r, es5510_dsp_w)
     AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff)
@@ -348,13 +358,24 @@ static ADDRESS_MAP_START( vfxsd_map, AS_PROGRAM, 16, esq5505_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_READWRITE(lower_r, lower_w)
+	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
     AM_RANGE(0x240000, 0x2400ff) AM_DEVREADWRITE_LEGACY("mc68450", hd63450_r, hd63450_w)
     AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff)
     AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
     AM_RANGE(0x580000, 0x7fffff) AM_RAM         // sample RAM?
     AM_RANGE(0xc00000, 0xc0ffff) AM_ROM AM_REGION("osrom", 0)
+    AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sq1_map, AS_PROGRAM, 16, esq5505_state )
+	AM_RANGE(0x000000, 0x03ffff) AM_READWRITE(lower_r, lower_w)
+	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
+	AM_RANGE(0x260000, 0x2601ff) AM_READWRITE(es5510_dsp_r, es5510_dsp_w)
+    AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff)
+    AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
+    AM_RANGE(0x330000, 0x3bffff) AM_RAM // sequencer memory?
+    AM_RANGE(0xc00000, 0xc3ffff) AM_ROM AM_REGION("osrom", 0)
     AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
@@ -421,12 +442,12 @@ static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 //    printf("\nDUART IRQ: state %d vector %d\n", state, vector);
     if (state == ASSERT_LINE)
     {
-        esq5505->m_maincpu->set_input_line_vector(2, vector);
-        esq5505->m_maincpu->set_input_line(2, ASSERT_LINE);
+        esq5505->m_maincpu->set_input_line_vector(M68K_IRQ_3, vector);
+        esq5505->m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
     }
     else
     {
-        esq5505->m_maincpu->set_input_line(2, CLEAR_LINE);
+        esq5505->m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
     }
 };
 
@@ -503,7 +524,7 @@ static void duart_tx(device_t *device, int channel, UINT8 data)
 
     if (channel == 1)
     {
-//        printf("ch %d: [%02x] (PC=%x)\n", channel, data, state->m_maincpu->pc());
+        printf("ch %d: [%02x] (PC=%x)\n", channel, data, state->m_maincpu->pc());
 
         switch (state->m_system_type)
         {
@@ -534,13 +555,22 @@ static void duart_tx(device_t *device, int channel, UINT8 data)
         }
         else
         {
-            // EPS-16+ wants a throwaway reply byte for each byte sent to the KPC
+            // EPS wants a throwaway reply byte for each byte sent to the KPC
             // VFX-SD and SD-1 definitely don't :)
             if (state->m_system_type == EPS)
             {
-                // 0xe7 must respond with any byte that isn't 0xc8 or the ROM dies.
-                // 0x71 must respond with anything (return not checked)
-                duart68681_rx_data(state->m_duart, 1, (UINT8)(FPTR)0x00);   // actual value of response is never checked
+				if (data == 0xe7)
+				{
+					duart68681_rx_data(state->m_duart, 1, (UINT8)(FPTR)0x00);   // actual value of response is never checked
+				}
+				else if (data == 0x71)
+				{
+					duart68681_rx_data(state->m_duart, 1, (UINT8)(FPTR)0x00);   // actual value of response is never checked
+				}
+				else
+				{
+					duart68681_rx_data(state->m_duart, 1, data);   // actual value of response is never checked
+				}
             }
         }
     }
@@ -553,8 +583,8 @@ static const duart68681_config duart_config =
 	duart_input,
 	duart_output,
 
-	500000, 500000,	// IP3, IP4
-	1000000, 1000000, // IP5, IP6
+	1000000, 500000,	// IP3, IP4
+	500000, 1000000, // IP5, IP6
 };
 
 static void esq_dma_end(running_machine &machine, int channel, int irq)
@@ -752,7 +782,10 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(sq1, vfx32)
-    MCFG_ESQ2x40_REMOVE("vfd")
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_PROGRAM_MAP(sq1_map)
+
+	MCFG_ESQ2x40_REMOVE("vfd")
     MCFG_ESQ2x40_SQ1_ADD("sq1vfd")
 MACHINE_CONFIG_END
 
@@ -889,14 +922,26 @@ ROM_END
 
 ROM_START( sq1 )
     ROM_REGION(0x40000, "osrom", 0)
-    ROM_LOAD16_BYTE( "esq5505lo.bin",    0x000000, 0x010000, CRC(b004cf05) SHA1(567b0dae2e35b06e39da108f9c041fd9bc38fa35) )
-    ROM_LOAD16_BYTE( "esq5505up.bin",    0x000001, 0x010000, CRC(2e927873) SHA1(06a948cb71fa254b23f4b9236f29035d10778da1) )
+    ROM_LOAD16_BYTE( "sq1lo.bin",    0x000000, 0x010000, CRC(b004cf05) SHA1(567b0dae2e35b06e39da108f9c041fd9bc38fa35) )
+    ROM_LOAD16_BYTE( "sq1up.bin",    0x000001, 0x010000, CRC(2e927873) SHA1(06a948cb71fa254b23f4b9236f29035d10778da1) )
 
     ROM_REGION(0x200000, "waverom", 0)
     ROM_LOAD16_BYTE( "sq1-u25.bin",  0x000001, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) )
     ROM_LOAD16_BYTE( "sq1-u26.bin",  0x100001, 0x080000, CRC(2edaa9dc) SHA1(72fead505c4f44e5736ff7d545d72dfa37d613e2) )
 
     ROM_REGION(0x80000, "nibbles", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sqrack )
+	ROM_REGION(0x40000, "osrom", 0)
+	ROM_LOAD16_BYTE( "sqr-102-lower.bin", 0x000000, 0x010000, CRC(186c85ad) SHA1(801c5cf82823ce31a88688fbee4c11ea5ffdbc10) ) 
+	ROM_LOAD16_BYTE( "sqr-102-upper.bin", 0x000001, 0x010000, CRC(088c9d31) SHA1(30627f21d893888b6159c481bea08e3eedd21902) ) 
+
+	ROM_REGION(0x200000, "waverom", 0)
+	ROM_LOAD16_BYTE( "sq1-u25.bin",  0x000001, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) )
+	ROM_LOAD16_BYTE( "sq1-u26.bin",  0x100001, 0x080000, CRC(2edaa9dc) SHA1(72fead505c4f44e5736ff7d545d72dfa37d613e2) )
+
+	ROM_REGION(0x80000, "nibbles", ROMREGION_ERASE00)
 ROM_END
 
 ROM_START( eps )
@@ -963,3 +1008,4 @@ CONS( 1989, vfxsd, 0, 0,   vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "VFX-SD
 CONS( 1990, sd1,   0, 0,   vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "SD-1", GAME_NOT_WORKING )      // 2x40 VFD
 CONS( 1990, sd132, sd1, 0, vfx32, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 32", GAME_NOT_WORKING )   // 2x40 VFD
 CONS( 1990, sq1,   0, 0,   sq1,   vfx, esq5505_state, sq1,    "Ensoniq", "SQ-1", GAME_NOT_WORKING )      // LCD of some sort
+CONS( 1990, sqrack,sq1, 0, sq1,   vfx, esq5505_state, sq1,    "Ensoniq", "SQ-Rack", GAME_NOT_WORKING )   // LCD of some sort
