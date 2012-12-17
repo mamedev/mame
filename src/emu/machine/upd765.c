@@ -94,7 +94,7 @@ upd765_family_device::upd765_family_device(const machine_config &mconfig, device
 	ready_polled = true;
 	ready_connected = true;
 	select_connected = true;
-	external_ready = true;
+	external_ready = false;
 	dor_reset = 0x00;
 }
 
