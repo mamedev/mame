@@ -12,7 +12,6 @@
     TODO:
 
 	- refactor to use wd_fdc and modern floppy
-    - 1541/1571 Alignment shows drive speed as 266 rpm, should be 310
 
 */
 
