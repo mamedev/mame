@@ -15,6 +15,7 @@ struct disk_data
 	device_t *device;
 	UINT32 size;
 	UINT8 *data;
+	bool ejected;
 
 	device_image_interface *image;
 };
@@ -39,14 +40,14 @@ protected:
         virtual void device_start();
         virtual void device_reset();
 
+        DECLARE_READ32_MEMBER(image_status_r);
+        DECLARE_WRITE32_MEMBER(image_status_w);
         DECLARE_READ32_MEMBER(image_r);
         DECLARE_WRITE32_MEMBER(image_w);
         DECLARE_READ32_MEMBER(image_super_r);
         DECLARE_WRITE32_MEMBER(image_super_w);
 
 public:
-	UINT32 image_length;
-	UINT32 *image_mapping;
 	disk_data *m_image;
 };
 
