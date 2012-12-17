@@ -1167,7 +1167,6 @@ fe9c  divb  direct_2
 
 fe9d  divb  immed_2b
 	PSW &= ~F_V;
-	OP1 = reg_r8(OP1);
 	if(OP1) {
 		TMP = reg_r16(OP2);
 		UINT32 TMP2 = INT16(TMP) / INT8(OP1);
