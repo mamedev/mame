@@ -28155,7 +28155,13 @@ as_ws			//
 
 ec_bar5		// Bar 5 (older PCB) (Electrocoin)
 ec_barxo	// Bar X (older PCB) (Electrocoin)
+ec_barxoa	//
+ec_barxob	//
+ec_barxoc	//
+ec_barxod	//
+ec_barxoe	//
 ec_casbxo	// Casino Bar X (older PCB) (Electrocoin)
+ec_casbxoa	//
 
 // Regular PCB
 
