@@ -483,7 +483,7 @@ offs_t m6502_device::disassemble_generic(char *buffer, offs_t pc, const UINT8 *o
 	UINT32 flags = e.flags | DASMFLAG_SUPPORTED;
 	buffer += sprintf(buffer, "%s", e.opcode);
 
-	switch(table[oprom[0]].mode) {
+	switch(e.mode) {
 	case DASM_non:
 		flags |= 1;
 		break;
@@ -603,7 +603,7 @@ offs_t m6502_device::disassemble_generic(char *buffer, offs_t pc, const UINT8 *o
 		break;
 
 	default:
-		fprintf(stderr, "Unhandled dasm mode %d\n", table[oprom[0]].mode);
+		fprintf(stderr, "Unhandled dasm mode %d\n", e.mode);
 		abort();
 	}
 	return flags;
