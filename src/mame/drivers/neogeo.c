@@ -1437,7 +1437,7 @@ MACHINE_CONFIG_START( neogeo_base, neogeo_state )
 	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 
 	/* NEC uPD4990A RTC */
-	MCFG_UPD4990A_ADD("upd4990a")
+	MCFG_UPD4990A_OLD_ADD("upd4990a")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( neogeo, neogeo_base )

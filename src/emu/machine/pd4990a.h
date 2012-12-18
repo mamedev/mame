@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef __PD4990A_H__
-#define __PD4990A_H__
+#ifndef __PD4990A_OLD_H__
+#define __PD4990A_OLD_H__
 
 #include "devlegcy.h"
 
@@ -16,11 +16,11 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-class upd4990a_device : public device_t
+class upd4990a_old_device : public device_t
 {
 public:
-	upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~upd4990a_device() { global_free(m_token); }
+	upd4990a_old_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	~upd4990a_old_device() { global_free(m_token); }
 
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
@@ -34,11 +34,11 @@ private:
 	void *m_token;
 };
 
-extern const device_type UPD4990A;
+extern const device_type UPD4990A_OLD;
 
 
-#define MCFG_UPD4990A_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, UPD4990A, 0)
+#define MCFG_UPD4990A_OLD_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, UPD4990A_OLD, 0)
 
 
 /***************************************************************************

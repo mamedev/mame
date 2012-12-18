@@ -21,6 +21,7 @@
 
 // device type definition
 const device_type UPD1990A = &device_creator<upd1990a_device>;
+const device_type UPD4990A = &device_creator<upd4990a_device>;
 
 
 //**************************************************************************
@@ -53,11 +54,25 @@ enum
 //  upd1990a_device - constructor
 //-------------------------------------------------
 
-upd1990a_device::upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, UPD1990A, "uPD1990A", tag, owner, clock),
+upd1990a_rtc_device::upd1990a_rtc_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
       device_rtc_interface(mconfig, *this),
       m_data_out(0)
 {
+}
+
+
+upd1990a_device::upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		: upd1990a_rtc_device(mconfig, UPD1990A, "uPD1990A", tag, owner, clock)
+{
+	m_device_type = TYPE_UPD1990A;
+}
+
+
+upd4990a_device::upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+		: upd1990a_rtc_device(mconfig, UPD4990A, "uPD4990A", tag, owner, clock)
+{
+	m_device_type = TYPE_UPD4990A;
 }
 
 
@@ -67,7 +82,7 @@ upd1990a_device::upd1990a_device(const machine_config &mconfig, const char *tag,
 //  complete
 //-------------------------------------------------
 
-void upd1990a_device::device_config_complete()
+void upd1990a_rtc_device::device_config_complete()
 {
 	// inherit a copy of the static data
 	const upd1990a_interface *intf = reinterpret_cast<const upd1990a_interface *>(static_config());
@@ -87,7 +102,7 @@ void upd1990a_device::device_config_complete()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void upd1990a_device::device_start()
+void upd1990a_rtc_device::device_start()
 {
 	// resolve callbacks
 	m_out_data_func.resolve(m_out_data_cb, *this);
@@ -119,7 +134,7 @@ void upd1990a_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void upd1990a_device::device_reset()
+void upd1990a_rtc_device::device_reset()
 {
 	set_current_time(machine());
 }
@@ -129,7 +144,7 @@ void upd1990a_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void upd1990a_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void upd1990a_rtc_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch (id)
 	{
@@ -194,7 +209,7 @@ void upd1990a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 //  rtc_clock_updated -
 //-------------------------------------------------
 
-void upd1990a_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+void upd1990a_rtc_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
 	m_time_counter[0] = convert_to_bcd(second);
 	m_time_counter[1] = convert_to_bcd(minute);
@@ -208,7 +223,7 @@ void upd1990a_device::rtc_clock_updated(int year, int month, int day, int day_of
 //  oe_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd1990a_device::oe_w )
+WRITE_LINE_MEMBER( upd1990a_rtc_device::oe_w )
 {
 	if (LOG) logerror("uPD1990A '%s' OE %u\n", tag(), state);
 
@@ -220,7 +235,7 @@ WRITE_LINE_MEMBER( upd1990a_device::oe_w )
 //  cs_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd1990a_device::cs_w )
+WRITE_LINE_MEMBER( upd1990a_rtc_device::cs_w )
 {
 	if (LOG) logerror("uPD1990A '%s' CS %u\n", tag(), state);
 
@@ -232,7 +247,7 @@ WRITE_LINE_MEMBER( upd1990a_device::cs_w )
 //  stb_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd1990a_device::stb_w )
+WRITE_LINE_MEMBER( upd1990a_rtc_device::stb_w )
 {
 	if (LOG) logerror("uPD1990A '%s' STB %u\n", tag(), state);
 
@@ -380,7 +395,7 @@ WRITE_LINE_MEMBER( upd1990a_device::stb_w )
 //  clk_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd1990a_device::clk_w )
+WRITE_LINE_MEMBER( upd1990a_rtc_device::clk_w )
 {
 	if (LOG) logerror("uPD1990A '%s' CLK %u\n", tag(), state);
 
@@ -422,7 +437,7 @@ WRITE_LINE_MEMBER( upd1990a_device::clk_w )
 //  c0_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd1990a_device::c0_w )
+WRITE_LINE_MEMBER( upd1990a_rtc_device::c0_w )
 {
 	if (LOG) logerror("uPD1990A '%s' C0 %u\n", tag(), state);
 
@@ -434,7 +449,7 @@ WRITE_LINE_MEMBER( upd1990a_device::c0_w )
 //  c1_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd1990a_device::c1_w )
+WRITE_LINE_MEMBER( upd1990a_rtc_device::c1_w )
 {
 	if (LOG) logerror("uPD1990A '%s' C1 %u\n", tag(), state);
 
@@ -446,7 +461,7 @@ WRITE_LINE_MEMBER( upd1990a_device::c1_w )
 //  c2_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd1990a_device::c2_w )
+WRITE_LINE_MEMBER( upd1990a_rtc_device::c2_w )
 {
 	if (LOG) logerror("uPD1990A '%s' C2 %u\n", tag(), state);
 
@@ -458,7 +473,7 @@ WRITE_LINE_MEMBER( upd1990a_device::c2_w )
 //  data_in_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd1990a_device::data_in_w )
+WRITE_LINE_MEMBER( upd1990a_rtc_device::data_in_w )
 {
 	if (LOG) logerror("uPD1990A '%s' DATA IN %u\n", tag(), state);
 
@@ -470,7 +485,7 @@ WRITE_LINE_MEMBER( upd1990a_device::data_in_w )
 //  data_out_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( upd1990a_device::data_out_r )
+READ_LINE_MEMBER( upd1990a_rtc_device::data_out_r )
 {
 	return m_data_out;
 }
@@ -480,7 +495,7 @@ READ_LINE_MEMBER( upd1990a_device::data_out_r )
 //  tp_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( upd1990a_device::tp_r )
+READ_LINE_MEMBER( upd1990a_rtc_device::tp_r )
 {
 	return m_tp;
 }

@@ -84,8 +84,8 @@ struct upd4990a_state
 INLINE upd4990a_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert((device->type() == UPD4990A));
-	return (upd4990a_state *)downcast<upd4990a_device *>(device)->token();
+	assert((device->type() == UPD4990A_OLD));
+	return (upd4990a_state *)downcast<upd4990a_old_device *>(device)->token();
 }
 
 INLINE UINT8 convert_to_bcd(int val)
@@ -520,10 +520,10 @@ static DEVICE_RESET( upd4990a )
 	upd4990a->command_line = 0;
 }
 
-const device_type UPD4990A = &device_creator<upd4990a_device>;
+const device_type UPD4990A_OLD = &device_creator<upd4990a_old_device>;
 
-upd4990a_device::upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, UPD4990A, "NEC uPD4990A", tag, owner, clock)
+upd4990a_old_device::upd4990a_old_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, UPD4990A_OLD, "NEC uPD4990A", tag, owner, clock)
 {
 	m_token = global_alloc_clear(upd4990a_state);
 }
@@ -534,7 +534,7 @@ upd4990a_device::upd4990a_device(const machine_config &mconfig, const char *tag,
 //  complete
 //-------------------------------------------------
 
-void upd4990a_device::device_config_complete()
+void upd4990a_old_device::device_config_complete()
 {
 }
 
@@ -542,7 +542,7 @@ void upd4990a_device::device_config_complete()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void upd4990a_device::device_start()
+void upd4990a_old_device::device_start()
 {
 	DEVICE_START_NAME( upd4990a )(this);
 }
@@ -551,7 +551,7 @@ void upd4990a_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void upd4990a_device::device_reset()
+void upd4990a_old_device::device_reset()
 {
 	DEVICE_RESET_NAME( upd4990a )(this);
 }

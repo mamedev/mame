@@ -61,13 +61,13 @@ struct upd1990a_interface
 
 // ======================> upd1990a_device
 
-class upd1990a_device :	public device_t,
-						public device_rtc_interface,
-                        public upd1990a_interface
+class upd1990a_rtc_device :	public device_t,
+						    public device_rtc_interface,
+                            public upd1990a_interface
 {
 public:
     // construction/destruction
-    upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd1990a_rtc_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock);
 
 	DECLARE_WRITE_LINE_MEMBER( oe_w );
 	DECLARE_WRITE_LINE_MEMBER( cs_w );
@@ -89,6 +89,11 @@ protected:
 
 	// device_rtc_interface overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second);
+	enum {
+			TYPE_UPD1990A = 0,
+			TYPE_UPD4990A
+	};
+	int m_device_type;
 
 private:
 	static const device_timer_id TIMER_CLOCK = 0;
@@ -119,10 +124,21 @@ private:
 	emu_timer *m_timer_test_mode;
 };
 
+class upd1990a_device : public upd1990a_rtc_device
+{
+public:
+	upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+class upd4990a_device : public upd1990a_rtc_device
+{
+public:
+	upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
 
 // device type definition
 extern const device_type UPD1990A;
-
-
+extern const device_type UPD4990A;
 
 #endif
