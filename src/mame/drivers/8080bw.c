@@ -1518,9 +1518,6 @@ static INPUT_PORTS_START( lupin3 )
 	PORT_DIPNAME(0x80,  0x00, "Invulnerability (Cheat)") PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	/* Dummy port for cocktail mode */
-	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lupin3a )
