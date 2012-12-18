@@ -205,6 +205,7 @@ public:
 	UINT8 m_sound_irq_cause;
 	UINT8 m_adpcm_data;
 
+	DECLARE_WRITE8_MEMBER(kurukuru_hopper_w);
 	DECLARE_WRITE8_MEMBER(kurukuru_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(kurukuru_soundlatch_w);
 	DECLARE_READ8_MEMBER(kurukuru_soundlatch_r);
@@ -282,6 +283,17 @@ static void kurukuru_msm5205_vck(device_t *device)
 
 // Main CPU
 
+WRITE8_MEMBER(kurukuru_state::kurukuru_hopper_w)
+{
+	/* assume hopper related.
+		$01 when coin 1 (jams)
+		$20 when coin 2
+		$40 when payout (jams) ...check
+	*/
+	if (data)
+		logerror("kurukuru_hopper_w %02X @ %04X\n", data, space.device().safe_pc());
+}
+
 WRITE8_MEMBER(kurukuru_state::kurukuru_bankswitch_w)
 {
 	// d4,d5: bank
@@ -304,7 +316,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x00, 0x00) AM_WRITENOP // hopper?
+	AM_RANGE(0x00, 0x00) AM_WRITE(kurukuru_hopper_w)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")
 	AM_RANGE(0x20, 0x20) AM_WRITE(kurukuru_soundlatch_w)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
@@ -316,12 +328,6 @@ static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
 	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 ADDRESS_MAP_END
 
-/*
-  0x00 Writes... assume hopper related.
-                 01 when coin 1 (jams)
-                 20 when coin 2
-                 40 when payout (jams) ...check
-*/
 
 
 // Audio CPU
