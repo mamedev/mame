@@ -549,6 +549,8 @@ public:
 	DECLARE_READ8_MEMBER(pc9821_window_bank_r);
 	DECLARE_WRITE8_MEMBER(pc9821_window_bank_w);
 	DECLARE_READ32_MEMBER(pc9821_timestamp_r);
+	DECLARE_READ8_MEMBER(pc9821_ext2_video_ff_r);
+	DECLARE_WRITE8_MEMBER(pc9821_ext2_video_ff_w);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
@@ -2413,12 +2415,22 @@ READ32_MEMBER(pc9801_state::pc9821_timestamp_r)
 	return m_maincpu->total_cycles();
 }
 
+READ8_MEMBER(pc9801_state::pc9821_ext2_video_ff_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER(pc9801_state::pc9821_ext2_video_ff_w)
+{
+	// ...
+}
+
 static ADDRESS_MAP_START( pc9821_map, AS_PROGRAM, 32, pc9801_state )
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE8(pc9821_memory_r,pc9821_memory_w,0xffffffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
-	ADDRESS_MAP_UNMAP_HIGH
+//	ADDRESS_MAP_UNMAP_HIGH // TODO: a read to somewhere makes this to fail at POST
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,        pc9801_00_w,        0xffffffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(pc9801_20_r,        pc9801_20_w,        0xffffffff) // RTC / DMA registers (LS244)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffffffff) //i8251 RS232c / i8255 system port
@@ -2452,8 +2464,8 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 //  AM_RANGE(0x0642, 0x064f) IDE registers / <undefined>
 	AM_RANGE(0x074c, 0x074f) AM_READ8(ide_status_r, 0x000000ff) // IDE status (r) - IDE control registers (w) / <undefined>
 //  AM_RANGE(0x08e0, 0x08ea) <undefined> / EMM SIO registers
-//  AM_RANGE(0x09a0, 0x09a0) GDC extended register r/w
-//  AM_RANGE(0x09a8, 0x09a8) GDC 31KHz register r/w
+	AM_RANGE(0x09a0, 0x09a3) AM_READWRITE8(pc9821_ext2_video_ff_r, pc9821_ext2_video_ff_w, 0xffffffff) // GDC extended register r/w
+//	AM_RANGE(0x09a8, 0x09a8) GDC 31KHz register r/w
 //  AM_RANGE(0x0c07, 0x0c07) EPSON register w
 //  AM_RANGE(0x0c03, 0x0c03) EPSON register 0 r
 //  AM_RANGE(0x0c13, 0x0c14) EPSON register 1 r
