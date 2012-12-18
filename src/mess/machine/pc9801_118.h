@@ -1,29 +1,30 @@
 /***************************************************************************
 
-	NEC PC-9801-86
+	NEC PC-9801-118
 
 ***************************************************************************/
 
 
 #pragma once
 
-#ifndef __PC9801_86DEV_H__
-#define __PC9801_86DEV_H__
+#ifndef __PC9801_118DEV_H__
+#define __PC9801_118DEV_H__
 
 #include "machine/pic8259.h"
 #include "sound/2608intf.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> pc9801_86_device
+// ======================> pc9801_118_device
 
-class pc9801_86_device : public device_t
+class pc9801_118_device : public device_t
 {
 public:
 	// construction/destruction
-	pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc9801_118_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -31,29 +32,29 @@ public:
 
 	DECLARE_READ8_MEMBER(opn_porta_r);
 	DECLARE_WRITE8_MEMBER(opn_portb_w);
-	DECLARE_READ8_MEMBER(pc9801_86_r);
-	DECLARE_WRITE8_MEMBER(pc9801_86_w);
-//	DECLARE_READ8_MEMBER(pc9801_86_ext_r);
-//	DECLARE_WRITE8_MEMBER(pc9801_86_ext_w);
+	DECLARE_READ8_MEMBER(pc9801_118_r);
+	DECLARE_WRITE8_MEMBER(pc9801_118_w);
+	DECLARE_READ8_MEMBER(pc9801_118_ext_r);
+	DECLARE_WRITE8_MEMBER(pc9801_118_ext_w);
 
 //	required_device<cpu_device>  m_maincpu;
-	required_device<ym2608_device>  m_opna;
+	required_device<ym2608_device>  m_opn3;
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "pc9801_86"; }
+	virtual void device_config_complete() { m_shortname = "pc9801_118"; }
 	void install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler);
 
 private:
 	UINT8 m_joy_sel;
-
+	UINT8 m_ext_reg;
 };
 
 
 // device type definition
-extern const device_type PC9801_86;
+extern const device_type PC9801_118;
 
 
 

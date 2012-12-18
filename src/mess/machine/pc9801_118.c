@@ -1,17 +1,16 @@
 /***************************************************************************
 
-	NEC PC-9801-86 sound card
+	NEC PC-9801-118 sound card
 
-	Almost the same thing as PC-9801-86, but this one has YM2608 instead of
-	YM2203
+	YMF288 + some extra ports
 
 	TODO:
-	- i/o port base jumper
+	- preliminary, presumably needs CS-4231 too
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/pc9801_86.h"
+#include "machine/pc9801_118.h"
 #include "machine/pic8259.h"
 #include "sound/2608intf.h"
 
@@ -22,10 +21,10 @@
 //**************************************************************************
 
 // device type definition
-const device_type PC9801_86 = &device_creator<pc9801_86_device>;
+const device_type PC9801_118 = &device_creator<pc9801_118_device>;
 
 
-READ8_MEMBER(pc9801_86_device::opn_porta_r)
+READ8_MEMBER(pc9801_118_device::opn_porta_r)
 {
 	if(m_joy_sel == 0x80)
 		return ioport("OPNA_PA1")->read();
@@ -38,7 +37,7 @@ READ8_MEMBER(pc9801_86_device::opn_porta_r)
 	return 0xff;
 }
 
-WRITE8_MEMBER(pc9801_86_device::opn_portb_w){ m_joy_sel = data; }
+WRITE8_MEMBER(pc9801_118_device::opn_portb_w){ m_joy_sel = data; }
 
 static void pc9801_sound_irq( device_t *device, int irq )
 {
@@ -53,17 +52,17 @@ static const ym2608_interface pc98_ym2608_intf =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pc9801_86_device,opn_porta_r),
+		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pc9801_118_device,opn_porta_r),
 		DEVCB_NULL,//(pc9801_state,opn_portb_r),
 		DEVCB_NULL,//(pc9801_state,opn_porta_w),
-		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pc9801_86_device,opn_portb_w),
+		DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, pc9801_118_device,opn_portb_w),
 	},
 	pc9801_sound_irq
 };
 
-static MACHINE_CONFIG_FRAGMENT( pc9801_86_config )
+static MACHINE_CONFIG_FRAGMENT( pc9801_118_config )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("opna", YM2608, MAIN_CLOCK_X1*4) // unknown clock / divider
+	MCFG_SOUND_ADD("opn3", YM2608, MAIN_CLOCK_X1*4) // actually YMF288, unknown clock / divider
 	MCFG_SOUND_CONFIG(pc98_ym2608_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
@@ -73,9 +72,9 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor pc9801_86_device::device_mconfig_additions() const
+machine_config_constructor pc9801_118_device::device_mconfig_additions() const
 {
-	return MACHINE_CONFIG_NAME( pc9801_86_config );
+	return MACHINE_CONFIG_NAME( pc9801_118_config );
 }
 
 
@@ -83,7 +82,7 @@ machine_config_constructor pc9801_86_device::device_mconfig_additions() const
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-static INPUT_PORTS_START( pc9801_86 )
+static INPUT_PORTS_START( pc9801_118 )
 	PORT_START("OPNA_PA1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("P1 Joystick Up")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("P1 Joystick Down")
@@ -103,9 +102,9 @@ static INPUT_PORTS_START( pc9801_86 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-ioport_constructor pc9801_86_device::device_input_ports() const
+ioport_constructor pc9801_118_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( pc9801_86 );
+	return INPUT_PORTS_NAME( pc9801_118 );
 }
 
 //**************************************************************************
@@ -113,13 +112,13 @@ ioport_constructor pc9801_86_device::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  pc9801_86_device - constructor
+//  pc9801_118_device - constructor
 //-------------------------------------------------
 
-pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PC9801_86, "pc9801_86", tag, owner, clock),
+pc9801_118_device::pc9801_118_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PC9801_118, "pc9801_118", tag, owner, clock),
 //		m_maincpu(*owner, "maincpu"),
-		m_opna(*this, "opna")
+		m_opn3(*this, "opn3")
 {
 
 }
@@ -130,7 +129,7 @@ pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *ta
 //  on this device
 //-------------------------------------------------
 
-void pc9801_86_device::device_validity_check(validity_checker &valid) const
+void pc9801_118_device::device_validity_check(validity_checker &valid) const
 {
 }
 
@@ -138,7 +137,7 @@ void pc9801_86_device::device_validity_check(validity_checker &valid) const
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pc9801_86_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler)
+void pc9801_118_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler)
 {
 	int buswidth = machine().firstcpu->space_config(AS_IO)->m_databus_width;
 	switch(buswidth)
@@ -153,16 +152,16 @@ void pc9801_86_device::install_device(offs_t start, offs_t end, offs_t mask, off
 			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0xffffffff);
 			break;
 		default:
-			fatalerror("PC-9801-86: Bus width %d not supported\n", buswidth);
+			fatalerror("PC-9801-118: Bus width %d not supported\n", buswidth);
 			break;
 	}
 }
 
 
-void pc9801_86_device::device_start()
+void pc9801_118_device::device_start()
 {
-	install_device(0x0188, 0x018f, 0, 0, read8_delegate(FUNC(pc9801_86_device::pc9801_86_r), this), write8_delegate(FUNC(pc9801_86_device::pc9801_86_w), this) );
-//	install_device(0xa460, 0xa463, 0, 0, read8_delegate(FUNC(pc9801_86_device::pc9801_86_ext_r), this), write8_delegate(FUNC(pc9801_86_device::pc9801_86_ext_w), this) );
+	install_device(0x0188, 0x018f, 0, 0, read8_delegate(FUNC(pc9801_118_device::pc9801_118_r), this), write8_delegate(FUNC(pc9801_118_device::pc9801_118_w), this) );
+	install_device(0xa460, 0xa463, 0, 0, read8_delegate(FUNC(pc9801_118_device::pc9801_118_ext_r), this), write8_delegate(FUNC(pc9801_118_device::pc9801_118_ext_w), this) );
 }
 
 
@@ -170,8 +169,9 @@ void pc9801_86_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void pc9801_86_device::device_reset()
+void pc9801_118_device::device_reset()
 {
+	m_ext_reg = 1; // TODO: enabled or disabled?
 }
 
 
@@ -180,47 +180,48 @@ void pc9801_86_device::device_reset()
 //**************************************************************************
 
 
-READ8_MEMBER(pc9801_86_device::pc9801_86_r)
+READ8_MEMBER(pc9801_118_device::pc9801_118_r)
 {
-	if((offset & 1) == 0)
-		return ym2608_r(m_opna, space, offset >> 1);
+	if(((offset & 5) == 0) || m_ext_reg)
+		return ym2608_r(m_opn3, space, offset >> 1);
 	else // odd
 	{
-		printf("PC9801-86: Read to undefined port [%02x]\n",offset+0x188);
+		//printf("PC9801-118: Read to undefined port [%02x]\n",offset+0x188);
 		return 0xff;
 	}
 }
 
 
-WRITE8_MEMBER(pc9801_86_device::pc9801_86_w)
+WRITE8_MEMBER(pc9801_118_device::pc9801_118_w)
 {
-	if((offset & 1) == 0)
-		ym2608_w(m_opna,space, offset >> 1,data);
-	else // odd
-		printf("PC9801-86: Write to undefined port [%02x] %02x\n",offset+0x188,data);
+	if(((offset & 5) == 0) || m_ext_reg)
+		ym2608_w(m_opn3,space, offset >> 1,data);
+	//else // odd
+	//	printf("PC9801-118: Write to undefined port [%02x] %02x\n",offset+0x188,data);
 }
 
-#if 0
-READ8_MEMBER( pc9801_86_device::pc9801_86_ext_r )
+READ8_MEMBER( pc9801_118_device::pc9801_118_ext_r )
 {
 	if(offset == 0)
 	{
-		printf("OPNA EXT read ID [%02x]\n",offset);
-		return 0xff;
+		printf("OPN3 EXT read ID [%02x]\n",offset);
+		return 0x80 | (m_ext_reg & 1);
 	}
 
-	printf("OPNA EXT read unk [%02x]\n",offset);
+	printf("OPN3 EXT read unk [%02x]\n",offset);
 	return 0xff;
 }
 
-WRITE8_MEMBER( pc9801_86_device::pc9801_86_ext_w )
+WRITE8_MEMBER( pc9801_118_device::pc9801_118_ext_w )
 {
 	if(offset == 0)
 	{
-		printf("OPNA EXT write mask %02x -> [%02x]\n",data,offset);
+		m_ext_reg = data & 1;
+		/* TODO: apparently writing a 1 doubles the available channels (and presumably enables CS-4231 too) */
+		if(data)
+			printf("PC-9801-118: extended register %02x write\n",data);
 		return;
 	}
 
-	printf("OPNA EXT write unk %02x -> [%02x]\n",data,offset);
+	printf("OPN3 EXT write unk %02x -> [%02x]\n",data,offset);
 }
-#endif

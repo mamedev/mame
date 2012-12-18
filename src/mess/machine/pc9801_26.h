@@ -13,10 +13,6 @@ Template for skeleton device
 #include "machine/pic8259.h"
 #include "sound/2203intf.h"
 
-#define MCFG_PC9801_26_SLOT_ADD(_tag, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, PC9801_26, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS

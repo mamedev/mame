@@ -329,6 +329,7 @@
 #include "formats/pc98fdi_dsk.h"
 #include "machine/pc9801_26.h"
 #include "machine/pc9801_86.h"
+#include "machine/pc9801_118.h"
 #include "machine/pc9801_cbus.h"
 
 
@@ -3283,7 +3284,7 @@ static SLOT_INTERFACE_START( pc9801_cbus )
 //	PC-9801-86
 //	PC-9801-26 + PC-9801-86 (?)
 //	PC-9801-86 + Chibi-Oto
-//	PC-9801-118
+	SLOT_INTERFACE( "pc9801_118", PC9801_118 )
 //	Speak Board
 //	Spark Board
 //	AMD-98 (AmuseMent boarD)
@@ -3589,7 +3590,7 @@ static MACHINE_CONFIG_FRAGMENT( pc9801_mouse )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_cbus )
-	MCFG_PC9801CBUS_SLOT_ADD("cbus0", pc9801_cbus, NULL, NULL)
+	MCFG_PC9801CBUS_SLOT_ADD("cbus0", pc9801_cbus, "pc9801_26", NULL)
 //	TODO: six max slots
 MACHINE_CONFIG_END
 

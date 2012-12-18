@@ -1473,6 +1473,7 @@ $(MESSOBJ)/pc.a:			\
 $(MESSOBJ)/pc9801.a:			\
 	$(MESS_MACHINE)/pc9801_26.o	\
 	$(MESS_MACHINE)/pc9801_86.o	\
+	$(MESS_MACHINE)/pc9801_118.o	\
 	$(MESS_MACHINE)/pc9801_cbus.o	\
 
 $(MESSOBJ)/pcshare.a:			\
