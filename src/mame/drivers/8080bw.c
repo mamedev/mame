@@ -156,7 +156,7 @@
         sound, a sort of rattling noise. Unable to find evidence
         of this (so far).
 
-    - Steel Worker, Space Commander
+    - Steel Worker, Space Combat
         Holding down the coin button causes the credits to rapidly increase.
 
 
