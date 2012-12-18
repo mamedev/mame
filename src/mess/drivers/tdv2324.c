@@ -129,7 +129,7 @@ WRITE8_MEMBER( tdv2324_state::tdv2324_main_io_e2 )
 static ADDRESS_MAP_START( tdv2324_mem, AS_PROGRAM, 8, tdv2324_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION(P8085AH_0_TAG, 0)
 	/* when copying code to 4000 area it runs right off the end of rom;
-     * I'm not sure if its supposed to mirror or read as open bus */
+	 * I'm not sure if its supposed to mirror or read as open bus */
 //  AM_RANGE(0x4000, 0x5fff) AM_RAM // 0x4000 has the boot code copied to it, 5fff and down are the stack
 //  AM_RANGE(0x6000, 0x6fff) AM_RAM // used by the relocated boot code; shared?
 	AM_RANGE(0x0800, 0xffff) AM_RAM
@@ -247,10 +247,10 @@ UINT32 tdv2324_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 static I8085_CONFIG( i8085_intf )
 {
-	DEVCB_NULL,	/* STATUS changed callback */
-	DEVCB_NULL,	/* INTE changed callback */
-	DEVCB_NULL,	/* SID changed callback (I8085A only) */
-	DEVCB_NULL	/* SOD changed callback (I8085A only) */
+	DEVCB_NULL, /* STATUS changed callback */
+	DEVCB_NULL, /* INTE changed callback */
+	DEVCB_NULL, /* SID changed callback (I8085A only) */
+	DEVCB_NULL  /* SOD changed callback (I8085A only) */
 };
 
 
@@ -260,10 +260,10 @@ static I8085_CONFIG( i8085_intf )
 
 static I8085_CONFIG( i8085_sub_intf )
 {
-	DEVCB_NULL,	/* STATUS changed callback */
-	DEVCB_NULL,	/* INTE changed callback */
-	DEVCB_NULL,	/* SID changed callback (I8085A only) */
-	DEVCB_NULL	/* SOD changed callback (I8085A only) */
+	DEVCB_NULL, /* STATUS changed callback */
+	DEVCB_NULL, /* INTE changed callback */
+	DEVCB_NULL, /* SID changed callback (I8085A only) */
+	DEVCB_NULL  /* SOD changed callback (I8085A only) */
 };
 
 
@@ -354,32 +354,6 @@ static Z80DART_INTERFACE( sio_intf )
 
 
 //-------------------------------------------------
-//  wd17xx_interface fdc_intf
-//-------------------------------------------------
-
-static const floppy_interface tdv2324_floppy_interface =
-{
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    DEVCB_NULL,
-    FLOPPY_STANDARD_8_DSDD,
-    LEGACY_FLOPPY_OPTIONS_NAME(default),
-    "floppy_8",
-	NULL
-};
-
-static const wd17xx_interface fdc_intf =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	{ FLOPPY_0, NULL, NULL, NULL }
-};
-
-
-//-------------------------------------------------
 //  tms9927_interface vtac_intf
 //-------------------------------------------------
 
@@ -389,6 +363,15 @@ static const tms9927_interface vtac_intf =
 	8,
 	NULL
 };
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( tdv2324_floppies )
+//-------------------------------------------------
+
+static SLOT_INTERFACE_START( tdv2324_floppies )
+	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
+SLOT_INTERFACE_END
 
 
 
@@ -432,8 +415,9 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 	MCFG_PIT8253_ADD(P8253_5_0_TAG, pit0_intf)
 	MCFG_PIT8253_ADD(P8253_5_1_TAG, pit1_intf)
 	MCFG_Z80SIO2_ADD(MK3887N4_TAG, 8000000/2, sio_intf)
-	MCFG_FD1797_ADD(FD1797PL02_TAG, fdc_intf)
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, tdv2324_floppy_interface)
+	MCFG_FD1797x_ADD(FD1797PL02_TAG, 8000000/4)
+	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":0", tdv2324_floppies, "8dsdd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(FD1797PL02_TAG":1", tdv2324_floppies, "8dsdd", NULL, floppy_image_device::default_floppy_formats)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -490,4 +474,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY     FULLNAME     FLAGS
-COMP( 1983, tdv2324,		0,		0,		tdv2324,		tdv2324, driver_device,		0,		"Tandberg",		"TDV 2324",		GAME_NOT_WORKING|GAME_NO_SOUND)
+COMP( 1983, tdv2324,        0,      0,      tdv2324,        tdv2324, driver_device,     0,      "Tandberg",     "TDV 2324",     GAME_NOT_WORKING|GAME_NO_SOUND)
