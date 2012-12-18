@@ -207,14 +207,17 @@ public:
 	DECLARE_READ8_MEMBER(lcd_ctrl_r);
 	DECLARE_WRITE8_MEMBER(lcd_ctrl_w);
 	DECLARE_WRITE8_MEMBER(lcd_data_w);
+	DECLARE_READ16_MEMBER(port0_r);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
 
 private:
 	UINT8 lcd_data_buffer[256];
 	int lcd_data_buffer_pos;
 	UINT8 midi;
 	int midi_pos;
+	UINT8 port0;
 };
 
 mt32_state::mt32_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -253,6 +256,7 @@ void mt32_state::machine_reset()
 {
 	midi_timer->adjust(attotime::from_hz(1));
 	midi_pos = 0;
+	port0 = 0;
 }
 
 WRITE8_MEMBER(mt32_state::lcd_ctrl_w)
@@ -286,12 +290,22 @@ WRITE16_MEMBER(mt32_state::midi_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(mt32_state::midi_timer_cb)
 {
-	const static UINT8 midi_data[3] = { 0x91, 0x40, 0x40 };
+	const static UINT8 midi_data[3] = { 0x91, 0x40, 0x7f };
 	midi = midi_data[midi_pos++];
 	logerror("midi_in %02x\n", midi);
 	cpu->serial_w(midi);
 	if(midi_pos < sizeof(midi_data))
 		midi_timer->adjust(attotime::from_hz(1250));
+}
+
+READ16_MEMBER(mt32_state::port0_r)
+{
+	return port0;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(mt32_state::samples_timer_cb)
+{
+	port0 ^= 0x10;
 }
 
 WRITE8_MEMBER(mt32_state::so_w)
@@ -326,6 +340,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mt32_io, AS_IO, 16, mt32_state )
 	AM_RANGE(i8x9x_device::A7,     i8x9x_device::A7)     AM_READ_PORT("A7")
 	AM_RANGE(i8x9x_device::SERIAL, i8x9x_device::SERIAL) AM_WRITE(midi_w)
+	AM_RANGE(i8x9x_device::P0,     i8x9x_device::P0)     AM_READ(port0_r)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( mt32, mt32_state )
@@ -347,6 +362,8 @@ static MACHINE_CONFIG_START( mt32, mt32_state )
 	MCFG_SED1200D0A_ADD( "lcd" )
 
 	MCFG_TIMER_DRIVER_ADD( "midi_timer", mt32_state, midi_timer_cb )
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC( "samples_timer", mt32_state, samples_timer_cb, attotime::from_hz(32000*2) )
 MACHINE_CONFIG_END
 
 ROM_START( mt32 )
