@@ -4,7 +4,7 @@
   Taiyo Jidoki / Success
 
 
-  Driver by Roberto Fresca.
+  Driver by Roberto Fresca & hap.
 
 
   This hardware seems to be a derivative of MSX2 'on steroids'.
@@ -12,8 +12,6 @@
   Depending how complex is turning the emulation, this driver
   could be merged later with tonton.c, since the platforms are
   sharing the hardware base...
-
-  Special thanks to hap, that implemented the correct graphics bankswitch.
 
 
 ***************************************************************************
@@ -179,8 +177,6 @@
 
   TODO:
 
-  - Audio CPU interrupts and connections/latches.
-  - M5205 ADPCM system.
   - Hook up AY8910 output ports. Or unused?
   - Find why the use of coin 1 always jams. Hopper?
 
@@ -207,19 +203,19 @@ public:
 	required_device<v9938_device> m_v9938;
 
 	UINT8 m_sound_irq_cause;
-	UINT8 m_sound_irq_mask;
+	UINT8 m_adpcm_data;
 
 	DECLARE_WRITE8_MEMBER(kurukuru_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(kurukuru_soundlatch_w);
 	DECLARE_READ8_MEMBER(kurukuru_soundlatch_r);
-	DECLARE_WRITE8_MEMBER(kurukuru_sound_irqmask_w);
-	DECLARE_READ8_MEMBER(kurukuru_sound_timer_irqack_r);
+	DECLARE_WRITE8_MEMBER(kurukuru_adpcm_reset_w);
+	DECLARE_READ8_MEMBER(kurukuru_adpcm_timer_irqack_r);
+	DECLARE_WRITE8_MEMBER(kurukuru_adpcm_data_w);
 
 	void update_sound_irq(UINT8 cause);
 	virtual void machine_start();
 	virtual void machine_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(kurukuru_vdp_scanline);
-	INTERRUPT_GEN_MEMBER(kurukuru_sound_timer_irq);
 };
 
 #define MAIN_CLOCK		XTAL_21_4772MHz
@@ -227,6 +223,7 @@ public:
 
 #define VDP_MEM            0x30000
 
+/* from MSX2 driver, may be not accurate for this HW */
 #define MSX2_XBORDER_PIXELS		16
 #define MSX2_YBORDER_PIXELS		28
 #define MSX2_TOTAL_XRES_PIXELS		256 * 2 + (MSX2_XBORDER_PIXELS * 2)
@@ -255,15 +252,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(kurukuru_state::kurukuru_vdp_scanline)
 void kurukuru_state::update_sound_irq(UINT8 cause)
 {
 	m_sound_irq_cause = cause & 3;
-	UINT8 mask = m_sound_irq_cause & m_sound_irq_mask;
-	if (mask)
+	if (m_sound_irq_cause)
 	{
 		// use bit 0 for latch irq, and bit 1 for timer irq
 		// latch irq vector is $ef (rst $28)
 		// timer irq vector is $f7 (rst $30)
 		// if both are asserted, the vector becomes $f7 AND $ef = $e7 (rst $20)
 		const UINT8 irq_vector[4] = { 0x00, 0xef, 0xf7, 0xe7 };
-		m_audiocpu->set_input_line_and_vector(0, ASSERT_LINE, irq_vector[mask]);
+		m_audiocpu->set_input_line_and_vector(0, ASSERT_LINE, irq_vector[m_sound_irq_cause]);
 	}
 	else
 	{
@@ -272,9 +268,11 @@ void kurukuru_state::update_sound_irq(UINT8 cause)
 }
 
 
-INTERRUPT_GEN_MEMBER(kurukuru_state::kurukuru_sound_timer_irq)
+static void kurukuru_msm5205_vck(device_t *device)
 {
-	update_sound_irq(m_sound_irq_cause | 2);
+	kurukuru_state *state = device->machine().driver_data<kurukuru_state>();
+	state->update_sound_irq(state->m_sound_irq_cause | 2);
+	msm5205_data_w(device, state->m_adpcm_data);
 }
 
 
@@ -306,7 +304,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x00, 0x00) AM_WRITENOP // seems for switch cpu... or irq? or hopper?
+//  AM_RANGE(0x00, 0x00) AM_WRITENOP // hopper?
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")
 	AM_RANGE(0x20, 0x20) AM_WRITE(kurukuru_soundlatch_w)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
@@ -319,25 +317,25 @@ static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
 ADDRESS_MAP_END
 
 /*
-  0x00 Writes... 2nd cpu related.
+  0x00 Writes... assume hopper related.
                  01 when coin 1 (jams)
                  20 when coin 2
                  40 when payout (jams) ...check
-
-  0x20 Writes... # sample to trigger
-                 00, 08, 03, 04, 05 for bets 1-2-3-4-5 respectively.
-                 0d while reels are running.
 */
 
 
 // Audio CPU
 
-WRITE8_MEMBER(kurukuru_state::kurukuru_sound_irqmask_w)
+WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_data_w)
 {
-	// d0: sound latch irq enable
-	// d1: sound timer irq enable
+	m_adpcm_data = data & 0xf;
+}
+
+WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_reset_w)
+{
+	// d0: reset adpcm chip
 	// other bits: ?
-	m_sound_irq_mask = data;
+	msm5205_reset_w(machine().device("adpcm"), data & 1);
 	update_sound_irq(m_sound_irq_cause);
 }
 
@@ -347,7 +345,7 @@ READ8_MEMBER(kurukuru_state::kurukuru_soundlatch_r)
 	return soundlatch_byte_r(space, 0);
 }
 
-READ8_MEMBER(kurukuru_state::kurukuru_sound_timer_irqack_r)
+READ8_MEMBER(kurukuru_state::kurukuru_adpcm_timer_irqack_r)
 {
 	update_sound_irq(m_sound_irq_cause & ~2);
 	return 0;
@@ -361,10 +359,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_io, AS_IO, 8, kurukuru_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x40, 0x40) AM_WRITENOP
-	AM_RANGE(0x50, 0x50) AM_WRITE(kurukuru_sound_irqmask_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(kurukuru_adpcm_data_w)
+	AM_RANGE(0x50, 0x50) AM_WRITE(kurukuru_adpcm_reset_w)
 	AM_RANGE(0x60, 0x60) AM_READ(kurukuru_soundlatch_r)
-	AM_RANGE(0x70, 0x70) AM_READ(kurukuru_sound_timer_irqack_r)
+	AM_RANGE(0x70, 0x70) AM_READ(kurukuru_adpcm_timer_irqack_r)
 ADDRESS_MAP_END
 
 
@@ -457,7 +455,6 @@ void kurukuru_state::machine_start()
 
 void kurukuru_state::machine_reset()
 {
-	m_sound_irq_mask = 0;
 	update_sound_irq(0);
 }
 
@@ -476,6 +473,12 @@ static const ay8910_interface ay8910_intf =
 	DEVCB_UNMAPPED	// some writes...
 };
 
+static const msm5205_interface msm5205_config =
+{
+	kurukuru_msm5205_vck,
+	MSM5205_S48_4B		/* 8 kHz? */
+};
+
 
 /*************************************************
 *                 Machine Driver                 *
@@ -492,7 +495,6 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 	MCFG_CPU_ADD("audiocpu", Z80, MAIN_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_io)
-	MCFG_CPU_PERIODIC_INT_DRIVER(kurukuru_state, kurukuru_sound_timer_irq, 4*60) // from M5205? need to fix that
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -517,6 +519,10 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", YM2149, MAIN_CLOCK/12)
 	MCFG_SOUND_CONFIG(ay8910_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_CONFIG(msm5205_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -545,4 +551,4 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY                   FULLNAME                       FLAGS  */
-GAME( 199?, kurukuru, 0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",  GAME_IMPERFECT_SOUND )
+GAME( 199?, kurukuru, 0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",  0 )
