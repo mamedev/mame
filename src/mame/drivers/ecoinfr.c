@@ -319,8 +319,8 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0d_out_cred_data_w)
 {
 	if (m_credsel!=0xff)
 	{
-	//	UINT8 bf7segdata = BITSWAP8(data,7,6,5,4,3,2,1,0);
-		output_set_digit_value(m_credsel+8, data);
+		UINT8 bf7segdata = BITSWAP8(data,7,0,1,2,3,4,5,6);
+		output_set_digit_value(m_credsel+8, bf7segdata);
 	}
 }
 
@@ -333,8 +333,8 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0f_out_bank_segdata_w)
 {
 	if (m_banksel!=0xff)
 	{
-	//	UINT8 bf7segdata = BITSWAP8(data,7,6,5,4,3,2,1,0);
-		output_set_digit_value(m_banksel, data);
+		UINT8 bf7segdata = BITSWAP8(data,7,0,1,2,3,4,5,6);
+		output_set_digit_value(m_banksel, bf7segdata);
 	}
 }
 
