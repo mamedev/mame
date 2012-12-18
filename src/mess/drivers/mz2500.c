@@ -24,7 +24,7 @@
     - Mugen no Shinzou II - The Prince of Darkness: dies on IPLPRO loading, presumably a wd17xx core bug;
     - Multiplan: random hangs/crashes after you set the RTC, sometimes it loads properly;
     - Murder Club: has lots of CG artifacts, FDC issue?
-    - Orbit 3: floppy issue makes it to throw a game over as soon as you start a game;
+    - Orrbit 3: floppy issue makes it to throw a game over as soon as you start a game;
     - Penguin Kun Wars: has a bug with window effects ("Push space or trigger" msg on the bottom"), needs investigation;
     - Sound Gal Music Editor: wants a "master disk", that apparently isn't available;
     - Yukar K2 (normal version): moans about something, DFJustin: "please put the system disk back to normal", disk write-protected?
