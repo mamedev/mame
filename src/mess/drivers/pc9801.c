@@ -54,6 +54,8 @@
     - Beast (keeps reading command sense)
     - Beast 2
     - Bells Avenue (disk swap?)
+	- Bible Master 2 (at new game loading)
+	- Birdy World
 
     - Bokosuka Wars
     - Dokkin Minako Sensei (2dd image)
@@ -82,6 +84,9 @@
     - Bakasuka Wars: drawing seems busted (either mouse or upd7220)
     - Band-Kun: (how to run this without installing?)
     - Battle Chess: wants some dip-switches to be on in DSW4, too slow during IA thinking?
+	- Bishoujo Audition: Moans with a "(program) ended. remove the floppy disk and turn off the poewr."
+	- Bishoujo Hunter ZX: Doesn't color cycle at intro (seems stuck?), doesn't clear text selection at new game screen;
+	- Bishoujo Shanshinkan: has white rectangles all over the place;
 
     - Dragon Buster: slight issue with window masking;
     - Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)
@@ -318,11 +323,13 @@
 #include "machine/i8251.h"
 #include "sound/beep.h"
 #include "sound/speaker.h"
-#include "sound/2203intf.h"
 #include "sound/2608intf.h"
 #include "video/upd7220.h"
 #include "machine/ram.h"
 #include "formats/pc98fdi_dsk.h"
+#include "machine/pc9801_26.h"
+#include "machine/pc9801_slot.h"
+
 
 #define UPD1990A_TAG "upd1990a"
 #define UPD8251_TAG  "upd8251"
@@ -340,7 +347,7 @@ public:
 		m_sio(*this, UPD8251_TAG),
 		m_hgdc1(*this, "upd7220_chr"),
 		m_hgdc2(*this, "upd7220_btm"),
-		m_opn(*this, "opn"),
+//		m_opn(*this, "opn"),
 //      m_opna(*this, "opna"),
 		m_video_ram_1(*this, "video_ram_1"),
 		m_video_ram_2(*this, "video_ram_2"){ }
@@ -353,7 +360,7 @@ public:
 	required_device<i8251_device> m_sio;
 	required_device<upd7220_device> m_hgdc1;
 	required_device<upd7220_device> m_hgdc2;
-	required_device<ym2203_device> m_opn;
+//	required_device<ym2203_device> m_opn;
 //  optional_device<ym2608_device> m_opna;
 
 	required_shared_ptr<UINT8> m_video_ram_1;
@@ -412,7 +419,6 @@ public:
 		UINT8 mode;
 		UINT8 tile[4], tile_index;
 	}m_grcg;
-	UINT8 m_has_opna;
 
 	/* PC9821 specific */
 	UINT8 m_sdip[24], m_sdip_bank;
@@ -1591,38 +1597,6 @@ inline void pc9801_state::m_pc9801rs_grcg_w(UINT32 offset,int vbank,UINT8 data)
 }
 
 
-READ8_MEMBER(pc9801_state::pc9801_opn_r)
-{
-	if((offset & 1) == 0)
-	{
-		//if(m_has_opna)
-		//  return ym2608_r(m_opna, space, offset >> 1);
-
-		return offset & 4 ? 0xff : ym2203_r(m_opn,space, offset >> 1);
-	}
-	else // odd
-	{
-		printf("Read to undefined port [%02x]\n",offset+0x188);
-		return 0xff;
-	}
-}
-
-WRITE8_MEMBER(pc9801_state::pc9801_opn_w)
-{
-	if((offset & 1) == 0)
-	{
-		/*if(m_has_opna)
-            ym2608_w(m_opna,space, offset >> 1,data);
-        else */
-		if((offset & 4) == 0)
-			ym2203_w(m_opn,space, offset >> 1,data);
-	}
-	else // odd
-	{
-		printf("Write to undefined port [%02x] %02x\n",offset+0x188,data);
-	}
-}
-
 READ8_MEMBER(pc9801_state::pc9801_mouse_r)
 {
 	if((offset & 1) == 0)
@@ -1658,6 +1632,7 @@ ADDRESS_MAP_END
 
 /* first device is even offsets, second one is odd offsets */
 static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,pc9801_00_w,0xffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(pc9801_20_r,pc9801_20_w,0xffff) // RTC / DMA registers (LS244)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801_30_r,pc9801_30_w,0xffff) //i8251 RS232c / i8255 system port
@@ -1672,7 +1647,7 @@ static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801_fdc_2hd_r,pc9801_fdc_2hd_w,0xffff) //upd765a 2hd / cmt
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,pc9801_a0_w,0xffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00c8, 0x00cd) AM_READWRITE8(pc9801_fdc_2dd_r,pc9801_fdc_2dd_w,0xffff) //upd765a 2dd / <undefined>
-	AM_RANGE(0x0188, 0x018b) AM_READWRITE8(pc9801_opn_r,pc9801_opn_w,0xffff) //ym2203 opn / <undefined>
+//	AM_RANGE(0x0188, 0x018b) AM_READWRITE8(pc9801_opn_r,pc9801_opn_w,0xffff) //ym2203 opn / <undefined>
 	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,pc9801_mouse_w,0xffff) // <undefined> / mouse ppi8255 ports
 ADDRESS_MAP_END
 
@@ -2097,6 +2072,7 @@ static ADDRESS_MAP_START( pc9801rs_map, AS_PROGRAM, 32, pc9801_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,        pc9801_00_w,        0xffffffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(pc9801_20_r,        pc9801_20_w,        0xffffffff) // RTC / DMA registers (LS244)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffffffff) //i8251 RS232c / i8255 system port
@@ -2114,7 +2090,7 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
 //  AM_RANGE(0x00ec, 0x00ef) PC-9801-86 sound board
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
-	AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
+//	AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffffffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank
 	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,     pc9801_mouse_w,     0xffffffff) // <undefined> / mouse ppi8255 ports
@@ -2162,6 +2138,7 @@ static ADDRESS_MAP_START( pc9801ux_map, AS_PROGRAM, 16, pc9801_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,        pc9801_00_w,        0xffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(pc9801_20_r,        pc9801_20_w,        0xffff) // RTC / DMA registers (LS244)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffff) //i8251 RS232c / i8255 system port
@@ -2176,7 +2153,7 @@ static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x00bc, 0x00bf) AM_READWRITE8(pc9810rs_fdc_ctrl_r,pc9810rs_fdc_ctrl_w,0xffff)
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffff)
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffff)
-	AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffff) //ym2203 opn / <undefined>
+//	AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffff) //ym2203 opn / <undefined>
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffff) //ROM/RAM bank
 	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,     pc9801_mouse_w,     0xffff) // <undefined> / mouse ppi8255 ports
@@ -2462,6 +2439,7 @@ static ADDRESS_MAP_START( pc9821_map, AS_PROGRAM, 32, pc9801_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE8(pc9801_00_r,        pc9801_00_w,        0xffffffff) // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 	AM_RANGE(0x0020, 0x0027) AM_READWRITE8(pc9801_20_r,        pc9801_20_w,        0xffffffff) // RTC / DMA registers (LS244)
 	AM_RANGE(0x0030, 0x0037) AM_READWRITE8(pc9801rs_30_r,      pc9801_30_w,        0xffffffff) //i8251 RS232c / i8255 system port
@@ -2482,7 +2460,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x00c8, 0x00cf) AM_READWRITE8(pc9801rs_2hd_r,     pc9801rs_2hd_w,     0xffffffff)
 //  AM_RANGE(0x00d8, 0x00df) AMD98 (sound?) board
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE8(pc9801rs_f0_r,      pc9801rs_f0_w,      0xffffffff)
-	AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
+//	AM_RANGE(0x0188, 0x018f) AM_READWRITE8(pc9801_opn_r,       pc9801_opn_w,       0xffffffff) //ym2203 opn / <undefined>
 //  AM_RANGE(0x018c, 0x018f) YM2203 OPN extended ports / <undefined>
 //  AM_RANGE(0x0430, 0x0430) IDE bank register
 //  AM_RANGE(0x0432, 0x0432) IDE bank register (mirror)
@@ -2865,24 +2843,6 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("OPN_PA1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 2")
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("OPN_PA2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Joystick Button 1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Joystick Button 2")
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("MOUSE_X")
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_RESET PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
@@ -3338,6 +3298,20 @@ static SLOT_INTERFACE_START( pc9801_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
+static SLOT_INTERFACE_START( pc9801_sound )
+//	PC-9801-14
+	SLOT_INTERFACE( "pc9801_26", PC9801_26 )
+//	PC-9801-86
+//	PC-9801-26 + PC-9801-86 (?)
+//	PC-9801-86 + Chibi-Oto
+//	PC-9801-118
+//	Speak Board
+//	Spark Board
+//	AMD-98 (AmuseMent boarD)
+SLOT_INTERFACE_END
+
+//	Jast Sound, could be put independently
+
 void pc9801_state::fdc_2hd_irq(bool state)
 {
 //  printf("IRQ 2HD %d\n",state);
@@ -3593,43 +3567,6 @@ INTERRUPT_GEN_MEMBER(pc9801_state::pc9801_vrtc_irq)
 //      pic8259_ir2_w(machine().device("pic8259_master"), 0);
 }
 
-static void pc9801_sound_irq( device_t *device, int irq )
-{
-//  pc9801_state *state = device->machine().driver_data<pc9801_state>();
-
-	/* TODO: seems to die very often */
-	pic8259_ir4_w(device->machine().device("pic8259_slave"), irq);
-}
-
-READ8_MEMBER(pc9801_state::opn_porta_r)
-{
-	if(m_joy_sel == 0x80)
-		return machine().root_device().ioport("OPN_PA1")->read();
-
-	if(m_joy_sel == 0xc0)
-		return machine().root_device().ioport("OPN_PA2")->read();
-
-//  0x81?
-//  printf("%02x\n",m_joy_sel);
-	return 0xff;
-}
-
-WRITE8_MEMBER(pc9801_state::opn_portb_w){ m_joy_sel = data; }
-
-
-static const ym2203_interface pc98_ym2203_intf =
-{
-	{
-		AY8910_LEGACY_OUTPUT,
-		AY8910_DEFAULT_LOADS,
-		DEVCB_DRIVER_MEMBER(pc9801_state,opn_porta_r),
-		DEVCB_NULL,//(pc9801_state,opn_portb_r),
-		DEVCB_NULL,//(pc9801_state,opn_porta_w),
-		DEVCB_DRIVER_MEMBER(pc9801_state,opn_portb_w),
-	},
-	DEVCB_LINE(pc9801_sound_irq)
-};
-
 #if 0
 static const ym2608_interface pc98_ym2608_intf =
 {
@@ -3702,6 +3639,8 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc98")
 
+	MCFG_PC9801BUS_SLOT_ADD("sound_bus", pc9801_sound, NULL, NULL)
+
 	#if 0
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
@@ -3724,10 +3663,6 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_GFXDECODE(pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("opn", YM2203, MAIN_CLOCK_X1*2) // unknown clock / divider
-	MCFG_SOUND_CONFIG(pc98_ym2203_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
@@ -3767,6 +3702,8 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
 
+	MCFG_PC9801BUS_SLOT_ADD("sound_bus", pc9801_sound, NULL, NULL)
+
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
 	MCFG_RAM_EXTRA_OPTIONS("640K,3712K,7808K")
@@ -3786,10 +3723,6 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_GFXDECODE(pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("opn", YM2203, MAIN_CLOCK_X1*2) // unknown clock / divider
-	MCFG_SOUND_CONFIG(pc98_ym2203_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 //  MCFG_SOUND_ADD("opna", YM2608, MAIN_CLOCK_X1*4) // unknown clock / divider
 //  MCFG_SOUND_CONFIG(pc98_ym2608_intf)
@@ -3834,6 +3767,8 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
 
+	MCFG_PC9801BUS_SLOT_ADD("sound_bus", pc9801_sound, NULL, NULL)
+
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
 	MCFG_RAM_EXTRA_OPTIONS("3712K,7808K")
@@ -3853,10 +3788,6 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_GFXDECODE(pc9801)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("opn", YM2203, MAIN_CLOCK_X1*2) // unknown clock / divider
-	MCFG_SOUND_CONFIG(pc98_ym2203_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 //  MCFG_SOUND_ADD("opna", YM2608, MAIN_CLOCK_X1*4) // unknown clock / divider
 //  MCFG_SOUND_CONFIG(pc98_ym2608_intf)

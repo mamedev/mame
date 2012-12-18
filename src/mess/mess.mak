@@ -350,6 +350,7 @@ DRVLIBS += \
 	$(MESSOBJ)/palm.a \
 	$(MESSOBJ)/parker.a \
 	$(MESSOBJ)/pc.a \
+	$(MESSOBJ)/pc9801.a \
 	$(MESSOBJ)/pcshare.a \
 	$(MESSOBJ)/pdp1.a \
 	$(MESSOBJ)/pel.a \
@@ -1458,7 +1459,7 @@ $(MESSOBJ)/parker.a:			\
 $(MESSOBJ)/pitronic.a:			\
 	$(MESS_DRIVERS)/beta.o		\
 
-$(MESSOBJ)/pc.a:				\
+$(MESSOBJ)/pc.a:			\
 	$(MESS_VIDEO)/pc_aga.o		\
 	$(MESS_MACHINE)/tandy1t.o	\
 	$(MESS_MACHINE)/europc.o	\
@@ -1468,6 +1469,10 @@ $(MESSOBJ)/pc.a:				\
 	$(MESS_MACHINE)/genpc.o		\
 	$(MESS_DRIVERS)/ibmpc.o		\
 	$(MESS_VIDEO)/pc_t1t.o		\
+
+$(MESSOBJ)/pc9801.a:			\
+	$(MESS_MACHINE)/pc9801_26.o	\
+	$(MESS_MACHINE)/pc9801_slot.o	\
 
 $(MESSOBJ)/pcshare.a:			\
 	$(MESS_MACHINE)/pc_turbo.o	\
