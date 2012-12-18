@@ -704,7 +704,7 @@ WRITE8_MEMBER(_8080bw_state::polaris_sh_port_3_w)
 
 	coin_lockout_global_w(machine(), data & 0x04);  /* SX8 */
 
-	m_c8080bw_flip_screen = BIT(data, 5) & BIT(ioport(CABINET_PORT_TAG)->read(), 0); /* SX11 */
+	m_c8080bw_flip_screen = BIT(data, 5) & BIT(ioport("IN2")->read(), 2); /* SX11 */
 
 	/* 0x01 - SX6 - Plane Down */
 	discrete_sound_w(m_discrete, space, POLARIS_SX6_EN, data & 0x01);

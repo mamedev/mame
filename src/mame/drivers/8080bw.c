@@ -1227,9 +1227,9 @@ static INPUT_PORTS_START( schaser )
 	// Name Reset - if name of high scorer was rude, owner can press this button
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Name Reset") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_DIPNAME( 0x40, 0x00, "Cabinet" )	PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x00, "Upright" )
-	PORT_DIPSETTING(    0x40, "Cocktail" )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("VR1")
@@ -1670,12 +1670,9 @@ static INPUT_PORTS_START( polaris )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	/* 0x04 should be Cabinet - Upright/Cocktail,
-       but until the cocktail hack is changed,
-       this will have to do. */
-	PORT_DIPNAME( 0x04, 0x00, "Number of Controls" )	PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x08, 0x00, "Invincible Test" )		PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
@@ -1689,9 +1686,6 @@ static INPUT_PORTS_START( polaris )
 	PORT_DIPNAME( 0x80, 0x00, "High Score Preset Mode" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	/* Dummy port for cocktail mode */
-	INVADERS_CAB_TYPE_PORT
 
 	PORT_START("VR1")
 	PORT_ADJUSTER( 80, "Sub Volume VR1" )
