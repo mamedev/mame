@@ -867,20 +867,20 @@ MACHINE_CONFIG_END
 // 48 - 4f | 10pHopp | Different Hopper Type?                             | ---- -H--
 // 50 - 57 | ?????   | not seen used                                      | ---- --?-
 // 58 - 5f | GALA    | ? (in some of the earlier sets this is a 0 fill)   | ---- ---G  (or ---- ---0)
-EC_BARX_SET( 199?, ec_barx,		0,			"iss354.rom",	0x0000, 0x008000, CRC(0da15b8e) SHA1(435451f7c428beaacf182d112214482503dec483), "Electrocoin","Bar X (Electrocoin) (set 1)" )
-EC_BARX_SET( 199?, ec_barx__a,	ec_barx,	"iss9007.rom",	0x0000, 0x008000, CRC(c73b7c4e) SHA1(2d1fecb8efd4b80d1249034efc5ea9c1d3cb660b), "Electrocoin","Bar X (Electrocoin) (set 2)" )
-EC_BARX_SET( 199?, ec_barx__b,	ec_barx,	"iss9011.rom",	0x0000, 0x008000, CRC(7b69ff3c) SHA1(f13e71fa2ae997fd2c80ca060cdbe2115468df6b), "Electrocoin","Bar X (Electrocoin) (set 3)" )
-EC_BARX_SET( 199?, ec_barx__c,	ec_barx,	"iss9015.rom",	0x0000, 0x008000, CRC(fd2fabe8) SHA1(2a0261c39187746a53ff7c32a759ba1311ec56a9), "Electrocoin","Bar X (Electrocoin) (set 4)" )
-EC_BARX_SET( 199?, ec_barx__d,	ec_barx,	"iss9201.rom",	0x0000, 0x008000, CRC(35cf9280) SHA1(d271a89178b026c2847b8f192c72f8ce841a1548), "Electrocoin","Bar X (Electrocoin) (set 5)" )
-EC_BARX_SET( 199?, ec_barx__e,	ec_barx,	"iss9204.rom",	0x0000, 0x008000, CRC(e8ced9c9) SHA1(a028c2bf35add11c2ff3b98cf34925acb99ef1c4), "Electrocoin","Bar X (Electrocoin) (set 6)" )
+EC_BARX_SET( 199?, ec_barx,		0,			"iss354.rom",	0x0000, 0x008000, CRC(0da15b8e) SHA1(435451f7c428beaacf182d112214482503dec483), "Electrocoin","Bar X (Electrocoin) (set 1)" ) // ELCNSBRX - Wed Feb 07 17:28:02 1996
+EC_BARX_SET( 199?, ec_barx__a,	ec_barx,	"iss9007.rom",	0x0000, 0x008000, CRC(c73b7c4e) SHA1(2d1fecb8efd4b80d1249034efc5ea9c1d3cb660b), "Electrocoin","Bar X (Electrocoin) (set 2)" ) // ELCNCBX1 - Thu May 01 16:23:14 1997
+EC_BARX_SET( 199?, ec_barx__b,	ec_barx,	"iss9011.rom",	0x0000, 0x008000, CRC(7b69ff3c) SHA1(f13e71fa2ae997fd2c80ca060cdbe2115468df6b), "Electrocoin","Bar X (Electrocoin) (set 3)" ) // ELCNCBX1 - Sun Sep 21 10:28:56 1997
+EC_BARX_SET( 199?, ec_barx__c,	ec_barx,	"iss9015.rom",	0x0000, 0x008000, CRC(fd2fabe8) SHA1(2a0261c39187746a53ff7c32a759ba1311ec56a9), "Electrocoin","Bar X (Electrocoin) (set 4)" ) // ELCNCBX1 - Tue May 19 14:26:38 1998
+EC_BARX_SET( 199?, ec_barx__d,	ec_barx,	"iss9201.rom",	0x0000, 0x008000, CRC(35cf9280) SHA1(d271a89178b026c2847b8f192c72f8ce841a1548), "Electrocoin","Bar X (Electrocoin) (set 5)" ) // ELCNCBX1 - Sun Jun 21 11:07:37 1998
+EC_BARX_SET( 199?, ec_barx__e,	ec_barx,	"iss9204.rom",	0x0000, 0x008000, CRC(e8ced9c9) SHA1(a028c2bf35add11c2ff3b98cf34925acb99ef1c4), "Electrocoin","Bar X (Electrocoin) (set 6)" ) // ELCPCBX1 - Thu Sep 03 12:41:08 1998
 // No Header info, or title info (although there is space for one)
-EC_BARX_SET( 199?, ec_barx__f,	ec_barx,	"barx5ft",		0x0000, 0x008000, CRC(6a549ff3) SHA1(02766642c5aee5fa3f1e0d9d7a0ec30192e597f1), "Electrocoin","Bar X (Electrocoin) (set 7)" )
-EC_BARX_SET( 199?, ec_barx__g,	ec_barx,	"bx503cas",		0x0000, 0x008000, CRC(ac974ac2) SHA1(d317730506c075b108c68b3fc5628837b12863fe), "Electrocoin","Bar X (Electrocoin) (set 8)" )
+EC_BARX_SET( 199?, ec_barx__f,	ec_barx,	"barx5ft",		0x0000, 0x008000, CRC(6a549ff3) SHA1(02766642c5aee5fa3f1e0d9d7a0ec30192e597f1), "Electrocoin","Bar X (Electrocoin) (set 7)" ) // ELCNCBX1 - Thu Sep 03 12:40:21 1998
+EC_BARX_SET( 199?, ec_barx__g,	ec_barx,	"bx503cas",		0x0000, 0x008000, CRC(ac974ac2) SHA1(d317730506c075b108c68b3fc5628837b12863fe), "Electrocoin","Bar X (Electrocoin) (set 8)" ) // ELCNCBX1 - Thu Sep 03 12:40:21 1998
 // Sets below all marked '2001 BARX' (older header type?)
-EC_BARX_SET( 199?, ec_barx__h,	ec_barx,	"issa091",		0x0000, 0x008000, CRC(6748c76c) SHA1(115b6f30971fbbbd67ece3eeba66431c7440267e), "Electrocoin","Bar X (Electrocoin) (set 9)" )  // ---- ---0
-EC_BARX_SET( 199?, ec_barx__i,	ec_barx,	"issa092",		0x0000, 0x008000, CRC(82c4e44d) SHA1(a253779c3666eb1c3b4a45f22478b2310a23540a), "Electrocoin","Bar X (Electrocoin) (set 10)" ) // -N-- ---0
-EC_BARX_SET( 199?, ec_barx__j,	ec_barx,	"issa096",		0x0000, 0x008000, CRC(8536c23d) SHA1(3acca3016dd5a8a183f646095856fffca9d0fd9c), "Electrocoin","Bar X (Electrocoin) (set 11)" ) // P--- ---0
-EC_BARX_SET( 199?, ec_barx__k,	ec_barx,	"issa097",		0x0000, 0x008000, CRC(0650275f) SHA1(eb06a7b245103aeb53973897128063b04e599fde), "Electrocoin","Bar X (Electrocoin) (set 12)" ) // PN-- ---0
+EC_BARX_SET( 199?, ec_barx__h,	ec_barx,	"issa091",		0x0000, 0x008000, CRC(6748c76c) SHA1(115b6f30971fbbbd67ece3eeba66431c7440267e), "Electrocoin","Bar X (Electrocoin) (set 9)" ) // ELCNSBRX - Fri Feb 21 20:39:04 2003 // ---- ---0
+EC_BARX_SET( 199?, ec_barx__i,	ec_barx,	"issa092",		0x0000, 0x008000, CRC(82c4e44d) SHA1(a253779c3666eb1c3b4a45f22478b2310a23540a), "Electrocoin","Bar X (Electrocoin) (set 10)" )// ELCNSBRX - Fri Feb 21 20:39:29 2003 // -N-- ---0
+EC_BARX_SET( 199?, ec_barx__j,	ec_barx,	"issa096",		0x0000, 0x008000, CRC(8536c23d) SHA1(3acca3016dd5a8a183f646095856fffca9d0fd9c), "Electrocoin","Bar X (Electrocoin) (set 11)" )// ELCPSBRX - Fri Feb 21 20:42:18 2003 // P--- ---0
+EC_BARX_SET( 199?, ec_barx__k,	ec_barx,	"issa097",		0x0000, 0x008000, CRC(0650275f) SHA1(eb06a7b245103aeb53973897128063b04e599fde), "Electrocoin","Bar X (Electrocoin) (set 12)" )// ELCPSBRX - Fri Feb 21 20:46:35 2003 // PN-- ---0
 // 2001 BARX (newer header type?)
 // Are these actually 'Super Bar X'? They have SBARX strings in them near build dates etc.
 EC_BARX_SET( 199?, ec_barx__l,	ec_barx,	"issa793",		0x0000, 0x008000, CRC(e3de7b43) SHA1(5d33d39f59e30510ac89d9a03979f17a4a3707eb), "Electrocoin","Bar X (Electrocoin) (set 13)" ) // ---- ----
@@ -965,8 +965,11 @@ EC_BARX_SET( 199?, ec_barx__br,	ec_barx,	"issa871",		0x0000, 0x008000, CRC(aed72
 EC_BARX_SET( 199?, ec_barx__bs,	ec_barx,	"issa872",		0x0000, 0x008000, CRC(957536b1) SHA1(4ca031ba9b3bd5e178abe7951498f8202fa4cd48), "Electrocoin","Bar X (Electrocoin) (set 92)" ) // P1-- ---G
 EC_BARX_SET( 199?, ec_barx__bt,	ec_barx,	"issa873",		0x0000, 0x008000, CRC(171cdb19) SHA1(f0f7cb81b220d757c5dadbe9e2cc0dbc6aa02962), "Electrocoin","Bar X (Electrocoin) (set 93)" ) // P-2S K--G
 EC_BARX_SET( 199?, ec_barx__bu,	ec_barx,	"issa874",		0x0000, 0x008000, CRC(704f999c) SHA1(259430d175c22a33f222ab1138159b8fc838c98f), "Electrocoin","Bar X (Electrocoin) (set 94)" ) // P1-S K--G
-/* Unique ROM containing 1993 Electrocoin Copyright - for a z180 instead? */
-EC_BARX_SET( 199?, ec_barx__bv,	ec_barx,	"bxc1&6c.rom",	0x0000, 0x008000, CRC(356964c3) SHA1(68522a0d379ab49f5975e0628f3e813cfe3287a3), "Electrocoin","Bar X (Electrocoin) (set 95)" )
+
+
+/* 1993 Electrocoin Copyright - z180 code - these might belong in the pyramid driver, oxo driver, or their own driver */
+EC_BARX_SET( 199?, ec_bx180,	0,       	"sbarx6c.bin",	0x0000, 0x008000, CRC(f747fa74) SHA1(7820e9225924c8b2fd78c625cc61871f7c76357f), "Electrocoin","Bar X (Z180 hardware) (Electrocoin) (set 1)" ) // ELCNBARX - no build date?
+EC_BARX_SET( 199?, ec_bx180a,	ec_bx180,	"bxc1&6c.rom",	0x0000, 0x008000, CRC(356964c3) SHA1(68522a0d379ab49f5975e0628f3e813cfe3287a3), "Electrocoin","Bar X (Z180 hardware) (Electrocoin) (set 2)" ) // ELCNBARX - no date string
 
 
 
@@ -1039,24 +1042,24 @@ EC_BIG7_SET( 199?, ec_big7__a0,	ec_big7,	"iss2017.rom",				0x0000, 0x008000, CRC
 EC_BIG7_SET( 199?, ec_big7__a1,	ec_big7,	"iss2019.rom",				0x0000, 0x008000, CRC(475b224a) SHA1(c837aa0c73cf5947b6b4d106d4f0967da040e5dc), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 65)" )
 EC_BIG7_SET( 199?, ec_big7__a2,	ec_big7,	"iss513.rom",				0x0000, 0x008000, CRC(ca302c47) SHA1(9fb9cdd140baa0ec36250b4ebd0a25450348075f), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 66)" )
 // No Header - Taken from a Super Big 7 Set
-EC_BIG7_SET( 199?, ec_big7__ak,	ec_big7,	"iss197.rom",				0x0000, 0x008000, CRC(45d975c8) SHA1(1ef7693fb000b85f661ebd06512f916297d0662c), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 48)" ) // 'Super Big 7' ?
-EC_BIG7_SET( 199?, ec_big7__al,	ec_big7,	"sb7.58",					0x0000, 0x008000, CRC(0876d8bf) SHA1(b15584c7c994d29010652cdf8d9c79b661e01b01), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 49)" )  // 'Super Big 7' ?
+EC_BIG7_SET( 199?, ec_big7__ak,	ec_big7,	"iss197.rom",				0x0000, 0x008000, CRC(45d975c8) SHA1(1ef7693fb000b85f661ebd06512f916297d0662c), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 48)" ) // ELCNBIG7 - Thu Mar 16 13:21:54 1995
+EC_BIG7_SET( 199?, ec_big7__al,	ec_big7,	"sb7.58",					0x0000, 0x008000, CRC(0876d8bf) SHA1(b15584c7c994d29010652cdf8d9c79b661e01b01), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 49)" ) // ELCNBIG7 - Thu May 27 18:47:36 1993
 /* sets below have different behavior, maybe 3rd party? */
 // Different Code structure, no space for header - checking some kind of device at 0xa000 */
-EC_BIG7_SET( 199?, ec_big7__am,	ec_big7,	"sb710d",					0x0000, 0x008000, CRC(9d9d14fe) SHA1(acc4c92a800d0891ebace8a60d04df09b43bfb1c), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 50)" )  // 'Super Big 7' ?
-EC_BIG7_SET( 199?, ec_big7__an,	ec_big7,	"b710",						0x0000, 0x008000, CRC(0cdae404) SHA1(e8d713e172e5ff37e31e68d096fac77fbe676006), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 51)" )
-EC_BIG7_SET( 199?, ec_big7__as,	ec_big7,	"big78t",					0x0000, 0x008000, CRC(310ffd92) SHA1(1cfc3801bb04d4e3d4c2d6e271c3ac71c49d466b), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 56)" )
-EC_BIG7_SET( 199?, ec_big7__at,	ec_big7,	"genbig.bin",				0x0000, 0x008000, CRC(025b129f) SHA1(07d53f8780fca7b90243c01f5892f3c0622ca387), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 57)" )
+EC_BIG7_SET( 199?, ec_big7__am,	ec_big7,	"sb710d",					0x0000, 0x008000, CRC(9d9d14fe) SHA1(acc4c92a800d0891ebace8a60d04df09b43bfb1c), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 50)" ) // ELCNBIG7 - no date string
+EC_BIG7_SET( 199?, ec_big7__an,	ec_big7,	"b710",						0x0000, 0x008000, CRC(0cdae404) SHA1(e8d713e172e5ff37e31e68d096fac77fbe676006), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 51)" ) // ELCNBIG7 - no date string
+EC_BIG7_SET( 199?, ec_big7__as,	ec_big7,	"big78t",					0x0000, 0x008000, CRC(310ffd92) SHA1(1cfc3801bb04d4e3d4c2d6e271c3ac71c49d466b), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 56)" ) // ELCNBIG7 - no date string
+EC_BIG7_SET( 199?, ec_big7__at,	ec_big7,	"genbig.bin",				0x0000, 0x008000, CRC(025b129f) SHA1(07d53f8780fca7b90243c01f5892f3c0622ca387), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 57)" ) // ELCNBIG7 - no date string
 /* device at a100? */
-EC_BIG7_SET( 199?, ec_big7__ar,	ec_big7,	"big 7 8 1-0.bin",			0x0000, 0x008000, CRC(164fd1e6) SHA1(25be8962f8b7a6a78345dd60319a391c583b6b2f), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 55)" )
+EC_BIG7_SET( 199?, ec_big7__ar,	ec_big7,	"big 7 8 1-0.bin",			0x0000, 0x008000, CRC(164fd1e6) SHA1(25be8962f8b7a6a78345dd60319a391c583b6b2f), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 55)" ) // ELCNBIG7 - no date string
 /* No indication, no space for header */
-EC_BIG7_SET( 199?, ec_big7__ao,	ec_big7,	"b75p4",					0x0000, 0x008000, CRC(27ad1971) SHA1(4c1248d5815143dc0b23ada909c4f1fc16a1a18b), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 52)" )
-EC_BIG7_SET( 199?, ec_big7__ap,	ec_big7,	"b78ac",					0x0000, 0x008000, CRC(454e9ac5) SHA1(a700a399632fa546473503f8e7e8dc3abc966ee6), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 53)" )
-EC_BIG7_SET( 199?, ec_big7__aq,	ec_big7,	"b7rb5",					0x0000, 0x008000, CRC(cc59283a) SHA1(63d53f6f5e9c16df77a430443aade18722d7bcd7), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 54)" )
+EC_BIG7_SET( 199?, ec_big7__ao,	ec_big7,	"b75p4",					0x0000, 0x008000, CRC(27ad1971) SHA1(4c1248d5815143dc0b23ada909c4f1fc16a1a18b), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 52)" ) // ELCNBIG7 - no date string
+EC_BIG7_SET( 199?, ec_big7__ap,	ec_big7,	"b78ac",					0x0000, 0x008000, CRC(454e9ac5) SHA1(a700a399632fa546473503f8e7e8dc3abc966ee6), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 53)" ) // ELCNBIG7 - no date string
+EC_BIG7_SET( 199?, ec_big7__aq,	ec_big7,	"b7rb5",					0x0000, 0x008000, CRC(cc59283a) SHA1(63d53f6f5e9c16df77a430443aade18722d7bcd7), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 54)" ) // ELCNBIG7 - no date string
 /* device at a000? */
-EC_BIG7_SET( 199?, ec_big7__aw,	ec_big7,	"bigcon10.hex",				0x0000, 0x008000, CRC(b1176841) SHA1(ef23a61355ff194b1dd2c54bc94b175272a8058d), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 60)" )
-EC_BIG7_SET( 199?, ec_big7__ax,	ec_big7,	"bigcon8c.hex",				0x0000, 0x008000, CRC(5b586abc) SHA1(8cabb266db4e0453e081ce6ff3ee0c850b66bede), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 61)" )
-EC_BIG7_SET( 199?, ec_big7__ay,	ec_big7,	"bigcon8t.hex",				0x0000, 0x008000, CRC(809e2ec5) SHA1(15a1da75f24c167089051645362c9f53be54e16e), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 62)" )
+EC_BIG7_SET( 199?, ec_big7__aw,	ec_big7,	"bigcon10.hex",				0x0000, 0x008000, CRC(b1176841) SHA1(ef23a61355ff194b1dd2c54bc94b175272a8058d), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 60)" ) // ELCNBIG7 - Tue Mar 08 10:05:02 1994
+EC_BIG7_SET( 199?, ec_big7__ax,	ec_big7,	"bigcon8c.hex",				0x0000, 0x008000, CRC(5b586abc) SHA1(8cabb266db4e0453e081ce6ff3ee0c850b66bede), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 61)" ) // ELCNBIG7 - Tue Mar 08 10:05:02 1994
+EC_BIG7_SET( 199?, ec_big7__ay,	ec_big7,	"bigcon8t.hex",				0x0000, 0x008000, CRC(809e2ec5) SHA1(15a1da75f24c167089051645362c9f53be54e16e), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 62)" ) // ELCNBIG7 - Tue Mar 08 10:05:02 1994
 
 
 #define EC_SBARX_OTHERS \
@@ -1136,14 +1139,20 @@ EC_SBARX_SET( 199?, ec_sbarx__aw,	ec_sbarx,	"iss3287.rom",							0x0000, 0x00800
 EC_SBARX_SET( 199?, ec_sbarx__ax,	ec_sbarx,	"iss9401.rom",							0x0000, 0x008000, CRC(abe83480) SHA1(581fab39096b6327b8e88c7ce848126123f524b8), "Electrocoin","Super Bar X (Electrocoin) (set 61)" )
 EC_SBARX_SET( 199?, ec_sbarx__ay,	ec_sbarx,	"iss9405.rom",							0x0000, 0x008000, CRC(6435586d) SHA1(95f2cda1bc80bb8f7c3d2d2b41abbfd634a88237), "Electrocoin","Super Bar X (Electrocoin) (set 62)" ) // from unknown set
 /* No header (all 0x00) space for one tho */
-EC_SBARX_SET( 199?, ec_sbarx__az,	ec_sbarx,	"iss129.rom",							0x0000, 0x008000, CRC(b4adae28) SHA1(5d747624dafc8d65fd3b49ff3649ad9973d9271b), "Electrocoin","Super Bar X (Electrocoin) (set 63)" ) // superbarx_issue129_10cash.bin, doesn't do port09 0x40 changed 40
-EC_SBARX_SET( 199?, ec_sbarx__a0,	ec_sbarx,	"superbarx_issue158_sitdown10cash.bin",	0x0000, 0x008000, CRC(80c2d523) SHA1(1252bf66987aa9ac610c3e9f0919f29a6ad6cc52), "Electrocoin","Super Bar X (Electrocoin) (set 64)" ) // ^^
-EC_SBARX_SET( 199?, ec_sbarx__a1,	ec_sbarx,	"iss173.rom",							0x0000, 0x008000, CRC(984f9c18) SHA1(f160eeee6ea70c79502fc68f70cb973e1ca029b8), "Electrocoin","Super Bar X (Electrocoin) (set 65)" )
-EC_SBARX_SET( 199?, ec_sbarx__a2,	ec_sbarx,	"iss2012.rom",							0x0000, 0x008000, CRC(455cfdcb) SHA1(53fb0748a544b432b88455fa597b7017e06b3059), "Electrocoin","Super Bar X (Electrocoin) (set 66)" )
-EC_SBARX_SET( 199?, ec_sbarx__a3,	ec_sbarx,	"sbx5red",								0x0000, 0x008000, CRC(7991231a) SHA1(cd1978c48a3c214666d51ca930d3d480540448ec), "Electrocoin","Super Bar X (Electrocoin) (set 67)" )
-EC_SBARX_SET( 199?, ec_sbarx__a4,	ec_sbarx,	"sbx8elac",								0x0000, 0x008000, CRC(102a3f38) SHA1(5f4f55904b00dde47e9841de313ed76a56e711df), "Electrocoin","Super Bar X (Electrocoin) (set 68)" )
-/* 1993 Electrocoin Copyright - z180 code */
-EC_SBARX_SET( 199?, ec_sbarx__be,	ec_sbarx,	"sbarx6c.bin",							0x0000, 0x008000, CRC(f747fa74) SHA1(7820e9225924c8b2fd78c625cc61871f7c76357f), "Electrocoin","Super Bar X (Electrocoin) (set 78)" ) // aka sbarx6t
+EC_SBARX_SET( 199?, ec_sbarx__az,	ec_sbarx,	"iss129.rom",							0x0000, 0x008000, CRC(b4adae28) SHA1(5d747624dafc8d65fd3b49ff3649ad9973d9271b), "Electrocoin","Super Bar X (Electrocoin) (set 63)" ) // ELCNSBRX - Sat Jun 22 13:24:27 1996
+EC_SBARX_SET( 199?, ec_sbarx__a0,	ec_sbarx,	"superbarx_issue158_sitdown10cash.bin",	0x0000, 0x008000, CRC(80c2d523) SHA1(1252bf66987aa9ac610c3e9f0919f29a6ad6cc52), "Electrocoin","Super Bar X (Electrocoin) (set 64)" ) // ELCNSBRX - Mon Oct 14 11:03:39 1996
+EC_SBARX_SET( 199?, ec_sbarx__a1,	ec_sbarx,	"iss173.rom",							0x0000, 0x008000, CRC(984f9c18) SHA1(f160eeee6ea70c79502fc68f70cb973e1ca029b8), "Electrocoin","Super Bar X (Electrocoin) (set 65)" ) // ELCNSBRX - Thu Mar 16 12:12:19 1995
+EC_SBARX_SET( 199?, ec_sbarx__a2,	ec_sbarx,	"iss2012.rom",							0x0000, 0x008000, CRC(455cfdcb) SHA1(53fb0748a544b432b88455fa597b7017e06b3059), "Electrocoin","Super Bar X (Electrocoin) (set 66)" ) // ELCNSBRX - Thu Sep 25 10:18:38 1997
+EC_SBARX_SET( 199?, ec_sbarx__a3,	ec_sbarx,	"sbx5red",								0x0000, 0x008000, CRC(7991231a) SHA1(cd1978c48a3c214666d51ca930d3d480540448ec), "Electrocoin","Super Bar X (Electrocoin) (set 67)" ) // ELCNSBRX - Tue Mar 08 09:51:56 1994
+EC_SBARX_SET( 199?, ec_sbarx__a4,	ec_sbarx,	"sbx8elac",								0x0000, 0x008000, CRC(102a3f38) SHA1(5f4f55904b00dde47e9841de313ed76a56e711df), "Electrocoin","Super Bar X (Electrocoin) (set 68)" ) // ELCNSBRX - Mon Apr 21 19:01:53 1997
+
+
+
+
+
+
+/* Unique ROM containing 1993 Electrocoin Copyright - for a z180 instead? */
+
 
 
 /* is Brunel Research the company, or related to the Brunel language? */
@@ -1254,7 +1263,8 @@ EC_MAG7S_SET( 199?, ec_mag7s__ay,	ec_mag7s,	"issa945", 0x0000, 0x008000, CRC(9c2
 // 2001 COOL7 (from Unknown set)
 EC_MAG7S_SET( 199?, ec_mag7s__az,	ec_mag7s,	"issa998", 0x0000, 0x008000, CRC(7314e2a8) SHA1(3a108bf2ba0173ecab85fe7110174f5db8f75e17), "Electrocoin","Magic 7s / Cool 7 / Bar X 7 (2001 COOL7) (Electrocoin) (set 63)" )
 // This just has 'Cool7' with no other header information (all 0x00)
-EC_MAG7S_SET( 199?, ec_mag7s__a0,	ec_mag7s,	"majic",   0x0000, 0x008000, CRC(a1ca176f) SHA1(90dc3204091c6328764122dc583e47ea8ac314e4), "Electrocoin","Magic 7s / Cool 7 / Bar X 7 (2001 COOL7) (Electrocoin) (set 64)" )
+// (C)1993/97 ELECTROCOIN
+EC_MAG7S_SET( 199?, ec_mag7s__a0,	ec_mag7s,	"majic",   0x0000, 0x008000, CRC(a1ca176f) SHA1(90dc3204091c6328764122dc583e47ea8ac314e4), "Electrocoin","Magic 7s / Cool 7 / Bar X 7 (2001 COOL7) (Electrocoin) (set 64)" ) // ELCNCOOL - on Jan 10 19:22:08 2000
 
 
 #define EC_REDBR_OTHERS \
@@ -1415,14 +1425,17 @@ EC_BXD7S_SET( 199?, ec_bxd7s__d,	ec_bxd7s,	"issc337",		0x0000, 0x008000, CRC(79b
 	GAME(year, setname, parent ,ecoinfr	,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
 
 
+
+/* (C)1993-97/2002-03 ELECTROCOIN */
 // These are '2006 BARX'
-EC_CASBX_SET( 199?, ec_casbx,		0,			"issc287",		0x0000, 0x008000, CRC(fe528b9f) SHA1(ac2a7648b9a706de780a059e7f77573be1d6b9cd), "Electrocoin","Casino Bar X (Electrocoin) (set 1)" ) // P--- ----
-EC_CASBX_SET( 199?, ec_casbx__a,	ec_casbx,	"issc293",		0x0000, 0x008000, CRC(93c83913) SHA1(b4cfed0836f57d7f6c828273468a89532607cde2), "Electrocoin","Casino Bar X (Electrocoin) (set 2)" ) // P-2S K---
-// These are '2006 BARX' (from Bar X Deluxe set)
-EC_CASBX_SET( 199?, ec_casbx__b,	ec_casbx,	"issc289",		0x0000, 0x008000, CRC(31e8ae3a) SHA1(accc14b292f220dfc9695638c0402de28fe19bae), "Electrocoin","Casino Bar X (Electrocoin) (set 3)" ) // P-2S K---
-/* No header space, Z80 code */
-EC_CASBX_SET( 199?, ec_casbx__c,	ec_casbx,	"bx125p25",		0x0000, 0x010000, CRC(beff03e1) SHA1(d0bf997f9766a801274a02242755df3419879bd4), "Electrocoin","Casino Bar X (Electrocoin) (set 4)" ) // different?
-EC_CASBX_SET( 199?, ec_casbx__d,	ec_casbx,	"x125n34.bin",	0x0000, 0x010000, CRC(5ab73808) SHA1(f857bd9a9a2f1c7c795a7203f2932acac051ae55), "Electrocoin","Casino Bar X (Electrocoin) (set 5)" ) // different?
+EC_CASBX_SET( 199?, ec_casbx,		0,			"issc287",		0x0000, 0x008000, CRC(fe528b9f) SHA1(ac2a7648b9a706de780a059e7f77573be1d6b9cd), "Electrocoin","Casino Bar X (Electrocoin) (set 1)" ) // P--- ----   // ELCPSBRX - Thu Jun 07 11:45:38 2007
+EC_CASBX_SET( 199?, ec_casbx__b,	ec_casbx,	"issc289",		0x0000, 0x008000, CRC(31e8ae3a) SHA1(accc14b292f220dfc9695638c0402de28fe19bae), "Electrocoin","Casino Bar X (Electrocoin) (set 3)" ) // P-2S K---   // ELCPSBRX - Thu Jun 07 11:46:21 2007
+EC_CASBX_SET( 199?, ec_casbx__a,	ec_casbx,	"issc293",		0x0000, 0x008000, CRC(93c83913) SHA1(b4cfed0836f57d7f6c828273468a89532607cde2), "Electrocoin","Casino Bar X (Electrocoin) (set 2)" ) // P-2S K---   // ELCPSBRX - Thu Jun 07 11:47:48 2007
+
+
+ // these both have a date string of "Tue Dec 06 15:16:04 2005" and the title of "Bar X 125" along with various other strings for an alpha display
+EC_CASBX_SET( 2005, ec_bx125,	0,         	"bx125p25",		0x0000, 0x010000, CRC(beff03e1) SHA1(d0bf997f9766a801274a02242755df3419879bd4), "Electrocoin","Bar X 125 (Electrocoin) (set 1)" )
+EC_CASBX_SET( 2005, ec_bx125a,	ec_bx125,	"x125n34.bin",	0x0000, 0x010000, CRC(5ab73808) SHA1(f857bd9a9a2f1c7c795a7203f2932acac051ae55), "Electrocoin","Bar X 125 (Electrocoin) (set 2)" )
 
 
 
@@ -1440,12 +1453,12 @@ EC_CASBX_SET( 199?, ec_casbx__d,	ec_casbx,	"x125n34.bin",	0x0000, 0x010000, CRC(
 	GAME(year, setname, parent ,ecoinfr	,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
 
 
-/* No header (space for one, but 0x00 fill) - Electrocin 1993 copyright near end */
-EC_SPBDX_SET( 199?, ec_spbdx,		0,			"iss132.rom",	0x0000, 0x008000, CRC(fd2ea535) SHA1(6deda1825bfce9481bf85a500e031242a2c9cf8c), "Electrocoin","Super Bar X Deluxe (Electrocoin) (set 1)" )
-EC_SPBDX_SET( 199?, ec_spbdx__a,	ec_spbdx,	"iss133.rom",	0x0000, 0x008000, CRC(9522c295) SHA1(7b9f1c672c15b5e353c19ad5237ffd85f4c83fdb), "Electrocoin","Super Bar X Deluxe (Electrocoin) (set 2)" )
-EC_SPBDX_SET( 199?, ec_spbdx__b,	ec_spbdx,	"iss134.rom",	0x0000, 0x008000, CRC(888809a6) SHA1(5e1163ef63616f4934a4894772457b70c5ef4fb2), "Electrocoin","Super Bar X Deluxe (Electrocoin) (set 3)" )
-EC_SPBDX_SET( 199?, ec_spbdx__c,	ec_spbdx,	"iss176.rom",	0x0000, 0x008000, CRC(f6d0c2cd) SHA1(dfd5e040f2aa42d2186a0d3c94f692cfc560236a), "Electrocoin","Super Bar X Deluxe (Electrocoin) (set 4)" )
-EC_SPBDX_SET( 199?, ec_spbdx__d,	ec_spbdx,	"300615",		0x0000, 0x008000, CRC(8a5a4e35) SHA1(be3acfaf116ae23a61aac581d9f83287cddcdaab), "Electrocoin","Super Bar X Deluxe (Electrocoin) (set 5)" ) // bad?
+/* No header (space for one, but 0x00 fill) - Electrocoin 1993 copyright near end */
+EC_SPBDX_SET( 199?, ec_spbdx,		0,			"iss132.rom",	0x0000, 0x008000, CRC(fd2ea535) SHA1(6deda1825bfce9481bf85a500e031242a2c9cf8c), "Electrocoin","Super Bar X Deluxe (Electrocoin) (set 1)" ) // ELCNSBRX - Sat Jun 22 13:28:41 1996
+EC_SPBDX_SET( 199?, ec_spbdx__a,	ec_spbdx,	"iss133.rom",	0x0000, 0x008000, CRC(9522c295) SHA1(7b9f1c672c15b5e353c19ad5237ffd85f4c83fdb), "Electrocoin","Super Bar X Deluxe (Electrocoin) (set 2)" ) // ELCNSBRX - Sat Jun 22 13:29:06 1996
+EC_SPBDX_SET( 199?, ec_spbdx__b,	ec_spbdx,	"iss134.rom",	0x0000, 0x008000, CRC(888809a6) SHA1(5e1163ef63616f4934a4894772457b70c5ef4fb2), "Electrocoin","Super Bar X Deluxe (Electrocoin) (set 3)" ) // ELCNSBRX - Sat Jun 22 13:29:28 1996
+EC_SPBDX_SET( 199?, ec_spbdx__c,	ec_spbdx,	"iss176.rom",	0x0000, 0x008000, CRC(f6d0c2cd) SHA1(dfd5e040f2aa42d2186a0d3c94f692cfc560236a), "Electrocoin","Super Bar X Deluxe (Electrocoin) (set 4)" ) // ELCNSBRX - Thu Mar 16 12:14:40 1995
+EC_SPBDX_SET( 199?, ec_spbdx__d,	ec_spbdx,	"300615",		0x0000, 0x008000, CRC(8a5a4e35) SHA1(be3acfaf116ae23a61aac581d9f83287cddcdaab), "Electrocoin","Super Bar X Deluxe (Electrocoin) (set 5)" ) // ELCNSBRX - Fri Sep 11 13:01:02 1998 // bad?
 
 
 #define EC_UNK5_OTHERS \
@@ -1462,9 +1475,12 @@ EC_SPBDX_SET( 199?, ec_spbdx__d,	ec_spbdx,	"300615",		0x0000, 0x008000, CRC(8a5a
 
 
 // No Header info (all 0x00)
-EC_UNK5_SET( 199?, ec_unk5,		0,			"iss9016.rom",			0x0000, 0x008000, CRC(e8ebafd0) SHA1(fa9fc04d04f9ac2360c66727afaf567527e95e01), "Electrocoin","unknown 'Electrocoin' Fruit Machines (Electrocoin) (set 1)" )
-EC_UNK5_SET( 199?, ec_unk5__a,	ec_unk5,	"iss9207.rom",			0x0000, 0x008000, CRC(f646702a) SHA1(9e2e7da0edaecd021861145b6abd1498fc3b563a), "Electrocoin","unknown 'Electrocoin' Fruit Machines (Electrocoin) (set 2)" )
-EC_UNK5_SET( 199?, ec_unk5__b,	ec_unk5,	"iss9208.rom",			0x0000, 0x008000, CRC(b4c3c98a) SHA1(10aeeca8c7b2923e3768f82c672229898c51062d), "Electrocoin","unknown 'Electrocoin' Fruit Machines (Electrocoin) (set 3)" )
+// (C)1993/97 ELECTROCOIN
+EC_UNK5_SET( 199?, ec_unk5,		0,			"iss9016.rom",			0x0000, 0x008000, CRC(e8ebafd0) SHA1(fa9fc04d04f9ac2360c66727afaf567527e95e01), "Electrocoin","unknown 'Electrocoin' Fruit Machines (Electrocoin) (set 1)" ) // ELCPCBX1 - Tue May 19 14:27:48 1998
+EC_UNK5_SET( 199?, ec_unk5__a,	ec_unk5,	"iss9207.rom",			0x0000, 0x008000, CRC(f646702a) SHA1(9e2e7da0edaecd021861145b6abd1498fc3b563a), "Electrocoin","unknown 'Electrocoin' Fruit Machines (Electrocoin) (set 2)" ) // ELCNCBX1 - Fri Nov 24 16:27:23 2000
+EC_UNK5_SET( 199?, ec_unk5__b,	ec_unk5,	"iss9208.rom",			0x0000, 0x008000, CRC(b4c3c98a) SHA1(10aeeca8c7b2923e3768f82c672229898c51062d), "Electrocoin","unknown 'Electrocoin' Fruit Machines (Electrocoin) (set 3)" ) // ELCPCBX1 - Fri Nov 24 16:27:47 2000
+
+
 // No header.. no space for header
 EC_UNK5_SET( 199?, ec_unk5__c,	ec_unk5,	"v1.1non_protocol.hex", 0x0000, 0x02680d, CRC(0b76e2de) SHA1(1bc330558e69b316a26d659463406324f24b5978), "Electrocoin","unknown 'Electrocoin' Fruit Machines (Electrocoin) (set 4)" ) // convert from HEX and check
 

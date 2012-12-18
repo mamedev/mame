@@ -28261,7 +28261,6 @@ ec_barx__br	//
 ec_barx__bs	//
 ec_barx__bt	//
 ec_barx__bu	//
-ec_barx__bv	//
 ec_mag7s	// Magic 7s / Cool 7 / Bar X 7 (2001 COOL7) (Electrocoin)
 ec_mag7s__a		//
 ec_mag7s__b		//
@@ -28400,8 +28399,8 @@ ec_big7__a2	//
 ec_casbx	// Casino Bar X (Electrocoin)
 ec_casbx__a	//
 ec_casbx__b	//
-ec_casbx__c	//
-ec_casbx__d	//
+ec_bx125	//
+ec_bx125a	//
 ec_redbr	// Red Bar (Electrocoin)
 ec_redbr__a		//
 ec_redbr__b		//
@@ -28579,7 +28578,6 @@ ec_sbxbre	//
 ec_sbxbrf	//
 ec_sbxbrg	//
 ec_sbxbrh	//
-ec_sbarx__be	//
 ec_spbdx	// Super Bar X Deluxe (Electrocoin)
 ec_spbdx__a	//
 ec_spbdx__b	//
@@ -28589,6 +28587,8 @@ ec_unk5		// Unknown 'Electrocoin' Fruit Machine(s) (Electrocoin)
 ec_unk5__a	//
 ec_unk5__b	//
 ec_unk5__c	//
+ec_bx180	// Bar X (Z180 hardware)
+ec_bx180a	//
 
 ec_barxmab	// Bar X (MAB PCB) (Electrocoin)
 ec_spbg7mab	// Super Big 7 (MAB PCB) (Electrocoin)
