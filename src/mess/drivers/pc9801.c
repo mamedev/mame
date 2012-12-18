@@ -431,6 +431,7 @@ public:
 	UINT8 *m_vram256;
 	UINT8 m_pc9821_window_bank;
 	UINT8 m_joy_sel;
+	UINT8 m_ext2_ff;
 
 	DECLARE_READ8_MEMBER(pc9801_xx_r);
 	DECLARE_WRITE8_MEMBER(pc9801_xx_w);
@@ -676,6 +677,8 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 	if(state->m_video_ff[DISPLAY_REG] == 0) //screen is off
 		return;
 
+//	popmessage("%02x %d",state->m_video_ff[INTERLACE_REG],device->machine().primary_screen->visible_area().max_y + 1);
+//	interlace_on = ((device->machine().primary_screen->visible_area().max_y + 1) >= 400) ? 1 : 0;
 	interlace_on = state->m_video_ff[INTERLACE_REG];
 	colors16_mode = (state->m_ex_video_ff[ANALOG_16_MODE]) ? 16 : 8;
 
@@ -1151,7 +1154,7 @@ WRITE8_MEMBER(pc9801_state::pc9801_video_ff_w)
 	if((offset & 1) == 0)
 	{
 		/*
-        TODO: this is my best bet so far. Register 4 is annoying, the pattern seems to be:
+		TODO: this is my best bet so far. Register 4 is annoying, the pattern seems to be:
         Write to video FF register Graphic -> 00
         Write to video FF register 200 lines -> 0x
         Write to video FF register 200 lines -> 00
@@ -1161,20 +1164,19 @@ WRITE8_MEMBER(pc9801_state::pc9801_video_ff_w)
 		switch((data & 0x0e) >> 1)
 		{
 			case 1:
-				m_gfx_ff = 1;
-				if(data & 1)
-					printf("Graphic f/f actually enabled!\n");
-				break;
+		        m_gfx_ff = 1;
+		        if(data & 1)
+		        	printf("Graphic f/f actually enabled!\n");
+					break;
 			case 4:
 				if(m_gfx_ff)
-				{
-					m_video_ff[(data & 0x0e) >> 1] = data & 1;
+		        {
+					m_video_ff[(data & 0x0e) >> 1] = data &1;
 					m_gfx_ff = 0;
 				}
-				break;
+		        break;
 			default: m_video_ff[(data & 0x0e) >> 1] = data & 1; break;
 		}
-
 
 		if(0)
 		{
@@ -2415,14 +2417,30 @@ READ32_MEMBER(pc9801_state::pc9821_timestamp_r)
 	return m_maincpu->total_cycles();
 }
 
+/* basically a read-back of various registers */
 READ8_MEMBER(pc9801_state::pc9821_ext2_video_ff_r)
 {
-	return 0;
+	UINT8 res;
+
+	if(offset)
+		return 0xff;
+
+	res = 0;
+
+	switch(m_ext2_ff)
+	{
+		case 3: res = m_video_ff[DISPLAY_REG]; break; // display reg
+		default:
+			printf("PC-9821: read ext2 f/f with value %02x\n",m_ext2_ff);
+	}
+
+	return res;
 }
 
 WRITE8_MEMBER(pc9801_state::pc9821_ext2_video_ff_w)
 {
-	// ...
+	if(offset == 0)
+		m_ext2_ff = data;
 }
 
 static ADDRESS_MAP_START( pc9821_map, AS_PROGRAM, 32, pc9801_state )
