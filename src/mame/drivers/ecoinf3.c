@@ -27,6 +27,7 @@ public:
 	{
 		strobe_amount = 0;
 		strobe_addr = 0;
+		m_percent_mux = 0;
 	}
 
 	required_device<z180_device> m_maincpu;
@@ -38,6 +39,7 @@ public:
 	int strobe_addr;
 	int strobe_amount;
 	int m_optic_pattern;
+	int m_percent_mux;
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_a_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_b)
@@ -102,9 +104,26 @@ public:
 	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_b)
 	{   // changing gives no % key error in sphinx
-		int ret = ioport("IN3")->read();
-		logerror("%04x - ppi8255_intf_e_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
+	
+		int ret;
+
+		if (m_percent_mux==1)
+		{
+			ret = ioport("PERKEY")->read();
+			logerror("%04x - ppi8255_intf_e_(used)read_b (PER KEY) %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
+		}
+		else if (m_percent_mux==0x80)
+		{
+			ret = ioport("BUTTONS")->read();
+			logerror("%04x - ppi8255_intf_e_(used)read_b (BUTTONS?) %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
+		}
+		else
+		{
+			ret = 0x00;
+			logerror("%04x - ppi8255_intf_e_(used)read_b (UNK MUX %02x) %02x\n", machine().device("maincpu")->safe_pcbase(), m_percent_mux, ret);
+		}
 		return ret;
+
 	}
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
@@ -224,7 +243,12 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_a_alpha_display);
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_b) { logerror("%04x - ppi8255_intf_e_write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_c) { logerror("%04x - ppi8255_intf_e_write_c %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_e_write_c)
+	{
+		m_percent_mux = data;
+
+		logerror("%04x - ppi8255_intf_e_write_c %02x (INPUT MUX?)\n", machine().device("maincpu")->safe_pcbase(), data);
+	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_f_write_a) { logerror("%04x - ppi8255_intf_f_write_a %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
 	DECLARE_WRITE8_MEMBER(ppi8255_intf_f_write_b) { logerror("%04x - ppi8255_intf_f_write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data); }
@@ -559,7 +583,7 @@ static INPUT_PORTS_START( ecoinf3 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("IN3")
+	PORT_START("PERKEY")
 	PORT_DIPNAME( 0x0f, 0x00, "% Key?" )
 	PORT_DIPSETTING(    0x00, "0x00" )
 	PORT_DIPSETTING(    0x01, "0x01" )
@@ -577,24 +601,39 @@ static INPUT_PORTS_START( ecoinf3 )
 	PORT_DIPSETTING(    0x0d, "0x0d" )
 	PORT_DIPSETTING(    0x0e, "0x0e" )
 	PORT_DIPSETTING(    0x0f, "None" )
-
-	PORT_DIPNAME( 0x10, 0x00, "IN3:10" )
+	PORT_DIPNAME( 0x10, 0x10, "PER_KEY:10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "IN3:20" )
+	PORT_DIPNAME( 0x20, 0x20, "PER_KEY:20" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "IN3:40" )
+	PORT_DIPNAME( 0x40, 0x40, "PER_KEY:40" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "IN3:80" )
+	PORT_DIPNAME( 0x80, 0x80, "PER_KEY:80" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("IN4")
-	PORT_DIPNAME( 0x01, 0x01, "IN4:01" )
+	PORT_START("BUTTONS")
+	PORT_DIPNAME( 0x01, 0x01, "BT:01" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "BT:02" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "BT:04" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "BT:08" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) // ?? advances through test items
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) // causes various spins etc. (but also causes the whole thing to freak out?)
 	PORT_DIPNAME( 0x02, 0x02, "IN4:02" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
