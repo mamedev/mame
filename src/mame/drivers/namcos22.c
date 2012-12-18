@@ -4757,30 +4757,27 @@ ROM_START( adillor )
 
 	ROM_REGION16_LE( 0x300000, "textilemap", 0 ) /* texture tilemap */
     ROM_LOAD( "am1ccrl.3d",   0x000000, 0x200000, CRC(76c6d5f3) SHA1(637efe30d004a9c42864b7536e02e9805ed9b6ef) ) 
-    ROM_LOAD( "am1ccrh.1d",   0x200000, 0x100000, CRC(a1cf55c2) SHA1(6b45e340d329b64af3da48c7dfc277feeef05041) ) 
-    // PCB has 2 copies of these ROMs
+    ROM_LOAD( "am1ccrh.1d",   0x200000, 0x080000, CRC(180c4a33) SHA1(5e0818ba8a135c51953bc3bc5c4a1475f7f93eff) ) 
     ROM_LOAD( "am1ccrl.7b",   0x000000, 0x200000, CRC(76c6d5f3) SHA1(637efe30d004a9c42864b7536e02e9805ed9b6ef) ) 
-    ROM_LOAD( "am1ccrh.5b",   0x200000, 0x100000, CRC(a1cf55c2) SHA1(6b45e340d329b64af3da48c7dfc277feeef05041) ) 
+    ROM_LOAD( "am1ccrh.5b",   0x200000, 0x080000, CRC(180c4a33) SHA1(5e0818ba8a135c51953bc3bc5c4a1475f7f93eff) ) 
 
-	ROM_REGION( 0x680000, "pointrom", 0 ) /* 3d model data */
-    // note: these appear to be double-sized in the current dump, but I'm "fixing" it in loading until things
-    // are more nailed down with the support.
-    ROM_LOAD( "am1ptrl0.18k", 0x000000, 0x100000, CRC(d687a7ab) SHA1(5377a555c32034411f0b6e033d0e1bcffaf1bbf8) ) 
-    ROM_LOAD( "am1ptrl1.16k", 0x080000, 0x100000, CRC(abaf37ee) SHA1(4853b89037210179ae551f4f074abba172239176) ) 
-    ROM_LOAD( "am1ptrl2.15k", 0x100000, 0x100000, CRC(97cbd898) SHA1(3202bc8d1d0506f23fbbcd579d537f9a845711ec) ) 
-    ROM_LOAD( "am1ptrl3.14k", 0x180000, 0x100000, CRC(6b8887f8) SHA1(fb0924e204c857899b2c214a91bd592555098c6b) ) 
-    ROM_LOAD( "am1ptrm0.18j", 0x200000, 0x100000, CRC(e9815db9) SHA1(fe556b014b85fba79e8cd2ec2dd99e7ecdb7fd5e) ) 
-    ROM_LOAD( "am1ptrm1.16j", 0x280000, 0x100000, CRC(eb15b181) SHA1(12c10fbc60fc4e4915f94e5f4ae5a488c62b8991) ) 
-    ROM_LOAD( "am1ptrm2.15j", 0x300000, 0x100000, CRC(f6c2d643) SHA1(cc2d5b1f0cc3896251774be7919b8774f793fc0c) ) 
-    ROM_LOAD( "am1ptrm3.14j", 0x380000, 0x100000, CRC(ddd7bf15) SHA1(fd150bf3e89d07d265d3f7063db9509ff5c180b4) ) 
-    ROM_LOAD( "am1ptru0.18f", 0x400000, 0x100000, CRC(c8a702c8) SHA1(d0f70235403cbc32a40f6d65f144b58f35999d7d) ) 
-    ROM_LOAD( "am1ptru1.16f", 0x480000, 0x100000, CRC(5299215c) SHA1(9339bbdd14f23366ef676a08c2612e1391d20d5a) ) 
-    ROM_LOAD( "am1ptru2.15f", 0x500000, 0x100000, CRC(cc2a803b) SHA1(dea96f04adbdba208f9c4af8800eaba52bdec548) ) 
-    ROM_LOAD( "am1ptru3.14f", 0x580000, 0x100000, CRC(8667d129) SHA1(aaf37c4b0a1fd56862331a0db4152150cfbd2648) ) 
+	ROM_REGION( 0x600000, "pointrom", 0 ) /* 3d model data */
+    ROM_LOAD( "am1ptrl0.18k", 0x000000, 0x080000, CRC(6fdb34f6) SHA1(5dc7359eef0dbe6d421808eefd3920159ce34944) ) 
+    ROM_LOAD( "am1ptrl1.16k", 0x080000, 0x080000, CRC(32e40601) SHA1(161b148aae688e944cfe456d9bca1ca7139812e1) ) 
+    ROM_LOAD( "am1ptrl2.15k", 0x100000, 0x080000, CRC(e27e29cc) SHA1(3a2b0d18d23b2ace6fe1c6c4dbcc73cb74acd189) ) 
+    ROM_LOAD( "am1ptrl3.14k", 0x180000, 0x080000, CRC(0c638e3e) SHA1(2cd68e6aa04a9235f792fad0913314545ab70e71) ) 
+    ROM_LOAD( "am1ptrm0.18j", 0x200000, 0x080000, CRC(e676cd98) SHA1(f7b31c848bc2afc31f3ad53d9eda7daae5f28865) ) 
+    ROM_LOAD( "am1ptrm1.16j", 0x280000, 0x080000, CRC(eb115d9d) SHA1(165cb13a3d0f2982c35ae5e6e796de48cf2b5846) ) 
+    ROM_LOAD( "am1ptrm2.15j", 0x300000, 0x080000, CRC(86b4ed0c) SHA1(d97f2b26cc3981b4b337029723c5ddec9316628f) ) 
+    ROM_LOAD( "am1ptrm3.14j", 0x380000, 0x080000, CRC(97c1c6b0) SHA1(84e5f982f50560debd6f1f4d3d96f58888616529) ) 
+    ROM_LOAD( "am1ptru0.18f", 0x400000, 0x080000, CRC(6a3fd855) SHA1(c6d2029e676426c4e71d9cfddbac7ecdec81c4da) ) 
+    ROM_LOAD( "am1ptru1.16f", 0x480000, 0x080000, CRC(551bf714) SHA1(4af1e65ad1e42a95accafb57422fc276743f408a) ) 
+    ROM_LOAD( "am1ptru2.15f", 0x500000, 0x080000, CRC(ce790635) SHA1(fb49646a9b35ee7cb3ace59a7f0932a08c393052) ) 
+    ROM_LOAD( "am1ptru3.14f", 0x580000, 0x080000, CRC(5e4e6333) SHA1(5897251e4694c5c24f1810ff6f9177a0456baf2e) ) 
 
 	ROM_REGION( 0x1000000, "c352", 0 ) /* sound samples */
-    ROM_LOAD( "am1wavea.2l",  0x000000, 0x400000, CRC(2083c523) SHA1(4d09353cad443158f152f78e6696fffd992bbf5a) ) 
-    ROM_LOAD( "am1waveb.1l",  0x800000, 0x400000, CRC(130e34a5) SHA1(f544c32c5cead7412412ae254f10d053394d287a) ) 
+    ROM_LOAD( "am1wavea.2l",  0x000000, 0x400000, CRC(48f8c20c) SHA1(48b4fbcb7e9dbbb70a542ef7cb7ee0e46fad23fc) ) 
+    ROM_LOAD( "am1waveb.1l",  0x800000, 0x400000, CRC(fd8e7384) SHA1(91e53ab0293f81f8357645fd319249abc128b78e) ) 
 
 	ROM_REGION( 0x4000, "nvram", ROMREGION_ERASE00 ) // default eeprom
 ROM_END
@@ -5759,4 +5756,4 @@ GAME( 1996, tokyowar, 0,         namcos22s, tokyowar, namcos22_state, tokyowar, 
 GAME( 1996, aquajet,  0,         namcos22s, aquajet, namcos22_state,  aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B)"                 , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
 GAME( 1996, alpinr2b, 0,         namcos22s, alpiner, namcos22_state,  alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 97/01/10 17:10:59
 GAME( 1996, alpinr2a, alpinr2b,  namcos22s, alpiner, namcos22_state,  alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/12/06 13:45:05
-GAME( 1996, adillor,  0,         namcos22s, aquajet, namcos22_state,  adillor,  ROT0, "Namco", "Armadillo Racing (Rev. AM1 Ver.A)"                 , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // needs trackball hookup, dies with "bad packet length"
+GAME( 1996, adillor,  0,         namcos22s, aquajet, namcos22_state,  adillor,  ROT0, "Namco", "Armadillo Racing (Rev. AM1 Ver.A)"                 , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // needs trackball hookup
