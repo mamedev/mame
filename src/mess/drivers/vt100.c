@@ -20,6 +20,7 @@
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/z80/z80.h"
+#include "machine/i8251.h"
 #include "sound/beep.h"
 #include "video/vtvideo.h"
 #include "vt100.lh"
@@ -30,15 +31,17 @@ class vt100_state : public driver_device
 public:
 	vt100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_crtc(*this, "vt100_video"),
-	m_speaker(*this, BEEPER_TAG)
-	,
-		m_p_ram(*this, "p_ram"){ }
+		m_maincpu(*this, "maincpu"),
+		m_crtc(*this, "vt100_video"),
+		m_speaker(*this, BEEPER_TAG),
+		m_uart(*this, "i8251"),
+		m_p_ram(*this, "p_ram")
+		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<vt100_video_device> m_crtc;
 	required_device<beep_device> m_speaker;
+	required_device<i8251_device> m_uart;
 	DECLARE_READ8_MEMBER(vt100_flags_r);
 	DECLARE_WRITE8_MEMBER(vt100_keyboard_w);
 	DECLARE_READ8_MEMBER(vt100_keyboard_r);
@@ -177,7 +180,8 @@ static ADDRESS_MAP_START(vt100_io, AS_IO, 8, vt100_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// 0x00, 0x01 PUSART  (Intel 8251)
-	// AM_RANGE (0x00, 0x01)
+	AM_RANGE (0x00, 0x00) AM_DEVREADWRITE("i8251", i8251_device, data_r, data_w)
+	AM_RANGE (0x01, 0x01) AM_DEVREADWRITE("i8251", i8251_device, status_r, control_w)
 	// 0x02 Baud rate generator
 	AM_RANGE (0x02, 0x02) AM_WRITE(vt100_baud_rate_w)
 	// 0x22 Modem buffer
@@ -404,8 +408,19 @@ static GFXDECODE_START( vt100 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vt100_charlayout, 0, 1 )
 GFXDECODE_END
 
-
-#define XTAL_24_8832MHz	 24883200
+/* TODO: i8251: connect me up! */
+static const i8251_interface i8251_intf =
+{
+	DEVCB_NULL, // in_rxd_cb
+	DEVCB_NULL, // out_txd_cb
+	DEVCB_NULL, // in_dsr_cb
+	DEVCB_NULL, // out_dtr_cb
+	DEVCB_NULL, // out_rts_cb
+	DEVCB_NULL, // out_rxrdy_cb
+	DEVCB_NULL, // out_txrdy_cb
+	DEVCB_NULL, // out_txempty_cb
+	DEVCB_NULL // out_syndet_cb
+};
 
 static MACHINE_CONFIG_START( vt100, vt100_state )
 	/* basic machine hardware */
@@ -430,6 +445,11 @@ static MACHINE_CONFIG_START( vt100, vt100_state )
 	MCFG_DEFAULT_LAYOUT( layout_vt100 )
 
 	MCFG_VT100_VIDEO_ADD("vt100_video", vt100_video_interface)
+
+
+	/* i8251 uart */
+	MCFG_I8251_ADD("i8251", i8251_intf)
+
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -748,8 +768,9 @@ ROM_START( vt101 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 m
 // does not have integrated STP or AVO populated
 // 8085 based instead of I8080
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "23-???e4-00.e71", 0x0000, 0x2000, NO_DUMP)
-	ROM_LOAD( "23-???e4-00.e69", 0x8000, 0x2000, NO_DUMP)
+	ROM_LOAD( "23-???e4-00.e71", 0x0000, 0x2000, NO_DUMP) // rom is unique to vt101
+	//e69 socket is empty/unpopulated on vt101?
+	//e67 socket is empty/unpopulated on vt101?
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e3", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
@@ -761,8 +782,9 @@ ROM_START( vt102 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 m
 // ROMS have the set up page C in them
 // 8085 based instead of I8080
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, BAD_DUMP CRC(339d4e4e) SHA1(f1b08f2c6bbc2b234f3f43bd800a2615f6dd18d3)) // is this right for vt102? A11 stuck high
-	ROM_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31C5374b))
+	ROM_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, BAD_DUMP CRC(85c9279a) SHA1(3283D27E9C45D9E384227A7E6E98EE8D54B92BCB)) // shared with vt131; dump may be bad, assembled from quarters two bad dumps
+	ROM_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31C5374b)) // shared with vt131
+	//e67 socket is empty but populated on vt102
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e3", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
@@ -774,8 +796,8 @@ ROM_START( vt131 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt131 mainboa
 // ROMS have the set up page C in them
 // 8085 based instead of I8080
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, BAD_DUMP CRC(339d4e4e) SHA1(f1b08f2c6bbc2b234f3f43bd800a2615f6dd18d3)) // A11 stuck high
-	ROM_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31C5374b))
+	ROM_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, BAD_DUMP CRC(85c9279a) SHA1(3283D27E9C45D9E384227A7E6E98EE8D54B92BCB)) // shared with vt102; dump may be bad, assembled from quarters two bad dumps
+	ROM_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31C5374b)) // shared with vt102
 	ROM_LOAD( "23-280e2-00.e67", 0xA000, 0x0800, CRC(71b4172e) SHA1(5a82c7dc313bb92b9829eb8350840e072825a797)) // called "VT131 ROM" in the vt101 quick reference guide
 
 	ROM_REGION(0x1000, "chargen", 0)
