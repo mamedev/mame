@@ -328,7 +328,8 @@
 #include "machine/ram.h"
 #include "formats/pc98fdi_dsk.h"
 #include "machine/pc9801_26.h"
-#include "machine/pc9801_slot.h"
+#include "machine/pc9801_86.h"
+#include "machine/pc9801_cbus.h"
 
 
 #define UPD1990A_TAG "upd1990a"
@@ -507,8 +508,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9821_vram256_w);
 	DECLARE_READ8_MEMBER(opn_porta_r);
 	DECLARE_WRITE8_MEMBER(opn_portb_w);
-	DECLARE_READ8_MEMBER(pc9801_ext_opna_r);
-	DECLARE_WRITE8_MEMBER(pc9801_ext_opna_w);
+//	DECLARE_READ8_MEMBER(pc9801_ext_opna_r);
+//	DECLARE_WRITE8_MEMBER(pc9801_ext_opna_w);
 	DECLARE_WRITE8_MEMBER(pc9801rs_nmi_w);
 	DECLARE_READ8_MEMBER(pc9801rs_midi_r);
 
@@ -2028,29 +2029,6 @@ WRITE8_MEMBER( pc9801_state::pc9801rs_mouse_freq_w )
 	}
 }
 
-READ8_MEMBER( pc9801_state::pc9801_ext_opna_r )
-{
-	if(offset == 0)
-	{
-		printf("OPNA EXT read ID [%02x]\n",offset);
-		return 0xff;
-	}
-
-	printf("OPNA EXT read unk [%02x]\n",offset);
-	return 0xff;
-}
-
-WRITE8_MEMBER( pc9801_state::pc9801_ext_opna_w )
-{
-	if(offset == 0)
-	{
-		printf("OPNA EXT write mask %02x -> [%02x]\n",data,offset);
-		return;
-	}
-
-	printf("OPNA EXT write unk %02x -> [%02x]\n",data,offset);
-}
-
 
 WRITE8_MEMBER( pc9801_state::pc9801rs_nmi_w )
 {
@@ -2094,7 +2072,7 @@ static ADDRESS_MAP_START( pc9801rs_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffffffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffffffff) //ROM/RAM bank
 	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,     pc9801_mouse_w,     0xffffffff) // <undefined> / mouse ppi8255 ports
-	AM_RANGE(0xa460, 0xa463) AM_READWRITE8(pc9801_ext_opna_r,  pc9801_ext_opna_w,  0xffffffff)
+//	AM_RANGE(0xa460, 0xa463) AM_READWRITE8(pc9801_ext_opna_r,  pc9801_ext_opna_w,  0xffffffff)
 	AM_RANGE(0xbfd8, 0xbfdf) AM_WRITE8(pc9801rs_mouse_freq_w, 0xffffffff)
 	AM_RANGE(0xe0d0, 0xe0d3) AM_READ8(pc9801rs_midi_r, 0xffffffff)
 ADDRESS_MAP_END
@@ -2157,7 +2135,7 @@ static ADDRESS_MAP_START( pc9801ux_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x0438, 0x043b) AM_READWRITE8(pc9801rs_access_ctrl_r,pc9801rs_access_ctrl_w,0xffff)
 	AM_RANGE(0x043c, 0x043f) AM_WRITE8(pc9801rs_bank_w,    0xffff) //ROM/RAM bank
 	AM_RANGE(0x7fd8, 0x7fdf) AM_READWRITE8(pc9801_mouse_r,     pc9801_mouse_w,     0xffff) // <undefined> / mouse ppi8255 ports
-	AM_RANGE(0xa460, 0xa463) AM_READWRITE8(pc9801_ext_opna_r,  pc9801_ext_opna_w,  0xffff)
+//	AM_RANGE(0xa460, 0xa463) AM_READWRITE8(pc9801_ext_opna_r,  pc9801_ext_opna_w,  0xffff)
 
 ADDRESS_MAP_END
 
@@ -2497,7 +2475,7 @@ static ADDRESS_MAP_START( pc9821_io, AS_IO, 32, pc9801_state )
 	AM_RANGE(0x8d1c, 0x8d1f) AM_READWRITE8(sdip_9_r,sdip_9_w,0xffffffff)
 	AM_RANGE(0x8e1c, 0x8e1f) AM_READWRITE8(sdip_a_r,sdip_a_w,0xffffffff)
 	AM_RANGE(0x8f1c, 0x8f1f) AM_READWRITE8(sdip_b_r,sdip_b_w,0xffffffff)
-	AM_RANGE(0xa460, 0xa463) AM_READWRITE8(pc9801_ext_opna_r,  pc9801_ext_opna_w,  0xffffffff)
+//	AM_RANGE(0xa460, 0xa463) AM_READWRITE8(pc9801_ext_opna_r,  pc9801_ext_opna_w,  0xffffffff)
 //  AM_RANGE(0xa460, 0xa46f) cs4231 PCM extended port / <undefined>
 //  AM_RANGE(0xbfdb, 0xbfdb) mouse timing port
 //  AM_RANGE(0xc0d0, 0xc0d3) MIDI port, option 0 / <undefined>
@@ -3298,9 +3276,10 @@ static SLOT_INTERFACE_START( pc9801_floppies )
 	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
-static SLOT_INTERFACE_START( pc9801_sound )
+static SLOT_INTERFACE_START( pc9801_cbus )
 //	PC-9801-14
 	SLOT_INTERFACE( "pc9801_26", PC9801_26 )
+	SLOT_INTERFACE( "pc9801_86", PC9801_86 )
 //	PC-9801-86
 //	PC-9801-26 + PC-9801-86 (?)
 //	PC-9801-86 + Chibi-Oto
@@ -3609,6 +3588,10 @@ static MACHINE_CONFIG_FRAGMENT( pc9801_mouse )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mouse_timer", pc9801_state, mouse_irq_cb, attotime::from_hz(120))
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_FRAGMENT( pc9801_cbus )
+	MCFG_PC9801CBUS_SLOT_ADD("cbus0", pc9801_cbus, NULL, NULL)
+//	TODO: six max slots
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_CPU_ADD("maincpu", I8086, 5000000) //unknown clock
@@ -3627,6 +3610,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
 	MCFG_FRAGMENT_ADD(pc9801_mouse)
+	MCFG_FRAGMENT_ADD(pc9801_cbus)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc9801_upd1990a_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
@@ -3639,7 +3623,6 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 
 	MCFG_SOFTWARE_LIST_ADD("disk_list","pc98")
 
-	MCFG_PC9801BUS_SLOT_ADD("sound_bus", pc9801_sound, NULL, NULL)
 
 	#if 0
 	MCFG_RAM_ADD(RAM_TAG)
@@ -3702,7 +3685,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
 
-	MCFG_PC9801BUS_SLOT_ADD("sound_bus", pc9801_sound, NULL, NULL)
+	MCFG_FRAGMENT_ADD(pc9801_cbus)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")
@@ -3767,7 +3750,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:0", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2hd:1", pc9801_floppies, "525hd", 0, pc9801_state::floppy_formats)
 
-	MCFG_PC9801BUS_SLOT_ADD("sound_bus", pc9801_sound, NULL, NULL)
+	MCFG_FRAGMENT_ADD(pc9801_cbus)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")

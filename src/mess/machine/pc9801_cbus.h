@@ -5,8 +5,8 @@
 
 #pragma once
 
-#ifndef __PC9801_SLOTBUS__
-#define __PC9801_SLOTBUS__
+#ifndef __PC9801_SLOTCBUS__
+#define __PC9801_SLOTCBUS__
 
 #include "emu.h"
 
@@ -22,8 +22,8 @@
 //**************************************************************************
 
 
-#define MCFG_PC9801BUS_SLOT_ADD(_tag, _slot_intf, _def_slot, _def_inp) \
-    MCFG_DEVICE_ADD(_tag, PC9801BUS_SLOT, 0) \
+#define MCFG_PC9801CBUS_SLOT_ADD(_tag, _slot_intf, _def_slot, _def_inp) \
+    MCFG_DEVICE_ADD(_tag, PC9801CBUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
 
@@ -68,7 +68,7 @@ public:
 
 
 // device type definition
-extern const device_type PC9801BUS_SLOT;
+extern const device_type PC9801CBUS_SLOT;
 
 
 
