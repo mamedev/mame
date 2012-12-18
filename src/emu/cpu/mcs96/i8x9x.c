@@ -238,13 +238,14 @@ UINT8 i8x9x_device::io_r8(UINT8 adr)
 	case 0x0d:
 		logerror("%s: read timer2 h (%04x)\n", tag(), PPC);
 		return timer_value(2, get_cycle()) >> 8;
-	case 0x0e:
+	case 0x0e: {
 		static int last = -1;
 		if(io->read_word(P0*2) != last) {
 			last = io->read_word(P0*2);
 			logerror("%s: read p0 %02x\n", tag(), io->read_word(P0*2));
 		}
 		return io->read_word(P0*2);
+	}
 	case 0x0f:
 		return io->read_word(P1*2);
 	case 0x10:
