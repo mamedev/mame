@@ -1157,7 +1157,7 @@ fe9c  divb  direct_2
 	if(OP1) {
 		TMP = reg_r16(OP2);
 		UINT32 TMP2 = INT16(TMP) / INT8(OP1);
-		if(INT8(TMP2) > 127 || INT8(TMP2) < -128)
+		if(INT16(TMP2) > 127 || INT16(TMP2) < -128)
 			PSW |= F_V|F_VT;
 		TMP = INT16(TMP) % INT8(OP1);
 		TMP = (TMP2 & 0xff) | ((TMP & 0xff) << 8);
@@ -1170,7 +1170,7 @@ fe9d  divb  immed_2b
 	if(OP1) {
 		TMP = reg_r16(OP2);
 		UINT32 TMP2 = INT16(TMP) / INT8(OP1);
-		if(INT8(TMP2) > 127 || INT8(TMP2) < -128)
+		if(INT16(TMP2) > 127 || INT16(TMP2) < -128)
 			PSW |= F_V|F_VT;
 		TMP = INT16(TMP) % INT8(OP1);
 		TMP = (TMP2 & 0xff) | ((TMP & 0xff) << 8);
