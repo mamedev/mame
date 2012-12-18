@@ -24,6 +24,7 @@
     - Mugen no Shinzou II - The Prince of Darkness: dies on IPLPRO loading, presumably a wd17xx core bug;
     - Multiplan: random hangs/crashes after you set the RTC, sometimes it loads properly;
     - Murder Club: has lots of CG artifacts, FDC issue?
+    - Orbit 3: floppy issue makes it to throw a game over as soon as you start a game;
     - Penguin Kun Wars: has a bug with window effects ("Push space or trigger" msg on the bottom"), needs investigation;
     - Sound Gal Music Editor: wants a "master disk", that apparently isn't available;
     - Yukar K2 (normal version): moans about something, DFJustin: "please put the system disk back to normal", disk write-protected?
@@ -111,6 +112,7 @@ public:
 	UINT8 m_prev_col_val;
 	UINT8 m_pio_latchb;
 	UINT8 m_ym_porta;
+	UINT8 m_screen_enable;
 	DECLARE_READ8_MEMBER(bank0_r);
 	DECLARE_READ8_MEMBER(bank1_r);
 	DECLARE_READ8_MEMBER(bank2_r);
@@ -651,6 +653,9 @@ static void draw_cg_screen(running_machine &machine, bitmap_ind16 &bitmap,const 
 UINT32 mz2500_state::screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(machine().pens[0], cliprect); //TODO: correct?
+
+	if(m_screen_enable)
+		return 0;
 
 	draw_cg_screen(machine(),bitmap,cliprect,0);
 	draw_tv_screen(machine(),bitmap,cliprect);
@@ -1884,6 +1889,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
     ---- x--- 0->1 transition = IPL reset
     ---- -x-- beeper state
     ---- --x- 0->1 transition = Work RAM reset
+    ---- ---x screen mask
     */
 
 	/* work RAM reset */
@@ -1904,8 +1910,10 @@ WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
 
 	beep_set_state(machine().device(BEEPER_TAG),data & 0x04);
 
-	if(data & ~0x0e)
-		logerror("PPI PORTC W %02x\n",data & ~0x0e);
+	m_screen_enable = data & 1;
+
+	if(data & ~0x0f)
+		logerror("PPI PORTC W %02x\n",data & ~0x0f);
 }
 
 static I8255_INTERFACE( ppi8255_intf )
