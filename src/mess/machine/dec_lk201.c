@@ -23,7 +23,7 @@ const device_type LK201 = &device_creator<lk201_device>;
 
 ROM_START( lk201 )
 	ROM_REGION(0x2000, LK201_CPU_TAG, 0)
-    ROM_LOAD( "23-00159-00.bin", 0x0000, 0x2000, CRC(be293c51) SHA1(a11ae004d2d6055d7279da3560c3e56610a19fdb) )
+    ROM_LOAD( "23-001s9-00.bin", 0x0000, 0x2000, CRC(be293c51) SHA1(a11ae004d2d6055d7279da3560c3e56610a19fdb) )
 ROM_END
 
 //-------------------------------------------------
