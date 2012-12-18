@@ -395,9 +395,13 @@ void ecoinf3_state::update_display()
 	}
 }
 
-
+// is the 2 digit bank display part of this, or multiplexed elsewhere
 WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a_alpha_display)
 {
+
+	if ((data>=0x20) && (data<0x5b))  logerror("%04x - ppi8255_intf_e_write_a %02x (alpha) '%c'\n", machine().device("maincpu")->safe_pcbase(), data, data);
+	else logerror("%04x - ppi8255_intf_e_write_a %02x (alpha)\n", machine().device("maincpu")->safe_pcbase(), data);
+
 	static UINT8 send_buffer = 0;
 	static int count = 0;
 	// writes the 'PYRAMID' string from RAM (copied from ROM) here...
@@ -615,25 +619,21 @@ static INPUT_PORTS_START( ecoinf3 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("BUTTONS")
-	PORT_DIPNAME( 0x01, 0x01, "BT:01" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Nudge / Hold 3") PORT_CODE(KEYCODE_D)
 	PORT_DIPNAME( 0x02, 0x02, "BT:02" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "BT:04" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "BT:08" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Cancel Holds") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Nudge / Hold 1") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) // ?? advances through test items
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Nudge / Hold 2") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) // ?? advances through test items, spins the reels
 
 	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) // causes various spins etc. (but also causes the whole thing to freak out?)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) // causes various spins etc. (but also causes the whole thing to freak out?)
 	PORT_DIPNAME( 0x02, 0x02, "IN4:02" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
