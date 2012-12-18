@@ -152,7 +152,8 @@ Soundboard:
 
 
 GUN CHAMP
-Same pcb as Super Shot, but with gun hardware as 8080bw Gun Champ, no xy pots
+Same pcb as Super Shot, but with gun hardware as 8080bw Gun Champ, no xy pots,
+ seems it uses $4202 and $4206 to read gun pos
 Mainboard:  CS249
 Soundboard: CS240
 Given CS numbers this is released after the other GunChamp
