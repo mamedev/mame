@@ -59,6 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lrescue_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(lrescue_sh_port_2_w);
 	DECLARE_WRITE8_MEMBER(cosmo_sh_port_2_w);
+	DECLARE_READ8_MEMBER(darthvdr_01_r);
 	DECLARE_WRITE8_MEMBER(darthvdr_00_w);
 	DECLARE_WRITE8_MEMBER(darthvdr_08_w);
 	DECLARE_WRITE8_MEMBER(ballbomb_01_w);

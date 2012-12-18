@@ -2309,6 +2309,12 @@ MACHINE_RESET_MEMBER(_8080bw_state,darthvdr)
 	/* do nothing for now - different interrupt system */
 }
 
+READ8_MEMBER(_8080bw_state::darthvdr_01_r)
+{
+	UINT8 data = ioport("P2")->read();
+	if (m_invaders_flip_screen) return data;
+	return (data & 0xe1) | (ioport("P1")->read() & 0x0e);
+}
 
 static ADDRESS_MAP_START( darthvdr_map, AS_PROGRAM, 8, _8080bw_state )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
@@ -2318,7 +2324,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( darthvdr_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
+	AM_RANGE(0x01, 0x01) AM_READ(darthvdr_01_r)
 
 	AM_RANGE(0x00, 0x00) AM_WRITE(darthvdr_00_w) // flipscreen
 	AM_RANGE(0x04, 0x04) AM_WRITENOP
