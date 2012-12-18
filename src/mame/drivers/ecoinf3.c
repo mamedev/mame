@@ -47,7 +47,12 @@ public:
 		return ret;
 	}
 
-	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_a_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	DECLARE_READ8_MEMBER(ppi8255_intf_a_read_c)
+	{
+		int ret = ioport("IN5")->read();
+		logerror("%04x - ppi8255_intf_a_(used)read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
+		return ret;
+	}
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_b_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 	DECLARE_READ8_MEMBER(ppi8255_intf_b_read_b) { int ret = 0x00; logerror("%04x - ppi8255_intf_b_read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
@@ -60,10 +65,23 @@ public:
 		logerror("%04x - ppi8255_intf_c_(used)read_b %02x (COINS+TEST)\n", machine().device("maincpu")->safe_pcbase(), ret);
 		return ret;
 	} // changing to 00 gives coin tamper
-	DECLARE_READ8_MEMBER(ppi8255_intf_c_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_c_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	
+	DECLARE_READ8_MEMBER(ppi8255_intf_c_read_c)
+	{
+		int ret = ioport("IN6")->read();
+		logerror("%04x - ppi8255_intf_c_(used)read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
+		return ret;
+	}
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_d_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_b)
+	{
+		int ret = ioport("IN7")->read();
+		logerror("%04x - ppi8255_intf_d_(used)read_b %02x\n", machine().device("maincpu")->safe_pcbase(), ret);
+		return ret;
+	}
+
+	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_c)
 	{
 		// guess, what are the bottom 4 bits, if anything?
 
@@ -74,13 +92,12 @@ public:
 		// | 0x20 = reel 2 fault
 		// | 0x10 = reel 1 fault
 
-		logerror("%04x - ppi8255_intf_d_(used)read_b %02x (Reel Optics)\n", machine().device("maincpu")->safe_pcbase(), ret);
+		logerror("%04x - ppi8255_intf_d_(used)read_c %02x (Reel Optics)\n", machine().device("maincpu")->safe_pcbase(), ret);
 
 		return ret;
 
 
-	} // changing goes from reel 1 error to running something in sphinx
-	DECLARE_READ8_MEMBER(ppi8255_intf_d_read_c) { int ret = 0x00; logerror("%04x - ppi8255_intf_d_read_c %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
+	}
 
 	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_a) { int ret = 0x00; logerror("%04x - ppi8255_intf_e_read_a %02x\n", machine().device("maincpu")->safe_pcbase(), ret); return ret; }
 	DECLARE_READ8_MEMBER(ppi8255_intf_e_read_b)
@@ -187,7 +204,7 @@ public:
 		awp_draw_reel(1);
 	}
 
-	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_a_reel23)
+	DECLARE_WRITE8_MEMBER(ppi8255_intf_d_write_b_reel23)
 	{
 //      logerror("%04x - ppi8255_intf_d_(used)write_b %02x\n", machine().device("maincpu")->safe_pcbase(), data);
 
@@ -235,7 +252,7 @@ static I8255_INTERFACE (ppi8255_intf_a)
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_write_a_strobedat0),			/* Port A write */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_read_b),			/* Port B read */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_write_b_strobedat1),			/* Port B write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_read_b),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_read_c),			/* Port C read */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_a_write_c_strobe)			/* Port C write */
 };
 
@@ -245,7 +262,7 @@ static I8255_INTERFACE (ppi8255_intf_b)
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_b_write_a),			/* Port A write */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_b_read_b),			/* Port B read */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_b_write_b),			/* Port B write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_b_read_b),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_b_read_c),			/* Port C read */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_b_write_c)			/* Port C write */
 };
 
@@ -255,7 +272,7 @@ static I8255_INTERFACE (ppi8255_intf_c)
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_c_write_a),			/* Port A write */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_c_read_b),			/* Port B read */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_c_write_b),			/* Port B write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_c_read_b),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_c_read_c),			/* Port C read */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_c_write_c)			/* Port C write */
 };
 
@@ -264,8 +281,8 @@ static I8255_INTERFACE (ppi8255_intf_d)
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_read_a),			/* Port A read */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_write_a_reel01),			/* Port A write */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_read_b),			/* Port B read */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_write_a_reel23),			/* Port B write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_read_b),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_write_b_reel23),			/* Port B write */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_read_c),			/* Port C read */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_d_write_c)			/* Port C write */
 };
 
@@ -434,7 +451,7 @@ static I8255_INTERFACE (ppi8255_intf_f)
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_f_write_a),			/* Port A write */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_f_read_b),			/* Port B read */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_f_write_b),			/* Port B write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_f_read_b),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_f_read_c),			/* Port C read */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_f_write_c)			/* Port C write */
 };
 
@@ -444,7 +461,7 @@ static I8255_INTERFACE (ppi8255_intf_g)
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_g_write_a),			/* Port A write */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_g_read_b),			/* Port B read */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_g_write_b),			/* Port B write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_g_read_b),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_g_read_c),			/* Port C read */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_g_write_c)			/* Port C write */
 };
 
@@ -454,7 +471,7 @@ static I8255_INTERFACE (ppi8255_intf_h)
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_h_write_a),			/* Port A write */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_h_read_b),			/* Port B read */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_h_write_b),			/* Port B write */
-	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_h_read_b),			/* Port C read */
+	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_h_read_c),			/* Port C read */
 	DEVCB_DRIVER_MEMBER(ecoinf3_state,ppi8255_intf_h_write_c)			/* Port C write */
 };
 
@@ -513,7 +530,7 @@ static INPUT_PORTS_START( ecoinf3 )
 	PORT_DIPNAME( 0x08, 0x08, "IN1:08" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Meter Connection (leave on)" )
+	PORT_DIPNAME( 0x10, 0x10, "IN1:18" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "IN1:20" )
@@ -613,7 +630,7 @@ static INPUT_PORTS_START( ecoinf3 )
 	PORT_DIPNAME( 0x08, 0x08, "IN5:08" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "IN5:10" )
+	PORT_DIPNAME( 0x10, 0x10, "Meter Connection (leave on)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, "IN5:20" )
@@ -625,7 +642,7 @@ static INPUT_PORTS_START( ecoinf3 )
 	PORT_DIPNAME( 0x80, 0x80, "IN5:80" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-#if 0
+
 	PORT_START("IN6")
 	PORT_DIPNAME( 0x01, 0x01, "IN6:01" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -677,7 +694,6 @@ static INPUT_PORTS_START( ecoinf3 )
 	PORT_DIPNAME( 0x80, 0x80, "IN7:80" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-#endif
 INPUT_PORTS_END
 
 MACHINE_START_MEMBER(ecoinf3_state,ecoinf3)

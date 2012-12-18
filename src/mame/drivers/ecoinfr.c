@@ -27,6 +27,12 @@
 
   30/08/11 - Started to sort out the roms by header type, some things are clearly
              just newer revisions / alt titles of other things. DH
+
+	
+ ------
+ the 'Brunel Research' (ec_sbxbr) sets seem interesting for now
+ ------
+
 */
 
 
@@ -91,6 +97,11 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel1_opto_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel2_opto_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel3_opto_r);
+
+	DECLARE_READ8_MEMBER(i8251_in_rxd_cb);
+
+
+	DECLARE_DRIVER_INIT(ecoinfrbr);
 	DECLARE_DRIVER_INIT(ecoinfr);
 	DECLARE_DRIVER_INIT(ecoinfrmab);
 	virtual void machine_reset();
@@ -100,7 +111,6 @@ public:
 	UINT8 m_credsel;
 
 	DECLARE_MACHINE_START(ecoinfr);
-
 };
 
 
@@ -784,6 +794,25 @@ MACHINE_START_MEMBER(ecoinfr_state,ecoinfr)
 	}
 }
 
+READ8_MEMBER(ecoinfr_state::i8251_in_rxd_cb)
+{
+	return 0x06;
+}
+
+static const i8251_interface i8251_intf =
+{
+	DEVCB_DRIVER_MEMBER(ecoinfr_state,i8251_in_rxd_cb), // in_rxd_cb
+	DEVCB_NULL, // out_txd_cb
+	DEVCB_NULL, // in_dsr_cb
+	DEVCB_NULL, // out_dtr_cb
+	DEVCB_NULL, // out_rts_cb
+	DEVCB_NULL, // out_rxrdy_cb
+	DEVCB_NULL, // out_txrdy_cb
+	DEVCB_NULL, // out_txempty_cb
+	DEVCB_NULL // out_syndet_cb
+};
+
+
 static MACHINE_CONFIG_START( ecoinfr, ecoinfr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)
@@ -795,7 +824,7 @@ static MACHINE_CONFIG_START( ecoinfr, ecoinfr_state )
 
 	MCFG_MACHINE_START_OVERRIDE(ecoinfr_state, ecoinfr )
 
-	MCFG_I8251_ADD(UPD8251_TAG, default_i8251_interface)
+	MCFG_I8251_ADD(UPD8251_TAG, i8251_intf)
 MACHINE_CONFIG_END
 
 
@@ -1113,19 +1142,32 @@ EC_SBARX_SET( 199?, ec_sbarx__a1,	ec_sbarx,	"iss173.rom",							0x0000, 0x008000
 EC_SBARX_SET( 199?, ec_sbarx__a2,	ec_sbarx,	"iss2012.rom",							0x0000, 0x008000, CRC(455cfdcb) SHA1(53fb0748a544b432b88455fa597b7017e06b3059), "Electrocoin","Super Bar X (Electrocoin) (set 66)" )
 EC_SBARX_SET( 199?, ec_sbarx__a3,	ec_sbarx,	"sbx5red",								0x0000, 0x008000, CRC(7991231a) SHA1(cd1978c48a3c214666d51ca930d3d480540448ec), "Electrocoin","Super Bar X (Electrocoin) (set 67)" )
 EC_SBARX_SET( 199?, ec_sbarx__a4,	ec_sbarx,	"sbx8elac",								0x0000, 0x008000, CRC(102a3f38) SHA1(5f4f55904b00dde47e9841de313ed76a56e711df), "Electrocoin","Super Bar X (Electrocoin) (set 68)" )
-/* No Header, type 2 - closer to the BRUNEL sets but these make writes to the reel ports */ // spin the reels a lot more than anything else
-EC_SBARX_SET( 199?, ec_sbarx__a5,	ec_sbarx,	"sbx5nc.10",							0x0000, 0x008000, CRC(beb7254a) SHA1(137e91e0b92d970d09d165a42b890a5d31d795d9), "Electrocoin","Super Bar X (Electrocoin) (set 69)" )
-EC_SBARX_SET( 199?, ec_sbarx__a6,	ec_sbarx,	"sbx5nc.20",							0x0000, 0x008000, CRC(0ceb3e29) SHA1(e96e1470292208825407ba64750121dd3c7bf857), "Electrocoin","Super Bar X (Electrocoin) (set 70)" )
-EC_SBARX_SET( 199?, ec_sbarx__a7,	ec_sbarx,	"sbxup",								0x0000, 0x008000, CRC(f8d7e9db) SHA1(7dea1f7215070a8a413af63d0e379b2e228e63d7), "Electrocoin","Super Bar X (Electrocoin) (set 71)" )
-EC_SBARX_SET( 199?, ec_sbarx__a8,	ec_sbarx,	"sbxup_10",								0x0000, 0x008000, CRC(3c932de3) SHA1(2c1e09436a5895aa738567843c7f25ed047dc9ac), "Electrocoin","Super Bar X (Electrocoin) (set 72)" )
-/* 1991 BRUNEL RESEARCH Copyright, device at a000 / a001 / a100 */
-EC_SBARX_SET( 199?, ec_sbarx__a9,	ec_sbarx,	"sbarx.210",							0x0000, 0x008000, CRC(1e9933b2) SHA1(ee546cd2f0659c669b98a14f032298ebc4fa7e5c), "Electrocoin","Super Bar X (Electrocoin) (set 73)" ) // sbx210
-EC_SBARX_SET( 199?, ec_sbarx__ba,	ec_sbarx,	"sbx18ac",								0x0000, 0x008000, CRC(a3b4cfbe) SHA1(20f78d565504878d0d6a53b6bc32e31d3a32c736), "Electrocoin","Super Bar X (Electrocoin) (set 74)" )
-EC_SBARX_SET( 199?, ec_sbarx__bb,	ec_sbarx,	"sbx2 8t",								0x0000, 0x008000, CRC(c63e8d0a) SHA1(17ccb75602a2738296b419761835008ef798fdb0), "Electrocoin","Super Bar X (Electrocoin) (set 75)" ) // sbx8d
-EC_SBARX_SET( 199?, ec_sbarx__bc,	ec_sbarx,	"sbx28ac",								0x0000, 0x008000, CRC(338ff3e3) SHA1(d8470b029aff7b6b8f07df19d9edcf3d01b7e3d0), "Electrocoin","Super Bar X (Electrocoin) (set 76)" )
-EC_SBARX_SET( 199?, ec_sbarx__bd,	ec_sbarx,	"super bar x 8 1-0.bin",				0x0000, 0x008000, CRC(b33e2891) SHA1(c0383740776a20f41de3f1a46c766a8e6c53101f), "Electrocoin","Super Bar X (Electrocoin) (set 77)" )
 /* 1993 Electrocoin Copyright - z180 code */
 EC_SBARX_SET( 199?, ec_sbarx__be,	ec_sbarx,	"sbarx6c.bin",							0x0000, 0x008000, CRC(f747fa74) SHA1(7820e9225924c8b2fd78c625cc61871f7c76357f), "Electrocoin","Super Bar X (Electrocoin) (set 78)" ) // aka sbarx6t
+
+
+/* is Brunel Research the company, or related to the Brunel language? */
+
+#define EC_SBARXBR_SET(year, setname,parent,name,offset,length,hash,company,title) \
+	ROM_START( setname ) \
+		ROM_REGION( length, "maincpu", 0 ) \
+		ROM_LOAD( name, offset, length, hash ) \
+		EC_SBARX_OTHERS \
+	ROM_END \
+	GAME(year, setname, parent ,ecoinfr	,ecoinfr_barx , ecoinfr_state,ecoinfrbr ,ROT0,company,title,GAME_FLAGS ) \
+
+
+/* No Header - very similar to Brunel sets, but no device at 0xa000 */ // spin the reels a lot more than anything else
+EC_SBARXBR_SET( 1991, ec_sbxbr,      	0,	        "sbx5nc.10",							0x0000, 0x008000, CRC(beb7254a) SHA1(137e91e0b92d970d09d165a42b890a5d31d795d9), "Brunel Research","Super Bar X (Brunel Research) (set 1)" )
+EC_SBARXBR_SET( 1991, ec_sbxbra,		ec_sbxbr,	"sbx5nc.20",							0x0000, 0x008000, CRC(0ceb3e29) SHA1(e96e1470292208825407ba64750121dd3c7bf857), "Brunel Research","Super Bar X (Brunel Research) (set 2)" )
+EC_SBARXBR_SET( 1991, ec_sbxbrb,		ec_sbxbr,	"sbxup",								0x0000, 0x008000, CRC(f8d7e9db) SHA1(7dea1f7215070a8a413af63d0e379b2e228e63d7), "Brunel Research","Super Bar X (Brunel Research) (set 3)" )
+EC_SBARXBR_SET( 1991, ec_sbxbrc,		ec_sbxbr,	"sbxup_10",								0x0000, 0x008000, CRC(3c932de3) SHA1(2c1e09436a5895aa738567843c7f25ed047dc9ac), "Brunel Research","Super Bar X (Brunel Research) (set 4)" )
+/* 1991 BRUNEL RESEARCH Copyright, device at a000 / a001 / a100 */
+EC_SBARXBR_SET( 1991, ec_sbxbrd,		ec_sbxbr,	"sbarx.210",							0x0000, 0x008000, CRC(1e9933b2) SHA1(ee546cd2f0659c669b98a14f032298ebc4fa7e5c), "Brunel Research","Super Bar X (Brunel Research) (set 5)" ) // sbx210
+EC_SBARXBR_SET( 1991, ec_sbxbre,		ec_sbxbr,	"sbx18ac",								0x0000, 0x008000, CRC(a3b4cfbe) SHA1(20f78d565504878d0d6a53b6bc32e31d3a32c736), "Brunel Research","Super Bar X (Brunel Research) (set 6)" )
+EC_SBARXBR_SET( 1991, ec_sbxbrf,		ec_sbxbr,	"sbx2 8t",								0x0000, 0x008000, CRC(c63e8d0a) SHA1(17ccb75602a2738296b419761835008ef798fdb0), "Brunel Research","Super Bar X (Brunel Research) (set 7)" ) // sbx8d
+EC_SBARXBR_SET( 1991, ec_sbxbrg,		ec_sbxbr,	"sbx28ac",								0x0000, 0x008000, CRC(338ff3e3) SHA1(d8470b029aff7b6b8f07df19d9edcf3d01b7e3d0), "Brunel Research","Super Bar X (Brunel Research) (set 8)" )
+EC_SBARXBR_SET( 1991, ec_sbxbrh,		ec_sbxbr,	"super bar x 8 1-0.bin",				0x0000, 0x008000, CRC(b33e2891) SHA1(c0383740776a20f41de3f1a46c766a8e6c53101f), "Brunel Research","Super Bar X (Brunel Research) (set 9)" )
 
 
 
@@ -1669,8 +1711,11 @@ DRIVER_INIT_MEMBER(ecoinfr_state,ecoinfrmab)
 	// descramble here
 }
 
-
-
+// for the Brunel Research sets
+DRIVER_INIT_MEMBER(ecoinfr_state,ecoinfrbr)
+{
+	
+}
 
 // 3rd party sets with MAB scrambling, game names might be incorrect, should be the same basic hardware as these tho.
 GAME( 19??, ec_barxmab, ec_barx	 , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,	ROT0,  "Electrocoin", "Bar X (MAB PCB) (Electrocoin)"		, GAME_FLAGS) // scrambled roms
