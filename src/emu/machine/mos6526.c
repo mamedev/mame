@@ -54,20 +54,20 @@ enum
 
 
 // interrupt control register
-#define ICR_TA		0x01
-#define ICR_TB		0x02
-#define ICR_ALARM	0x04
-#define ICR_SP		0x08
-#define ICR_FLAG	0x10
+#define ICR_TA      0x01
+#define ICR_TB      0x02
+#define ICR_ALARM   0x04
+#define ICR_SP      0x08
+#define ICR_FLAG    0x10
 
 
 // interrupt mask register
-#define IMR_TA		BIT(m_imr, 0)
-#define IMR_TB		BIT(m_imr, 1)
-#define IMR_ALARM	BIT(m_imr, 2)
-#define IMR_SP		BIT(m_imr, 3)
-#define IMR_FLAG	BIT(m_imr, 4)
-#define IMR_SET		BIT(data, 7)
+#define IMR_TA      BIT(m_imr, 0)
+#define IMR_TB      BIT(m_imr, 1)
+#define IMR_ALARM   BIT(m_imr, 2)
+#define IMR_SP      BIT(m_imr, 3)
+#define IMR_FLAG    BIT(m_imr, 4)
+#define IMR_SET     BIT(data, 7)
 
 
 // control register A
@@ -77,15 +77,15 @@ enum
 	CRA_INMODE_CNT
 };
 
-#define CRA_START		0x01
-#define CRA_STARTED		BIT(m_cra, 0)
-#define CRA_PBON		BIT(m_cra, 1)
-#define CRA_OUTMODE 	BIT(m_cra, 2)
-#define CRA_RUNMODE 	BIT(m_cra, 3)
-#define CRA_LOAD		BIT(m_cra, 4)
-#define CRA_INMODE		BIT(m_cra, 5)
-#define CRA_SPMODE		BIT(m_cra, 6)
-#define CRA_TODIN		BIT(m_cra, 7)
+#define CRA_START       0x01
+#define CRA_STARTED     BIT(m_cra, 0)
+#define CRA_PBON        BIT(m_cra, 1)
+#define CRA_OUTMODE     BIT(m_cra, 2)
+#define CRA_RUNMODE     BIT(m_cra, 3)
+#define CRA_LOAD        BIT(m_cra, 4)
+#define CRA_INMODE      BIT(m_cra, 5)
+#define CRA_SPMODE      BIT(m_cra, 6)
+#define CRA_TODIN       BIT(m_cra, 7)
 
 
 // control register B
@@ -97,14 +97,14 @@ enum
 	CRB_INMODE_CNT_TA
 };
 
-#define CRB_START		0x01
-#define CRB_STARTED		BIT(m_crb, 0)
-#define CRB_PBON		BIT(m_crb, 1)
-#define CRB_OUTMODE 	BIT(m_crb, 2)
-#define CRB_RUNMODE 	BIT(m_crb, 3)
-#define CRB_LOAD		BIT(m_crb, 4)
-#define CRB_INMODE		((m_crb & 0x60) >> 5)
-#define CRB_ALARM		BIT(m_crb, 7)
+#define CRB_START       0x01
+#define CRB_STARTED     BIT(m_crb, 0)
+#define CRB_PBON        BIT(m_crb, 1)
+#define CRB_OUTMODE     BIT(m_crb, 2)
+#define CRB_RUNMODE     BIT(m_crb, 3)
+#define CRB_LOAD        BIT(m_crb, 4)
+#define CRB_INMODE      ((m_crb & 0x60) >> 5)
+#define CRB_ALARM       BIT(m_crb, 7)
 
 
 
@@ -146,14 +146,14 @@ void mos6526_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-    	memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-    	memset(&m_out_pc_cb, 0, sizeof(m_out_pc_cb));
-    	memset(&m_out_cnt_cb, 0, sizeof(m_out_cnt_cb));
-    	memset(&m_out_sp_cb, 0, sizeof(m_out_sp_cb));
-    	memset(&m_in_pa_cb, 0, sizeof(m_in_pa_cb));
-    	memset(&m_out_pa_cb, 0, sizeof(m_out_pa_cb));
-    	memset(&m_in_pb_cb, 0, sizeof(m_in_pb_cb));
-    	memset(&m_out_pb_cb, 0, sizeof(m_out_pb_cb));
+		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
+		memset(&m_out_pc_cb, 0, sizeof(m_out_pc_cb));
+		memset(&m_out_cnt_cb, 0, sizeof(m_out_cnt_cb));
+		memset(&m_out_sp_cb, 0, sizeof(m_out_sp_cb));
+		memset(&m_in_pa_cb, 0, sizeof(m_in_pa_cb));
+		memset(&m_out_pa_cb, 0, sizeof(m_out_pa_cb));
+		memset(&m_in_pb_cb, 0, sizeof(m_in_pb_cb));
+		memset(&m_out_pb_cb, 0, sizeof(m_out_pb_cb));
 	}
 }
 
@@ -264,10 +264,10 @@ inline UINT8 mos6526_device::bcd_increment(UINT8 value)
 
 inline void mos6526_device::clock_tod()
 {
-	UINT8 subsecond	= (UINT8) (m_tod >>  0);
-	UINT8 second	= (UINT8) (m_tod >>  8);
-	UINT8 minute	= (UINT8) (m_tod >> 16);
-	UINT8 hour		= (UINT8) (m_tod >> 24);
+	UINT8 subsecond = (UINT8) (m_tod >>  0);
+	UINT8 second    = (UINT8) (m_tod >>  8);
+	UINT8 minute    = (UINT8) (m_tod >> 16);
+	UINT8 hour      = (UINT8) (m_tod >> 24);
 
 	m_tod_count++;
 
@@ -305,10 +305,10 @@ inline void mos6526_device::clock_tod()
 		}
 	}
 
-	m_tod = (((UINT32) subsecond)	<<  0)
-		  | (((UINT32) second)		<<  8)
-		  | (((UINT32) minute)		<< 16)
-		  | (((UINT32) hour)		<< 24);
+	m_tod = (((UINT32) subsecond)   <<  0)
+			| (((UINT32) second)        <<  8)
+			| (((UINT32) minute)        << 16)
+			| (((UINT32) hour)      << 24);
 }
 
 
@@ -631,28 +631,28 @@ inline void mos6526_device::synchronize()
 //-------------------------------------------------
 
 mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
-    : device_t(mconfig, type, name, tag, owner, clock),
-	  device_execute_interface(mconfig, *this),
-	  m_icount(0),
-	  m_variant(variant)
+	: device_t(mconfig, type, name, tag, owner, clock),
+		device_execute_interface(mconfig, *this),
+		m_icount(0),
+		m_variant(variant)
 {
 }
 
 mos6526_device::mos6526_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : device_t(mconfig, MOS6526, "MOS6526", tag, owner, clock),
-	  device_execute_interface(mconfig, *this),
-	  m_icount(0),
-	  m_variant(TYPE_6526)
+	: device_t(mconfig, MOS6526, "MOS6526", tag, owner, clock),
+		device_execute_interface(mconfig, *this),
+		m_icount(0),
+		m_variant(TYPE_6526)
 { }
 
 mos6526a_device::mos6526a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : mos6526_device(mconfig, MOS6526A, "MOS6526A", tag, owner, clock, TYPE_6526A) { }
+	: mos6526_device(mconfig, MOS6526A, "MOS6526A", tag, owner, clock, TYPE_6526A) { }
 
 mos8520_device::mos8520_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : mos6526_device(mconfig, MOS8520, "MOS8520", tag, owner, clock, TYPE_8520) { }
+	: mos6526_device(mconfig, MOS8520, "MOS8520", tag, owner, clock, TYPE_8520) { }
 
 mos5710_device::mos5710_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-    : mos6526_device(mconfig, MOS5710, "MOS5710", tag, owner, clock, TYPE_5710) { }
+	: mos6526_device(mconfig, MOS5710, "MOS5710", tag, owner, clock, TYPE_5710) { }
 
 
 //-------------------------------------------------

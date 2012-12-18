@@ -28,6 +28,32 @@
                    TOD  19 |             | 22  R/W
                    Vcc  20 |_____________| 21  _IRQ
 
+                            _____   _____
+                  FCO*   1 |*    \_/     | 48  FDO*
+                   TED   2 |             | 47  FCI*
+                  phi0   3 |             | 46  FDI*
+                 CLKIN   4 |             | 45  IRQ
+                 CTRLO   5 |             | 44  RSET
+                 CTRLI   6 |             | 43
+                  phi2   7 |             | 42
+                    D7   8 |             | 41  INDEX*
+                    D6   9 |             | 40  WG2*
+                    D5  10 |             | 39  WPRT*
+                    D4  11 |             | 38  RPULSE
+                   GND  12 |   MOS5710   | 37  Q
+                   Vcc  13 |             | 36  Vcc
+                    D3  14 |             | 35  GND
+                    D2  15 |             | 34  CS3*
+                    D1  16 |             | 33  CS2*
+                    D0  17 |             | 32  CS1*
+                   A15  18 |             | 31  R/W*
+                   A14  19 |             | 30  OSC
+                   A13  20 |             | 29  XTL1
+                   A12  21 |             | 28  XTL2
+                   A10  22 |             | 27  A0
+                    A4  23 |             | 26  A1
+                    A3  24 |_____________| 25  A2
+
 **********************************************************************/
 
 #pragma once
@@ -137,7 +163,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void execute_run();
 
-    int m_icount;
+	int m_icount;
 	int m_variant;
 	int m_tod_clock;
 
@@ -157,10 +183,10 @@ protected:
 	inline void write_tod(int offset, UINT8 data);
 	inline void synchronize();
 
-	devcb_resolved_write_line	m_out_irq_func;
-	devcb_resolved_write_line	m_out_pc_func;
-	devcb_resolved_write_line	m_out_cnt_func;
-	devcb_resolved_write_line	m_out_sp_func;
+	devcb_resolved_write_line   m_out_irq_func;
+	devcb_resolved_write_line   m_out_pc_func;
+	devcb_resolved_write_line   m_out_cnt_func;
+	devcb_resolved_write_line   m_out_sp_func;
 	devcb_resolved_read8        m_in_pa_func;
 	devcb_resolved_write8       m_out_pa_func;
 	devcb_resolved_read8        m_in_pb_func;
