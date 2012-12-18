@@ -1923,7 +1923,7 @@ MACHINE_CONFIG_END
 /*******************************************************/
 
 static INPUT_PORTS_START( indianbt )
-	PORT_START("IN0")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
@@ -1950,8 +1950,8 @@ static INPUT_PORTS_START( indianbt )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START(CABINET_PORT_TAG)		/* Dummy port for cocktail mode */
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	/* Dummy port for cocktail mode */
+	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
 
@@ -1989,8 +1989,8 @@ READ8_MEMBER(_8080bw_state::indianbt_r)
 
 static ADDRESS_MAP_START( indianbt_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x00, 0x00) AM_READ(indianbt_r)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ(invrvnge_02_r) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
 	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r) AM_WRITE(indianbt_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(indianbt_sh_port_2_w)

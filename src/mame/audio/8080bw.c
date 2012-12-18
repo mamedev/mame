@@ -352,6 +352,8 @@ WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_2_w)
 	if (rising_bits & 0x08) m_samples->start(5, 0);		/* Grabber, Lasso caught something */
 	if (rising_bits & 0x10) m_samples->start(3, 7);		/* Lasso sound */
 
+	m_c8080bw_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
+
 	m_port_2_last_extra = data;
 }
 
