@@ -157,9 +157,11 @@ void i8x9x_device::io_w8(UINT8 adr, UINT8 data)
 		break;
 	case 0x0f:
 		logerror("%s: io port 1 %02x (%04x)\n", tag(), data, PPC);
+		io->write_word(P1*2, data);
 		break;
 	case 0x10:
 		logerror("%s: io port 2 %02x (%04x)\n", tag(), data, PPC);
+		io->write_word(P2*2, data);
 		break;
 	case 0x11:
 		logerror("%s: sp con %02x (%04x)\n", tag(), data, PPC);
@@ -237,14 +239,16 @@ UINT8 i8x9x_device::io_r8(UINT8 adr)
 		logerror("%s: read timer2 h (%04x)\n", tag(), PPC);
 		return timer_value(2, get_cycle()) >> 8;
 	case 0x0e:
-		logerror("%s: read io port 0 (%04x)\n", tag(), PPC);
-		return 0x00;
+		static int last = -1;
+		if(io->read_word(P0*2) != last) {
+			last = io->read_word(P0*2);
+			logerror("%s: read p0 %02x\n", tag(), io->read_word(P0*2));
+		}
+		return io->read_word(P0*2);
 	case 0x0f:
-		logerror("%s: read io port 1 (%04x)\n", tag(), PPC);
-		return 0x00;
+		return io->read_word(P1*2);
 	case 0x10:
-		logerror("%s: read io port 2 (%04x)\n", tag(), PPC);
-		return 0x00;
+		return io->read_word(P2*2);
 	case 0x11: {
 		UINT8 res = sp_stat;
 		sp_stat &= 0x80;

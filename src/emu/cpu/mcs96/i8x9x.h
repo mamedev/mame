@@ -46,7 +46,8 @@ class i8x9x_device : public mcs96_device {
 public:
 	enum {
 		A0, A1, A2, A3, A4, A5, A6, A7,
-		SERIAL
+		SERIAL,
+		P0, P1, P2
 	};
 
 	i8x9x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
