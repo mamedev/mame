@@ -25,7 +25,8 @@ enum
 	NAMCOS22_ALPINE_SURFER,
 	NAMCOS22_TOKYO_WARS,
 	NAMCOS22_AQUA_JET,
-	NAMCOS22_DIRT_DASH
+	NAMCOS22_DIRT_DASH,
+	NAMCOS22_ARMADILLO_RACING
 };
 
 class namcos22_state : public driver_device
@@ -235,6 +236,7 @@ public:
 	void WriteToPointRAM(offs_t offs, UINT32 data );
 	DECLARE_DRIVER_INIT(acedrvr);
 	DECLARE_DRIVER_INIT(aquajet);
+	DECLARE_DRIVER_INIT(adillor);
 	DECLARE_DRIVER_INIT(cybrcyc);
 	DECLARE_DRIVER_INIT(raveracw);
 	DECLARE_DRIVER_INIT(ridger2j);
