@@ -74,7 +74,7 @@ static const mc6845_interface crtc_intf =
 void fp_state::video_start()
 {
 	// allocate memory
-	m_video_ram = auto_alloc_array(machine(), UINT16, 0x20000);
+	m_video_ram.allocate(0x20000);
 }
 
 
@@ -124,25 +124,29 @@ READ8_MEMBER( fp_state::prtr_snd_r )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       BUSY
-        1       SE
-        2       _FAULT
-        3       PE
-        4       LP23
-        5       DCNG-L
-        6       J9 1-2
-        7       J9 3-4
+	    0       BUSY
+	    1       SE
+	    2       _FAULT
+	    3       PE
+	    4       LP23
+	    5       DCNG-L
+	    6       J9 1-2
+	    7       J9 3-4
 
-    */
+	*/
 
 	UINT8 data = 0;
 
+	// centronics
 	data |= m_centronics->busy_r();
 	data |= m_centronics->vcc_r() << 1;
 	data |= m_centronics->fault_r() << 2;
 	data |= m_centronics->pe_r() << 3;
+
+	// floppy
+	data |= (m_floppy ? m_floppy->dskchg_r() : 1) << 5;
 
 	return data;
 }
@@ -169,18 +173,18 @@ WRITE8_MEMBER( fp_state::palette_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       B
-        1       G
-        2       R
-        3       I
-        4       index
-        5       index
-        6       index
-        7       index
+	    0       B
+	    1       G
+	    2       R
+	    3       I
+	    4       index
+	    5       index
+	    6       index
+	    7       index
 
-    */
+	*/
 }
 
 
@@ -188,28 +192,56 @@ WRITE16_MEMBER( fp_state::video_w )
 {
 	/*
 
-        bit     description
+	    bit     description
 
-        0       CRTRES-H
-        1       SEL1
-        2       DON-H
-        3       LCDON-H
-        4       SEL2
-        5       L3 even access
-        6       L2 odd access
-        7       L1 video RAM enable
-        8
-        9       STOP LED
-        10      POWER LED
-        11      SHIFT LOCK LED
-        12      DISK LED
-        13      VOICE LED
-        14      COLOUR SELECT LED
-        15      CAPS LOCK LED
+	    0       CRTRES-H
+	    1       SEL1
+	    2       DON-H
+	    3       LCDON-H
+	    4       SEL2
+	    5       L3 even access
+	    6       L2 odd access
+	    7       L1 video RAM enable
+	    8
+	    9       STOP LED
+	    10      POWER LED
+	    11      SHIFT LOCK LED
+	    12      DISK LED
+	    13      VOICE LED
+	    14      COLOUR SELECT LED
+	    15      CAPS LOCK LED
 
-    */
+	*/
 
 	m_video = data & 0xff;
+}
+
+void fp_state::lat_ls259_w(offs_t offset, int state)
+{
+	switch (offset)
+	{
+	case 0:
+		{
+			m_floppy = NULL;
+
+			if (state) m_floppy = m_floppy0->get_device();
+			else m_floppy = m_floppy1->get_device();
+
+			m_fdc->set_floppy(m_floppy);
+
+			if (m_floppy)
+			{
+				m_floppy->set_rpm(600);
+				m_floppy->mon_w(0);
+			}
+		}
+		break;
+	}
+}
+
+WRITE8_MEMBER( fp_state::lat_w )
+{
+	lat_ls259_w((offset >> 1) & 0x07, BIT(data, 0));
 }
 
 
@@ -312,7 +344,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fp_io, AS_IO, 16, fp_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000, 0x007) AM_DEVREADWRITE8_LEGACY(WD2797_TAG, wd17xx_r, wd17xx_w, 0x00ff)
+	AM_RANGE(0x000, 0x007) AM_DEVREADWRITE8(WD2797_TAG, wd2797_t, read, write, 0x00ff)
 	AM_RANGE(0x008, 0x00f) AM_DEVREADWRITE8_LEGACY(I8253A5_TAG, pit8253_r, pit8253_w, 0x00ff)
 	AM_RANGE(0x018, 0x01f) AM_DEVREADWRITE8_LEGACY(Z80SIO0_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w, 0x00ff)
 	AM_RANGE(0x020, 0x021) AM_DEVWRITE8(CENTRONICS_TAG, centronics_device, write, 0x00ff)
@@ -445,8 +477,8 @@ static I8237_INTERFACE( dmac_intf )
 	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir7_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	{ DEVCB_NULL, DEVCB_DEVICE_HANDLER(WD2797_TAG, wd17xx_data_r), DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_DEVICE_HANDLER(WD2797_TAG, wd17xx_data_w), DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_DEVICE_MEMBER(WD2797_TAG, wd_fdc_t, data_r), DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_DEVICE_MEMBER(WD2797_TAG, wd_fdc_t, data_w), DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
@@ -481,35 +513,29 @@ static Z80DART_INTERFACE( sio_intf )
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
+static SLOT_INTERFACE_START( fp_floppies )
+	SLOT_INTERFACE( "35dd", FLOPPY_35_DD ) // Sony OA-D32W (600 rpm)
+SLOT_INTERFACE_END
+/*
 static LEGACY_FLOPPY_OPTIONS_START( act )
-	LEGACY_FLOPPY_OPTION( img2hd, "dsk", "2HD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
-		HEADS([2])
-		TRACKS([80])
-		SECTORS([16])
-		SECTOR_LENGTH([256])
-		FIRST_SECTOR_ID([1]))
+    LEGACY_FLOPPY_OPTION( img2hd, "dsk", "2HD disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+        HEADS([2])
+        TRACKS([80])
+        SECTORS([16])
+        SECTOR_LENGTH([256])
+        FIRST_SECTOR_ID([1]))
 LEGACY_FLOPPY_OPTIONS_END
+*/
 
-static const floppy_interface act_floppy_interface =
+void fp_state::fdc_intrq_w(bool state)
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_3_5_DSDD, // Sony OA-D32W
-	LEGACY_FLOPPY_OPTIONS_NAME(act),
-	"floppy_3_5",
-	NULL
-};
+	m_pic->ir1_w(state);
+}
 
-static const wd17xx_interface fdc_intf =
+void fp_state::fdc_drq_w(bool state)
 {
-	DEVCB_LINE_GND,
-	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir1_w),
-	DEVCB_DEVICE_LINE_MEMBER(I8237_TAG, am9517a_device, dreq1_w),
-	{ FLOPPY_0, NULL, NULL, NULL }
-};
+	m_dmac->dreq1_w(state);
+}
 
 
 //-------------------------------------------------
@@ -518,7 +544,7 @@ static const wd17xx_interface fdc_intf =
 
 WRITE_LINE_MEMBER( fp_state::busy_w )
 {
-	if (!state)	pic8259_ir6_w(m_pic, ASSERT_LINE);
+	if (!state) pic8259_ir6_w(m_pic, ASSERT_LINE);
 }
 
 static const centronics_interface centronics_intf =
@@ -542,7 +568,7 @@ static const centronics_interface centronics_intf =
 
 static const sn76496_config psg_intf =
 {
-    DEVCB_NULL
+	DEVCB_NULL
 };
 
 
@@ -556,11 +582,15 @@ static const sn76496_config psg_intf =
 
 void fp_state::machine_start()
 {
+	// floppy callbacks
+	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(fp_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(fp_state::fdc_drq_w), this));
+
 	// register CPU IRQ callback
 	m_maincpu->set_irq_acknowledge_callback(fp_irq_callback);
 
 	// allocate memory
-	m_work_ram = auto_alloc_array(machine(), UINT16, m_ram->size() / 2);
+	m_work_ram.allocate(m_ram->size() / 2);
 }
 
 
@@ -571,6 +601,13 @@ void fp_state::machine_start()
 void fp_state::machine_reset()
 {
 	m_video = 0;
+
+	m_fdc->dden_w(0);
+
+	for (offs_t offset = 0; offset < 7; offset++)
+	{
+		lat_ls259_w(offset, 0);
+	}
 }
 
 
@@ -627,8 +664,9 @@ static MACHINE_CONFIG_START( fp, fp_state )
 	MCFG_PIC8259_ADD(I8259A_TAG, pic_intf)
 	MCFG_PIT8253_ADD(I8253A5_TAG, pit_intf)
 	MCFG_Z80DART_ADD(Z80SIO0_TAG, 2500000, sio_intf)
-	MCFG_WD2797_ADD(WD2797_TAG, fdc_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(act_floppy_interface)
+	MCFG_WD2797x_ADD(WD2797_TAG, 2000000)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":0", fp_floppies, "35dd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2797_TAG":1", fp_floppies, NULL,   NULL, floppy_image_device::default_floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 
 	/* internal ram */
@@ -649,8 +687,8 @@ MACHINE_CONFIG_END
 
 ROM_START( fp )
 	ROM_REGION( 0x8000, I8086_TAG, 0 )
-	ROM_LOAD16_BYTE( "lo_fp_3.1.ic20", 0x0000, 0x4000, CRC(0572add2) SHA1(c7ab0e5ced477802e37f9232b5673f276b8f5623) )	// Labelled 11212721 F97E PORT LO VR 3.1
-	ROM_LOAD16_BYTE( "hi_fp_3.1.ic9",  0x0001, 0x4000, CRC(3903674b) SHA1(8418682dcc0c52416d7d851760fea44a3cf2f914) )	// Labelled 11212721 BD2D PORT HI VR 3.1
+	ROM_LOAD16_BYTE( "lo_fp_3.1.ic20", 0x0000, 0x4000, CRC(0572add2) SHA1(c7ab0e5ced477802e37f9232b5673f276b8f5623) )   // Labelled 11212721 F97E PORT LO VR 3.1
+	ROM_LOAD16_BYTE( "hi_fp_3.1.ic9",  0x0001, 0x4000, CRC(3903674b) SHA1(8418682dcc0c52416d7d851760fea44a3cf2f914) )   // Labelled 11212721 BD2D PORT HI VR 3.1
 
 	ROM_REGION( 0x1000, HD63B01V1_TAG, 0 )
 	ROM_LOAD( "voice interface hd63b01v01.ic29", 0x0000, 0x1000, NO_DUMP )
