@@ -33,6 +33,10 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8251.h"
+#include "ecoinfr.lh"
+#include "machine/steppers.h" // stepper motor
+#include "video/awpvid.h" // drawing reels
+
 
 #define UPD8251_TAG      "upd8251"
 
@@ -42,9 +46,12 @@ class ecoinfr_state : public driver_device
 {
 public:
 	ecoinfr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+	{
+	}
 
 	int irq_toggle;
+	int m_optic_pattern;
 
 	UINT8 port09_value;
 	UINT8 port10_value;
@@ -64,14 +71,14 @@ public:
 	DECLARE_WRITE8_MEMBER(ec_port05_out_w);
 	DECLARE_WRITE8_MEMBER(ec_port06_out_w);
 	DECLARE_WRITE8_MEMBER(ec_port07_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port08_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port09_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port08_out_bank_strobe_w);
+	DECLARE_WRITE8_MEMBER(ec_port09_out_reelen_w);
 	DECLARE_WRITE8_MEMBER(ec_port0a_out_w);
 	DECLARE_WRITE8_MEMBER(ec_port0b_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port0c_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port0d_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port0c_out_cred_strobe_w);
+	DECLARE_WRITE8_MEMBER(ec_port0d_out_cred_data_w);
 	DECLARE_WRITE8_MEMBER(ec_port0e_out_w);
-	DECLARE_WRITE8_MEMBER(ec_port0f_out_w);
+	DECLARE_WRITE8_MEMBER(ec_port0f_out_bank_segdata_w);
 	DECLARE_WRITE8_MEMBER(ec_port10_out_w);
 	DECLARE_WRITE8_MEMBER(ec_port11_out_w);
 	DECLARE_WRITE8_MEMBER(ec_port12_out_w);
@@ -88,6 +95,12 @@ public:
 	DECLARE_DRIVER_INIT(ecoinfrmab);
 	virtual void machine_reset();
 	TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_irq_timer);
+
+	UINT8 m_banksel;
+	UINT8 m_credsel;
+
+	DECLARE_MACHINE_START(ecoinfr);
+
 };
 
 
@@ -103,6 +116,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_state::ecoinfr_irq_timer)
      It runs in IM2
      0xe0 / 0xe4 seem to be the valid interrupts
      0xf0 / 0xf4 mirror those
+
+	 there seem to be plenty of valid looking vectors between
+	 these too.. really not sure what all the sources are, nor
+	 the frequency
 
      NMI is also valid
 
@@ -123,18 +140,50 @@ TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_state::ecoinfr_irq_timer)
 
 WRITE8_MEMBER(ecoinfr_state::ec_port00_out_w)
 {
-	// Reel 1 Control
+	if (data&0x70) // lots of games set 0x80
+	{
+		printf("ec_port0a_out_w (reel 1 port) unk bits used %02x\n", data);
+	}
+
+	stepper_update(0, data&0x0f);
+
+	if ( stepper_optic_state(0) ) m_optic_pattern |=  0x01;
+	else                          m_optic_pattern &= ~0x01;
+
+	awp_draw_reel(0);
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port01_out_w)
 {
-	// Reel 2 Control
+	if (data&0xf0)
+	{
+		printf("ec_port01_out_w (reel 2 port) unk bits used %02x\n", data);
+	}
+
+	stepper_update(1, data&0x0f);
+
+	if ( stepper_optic_state(1) ) m_optic_pattern |=  0x02;
+	else                          m_optic_pattern &= ~0x02;
+
+	awp_draw_reel(1);
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port02_out_w)
 {
-	// Reel 3 Control
+	if (data&0xf0)
+	{
+		printf("ec_port02_out_w (reel 3 port) unk bits used %02x\n", data);
+	}
+
+	stepper_update(2, data&0x0f);
+
+	if ( stepper_optic_state(2) ) m_optic_pattern |=  0x04;
+	else                          m_optic_pattern &= ~0x04;
+
+	awp_draw_reel(2);
 }
+
+
 
 WRITE8_MEMBER(ecoinfr_state::ec_port03_out_w)
 {
@@ -161,15 +210,50 @@ WRITE8_MEMBER(ecoinfr_state::ec_port07_out_w)
 
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port08_out_w)
+WRITE8_MEMBER(ecoinfr_state::ec_port08_out_bank_strobe_w)
 {
+	switch (data)
+	{
+		case 0x00:
+			// ?? written after select values
+			break;
 
+		case 0x01:
+			m_banksel = 0;
+			break;
+		case 0x02:
+			m_banksel = 1;
+			break;
+		case 0x04:
+			m_banksel = 2;
+			break;
+		case 0x08:
+			m_banksel = 3;
+			break;
+		case 0x10:
+			m_banksel = 4;
+			break;
+		case 0x20:
+			m_banksel = 5;
+			break;
+		case 0x40:
+			m_banksel = 6;
+			break;
+		case 0x80:
+			m_banksel = 7;
+			break;
+
+		default:
+			printf("ec_port08_out_bank_strobe_w unk data %02x\n", data);
+			break;
+
+	}
 }
 
 // we could do the same thing here with input ports configured to outputs, however
 // I've done it with handlers for now as it allows greater flexibility while the driver
 // is developed
-WRITE8_MEMBER(ecoinfr_state::ec_port09_out_w)
+WRITE8_MEMBER(ecoinfr_state::ec_port09_out_reelen_w)
 {
 
 	int old_port09_value = port09_value;
@@ -196,14 +280,48 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0b_out_w)
 
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port0c_out_w)
+WRITE8_MEMBER(ecoinfr_state::ec_port0c_out_cred_strobe_w)
 {
-
+	switch (data)
+	{
+	case 0x00:
+		break;
+	case 0x01:
+		m_credsel = 0;
+		break;
+	case 0x02:
+		m_credsel = 1;
+		break;
+	case 0x04:
+		m_credsel = 2;
+		break;
+	case 0x08:
+		m_credsel = 3;
+		break;
+	case 0x10:
+		m_credsel = 4;
+		break;
+	case 0x20:
+		m_credsel = 5;
+		break;
+	case 0x40:
+		m_credsel = 6;
+		break;
+	case 0x80:
+		m_credsel = 7;
+		break;
+	default:
+		printf("ec_port0c_out_cred_strobe_w unk %02x\n", data);
+	}
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port0d_out_w)
+WRITE8_MEMBER(ecoinfr_state::ec_port0d_out_cred_data_w)
 {
-
+	if (m_credsel!=0xff)
+	{
+	//	UINT8 bf7segdata = BITSWAP8(data,7,6,5,4,3,2,1,0);
+		output_set_digit_value(m_credsel+8, data);
+	}
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port0e_out_w)
@@ -211,9 +329,13 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0e_out_w)
 
 }
 
-WRITE8_MEMBER(ecoinfr_state::ec_port0f_out_w)
+WRITE8_MEMBER(ecoinfr_state::ec_port0f_out_bank_segdata_w)
 {
-
+	if (m_banksel!=0xff)
+	{
+	//	UINT8 bf7segdata = BITSWAP8(data,7,6,5,4,3,2,1,0);
+		output_set_digit_value(m_banksel, data);
+	}
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port10_out_w)
@@ -377,14 +499,14 @@ static ADDRESS_MAP_START( portmap, AS_IO, 8, ecoinfr_state )
 	AM_RANGE(0x05, 0x05) AM_WRITE(ec_port05_out_w) AM_READ_PORT("IN5")
 	AM_RANGE(0x06, 0x06) AM_WRITE(ec_port06_out_w) AM_READ_PORT("IN6")
 	AM_RANGE(0x07, 0x07) AM_WRITE(ec_port07_out_w) AM_READ_PORT("IN7")
-	AM_RANGE(0x08, 0x08) AM_WRITE(ec_port08_out_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(ec_port09_out_w) // 09 Reel Enables
+	AM_RANGE(0x08, 0x08) AM_WRITE(ec_port08_out_bank_strobe_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE(ec_port09_out_reelen_w) // 09 Reel Enables
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(ec_port0a_out_w) // 10 (Sound 1)
 	AM_RANGE(0x0b, 0x0b) AM_WRITE(ec_port0b_out_w) // 11 (Sound 2)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(ec_port0c_out_w)
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(ec_port0d_out_w)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(ec_port0e_out_w)
-	AM_RANGE(0x0f, 0x0f) AM_WRITE(ec_port0f_out_w)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(ec_port0c_out_cred_strobe_w)
+	AM_RANGE(0x0d, 0x0d) AM_WRITE(ec_port0d_out_cred_data_w)
+//	AM_RANGE(0x0e, 0x0e) AM_WRITE(ec_port0e_out_w)
+	AM_RANGE(0x0f, 0x0f) AM_WRITE(ec_port0f_out_bank_segdata_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(ec_port10_out_w) // 16 (Meter)
 	AM_RANGE(0x11, 0x11) AM_WRITE(ec_port11_out_w) // SEC
 	AM_RANGE(0x12, 0x12) AM_WRITE(ec_port12_out_w) // SEC
@@ -398,16 +520,19 @@ ADDRESS_MAP_END
 
 CUSTOM_INPUT_MEMBER(ecoinfr_state::ecoinfr_reel1_opto_r)
 {
+	if (m_optic_pattern & 0x1) return 1;
 	return 0;
 }
 
 CUSTOM_INPUT_MEMBER(ecoinfr_state::ecoinfr_reel2_opto_r)
 {
+	if (m_optic_pattern & 0x2) return 1;
 	return 0;
 }
 
 CUSTOM_INPUT_MEMBER(ecoinfr_state::ecoinfr_reel3_opto_r)
 {
+	if (m_optic_pattern & 0x4) return 1;
 	return 0;
 }
 
@@ -644,6 +769,19 @@ void ecoinfr_state::machine_reset()
 	port17_value = 0x00;
 
 	irq_toggle = 0;
+
+	m_banksel = 0xff;
+	m_credsel = 0xff;
+
+}
+
+
+MACHINE_START_MEMBER(ecoinfr_state,ecoinfr)
+{
+	for ( int n = 0; n < 4; n++ )
+	{
+		stepper_config(machine(), n, &ecoin_interface_200step_reel);
+	}
 }
 
 static MACHINE_CONFIG_START( ecoinfr, ecoinfr_state )
@@ -652,6 +790,10 @@ static MACHINE_CONFIG_START( ecoinfr, ecoinfr_state )
 	MCFG_CPU_PROGRAM_MAP(memmap)
 	MCFG_CPU_IO_MAP(portmap)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ectimer", ecoinfr_state, ecoinfr_irq_timer, attotime::from_hz(250))
+
+	MCFG_DEFAULT_LAYOUT(layout_ecoinfr)
+
+	MCFG_MACHINE_START_OVERRIDE(ecoinfr_state, ecoinfr )
 
 	MCFG_I8251_ADD(UPD8251_TAG, default_i8251_interface)
 MACHINE_CONFIG_END
@@ -971,7 +1113,7 @@ EC_SBARX_SET( 199?, ec_sbarx__a1,	ec_sbarx,	"iss173.rom",							0x0000, 0x008000
 EC_SBARX_SET( 199?, ec_sbarx__a2,	ec_sbarx,	"iss2012.rom",							0x0000, 0x008000, CRC(455cfdcb) SHA1(53fb0748a544b432b88455fa597b7017e06b3059), "Electrocoin","Super Bar X (Electrocoin) (set 66)" )
 EC_SBARX_SET( 199?, ec_sbarx__a3,	ec_sbarx,	"sbx5red",								0x0000, 0x008000, CRC(7991231a) SHA1(cd1978c48a3c214666d51ca930d3d480540448ec), "Electrocoin","Super Bar X (Electrocoin) (set 67)" )
 EC_SBARX_SET( 199?, ec_sbarx__a4,	ec_sbarx,	"sbx8elac",								0x0000, 0x008000, CRC(102a3f38) SHA1(5f4f55904b00dde47e9841de313ed76a56e711df), "Electrocoin","Super Bar X (Electrocoin) (set 68)" )
-/* No Header, type 2 - closer to the BRUNEL sets but these make writes to the reel ports */
+/* No Header, type 2 - closer to the BRUNEL sets but these make writes to the reel ports */ // spin the reels a lot more than anything else
 EC_SBARX_SET( 199?, ec_sbarx__a5,	ec_sbarx,	"sbx5nc.10",							0x0000, 0x008000, CRC(beb7254a) SHA1(137e91e0b92d970d09d165a42b890a5d31d795d9), "Electrocoin","Super Bar X (Electrocoin) (set 69)" )
 EC_SBARX_SET( 199?, ec_sbarx__a6,	ec_sbarx,	"sbx5nc.20",							0x0000, 0x008000, CRC(0ceb3e29) SHA1(e96e1470292208825407ba64750121dd3c7bf857), "Electrocoin","Super Bar X (Electrocoin) (set 70)" )
 EC_SBARX_SET( 199?, ec_sbarx__a7,	ec_sbarx,	"sbxup",								0x0000, 0x008000, CRC(f8d7e9db) SHA1(7dea1f7215070a8a413af63d0e379b2e228e63d7), "Electrocoin","Super Bar X (Electrocoin) (set 71)" )

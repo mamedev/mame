@@ -4429,6 +4429,7 @@ src/mame/layout/dpoker.lay svneol=native#text/plain
 src/mame/layout/dragrace.lay svneol=native#text/plain
 src/mame/layout/drwho.lay svneol=native#text/plain
 src/mame/layout/ecoinf3.lay svneol=native#text/plain
+src/mame/layout/ecoinfr.lay svneol=native#text/plain
 src/mame/layout/eforest.lay svneol=native#text/plain
 src/mame/layout/elecyoyo.lay svneol=native#text/plain
 src/mame/layout/f1gpstar.lay svneol=native#text/plain
