@@ -629,8 +629,23 @@ INPUT_PORTS_END
 
 /*******************************************************/
 /*                                                     */
-/* bootleg "Space Attack II"                           */
+/* bootleg "Super Invaders (Zenitone-Microsec)"        */
 /*                                                     */
+/*******************************************************/
+
+static INPUT_PORTS_START( sinvzen )
+	PORT_INCLUDE( sicv )
+
+	PORT_MODIFY("IN2")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+INPUT_PORTS_END
+
+/*******************************************************/
+/*                                                     */
+/* bootleg "Space Attack II"                           */
+/* no cocktail mode, only has one controller           */
 /*******************************************************/
 
 static INPUT_PORTS_START( spaceatt )
@@ -4256,7 +4271,7 @@ GAMEL(1978, spcewars,   invaders, spcewars,  spcewars,  driver_device, 0, ROT270
 GAMEL(1978, spceking,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "Taito / Leijac Corporation", "Space King", GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1979, cosmicmo,   invaders, invaders,  cosmicmo,  driver_device, 0, ROT270, "Taito / Universal", "Cosmic Monsters", GAME_SUPPORTS_SAVE, layout_cosmicm ) // unclassified, licensed or bootleg?
 GAMEL(1979, cosmicm2,   invaders, invaders,  cosmicmo,  driver_device, 0, ROT270, "Taito / Universal", "Cosmic Monsters 2", GAME_SUPPORTS_SAVE, layout_cosmicm ) // unclassified, licensed or bootleg?
-GAMEL(1980?,sinvzen,    invaders, invaders,  spaceatt,  driver_device, 0, ROT270, "Taito / Zenitone-Microsec Ltd.", "Super Invaders (Zenitone-Microsec)", GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
+GAMEL(1980?,sinvzen,    invaders, invaders,  sinvzen,   driver_device, 0, ROT270, "Taito / Zenitone-Microsec Ltd.", "Super Invaders (Zenitone-Microsec)", GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1980, ultrainv,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "Taito / Konami", "Ultra Invaders", GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1978, spaceatt,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg (Video Games GmbH)", "Space Attack (bootleg of Space Invaders)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1980, spaceat2,   invaders, invaders,  spaceatt,  driver_device, 0, ROT270, "bootleg (Video Games UK)", "Space Attack II (bootleg of Super Invaders)", GAME_SUPPORTS_SAVE, layout_invaders ) // bootleg of Zenitone-Microsec Super Invaders
