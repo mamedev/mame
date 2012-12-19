@@ -26,14 +26,9 @@ const device_type PC9801_118 = &device_creator<pc9801_118_device>;
 
 READ8_MEMBER(pc9801_118_device::opn_porta_r)
 {
-	if(m_joy_sel == 0x80)
-		return ioport("OPNA_PA1")->read();
+	if(m_joy_sel & 0x80)
+		return ioport(m_joy_sel & 0x40 ? "OPN3_PA2" : "OPN3_PA1")->read();
 
-	if(m_joy_sel == 0xc0)
-		return ioport("OPNA_PA2")->read();
-
-//  0x81?
-//  printf("%02x\n",m_joy_sel);
 	return 0xff;
 }
 
@@ -83,7 +78,7 @@ machine_config_constructor pc9801_118_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 static INPUT_PORTS_START( pc9801_118 )
-	PORT_START("OPNA_PA1")
+	PORT_START("OPN3_PA1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("P1 Joystick Up")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("P1 Joystick Down")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("P1 Joystick Left")
@@ -92,7 +87,7 @@ static INPUT_PORTS_START( pc9801_118 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 2")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("OPNA_PA2")
+	PORT_START("OPN3_PA2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_NAME("P2 Joystick Up")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) PORT_NAME("P2 Joystick Down")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) PORT_NAME("P2 Joystick Left")
@@ -100,11 +95,26 @@ static INPUT_PORTS_START( pc9801_118 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Joystick Button 1")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Joystick Button 2")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+//	PORT_START("OPN_DSW")
+//	PORT_CONFNAME( 0x01, 0x01, "PC-9801-118: Port Base" )
+//	PORT_CONFSETTING(    0x00, "0x088" )
+//	PORT_CONFSETTING(    0x01, "0x188" )
 INPUT_PORTS_END
 
 ioport_constructor pc9801_118_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( pc9801_118 );
+}
+
+// RAM
+ROM_START( pc9801_118 )
+	ROM_REGION( 0x100000, "opn3", ROMREGION_ERASE00 )
+ROM_END
+
+const rom_entry *pc9801_118_device::device_rom_region() const
+{
+	return ROM_NAME( pc9801_118 );
 }
 
 //**************************************************************************
@@ -160,7 +170,8 @@ void pc9801_118_device::install_device(offs_t start, offs_t end, offs_t mask, of
 
 void pc9801_118_device::device_start()
 {
-	install_device(0x0188, 0x018f, 0, 0, read8_delegate(FUNC(pc9801_118_device::pc9801_118_r), this), write8_delegate(FUNC(pc9801_118_device::pc9801_118_w), this) );
+	UINT16 port_base = 0x100;//(ioport("OPN_DSW")->read() & 1) << 8;
+	install_device(port_base + 0x0088, port_base + 0x008f, 0, 0, read8_delegate(FUNC(pc9801_118_device::pc9801_118_r), this), write8_delegate(FUNC(pc9801_118_device::pc9801_118_w), this) );
 	install_device(0xa460, 0xa463, 0, 0, read8_delegate(FUNC(pc9801_118_device::pc9801_118_ext_r), this), write8_delegate(FUNC(pc9801_118_device::pc9801_118_ext_w), this) );
 }
 

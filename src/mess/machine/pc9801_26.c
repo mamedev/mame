@@ -21,16 +21,12 @@
 const device_type PC9801_26 = &device_creator<pc9801_26_device>;
 
 
+
 READ8_MEMBER(pc9801_26_device::opn_porta_r)
 {
-	if(m_joy_sel == 0x80)
-		return ioport("OPN_PA1")->read();
+	if(m_joy_sel & 0x80)
+		return ioport(m_joy_sel & 0x40 ? "OPN_PA2" : "OPN_PA1")->read();
 
-	if(m_joy_sel == 0xc0)
-		return ioport("OPN_PA2")->read();
-
-//  0x81?
-//  printf("%02x\n",m_joy_sel);
 	return 0xff;
 }
 
@@ -87,7 +83,8 @@ static INPUT_PORTS_START( pc9801_26 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("P1 Joystick Right")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 1")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 2")
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("OPN_PA2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_NAME("P2 Joystick Up")
@@ -96,7 +93,13 @@ static INPUT_PORTS_START( pc9801_26 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) PORT_NAME("P2 Joystick Right")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Joystick Button 1")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Joystick Button 2")
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+//	PORT_START("OPN_DSW")
+//	PORT_CONFNAME( 0x01, 0x01, "PC-9801-26: Port Base" )
+//	PORT_CONFSETTING(    0x00, "0x088" )
+//	PORT_CONFSETTING(    0x01, "0x188" )
 INPUT_PORTS_END
 
 ioport_constructor pc9801_26_device::device_input_ports() const
@@ -157,7 +160,8 @@ void pc9801_26_device::install_device(offs_t start, offs_t end, offs_t mask, off
 
 void pc9801_26_device::device_start()
 {
-	install_device(0x0188, 0x018b, 0, 0, read8_delegate(FUNC(pc9801_26_device::pc9801_26_r), this), write8_delegate(FUNC(pc9801_26_device::pc9801_26_w), this) );
+	UINT16 port_base = 0x100;//(ioport("OPN_DSW")->read() & 1) << 8;
+	install_device(port_base + 0x0088, port_base + 0x008b, 0, 0, read8_delegate(FUNC(pc9801_26_device::pc9801_26_r), this), write8_delegate(FUNC(pc9801_26_device::pc9801_26_w), this) );
 }
 
 
