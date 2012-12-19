@@ -311,10 +311,12 @@
 ****************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i86/i86.h"
 #include "cpu/nec/nec.h"
 #include "cpu/i86/i286.h"
 #include "cpu/i386/i386.h"
+
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/am9517a.h"
@@ -322,12 +324,22 @@
 #include "machine/upd765.h"
 #include "machine/upd1990a.h"
 #include "machine/i8251.h"
+
+#include "machine/s1410.h"
+#include "machine/scsibus.h"
+#include "machine/scsicb.h"
+#include "machine/scsihd.h"
+
 #include "sound/beep.h"
 #include "sound/speaker.h"
 #include "sound/2608intf.h"
+
 #include "video/upd7220.h"
+
 #include "machine/ram.h"
+
 #include "formats/pc98fdi_dsk.h"
+
 #include "machine/pc9801_26.h"
 #include "machine/pc9801_86.h"
 #include "machine/pc9801_118.h"
@@ -336,6 +348,7 @@
 
 #define UPD1990A_TAG "upd1990a"
 #define UPD8251_TAG  "upd8251"
+#define SASIBUS_TAG	 "sasi"
 
 class pc9801_state : public driver_device
 {
@@ -350,8 +363,7 @@ public:
 		m_sio(*this, UPD8251_TAG),
 		m_hgdc1(*this, "upd7220_chr"),
 		m_hgdc2(*this, "upd7220_btm"),
-//		m_opn(*this, "opn"),
-//      m_opna(*this, "opna"),
+		m_sasibus(*this, SASIBUS_TAG ":host"),
 		m_video_ram_1(*this, "video_ram_1"),
 		m_video_ram_2(*this, "video_ram_2"){ }
 
@@ -363,9 +375,7 @@ public:
 	required_device<i8251_device> m_sio;
 	required_device<upd7220_device> m_hgdc1;
 	required_device<upd7220_device> m_hgdc2;
-//	required_device<ym2203_device> m_opn;
-//  optional_device<ym2608_device> m_opna;
-
+	optional_device<scsicb_device> m_sasibus;
 	required_shared_ptr<UINT8> m_video_ram_1;
 	required_shared_ptr<UINT8> m_video_ram_2;
 
@@ -470,8 +480,17 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9801rs_mouse_freq_w);
 	inline UINT8 m_pc9801rs_grcg_r(UINT32 offset,int vbank);
 	inline void m_pc9801rs_grcg_w(UINT32 offset,int vbank,UINT8 data);
-	DECLARE_READ8_MEMBER(pc9801_opn_r);
-	DECLARE_WRITE8_MEMBER(pc9801_opn_w);
+
+	DECLARE_WRITE8_MEMBER(sasi_data_w);
+	DECLARE_WRITE_LINE_MEMBER(sasi_io_w);
+	DECLARE_READ8_MEMBER( sasi_status_r );
+	DECLARE_WRITE8_MEMBER( sasi_ctrl_w );
+
+	struct{
+		UINT8 data_out;
+		UINT8 ctrl;
+	}m_sasi;
+
 	DECLARE_READ8_MEMBER(pc9801rs_wram_r);
 	DECLARE_WRITE8_MEMBER(pc9801rs_wram_w);
 	DECLARE_READ8_MEMBER(pc9801rs_ex_wram_r);
@@ -1623,6 +1642,86 @@ WRITE8_MEMBER(pc9801_state::pc9801_mouse_w)
 	}
 }
 
+WRITE8_MEMBER( pc9801_state::sasi_data_w )
+{
+	m_sasi.data_out = data;
+
+	if( !m_sasibus->scsi_io_r() )
+	{
+		m_sasibus->scsi_data_w( data );
+	}
+}
+
+WRITE_LINE_MEMBER( pc9801_state::sasi_io_w )
+{
+	if( !state )
+	{
+		m_sasibus->scsi_data_w( m_sasi.data_out );
+	}
+	else
+	{
+		m_sasibus->scsi_data_w( 0 );
+	}
+}
+
+#include "debugger.h"
+
+READ8_MEMBER( pc9801_state::sasi_status_r )
+{
+	UINT8 res = 0;
+
+	if(m_sasi.ctrl & 0x40) // read status
+	{
+	/*
+		x--- -.-- REQ
+		-x-- ---- ACK
+		--x- ---- BSY
+		---x ---- MSG
+		---- x--- CD
+		---- -x-- IO
+		---- ---x INT?
+    */
+//		res |= m_sasibus->scsi_cd_r() << 0;
+		res |= m_sasibus->scsi_io_r() << 2;
+		res |= m_sasibus->scsi_cd_r() << 3;
+		res |= m_sasibus->scsi_msg_r() << 4;
+		res |= m_sasibus->scsi_bsy_r() << 5;
+		res |= m_sasibus->scsi_ack_r() << 6;
+		res |= m_sasibus->scsi_req_r() << 7;
+	}
+	else // read drive info
+	{
+/*
+		xx-- ---- unknown but tested
+		--xx x--- SASI-1 media type
+		---- -xxx SASI-2 media type
+*/
+		res |= 7 << 3; // read mediatype SASI-1
+		res |= 7;	// read mediatype SASI-2
+	}
+
+	return res;
+}
+
+WRITE8_MEMBER( pc9801_state::sasi_ctrl_w )
+{
+	/*
+		---- ----
+		---- x--- reset line
+    */
+
+	if(m_sasi.ctrl & 8 && ((data & 8) == 0)) // 1 -> 0 transition
+	{
+		m_sasibus->scsi_rst_w(1);
+//		m_timer_rst->adjust(attotime::from_nsec(100));
+	}
+	else
+		m_sasibus->scsi_rst_w(0); // TODO
+
+	m_sasi.ctrl = data;
+
+//	m_sasibus->scsi_sel_w(BIT(data, 0));
+}
 
 static ADDRESS_MAP_START( pc9801_map, AS_PROGRAM, 16, pc9801_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM //work RAM
@@ -1647,7 +1746,9 @@ static ADDRESS_MAP_START( pc9801_io, AS_IO, 16, pc9801_state )
 	AM_RANGE(0x0068, 0x0069) AM_WRITE8(pc9801_video_ff_w,0xffff) //mode FF / <undefined>
 //  AM_RANGE(0x006c, 0x006f) border color / <undefined>
 	AM_RANGE(0x0070, 0x007b) AM_READWRITE8(pc9801_70_r,pc9801_70_w,0xffff) //display registers / i8253 pit
-	AM_RANGE(0x0080, 0x0083) AM_READWRITE8(pc9801_sasi_r,pc9801_sasi_w,0xffff) //HDD SASI interface / <undefined>
+//	AM_RANGE(0x0080, 0x0083) AM_READWRITE8(pc9801_sasi_r,pc9801_sasi_w,0xffff) //HDD SASI interface / <undefined>
+	AM_RANGE(0x0080, 0x0081) AM_DEVREAD8(SASIBUS_TAG ":host", scsicb_device, scsi_data_r, 0x00ff) AM_WRITE8(sasi_data_w, 0x00ff)
+	AM_RANGE(0x0082, 0x0083) AM_READWRITE8(sasi_status_r, sasi_ctrl_w,0x00ff)
 	AM_RANGE(0x0090, 0x0097) AM_READWRITE8(pc9801_fdc_2hd_r,pc9801_fdc_2hd_w,0xffff) //upd765a 2hd / cmt
 	AM_RANGE(0x00a0, 0x00af) AM_READWRITE8(pc9801_a0_r,pc9801_a0_w,0xffff) //upd7220 bitmap ports / display registers
 	AM_RANGE(0x00c8, 0x00cd) AM_READWRITE8(pc9801_fdc_2dd_r,pc9801_fdc_2dd_w,0xffff) //upd765a 2dd / <undefined>
@@ -3594,6 +3695,13 @@ static MACHINE_CONFIG_FRAGMENT( pc9801_cbus )
 //	TODO: six max slots
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_FRAGMENT( pc9801_sasi )
+	MCFG_SCSIBUS_ADD(SASIBUS_TAG)
+	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":harddisk0", S1410, SCSI_ID_0) // TODO: correct one, perhaps ttl
+	MCFG_SCSICB_ADD(SASIBUS_TAG ":host")
+	MCFG_SCSICB_IO_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, pc9801_state, sasi_io_w))
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_CPU_ADD("maincpu", I8086, 5000000) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9801_map)
@@ -3612,6 +3720,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
 	MCFG_FRAGMENT_ADD(pc9801_mouse)
 	MCFG_FRAGMENT_ADD(pc9801_cbus)
+	MCFG_FRAGMENT_ADD(pc9801_sasi)
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc9801_upd1990a_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
 
