@@ -141,6 +141,7 @@ EMUDRIVEROBJS = \
 	$(EMUDRIVERS)/testcpu.o \
 
 EMUMACHINEOBJS = \
+	$(EMUMACHINE)/53c7xx.o		\
 	$(EMUMACHINE)/53c810.o		\
 	$(EMUMACHINE)/6522via.o		\
 	$(EMUMACHINE)/6525tpi.o		\
