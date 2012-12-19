@@ -3275,6 +3275,7 @@ src/mame/drivers/rainbow.c svneol=native#text/plain
 src/mame/drivers/rallyx.c svneol=native#text/plain
 src/mame/drivers/rampart.c svneol=native#text/plain
 src/mame/drivers/rastan.c svneol=native#text/plain
+src/mame/drivers/rastersp.c svneol=native#text/plain
 src/mame/drivers/rbmk.c svneol=native#text/plain
 src/mame/drivers/rcorsair.c svneol=native#text/plain
 src/mame/drivers/re900.c svneol=native#text/plain
