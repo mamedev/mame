@@ -10,7 +10,7 @@ ToDo:
 - Can coin up but not start
 - Doesn't react to the Advance button very well
 - Some LEDs flicker
-- Diagnostic LED flips between 7 and 0 regularly
+- Diagnostic LED blinks constantly
 
 *****************************************************************************************/
 
@@ -304,11 +304,12 @@ READ_LINE_MEMBER( s11a_state::pia28_cb1_r )
 
 WRITE8_MEMBER( s11a_state::dig0_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	data &= 0x7f;
 	m_strobe = data & 15;
 	m_diag = (data & 0x70) >> 4;
-	output_set_digit_value(60, patterns[m_diag]); // diag digit
+	output_set_digit_value(60, 0);  // not connected to PA5 or PA6?
+	output_set_digit_value(61, m_diag & 0x01);  // connected to PA4
+	output_set_digit_value(62, 0);
 	m_segment1 = 0;
 	m_segment2 = 0;
 }
