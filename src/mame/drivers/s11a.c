@@ -7,8 +7,10 @@
 
 
 ToDo:
-- Determine what drives the background sound (atm it's a guess)
 - Can coin up but not start
+- Doesn't react to the Advance button very well
+- Some LEDs flicker
+- Diagnostic LED flips between 7 and 0 regularly
 
 *****************************************************************************************/
 
@@ -66,6 +68,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
 	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
+	DECLARE_READ8_MEMBER(pia28_w7_r);
 	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
@@ -98,24 +101,24 @@ protected:
 	required_device<pia6821_device> m_pia34;
 	required_device<pia6821_device> m_pia40;
 private:
-	UINT8 m_t_c;
 	UINT8 m_sound_data;
 	UINT8 m_strobe;
 	UINT8 m_kbdrow;
+	UINT8 m_diag;
 	UINT32 m_segment1;
 	UINT32 m_segment2;
 	bool m_ca1;
 };
 
 static ADDRESS_MAP_START( s11a_main_map, AS_PROGRAM, 8, s11a_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2100, 0x2103) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
-	AM_RANGE(0x2200, 0x2200) AM_WRITE(sol3_w) // solenoids
-	AM_RANGE(0x2400, 0x2403) AM_DEVREADWRITE("pia24", pia6821_device, read, write) // lamps
-	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("pia28", pia6821_device, read, write) // display
-	AM_RANGE(0x2c00, 0x2c03) AM_DEVREADWRITE("pia2c", pia6821_device, read, write) // alphanumeric display
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("pia30", pia6821_device, read, write) // inputs
-	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE("pia34", pia6821_device, read, write) // widget
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x2100, 0x2103) AM_MIRROR(0x00fc) AM_DEVREADWRITE("pia21", pia6821_device, read, write) // sound+solenoids
+	AM_RANGE(0x2200, 0x2200) AM_MIRROR(0x01ff) AM_WRITE(sol3_w) // solenoids
+	AM_RANGE(0x2400, 0x2403) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia24", pia6821_device, read, write) // lamps
+	AM_RANGE(0x2800, 0x2803) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia28", pia6821_device, read, write) // display
+	AM_RANGE(0x2c00, 0x2c03) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia2c", pia6821_device, read, write) // alphanumeric display
+	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x03fc) AM_DEVREADWRITE("pia30", pia6821_device, read, write) // inputs
+	AM_RANGE(0x3400, 0x3403) AM_MIRROR(0x0bfc) AM_DEVREADWRITE("pia34", pia6821_device, read, write) // widget
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -209,11 +212,13 @@ static INPUT_PORTS_START( s11a )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, s11a_state, main_nmi, 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Advance") PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_9)
+	PORT_CONFNAME( 0x10, 0x10, "Language" )
+	PORT_CONFSETTING( 0x00, "German" )
+	PORT_CONFSETTING( 0x10, "English" )
 INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER( s11a_state, s11a )
 {
-	m_t_c = 0;
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);
 }
@@ -289,12 +294,12 @@ static const pia6821_interface pia24_intf =
 
 READ_LINE_MEMBER( s11a_state::pia28_ca1_r )
 {
-	return BIT(ioport("DIAGS")->read(), 2); // advance button
+	return BIT(ioport("DIAGS")->read(), 2) ? 1 : 0; // advance button
 }
 
 READ_LINE_MEMBER( s11a_state::pia28_cb1_r )
 {
-	return BIT(ioport("DIAGS")->read(), 3); // up/down switch
+	return BIT(ioport("DIAGS")->read(), 3) ? 1 : 0; // up/down switch
 }
 
 WRITE8_MEMBER( s11a_state::dig0_w )
@@ -302,7 +307,8 @@ WRITE8_MEMBER( s11a_state::dig0_w )
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	data &= 0x7f;
 	m_strobe = data & 15;
-	output_set_digit_value(60, patterns[data>>4]); // diag digit
+	m_diag = (data & 0x70) >> 4;
+	output_set_digit_value(60, patterns[m_diag]); // diag digit
 	m_segment1 = 0;
 	m_segment2 = 0;
 }
@@ -318,9 +324,22 @@ WRITE8_MEMBER( s11a_state::dig1_w )
 	}
 }
 
+READ8_MEMBER( s11a_state::pia28_w7_r)
+{
+	UINT8 ret = 0x80;
+
+	ret |= m_strobe;
+	ret |= m_diag << 4;
+
+	if(BIT(ioport("DIAGS")->read(), 4))  // W7 Jumper
+		ret &= ~0x80;
+
+	return ret;
+}
+
 static const pia6821_interface pia28_intf =
 {
-	DEVCB_NULL,		/* port A in */
+	DEVCB_DRIVER_MEMBER(s11a_state, pia28_w7_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
 	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia28_ca1_r),		/* line CA1 in */
 	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia28_cb1_r),		/* line CB1 in */
@@ -517,20 +536,15 @@ DRIVER_INIT_MEMBER( s11a_state, s11a )
 
 TIMER_DEVICE_CALLBACK_MEMBER( s11a_state::irq)
 {
-	if (m_t_c > 0x70)
-	{
-		m_maincpu->set_input_line(M6800_IRQ_LINE, ASSERT_LINE);
-		m_pias->cb1_w(0);
-	}
-	else
-		m_t_c++;
+	m_maincpu->set_input_line(M6800_IRQ_LINE, HOLD_LINE);
+	m_pias->cb1_w(0);
 }
 
 static MACHINE_CONFIG_START( s11a, s11a_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 4000000)
+	MCFG_CPU_ADD("maincpu", M6802, 4000000)
 	MCFG_CPU_PROGRAM_MAP(s11a_main_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s11a_state, irq, attotime::from_hz(250))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s11a_state, irq, attotime::from_hz(1000))
 	MCFG_MACHINE_RESET_OVERRIDE(s11a_state, s11a)
 
 	/* Video */
@@ -591,7 +605,7 @@ ROM_START(f14_p3)
 	ROM_LOAD("f14_u22.l1", 0x10000, 0x8000, CRC(c9dd7496) SHA1(de3cb855d87033274cc912578b02d1593d2d69f9))
 
 	ROM_REGION(0x20000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("f14_u4.l1", 0x00000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
+	ROM_LOAD("f14_u4.l1", 0x08000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
 	ROM_LOAD("f14_u19.l1", 0x10000, 0x8000, CRC(d0de4a7c) SHA1(46ecd5786653add47751cc56b38d9db7c4622377))
 ROM_END
 
@@ -605,7 +619,7 @@ ROM_START(f14_p4)
 	ROM_LOAD("f14_u22.l1", 0x10000, 0x8000, CRC(c9dd7496) SHA1(de3cb855d87033274cc912578b02d1593d2d69f9))
 
 	ROM_REGION(0x20000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("f14_u4.l1", 0x00000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
+	ROM_LOAD("f14_u4.l1", 0x08000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
 	ROM_LOAD("f14_u19.l1", 0x10000, 0x8000, CRC(d0de4a7c) SHA1(46ecd5786653add47751cc56b38d9db7c4622377))
 ROM_END
 
@@ -619,7 +633,7 @@ ROM_START(f14_l1)
 	ROM_LOAD("f14_u22.l1", 0x10000, 0x8000, CRC(c9dd7496) SHA1(de3cb855d87033274cc912578b02d1593d2d69f9))
 
 	ROM_REGION(0x20000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("f14_u4.l1", 0x00000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
+	ROM_LOAD("f14_u4.l1", 0x08000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
 	ROM_LOAD("f14_u19.l1", 0x10000, 0x8000, CRC(d0de4a7c) SHA1(46ecd5786653add47751cc56b38d9db7c4622377))
 ROM_END
 
@@ -656,7 +670,7 @@ ROM_START(milln_l3)
 	ROM_LOAD("mill_u22.l1", 0x10000, 0x8000, CRC(73735cfc) SHA1(f74c873a20990263e0d6b35609fc51c08c9f8e31))
 
 	ROM_REGION(0x20000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("mill_u4.l1", 0x00000, 0x8000, CRC(cf766506) SHA1(a6e4df19a513102abbce2653d4f72245f54407b1))
+	ROM_LOAD("mill_u4.l1", 0x08000, 0x8000, CRC(cf766506) SHA1(a6e4df19a513102abbce2653d4f72245f54407b1))
 	ROM_LOAD("mill_u19.l1", 0x10000, 0x8000, CRC(e073245a) SHA1(cbaddde6bb19292ace574a8329e18c97c2ee9763))
 ROM_END
 
@@ -673,7 +687,7 @@ ROM_START(pb_l5)
 	ROM_LOAD("pbot_u22.l1", 0x10000, 0x8000, CRC(a2d2c9cb) SHA1(46437dc54538f1626caf41a2818ddcf8000c44e4))
 
 	ROM_REGION(0x20000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("pbot_u4.l1", 0x00000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
+	ROM_LOAD("pbot_u4.l1", 0x08000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
 	ROM_LOAD("pbot_u19.l1", 0x10000, 0x8000, CRC(40eb4e9f) SHA1(07b0557b35599a2dd5aa66a306fbbe8f50eed998))
 ROM_END
 
@@ -687,7 +701,7 @@ ROM_START(pb_l2)
 	ROM_LOAD("pbot_u22.l1", 0x10000, 0x8000, CRC(a2d2c9cb) SHA1(46437dc54538f1626caf41a2818ddcf8000c44e4))
 
 	ROM_REGION(0x20000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("pbot_u4.l1", 0x00000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
+	ROM_LOAD("pbot_u4.l1", 0x08000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
 	ROM_LOAD("pbot_u19.l1", 0x10000, 0x8000, CRC(40eb4e9f) SHA1(07b0557b35599a2dd5aa66a306fbbe8f50eed998))
 ROM_END
 
@@ -701,7 +715,7 @@ ROM_START(pb_l3)
 	ROM_LOAD("pbot_u22.l1", 0x10000, 0x8000, CRC(a2d2c9cb) SHA1(46437dc54538f1626caf41a2818ddcf8000c44e4))
 
 	ROM_REGION(0x20000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("pbot_u4.l1", 0x00000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
+	ROM_LOAD("pbot_u4.l1", 0x08000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
 	ROM_LOAD("pbot_u19.l1", 0x10000, 0x8000, CRC(40eb4e9f) SHA1(07b0557b35599a2dd5aa66a306fbbe8f50eed998))
 ROM_END
 

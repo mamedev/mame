@@ -101,10 +101,10 @@ protected:
 	required_device<pia6821_device> m_pia34;
 	required_device<pia6821_device> m_pia40;
 private:
-	UINT8 m_t_c;
 	UINT8 m_sound_data;
 	UINT8 m_strobe;
 	UINT8 m_kbdrow;
+	UINT8 m_diag;
 	UINT32 m_segment1;
 	UINT32 m_segment2;
 	bool m_ca1;
@@ -212,14 +212,13 @@ static INPUT_PORTS_START( s11 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Main Diag") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, s11_state, main_nmi, 1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Advance") PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_9) PORT_TOGGLE
-	PORT_CONFNAME( 0x10, 0x00, "Language" )
+	PORT_CONFNAME( 0x10, 0x10, "Language" )
 	PORT_CONFSETTING( 0x00, "German" )
 	PORT_CONFSETTING( 0x10, "English" )
 INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER( s11_state, s11 )
 {
-	m_t_c = 0;
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);
 }
@@ -308,6 +307,7 @@ WRITE8_MEMBER( s11_state::dig0_w )
 	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	data &= 0x7f;
 	m_strobe = data & 15;
+	m_diag = (data & 0x70) >> 4;
 	output_set_digit_value(60, patterns[data>>4]); // diag digit
 	m_segment1 = 0;
 	m_segment2 = 0;
@@ -326,9 +326,15 @@ WRITE8_MEMBER( s11_state::dig1_w )
 
 READ8_MEMBER( s11_state::pia28_w7_r)
 {
+	UINT8 ret = 0x80;
+
+	ret |= m_strobe;
+	ret |= m_diag << 4;
+
 	if(BIT(ioport("DIAGS")->read(), 4))  // W7 Jumper
-		return 0x00;
-	return 0x80;
+		ret &= ~0x80;
+
+	return ret;
 }
 
 static const pia6821_interface pia28_intf =
@@ -538,20 +544,15 @@ DRIVER_INIT_MEMBER( s11_state, s11 )
 
 TIMER_DEVICE_CALLBACK_MEMBER( s11_state::irq)
 {
-	if (m_t_c > 0x70)
-	{
-		m_maincpu->set_input_line(M6800_IRQ_LINE, ASSERT_LINE);
-		m_pias->cb1_w(0);
-	}
-	else
-		m_t_c++;
+	m_maincpu->set_input_line(M6800_IRQ_LINE, HOLD_LINE);
+	m_pias->cb1_w(0);
 }
 
 static MACHINE_CONFIG_START( s11, s11_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, 4000000)
+	MCFG_CPU_ADD("maincpu", M6802, 4000000)
 	MCFG_CPU_PROGRAM_MAP(s11_main_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s11_state, irq, attotime::from_hz(500))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", s11_state, irq, attotime::from_hz(1000))
 	MCFG_MACHINE_RESET_OVERRIDE(s11_state, s11)
 
 	/* Video */
