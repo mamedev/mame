@@ -891,6 +891,38 @@ WRITE8_MEMBER(pacman_state::superabc_bank_w)
   In a further attempt to thwart copying, the aux board ROMs have a simple encryption scheme: their address and data
   lines are bit flipped (i.e., wired in a nonstandard fashion). The specific bit flips were selected to minimize the
   vias required to lay out the aux PCB.
+
+
+  History  (Originally contributed by Steve Golson of GCC, one of the original Developers of Ms. Pac-Man, with some
+  -------   minor modifications to address availability of data.)
+
+  During the summer of 1981, General Computer Corp. of Massachusetts developed a game called Crazy Otto. This game was
+  intended to be sold as an enhancement kit for Pac-Man cabinets. The main character Crazy Otto had legs and blue
+  eyes. Also the monsters have blue feet and antennae that bob up and down. New game play, mazes, music, and sounds were
+  developed. Several new bonus characters (fruit) were added. Otto and his female counterpart appeared in three new
+  animations, culminating in the arrival of JUNIOR, a baby Crazy Otto.
+
+  In October 1981 this game was licensed to Midway, who owned the North American rights to produce Pac-Man. With Midway
+  producing the game, the original Pac-Man character and name could be used. At first the game was called Super Pac-Man,
+  but eventually the decision was made to use the female character as the protagonist, resulting in Ms. Pac-Man.
+
+  The only differences between Crazy Otto and the final production Ms. Pac-Man are the characters themselves and related
+  text strings. Game play, mazes, colors, fruits, sounds, music, animations are unchanged from original GCC Crazy Otto.
+  Also the "marquee" attract mode was added to include the Midway logo and copyright string.
+
+  The ROMs from several prototype versions of Crazy Otto have been recovered, documented and archived since that time but
+  as of now are not available outside of the occasional public viewing and playing of a modified upright Ms. Pac-Man machine
+  at a gaming convention, exposition or specific special industry events.
+
+  Information shared regarding the known prototypes indicates they are dated from 10/12/81, 10/20/81 and 10/29/81.  Also
+  two prototype versions of Super Pac-Man, one with old Pac-Man monsters and one with new Crazy Otto monsters are both
+  dated 10/29/81.
+
+  Early prototypes - those dated 10/12/81 and 10/20/81 - do not use the Ms. Pac-Man code patch scheme outlined above.
+  Instead, all four Pac-Man ROMs are replaced, and one or two additional ROMs are provided at addresses above 0x8000.
+
+  Later prototypes - those dated 10/29/81 - use the patch hardware, however the latch set/clear function is not implemented.
+  Furthermore the ROM encryption bit flip is not used.
 */
 
 #define mspacman_enable_decode_latch(m)  m.root_device().membank("bank1")->set_entry(1)
