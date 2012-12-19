@@ -97,6 +97,7 @@
     - Quarth: should do a split screen effect, it doesn't hence there are broken gfxs
     - Quarth: uploads a PCG charset
     - Runner's High: wrong double height on the title screen;
+	- Sorcerian, Twilight Zone 3: Fails initial booting, issue with 2dd irq?
     - Uchiyama Aki no Chou Bangai: keyboard irq is fussy (sometimes it doesn't register a key press);
     - Uno: uses EGC
 
@@ -1973,8 +1974,8 @@ WRITE8_MEMBER(pc9801_state::pc9810rs_fdc_ctrl_w)
     ---- ---x select irq
     */
 
-//  machine().device<floppy_connector>("upd765_2hd:0")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
-//  machine().device<floppy_connector>("upd765_2hd:1")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
+	machine().device<floppy_connector>("upd765_2hd:0")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
+	machine().device<floppy_connector>("upd765_2hd:1")->get_device()->set_rpm(data & 0x02 ? 360 : 300);
 
 	machine().device<upd765a_device>("upd765_2hd")->set_rate(data & 0x02 ? 500000 : 250000);
 
