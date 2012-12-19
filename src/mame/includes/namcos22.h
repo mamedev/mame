@@ -226,6 +226,7 @@ public:
 	DECLARE_READ8_MEMBER(tokyowar_mcu_adc_r);
 	DECLARE_READ8_MEMBER(aquajet_mcu_adc_r);
 	DECLARE_READ8_MEMBER(airco22_mcu_adc_r);
+	DECLARE_READ8_MEMBER(adillor_mcu_adc_r);
 	DECLARE_READ8_MEMBER(mcu_port4_s22_r);
 	DECLARE_READ16_MEMBER(mcu141_speedup_r);
 	DECLARE_WRITE16_MEMBER(mcu_speedup_w);

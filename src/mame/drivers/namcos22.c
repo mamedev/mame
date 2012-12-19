@@ -151,15 +151,14 @@
  * Alpine Racer 2   (C) Namco, 1996
  * Alpine Surfer    (C) Namco, 1996
  * Aqua Jet         (C) Namco, 1996
- * *Armadillo Racing(C) Namco, 1997
+ * Armadillo Racing (C) Namco, 1996
  * Cyber Cycles     (C) Namco, 1995
  * Dirt Dash        (C) Namco, 1995
  * Prop Cycle       (C) Namco, 1996
  * Time Crisis      (C) Namco, 1995
  * Tokyo Wars       (C) Namco, 1996
  *
- * * - denotes not available. If you can help with the remaining undumped SS22 game other other revisions of the
- *     dumped games, please contact http://guru.mameworld.info/
+ * If you can help with other revisions of the dumped games, please contact http://guru.mameworld.info/
  *
  * The Namco Super System 22 System comprises 4 PCB's plugged into a motherboard. The motherboard contains only
  * some slots and connectors. The 4 PCB's are housed in a metal box with a large fan on the side. The fan mostly cools
@@ -354,7 +353,7 @@
  *                           Alpine Racer     'AR2 Ver.C'
  *                           Alpine Racer     'AR2 Ver.D'
  *                           Aqua Jet         'AJ2 Ver.B'
- *                           Armadillo Racing 'AR' Ver.?
+ *                           Armadillo Racing 'AM1 Ver.A
  *                           Cyber Cycles     'CB2 Ver.C'
  *                           Prop Cycle       'PR2 Ver.A'
  *                           Time Crisis      'TS2 Ver.B'
@@ -2342,7 +2341,6 @@ Cyber Commando:
 */
 INTERRUPT_GEN_MEMBER(namcos22_state::namcos22_interrupt)
 {
-
 	switch( m_gametype )
 	{
 		case NAMCOS22_RIDGE_RACER:
@@ -2709,7 +2707,6 @@ TIMER_CALLBACK_MEMBER(namcos22_state::alpine_steplock_callback)
 
 WRITE8_MEMBER(namcos22_state::alpine_mcu_port5_w)
 {
-
 	// bits 1+2 are steplock motor outputs
 	if ((data & 6) == 6)
 	{
@@ -2866,6 +2863,12 @@ READ8_MEMBER(namcos22_state::aquajet_mcu_adc_r)
 		default:
 			return 0;
 	}
+}
+
+READ8_MEMBER(namcos22_state::adillor_mcu_adc_r)
+{
+	// unused
+	return 0;
 }
 
 READ8_MEMBER(namcos22_state::airco22_mcu_adc_r)
@@ -5068,6 +5071,48 @@ static INPUT_PORTS_START( aquajet )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END /* Aqua Jet */
 
+static INPUT_PORTS_START( adillor )
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x01, 0x01, "DIP4-1 (Test Mode)" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "DIP4-2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "DIP4-3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "DIP4-4" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "DIP4-5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "DIP4-6" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "DIP4-7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "DIP4-8" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("MCUP5A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("MCUP5B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END /* Armadillo Racing */
+
 static INPUT_PORTS_START( propcycl )
 	PORT_START("DSW0")	/* DIP4 */
 	PORT_DIPNAME( 0x01, 0x01, "DIP1" )
@@ -5707,7 +5752,7 @@ DRIVER_INIT_MEMBER(namcos22_state,aquajet)
 DRIVER_INIT_MEMBER(namcos22_state,adillor)
 {
 	namcos22_init(machine(), NAMCOS22_ARMADILLO_RACING);
-	m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::aquajet_mcu_adc_r),this));
+	m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::adillor_mcu_adc_r),this));
 	install_141_speedup(machine());
 
 	m_keycus_id = 0x59b7;
@@ -5725,35 +5770,35 @@ DRIVER_INIT_MEMBER(namcos22_state,dirtdash)
 
 /************************************************************************************/
 
-/*     YEAR, NAME,    PARENT,    MACHINE,   INPUT,    INIT,     MNTR,  COMPANY, FULLNAME,                                    FLAGS */
+/*     YEAR, NAME,    PARENT,    MACHINE,   INPUT,     INIT,                     MNTR,  COMPANY, FULLNAME, FLAGS */
 /* System22 games */
-GAME( 1993, ridgerac,  0,        namcos22,  ridgera, namcos22_state,  ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR3, World)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 1994-01-17
-GAME( 1993, ridgerac3, ridgerac, namcos22,  ridgera, namcos22_state,  ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR2 Ver.B, World, 3-screen?)", GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 1993-10-28, no indication that this really is a 3-screen version.
-GAME( 1993, ridgeracb, ridgerac, namcos22,  ridgera, namcos22_state,  ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR2, World)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 1993-10-07
-GAME( 1993, ridgeracj, ridgerac, namcos22,  ridgera, namcos22_state,  ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR1, Japan)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 1993-10-07
-GAME( 1993, ridgeracf, ridgerac, namcos22,  ridgeracf, namcos22_state,ridgeraj, ROT0, "Namco", "Ridge Racer Full Scale (World)"            , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 1993-12-13, very different version, incomplete dump.
-GAME( 1994, ridgera2,  0,        namcos22,  ridgera2, namcos22_state, ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS2, World)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 1994-06-21
-GAME( 1994, ridgera2j, ridgera2, namcos22,  ridgera2, namcos22_state, ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1 Ver.B, Japan)"    , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 1994-06-21
-GAME( 1994, ridgera2ja,ridgera2, namcos22,  ridgera2, namcos22_state, ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1, Japan)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 1994-06-13
-GAME( 1994, cybrcomm,  0,        namcos22,  cybrcomm, namcos22_state, cybrcomm, ROT0, "Namco", "Cyber Commando (Rev. CY1, Japan)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 10/14/94
-GAME( 1995, raveracw,  0,        namcos22,  raveracw, namcos22_state, raveracw, ROT0, "Namco", "Rave Racer (Rev. RV2, World)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 07/16/95
-GAME( 1995, raveracj,  raveracw, namcos22,  raveracw, namcos22_state, raveracw, ROT0, "Namco", "Rave Racer (Rev. RV1 Ver.B, Japan)"        , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 07/16/95
-GAME( 1995, raveracja, raveracw, namcos22,  raveracw, namcos22_state, raveracw, ROT0, "Namco", "Rave Racer (Rev. RV1, Japan)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 06/29/95
-GAME( 1994, acedrvrw,  0,        namcos22,  acedrvr, namcos22_state,  acedrvr,  ROT0, "Namco", "Ace Driver: Racing Evolution (Rev. AD2)"   , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 94/10/20 16:22:25
-GAME( 1996, victlapw,  0,        namcos22,  acedrvr, namcos22_state,  victlap,  ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV2)"       , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/02/13 17:50:06
+GAME( 1993, ridgerac,  0,        namcos22,  ridgera,   namcos22_state, ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR3, World)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 1994-01-17
+GAME( 1993, ridgerac3, ridgerac, namcos22,  ridgera,   namcos22_state, ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR2 Ver.B, World, 3-screen?)", GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 1993-10-28, no indication that this really is a 3-screen version.
+GAME( 1993, ridgeracb, ridgerac, namcos22,  ridgera,   namcos22_state, ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR2, World)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 1993-10-07
+GAME( 1993, ridgeracj, ridgerac, namcos22,  ridgera,   namcos22_state, ridgeraj, ROT0, "Namco", "Ridge Racer (Rev. RR1, Japan)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 1993-10-07
+GAME( 1993, ridgeracf, ridgerac, namcos22,  ridgeracf, namcos22_state, ridgeraj, ROT0, "Namco", "Ridge Racer Full Scale (World)"         , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 1993-12-13, very different version, incomplete dump.
+GAME( 1994, ridgera2,  0,        namcos22,  ridgera2,  namcos22_state, ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS2, World)"       , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 1994-06-21
+GAME( 1994, ridgera2j, ridgera2, namcos22,  ridgera2,  namcos22_state, ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1 Ver.B, Japan)" , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 1994-06-21
+GAME( 1994, ridgera2ja,ridgera2, namcos22,  ridgera2,  namcos22_state, ridger2j, ROT0, "Namco", "Ridge Racer 2 (Rev. RRS1, Japan)"       , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 1994-06-13
+GAME( 1994, cybrcomm,  0,        namcos22,  cybrcomm,  namcos22_state, cybrcomm, ROT0, "Namco", "Cyber Commando (Rev. CY1, Japan)"       , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 10/14/94
+GAME( 1995, raveracw,  0,        namcos22,  raveracw,  namcos22_state, raveracw, ROT0, "Namco", "Rave Racer (Rev. RV2, World)"           , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 07/16/95
+GAME( 1995, raveracj,  raveracw, namcos22,  raveracw,  namcos22_state, raveracw, ROT0, "Namco", "Rave Racer (Rev. RV1 Ver.B, Japan)"     , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 07/16/95
+GAME( 1995, raveracja, raveracw, namcos22,  raveracw,  namcos22_state, raveracw, ROT0, "Namco", "Rave Racer (Rev. RV1, Japan)"           , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 06/29/95
+GAME( 1994, acedrvrw,  0,        namcos22,  acedrvr,   namcos22_state, acedrvr,  ROT0, "Namco", "Ace Driver: Racing Evolution (Rev. AD2)", GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 94/10/20 16:22:25
+GAME( 1996, victlapw,  0,        namcos22,  acedrvr,   namcos22_state, victlap,  ROT0, "Namco", "Ace Driver: Victory Lap (Rev. ADV2)"    , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/02/13 17:50:06
 
 /* Super System22 games */
-GAME( 1994, alpinerd, 0,         namcos22s, alpiner, namcos22_state,  alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.D)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, alpinerc, alpinerd,  namcos22s, alpiner, namcos22_state,  alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, airco22b, 0,         namcos22s, airco22, namcos22_state,  airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)"    , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // boots but missing sprite clear DMA?
-GAME( 1995, cybrcycc, 0,         namcos22s, cybrcycc, namcos22_state, cybrcyc,  ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C)"             , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 95/04/04
-GAME( 1995, dirtdash, 0,         namcos22s, dirtdash, namcos22_state, dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2)"                      , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
-GAME( 1995, timecris, 0,         timecris,  timecris, namcos22_state, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
-GAME( 1995, timecrisa,timecris,  timecris,  timecris, namcos22_state, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
-GAME( 1996, propcycl, 0,         namcos22s, propcycl, namcos22_state, propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A)"               , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
-GAME( 1996, alpinesa, 0,         namcos22s, alpiner, namcos22_state,  alpinesa, ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A)"            , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 96/07/01 15:19:23. major gfx problems, slave dsp?
-GAME( 1996, tokyowar, 0,         namcos22s, tokyowar, namcos22_state, tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A)"               , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 96/09/03 14:08:47. near-invincible tanks, maybe related to timecris helicopter bug?
-GAME( 1996, aquajet,  0,         namcos22s, aquajet, namcos22_state,  aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B)"                 , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
-GAME( 1996, alpinr2b, 0,         namcos22s, alpiner, namcos22_state,  alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 97/01/10 17:10:59
-GAME( 1996, alpinr2a, alpinr2b,  namcos22s, alpiner, namcos22_state,  alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/12/06 13:45:05
-GAME( 1996, adillor,  0,         namcos22s, aquajet, namcos22_state,  adillor,  ROT0, "Namco", "Armadillo Racing (Rev. AM1 Ver.A)"                 , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // needs trackball hookup
+GAME( 1994, alpinerd, 0,         namcos22s, alpiner,   namcos22_state, alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.D)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, alpinerc, alpinerd,  namcos22s, alpiner,   namcos22_state, alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, airco22b, 0,         namcos22s, airco22,   namcos22_state, airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)" , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // boots but missing sprite clear DMA?
+GAME( 1995, cybrcycc, 0,         namcos22s, cybrcycc,  namcos22_state, cybrcyc,  ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 95/04/04
+GAME( 1995, dirtdash, 0,         namcos22s, dirtdash,  namcos22_state, dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2)"                   , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
+GAME( 1995, timecris, 0,         timecris,  timecris,  namcos22_state, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B)"           , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
+GAME( 1995, timecrisa,timecris,  timecris,  timecris,  namcos22_state, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A)"           , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
+GAME( 1996, propcycl, 0,         namcos22s, propcycl,  namcos22_state, propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A)"            , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
+GAME( 1996, alpinesa, 0,         namcos22s, alpiner,   namcos22_state, alpinesa, ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A)"         , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 96/07/01 15:19:23. major gfx problems, slave dsp?
+GAME( 1996, tokyowar, 0,         namcos22s, tokyowar,  namcos22_state, tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A)"            , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 96/09/03 14:08:47. near-invincible tanks, maybe related to timecris helicopter bug?
+GAME( 1996, aquajet,  0,         namcos22s, aquajet,   namcos22_state, aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
+GAME( 1996, alpinr2b, 0,         namcos22s, alpiner,   namcos22_state, alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B)"       , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 97/01/10 17:10:59
+GAME( 1996, alpinr2a, alpinr2b,  namcos22s, alpiner,   namcos22_state, alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A)"       , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/12/06 13:45:05
+GAME( 1996, adillor,  0,         namcos22s, adillor,   namcos22_state, adillor,  ROT0, "Namco", "Armadillo Racing (Rev. AM1 Ver.A)"      , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 97/04/07 19:19:41. needs trackball hookup
