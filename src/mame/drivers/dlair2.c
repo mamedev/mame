@@ -3,6 +3,9 @@
 Skeleton driver for Dragon's Lair II: Time Warp
 by Leland
 
+Notes:
+- two irqs, timer (vector 0x20/4) and serial (vector 0x2c/4)
+
 Some information from
 http://www.dragons-lair-project.com/tech/pages/dl2.asp
 
@@ -41,6 +44,7 @@ public:
 	// screen updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	INTERRUPT_GEN_MEMBER(dlair2_timer_irq);
 protected:
 	// driver_device overrides
 	virtual void machine_start();
@@ -63,6 +67,14 @@ UINT32 dlair2_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap,
 static ADDRESS_MAP_START( dlair2_map, AS_PROGRAM, 8, dlair2_state )
 	AM_RANGE(0x00000, 0xeffff) AM_RAM
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("ipl", 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dlair2_io, AS_IO, 8, dlair2_state )
+//	AM_RANGE(0x020, 0x020) ICR
+//	AM_RANGE(0x042, 0x043) sound related
+//	AM_RANGE(0x061, 0x061) sound related
+//	AM_RANGE(0x200, 0x203) i/o, coin, eeprom
+//	AM_RANGE(0x2f8, 0x2ff) COM2
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dlair2 )
@@ -150,11 +162,18 @@ void dlair2_state::palette_init()
 {
 }
 
+INTERRUPT_GEN_MEMBER(dlair2_state::dlair2_timer_irq)
+{
+	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x20/4);
+}
+
 static MACHINE_CONFIG_START( dlair2, dlair2_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088 , MAIN_CLOCK/3)	/* Schematics show I8088 "max" CPU */
 	MCFG_CPU_PROGRAM_MAP(dlair2_map)
+	MCFG_CPU_IO_MAP(dlair2_io)
+	MCFG_CPU_PERIODIC_INT_DRIVER(dlair2_state, dlair2_timer_irq, 60) // timer irq, TODO: timing
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -183,42 +202,52 @@ ROM_START( dlair2 )
 	ROM_REGION( 0x10000, "ipl", 0 )
 	ROM_LOAD( "dl2_319.bin",     0x00000, 0x10000, CRC(e9453a1b) SHA1(eb1201abd0124f6edbabd49bec81af827369cb2c) )
 ROM_END
+
 ROM_START( dlair2_319e )
 	ROM_REGION( 0x10000, "ipl", 0 )
 	ROM_LOAD( "dl2euro3.19.bin", 0x00000, 0x10000, CRC(cc23ad9f) SHA1(24add8f03749dcc27b1b166dc2e5d346534a0088) )
 ROM_END
+
 ROM_START( dlair2_319s )
 	ROM_REGION( 0x10000, "ipl", 0 )
 	ROM_LOAD( "dl2-span.bin",    0x00000, 0x10000, CRC(4b9a811d) SHA1(6fe580f541305422f89edbbf475f7c5f17153738) )
 ROM_END
+
 ROM_START( dlair2_318 )
 	ROM_REGION( 0x10000, "ipl", 0 )
 	ROM_LOAD( "dl2_318.bin",     0x00000, 0x10000, CRC(64706492) SHA1(99c92572c59ce1206847a5363d3791196fccd742) )
 ROM_END
+
 ROM_START( dlair2_316e )
 	ROM_REGION( 0x10000, "ipl", 0 )
 	ROM_LOAD( "dl2euro.bin",     0x00000, 0x10000, CRC(d68f1b13) SHA1(cc9ee307b4d3caba049be6226163c810cf89ab44) )
 ROM_END
+
 ROM_START( dlair2_315 )
 	ROM_REGION( 0x10000, "ipl", 0 )
 	ROM_LOAD( "dl2_315.rom",     0x00000, 0x10000, CRC(13ec0600) SHA1(9366dfac4508c4a723d688016b8cddb57aa6f5f1) )
 ROM_END
+
 ROM_START( dlair2_315s )
 	ROM_REGION( 0x10000, "ipl", 0 )
 	ROM_LOAD( "315pi.bin",       0x00000, 0x10000, CRC(75d8861a) SHA1(56ab31a760f43f98fa40396ee7d7af7ce982d28d) )
 ROM_END
+
 ROM_START( dlair2_314 )
 	ROM_REGION( 0x10000, "ipl", 0 )
 	ROM_LOAD( "dl2_314.bin",     0x00000, 0x10000, CRC(af92b612) SHA1(a0b986fa8a0f2206beedf1dcaed4d108599947ff) )
 ROM_END
+
 ROM_START( dlair2_312 )
 	ROM_REGION( 0x10000, "ipl", 0 )
 	ROM_LOAD( "312.bin",         0x00000, 0x10000, CRC(c842be6b) SHA1(bf548ea3c6e98cd93f79408c3b9f0e1e22cc8bd1) )
 ROM_END
+
 ROM_START( dlair2_300 )
 	ROM_REGION( 0x10000, "ipl", 0 )
 	ROM_LOAD( "dl2_300.bin",     0x00000, 0x10000, CRC(dec4f2e3) SHA1(fd96378c78df4aacd4b2190823ec5c1591199d44) )
 ROM_END
+
 ROM_START( dlair2_211 )
 	ROM_REGION( 0x10000, "ipl", 0 )
 	ROM_LOAD( "dl2_211.bin",     0x00000, 0x10000, CRC(9f2660a3) SHA1(bf35356aab0138f86e6ea18c7bcf4f3f3c428d98) )
@@ -228,6 +257,7 @@ ROM_START( spacea91 )
 	ROM_REGION( 0x10000, "ipl", 0 )
 	ROM_LOAD( "ace.dat",         0x00000, 0x10000, CRC(de93a213) SHA1(1c95d5f45292f08149d749e1f7b5d9409d3a266e) )
 ROM_END
+
 ROM_START( spacea91_13e )
 	ROM_REGION( 0x10000, "ipl", 0 )
 	ROM_LOAD( "sa91euro1.3.bin", 0x00000, 0x10000, CRC(27dd0486) SHA1(8a57510b466381d9962e5397d89a7a3e73d757b0) )
