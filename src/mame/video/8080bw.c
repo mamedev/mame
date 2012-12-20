@@ -15,7 +15,7 @@
 
 MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_vh)
 {
-	save_item(NAME(m_c8080bw_flip_screen));
+	save_item(NAME(m_flip_screen));
 	save_item(NAME(m_color_map));
 	save_item(NAME(m_screen_red));
 
@@ -67,7 +67,7 @@ INLINE void set_pixel( running_machine &machine, bitmap_rgb32 &bitmap, UINT8 y, 
 
 	if (y >= MW8080BW_VCOUNTER_START_NO_VBLANK)
 	{
-		if (state->m_c8080bw_flip_screen)
+		if (state->m_flip_screen)
 			bitmap.pix32(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = pens[color];
 		else
 			bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = pens[color];
@@ -101,7 +101,7 @@ static void clear_extra_columns( running_machine &machine, bitmap_rgb32 &bitmap,
 
 		for (y = MW8080BW_VCOUNTER_START_NO_VBLANK; y != 0; y++)
 		{
-			if (state->m_c8080bw_flip_screen)
+			if (state->m_flip_screen)
 				bitmap.pix32(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - (256 + x)) = pens[color];
 			else
 				bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, 256 + x) = pens[color];
@@ -454,7 +454,7 @@ UINT32 _8080bw_state::screen_update_shuttlei(screen_device &screen, bitmap_rgb32
 
 		for (i = 0; i < 8; i++)
 		{
-			if (m_c8080bw_flip_screen)
+			if (m_flip_screen)
 				bitmap.pix32(191-y, 255-(x|i)) = pens[BIT(data, 7)];
 			else
 				bitmap.pix32(y, x|i) = pens[BIT(data, 7)];
@@ -477,7 +477,7 @@ UINT32 _8080bw_state::screen_update_spacecom(screen_device &screen, bitmap_rgb32
 
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
-		UINT8 flipx = m_invaders_flip_screen ? 7 : 0;
+		UINT8 flipx = m_flip_screen ? 7 : 0;
 
 		UINT8 data = m_main_ram[offs+0x400];
 

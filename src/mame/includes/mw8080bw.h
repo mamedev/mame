@@ -57,7 +57,7 @@ public:
 
 	/* misc game specific */
 	UINT16      m_phantom2_cloud_counter;
-	UINT8       m_invaders_flip_screen;
+	UINT8       m_flip_screen;
 	UINT8       m_rev_shift_res;
 	UINT8       m_maze_tone_timing_state;	/* output of IC C1, pin 5 */
 	UINT8       m_desertgun_controller_select;

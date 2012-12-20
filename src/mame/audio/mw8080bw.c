@@ -4204,7 +4204,7 @@ WRITE8_MEMBER(mw8080bw_state::invaders_audio_2_w)
 	/* the flip screen line is only connected on the cocktail PCB */
 	if (invaders_is_cabinet_cocktail(machine()))
 	{
-		m_invaders_flip_screen = (data >> 5) & 0x01;
+		m_flip_screen = (data >> 5) & 0x01;
 	}
 
 	/* D6 and D7 are not connected */

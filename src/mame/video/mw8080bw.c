@@ -336,7 +336,7 @@ UINT32 mw8080bw_state::screen_update_invaders(screen_device &screen, bitmap_rgb3
 	UINT8 x = 0;
 	UINT8 y = MW8080BW_VCOUNTER_START_NO_VBLANK;
 	UINT8 video_data = 0;
-	UINT8 flip = m_invaders_flip_screen;
+	UINT8 flip = m_flip_screen;
 
 	while (1)
 	{

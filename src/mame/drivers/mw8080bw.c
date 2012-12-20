@@ -2496,7 +2496,7 @@ MACHINE_CONFIG_END
 MACHINE_START_MEMBER(mw8080bw_state,invaders)
 {
 	/* setup for save states */
-	save_item(NAME(m_invaders_flip_screen));
+	save_item(NAME(m_flip_screen));
 
 	MACHINE_START_CALL_MEMBER(mw8080bw);
 }

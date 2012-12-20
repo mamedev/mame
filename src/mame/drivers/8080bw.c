@@ -777,7 +777,7 @@ DRIVER_INIT_MEMBER(_8080bw_state, spacecom)
 READ8_MEMBER(_8080bw_state::invrvnge_02_r)
 {
 	UINT8 data = ioport("IN2")->read();
-	if (m_c8080bw_flip_screen) return data;
+	if (m_flip_screen) return data;
 	return (data & 0x8f) | (ioport("IN1")->read() & 0x70);
 }
 
@@ -1319,7 +1319,7 @@ MACHINE_CONFIG_END
 READ8_MEMBER(_8080bw_state::schasercv_02_r)
 {
 	UINT8 data = ioport("IN2")->read();
-	if (m_c8080bw_flip_screen) return data;
+	if (m_flip_screen) return data;
 	UINT8 in1 = ioport("IN1")->read();
 	return (data & 0x89) | (in1 & 0x70) | (BIT(in1, 3) << 1) | (BIT(in1, 7) << 2);
 }
@@ -1643,7 +1643,7 @@ MACHINE_START_MEMBER(_8080bw_state,polaris)
 READ8_MEMBER(_8080bw_state::polaris_port00_r)
 {
 	UINT8 data = ioport("IN0")->read();
-	if (m_c8080bw_flip_screen) return data;
+	if (m_flip_screen) return data;
 	return (data & 7) | (ioport("IN1")->read() & 0xf8);
 }
 
@@ -2235,7 +2235,7 @@ INPUT_PORTS_END
 READ8_MEMBER(_8080bw_state::shuttlei_ff_r)
 {
 	UINT8 data = ioport("INPUTS")->read();
-	if (!m_c8080bw_flip_screen) return data;
+	if (!m_flip_screen) return data;
 	return (data & 0x3b) | ioport("P2")->read();
 }
 
@@ -2246,7 +2246,7 @@ WRITE8_MEMBER(_8080bw_state::shuttlei_ff_w)
               These may be for indicator lamps under the start buttons.
            bit 2 goes high while player 2 is playing     */
 
-	m_c8080bw_flip_screen = BIT(data, 2) & BIT(ioport(CABINET_PORT_TAG)->read(), 0);
+	m_flip_screen = BIT(data, 2) & BIT(ioport(CABINET_PORT_TAG)->read(), 0);
 }
 
 static ADDRESS_MAP_START( shuttlei_map, AS_PROGRAM, 8, _8080bw_state )
@@ -2330,7 +2330,7 @@ MACHINE_RESET_MEMBER(_8080bw_state,darthvdr)
 READ8_MEMBER(_8080bw_state::darthvdr_01_r)
 {
 	UINT8 data = ioport("P2")->read();
-	if (m_invaders_flip_screen) return data;
+	if (m_flip_screen) return data;
 	return (data & 0xe1) | (ioport("P1")->read() & 0x0e);
 }
 

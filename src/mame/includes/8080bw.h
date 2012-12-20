@@ -28,7 +28,6 @@ public:
 
 
 	/* misc game specific */
-	UINT8 m_c8080bw_flip_screen;
 	UINT8 m_color_map;
 	UINT8 m_screen_red;
 	UINT8 m_fleet_step;
