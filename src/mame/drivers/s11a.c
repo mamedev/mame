@@ -7,10 +7,14 @@
 
 
 ToDo:
-- Can coin up but not start
 - Doesn't react to the Advance button very well
 - Some LEDs flicker
 - Diagnostic LED blinks constantly
+
+Note: To start a game, certain switches need to be activated.  You must first press and
+      hold one of the trough switches (usually the left) and the ball shooter switch for
+      about 1 second.  Then you are able to start a game.
+      Example: For Pinbot, you must hold L and V for a second, then press start.
 
 *****************************************************************************************/
 
@@ -49,6 +53,7 @@ public:
 	DECLARE_READ8_MEMBER(dac_r);
 	DECLARE_WRITE8_MEMBER(dac_w);
 	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_WRITE8_MEMBER(bgbank_w);
 	DECLARE_WRITE8_MEMBER(dig0_w);
 	DECLARE_WRITE8_MEMBER(dig1_w);
 	DECLARE_WRITE8_MEMBER(lamp0_w);
@@ -134,7 +139,7 @@ static ADDRESS_MAP_START( s11a_bg_map, AS_PROGRAM, 8, s11a_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia40", pia6821_device, read, write)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bgbank")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( s11a )
@@ -221,6 +226,7 @@ MACHINE_RESET_MEMBER( s11a_state, s11a )
 {
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);
+	membank("bgbank")->set_entry(0);
 }
 
 INPUT_CHANGED_MEMBER( s11a_state::main_nmi )
@@ -433,6 +439,9 @@ WRITE8_MEMBER( s11a_state::pia34_pa_w )
 
 WRITE8_MEMBER( s11a_state::pia34_pb_w )
 {
+	m_pia40->portb_w(data);
+	m_pia40->cb1_w(1);
+	m_pia40->cb1_w(0);
 }
 
 static const pia6821_interface pia34_intf =
@@ -455,6 +464,11 @@ WRITE8_MEMBER( s11a_state::bank_w )
 {
 	membank("bank0")->set_entry(BIT(data, 1));
 	membank("bank1")->set_entry(BIT(data, 0));
+}
+
+WRITE8_MEMBER( s11a_state::bgbank_w )
+{
+	membank("bgbank")->set_entry(BIT(data, 0));
 }
 
 READ_LINE_MEMBER( s11a_state::pias_ca1_r )
@@ -513,7 +527,7 @@ WRITE_LINE_MEMBER( s11a_state::ym2151_irq_w)
 static const pia6821_interface pia40_intf =
 {
 	DEVCB_NULL,		/* port A in */
-	DEVCB_DRIVER_MEMBER(s11a_state, dac_r),		/* port B in */
+	DEVCB_NULL,		/* port B in */
 	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pias_ca1_r),		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_LINE_VCC,		/* line CA2 in */
@@ -529,10 +543,13 @@ static const pia6821_interface pia40_intf =
 DRIVER_INIT_MEMBER( s11a_state, s11a )
 {
 	UINT8 *ROM = memregion("audiocpu")->base();
+	UINT8 *BGROM = memregion("bgcpu")->base();
 	membank("bank0")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 	membank("bank1")->configure_entries(0, 2, &ROM[0x18000], 0x4000);
+	membank("bgbank")->configure_entries(0, 2, &BGROM[0x10000], 0x8000);
 	membank("bank0")->set_entry(0);
 	membank("bank1")->set_entry(0);
+	membank("bgbank")->set_entry(0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( s11a_state::irq)
@@ -606,8 +623,8 @@ ROM_START(f14_p3)
 	ROM_LOAD("f14_u22.l1", 0x10000, 0x8000, CRC(c9dd7496) SHA1(de3cb855d87033274cc912578b02d1593d2d69f9))
 
 	ROM_REGION(0x20000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("f14_u4.l1", 0x08000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
-	ROM_LOAD("f14_u19.l1", 0x10000, 0x8000, CRC(d0de4a7c) SHA1(46ecd5786653add47751cc56b38d9db7c4622377))
+	ROM_LOAD("f14_u4.l1", 0x10000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
+	ROM_LOAD("f14_u19.l1", 0x18000, 0x8000, CRC(d0de4a7c) SHA1(46ecd5786653add47751cc56b38d9db7c4622377))
 ROM_END
 
 ROM_START(f14_p4)
@@ -620,8 +637,8 @@ ROM_START(f14_p4)
 	ROM_LOAD("f14_u22.l1", 0x10000, 0x8000, CRC(c9dd7496) SHA1(de3cb855d87033274cc912578b02d1593d2d69f9))
 
 	ROM_REGION(0x20000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("f14_u4.l1", 0x08000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
-	ROM_LOAD("f14_u19.l1", 0x10000, 0x8000, CRC(d0de4a7c) SHA1(46ecd5786653add47751cc56b38d9db7c4622377))
+	ROM_LOAD("f14_u4.l1", 0x10000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
+	ROM_LOAD("f14_u19.l1", 0x18000, 0x8000, CRC(d0de4a7c) SHA1(46ecd5786653add47751cc56b38d9db7c4622377))
 ROM_END
 
 ROM_START(f14_l1)
@@ -634,8 +651,8 @@ ROM_START(f14_l1)
 	ROM_LOAD("f14_u22.l1", 0x10000, 0x8000, CRC(c9dd7496) SHA1(de3cb855d87033274cc912578b02d1593d2d69f9))
 
 	ROM_REGION(0x20000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("f14_u4.l1", 0x08000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
-	ROM_LOAD("f14_u19.l1", 0x10000, 0x8000, CRC(d0de4a7c) SHA1(46ecd5786653add47751cc56b38d9db7c4622377))
+	ROM_LOAD("f14_u4.l1", 0x10000, 0x8000, CRC(43ecaabf) SHA1(64b50dbff03cd556130d0cff47b951fdf37d397d))
+	ROM_LOAD("f14_u19.l1", 0x18000, 0x8000, CRC(d0de4a7c) SHA1(46ecd5786653add47751cc56b38d9db7c4622377))
 ROM_END
 
 /*--------------------
@@ -651,7 +668,7 @@ ROM_START(fire_l3)
 	ROM_LOAD("fire_u22.l2", 0x10000, 0x8000, CRC(16145c97) SHA1(523e99df3907a2c843c6e27df4d16799c4136a46))
 
 	ROM_REGION(0x20000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("fire_u4.l1", 0x8000, 0x8000, CRC(0e058918) SHA1(4d6bf2290141119174787f8dd653c47ea4c73693))
+	ROM_LOAD("fire_u4.l1", 0x10000, 0x8000, CRC(0e058918) SHA1(4d6bf2290141119174787f8dd653c47ea4c73693))
 ROM_END
 
 /*--------------------------------------
@@ -671,8 +688,8 @@ ROM_START(milln_l3)
 	ROM_LOAD("mill_u22.l1", 0x10000, 0x8000, CRC(73735cfc) SHA1(f74c873a20990263e0d6b35609fc51c08c9f8e31))
 
 	ROM_REGION(0x20000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("mill_u4.l1", 0x08000, 0x8000, CRC(cf766506) SHA1(a6e4df19a513102abbce2653d4f72245f54407b1))
-	ROM_LOAD("mill_u19.l1", 0x10000, 0x8000, CRC(e073245a) SHA1(cbaddde6bb19292ace574a8329e18c97c2ee9763))
+	ROM_LOAD("mill_u4.l1", 0x10000, 0x8000, CRC(cf766506) SHA1(a6e4df19a513102abbce2653d4f72245f54407b1))
+	ROM_LOAD("mill_u19.l1", 0x18000, 0x8000, CRC(e073245a) SHA1(cbaddde6bb19292ace574a8329e18c97c2ee9763))
 ROM_END
 
 /*--------------------
@@ -688,8 +705,8 @@ ROM_START(pb_l5)
 	ROM_LOAD("pbot_u22.l1", 0x10000, 0x8000, CRC(a2d2c9cb) SHA1(46437dc54538f1626caf41a2818ddcf8000c44e4))
 
 	ROM_REGION(0x20000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("pbot_u4.l1", 0x08000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
-	ROM_LOAD("pbot_u19.l1", 0x10000, 0x8000, CRC(40eb4e9f) SHA1(07b0557b35599a2dd5aa66a306fbbe8f50eed998))
+	ROM_LOAD("pbot_u4.l1", 0x10000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
+	ROM_LOAD("pbot_u19.l1", 0x18000, 0x8000, CRC(40eb4e9f) SHA1(07b0557b35599a2dd5aa66a306fbbe8f50eed998))
 ROM_END
 
 ROM_START(pb_l2)
@@ -702,8 +719,8 @@ ROM_START(pb_l2)
 	ROM_LOAD("pbot_u22.l1", 0x10000, 0x8000, CRC(a2d2c9cb) SHA1(46437dc54538f1626caf41a2818ddcf8000c44e4))
 
 	ROM_REGION(0x20000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("pbot_u4.l1", 0x08000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
-	ROM_LOAD("pbot_u19.l1", 0x10000, 0x8000, CRC(40eb4e9f) SHA1(07b0557b35599a2dd5aa66a306fbbe8f50eed998))
+	ROM_LOAD("pbot_u4.l1", 0x10000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
+	ROM_LOAD("pbot_u19.l1", 0x18000, 0x8000, CRC(40eb4e9f) SHA1(07b0557b35599a2dd5aa66a306fbbe8f50eed998))
 ROM_END
 
 ROM_START(pb_l3)
@@ -716,8 +733,8 @@ ROM_START(pb_l3)
 	ROM_LOAD("pbot_u22.l1", 0x10000, 0x8000, CRC(a2d2c9cb) SHA1(46437dc54538f1626caf41a2818ddcf8000c44e4))
 
 	ROM_REGION(0x20000, "bgcpu", ROMREGION_ERASEFF)
-	ROM_LOAD("pbot_u4.l1", 0x08000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
-	ROM_LOAD("pbot_u19.l1", 0x10000, 0x8000, CRC(40eb4e9f) SHA1(07b0557b35599a2dd5aa66a306fbbe8f50eed998))
+	ROM_LOAD("pbot_u4.l1", 0x10000, 0x8000, CRC(de5926bd) SHA1(3d111e27c5f0c8c0afc5fe5cc45bf77c12b69228))
+	ROM_LOAD("pbot_u19.l1", 0x18000, 0x8000, CRC(40eb4e9f) SHA1(07b0557b35599a2dd5aa66a306fbbe8f50eed998))
 ROM_END
 
 GAME(1987, f14_l1,   0,      s11a, s11a, s11a_state, s11a, ROT0, "Williams", "F14 Tomcat (L-1)", GAME_IS_SKELETON_MECHANICAL)
