@@ -510,6 +510,7 @@ $(MAMEOBJ)/atlus.a: \
 	$(DRIVERS)/blmbycar.o $(VIDEO)/blmbycar.o \
 	$(DRIVERS)/ohmygod.o $(VIDEO)/ohmygod.o \
 	$(DRIVERS)/powerins.o $(VIDEO)/powerins.o \
+	$(DRIVERS)/bowltry.o \
 
 $(MAMEOBJ)/barcrest.a: \
 	$(DRIVERS)/mpu2.o \
