@@ -4,7 +4,6 @@
 
     - 8088 board
     - CIA timers fail in burn-in test
-    - NTSC variants unable to load from disk
     - shift lock
     - Hungarian keyboard
     - cbm620hu charom banking?
@@ -344,14 +343,16 @@ WRITE8_MEMBER( cbm2_state::write )
 
 READ8_MEMBER( cbm2_state::ext_read )
 {
-	int ras = 1, cas = 1, refen = 1, eras = 1, ecas = 0;
+	/*int ras = 1, cas = 1, refen = 1, eras = 1, ecas = 0;
 	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, rasseg1 = 1, rasseg2 = 1, rasseg3 = 1, rasseg4 = 1;
 
-	this->read_pla(offset, ras, cas, refen, eras, ecas, &casseg1, &casseg2, &casseg3, &casseg4, &rasseg1, &rasseg2, &rasseg3, &rasseg4);
-
+	this->read_pla(offset, ras, cas, refen, eras, ecas, &casseg1, &casseg2, &casseg3, &casseg4, &rasseg1, &rasseg2, &rasseg3, &rasseg4);*/
 	UINT8 data = 0xff;
 
-	if (!casseg1)
+	if (offset < 0x40000)
+	data = m_ram->pointer()[offset];
+
+	/*if (!casseg1)
 	{
 		data = m_ram->pointer()[offset & 0xffff];
 	}
@@ -366,7 +367,7 @@ READ8_MEMBER( cbm2_state::ext_read )
 	if (!casseg4 && (m_ram->size() > 0x30000))
 	{
 		data = m_ram->pointer()[0x30000 | (offset & 0xffff)];
-	}
+	}*/
 
 	return data;
 }
@@ -378,7 +379,7 @@ READ8_MEMBER( cbm2_state::ext_read )
 
 WRITE8_MEMBER( cbm2_state::ext_write )
 {
-	int ras = 1, cas = 1, refen = 1, eras = 1, ecas = 0;
+	/*int ras = 1, cas = 1, refen = 1, eras = 1, ecas = 0;
 	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, rasseg1 = 1, rasseg2 = 1, rasseg3 = 1, rasseg4 = 1;
 
 	this->read_pla(offset, ras, cas, refen, eras, ecas, &casseg1, &casseg2, &casseg3, &casseg4, &rasseg1, &rasseg2, &rasseg3, &rasseg4);
@@ -398,7 +399,10 @@ WRITE8_MEMBER( cbm2_state::ext_write )
 	if (!casseg4 && (m_ram->size() > 0x30000))
 	{
 		m_ram->pointer()[0x30000 | (offset & 0xffff)] = data;
-	}
+	}*/
+
+	if (offset < 0x40000)
+	m_ram->pointer()[offset] = data;
 }
 
 
@@ -1787,6 +1791,7 @@ WRITE8_MEMBER( cbm2_state::ext_tpi_pb_w )
 	// _BUSY2
 	if (!BIT(data, 0))
 	{
+		logerror("BUSY2 1\n");
 		m_busy2 = 1;
 		m_busen1 = m_dramon;
 	}
@@ -1805,11 +1810,19 @@ WRITE8_MEMBER( cbm2_state::ext_tpi_pc_w )
         2
         3
         4
-        5       U22 CLK
+        5       U22B CLK
         6
         7
 
     */
+
+	// _BUSY2
+	if (BIT(data, 5))
+	{
+		logerror("BUSY2 1\n");
+		m_busy2 = 1;
+		m_busen1 = m_dramon;
+	}
 }
 
 static const tpi6525_interface ext_tpi_intf =
@@ -1878,11 +1891,13 @@ WRITE8_MEMBER( cbm2_state::ext_cia_pb_w )
 	// _BUSY2
 	if (!BIT(data, 0))
 	{
+		logerror("BUSY2 1\n");
 		m_busy2 = 1;
 		m_busen1 = m_dramon;
 	}
 	else if (!BIT(data, 6))
 	{
+		logerror("BUSY2 0\n");
 		m_busy2 = 0;
 		m_busen1 = 0;
 	}
