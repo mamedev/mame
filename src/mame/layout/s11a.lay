@@ -10,6 +10,11 @@
 			<color red="1.0" green="0.0" blue="0.0" />
 		</led14segsc>
 	</element>
+	<element name="ldigit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
 	<element name="diagled" defstate="0">
 		<disk>
 			<color red="1.0" green="0.0" blue="0.0" />
@@ -146,10 +151,10 @@
 		<bezel name="digit62" element="diagled">
 			<bounds left="200" top="224" right="210" bottom="234" />
 		</bezel>
-		<bezel name="digit0" element="digit">
+		<bezel name="digit0" element="ldigit">
 			<bounds left="310" top="200" right="330" bottom="239" />
 		</bezel>
-		<bezel name="digit8" element="digit">
+		<bezel name="digit8" element="ldigit">
 			<bounds left="334" top="200" right="354" bottom="239" />
 		</bezel>
 		<bezel element="P0"><bounds left="310" right="354" top="180" bottom="192" /></bezel>
