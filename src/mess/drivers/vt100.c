@@ -568,7 +568,7 @@ MACHINE_CONFIG_END
        (This same cute trick is almost certainly also done with the
        23-180e2, 181e2, 182e2 183e2 romset, as well as the
        23-095e2,096e2,139e2,140e2 set and probably others as well)
- * The vt100/103 23-018e2-00 character set rom at location e4 is a 24 pin 2316 mask rom with enables as such: pin 18: CS2; pin 20: /CS1; pin 21: /CS3
+ * The vt100/101/102/103/etc 23-018e2-00 character set rom at location e4 is a 24 pin 2316 mask rom with enables as such: pin 18: CS2; pin 20: /CS1; pin 21: /CS3
  * The optional 23-094e2-00 alternate character set rom at location e9 is a 24 pin 2316 mask rom with enables as such: pin 18: /CS2; pin 20: /CS1; pin 21: /CS3
        Supposedly the 23-094e2 rom is meant for vt100-WC or -WF systems, (which are french canadian and french respectively), implying that it has european language specific accented characters on it. It is probably used in all the -W* systems.
        Pin 21 can be jumpered to +5v for this socket at location e9 by removing jumper w4 and inserting jumper w5, allowing a normal 2716 eprom to be used.
@@ -798,7 +798,7 @@ ROM_START( vt131 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt131 mainboa
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-226e4-00.e71", 0x0000, 0x2000, CRC(85c9279a) SHA1(3283d27e9c45d9e384227a7e6e98ee8d54b92bcb)) // shared with vt102
 	ROM_LOAD( "23-225e4-00.e69", 0x8000, 0x2000, CRC(3567c760) SHA1(672473162e9c92cd237e4dbf92c2700a31C5374b)) // shared with vt102
-	ROM_LOAD( "23-280e2-00.e67", 0xA000, 0x0800, CRC(71b4172e) SHA1(5a82c7dc313bb92b9829eb8350840e072825a797)) // called "VT131 ROM" in the vt101 quick reference guide
+	ROM_LOAD( "23-280e2-00.e67", 0xA000, 0x0800, CRC(71b4172e) SHA1(5a82c7dc313bb92b9829eb8350840e072825a797)) // called "VT131 ROM" in the vt101 quick reference guide; pins 20, 18 and 21 are /CE /CE2 and /CE3 on this mask rom
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e3", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
@@ -830,11 +830,11 @@ COMP( 1978, vt100,    0,      0,       vt100,     vt100, driver_device,   0,  "D
 //COMP( 1978, vt100wp,  vt100,  0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT100-Wx", GAME_NOT_WORKING)
 //COMP( 1978, vt100stp, vt100,  0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT100 w/VT1xx-AC STP", GAME_NOT_WORKING)
 //COMP( 1981, vt101,    0,      0,       vt102,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT101", GAME_NOT_WORKING)
-//COMP( 1981, vt102,    vt101,  0,       vt102,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT102", GAME_NOT_WORKING)
+COMP( 1981, vt102,    0,      0,       vt102,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT102", GAME_NOT_WORKING)
 //COMP( 1979, vt103,    vt100,  0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT103", GAME_NOT_WORKING)
 COMP( 1978, vt105,    vt100,  0,       vt100,     vt100, driver_device,   0,   "Digital Equipment Corporation", "VT105", GAME_NOT_WORKING)
 //COMP( 1978, vt110,    vt100,  0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT110", GAME_NOT_WORKING)
 //COMP( 1981, vt125,    vt100,  0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT125", GAME_NOT_WORKING)
-COMP( 1981, vt131,  /*vt101*/0, 0,     vt102,     vt100, driver_device,   0,   "Digital Equipment Corporation", "VT131", GAME_NOT_WORKING)// this should be a vt101 clone, once the vt101 has been enabled (i.e. its roms dumped)
+COMP( 1981, vt131,    vt102,  0,       vt102,     vt100, driver_device,   0,   "Digital Equipment Corporation", "VT131", GAME_NOT_WORKING)
 //COMP( 1979, vt132,    vt100,  0,       vt100,     vt100, driver_device,   0,  "Digital Equipment Corporation", "VT132", GAME_NOT_WORKING)
 COMP( 1983, vt180,    vt100,  0,       vt180,     vt100, driver_device,   0,   "Digital Equipment Corporation", "VT180", GAME_NOT_WORKING)
