@@ -128,6 +128,7 @@ public:
 	UINT16 *m_palette;
 	UINT32	m_speedup_count;
 	UINT32	m_tms_io_regs[0x80];
+	bitmap_ind16 m_update_bitmap;
 
 	UINT32	screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void	update_irq(UINT32 which, UINT32 state);
@@ -193,7 +194,7 @@ void rastersp_state::machine_reset()
 
 void rastersp_state::video_start()
 {
-
+	m_update_bitmap.allocate(320, 240);
 }
 
 
@@ -201,6 +202,86 @@ WRITE32_MEMBER( rastersp_state::dpylist_w )
 {
 	m_dpyaddr = data;
 
+	// Update the video now
+	// TODO: This should probably be done in sync with the video scan
+	if (m_dpyaddr == 0)
+	{
+		m_update_bitmap.fill(get_black_pen(machine()));
+		return;
+	}
+
+	UINT32 dpladdr = (m_dpyaddr & ~0xff) >> 6;
+
+	if ((m_dpyaddr & 0xff) != 0xb2 && (m_dpyaddr & 0xff) != 0xf2)
+		logerror("Unusual display list data: %x\n", m_dpyaddr);
+
+	int y = 0;
+	int x = 0;
+	UINT16 *bmpptr = &m_update_bitmap.pix16(0, 0);
+
+	while (y < 240)
+	{
+		UINT32 word1 = m_dram[dpladdr/4];
+
+		if (word1 & 0x80000000)
+		{
+			// TODO: What does this signify?
+			dpladdr += 4;
+		}
+		else
+		{
+			UINT32 word2 = m_dram[(dpladdr + 4)/4];
+
+			dpladdr += 8;
+
+			if (word2 & 0x10000000)
+			{
+				if ((word2 & 0xfe000000) != 0x94000000)
+					logerror("Unusual display list entry: %x %x\n", word1, word2);
+
+				UINT32 srcaddr = word1 >> 8;
+				UINT32 pixels = (word2 >> 16) & 0x1ff;
+				UINT32 palbase = (word2 >> 4) & 0xf00;
+
+				UINT16* palptr = &m_palette[palbase];
+				UINT8* srcptr = reinterpret_cast<UINT8*>(&m_dram[0]);
+
+				UINT32 acc = srcaddr << 8;
+
+				INT32 incr = word2 & 0xfff;
+
+				// Sign extend for our convenience
+				incr |= ~((incr & 0x800) - 1) & ~0xff;
+
+				// TODO: Assumes 8-bit palettized mode - the hardware also supports 16-bit direct
+				while (y < 240 && pixels)
+				{
+					while (x < 320 && pixels)
+					{
+						*bmpptr++ = palptr[srcptr[BYTE_XOR_LE(acc >> 8)]];
+						acc = (acc + incr) & VIDEO_ADDR_MASK;
+
+						--pixels;
+						++x;
+					}
+
+					// Advance to the next scanline
+					if (x >= 320)
+					{
+						x = 0;
+						++y;
+					}
+				}
+			}
+			else
+			{
+				if ((word2 & 0x0c000000) != 0x0c000000)
+					logerror("Unknown palette upload: %.8x %.8x\n", word1, word2);
+
+				upload_palette(word1, word2);
+			}
+		}
+	}	
 }
 
 
@@ -265,85 +346,7 @@ Unknown: (D4000100) - Present at start of a list
 
 UINT32 rastersp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_dpyaddr == 0)
-	{
-		bitmap.fill(get_black_pen(machine()), cliprect);
-		return 0;
-	}
-
-	UINT32 dpladdr = (m_dpyaddr & ~0xff) >> 6;
-
-	if ((m_dpyaddr & 0xff) != 0xb2 && (m_dpyaddr & 0xff) != 0xf2)
-		logerror("Unusual display list data: %x\n", m_dpyaddr);
-
-	int y = cliprect.min_y;
-	int x = cliprect.min_x;
-	UINT16 *bmpptr = &bitmap.pix16(cliprect.min_y, cliprect.min_x);
-
-	while (y <= cliprect.max_y)
-	{
-		UINT32 word1 = m_dram[dpladdr/4];
-
-		if (word1 & 0x80000000)
-		{
-			// TODO: What does this signify?
-			dpladdr += 4;
-		}
-		else
-		{
-			UINT32 word2 = m_dram[(dpladdr + 4)/4];
-
-			dpladdr += 8;
-
-			if (word2 & 0x10000000)
-			{
-				if ((word2 & 0xfe000000) != 0x94000000)
-					logerror("Unusual display list entry: %x %x\n", word1, word2);
-
-				UINT32 srcaddr = word1 >> 8;
-				UINT32 pixels = (word2 >> 16) & 0x1ff;
-				UINT32 palbase = (word2 >> 4) & 0xf00;
-
-				UINT16* palptr = &m_palette[palbase];
-				UINT8* srcptr = reinterpret_cast<UINT8*>(&m_dram[0]);
-
-				UINT32 acc = srcaddr << 8;
-
-				INT32 incr = word2 & 0xfff;
-
-				// Sign extend for our convenience
-				incr |= ~((incr & 0x800) - 1) & ~0xff;
-
-				// TODO: Assumes 8-bit palettized mode - the hardware also supports 16-bit direct
-				while (y <= cliprect.max_y && pixels)
-				{
-					while (x <= cliprect.max_x && pixels)
-					{
-						*bmpptr++ = palptr[srcptr[BYTE_XOR_LE(acc >> 8)]];
-						acc = (acc + incr) & VIDEO_ADDR_MASK;
-
-						--pixels;
-						++x;
-					}
-
-					// Advance to the next scanline
-					if (x > cliprect.max_x)
-					{
-						x = cliprect.min_x;
-						++y;
-					}
-				}
-			}
-			else
-			{
-				if ((word2 & 0x0c000000) != 0x0c000000)
-					logerror("Unknown palette upload: %.8x %.8x\n", word1, word2);
-
-				upload_palette(word1, word2);
-			}
-		}
-	}
-
+	copybitmap(bitmap, m_update_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
