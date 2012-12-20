@@ -3626,11 +3626,6 @@ INPUT_PORTS_EXTERN( sc4_base );
 
 #define sc_fbcrz_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
-	\
-	ROM_REGION( 0x400000, "others", ROMREGION_ERASE00 ) \
-	/* DMD? */ \
-	ROM_LOAD( "95751937.hex", 0x0000, 0x025f91, CRC(8f412e97) SHA1(a5ff924fbc327114e59d75de644ed0d5cd7fa6b3) ) \
-	ROM_LOAD( "95751937.bin", 0x0000, 0x010000, CRC(4a99ee11) SHA1(335398ebc64bbfe86e2652ac080a5943dd413928) ) /* contains PC-like references and 'Rasterspeed' stuff - the only other reference I find to this is on unmamed regarding 'Zool' */ \
 
 #define sc_sdr_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \

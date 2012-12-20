@@ -947,6 +947,36 @@ ROM_START( rotr )
 ROM_END
 
 
+/* 
+  Football Crazy runs on the (c)1997 "RASTERSPEED 2.1 31-599-001 ISS 4" PCB, which seems to be a more modern production version.
+  a PCB photo with the rom sticker showing the text below has also been seen
+  
+  Football Crazy Cashflow
+  95 750 956
+  STANDARD UK 64K
+  VER. FOOT 3.2 BFM
+
+  
+
+*/
+
+// the rom also exists in some odd hex format like this
+// ROM_LOAD( "95751937.hex", 0x0000, 0x025f91, CRC(8f412e97) SHA1(a5ff924fbc327114e59d75de644ed0d5cd7fa6b3) )
+ROM_START( fbcrazy )
+	ROM_REGION(0x100000, "bios", 0)
+	ROM_LOAD( "95751937.bin", 0x0000, 0x010000, CRC(4a99ee11) SHA1(335398ebc64bbfe86e2652ac080a5943dd413928) )
+
+	ROM_REGION(0x1000000, "dspboot", 0)
+	ROM_LOAD32_BYTE( "95751937.bin", 0x0000, 0x010000, CRC(4a99ee11) SHA1(335398ebc64bbfe86e2652ac080a5943dd413928) )
+
+	ROM_REGION(0x8000, "proms", ROMREGION_ERASEFF )
+	/* not on this PCB type? */
+
+	ROM_REGION(0x8000, "nvram", ROMREGION_ERASEFF )
+
+	DISK_REGION( "scsibus:0:harddisk" )
+	DISK_IMAGE( "fbcrazy_hdd", 0, NO_DUMP )
+ROM_END
 
 /*************************************
  *
@@ -955,3 +985,4 @@ ROM_END
  *************************************/
 
 GAME( 1994, rotr, 0, rastersp, rotr, driver_device, 0, ROT0, "BFM/Mirage", "Rise of the Robots (prototype)", 0 )
+GAME( 1997, fbcrazy, 0, rastersp, rotr, driver_device, 0, ROT0, "BFM", "Football Crazy (Video Quiz)", GAME_NOT_WORKING )
