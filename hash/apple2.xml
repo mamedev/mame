@@ -4,7 +4,7 @@
 
 <softwarelist name="apple2" description="Apple II 5.25 disks">
 
-	<software name="4080trkd">
+    <software name="4080trkd">
 		<description>40 and 80 Track DOS</description>
 		<year>1980</year>
 		<publisher>Sympathetic Software</publisher>
@@ -346,6 +346,698 @@
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="prodos 1.1.1 - basic examples.po" size="143360" crc="fb56bda0" sha1="35be78e81cf99fafb454b1d8dc6d51380c1979c4" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="221baker">
+		<description>221B Baker Street</description>
+		<year>1986</year>
+		<publisher>Datasoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="221B Baker Street (1986)(Datasoft)(Side A)[cr Digital Gang].do" size="143360" crc="9e44f2a5" sha1="2819e924a5507e9a0509cbc4b711813043f8dfe8" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="221B Baker Street (1986)(Datasoft)(Side B)[cr Digital Gang].do" size="143360" crc="525a221a" sha1="56d5d0d3d91a768e8047d92d46f3ae7bf8567185" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3ddockms">
+		<description>3-D Docking Mission</description>
+		<year>1978</year>
+		<publisher>Programma International</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="3-D Docking Mission (1978)(Programma International).do" size="143360" crc="0a0ce1ff" sha1="9f19c22d9694a24a7393a557e6104b8cb73fb4f8" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3in1ftbl">
+		<description>3 in 1 College &amp; Pro Football</description>
+		<year>1984</year>
+		<publisher>Lance Haffner</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="3 in 1 College &amp; Pro Football (1984)(Lance Haffner).do" size="143360" crc="2c4f4a1a" sha1="28d701ec87a35e0a29b8319191dc3b353fa9632b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="a2fltsim">
+		<description>A2-FS1 Flight Simulator</description>
+		<year>1981</year>
+		<publisher>subLOGIC</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="A2-FS1 Flight Simulator (1981)(subLOGIC).do" size="143360" crc="cb8212c9" sha1="b544d873349b44c5b776521b07ca9879858a6cc2" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abm">
+		<description>ABM</description>
+		<year>1980</year>
+		<publisher>Muse</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ABM (1980)(Muse).do" size="143360" crc="ce8e11b8" sha1="c766c8b5d91ff1ed16a6b80ed59fef88d08165b4" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abyszone">
+		<description>The Abyssal Zone</description>
+		<year>1984</year>
+		<publisher>Salty Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Abyssal Zone, The (1984)(Salty Software)(Side A)[cr Black Bag - Incorrigibles].do" size="143360" crc="41d5846d" sha1="5d06416c570d9409b2ad992c5c95ab131bbd7a0a" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Abyssal Zone, The (1984)(Salty Software)(Side B)[cr Black Bag - Incorrigibles].do" size="143360" crc="abe3ee6c" sha1="e97fee4aac6d53f9bf5198718a1fc35614303df9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="acidtrap">
+		<description>Acid Trap</description>
+		<year>1982</year>
+		<publisher>Demetrius Cross</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Acid Trap (1982)(Demetrius Cross).do" size="143360" crc="42150437" sha1="48ea277c1fb432a2d2cbf40b32426027cb779514" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="actsrcvb">
+		<description>Accounts Receivable v2.5</description>
+		<year>1983</year>
+		<publisher>Continental Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Accounts Receivable v2.5 (1983-12-09)(Continental Software).do" size="143360" crc="b9423826" sha1="f7411e04dfbd3acf066e74291af19b15857778b6" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adv1980">
+		<description>Adventure (A Bit Better Associates)</description>
+		<year>1980</year>
+		<publisher>A Bit Better Associates</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Adventure (1980)(A Bit Better Associates).do" size="143360" crc="fbd3f87d" sha1="aa7277fbe1d61962bdd685b37d7e4903ee48362c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adv1">
+		<description>Adventure 1</description>
+		<year>1980</year>
+		<publisher>Unknown</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Adventure - 1 (19xx)(-).do" size="143360" crc="9038b45b" sha1="e346b9b14f887ddfc2b1ce6e556c061b660c2edf" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adv4vdcs">
+		<description>Adventure 4 - Voodoo Castle</description>
+		<year>1980</year>
+		<publisher>Adventure International</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Adventure 4 - Voodoo Castle (1980)(Adventure International).do" size="143360" crc="2a486454" sha1="10885c566d30a06c53786c223474a7875286eaaa" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advatlts">
+		<description>Adventure to Atlantis</description>
+		<year>1982</year>
+		<publisher>Synergistic Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Adventure to Atlantis (1982)(Synergistic Software).do" size="143360" crc="5b1955df" sha1="e58230572df58529e749c176552022e91c18f34b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advbljk">
+		<description>Advanced Blackjack</description>
+		<year>1983</year>
+		<publisher>Muse</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Advanced Blackjack (1983)(Muse)[cr Whip].do" size="143360" crc="97c78019" sha1="fcdcfcb367d0f6526289ddae5632b7182c762663" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advfitst">
+		<description>The Adventure - Only The Fittest Shall Survive v3.5</description>
+		<year>1985</year>
+		<publisher>Green Valley Publishing</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Adventure - Only the Fittest Shall Survive, The v3.5 (1985)(Green Valley Publishing).do" size="143360" crc="2f227f5d" sha1="dd55402ed09ff97e6c12c1d53a55aa83a9b858d6" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aeronaut">
+		<description>Aeronaut</description>
+		<year>1984</year>
+		<publisher>Bill Edison</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Aeronaut (1984)(Bill Edison).do" size="143360" crc="0078d91f" sha1="c412d5fd7770e18f1ebb3e891e31d8cbe9c0aa4a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ae">
+		<description>A-E</description>
+		<year>1982</year>
+		<publisher>Broderbund</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="A-E (1982)(Broderbund)(Side A)[cr Black Bag].do" size="143360" crc="25615cc0" sha1="4927ab923d6fe9bbd0ef8c8c8acef41755b1c335" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="A-E (1982)(Broderbund)(Side B)[cr Black Bag][unk filesys].do" size="143360" crc="8d90b09f" sha1="59e1efd82f0ef98eaa265b11a2bebe0c530a3eca" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="agentusa">
+		<description>Agent USA</description>
+		<year>1984</year>
+		<publisher>Scholastic</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Agent USA (1984)(Scholastic)[cr Mr. Clean][t +1].do" size="143360" crc="39d6b768" sha1="af8ac664eeec3ff1433361239e798487652cc52c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airplsm">
+		<description>Airplane Simulator</description>
+		<year>1983</year>
+		<publisher>Ted Kurtz</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Airplane Simulator (1983)(Ted Kurtz)[cr Reset Vector].do" size="143360" crc="6d6c938b" sha1="a66359ef11627bbd87c5da11bededa98e815e236" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aklabeth">
+		<description>Aklabeth</description>
+		<year>109-</year>
+		<publisher>California Pacific Computer</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Akalabeth (1980)(California Pacific Computer).do" size="143360" crc="d6d326af" sha1="54805ac6f415fa5e4a7f89d7f2e5e26003688d1f" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alcazar">
+		<description>Alcazar the Forgotten  Fortress</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Alcazar the Forgotten Fortress (1985)(Activision)[cr Disk Jockey].do" size="143360" crc="7ef58da3" sha1="65f0036593f8083537b901cabe9e7a7859249600" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alesia">
+		<description>Alesia</description>
+		<year>1984</year>
+		<publisher>P. Garcia</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Alesia (1984)(P. Garcia)(fr)(Side A).do" size="143360" crc="a7fa590e" sha1="235837e287fd83a0427081729a97a5bfa9b9ae7c" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Alesia (1984)(P. Garcia)(fr)(Side B).do" size="143360" crc="6855edd4" sha1="5cef1885fb0ed18dfeb44fd72a40b46cee101dfa" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alice">
+		<description>Alice in Wonderland</description>
+		<year>1985</year>
+		<publisher>Windham Classics</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Alice in Wonderland (1985)(Windham Classics)(Side A)[cr Gadget Master].do" size="143360" crc="8c53a15f" sha1="1dfc85cc6c0360e23b6eec7399682d42aaa655ac" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Alice in Wonderland (1985)(Windham Classics)(Side B)[cr Gadget Master][unk filesys].do" size="143360" crc="df1001b1" sha1="df48b30a27fd2ca8423c423206e400629e612f5b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliens">
+		<description>Aliens</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Aliens (1986)(Activision)(Disk 1 of 2)[cr Digital Gang][unk filesys].do" size="143360" crc="35b077e3" sha1="890876f6f65808a1a1a5e0bd60bce15bb564af87" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Aliens (1986)(Activision)(Disk 2 of 2)[cr Digital Gang].do" size="143360" crc="9ed3a7e3" sha1="f1dddc3518f66121e097b719f3bfac9e3f880421" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alien">
+		<description>Alien</description>
+		<year></year>
+		<publisher></publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Alien (1982)(Avalon Hill).do" size="143360" crc="8928926a" sha1="cf8861b433def03864b4611d21be058d86fb53da" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alterego">
+		<description>Alter Ego</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Alter Ego (1985)(Activision)(Disk 1 of 3 Side A)[cr Digital Gang].do" size="143360" crc="01a5049f" sha1="aa8195ca8a6a276a655e6e623ec9c32d608d7226" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Alter Ego (1985)(Activision)(Disk 1 of 3 Side B)[cr Digital Gang].do" size="143360" crc="e48672d6" sha1="ffefd445be1f57fbe838dda0bf05bfc33aa5af80" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Alter Ego (1985)(Activision)(Disk 2 of 3 Side A)[cr Digital Gang].do" size="143360" crc="6ed08218" sha1="d490ed910e9733bb62689b80d73af0cfadbc0d77" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Alter Ego (1985)(Activision)(Disk 2 of 3 Side B)[cr Digital Gang].do" size="143360" crc="75b3fef7" sha1="8cf4a8e76f461f57b51156c5696a6a64ebe75737" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Alter Ego (1985)(Activision)(Disk 3 of 3 Side A)[cr Digital Gang].do" size="143360" crc="dab211b0" sha1="6869a8d36ded1e3249977d7dd4b49268020b6c2d" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Alter Ego (1985)(Activision)(Disk 3 of 3 Side B)[cr Digital Gang].do" size="143360" crc="064586ec" sha1="58b8418e4ed792a3ccba7fb0c3ec369ceadeb737" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="andrconq">
+		<description>Andromeda Conquest</description>
+		<year>1982</year>
+		<publisher>Avalon Hill</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Andromeda Conquest (1982)(Avalon Hill).do" size="143360" crc="2adace12" sha1="225fc044699eecb24fd4ee34cc473a227909d3d6" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ankh">
+		<description>Ankh</description>
+		<year>1984</year>
+		<publisher>Datamost</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Ankh (1984)(Datamost)[cr].do" size="143360" crc="8df186e1" sha1="d23ea3455711317c74679002e16cc1e8e3f63960" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ants">
+		<description>Ants</description>
+		<year>1985</year>
+		<publisher>Micro-Sparc</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Ants (1985)(Micro-Sparc).do" size="143360" crc="4381abf2" sha1="98f7fd3576cf236a2e4feb872de88a2012aa1a40" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplbowl">
+		<description>Apple Bowl</description>
+		<year>1979</year>
+		<publisher>Apple Computer, Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Apple Bowl (1979)(Apple Computer).do" size="143360" crc="8ebc6802" sha1="f49da28cc60b9442082fda59ff71330128d72ec1" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplcdspd">
+		<description>Apple Cider Spider</description>
+		<year>1983</year>
+		<publisher>Sierra</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Apple Cider Spider (1983)(Sierra).do" size="143360" crc="398ac0b5" sha1="d36837612dd4358a8fe7a445597168af697b26f7" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplgrgms">
+		<description>Apple Graphics Games</description>
+		<year>1980</year>
+		<publisher>Unknown</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Apple Graphics Games (19xx)(-).do" size="143360" crc="5c69bf54" sha1="701cd27dc46d3886da34449135cfd477b9b4595e" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplinvdr">
+		<description>Apple Invader</description>
+		<year>1981</year>
+		<publisher>Creative Computing</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Apple Invader (1981)(Creative Computing).do" size="143360" crc="29f1ed82" sha1="8415890bd80815bc8956b82a5be233d2283529b1" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplpanic">
+		<description>Apple Panic</description>
+		<year>1981</year>
+		<publisher>Broderbund</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Apple Panic (1981)(Broderbund)[cr Cracker-Jack].do" size="143360" crc="f572fb44" sha1="5ce8f7746998d2666ed3a1ccb7d355fd9cc36c95" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplprng">
+		<description>Apple Pairing</description>
+		<year>1980</year>
+		<publisher>Fan's Brother</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Apple Pairing (19xx)(Fan's Brother).do" size="143360" crc="4451e95c" sha1="a485a79b5d5f2eb3a02078c46f01316048f12a81" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplspice">
+		<description>Apple Spice</description>
+		<year>1991</year>
+		<publisher>Marin Computer Center</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Apple Spice (1991)(Marin Computer Center).do" size="143360" crc="879c9224" sha1="f54632a20aefd12471480647e77a77c58785aa80" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apltrek">
+		<description>Apple Trek</description>
+		<year>1979</year>
+		<publisher>Apple Computer, Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Apple Trek (1979)(Apple).do" size="143360" crc="749c23a0" sha1="df1ef3313e1b7b65832ab39791bf9102cb95fa63" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcbtcmp">
+		<description>Arcade Boot Camp</description>
+		<year>1984</year>
+		<publisher>John Besnard</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Arcade Boot Camp (1984)(John Besnard)[cr Black Bag].do" size="143360" crc="f4856577" sha1="fa6df5688da6b6723689c9c9b9ebe32609691a78" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcinsn">
+		<description>Arcade Insanity</description>
+		<year>1983</year>
+		<publisher>Avant-Garde</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Arcade Insanity (1983)(Avant-Garde).do" size="143360" crc="a7efd956" sha1="909d774e67ab27ca634887cdc3fd6567bd6f9b80" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcmachn">
+		<description>The Arcade Machine</description>
+		<year>1982</year>
+		<publisher>Broderbund</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Arcade Machine, The (1982)(Broderbund)(Disk 1 of 2)[cr Krakowicz].do" size="143360" crc="5ec1334d" sha1="236bddafa75b5bb969d271efa5dcf554b17e8309" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Arcade Machine, The (1982)(Broderbund)(Disk 2 of 2)[cr Krakowicz][unk filesys].do" size="143360" crc="2da46af7" sha1="8bc5bdec8bf61aeae78147945f4f6ec98ec98cec" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ardprlhb">
+		<description>Air Raid Pearl Harbor</description>
+		<year>1980</year>
+		<publisher>Unknown</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Air Raid Pearl Harbor (19xx)(-)(Disk 1 of 2).do" size="143360" crc="90057eca" sha1="58e9cbee135e7e5a2f2c346a97012b27c0e6e398" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Air Raid Pearl Harbor (19xx)(-)(Disk 2 of 2).do" size="143360" crc="ce6d43fd" sha1="beabd2f8af50120d2f9a284cb18281db0a4efcd4" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ardy">
+		<description>Ardy</description>
+		<year>1985</year>
+		<publisher>Daily Computer Game</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Ardy (1985)(Daily Computer Game)[cr Twin Stars].do" size="143360" crc="8b5b9ba8" sha1="4b3c3ea89b317d67641a7d5cc820de3cac72e57d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="argos">
+		<description>Argos</description>
+		<year>1983</year>
+		<publisher>Datamost</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Argos (1983)(Datamost)[cr Buffalo Bill].do" size="143360" crc="44d7c92c" sha1="6fb2912e74399eea93ad61fa3a877f9290360eaa" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arkanoid">
+		<description>Arkanoid</description>
+		<year>1987</year>
+		<publisher>Taito</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Arkanoid (1987)(Taito).do" size="143360" crc="ec333f72" sha1="50f486394d1576697f95126c8fefa4fdf80191fb" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armagedn">
+		<description>Armageddon</description>
+		<year>1986</year>
+		<publisher>King Cruces Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Armageddon (1986)(King Cruces Software)[cr Sinbad the Sailor].do" size="143360" crc="be3c1ced" sha1="24e0e665e1b66b19ea2953feee6742f556d911b8" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aspidrmn">
+		<description>The Amazing Spider-Man</description>
+		<year>1986</year>
+		<publisher>Green Valley Publishing</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Amazing Spider-Man, The v1.0 (1986)(Green Valley Publishing)(Side A).do" size="143360" crc="54d30a00" sha1="7a1fba09d1b59007e358813a61d31bb25b5a638c" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Amazing Spider-Man, The v1.0 (1986)(Green Valley Publishing)(Side B)[unk filesys].do" size="143360" crc="bf0efeec" sha1="dd278573f661d43a736cde2c30e15dcff66c50df" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteroid">
+		<description>Asteroids</description>
+		<year>1980</year>
+		<publisher>Cavalier Computer</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Asteroids (1980)(Cavalier Computer).do" size="143360" crc="f9bf9c05" sha1="9d83ef64f51cfa94659e3d159df743a76e3a6f57" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atc">
+		<description>ATC</description>
+		<year>1979</year>
+		<publisher>Avante-Garde</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ATC (1979)(Avante Garde).do" size="143360" crc="c90eddd7" sha1="1f648d67a1650a66e22baf654be1ab95f45d07bc" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atgtsmcw">
+		<description>At The Gates Of Moscow</description>
+		<year>1985</year>
+		<publisher>Softgroup</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="At the Gates of Moscow (1985)(Softgroup)(Side A)[cr Pete The Pirate].do" size="143360" crc="6738cba0" sha1="85a4487eee45dbb670b167dba46f51ffeb4c3ce4" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="At the Gates of Moscow (1985)(Softgroup)(Side B)[cr Pete The Pirate].do" size="143360" crc="ccdb9b06" sha1="44aed7b72958b6c4ddd04fb4e499da35c2d3ce37" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atyphoon">
+		<description>Alien Typhoon</description>
+		<year>1981</year>
+		<publisher>Starcraft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Alien Typhoon (1981)(Starcraft).do" size="143360" crc="0d418c19" sha1="500bd9a67e7defebdb6baf137deb7b9531d8e2a8" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="autoduel">
+		<description>Autoduel</description>
+		<year>1985</year>
+		<publisher>Origin Systems</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Autoduel (1985)(Origins)(Side A).do" size="143360" crc="97940fb3" sha1="0a94492f58f689143a35875e59938acfa1a4cb1f" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Autoduel (1985)(Origins)(Side B).do" size="143360" crc="373d3031" sha1="62dc18584e5a3250119be67208914f21f48c4f64" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aztec">
+		<description>Aztec</description>
+		<year>1982</year>
+		<publisher>Datamost</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="Aztec (1982)(Datamost)[cr Grossiers].do" size="143360" crc="aa0e78c9" sha1="9a9d639798dda33e9b591e419ea4de602ff405fb" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
