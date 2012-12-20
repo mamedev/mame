@@ -1,4 +1,4 @@
-/**************************************************************************
+/******************************************************************************
 
   KURU KURU PYON PYON
   Taiyo Jidoki / Success
@@ -9,15 +9,11 @@
 
   This hardware seems to be a derivative of MSX2 'on steroids'.
 
-  Depending how complex is turning the emulation, this driver
-  could be merged later with tonton.c, since the platforms are
-  sharing the hardware base...
 
+*******************************************************************************
 
-***************************************************************************
+  Technical Notes....
 
-  KURU KURU PYON PYON
-  (c)SUCCESS / CABINET :TAIYO JIDOKI
 
   CPU   : 2x Sharp LH0080A Z80A
 
@@ -41,8 +37,6 @@
   3x PAL16L8A (IC12, IC26 & IC27)
   1x PAL12L6 (IC32)
 
-
-***************************************************************************
 
   PCB Layout...
 
@@ -114,74 +108,94 @@
   AB =  NEC C1663C 8926B.
 
 
-***************************************************************************
+*******************************************************************************
 
-  Notes....
+  General Notes....
 
   The game name could be translated as "Croak Croak Hop Hop"
   Kuru is the frog sound, and Pyon is the sound of jumps.
-
-  The game is playable, even when you can't hear all sounds.
 
   Coin 1 (key 5) is not working properly and could hang the system.
   Once pressed, the game spits a message that means "Jammed Medal".
   For now, use Coin 2 (key 6) and Service (key 8) for credits...
 
   If you pressed Coin 1 and the game is not responding anymore, press RESET
-  (key 0) and the game will reset to default values.
+  (key 0), and the game will reset to default values (even all counters will
+  be cleared).
 
 
-  In the Book Keeping, you can find the statistics...
+*******************************************************************************
+
+  * How to play...
+
+  Insert tokens (medals)...
+
+  You can bet to any (or all) of the following 5 characters: Bote, Oume, Pyoko,
+  Kunio, and Pyon Pyon. Press start, and the reels start to roll. You'll win if
+  you can get 3 of the choosen character(s) in a row, column or diagonal.
+
+  The black tadpoles behave just like jokers... If you have 2 choosen characters
+  in a row and the remaining one is a black tadpole, it will transform into another
+  character to complete the 3 in a row, allowing you to win.
+
+  Red tadpoles are a bonus. Once you get one, it will go to the right panel,
+  revealing a number. This number represents the extra credits you won.
+
+
+  * Bookkeeping...
+
+  Pressing Bookkeeping key (key 9), you enter the Bookkeeping Mode. There are
+  2 screens with all the game information like DIP switches and statistics...
 
   1st screen...
 
-  - OMAKE:  Extra/Bonus.
+  - [Left panel]:  All the DIP switches parameters.
 
-  2nd screen...
+  - [Right panel]: Bet and Win totals, 100Y/10Y/medal IN/OUT, total of games,
+                   won, loss, won by paid range, and 'omake' (extra/bonus). 
 
-  - TATE:   Vertical.
-  - YOKO:   Horizontal.
-  - NANAME: Diagonal.
+  2nd screen (press Bookkeeping key again)...
 
-  ...for each character (BOTE, OUME, PYOKO, KUNIO & PP).
+  - Tate (vertical), Yoko (horizontal) and Naname (diagonal),
+    for each character (Bote, Oume, Pyoko, Kunio and Pyon Pyon).
 
-  Also...
+    Also Aka (red) and Kuro (black).
 
-  - AKA:    Red.
-  - KURO:   Black.
+  Pressing the Bookkeeping key once more, you exit the mode and go back to the game.
 
 
-***************************************************************************
+*******************************************************************************
 
-  Samples....
+  ADPCM Samples....
 
   There are 14 samples in the system.
 
-  00: "boterin" (?)
+  00: "Boterin"
   01:
-  02: "hakase" ("professor")
-  03: "pyokorin"
-  04: "kunio"
-  05: "pyon pyon"
+  02: "Hakase" ("professor")
+  03: "Pyokorin"
+  04: "Kunio"
+  05: "Pyon Pyon"
   06:
   07:
-  08: "oume"
-  09: "haipaa" ("hyper")
-  10: "ichi ni tsuite" ("on your marks")
-  11: "youi" ("get ready")
-  12: bang sound for the tadpoles landing in the right panel
-  13: sound for reels when running
+  08: "Oume"
+  09: "Haipaa" ("hyper")
+  10: "Ichi ni tsuite" ("on your marks")
+  11: "Youi" ("get ready")
+  12: Bang sound for the tadpoles landing in the right panel.
+  13: Sound effect for reels when running.
 
 
-***************************************************************************
+*******************************************************************************
 
   TODO:
 
-  - Hook up AY8910 output ports. Or unused?
-  - Find why the use of coin 1 always jams. Hopper?
+  - Hopper emulation.
+  - Find why the use of coin 1 / payout always jam. Hopper related?
+  - Default DIP Switches, once the hopper/coin jam issues were solved...
 
 
-***************************************************************************/
+******************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -212,6 +226,8 @@ public:
 	DECLARE_WRITE8_MEMBER(kurukuru_adpcm_reset_w);
 	DECLARE_READ8_MEMBER(kurukuru_adpcm_timer_irqack_r);
 	DECLARE_WRITE8_MEMBER(kurukuru_adpcm_data_w);
+	DECLARE_WRITE8_MEMBER(ym2149_aout_w);
+	DECLARE_WRITE8_MEMBER(ym2149_bout_w);
 
 	void update_sound_irq(UINT8 cause);
 	virtual void machine_start();
@@ -220,9 +236,11 @@ public:
 };
 
 #define MAIN_CLOCK		XTAL_21_4772MHz
+#define CPU_CLOCK		MAIN_CLOCK/6
+#define YM2149_CLOCK	MAIN_CLOCK/12
 #define M5205_CLOCK		XTAL_384kHz
 
-#define VDP_MEM            0x30000
+#define VDP_MEM			0x30000
 
 /* from MSX2 driver, may be not accurate for this HW */
 #define MSX2_XBORDER_PIXELS		16
@@ -323,9 +341,9 @@ static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
 	AM_RANGE(0x90, 0x90) AM_WRITE(kurukuru_bankswitch_w)
 	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN0")
 	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("IN1")
-	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE_LEGACY("ym2149", ay8910_address_w)
 	AM_RANGE(0xc8, 0xc8) AM_READ_PORT("DSW2")
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("ym2149", ay8910_data_w)
 ADDRESS_MAP_END
 
 
@@ -372,6 +390,18 @@ static ADDRESS_MAP_START( audio_io, AS_IO, 8, kurukuru_state )
 ADDRESS_MAP_END
 
 
+/* YM2149 ports */
+WRITE8_MEMBER(kurukuru_state::ym2149_aout_w)
+{
+	logerror("YM2149: Port A out: %02X\n", data);
+}
+
+WRITE8_MEMBER(kurukuru_state::ym2149_bout_w)
+{
+	logerror("YM2149: Port B out: %02X\n", data);
+}
+
+
 /*************************************************
 *            Input Ports Definitions             *
 *************************************************/
@@ -389,7 +419,7 @@ static INPUT_PORTS_START( kurukuru )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Bookkeeping")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_8) PORT_NAME("Service")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_8) PORT_NAME("Service")		// add credits without contabilize them
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Reset Button")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_A) PORT_NAME("Unknown 1")
@@ -469,14 +499,14 @@ void kurukuru_state::machine_reset()
 *                Sound Interfaces                *
 *************************************************/
 
-static const ay8910_interface ay8910_intf =
+static const ay8910_interface ym2149_intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_UNMAPPED,
 	DEVCB_UNMAPPED,
-	DEVCB_UNMAPPED,	// some writes...
-	DEVCB_UNMAPPED	// some writes...
+	DEVCB_DRIVER_MEMBER(kurukuru_state, ym2149_aout_w),
+	DEVCB_DRIVER_MEMBER(kurukuru_state, ym2149_bout_w)
 };
 
 static const msm5205_interface msm5205_config =
@@ -493,12 +523,12 @@ static const msm5205_interface msm5205_config =
 static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/6)
+	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(kurukuru_map)
 	MCFG_CPU_IO_MAP(kurukuru_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kurukuru_state, kurukuru_vdp_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, MAIN_CLOCK/6)
+	MCFG_CPU_ADD("audiocpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_io)
 
@@ -523,11 +553,11 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", YM2149, MAIN_CLOCK/12)
-	MCFG_SOUND_CONFIG(ay8910_intf)
+	MCFG_SOUND_ADD("ym2149", YM2149, YM2149_CLOCK)
+	MCFG_SOUND_CONFIG(ym2149_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_ADD("adpcm", MSM5205, M5205_CLOCK)
 	MCFG_SOUND_CONFIG(msm5205_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
