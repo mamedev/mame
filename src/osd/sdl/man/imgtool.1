@@ -1,0 +1,157 @@
+.\"  -*- nroff -*-
+.\"
+.\" imgtool.1
+.\"
+.\" Man page created from usage info and imgtool.txt
+.\" Cesare Falco <c.falco@ubuntu.com>, February 2011
+.\"
+.\"
+.TH imgtool 1 2012-12-01 0.147u3 "Image manipulation tool for MESS"
+.\"
+.\"
+.\" NAME chapter
+.SH NAME
+imgtool \- A generic image manipulation tool for MESS
+.\"
+.\"
+.\" SYNOPSIS chapter
+.SH SYNOPSIS
+.B imgtool create
+.I format image
+.RI [ option " ...]"
+.br
+.B imgtool dir
+.I format image
+.RI [ path ]
+.br
+.B imgtool get
+.I format image file
+.RI [ newname ]
+.RB [ \-\-filter=\c
+.IR filter ]
+.RB [ \-\-fork=\c
+.IR fork ]
+.br
+.B imgtool put
+.IR "format image file " ...
+.RI [ newname ]
+.RI [ option " ...]"
+.RB [ \-\-filter=\c
+.IR filter ]
+.RB [ \-\-fork=\c
+.IR fork ]
+.br
+.B imgtool getall
+.I format image
+.RI [ path ]
+.RB [ \-\-filter=\c
+.IR filter ]
+.br
+.B imgtool del
+.IR "format image file " ...
+.br
+.B imgtool mkdir
+.I format image directory
+.br
+.B imgtool rmdir
+.IR "format image directory " ...
+.br
+.BR "imgtool readsector" | writesector
+.I format image track head sector file
+.br
+.B imgtool identify
+.I image
+.br
+.BR "imgtool listformats" | listfilters
+.br
+.B imgtool
+.B listdriveroptions
+.I format
+.\"
+.\"
+.\" DESCRIPTION chapter
+.SH DESCRIPTION
+.B imgtool
+is a tool for the maintenance and manipulation of disk and
+other types of images that MESS users need to deal with. Functions
+include retrieving and storing files and CRC checking and validation.
+Image files can also be within .zip files.
+.\"
+.\"
+.\" OPTIONS chapter
+.SH OPTIONS
+.TP
+.B create
+Creates and image. Optional, image\-specific parameters can be
+specified, see
+.B imgtool listdriveroptions
+command for a full list.
+.TP
+.B dir
+Lists the contents of an image.
+.TP
+.B get
+Gets a single file from an image. A filter can be specified to convert 
+custom file formats to ASCII, see
+.B imgtool listfilters
+command for a full list. File can optionally be renamed.
+.TP
+.B put
+Puts file(s) on an image (wildcards and rename supported).
+Filters are supplied to convert ASCII files to custom file formats,
+see
+.B imgtool listfilters
+command for a full list.
+.TP
+.B getall
+Gets all files off an image. Filters can be specified to convert
+custom file formats to ASCII, see
+.B imgtool listfilters
+command for a full list.
+.TP
+.B del
+Deletes a file on an image.
+.TP
+.B mkdir
+Create a directory on an image.
+.TP
+.B rmdir
+Delete directories on an image.
+.TP
+.B readsector
+Extract content of a single sector from an image to a file.
+.TP
+.B writesector
+Write file content to a specific sector on an image.
+.TP
+.B identify
+Try to recognize the format of an image file.
+.TP
+.B listformats
+Lists all image file formats supported by imgtool.
+.TP
+.B listfilters
+Lists all filters supported by imgtool.
+Filters are a mean to process data being written into or read out
+of an image in a certain way.
+.TP
+.B listdriveroptions
+Lists all format\-specific options for 
+.B imgtool put
+and 
+.B imgtool create
+commands.
+.\"
+.\"
+.\" EXAMPLES chapter
+.SH EXAMPLES
+.B imgtool dir coco_jvc_rsdos myimageinazip.zip
+.P
+.B imgtool get coco_jvc_rsdos myimage.dsk myfile.bin mynewfile.txt 
+.P
+.B imgtool getall coco_jvc_rsdos myimage.dsk
+.\"
+.\"
+.\" SEE ALSO chapter
+.SH SEE ALSO
+.BR mess (6)
