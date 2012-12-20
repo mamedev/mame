@@ -2251,9 +2251,9 @@ WRITE8_MEMBER(_8080bw_state::shuttlei_ff_w)
 
 static ADDRESS_MAP_START( shuttlei_map, AS_PROGRAM, 8, _8080bw_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("main_ram")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("share1") // shuttlei
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1") // skylove (is it mirrored, or different PCB hookup?)
+	AM_RANGE(0x2000, 0x37ff) AM_RAM AM_SHARE("main_ram")
+	AM_RANGE(0x3800, 0x43ff) AM_RAM // shuttlei
+	AM_RANGE(0x5800, 0x63ff) AM_RAM // skylove (is it mirrored, or different PCB hookup?)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shuttlei_io_map, AS_IO, 8, _8080bw_state )
