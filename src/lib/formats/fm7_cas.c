@@ -78,7 +78,7 @@ static const struct CassetteLegacyWaveFiller fm7_legacy_fill_wave =
 	-1,										/* chunk_size */
 	0,										/* chunk_samples */
 	fm7_cas_to_wav_size,					/* chunk_sample_calc */
-	125000,									/* sample_frequency */
+	110250,									/* sample_frequency */
 	0,										/* header_samples */
 	0										/* trailer_samples */
 };
