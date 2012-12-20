@@ -30,10 +30,10 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> base_c2040_device
+// ======================> c2040_device
 
-class base_c2040_device :  public device_t,
-						   public device_ieee488_interface
+class c2040_device :  public device_t,
+					  public device_ieee488_interface
 {
 public:
 	enum
@@ -48,7 +48,8 @@ public:
 	};
 
 	// construction/destruction
-    base_c2040_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+    c2040_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+    c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// not really public
 	static void on_disk0_change(device_image_interface &image);
@@ -70,10 +71,6 @@ public:
 	DECLARE_WRITE8_MEMBER( pi_w );
 	DECLARE_READ8_MEMBER( miot_pb_r );
 	DECLARE_WRITE8_MEMBER( miot_pb_w );
-	DECLARE_READ8_MEMBER( c8050_via_pb_r );
-	DECLARE_WRITE8_MEMBER( c8050_via_pb_w );
-	DECLARE_READ8_MEMBER( c8050_miot_pb_r );
-	DECLARE_WRITE8_MEMBER( c8050_miot_pb_w );
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -96,7 +93,6 @@ protected:
 	inline void spindle_motor(int unit, int mtr);
 	inline void micropolis_step_motor(int unit, int stp);
 	inline void mpi_step_motor(int unit, int stp);
-	inline void initialize(int drives);
 
 	required_device<m6502_device> m_maincpu;
 	required_device<m6504_device> m_fdccpu;
@@ -135,7 +131,7 @@ protected:
 	int m_bit_count;					// GCR bit counter
 	UINT16 m_sr;						// GCR data shift register
 	UINT8 m_pi;							// parallel data input
-	UINT8* m_gcr;						// GCR encoder/decoder ROM
+	const UINT8* m_gcr;					// GCR encoder/decoder ROM
 	UINT16 m_i;							// GCR encoder/decoded ROM address
 	UINT8 m_e;							// GCR encoder/decoded ROM data
 
@@ -152,19 +148,9 @@ protected:
 };
 
 
-// ======================> c2040_device
-
-class c2040_device :  public base_c2040_device
-{
-public:
-    // construction/destruction
-    c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-};
-
-
 // ======================> c3040_device
 
-class c3040_device :  public base_c2040_device
+class c3040_device :  public c2040_device
 {
 public:
     // construction/destruction
@@ -174,7 +160,7 @@ public:
 
 // ======================> c4040_device
 
-class c4040_device :  public base_c2040_device
+class c4040_device :  public c2040_device
 {
 public:
     // construction/destruction
@@ -184,17 +170,23 @@ public:
 
 // ======================> c8050_device
 
-class c8050_device :  public base_c2040_device
+class c8050_device :  public c2040_device
 {
 public:
 	// construction/destruction
     c8050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+    c8050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+
+	DECLARE_READ8_MEMBER( via_pb_r );
+	DECLARE_WRITE8_MEMBER( via_pb_w );
+	DECLARE_READ8_MEMBER( miot_pb_r );
+	DECLARE_WRITE8_MEMBER( miot_pb_w );
 };
 
 
 // ======================> c8250_device
 
-class c8250_device :  public base_c2040_device
+class c8250_device :  public c8050_device
 {
 public:
     // construction/destruction
@@ -204,7 +196,7 @@ public:
 
 // ======================> c8250lp_device
 
-class c8250lp_device :  public base_c2040_device
+class c8250lp_device :  public c8050_device
 {
 public:
     // construction/destruction
@@ -214,7 +206,7 @@ public:
 
 // ======================> sfd1001_device
 
-class sfd1001_device :  public base_c2040_device
+class sfd1001_device :  public c8050_device
 {
 public:
     // construction/destruction

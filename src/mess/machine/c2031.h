@@ -37,9 +37,6 @@ public:
     // construction/destruction
     c2031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// not really public
-	static void on_disk_change(device_image_interface &image);
-
 	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
 	DECLARE_READ8_MEMBER( via0_pa_r );
 	DECLARE_WRITE8_MEMBER( via0_pa_w );

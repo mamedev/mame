@@ -45,9 +45,6 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
-	// not really public
-	static void on_disk_change(device_image_interface &image);
-
 	DECLARE_READ8_MEMBER( port_r );
 	DECLARE_WRITE8_MEMBER( port_w );
 

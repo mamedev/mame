@@ -98,10 +98,10 @@ inline void c64h156_device::read_current_track()
 	int track_length = G64_BUFFER_SIZE;
 
 	// read track data
-	floppy_drive_read_track_data_info_buffer(m_image, m_side, m_track_buffer, &track_length);
+	floppy_drive_read_track_data_info_buffer(m_floppy, m_side, m_track_buffer, &track_length);
 
 	// extract track length
-	m_track_len = floppy_drive_get_current_track_size(m_image, m_side);
+	m_track_len = floppy_drive_get_current_track_size(m_floppy, m_side);
 
 	// set bit pointer to track start
 	m_buffer_pos = 0;
@@ -400,7 +400,7 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
     : device_t(mconfig, C64H156, "64H156", tag, owner, clock),
       device_execute_interface(mconfig, *this),
       m_icount(0),
-	  m_image(*this->owner(), FLOPPY_0),
+	  m_floppy(NULL),
 	  m_track_buffer(*this, "track_buffer"),
 	  m_speed_buffer(*this, "speed_buffer"),
 	  m_side(0),
@@ -409,7 +409,7 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 	  m_bit_pos(0),
 	  m_bit_count(0),
 	  m_mtr(0),
-	  m_accl(1),
+	  m_accl(0),
 	  m_ds(0),
 	  m_soe(0),
 	  m_oe(0),
@@ -627,7 +627,7 @@ WRITE_LINE_MEMBER( c64h156_device::mtr_w )
 			read_current_track();
 		}
 
-		floppy_mon_w(m_image, !state);
+		floppy_mon_w(m_floppy, !state);
 
 		m_mtr = state;
 	}
@@ -697,6 +697,20 @@ WRITE_LINE_MEMBER( c64h156_device::atna_w )
 
 
 //-------------------------------------------------
+//  set_floppy -
+//-------------------------------------------------
+
+void c64h156_device::set_floppy(legacy_floppy_image_device *floppy)
+{
+	m_floppy = floppy;
+
+	// install image callbacks
+	floppy_install_unload_proc(m_floppy, c64h156_device::on_disk_change);
+	floppy_install_load_proc(m_floppy, c64h156_device::on_disk_change);
+}
+
+
+//-------------------------------------------------
 //  stp_w -
 //-------------------------------------------------
 
@@ -704,7 +718,7 @@ void c64h156_device::stp_w(int data)
 {
 	if (m_mtr)
 	{
-		int track = floppy_drive_get_current_track(m_image);
+		int track = floppy_drive_get_current_track(m_floppy);
 		int tracks = (data - track) & 0x03;
 
 		if (tracks == 3)
@@ -715,7 +729,7 @@ void c64h156_device::stp_w(int data)
 		if (tracks == -1 || tracks == 1)
 		{
 			// step read/write head
-			floppy_drive_seek(m_image, tracks);
+			floppy_drive_seek(m_floppy, tracks);
 
 			// read new track data
 			read_current_track();
@@ -735,22 +749,22 @@ void c64h156_device::ds_w(int data)
 
 
 //-------------------------------------------------
-//  on_disk_changed -
-//-------------------------------------------------
-
-void c64h156_device::on_disk_changed(int wp)
-{
-	m_wp = wp;
-
-	read_current_track();
-}
-
-
-//-------------------------------------------------
 //  set_side -
 //-------------------------------------------------
 
 void c64h156_device::set_side(int side)
 {
 	m_side = side;
+}
+
+
+//-------------------------------------------------
+//  on_disk_change -
+//-------------------------------------------------
+
+void c64h156_device::on_disk_change(device_image_interface &image)
+{
+	//m_wp = !floppy_wpt_r(image);
+
+	//read_current_track();
 }

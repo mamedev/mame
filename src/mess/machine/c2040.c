@@ -11,8 +11,6 @@
 
     TODO:
 
-    - 8050/8250 only work when debugger is active!?
-
     - 2040 DOS 1 FDC rom (jumps to 104d while getting block header)
 
         FE70: jsr  $104D
@@ -83,7 +81,7 @@ const device_type SFD1001 = &device_creator<sfd1001_device>;
 //  complete
 //-------------------------------------------------
 
-void base_c2040_device::device_config_complete()
+void c2040_device::device_config_complete()
 {
 	switch (m_variant)
 	{
@@ -265,7 +263,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *base_c2040_device::device_rom_region() const
+const rom_entry *c2040_device::device_rom_region() const
 {
 	switch (m_variant)
 	{
@@ -294,7 +292,7 @@ const rom_entry *base_c2040_device::device_rom_region() const
 //  ADDRESS_MAP( c2040_main_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c2040_main_mem, AS_PROGRAM, 8, base_c2040_device )
+static ADDRESS_MAP_START( c2040_main_mem, AS_PROGRAM, 8, c2040_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_RAM // 6532 #1
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM // 6532 #2
@@ -312,7 +310,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( c2040_fdc_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c2040_fdc_mem, AS_PROGRAM, 8, base_c2040_device )
+static ADDRESS_MAP_START( c2040_fdc_mem, AS_PROGRAM, 8, c2040_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
 	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via6522_device, read, write)
@@ -329,7 +327,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( c8050_main_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c8050_main_mem, AS_PROGRAM, 8, base_c2040_device )
+static ADDRESS_MAP_START( c8050_main_mem, AS_PROGRAM, 8, c2040_device )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_RAM // 6532 #1
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM // 6532 #2
 	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0d60) AM_DEVREADWRITE_LEGACY(M6532_0_TAG, riot6532_r, riot6532_w)
@@ -346,7 +344,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( c8050_fdc_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c8050_fdc_mem, AS_PROGRAM, 8, base_c2040_device )
+static ADDRESS_MAP_START( c8050_fdc_mem, AS_PROGRAM, 8, c2040_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
 	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via6522_device, read, write)
@@ -363,7 +361,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( c8250lp_fdc_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c8250lp_fdc_mem, AS_PROGRAM, 8, base_c2040_device )
+static ADDRESS_MAP_START( c8250lp_fdc_mem, AS_PROGRAM, 8, c2040_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
 	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via6522_device, read, write)
@@ -380,7 +378,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( sfd1001_fdc_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( sfd1001_fdc_mem, AS_PROGRAM, 8, base_c2040_device )
+static ADDRESS_MAP_START( sfd1001_fdc_mem, AS_PROGRAM, 8, c2040_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x003f) AM_MIRROR(0x0300) AM_RAM // 6530
 	AM_RANGE(0x0040, 0x004f) AM_MIRROR(0x0330) AM_DEVREADWRITE(M6522_TAG, via6522_device, read, write)
@@ -397,7 +395,7 @@ ADDRESS_MAP_END
 //  riot6532_interface riot0_intf uc1
 //-------------------------------------------------
 
-READ8_MEMBER( base_c2040_device::dio_r )
+READ8_MEMBER( c2040_device::dio_r )
 {
 	/*
 
@@ -417,8 +415,7 @@ READ8_MEMBER( base_c2040_device::dio_r )
 	return m_bus->dio_r();
 }
 
-
-WRITE8_MEMBER( base_c2040_device::dio_w )
+WRITE8_MEMBER( c2040_device::dio_w )
 {
 	/*
 
@@ -438,13 +435,12 @@ WRITE8_MEMBER( base_c2040_device::dio_w )
 	m_bus->dio_w(this, data);
 }
 
-
 static const riot6532_interface riot0_intf =
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, dio_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, dio_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, dio_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, dio_w),
 	DEVCB_NULL
 };
 
@@ -453,7 +449,7 @@ static const riot6532_interface riot0_intf =
 //  riot6532_interface riot1_intf ue1
 //-------------------------------------------------
 
-READ8_MEMBER( base_c2040_device::riot1_pa_r )
+READ8_MEMBER( c2040_device::riot1_pa_r )
 {
 	/*
 
@@ -484,8 +480,7 @@ READ8_MEMBER( base_c2040_device::riot1_pa_r )
 	return data;
 }
 
-
-WRITE8_MEMBER( base_c2040_device::riot1_pa_w )
+WRITE8_MEMBER( c2040_device::riot1_pa_w )
 {
 	/*
 
@@ -520,8 +515,7 @@ WRITE8_MEMBER( base_c2040_device::riot1_pa_w )
 	update_ieee_signals();
 }
 
-
-READ8_MEMBER( base_c2040_device::riot1_pb_r )
+READ8_MEMBER( c2040_device::riot1_pb_r )
 {
 	/*
 
@@ -552,8 +546,7 @@ READ8_MEMBER( base_c2040_device::riot1_pb_r )
 	return data;
 }
 
-
-WRITE8_MEMBER( base_c2040_device::riot1_pb_w )
+WRITE8_MEMBER( c2040_device::riot1_pb_w )
 {
 	/*
 
@@ -580,13 +573,12 @@ WRITE8_MEMBER( base_c2040_device::riot1_pb_w )
 	output_set_led_value(LED_ERR, BIT(data, 5));
 }
 
-
 static const riot6532_interface riot1_intf =
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, riot1_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, riot1_pb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, riot1_pa_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, riot1_pb_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, riot1_pa_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, riot1_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, riot1_pa_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, riot1_pb_w),
 	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0)
 };
 
@@ -595,7 +587,7 @@ static const riot6532_interface riot1_intf =
 //  via6522_interface via_intf um3
 //-------------------------------------------------
 
-READ8_MEMBER( base_c2040_device::via_pa_r )
+READ8_MEMBER( c2040_device::via_pa_r )
 {
 	/*
 
@@ -612,15 +604,10 @@ READ8_MEMBER( base_c2040_device::via_pa_r )
 
     */
 
-	UINT16 i = m_i;
-	UINT8 e = m_e;
-	UINT8 data = (BIT(e, 6) << 7) | (BIT(i, 7) << 6) | (e & 0x33) | (BIT(e, 2) << 3) | (i & 0x04);
-
-	return data;
+	return (BIT(m_e, 6) << 7) | (BIT(m_i, 7) << 6) | (m_e & 0x33) | (BIT(m_e, 2) << 3) | (m_i & 0x04);
 }
 
-
-WRITE8_MEMBER( base_c2040_device::via_pb_w )
+WRITE8_MEMBER( c2040_device::via_pb_w )
 {
 	/*
 
@@ -656,20 +643,17 @@ WRITE8_MEMBER( base_c2040_device::via_pb_w )
 	m_bit_timer->enable(!mtr1 || !mtr0);
 }
 
-
-READ_LINE_MEMBER( base_c2040_device::ready_r )
+READ_LINE_MEMBER( c2040_device::ready_r )
 {
 	return m_ready;
 }
 
-
-READ_LINE_MEMBER( base_c2040_device::err_r )
+READ_LINE_MEMBER( c2040_device::err_r )
 {
 	return ERROR;
 }
 
-
-WRITE_LINE_MEMBER( base_c2040_device::mode_sel_w )
+WRITE_LINE_MEMBER( c2040_device::mode_sel_w )
 {
 	// mode select
 	m_mode = state;
@@ -678,7 +662,7 @@ WRITE_LINE_MEMBER( base_c2040_device::mode_sel_w )
 	m_via->write_cb1(ERROR);
 }
 
-WRITE_LINE_MEMBER( base_c2040_device::rw_sel_w )
+WRITE_LINE_MEMBER( c2040_device::rw_sel_w )
 {
 	// read/write select
 	m_rw = state;
@@ -687,22 +671,21 @@ WRITE_LINE_MEMBER( base_c2040_device::rw_sel_w )
 	m_via->write_cb1(ERROR);
 }
 
-
 static const via6522_interface via_intf =
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, via_pa_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, via_pa_r),
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, ready_r),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, err_r),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c2040_device, ready_r),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c2040_device, err_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, via_pb_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, via_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, mode_sel_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, rw_sel_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c2040_device, mode_sel_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c2040_device, rw_sel_w),
 
 	DEVCB_NULL
 };
@@ -712,7 +695,7 @@ static const via6522_interface via_intf =
 //  via6522_interface c8050_via_intf um3
 //-------------------------------------------------
 
-READ8_MEMBER( base_c2040_device::c8050_via_pb_r )
+READ8_MEMBER( c8050_device::via_pb_r )
 {
 	/*
 
@@ -737,8 +720,7 @@ READ8_MEMBER( base_c2040_device::c8050_via_pb_r )
 	return data;
 }
 
-
-WRITE8_MEMBER( base_c2040_device::c8050_via_pb_w )
+WRITE8_MEMBER( c8050_device::via_pb_w )
 {
 	/*
 
@@ -774,22 +756,21 @@ WRITE8_MEMBER( base_c2040_device::c8050_via_pb_w )
 	m_bit_timer->enable(!mtr1 || !mtr0);
 }
 
-
 static const via6522_interface c8050_via_intf =
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, via_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, c8050_via_pb_r),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, ready_r),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, err_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, via_pa_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c8050_device, via_pb_r),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c2040_device, ready_r),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c2040_device, err_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, c8050_via_pb_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c8050_device, via_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, mode_sel_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, rw_sel_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c2040_device, mode_sel_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c2040_device, rw_sel_w),
 
 	DEVCB_NULL
 };
@@ -799,7 +780,7 @@ static const via6522_interface c8050_via_intf =
 //  mos6530_interface miot_intf uk3
 //-------------------------------------------------
 
-READ8_MEMBER( base_c2040_device::pi_r )
+READ8_MEMBER( c2040_device::pi_r )
 {
 	/*
 
@@ -819,7 +800,7 @@ READ8_MEMBER( base_c2040_device::pi_r )
 	return m_pi;
 }
 
-WRITE8_MEMBER( base_c2040_device::pi_w )
+WRITE8_MEMBER( c2040_device::pi_w )
 {
 	/*
 
@@ -839,7 +820,7 @@ WRITE8_MEMBER( base_c2040_device::pi_w )
 	m_pi = data;
 }
 
-READ8_MEMBER( base_c2040_device::miot_pb_r )
+READ8_MEMBER( c2040_device::miot_pb_r )
 {
 	/*
 
@@ -867,7 +848,7 @@ READ8_MEMBER( base_c2040_device::miot_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( base_c2040_device::miot_pb_w )
+WRITE8_MEMBER( c2040_device::miot_pb_w )
 {
 	/*
 
@@ -906,10 +887,10 @@ WRITE8_MEMBER( base_c2040_device::miot_pb_w )
 
 static MOS6530_INTERFACE( miot_intf )
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, pi_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, pi_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, miot_pb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, miot_pb_w)
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, pi_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, pi_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, miot_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, miot_pb_w)
 };
 
 
@@ -917,7 +898,7 @@ static MOS6530_INTERFACE( miot_intf )
 //  mos6530_interface c8050_miot_intf uk3
 //-------------------------------------------------
 
-READ8_MEMBER( base_c2040_device::c8050_miot_pb_r )
+READ8_MEMBER( c8050_device::miot_pb_r )
 {
 	/*
 
@@ -943,7 +924,7 @@ READ8_MEMBER( base_c2040_device::c8050_miot_pb_r )
 	data |= 0x10;
 
 	// single/dual sided
-	if (m_variant == base_c2040_device::TYPE_8050)
+	if (m_variant == c2040_device::TYPE_8050)
 	{
 		data |= 0x40;
 	}
@@ -951,7 +932,7 @@ READ8_MEMBER( base_c2040_device::c8050_miot_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( base_c2040_device::c8050_miot_pb_w )
+WRITE8_MEMBER( c8050_device::miot_pb_w )
 {
 	/*
 
@@ -969,8 +950,8 @@ WRITE8_MEMBER( base_c2040_device::c8050_miot_pb_w )
     */
 
 	// drive select
-	if ((m_variant == base_c2040_device::TYPE_8050) ||
-		(m_variant == base_c2040_device::TYPE_8250))
+	if ((m_variant == c2040_device::TYPE_8050) ||
+		(m_variant == c2040_device::TYPE_8250))
 	{
 		m_drive = BIT(data, 0);
 	}
@@ -985,8 +966,8 @@ WRITE8_MEMBER( base_c2040_device::c8050_miot_pb_w )
 	}
 
 	// side select
-	if ((m_variant == base_c2040_device::TYPE_8250) ||
-		(m_variant == base_c2040_device::TYPE_SFD1001))
+	if ((m_variant == c2040_device::TYPE_8250) ||
+		(m_variant == c2040_device::TYPE_SFD1001))
 	{
 		m_side = !BIT(data, 4);
 	}
@@ -1001,10 +982,10 @@ WRITE8_MEMBER( base_c2040_device::c8050_miot_pb_w )
 
 static MOS6530_INTERFACE( c8050_miot_intf )
 {
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, pi_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, pi_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, c8050_miot_pb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c2040_device, c8050_miot_pb_w)
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, pi_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c2040_device, pi_w),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c8050_device, miot_pb_r),
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c8050_device, miot_pb_w)
 };
 
 
@@ -1262,7 +1243,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor base_c2040_device::device_mconfig_additions() const
+machine_config_constructor c2040_device::device_mconfig_additions() const
 {
 	switch (m_variant)
 	{
@@ -1298,7 +1279,7 @@ machine_config_constructor base_c2040_device::device_mconfig_additions() const
 //  update_ieee_signals -
 //-------------------------------------------------
 
-inline void base_c2040_device::update_ieee_signals()
+inline void c2040_device::update_ieee_signals()
 {
 	int atn = m_bus->atn_r();
 	int nrfd = !(!(!(atn && m_atna) && m_rfdo) || !(atn || m_atna));
@@ -1313,7 +1294,7 @@ inline void base_c2040_device::update_ieee_signals()
 //  update_gcr_data -
 //-------------------------------------------------
 
-inline void base_c2040_device::update_gcr_data()
+inline void c2040_device::update_gcr_data()
 {
 	if (m_rw)
 	{
@@ -1368,7 +1349,7 @@ inline void base_c2040_device::update_gcr_data()
 //  update_ieee_signals -
 //-------------------------------------------------
 
-inline void base_c2040_device::read_current_track(int unit)
+inline void c2040_device::read_current_track(int unit)
 {
 	m_unit[unit].m_track_len = G64_BUFFER_SIZE;
 	m_unit[unit].m_buffer_pos = 0;
@@ -1387,7 +1368,7 @@ inline void base_c2040_device::read_current_track(int unit)
 //  spindle_motor -
 //-------------------------------------------------
 
-inline void base_c2040_device::spindle_motor(int unit, int mtr)
+inline void c2040_device::spindle_motor(int unit, int mtr)
 {
 	if (m_unit[unit].m_mtr != mtr)
 	{
@@ -1408,7 +1389,7 @@ inline void base_c2040_device::spindle_motor(int unit, int mtr)
 //  micropolis_step_motor -
 //-------------------------------------------------
 
-inline void base_c2040_device::micropolis_step_motor(int unit, int stp)
+inline void c2040_device::micropolis_step_motor(int unit, int stp)
 {
 	if (!m_unit[unit].m_mtr && (m_unit[unit].m_stp != stp))
 	{
@@ -1440,7 +1421,7 @@ inline void base_c2040_device::micropolis_step_motor(int unit, int stp)
 //  mpi_step_motor -
 //-------------------------------------------------
 
-inline void base_c2040_device::mpi_step_motor(int unit, int stp)
+inline void c2040_device::mpi_step_motor(int unit, int stp)
 {
 	if (!m_unit[unit].m_mtr && (m_unit[unit].m_stp != stp))
 	{
@@ -1468,72 +1449,16 @@ inline void base_c2040_device::mpi_step_motor(int unit, int stp)
 }
 
 
-//-------------------------------------------------
-//  initialize -
-//-------------------------------------------------
-
-inline void base_c2040_device::initialize(int drives)
-{
-	// find GCR ROM
-	m_gcr = memregion("gcr")->base();
-
-	// install image callbacks
-	m_unit[0].m_image = m_image0;
-
-	floppy_install_unload_proc(m_image0, base_c2040_device::on_disk0_change);
-	floppy_install_load_proc(m_image0, base_c2040_device::on_disk0_change);
-
-	if (drives == 2)
-	{
-		m_unit[1].m_image = m_image1;
-
-		floppy_install_unload_proc(m_image1, base_c2040_device::on_disk1_change);
-		floppy_install_load_proc(m_image1, base_c2040_device::on_disk1_change);
-	}
-
-	// register for state saving
-	save_item(NAME(m_drive));
-	save_item(NAME(m_side));
-	save_item(NAME(m_rfdo));
-	save_item(NAME(m_daco));
-	save_item(NAME(m_atna));
-	save_item(NAME(m_ds));
-	save_item(NAME(m_bit_count));
-	save_item(NAME(m_sr));
-	save_item(NAME(m_pi));
-	save_item(NAME(m_i));
-	save_item(NAME(m_e));
-	save_item(NAME(m_ready));
-	save_item(NAME(m_mode));
-	save_item(NAME(m_rw));
-	save_item(NAME(m_miot_irq));
-	save_item(NAME(m_unit[0].m_stp));
-	save_item(NAME(m_unit[0].m_mtr));
-	save_item(NAME(m_unit[0].m_track_len));
-	save_item(NAME(m_unit[0].m_buffer_pos));
-	save_item(NAME(m_unit[0].m_bit_pos));
-
-	if (drives == 2)
-	{
-		save_item(NAME(m_unit[1].m_stp));
-		save_item(NAME(m_unit[1].m_mtr));
-		save_item(NAME(m_unit[1].m_track_len));
-		save_item(NAME(m_unit[1].m_buffer_pos));
-		save_item(NAME(m_unit[1].m_bit_pos));
-	}
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
 //-------------------------------------------------
-//  base_c2040_device - constructor
+//  c2040_device - constructor
 //-------------------------------------------------
 
-base_c2040_device::base_c2040_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
+c2040_device::c2040_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
     : device_t(mconfig, type, name, tag, owner, clock),
 	  device_ieee488_interface(mconfig, *this),
 	  m_maincpu(*this, M6502_TAG),
@@ -1567,13 +1492,39 @@ base_c2040_device::base_c2040_device(const machine_config &mconfig, device_type 
 	}
 }
 
-
-//-------------------------------------------------
-//  base_c2040_device - constructor
-//-------------------------------------------------
-
 c2040_device::c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c2040_device(mconfig, C2040, "C2040", tag, owner, clock, TYPE_2040) { }
+	: device_t(mconfig, C2040, "C2040", tag, owner, clock),
+	  device_ieee488_interface(mconfig, *this),
+	  m_maincpu(*this, M6502_TAG),
+	  m_fdccpu(*this, M6504_TAG),
+	  m_riot0(*this, M6532_0_TAG),
+	  m_riot1(*this, M6532_1_TAG),
+	  m_miot(*this, M6530_TAG),
+	  m_via(*this, M6522_TAG),
+	  m_image0(*this, FLOPPY_0),
+	  m_image1(*this, FLOPPY_1),
+	  m_drive(0),
+	  m_side(0),
+	  m_rfdo(1),
+	  m_daco(1),
+	  m_atna(1),
+	  m_ds(-1),
+	  m_bit_count(0),
+	  m_ready(0),
+	  m_mode(0),
+	  m_rw(0),
+	  m_miot_irq(CLEAR_LINE),
+	  m_variant(TYPE_2040)
+{
+	for (int i = 0; i < 2; i++)
+	{
+		m_unit[i].m_stp = 0;
+		m_unit[i].m_mtr = 1;
+		m_unit[i].m_track_len = 0;
+		m_unit[i].m_buffer_pos = 0;
+		m_unit[i].m_bit_pos = 0;
+	}
+}
 
 
 //-------------------------------------------------
@@ -1581,7 +1532,7 @@ c2040_device::c2040_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c3040_device::c3040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c2040_device(mconfig, C3040, "C3040", tag, owner, clock, TYPE_3040) { }
+	: c2040_device(mconfig, C3040, "C3040", tag, owner, clock, TYPE_3040) { }
 
 
 //-------------------------------------------------
@@ -1589,15 +1540,18 @@ c3040_device::c3040_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c4040_device::c4040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c2040_device(mconfig, C4040, "C4040", tag, owner, clock, TYPE_4040) { }
+	: c2040_device(mconfig, C4040, "C4040", tag, owner, clock, TYPE_4040) { }
 
 
 //-------------------------------------------------
 //  c8050_device - constructor
 //-------------------------------------------------
 
+c8050_device::c8050_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
+	: c2040_device(mconfig, type, name, tag, owner, clock, variant) { }
+
 c8050_device::c8050_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c2040_device(mconfig, C8050, "C8050", tag, owner, clock, TYPE_8050) { }
+	: c2040_device(mconfig, C8050, "C8050", tag, owner, clock, TYPE_8050) { }
 
 
 //-------------------------------------------------
@@ -1605,7 +1559,7 @@ c8050_device::c8050_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c8250_device::c8250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c2040_device(mconfig, C8250, "C8250", tag, owner, clock, TYPE_8250) { }
+	: c8050_device(mconfig, C8250, "C8250", tag, owner, clock, TYPE_8250) { }
 
 
 //-------------------------------------------------
@@ -1613,7 +1567,7 @@ c8250_device::c8250_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 c8250lp_device::c8250lp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c2040_device(mconfig, C8250LP, "C8250LP", tag, owner, clock, TYPE_8250LP) { }
+	: c8050_device(mconfig, C8250LP, "C8250LP", tag, owner, clock, TYPE_8250LP) { }
 
 
 //-------------------------------------------------
@@ -1621,26 +1575,63 @@ c8250lp_device::c8250lp_device(const machine_config &mconfig, const char *tag, d
 //-------------------------------------------------
 
 sfd1001_device::sfd1001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c2040_device(mconfig, SFD1001, "SFD1001", tag, owner, clock, TYPE_SFD1001) { }
+	: c8050_device(mconfig, SFD1001, "SFD1001", tag, owner, clock, TYPE_SFD1001) { }
 
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void base_c2040_device::device_start()
+void c2040_device::device_start()
 {
 	m_bit_timer = timer_alloc();
 
-	switch (m_variant)
-	{
-	default:
-		initialize(2);
-		break;
+	// find GCR ROM
+	m_gcr = memregion("gcr")->base();
 
-	case base_c2040_device::TYPE_SFD1001:
-		initialize(1);
-		break;
+	// install image callbacks
+	m_unit[0].m_image = m_image0;
+
+	floppy_install_unload_proc(m_image0, c2040_device::on_disk0_change);
+	floppy_install_load_proc(m_image0, c2040_device::on_disk0_change);
+
+	if (m_image1)
+	{
+		m_unit[1].m_image = m_image1;
+
+		floppy_install_unload_proc(m_image1, c2040_device::on_disk1_change);
+		floppy_install_load_proc(m_image1, c2040_device::on_disk1_change);
+	}
+
+	// register for state saving
+	save_item(NAME(m_drive));
+	save_item(NAME(m_side));
+	save_item(NAME(m_rfdo));
+	save_item(NAME(m_daco));
+	save_item(NAME(m_atna));
+	save_item(NAME(m_ds));
+	save_item(NAME(m_bit_count));
+	save_item(NAME(m_sr));
+	save_item(NAME(m_pi));
+	save_item(NAME(m_i));
+	save_item(NAME(m_e));
+	save_item(NAME(m_ready));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_rw));
+	save_item(NAME(m_miot_irq));
+	save_item(NAME(m_unit[0].m_stp));
+	save_item(NAME(m_unit[0].m_mtr));
+	save_item(NAME(m_unit[0].m_track_len));
+	save_item(NAME(m_unit[0].m_buffer_pos));
+	save_item(NAME(m_unit[0].m_bit_pos));
+
+	if (m_image1)
+	{
+		save_item(NAME(m_unit[1].m_stp));
+		save_item(NAME(m_unit[1].m_mtr));
+		save_item(NAME(m_unit[1].m_track_len));
+		save_item(NAME(m_unit[1].m_buffer_pos));
+		save_item(NAME(m_unit[1].m_bit_pos));
 	}
 }
 
@@ -1649,7 +1640,7 @@ void base_c2040_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void base_c2040_device::device_reset()
+void c2040_device::device_reset()
 {
     m_maincpu->reset();
 
@@ -1673,7 +1664,7 @@ void base_c2040_device::device_reset()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void base_c2040_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void c2040_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	int ready = 1;
 
@@ -1721,9 +1712,9 @@ void base_c2040_device::device_timer(emu_timer &timer, device_timer_id id, int p
 		m_via->write_ca1(ready);
 		m_via->write_cb1(ERROR);
 
-		if ((m_variant == base_c2040_device::TYPE_8050) ||
-			(m_variant == base_c2040_device::TYPE_8250) ||
-			(m_variant == base_c2040_device::TYPE_SFD1001))
+		if ((m_variant == c2040_device::TYPE_8050) ||
+			(m_variant == c2040_device::TYPE_8250) ||
+			(m_variant == c2040_device::TYPE_SFD1001))
 		{
 			m_fdccpu->set_input_line(M6502_SET_OVERFLOW, ready ? CLEAR_LINE : ASSERT_LINE);
 		}
@@ -1735,7 +1726,7 @@ void base_c2040_device::device_timer(emu_timer &timer, device_timer_id id, int p
 //  ieee488_atn -
 //-------------------------------------------------
 
-void base_c2040_device::ieee488_atn(int state)
+void c2040_device::ieee488_atn(int state)
 {
 	update_ieee_signals();
 
@@ -1748,7 +1739,7 @@ void base_c2040_device::ieee488_atn(int state)
 //  ieee488_ifc -
 //-------------------------------------------------
 
-void base_c2040_device::ieee488_ifc(int state)
+void c2040_device::ieee488_ifc(int state)
 {
 	if (!state)
 	{
@@ -1761,9 +1752,9 @@ void base_c2040_device::ieee488_ifc(int state)
 //  on_disk0_change -
 //-------------------------------------------------
 
-void base_c2040_device::on_disk0_change(device_image_interface &image)
+void c2040_device::on_disk0_change(device_image_interface &image)
 {
-    base_c2040_device *c2040 = static_cast<base_c2040_device *>(image.device().owner());
+    c2040_device *c2040 = static_cast<c2040_device *>(image.device().owner());
 
 	c2040->read_current_track(0);
 }
@@ -1773,9 +1764,9 @@ void base_c2040_device::on_disk0_change(device_image_interface &image)
 //  on_disk_change -
 //-------------------------------------------------
 
-void base_c2040_device::on_disk1_change(device_image_interface &image)
+void c2040_device::on_disk1_change(device_image_interface &image)
 {
-    base_c2040_device *c2040 = static_cast<base_c2040_device *>(image.device().owner());
+    c2040_device *c2040 = static_cast<c2040_device *>(image.device().owner());
 
 	c2040->read_current_track(1);
 }

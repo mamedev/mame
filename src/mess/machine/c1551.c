@@ -493,8 +493,7 @@ void c1551_device::device_start()
 	m_irq_timer->adjust(attotime::zero, CLEAR_LINE);
 
 	// install image callbacks
-	floppy_install_unload_proc(m_image, c1551_device::on_disk_change);
-	floppy_install_load_proc(m_image, c1551_device::on_disk_change);
+	m_ga->set_floppy(m_image);
 
 	// register for state saving
 	save_item(NAME(m_tcbm_data));
@@ -612,17 +611,4 @@ void c1551_device::plus4_breset_w(int state)
 	}
 
 	m_exp->breset_w(state);
-}
-
-
-//-------------------------------------------------
-//  on_disk_change -
-//-------------------------------------------------
-
-void c1551_device::on_disk_change(device_image_interface &image)
-{
-    c1551_device *c1551 = static_cast<c1551_device *>(image.device().owner());
-
-    int wp = floppy_wpt_r(image);
-	c1551->m_ga->on_disk_changed(wp);
 }

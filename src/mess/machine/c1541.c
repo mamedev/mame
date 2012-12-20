@@ -1075,9 +1075,8 @@ c1541_prologic_dos_classic_device::c1541_prologic_dos_classic_device(const machi
 
 void base_c1541_device::device_start()
 {
-	// install image callbacks
-	floppy_install_unload_proc(m_image, base_c1541_device::on_disk_change);
-	floppy_install_load_proc(m_image, base_c1541_device::on_disk_change);
+    // install image callbacks
+    m_ga->set_floppy(m_image);
 
 	// register for state saving
 	save_item(NAME(m_data_out));
@@ -1117,6 +1116,10 @@ void base_c1541_device::device_reset()
 
     m_via0->reset();
     m_via1->reset();
+
+    // initialize gate array
+    m_ga->accl_w(0);
+    m_ga->ted_w(1);
 }
 
 
@@ -1163,17 +1166,4 @@ void base_c1541_device::parallel_data_w(UINT8 data)
 void base_c1541_device::parallel_strobe_w(int state)
 {
     m_via0->write_cb1(state);
-}
-
-
-//-------------------------------------------------
-//  on_disk_change -
-//-------------------------------------------------
-
-void base_c1541_device::on_disk_change(device_image_interface &image)
-{
-    base_c1541_device *c1541 = static_cast<base_c1541_device *>(image.device().owner());
-
-    int wp = floppy_wpt_r(image);
-	c1541->m_ga->on_disk_changed(wp);
 }

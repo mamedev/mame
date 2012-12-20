@@ -972,8 +972,8 @@ mini_chief_device::mini_chief_device(const machine_config &mconfig, const char *
 void base_c1571_device::device_start()
 {
 	// install image callbacks
-	floppy_install_unload_proc(m_image, base_c1571_device::on_disk_change);
-	floppy_install_load_proc(m_image, base_c1571_device::on_disk_change);
+	m_ga->set_floppy(m_image);
+	//m_fdc->set_floppy(m_floppy);
 
 	// register for state saving
 	save_item(NAME(m_1_2mhz));
@@ -1000,7 +1000,6 @@ void base_c1571_device::device_reset()
 	m_cia->reset();
 	m_fdc->reset();
 
-	//m_fdc->set_floppy(m_floppy);
 	m_fdc->dden_w(0);
 
 	m_sp_out = 1;
@@ -1070,19 +1069,6 @@ void base_c1571_device::parallel_data_w(UINT8 data)
 void base_c1571_device::parallel_strobe_w(int state)
 {
 	m_cia->flag_w(state);
-}
-
-
-//-------------------------------------------------
-//  on_disk_change -
-//-------------------------------------------------
-
-void base_c1571_device::on_disk_change(device_image_interface &image)
-{
-	base_c1571_device *c1571 = static_cast<base_c1571_device *>(image.device().owner());
-
-	int wp = floppy_wpt_r(image);
-	c1571->m_ga->on_disk_changed(wp);
 }
 
 

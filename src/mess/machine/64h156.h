@@ -118,11 +118,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( atni_w );
 	DECLARE_WRITE_LINE_MEMBER( atna_w );
 
+	void set_floppy(legacy_floppy_image_device *floppy);
+
 	void stp_w(int data);
 	void ds_w(int data);
 	void set_side(int side);
 
-	void on_disk_changed(int wp);
+	static void on_disk_change(device_image_interface &image);
 
 protected:
     // device-level overrides
@@ -145,7 +147,7 @@ private:
 	devcb_resolved_write_line	m_out_sync_func;
 	devcb_resolved_write_line	m_out_byte_func;
 
-	required_device<legacy_floppy_image_device> m_image;
+	legacy_floppy_image_device *m_floppy;
 	optional_shared_ptr<UINT8> m_track_buffer;					// track data buffer
 	optional_shared_ptr<UINT8> m_speed_buffer;					// speed block buffer
 
