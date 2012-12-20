@@ -19,18 +19,40 @@
     Since the chip generates tones using ROM wavetables,
     it is perfectly possible to generate other sounds with different rom code and data.
 
-    upd17XXX devices are typically 4bit NEC MCUs, however based on information
-    in in "Electronic Speech Synthesis" by Geoff Bristow (ISBN 0-07-007912-9, pages 148-152):
+    Most upd17XXX devices are typically 4bit NEC MCUs, however based on information
+    in in "Electronic Speech Synthesis" by Geoff Bristow (ISBN 0-07-007912-9, pages 148-152)
+    the upd1770/1771 is not one of these 4-bit ones.
 
-    The uPD1770/uPD1771 is a 16-bit-wide rom/ram mcu with 8kb (4kw) of rom code,
+    The uPD1770/uPD1771 SSM is a 16-bit-wide rom/ram mcu with 8kb (4kw) of rom code,
     64 bytes of ram (16x16bit words addressable as 16 or 2x8 bits each, the
-    remaining 32 bytes acting as a stack), 138 instruction types, a complex
-    noise-IRQ system, external interrupts, and two 8-bit ports with multiple modes.
+    remaining 32 bytes acting as an 8-level stack), 182 instructions, a complex
+    noise and tone internal interrupt system, external interrupts,
+    and two 8-bit ports with multiple modes allowing for chips to operate as master
+    or slave devices.
+    SSM stands for "Sound Synthesis Microcomputer".
+
+    People who I *THINK* worked on the uPD1771 and what part I think they worked on:
+    Toshio Oura - Project Lead(?), VSRSSS/TSRSSS speech synthesis engine (on upd1776C), master/slave i/o controls, author of bristow article and primary author of the IEEE article
+    Hatsuhide Igarashi - Clock oscillator and pad layout, coauthor on the IEEE article, other IEEE stuff
+    Tomoaki Isozaki - ? (senior NEC engineer?), coauthor on the IEEE article
+    Sachiyuki Toufuku - ?, coauthor on the IEEE article
+    Tojiro Mukawa - IGFETs and the DAC
+    M. Sakai ? - digital filtering for VSRSSS? (IEEE 4131979, 1169295)
+    M. Endo ? - digital design system or speech synthesis? (IEEE 4069656, another? person: IEEE 150330, 225838)
+    H. Aoyama ? - logic design system used to assemble/lay out the chip? (IEEE 1585393)
+    I. Fujitaka ? (no IEEE)
+    Eiji Sugimoto - cpu design? 1156033 1155824
+    F. Tsukuda ? (no IEEE)
+    N. Miyake ? switched capacitor stuff? (IEEE nnnnnn)
+
 
     The uPD1771 internal workings are described to some extent by the Bristow book
-    and are covered by at least three US patents:
-    4408094 - covers the 3 pin 5-bit DAC with the volume control/vref pin. Not all that interesting,
-              except it might describe to some extent how the 9->5bit PWM works in the text.
+    and the IEEE article "A Single-Chip Sound Synthesis Microcomputer" which complements the book 
+    and are covered by at least four US patents:
+    4184152 - on IGFET-based DAC stuff
+    4488061 - on the IGFET-based drive circuit part of the DAC. 
+    4408094 - covers the 3 pin DAC with the volume control/vref pin. Not all that interesting,
+              except it might describe to some extent how the (9->5bit?) PWM works in the text.
     4470113 - covers the multiplexed PB0/1/2/3 pins and their use as /CS /WR /RD and ALE
               note as I have marked the pins below I assume the final pins connected
               to /CS /WR /RD and /ALE are PB7,6,5,4 but this is just a guess of mine:
@@ -38,8 +60,16 @@
     4577343 - covers the VSRSSS implementation as discussed in the Bristow book.
               This patent has an internal diagram of the workings of the chips and
               a limited description of how many registers etc it has.
+    4805508 - on the operation of the tone divider register and correction for accurate period when
+              the tone interrupt frequency is not perfectly divisible from the clock.
+    These next two may not be specific to the 1771 or even related at all!
+    4321562 - on a self-adjusting circuit for internal coupling to the clock crystal inputs.
+              This may be a generic NEC invention and probably isn't limited to the upd1771.
+    4656491 - on a new method of distributing resistors and transistors on anti-ESD pin buffers
+              This may be a generic NEC invention and probably isn't limited to the upd1771.
 
-    Based on the 4577343 patent mostly:
+
+    Based on the 4577343 patent mostly, plus the bristow and IEEE article:
     * these are the registers:
     8bits:
      AH, AL (forming the 16-bit A' accumulator),
