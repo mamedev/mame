@@ -1710,14 +1710,21 @@ struct banshee_info
 	UINT8				attff;					/* VGA attribute flip-flop */
 
 	UINT32				blt_regs[0x20];			/* 2D Blitter registers */
-	UINT32				blt_base;
-	UINT32				blt_x;
-	UINT32				blt_y;
-	UINT32				blt_width;
-	UINT32				blt_height;
-	UINT32				blt_stride;
-	UINT32				blt_bpp;
+	UINT32				blt_dst_base;
+	UINT32				blt_dst_x;
+	UINT32				blt_dst_y;
+	UINT32				blt_dst_width;
+	UINT32				blt_dst_height;
+	UINT32				blt_dst_stride;
+	UINT32				blt_dst_bpp;
 	UINT32				blt_cmd;
+	UINT32				blt_src_base;
+	UINT32				blt_src_x;
+	UINT32				blt_src_y;
+	UINT32				blt_src_width;
+	UINT32				blt_src_height;
+	UINT32				blt_src_stride;
+	UINT32				blt_src_bpp;
 };
 
 

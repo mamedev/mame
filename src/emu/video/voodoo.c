@@ -199,7 +199,7 @@ bits(7:4) and bit(24)), X, and Y:
 #define LOG_RASTERIZERS		(0)
 #define LOG_CMDFIFO			(0)
 #define LOG_CMDFIFO_VERBOSE	(0)
-#define LOG_BANSHEE_2D		(1)
+#define LOG_BANSHEE_2D		(0)
 
 #define MODIFY_PIXEL(VV)
 
@@ -1947,22 +1947,63 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 			target = *src++ / 4;
 
 			/* handle LFB writes */
-			if ((command >> 30) == 2)
+			switch (command >> 30)
 			{
-				if (LOG_CMDFIFO) logerror("  PACKET TYPE 5: LFB count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
+				case 0:		// Linear FB
+				{
+					if (LOG_CMDFIFO) logerror("  PACKET TYPE 5: FB count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
 
-				/* loop over words */
-				for (i = 0; i < count; i++)
-					cycles += lfb_w(v, target++, *src++, 0xffffffff, FALSE);
-			}
-			else if ((command >> 30) == 3)
-			{
-				if (LOG_CMDFIFO) logerror("  PACKET TYPE 5: textureRAM count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
+					UINT32 addr = target * 4;
+					for (i=0; i < count; i++)
+					{
+						UINT32 data = *src++;
 
-				/* loop over words */
-				for (i = 0; i < count; i++)
-					cycles += texture_w(v, target++, *src++);
+						v->fbi.ram[BYTE_XOR_LE(addr + 0)] = (UINT8)(data);
+						v->fbi.ram[BYTE_XOR_LE(addr + 1)] = (UINT8)(data >> 8);
+						v->fbi.ram[BYTE_XOR_LE(addr + 2)] = (UINT8)(data >> 16);
+						v->fbi.ram[BYTE_XOR_LE(addr + 3)] = (UINT8)(data >> 24);
+
+						addr += 4;
+					}
+					break;
+				}
+				case 2:		// 3D LFB
+				{
+					if (LOG_CMDFIFO) logerror("  PACKET TYPE 5: 3D LFB count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
+
+					/* loop over words */
+					for (i = 0; i < count; i++)
+						cycles += lfb_w(v, target++, *src++, 0xffffffff, FALSE);
+
+					break;
+				}
+
+				case 1:		// Planar YUV
+				{
+					// TODO
+
+					/* just update the pointers for now */
+					for (i = 0; i < count; i++)
+					{
+						target++;
+						src++;
+					}
+
+					break;
+				}
+
+				case 3:		// Texture Port
+				{
+					if (LOG_CMDFIFO) logerror("  PACKET TYPE 5: textureRAM count=%d dest=%08X bd2=%X bdN=%X\n", count, target, (command >> 26) & 15, (command >> 22) & 15);
+
+					/* loop over words */
+					for (i = 0; i < count; i++)
+						cycles += texture_w(v, target++, *src++);
+
+					break;
+				}
 			}
+
 			break;
 
 		default:
@@ -4283,46 +4324,46 @@ static void blit_2d(voodoo_state *v, UINT32 data)
 
 		case 3:			// Host-to-screen blit
 		{
-			UINT32 addr = v->banshee.blt_base;
+			UINT32 addr = v->banshee.blt_dst_base;
 
-			addr += (v->banshee.blt_y * v->banshee.blt_stride) + (v->banshee.blt_x * v->banshee.blt_bpp);
+			addr += (v->banshee.blt_dst_y * v->banshee.blt_dst_stride) + (v->banshee.blt_dst_x * v->banshee.blt_dst_bpp);
 
 #if LOG_BANSHEE_2D
-			logerror("   blit_2d:host_to_screen: %08x -> %08x, %d, %d\n", data, addr, v->banshee.blt_x, v->banshee.blt_y);
+			logerror("   blit_2d:host_to_screen: %08x -> %08x, %d, %d\n", data, addr, v->banshee.blt_dst_x, v->banshee.blt_dst_y);
 #endif
 
-			switch (v->banshee.blt_bpp)
+			switch (v->banshee.blt_dst_bpp)
 			{
 				case 1:
 					v->fbi.ram[addr+0] = data & 0xff;
 					v->fbi.ram[addr+1] = (data >> 8) & 0xff;
 					v->fbi.ram[addr+2] = (data >> 16) & 0xff;
 					v->fbi.ram[addr+3] = (data >> 24) & 0xff;
-					v->banshee.blt_x += 4;
+					v->banshee.blt_dst_x += 4;
 					break;
 				case 2:
 					v->fbi.ram[addr+1] = data & 0xff;
 					v->fbi.ram[addr+0] = (data >> 8) & 0xff;
 					v->fbi.ram[addr+3] = (data >> 16) & 0xff;
 					v->fbi.ram[addr+2] = (data >> 24) & 0xff;
-					v->banshee.blt_x += 2;
+					v->banshee.blt_dst_x += 2;
 					break;
 				case 3:
-					v->banshee.blt_x += 1;
+					v->banshee.blt_dst_x += 1;
 					break;
 				case 4:
 					v->fbi.ram[addr+3] = data & 0xff;
 					v->fbi.ram[addr+2] = (data >> 8) & 0xff;
 					v->fbi.ram[addr+1] = (data >> 16) & 0xff;
 					v->fbi.ram[addr+0] = (data >> 24) & 0xff;
-					v->banshee.blt_x += 1;
+					v->banshee.blt_dst_x += 1;
 					break;
 			}
 
-			if (v->banshee.blt_x >= v->banshee.blt_width)
+			if (v->banshee.blt_dst_x >= v->banshee.blt_dst_width)
 			{
-				v->banshee.blt_x = 0;
-				v->banshee.blt_y++;
+				v->banshee.blt_dst_x = 0;
+				v->banshee.blt_dst_y++;
 			}
 			break;
 		}
@@ -4360,25 +4401,44 @@ static INT32 banshee_2d_w(voodoo_state *v, offs_t offset, UINT32 data)
 	{
 		case banshee2D_command:
 #if LOG_BANSHEE_2D
-			logerror("   2D:command: cmd %d, ROP0 %02X\n", data & 0x3, data >> 24);
+			logerror("   2D:command: cmd %d, ROP0 %02X\n", data & 0xf, data >> 24);
 #endif
-			v->banshee.blt_x		= v->banshee.blt_regs[banshee2D_srcXY] & 0xfff;
-			v->banshee.blt_y		= (v->banshee.blt_regs[banshee2D_srcXY] >> 16) & 0xfff;
-			v->banshee.blt_base		= v->banshee.blt_regs[banshee2D_dstBaseAddr] & 0xffffff;
-			v->banshee.blt_stride	= v->banshee.blt_regs[banshee2D_dstFormat] & 0x3fff;
-			v->banshee.blt_width	= v->banshee.blt_regs[banshee2D_dstSize] & 0xfff;
-			v->banshee.blt_height	= (v->banshee.blt_regs[banshee2D_dstSize] >> 16) & 0xfff;
+
+			v->banshee.blt_src_x		= v->banshee.blt_regs[banshee2D_srcXY] & 0xfff;
+			v->banshee.blt_src_y		= (v->banshee.blt_regs[banshee2D_srcXY] >> 16) & 0xfff;
+			v->banshee.blt_src_base		= v->banshee.blt_regs[banshee2D_srcBaseAddr] & 0xffffff;
+			v->banshee.blt_src_stride	= v->banshee.blt_regs[banshee2D_srcFormat] & 0x3fff;
+			v->banshee.blt_src_width	= v->banshee.blt_regs[banshee2D_srcSize] & 0xfff;
+			v->banshee.blt_src_height	= (v->banshee.blt_regs[banshee2D_srcSize] >> 16) & 0xfff;
+
+			switch ((v->banshee.blt_regs[banshee2D_srcFormat] >> 16) & 0xf)
+			{
+				case 1: v->banshee.blt_src_bpp = 1; break;
+				case 3: v->banshee.blt_src_bpp = 2; break;
+				case 4: v->banshee.blt_src_bpp = 3; break;
+				case 5: v->banshee.blt_src_bpp = 4; break;
+				case 8: v->banshee.blt_src_bpp = 2; break;
+				case 9: v->banshee.blt_src_bpp = 2; break;
+				default: v->banshee.blt_src_bpp = 1; break;
+			}
+
+			v->banshee.blt_dst_x		= v->banshee.blt_regs[banshee2D_dstXY] & 0xfff;
+			v->banshee.blt_dst_y		= (v->banshee.blt_regs[banshee2D_dstXY] >> 16) & 0xfff;
+			v->banshee.blt_dst_base		= v->banshee.blt_regs[banshee2D_dstBaseAddr] & 0xffffff;
+			v->banshee.blt_dst_stride	= v->banshee.blt_regs[banshee2D_dstFormat] & 0x3fff;
+			v->banshee.blt_dst_width	= v->banshee.blt_regs[banshee2D_dstSize] & 0xfff;
+			v->banshee.blt_dst_height	= (v->banshee.blt_regs[banshee2D_dstSize] >> 16) & 0xfff;
 
 			switch ((v->banshee.blt_regs[banshee2D_dstFormat] >> 16) & 0x7)
 			{
-				case 1: v->banshee.blt_bpp = 1; break;
-				case 3: v->banshee.blt_bpp = 2; break;
-				case 4: v->banshee.blt_bpp = 3; break;
-				case 5: v->banshee.blt_bpp = 4; break;
-				default: v->banshee.blt_bpp = 1; break;
+				case 1: v->banshee.blt_dst_bpp = 1; break;
+				case 3: v->banshee.blt_dst_bpp = 2; break;
+				case 4: v->banshee.blt_dst_bpp = 3; break;
+				case 5: v->banshee.blt_dst_bpp = 4; break;
+				default: v->banshee.blt_dst_bpp = 1; break;
 			}
 
-			v->banshee.blt_cmd = data & 0x3;
+			v->banshee.blt_cmd = data & 0xf;
 			break;
 
 		case banshee2D_colorBack:
