@@ -1797,16 +1797,17 @@ ROM_START( pgm3in1 )
 	ROM_LOAD( "pgm_a1102.u6",    0x1000000, 0x0800000, CRC(6da7c143) SHA1(9408ba7722bfc8013f851aadea5e2819f5263129) ) // == y2k2_a1102.u8
 	ROM_LOAD( "pgm_a1103.u7",    0x1800000, 0x0800000, CRC(0ebebfdc) SHA1(4faad7f97c7e734f179ec934a37e75d8d6adccf4) ) // == y2k2_a1103.u9
 	ROM_LOAD( "ext_bit_cg.u20",  0x2000000, 0x0400000, CRC(fe314754) SHA1(ae3e8bbdce852a3fa39806a5221c053dee5abfd4) )
-
-	ROM_REGION( 0x1800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	
+	ROM_REGION( 0x1000000, "sprmask", ROMREGION_ERASE00 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "pgm_b1100.u8",    0x0000000, 0x0800000, CRC(fa53d6f6) SHA1(c2da55f4b7e721fa1c63bd7f9528f261643164e8) ) // == y2k2_b1100.u4
 	ROM_LOAD( "pgm_b1101.u9",    0x0800000, 0x0800000, CRC(001e4c81) SHA1(21119055f8fd7f831529e73ff9c97bca3987a1dc) ) // == y2k2_b1101.u5
-	ROM_LOAD( "ext_bit_map.u21", 0x1000000, 0x0200000, CRC(fe31dca6) SHA1(825bab7342c944794514fc7fe3e41779de3b5cd4) )
+	ROM_LOAD( "ext_bit_map.u21", 0x0f00000, 0x0100000, CRC(fe31dca6) SHA1(825bab7342c944794514fc7fe3e41779de3b5cd4) ) // yes this loads over the empty part of u9
+	ROM_IGNORE(0x0100000) // the 2nd half is empty
 
 	ROM_REGION( 0xe80000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	PGM_AUDIO_BIOS
 	ROM_LOAD( "pgm_m1100.u17",    0x400000, 0x200000, CRC(fb1515f8) SHA1(90e5e5bfdac9a460445bf224952e4a536888dc1b) ) // == y2k2_m1100.u3
-	ROM_LOAD( "u16.u16",          0x600000, 0x800000, CRC(714c33e5) SHA1(5478d5247349cdfb5f835171615d6ca2e5689140) )
+	ROM_LOAD( "u16.u16",          0x600000, 0x800000, CRC(714c33e5) SHA1(5478d5247349cdfb5f835171615d6ca2e5689140) ) // check loading
 ROM_END
 
 
@@ -3919,7 +3920,7 @@ GAME( 1998, dwex,         pgm,       pgm_022_025_dw,     dw3, pgm_022_025_state,
 GAME( 1999, puzlstar,     pgm,       pgm_arm_type1_sim,    pstar, pgm_arm_type1_state,    pstar,      ROT0,   "IGS", "Puzzle Star (ver. 100MG)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
 GAME( 2001, py2k2,        pgm,       pgm_arm_type1_sim,    py2k2, pgm_arm_type1_state,    py2k2,      ROT0,   "IGS", "Photo Y2K 2", GAME_NOT_WORKING )  /* need internal rom of IGS027A */
-GAME( 2004, pgm3in1,      pgm,       pgm_arm_type1_sim,    py2k2, pgm_arm_type1_state,    py2k2,      ROT0,   "IGS", "Photo Y2K 2 (3-in-1)", GAME_NOT_WORKING )  /* need internal rom of IGS027A */
+GAME( 2004, pgm3in1,      pgm,       pgm_arm_type1_sim,    py2k2, pgm_arm_type1_state,    pgm3in1,      ROT0,   "IGS", "Photo Y2K 2 (Flash 3-in-1)", GAME_NOT_WORKING )  /* need internal rom of IGS027A */
 
 GAME( 1999, puzzli2,      pgm,       pgm_arm_type1_sim,  puzzli2, pgm_arm_type1_state,    puzzli2,    ROT0,   "IGS", "Puzzli 2 (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // ROM label is V100
 GAME( 2001, puzzli2s,     puzzli2,   pgm_arm_type1_sim,  puzzli2, pgm_arm_type1_state,    puzzli2,    ROT0,   "IGS", "Puzzli 2 Super (ver. 200)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

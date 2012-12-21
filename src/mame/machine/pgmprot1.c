@@ -1453,6 +1453,16 @@ DRIVER_INIT_MEMBER(pgm_arm_type1_state,py2k2)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pgm_arm7_type1_sim_protram_r));
 }
 
+DRIVER_INIT_MEMBER(pgm_arm_type1_state,pgm3in1)
+{
+	pgm_basic_init(machine());
+	pgm_decrypt_pgm3in1(machine());
+	arm_sim_handler = command_handler_py2k2;
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pgm_arm7_type1_sim_protram_r));
+	m_irq4_disabled = 1; // // doesn't like this irq??
+}
+
 DRIVER_INIT_MEMBER(pgm_arm_type1_state,pstar)
 {
 	pgm_basic_init(machine());
