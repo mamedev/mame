@@ -681,6 +681,19 @@ void command_handler_py2k2(pgm_arm_type1_state *state, int pc)
 			state->m_valueresponse = 0x880000;
 			break;
 
+		case 0xcb: // Background layer 'x' select (pgm3in1, same as kov)
+			state->m_valueresponse = 0x880000;
+			state->m_kov_cb_value = state->m_value0;
+		break;
+
+		case 0xcc: // Background layer offset (pgm3in1, same as kov)
+		{
+			int y = state->m_value0;
+			if (y & 0x400) y = -(0x400 - (y & 0x3ff));
+			state->m_valueresponse = 0x900000 + ((state->m_kov_cb_value + (y * 0x40)) * 4);
+		}
+		break;
+
 		case 0x99: // reset?
 			state->m_valuekey = 0x100;
 			state->m_valueresponse = 0x00880000;

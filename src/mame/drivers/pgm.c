@@ -1787,7 +1787,7 @@ ROM_START( pgm3in1 )
 
 	/* No external ARM rom */
 
-	ROM_REGION( 0x480000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x380000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "u5.u5",    0x180000, 0x200000, CRC(da375a50) SHA1(62cd2fd3dfc1897528eaa38d243d7a9526eac71b) )
 
