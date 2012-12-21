@@ -59,15 +59,15 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 0
+#define LOG 1
 
-#define MMU_IOEN_MEMEN	0x01
-#define MMU_RAMEN		0x02
-#define MMU_CE4			0x08
-#define MMU_CE0			0x10
-#define MMU_CE1			0x20
-#define MMU_CE2			0x40
-#define MMU_CE3			0x80
+#define MMU_IOEN	0x01
+#define MMU_RAMEN	0x02
+#define MMU_CE4		0x08
+#define MMU_CE0		0x10
+#define MMU_CE1		0x20
+#define MMU_CE2		0x40
+#define MMU_CE3		0x80
 
 
 
@@ -76,15 +76,15 @@
 //**************************************************************************
 
 //-------------------------------------------------
-//  mmu_r -
+//  read -
 //-------------------------------------------------
 
-READ8_MEMBER( mm1_state::mmu_r )
+READ8_MEMBER( mm1_state::read )
 {
 	UINT8 data = 0;
 	UINT8 mmu = m_mmu_rom[(m_a8 << 8) | (offset >> 8)];
 
-	if (mmu & MMU_IOEN_MEMEN)
+	if (mmu & MMU_IOEN)
 	{
 		switch ((offset >> 4) & 0x07)
 		{
@@ -146,14 +146,14 @@ READ8_MEMBER( mm1_state::mmu_r )
 
 
 //-------------------------------------------------
-//  mmu_w -
+//  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( mm1_state::mmu_w )
+WRITE8_MEMBER( mm1_state::write )
 {
 	UINT8 mmu = m_mmu_rom[(m_a8 << 8) | (offset >> 8)];
 
-	if (mmu & MMU_IOEN_MEMEN)
+	if (mmu & MMU_IOEN)
 	{
 		switch ((offset >> 4) & 0x07)
 		{
@@ -221,8 +221,7 @@ WRITE8_MEMBER( mm1_state::ls259_w )
 	case 1: // RECALL
 		if (LOG) logerror("RECALL %u\n", d);
 		m_recall = d;
-		if(d)
-			m_fdc->reset();
+		if (d) m_fdc->reset();
 		break;
 
 	case 2: // _RV28/RX21
@@ -333,7 +332,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mm1_state::kbclk_tick)
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( mm1_map, AS_PROGRAM, 8, mm1_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mmu_r, mmu_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
 
@@ -485,7 +484,12 @@ static I8212_INTERFACE( iop_intf )
 //  I8237_INTERFACE( dmac_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mm1_state::dma_hrq_changed )
+void mm1_state::update_tc()
+{
+	m_fdc->tc_w(m_tc && !m_dack3);
+}
+
+WRITE_LINE_MEMBER( mm1_state::dma_hrq_w )
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -509,51 +513,28 @@ WRITE8_MEMBER( mm1_state::mpsc_dack_w )
 	m_dmac->dreq1_w(CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( mm1_state::tc_w )
+WRITE_LINE_MEMBER( mm1_state::dma_eop_w )
 {
-	if (!m_dack3)
-	{
-		// floppy terminal count
-		m_fdc->tc_w(!state);
-	}
-
-	m_tc = !state;
-
 	m_maincpu->set_input_line(I8085_RST75_LINE, state);
+
+	m_tc = state;
+	update_tc();
 }
 
 WRITE_LINE_MEMBER( mm1_state::dack3_w )
 {
 	m_dack3 = state;
-
-	if (!m_dack3)
-	{
-		// floppy terminal count
-		m_fdc->tc_w(m_tc);
-	}
-}
-
-static UINT8 memory_read_byte(address_space &space, offs_t address, UINT8 mem_mask) { return space.read_byte(address); }
-static void memory_write_byte(address_space &space, offs_t address, UINT8 data, UINT8 mem_mask) { space.write_byte(address, data); }
-
-READ8_MEMBER( mm1_state::fdc_dma_r )
-{
-	return m_fdc->dma_r();
-}
-
-WRITE8_MEMBER( mm1_state::fdc_dma_w )
-{
-	m_fdc->dma_w(data);
+	update_tc();
 }
 
 static I8237_INTERFACE( dmac_intf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(mm1_state, dma_hrq_changed),
-	DEVCB_DRIVER_LINE_MEMBER(mm1_state, tc_w),
-	DEVCB_MEMORY_HANDLER(I8085A_TAG, PROGRAM, memory_read_byte),
-	DEVCB_MEMORY_HANDLER(I8085A_TAG, PROGRAM, memory_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(mm1_state, mpsc_dack_r),  DEVCB_DRIVER_MEMBER(mm1_state, fdc_dma_r) },
-	{ DEVCB_DEVICE_HANDLER(I8275_TAG, i8275_dack_w), DEVCB_DRIVER_MEMBER(mm1_state, mpsc_dack_w), DEVCB_NULL, DEVCB_DRIVER_MEMBER(mm1_state, fdc_dma_w) },
+	DEVCB_DRIVER_LINE_MEMBER(mm1_state, dma_hrq_w),
+	DEVCB_DRIVER_LINE_MEMBER(mm1_state, dma_eop_w),
+	DEVCB_DRIVER_MEMBER(mm1_state, read),
+	DEVCB_DRIVER_MEMBER(mm1_state, write),
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(mm1_state, mpsc_dack_r),  DEVCB_DEVICE_MEMBER(UPD765_TAG, upd765_family_device, mdma_r) },
+	{ DEVCB_DEVICE_HANDLER(I8275_TAG, i8275_dack_w), DEVCB_DRIVER_MEMBER(mm1_state, mpsc_dack_w), DEVCB_NULL, DEVCB_DEVICE_MEMBER(UPD765_TAG, upd765_family_device, mdma_w) },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(mm1_state, dack3_w) }
 };
 
@@ -693,12 +674,12 @@ static SLOT_INTERFACE_START( mm1_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-void mm1_state::fdc_irq(bool state)
+void mm1_state::fdc_intrq_w(bool state)
 {
 	m_maincpu->set_input_line(I8085_RST55_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void mm1_state::fdc_drq(bool state)
+void mm1_state::fdc_drq_w(bool state)
 {
 	m_dmac->dreq3_w(state);
 }
@@ -715,8 +696,8 @@ void mm1_state::fdc_drq(bool state)
 void mm1_state::machine_start()
 {
 	// floppy callbacks
-	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(mm1_state::fdc_irq), this));
-	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(mm1_state::fdc_drq), this));
+	m_fdc->setup_intrq_cb(upd765_family_device::line_cb(FUNC(mm1_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(upd765_family_device::line_cb(FUNC(mm1_state::fdc_drq_w), this));
 
 	// find memory regions
 	m_mmu_rom = memregion("address")->base();
@@ -731,7 +712,6 @@ void mm1_state::machine_start()
 	save_item(NAME(m_tx21));
 	save_item(NAME(m_rcl));
 	save_item(NAME(m_recall));
-	save_item(NAME(m_dack3));
 }
 
 
@@ -742,10 +722,12 @@ void mm1_state::machine_start()
 void mm1_state::machine_reset()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	int i;
 
 	// reset LS259
-	for (i = 0; i < 8; i++) ls259_w(program, i, 0);
+	for (int i = 0; i < 8; i++)
+	{
+		ls259_w(program, i, 0);
+	}
 
 	// reset FDC
 	m_fdc->reset();
@@ -766,6 +748,7 @@ static MACHINE_CONFIG_START( mm1, mm1_state )
 	MCFG_CPU_ADD(I8085A_TAG, I8085A, XTAL_6_144MHz)
 	MCFG_CPU_PROGRAM_MAP(mm1_map)
 	MCFG_CPU_CONFIG(i8085_intf)
+	MCFG_QUANTUM_PERFECT_CPU(I8085A_TAG)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kbclk", mm1_state, kbclk_tick, attotime::from_hz(2500))
 

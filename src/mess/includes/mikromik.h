@@ -43,7 +43,11 @@ public:
 		  m_floppy0(*this, UPD765_TAG ":0:525qd"),
 		  m_floppy1(*this, UPD765_TAG ":1:525qd"),
 		  m_ram(*this, RAM_TAG),
-		  m_video_ram(*this, "video_ram")
+		  m_video_ram(*this, "video_ram"),
+		  m_a8(0),
+		  m_recall(0),
+		  m_dack3(1),
+		  m_tc(CLEAR_LINE)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -66,14 +70,14 @@ public:
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER( mmu_r );
-	DECLARE_WRITE8_MEMBER( mmu_w );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE8_MEMBER( ls259_w );
 	DECLARE_READ8_MEMBER( kb_r );
-	DECLARE_WRITE_LINE_MEMBER( dma_hrq_changed );
+	DECLARE_WRITE_LINE_MEMBER( dma_hrq_w );
 	DECLARE_READ8_MEMBER( mpsc_dack_r );
 	DECLARE_WRITE8_MEMBER( mpsc_dack_w );
-	DECLARE_WRITE_LINE_MEMBER( tc_w );
+	DECLARE_WRITE_LINE_MEMBER( dma_eop_w );
 	DECLARE_WRITE_LINE_MEMBER( dack3_w );
 	DECLARE_WRITE_LINE_MEMBER( itxc_w );
 	DECLARE_WRITE_LINE_MEMBER( irxc_w );
@@ -81,12 +85,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( drq2_w );
 	DECLARE_WRITE_LINE_MEMBER( drq1_w );
 	DECLARE_READ_LINE_MEMBER( dsra_r );
-	DECLARE_PALETTE_INIT(mm1);
-	DECLARE_READ8_MEMBER(fdc_dma_r);
-	DECLARE_WRITE8_MEMBER(fdc_dma_w);
 
-	void fdc_irq(bool state);
-	void fdc_drq(bool state);
+	void update_tc();
+	void fdc_intrq_w(bool state);
+	void fdc_drq_w(bool state);
 
 	void scan_keyboard();
 
@@ -114,7 +116,7 @@ public:
 	int m_recall;
 	int m_dack3;
 	int m_tc;
-	UINT32 screen_update_mm1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(kbclk_tick);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };

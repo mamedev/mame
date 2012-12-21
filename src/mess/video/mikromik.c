@@ -49,7 +49,8 @@ static const i8275_interface crtc_intf =
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( mm1_upd7220_map, AS_0, 8, mm1_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 
@@ -61,7 +62,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 {
 	mm1_state *state = device->machine().driver_data<mm1_state>();
 
-	UINT8 data = state->m_video_ram[address * 2];
+	UINT8 data = state->m_video_ram[address];
 
 	for (int i = 0; i < 8; i++)
 	{
