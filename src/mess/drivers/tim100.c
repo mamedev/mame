@@ -63,11 +63,11 @@ void tim100_state::machine_reset()
 
 const gfx_layout tim100_charlayout =
 {
-	16, 16,				/* 8x16 characters */
+	12, 16,				/* 8x16 characters */
 	128,				/* 128 characters */
 	1,				/* 1 bits per pixel */
 	{0},				/* no bitplanes; 1 bit per pixel */
-	{0,1,2,3,4,5,6,7,0+0x4000,1+0x4000,2+0x4000,3+0x4000,4+0x4000,5+0x4000,6+0x4000,7+0x4000},
+	{0,1,2,3,4,5,0+0x4000,1+0x4000,2+0x4000,3+0x4000,4+0x4000,5+0x4000},
 	{0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8,
 	 8 * 8, 9 * 8, 10 * 8, 11 * 8, 12 * 8, 13 * 8, 14 * 8, 15 * 8},
 	8*16				/* space between characters */
@@ -88,34 +88,40 @@ UINT32 tim100_state::screen_update_tim100(screen_device &screen, bitmap_rgb32 &b
 }
 
 
-
+// this gets called via a (i8275_dack_w), so does nothing currently
+// once fixed, pixel count needs adjusting
 static I8275_DISPLAY_PIXELS(tim100_display_pixels)
 {
-	
 	tim100_state *state = device->machine().driver_data<tim100_state>();
 	int i;
 	bitmap_rgb32 &bitmap = state->m_bitmap;
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 *charmap = state->memregion("chargen")->base();
-	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
-	if (vsp) {
+	UINT8 pixels = charmap[(linecount & 15) + (charcode << 4)];
+	if (vsp)
+	{
 		pixels = 0;
 	}
-	if (lten) {
+	
+	if (lten)
+	{
 		pixels = 0xff;
 	}
-	if (rvv) {
+
+	if (rvv)
+	{
 		pixels ^= 0xff;
 	}
-	for(i=0;i<8;i++) {
+
+	for(i=0;i<8;i++) // 6 pixels
+	{
 		bitmap.pix32(y, x + i) = palette[(pixels >> (7-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 	}
-	
 }
 
 static const i8275_interface tim100_i8276_interface = {
 	"screen",
-	16,
+	16, //12
 	0,
 	DEVCB_CPU_INPUT_LINE("maincpu", I8085_RST65_LINE),
 	DEVCB_NULL,	
@@ -140,8 +146,7 @@ static MACHINE_CONFIG_START( tim100, tim100_state )
 
 	MCFG_I8275_ADD	( "i8276", tim100_i8276_interface)
 	
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(3)
 	
 	MCFG_I8251_ADD("uart_u17", default_i8251_interface)
 	MCFG_I8251_ADD("uart_u18", default_i8251_interface)
@@ -151,7 +156,7 @@ MACHINE_CONFIG_END
 ROM_START( tim100 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "tim 100 v.3.2.0.u16",   0x0000, 0x2000, CRC(4de9c8ad) SHA1(b0914d6e8d618e92a87b4b39c35391541251e8cc))  
-	ROM_REGION( 0x2000, "chargen", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2000, "chargen", ROMREGION_INVERT )
 	ROM_SYSTEM_BIOS( 0, "212", "v 2.1.2" )
 	ROMX_LOAD( "tim 100kg v.2.1.2.u12", 0x0000, 0x2000, CRC(faf5743c) SHA1(310b662e9535878210f8aaab3e2b846fade60642),ROM_BIOS(1))	
 	ROM_SYSTEM_BIOS( 1, "220", "v 2.2.0" )
