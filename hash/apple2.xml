@@ -386,7 +386,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="3 in 1 college & pro football (1984)(lance haffner).do" size="143360" crc="2c4f4a1a" sha1="28d701ec87a35e0a29b8319191dc3b353fa9632b" offset="0x0000" />
+				<rom name="3 in 1 college &amp; pro football (1984)(lance haffner).do" size="143360" crc="2c4f4a1a" sha1="28d701ec87a35e0a29b8319191dc3b353fa9632b" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1038,6 +1038,348 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="aztec (1982)(datamost)[cr grossiers].do" size="143360" crc="aa0e78c9" sha1="9a9d639798dda33e9b591e419ea4de602ff405fb" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advbuckb">
+		<description>Adventures of Buckaroo Banzai</description>
+		<year>1985</year>
+		<publisher>Adventure International</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="adventures of buckaroo banzai, the (19xx)(-)(side a)[cr].dsk" size="143360" crc="61e0f76c" sha1="9e625df4fdf3fcf6e1b854c47190617b111ff12f" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="adventures of buckaroo banzai, the (19xx)(-)(side b)[cr].dsk" size="143360" crc="86e0177f" sha1="b7272c6ce519d1e8a51f27048b2adf6dcd179aef" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airheart">
+		<description>Airheart</description>
+		<year>1986</year>
+		<publisher>Broderbund</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="airheart (1986)(broderbund)[cr evil sock].dsk" size="143360" crc="6223b013" sha1="9b6431b8a7b9aceb4ac441ec19f6ba9fcc2a02e6" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alert">
+		<description>Alert</description>
+		<year>1985</year>
+		<publisher>Mindscape</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alert (1985)(mindscape)[cr disk jockey].dsk" size="143360" crc="2c36e539" sha1="43f27944bbc738b85df0ae59c950a7b4b2b3b625" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alf">
+		<description>Alf, The First Adventure</description>
+		<year>1987</year>
+		<publisher>Box Office</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alf, the first adventure (1985)(box office).dsk" size="143360" crc="19f78e62" sha1="125068a8b39ac4e5a0914505c4002b38478a810a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alibaba">
+		<description>Ali Baba and the Forty Thieves</description>
+		<year>1982</year>
+		<publisher>Stuart Smith</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ali baba and the forty thieves (1982)(smith, stuart)[cr dr. death].dsk" size="143360" crc="1217ae9a" sha1="a024a80fabaae447c36197d483efbba2b1150693" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alpine">
+		<description>The Alpine Encounter</description>
+		<year>1985</year>
+		<publisher>Random House, Inc.</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alpine encounter, the (19xx)(-)(side a)[cr mr. krac-man].dsk" size="143360" crc="562e5f89" sha1="7120673721825109779488f4e5cc795c68dd78de" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="alpine encounter, the (19xx)(-)(side b)[cr mr. krac-man].dsk" size="143360" crc="c782b168" sha1="70e10e543fb5169edd8bd66f2c92bc408fb83aea" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amchal">
+		<description>The American Challenge</description>
+		<year>1986</year>
+		<publisher>MIndscape</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="american challenge, the (1986)(mindscape)[cr first class].dsk" size="143360" crc="f4320ad1" sha1="90d6b869c22f5245a16999bc0186e21bad1414b1" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amnesia">
+		<description>Amnesia</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="amnesia (1986)(electronic arts)(disk 1 of 4).dsk" size="143360" crc="d38304c5" sha1="4746a9f36202de40b2fcc3b2b077a7901032318c" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="amnesia (1986)(electronic arts)(disk 2 of 4).dsk" size="143360" crc="22131ea6" sha1="6c1955d5ab244053a443528e4afd9fd6d2bbc030" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="amnesia (1986)(electronic arts)(disk 3 of 4).dsk" size="143360" crc="ce2d6688" sha1="59442d005eb8b35af3e9a624f13d4003a4d69004" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="amnesia (1986)(electronic arts)(disk 4 of 4).dsk" size="143360" crc="b86aad3a" sha1="9ceb153c5d79e5f3772f5ca8a6b04b9644a68bbf" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="archon2">
+		<description>Archon II: Adept</description>
+		<year>1985</year>
+		<publisher>Electronic Arts</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="archon ii - adept (1985)(electronic arts)[cr racketeers].dsk" size="143360" crc="fcf7b2e8" sha1="9b6e91644b23e08138dd125a11ce51aef0e1138d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="archon">
+		<description>Archon</description>
+		<year>1984</year>
+		<publisher>Electronic Arts</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="archon (1984)(electronic arts)[cr midwest pirates guild].dsk" size="143360" crc="34acae6e" sha1="731c8b7eed9992eaa104d6c3c049737943f04a49" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arctfox">
+		<description>Arctic Fox</description>
+		<year>1986</year>
+		<publisher>Dynamix</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143363">
+				<rom name="arcticfox (1986)(dynamix)[cr first class][o].dsk" size="143363" crc="38649e56" sha1="cfec097f4ea49e02f4960dcbaa735f7a1de59910" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artesian">
+		<description>Artesians</description>
+		<year>&lt;unknown&gt;</year>
+		<publisher>Reno Soft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="artesians (19xx)(reno soft)[cr nibbler].dsk" size="143360" crc="4446cd85" sha1="5992f39785d459d010d47a93a407b9d23d208294" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienrn">
+		<description>Alien Rain</description>
+		<year>1981</year>
+		<publisher>Broderbund</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="232960">
+				<rom name="alien rain (1981)(broderbund)[dos].nib" size="232960" crc="11911c91" sha1="52c2b9b49ca6caa0e273522b1128b7a1611d9a8e" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="altrcity">
+		<description>Alternate Reality - The City</description>
+		<year>1985</year>
+		<publisher>Datasoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="232960">
+				<rom name="alternate reality - the city (1985)(datasoft)(disk 1 of 3)[cr circle k].nib" size="232960" crc="776c280a" sha1="3a98a3b845e25477c3791660caef681f4e80ddc2" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="232960">
+				<rom name="alternate reality - the city (1985)(datasoft)(disk 2 of 3)[cr circle k].nib" size="232960" crc="dfd68cd4" sha1="e346a7af6d770b6ba27286fdafeb67c078821d98" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="232960">
+				<rom name="alternate reality - the city (1985)(datasoft)(disk 3 of 3)(character)[cr circle k].nib" size="232960" crc="06d4d109" sha1="8e00766fd4a87f264e3c8847b51ecf43e0242cae" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="altrdng">
+		<description>Alternate Reality - The Dungeon</description>
+		<year>1987</year>
+		<publisher>Datasoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="232960">
+				<rom name="alternate reality - the dungeon (1987)(datasoft)(disk 1 of 3 side a).nib" size="232960" crc="1a47e41e" sha1="26a86c8f328ba2837fa261479ab4eea04a0f24df" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="232960">
+				<rom name="alternate reality - the dungeon (1987)(datasoft)(disk 1 of 3 side b).nib" size="232960" crc="4f1c8fcb" sha1="e834ead62d79bb77619cb2e08f84c072ab72554f" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="232960">
+				<rom name="alternate reality - the dungeon (1987)(datasoft)(disk 2 of 3).nib" size="232960" crc="98563824" sha1="a00a4577717ab02e2c3ffdd36f2720fabd4c724e" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="232960">
+				<rom name="alternate reality - the dungeon (1987)(datasoft)(disk 3 of 3)(character).nib" size="232960" crc="e5e53349" sha1="7ea55e94da8cc7cfcb11b372fef842a349ebe739" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amazon">
+		<description>Amazon</description>
+		<year>1984</year>
+		<publisher>Trillium</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="232960">
+				<rom name="amazon (1984)(trillium)(disk 1 of 4)[cr disk master - micron].nib" size="232960" crc="770711a5" sha1="7e555ebd926d7269e1c289106c950c877021012b" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="232960">
+				<rom name="amazon (1984)(trillium)(disk 2 of 4)[cr disk master - micron].nib" size="232960" crc="4d6d86d4" sha1="c5fe5360b0065de05ed7ad2cbd5e93f15372f3d5" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="232960">
+				<rom name="amazon (1984)(trillium)(disk 3 of 4)(boot)[cr disk master - micron].nib" size="232960" crc="79705cd3" sha1="9617cfdf63bd42fcffc2884250bb0bd489abeaf6" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="232960">
+				<rom name="amazon (1984)(trillium)(disk 4 of 4)[cr disk master - micron].nib" size="232960" crc="1933cc93" sha1="26be6048ed0a5855b57ebb38901f4f9f9207cd28" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amcivw1">
+		<description>Decisive Battles Of The American Civil War, Volume I</description>
+		<year>1987</year>
+		<publisher>Strategic Studies Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="232960">
+				<rom name="american civil war 1, the v1.0 (1987)(roger keating - ian trout)(disk 1 of 2).nib" size="232960" crc="b291334c" sha1="f0f6ed4fc0bad20a4acd68b8a15138d2ab8c3856" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="232960">
+				<rom name="american civil war 1, the v1.0 (1987)(roger keating - ian trout)(disk 2 of 2).nib" size="232960" crc="dc20461d" sha1="302be7ff59e71a589abdc5c07fd9dd72cb177068" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amcivw2">
+		<description>Decisive Battles Of The American Civil War, Volume II</description>
+		<year>1988</year>
+		<publisher>Strategic Studies Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="232960">
+				<rom name="american civil war ii, the v1.0 (19xx)(roger keating - ian trout)(disk 1 of 2).nib" size="232960" crc="e8cdc390" sha1="083ad235a0593ef1c28fb712ab75bbd1c84fa676" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="232960">
+				<rom name="american civil war ii, the v1.0 (19xx)(roger keating - ian trout)(disk 2 of 2).nib" size="232960" crc="d35b95a0" sha1="7bf4864b00f51c587b3b3f5f00afd17b7c2fe311" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amcivw3">
+		<description>Decisive Battles Of The American Civil War, Volume III</description>
+		<year>1988</year>
+		<publisher>Strategic Studies Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="232960">
+				<rom name="american civil war iii, the v1.0 (19xx)(roger keating - ian trout)(disk 1 of 2).nib" size="232960" crc="ea9bebee" sha1="e44c9824bc58810e8f39947dc864f663d91543ac" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="232960">
+				<rom name="american civil war iii, the v1.0 (19xx)(roger keating - ian trout)(disk 2 of 2).nib" size="232960" crc="6685d154" sha1="85be1e4af00287afd4c3b4983793893e1de1ac32" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aawsea">
+		<description>The Ancient Art Of War At Sea</description>
+		<year>1988</year>
+		<publisher>Broderbund</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ancient art of war at sea, the (1988)(broderbund)(side a).po" size="143360" crc="16031564" sha1="0392381786601b101cfe99dbfb33a6509124dc3a" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ancient art of war at sea, the (1988)(broderbund)(side b).po" size="143360" crc="2e2ca6d4" sha1="699798ce9e02d484b3dce48d27b5604eaf1ef6c5" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aaw">
+		<description>The Ancient Art Of War</description>
+		<year>1989</year>
+		<publisher>Broderbund</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ancient art of war, the (1989)(broderbund)(side a)[cr club 96].po" size="143360" crc="325b8190" sha1="0c77caf172422753a20525918b9455d6c5bb0c94" offset="0x0000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ancient art of war, the (1989)(broderbund)(side b).po" size="143360" crc="f7b680cb" sha1="5b611e6a4225d61f3a785a3b9f880cf1b3478d66" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
