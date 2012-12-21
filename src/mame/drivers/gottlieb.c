@@ -33,6 +33,7 @@
     Board Id           Game             Game Id
     ---------------    -------------    --------
                        Reactor          GV-100
+                       Argus            GV-101 (unreleased)
                        Mad Planets      GV-102
     C-22248-2          Q*Bert           GV-103
                        Krull            GV-105
