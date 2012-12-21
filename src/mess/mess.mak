@@ -2073,6 +2073,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/systec.o	\
 	$(MESS_DRIVERS)/terak.o		\
 	$(MESS_DRIVERS)/tim011.o	\
+	$(MESS_DRIVERS)/tim100.o	\
 	$(MESS_DRIVERS)/tricep.o	\
 	$(MESS_DRIVERS)/ts802.o		\
 	$(MESS_DRIVERS)/ts803.o		\

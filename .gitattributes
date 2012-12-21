@@ -6134,6 +6134,7 @@ src/mess/drivers/ti99_4x.c svneol=native#text/plain
 src/mess/drivers/ti99_8.c svneol=native#text/plain
 src/mess/drivers/tiki100.c svneol=native#text/plain
 src/mess/drivers/tim011.c svneol=native#text/plain
+src/mess/drivers/tim100.c svneol=native#text/plain
 src/mess/drivers/timex.c svneol=native#text/plain
 src/mess/drivers/tk80bs.c svneol=native#text/plain
 src/mess/drivers/tm990189.c svneol=native#text/plain
