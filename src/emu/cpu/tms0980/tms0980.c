@@ -960,9 +960,12 @@ static CPU_EXECUTE( tms0980 )
 				if ( cpustate->m_decode & F_TDO )
 				{
 					/* Calculate O-outputs based on status latch, A, and the output PLA configuration */
-//printf("o output m_status_latch = %X, m_a = %X\n", cpustate->m_status_latch, cpustate->m_a);
 					cpustate->m_o = cpustate->config->o_pla[ ( cpustate->m_status_latch << 4 ) | cpustate->m_a ];
-//if ( cpustate->m_o == 0 )
+					if ( ( cpustate->config->o_pla[ ( cpustate->m_status_latch << 4 ) | cpustate->m_a ] & 0xFF00 ) == 0xFF00 )
+					{
+						logerror("unknown output pla mapping for status latch = %d and a = %X\n", cpustate->m_status_latch, cpustate->m_a);
+					}
+//if ( ( cpustate->config->o_pla[ ( cpustate->m_status_latch << 4 ) | cpustate->m_a ] & 0xFF00 ) == 0xFF00 )
 //printf("****** o output m_status_latch = %X, m_a = %X\n", cpustate->m_status_latch, cpustate->m_a);
 //else
 //printf("o output m_status_latch = %X, m_a = %X\n", cpustate->m_status_latch, cpustate->m_a);
