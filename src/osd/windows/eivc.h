@@ -45,7 +45,13 @@
 #define __EIVC__
 
 #if (_MSC_VER >= 1400)
+
+// need to ignore 'nonstandard extension used' warning in setjmp.h
+#pragma warning(push)
+#pragma warning(disable: 4987)
 #include <intrin.h>
+#pragma warning(pop)
+
 #else
 extern "C" long __cdecl _InterlockedIncrement(long volatile *);
 extern "C" long __cdecl _InterlockedDecrement(long volatile *);
