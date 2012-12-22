@@ -1383,7 +1383,6 @@ Force Five
 Kenju
 Premier Eleven
 Sushi Bar
-Sega Clay Challenge
 Sega Bass Fishing Challenge
 
 */
