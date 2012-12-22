@@ -1407,7 +1407,7 @@ public:
 
 	int m_s23_porta;
 	int m_s23_rtcstate;
-	int m_s23_lastpB;
+	int m_s23_lastpb;
 	int m_s23_setstate;
 	int m_s23_setnum;
 	int m_s23_settings[8];
@@ -1422,9 +1422,9 @@ public:
 	void update_main_interrupts(UINT32 cause);
 	void update_mixer();
 
-	DECLARE_WRITE32_MEMBER(namcos23_textram_w);
-	DECLARE_WRITE32_MEMBER(s23_txtchar_w);
-	DECLARE_WRITE32_MEMBER(namcos23_paletteram_w);
+	DECLARE_WRITE32_MEMBER(s23_textram_w);
+	DECLARE_WRITE32_MEMBER(s23_textchar_w);
+	DECLARE_WRITE32_MEMBER(s23_paletteram_w);
 	DECLARE_READ16_MEMBER(s23_c417_r);
 	DECLARE_WRITE16_MEMBER(s23_c417_w);
 	DECLARE_READ16_MEMBER(s23_c412_ram_r);
@@ -1442,7 +1442,8 @@ public:
 	DECLARE_READ16_MEMBER(s23_c422_r);
 	DECLARE_WRITE16_MEMBER(s23_c422_w);
 	DECLARE_WRITE16_MEMBER(s23_mcuen_w);
-	DECLARE_READ32_MEMBER(s23_unk_status_r);
+	DECLARE_READ16_MEMBER(s23_sub_comm_r);
+	DECLARE_WRITE16_MEMBER(s23_sub_comm_w);
 	DECLARE_READ32_MEMBER(p3d_r);
 	DECLARE_WRITE32_MEMBER(p3d_w);
 	DECLARE_READ32_MEMBER(gmen_trigger_sh2);
@@ -1452,11 +1453,12 @@ public:
 	DECLARE_READ16_MEMBER(sharedram_sub_r);
 	DECLARE_WRITE16_MEMBER(sub_interrupt_main_w);
 	DECLARE_READ8_MEMBER(s23_mcu_p8_r);
+	DECLARE_WRITE8_MEMBER(s23_mcu_p8_w);
 	DECLARE_READ8_MEMBER(s23_mcu_pa_r);
 	DECLARE_WRITE8_MEMBER(s23_mcu_pa_w);
 	DECLARE_READ8_MEMBER(s23_mcu_rtc_r);
-	DECLARE_READ8_MEMBER(s23_mcu_portB_r);
-	DECLARE_WRITE8_MEMBER(s23_mcu_portB_w);
+	DECLARE_READ8_MEMBER(s23_mcu_pb_r);
+	DECLARE_WRITE8_MEMBER(s23_mcu_pb_w);
 	DECLARE_WRITE8_MEMBER(s23_mcu_settings_w);
 	DECLARE_READ8_MEMBER(s23_mcu_iob_r);
 	DECLARE_WRITE8_MEMBER(s23_mcu_iob_w);
@@ -1535,20 +1537,20 @@ TILE_GET_INFO_MEMBER(namcos23_state::TextTilemapGetInfo)
 	SET_TILE_INFO_MEMBER(0, data&0x03ff, data>>12, TILE_FLIPYX((data&0x0c00)>>10));
 }
 
-WRITE32_MEMBER(namcos23_state::namcos23_textram_w)
+WRITE32_MEMBER(namcos23_state::s23_textram_w)
 {
 	COMBINE_DATA( &m_textram[offset] );
 	m_bgtilemap->mark_tile_dirty(offset*2);
 	m_bgtilemap->mark_tile_dirty((offset*2)+1);
 }
 
-WRITE32_MEMBER(namcos23_state::s23_txtchar_w)
+WRITE32_MEMBER(namcos23_state::s23_textchar_w)
 {
 	COMBINE_DATA(&m_charram[offset]);
 	machine().gfx[0]->mark_dirty(offset/32);
 }
 
-WRITE32_MEMBER(namcos23_state::namcos23_paletteram_w)
+WRITE32_MEMBER(namcos23_state::s23_paletteram_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
@@ -1948,13 +1950,17 @@ WRITE16_MEMBER(namcos23_state::s23_mcuen_w)
 	}
 }
 
-// panicprk sits in a tight loop waiting for this AND 0002 to be non-zero (at PC=BFC02F00)
+// while getting the subcpu to be ready, panicprk sits in a tight loop waiting for this AND 0002 to be non-zero (at PC=BFC02F00)
 // timecrs2 locks up in a similar way as panicprk, at the beginning of the 2nd level, by reading/writing to this register a couple of times
-READ32_MEMBER(namcos23_state::s23_unk_status_r)
+READ16_MEMBER(namcos23_state::s23_sub_comm_r)
 {
-	return 0x00020002;
+	return 2;
 }
 
+WRITE16_MEMBER(namcos23_state::s23_sub_comm_w)
+{
+	;
+}
 
 // 3D hardware, to throw at least in part in video/namcos23.c
 
@@ -2564,15 +2570,15 @@ static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32, namcos23_state )
 	AM_RANGE(0x06080000, 0x0608000f) AM_RAM AM_SHARE("czattr")
 	AM_RANGE(0x06080200, 0x060803ff) AM_RAM // PCZ Convert RAM (C406) (should be banked)
 	AM_RANGE(0x06108000, 0x061087ff) AM_RAM AM_SHARE("gammaram") // Gamma RAM (C404)
-	AM_RANGE(0x06110000, 0x0613ffff) AM_RAM_WRITE(namcos23_paletteram_w) AM_SHARE("paletteram") // Palette RAM (C404)
-	AM_RANGE(0x06400000, 0x0641dfff) AM_RAM_WRITE(s23_txtchar_w) AM_SHARE("charram") // Text CGRAM (C361)
-	AM_RANGE(0x0641e000, 0x0641ffff) AM_RAM_WRITE(namcos23_textram_w) AM_SHARE("textram") // Text VRAM (C361)
+	AM_RANGE(0x06110000, 0x0613ffff) AM_RAM_WRITE(s23_paletteram_w) AM_SHARE("paletteram") // Palette RAM (C404)
+	AM_RANGE(0x06400000, 0x0641dfff) AM_RAM_WRITE(s23_textchar_w) AM_SHARE("charram") // Text CGRAM (C361)
+	AM_RANGE(0x0641e000, 0x0641ffff) AM_RAM_WRITE(s23_textram_w) AM_SHARE("textram") // Text VRAM (C361)
 	AM_RANGE(0x06420000, 0x0642000f) AM_READWRITE16(s23_c361_r, s23_c361_w, 0xffffffff) // C361
 	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("data", 0) // data ROMs
 	AM_RANGE(0x0c000000, 0x0c00ffff) AM_RAM	AM_SHARE("nvram") // Backup RAM
 	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16(s23_ctl_r, s23_ctl_w, 0xffffffff) // write for LEDs at d000000, watchdog at d000004
 	AM_RANGE(0x0e000000, 0x0e007fff) AM_RAM // C405 RAM - what is this?
-	AM_RANGE(0x0f000000, 0x0f000003) AM_READ(s23_unk_status_r) // error status, or protection? (also gets written to)
+	AM_RANGE(0x0f000000, 0x0f000003) AM_READWRITE16(s23_sub_comm_r, s23_sub_comm_w, 0xffffffff) // not sure
 	AM_RANGE(0x0f200000, 0x0f203fff) AM_RAM // C422 RAM
 	AM_RANGE(0x0f300000, 0x0f30000f) AM_READWRITE16(s23_c422_r, s23_c422_w, 0xffffffff) // C422 registers
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
@@ -2588,17 +2594,17 @@ static ADDRESS_MAP_START( ss23_map, AS_PROGRAM, 32, namcos23_state )
 	AM_RANGE(0x06000000, 0x0600ffff) AM_RAM AM_SHARE("nvram") // Backup RAM
 	AM_RANGE(0x06200000, 0x06203fff) AM_RAM // C422 RAM
 	AM_RANGE(0x06400000, 0x0640000f) AM_READWRITE16(s23_c422_r, s23_c422_w, 0xffffffff) // C422 registers
-	AM_RANGE(0x06800000, 0x0681dfff) AM_RAM_WRITE(s23_txtchar_w) AM_SHARE("charram") // Text CGRAM (C361)
-	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE(namcos23_textram_w) AM_SHARE("textram") // Text VRAM (C361)
+	AM_RANGE(0x06800000, 0x0681dfff) AM_RAM_WRITE(s23_textchar_w) AM_SHARE("charram") // Text CGRAM (C361)
+	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE(s23_textram_w) AM_SHARE("textram") // Text VRAM (C361)
 	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE16(s23_c361_r, s23_c361_w, 0xffffffff) // C361
 	AM_RANGE(0x06a08000, 0x06a087ff) AM_RAM AM_SHARE("gammaram") // Gamma RAM (C404)
-	AM_RANGE(0x06a10000, 0x06a3ffff) AM_RAM_WRITE(namcos23_paletteram_w) AM_SHARE("paletteram") // Palette RAM (C404)
+	AM_RANGE(0x06a10000, 0x06a3ffff) AM_RAM_WRITE(s23_paletteram_w) AM_SHARE("paletteram") // Palette RAM (C404)
 	AM_RANGE(0x08000000, 0x08ffffff) AM_ROM AM_REGION("data", 0x0000000) AM_MIRROR(0x1000000) // data ROMs
 	AM_RANGE(0x0a000000, 0x0affffff) AM_ROM AM_REGION("data", 0x1000000) AM_MIRROR(0x1000000)
 	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE16(s23_c412_r, s23_c412_w, 0xffffffff)
 	AM_RANGE(0x0c400000, 0x0c400007) AM_READWRITE16(s23_c421_r, s23_c421_w, 0xffffffff)
 	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16(s23_ctl_r, s23_ctl_w, 0xffffffff)
-	AM_RANGE(0x0e800000, 0x0e800003) AM_READ(s23_unk_status_r) // error status, or protection? (also gets written to)
+	AM_RANGE(0x0e800000, 0x0e800003) AM_READWRITE16(s23_sub_comm_r, s23_sub_comm_w, 0xffffffff) // not sure
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -2686,9 +2692,15 @@ static ADDRESS_MAP_START( s23h8rwmap, AS_PROGRAM, 16, namcos23_state )
 	AM_RANGE(0x300030, 0x300031) AM_WRITENOP	// timecrs2 writes this when writing to the sync shared ram location, motoxgo doesn't
 ADDRESS_MAP_END
 
+// port 8, looks like serial comms, where to/from?
 READ8_MEMBER(namcos23_state::s23_mcu_p8_r)
 {
 	return 0x02;
+}
+
+WRITE8_MEMBER(namcos23_state::s23_mcu_p8_w)
+{
+	;
 }
 
 // emulation of the Epson R4543 real time clock
@@ -2724,13 +2736,13 @@ READ8_MEMBER(namcos23_state::s23_mcu_rtc_r)
 }
 
 
-READ8_MEMBER(namcos23_state::s23_mcu_portB_r)
+READ8_MEMBER(namcos23_state::s23_mcu_pb_r)
 {
-	m_s23_lastpB ^= 0x80;
-	return m_s23_lastpB;
+	m_s23_lastpb ^= 0x80;
+	return m_s23_lastpb;
 }
 
-WRITE8_MEMBER(namcos23_state::s23_mcu_portB_w)
+WRITE8_MEMBER(namcos23_state::s23_mcu_pb_w)
 {
 	// bit 7 = chip enable for the video settings controller
 	if (data & 0x80)
@@ -2738,7 +2750,7 @@ WRITE8_MEMBER(namcos23_state::s23_mcu_portB_w)
 		m_s23_setstate = 0;
 	}
 
-	m_s23_lastpB = data;
+	m_s23_lastpb = data;
 }
 
 WRITE8_MEMBER(namcos23_state::s23_mcu_settings_w)
@@ -3068,9 +3080,9 @@ WRITE8_MEMBER(namcos23_state::s23_mcu_p6_w)
 
 static ADDRESS_MAP_START( s23h8iomap, AS_IO, 8, namcos23_state )
 	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE(s23_mcu_p6_r, s23_mcu_p6_w )
-	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ(s23_mcu_p8_r ) AM_WRITENOP
+	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READWRITE(s23_mcu_p8_r, s23_mcu_p8_w )
 	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE(s23_mcu_pa_r, s23_mcu_pa_w )
-	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE(s23_mcu_portB_r, s23_mcu_portB_w )
+	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE(s23_mcu_pb_r, s23_mcu_pb_w )
 	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0) AM_READWRITE(s23_mcu_iob_r, s23_mcu_iob_w )
 	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1) AM_READWRITE(s23_mcu_rtc_r, s23_mcu_settings_w )
 	AM_RANGE(H8_ADC_0_H, H8_ADC_0_L) AM_NOP
@@ -3082,9 +3094,9 @@ ADDRESS_MAP_END
 // version without serial hookup to I/O board for games where the PIC isn't dumped
 static ADDRESS_MAP_START( s23h8noiobmap, AS_IO, 8, namcos23_state )
 	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE(s23_mcu_p6_r, s23_mcu_p6_w )
-	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ(s23_mcu_p8_r ) AM_WRITENOP
+	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READWRITE(s23_mcu_p8_r, s23_mcu_p8_w )
 	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE(s23_mcu_pa_r, s23_mcu_pa_w )
-	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE(s23_mcu_portB_r, s23_mcu_portB_w )
+	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE(s23_mcu_pb_r, s23_mcu_pb_w )
 	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1) AM_READWRITE(s23_mcu_rtc_r, s23_mcu_settings_w )
 	AM_RANGE(H8_ADC_0_H, H8_ADC_0_L) AM_NOP
 	AM_RANGE(H8_ADC_1_H, H8_ADC_1_L) AM_NOP
@@ -3219,7 +3231,7 @@ DRIVER_INIT_MEMBER(namcos23_state,ss23)
 	m_jvssense = 1;
 	m_main_irqcause = 0;
 	m_ctl_vbl_active = false;
-	m_s23_lastpB = 0x50;
+	m_s23_lastpb = 0x50;
 	m_s23_setstate = 0;
 	m_s23_setnum = 0;
 	memset(m_s23_settings, 0, sizeof(m_s23_settings));
