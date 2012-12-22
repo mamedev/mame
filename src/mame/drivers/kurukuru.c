@@ -367,7 +367,6 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_reset_w)
 */
 	msm5205_playmode_w(device, BITSWAP8((data>>1), 7,6,5,4,3,0,1,2));
 	msm5205_reset_w(device, data & 1);
-	update_sound_irq(m_sound_irq_cause);
 }
 
 READ8_MEMBER(kurukuru_state::kurukuru_soundlatch_r)
