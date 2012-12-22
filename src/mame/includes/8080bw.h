@@ -57,6 +57,7 @@ public:
 	DECLARE_WRITE8_MEMBER(spcewars_sh_port_w);
 	DECLARE_WRITE8_MEMBER(lrescue_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(lrescue_sh_port_2_w);
+	DECLARE_WRITE8_MEMBER(cosmicmo_05_w);
 	DECLARE_WRITE8_MEMBER(cosmo_sh_port_2_w);
 	DECLARE_READ8_MEMBER(darthvdr_01_r);
 	DECLARE_WRITE8_MEMBER(darthvdr_00_w);
