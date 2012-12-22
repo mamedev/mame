@@ -343,7 +343,7 @@ static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
 	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN0")
 	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("IN1")
 	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE_LEGACY("ym2149", ay8910_address_w)
-	AM_RANGE(0xc8, 0xc8) AM_READ_PORT("DSW2")
+	AM_RANGE(0xc8, 0xc8) AM_DEVREAD_LEGACY("ym2149", ay8910_r)
 	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("ym2149", ay8910_data_w)
 ADDRESS_MAP_END
 
@@ -384,16 +384,16 @@ READ8_MEMBER(kurukuru_state::kurukuru_adpcm_timer_irqack_r)
 
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, kurukuru_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_io, AS_IO, 8, kurukuru_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_WRITE(kurukuru_adpcm_data_w)
-	AM_RANGE(0x50, 0x50) AM_WRITE(kurukuru_adpcm_reset_w)
-	AM_RANGE(0x60, 0x60) AM_READ(kurukuru_soundlatch_r)
-	AM_RANGE(0x70, 0x70) AM_READ(kurukuru_adpcm_timer_irqack_r)
+	ADDRESS_MAP_GLOBAL_MASK(0x7f)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_WRITE(kurukuru_adpcm_data_w)
+	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_WRITE(kurukuru_adpcm_reset_w)
+	AM_RANGE(0x60, 0x60) AM_MIRROR(0x0f) AM_READ(kurukuru_soundlatch_r)
+	AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) AM_READ(kurukuru_adpcm_timer_irqack_r)
 ADDRESS_MAP_END
 
 
@@ -511,7 +511,7 @@ static const ay8910_interface ym2149_intf =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_UNMAPPED,
-	DEVCB_UNMAPPED,
+	DEVCB_INPUT_PORT("DSW2"),
 	DEVCB_DRIVER_MEMBER(kurukuru_state, ym2149_aout_w),
 	DEVCB_DRIVER_MEMBER(kurukuru_state, ym2149_bout_w)
 };
