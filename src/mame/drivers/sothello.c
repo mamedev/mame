@@ -49,10 +49,12 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_v9938(*this, "v9938") { }
 
+	required_device<v9938_device> m_v9938;
+
 	int m_subcpu_status;
 	int m_soundcpu_busy;
 	int m_msm_data;
-	required_device<v9938_device> m_v9938;
+
 	DECLARE_WRITE8_MEMBER(bank_w);
 	DECLARE_READ8_MEMBER(subcpu_halt_set);
 	DECLARE_READ8_MEMBER(subcpu_halt_clear);
@@ -65,6 +67,7 @@ public:
 	DECLARE_WRITE8_MEMBER(subcpu_status_w);
 	DECLARE_READ8_MEMBER(subcpu_status_r);
 	DECLARE_WRITE8_MEMBER(msm_cfg_w);
+
 	virtual void machine_reset();
 	TIMER_CALLBACK_MEMBER(subcpu_suspend);
 	TIMER_CALLBACK_MEMBER(subcpu_resume);
@@ -167,7 +170,7 @@ WRITE8_MEMBER(sothello_state::msm_cfg_w)
      bit 2 = S2    1
      bit 3 = S1    2
 */
-    msm5205_playmode_w(device, BITSWAP8((data>>1), 7,6,5,4,3,0,1,2)); /* or maybe 7,6,5,4,3,0,2,1 ??? */
+    msm5205_playmode_w(device, BITSWAP8((data>>1), 7,6,5,4,3,0,1,2));
     msm5205_reset_w(device,data&1);
 }
 
@@ -365,7 +368,6 @@ static const ym2203_interface ym2203_config =
 static MACHINE_CONFIG_START( sothello, sothello_state )
 
     /* basic machine hardware */
-
     MCFG_CPU_ADD("maincpu",Z80, MAINCPU_CLOCK)
     MCFG_CPU_PROGRAM_MAP(maincpu_mem_map)
     MCFG_CPU_IO_MAP(maincpu_io_map)
@@ -380,7 +382,7 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
 
     MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-
+	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM)
 	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(sothello_vdp_interrupt)
 
@@ -408,7 +410,6 @@ static MACHINE_CONFIG_START( sothello, sothello_state )
     MCFG_SOUND_ADD("msm",MSM5205, MSM_CLOCK)
     MCFG_SOUND_CONFIG(msm_interface)
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
 MACHINE_CONFIG_END
 
 /***************************************************************************

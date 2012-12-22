@@ -8,6 +8,7 @@
 
 
   This hardware seems to be a derivative of MSX2 'on steroids'.
+  It has many similarites with sothello.c and tonton.c
 
 
 *******************************************************************************
@@ -357,9 +358,15 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_data_w)
 
 WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_reset_w)
 {
-	// d0: reset adpcm chip
-	// other bits: ?
-	msm5205_reset_w(machine().device("adpcm"), data & 1);
+	device_t *device = machine().device("adpcm");
+/*
+     bit 0 = RESET
+     bit 1 = 4B/3B
+     bit 2 = S2
+     bit 3 = S1
+*/
+	msm5205_playmode_w(device, BITSWAP8((data>>1), 7,6,5,4,3,0,1,2));
+	msm5205_reset_w(device, data & 1);
 	update_sound_irq(m_sound_irq_cause);
 }
 
@@ -512,7 +519,7 @@ static const ay8910_interface ym2149_intf =
 static const msm5205_interface msm5205_config =
 {
 	kurukuru_msm5205_vck,
-	MSM5205_S48_4B		/* 8 kHz? */
+	MSM5205_S48_4B		/* changed on the fly */
 };
 
 
