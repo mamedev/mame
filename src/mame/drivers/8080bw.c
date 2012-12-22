@@ -1066,6 +1066,9 @@ static INPUT_PORTS_START( cosmicmo )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+
+//	PORT_MODIFY(CABINET_PORT_TAG)
+//	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -1916,10 +1919,10 @@ static INPUT_PORTS_START( yosakdon )
 
 	/* Dummy controls port, P1 */
 	INVADERS_CONTROL_PORT_P1
+	INVADERS_CONTROL_PORT_P2
 
 	/* Dummy port for cocktail mode (not used) */
-	PORT_START(CABINET_PORT_TAG)
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
 
@@ -1933,6 +1936,10 @@ static MACHINE_CONFIG_DERIVED_CLASS( yosakdon, mw8080bw_root, _8080bw_state )
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
+
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invaders)
 MACHINE_CONFIG_END
 
 
