@@ -157,6 +157,7 @@ public:
 	DECLARE_MACHINE_RESET(type4);
 	DECLARE_MACHINE_RESET(cbdash);
 	DECLARE_MACHINE_RESET(cflyball);
+	DECLARE_MACHINE_RESET(cmanhat);
 	UINT32 screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(decocass_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(decocass_sound_command_w);
@@ -230,6 +231,7 @@ private:
 	DECLARE_READ8_MEMBER(decocass_type1_latch_27_pass_3_inv_2_r);
 	DECLARE_READ8_MEMBER(decocass_type1_latch_26_pass_5_inv_2_r);
 	DECLARE_READ8_MEMBER(decocass_type1_latch_16_pass_3_inv_1_r);
+	DECLARE_READ8_MEMBER(decocass_type1_latch_xab_pass_x54_r);
 	DECLARE_READ8_MEMBER(decocass_type2_r);
 	DECLARE_WRITE8_MEMBER(decocass_type2_w);
 	DECLARE_READ8_MEMBER(decocass_type3_r);

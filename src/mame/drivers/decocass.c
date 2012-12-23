@@ -808,6 +808,12 @@ static MACHINE_CONFIG_DERIVED( cdsteljn, decocass )
 	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cdsteljn)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( cmanhat, decocass )
+
+	/* basic machine hardware */
+	MCFG_MACHINE_RESET_OVERRIDE(decocass_state,cmanhat)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( cfishing, decocass )
 
 	/* basic machine hardware */
@@ -1087,6 +1093,17 @@ ROM_START( chwy )
 
 	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
 	ROM_LOAD( "chwy.cas",   0x0000, 0x8000, CRC(68a48064) SHA1(7e389737972fd0c54f398d296159c561f5ec3a93) )
+ROM_END
+
+/* 03 Manhatten */
+ROM_START( cmanhat )
+	DECOCASS_BIOS_A_ROMS
+
+	ROM_REGION( 0x00020, "dongle", 0 )	  /* dongle data */
+	ROM_LOAD( "manhattan.pro",   0x0000, 0x0020, CRC(1bc9fccb) SHA1(ffc59c7660d5c87a8deca294f80260b6bc7c3027) ) // == a-0061.dgl
+
+	ROM_REGION( 0x10000, "cassette", 0 )	  /* (max) 64k for cassette image */
+	ROM_LOAD( "manhattan.cas", 0x000000, 0x006000, CRC(92dae2b1) SHA1(cc048ac6601553675078230290beb3d59775bfe0) )
 ROM_END
 
 /* 04 Terranean */
@@ -1693,7 +1710,7 @@ DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
 /* -- */ GAME( 1981, ctsttape,  decocass, ctsttape, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Test Tape (DECO Cassette)", 0 )
 /* 01 */ GAME( 1980, chwy,      decocass, chwy,     decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Highway Chase (DECO Cassette)", 0 )
 /* 02 */ // 1980.12 Sengoku Ninjatai
-/* 03 */ // 1981.01 Manhattan
+/* 03 */ GAME( 1981, cmanhat,   decocass, cmanhat,  decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Manhattan (DECO Cassette)", GAME_NOT_WORKING )
 /* 04 */ GAME( 1981, cterrani,  decocass, cterrani, cterrani, decocass_state, decocass, ROT270, "Data East Corporation", "Terranean (DECO Cassette)", 0 )
 /* 05 */ // 1981.?? Missile Sprinter
 /* 06 */ // 1980.12 Nebula

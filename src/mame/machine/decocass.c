@@ -401,6 +401,88 @@ READ8_MEMBER(decocass_state::decocass_type1_pass_136_r)
 	return data;
 }
 
+
+/***************************************************************************
+ *
+ *  TYPE1 DONGLE (DE-0061)
+ *  - Manhattan
+ *
+ * Input bits that are passed uninverted = $54 (3 true bits)
+ * Input bits that are passed inverted   = $00 (0 inverted bits)
+ * Remaining bits for addressing PROM    = $AB (5 bits)
+ *
+ ***************************************************************************/
+
+READ8_MEMBER(decocass_state::decocass_type1_latch_xab_pass_x54_r)
+{
+	UINT8 data;
+
+	if (1 == (offset & 1))
+	{
+		if (0 == (offset & E5XX_MASK))
+			data = upi41_master_r(m_mcu, 1);
+		else
+			data = 0xff;
+
+		data = (BIT(data, 0) << 0) | (BIT(data, 1) << 1) | 0x7c;
+		LOG(4,("%10s 6502-PC: %04x decocass_type1_latch_27_pass_3_inv_2_r(%02x): $%02x <- (%s %s)\n",
+			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data,
+			(data & 1) ? "OBF" : "-",
+			(data & 2) ? "IBF" : "-"));
+	}
+	else
+	{
+		offs_t promaddr;
+		UINT8 save;
+		UINT8 *prom = space.machine().root_device().memregion("dongle")->base();
+
+		if (m_firsttime)
+		{
+			LOG(3,("prom data:\n"));
+			for (promaddr = 0; promaddr < 32; promaddr++)
+			{
+				if (promaddr % 8 == 0)
+					LOG(3,("  %02x:", promaddr));
+				LOG(3,(" %02x%s", prom[promaddr], (promaddr % 8) == 7 ? "\n" : ""));
+			}
+			m_firsttime = 0;
+			m_latch1 = 0;	 /* reset latch (??) */
+		}
+
+		if (0 == (offset & E5XX_MASK))
+			data = upi41_master_r(m_mcu, 0);
+		else
+			data = 0xff;
+
+		save = data;	/* save the unmodifed data for the latch */
+
+		/* AB 10101011 */
+		promaddr =
+			(((data >> MAP0(m_type1_inmap)) & 1) << 0) |
+			(((data >> MAP1(m_type1_inmap)) & 1) << 1) |
+			(((data >> MAP3(m_type1_inmap)) & 1) << 2) |
+			(((data >> MAP5(m_type1_inmap)) & 1) << 3) |
+			(((data >> MAP7(m_type1_inmap)) & 1) << 4);
+		/* no latch, pass bit 0x54 */
+		data =
+			(((prom[promaddr] >> 0) & 1)			   << MAP0(m_type1_outmap)) |
+			(((prom[promaddr] >> 1) & 1)			   << MAP1(m_type1_outmap)) |
+			(((data >> MAP2(m_type1_inmap)) & 1)		   << MAP2(m_type1_outmap)) |
+			(((prom[promaddr] >> 2) & 1)			   << MAP3(m_type1_outmap)) |
+			(((data >> MAP4(m_type1_inmap)) & 1)		   << MAP4(m_type1_outmap))  |
+			(((prom[promaddr] >> 3) & 1)			   << MAP5(m_type1_outmap)) |
+			(((data >> MAP6(m_type1_inmap)) & 1)		   << MAP6(m_type1_outmap)) |
+			(((prom[promaddr] >> 4) & 1)			   << MAP7(m_type1_outmap));
+
+		LOG(3,("%10s 6502-PC: %04x decocass_type1_latch_27_pass_3_inv_2_r(%02x): $%02x\n",
+			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
+
+		m_latch1 = save;		/* latch the data for the next A0 == 0 read */
+	}
+	return data;
+}
+
+
 /***************************************************************************
  *
  *  TYPE1 DONGLE (DE-0061)
@@ -1409,6 +1491,15 @@ MACHINE_RESET_MEMBER(decocass_state,csuperas)
 	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_latch_26_pass_3_inv_2_r),this);
 	m_type1_inmap = MAKE_MAP(0,1,2,3,5,4,6,7);
 	m_type1_outmap = MAKE_MAP(0,1,2,3,5,4,6,7);
+}
+
+MACHINE_RESET_MEMBER(decocass_state,cmanhat)
+{
+	decocass_state::machine_reset();
+	LOG(0,("dongle type #1 (DE-0061)\n"));
+	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_latch_xab_pass_x54_r),this);
+//	m_type1_inmap = MAKE_MAP(0,1,2,3,5,4,6,7);
+//	m_type1_outmap = MAKE_MAP(0,1,2,3,5,4,6,7);
 }
 
 MACHINE_RESET_MEMBER(decocass_state,clocknch)
