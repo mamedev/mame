@@ -11,8 +11,7 @@ System driver:
       - First attempt
 
 Memory map:
-    00000000 System ROM (2MB)
-    00200000 RAM (256K)
+    00000000 System ROM (2MB)    00200000 RAM (256K)
     00400000 Flash memory (128K)
     00600000 Some memory mapped hardware
     00a00000 Cartridge port
