@@ -116,13 +116,17 @@
   The game name could be translated as "Croak Croak Hop Hop"
   Kuru is the frog sound, and Pyon is the sound of jumps.
 
-  Coin 1 (key 5) is not working properly and could hang the system.
-  Once pressed, the game spits a message that means "Jammed Medal".
-  For now, use Coin 2 (key 6) and Service (key 8) for credits...
+  Coin 1 (key 5) could be set either as Coin 1 or as Payout button, through
+  a DIP switch. Once pressed, if it's set as payout, the game spits a message
+  that means "Jammed Medal". So set it to 'Normal' for normal behaviour...
 
-  If you pressed Coin 1 and the game is not responding anymore, press RESET
-  (key 0), and the game will reset to default values (even all counters will
-  be cleared).
+  If you get the coin jam error, and the game is not responding anymore, press
+  RESET (key 0), and the game will reset to default values (even all counters
+  will be cleared).
+
+
+  DSW2 bits 5 & 6 (maybe 4 too) seems to change the YM2149 sound quality, as a
+  side effect. Need to investigate more about...
 
 
 *******************************************************************************
@@ -192,9 +196,9 @@
   TODO:
 
   - Hopper emulation.
-  - Find why the use of coin 1 / payout always jam. Hopper related?
-  - Default DIP Switches, once the hopper/coin jam issues were solved...
-
+  - Find why the use of payout always jam. Hopper related?
+  - Default DIP Switches, once the YM sound degrade issues were solved...
+    (see general notes about)
 
 ******************************************************************************/
 
@@ -414,27 +418,27 @@ WRITE8_MEMBER(kurukuru_state::ym2149_bout_w)
 
 static INPUT_PORTS_START( kurukuru )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("1st (BOTE)")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("2nd (OUME)")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("3rd (PYOKO)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V) PORT_NAME("4th (KUNIO)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("5th (PP)")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("1st (Bote)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("2nd (Oume)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("3rd (Pyoko)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V) PORT_NAME("4th (Kunio)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("5th (Pyon Pyon)")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_N) PORT_NAME("unknown N")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_M) PORT_NAME("unknown M")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Bookkeeping")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_8) PORT_NAME("Service")		// add credits without contabilize them
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Medal In")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Reset Button")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_A) PORT_NAME("Unknown 1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE (2)								// coin 1 is not incrementing the credits and jams
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE (2)								// coin 1 jams if is set as payout
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_S) PORT_NAME("Unknown 2")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )											// payout write the pulses, but jams.
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )											// payout writes the pulses, but jams.
 
 	PORT_START("DSW1")	// found in the PCB: 11111111
-	PORT_DIPNAME( 0x07, 0x03, "Coinage A (100 Y)" )	PORT_DIPLOCATION("DSW1:1,2,3")
+	PORT_DIPNAME( 0x07, 0x00, "Coinage A (100 Y)" )	PORT_DIPLOCATION("DSW1:1,2,3")
 	PORT_DIPSETTING(    0x02, "1 Coin / 3 Medal" )
 	PORT_DIPSETTING(    0x06, "1 Coin / 4 Medal" )
 	PORT_DIPSETTING(    0x01, "1 Coin / 5 Medal" )
@@ -443,18 +447,18 @@ static INPUT_PORTS_START( kurukuru )
 	PORT_DIPSETTING(    0x07, "1 Coin / 11 Medal" )
 	PORT_DIPSETTING(    0x04, "1 Coin / 20 Medal" )
 	PORT_DIPSETTING(    0x00, "1 Coin / 50 Medal" )
-	PORT_DIPNAME( 0x18, 0x08, "Coinage B (10 Y)" )	PORT_DIPLOCATION("DSW1:4,5")
+	PORT_DIPNAME( 0x18, 0x00, "Coinage B (10 Y)" )	PORT_DIPLOCATION("DSW1:4,5")
 	PORT_DIPSETTING(    0x00, "3 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x10, "2 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x18, "1 Coin / 1 Medal" )
 	PORT_DIPSETTING(    0x08, "1 Coin / 2 Medal" )
-	PORT_DIPNAME( 0x20, 0x20, "Service Coinage" )	PORT_DIPLOCATION("DSW1:6")
-	PORT_DIPSETTING(    0x20, "1 Pulse / 1 Medal" )
-	PORT_DIPSETTING(    0x00, "1 Pulse / 2 Medal" )
+	PORT_DIPNAME( 0x20, 0x00, "Coinage Config" )	PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x00, "Coin 1 = Normal; Medal In = 2 Credits by Medal" )
+	PORT_DIPSETTING(    0x20, "Coin 1 = Payout; Medal In = 1 Credit by Medal" )
 	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )		PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x40, "Manual" )
 	PORT_DIPSETTING(    0x00, "Automatic" )
-	PORT_DIPNAME( 0x80, 0x00, "Repeat Bet")			PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x80, 0x00, "Repeat Last Bet")	PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
