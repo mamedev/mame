@@ -17,17 +17,6 @@
 #define PARENT_FLOPPY_2 "^floppy2"
 #define PARENT_FLOPPY_3 "^floppy3"
 
-struct apple525_disk
-{
-	unsigned int state : 4;		/* bits 0-3 are the phase */
-	unsigned int tween_tracks : 1;
-	unsigned int track_loaded : 1;
-	unsigned int track_dirty : 1;
-	int position;
-	int spin_count; 		/* simulate drive spin to fool RWTS test at $BD34 */
-	UINT8 track_data[APPLE2_NIBBLE_SIZE * APPLE2_SECTOR_COUNT];
-};
-
 INLINE apple525_floppy_image_device *get_device(device_t *device)
 {
 	assert(device != NULL);
@@ -75,9 +64,9 @@ void apple525_set_enable_lines(device_t *device,int enable_mask)
 static void apple525_load_current_track(device_t *image)
 {
 	int len;
-	struct apple525_disk *disk;
+	apple525_floppy_image_device *disk;
 
-	disk = (struct apple525_disk *) flopimg_get_custom_data(image);
+	disk = get_device(image);
 	len = sizeof(disk->track_data);
 
 	floppy_drive_read_track_data_info_buffer(image, 0, disk->track_data, &len);
@@ -88,9 +77,9 @@ static void apple525_load_current_track(device_t *image)
 static void apple525_save_current_track(device_t *image, int unload)
 {
 	int len;
-	struct apple525_disk *disk;
+	apple525_floppy_image_device *disk;
 
-	disk = (struct apple525_disk *)  flopimg_get_custom_data(image);
+	disk = get_device(image);
 
 	if (disk->track_dirty)
 	{
@@ -102,10 +91,13 @@ static void apple525_save_current_track(device_t *image, int unload)
 		disk->track_loaded = 0;
 }
 
-static void apple525_seek_disk(device_t *img, struct apple525_disk *disk, signed int step)
+static void apple525_seek_disk(device_t *img, signed int step)
 {
 	int track;
 	int pseudo_track;
+	apple525_floppy_image_device *disk;
+
+	disk = get_device(img);
 
 	apple525_save_current_track(img, FALSE);
 
@@ -132,11 +124,11 @@ static void apple525_seek_disk(device_t *img, struct apple525_disk *disk, signed
 
 static void apple525_disk_set_lines(device_t *device,device_t *image, UINT8 new_state)
 {
-	struct apple525_disk *cur_disk;
+	apple525_floppy_image_device *cur_disk;
 	UINT8 old_state;
 	unsigned int phase;
 
-	cur_disk = (struct apple525_disk *)  flopimg_get_custom_data(image);
+	cur_disk = get_device(image);
 
 	old_state = cur_disk->state;
 	cur_disk->state = new_state;
@@ -160,10 +152,10 @@ static void apple525_disk_set_lines(device_t *device,device_t *image, UINT8 new_
 		switch(phase)
 		{
 			case 1:
-				apple525_seek_disk(image, cur_disk, +1);
+				apple525_seek_disk(image, +1);
 				break;
 			case 3:
-				apple525_seek_disk(image, cur_disk, -1);
+				apple525_seek_disk(image, -1);
 				break;
 		}
 	}
@@ -172,10 +164,10 @@ static void apple525_disk_set_lines(device_t *device,device_t *image, UINT8 new_
 int apple525_get_count(device_t *device)
 {
 	int cnt = 0;
-	if (device->subdevice("^"FLOPPY_0)!=NULL && flopimg_get_custom_data(device->subdevice(PARENT_FLOPPY_0))!=NULL) cnt++;
-    if (device->subdevice("^"FLOPPY_1)!=NULL && flopimg_get_custom_data(device->subdevice(PARENT_FLOPPY_1))!=NULL) cnt++;
-    if (device->subdevice("^"FLOPPY_2)!=NULL && flopimg_get_custom_data(device->subdevice(PARENT_FLOPPY_2))!=NULL) cnt++;
-    if (device->subdevice("^"FLOPPY_3)!=NULL && flopimg_get_custom_data(device->subdevice(PARENT_FLOPPY_3))!=NULL) cnt++;
+	if (device->subdevice("^"FLOPPY_0)!=NULL && get_device(device->subdevice(PARENT_FLOPPY_0))!=NULL) cnt++;
+    if (device->subdevice("^"FLOPPY_1)!=NULL && get_device(device->subdevice(PARENT_FLOPPY_1))!=NULL) cnt++;
+    if (device->subdevice("^"FLOPPY_2)!=NULL && get_device(device->subdevice(PARENT_FLOPPY_2))!=NULL) cnt++;
+    if (device->subdevice("^"FLOPPY_3)!=NULL && get_device(device->subdevice(PARENT_FLOPPY_3))!=NULL) cnt++;
 
 //    printf("%d apple525 drives\n", cnt);
     return cnt;
@@ -202,13 +194,13 @@ void apple525_set_lines(device_t *device, UINT8 lines)
 static UINT8 apple525_process_byte(device_t *img, int write_value)
 {
 	UINT8 read_value;
-	struct apple525_disk *disk;
+	apple525_floppy_image_device *disk;
 	int spinfract_divisor;
 	int spinfract_dividend;
 	apple525_floppy_image_device *config = get_device(img);
 	device_image_interface *image = dynamic_cast<device_image_interface *>(img);
 
-	disk = (struct apple525_disk *)  flopimg_get_custom_data(img);
+	disk = get_device(img);
 	spinfract_dividend = config->get_dividend();
 	spinfract_divisor = config->get_divisor();
 
@@ -316,7 +308,6 @@ apple525_floppy_image_device::apple525_floppy_image_device(const machine_config 
 void apple525_floppy_image_device::device_start()
 {
 	legacy_floppy_image_device::device_start();
-	flopimg_alloc_custom_data(this,auto_alloc_clear(machine(),struct apple525_disk));
 	floppy_set_type(this,FLOPPY_TYPE_APPLE);
 }
 

@@ -543,9 +543,8 @@ READ8_MEMBER(apple2_state::apple2_c4xx_r )
 	// is a card installed in this slot?
 	if (slotdevice != NULL)
 	{
-		if (slotdevice->take_c800())
+		if (slotdevice->take_c800() && (m_a2_cnxx_slot != slotnum))
 		{
-//          printf("c4xx_r: taking cnxx_slot to %d\n", slotnum);
 			m_a2_cnxx_slot = slotnum;
 			apple2_update_memory(space.machine());
 		}

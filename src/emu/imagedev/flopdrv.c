@@ -85,7 +85,6 @@ struct floppy_drive
 	int track;
 	void (*load_proc)(device_image_interface &image);
 	void (*unload_proc)(device_image_interface &image);
-	void *custom_data;
 	int floppy_drive_type;
 };
 
@@ -125,18 +124,6 @@ INLINE floppy_drive *get_safe_token(device_t *device)
 floppy_image_legacy *flopimg_get_image(device_t *image)
 {
 	return get_safe_token(image)->floppy;
-}
-
-void *flopimg_get_custom_data(device_t *image)
-{
-	floppy_drive *flopimg = get_safe_token( image );
-	return flopimg->custom_data;
-}
-
-void flopimg_alloc_custom_data(device_t *image,void *custom)
-{
-	floppy_drive *flopimg = get_safe_token( image );
-	flopimg->custom_data = custom;
 }
 
 static int flopimg_get_sectors_per_track(device_t *image, int side)
@@ -223,8 +210,6 @@ static void floppy_drive_init(device_t *img)
 	pDrive->rpm = 300;
 
 	pDrive->controller = NULL;
-
-	pDrive->custom_data = NULL;
 
 	pDrive->floppy_drive_type = FLOPPY_TYPE_REGULAR;
 }

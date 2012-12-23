@@ -145,9 +145,6 @@ int floppy_get_count(running_machine &machine);
 int floppy_get_drive(device_t *image);
 int floppy_get_drive_by_type(device_t *image,int ftype);
 
-void *flopimg_get_custom_data(device_t *image);
-void flopimg_alloc_custom_data(device_t *image,void *custom);
-
 void floppy_drive_set_geometry(device_t *img, floppy_type_t type);
 
 /* drive select lines */
