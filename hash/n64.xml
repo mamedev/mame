@@ -9670,7 +9670,7 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="turok2ua" cloneof="turok2">
+	<software name="turok2ud" cloneof="turok2">
 		<description>Turok 2 - Seeds of Evil (USA, Demo Kiosk)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -9692,7 +9692,7 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="turok2ub" cloneof="turok2">
+	<software name="turok2ua" cloneof="turok2">
 		<description>Turok 2 - Seeds of Evil (USA)</description>
 		<year>1998</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -9714,13 +9714,24 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="turok3ub" cloneof="turok3">
+	<software name="turok3up1" cloneof="turok3">
 		<description>Turok 3 - Shadow of Oblivion (USA, Prototype)</description>
 		<year>2000</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432">
 				<rom name="turok 3 - shadow of oblivion (usa) (beta).bin" size="33554432" crc="a53de25f" sha1="ab268d630c5f206b36f0db0605be8762cd2b96da" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turok3up2" cloneof="turok3">
+		<description>Turok 3 - Shadow of Oblivion (USA, Prototype 20000531)</description>
+		<year>2000</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432">
+				<rom name="turok 3 - shadow of oblivion (usa) (2000-05-31) (beta).bin" size="33554432" crc="505e9066" sha1="12a22310e653b2389110e7708831634e3f9f18db" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

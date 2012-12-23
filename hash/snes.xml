@@ -7645,7 +7645,7 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="deaddanc">
+	<software name="deaddanc" cloneof="tuffnuff">
 		<description>Dead Dance (Jpn)</description>
 		<year>1993</year>
 		<publisher>Jaleco</publisher>
@@ -40984,7 +40984,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="metaljck">
+	<software name="metaljckj" cloneof="metaljck">
 		<description>Kikou Keisatsu Metal Jack (Jpn)</description>
 		<year>1992</year>
 		<publisher>Atlus</publisher>
@@ -43459,6 +43459,17 @@ List of unclassified roms
 				<rom name="metal combat - falcon's revenge (usa).sfc" size="2097152" crc="c3131b49" sha1="da88fc5830ddb0cdf8ffc2e8340a607d0ad8eaa1" offset="0x000000" />
 			</dataarea>
 			<dataarea name="sram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metaljck">
+		<description>Metal Jack (USA, Prototype)</description>
+		<year>1992</year>
+		<publisher>Atlus</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="metal jack (prototype usa).sfc" size="1048576" crc="bf5a26fb" sha1="4c34312cfd2a8ecba64365e3b78d2c34d9db80ba" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48534,7 +48545,7 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="rushbetr">
+	<software name="rushbetr" cloneof="brawlbro">
 		<description>Rushing Beat Ran - Fukusei Toshi (Jpn)</description>
 		<year>1992</year>
 		<publisher>Jaleco</publisher>
@@ -61077,6 +61088,42 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="ascii data 3.bs" size="1048576" crc="2ab43134" sha1="885c80f0e8582e6ae62bcc42ec6249f50c5b56da" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsmachi" supported="no">
+		<description>Machi Magazine</description>
+		<!-- BS -->
+		<year>1995?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="machi magazine (d).bs" size="1048576" crc="0e6c76e6" sha1="ca291cb350f69660ebc054906d05408ffef75b8d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsmachih" cloneof="bsmachi" supported="no">
+		<description>Machi Magazine (Hacked)</description>
+		<!-- BS -->
+		<year>1995?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="machi magazine (header fix prepatched).bs" size="262144" crc="eda14445" sha1="f351b8593e587e7a264dd60cdf3713598289f5b5" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bswaiwaia" cloneof="bswaiwai" supported="no">
+		<description>WaiWai Check 3-21 Saihousou + WaiWai Kids 3-16</description>
+		<!-- BS -->
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="waiwai check 3-21 saihousou + waiwai kids 3-16.bs" size="1048576" crc="17239e91" sha1="fe67f40912e7c4d290eeb175a2bd2122bfa3ae8c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>

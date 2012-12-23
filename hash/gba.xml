@@ -12554,6 +12554,19 @@
 	</software>
 
 	<software name="franklin">
+		<description>Franklin the Turtle (Euro, Rev. 2)</description>
+		<year>2006</year>
+		<publisher>The Game Factory</publisher>
+		<info name="serial" value="AGB-BFKP-EUR"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="pcb_type" value="GBA-EEPROM-4K" />
+			<dataarea name="rom" size="4194304">
+				<rom name="frank.bin" size="4194304" crc="a0952cd0" sha1="ce978dbda60ddbee77657a60cf2102722e645dcf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="franklin1" cloneof="franklin">
 		<description>Franklin the Turtle (Euro)</description>
 		<year>2006</year>
 		<publisher>The Game Factory</publisher>
