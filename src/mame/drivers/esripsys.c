@@ -95,7 +95,7 @@ READ8_MEMBER(esripsys_state::uart_r)
 
 READ8_MEMBER(esripsys_state::g_status_r)
 {
-	int bank4 = BIT(get_rip_status(machine().device("video_cpu")), 2);
+	int bank4 = BIT(m_videocpu->get_rip_status(), 2);
 	int vblank = machine().primary_screen->vblank();
 
 	return (!vblank << 7) | (bank4 << 6) | (m_f_status & 0x2f);
@@ -144,7 +144,7 @@ WRITE8_MEMBER(esripsys_state::g_status_w)
 READ8_MEMBER(esripsys_state::f_status_r)
 {
 	int vblank = machine().primary_screen->vblank();
-	UINT8 rip_status = get_rip_status(machine().device("video_cpu"));
+	UINT8 rip_status = m_videocpu->get_rip_status();
 
 	rip_status = (rip_status & 0x18) | (BIT(rip_status, 6) << 1) |  BIT(rip_status, 7);
 
@@ -705,7 +705,7 @@ static MACHINE_CONFIG_START( esripsys, esripsys_state )
 
 	MCFG_CPU_ADD("video_cpu", ESRIP, XTAL_40MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(video_cpu_map)
-	MCFG_CPU_CONFIG(rip_config)
+	MCFG_CPU_ESRIP_CONFIG(rip_config)
 
 	MCFG_CPU_ADD("sound_cpu", M6809E, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)

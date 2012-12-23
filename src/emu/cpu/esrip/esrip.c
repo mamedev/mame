@@ -11,8 +11,6 @@
 #include "debugger.h"
 #include "esrip.h"
 
-CPU_DISASSEMBLE( esrip );
-
 
 /***************************************************************************
     CONSTANTS
@@ -25,7 +23,7 @@ CPU_DISASSEMBLE( esrip );
     MACROS
 ***************************************************************************/
 
-#define RIP_PC		(cpustate->pc | ((cpustate->status_out & 1) << 8))
+#define RIP_PC		(m_pc | ((m_status_out & 1) << 8))
 #define _BIT(x, n)	((x) & (1 << (n)))
 #define RISING_EDGE(old_val, new_val, bit)	(!(old_val & (1 << bit)) && (new_val & (1 << bit)))
 
@@ -53,90 +51,21 @@ CPU_DISASSEMBLE( esrip );
 #define	C_FLAG		(1 << 1)
 #define	Z_FLAG		(1 << 0)
 
-#define CLEAR_FLAGS(a)	(cpustate->new_status &= ~(a))
-#define SET_FLAGS(a)	(cpustate->new_status |=  (a))
+#define CLEAR_FLAGS(a)	(m_new_status &= ~(a))
+#define SET_FLAGS(a)	(m_new_status |=  (a))
 
 
 /***************************************************************************
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
 
-struct esrip_state
-{
-	UINT16	ram[32];
-	UINT16	acc;
-	UINT16	d_latch;
-	UINT16	i_latch;
-	UINT16	result;
-	UINT8	new_status;
-	UINT8	status;
-	UINT16	inst;
-	UINT8	immflag;
-	UINT8	ct;
-	UINT8	t;
-
-	/* Instruction latches - current and previous values */
-	UINT8	l1, pl1;
-	UINT8	l2, pl2;
-	UINT8	l3, pl3;
-	UINT8	l4, pl4;
-	UINT8	l5, pl5;
-	UINT8	l6, pl6;
-	UINT8	l7, pl7;
-
-	UINT8	pc;
-	UINT8	status_out;
-
-	UINT8	x_scale;
-	UINT8	y_scale;
-	UINT8	img_bank;
-	UINT8	line_latch;
-	UINT16	fig_latch;
-	UINT16	attr_latch;
-	UINT16	adl_latch;
-	UINT16	adr_latch;
-	UINT16	iaddr_latch;
-	UINT8	c_latch;
-
-	UINT16	fdt_cnt;
-	UINT16	ipt_cnt;
-
-	UINT8	fig;
-	UINT16	fig_cycles;
-
-	UINT8	*optable;
-
-	UINT16	*ipt_ram;
-	UINT8	*lbrm;
-
-	legacy_cpu_device *device;
-	address_space *program;
-	direct_read_data *direct;
-	int		icount;
-
-	read16_device_func	fdt_r;
-	write16_device_func	fdt_w;
-	UINT8 (*status_in)(running_machine &machine);
-	int (*draw)(running_machine &machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank);
-};
-
-
-INLINE esrip_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == ESRIP);
-	return (esrip_state *)downcast<legacy_cpu_device *>(device)->token();
-}
-
-
 /***************************************************************************
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-UINT8 get_rip_status(device_t *cpu)
+UINT8 esrip_device::get_rip_status()
 {
-	esrip_state *cpustate = get_safe_token(cpu);
-	return cpustate->status_out;
+	return m_status_out;
 }
 
 
@@ -151,7 +80,7 @@ enum ops
 	ROTNR, BONR, BOR1, SONR, SHFTNR, PRTNR, TONR
 };
 
-static void make_ops(esrip_state *cpustate)
+void esrip_device::make_ops()
 {
 	int inst;
 
@@ -162,83 +91,83 @@ static void make_ops(esrip_state *cpustate)
 		if (quad == 0)
 		{
 			if (((inst >> 5) & 0xc) == 0xc)
-				cpustate->optable[inst] = ROTR1;
+				m_optable[inst] = ROTR1;
 			else
-				cpustate->optable[inst] = TOR1;
+				m_optable[inst] = TOR1;
 		}
 		else if (quad == 1)
 		{
 			if (OPCODE < 2)
-				cpustate->optable[inst] = ROTR2;
+				m_optable[inst] = ROTR2;
 			else if (OPCODE < 6)
-				cpustate->optable[inst] = ROTC;
+				m_optable[inst] = ROTC;
 			else
-				cpustate->optable[inst] = ROTM;
+				m_optable[inst] = ROTM;
 		}
 		else if (quad == 2)
 		{
 			if (OPCODE > 11)
-				cpustate->optable[inst] = BOR2;
+				m_optable[inst] = BOR2;
 			else
 			{
 				int tmp = (inst >> 5) & 0xff;
 
 				if (tmp == 0x63)
-					cpustate->optable[inst] = CRCF;
+					m_optable[inst] = CRCF;
 				else if (tmp == 0x69)
-					cpustate->optable[inst] = CRCR;
+					m_optable[inst] = CRCR;
 				else if (tmp == 0x7a)
-					cpustate->optable[inst] = SVSTR;
+					m_optable[inst] = SVSTR;
 				else
 				{
 					if ((SRC > 7) && (SRC < 12))
-						cpustate->optable[inst] = PRT;
+						m_optable[inst] = PRT;
 					else if (SRC > 11)
-						cpustate->optable[inst] = SOR;
+						m_optable[inst] = SOR;
 					else if (SRC < 6)
-						cpustate->optable[inst] = TOR2;
+						m_optable[inst] = TOR2;
 					else
-						cpustate->optable[inst] = SHFTR;
+						m_optable[inst] = SHFTR;
 				}
 			}
 		}
 		else
 		{
 			if (inst == 0x7140)
-				cpustate->optable[inst] = NOP;
+				m_optable[inst] = NOP;
 			else
 			{
 				int x = (inst & 0xffe0);
 				if (x == 0x7340)
-					cpustate->optable[inst] = TEST;
+					m_optable[inst] = TEST;
 				else if (x == 0x7740)
-					cpustate->optable[inst] = SETST;
+					m_optable[inst] = SETST;
 				else if (x == 0x7540)
-					cpustate->optable[inst] = RSTST;
+					m_optable[inst] = RSTST;
 				else
 				{
 					int op = OPCODE;
 					if (op == 0xc)
 					{
 						if ((inst & 0x18) == 0x18)
-							cpustate->optable[inst] = ROTNR;
+							m_optable[inst] = ROTNR;
 						else
-							cpustate->optable[inst] = BONR;
+							m_optable[inst] = BONR;
 					}
 					else if ((op & 0xc) == 0xc)
-						cpustate->optable[inst] = BOR1;
+						m_optable[inst] = BOR1;
 					else
 					{
 						int src = SRC;
 
 						if ((src & 0xc) == 0xc)
-							cpustate->optable[inst] = SONR;
+							m_optable[inst] = SONR;
 						else if ((src & 0x6) == 0x6)
-							cpustate->optable[inst] = SHFTNR;
+							m_optable[inst] = SHFTNR;
 						else if (src & 0x8)
-							cpustate->optable[inst] = PRTNR;
+							m_optable[inst] = PRTNR;
 						else
-							cpustate->optable[inst] = TONR;
+							m_optable[inst] = TONR;
 					}
 				}
 			}
@@ -246,107 +175,233 @@ static void make_ops(esrip_state *cpustate)
 	}
 }
 
-static CPU_INIT( esrip )
+void esrip_device::device_start()
 {
-	esrip_state *cpustate = get_safe_token(device);
-	esrip_config* _config = (esrip_config*)device->static_config();
-
-	memset(cpustate, 0, sizeof(*cpustate));
+	esrip_config* _config = (esrip_config*)static_config();
 
 	/* Register configuration structure callbacks */
-	cpustate->fdt_r = _config->fdt_r;
-	cpustate->fdt_w = _config->fdt_w;
-	cpustate->lbrm = (UINT8*)device->machine().root_device().memregion(_config->lbrm_prom)->base();
-	cpustate->status_in = _config->status_in;
-	cpustate->draw = _config->draw;
+	m_fdt_r = _config->fdt_r;
+	m_fdt_w = _config->fdt_w;
+	m_lbrm = (UINT8*)machine().root_device().memregion(_config->lbrm_prom)->base();
+	m_status_in = _config->status_in;
+	m_draw = _config->draw;
 
 	/* Allocate image pointer table RAM */
-	cpustate->ipt_ram = auto_alloc_array(device->machine(), UINT16, IPT_RAM_SIZE/2);
+	m_ipt_ram = auto_alloc_array(machine(), UINT16, IPT_RAM_SIZE/2);
 
-	cpustate->device = device;
-	cpustate->program = &device->space(AS_PROGRAM);
-	cpustate->direct = &cpustate->program->direct();
+	m_program = &space(AS_PROGRAM);
+	m_direct = &m_program->direct();
+
+	// register our state for the debugger
+	astring tempstr;
+	state_add(STATE_GENPC,     "GENPC",     m_rip_pc).noshow();
+	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_status).callimport().callexport().formatstr("%8s").noshow();
+	state_add(ESRIP_PC,        "PC:",    	m_rip_pc).mask(0xffff);
+	state_add(ESRIP_ACC,       "ACC:",		m_acc).mask(0xffff);
+	state_add(ESRIP_DLATCH,    "DLATCH:",	m_d_latch).mask(0xff);
+	state_add(ESRIP_ILATCH,    "ILATCH:",	m_i_latch).mask(0xffff);
+	state_add(ESRIP_RAM00,     "RAM[00]:",  m_ram[0x00]).mask(0xffff);
+	state_add(ESRIP_RAM01,     "RAM[01]:",  m_ram[0x01]).mask(0xffff);
+	state_add(ESRIP_RAM02,     "RAM[02]:",  m_ram[0x02]).mask(0xffff);
+	state_add(ESRIP_RAM03,     "RAM[03]:",  m_ram[0x03]).mask(0xffff);
+	state_add(ESRIP_RAM04,     "RAM[04]:",  m_ram[0x04]).mask(0xffff);
+	state_add(ESRIP_RAM05,     "RAM[05]:",  m_ram[0x05]).mask(0xffff);
+	state_add(ESRIP_RAM06,     "RAM[06]:",  m_ram[0x06]).mask(0xffff);
+	state_add(ESRIP_RAM07,     "RAM[07]:",  m_ram[0x07]).mask(0xffff);
+	state_add(ESRIP_RAM08,     "RAM[08]:",  m_ram[0x08]).mask(0xffff);
+	state_add(ESRIP_RAM09,     "RAM[09]:",  m_ram[0x09]).mask(0xffff);
+	state_add(ESRIP_RAM0A,     "RAM[0A]:",  m_ram[0x0a]).mask(0xffff);
+	state_add(ESRIP_RAM0B,     "RAM[0B]:",  m_ram[0x0b]).mask(0xffff);
+	state_add(ESRIP_RAM0C,     "RAM[0C]:",  m_ram[0x0c]).mask(0xffff);
+	state_add(ESRIP_RAM0D,     "RAM[0D]:",  m_ram[0x0d]).mask(0xffff);
+	state_add(ESRIP_RAM0E,     "RAM[0E]:",  m_ram[0x0e]).mask(0xffff);
+	state_add(ESRIP_RAM0F,     "RAM[0F]:",  m_ram[0x0f]).mask(0xffff);
+	state_add(ESRIP_RAM10,     "RAM[10]:",  m_ram[0x10]).mask(0xffff);
+	state_add(ESRIP_RAM11,     "RAM[11]:",  m_ram[0x11]).mask(0xffff);
+	state_add(ESRIP_RAM12,     "RAM[12]:",  m_ram[0x12]).mask(0xffff);
+	state_add(ESRIP_RAM13,     "RAM[13]:",  m_ram[0x13]).mask(0xffff);
+	state_add(ESRIP_RAM14,     "RAM[14]:",  m_ram[0x14]).mask(0xffff);
+	state_add(ESRIP_RAM15,     "RAM[15]:",  m_ram[0x15]).mask(0xffff);
+	state_add(ESRIP_RAM16,     "RAM[16]:",  m_ram[0x16]).mask(0xffff);
+	state_add(ESRIP_RAM17,     "RAM[17]:",  m_ram[0x17]).mask(0xffff);
+	state_add(ESRIP_RAM18,     "RAM[18]:",  m_ram[0x18]).mask(0xffff);
+	state_add(ESRIP_RAM19,     "RAM[19]:",  m_ram[0x19]).mask(0xffff);
+	state_add(ESRIP_RAM1A,     "RAM[1A]:",  m_ram[0x1a]).mask(0xffff);
+	state_add(ESRIP_RAM1B,     "RAM[1B]:",  m_ram[0x1b]).mask(0xffff);
+	state_add(ESRIP_RAM1C,     "RAM[1C]:",  m_ram[0x1c]).mask(0xffff);
+	state_add(ESRIP_RAM1D,     "RAM[1D]:",  m_ram[0x1d]).mask(0xffff);
+	state_add(ESRIP_RAM1E,     "RAM[1E]:",  m_ram[0x1e]).mask(0xffff);
+	state_add(ESRIP_RAM1F,     "RAM[1F]:",  m_ram[0x1f]).mask(0xffff);
+	state_add(ESRIP_STATW,     "STAT:",     m_status_out).mask(0xffff);
+	state_add(ESRIP_FDTC,      "FDTC:",     m_fdt_cnt).mask(0xffff);
+	state_add(ESRIP_IPTC,      "IPTC:",     m_ipt_cnt).mask(0xffff);
+	state_add(ESRIP_XSCALE,    "XSCL:",     m_x_scale).mask(0xffff);
+	state_add(ESRIP_YSCALE,    "YSCL:",     m_y_scale).mask(0xffff);
+	state_add(ESRIP_BANK,      "BANK:",     m_img_bank).mask(0xffff);
+	state_add(ESRIP_LINE,      "LINE:",     m_line_latch).mask(0xffff);
+	state_add(ESRIP_FIG,       "FIG:",      m_fig_latch).mask(0xffff);
+	state_add(ESRIP_ATTR,      "ATTR:",     m_attr_latch).mask(0xffff);
+	state_add(ESRIP_ADRL,      "ADRL:",     m_adl_latch).mask(0xffff);
+	state_add(ESRIP_ADRR,      "ADRR:",     m_adr_latch).mask(0xffff);
+	state_add(ESRIP_COLR,      "COLR:",     m_c_latch).mask(0xffff);
+	state_add(ESRIP_IADDR,     "IADR:",     m_iaddr_latch).mask(0xffff);
 
 	/* Create the instruction decode lookup table */
-	cpustate->optable = auto_alloc_array(device->machine(), UINT8, 65536);
-	make_ops(cpustate);
+	make_ops();
 
 	/* Register stuff for state saving */
-	device->save_item(NAME(cpustate->acc));
-	device->save_item(NAME(cpustate->ram));
-	device->save_item(NAME(cpustate->d_latch));
-	device->save_item(NAME(cpustate->i_latch));
-	device->save_item(NAME(cpustate->result));
-	device->save_item(NAME(cpustate->new_status));
-	device->save_item(NAME(cpustate->status));
-	device->save_item(NAME(cpustate->inst));
-	device->save_item(NAME(cpustate->immflag));
-	device->save_item(NAME(cpustate->ct));
-	device->save_item(NAME(cpustate->t));
-	device->save_item(NAME(cpustate->l1));
-	device->save_item(NAME(cpustate->l2));
-	device->save_item(NAME(cpustate->l3));
-	device->save_item(NAME(cpustate->l4));
-	device->save_item(NAME(cpustate->l5));
-	device->save_item(NAME(cpustate->l6));
-	device->save_item(NAME(cpustate->l7));
-	device->save_item(NAME(cpustate->pl1));
-	device->save_item(NAME(cpustate->pl2));
-	device->save_item(NAME(cpustate->pl3));
-	device->save_item(NAME(cpustate->pl4));
-	device->save_item(NAME(cpustate->pl5));
-	device->save_item(NAME(cpustate->pl6));
-	device->save_item(NAME(cpustate->pl7));
-	device->save_item(NAME(cpustate->pc));
-	device->save_item(NAME(cpustate->status_out));
-	device->save_item(NAME(cpustate->x_scale));
-	device->save_item(NAME(cpustate->y_scale));
-	device->save_item(NAME(cpustate->img_bank));
-	device->save_item(NAME(cpustate->line_latch));
-	device->save_item(NAME(cpustate->fig_latch));
-	device->save_item(NAME(cpustate->attr_latch));
-	device->save_item(NAME(cpustate->adl_latch));
-	device->save_item(NAME(cpustate->adr_latch));
-	device->save_item(NAME(cpustate->iaddr_latch));
-	device->save_item(NAME(cpustate->c_latch));
-	device->save_item(NAME(cpustate->fdt_cnt));
-	device->save_item(NAME(cpustate->ipt_cnt));
-	device->save_item(NAME(cpustate->fig));
-	device->save_item(NAME(cpustate->fig_cycles));
-	device->save_pointer(NAME(cpustate->ipt_ram), IPT_RAM_SIZE / sizeof(UINT16));
+	save_item(NAME(m_acc));
+	save_item(NAME(m_ram));
+	save_item(NAME(m_d_latch));
+	save_item(NAME(m_i_latch));
+	save_item(NAME(m_result));
+	save_item(NAME(m_new_status));
+	save_item(NAME(m_status));
+	save_item(NAME(m_inst));
+	save_item(NAME(m_immflag));
+	save_item(NAME(m_ct));
+	save_item(NAME(m_t));
+	save_item(NAME(m_l1));
+	save_item(NAME(m_l2));
+	save_item(NAME(m_l3));
+	save_item(NAME(m_l4));
+	save_item(NAME(m_l5));
+	save_item(NAME(m_l6));
+	save_item(NAME(m_l7));
+	save_item(NAME(m_pl1));
+	save_item(NAME(m_pl2));
+	save_item(NAME(m_pl3));
+	save_item(NAME(m_pl4));
+	save_item(NAME(m_pl5));
+	save_item(NAME(m_pl6));
+	save_item(NAME(m_pl7));
+	save_item(NAME(m_pc));
+	save_item(NAME(m_status_out));
+	save_item(NAME(m_x_scale));
+	save_item(NAME(m_y_scale));
+	save_item(NAME(m_img_bank));
+	save_item(NAME(m_line_latch));
+	save_item(NAME(m_fig_latch));
+	save_item(NAME(m_attr_latch));
+	save_item(NAME(m_adl_latch));
+	save_item(NAME(m_adr_latch));
+	save_item(NAME(m_iaddr_latch));
+	save_item(NAME(m_c_latch));
+	save_item(NAME(m_fdt_cnt));
+	save_item(NAME(m_ipt_cnt));
+	save_item(NAME(m_fig));
+	save_item(NAME(m_fig_cycles));
+	save_pointer(NAME(m_ipt_ram), IPT_RAM_SIZE / sizeof(UINT16));
+
+	// set our instruction counter
+	m_icountptr = &m_icount;
 }
 
 
-static CPU_RESET( esrip )
+void esrip_device::device_reset()
 {
-	esrip_state *cpustate = get_safe_token(device);
+	m_pc = 0;
 
-	cpustate->pc = 0;
+	m_pl1 = 0xff;
+	m_pl2 = 0xff;
+	m_pl3 = 0xff;
+	m_pl4 = 0xff;
+	m_pl5 = 0xff;
+	m_pl6 = 0xff;
+	m_pl7 = 0xff;
 
-	cpustate->pl1 = 0xff;
-	cpustate->pl2 = 0xff;
-	cpustate->pl3 = 0xff;
-	cpustate->pl4 = 0xff;
-	cpustate->pl5 = 0xff;
-	cpustate->pl6 = 0xff;
-	cpustate->pl7 = 0xff;
+	m_l1 = 0xff;
+	m_l2 = 0xff;
+	m_l3 = 0xff;
+	m_l4 = 0xff;
+	m_l5 = 0xff;
+	m_l6 = 0xff;
+	m_l7 = 0xff;
 
-	cpustate->l1 = 0xff;
-	cpustate->l2 = 0xff;
-	cpustate->l3 = 0xff;
-	cpustate->l4 = 0xff;
-	cpustate->l5 = 0xff;
-	cpustate->l6 = 0xff;
-	cpustate->l7 = 0xff;
+	m_status_out = 0;
+	m_immflag = 0;
 
-	cpustate->status_out = 0;
-	cpustate->immflag = 0;
+	m_rip_pc = (m_pc | ((m_status_out & 1) << 8));
+}
+
+void esrip_device::device_stop()
+{
+
 }
 
 
-static CPU_EXIT( esrip )
-{
+//-------------------------------------------------
+//  memory_space_config - return the configuration
+//  of the specified address space, or NULL if
+//  the space doesn't exist
+//-------------------------------------------------
 
+const address_space_config *esrip_device::memory_space_config(address_spacenum spacenum) const
+{
+	if (spacenum == AS_PROGRAM)
+	{
+		return &m_program_config;
+	}
+	return NULL;
+}
+
+
+//-------------------------------------------------
+//  state_string_export - export state as a string
+//  for the debugger
+//-------------------------------------------------
+
+void esrip_device::state_string_export(const device_state_entry &entry, astring &string)
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c%c%c%c%c%c%c%c%c",
+				(m_status & 0x80) ? '3' : '.',
+				(m_status & 0x40) ? '2' : '.',
+				(m_status & 0x20) ? '1' : '.',
+				(m_status & 0x10) ? 'L' : '.',
+				(m_status & 0x08) ? 'V' : '.',
+				(m_status & 0x04) ? 'N' : '.',
+				(m_status & 0x02) ? 'C' : '.',
+				(m_status & 0x01) ? 'Z' : '.',
+				get_hblank() ? 'H' : '.');
+			break;
+	}
+}
+
+
+//-------------------------------------------------
+//  disasm_min_opcode_bytes - return the length
+//  of the shortest instruction, in bytes
+//-------------------------------------------------
+
+UINT32 esrip_device::disasm_min_opcode_bytes() const
+{
+	return 8;
+}
+
+
+//-------------------------------------------------
+//  disasm_max_opcode_bytes - return the length
+//  of the longest instruction, in bytes
+//-------------------------------------------------
+
+UINT32 esrip_device::disasm_max_opcode_bytes() const
+{
+	return 8;
+}
+
+
+//-------------------------------------------------
+//  disasm_disassemble - call the disassembly
+//  helper function
+//-------------------------------------------------
+
+offs_t esrip_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+{
+	extern CPU_DISASSEMBLE( esrip );
+	return disassemble(buffer, pc, oprom, opram, 0);
 }
 
 
@@ -354,23 +409,23 @@ static CPU_EXIT( esrip )
     PRIVATE FUNCTIONS
 ***************************************************************************/
 
-static int get_hblank(running_machine &machine)
+int esrip_device::get_hblank()
 {
-	return machine.primary_screen->hblank();
+	return machine().primary_screen->hblank();
 }
 
 /* Return the state of the LBRM line (Y-scaling related) */
-static int get_lbrm(esrip_state *cpustate)
+int esrip_device::get_lbrm()
 {
-	int addr = ((cpustate->y_scale & 0x3f) << 3) | ((cpustate->line_latch >> 3) & 7);
-	int sel = (cpustate->line_latch & 7);
+	int addr = ((m_y_scale & 0x3f) << 3) | ((m_line_latch >> 3) & 7);
+	int sel = (m_line_latch & 7);
 
-	UINT8 val = cpustate->lbrm[addr];
+	UINT8 val = m_lbrm[addr];
 
 	return (val >> sel) & 1;
 }
 
-INLINE int check_jmp(esrip_state *cpustate, UINT8 jmp_ctrl)
+int esrip_device::check_jmp(UINT8 jmp_ctrl)
 {
 	int ret = 0;
 
@@ -378,13 +433,13 @@ INLINE int check_jmp(esrip_state *cpustate, UINT8 jmp_ctrl)
 	{
 		switch (jmp_ctrl & 7)
 		{
-			/* CT */      case 0: ret = cpustate->ct;         break;
-			/* T1 */      case 4: ret = BIT(cpustate->t, 0);  break;
-			/* T2 */      case 2: ret = BIT(cpustate->t, 1);  break;
-			/* T3 */      case 6: ret = BIT(cpustate->t, 2);  break;
-			/* T4 */      case 1: ret = BIT(cpustate->t, 3);  break;
-			/* /LBRM */   case 5: ret = !get_lbrm(cpustate);  break;
-			/* /HBLANK */ case 3: ret = !get_hblank(cpustate->device->machine()); break;
+			/* CT */      case 0: ret = m_ct;         break;
+			/* T1 */      case 4: ret = BIT(m_t, 0);  break;
+			/* T2 */      case 2: ret = BIT(m_t, 1);  break;
+			/* T3 */      case 6: ret = BIT(m_t, 2);  break;
+			/* T4 */      case 1: ret = BIT(m_t, 3);  break;
+			/* /LBRM */   case 5: ret = !get_lbrm();  break;
+			/* /HBLANK */ case 3: ret = !get_hblank(); break;
 			/* JMP */     case 7: ret = 0;                    break;
 		}
 
@@ -394,57 +449,59 @@ INLINE int check_jmp(esrip_state *cpustate, UINT8 jmp_ctrl)
 	{
 		switch (jmp_ctrl & 7)
 		{
-			/* CT */      case 0: ret = cpustate->ct;        break;
-			/* T1 */      case 4: ret = BIT(cpustate->t, 0); break;
-			/* T2 */      case 2: ret = BIT(cpustate->t, 1); break;
-			/* T3 */      case 6: ret = BIT(cpustate->t, 2); break;
-			/* T4 */      case 1: ret = BIT(cpustate->t, 3); break;
-			/* /LBRM */   case 5: ret = !get_lbrm(cpustate); break;
-			/* /FIG */    case 3: ret = !cpustate->fig;      break;
+			/* CT */      case 0: ret = m_ct;        break;
+			/* T1 */      case 4: ret = BIT(m_t, 0); break;
+			/* T2 */      case 2: ret = BIT(m_t, 1); break;
+			/* T3 */      case 6: ret = BIT(m_t, 2); break;
+			/* T4 */      case 1: ret = BIT(m_t, 3); break;
+			/* /LBRM */   case 5: ret = !get_lbrm(); break;
+			/* /FIG */    case 3: ret = !m_fig;      break;
 			/* JMP */     case 7: ret = 1;                   break;
 		}
 	}
 	else
+	{
 		assert(!"RIP: Invalid jump control");
+	}
 
 	return ret;
 }
 
 
-INLINE void calc_z_flag(esrip_state *cpustate, UINT16 res)
+void esrip_device::calc_z_flag(UINT16 res)
 {
-	cpustate->new_status &= ~Z_FLAG;
-	cpustate->new_status |= (res == 0);
+	m_new_status &= ~Z_FLAG;
+	m_new_status |= (res == 0);
 }
 
-INLINE void calc_c_flag_add(esrip_state *cpustate, UINT16 a, UINT16 b)
+void esrip_device::calc_c_flag_add(UINT16 a, UINT16 b)
 {
-	cpustate->new_status &= ~C_FLAG;
-	cpustate->new_status |= ((UINT16)(b) > (UINT16)(~(a))) ? 2 : 0;
+	m_new_status &= ~C_FLAG;
+	m_new_status |= ((UINT16)(b) > (UINT16)(~(a))) ? 2 : 0;
 }
 
-INLINE void calc_c_flag_sub(esrip_state *cpustate, UINT16 a, UINT16 b)
+void esrip_device::calc_c_flag_sub(UINT16 a, UINT16 b)
 {
-	cpustate->new_status &= ~C_FLAG;
-	cpustate->new_status |= ((UINT16)(b) <= (UINT16)(a)) ? 2 : 0;
+	m_new_status &= ~C_FLAG;
+	m_new_status |= ((UINT16)(b) <= (UINT16)(a)) ? 2 : 0;
 }
 
-INLINE void calc_n_flag(esrip_state *cpustate, UINT16 res)
+void esrip_device::calc_n_flag(UINT16 res)
 {
-	cpustate->new_status &= ~N_FLAG;
-	cpustate->new_status |= (res & 0x8000) ? 4 : 0;
+	m_new_status &= ~N_FLAG;
+	m_new_status |= (res & 0x8000) ? 4 : 0;
 }
 
-INLINE void calc_v_flag_add(esrip_state *cpustate, UINT16 a, UINT16 b, UINT32 r)
+void esrip_device::calc_v_flag_add(UINT16 a, UINT16 b, UINT32 r)
 {
-	cpustate->new_status &= ~V_FLAG;
-	cpustate->new_status |= ((a ^ r) & (b ^ r) & 0x8000) ? 8 : 0;
+	m_new_status &= ~V_FLAG;
+	m_new_status |= ((a ^ r) & (b ^ r) & 0x8000) ? 8 : 0;
 }
 
-INLINE void calc_v_flag_sub(esrip_state *cpustate, UINT16 a, UINT16 b, UINT32 r)
+void esrip_device::calc_v_flag_sub(UINT16 a, UINT16 b, UINT32 r)
 {
-	cpustate->new_status &= ~V_FLAG;
-	cpustate->new_status |= ((a ^ b) & (r ^ b) & 0x8000) ? 8 : 0;
+	m_new_status &= ~V_FLAG;
+	m_new_status |= ((a ^ b) & (r ^ b) & 0x8000) ? 8 : 0;
 }
 
 
@@ -465,6 +522,7 @@ enum
  *  Single operand
  *
  *************************************/
+
 enum
 {
 	MOVE = 0xc,
@@ -487,7 +545,7 @@ enum
 	SORR  = 0xb
 };
 
-static UINT16 sor_op(esrip_state *cpustate, UINT16 r, UINT16 opcode)
+UINT16 esrip_device::sor_op(UINT16 r, UINT16 opcode)
 {
 	UINT32 res = 0;
 
@@ -497,34 +555,34 @@ static UINT16 sor_op(esrip_state *cpustate, UINT16 r, UINT16 opcode)
 		{
 			res = r;
 			CLEAR_FLAGS(V_FLAG | C_FLAG);
-			calc_n_flag(cpustate, res);
-			calc_z_flag(cpustate, res);
+			calc_n_flag(res);
+			calc_z_flag(res);
 			break;
 		}
 		case COMP:
 		{
 			res = r ^ 0xffff;
 			CLEAR_FLAGS(V_FLAG | C_FLAG);
-			calc_n_flag(cpustate, res);
-			calc_z_flag(cpustate, res);
+			calc_n_flag(res);
+			calc_z_flag(res);
 			break;
 		}
 		case INC:
 		{
 			res = r + 1;
-			calc_v_flag_add(cpustate, r, 1, res);
-			calc_n_flag(cpustate, res);
-			calc_c_flag_add(cpustate, r, 1);
-			calc_z_flag(cpustate, res);
+			calc_v_flag_add(r, 1, res);
+			calc_n_flag(res);
+			calc_c_flag_add(r, 1);
+			calc_z_flag(res);
 			break;
 		}
 		case NEG:
 		{
 			res = (r ^ 0xffff) + 1;
-			calc_v_flag_sub(cpustate, 0, r, res);
-			calc_n_flag(cpustate, res);
-			calc_c_flag_sub(cpustate, 0, r);
-			calc_z_flag(cpustate, res);
+			calc_v_flag_sub(0, r, res);
+			calc_n_flag(res);
+			calc_c_flag_sub(0, r);
+			calc_z_flag(res);
 			break;
 		}
 		default: assert(0);
@@ -533,7 +591,7 @@ static UINT16 sor_op(esrip_state *cpustate, UINT16 r, UINT16 opcode)
 	return res & 0xffff;
 }
 
-static void sor(esrip_state *cpustate, UINT16 inst)
+void esrip_device::sor(UINT16 inst)
 {
 	UINT16	r = 0;
 	UINT16	dst = 0;
@@ -547,44 +605,44 @@ static void sor(esrip_state *cpustate, UINT16 inst)
 
 	switch ((inst >> 5) & 0xf)
 	{
-		case SORA: r = cpustate->ram[RAM_ADDR];		dst = ACC;		break;
-		case SORY: r = cpustate->ram[RAM_ADDR];		dst = Y_BUS;	break;
-		case SORS: r = cpustate->ram[RAM_ADDR];		dst = STATUS;	break;
-		case SOAR: r = cpustate->acc;				dst = RAM;		break;
-		case SODR: r = cpustate->d_latch;			dst = RAM;		break;
+		case SORA: r = m_ram[RAM_ADDR];		dst = ACC;		break;
+		case SORY: r = m_ram[RAM_ADDR];		dst = Y_BUS;	break;
+		case SORS: r = m_ram[RAM_ADDR];		dst = STATUS;	break;
+		case SOAR: r = m_acc;				dst = RAM;		break;
+		case SODR: r = m_d_latch;			dst = RAM;		break;
 		case SOIR:
 		{
-			if (cpustate->immflag == 0)		// Macrofiy this?
+			if (m_immflag == 0)		// Macrofiy this?
 			{
-				cpustate->i_latch = inst;
-				cpustate->immflag = 1;
+				m_i_latch = inst;
+				m_immflag = 1;
 				return;
 			}
 			else
 			{
-				r = cpustate->inst;
+				r = m_inst;
 				dst = RAM;
-				cpustate->immflag = 0;
+				m_immflag = 0;
 			}
 			break;
 		}
 		case SOZR: r = 0;						dst = RAM;		break;
-		case SORR: r = cpustate->ram[RAM_ADDR];	dst = RAM;		break;
+		case SORR: r = m_ram[RAM_ADDR];	dst = RAM;		break;
 		default: UNHANDLED;
 	}
 
 	/* Operation */
-	res = sor_op(cpustate, r, (inst >> 9) & 0xf);
+	res = sor_op(r, (inst >> 9) & 0xf);
 
 	switch (dst)
 	{
 		case Y_BUS: break;
-		case ACC: cpustate->acc = res; break;
-		case RAM: cpustate->ram[RAM_ADDR] = res; break;
+		case ACC: m_acc = res; break;
+		case RAM: m_ram[RAM_ADDR] = res; break;
 		default: UNHANDLED;
 	}
 
-	cpustate->result = res;
+	m_result = res;
 }
 
 enum
@@ -605,27 +663,27 @@ enum
 	NRAS = 5,
 };
 
-static void sonr(esrip_state *cpustate, UINT16 inst)
+void esrip_device::sonr(UINT16 inst)
 {
 	UINT16	r = 0;
 	UINT16	res = 0;
 
 	switch ((inst >> 5) & 0xf)
 	{
-		case SOA:	r = cpustate->acc;		break;
-		case SOD:	r = cpustate->d_latch;	break;
+		case SOA:	r = m_acc;		break;
+		case SOD:	r = m_d_latch;	break;
 		case SOI:
 		{
-			if (cpustate->immflag == 0)
+			if (m_immflag == 0)
 			{
-				cpustate->i_latch = inst;
-				cpustate->immflag = 1;
+				m_i_latch = inst;
+				m_immflag = 1;
 				return;
 			}
 			else
 			{
-				r = cpustate->inst;
-				cpustate->immflag = 0;
+				r = m_inst;
+				m_immflag = 0;
 			}
 			break;
 		}
@@ -634,17 +692,17 @@ static void sonr(esrip_state *cpustate, UINT16 inst)
 	}
 
 	/* Operation */
-	res = sor_op(cpustate, r, (inst >> 9) & 0xf);
+	res = sor_op(r, (inst >> 9) & 0xf);
 
 	/* Destination */
 	switch (inst & 0x1f)
 	{
 		case NRY: break;
-		case NRA: cpustate->acc = res; break;
+		case NRA: m_acc = res; break;
 		default: UNHANDLED;
 	}
 
-	cpustate->result = res;
+	m_result = res;
 }
 
 /*************************************
@@ -669,7 +727,7 @@ enum
 	EXNOR = 0xb
 };
 
-static UINT16 tor_op(esrip_state *cpustate, UINT16 r, UINT16 s, int opcode)
+UINT16 esrip_device::tor_op(UINT16 r, UINT16 s, int opcode)
 {
 	UINT32 res = 0;
 
@@ -678,87 +736,87 @@ static UINT16 tor_op(esrip_state *cpustate, UINT16 r, UINT16 s, int opcode)
 		case SUBR:
 		{
 			res = s - r;
-			calc_v_flag_sub(cpustate, s, r, res);
-			calc_n_flag(cpustate, res);
-			calc_c_flag_sub(cpustate, s, r);
-			calc_z_flag(cpustate, res);
+			calc_v_flag_sub(s, r, res);
+			calc_n_flag(res);
+			calc_c_flag_sub(s, r);
+			calc_z_flag(res);
 			break;
 		}
 		case SUBRC: assert(0); break;
 		case SUBS:
 		{
 			res = r - s;
-			calc_v_flag_sub(cpustate, r, s, res);
-			calc_n_flag(cpustate, res);
-			calc_c_flag_sub(cpustate, r, s);
-			calc_z_flag(cpustate, res);
+			calc_v_flag_sub(r, s, res);
+			calc_n_flag(res);
+			calc_c_flag_sub(r, s);
+			calc_z_flag(res);
 			break;
 		}
 		case SUBSC: assert(0); break;
 		case ADD:
 		{
 			res = r + s;
-			calc_v_flag_add(cpustate, r, s, res);
-			calc_n_flag(cpustate, res);
-			calc_c_flag_add(cpustate, r, s);
-			calc_z_flag(cpustate, res);
+			calc_v_flag_add(r, s, res);
+			calc_n_flag(res);
+			calc_c_flag_add(r, s);
+			calc_z_flag(res);
 			break;
 		}
 		case ADDC:
 		{
 			// TODO TODO CHECK ME ETC
-			res = r + s + ((cpustate->status >> 1) & 1);
-			calc_v_flag_add(cpustate, r, s, res);
-			calc_n_flag(cpustate, res);
-			calc_c_flag_add(cpustate, r, s);
-			calc_z_flag(cpustate, res);
+			res = r + s + ((m_status >> 1) & 1);
+			calc_v_flag_add(r, s, res);
+			calc_n_flag(res);
+			calc_c_flag_add(r, s);
+			calc_z_flag(res);
 			break;
 		}
 		case AND:
 		{
 			res = r & s;
 			CLEAR_FLAGS(V_FLAG | C_FLAG);
-			calc_n_flag(cpustate, res);
-			calc_z_flag(cpustate, res);
+			calc_n_flag(res);
+			calc_z_flag(res);
 			break;
 		}
 		case NAND:
 		{
 			res = (r & s) ^ 0xffff;
 			CLEAR_FLAGS(V_FLAG | C_FLAG);
-			calc_n_flag(cpustate, res);
-			calc_z_flag(cpustate, res);
+			calc_n_flag(res);
+			calc_z_flag(res);
 			break;
 		}
 		case EXOR:
 		{
 			res = r ^ s;
 			CLEAR_FLAGS(V_FLAG | C_FLAG);
-			calc_n_flag(cpustate, res);
-			calc_z_flag(cpustate, res);
+			calc_n_flag(res);
+			calc_z_flag(res);
 			break;
 		}
 		case NOR:
 		{
 			res = (r | s) ^ 0xffff;
 			CLEAR_FLAGS(V_FLAG | C_FLAG);
-			calc_n_flag(cpustate, res);
-			calc_z_flag(cpustate, res);
+			calc_n_flag(res);
+			calc_z_flag(res);
 			break;
 		}
 		case OR:
 		{
 			res = r | s;
 			CLEAR_FLAGS(V_FLAG | C_FLAG);
-			calc_n_flag(cpustate, res);
-			calc_z_flag(cpustate, res);
+			calc_n_flag(res);
+			calc_z_flag(res);
 			break;
 		}
 		case EXNOR:
 		{
 			res = (r ^ s) ^ 0xffff;
 			CLEAR_FLAGS(V_FLAG | N_FLAG | C_FLAG);
-			calc_z_flag(cpustate, res);
+			calc_z_flag(res);
 			break;
 		}
 		default: assert(0);
@@ -767,7 +825,7 @@ static UINT16 tor_op(esrip_state *cpustate, UINT16 r, UINT16 s, int opcode)
 	return res & 0xffff;
 }
 
-static void tor1(esrip_state *cpustate, UINT16 inst)
+void esrip_device::tor1(UINT16 inst)
 {
 	UINT16 r = 0;
 	UINT16 s = 0;
@@ -789,82 +847,82 @@ static void tor1(esrip_state *cpustate, UINT16 inst)
 
 	switch (SRC)
 	{
-		case TORAA: r = cpustate->ram[RAM_ADDR];	s = cpustate->acc;	dst = ACC;	break;
+		case TORAA: r = m_ram[RAM_ADDR];	s = m_acc;	dst = ACC;	break;
 		case TORIA:
 		{
-			if (cpustate->immflag == 0)
+			if (m_immflag == 0)
 			{
-				cpustate->i_latch = inst;
-				cpustate->immflag = 1;
+				m_i_latch = inst;
+				m_immflag = 1;
 				return;
 			}
 			else
 			{
-				r = cpustate->ram[RAM_ADDR];
-				s = cpustate->inst;
+				r = m_ram[RAM_ADDR];
+				s = m_inst;
 				dst = ACC;
-				cpustate->immflag = 0;
+				m_immflag = 0;
 			}
 			break;
 		}
-		case TODRA: r = cpustate->d_latch;		s = cpustate->ram[RAM_ADDR];	dst = ACC;	break;
-		case TORAY: r = cpustate->ram[RAM_ADDR];	s = cpustate->acc;			dst = Y_BUS;break;
+		case TODRA: r = m_d_latch;		s = m_ram[RAM_ADDR];	dst = ACC;	break;
+		case TORAY: r = m_ram[RAM_ADDR];	s = m_acc;			dst = Y_BUS;break;
 		case TORIY:
 		{
-			if (cpustate->immflag == 0)
+			if (m_immflag == 0)
 			{
-				cpustate->i_latch = inst;
-				cpustate->immflag = 1;
+				m_i_latch = inst;
+				m_immflag = 1;
 				return;
 			}
 			else
 			{
-				r = cpustate->ram[RAM_ADDR];
-				s = cpustate->inst;
+				r = m_ram[RAM_ADDR];
+				s = m_inst;
 				dst = Y_BUS;
-				cpustate->immflag = 0;
+				m_immflag = 0;
 			}
 			break;
 		}
-		case TODRY: r = cpustate->d_latch;		s = cpustate->ram[RAM_ADDR];	dst = Y_BUS;break;
-		case TORAR: r = cpustate->ram[RAM_ADDR];	s = cpustate->acc;			dst = RAM;	break;
+		case TODRY: r = m_d_latch;		s = m_ram[RAM_ADDR];	dst = Y_BUS;break;
+		case TORAR: r = m_ram[RAM_ADDR];	s = m_acc;			dst = RAM;	break;
 		case TORIR:
 		{
-			if (cpustate->immflag == 0)
+			if (m_immflag == 0)
 			{
-				cpustate->i_latch = inst;
-				cpustate->immflag = 1;
+				m_i_latch = inst;
+				m_immflag = 1;
 				return;
 			}
 			else
 			{
-				r = cpustate->ram[RAM_ADDR];
-				s = cpustate->inst;
+				r = m_ram[RAM_ADDR];
+				s = m_inst;
 				dst = RAM;
-				cpustate->immflag = 0;
+				m_immflag = 0;
 			}
 			break;
 		}
-		case TODRR: r = cpustate->d_latch;		s = cpustate->ram[RAM_ADDR];	dst = RAM;	break;
+		case TODRR: r = m_d_latch;		s = m_ram[RAM_ADDR];	dst = RAM;	break;
 		default: INVALID;
 	}
 
 	/* Operation */
-	res = tor_op(cpustate, r, s, (inst >> 5) & 0xf);
+	res = tor_op(r, s, (inst >> 5) & 0xf);
 
 	/* Destination */
 	switch (dst)
 	{
-		case ACC:	cpustate->acc = res; break;
+		case ACC:	m_acc = res; break;
 		case Y_BUS:	break;
-		case RAM:	cpustate->ram[RAM_ADDR] = res; break;
+		case RAM:	m_ram[RAM_ADDR] = res; break;
 		default:	INVALID;
 	}
 
-	cpustate->result = res;
+	m_result = res;
 }
 
-static void tor2(esrip_state *cpustate, UINT16 inst)
+void esrip_device::tor2(UINT16 inst)
 {
 	UINT16 r = 0;
 	UINT16 s = 0;
@@ -879,36 +937,36 @@ static void tor2(esrip_state *cpustate, UINT16 inst)
 
 	switch (SRC)
 	{
-		case TODAR: r = cpustate->d_latch;	s = cpustate->acc;	break;
+		case TODAR: r = m_d_latch;	s = m_acc;	break;
 		case TOAIR:
 		{
-			if (cpustate->immflag == 0)
+			if (m_immflag == 0)
 			{
-				cpustate->i_latch = inst;
-				cpustate->immflag = 1;
+				m_i_latch = inst;
+				m_immflag = 1;
 				return;
 			}
 			else
 			{
-				r = cpustate->acc;
-				s = cpustate->inst;
-				cpustate->immflag = 0;
+				r = m_acc;
+				s = m_inst;
+				m_immflag = 0;
 			}
 			break;
 		}
 		case TODIR:
 		{
-			if (cpustate->immflag == 0)
+			if (m_immflag == 0)
 			{
-				cpustate->i_latch = inst;
-				cpustate->immflag = 1;
+				m_i_latch = inst;
+				m_immflag = 1;
 				return;
 			}
 			else
 			{
-				r = cpustate->d_latch;
-				s = cpustate->inst;
-				cpustate->immflag = 0;
+				r = m_d_latch;
+				s = m_inst;
+				m_immflag = 0;
 			}
 			break;
 		}
@@ -916,15 +974,15 @@ static void tor2(esrip_state *cpustate, UINT16 inst)
 	}
 
 	/* Operation */
-	res = tor_op(cpustate, r, s, (inst >> 5) & 0xf);
+	res = tor_op(r, s, (inst >> 5) & 0xf);
 
 	/* Destination is always RAM */
-	cpustate->ram[RAM_ADDR] = res;
+	m_ram[RAM_ADDR] = res;
 
-	cpustate->result = res;
+	m_result = res;
 }
 
-static void tonr(esrip_state *cpustate, UINT16 inst)
+void esrip_device::tonr(UINT16 inst)
 {
 	enum
 	{
@@ -949,8 +1007,8 @@ static void tonr(esrip_state *cpustate, UINT16 inst)
 	{
 		case TODA:
 		{
-			r = cpustate->d_latch;
-			s = cpustate->acc;
+			r = m_d_latch;
+			s = m_acc;
 			break;
 		}
 		case TOAI:
@@ -959,17 +1017,17 @@ static void tonr(esrip_state *cpustate, UINT16 inst)
 		}
 		case TODI:
 		{
-			if (cpustate->immflag == 0)
+			if (m_immflag == 0)
 			{
-				cpustate->i_latch = inst;
-				cpustate->immflag = 1;
+				m_i_latch = inst;
+				m_immflag = 1;
 				return;
 			}
 			else
 			{
-				r = cpustate->d_latch;
-				s = cpustate->inst;
-				cpustate->immflag = 0;
+				r = m_d_latch;
+				s = m_inst;
+				m_immflag = 0;
 			}
 			break;
 		}
@@ -977,7 +1035,7 @@ static void tonr(esrip_state *cpustate, UINT16 inst)
 	}
 
 	/* Operation */
-	res = tor_op(cpustate, r, s, (inst >> 5) & 0xf);
+	res = tor_op(r, s, (inst >> 5) & 0xf);
 
 	/* Destination */
 	switch (DST)
@@ -985,7 +1043,7 @@ static void tonr(esrip_state *cpustate, UINT16 inst)
 		case NRY:
 			break;
 		case NRA:
-			cpustate->acc = res;
+			m_acc = res;
 			break;
 		case NRS:
 			UNHANDLED;
@@ -996,7 +1054,7 @@ static void tonr(esrip_state *cpustate, UINT16 inst)
 		default:
 			INVALID;
 	}
-	cpustate->result = res;
+	m_result = res;
 }
 
 /*************************************
@@ -1005,7 +1063,7 @@ static void tonr(esrip_state *cpustate, UINT16 inst)
  *
  *************************************/
 
-static void bonr(esrip_state *cpustate, UINT16 inst)
+void esrip_device::bonr(UINT16 inst)
 {
 	enum
 	{
@@ -1031,98 +1089,98 @@ static void bonr(esrip_state *cpustate, UINT16 inst)
 	{
 		case TSTNA:
 		{
-			res = cpustate->acc & (1 << N);
+			res = m_acc & (1 << N);
 			CLEAR_FLAGS(V_FLAG | C_FLAG);
-			calc_n_flag(cpustate, res);
-			calc_z_flag(cpustate, res);
+			calc_n_flag(res);
+			calc_z_flag(res);
 			break;
 		}
 		case RSTNA:
 		{
-			res = cpustate->acc & ~(1 << N);
+			res = m_acc & ~(1 << N);
 			CLEAR_FLAGS(V_FLAG | C_FLAG);
-			calc_n_flag(cpustate, res);
-			calc_z_flag(cpustate, res);
-			cpustate->acc = res;
+			calc_n_flag(res);
+			calc_z_flag(res);
+			m_acc = res;
 			break;
 		}
 		case SETNA:
 		{
-			res = cpustate->acc | (1 << N);
+			res = m_acc | (1 << N);
 			CLEAR_FLAGS(V_FLAG | C_FLAG | Z_FLAG);
-			calc_n_flag(cpustate, res);
-			cpustate->acc = res;
+			calc_n_flag(res);
+			m_acc = res;
 			break;
 		}
 		case A2NA:
 		{
-			UINT16 r = cpustate->acc;
+			UINT16 r = m_acc;
 			UINT16 s = 1 << N;
 			res = r + s;
-			calc_z_flag(cpustate, res);
-			calc_n_flag(cpustate, res);
-			calc_c_flag_add(cpustate, r, s);
-			calc_v_flag_add(cpustate, r, s, res);
-			cpustate->acc = res;
+			calc_z_flag(res);
+			calc_n_flag(res);
+			calc_c_flag_add(r, s);
+			calc_v_flag_add(r, s, res);
+			m_acc = res;
 			break;
 		}
 		case S2NA:
 		{
-			UINT16 r = cpustate->acc;
+			UINT16 r = m_acc;
 			UINT16 s = 1 << N;
 			res = r - s;
-			calc_z_flag(cpustate, res);
-			calc_n_flag(cpustate, res);
-			calc_c_flag_sub(cpustate, r, s);
-			calc_v_flag_sub(cpustate, r, s, res);
-			cpustate->acc = res;
+			calc_z_flag(res);
+			calc_n_flag(res);
+			calc_c_flag_sub(r, s);
+			calc_v_flag_sub(r, s, res);
+			m_acc = res;
 			break;
 		}
 
 		case TSTND:
 		{
-			res = cpustate->d_latch & (1 << N);
+			res = m_d_latch & (1 << N);
 			CLEAR_FLAGS(V_FLAG | C_FLAG);
-			calc_n_flag(cpustate, res);
-			calc_z_flag(cpustate, res);
+			calc_n_flag(res);
+			calc_z_flag(res);
 			break;
 		}
 
 		case SETND:
 		{
-			UINT16 r = cpustate->d_latch;
+			UINT16 r = m_d_latch;
 			res = r | (1 << N);
-			cpustate->d_latch = res;
+			m_d_latch = res;
 
 			CLEAR_FLAGS(V_FLAG | C_FLAG | Z_FLAG);
-			calc_n_flag(cpustate, res);
+			calc_n_flag(res);
 			break;
 		}
 		case LD2NY:
 		{
 			res = (1 << N);
 			CLEAR_FLAGS(V_FLAG | C_FLAG | Z_FLAG);
-			calc_n_flag(cpustate, res);
+			calc_n_flag(res);
 			break;
 		}
 		case LDC2NY:
 		{
 			res = (1 << N) ^ 0xffff;
 			CLEAR_FLAGS(Z_FLAG | C_FLAG | V_FLAG);
-			calc_n_flag(cpustate, res);
+			calc_n_flag(res);
 			break;
 		}
 
 		case A2NDY:
 		{
-			UINT16 r = cpustate->d_latch;
+			UINT16 r = m_d_latch;
 			UINT16 s = 1 << N;
 			res = r + s;
 
-			calc_z_flag(cpustate, res);
-			calc_n_flag(cpustate, res);
-			calc_c_flag_add(cpustate, r, s);
-			calc_v_flag_add(cpustate, r, s, res);
+			calc_z_flag(res);
+			calc_n_flag(res);
+			calc_c_flag_add(r, s);
+			calc_v_flag_add(r, s, res);
 			break;
 		}
 
@@ -1130,10 +1188,10 @@ static void bonr(esrip_state *cpustate, UINT16 inst)
 			UNHANDLED;
 	}
 
-	cpustate->result = res;
+	m_result = res;
 }
 
-static void bor1(esrip_state *cpustate, UINT16 inst)
+void esrip_device::bor1(UINT16 inst)
 {
 	enum
 	{
@@ -1148,38 +1206,36 @@ static void bor1(esrip_state *cpustate, UINT16 inst)
 	{
 		case SETNR:
 		{
-			res = cpustate->ram[RAM_ADDR] | (1 << N);
-			cpustate->ram[RAM_ADDR] = res;
+			res = m_ram[RAM_ADDR] | (1 << N);
+			m_ram[RAM_ADDR] = res;
 			CLEAR_FLAGS(V_FLAG | C_FLAG | Z_FLAG);
-			calc_n_flag(cpustate, res);
+			calc_n_flag(res);
 			break;
 		}
 		case RSTNR:
 		{
-			res = cpustate->ram[RAM_ADDR] & ~(1 << N);
-			cpustate->ram[RAM_ADDR] = res;
+			res = m_ram[RAM_ADDR] & ~(1 << N);
+			m_ram[RAM_ADDR] = res;
 			CLEAR_FLAGS(V_FLAG | C_FLAG);
-			calc_n_flag(cpustate, res);
-			calc_z_flag(cpustate, res);
+			calc_n_flag(res);
+			calc_z_flag(res);
 			break;
 		}
 		case TSTNR:
 		{
-			res = cpustate->ram[RAM_ADDR] & (1 << N);
+			res = m_ram[RAM_ADDR] & (1 << N);
 			CLEAR_FLAGS(V_FLAG | C_FLAG);
-			calc_n_flag(cpustate, res);
-			calc_z_flag(cpustate, res);
+			calc_n_flag(res);
+			calc_z_flag(res);
 			break;
 		}
 		default: INVALID;
 	}
 
-	cpustate->result = res;
+	m_result = res;
 }
 
-
-
-static void bor2(esrip_state *cpustate, UINT16 inst)
+void esrip_device::bor2(UINT16 inst)
 {
 	enum
 	{
@@ -1197,46 +1253,46 @@ static void bor2(esrip_state *cpustate, UINT16 inst)
 		{
 			res = 1 << N;
 			CLEAR_FLAGS(V_FLAG | C_FLAG | Z_FLAG);
-			calc_n_flag(cpustate, res);
+			calc_n_flag(res);
 			break;
 		}
 		case LDC2NR:
 		{
 			res = (1 << N) ^ 0xffff;
 			CLEAR_FLAGS(V_FLAG | C_FLAG | Z_FLAG);
-			calc_n_flag(cpustate, res);
+			calc_n_flag(res);
 			break;
 		}
 		case A2NR:
 		{
-			UINT16 r = cpustate->ram[RAM_ADDR];
+			UINT16 r = m_ram[RAM_ADDR];
 			UINT16 s = 1 << N;
 
 			res = r + s;
-			calc_v_flag_add(cpustate, r, s, res);
-			calc_n_flag(cpustate, res);
-			calc_c_flag_add(cpustate, r, s);
-			calc_z_flag(cpustate, res);
+			calc_v_flag_add(r, s, res);
+			calc_n_flag(res);
+			calc_c_flag_add(r, s);
+			calc_z_flag(res);
 			break;
 		}
 		case S2NR:
 		{
-			UINT16 r = cpustate->ram[RAM_ADDR];
+			UINT16 r = m_ram[RAM_ADDR];
 			UINT16 s = 1 << N;
 
 			res = r - s;
-			calc_v_flag_sub(cpustate, r, s, res);
-			calc_n_flag(cpustate, res);
-			calc_c_flag_sub(cpustate, r, s);
-			calc_z_flag(cpustate, res);
+			calc_v_flag_sub(r, s, res);
+			calc_n_flag(res);
+			calc_c_flag_sub(r, s);
+			calc_z_flag(res);
 			break;
 		}
 		default: INVALID;
 	}
 
 	/* Destination is RAM */
-	cpustate->ram[RAM_ADDR] = res;
-	cpustate->result = res;
+	m_ram[RAM_ADDR] = res;
+	m_result = res;
 }
 
 /*************************************
@@ -1246,7 +1302,7 @@ static void bor2(esrip_state *cpustate, UINT16 inst)
  *************************************/
 
 /* TODO Combine these */
-static void rotr1(esrip_state *cpustate, UINT16 inst)
+void esrip_device::rotr1(UINT16 inst)
 {
 	enum
 	{
@@ -1262,27 +1318,27 @@ static void rotr1(esrip_state *cpustate, UINT16 inst)
 
 	switch ((inst >> 5) & 0xf)
 	{
-		case RTRA: u = cpustate->ram[RAM_ADDR];	dst = ACC;		break;
-		case RTRY: u = cpustate->ram[RAM_ADDR];	dst = Y_BUS;	break;
-		case RTRR: u = cpustate->ram[RAM_ADDR];	dst = RAM;		break;
+		case RTRA: u = m_ram[RAM_ADDR];	dst = ACC;		break;
+		case RTRY: u = m_ram[RAM_ADDR];	dst = Y_BUS;	break;
+		case RTRR: u = m_ram[RAM_ADDR];	dst = RAM;		break;
 		default: INVALID;
 	}
 
 	res = (u << n) | (u >> (16 - n));
 	CLEAR_FLAGS(V_FLAG | C_FLAG);
-	calc_n_flag(cpustate, res);
-	calc_z_flag(cpustate, res);
+	calc_n_flag(res);
+	calc_z_flag(res);
 
 	switch (dst)
 	{
-		case ACC: cpustate->acc = res; break;
-		case RAM: cpustate->ram[RAM_ADDR] = res; break;
+		case ACC: m_acc = res; break;
+		case RAM: m_ram[RAM_ADDR] = res; break;
 	}
 
-	cpustate->result = res;
+	m_result = res;
 }
 
-static void rotr2(esrip_state *cpustate, UINT16 inst)
+void esrip_device::rotr2(UINT16 inst)
 {
 	enum
 	{
@@ -1295,21 +1351,21 @@ static void rotr2(esrip_state *cpustate, UINT16 inst)
 
 	switch ((inst >> 5) & 0xf)
 	{
-		case RTAR: u = cpustate->acc;		break;
-		case RTDR: u = cpustate->d_latch;	break;
+		case RTAR: u = m_acc;		break;
+		case RTDR: u = m_d_latch;	break;
 		default: INVALID;
 	}
 
 	res = (u << N) | (u >> (16 - N));
 	CLEAR_FLAGS(V_FLAG | C_FLAG);
-	calc_n_flag(cpustate, res);
-	calc_z_flag(cpustate, res);
-	cpustate->ram[RAM_ADDR] = res;
+	calc_n_flag(res);
+	calc_z_flag(res);
+	m_ram[RAM_ADDR] = res;
 
-	cpustate->result = res;
+	m_result = res;
 }
 
-static void rotnr(esrip_state *cpustate, UINT16 inst)
+void esrip_device::rotnr(UINT16 inst)
 {
 	enum
 	{
@@ -1325,27 +1381,27 @@ static void rotnr(esrip_state *cpustate, UINT16 inst)
 
 	switch (inst & 0x1f)
 	{
-		case RTDY: u = cpustate->d_latch;	dst = Y_BUS;	break;
-		case RTDA: u = cpustate->d_latch;	dst = ACC;		break;
-		case RTAY: u = cpustate->acc;		dst = Y_BUS;	break;
-		case RTAA: u = cpustate->acc;		dst = ACC;		break;
+		case RTDY: u = m_d_latch;	dst = Y_BUS;	break;
+		case RTDA: u = m_d_latch;	dst = ACC;		break;
+		case RTAY: u = m_acc;		dst = Y_BUS;	break;
+		case RTAA: u = m_acc;		dst = ACC;		break;
 		default: INVALID;
 	}
 
 	res = (u << N) | (u >> (16 - N));
 	CLEAR_FLAGS(V_FLAG | C_FLAG);
-	calc_n_flag(cpustate, res);
-	calc_z_flag(cpustate, res);
+	calc_n_flag(res);
+	calc_z_flag(res);
 
 	switch (dst)
 	{
 		case Y_BUS: break;
-		case ACC: cpustate->acc = res; break;
-		case RAM: cpustate->ram[RAM_ADDR] = res; break;
+		case ACC: m_acc = res; break;
+		case RAM: m_ram[RAM_ADDR] = res; break;
 		default: UNHANDLED;
 	}
 
-	cpustate->result = res;
+	m_result = res;
 }
 
 /*************************************
@@ -1354,7 +1410,7 @@ static void rotnr(esrip_state *cpustate, UINT16 inst)
  *
  *************************************/
 
-static void rotc(esrip_state *cpustate, UINT16 inst)
+void esrip_device::rotc(UINT16 inst)
 {
 	UNHANDLED;
 }
@@ -1365,7 +1421,7 @@ static void rotc(esrip_state *cpustate, UINT16 inst)
  *
  *************************************/
 
-static void rotm(esrip_state *cpustate, UINT16 inst)
+void esrip_device::rotm(UINT16 inst)
 {
 	UNHANDLED;
 }
@@ -1376,12 +1432,12 @@ static void rotm(esrip_state *cpustate, UINT16 inst)
  *
  *************************************/
 
-static void prt(esrip_state *cpustate, UINT16 inst)
+void esrip_device::prt(UINT16 inst)
 {
 	UNHANDLED;
 }
 
-static void prtnr(esrip_state *cpustate, UINT16 inst)
+void esrip_device::prtnr(UINT16 inst)
 {
 	UNHANDLED;
 }
@@ -1393,12 +1449,12 @@ static void prtnr(esrip_state *cpustate, UINT16 inst)
  *
  *************************************/
 
-static void crcf(esrip_state *cpustate, UINT16 inst)
+void esrip_device::crcf(UINT16 inst)
 {
 	UNHANDLED;
 }
 
-static void crcr(esrip_state *cpustate, UINT16 inst)
+void esrip_device::crcr(UINT16 inst)
 {
 	UNHANDLED;
 }
@@ -1421,10 +1477,10 @@ enum
 	SHDNOV = 8,
 };
 
-#define	SET_LINK_flag(cpustate, x)	(cpustate->new_status &= ~L_FLAG); \
-							(cpustate->new_status |= x ? L_FLAG : 0)
+#define	SET_LINK_flag(x)	(m_new_status &= ~L_FLAG); \
+							(m_new_status |= x ? L_FLAG : 0)
 
-static UINT16 shift_op(esrip_state *cpustate, UINT16 u, int opcode)
+UINT16 esrip_device::shift_op(UINT16 u, int opcode)
 {
 	UINT32 res = 0;
 
@@ -1433,28 +1489,28 @@ static UINT16 shift_op(esrip_state *cpustate, UINT16 u, int opcode)
 		case SHUPZ:
 		{
 			res = (u << 1);
-			SET_LINK_flag(cpustate, u & 0x8000);
+			SET_LINK_flag(u & 0x8000);
 			CLEAR_FLAGS(V_FLAG | C_FLAG);
-			calc_n_flag(cpustate, res);
-			calc_z_flag(cpustate, res);
+			calc_n_flag(res);
+			calc_z_flag(res);
 			break;
 		}
 		case SHUP1:
 		{
 			res = (u << 1) | 1;
-			SET_LINK_flag(cpustate, u & 0x8000);
+			SET_LINK_flag(u & 0x8000);
 			CLEAR_FLAGS(V_FLAG | C_FLAG);
-			calc_n_flag(cpustate, res);
-			calc_z_flag(cpustate, res);
+			calc_n_flag(res);
+			calc_z_flag(res);
 			break;
 		}
 		case SHUPL:
 		{
-			res = (u << 1) | ((cpustate->status & L_FLAG) ? 1 : 0);
-			SET_LINK_flag(cpustate, u & 0x8000);
+			res = (u << 1) | ((m_status & L_FLAG) ? 1 : 0);
+			SET_LINK_flag(u & 0x8000);
 			CLEAR_FLAGS(V_FLAG | C_FLAG);
-			calc_n_flag(cpustate, res);
-			calc_z_flag(cpustate, res);
+			calc_n_flag(res);
+			calc_z_flag(res);
 			break;
 		}
 
@@ -1469,7 +1525,7 @@ static UINT16 shift_op(esrip_state *cpustate, UINT16 u, int opcode)
 	return res;
 }
 
-static void shftr(esrip_state *cpustate, UINT16 inst)
+void esrip_device::shftr(UINT16 inst)
 {
 	enum
 	{
@@ -1482,19 +1538,19 @@ static void shftr(esrip_state *cpustate, UINT16 inst)
 
 	switch ((inst >> 9) & 0xf)
 	{
-		case SHRR: u = cpustate->ram[RAM_ADDR];	break;
-		case SHDR: u = cpustate->d_latch;			break;
+		case SHRR: u = m_ram[RAM_ADDR];	break;
+		case SHDR: u = m_d_latch;			break;
 		default: INVALID;
 	}
 
-	res = shift_op(cpustate, u, (inst >> 5) & 0xf);
+	res = shift_op(u, (inst >> 5) & 0xf);
 
 	/* Destination is always RAM */
-	cpustate->ram[RAM_ADDR] = res;
-	cpustate->result = res;
+	m_ram[RAM_ADDR] = res;
+	m_result = res;
 }
 
-static void shftnr(esrip_state *cpustate, UINT16 inst)
+void esrip_device::shftnr(UINT16 inst)
 {
 	enum
 	{
@@ -1507,20 +1563,20 @@ static void shftnr(esrip_state *cpustate, UINT16 inst)
 
 	switch ((inst >> 9) & 0xf)
 	{
-		case SHA: u = cpustate->acc;			break;
-		case SHD: u = cpustate->d_latch;		break;
+		case SHA: u = m_acc;			break;
+		case SHD: u = m_d_latch;		break;
 		default: INVALID;
 	}
 
-	res = shift_op(cpustate, u, (inst >> 5) & 0xf);
+	res = shift_op(u, (inst >> 5) & 0xf);
 
 	switch (DST)
 	{
 		case NRY:	break;
-		case NRA:	cpustate->acc = res; break;
+		case NRA:	m_acc = res; break;
 		default:	INVALID;
 	}
-	cpustate->result = res;
+	m_result = res;
 }
 
 
@@ -1530,12 +1586,12 @@ static void shftnr(esrip_state *cpustate, UINT16 inst)
  *
  *************************************/
 
-static void svstr(esrip_state *cpustate, UINT16 inst)
+void esrip_device::svstr(UINT16 inst)
 {
 	UNHANDLED;
 }
 
-static void rstst(esrip_state *cpustate, UINT16 inst)
+void esrip_device::rstst(UINT16 inst)
 {
 	enum
 	{
@@ -1555,10 +1611,10 @@ static void rstst(esrip_state *cpustate, UINT16 inst)
 		case RF3:	CLEAR_FLAGS(FLAG_3); break;
 	}
 
-	cpustate->result = 0;
+	m_result = 0;
 }
 
-static void setst(esrip_state *cpustate, UINT16 inst)
+void esrip_device::setst(UINT16 inst)
 {
 	enum
 	{
@@ -1578,10 +1634,10 @@ static void setst(esrip_state *cpustate, UINT16 inst)
 		case SF3:	SET_FLAGS(FLAG_3); break;
 	}
 
-	cpustate->result = 0xffff;
+	m_result = 0xffff;
 }
 
-static void test(esrip_state *cpustate, UINT16 inst)
+void esrip_device::test(UINT16 inst)
 {
 	enum
 	{
@@ -1605,20 +1661,20 @@ static void test(esrip_state *cpustate, UINT16 inst)
 	{
 		case TNOZ: UNHANDLED; break;
 		case TNO:  UNHANDLED; break;
-		case TZ:   res = cpustate->status & (Z_FLAG); break;
-		case TOVR: res = cpustate->status & (V_FLAG); break;
+		case TZ:   res = m_status & (Z_FLAG); break;
+		case TOVR: res = m_status & (V_FLAG); break;
 		case TLOW: UNHANDLED; break;
-		case TC:   res = cpustate->status & (C_FLAG); break;
+		case TC:   res = m_status & (C_FLAG); break;
 		case TZC:  UNHANDLED; break;
-		case TN:   res = cpustate->status & (N_FLAG); break;
-		case TL:   res = cpustate->status & (L_FLAG); break;
-		case TF1:  res = cpustate->status & (FLAG_1); break;
-		case TF2:  res = cpustate->status & (FLAG_2); break;
-		case TF3:  res = cpustate->status & (FLAG_3); break;
+		case TN:   res = m_status & (N_FLAG); break;
+		case TL:   res = m_status & (L_FLAG); break;
+		case TF1:  res = m_status & (FLAG_1); break;
+		case TF2:  res = m_status & (FLAG_2); break;
+		case TF3:  res = m_status & (FLAG_3); break;
 		default:   INVALID;
 	}
 
-	cpustate->ct = res ? 1 : 0;
+	m_ct = res ? 1 : 0;
 }
 
 
@@ -1628,47 +1684,130 @@ static void test(esrip_state *cpustate, UINT16 inst)
  *
  *************************************/
 
-static void nop(esrip_state *cpustate, UINT16 inst)
+void esrip_device::nop(UINT16 inst)
 {
-	cpustate->result = 0xff;	// Undefined
+	m_result = 0xff;	// Undefined
 }
 
-static void (*const operations[24])(esrip_state *cpustate, UINT16 inst) =
+//**************************************************************************
+//  DEVICE INTERFACE
+//**************************************************************************
+
+const device_type ESRIP = &device_creator<esrip_device>;
+
+//-------------------------------------------------
+//  esrip_device - constructor
+//-------------------------------------------------
+
+esrip_device::esrip_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, ESRIP, "ESRIP", tag, owner, clock),
+	  m_program_config("program", ENDIANNESS_BIG, 64, 9, -3)
 {
-	rotr1, tor1, rotr2, rotc, rotm, bor2, crcf, crcr,
-	svstr, prt, sor, tor2, shftr, test, nop, setst, rstst,
-	rotnr, bonr, bor1, sonr, shftnr, prtnr, tonr
+	// build the opcode table
+	for (int op = 0; op < 24; op++)
+		m_opcode[op] = s_opcodetable[op];
+}
+
+
+//-------------------------------------------------
+//  static_set_config - set the configuration
+//  structure
+//-------------------------------------------------
+
+void esrip_device::static_set_config(device_t &device, const esrip_config &config)
+{
+	esrip_device &esrip = downcast<esrip_device &>(device);
+	static_cast<esrip_config &>(esrip) = config;
+	static_set_static_config(device, &config);
+}
+
+
+//**************************************************************************
+//  STATIC OPCODE TABLES
+//**************************************************************************
+
+const esrip_device::ophandler esrip_device::s_opcodetable[24] =
+{
+	&esrip_device::rotr1,	&esrip_device::tor1,	&esrip_device::rotr2,	&esrip_device::rotc,
+	&esrip_device::rotm,	&esrip_device::bor2,	&esrip_device::crcf,	&esrip_device::crcr,
+	&esrip_device::svstr,	&esrip_device::prt,		&esrip_device::sor,		&esrip_device::tor2,
+	&esrip_device::shftr,	&esrip_device::test,	&esrip_device::nop,		&esrip_device::setst,
+	&esrip_device::rstst,	&esrip_device::rotnr,	&esrip_device::bonr,	&esrip_device::bor1,
+	&esrip_device::sonr,	&esrip_device::shftnr,	&esrip_device::prtnr,	&esrip_device::tonr
 };
 
-INLINE void am29116_execute(esrip_state *cpustate, UINT16 inst, int _sre)
+
+void esrip_device::am29116_execute(UINT16 inst, int _sre)
 {
 	/* Status register shadow */
-	cpustate->new_status = cpustate->status;
+	m_new_status = m_status;
 
 	/* Required for immediate source instructions */
-	cpustate->inst = inst;
+	m_inst = inst;
 
-	if (cpustate->immflag == 1)
-		inst = cpustate->i_latch;
+	if (m_immflag == 1)
+		inst = m_i_latch;
 
-	(*operations[cpustate->optable[inst]])(cpustate, inst);
+	(this->*m_opcode[m_optable[inst]])(inst);
 
 	if (!_sre)
 	{
-		cpustate->status = cpustate->new_status;
-		cpustate->t = cpustate->status;
+		m_status = m_new_status;
+		m_t = m_status;
 	}
 }
 
 
-static CPU_EXECUTE( esrip )
+//-------------------------------------------------
+//  execute_min_cycles - return minimum number of
+//  cycles it takes for one instruction to execute
+//-------------------------------------------------
+
+UINT32 esrip_device::execute_min_cycles() const
 {
-	esrip_state *cpustate = get_safe_token(device);
-	int calldebugger = (device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0;
+	return 1;
+}
+
+
+//-------------------------------------------------
+//  execute_max_cycles - return maximum number of
+//  cycles it takes for one instruction to execute
+//-------------------------------------------------
+
+UINT32 esrip_device::execute_max_cycles() const
+{
+	return 1;
+}
+
+
+//-------------------------------------------------
+//  execute_input_lines - return the number of
+//  input/interrupt lines
+//-------------------------------------------------
+
+UINT32 esrip_device::execute_input_lines() const
+{
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  execute_set_input - act on a changed input/
+//  interrupt line
+//-------------------------------------------------
+
+void esrip_device::execute_set_input(int inputnum, int state)
+{
+}
+
+
+void esrip_device::execute_run()
+{
+	int calldebugger = (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0;
 	UINT8 status;
 
 	/* I think we can get away with placing this outside of the loop */
-	status = cpustate->status_in(device->machine());
+	status = m_status_in(machine());
 
 	/* Core execution loop */
 	do
@@ -1679,72 +1818,72 @@ static CPU_EXECUTE( esrip )
 		UINT16	ipt_bus = 0;
 		UINT16	y_bus = 0;
 
-		int yoe = _BIT(cpustate->l5, 1);
-		int bl46 = BIT(cpustate->l4, 6);
-		int bl44 = BIT(cpustate->l4, 4);
+		int yoe = _BIT(m_l5, 1);
+		int bl46 = BIT(m_l4, 6);
+		int bl44 = BIT(m_l4, 4);
 
 		UINT32 in_h;
 		UINT32 in_l;
 
-		if (cpustate->fig_cycles)
+		if (m_fig_cycles)
 		{
-			if (--cpustate->fig_cycles == 0)
-				cpustate->fig = 0;
+			if (--m_fig_cycles == 0)
+				m_fig = 0;
 		}
 
 		/* /OEY = 1 : Y-bus is high imped */
 		if (yoe)
 		{
 			/* Status In */
-			if (!_BIT(cpustate->l2, 0))
-				y_bus = status | (!cpustate->fig << 3);
+			if (!_BIT(m_l2, 0))
+				y_bus = status | (!m_fig << 3);
 
 			/* FDT RAM: /Enable, Direction and /RAM OE */
-			else if (!bl44 && !_BIT(cpustate->l2, 3) && bl46)
-				y_bus = cpustate->fdt_r(device, *cpustate->program, cpustate->fdt_cnt, 0);
+			else if (!bl44 && !_BIT(m_l2, 3) && bl46)
+				y_bus = m_fdt_r(this, *m_program, m_fdt_cnt, 0);
 
 			/* IPT RAM: /Enable and /READ */
-			else if (!_BIT(cpustate->l2, 6) && !_BIT(cpustate->l4, 5))
-				y_bus = cpustate->ipt_ram[cpustate->ipt_cnt];
+			else if (!_BIT(m_l2, 6) && !_BIT(m_l4, 5))
+				y_bus = m_ipt_ram[m_ipt_cnt];
 
 			/* DLE  - latch the value on the Y-BUS into the data latch */
-			if (_BIT(cpustate->l5, 0))
-				cpustate->d_latch = y_bus;
+			if (_BIT(m_l5, 0))
+				m_d_latch = y_bus;
 
 			/* Now execute the AM29116 instruction */
-			am29116_execute(cpustate, (cpustate->l7 << 8) | cpustate->l6, BIT(cpustate->l5, 2));
+			am29116_execute((m_l7 << 8) | m_l6, BIT(m_l5, 2));
 		}
 		else
 		{
-			am29116_execute(cpustate, (cpustate->l7 << 8) | cpustate->l6, BIT(cpustate->l5, 2));
+			am29116_execute((m_l7 << 8) | m_l6, BIT(m_l5, 2));
 
-			y_bus = cpustate->result;
+			y_bus = m_result;
 
-			if (BIT(cpustate->l5, 0))
-				cpustate->d_latch = y_bus;
+			if (BIT(m_l5, 0))
+				m_d_latch = y_bus;
 		}
 
 		/* Determine what value is on the X-Bus */
 
 		/* FDT RAM */
 		if (!bl44)
-			x_bus = cpustate->fdt_r(device, *cpustate->program, cpustate->fdt_cnt, 0);
+			x_bus = m_fdt_r(this, *m_program, m_fdt_cnt, 0);
 
 		/* Buffer is enabled - write direction */
-		else if (!BIT(cpustate->l2, 3) && !bl46)
+		else if (!BIT(m_l2, 3) && !bl46)
 		{
 			if (!yoe)
 				x_bus = y_bus;
-			else if ( !BIT(cpustate->l2, 6) && !BIT(cpustate->l4, 5) )
-				x_bus = cpustate->ipt_ram[cpustate->ipt_cnt];
+			else if ( !BIT(m_l2, 6) && !BIT(m_l4, 5) )
+				x_bus = m_ipt_ram[m_ipt_cnt];
 		}
 
 		/* IPT BUS */
-		if (!BIT(cpustate->l2, 6))
-			ipt_bus = cpustate->ipt_ram[cpustate->ipt_cnt];
-		else if (!BIT(cpustate->l4, 5))
+		if (!BIT(m_l2, 6))
+			ipt_bus = m_ipt_ram[m_ipt_cnt];
+		else if (!BIT(m_l4, 5))
 		{
-			if (!BIT(cpustate->l5, 1))
+			if (!BIT(m_l5, 1))
 				ipt_bus = y_bus;
 			else
 				ipt_bus = x_bus;
@@ -1752,249 +1891,112 @@ static CPU_EXECUTE( esrip )
 
 
 		/* Write FDT RAM: /Enable, Direction and WRITE */
-		if (!BIT(cpustate->l2, 3) && !bl46 && !BIT(cpustate->l4, 3))
-			cpustate->fdt_w(device, *cpustate->program, cpustate->fdt_cnt, x_bus, 0);
+		if (!BIT(m_l2, 3) && !bl46 && !BIT(m_l4, 3))
+			m_fdt_w(this, *m_program, m_fdt_cnt, x_bus, 0);
 
 		/* Write IPT RAM: /Enable and /WR */
-		if (!BIT(cpustate->l2, 7) && !BIT(cpustate->l4, 5))
-			cpustate->ipt_ram[cpustate->ipt_cnt] = ipt_bus;
+		if (!BIT(m_l2, 7) && !BIT(m_l4, 5))
+			m_ipt_ram[m_ipt_cnt] = ipt_bus;
 
 
-		if ((((cpustate->l5 >> 3) & 0x1f) & 0x18) != 0x18)
+		if ((((m_l5 >> 3) & 0x1f) & 0x18) != 0x18)
 		{
-			if ( check_jmp(cpustate, (cpustate->l5 >> 3) & 0x1f) )
-				next_pc = cpustate->l1;
+			if ( check_jmp((m_l5 >> 3) & 0x1f) )
+				next_pc = m_l1;
 			else
-				next_pc = cpustate->pc + 1;
+				next_pc = m_pc + 1;
 		}
 		else
-			next_pc = cpustate->pc + 1;
+			next_pc = m_pc + 1;
 
-		cpustate->pl1 = cpustate->l1;
-		cpustate->pl2 = cpustate->l2;
-		cpustate->pl3 = cpustate->l3;
-		cpustate->pl4 = cpustate->l4;
-		cpustate->pl5 = cpustate->l5;
-		cpustate->pl6 = cpustate->l6;
-		cpustate->pl7 = cpustate->l7;
+		m_pl1 = m_l1;
+		m_pl2 = m_l2;
+		m_pl3 = m_l3;
+		m_pl4 = m_l4;
+		m_pl5 = m_l5;
+		m_pl6 = m_l6;
+		m_pl7 = m_l7;
 
 		/* Latch instruction */
-		inst = cpustate->direct->read_decrypted_qword(RIP_PC << 3);
+		inst = m_direct->read_decrypted_qword(RIP_PC << 3);
 
 		in_h = inst >> 32;
 		in_l = inst & 0xffffffff;
 
-		cpustate->l1 = (in_l >> 8);
-		cpustate->l2 = (in_l >> 16);
-		cpustate->l3 = (in_l >> 24);
+		m_l1 = (in_l >> 8);
+		m_l2 = (in_l >> 16);
+		m_l3 = (in_l >> 24);
 
-		cpustate->l4 = (in_h >> 0);
-		cpustate->l5 = (in_h >> 8);
-		cpustate->l6 = (in_h >> 16);
-		cpustate->l7 = (in_h >> 24);
+		m_l4 = (in_h >> 0);
+		m_l5 = (in_h >> 8);
+		m_l6 = (in_h >> 16);
+		m_l7 = (in_h >> 24);
 
 		/* Colour latch */
-		if (RISING_EDGE(cpustate->pl3, cpustate->l3, 0))
-			cpustate->c_latch = (x_bus >> 12) & 0xf;
+		if (RISING_EDGE(m_pl3, m_l3, 0))
+			m_c_latch = (x_bus >> 12) & 0xf;
 
 		/* Right pixel line buffer address */
-		if (RISING_EDGE(cpustate->pl3, cpustate->l3, 1))
-			cpustate->adr_latch = x_bus & 0xfff;
+		if (RISING_EDGE(m_pl3, m_l3, 1))
+			m_adr_latch = x_bus & 0xfff;
 
 		/* Left pixel line buffer address */
-		if (RISING_EDGE(cpustate->pl3, cpustate->l3, 2))
-			cpustate->adl_latch = x_bus & 0xfff;
+		if (RISING_EDGE(m_pl3, m_l3, 2))
+			m_adl_latch = x_bus & 0xfff;
 
 		/* FIGLD: Start the DMA */
-		if (RISING_EDGE(cpustate->pl3, cpustate->l3, 3))
+		if (RISING_EDGE(m_pl3, m_l3, 3))
 		{
-			cpustate->attr_latch = x_bus;
+			m_attr_latch = x_bus;
 
-			cpustate->fig = 1;
-			cpustate->fig_cycles = cpustate->draw(device->machine(), cpustate->adl_latch, cpustate->adr_latch, cpustate->fig_latch, cpustate->attr_latch, cpustate->iaddr_latch, cpustate->c_latch, cpustate->x_scale, cpustate->img_bank);
+			m_fig = 1;
+			m_fig_cycles = m_draw(machine(), m_adl_latch, m_adr_latch, m_fig_latch, m_attr_latch, m_iaddr_latch, m_c_latch, m_x_scale, m_img_bank);
 		}
 
 		/* X-scale */
-		if (RISING_EDGE(cpustate->pl3, cpustate->l3, 4))
-			cpustate->x_scale = x_bus >> 8;
+		if (RISING_EDGE(m_pl3, m_l3, 4))
+			m_x_scale = x_bus >> 8;
 
 		/* Y-scale and image bank */
-		if (RISING_EDGE(cpustate->pl4, cpustate->l4, 2))
+		if (RISING_EDGE(m_pl4, m_l4, 2))
 		{
-			cpustate->y_scale = x_bus & 0xff;
-			cpustate->img_bank = (y_bus >> 14) & 3;
+			m_y_scale = x_bus & 0xff;
+			m_img_bank = (y_bus >> 14) & 3;
 		}
 
 		/* Image ROM address */
-		if (RISING_EDGE(cpustate->pl3, cpustate->l3, 5))
-			cpustate->iaddr_latch = y_bus;
+		if (RISING_EDGE(m_pl3, m_l3, 5))
+			m_iaddr_latch = y_bus;
 
 		/* IXLLD */
-		if (RISING_EDGE(cpustate->pl3, cpustate->l3, 6))
+		if (RISING_EDGE(m_pl3, m_l3, 6))
 		{
-			cpustate->line_latch = ipt_bus >> 10;
-			cpustate->fig_latch  = ipt_bus & 0x3ff;
+			m_line_latch = ipt_bus >> 10;
+			m_fig_latch  = ipt_bus & 0x3ff;
 		}
 
 		/* Status write */
-		if (RISING_EDGE(cpustate->pl3, cpustate->l3, 7))
-			cpustate->status_out = y_bus & 0xff;
+		if (RISING_EDGE(m_pl3, m_l3, 7))
+			m_status_out = y_bus & 0xff;
 
 		/* FDT address counter */
-		if (!BIT(cpustate->pl2, 1))
-			cpustate->fdt_cnt = y_bus & 0xfff;
-		else if (BIT(cpustate->pl2, 2))
-			cpustate->fdt_cnt = (cpustate->fdt_cnt + 1) & 0xfff;
+		if (!BIT(m_pl2, 1))
+			m_fdt_cnt = y_bus & 0xfff;
+		else if (BIT(m_pl2, 2))
+			m_fdt_cnt = (m_fdt_cnt + 1) & 0xfff;
 
 		/* Now we can alter the IPT address counter */
-		if (!BIT(cpustate->pl2, 4))
-			cpustate->ipt_cnt = y_bus & 0x1fff;
-		else if (BIT(cpustate->pl2, 5))
-			cpustate->ipt_cnt = (cpustate->ipt_cnt + 1) & 0x1fff;
+		if (!BIT(m_pl2, 4))
+			m_ipt_cnt = y_bus & 0x1fff;
+		else if (BIT(m_pl2, 5))
+			m_ipt_cnt = (m_ipt_cnt + 1) & 0x1fff;
 
 		if (calldebugger)
-			debugger_instruction_hook(device, RIP_PC);
+			debugger_instruction_hook(this, RIP_PC);
 
-		cpustate->pc = next_pc;
+		m_pc = next_pc;
+		m_rip_pc = (m_pc | ((m_status_out & 1) << 8));
 
-		cpustate->icount--;
-	} while (cpustate->icount > 0);
+		m_icount--;
+	} while (m_icount > 0);
 }
-
-
-/**************************************************************************
- * set_info
- **************************************************************************/
-
-static CPU_SET_INFO( esrip )
-{
-	esrip_state *cpustate = get_safe_token(device);
-
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + ESRIP_PC:	cpustate->pc = info->i & 0xff;
-												cpustate->status_out &= ~1;
-												cpustate->status_out |= ((info->i >> 8) & 1);
-												break;
-	}
-}
-
-/**************************************************************************
- * get_info
- **************************************************************************/
-
-CPU_GET_INFO( esrip )
-{
-	esrip_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(esrip_state);	break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;		break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;					break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;					break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 8;					break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 8;					break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;					break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 1;					break;
-
-		case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 64;			break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 9;			break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = -3;			break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;			break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;			break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;			break;
-		case CPUINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 0;			break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 0;			break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;			break;
-
-		case CPUINFO_INT_REGISTER:
-		case CPUINFO_INT_PC:							info->i = RIP_PC;	break;
-		case CPUINFO_INT_REGISTER + ESRIP_STATW:		info->i = cpustate->status_out; break;
-		case CPUINFO_INT_REGISTER + ESRIP_FDTC:			info->i = cpustate->fdt_cnt; break;
-		case CPUINFO_INT_REGISTER + ESRIP_IPTC:			info->i = cpustate->ipt_cnt; break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(esrip);		break;
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(esrip);			break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(esrip);			break;
-		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(esrip);			break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(esrip);		break;
-		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(esrip);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "Real Time Image Processor");		break;
-		case CPUINFO_STR_FAMILY:					strcpy(info->s, "Entertainment Sciences");			break;
-		case CPUINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
-		case CPUINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CREDITS:					strcpy(info->s, "Copyright Philip J Bennett"); break;
-
-		case CPUINFO_STR_FLAGS:							sprintf(info->s, "%c%c%c%c%c%c%c%c%c",
-																		cpustate->status & 0x80 ? '3' : '.',
-																		cpustate->status & 0x40 ? '2' : '.',
-																		cpustate->status & 0x20 ? '1' : '.',
-																		cpustate->status & 0x10 ? 'L' : '.',
-																		cpustate->status & 0x08 ? 'V' : '.',
-																		cpustate->status & 0x04 ? 'N' : '.',
-																		cpustate->status & 0x02 ? 'C' : '.',
-																		cpustate->status & 0x01 ? 'Z' : '.',
-																		get_hblank(device->machine()) ? 'H' : '.'); break;
-
-		case CPUINFO_STR_REGISTER + ESRIP_PC:			sprintf(info->s, "PC: %04X", RIP_PC); break;
-		case CPUINFO_STR_REGISTER + ESRIP_ACC:			sprintf(info->s, "ACC: %04X", cpustate->acc); break;
-		case CPUINFO_STR_REGISTER + ESRIP_DLATCH:		sprintf(info->s, "DLATCH: %04X", cpustate->d_latch); break;
-		case CPUINFO_STR_REGISTER + ESRIP_ILATCH:		sprintf(info->s, "ILATCH: %04X", cpustate->i_latch); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM00:		sprintf(info->s, "RAM[00]: %04X", cpustate->ram[0x00]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM01:		sprintf(info->s, "RAM[01]: %04X", cpustate->ram[0x01]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM02:		sprintf(info->s, "RAM[02]: %04X", cpustate->ram[0x02]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM03:		sprintf(info->s, "RAM[03]: %04X", cpustate->ram[0x03]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM04:		sprintf(info->s, "RAM[04]: %04X", cpustate->ram[0x04]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM05:		sprintf(info->s, "RAM[05]: %04X", cpustate->ram[0x05]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM06:		sprintf(info->s, "RAM[06]: %04X", cpustate->ram[0x06]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM07:		sprintf(info->s, "RAM[07]: %04X", cpustate->ram[0x07]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM08:		sprintf(info->s, "RAM[08]: %04X", cpustate->ram[0x08]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM09:		sprintf(info->s, "RAM[09]: %04X", cpustate->ram[0x09]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM0A:		sprintf(info->s, "RAM[0A]: %04X", cpustate->ram[0x0a]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM0B:		sprintf(info->s, "RAM[0B]: %04X", cpustate->ram[0x0b]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM0C:		sprintf(info->s, "RAM[0C]: %04X", cpustate->ram[0x0c]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM0D:		sprintf(info->s, "RAM[0D]: %04X", cpustate->ram[0x0d]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM0E:		sprintf(info->s, "RAM[0E]: %04X", cpustate->ram[0x0e]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM0F:		sprintf(info->s, "RAM[0F]: %04X", cpustate->ram[0x0f]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM10:		sprintf(info->s, "RAM[10]: %04X", cpustate->ram[0x10]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM11:		sprintf(info->s, "RAM[11]: %04X", cpustate->ram[0x11]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM12:		sprintf(info->s, "RAM[12]: %04X", cpustate->ram[0x12]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM13:		sprintf(info->s, "RAM[13]: %04X", cpustate->ram[0x13]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM14:		sprintf(info->s, "RAM[14]: %04X", cpustate->ram[0x14]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM15:		sprintf(info->s, "RAM[15]: %04X", cpustate->ram[0x15]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM16:		sprintf(info->s, "RAM[16]: %04X", cpustate->ram[0x16]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM17:		sprintf(info->s, "RAM[17]: %04X", cpustate->ram[0x17]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM18:		sprintf(info->s, "RAM[18]: %04X", cpustate->ram[0x18]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM19:		sprintf(info->s, "RAM[19]: %04X", cpustate->ram[0x19]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM1A:		sprintf(info->s, "RAM[1A]: %04X", cpustate->ram[0x1a]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM1B:		sprintf(info->s, "RAM[1B]: %04X", cpustate->ram[0x1b]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM1C:		sprintf(info->s, "RAM[1C]: %04X", cpustate->ram[0x1c]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM1D:		sprintf(info->s, "RAM[1D]: %04X", cpustate->ram[0x1d]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM1E:		sprintf(info->s, "RAM[1E]: %04X", cpustate->ram[0x1e]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_RAM1F:		sprintf(info->s, "RAM[1F]: %04X", cpustate->ram[0x1f]); break;
-		case CPUINFO_STR_REGISTER + ESRIP_STATW:		sprintf(info->s, "STAT: %04X", cpustate->status_out); break;
-		case CPUINFO_STR_REGISTER + ESRIP_FDTC:			sprintf(info->s, "FDTC: %04X", cpustate->fdt_cnt); break;
-		case CPUINFO_STR_REGISTER + ESRIP_IPTC:			sprintf(info->s, "IPTC: %04X", cpustate->ipt_cnt); break;
-		case CPUINFO_STR_REGISTER + ESRIP_XSCALE:		sprintf(info->s, "XSCL: %04X", cpustate->x_scale); break;
-		case CPUINFO_STR_REGISTER + ESRIP_YSCALE:		sprintf(info->s, "YSCL: %04X", cpustate->y_scale); break;
-		case CPUINFO_STR_REGISTER + ESRIP_BANK:			sprintf(info->s, "BANK: %04X", cpustate->img_bank); break;
-		case CPUINFO_STR_REGISTER + ESRIP_LINE:			sprintf(info->s, "LINE: %04X", cpustate->line_latch); break;
-		case CPUINFO_STR_REGISTER + ESRIP_FIG:			sprintf(info->s, "FIG: %04X", cpustate->fig_latch); break;
-		case CPUINFO_STR_REGISTER + ESRIP_ATTR:			sprintf(info->s, "ATTR: %04X", cpustate->attr_latch); break;
-		case CPUINFO_STR_REGISTER + ESRIP_ADRL:			sprintf(info->s, "ADRL: %04X", cpustate->adl_latch); break;
-		case CPUINFO_STR_REGISTER + ESRIP_ADRR:			sprintf(info->s, "ADRR: %04X", cpustate->adr_latch); break;
-		case CPUINFO_STR_REGISTER + ESRIP_COLR:			sprintf(info->s, "COLR: %04X", cpustate->c_latch); break;
-		case CPUINFO_STR_REGISTER + ESRIP_IADDR:		sprintf(info->s, "IADR: %04X", cpustate->iaddr_latch); break;
-	}
-}
-
-DEFINE_LEGACY_CPU_DEVICE(ESRIP, esrip);

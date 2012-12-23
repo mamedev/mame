@@ -4,6 +4,13 @@
 
 *************************************************************************/
 
+#ifndef _ESRIPSYS_H_
+#define _ESRIPSYS_H_
+
+#pragma once
+
+#include "cpu/esrip/esrip.h"
+
 /* TODO */
 #define ESRIPSYS_PIXEL_CLOCK	(XTAL_25MHz / 2)
 #define ESRIPSYS_HTOTAL			(512 + 141 + 2)
@@ -28,7 +35,10 @@ class esripsys_state : public driver_device
 public:
 	esripsys_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+          m_videocpu(*this, "video_cpu"),
 		  m_pal_ram(*this, "pal_ram") { }
+
+    required_device<esrip_device> m_videocpu;
 
 	UINT8 m_g_iodata;
 	UINT8 m_g_ioaddr;
@@ -102,3 +112,5 @@ public:
 
 /*----------- defined in video/esripsys.c -----------*/
 int esripsys_draw(running_machine &machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank);
+
+#endif // _ESRIPSYS_H_

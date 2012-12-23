@@ -129,10 +129,6 @@ protected:
     direct_read_data *m_direct;
 };
 
-// device type definition
-extern const device_type ATMEGA88;
-extern const device_type ATMEGA644;
-
 // ======================> m6809_device
 
 class m6809_device : public m6809_base_device
