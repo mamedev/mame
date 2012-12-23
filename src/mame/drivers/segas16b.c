@@ -3477,6 +3477,7 @@ ROM_START( aliensyn )
 	ROM_LOAD( "epr-10726.a10", 0x30000, 0x8000, CRC(d50b7736) SHA1(b1f8e3b0cf2ffee5382098100cfabe21b383cd51) )
 ROM_END
 
+
 //*************************************************************************************************************************
 //  Alien Syndrome, Sega System 16B
 //  CPU: FD1089A (317-0033)
@@ -3517,6 +3518,49 @@ ROM_START( aliensyn3 )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
 	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(49e882e5) SHA1(29d87af8fc775b22a9a546c112f8f5e7f700ac1a) )
+ROM_END
+
+
+//*************************************************************************************************************************
+//  Alien Syndrome, Sega System 16B
+//  CPU: 68000 + MC8123B (317-00xx) (sorry missing code, scratched off label)
+//  ROM Board type: 171-5358
+//  Sega game ID: 833-6308-05
+//    Main board: 837-6312-02
+//     Rom board: 834-6311-04
+//
+ROM_START( aliensyn7 )
+	ROM_REGION( 0x30000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "epr-11083.a4", 0x00000, 0x8000, CRC(cb2ad9b3) SHA1(66284b4e1071b3cb4b36960a2dba8949325f9e86) )
+	ROM_LOAD16_BYTE( "epr-11080.a1", 0x00001, 0x8000, CRC(fe7378d9) SHA1(acfee79e5fe9fdf95926562c02599e96e96f76b5) )
+	ROM_LOAD16_BYTE( "epr-11084.a5", 0x10000, 0x8000, CRC(2e1ec7b1) SHA1(666a9e402d7d02d74c0a2468853a3843b161c1a2) )
+	ROM_LOAD16_BYTE( "epr-11081.a2", 0x10001, 0x8000, CRC(1308ee63) SHA1(36a4c8cf3a310398e264c57c7c6f53c05dbc0108) )
+	ROM_LOAD16_BYTE( "epr-11085.a6", 0x20000, 0x8000, CRC(cff78f39) SHA1(78431ce6c03232150a8db15499da9371977b570b) )
+	ROM_LOAD16_BYTE( "epr-11082.a3", 0x20001, 0x8000, CRC(9cdc2a14) SHA1(c06693f45675e31d591703c27bb3f6ec02fc1215) )
+
+	ROM_REGION( 0x30000, "gfx1", 0 ) // tiles
+	ROM_LOAD( "epr-10702.b9",  0x00000, 0x10000, CRC(393bc813) SHA1(672782c8fb2a6e454b27e073acc26130cacf3e50) )
+	ROM_LOAD( "epr-10703.b10", 0x10000, 0x10000, CRC(6b6dd9f5) SHA1(964409c6630caa13caf7d644d0c6fb071860b61b) )
+	ROM_LOAD( "epr-10704.b11", 0x20000, 0x10000, CRC(911e7ebc) SHA1(f03d3d3a09d19f7b705f9cb29f73140a3073463f) )
+
+	ROM_REGION16_BE( 0x080000, "sprites", 0 ) // sprites
+	ROM_LOAD16_BYTE( "epr-10709.b1", 0x00001, 0x10000, CRC(addf0a90) SHA1(a92c9531f1817763773471ce63f566b9e88360a0) )
+	ROM_LOAD16_BYTE( "epr-10713.b5", 0x00000, 0x10000, CRC(ececde3a) SHA1(9c12d4665179bf433c42f5ddc8a043ad592aa90e) )
+	ROM_LOAD16_BYTE( "epr-10710.b2", 0x20001, 0x10000, CRC(992369eb) SHA1(c6796acf6807e9ba4c3d241903653f91adf4764e) )
+	ROM_LOAD16_BYTE( "epr-10714.b6", 0x20000, 0x10000, CRC(91bf42fb) SHA1(4b9d3e97768323dee01e92378adafecb26bcc094) )
+	ROM_LOAD16_BYTE( "epr-10711.b3", 0x40001, 0x10000, CRC(29166ef6) SHA1(99a7cfd7d811537c821412a320beadb5a9c09af3) )
+	ROM_LOAD16_BYTE( "epr-10715.b7", 0x40000, 0x10000, CRC(a7c57384) SHA1(46f8efa691d7bbb0a18119c0ff12cff7c0d129e1) )
+	ROM_LOAD16_BYTE( "epr-10712.b4", 0x60001, 0x10000, CRC(876ad019) SHA1(39973ddb5a5746e0e094c759447bff1130c72c84) )
+	ROM_LOAD16_BYTE( "epr-10716.b8", 0x60000, 0x10000, CRC(40ba1d48) SHA1(e2d4d2689bb9b9bdc85e7f72a6665e5fd4c583aa) )
+
+	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
+	ROM_LOAD( "epr-11086.a7",  0x00000, 0x8000, CRC(c7fddc28) SHA1(cf77748ba179829913923d2695101ac7c76c4667) )	// encrypted
+	ROM_LOAD( "epr-10724.a8",  0x10000, 0x8000, CRC(f971a817) SHA1(502c95638e4fd5f87e5fc837cb44b39a5d62f4e4) )
+	ROM_LOAD( "epr-10725.a9",  0x20000, 0x8000, CRC(6a50e08f) SHA1(d34b2ccadb8b07d5ad99cab5c5b5b79642c65574) )
+	ROM_LOAD( "epr-10726.a10", 0x30000, 0x8000, CRC(d50b7736) SHA1(b1f8e3b0cf2ffee5382098100cfabe21b383cd51) )
+
+	ROM_REGION( 0x2000, "mcu", 0 ) // MC8123 key
+	ROM_LOAD( "317-00xx.key",  0x0000, 0x2000, NO_DUMP )
 ROM_END
 
 
@@ -6435,6 +6479,12 @@ DRIVER_INIT_MEMBER(segas16b_state,aceattac_5358)
 	m_custom_io_r = read16_delegate(FUNC(segas16b_state::aceattac_custom_io_r), this);
 }
 
+DRIVER_INIT_MEMBER(segas16b_state,aliensyn7_5358_small)
+{
+	DRIVER_INIT_CALL(generic_5358_small);
+	mc8123_decrypt_rom(machine(), "soundcpu", "mcu", NULL, 0);
+}
+
 DRIVER_INIT_MEMBER(segas16b_state,altbeast_5521)
 {
 	DRIVER_INIT_CALL(generic_5521);
@@ -6577,6 +6627,7 @@ DRIVER_INIT_MEMBER(segas16b_state,snapper)
 GAME( 1988, aceattac,   0,        system16b_fd1094,    aceattac, segas16b_state,aceattac_5358,      ROT0,   "Sega", "Ace Attacker (FD1094 317-0059)", GAME_NOT_WORKING )
 
 GAME( 1987, aliensyn,   0,        system16b,           aliensyn, segas16b_state,generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 4, System 16B, unprotected)", 0 )
+GAME( 1987, aliensyn7,  aliensyn, system16b,           aliensyn, segas16b_state,aliensyn7_5358_small, ROT0,  "Sega", "Alien Syndrome (set 7, System 16B, MC-8123B 317-00xx)", GAME_NO_SOUND ) // missing 8123B key
 GAME( 1987, aliensyn3,  aliensyn, system16b_fd1089a,   aliensyn, segas16b_state,generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 3, System 16B, FD1089A 317-0033)", 0 )
 GAME( 1987, aliensynj,  aliensyn, system16b_fd1089a,   aliensynj,segas16b_state,generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 6, Japan, new, System 16B, FD1089A 317-0033)", 0 )
 

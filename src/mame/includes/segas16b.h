@@ -135,6 +135,7 @@ public:
 	DECLARE_DRIVER_INIT(shinobi3_5358);
 	DECLARE_DRIVER_INIT(goldnaxe_5797);
 	DECLARE_DRIVER_INIT(altbeas4_5521);
+	DECLARE_DRIVER_INIT(aliensyn7_5358_small);
 
 	// video updates
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
