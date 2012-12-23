@@ -583,7 +583,7 @@
 
 	<software name="aklabeth">
 		<description>Aklabeth</description>
-		<year>109-</year>
+		<year>19??</year>
 		<publisher>California Pacific Computer</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -658,8 +658,8 @@
 
 	<software name="alien">
 		<description>Alien</description>
-		<year></year>
-		<publisher></publisher>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -1201,7 +1201,7 @@
 
 	<software name="artesian">
 		<description>Artesians</description>
-		<year>&lt;unknown&gt;</year>
+		<year>19??</year>
 		<publisher>Reno Soft</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
