@@ -317,9 +317,21 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
 
 WRITE8_MEMBER(kurukuru_state::kurukuru_bankswitch_w)
 {
-	// d4,d5: bank
-	// other bits: ?
-	membank("bank1")->set_entry(data >> 4 & 3);
+	membank("bank1")->set_entry(7); // remove banked rom
+/*
+	if bits 5,4 are 00,10,01 then IC10 is enabled
+	if bits 3,2 are 00,10,01 then IC18 is enabled
+	if bits 1,0 are 00,10,01 then IC23 is enabled
+	Then in addition, A15 (ROM half) is determined by the low bit.
+	Note that in theory, it can cause a conflict by enabling more than one chip,
+	but the game never does this.
+*/
+	for (int chip = 0; chip < 3; chip++)
+	{
+		if ((data & 3) != 3)
+			membank("bank1")->set_entry((chip << 1) | (~data & 1));
+		data >>= 2;
+	}
 }
 
 WRITE8_MEMBER(kurukuru_state::kurukuru_soundlatch_w)
@@ -399,6 +411,10 @@ static ADDRESS_MAP_START( audio_io, AS_IO, 8, kurukuru_state )
 	AM_RANGE(0x60, 0x60) AM_MIRROR(0x0f) AM_READ(kurukuru_soundlatch_r)
 	AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) AM_READ(kurukuru_adpcm_timer_irqack_r)
 ADDRESS_MAP_END
+/*
+	Reading _any_ I/O port on the audio CPU should return ADPCM IRQ flag on bit 3, and sound command write status flag on bit 4.
+	How does this work when reading the sound latch? The game (un)fortunately doesn't test this, I'd rather leave it unemulated then.
+*/
 
 
 /* YM2149 ports */
@@ -497,7 +513,7 @@ INPUT_PORTS_END
 
 void kurukuru_state::machine_start()
 {
-	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base(), 0x8000);
+	membank("bank1")->configure_entries(0, 8, memregion("user1")->base(), 0x8000);
 }
 
 void kurukuru_state::machine_reset()
@@ -581,13 +597,17 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( kurukuru )
-	ROM_REGION( 0x28000, "maincpu", 0 )
-	ROM_LOAD( "kp_17l.ic17",  0x00000, 0x08000, CRC(9b552ebc) SHA1(07d0e62b7fdad381963a345376b72ad31eb7b96d) )	// program code
-	ROM_LOAD( "10.ic10",      0x08000, 0x10000, CRC(3d6012bc) SHA1(2764f70e0e0bef3f2f71dd6c78e0a4189057beca) )	// title + text + ingame gfx
-	ROM_LOAD( "18.ic18",      0x18000, 0x10000, CRC(afb13c6a) SHA1(ac3cd40fad081f7a2b3d1fc72ea96282b9d1f4a3) )	// big frog gfx
+	ROM_REGION( 0x08000, "maincpu", 0 )
+	ROM_LOAD( "kp_17l.ic17",  0x00000, 0x08000, CRC(9b552ebc) SHA1(07d0e62b7fdad381963a345376b72ad31eb7b96d) ) // program code
+
+	ROM_REGION( 0x40000, "user1", 0 ) // maincpu banked roms
+	ROM_FILL(                 0x00000, 0x10000, 0xff )                                                         // ic23: unpopulated
+	ROM_LOAD( "18.ic18",      0x10000, 0x10000, CRC(afb13c6a) SHA1(ac3cd40fad081f7a2b3d1fc72ea96282b9d1f4a3) ) // ic18: big frog gfx
+	ROM_LOAD( "10.ic10",      0x20000, 0x10000, CRC(3d6012bc) SHA1(2764f70e0e0bef3f2f71dd6c78e0a4189057beca) ) // ic10: title + text + ingame gfx
+	ROM_FILL(                 0x30000, 0x10000, 0xff )                                                         // dummy entry for when no romchip is selected
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "4.ic4",    0x00000, 0x10000, CRC(85d86f32) SHA1(f2aa93d702e6577f8f2204c74c44ac26d05be699) )	// code & adpcm samples
+	ROM_LOAD( "4.ic4",        0x00000, 0x10000, CRC(85d86f32) SHA1(f2aa93d702e6577f8f2204c74c44ac26d05be699) ) // code & adpcm samples
 
 	ROM_REGION( 0x800, "plds", 0 )
 	ROM_LOAD( "51.ic26",	  0x0000, 0x0104, CRC(ce4a601b) SHA1(07f5bbb327b220e5846927cbb91149174dd07b36) )
