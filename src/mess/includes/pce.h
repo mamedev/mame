@@ -10,6 +10,7 @@
 #define PCE_H_
 
 #include "cdrom.h"
+#include "cpu/h6280/h6280.h"
 #include "sound/msm5205.h"
 #include "machine/nvram.h"
 #include "video/huc6260.h"
@@ -108,12 +109,14 @@ class pce_state : public driver_device
 {
 public:
 	pce_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
+        m_maincpu(*this, "maincpu"),
 		m_cd_ram(*this, "cd_ram"),
 		m_user_ram(*this, "user_ram"),
 		m_huc6260(*this, "huc6260")
 	{ }
 
+    required_device<h6280_device> m_maincpu;
 	required_shared_ptr<UINT8> m_cd_ram;
 	required_shared_ptr<unsigned char> m_user_ram;
 	optional_device<huc6260_device> m_huc6260;

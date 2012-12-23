@@ -3,26 +3,23 @@
 #ifndef __C6280_H__
 #define __C6280_H__
 
-#include "devlegcy.h"
+#include "cpu/h6280/h6280.h"
 
 struct c6280_interface
 {
 	const char *	cpu;
 };
 
-/* Function prototypes */
-DECLARE_WRITE8_DEVICE_HANDLER( c6280_w );
-DECLARE_READ8_DEVICE_HANDLER( c6280_r );
-
 class c6280_device : public device_t,
-                                  public device_sound_interface
+                     public device_sound_interface
 {
 public:
 	c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~c6280_device() { global_free(m_token); }
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+	// read/write
+	DECLARE_READ8_MEMBER( c6280_r );
+	DECLARE_WRITE8_MEMBER( c6280_w );
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -30,9 +27,31 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
 private:
+	struct channel {
+		UINT16 m_frequency;
+		UINT8 m_control;
+		UINT8 m_balance;
+		UINT8 m_waveform[32];
+		UINT8 m_index;
+		INT16 m_dda;
+		UINT8 m_noise_control;
+		UINT32 m_noise_counter;
+		UINT32 m_counter;
+	};
+
 	// internal state
-	void *m_token;
+	sound_stream *m_stream;
+	h6280_device *m_cpudevice;
+    UINT8 m_select;
+    UINT8 m_balance;
+    UINT8 m_lfo_frequency;
+    UINT8 m_lfo_control;
+    channel m_channel[8];
+    INT16 m_volume_table[32];
+    UINT32 m_noise_freq_tab[32];
+    UINT32 m_wave_freq_tab[4096];
 };
 
 extern const device_type C6280;

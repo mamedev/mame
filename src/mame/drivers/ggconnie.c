@@ -139,10 +139,10 @@ static ADDRESS_MAP_START( sgx_mem , AS_PROGRAM, 8, ggconnie_state )
 	AM_RANGE( 0x1fe008, 0x1fe00f) AM_READWRITE_LEGACY(vpc_r, vpc_w) AM_MIRROR(0x03e0)
 	AM_RANGE( 0x1fe010, 0x1fe017) AM_READWRITE_LEGACY(vdc_1_r, vdc_1_w) AM_MIRROR(0x03e0)
 	AM_RANGE( 0x1fe400, 0x1fe7ff) AM_READWRITE_LEGACY(vce_r, vce_w)
-	AM_RANGE( 0x1fe800, 0x1febff) AM_DEVREADWRITE_LEGACY("c6280", c6280_r, c6280_w)
-	AM_RANGE( 0x1fec00, 0x1fefff) AM_READWRITE_LEGACY(h6280_timer_r, h6280_timer_w)
+	AM_RANGE( 0x1fe800, 0x1febff) AM_DEVREADWRITE("c6280", c6280_device, c6280_r, c6280_w)
+	AM_RANGE( 0x1fec00, 0x1fefff) AM_DEVREADWRITE("maincpu", h6280_device, timer_r, timer_w)
 	AM_RANGE( 0x1ff000, 0x1ff000) AM_READ_PORT("IN0") AM_WRITE(lamp_w)
-	AM_RANGE( 0x1ff400, 0x1ff7ff) AM_READWRITE_LEGACY(h6280_irq_status_r, h6280_irq_status_w )
+	AM_RANGE( 0x1ff400, 0x1ff7ff) AM_DEVREADWRITE("maincpu", h6280_device, irq_status_r, irq_status_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sgx_io , AS_IO, 8, ggconnie_state )

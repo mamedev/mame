@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( triothep_map, AS_PROGRAM, 8, actfancr_state )
 	AM_RANGE(0x140000, 0x140001) AM_READNOP /* Value doesn't matter */
 	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_SHARE("main_ram") /* Main ram */
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(triothep_control_r, triothep_control_select_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE_LEGACY(h6280_irq_status_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("maincpu", h6280_device, irq_status_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -321,7 +321,7 @@ MACHINE_RESET_MEMBER(actfancr_state,triothep)
 static MACHINE_CONFIG_START( actfancr, actfancr_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",H6280,21477200/3) /* Should be accurate */
+	MCFG_CPU_ADD("maincpu", H6280, 21477200/3) /* Should be accurate */
 	MCFG_CPU_PROGRAM_MAP(actfan_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", actfancr_state,  irq0_line_hold) /* VBL */
 

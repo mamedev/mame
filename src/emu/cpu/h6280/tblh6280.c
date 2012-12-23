@@ -11,7 +11,7 @@
 ******************************************************************************/
 
 #undef	OP
-#define OP(nnn) INLINE void h6280##nnn(h6280_Regs* cpustate)
+#define OP(nnn) inline void op##nnn()
 
 /*****************************************************************************
  *****************************************************************************
@@ -93,7 +93,7 @@ OP(_0d3) { int to,from,length;			      TIN;		   } // 6*l+17 TIN  XFER
 OP(_0f3) { int to,from,length,alternate;       TAI;		   } // 6*l+17 TAI  XFER
 
 OP(_004) { int tmp; H6280_CYCLES(6); RD_ZPG; TSB; WB_EAZ; } // 6 TSB  ZPG
-OP(_024) { int tmp; H6280_CYCLES(4); RD_ZPG; BIT;		   } // 4 BIT  ZPG
+OP(_024) { int tmp; H6280_CYCLES(4); RD_ZPG; HBIT;		   } // 4 BIT  ZPG
 OP(_044) { int tmp;							  BSR;		   } // 8 BSR  REL
 OP(_064) { int tmp; H6280_CYCLES(4);		  STZ; WR_ZPG; } // 4 STZ  ZPG
 OP(_084) { int tmp; H6280_CYCLES(4);		  STY; WR_ZPG; } // 4 STY  ZPG
@@ -102,7 +102,7 @@ OP(_0c4) { int tmp; H6280_CYCLES(4); RD_ZPG; CPY;		   } // 4 CPY  ZPG
 OP(_0e4) { int tmp; H6280_CYCLES(4); RD_ZPG; CPX;		   } // 4 CPX  ZPG
 
 OP(_014) { int tmp; H6280_CYCLES(6); RD_ZPG; TRB; WB_EAZ; } // 6 TRB  ZPG
-OP(_034) { int tmp; H6280_CYCLES(4); RD_ZPX; BIT;		   } // 4 BIT  ZPX
+OP(_034) { int tmp; H6280_CYCLES(4); RD_ZPX; HBIT;		   } // 4 BIT  ZPX
 OP(_054) {		   H6280_CYCLES(3);			CSL;		   } // 3 CSL
 OP(_074) { int tmp; H6280_CYCLES(4);		  STZ; WR_ZPX; } // 4 STZ  ZPX
 OP(_094) { int tmp; H6280_CYCLES(4);		  STY; WR_ZPX; } // 4 STY  ZPX
@@ -137,10 +137,10 @@ OP(_0a6) { int tmp; H6280_CYCLES(4); RD_ZPG; LDX;		   } // 4 LDX  ZPG
 OP(_0c6) { int tmp; H6280_CYCLES(6); RD_ZPG; DEC; WB_EAZ; } // 6 DEC  ZPG
 OP(_0e6) { int tmp; H6280_CYCLES(6); RD_ZPG; INC; WB_EAZ; } // 6 INC  ZPG
 
-OP(_016) { int tmp; H6280_CYCLES(6); RD_ZPX; ASL; WB_EAZ  } // 6 ASL  ZPX
-OP(_036) { int tmp; H6280_CYCLES(6); RD_ZPX; ROL; WB_EAZ  } // 6 ROL  ZPX
-OP(_056) { int tmp; H6280_CYCLES(6); RD_ZPX; LSR; WB_EAZ  } // 6 LSR  ZPX
-OP(_076) { int tmp; H6280_CYCLES(6); RD_ZPX; ROR; WB_EAZ  } // 6 ROR  ZPX
+OP(_016) { int tmp; H6280_CYCLES(6); RD_ZPX; ASL; WB_EAZ;  } // 6 ASL  ZPX
+OP(_036) { int tmp; H6280_CYCLES(6); RD_ZPX; ROL; WB_EAZ;  } // 6 ROL  ZPX
+OP(_056) { int tmp; H6280_CYCLES(6); RD_ZPX; LSR; WB_EAZ;  } // 6 LSR  ZPX
+OP(_076) { int tmp; H6280_CYCLES(6); RD_ZPX; ROR; WB_EAZ;  } // 6 ROR  ZPX
 OP(_096) { int tmp; H6280_CYCLES(4);		  STX; WR_ZPY; } // 4 STX  ZPY
 OP(_0b6) { int tmp; H6280_CYCLES(4); RD_ZPY; LDX;		   } // 4 LDX  ZPY
 OP(_0d6) { int tmp; H6280_CYCLES(6); RD_ZPX; DEC; WB_EAZ; } // 6 DEC  ZPX
@@ -186,7 +186,7 @@ OP(_009) { int tmp; H6280_CYCLES(2); RD_IMM; ORA;		   } // 2 ORA  IMM
 OP(_029) { int tmp; H6280_CYCLES(2); RD_IMM; AND;		   } // 2 AND  IMM
 OP(_049) { int tmp; H6280_CYCLES(2); RD_IMM; EOR;		   } // 2 EOR  IMM
 OP(_069) { int tmp; H6280_CYCLES(2); RD_IMM; ADC;		   } // 2 ADC  IMM
-OP(_089) { int tmp; H6280_CYCLES(2); RD_IMM; BIT;		   } // 2 BIT  IMM
+OP(_089) { int tmp; H6280_CYCLES(2); RD_IMM; HBIT;		   } // 2 BIT  IMM
 OP(_0a9) { int tmp; H6280_CYCLES(2); RD_IMM; LDA;		   } // 2 LDA  IMM
 OP(_0c9) { int tmp; H6280_CYCLES(2); RD_IMM; CMP;		   } // 2 CMP  IMM
 OP(_0e9) { int tmp; H6280_CYCLES(2); RD_IMM; SBC;		   } // 2 SBC  IMM
@@ -237,7 +237,7 @@ OP(_0db) {			H6280_CYCLES(2);		  NOP;		   } // 2 NOP
 OP(_0fb) {			H6280_CYCLES(2);		  NOP;		   } // 2 NOP
 
 OP(_00c) { int tmp; H6280_CYCLES(7); RD_ABS; TSB; WB_EA;  } // 7 TSB  ABS
-OP(_02c) { int tmp; H6280_CYCLES(5); RD_ABS; BIT;		   } // 5 BIT  ABS
+OP(_02c) { int tmp; H6280_CYCLES(5); RD_ABS; HBIT;		   } // 5 BIT  ABS
 OP(_04c) {		   H6280_CYCLES(4); EA_ABS; JMP;		   } // 4 JMP  ABS
 OP(_06c) { int tmp; H6280_CYCLES(7); EA_IND; JMP;		   } // 7 JMP  IND
 OP(_08c) { int tmp; H6280_CYCLES(5);		  STY; WR_ABS; } // 5 STY  ABS
@@ -246,7 +246,7 @@ OP(_0cc) { int tmp; H6280_CYCLES(5); RD_ABS; CPY;		   } // 5 CPY  ABS
 OP(_0ec) { int tmp; H6280_CYCLES(5); RD_ABS; CPX;		   } // 5 CPX  ABS
 
 OP(_01c) { int tmp; H6280_CYCLES(7); RD_ABS; TRB; WB_EA;  } // 7 TRB  ABS
-OP(_03c) { int tmp; H6280_CYCLES(5); RD_ABX; BIT;		   } // 5 BIT  ABX
+OP(_03c) { int tmp; H6280_CYCLES(5); RD_ABX; HBIT;		   } // 5 BIT  ABX
 OP(_05c) {			H6280_CYCLES(2);		  NOP;		   } // 2 NOP
 OP(_07c) { int tmp; H6280_CYCLES(7); EA_IAX; JMP;		   } // 7 JMP  IAX
 OP(_09c) { int tmp; H6280_CYCLES(5);		  STZ; WR_ABS; } // 5 STZ  ABS
@@ -307,38 +307,3 @@ OP(_09f) { int tmp; H6280_CYCLES(4); RD_ZPG; BBS(1);	   } // 6/8 BBS1 ZPG,REL
 OP(_0bf) { int tmp; H6280_CYCLES(4); RD_ZPG; BBS(3);	   } // 6/8 BBS3 ZPG,REL
 OP(_0df) { int tmp; H6280_CYCLES(4); RD_ZPG; BBS(5);	   } // 6/8 BBS5 ZPG,REL
 OP(_0ff) { int tmp; H6280_CYCLES(4); RD_ZPG; BBS(7);	   } // 6/8 BBS7 ZPG,REL
-
-static void (*const insnh6280[0x100])(h6280_Regs* cpustate) = {
-	h6280_000,h6280_001,h6280_002,h6280_003,h6280_004,h6280_005,h6280_006,h6280_007,
-	h6280_008,h6280_009,h6280_00a,h6280_00b,h6280_00c,h6280_00d,h6280_00e,h6280_00f,
-	h6280_010,h6280_011,h6280_012,h6280_013,h6280_014,h6280_015,h6280_016,h6280_017,
-	h6280_018,h6280_019,h6280_01a,h6280_01b,h6280_01c,h6280_01d,h6280_01e,h6280_01f,
-	h6280_020,h6280_021,h6280_022,h6280_023,h6280_024,h6280_025,h6280_026,h6280_027,
-	h6280_028,h6280_029,h6280_02a,h6280_02b,h6280_02c,h6280_02d,h6280_02e,h6280_02f,
-	h6280_030,h6280_031,h6280_032,h6280_033,h6280_034,h6280_035,h6280_036,h6280_037,
-	h6280_038,h6280_039,h6280_03a,h6280_03b,h6280_03c,h6280_03d,h6280_03e,h6280_03f,
-	h6280_040,h6280_041,h6280_042,h6280_043,h6280_044,h6280_045,h6280_046,h6280_047,
-	h6280_048,h6280_049,h6280_04a,h6280_04b,h6280_04c,h6280_04d,h6280_04e,h6280_04f,
-	h6280_050,h6280_051,h6280_052,h6280_053,h6280_054,h6280_055,h6280_056,h6280_057,
-	h6280_058,h6280_059,h6280_05a,h6280_05b,h6280_05c,h6280_05d,h6280_05e,h6280_05f,
-	h6280_060,h6280_061,h6280_062,h6280_063,h6280_064,h6280_065,h6280_066,h6280_067,
-	h6280_068,h6280_069,h6280_06a,h6280_06b,h6280_06c,h6280_06d,h6280_06e,h6280_06f,
-	h6280_070,h6280_071,h6280_072,h6280_073,h6280_074,h6280_075,h6280_076,h6280_077,
-	h6280_078,h6280_079,h6280_07a,h6280_07b,h6280_07c,h6280_07d,h6280_07e,h6280_07f,
-	h6280_080,h6280_081,h6280_082,h6280_083,h6280_084,h6280_085,h6280_086,h6280_087,
-	h6280_088,h6280_089,h6280_08a,h6280_08b,h6280_08c,h6280_08d,h6280_08e,h6280_08f,
-	h6280_090,h6280_091,h6280_092,h6280_093,h6280_094,h6280_095,h6280_096,h6280_097,
-	h6280_098,h6280_099,h6280_09a,h6280_09b,h6280_09c,h6280_09d,h6280_09e,h6280_09f,
-	h6280_0a0,h6280_0a1,h6280_0a2,h6280_0a3,h6280_0a4,h6280_0a5,h6280_0a6,h6280_0a7,
-	h6280_0a8,h6280_0a9,h6280_0aa,h6280_0ab,h6280_0ac,h6280_0ad,h6280_0ae,h6280_0af,
-	h6280_0b0,h6280_0b1,h6280_0b2,h6280_0b3,h6280_0b4,h6280_0b5,h6280_0b6,h6280_0b7,
-	h6280_0b8,h6280_0b9,h6280_0ba,h6280_0bb,h6280_0bc,h6280_0bd,h6280_0be,h6280_0bf,
-	h6280_0c0,h6280_0c1,h6280_0c2,h6280_0c3,h6280_0c4,h6280_0c5,h6280_0c6,h6280_0c7,
-	h6280_0c8,h6280_0c9,h6280_0ca,h6280_0cb,h6280_0cc,h6280_0cd,h6280_0ce,h6280_0cf,
-	h6280_0d0,h6280_0d1,h6280_0d2,h6280_0d3,h6280_0d4,h6280_0d5,h6280_0d6,h6280_0d7,
-	h6280_0d8,h6280_0d9,h6280_0da,h6280_0db,h6280_0dc,h6280_0dd,h6280_0de,h6280_0df,
-	h6280_0e0,h6280_0e1,h6280_0e2,h6280_0e3,h6280_0e4,h6280_0e5,h6280_0e6,h6280_0e7,
-	h6280_0e8,h6280_0e9,h6280_0ea,h6280_0eb,h6280_0ec,h6280_0ed,h6280_0ee,h6280_0ef,
-	h6280_0f0,h6280_0f1,h6280_0f2,h6280_0f3,h6280_0f4,h6280_0f5,h6280_0f6,h6280_0f7,
-	h6280_0f8,h6280_0f9,h6280_0fa,h6280_0fb,h6280_0fc,h6280_0fd,h6280_0fe,h6280_0ff
-};

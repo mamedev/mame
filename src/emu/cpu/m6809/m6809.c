@@ -337,7 +337,7 @@ const device_type M6809 = &device_creator<m6809_device>;
 const device_type M6809E = &device_creator<m6809e_device>;
 
 //-------------------------------------------------
-//  atmega8_device - constructor
+//  m6809_base_device - constructor
 //-------------------------------------------------
 
 m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const device_type type, int divider)
@@ -575,28 +575,6 @@ UINT32 m6809_base_device::disasm_max_opcode_bytes() const
 
 
 //-------------------------------------------------
-//  execute_clocks_to_cycles - convert the raw
-//  clock into cycles per second
-//-------------------------------------------------
-
-UINT64 m6809_base_device::execute_clocks_to_cycles(UINT64 clocks) const
-{
-	return (clocks + m_clock_divider - 1) / m_clock_divider;
-}
-
-
-//-------------------------------------------------
-//  execute_cycles_to_clocks - convert a cycle
-//  count back to raw clocks
-//-------------------------------------------------
-
-UINT64 m6809_base_device::execute_cycles_to_clocks(UINT64 cycles) const
-{
-	return cycles * m_clock_divider;
-}
-
-
-//-------------------------------------------------
 //  disasm_disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
@@ -606,6 +584,7 @@ offs_t m6809_base_device::disasm_disassemble(char *buffer, offs_t pc, const UINT
 	extern CPU_DISASSEMBLE( m6809 );
 	return disassemble(buffer, pc, oprom, opram, 0);
 }
+
 
 //**************************************************************************
 //  IRQ HANDLING
@@ -667,6 +646,28 @@ void m6809_base_device::set_irq_line(int irqline, int state)
 //**************************************************************************
 
 //-------------------------------------------------
+//  execute_clocks_to_cycles - convert the raw
+//  clock into cycles per second
+//-------------------------------------------------
+
+UINT64 m6809_base_device::execute_clocks_to_cycles(UINT64 clocks) const
+{
+	return (clocks + m_clock_divider - 1) / m_clock_divider;
+}
+
+
+//-------------------------------------------------
+//  execute_cycles_to_clocks - convert a cycle
+//  count back to raw clocks
+//-------------------------------------------------
+
+UINT64 m6809_base_device::execute_cycles_to_clocks(UINT64 cycles) const
+{
+	return cycles * m_clock_divider;
+}
+
+
+//-------------------------------------------------
 //  execute_min_cycles - return minimum number of
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
@@ -698,6 +699,11 @@ UINT32 m6809_base_device::execute_input_lines() const
 	return 3;
 }
 
+
+//-------------------------------------------------
+//  execute_set_input - act on a changed input/
+//  interrupt line
+//-------------------------------------------------
 
 void m6809_base_device::execute_set_input(int inputnum, int state)
 {

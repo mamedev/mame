@@ -10,14 +10,15 @@
 #include "imagedev/cartslot.h"
 #include <stdarg.h>
 
-
 class ssem_state : public driver_device
 {
 public:
 	ssem_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
+        m_maincpu(*this, "maincpu"),
 		m_store(*this, "store"){ }
 
+    required_device<ssem_device> m_maincpu;
 	required_shared_ptr<UINT8> m_store;
 	UINT8 m_store_line;
 	virtual void machine_reset();
@@ -632,7 +633,7 @@ void ssem_state::machine_reset()
 
 static MACHINE_CONFIG_START( ssem, ssem_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SSEM, 700)
+	MCFG_CPU_ADD("maincpu", SSEMCPU, 700)
 	MCFG_CPU_PROGRAM_MAP(ssem_map)
 
 

@@ -21,22 +21,22 @@
 #define _fN 0x80
 
 /* some shortcuts for improved readability */
-#define A	cpustate->a
-#define X	cpustate->x
-#define Y	cpustate->y
-#define P	cpustate->p
-#define S	cpustate->sp.b.l
+#define A	m_a
+#define X	m_x
+#define Y	m_y
+#define P	m_p
+#define S	m_sp.b.l
 
-#define TRANSLATED(addr)	((cpustate->mmr[(addr)>>13&7] << 13) | ((addr)&0x1fff))
-#define H6280_CYCLES(cyc)											\
-	{																\
-		cpustate->ICount -= ((cyc) * cpustate->clocks_per_cycle);		\
-		cpustate->timer_value -= ((cyc) * cpustate->clocks_per_cycle);	\
+#define TRANSLATED(addr)	((m_mmr[(addr) >> 13 & 7] << 13) | ((addr) & 0x1fff))
+#define H6280_CYCLES(cyc)								\
+	{													\
+		m_icount -= ((cyc) * m_clocks_per_cycle);		\
+		m_timer_value -= ((cyc) * m_clocks_per_cycle);	\
 	}
 
 #if LAZY_FLAGS
 
-#define NZ	cpustate->NZ
+#define NZ	m_NZ
 #define SET_NZ(n)				\
 	P &= ~_fT;					\
     NZ = ((n & _fN) << 8) | n
@@ -50,20 +50,20 @@
 
 #endif
 
-#define EAL cpustate->ea.b.l
-#define EAH cpustate->ea.b.h
-#define EAW cpustate->ea.w.l
-#define EAD cpustate->ea.d
+#define EAL m_ea.b.l
+#define EAH m_ea.b.h
+#define EAW m_ea.w.l
+#define EAD m_ea.d
 
-#define ZPL cpustate->zp.b.l
-#define ZPH cpustate->zp.b.h
-#define ZPW cpustate->zp.w.l
-#define ZPD cpustate->zp.d
+#define ZPL m_zp.b.l
+#define ZPH m_zp.b.h
+#define ZPW m_zp.w.l
+#define ZPD m_zp.d
 
-#define PCL cpustate->pc.b.l
-#define PCH cpustate->pc.b.h
-#define PCW cpustate->pc.w.l
-#define PCD cpustate->pc.d
+#define PCL m_pc.b.l
+#define PCH m_pc.b.h
+#define PCW m_pc.w.l
+#define PCD m_pc.d
 
 #define CLEAR_T  \
 	P &= ~_fT;
@@ -71,44 +71,44 @@
 #define DO_INTERRUPT(vector)									\
 {																\
 	H6280_CYCLES(7);	/* 7 cycles for an int */				\
-	PUSH(PCH);													\
-	PUSH(PCL);													\
-	COMPOSE_P(0,_fB);											\
-	PUSH(P);													\
+	push(PCH);													\
+	push(PCL);													\
+	COMPOSE_P(0, _fB);											\
+	push(P);													\
 	P = (P & ~_fD) | _fI;	/* knock out D and set I flag */	\
-	PCL = RDMEM(cpustate, vector);										\
-	PCH = RDMEM(cpustate, (vector+1));									\
+	PCL = program_read8(vector);								\
+	PCH = program_read8(vector + 1);							\
 }
 
-#define CHECK_AND_TAKE_IRQ_LINES								\
-	if ( cpustate->nmi_state != CLEAR_LINE ) {						\
-		cpustate->nmi_state = CLEAR_LINE;							\
-		DO_INTERRUPT(H6280_NMI_VEC);							\
-	}															\
-	else if( !(P & _fI) )										\
-	{															\
-        if ( cpustate->irq_state[2] != CLEAR_LINE &&                \
-			 !(cpustate->irq_mask & 0x4) )							\
-		{														\
-			DO_INTERRUPT(H6280_TIMER_VEC);						\
-		} else													\
-		if ( cpustate->irq_state[0] != CLEAR_LINE &&				\
-			 !(cpustate->irq_mask & 0x2) )							\
-		{														\
-			DO_INTERRUPT(H6280_IRQ1_VEC);						\
-			(*cpustate->irq_callback)(cpustate->device, 0);				\
-		} else													\
-		if ( cpustate->irq_state[1] != CLEAR_LINE &&				\
-			 !(cpustate->irq_mask & 0x1) )							\
-		{														\
-			DO_INTERRUPT(H6280_IRQ2_VEC);						\
-			(*cpustate->irq_callback)(cpustate->device, 1);				\
-        }                                                       \
+#define CHECK_AND_TAKE_IRQ_LINES				\
+	if ( m_nmi_state != CLEAR_LINE ) {			\
+		m_nmi_state = CLEAR_LINE;				\
+		DO_INTERRUPT(H6280_NMI_VEC);			\
+	}											\
+	else if( !(P & _fI) )						\
+	{											\
+        if ( m_irq_state[2] != CLEAR_LINE &&  	\
+			 !(m_irq_mask & 0x4) )				\
+		{										\
+			DO_INTERRUPT(H6280_TIMER_VEC);		\
+		} else									\
+		if ( m_irq_state[0] != CLEAR_LINE &&	\
+			 !(m_irq_mask & 0x2) )				\
+		{										\
+			DO_INTERRUPT(H6280_IRQ1_VEC);		\
+			standard_irq_callback(0);			\
+		} else									\
+		if ( m_irq_state[1] != CLEAR_LINE &&	\
+			 !(m_irq_mask & 0x1) )				\
+		{										\
+			DO_INTERRUPT(H6280_IRQ2_VEC);		\
+			standard_irq_callback(1);			\
+        }                                      	\
     }
 
-#define CHECK_IRQ_LINES											\
-	if ( ! cpustate->irq_pending )									\
-		cpustate->irq_pending = 2;
+#define CHECK_IRQ_LINES							\
+	if (!m_irq_pending)							\
+		m_irq_pending = 2;
 
 /***************************************************************
  *  CHECK_VDC_VCE_PENALTY
@@ -121,74 +121,6 @@
 	}
 
 /***************************************************************
- *  RDMEM   read memory
- ***************************************************************/
-INLINE UINT8 RDMEM(h6280_Regs* cpustate, offs_t addr) {
-	CHECK_VDC_VCE_PENALTY(addr);
-	return cpustate->program->read_byte(TRANSLATED(addr));
-}
-
-/***************************************************************
- *  WRMEM   write memory
- ***************************************************************/
-INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
-	CHECK_VDC_VCE_PENALTY(addr);
-	cpustate->program->write_byte(TRANSLATED(addr),data);
-}
-
-/***************************************************************
- *  RDMEMZ   read memory - zero page
- ***************************************************************/
-#define RDMEMZ(addr)											\
-	cpustate->program->read_byte((cpustate->mmr[1] << 13) | ((addr)&0x1fff));
-
-/***************************************************************
- *  WRMEMZ   write memory - zero page
- ***************************************************************/
-#define WRMEMZ(addr,data)										\
-	cpustate->program->write_byte((cpustate->mmr[1] << 13) | ((addr)&0x1fff),data);
-
-/***************************************************************
- *  RDMEMW   read word from memory
- ***************************************************************/
-#define RDMEMW(addr)											\
-	cpustate->program->read_byte(TRANSLATED(addr)) \
-| ( cpustate->program->read_byte(TRANSLATED(addr+1)) << 8 )
-
-/***************************************************************
- *  RDZPWORD    read a word from a zero page address
- ***************************************************************/
-#define RDZPWORD(addr)											\
-	((addr&0xff)==0xff) ?										\
-		cpustate->program->read_byte((cpustate->mmr[1] << 13) | ((addr)&0x1fff))				\
-		+(cpustate->program->read_byte((cpustate->mmr[1] << 13) | ((addr-0xff)&0x1fff))<<8) : \
-		cpustate->program->read_byte((cpustate->mmr[1] << 13) | ((addr)&0x1fff))				\
-		+(cpustate->program->read_byte((cpustate->mmr[1] << 13) | ((addr+1)&0x1fff))<<8)
-
-
-/***************************************************************
- * push a register onto the stack
- ***************************************************************/
-#define PUSH(Rg) cpustate->program->write_byte((cpustate->mmr[1] << 13) | cpustate->sp.d,Rg); S--
-
-/***************************************************************
- * pull a register from the stack
- ***************************************************************/
-#define PULL(Rg) S++; Rg = cpustate->program->read_byte((cpustate->mmr[1] << 13) | cpustate->sp.d)
-
-/***************************************************************
- *  RDOP    read an opcode
- ***************************************************************/
-#define RDOP()													\
-	cpustate->direct->read_decrypted_byte(TRANSLATED(PCW))
-
-/***************************************************************
- *  RDOPARG read an opcode argument
- ***************************************************************/
-#define RDOPARG()												\
-	cpustate->direct->read_raw_byte(TRANSLATED(PCW))
-
-/***************************************************************
  *  BRA  branch relative
  ***************************************************************/
 #define BRA(cond)												\
@@ -196,7 +128,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 	if (cond)													\
 	{															\
 		H6280_CYCLES(4);										\
-		tmp = RDOPARG();										\
+		tmp = read_opcode_arg();								\
 		PCW++;													\
 		EAW = PCW + (signed char)tmp;							\
 		PCD = EAD;												\
@@ -217,7 +149,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  *  EA = zero page address
  ***************************************************************/
 #define EA_ZPG													\
-	ZPL = RDOPARG();											\
+	ZPL = read_opcode_arg();									\
 	PCW++;														\
 	EAD = ZPD
 
@@ -232,7 +164,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  *  EA = zero page address + X
  ***************************************************************/
 #define EA_ZPX													\
-	ZPL = RDOPARG() + X;										\
+	ZPL = read_opcode_arg() + X;								\
 	PCW++;														\
 	EAD = ZPD
 
@@ -240,7 +172,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  *  EA = zero page address + Y
  ***************************************************************/
 #define EA_ZPY													\
-	ZPL = RDOPARG() + Y;										\
+	ZPL = read_opcode_arg() + Y;								\
 	PCW++;														\
 	EAD = ZPD
 
@@ -248,9 +180,9 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  *  EA = absolute address
  ***************************************************************/
 #define EA_ABS													\
-	EAL = RDOPARG();											\
+	EAL = read_opcode_arg();									\
 	PCW++;														\
-	EAH = RDOPARG();											\
+	EAH = read_opcode_arg();									\
 	PCW++
 
 /***************************************************************
@@ -271,25 +203,25 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  *  EA = zero page indirect (65c02 pre indexed w/o X)
  ***************************************************************/
 #define EA_ZPI													\
-	ZPL = RDOPARG();											\
+	ZPL = read_opcode_arg();									\
 	PCW++;														\
-	EAD = RDZPWORD(ZPD)
+	EAD = program_read16z(ZPD);
 
 /***************************************************************
  *  EA = zero page + X indirect (pre indexed)
  ***************************************************************/
 #define EA_IDX													\
-	ZPL = RDOPARG() + X;										\
+	ZPL = read_opcode_arg() + X;								\
 	PCW++;														\
-	EAD = RDZPWORD(ZPD);
+	EAD = program_read16z(ZPD);
 
 /***************************************************************
  *  EA = zero page indirect + Y (post indexed)
  ***************************************************************/
 #define EA_IDY													\
-	ZPL = RDOPARG();											\
+	ZPL = read_opcode_arg();									\
 	PCW++;														\
-	EAD = RDZPWORD(ZPD);										\
+	EAD = program_read16z(ZPD);									\
 	EAW += Y
 
 /***************************************************************
@@ -297,9 +229,9 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  ***************************************************************/
 #define EA_IND													\
 	EA_ABS; 													\
-	tmp = RDMEM(cpustate, EAD);									\
+	tmp = program_read8(EAD);									\
 	EAD++;														\
-	EAH = RDMEM(cpustate, EAD);									\
+	EAH = program_read8(EAD);									\
 	EAL = tmp
 
 /***************************************************************
@@ -308,42 +240,42 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 #define EA_IAX                                                  \
 	EA_ABS;														\
 	EAD+=X;														\
-	tmp = RDMEM(cpustate, EAD);											\
+	tmp = program_read8(EAD);									\
 	EAD++;														\
-	EAH = RDMEM(cpustate, EAD);											\
+	EAH = program_read8(EAD);									\
 	EAL = tmp
 
 /* read a value into tmp */
-#define RD_IMM	tmp = RDOPARG(); PCW++
-#define RD_IMM2	tmp2 = RDOPARG(); PCW++
+#define RD_IMM	tmp = read_opcode_arg(); PCW++
+#define RD_IMM2	tmp2 = read_opcode_arg(); PCW++
 #define RD_ACC	tmp = A
-#define RD_ZPG	EA_ZPG; tmp = RDMEMZ(EAD)
-#define RD_ZPX	EA_ZPX; tmp = RDMEMZ(EAD)
-#define RD_ZPY	EA_ZPY; tmp = RDMEMZ(EAD)
-#define RD_ABS	EA_ABS; tmp = RDMEM(cpustate, EAD)
-#define RD_ABX	EA_ABX; tmp = RDMEM(cpustate, EAD)
-#define RD_ABY	EA_ABY; tmp = RDMEM(cpustate, EAD)
-#define RD_ZPI	EA_ZPI; tmp = RDMEM(cpustate, EAD)
-#define RD_IDX	EA_IDX; tmp = RDMEM(cpustate, EAD)
-#define RD_IDY	EA_IDY; tmp = RDMEM(cpustate, EAD)
-#define RD_TFL  EA_TFLG; tflagtemp = RDMEMZ(EAD)
+#define RD_ZPG	EA_ZPG; tmp = program_read8z(EAD)
+#define RD_ZPX	EA_ZPX; tmp = program_read8z(EAD)
+#define RD_ZPY	EA_ZPY; tmp = program_read8z(EAD)
+#define RD_ABS	EA_ABS; tmp = program_read8(EAD)
+#define RD_ABX	EA_ABX; tmp = program_read8(EAD)
+#define RD_ABY	EA_ABY; tmp = program_read8(EAD)
+#define RD_ZPI	EA_ZPI; tmp = program_read8(EAD)
+#define RD_IDX	EA_IDX; tmp = program_read8(EAD)
+#define RD_IDY	EA_IDY; tmp = program_read8(EAD)
+#define RD_TFL  EA_TFLG; tflagtemp = program_read8z(EAD)
 
 /* write a value from tmp */
-#define WR_ZPG	EA_ZPG; WRMEMZ(EAD, tmp)
-#define WR_ZPX	EA_ZPX; WRMEMZ(EAD, tmp)
-#define WR_ZPY	EA_ZPY; WRMEMZ(EAD, tmp)
-#define WR_ABS	EA_ABS; WRMEM(cpustate, EAD, tmp)
-#define WR_ABX	EA_ABX; WRMEM(cpustate, EAD, tmp)
-#define WR_ABY	EA_ABY; WRMEM(cpustate, EAD, tmp)
-#define WR_ZPI	EA_ZPI; WRMEM(cpustate, EAD, tmp)
-#define WR_IDX	EA_IDX; WRMEM(cpustate, EAD, tmp)
-#define WR_IDY	EA_IDY; WRMEM(cpustate, EAD, tmp)
+#define WR_ZPG	EA_ZPG; program_write8z(EAD, tmp)
+#define WR_ZPX	EA_ZPX; program_write8z(EAD, tmp)
+#define WR_ZPY	EA_ZPY; program_write8z(EAD, tmp)
+#define WR_ABS	EA_ABS; program_write8(EAD, tmp)
+#define WR_ABX	EA_ABX; program_write8(EAD, tmp)
+#define WR_ABY	EA_ABY; program_write8(EAD, tmp)
+#define WR_ZPI	EA_ZPI; program_write8(EAD, tmp)
+#define WR_IDX	EA_IDX; program_write8(EAD, tmp)
+#define WR_IDY	EA_IDY; program_write8(EAD, tmp)
 
 /* write back a value from tmp to the last EA */
 #define WB_ACC	A = (UINT8)tmp;
-#define WB_EA	WRMEM(cpustate, EAD, tmp)
-#define WB_EAZ	WRMEMZ(EAD, tmp)
-#define WB_TFL  WRMEMZ(EAD, tflagtemp)
+#define WB_EA	program_write8(EAD, tmp)
+#define WB_EAZ	program_write8z(EAD, tmp)
+#define WB_TFL  program_write8z(EAD, tflagtemp)
 
 /***************************************************************
  *
@@ -515,8 +447,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 /* 6280 ********************************************************
  *  BIT Bit test
  ***************************************************************/
-#undef BIT
-#define BIT														\
+#define HBIT													\
 	P = (P & ~(_fN|_fV|_fT|_fZ))								\
 		| ((tmp&0x80) ? _fN:0)									\
 		| ((tmp&0x40) ? _fV:0)									\
@@ -558,19 +489,19 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 	logerror("BRK %04x\n",PCW);									\
 	CLEAR_T;													\
 	PCW++;														\
-	PUSH(PCH);													\
-	PUSH(PCL);													\
-	PUSH(P);													\
+	push(PCH);													\
+	push(PCL);													\
+	push(P);													\
 	P = (P & ~_fD) | _fI;										\
-	PCL = RDMEM(cpustate, H6280_IRQ2_VEC);								\
-	PCH = RDMEM(cpustate, H6280_IRQ2_VEC+1);								\
+	PCL = program_read8(H6280_IRQ2_VEC);						\
+	PCH = program_read8(H6280_IRQ2_VEC+1);						\
 
 /* 6280 ********************************************************
  *  BSR Branch to subroutine
  ***************************************************************/
 #define BSR 													\
-	PUSH(PCH);													\
-	PUSH(PCL);													\
+	push(PCH);													\
+	push(PCL);													\
 	H6280_CYCLES(4); /* 4 cycles here, 4 in BRA */				\
 	BRA(1)
 
@@ -770,8 +701,8 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 #define JSR 													\
 	CLEAR_T;													\
 	PCW--;														\
-	PUSH(PCH);													\
-	PUSH(PCL);													\
+	push(PCH);													\
+	push(PCL);													\
 	PCD = EAD;													\
 
 /* 6280 ********************************************************
@@ -841,7 +772,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  ***************************************************************/
 #define PHA 													\
 	CLEAR_T;													\
-	PUSH(A)
+	push(A)
 
 /* 6280 ********************************************************
  *  PHP Push processor status (flags)
@@ -849,28 +780,28 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 #define PHP 													\
 	CLEAR_T;													\
 	COMPOSE_P(0,0); 											\
-	PUSH(P)
+	push(P)
 
 /* 6280 ********************************************************
  *  PHX Push index X
  ***************************************************************/
 #define PHX                                                     \
 	CLEAR_T;													\
-    PUSH(X)
+    push(X)
 
 /* 6280 ********************************************************
  *  PHY Push index Y
  ***************************************************************/
 #define PHY                                                     \
 	CLEAR_T;													\
-    PUSH(Y)
+    push(Y)
 
 /* 6280 ********************************************************
  *  PLA Pull accumulator
  ***************************************************************/
 #define PLA 													\
 	CLEAR_T;													\
-	PULL(A);													\
+	pull(A);													\
 	SET_NZ(A)
 
 /* 6280 ********************************************************
@@ -879,7 +810,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 #if LAZY_FLAGS
 
 #define PLP 													\
-	PULL(P);													\
+	pull(P);													\
 	P |= _fB;													\
 	NZ = ((P & _fN) << 8) | 									\
 		 ((P & _fZ) ^ _fZ); 									\
@@ -888,7 +819,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 #else
 
 #define PLP 													\
-	PULL(P);													\
+	pull(P);													\
 	P |= _fB;													\
 	CHECK_IRQ_LINES
 #endif
@@ -898,7 +829,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  ***************************************************************/
 #define PLX                                                     \
 	CLEAR_T;													\
-    PULL(X);													\
+    pull(X);													\
 	SET_NZ(X)
 
 /* 6280 ********************************************************
@@ -906,7 +837,7 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  ***************************************************************/
 #define PLY                                                     \
 	CLEAR_T;													\
-    PULL(Y);													\
+    pull(Y);													\
 	SET_NZ(Y)
 
 /* 6280 ********************************************************
@@ -945,20 +876,20 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 #if LAZY_FLAGS
 
 #define RTI 													\
-	PULL(P);													\
+	pull(P);													\
 	P |= _fB;													\
 	NZ = ((P & _fN) << 8) | 									\
 		 ((P & _fZ) ^ _fZ); 									\
-	PULL(PCL);													\
-	PULL(PCH);													\
+	pull(PCL);													\
+	pull(PCH);													\
 	CHECK_IRQ_LINES
 #else
 
 #define RTI 													\
-	PULL(P);													\
+	pull(P);													\
 	P |= _fB;													\
-	PULL(PCL);													\
-	PULL(PCH);													\
+	pull(PCL);													\
+	pull(PCH);													\
 	CHECK_IRQ_LINES
 #endif
 
@@ -968,8 +899,8 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  ***************************************************************/
 #define RTS 													\
 	CLEAR_T;													\
-	PULL(PCL);													\
-	PULL(PCH);													\
+	pull(PCL);													\
+	pull(PCH);													\
 	PCW++;
 
 /* 6280 ********************************************************
@@ -1110,21 +1041,21 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  ***************************************************************/
 #define ST0                                                     \
 	CLEAR_T;													\
-    cpustate->io->write_byte(0x0000,tmp)
+    m_io->write_byte(0x0000,tmp)
 
 /* 6280 ********************************************************
  *  ST1 Store at hardware address 2
  ***************************************************************/
 #define ST1                                                     \
 	CLEAR_T;													\
-    cpustate->io->write_byte(0x0002,tmp)
+    m_io->write_byte(0x0002,tmp)
 
 /* 6280 ********************************************************
  *  ST2 Store at hardware address 3
  ***************************************************************/
 #define ST2                                                     \
 	CLEAR_T;													\
-    cpustate->io->write_byte(0x0003,tmp)
+    m_io->write_byte(0x0003,tmp)
 
 /* 6280 ********************************************************
  *  STA Store accumulator
@@ -1168,15 +1099,16 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  ***************************************************************/
 #define TAI 													\
 	CLEAR_T;													\
-	from=RDMEMW(PCW);											\
-	to  =RDMEMW(PCW+2);											\
-	length=RDMEMW(PCW+4);										\
-	PCW+=6; 													\
-	alternate=0;												\
+	from = program_read16(PCW);									\
+	to = program_read16(PCW + 2);								\
+	length = program_read16(PCW + 4);							\
+	PCW += 6; 													\
+	alternate = 0;												\
 	if (!length) length = 0x10000;								\
 	H6280_CYCLES( ((6 * length) + 17) );						\
-	while ((length--) != 0) {									\
-		WRMEM(cpustate, to,RDMEM(cpustate, from+alternate));						\
+	while ((length--) != 0)										\
+	{															\
+		program_write8(to, program_read8(from + alternate));	\
 		to++;													\
 		alternate ^= 1; 										\
 	}
@@ -1186,14 +1118,14 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  ***************************************************************/
 #define TAM                                                     \
 	CLEAR_T;													\
-    if (tmp&0x01) cpustate->mmr[0] = A;                             \
-    if (tmp&0x02) cpustate->mmr[1] = A;                             \
-    if (tmp&0x04) cpustate->mmr[2] = A;                             \
-    if (tmp&0x08) cpustate->mmr[3] = A;                             \
-    if (tmp&0x10) cpustate->mmr[4] = A;                             \
-    if (tmp&0x20) cpustate->mmr[5] = A;                             \
-    if (tmp&0x40) cpustate->mmr[6] = A;                             \
-    if (tmp&0x80) cpustate->mmr[7] = A
+    if (tmp&0x01) m_mmr[0] = A;                             	\
+    if (tmp&0x02) m_mmr[1] = A;                             	\
+    if (tmp&0x04) m_mmr[2] = A;                             	\
+    if (tmp&0x08) m_mmr[3] = A;                             	\
+    if (tmp&0x10) m_mmr[4] = A;                             	\
+    if (tmp&0x20) m_mmr[5] = A;                             	\
+    if (tmp&0x40) m_mmr[6] = A;                             	\
+    if (tmp&0x80) m_mmr[7] = A
 
 /* 6280 ********************************************************
  *  TAX Transfer accumulator to index X
@@ -1216,14 +1148,14 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  ***************************************************************/
 #define TDD 													\
 	CLEAR_T;													\
-	from=RDMEMW(PCW);											\
-	to  =RDMEMW(PCW+2);											\
-	length=RDMEMW(PCW+4);										\
+	from = program_read16(PCW);									\
+	to = program_read16(PCW + 2);								\
+	length = program_read16(PCW + 4);							\
 	PCW+=6; 													\
 	if (!length) length = 0x10000;								\
 	H6280_CYCLES( ((6 * length) + 17) );						\
 	while ((length--) != 0) {									\
-		WRMEM(cpustate, to,RDMEM(cpustate, from));									\
+		program_write8(to, program_read8(from));				\
 		to--;													\
 		from--;													\
 	}
@@ -1233,15 +1165,15 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  ***************************************************************/
 #define TIA 													\
 	CLEAR_T;													\
-	from=RDMEMW(PCW);											\
-	to  =RDMEMW(PCW+2);											\
-	length=RDMEMW(PCW+4);										\
+	from = program_read16(PCW);									\
+	to  = program_read16(PCW + 2);								\
+	length = program_read16(PCW + 4);							\
 	PCW+=6; 													\
 	alternate=0;												\
 	if (!length) length = 0x10000;								\
 	H6280_CYCLES( ((6 * length) + 17) );						\
 	while ((length--) != 0) {									\
-		WRMEM(cpustate, to+alternate,RDMEM(cpustate, from));						\
+		program_write8(to + alternate, program_read8(from));	\
 		from++; 												\
 		alternate ^= 1; 										\
 	}
@@ -1251,14 +1183,14 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  ***************************************************************/
 #define TII 													\
 	CLEAR_T;													\
-	from=RDMEMW(PCW);											\
-	to  =RDMEMW(PCW+2);											\
-	length=RDMEMW(PCW+4);										\
-	PCW+=6; 													\
+	from = program_read16(PCW);									\
+	to = program_read16(PCW + 2);								\
+	length = program_read16(PCW + 4);							\
+	PCW += 6; 													\
 	if (!length) length = 0x10000;								\
 	H6280_CYCLES( ((6 * length) + 17) );						\
 	while ((length--) != 0) {									\
-		WRMEM(cpustate, to,RDMEM(cpustate, from));									\
+		program_write8(to, program_read8(from));				\
 		to++;													\
 		from++;													\
 	}
@@ -1268,14 +1200,14 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  ***************************************************************/
 #define TIN 													\
 	CLEAR_T;													\
-	from=RDMEMW(PCW);											\
-	to  =RDMEMW(PCW+2);											\
-	length=RDMEMW(PCW+4);										\
+	from = program_read16(PCW);									\
+	to = program_read16(PCW + 2);								\
+	length = program_read16(PCW + 4);							\
 	PCW+=6; 													\
 	if (!length) length = 0x10000;								\
 	H6280_CYCLES( ((6 * length) + 17) );						\
 	while ((length--) != 0) {									\
-		WRMEM(cpustate, to,RDMEM(cpustate, from));									\
+		program_write8(to, program_read8(from));				\
 		from++;													\
 	}
 
@@ -1285,14 +1217,14 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  ***************************************************************/
 #define TMA                                                     \
 	CLEAR_T;													\
-    if (tmp&0x01) A = cpustate->mmr[0];                             \
-    if (tmp&0x02) A = cpustate->mmr[1];                             \
-    if (tmp&0x04) A = cpustate->mmr[2];                             \
-    if (tmp&0x08) A = cpustate->mmr[3];                             \
-    if (tmp&0x10) A = cpustate->mmr[4];                             \
-    if (tmp&0x20) A = cpustate->mmr[5];                             \
-    if (tmp&0x40) A = cpustate->mmr[6];                             \
-    if (tmp&0x80) A = cpustate->mmr[7]
+    if (tmp&0x01) A = m_mmr[0];                             	\
+    if (tmp&0x02) A = m_mmr[1];                             	\
+    if (tmp&0x04) A = m_mmr[2];                             	\
+    if (tmp&0x08) A = m_mmr[3];                             	\
+    if (tmp&0x10) A = m_mmr[4];                             	\
+    if (tmp&0x20) A = m_mmr[5];                             	\
+    if (tmp&0x40) A = m_mmr[6];                             	\
+    if (tmp&0x80) A = m_mmr[7]
 
 /* 6280 ********************************************************
  * TRB  Test and reset bits
@@ -1361,10 +1293,10 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  * CSH Set CPU in high speed mode
  ***************************************************************/
 #define CSH														\
-	cpustate->clocks_per_cycle = 1;
+	m_clocks_per_cycle = 1;
 
 /* 6280 ********************************************************
  * CSL Set CPU in low speed mode
  ***************************************************************/
 #define CSL														\
-    cpustate->clocks_per_cycle = 4;
+    m_clocks_per_cycle = 4;

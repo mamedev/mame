@@ -74,8 +74,14 @@ inline void ssem_device::program_write32(UINT32 address, UINT32 data)
 
 /*****************************************************************************/
 
+const device_type SSEMCPU = &device_creator<ssem_device>;
+
+//-------------------------------------------------
+//  ssem_device - constructor
+//-------------------------------------------------
+
 ssem_device::ssem_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, SSEM, "SSEM", tag, owner, clock),
+	: cpu_device(mconfig, SSEMCPU, "SSEMCPU", tag, owner, clock),
 	  m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
 	  m_pc(1),
 	  m_shifted_pc(1<<2),

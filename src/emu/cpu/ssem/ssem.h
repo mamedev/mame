@@ -13,8 +13,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class ssem_device;
-
 // ======================> ssem_device
 
 // Used by core CPU interface
@@ -68,7 +66,7 @@ public:
 };
 
 // device type definition
-extern const device_type SSEM;
+extern const device_type SSEMCPU;
 
 /***************************************************************************
     REGISTER ENUMERATION
