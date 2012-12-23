@@ -125,10 +125,6 @@
   will be cleared).
 
 
-  DSW2 bits 5 & 6 (maybe 4 too) seems to change the YM2149 sound quality, as a
-  side effect. Need to investigate more about...
-
-
 *******************************************************************************
 
   * How to play...
@@ -195,10 +191,8 @@
 
   TODO:
 
-  - Hopper emulation.
+  - Out latch (Hopper emulation?).
   - Find why the use of payout always jam. Hopper related?
-  - Default DIP Switches, once the YM sound degrade issues were solved...
-    (see general notes about)
 
 ******************************************************************************/
 
@@ -224,7 +218,7 @@ public:
 	UINT8 m_sound_irq_cause;
 	UINT8 m_adpcm_data;
 
-	DECLARE_WRITE8_MEMBER(kurukuru_hopper_w);
+	DECLARE_WRITE8_MEMBER(kurukuru_out_latch_w);
 	DECLARE_WRITE8_MEMBER(kurukuru_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(kurukuru_soundlatch_w);
 	DECLARE_READ8_MEMBER(kurukuru_soundlatch_r);
@@ -306,15 +300,19 @@ static void kurukuru_msm5205_vck(device_t *device)
 
 // Main CPU
 
-WRITE8_MEMBER(kurukuru_state::kurukuru_hopper_w)
+WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
 {
-	/* assume hopper related.
-		$01 when coin 1 (jams)
-		$20 when coin 2
-		$40 when payout (jams) ...check
-	*/
+/*
+   00-0f is output latch (controls jamma output pins)
+
+   assume hopper related:
+	$01 when coin 1
+	$20 when coin 2
+	$40 when payout (jams) ...to check
+
+*/
 	if (data)
-		logerror("kurukuru_hopper_w %02X @ %04X\n", data, space.device().safe_pc());
+		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, space.device().safe_pc());
 }
 
 WRITE8_MEMBER(kurukuru_state::kurukuru_bankswitch_w)
@@ -332,31 +330,33 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_soundlatch_w)
 
 
 static ADDRESS_MAP_START( kurukuru_map, AS_PROGRAM, 8, kurukuru_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(kurukuru_hopper_w)
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")
-	AM_RANGE(0x20, 0x20) AM_WRITE(kurukuru_soundlatch_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0f) AM_WRITE(kurukuru_out_latch_w)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0f) AM_READ_PORT("DSW1")
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_WRITE(kurukuru_soundlatch_w)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
 	AM_RANGE(0x90, 0x90) AM_WRITE(kurukuru_bankswitch_w)
-	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN0")
-	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("IN1")
-	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE_LEGACY("ym2149", ay8910_address_w)
-	AM_RANGE(0xc8, 0xc8) AM_DEVREAD_LEGACY("ym2149", ay8910_r)
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("ym2149", ay8910_data_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_READ_PORT("IN0")	// need mirror confirmation
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0x0f) AM_READ_PORT("IN1")
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE_LEGACY("ym2149", ay8910_r, ay8910_address_w)
+	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_DEVWRITE_LEGACY("ym2149", ay8910_data_w)
 ADDRESS_MAP_END
-
 
 
 // Audio CPU
 
 WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_data_w)
 {
+/*
+     6-bit latch. only 4 connected...
+       bit 0-3 = MSM5205 data.
+*/
 	m_adpcm_data = data & 0xf;
 }
 
@@ -364,10 +364,11 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_reset_w)
 {
 	device_t *device = machine().device("adpcm");
 /*
-     bit 0 = RESET
-     bit 1 = 4B/3B
-     bit 2 = S2
-     bit 3 = S1
+     6-bit latch. only 4 connected...
+       bit 0 = RESET
+       bit 1 = 4B/3B
+       bit 2 = S2
+       bit 3 = S1
 */
 	msm5205_playmode_w(device, BITSWAP8((data>>1), 7,6,5,4,3,0,1,2));
 	msm5205_reset_w(device, data & 1);
