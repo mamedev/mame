@@ -52,7 +52,7 @@ struct gime_interface
 //**************************************************************************
 
 class cococart_slot_device;
-\
+
 class gime_base_device : public mc6847_friend_device, public sam6883_friend_device
 {
 public:
