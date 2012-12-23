@@ -3560,7 +3560,7 @@ ROM_START( aliensyn7 )
 	ROM_LOAD( "epr-10726.a10", 0x30000, 0x8000, CRC(d50b7736) SHA1(b1f8e3b0cf2ffee5382098100cfabe21b383cd51) )
 
 	ROM_REGION( 0x2000, "mcu", 0 ) // MC8123 key
-	ROM_LOAD( "317-00xx.key",  0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "317-00xx.key",  0x0000, 0x2000, CRC(76b370cd) SHA1(996a4a24dec085caf93cbe614d3b0888379c91dd) )
 ROM_END
 
 
@@ -6627,7 +6627,7 @@ DRIVER_INIT_MEMBER(segas16b_state,snapper)
 GAME( 1988, aceattac,   0,        system16b_fd1094,    aceattac, segas16b_state,aceattac_5358,      ROT0,   "Sega", "Ace Attacker (FD1094 317-0059)", GAME_NOT_WORKING )
 
 GAME( 1987, aliensyn,   0,        system16b,           aliensyn, segas16b_state,generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 4, System 16B, unprotected)", 0 )
-GAME( 1987, aliensyn7,  aliensyn, system16b,           aliensyn, segas16b_state,aliensyn7_5358_small, ROT0,  "Sega", "Alien Syndrome (set 7, System 16B, MC-8123B 317-00xx)", GAME_NO_SOUND ) // missing 8123B key
+GAME( 1987, aliensyn7,  aliensyn, system16b,           aliensyn, segas16b_state,aliensyn7_5358_small, ROT0,  "Sega", "Alien Syndrome (set 7, System 16B, MC-8123B 317-00xx)", 0 )
 GAME( 1987, aliensyn3,  aliensyn, system16b_fd1089a,   aliensyn, segas16b_state,generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 3, System 16B, FD1089A 317-0033)", 0 )
 GAME( 1987, aliensynj,  aliensyn, system16b_fd1089a,   aliensynj,segas16b_state,generic_5358_small, ROT0,   "Sega", "Alien Syndrome (set 6, Japan, new, System 16B, FD1089A 317-0033)", 0 )
 
