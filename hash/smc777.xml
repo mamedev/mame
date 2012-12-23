@@ -4,7 +4,6 @@
 Dumps needed: (Info taken from: http://home.pacbell.net/smc777/comsoft.htm )
 
 OS:
-  SMC-777 System 1.1j
   SMC-777 System 1.3j
   SMC-777 System 1.4j
   Sony Disk Basic
@@ -33,7 +32,6 @@ SMCゲームパックI
   リメインズロボット
   トランジット
   SMC Super Golf
-  Choplifter
   オセロゲーム
   Miner 2049
   九十九 ウルトラ4人麻雀
@@ -70,7 +68,6 @@ SMCゲームパックI
   秘境アマゾンの奥地に・・
   キャノンショット
   Mario Bros.
-  ストリッツb.h.
 
 Home:
   SMC日本語ワープロ
@@ -176,6 +173,69 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		</part>
 	</software>
 
+	<software name="sys11j">
+		<description>SMC-777 System v1.1j</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305328">
+				<rom name="system 11.1dd" size="305328" crc="fcf54a39" sha1="d5aa09c73cef0cf639ef3adbe6e64a109f883ad6" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sys10j">
+		<description>SMC-777 System v1.0j</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305328">
+				<rom name="system 10.1dd" size="305328" crc="89a0c347" sha1="2d3fdacef43d6b89861b90997715a80d784dd2d9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="choplift">
+		<description>Choplifter</description>
+		<year>198?</year>
+		<publisher>Sony</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="211808">
+				<rom name="choplifter.1dd" size="211808" crc="bf2ea51c" sha1="4610f7456ca6bd1740b9c98fb3d2bd67aadffb5c" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strizbh">
+		<description>Striz B.H.</description>
+		<year>1984</year>
+		<publisher>Sony</publisher>
+		<info name="alt_title" value="ストリッツb.h." />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305328">
+				<rom name="strizbh.1dd" size="305328" crc="efa24635" sha1="c2308afeb555197c6d583e6cd46e6c5c5c9b4ea9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- which issue of the magazine? -->
+	<software name="flopmag" supported="no">
+		<description>Floppy Magazine</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="305056">
+				<rom name="floppy magazine.1dd" size="305056" crc="44f18e58" sha1="dc4d8bda72d408e53edd4be4f1d9497d9179d35e" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+
 	<!-- Homebrew Software-->
 
 	<software name="corewars">
@@ -251,6 +311,32 @@ Known to be dumped, but no longer available: (If you do have any of these please
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="s-os sword monitor 2.2.1dd" size="348848" crc="6e3215ce" sha1="1fffac3db3005e3de750c63ce1285f6b8a40310a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- It would be nice to find out original releases of some of these, but in the meanwhile let's document what we have -->
+	<software name="comp1">
+		<description>Game Compilation 1</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="261808">
+				<rom name="compilation 1.1dd" size="261808" crc="cc7827f5" sha1="8c24ec40cab047cff716d57ce44066709d238f5a" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="comp2">
+		<description>Game Compilation 2</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="261808">
+				<rom name="compilation 2.1dd" size="261808" crc="6be3d020" sha1="9398acca8f44c868abc3a837f91c56833962c17f" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
