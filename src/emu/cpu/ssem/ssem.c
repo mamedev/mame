@@ -14,24 +14,6 @@ CPU_DISASSEMBLE( ssem );
 #define SSEM_DISASM_ON_UNIMPL           0
 #define SSEM_DUMP_MEM_ON_UNIMPL         0
 
-struct ssem_state
-{
-    UINT32 pc;
-    UINT32 a;
-    UINT32 halt;
-
-    legacy_cpu_device *device;
-    address_space *program;
-    int icount;
-};
-
-INLINE ssem_state *get_safe_token(device_t *device)
-{
-    assert(device != NULL);
-    assert(device->type() == SSEM);
-    return (ssem_state *)downcast<legacy_cpu_device *>(device)->token();
-}
-
 #define INSTR       ((op >> 13) & 7)
 #define ADDR        (op & 0x1f)
 
@@ -58,7 +40,7 @@ INLINE UINT32 reverse(UINT32 v)
     return v;
 }
 
-INLINE UINT32 READ32(ssem_state *cpustate, UINT32 address)
+inline UINT32 ssem_device::program_read32(UINT32 address)
 {
     UINT32 v = 0;
     // The MAME core does not have a good way of specifying a minimum datum size that is more than
@@ -66,15 +48,15 @@ INLINE UINT32 READ32(ssem_state *cpustate, UINT32 address)
     // the address value to get the appropriate byte index.
     address <<= 2;
 
-    v |= cpustate->program->read_byte(address + 0) << 24;
-    v |= cpustate->program->read_byte(address + 1) << 16;
-    v |= cpustate->program->read_byte(address + 2) <<  8;
-    v |= cpustate->program->read_byte(address + 3) <<  0;
+    v |= m_program->read_byte(address + 0) << 24;
+    v |= m_program->read_byte(address + 1) << 16;
+    v |= m_program->read_byte(address + 2) <<  8;
+    v |= m_program->read_byte(address + 3) <<  0;
 
     return reverse(v);
 }
 
-INLINE void WRITE32(ssem_state *cpustate, UINT32 address, UINT32 data)
+inline void ssem_device::program_write32(UINT32 address, UINT32 data)
 {
     UINT32 v = reverse(data);
 
@@ -83,104 +65,197 @@ INLINE void WRITE32(ssem_state *cpustate, UINT32 address, UINT32 data)
     // the address value to get the appropriate byte index.
     address <<= 2;
 
-    cpustate->program->write_byte(address + 0, (v >> 24) & 0x000000ff);
-    cpustate->program->write_byte(address + 1, (v >> 16) & 0x000000ff);
-    cpustate->program->write_byte(address + 2, (v >>  8) & 0x000000ff);
-    cpustate->program->write_byte(address + 3, (v >>  0) & 0x000000ff);
+    m_program->write_byte(address + 0, (v >> 24) & 0x000000ff);
+    m_program->write_byte(address + 1, (v >> 16) & 0x000000ff);
+    m_program->write_byte(address + 2, (v >>  8) & 0x000000ff);
+    m_program->write_byte(address + 3, (v >>  0) & 0x000000ff);
     return;
 }
 
 /*****************************************************************************/
 
-static void unimplemented_opcode(ssem_state *cpustate, UINT32 op)
+ssem_device::ssem_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: cpu_device(mconfig, SSEM, "SSEM", tag, owner, clock),
+	  m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
+	  m_pc(1),
+	  m_shifted_pc(1<<2),
+	  m_a(0),
+	  m_halt(0),
+      m_icount(0)
 {
-    if((cpustate->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
-    {
-        char string[200];
-        ssem_dasm_one(string, cpustate->pc-1, op);
-        mame_printf_debug("%08X: %s\n", cpustate->pc-1, string);
-    }
-
-#if SSEM_DISASM_ON_UNIMPL
-    {
-        char string[200] = { 0 };
-        UINT32 i = 0;
-        FILE *disasm = fopen("ssemdasm.txt", "wt");
-
-        if(disasm)
-        {
-            for(i = 0; i < 0x20; i++)
-            {
-                UINT32 opcode = reverse(READ32(cpustate, i));
-                ssem_dasm_one(string, i, opcode);
-                fprintf(disasm, "%02X: %08X    %s\n", i, opcode, string);
-            }
-
-            fclose(disasm);
-        }
-    }
-#endif
-#if SSEM_DUMP_MEM_ON_UNIMPL
-    {
-        UINT32 i = 0;
-        FILE *store = fopen("ssemmem.bin", "wb");
-
-        if(store)
-        {
-            for( i = 0; i < 0x80; i++ )
-            {
-                fputc(cpustate->program->read_byte(i), store);
-            }
-            fclose(store);
-        }
-    }
-#endif
-
-    fatalerror("SSEM: unknown opcode %d (%08X) at %d\n", reverse(op) & 7, reverse(op), cpustate->pc);
+    // Allocate & setup
 }
 
-/*****************************************************************************/
 
-static CPU_INIT( ssem )
+void ssem_device::device_start()
 {
-    ssem_state *cpustate = get_safe_token(device);
-    cpustate->pc = 1;
-    cpustate->a = 0;
-    cpustate->halt = 0;
+	m_program = &space(AS_PROGRAM);
 
-    cpustate->device = device;
-    cpustate->program = &device->space(AS_PROGRAM);
+	// register our state for the debugger
+	astring tempstr;
+	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
+	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_halt).callimport().callexport().formatstr("%1s").noshow();
+	state_add(SSEM_PC,         "PC",    	m_shifted_pc).mask(0xffff);
+	state_add(SSEM_A,          "A",       	m_a).mask(0xffffffff);
+	state_add(SSEM_HALT,       "HALT",     m_halt).mask(0xf);
+
+	/* setup regtable */
+	save_item(NAME(m_pc));
+	save_item(NAME(m_a));
+	save_item(NAME(m_halt));
+
+	// set our instruction counter
+	m_icountptr = &m_icount;
 }
 
-static CPU_EXIT( ssem )
+void ssem_device::device_stop()
 {
 }
 
-static CPU_RESET( ssem )
+void ssem_device::device_reset()
 {
-    ssem_state *cpustate = get_safe_token(device);
-
-    cpustate->pc = 1;
-    cpustate->a = 0;
-    cpustate->halt = 0;
+    m_pc = 1;
+    m_shifted_pc = m_pc << 2;
+    m_a = 0;
+    m_halt = 0;
 }
 
-static CPU_EXECUTE( ssem )
+
+//-------------------------------------------------
+//  memory_space_config - return the configuration
+//  of the specified address space, or NULL if
+//  the space doesn't exist
+//-------------------------------------------------
+
+const address_space_config *ssem_device::memory_space_config(address_spacenum spacenum) const
 {
-    ssem_state *cpustate = get_safe_token(device);
+	if (spacenum == AS_PROGRAM)
+	{
+		return &m_program_config;
+	}
+	return NULL;
+}
+
+
+//-------------------------------------------------
+//  state_string_export - export state as a string
+//  for the debugger
+//-------------------------------------------------
+
+void ssem_device::state_string_export(const device_state_entry &entry, astring &string)
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			string.printf("%c", m_halt ? 'H' : '.');
+			break;
+	}
+}
+
+
+//-------------------------------------------------
+//  disasm_min_opcode_bytes - return the length
+//  of the shortest instruction, in bytes
+//-------------------------------------------------
+
+UINT32 ssem_device::disasm_min_opcode_bytes() const
+{
+	return 4;
+}
+
+
+//-------------------------------------------------
+//  disasm_max_opcode_bytes - return the length
+//  of the longest instruction, in bytes
+//-------------------------------------------------
+
+UINT32 ssem_device::disasm_max_opcode_bytes() const
+{
+	return 4;
+}
+
+
+//-------------------------------------------------
+//  disasm_disassemble - call the disassembly
+//  helper function
+//-------------------------------------------------
+
+offs_t ssem_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+{
+	extern CPU_DISASSEMBLE( ssem );
+	return disassemble(buffer, pc, oprom, opram, 0);
+}
+
+
+//**************************************************************************
+//  CORE EXECUTION LOOP
+//**************************************************************************
+
+//-------------------------------------------------
+//  execute_min_cycles - return minimum number of
+//  cycles it takes for one instruction to execute
+//-------------------------------------------------
+
+UINT32 ssem_device::execute_min_cycles() const
+{
+	return 1;
+}
+
+
+//-------------------------------------------------
+//  execute_max_cycles - return maximum number of
+//  cycles it takes for one instruction to execute
+//-------------------------------------------------
+
+UINT32 ssem_device::execute_max_cycles() const
+{
+	return 1;
+}
+
+
+//-------------------------------------------------
+//  execute_input_lines - return the number of
+//  input/interrupt lines
+//-------------------------------------------------
+
+UINT32 ssem_device::execute_input_lines() const
+{
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  execute_set_input - set the state of an input
+//  line during execution
+//-------------------------------------------------
+
+void ssem_device::execute_set_input(int inputnum, int state)
+{
+}
+
+
+//-------------------------------------------------
+//  execute_run - execute a timeslice's worth of
+//  opcodes
+//-------------------------------------------------
+
+void ssem_device::execute_run()
+{
     UINT32 op;
 
-    cpustate->pc &= 0x1f;
+    m_pc &= 0x1f;
+    m_shifted_pc = m_pc << 2;
 
-    while (cpustate->icount > 0)
+    while (m_icount > 0)
     {
-        debugger_instruction_hook(device, cpustate->pc);
+        debugger_instruction_hook(this, m_pc);
 
-        op = READ32(cpustate, cpustate->pc);
+        op = program_read32(m_pc);
 
-        if( !cpustate->halt )
+        if( !m_halt )
         {
-            cpustate->pc++;
+            m_pc++;
+    		m_shifted_pc = m_pc << 2;
         }
         else
         {
@@ -191,118 +266,43 @@ static CPU_EXECUTE( ssem )
         {
             case 0:
                 // JMP: Move the value at the specified address into the Program Counter.
-                cpustate->pc = READ32(cpustate, ADDR) + 1;
+                m_pc = program_read32(ADDR) + 1;
+    			m_shifted_pc = m_pc << 2;
                 break;
             case 1:
                 // JRP: Add the value at the specified address to the Program Counter.
-                cpustate->pc += (INT32)READ32(cpustate, ADDR);
+                m_pc += (INT32)program_read32(ADDR);
+    			m_shifted_pc = m_pc << 2;
                 break;
             case 2:
                 // LDN: Load the accumulator with the two's-complement negation of the value at the specified address.
-                cpustate->a = (UINT32)(0 - (INT32)READ32(cpustate, ADDR));
+                m_a = (UINT32)(0 - (INT32)program_read32(ADDR));
                 break;
             case 3:
                 // STO: Store the value in the accumulator at the specified address.
-                WRITE32(cpustate, ADDR, cpustate->a);
+                program_write32(ADDR, m_a);
                 break;
             case 4:
             case 5:
                 // SUB: Subtract the value at the specified address from the accumulator.
-                cpustate->a -= READ32(cpustate, ADDR);
+                m_a -= program_read32(ADDR);
                 break;
             case 6:
                 // CMP: If the accumulator is less than zero, skip the next opcode.
-                if((INT32)(cpustate->a) < 0)
+                if((INT32)(m_a) < 0)
                 {
-                    cpustate->pc++;
+                	m_pc++;
+    				m_shifted_pc = m_pc << 2;
                 }
                 break;
             case 7:
                 // STP: Halt the computer.
-                cpustate->halt = 1;
+                m_halt = 1;
                 break;
             default:
-                // This is impossible, but it's better to be safe than sorry.
-                unimplemented_opcode(cpustate, op);
+            	break;
         }
 
-        --cpustate->icount;
+        --m_icount;
     }
 }
-
-
-/*****************************************************************************/
-
-static CPU_SET_INFO( ssem )
-{
-    ssem_state *cpustate = get_safe_token(device);
-
-    switch (state)
-    {
-        /* --- the following bits of info are set as 64-bit signed integers --- */
-        case CPUINFO_INT_PC:
-        case CPUINFO_INT_REGISTER + SSEM_PC:            cpustate->pc = info->i;         break;
-        case CPUINFO_INT_REGISTER + SSEM_A:             cpustate->a = info->i;          break;
-        case CPUINFO_INT_REGISTER + SSEM_HALT:          cpustate->halt = info->i;       break;
-    }
-}
-
-CPU_GET_INFO( ssem )
-{
-    ssem_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
-
-    switch(state)
-    {
-        /* --- the following bits of info are returned as 64-bit signed integers --- */
-        case CPUINFO_INT_CONTEXT_SIZE:          info->i = sizeof(ssem_state);   break;
-        case CPUINFO_INT_INPUT_LINES:           info->i = 0;                    break;
-        case CPUINFO_INT_DEFAULT_IRQ_VECTOR:    info->i = 0;                    break;
-        case CPUINFO_INT_ENDIANNESS:            info->i = ENDIANNESS_LITTLE;    break;
-        case CPUINFO_INT_CLOCK_MULTIPLIER:      info->i = 1;                    break;
-        case CPUINFO_INT_CLOCK_DIVIDER:         info->i = 1;                    break;
-        case CPUINFO_INT_MIN_INSTRUCTION_BYTES: info->i = 4;                    break;
-        case CPUINFO_INT_MAX_INSTRUCTION_BYTES: info->i = 4;                    break;
-        case CPUINFO_INT_MIN_CYCLES:            info->i = 1;                    break;
-        case CPUINFO_INT_MAX_CYCLES:            info->i = 1;                    break;
-
-        case CPUINFO_INT_DATABUS_WIDTH + AS_PROGRAM: info->i = 8;                    break;
-        case CPUINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;                   break;
-        case CPUINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;                    break;
-        case CPUINFO_INT_DATABUS_WIDTH + AS_DATA:    info->i = 0;                    break;
-        case CPUINFO_INT_ADDRBUS_WIDTH + AS_DATA:    info->i = 0;                    break;
-        case CPUINFO_INT_ADDRBUS_SHIFT + AS_DATA:    info->i = 0;                    break;
-        case CPUINFO_INT_DATABUS_WIDTH + AS_IO:      info->i = 0;                    break;
-        case CPUINFO_INT_ADDRBUS_WIDTH + AS_IO:      info->i = 0;                    break;
-        case CPUINFO_INT_ADDRBUS_SHIFT + AS_IO:      info->i = 0;                    break;
-
-        case CPUINFO_INT_PC:    /* intentional fallthrough */
-        case CPUINFO_INT_REGISTER + SSEM_PC:    info->i = cpustate->pc << 2;    break;
-        case CPUINFO_INT_REGISTER + SSEM_A:     info->i = cpustate->a;          break;
-        case CPUINFO_INT_REGISTER + SSEM_HALT:  info->i = cpustate->halt;       break;
-
-        /* --- the following bits of info are returned as pointers to data or functions --- */
-        case CPUINFO_FCT_SET_INFO:              info->setinfo = CPU_SET_INFO_NAME(ssem);        break;
-        case CPUINFO_FCT_INIT:                  info->init = CPU_INIT_NAME(ssem);               break;
-        case CPUINFO_FCT_RESET:                 info->reset = CPU_RESET_NAME(ssem);             break;
-        case CPUINFO_FCT_EXIT:                  info->exit = CPU_EXIT_NAME(ssem);               break;
-        case CPUINFO_FCT_EXECUTE:               info->execute = CPU_EXECUTE_NAME(ssem);         break;
-        case CPUINFO_FCT_BURN:                  info->burn = NULL;                              break;
-        case CPUINFO_FCT_DISASSEMBLE:           info->disassemble = CPU_DISASSEMBLE_NAME(ssem); break;
-        case CPUINFO_PTR_INSTRUCTION_COUNTER:   info->icount = &cpustate->icount;               break;
-
-        /* --- the following bits of info are returned as NULL-terminated strings --- */
-        case CPUINFO_STR_NAME:                          strcpy(info->s, "SSEM");                break;
-        case CPUINFO_STR_FAMILY:                   strcpy(info->s, "SSEM");                break;
-        case CPUINFO_STR_VERSION:                  strcpy(info->s, "1.0");                 break;
-        case CPUINFO_STR_SOURCE_FILE:                     strcpy(info->s, __FILE__);              break;
-        case CPUINFO_STR_CREDITS:                  strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-
-        case CPUINFO_STR_FLAGS:                         strcpy(info->s, " ");                   break;
-
-        case CPUINFO_STR_REGISTER + SSEM_PC:            sprintf(info->s, "PC: %08X", cpustate->pc);     break;
-        case CPUINFO_STR_REGISTER + SSEM_A:             sprintf(info->s, "A: %08X", cpustate->a);       break;
-        case CPUINFO_STR_REGISTER + SSEM_HALT:          sprintf(info->s, "HALT: %d", cpustate->halt);   break;
-    }
-}
-
-DEFINE_LEGACY_CPU_DEVICE(SSEM, ssem);
