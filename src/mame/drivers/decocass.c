@@ -1710,7 +1710,7 @@ DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
 /* -- */ GAME( 1981, ctsttape,  decocass, ctsttape, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Test Tape (DECO Cassette)", 0 )
 /* 01 */ GAME( 1980, chwy,      decocass, chwy,     decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Highway Chase (DECO Cassette)", 0 )
 /* 02 */ // 1980.12 Sengoku Ninjatai
-/* 03 */ GAME( 1981, cmanhat,   decocass, cmanhat,  decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Manhattan (DECO Cassette)", GAME_NOT_WORKING )
+/* 03 */ GAME( 1981, cmanhat,   decocass, cmanhat,  decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Manhattan (DECO Cassette)", GAME_IMPERFECT_GRAPHICS )
 /* 04 */ GAME( 1981, cterrani,  decocass, cterrani, cterrani, decocass_state, decocass, ROT270, "Data East Corporation", "Terranean (DECO Cassette)", 0 )
 /* 05 */ // 1981.?? Missile Sprinter
 /* 06 */ // 1980.12 Nebula
