@@ -573,6 +573,7 @@ src/emu/cpu/m6805/m6805.h svneol=native#text/plain
 src/emu/cpu/m6809/6809dasm.c svneol=native#text/plain
 src/emu/cpu/m6809/6809ops.c svneol=native#text/plain
 src/emu/cpu/m6809/6809tbl.c svneol=native#text/plain
+src/emu/cpu/m6809/6809tbl.h svneol=native#text/plain
 src/emu/cpu/m6809/m6809.c svneol=native#text/plain
 src/emu/cpu/m6809/m6809.h svneol=native#text/plain
 src/emu/cpu/mb86233/mb86233.c svneol=native#text/plain

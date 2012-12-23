@@ -198,7 +198,7 @@ WRITE8_MEMBER(capbowl_state::capbowl_sndcmd_w)
 static void firqhandler( device_t *device, int irq )
 {
 	capbowl_state *state = device->machine().driver_data<capbowl_state>();
-	state->m_audiocpu->set_input_line(1, irq ? ASSERT_LINE : CLEAR_LINE);
+	state->m_audiocpu->set_input_line(M6809_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

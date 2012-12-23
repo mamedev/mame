@@ -363,14 +363,18 @@ static const char *const m6809_regs_te[16] =
 	"A", "B", "CC", "DP", "inv", "inv", "inv", "inv"
 };
 
-CPU_DISASSEMBLE( m6809 )
+offs_t m6809_disassemble(legacy_cpu_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options, m6809_base_device *m6809)
 {
 	UINT8 opcode, mode, pb, pbm, reg;
 	const UINT8 *operandarray;
 	unsigned int ea, flags;
 	int numoperands, offset, indirect;
-	const m6809_config *configdata = device ? (const m6809_config *)device->static_config() : NULL;
-	int encrypt_only_first_byte = configdata ? configdata->encrypt_only_first_byte : 0;
+	bool encrypt_only_first_byte = false;
+	if (m6809 != NULL)
+	{
+		m6809_config &config = static_cast<m6809_config &>(*m6809);
+		encrypt_only_first_byte = config.m_encrypt_only_first_byte;
+	}
 
 	int i, p = 0, page = 0, opcode_found = FALSE;
 
@@ -616,4 +620,14 @@ CPU_DISASSEMBLE( m6809 )
 	}
 
 	return p | flags | DASMFLAG_SUPPORTED;
+}
+
+CPU_DISASSEMBLE( m6809 )
+{
+	return m6809_disassemble(device, buffer, pc, oprom, opram, options, NULL);
+}
+
+offs_t m6809_base_device::disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
+{
+	return m6809_disassemble(NULL, buffer, pc, oprom, opram, options, this);
 }
