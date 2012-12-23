@@ -411,10 +411,6 @@ static ADDRESS_MAP_START( audio_io, AS_IO, 8, kurukuru_state )
 	AM_RANGE(0x60, 0x60) AM_MIRROR(0x0f) AM_READ(kurukuru_soundlatch_r)
 	AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) AM_READ(kurukuru_adpcm_timer_irqack_r)
 ADDRESS_MAP_END
-/*
-	Reading _any_ I/O port on the audio CPU should return ADPCM IRQ flag on bit 3, and sound command write status flag on bit 4.
-	How does this work when reading the sound latch? The game (un)fortunately doesn't test this, I'd rather leave it unemulated then.
-*/
 
 
 /* YM2149 ports */
