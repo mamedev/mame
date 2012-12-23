@@ -2258,6 +2258,7 @@ $(DRIVERS)/s9.o:	$(LAYOUT)/s9.lh
 
 $(DRIVERS)/s11.o:	$(LAYOUT)/s11.lh
 $(DRIVERS)/s11a.o:	$(LAYOUT)/s11a.lh
+$(DRIVERS)/s11b.o:	$(LAYOUT)/s11b.lh
 
 $(DRIVERS)/sbrkout.o:	$(LAYOUT)/sbrkout.lh
 
