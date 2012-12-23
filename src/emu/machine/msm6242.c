@@ -41,8 +41,9 @@ enum
 
 #define TIMER_RTC_CALLBACK		1
 
-#define LOG_UNMAPPED			1
-#define LOG_IRQ					1
+#define LOG_UNMAPPED			0
+#define LOG_IRQ					0
+#define LOG_IRQ_ENABLE			0
 
 
 
@@ -316,7 +317,17 @@ void msm6242_device::update_timer()
 	// if set, convert ticks to an attotime
 	if (callback_ticks > 0)
 	{
-		callback_time = attotime::from_ticks(callback_ticks, clock()) - machine().time();
+		// get the current time
+		UINT64 curtime = current_time();
+
+		// we need the absolute callback time, in ticks
+		UINT64 absolute_callback_ticks = curtime + callback_ticks;
+
+		// convert that to an attotime
+		attotime absolute_callback_time = attotime::from_ticks(absolute_callback_ticks, clock());		
+
+		// and finally get the delta as an attotime
+		callback_time = absolute_callback_time - machine().time();
 	}
 
 	m_timer->adjust(callback_time);
@@ -342,6 +353,7 @@ void msm6242_device::rtc_clock_updated(int year, int month, int day, int day_of_
 void msm6242_device::rtc_timer_callback()
 {
 	update_rtc_registers();
+	update_timer();
 }
 
 
@@ -355,6 +367,24 @@ UINT8 msm6242_device::get_clock_nibble(int rtc_register, bool high)
 	int value = get_clock_register(rtc_register);
 	value /= high ? 10 : 1;
 	return (UINT8) ((value % 10) & 0x0F);
+}
+
+
+
+//-------------------------------------------------
+//  get_clock_nibble
+//-------------------------------------------------
+
+const char *msm6242_device::irq_type_string(UINT8 irq_type)
+{
+	switch(irq_type)
+	{
+		case IRQ_64THSECOND:	return "1/64th second";
+		case IRQ_SECOND:		return "second";
+		case IRQ_MINUTE:		return "minute";
+		case IRQ_HOUR:			return "hour";
+		default:				return "???";
+	}
 }
 
 
@@ -487,12 +517,18 @@ WRITE8_MEMBER( msm6242_device::write )
 			{
 				m_irq_flag = 1;
 				m_irq_type = (data & 0xc) >> 2;
+
+				if (LOG_IRQ_ENABLE)
+					logerror("%s: MSM6242 enabling irq '%s'\n", machine().describe_context(), irq_type_string(m_irq_type));
 			}
 			else
 			{
 				m_irq_flag = 0;
 				if ( !m_res_out_int_func.isnull() )
 					m_res_out_int_func( CLEAR_LINE );
+
+				if (LOG_IRQ_ENABLE)
+					logerror("%s: MSM6242 disabling irq\n", machine().describe_context());
 			}
 			break;
 

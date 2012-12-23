@@ -81,6 +81,7 @@ private:
 	void update_rtc_registers();
 	void update_timer();
 	UINT8 get_clock_nibble(int rtc_register, bool high);
+	static const char *irq_type_string(UINT8 irq_type);
 };
 
 
