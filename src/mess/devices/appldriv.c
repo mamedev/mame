@@ -309,6 +309,14 @@ void apple525_floppy_image_device::device_start()
 {
 	legacy_floppy_image_device::device_start();
 	floppy_set_type(this,FLOPPY_TYPE_APPLE);
+
+	state = 0;
+	tween_tracks = 0;
+	track_loaded = 0;
+	track_dirty = 0;
+	position = 0;
+	spin_count = 0;
+	memset(track_data, 0, sizeof(track_data));
 }
 
 bool apple525_floppy_image_device::call_load()
