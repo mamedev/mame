@@ -157,7 +157,7 @@ ROM_START( tim100 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "tim 100 v.3.2.0.u16",   0x0000, 0x2000, CRC(4de9c8ad) SHA1(b0914d6e8d618e92a87b4b39c35391541251e8cc))  
 
-	// The first and 2nd halves of these roms are identical, possibly overdumped?
+	// The first and 2nd halves of these roms are identical, confirmed ok
 	ROM_REGION( 0x2000, "chargen", ROMREGION_INVERT )
 	ROM_SYSTEM_BIOS( 0, "212", "v 2.1.2" )
 	ROMX_LOAD( "tim 100kg v.2.1.2.u12", 0x0000, 0x0800, CRC(faf5743c) SHA1(310b662e9535878210f8aaab3e2b846fade60642),ROM_BIOS(1))
