@@ -505,7 +505,9 @@ void device_scheduler::timeslice()
 					exec->m_totalcycles += ran;
 
 					// update the local time for this CPU
-					exec->m_localtime += attotime(0, exec->m_attoseconds_per_cycle * ran);
+					attotime delta = attotime(0, exec->m_attoseconds_per_cycle * ran);
+					assert(delta >= attotime::zero);
+					exec->m_localtime += delta;
 					LOG(("         %d ran, %d total, time = %s\n", ran, (INT32)exec->m_totalcycles, exec->m_localtime.as_string()));
 
 					// if the new local CPU time is less than our target, move the target up, but not before the base

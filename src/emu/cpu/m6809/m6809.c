@@ -474,7 +474,7 @@ void m6809_base_device::device_start()
 	state_add(M6809_Y,         "Y",        	m_y.w.l).mask(0xffff);
 	state_add(M6809_DP,        "DP",        m_dp.w.l).mask(0xffff);
 
-	/* setup regtable */
+	// setup regtable
 	save_item(NAME(PC));
 	save_item(NAME(PPC));
 	save_item(NAME(D));
@@ -490,6 +490,8 @@ void m6809_base_device::device_start()
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
+	m_icount = 0;
+	m_extra_cycles = 0;
 }
 
 /****************************************************************************/
