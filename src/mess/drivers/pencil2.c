@@ -76,6 +76,7 @@ ToDo:
 #include "cpu/z80/z80.h"
 #include "video/tms9928a.h"
 #include "sound/sn76496.h"
+#include "machine/ctronics.h"
 //#include "imagedev/cartslot.h"
 //#include "imagedev/cassette.h"
 //#include "sound/wave.h"
@@ -86,13 +87,19 @@ class pencil2_state : public driver_device
 public:
 	pencil2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+	m_maincpu(*this, "maincpu"),
+	m_printer(*this, "centronics")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(port10_w);
 	DECLARE_WRITE8_MEMBER(port80_w);
+	DECLARE_WRITE8_MEMBER(portc0_w);
 	DECLARE_READ8_MEMBER(porte0_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(printer_ready_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(printer_ack_r);
 	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
+	required_device<centronics_device> m_printer;
 };
 
 static ADDRESS_MAP_START(pencil2_mem, AS_PROGRAM, 8, pencil2_state)
@@ -106,9 +113,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(pencil2_io, AS_IO, 8, pencil2_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("centronics", centronics_device, write)
+	AM_RANGE(0x10, 0x1f) AM_WRITE(port10_w)
+	//AM_RANGE(0x30, 0x3f) AM_WRITE(port30_w) cass out
 	AM_RANGE(0x80, 0x9f) AM_WRITE(port80_w)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
 	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
+	AM_RANGE(0xc0, 0xdf) AM_WRITE(portc0_w)
 	AM_RANGE(0xe0, 0xff) AM_READ(porte0_r) AM_DEVWRITE("sn76489a", sn76489a_device, write)
 ADDRESS_MAP_END
 
@@ -119,22 +130,42 @@ READ8_MEMBER( pencil2_state::porte0_r)
 	return ioport( kbdrow )->read();
 }
 
+WRITE8_MEMBER( pencil2_state::port10_w )
+{
+	m_printer->strobe_w(BIT(data, 0));
+}
+
 WRITE8_MEMBER( pencil2_state::port80_w )
 {
+}
+
+WRITE8_MEMBER( pencil2_state::portc0_w )
+{
+}
+
+CUSTOM_INPUT_MEMBER( pencil2_state::printer_ready_r )
+{
+	return m_printer->busy_r();
+}
+
+CUSTOM_INPUT_MEMBER( pencil2_state::printer_ack_r )
+{
+	return m_printer->ack_r();
 }
 
 
 /* Input ports */
 static INPUT_PORTS_START( pencil2 )
 	PORT_START("X0")
+	// port_custom MUST be ACTIVE_HIGH to work
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pencil2_state, printer_ready_r, " ")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Stop") PORT_CODE(KEYCODE_END)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pencil2_state, printer_ack_r, " ")
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
@@ -262,6 +293,9 @@ static MACHINE_CONFIG_START( pencil2, pencil2_state )
 //	MCFG_CARTSLOT_NOT_MANDATORY
 //	MCFG_CARTSLOT_LOAD(pencil2_cart)
 //	MCFG_CARTSLOT_INTERFACE("pencil2_cart")
+
+	/* printer */
+	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 MACHINE_CONFIG_END
 
 /* ROM definition */
