@@ -1065,7 +1065,7 @@ GFXDECODE_END
 
 
 static GFXDECODE_START( spyhunt )
-	GFXDECODE_ENTRY( "gfx1", 0, spyhunt_charlayout,  1*16, 1 )
+	GFXDECODE_ENTRY( "gfx1", 0, spyhunt_charlayout,  3*16, 1 )
 	GFXDECODE_ENTRY( "gfx2", 0, mcr_sprite_layout,   0*16, 4 )
 	GFXDECODE_ENTRY( "gfx3", 0, spyhunt_alphalayout, 4*16, 1 )
 GFXDECODE_END
