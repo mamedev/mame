@@ -94,6 +94,7 @@ public:
 	emu_timer		*m_irq_off_timer;
 	UINT8 m_pcg_bank;
 	UINT8 m_force_pattern;
+	UINT8 m_fd_buffer_flag;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -171,8 +172,9 @@ READ8_MEMBER( pv1000_state::pv1000_io_r )
 		/* Bit 1 = 1 => Data is available in port FD */
 		/* Bit 0 = 1 => Buffer at port FD is empty */
 		data = 0;
-		data = ( m_screen->vpos() >= 212 && m_screen->vpos() <= 220 ) ? 1 : 0;
+		data = m_fd_buffer_flag & 1;
 		data |= m_fd_data ? 2 : 0;
+		m_fd_buffer_flag &= ~1;
 		break;
 	case 0x05:
 		static const char *const joynames[] = { "IN0", "IN1", "IN2", "IN3" };
@@ -355,7 +357,10 @@ static DEVICE_START( pv1000_sound )
 TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_on_cb)
 {
 	int vpos = m_screen->vpos();
-	int next_vpos = vpos + 12;
+	int next_vpos = vpos + 4;
+
+	if(vpos == 195)
+		m_fd_buffer_flag |= 1; /* TODO: exact timing of this */
 
 	/* Set IRQ line and schedule release of IRQ line */
 	m_maincpu->set_input_line(0, ASSERT_LINE );
@@ -449,4 +454,4 @@ ROM_END
 
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT    COMPANY   FULLNAME    FLAGS */
-CONS( 1983, pv1000,  0,      0,      pv1000,  pv1000, driver_device,   0,   "Casio",  "PV-1000",  GAME_NOT_WORKING )
+CONS( 1983, pv1000,  0,      0,      pv1000,  pv1000, driver_device,   0,   "Casio",  "PV-1000",  0 )
