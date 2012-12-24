@@ -2052,6 +2052,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/okean240.o	\
 	$(MESS_DRIVERS)/p8k.o		\
 	$(MESS_DRIVERS)/pegasus.o	\
+	$(MESS_DRIVERS)/pencil2.o	\
 	$(MESS_DRIVERS)/pes.o		\
 	$(MESS_DRIVERS)/pipbug.o	\
 	$(MESS_DRIVERS)/plan80.o	\

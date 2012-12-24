@@ -6021,6 +6021,7 @@ src/mess/drivers/pdp1.c svneol=native#text/plain
 src/mess/drivers/pdp11.c svneol=native#text/plain
 src/mess/drivers/pecom.c svneol=native#text/plain
 src/mess/drivers/pegasus.c svneol=native#text/plain
+src/mess/drivers/pencil2.c svneol=native#text/plain
 src/mess/drivers/pentagon.c svneol=native#text/plain
 src/mess/drivers/pes.c svneol=native#text/plain
 src/mess/drivers/pet.c svneol=native#text/plain
