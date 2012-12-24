@@ -230,14 +230,10 @@ INPUT_PORTS_END
 
 void pv1000_state::palette_init()
 {
-	palette_set_color_rgb( machine(),  0,   0,   0,   0 );
-	palette_set_color_rgb( machine(),  1,   0,   0, 255 );
-	palette_set_color_rgb( machine(),  2,   0, 255,   0 );
-	palette_set_color_rgb( machine(),  3,   0, 255, 255 );
-	palette_set_color_rgb( machine(),  4, 255,   0,   0 );
-	palette_set_color_rgb( machine(),  5, 255,   0, 255 );
-	palette_set_color_rgb( machine(),  6, 255, 255,   0 );
-	palette_set_color_rgb( machine(),  7, 255, 255, 255 );
+	int i;
+
+	for(i=0;i<8;i++)
+		palette_set_color_rgb( machine(), i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 }
 
 
