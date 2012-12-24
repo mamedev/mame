@@ -5765,6 +5765,7 @@ src/mess/drivers/bk.c svneol=native#text/plain
 src/mess/drivers/bmjr.c svneol=native#text/plain
 src/mess/drivers/bml3.c svneol=native#text/plain
 src/mess/drivers/bob85.c svneol=native#text/plain
+src/mess/drivers/br8641.c svneol=native#text/plain
 src/mess/drivers/bullet.c svneol=native#text/plain
 src/mess/drivers/busicom.c svneol=native#text/plain
 src/mess/drivers/bw12.c svneol=native#text/plain
