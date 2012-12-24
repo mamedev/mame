@@ -50,6 +50,7 @@
 #include "machine/6522via.h"
 #include "machine/ncr5380.h"
 #include "machine/applefdc.h"
+#include "machine/swim.h"
 #include "devices/sonydriv.h"
 #include "formats/ap_dsk35.h"
 #include "machine/ram.h"

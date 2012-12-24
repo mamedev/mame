@@ -104,7 +104,7 @@ void apple3_state::apple3_profile_w(offs_t offset, UINT8 data)
 READ8_MEMBER(apple3_state::apple3_c0xx_r)
 {
 	acia6551_device *acia = machine().device<acia6551_device>("acia");
-	device_t *fdc = machine().device("fdc");
+	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 	UINT8 result = 0xFF;
 
 	switch(offset)
@@ -171,7 +171,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 		case 0xE4: case 0xE5: case 0xE6: case 0xE7:
 		case 0xE8: case 0xE9: case 0xEA: case 0xEB:
 		case 0xEC: case 0xED: case 0xEE: case 0xEF:
-			result = applefdc_r(fdc, space, offset);
+			result = fdc->read(offset);
 			break;
 
 		case 0xF0:
@@ -189,7 +189,8 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 {
 	acia6551_device *acia = machine().device<acia6551_device>("acia");
-	device_t *fdc = machine().device("fdc");
+	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
+
 	switch(offset)
 	{
 		case 0x10: case 0x11: case 0x12: case 0x13:
@@ -234,7 +235,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 		case 0xE4: case 0xE5: case 0xE6: case 0xE7:
 		case 0xE8: case 0xE9: case 0xEA: case 0xEB:
 		case 0xEC: case 0xED: case 0xEE: case 0xEF:
-			applefdc_w(fdc, space, offset, data);
+			fdc->write(offset, data);
 			break;
 
 		case 0xF0:

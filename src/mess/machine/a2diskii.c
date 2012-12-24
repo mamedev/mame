@@ -138,7 +138,7 @@ void a2bus_floppy_device::device_reset()
 
 UINT8 a2bus_floppy_device::read_c0nx(address_space &space, UINT8 offset)
 {
-	return applefdc_r(m_fdc, space, offset);
+	return m_fdc->read(offset);
 }
 
 
@@ -148,7 +148,7 @@ UINT8 a2bus_floppy_device::read_c0nx(address_space &space, UINT8 offset)
 
 void a2bus_floppy_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
 {
-    applefdc_w(m_fdc, space, offset, data);
+	m_fdc->write(offset, data);
 }
 
 /*-------------------------------------------------

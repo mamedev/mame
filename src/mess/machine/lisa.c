@@ -1196,10 +1196,10 @@ INLINE void lisa_fdc_ttl_glue_access(running_machine &machine, offs_t offset)
 			state->m_MT1 = offset & 1;
 			if (state->m_MT1 && ! oldMT1)
 			{
-				device_t *fdc = machine.device("fdc");
+				applefdc_base_device *fdc = machine.device<applefdc_base_device>("fdc");
 
 				state->m_PWM_floppy_motor_speed = (state->m_PWM_floppy_motor_speed << 1) & 0xff;
-				if (applefdc_get_lines(fdc) & APPLEFDC_PH0)
+				if (fdc->get_lines() & APPLEFDC_PH0)
 					state->m_PWM_floppy_motor_speed |= 1;
 				sony_set_speed(((256-state->m_PWM_floppy_motor_speed) * 1.3) + 237);
 			}
@@ -1233,12 +1233,12 @@ INLINE void lisa_fdc_ttl_glue_access(running_machine &machine, offs_t offset)
 READ8_MEMBER(lisa_state::lisa_fdc_io_r)
 {
 	int answer=0;
-	device_t *fdc = machine().device("fdc");
+	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 
 	switch ((offset & 0x0030) >> 4)
 	{
 	case 0:	/* IWM */
-		answer = applefdc_r(fdc, space, offset);
+		answer = fdc->read(offset);
 		break;
 
 	case 1:	/* TTL glue */
@@ -1260,12 +1260,12 @@ READ8_MEMBER(lisa_state::lisa_fdc_io_r)
 
 WRITE8_MEMBER(lisa_state::lisa_fdc_io_w)
 {
-	device_t *fdc = machine().device("fdc");
+	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 
 	switch ((offset & 0x0030) >> 4)
 	{
 	case 0:	/* IWM */
-		applefdc_w(fdc, space, offset, data);
+		fdc->write(offset, data);
 		break;
 
 	case 1:	/* TTL glue */

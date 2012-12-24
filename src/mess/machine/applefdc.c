@@ -39,38 +39,24 @@
 
 
 /***************************************************************************
-    PARAMETERS
-***************************************************************************/
-
-/* logging */
-#define LOG_APPLEFDC		0
-#define LOG_APPLEFDC_EXTRA	0
-
-
-
-/***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
-/* mask for FDC lines */
-#define IWM_MOTOR	0x10
-#define IWM_DRIVE	0x20
-#define IWM_Q6		0x40
-#define IWM_Q7		0x80
+// logging
+#define LOG_APPLEFDC		0
+#define LOG_APPLEFDC_EXTRA	0
 
-enum applefdc_t
-{
-	APPLEFDC_APPLE2,	/* classic Apple II disk controller (pre-IWM) */
-	APPLEFDC_IWM,		/* Integrated Woz Machine */
-	APPLEFDC_SWIM		/* Sander/Woz Integrated Machine */
-};
+// mask for FDC lines
+#define IWM_MOTOR			0x10
+#define IWM_DRIVE			0x20
+#define IWM_Q6				0x40
+#define IWM_Q7				0x80
+
+const device_timer_id TIMER_MOTOR_ONOFF = 1;
 
 
-static UINT8 swim_default_parms[16] =
-{
-	0x38, 0x18, 0x41, 0x2e, 0x2e, 0x18, 0x18, 0x1b,
-	0x1b, 0x2f, 0x2f, 0x19, 0x19, 0x97, 0x1b, 0x57
-};
+
+
 
 /***************************************************************************
     IWM MODE
@@ -107,180 +93,131 @@ enum
 	IWM_MODE_LATCHMODE			= 0x01
 };
 
-enum
-{
-	SWIM_MODE_IWM,
-	SWIM_MODE_SWIM,
-	SWIM_MODE_SWIM2,
-	SWIM_MODE_SWIM3
-};
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-struct applefdc_token
-{
-	/* data that is constant for the lifetime of the emulation */
-	emu_timer *motor_timer;
-	applefdc_t type;
-
-	/* data that changes at emulation time */
-	UINT8 write_byte;
-	UINT8 lines;					/* flags from IWM_MOTOR - IWM_Q7 */
-	UINT8 mode;						/* 0-31; see above */
-	UINT8 handshake_hack;			/* not sure what this is for */
-
-	/* SWIM extentions */
-	UINT8 swim_mode;
-	UINT8 swim_magic_state;
-	UINT8 ism_regs[8];
-	UINT8 parm_offset;
-	UINT8 parms[16];
-};
-
 
 
 /***************************************************************************
-    PROTOTYPES
+    BASE DEVICE
 ***************************************************************************/
 
-static TIMER_CALLBACK(iwm_turnmotor_onoff);
+//-------------------------------------------------
+//  ctor
+//-------------------------------------------------
 
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE void assert_is_applefdc(device_t *device)
+applefdc_base_device::applefdc_base_device(applefdc_base_device::applefdc_t fdc_type, const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, type, name, tag, owner, clock)
 {
-	assert(device != NULL);
-	assert((device->type() == APPLEFDC) || (device->type() == IWM) || (device->type() == SWIM));
+	m_type = fdc_type;
 }
 
 
 
-INLINE applefdc_token *get_token(device_t *device)
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void applefdc_base_device::device_start()
 {
-	assert_is_applefdc(device);
-	return (applefdc_token *) downcast<applefdc_base_device *>(device)->token();
+	// timer
+	m_motor_timer = timer_alloc(TIMER_MOTOR_ONOFF);
+
+	// state
+	m_write_byte		= 0x00;
+	m_lines				= 0x00;	
+	m_mode				= 0x1F;	// default value needed by Lisa 2 - no, I don't know if it is true
+	m_handshake_hack	= 0x00;
+
+	// register save states
+	save_item(NAME(m_write_byte));
+	save_item(NAME(m_lines));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_handshake_hack));
 }
 
 
 
-INLINE const applefdc_interface *get_interface(device_t *device)
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void applefdc_base_device::device_reset(void)
+{
+	m_handshake_hack = 0x00;
+	m_write_byte = 0x00;
+	m_lines = 0x00;
+	m_mode = 0x1F;	/* default value needed by Lisa 2 - no, I don't know if it is true */
+	m_motor_timer->reset();
+}
+
+
+
+//-------------------------------------------------
+//  device_timer - device-specific timer callbacks
+//-------------------------------------------------
+
+void applefdc_base_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+		case TIMER_MOTOR_ONOFF:
+			turn_motor_onoff(param != 0);
+			break;
+	}
+}
+
+
+
+//-------------------------------------------------
+//  get_interface - gets the interface
+//-------------------------------------------------
+
+const applefdc_interface *applefdc_base_device::get_interface()
 {
 	static const applefdc_interface dummy_interface = {0, };
 
-	assert_is_applefdc(device);
-	return (device->static_config() != NULL)
-		? (const applefdc_interface *) device->static_config()
+	return (static_config() != NULL)
+		? (const applefdc_interface *) static_config()
 		: &dummy_interface;
 }
 
 
 
-/***************************************************************************
-    CORE IMPLEMENTATION
-***************************************************************************/
+//-------------------------------------------------
+//  iwm_enable2 - hackish function
+//-------------------------------------------------
 
-/*-------------------------------------------------
-    applefdc_start - starts up an FDC
--------------------------------------------------*/
-
-static void applefdc_start(device_t *device, applefdc_t type)
+int applefdc_base_device::iwm_enable2()
 {
-	applefdc_token *fdc = get_token(device);
-
-	memset(fdc, 0, sizeof(*fdc));
-	fdc->type = type;
-	fdc->motor_timer = device->machine().scheduler().timer_alloc(FUNC(iwm_turnmotor_onoff), (void *) device);
-	fdc->lines = 0x00;
-	fdc->mode = 0x1F;	/* default value needed by Lisa 2 - no, I don't know if it is true */
-	fdc->swim_mode = SWIM_MODE_IWM;
-
-	/* register save states */
-	state_save_register_item(device->machine(), "applefdc", NULL, 0, fdc->write_byte);
-	state_save_register_item(device->machine(), "applefdc", NULL, 0, fdc->lines);
-	state_save_register_item(device->machine(), "applefdc", NULL, 0, fdc->mode);
-	state_save_register_item(device->machine(), "applefdc", NULL, 0, fdc->handshake_hack);
-}
-
-
-
-/*-------------------------------------------------
-    DEVICE_RESET(applefdc) - resets an FDC
--------------------------------------------------*/
-
-static DEVICE_RESET(applefdc)
-{
-	applefdc_token *fdc = get_token(device);
-
-	fdc->handshake_hack = 0x00;
-	fdc->write_byte = 0x00;
-	fdc->lines = 0x00;
-	fdc->mode = 0x1F;	/* default value needed by Lisa 2 - no, I don't know if it is true */
-	fdc->swim_magic_state = 0;
-	fdc->swim_mode = SWIM_MODE_IWM;
-	fdc->parm_offset = 0;
-
-	// setup SWIM default parms if it's a SWIM
-	if (fdc->type == APPLEFDC_SWIM)
-	{
-		for (int i = 0; i < 16; i++)
-		{
-			fdc->parms[i] = swim_default_parms[i];
-		}
-	}
-
-	fdc->motor_timer->reset();
-}
-
-
-
-/*-------------------------------------------------
-    iwm_enable2 - hackish function
--------------------------------------------------*/
-
-static int iwm_enable2(device_t *device)
-{
-	applefdc_token *fdc = get_token(device);
-
 	/* R. Nabet : This function looks more like a hack than a real feature of the IWM; */
 	/* it is not called from the Mac Plus driver */
-	return (fdc->lines & APPLEFDC_PH1) && (fdc->lines & APPLEFDC_PH3);
+	return (m_lines & APPLEFDC_PH1) && (m_lines & APPLEFDC_PH3);
 }
 
 
 
-/*-------------------------------------------------
-    iwm_readenable2handshake - hackish function
--------------------------------------------------*/
+//-------------------------------------------------
+//  iwm_readenable2handshake - hackish function
+//-------------------------------------------------
 
-static UINT8 iwm_readenable2handshake(device_t *device)
+UINT8 applefdc_base_device::iwm_readenable2handshake()
 {
-	applefdc_token *fdc = get_token(device);
-
 	/* R. Nabet : This function looks more like a hack than a real feature of the IWM; */
 	/* it is not called from the Mac Plus driver */
-	fdc->handshake_hack++;
-	fdc->handshake_hack %= 4;
-	return (fdc->handshake_hack != 0) ? 0xc0 : 0x80;
+	m_handshake_hack++;
+	m_handshake_hack %= 4;
+	return (m_handshake_hack != 0) ? 0xc0 : 0x80;
 }
 
 
 
-/*-------------------------------------------------
-    applefdc_statusreg_r - reads the status register
--------------------------------------------------*/
+//-------------------------------------------------
+//  statusreg_r - reads the status register
+//-------------------------------------------------
 
-static UINT8 applefdc_statusreg_r(device_t *device)
+UINT8 applefdc_base_device::statusreg_r()
 {
 	UINT8 result;
 	int status;
-	applefdc_token *fdc = get_token(device);
-	const applefdc_interface *intf = get_interface(device);
+	const applefdc_interface *intf = get_interface();
 
 	/* IWM status:
      *
@@ -290,120 +227,75 @@ static UINT8 applefdc_statusreg_r(device_t *device)
      * Bits 4-0 Same as IWM mode bits 4-0
      */
 
-	status = iwm_enable2(device) ? 1 : (intf->read_status ? intf->read_status(device) : 0);
+	status = iwm_enable2() ? 1 : (intf->read_status ? intf->read_status(this) : 0);
 
 	result = (status ? 0x80 : 0x00);
 
-	if (fdc->type != APPLEFDC_APPLE2)
-		 result |= (((fdc->lines & IWM_MOTOR) ? 1 : 0) << 5) | fdc->mode;
+	if (m_type != APPLEFDC_APPLE2)
+		 result |= (((m_lines & IWM_MOTOR) ? 1 : 0) << 5) | m_mode;
 	return result;
 }
 
 
 
-/*-------------------------------------------------
-    iwm_modereg_w - changes the mode register
--------------------------------------------------*/
+//-------------------------------------------------
+//  iwm_modereg_w - changes the mode register
+//-------------------------------------------------
 
-static void iwm_modereg_w(device_t *device, UINT8 data)
+void applefdc_base_device::iwm_modereg_w(UINT8 data)
 {
-	applefdc_token *fdc = get_token(device);
-
-	fdc->mode = data & 0x1f;	/* write mode register */
-
-	// SWIM mode is unlocked by writing 1/0/1/1 in a row to bit 6 (which is unused on IWM)
-	// when SWIM mode engages, the IWM is disconnected from both the 68k and the drives,
-	// and the ISM is substituted.
-	if (fdc->type == APPLEFDC_SWIM)
-	{
-		switch (fdc->swim_magic_state)
-		{
-			case 0:
-			case 2:
-			case 3:
-				if (data & 0x40)
-				{
-					fdc->swim_magic_state++;
-				}
-				else
-				{
-					fdc->swim_magic_state = 0;
-				}
-				break;
-			case 1:
-				if (!(data & 0x40))
-				{
-					fdc->swim_magic_state++;
-				}
-				else
-				{
-					fdc->swim_magic_state = 0;
-				}
-				break;
-		}
-
-		if (fdc->swim_magic_state == 4)
-		{
-			fdc->swim_magic_state = 0;
-//          printf("IWM: switching to SWIM mode\n");
-			fdc->swim_mode = SWIM_MODE_SWIM;
-		}
-	}
+	m_mode = data & 0x1f;	/* write mode register */
 
 	if (LOG_APPLEFDC_EXTRA)
-		logerror("iwm_modereg_w: iwm_mode=0x%02x\n", (unsigned) fdc->mode);
+		logerror("iwm_modereg_w: iwm_mode=0x%02x\n", (unsigned) m_mode);
 }
 
 
 
-/*-------------------------------------------------
-    applefdc_read_reg - reads a register
--------------------------------------------------*/
+//-------------------------------------------------
+//  read_reg - reads a register
+//-------------------------------------------------
 
-static UINT8 applefdc_read_reg(device_t *device, int lines)
+UINT8 applefdc_base_device::read_reg(int lines)
 {
-	applefdc_token *fdc = get_token(device);
-	const applefdc_interface *intf = get_interface(device);
+	const applefdc_interface *intf = get_interface();
 	UINT8 result = 0;
 
 	switch(lines)
 	{
 		case 0:
-			/* Read data register */
-			if ((fdc->type != APPLEFDC_APPLE2) && (iwm_enable2(device) || !(fdc->lines & IWM_MOTOR)))
+			// read data register
+			if ((m_type != APPLEFDC_APPLE2) && (iwm_enable2() || !(m_lines & IWM_MOTOR)))
 			{
 				result = 0xFF;
 			}
 			else
 			{
-				/*
-                         * Right now, this function assumes latch mode; which is always used for
-                         * 3.5 inch drives.  Eventually we should check to see if latch mode is
-                         * off
-                         */
+				// Right now, this function assumes latch mode; which is always used for
+				// 3.5 inch drives.  Eventually we should check to see if latch mode is
+				// off
 				if (LOG_APPLEFDC)
 				{
-					if ((fdc->mode & IWM_MODE_LATCHMODE) == 0x00)
+					if ((m_mode & IWM_MODE_LATCHMODE) == 0x00)
 						logerror("applefdc_read_reg(): latch mode off not implemented\n");
 				}
 
-				result = (intf->read_data ? intf->read_data(device) : 0x00);
+				result = (intf->read_data ? intf->read_data(this) : 0x00);
 			}
 			break;
 
 		case IWM_Q6:
-			/* Read status register */
-			result = applefdc_statusreg_r(device);
+			// read status register
+			result = statusreg_r();
 			break;
 
 		case IWM_Q7:
-			/* Classic Apple II: Read status register
-             * IWM: Read handshake register
-             */
-			if (fdc->type == APPLEFDC_APPLE2)
-				result = applefdc_statusreg_r(device);
+			// Classic Apple II: Read status register
+            // IWM: Read handshake register
+			if (m_type == APPLEFDC_APPLE2)
+				result = statusreg_r();
 			else
-				result = iwm_enable2(device) ? iwm_readenable2handshake(device) : 0x80;
+				result = iwm_enable2() ? iwm_readenable2handshake() : 0x80;
 			break;
 	}
 	return result;
@@ -411,37 +303,34 @@ static UINT8 applefdc_read_reg(device_t *device, int lines)
 
 
 
-/*-------------------------------------------------
-    applefdc_write_reg - writes a register
--------------------------------------------------*/
+//-------------------------------------------------
+//  write_reg - writes a register
+//-------------------------------------------------
 
-static void applefdc_write_reg(device_t *device, UINT8 data)
+void applefdc_base_device::write_reg(UINT8 data)
 {
-	applefdc_token *fdc = get_token(device);
-	const applefdc_interface *intf = get_interface(device);
+	const applefdc_interface *intf = get_interface();
 
-	switch(fdc->lines & (IWM_Q6 | IWM_Q7))
+	switch(m_lines & (IWM_Q6 | IWM_Q7))
 	{
 		case IWM_Q6 | IWM_Q7:
-			if (!(fdc->lines & IWM_MOTOR))
+			if (!(m_lines & IWM_MOTOR))
 			{
-				iwm_modereg_w(device, data);
+				iwm_modereg_w(data);
 			}
-			else if (!iwm_enable2(device))
+			else if (!iwm_enable2())
 			{
-				/*
-                         * Right now, this function assumes latch mode; which is always used for
-                         * 3.5 inch drives.  Eventually we should check to see if latch mode is
-                         * off
-                         */
+				// Right now, this function assumes latch mode; which is always used for
+				// 3.5 inch drives.  Eventually we should check to see if latch mode is
+				// off
 				if (LOG_APPLEFDC)
 				{
-					if ((fdc->mode & IWM_MODE_LATCHMODE) == 0)
+					if ((m_mode & IWM_MODE_LATCHMODE) == 0)
 						logerror("applefdc_write_reg(): latch mode off not implemented\n");
 				}
 
 				if (intf->write_data != NULL)
-					intf->write_data(device,data);
+					intf->write_data(this, data);
 			}
 			break;
 	}
@@ -449,37 +338,34 @@ static void applefdc_write_reg(device_t *device, UINT8 data)
 
 
 
-/*-------------------------------------------------
-    TIMER_CALLBACK(iwm_turnmotor_onoff) - timer
-    callback for turning motor on or off
--------------------------------------------------*/
+//-------------------------------------------------
+//  turn_motor_onoff - timer callback for turning
+//	motor on or off
+//-------------------------------------------------
 
-static TIMER_CALLBACK(iwm_turnmotor_onoff)
+void applefdc_base_device::turn_motor_onoff(bool status)
 {
-	device_t *device = (device_t *) ptr;
-	applefdc_token *fdc = get_token(device);
-	const applefdc_interface *intf = get_interface(device);
-	int status = param;
+	const applefdc_interface *intf = get_interface();
 	int enable_lines;
 
-	if (status != 0)
+	if (status)
 	{
-		fdc->lines |= IWM_MOTOR;
-		enable_lines = (fdc->lines & IWM_DRIVE) ? 2 : 1;
+		m_lines |= IWM_MOTOR;
+		enable_lines = (m_lines & IWM_DRIVE) ? 2 : 1;
 	}
 	else
 	{
-		fdc->lines &= ~IWM_MOTOR;
+		m_lines &= ~IWM_MOTOR;
 
-		if (fdc->type == APPLEFDC_APPLE2)
-			enable_lines = (fdc->lines & IWM_DRIVE) ? 2 : 1;
+		if (m_type == APPLEFDC_APPLE2)
+			enable_lines = (m_lines & IWM_DRIVE) ? 2 : 1;
 		else
 			enable_lines = 0;
 	}
 
 	/* invoke callback, if present */
 	if (intf->set_enable_lines != NULL)
-		intf->set_enable_lines(device,enable_lines);
+		intf->set_enable_lines(this, enable_lines);
 
 	if (LOG_APPLEFDC_EXTRA)
 		logerror("iwm_turnmotor_onoff(): Turning motor %s\n", status ? "on" : "off");
@@ -487,11 +373,11 @@ static TIMER_CALLBACK(iwm_turnmotor_onoff)
 
 
 
-/*-------------------------------------------------
-    iwm_access
--------------------------------------------------*/
+//-------------------------------------------------
+//  iwm_access
+//-------------------------------------------------
 
-static void iwm_access(device_t *device, int offset)
+void applefdc_base_device::iwm_access(int offset)
 {
 	static const char *const lines[] =
 	{
@@ -505,124 +391,107 @@ static void iwm_access(device_t *device, int offset)
 		"Q7"
 	};
 
-	applefdc_token *fdc = get_token(device);
-	const applefdc_interface *intf = get_interface(device);
+	const applefdc_interface *intf = get_interface();
 
 	if (offset & 1)
-		fdc->lines |= (1 << (offset >> 1));
+		m_lines |= (1 << (offset >> 1));
 	else
-		fdc->lines &= ~(1 << (offset >> 1));
+		m_lines &= ~(1 << (offset >> 1));
 
 	if (LOG_APPLEFDC_EXTRA)
 	{
 		logerror("iwm_access(): %s line %s => %02x\n",
-			(offset & 1) ? "setting" : "clearing", lines[offset >> 1], fdc->lines);
+			(offset & 1) ? "setting" : "clearing", lines[offset >> 1], m_lines);
 	}
 
 	if ((offset < 0x08) && (intf->set_lines != NULL))
-		intf->set_lines(device,fdc->lines & 0x0f);
+		intf->set_lines(this, m_lines & 0x0f);
 
 	switch(offset)
 	{
 		case 0x08:
 			/* turn off motor */
-			fdc->motor_timer->adjust(
-				(fdc->mode & IWM_MODE_MOTOROFFDELAY) ? attotime::zero : attotime::from_seconds(1), 0);
+			m_motor_timer->adjust(
+				(m_mode & IWM_MODE_MOTOROFFDELAY) ? attotime::zero : attotime::from_seconds(1), 0);
 			break;
 
 		case 0x09:
 			/* turn on motor */
-			fdc->motor_timer->adjust(attotime::zero, 1);
+			m_motor_timer->adjust(attotime::zero, 1);
 			break;
 
 		case 0x0A:
 			/* turn off IWM_DRIVE */
-			if ((fdc->lines & IWM_MOTOR) && (intf->set_enable_lines != NULL))
-				intf->set_enable_lines(device,1);
+			if ((m_lines & IWM_MOTOR) && (intf->set_enable_lines != NULL))
+				intf->set_enable_lines(this, 1);
 			break;
 
 		case 0x0B:
 			/* turn on IWM_DRIVE */
-			if ((fdc->lines & IWM_MOTOR) && (intf->set_enable_lines != NULL))
-				intf->set_enable_lines(device,2);
+			if ((m_lines & IWM_MOTOR) && (intf->set_enable_lines != NULL))
+				intf->set_enable_lines(this, 2);
 			break;
 	}
 }
 
 
 
-/*-------------------------------------------------
-    applefdc_r - reads a byte from the FDC
--------------------------------------------------*/
+//-------------------------------------------------
+//  read - reads a byte from the FDC
+//-------------------------------------------------
 
-READ8_DEVICE_HANDLER( applefdc_r )
+UINT8 applefdc_base_device::read(UINT8 offset)
 {
-	applefdc_token *fdc = get_token(device);
-	const applefdc_interface *intf = get_interface(device);
+	const applefdc_interface *intf = get_interface();
 	UINT8 result = 0;
 
-	/* normalize offset */
+	// normalize offset
 	offset &= 0xf;
 
 	if (LOG_APPLEFDC_EXTRA)
 		logerror("applefdc_r: offset=%i\n", offset);
 
-	if ((fdc->type < APPLEFDC_SWIM) || (fdc->swim_mode == SWIM_MODE_IWM))
+	iwm_access(offset);
+
+	switch(m_type)
 	{
-		iwm_access(device, offset);
+		case APPLEFDC_APPLE2:
+			switch(offset)
+			{
+				case 0x0C:
+					if (m_lines & IWM_Q7)
+					{
+						if (intf->write_data != NULL)
+							intf->write_data(this, m_write_byte);
+						result = 0;
+					}
+					else
+						result = read_reg(0);
+					break;
 
-		switch(fdc->type)
-		{
-			case APPLEFDC_APPLE2:
-				switch(offset)
-				{
-					case 0x0C:
-						if (fdc->lines & IWM_Q7)
-						{
-							if (intf->write_data != NULL)
-								intf->write_data(device,fdc->write_byte);
-							result = 0;
-						}
-						else
-							result = applefdc_read_reg(device, 0);
+				case 0x0D:
+					result = read_reg(IWM_Q6);
+					break;
 
-						break;
-					case 0x0D:
-						result = applefdc_read_reg(device, IWM_Q6);
-						break;
-					case 0x0E:
-						result = applefdc_read_reg(device, IWM_Q7);
-						break;
-					case 0x0F:
-						result = applefdc_read_reg(device, IWM_Q7 | IWM_Q6);
-						break;
-				}
-				break;
+				case 0x0E:
+					result = read_reg(IWM_Q7);
+					break;
 
-			case APPLEFDC_IWM:
-				if ((offset & 1) == 0)
-					result = applefdc_read_reg(device, fdc->lines & (IWM_Q6 | IWM_Q7));
-				break;
+				case 0x0F:
+					result = read_reg(IWM_Q7 | IWM_Q6);
+					break;
+			}
+			break;
 
-			case APPLEFDC_SWIM:
-				if ((offset & 1) == 0)
-					result = applefdc_read_reg(device, fdc->lines & (IWM_Q6 | IWM_Q7));
-				break;
-		}
-	}
-	else if (fdc->swim_mode >= SWIM_MODE_SWIM)
-	{
-		// reading parameter RAM?
-		if ((offset & 7) == 3)
-		{
-			result = fdc->parms[fdc->parm_offset++];
-			fdc->parm_offset &= 0xf;
-		}
-		else
-		{
-			result = fdc->ism_regs[offset&7];
-		}
-		printf("SWIM: read %02x from offset %x\n", result, offset & 7);
+		case APPLEFDC_IWM:
+			if ((offset & 1) == 0)
+				result = read_reg(m_lines & (IWM_Q6 | IWM_Q7));
+			break;
+
+		case APPLEFDC_SWIM:
+			if ((offset & 1) == 0)
+				result = read_reg(m_lines & (IWM_Q6 | IWM_Q7));
+			break;
 	}
 
 	return result;
@@ -630,14 +499,13 @@ READ8_DEVICE_HANDLER( applefdc_r )
 
 
 
-/*-------------------------------------------------
-    applefdc_w - writes a byte to the FDC
--------------------------------------------------*/
+//-------------------------------------------------
+//  write - writes a byte to the FDC
+//-------------------------------------------------
 
-WRITE8_DEVICE_HANDLER( applefdc_w )
+void applefdc_base_device::write(UINT8 offset, UINT8 data)
 {
-	applefdc_token *fdc = get_token(device);
-	const applefdc_interface *intf = get_interface(device);
+	const applefdc_interface *intf = get_interface();
 
 	/* normalize offset */
 	offset &= 15;
@@ -645,202 +513,72 @@ WRITE8_DEVICE_HANDLER( applefdc_w )
 	if (LOG_APPLEFDC_EXTRA)
 		logerror("applefdc_w: offset=%i data=0x%02x\n", offset, data);
 
-	if ((fdc->type < APPLEFDC_SWIM) || (fdc->swim_mode == SWIM_MODE_IWM))
+	iwm_access(offset);
+
+	switch(m_type)
 	{
-		iwm_access(device, offset);
+		case APPLEFDC_APPLE2:
+			switch(offset)
+			{
+				case 0x0C:
+					if (m_lines & IWM_Q7)
+					{
+						if (intf->write_data != NULL)
+							intf->write_data(this, m_write_byte);
+					}
+					break;
 
-		switch(fdc->type)
-		{
-			case APPLEFDC_APPLE2:
-				switch(offset)
-				{
-					case 0x0C:
-						if (fdc->lines & IWM_Q7)
-						{
-							if (intf->write_data != NULL)
-								intf->write_data(device,fdc->write_byte);
-						}
-						break;
+				case 0x0D:
+					m_write_byte = data;
+					break;
+			}
+			break;
 
-					case 0x0D:
-						fdc->write_byte = data;
-						break;
-				}
-				break;
+		case APPLEFDC_IWM:
+			if (offset & 1)
+				write_reg(data);
+			break;
 
-			case APPLEFDC_IWM:
-				if (offset & 1)
-					applefdc_write_reg(device, data);
-				break;
-
-			case APPLEFDC_SWIM:
-				if (offset & 1)
-					applefdc_write_reg(device, data);
-				break;
-		}
-	}
-	else if (fdc->swim_mode >= SWIM_MODE_SWIM)
-	{
-		printf("SWIM: write %02x to offset %x\n", data, offset & 7);
-		switch (offset & 7)
-		{
-			case 2: // write CRC
-				break;
-
-			case 3: // write parameter
-				fdc->parms[fdc->parm_offset++] = data;
-				fdc->parm_offset &= 0xf;
-				break;
-
-			case 6: // write zeros to status (also zeroes parameter RAM pointer)
-				fdc->ism_regs[6] &= ~data;
-				fdc->parm_offset = 0;
-
-				if (data == 0xf8)	// magic "revert to IWM" value
-				{
-					printf("SWIM: reverting to IWM\n");
-					fdc->swim_mode = SWIM_MODE_IWM;
-				}
-				break;
-
-			case 7: // write ones to status
-				fdc->ism_regs[6] |= data;
-				break;
-
-			default:
-				fdc->ism_regs[offset & 7] = data;
-				break;
-
-		}
+		case APPLEFDC_SWIM:
+			if (offset & 1)
+				write_reg(data);
+			break;
 	}
 }
 
 
 
-/*-------------------------------------------------
-    applefdc_w - writes a byte to the FDC
--------------------------------------------------*/
+//-------------------------------------------------
+//  get_lines - accessor
+//-------------------------------------------------
 
-UINT8 applefdc_get_lines(device_t *device)
+UINT8 applefdc_base_device::get_lines()
 {
-	applefdc_token *fdc = get_token(device);
-	return fdc->lines & 0x0f;
+	return m_lines & 0x0f;
 }
 
 
 
 /***************************************************************************
-    INTERFACE
+    APPLE FDC - Used on Apple II
 ***************************************************************************/
-
-/*-------------------------------------------------
-    DEVICE_START(oldfdc) - device start
-    callback
--------------------------------------------------*/
-
-static DEVICE_START(oldfdc)
-{
-	applefdc_start(device, APPLEFDC_APPLE2);
-}
-
-
-
-/*-------------------------------------------------
-    DEVICE_START(iwm) - device start
-    callback
--------------------------------------------------*/
-
-static DEVICE_START(iwm)
-{
-	applefdc_start(device, APPLEFDC_IWM);
-}
-
-
-/*-------------------------------------------------
-    DEVICE_START(iwm) - device start
-    callback
--------------------------------------------------*/
-
-static DEVICE_START(swim)
-{
-	applefdc_start(device, APPLEFDC_SWIM);
-}
-
-
-applefdc_base_device::applefdc_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock)
-{
-	m_token = global_alloc_clear(applefdc_token);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void applefdc_base_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void applefdc_base_device::device_reset()
-{
-	DEVICE_RESET_NAME( applefdc )(this);
-}
-
 
 const device_type APPLEFDC = &device_creator<applefdc_device>;
 
 applefdc_device::applefdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: applefdc_base_device(mconfig, APPLEFDC, "Apple FDC", tag, owner, clock)
+	: applefdc_base_device(APPLEFDC_APPLE2, mconfig, APPLEFDC, "Apple FDC", tag, owner, clock)
 {
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
 
-void applefdc_device::device_start()
-{
-	DEVICE_START_NAME( oldfdc )(this);
-}
 
+/***************************************************************************
+    IWM - Used on early Macs
+***************************************************************************/
 
 const device_type IWM = &device_creator<iwm_device>;
 
 iwm_device::iwm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: applefdc_base_device(mconfig, IWM, "Apple IWM (Integrated Woz Machine)", tag, owner, clock)
+	: applefdc_base_device(APPLEFDC_IWM, mconfig, IWM, "Apple IWM (Integrated Woz Machine)", tag, owner, clock)
 {
 }
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void iwm_device::device_start()
-{
-	DEVICE_START_NAME( iwm )(this);
-}
-
-
-const device_type SWIM = &device_creator<swim_device>;
-
-swim_device::swim_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: applefdc_base_device(mconfig, SWIM, "Apple SWIM (Steve Woz Integrated Machine)", tag, owner, clock)
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void swim_device::device_start()
-{
-	DEVICE_START_NAME( swim )(this);
-}
-
-

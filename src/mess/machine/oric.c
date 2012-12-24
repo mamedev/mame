@@ -417,18 +417,18 @@ CALL &320 to start, or use BOBY rom.
 static void oric_install_apple2_interface(running_machine &machine)
 {
 	oric_state *state = machine.driver_data<oric_state>();
-	device_t *fdc = machine.device("fdc");
+	applefdc_base_device *fdc = machine.device<applefdc_base_device>("fdc");
 	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (state->m_is_telestrat)
 		return;
 
-	space.install_read_handler(0x0300, 0x030f, read8_delegate(FUNC(oric_state::oric_IO_r),state));
-	space.install_legacy_read_handler(*fdc, 0x0310, 0x031f, FUNC(applefdc_r));
+	space.install_read_handler(0x0300, 0x030f, read8_delegate(FUNC(oric_state::oric_IO_r), state));
+	space.install_read_handler(0x0310, 0x031f, read8_delegate(FUNC(applefdc_base_device::read), fdc));
 	space.install_read_bank(0x0320, 0x03ff, "bank4");
 
-	space.install_write_handler(0x0300, 0x030f, write8_delegate(FUNC(oric_state::oric_IO_w),state));
-	space.install_legacy_write_handler(*fdc, 0x0310, 0x031f, FUNC(applefdc_w));
+	space.install_write_handler(0x0300, 0x030f, write8_delegate(FUNC(oric_state::oric_IO_w), state));
+	space.install_write_handler(0x0310, 0x031f, write8_delegate(FUNC(applefdc_base_device::write), fdc));
 	state->membank("bank4")->set_base(	state->memregion("maincpu")->base() + 0x014000 + 0x020);
 }
 
@@ -541,15 +541,15 @@ WRITE8_MEMBER(oric_state::apple2_v2_interface_w)
 static void oric_install_apple2_v2_interface(running_machine &machine)
 {
 	oric_state *state = machine.driver_data<oric_state>();
-	device_t *fdc = machine.device("fdc");
+	applefdc_base_device *fdc = machine.device<applefdc_base_device>("fdc");
 	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
-	space.install_read_handler(0x0300, 0x030f, read8_delegate(FUNC(oric_state::oric_IO_r),state));
-	space.install_legacy_read_handler(*fdc, 0x0310, 0x031f, FUNC(applefdc_r));
+	space.install_read_handler(0x0300, 0x030f, read8_delegate(FUNC(oric_state::oric_IO_r), state));
+	space.install_read_handler(0x0310, 0x031f, read8_delegate(FUNC(applefdc_base_device::read), fdc));
 	space.install_read_bank(0x0320, 0x03ff, "bank4");
 
-	space.install_write_handler(0x0300, 0x030f, write8_delegate(FUNC(oric_state::oric_IO_w),state));
-	space.install_legacy_write_handler(*fdc, 0x0310, 0x031f, FUNC(applefdc_w));
+	space.install_write_handler(0x0300, 0x030f, write8_delegate(FUNC(oric_state::oric_IO_w), state));
+	space.install_write_handler(0x0310, 0x031f, write8_delegate(FUNC(applefdc_base_device::write), fdc));
 	space.install_write_handler(0x0380, 0x0383, write8_delegate(FUNC(oric_state::apple2_v2_interface_w),state));
 
 	state->apple2_v2_interface_w(space, 0, 0);
