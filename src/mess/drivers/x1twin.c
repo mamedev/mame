@@ -573,7 +573,7 @@ static MACHINE_CONFIG_START( x1twin, x1twin_state )
 	MCFG_SPEAKER_ADD("x1_l",-0.2, 0.0, 1.0)
 	MCFG_SPEAKER_ADD("x1_r",0.2, 0.0, 1.0)
 	MCFG_SPEAKER_ADD("pce_l",-0.2, 0.0, 1.0)
-	MCFG_SPEAKER_ADD("pce_r",-0.2, 0.0, 1.0)
+	MCFG_SPEAKER_ADD("pce_r",0.2, 0.0, 1.0)
 
 //  MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

@@ -92,6 +92,8 @@ public:
 	sound_stream	*m_sh_channel;
 	emu_timer		*m_irq_on_timer;
 	emu_timer		*m_irq_off_timer;
+	UINT8 m_pcg_bank;
+	UINT8 m_force_pattern;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -144,6 +146,12 @@ WRITE8_MEMBER( pv1000_state::pv1000_io_w )
 
 	case 0x05:
 		m_fd_data = 1;
+		break;
+//	case 0x06 VRAM + PCG location, always fixed at 0xb8xx
+	case 0x07:
+		/* ---- -xxx unknown, border color? */
+		m_pcg_bank = (data & 0x20) >> 5;
+		m_force_pattern = ((data & 0x10) >> 4); /* Dig Dug relies on this */
 		break;
 	}
 
@@ -278,9 +286,9 @@ UINT32 pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 &b
 		{
 			UINT16 tile = m_p_videoram[ y * 32 + x ];
 
-			if ( tile < 0xe0 )
+			if ( tile < 0xe0 || m_force_pattern )
 			{
-				tile += ( m_io_regs[7] * 8 );
+				tile += ( m_pcg_bank << 8);
 				drawgfx_opaque( bitmap, cliprect, machine().gfx[0], tile, 0, 0, 0, x*8, y*8 );
 			}
 			else
@@ -312,7 +320,6 @@ static STREAM_UPDATE( pv1000_sound_update )
 
 	while ( samples > 0 )
 	{
-
 		*buffer=0;
 
 		for (size_t i=0;i<3;i++)
@@ -367,14 +374,12 @@ TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_on_cb)
 
 TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_off_cb)
 {
-
 	m_maincpu->set_input_line(0, CLEAR_LINE );
 }
 
 
 void pv1000_state::machine_start()
 {
-
 	m_irq_on_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pv1000_state::d65010_irq_on_cb),this));
 	m_irq_off_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pv1000_state::d65010_irq_off_cb),this));
 }
