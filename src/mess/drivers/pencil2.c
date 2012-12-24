@@ -17,8 +17,11 @@ J1 Expansion slot
 J2 Cart slot
 J3 Memory expansion slot
 J4 Printer slot
+J5,J6 Joystick ports
 
 XTAL 10.738 MHz
+
+Output is to a TV on Australian Channel 1 (no monitor output)
 
 U1     uPD780C-1 (Z80A)
 U2     Video chip with heatsink stuck on top, possibly TMS9928
@@ -55,13 +58,31 @@ The 16k dynamic RAM holds the BASIC program and the video/gfx etc
 but is banked out of view of a BASIC program.
 
 
+KNOWN CARTS
+SD-BASIC V1.0
+SD-BASIC V2.0
+
+
+ToDo:
+- Keyboard
+- Printer (out 00)
+- Cassette
+- Joysticks
+- Colours are different to the real system
+- RAM banking
+- Cart slot
+- Size of vram
+- When BASIC starts the intro is off the top of the screen
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/tms9928a.h"
+#include "sound/sn76496.h"
 //#include "imagedev/cartslot.h"
 //#include "imagedev/cassette.h"
+//#include "sound/wave.h"
 
 
 class pencil2_state : public driver_device
@@ -73,8 +94,8 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	DECLARE_READ8_MEMBER(port00_r) { return 0x80; };
-	DECLARE_READ8_MEMBER(port0f_r) { return 0x05; };
+	//DECLARE_READ8_MEMBER(port00_r) { return 0x80; };
+	//DECLARE_READ8_MEMBER(port0f_r) { return 0x05; };
 	virtual void machine_reset();
 };
 
@@ -88,9 +109,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(pencil2_io, AS_IO, 8, pencil2_state)
 	//ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
-	AM_RANGE(0x0f, 0x0f) AM_READ(port0f_r)
-	AM_RANGE(0x20, 0x20) AM_WRITENOP
+	//AM_RANGE(0x00, 0x00) AM_READ(port00_r)
+	//AM_RANGE(0x0f, 0x0f) AM_READ(port0f_r)
+	//AM_RANGE(0x20, 0x20) AM_WRITENOP
+	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
+	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
+	AM_RANGE(0xe0, 0xff) AM_DEVWRITE("sn76489a", sn76489a_device, write)
 ADDRESS_MAP_END
 
 
@@ -103,16 +127,21 @@ void pencil2_state::machine_reset()
 {
 }
 
+static const sn76496_config psg_intf =
+{
+	DEVCB_NULL
+};
+
 static TMS9928A_INTERFACE(pencil2_tms9928a_interface)
 {
-	"screen",
-	0x4000,
-	DEVCB_NULL
+	"screen",	// screen tag
+	0x4000,		// vram size (guess)
+	DEVCB_NULL	// write line if int changes
 };
 
 static MACHINE_CONFIG_START( pencil2, pencil2_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 10738000/3)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pencil2_mem)
 	MCFG_CPU_IO_MAP(pencil2_io)
 
@@ -121,6 +150,23 @@ static MACHINE_CONFIG_START( pencil2, pencil2_state )
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
+	// sound hardware
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_10_738635MHz/3) // guess
+	MCFG_SOUND_CONFIG(psg_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+//	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* cassette */
+//	MCFG_CASSETTE_ADD( CASSETTE_TAG, pencil2_cassette_interface )
+
+	/* cartridge */
+//	MCFG_CARTSLOT_ADD("cart")
+//	MCFG_CARTSLOT_EXTENSION_LIST("rom")
+//	MCFG_CARTSLOT_NOT_MANDATORY
+//	MCFG_CARTSLOT_LOAD(pencil2_cart)
+//	MCFG_CARTSLOT_INTERFACE("pencil2_cart")
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -131,6 +177,7 @@ ROM_START( pencil2 )
 	ROM_RELOAD(        0xb000, 0x1000 )
 	ROM_LOAD( "203",   0x8000, 0x2000, CRC(f502175c) SHA1(cb2190e633e98586758008577265a7a2bc088233) )
 	ROM_LOAD( "202",   0xc000, 0x2000, CRC(5171097d) SHA1(171999bc04dc98c74c0722b2866310d193dc0f82) )
+//	ROM_CART_LOAD("cart", 0x8000, 0x8000, ROM_OPTIONAL)
 ROM_END
 
 /* Driver */
