@@ -64,10 +64,10 @@ void tim100_state::machine_reset()
 const gfx_layout tim100_charlayout =
 {
 	12, 16,				/* 8x16 characters */
-	128,				/* 128 characters */
+	256,				/* 128 characters */
 	1,				/* 1 bits per pixel */
 	{0},				/* no bitplanes; 1 bit per pixel */
-	{0,1,2,3,4,5,0+0x4000,1+0x4000,2+0x4000,3+0x4000,4+0x4000,5+0x4000},
+	{0,1,2,3,4,5,0x8000,0x8001,0x8002,0x8003,0x8004,0x8005},
 	{0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8,
 	 8 * 8, 9 * 8, 10 * 8, 11 * 8, 12 * 8, 13 * 8, 14 * 8, 15 * 8},
 	8*16				/* space between characters */
@@ -156,11 +156,19 @@ MACHINE_CONFIG_END
 ROM_START( tim100 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "tim 100 v.3.2.0.u16",   0x0000, 0x2000, CRC(4de9c8ad) SHA1(b0914d6e8d618e92a87b4b39c35391541251e8cc))  
+
+	// The first and 2nd halves of these roms are identical, possibly overdumped?
 	ROM_REGION( 0x2000, "chargen", ROMREGION_INVERT )
 	ROM_SYSTEM_BIOS( 0, "212", "v 2.1.2" )
-	ROMX_LOAD( "tim 100kg v.2.1.2.u12", 0x0000, 0x2000, CRC(faf5743c) SHA1(310b662e9535878210f8aaab3e2b846fade60642),ROM_BIOS(1))	
+	ROMX_LOAD( "tim 100kg v.2.1.2.u12", 0x0000, 0x0800, CRC(faf5743c) SHA1(310b662e9535878210f8aaab3e2b846fade60642),ROM_BIOS(1))
+	ROM_CONTINUE (0x1000, 0x0800)
+	ROM_CONTINUE (0x0800, 0x0800)
+	ROM_CONTINUE (0x1800, 0x0800)
 	ROM_SYSTEM_BIOS( 1, "220", "v 2.2.0" )
-	ROMX_LOAD( "tim 100kg v.2.2.0.u12", 0x0000, 0x2000, CRC(358dbbd3) SHA1(14b7d6ee41b19bedf2f070f5b28b03aaff2cac4f),ROM_BIOS(2))
+	ROMX_LOAD( "tim 100kg v.2.2.0.u12", 0x0000, 0x0800, CRC(358dbbd3) SHA1(14b7d6ee41b19bedf2f070f5b28b03aaff2cac4f),ROM_BIOS(2))
+	ROM_CONTINUE (0x1000, 0x0800)
+	ROM_CONTINUE (0x0800, 0x0800)
+	ROM_CONTINUE (0x1800, 0x0800)
 ROM_END
 
 /* Driver */
