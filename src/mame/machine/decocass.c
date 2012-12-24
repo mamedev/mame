@@ -21,14 +21,9 @@
 	((UINT32)(m6) << 18) | \
 	((UINT32)(m7) << 21)
 
-#define MAP0(m) ((m)&7)
-#define MAP1(m) (((m)>>3)&7)
-#define MAP2(m) (((m)>>6)&7)
-#define MAP3(m) (((m)>>9)&7)
-#define MAP4(m) (((m)>>12)&7)
-#define MAP5(m) (((m)>>15)&7)
-#define MAP6(m) (((m)>>18)&7)
-#define MAP7(m) (((m)>>21)&7)
+
+#define T1MAP(x, m) (((m)>>(x*3))&7)
+
 
 
 enum {
@@ -238,6 +233,83 @@ static void decocass_fno( running_machine &machine, offs_t offset, UINT8 data )
 }
 #endif
 
+
+READ8_MEMBER(decocass_state::decocass_type1_r)
+{
+	if (!m_type1_map)
+		return 0x00;
+
+	UINT8 data;
+
+	if (1 == (offset & 1))
+	{
+		if (0 == (offset & E5XX_MASK))
+			data = upi41_master_r(m_mcu, 1);
+		else
+			data = 0xff;
+
+		data = (BIT(data, 0) << 0) | (BIT(data, 1) << 1) | 0x7c;
+		LOG(4,("%10s 6502-PC: %04x decocass_type1_r(%02x): $%02x <- (%s %s)\n",
+			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data,
+			(data & 1) ? "OBF" : "-",
+			(data & 2) ? "IBF" : "-"));
+	}
+	else
+	{
+		offs_t promaddr;
+		UINT8 save;
+		UINT8 *prom = space.machine().root_device().memregion("dongle")->base();
+
+		if (m_firsttime)
+		{
+			LOG(3,("prom data:\n"));
+			for (promaddr = 0; promaddr < 32; promaddr++)
+			{
+				if (promaddr % 8 == 0)
+					LOG(3,("  %02x:", promaddr));
+				LOG(3,(" %02x%s", prom[promaddr], (promaddr % 8) == 7 ? "\n" : ""));
+			}
+			m_firsttime = 0;
+			m_latch1 = 0;	 /* reset latch (??) */
+		}
+
+		if (0 == (offset & E5XX_MASK))
+			data = upi41_master_r(m_mcu, 0);
+		else
+			data = 0xff;
+
+		save = data;	/* save the unmodifed data for the latch */
+
+		promaddr = 0;
+		int promshift = 0;
+
+		for (int i=0;i<8;i++)
+		{
+			if (m_type1_map[i] == T1PROM) { promaddr |=	(((data >> T1MAP(i,m_type1_inmap)) & 1) << promshift); promshift++; }
+		}
+
+		if (promshift!=5)
+			printf("promshift != 5? (you specified more/less than 5 prom source bits)");
+
+		data = 0;
+		promshift = 0;
+
+		for (int i=0;i<8;i++)
+		{
+			if (m_type1_map[i] == T1PROM) 	  { data |= (((prom[promaddr] >> promshift) & 1)			   << T1MAP(i,m_type1_outmap)); promshift++; }
+			if (m_type1_map[i] == T1LATCHINV) { data |= ((1 - ((m_latch1 >> T1MAP(i,m_type1_inmap)) & 1)) << T1MAP(i,m_type1_outmap)); }
+			if (m_type1_map[i] == T1LATCH)    { data |= (((m_latch1 >> T1MAP(i,m_type1_inmap)) & 1)	   << T1MAP(i,m_type1_outmap)); }
+			if (m_type1_map[i] == T1DIRECT)   { data |= (((save >> T1MAP(i,m_type1_inmap)) & 1)		   << T1MAP(i,m_type1_outmap)); }
+		}
+	
+		LOG(3,("%10s 6502-PC: %04x decocass_type1_r(%02x): $%02x\n",
+			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
+
+		m_latch1 = save;		/* latch the data for the next A0 == 0 read */
+	}
+	return data;
+}
+
 /***************************************************************************
  *
  *  TYPE1 DONGLE (DE-0061)
@@ -254,74 +326,7 @@ static void decocass_fno( running_machine &machine, offs_t offset, UINT8 data )
  *
  ***************************************************************************/
 
-READ8_MEMBER(decocass_state::decocass_type1_latch_26_pass_3_inv_2_r)
-{
-	UINT8 data;
-
-	if (1 == (offset & 1))
-	{
-		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(m_mcu, 1);
-		else
-			data = 0xff;
-
-		data = (BIT(data, 0) << 0) | (BIT(data, 1) << 1) | 0x7c;
-		LOG(4,("%10s 6502-PC: %04x decocass_type1_latch_26_pass_3_inv_2_r(%02x): $%02x <- (%s %s)\n",
-			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data,
-			(data & 1) ? "OBF" : "-",
-			(data & 2) ? "IBF" : "-"));
-	}
-	else
-	{
-		offs_t promaddr;
-		UINT8 save;
-		UINT8 *prom = space.machine().root_device().memregion("dongle")->base();
-
-		if (m_firsttime)
-		{
-			LOG(3,("prom data:\n"));
-			for (promaddr = 0; promaddr < 32; promaddr++)
-			{
-				if (promaddr % 8 == 0)
-					LOG(3,("  %02x:", promaddr));
-				LOG(3,(" %02x%s", prom[promaddr], (promaddr % 8) == 7 ? "\n" : ""));
-			}
-			m_firsttime = 0;
-			m_latch1 = 0;	 /* reset latch (??) */
-		}
-
-		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(m_mcu, 0);
-		else
-			data = 0xff;
-
-		save = data;	/* save the unmodifed data for the latch */
-
-		promaddr =
-			(((data >> MAP0(m_type1_inmap)) & 1) << 0) |
-			(((data >> MAP1(m_type1_inmap)) & 1) << 1) |
-			(((data >> MAP4(m_type1_inmap)) & 1) << 2) |
-			(((data >> MAP5(m_type1_inmap)) & 1) << 3) |
-			(((data >> MAP7(m_type1_inmap)) & 1) << 4);
-		/* latch bits 2 and 6, pass bit 3, invert bit 2 */
-		data =
-			(((prom[promaddr] >> 0) & 1)			   << MAP0(m_type1_outmap)) |
-			(((prom[promaddr] >> 1) & 1)			   << MAP1(m_type1_outmap)) |
-			((1 - ((m_latch1 >> MAP2(m_type1_inmap)) & 1)) << MAP2(m_type1_outmap)) |
-			(((data >> MAP3(m_type1_inmap)) & 1)		   << MAP3(m_type1_outmap)) |
-			(((prom[promaddr] >> 2) & 1)			   << MAP4(m_type1_outmap)) |
-			(((prom[promaddr] >> 3) & 1)			   << MAP5(m_type1_outmap)) |
-			(((m_latch1 >> MAP6(m_type1_inmap)) & 1)	   << MAP6(m_type1_outmap)) |
-			(((prom[promaddr] >> 4) & 1)			   << MAP7(m_type1_outmap));
-
-		LOG(3,("%10s 6502-PC: %04x decocass_type1_latch_26_pass_3_inv_2_r(%02x): $%02x\n",
-			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
-
-		m_latch1 = save;		/* latch the data for the next A0 == 0 read */
-	}
-	return data;
-}
-
+static UINT8 type1_latch_26_pass_3_inv_2_table[8] = { T1PROM,T1PROM,T1LATCHINV,T1DIRECT,T1PROM, T1PROM,T1LATCH,T1PROM };
 
 /***************************************************************************
  *
@@ -333,74 +338,7 @@ READ8_MEMBER(decocass_state::decocass_type1_latch_26_pass_3_inv_2_r)
  *
  ***************************************************************************/
 
-READ8_MEMBER(decocass_state::decocass_type1_pass_136_r)
-{
-	UINT8 data;
-
-	if (1 == (offset & 1))
-	{
-		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(m_mcu, 1);
-		else
-			data = 0xff;
-
-		data = (BIT(data, 0) << 0) | (BIT(data, 1) << 1) | 0x7c;
-		LOG(4,("%10s 6502-PC: %04x decocass_type1_pass_136_r(%02x): $%02x <- (%s %s)\n",
-			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data,
-			(data & 1) ? "OBF" : "-",
-			(data & 2) ? "IBF" : "-"));
-	}
-	else
-	{
-		offs_t promaddr;
-		UINT8 save;
-		UINT8 *prom = space.machine().root_device().memregion("dongle")->base();
-
-		if (m_firsttime)
-		{
-			LOG(3,("prom data:\n"));
-			for (promaddr = 0; promaddr < 32; promaddr++)
-			{
-				if (promaddr % 8 == 0)
-					LOG(3,("  %02x:", promaddr));
-				LOG(3,(" %02x%s", prom[promaddr], (promaddr % 8) == 7 ? "\n" : ""));
-			}
-			m_firsttime = 0;
-			m_latch1 = 0;	 /* reset latch (??) */
-		}
-
-		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(m_mcu, 0);
-		else
-			data = 0xff;
-
-		save = data;	/* save the unmodifed data for the latch */
-
-		promaddr =
-			(((data >> MAP0(m_type1_inmap)) & 1) << 0) |
-			(((data >> MAP2(m_type1_inmap)) & 1) << 1) |
-			(((data >> MAP4(m_type1_inmap)) & 1) << 2) |
-			(((data >> MAP5(m_type1_inmap)) & 1) << 3) |
-			(((data >> MAP7(m_type1_inmap)) & 1) << 4);
-		/* latch bits 1 and 6, pass bit 3, invert bit 1 */
-		data =
-			(((prom[promaddr] >> 0) & 1)			   << MAP0(m_type1_outmap)) |
-			(((data >> MAP1(m_type1_inmap)) & 1)         << MAP1(m_type1_outmap)) |
-			(((prom[promaddr] >> 1) & 1)			   << MAP2(m_type1_outmap)) |
-			(((data >> MAP3(m_type1_inmap)) & 1)		   << MAP3(m_type1_outmap)) |
-			(((prom[promaddr] >> 2) & 1)			   << MAP4(m_type1_outmap)) |
-			(((prom[promaddr] >> 3) & 1)			   << MAP5(m_type1_outmap)) |
-			(((data >> MAP6(m_type1_inmap)) & 1)	       << MAP6(m_type1_outmap)) |
-			(((prom[promaddr] >> 4) & 1)			   << MAP7(m_type1_outmap));
-
-		LOG(3,("%10s 6502-PC: %04x decocass_type1_pass_136_r(%02x): $%02x\n",
-			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
-
-		m_latch1 = save;		/* latch the data for the next A0 == 0 read */
-	}
-	return data;
-}
-
+static UINT8 type1_pass_136_table[8] ={ T1PROM,T1DIRECT,T1PROM,T1DIRECT,T1PROM,T1PROM,T1DIRECT,T1PROM };
 
 /***************************************************************************
  *
@@ -413,75 +351,7 @@ READ8_MEMBER(decocass_state::decocass_type1_pass_136_r)
  *
  ***************************************************************************/
 
-READ8_MEMBER(decocass_state::decocass_type1_latch_xab_pass_x54_r)
-{
-	UINT8 data;
-
-	if (1 == (offset & 1))
-	{
-		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(m_mcu, 1);
-		else
-			data = 0xff;
-
-		data = (BIT(data, 0) << 0) | (BIT(data, 1) << 1) | 0x7c;
-		LOG(4,("%10s 6502-PC: %04x decocass_type1_latch_27_pass_3_inv_2_r(%02x): $%02x <- (%s %s)\n",
-			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data,
-			(data & 1) ? "OBF" : "-",
-			(data & 2) ? "IBF" : "-"));
-	}
-	else
-	{
-		offs_t promaddr;
-		UINT8 save;
-		UINT8 *prom = space.machine().root_device().memregion("dongle")->base();
-
-		if (m_firsttime)
-		{
-			LOG(3,("prom data:\n"));
-			for (promaddr = 0; promaddr < 32; promaddr++)
-			{
-				if (promaddr % 8 == 0)
-					LOG(3,("  %02x:", promaddr));
-				LOG(3,(" %02x%s", prom[promaddr], (promaddr % 8) == 7 ? "\n" : ""));
-			}
-			m_firsttime = 0;
-			m_latch1 = 0;	 /* reset latch (??) */
-		}
-
-		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(m_mcu, 0);
-		else
-			data = 0xff;
-
-		save = data;	/* save the unmodifed data for the latch */
-
-		/* AB 10101011 */
-		promaddr =
-			(((data >> MAP0(m_type1_inmap)) & 1) << 0) |
-			(((data >> MAP1(m_type1_inmap)) & 1) << 1) |
-			(((data >> MAP3(m_type1_inmap)) & 1) << 2) |
-			(((data >> MAP5(m_type1_inmap)) & 1) << 3) |
-			(((data >> MAP7(m_type1_inmap)) & 1) << 4);
-		/* no latch, pass bit 0x54 */
-		data =
-			(((prom[promaddr] >> 0) & 1)			   << MAP0(m_type1_outmap)) |
-			(((prom[promaddr] >> 1) & 1)			   << MAP1(m_type1_outmap)) |
-			(((data >> MAP2(m_type1_inmap)) & 1)		   << MAP2(m_type1_outmap)) |
-			(((prom[promaddr] >> 2) & 1)			   << MAP3(m_type1_outmap)) |
-			(((data >> MAP4(m_type1_inmap)) & 1)		   << MAP4(m_type1_outmap))  |
-			(((prom[promaddr] >> 3) & 1)			   << MAP5(m_type1_outmap)) |
-			(((data >> MAP6(m_type1_inmap)) & 1)		   << MAP6(m_type1_outmap)) |
-			(((prom[promaddr] >> 4) & 1)			   << MAP7(m_type1_outmap));
-
-		LOG(3,("%10s 6502-PC: %04x decocass_type1_latch_27_pass_3_inv_2_r(%02x): $%02x\n",
-			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
-
-		m_latch1 = save;		/* latch the data for the next A0 == 0 read */
-	}
-	return data;
-}
-
+static UINT8 type1_latch_xab_pass_x54_table[8] = { T1PROM,T1PROM,T1DIRECT,T1PROM,T1DIRECT,T1PROM,T1DIRECT,T1PROM };
 
 /***************************************************************************
  *
@@ -494,73 +364,7 @@ READ8_MEMBER(decocass_state::decocass_type1_latch_xab_pass_x54_r)
  *
  ***************************************************************************/
 
-READ8_MEMBER(decocass_state::decocass_type1_latch_27_pass_3_inv_2_r)
-{
-	UINT8 data;
-
-	if (1 == (offset & 1))
-	{
-		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(m_mcu, 1);
-		else
-			data = 0xff;
-
-		data = (BIT(data, 0) << 0) | (BIT(data, 1) << 1) | 0x7c;
-		LOG(4,("%10s 6502-PC: %04x decocass_type1_latch_27_pass_3_inv_2_r(%02x): $%02x <- (%s %s)\n",
-			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data,
-			(data & 1) ? "OBF" : "-",
-			(data & 2) ? "IBF" : "-"));
-	}
-	else
-	{
-		offs_t promaddr;
-		UINT8 save;
-		UINT8 *prom = space.machine().root_device().memregion("dongle")->base();
-
-		if (m_firsttime)
-		{
-			LOG(3,("prom data:\n"));
-			for (promaddr = 0; promaddr < 32; promaddr++)
-			{
-				if (promaddr % 8 == 0)
-					LOG(3,("  %02x:", promaddr));
-				LOG(3,(" %02x%s", prom[promaddr], (promaddr % 8) == 7 ? "\n" : ""));
-			}
-			m_firsttime = 0;
-			m_latch1 = 0;	 /* reset latch (??) */
-		}
-
-		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(m_mcu, 0);
-		else
-			data = 0xff;
-
-		save = data;	/* save the unmodifed data for the latch */
-
-		promaddr =
-			(((data >> MAP0(m_type1_inmap)) & 1) << 0) |
-			(((data >> MAP1(m_type1_inmap)) & 1) << 1) |
-			(((data >> MAP4(m_type1_inmap)) & 1) << 2) |
-			(((data >> MAP5(m_type1_inmap)) & 1) << 3) |
-			(((data >> MAP6(m_type1_inmap)) & 1) << 4);
-		/* latch bits 2 and 7, pass bit 3, invert bit 2 */
-		data =
-			(((prom[promaddr] >> 0) & 1)			   << MAP0(m_type1_outmap)) |
-			(((prom[promaddr] >> 1) & 1)			   << MAP1(m_type1_outmap)) |
-			((1 - ((m_latch1 >> MAP2(m_type1_inmap)) & 1)) << MAP2(m_type1_outmap)) |
-			(((data >> MAP3(m_type1_inmap)) & 1)		   << MAP3(m_type1_outmap)) |
-			(((prom[promaddr] >> 2) & 1)			   << MAP4(m_type1_outmap)) |
-			(((prom[promaddr] >> 3) & 1)			   << MAP5(m_type1_outmap)) |
-			(((prom[promaddr] >> 4) & 1)			   << MAP6(m_type1_outmap)) |
-			(((m_latch1 >> MAP7(m_type1_inmap)) & 1)	   << MAP7(m_type1_outmap));
-
-		LOG(3,("%10s 6502-PC: %04x decocass_type1_latch_27_pass_3_inv_2_r(%02x): $%02x\n",
-			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
-
-		m_latch1 = save;		/* latch the data for the next A0 == 0 read */
-	}
-	return data;
-}
+static UINT8 type1_latch_27_pass_3_inv_2_table[8] = { T1PROM,T1PROM,T1LATCHINV,T1DIRECT,T1PROM,T1PROM,T1PROM,T1LATCH };
 
 /***************************************************************************
  *
@@ -573,75 +377,7 @@ READ8_MEMBER(decocass_state::decocass_type1_latch_27_pass_3_inv_2_r)
  *
  ***************************************************************************/
 
-READ8_MEMBER(decocass_state::decocass_type1_latch_26_pass_5_inv_2_r)
-{
-	UINT8 data;
-
-	if (1 == (offset & 1))
-	{
-		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(m_mcu, 1);
-		else
-			data = 0xff;
-
-		data = (BIT(data, 0) << 0) | (BIT(data, 1) << 1) | 0x7c;
-		LOG(4,("%10s 6502-PC: %04x decocass_type1_latch_26_pass_5_inv_2_r(%02x): $%02x <- (%s %s)\n",
-			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data,
-			(data & 1) ? "OBF" : "-",
-			(data & 2) ? "IBF" : "-"));
-	}
-	else
-	{
-		offs_t promaddr;
-		UINT8 save;
-		UINT8 *prom = space.machine().root_device().memregion("dongle")->base();
-
-		if (m_firsttime)
-		{
-			LOG(3,("prom data:\n"));
-			for (promaddr = 0; promaddr < 32; promaddr++)
-			{
-				if (promaddr % 8 == 0)
-					LOG(3,("  %02x:", promaddr));
-				LOG(3,(" %02x%s", prom[promaddr], (promaddr % 8) == 7 ? "\n" : ""));
-			}
-			m_firsttime = 0;
-			m_latch1 = 0;	 /* reset latch (??) */
-		}
-
-		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(m_mcu, 0);
-		else
-			data = 0xff;
-
-		save = data;	/* save the unmodifed data for the latch */
-
-		promaddr =
-			(((data >> MAP0(m_type1_inmap)) & 1) << 0) |
-			(((data >> MAP1(m_type1_inmap)) & 1) << 1) |
-			(((data >> MAP3(m_type1_inmap)) & 1) << 2) |
-			(((data >> MAP4(m_type1_inmap)) & 1) << 3) |
-			(((data >> MAP7(m_type1_inmap)) & 1) << 4);
-		/* latch bits 2 and 6, pass bit 5, invert bit 2 */
-		data =
-			(((prom[promaddr] >> 0) & 1)			   << MAP0(m_type1_outmap)) |
-			(((prom[promaddr] >> 1) & 1)			   << MAP1(m_type1_outmap)) |
-			((1 - ((m_latch1 >> MAP2(m_type1_inmap)) & 1)) << MAP2(m_type1_outmap)) |
-			(((prom[promaddr] >> 2) & 1)			   << MAP3(m_type1_outmap)) |
-			(((prom[promaddr] >> 3) & 1)			   << MAP4(m_type1_outmap)) |
-			(((data >> MAP5(m_type1_inmap)) & 1)		   << MAP5(m_type1_outmap)) |
-			(((m_latch1 >> MAP6(m_type1_inmap)) & 1)		   << MAP6(m_type1_outmap)) |
-			(((prom[promaddr] >> 4) & 1)			   << MAP7(m_type1_outmap));
-
-		LOG(3,("%10s 6502-PC: %04x decocass_type1_latch_26_pass_5_inv_2_r(%02x): $%02x\n",
-			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
-
-		m_latch1 = save;		/* latch the data for the next A0 == 0 read */
-	}
-	return data;
-}
-
-
+static UINT8 type1_latch_26_pass_5_inv_2_table[8] = { T1PROM,T1PROM,T1LATCHINV,T1PROM,T1PROM,T1DIRECT,T1LATCH,T1PROM };
 
 /***************************************************************************
  *
@@ -654,76 +390,7 @@ READ8_MEMBER(decocass_state::decocass_type1_latch_26_pass_5_inv_2_r)
  *
  ***************************************************************************/
 
-READ8_MEMBER(decocass_state::decocass_type1_latch_16_pass_3_inv_1_r)
-{
-	UINT8 data;
-
-	if (1 == (offset & 1))
-	{
-		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(m_mcu, 1);
-		else
-			data = 0xff;
-
-		data = (BIT(data, 0) << 0) | (BIT(data, 1) << 1) | 0x7c;
-		LOG(4,("%10s 6502-PC: %04x decocass_type1_latch_16_pass_3_inv_1_r(%02x): $%02x <- (%s %s)\n",
-			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data,
-			(data & 1) ? "OBF" : "-",
-			(data & 2) ? "IBF" : "-"));
-	}
-	else
-	{
-		offs_t promaddr;
-		UINT8 save;
-		UINT8 *prom = space.machine().root_device().memregion("dongle")->base();
-
-		if (m_firsttime)
-		{
-			LOG(3,("prom data:\n"));
-			for (promaddr = 0; promaddr < 32; promaddr++)
-			{
-				if (promaddr % 8 == 0)
-					LOG(3,("  %02x:", promaddr));
-				LOG(3,(" %02x%s", prom[promaddr], (promaddr % 8) == 7 ? "\n" : ""));
-			}
-			m_firsttime = 0;
-			m_latch1 = 0;	 /* reset latch (??) */
-		}
-
-		if (0 == (offset & E5XX_MASK))
-			data = upi41_master_r(m_mcu, 0);
-		else
-			data = 0xff;
-
-		save = data;	/* save the unmodifed data for the latch */
-
-		promaddr =
-			(((data >> MAP0(m_type1_inmap)) & 1) << 0) |
-			(((data >> MAP2(m_type1_inmap)) & 1) << 1) |
-			(((data >> MAP4(m_type1_inmap)) & 1) << 2) |
-			(((data >> MAP5(m_type1_inmap)) & 1) << 3) |
-			(((data >> MAP7(m_type1_inmap)) & 1) << 4);
-		/* latch bits 1 and 6, pass bit 3, invert bit 1 */
-		data =
-			(((prom[promaddr] >> 0) & 1)			   << MAP0(m_type1_outmap)) |
-			((1 - ((m_latch1 >> MAP1(m_type1_inmap)) & 1)) << MAP1(m_type1_outmap)) |
-			(((prom[promaddr] >> 1) & 1)			   << MAP2(m_type1_outmap)) |
-			(((data >> MAP3(m_type1_inmap)) & 1)		   << MAP3(m_type1_outmap)) |
-			(((prom[promaddr] >> 2) & 1)			   << MAP4(m_type1_outmap)) |
-			(((prom[promaddr] >> 3) & 1)			   << MAP5(m_type1_outmap)) |
-			(((m_latch1 >> MAP6(m_type1_inmap)) & 1)	   << MAP6(m_type1_outmap)) |
-			(((prom[promaddr] >> 4) & 1)			   << MAP7(m_type1_outmap));
-
-		LOG(3,("%10s 6502-PC: %04x decocass_type1_latch_16_pass_3_inv_1_r(%02x): $%02x\n",
-			space.machine().time().as_string(6), space.device().safe_pcbase(), offset, data));
-
-		m_latch1 = save;		/* latch the data for the next A0 == 0 read */
-	}
-	return data;
-}
-
-
-
+static UINT8 type1_latch_16_pass_3_inv_1_table[8] = { T1PROM,T1LATCHINV,T1PROM,T1DIRECT,T1PROM,T1PROM,T1LATCH,T1PROM };
 
 /***************************************************************************
  *
@@ -1451,28 +1118,32 @@ MACHINE_RESET_MEMBER(decocass_state,ctsttape)
 {
 	decocass_state::machine_reset();
 	LOG(0,("dongle type #1 (DE-0061)\n"));
-	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_pass_136_r),this);
+	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_r),this);
+	m_type1_map = type1_pass_136_table;
 }
 
 MACHINE_RESET_MEMBER(decocass_state,chwy)
 {
 	decocass_state::machine_reset();
 	LOG(0,("dongle type #1 (DE-0061 own PROM)\n"));
-	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_latch_27_pass_3_inv_2_r),this);
+	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_r),this);
+	m_type1_map = type1_latch_27_pass_3_inv_2_table;
 }
 
 MACHINE_RESET_MEMBER(decocass_state,cdsteljn)
 {
 	decocass_state::machine_reset();
 	LOG(0,("dongle type #1 (A-0061)\n"));
-	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_latch_27_pass_3_inv_2_r),this);
+	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_r),this);
+	m_type1_map = type1_latch_27_pass_3_inv_2_table;
 }
 
 MACHINE_RESET_MEMBER(decocass_state,cterrani)
 {
 	decocass_state::machine_reset();
 	LOG(0,("dongle type #1 (DE-0061 straight)\n"));
-	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_latch_26_pass_3_inv_2_r),this);
+	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_r),this);
+	m_type1_map = type1_latch_26_pass_3_inv_2_table;
 	m_type1_inmap = MAKE_MAP(0,1,2,3,4,5,6,7);
 	m_type1_outmap = MAKE_MAP(0,1,2,3,4,5,6,7);
 }
@@ -1481,14 +1152,16 @@ MACHINE_RESET_MEMBER(decocass_state,castfant)
 {
 	decocass_state::machine_reset();
 	LOG(0,("dongle type #1 (DE-0061)\n"));
-	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_latch_16_pass_3_inv_1_r),this);
+	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_r),this);
+	m_type1_map = type1_latch_16_pass_3_inv_1_table;
 }
 
 MACHINE_RESET_MEMBER(decocass_state,csuperas)
 {
 	decocass_state::machine_reset();
 	LOG(0,("dongle type #1 (DE-0061 flip 4-5)\n"));
-	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_latch_26_pass_3_inv_2_r),this);
+	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_r),this);
+	m_type1_map = type1_latch_26_pass_3_inv_2_table;
 	m_type1_inmap = MAKE_MAP(0,1,2,3,5,4,6,7);
 	m_type1_outmap = MAKE_MAP(0,1,2,3,5,4,6,7);
 }
@@ -1497,16 +1170,16 @@ MACHINE_RESET_MEMBER(decocass_state,cmanhat)
 {
 	decocass_state::machine_reset();
 	LOG(0,("dongle type #1 (DE-0061)\n"));
-	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_latch_xab_pass_x54_r),this);
-//	m_type1_inmap = MAKE_MAP(0,1,2,3,5,4,6,7);
-//	m_type1_outmap = MAKE_MAP(0,1,2,3,5,4,6,7);
+	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_r),this);
+	m_type1_map = type1_latch_xab_pass_x54_table;
 }
 
 MACHINE_RESET_MEMBER(decocass_state,clocknch)
 {
 	decocass_state::machine_reset();
 	LOG(0,("dongle type #1 (DE-0061 flip 2-3)\n"));
-	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_latch_26_pass_3_inv_2_r),this);
+	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_r),this);
+	m_type1_map = type1_latch_26_pass_3_inv_2_table;
 	m_type1_inmap = MAKE_MAP(0,1,3,2,4,5,6,7);
 	m_type1_outmap = MAKE_MAP(0,1,3,2,4,5,6,7);
 }
@@ -1515,7 +1188,8 @@ MACHINE_RESET_MEMBER(decocass_state,cprogolf)
 {
 	decocass_state::machine_reset();
 	LOG(0,("dongle type #1 (DE-0061 flip 0-1)\n"));
-	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_latch_26_pass_3_inv_2_r),this);
+	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_r),this);
+	m_type1_map = type1_latch_26_pass_3_inv_2_table;
 	m_type1_inmap = MAKE_MAP(1,0,2,3,4,5,6,7);
 	m_type1_outmap = MAKE_MAP(1,0,2,3,4,5,6,7);
 }
@@ -1524,7 +1198,8 @@ MACHINE_RESET_MEMBER(decocass_state,cprogolfj)
 {
 	decocass_state::machine_reset();
 	LOG(0,("dongle type #1 (A-0061 flip 0-1)\n"));
-	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_latch_26_pass_3_inv_2_r),this);
+	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_r),this);
+	m_type1_map = type1_latch_26_pass_3_inv_2_table;
 	m_type1_inmap = MAKE_MAP(1,0,2,3,4,5,6,7);
 	m_type1_outmap = MAKE_MAP(1,0,2,3,4,5,6,7);
 }
@@ -1533,7 +1208,8 @@ MACHINE_RESET_MEMBER(decocass_state,cluckypo)
 {
 	decocass_state::machine_reset();
 	LOG(0,("dongle type #1 (DE-0061 flip 1-3)\n"));
-	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_latch_26_pass_3_inv_2_r),this);
+	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_r),this);
+	m_type1_map = type1_latch_26_pass_3_inv_2_table;
 	m_type1_inmap = MAKE_MAP(0,3,2,1,4,5,6,7);
 	m_type1_outmap = MAKE_MAP(0,3,2,1,4,5,6,7);
 }
@@ -1542,7 +1218,8 @@ MACHINE_RESET_MEMBER(decocass_state,ctisland)
 {
 	decocass_state::machine_reset();
 	LOG(0,("dongle type #1 (DE-0061 flip 0-2)\n"));
-	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_latch_26_pass_3_inv_2_r),this);
+	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_r),this);
+	m_type1_map = type1_latch_26_pass_3_inv_2_table;
 	m_type1_inmap = MAKE_MAP(2,1,0,3,4,5,6,7);
 	m_type1_outmap = MAKE_MAP(2,1,0,3,4,5,6,7);
 }
@@ -1551,7 +1228,8 @@ MACHINE_RESET_MEMBER(decocass_state,cexplore)
 {
 	decocass_state::machine_reset();
 	LOG(0,("dongle type #1 (DE-0061 own PROM)\n"));
-	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_latch_26_pass_5_inv_2_r),this);
+	m_dongle_r = read8_delegate(FUNC(decocass_state::decocass_type1_r),this);
+	m_type1_map = type1_latch_26_pass_5_inv_2_table;
 }
 
 MACHINE_RESET_MEMBER(decocass_state,cdiscon1)

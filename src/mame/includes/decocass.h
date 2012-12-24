@@ -7,6 +7,11 @@
 
 #include "machine/decocass_tape.h"
 
+#define T1PROM 1
+#define T1DIRECT 2
+#define T1LATCH 4
+#define T1LATCHINV 8
+
 class decocass_state : public driver_device
 {
 public:
@@ -22,7 +27,10 @@ public:
 		  m_colorram(*this, "colorram"),
 		  m_tileram(*this, "tileram"),
 		  m_objectram(*this, "objectram"),
-		  m_paletteram(*this, "paletteram") { }
+		  m_paletteram(*this, "paletteram")
+	{
+		m_type1_map = 0;
+	}
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -226,12 +234,7 @@ public:
 	DECLARE_WRITE8_MEMBER(cdsteljn_mux_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(decocass_audio_nmi_gen);
 private:
-	DECLARE_READ8_MEMBER(decocass_type1_latch_26_pass_3_inv_2_r);
-	DECLARE_READ8_MEMBER(decocass_type1_pass_136_r);
-	DECLARE_READ8_MEMBER(decocass_type1_latch_27_pass_3_inv_2_r);
-	DECLARE_READ8_MEMBER(decocass_type1_latch_26_pass_5_inv_2_r);
-	DECLARE_READ8_MEMBER(decocass_type1_latch_16_pass_3_inv_1_r);
-	DECLARE_READ8_MEMBER(decocass_type1_latch_xab_pass_x54_r);
+	DECLARE_READ8_MEMBER(decocass_type1_r);
 	DECLARE_READ8_MEMBER(decocass_type2_r);
 	DECLARE_WRITE8_MEMBER(decocass_type2_w);
 	DECLARE_READ8_MEMBER(decocass_type3_r);
@@ -241,6 +244,8 @@ private:
 	DECLARE_READ8_MEMBER(decocass_type5_r);
 	DECLARE_WRITE8_MEMBER(decocass_type5_w);
 	DECLARE_READ8_MEMBER(decocass_nodong_r);
+
+	UINT8* m_type1_map;
 
 	void draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_center(bitmap_ind16 &bitmap, const rectangle &cliprect);
