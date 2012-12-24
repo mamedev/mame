@@ -12,7 +12,7 @@ CRT-250
 |      21.47727MHz                    U12  U16  |
 |                                               |
 |   V9938 V9938                AY8930           |
-|                                               |
+|                       |-J2-|                  |
 |                              Z80APIO          |
 |                                               |
 |                P8255A        Z80APIO          |
@@ -35,6 +35,7 @@ Memory: Fujitsu MB81464-12 (or compatible) all socketted. The 3rd row or memory
 
 JP6 - 3 pin jumper: ROM size (1-2 = 27256, 2-3 = 27512)
 JP7 - 3 pin jumper: RAM / ROM for U13 to U16? (1-2 = RAM, 2-3 = ROM)
+J2 - 15 pin connector for harness to connect to the optional Video Billboard PCB
 J3 - 65 Pin connector:
 
  #1 - Blue  (video out)    #23 - V-Meter Lamp              #45 - P2 Discard 3 Switch
@@ -86,7 +87,7 @@ Power & Common Ground wires are 18 gauge, all other wires are 20 or 22 gauge.
   Pit Boss II (c)1988
   Super Pit Boss (c)1988
   Pit Boss Superstar (c)1990
-  *Pit Boss Superstar 30 (c)1993
+  *Pit Boss Superstar 30 (c)1993 (program code 9233-xx)
   *Pit Boss Superstar III 30 (c)1993?
   Pit Boss Megastar (c)1994
   Pit Boss Supertouch 30 (c)1993/4
@@ -100,6 +101,7 @@ Power & Common Ground wires are 18 gauge, all other wires are 20 or 22 gauge.
   Megatouch IV Tournament Edition (c)1996
   Super Megatouch IV (c) 1996  (rom labels 9255-41-0x, see below)
   Super Megatouch IV Tournament Edition (c) 1996
+  *The Real Broadway (c) 1996 (single rom at U38 + DS1204 security key)
   Megatouch 5 (c)1997
   Megatouch 5 Tournament Edition (c)1997
   Megatouch 6 (c)1998
