@@ -10,6 +10,9 @@
   This hardware seems to be a derivative of MSX2 'on steroids'.
   It has many similarites with sothello.c and tonton.c
 
+  Special thanks to Charles MacDonald, for all the hardware traces: clocks, 
+  ports, descriptions and a lot of things... :)
+
 
 *******************************************************************************
 
@@ -117,10 +120,9 @@
   Kuru is the frog sound, and Pyon is the sound of jumps.
 
   Coin 1 (key 5) could be set either as Coin 1 or as Payout button, through
-  a DIP switch. Once pressed, if it's set as payout, the game spits a message
-  that means "Jammed Medal". So set it to 'Normal' for normal behaviour...
+  a DIP switch.
 
-  If you get the coin jam error, and the game is not responding anymore, press
+  If you get a 'medal jam' error, and the game is not responding anymore, press
   RESET (key 0), and the game will reset to default values (even all counters
   will be cleared).
 
@@ -191,8 +193,8 @@
 
   TODO:
 
-  - Out latch (Hopper emulation?).
-  - Find why the use of payout always jam. Hopper related?
+  - Check interrupts against Charles HW traces.
+
 
 ******************************************************************************/
 
@@ -201,6 +203,7 @@
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "video/v9938.h"
+#include "machine/ticket.h"
 #include "machine/nvram.h"
 
 class kurukuru_state : public driver_device
@@ -236,9 +239,10 @@ public:
 
 #define MAIN_CLOCK		XTAL_21_4772MHz
 #define CPU_CLOCK		MAIN_CLOCK/6
-#define YM2149_CLOCK	MAIN_CLOCK/12
+#define YM2149_CLOCK	MAIN_CLOCK/6/2	// '/SEL' pin tied to GND, so internal divisor x2 is active
 #define M5205_CLOCK		XTAL_384kHz
 
+#define HOPPER_PULSE	50			// time between hopper pulses in milliseconds
 #define VDP_MEM			0x30000
 
 /* from MSX2 driver, may be not accurate for this HW */
@@ -305,13 +309,24 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
 /*
    00-0f is output latch (controls jamma output pins)
 
-   assume hopper related:
-	$01 when coin 1
-	$20 when coin 2
-	$40 when payout (jams) ...to check
+    BIT  EDGE CONNECTOR       JAMMA FUNCTION
+   ----+--------------------+----------------
+    00 | Pin 08 top side    | coin counter 1
+    01 | Pin 09 top side    | coin lockout 1
+    02 | Pin 14 bottom side | service switch
+    03 | Pin 11 bottom side | unused
+    04 | Pin 11 top side    | unused
+    05 | Pin 08 bottom side | coin counter 2
+    06 | Pin 09 bottom side | coin lockout 2
+    07 | Not connected      | unused
 
 */
-	if (data)
+	coin_counter_w(machine(), 0, data & 0x01);		/* Coin Counter 1 */
+	coin_counter_w(machine(), 1, data & 0x20);		/* Coin Counter 2 */ 
+	coin_lockout_global_w(machine(), data & 0x40);	/* Coin Lock */
+	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x40));	/* Hopper Motor */
+
+	if (data & 0x9e)
 		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, space.device().safe_pc());
 }
 
@@ -354,7 +369,7 @@ static ADDRESS_MAP_START( kurukuru_io, AS_IO, 8, kurukuru_state )
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_WRITE(kurukuru_soundlatch_w)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
 	AM_RANGE(0x90, 0x90) AM_WRITE(kurukuru_bankswitch_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_READ_PORT("IN0")	// need mirror confirmation
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_READ_PORT("IN0")
 	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0x0f) AM_READ_PORT("IN1")
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE_LEGACY("ym2149", ay8910_r, ay8910_address_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_DEVWRITE_LEGACY("ym2149", ay8910_data_w)
@@ -431,24 +446,30 @@ WRITE8_MEMBER(kurukuru_state::ym2149_bout_w)
 
 static INPUT_PORTS_START( kurukuru )
 	PORT_START("IN0")
+/*  bits d0-d3 are JAMMA top side pins 20,21,22,23, bits d4-d7 are JAMMA bottom side pins 20,21,22,23
+    so that's player 1 left/right/button1/button2 then player 2 left/right/button1/button2
+*/
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("1st (Bote)")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("2nd (Oume)")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("3rd (Pyoko)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V) PORT_NAME("4th (Kunio)")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B) PORT_NAME("5th (Pyon Pyon)")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_N) PORT_NAME("unknown N")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_M) PORT_NAME("unknown M")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_N) PORT_NAME("Unknown A0h - bit5")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_M) PORT_NAME("Unknown A0h - bit6")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN1")
+/*  routed to JAMMA top side 15, bottom 15, top 16, bottom 16, top 17, bottom 17, top 24, bottom 24
+    so that's test, tilt/slam, coin 1, coin 2, p1 start, p2 start, p1 button 3, p2 button 3
+*/
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Bookkeeping")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Medal In")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Reset Button")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_A) PORT_NAME("Unknown 1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE (2)								// coin 1 jams if is set as payout
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_S) PORT_NAME("Unknown 2")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )											// payout writes the pulses, but jams.
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_A) PORT_NAME("Unknown B0h - bit4")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE (2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)	// hopper feedback
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 
 	PORT_START("DSW1")	// found in the PCB: 11111111
 	PORT_DIPNAME( 0x07, 0x00, "Coinage A (100 Y)" )	PORT_DIPLOCATION("DSW1:1,2,3")
@@ -573,6 +594,8 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 
 	MCFG_PALETTE_LENGTH(512)
 	MCFG_PALETTE_INIT( v9938 )
+
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
