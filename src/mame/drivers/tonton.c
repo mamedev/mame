@@ -7,11 +7,7 @@
   Driver by Angelo Salese & Roberto Fresca.
 
 
-  TODO:
-
-  - Hopper mechanism.
-
-===========================================================================
+***************************************************************************
 
   WAKUWAKU DOUBUTSU LAND TONTON (ANIMAL VIDEO SLOT)
   (c)SUCCESS / CABINET :TAIYO JIDOKI (SUN AUTO MACHINE)
@@ -22,12 +18,14 @@
 
   TONTON.BIN  : MAIN ROM
 
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/v9938.h"
+#include "machine/ticket.h"
 #include "machine/nvram.h"
 
 class tonton_state : public driver_device
@@ -46,7 +44,12 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(tonton_interrupt);
 };
 
-#define MAIN_CLOCK XTAL_21_4772MHz
+#define MAIN_CLOCK		XTAL_21_4772MHz
+#define CPU_CLOCK		MAIN_CLOCK/6
+#define YM2149_CLOCK	MAIN_CLOCK/6/2	// '/SEL' pin tied to GND, so internal divisor x2 is active
+
+#define HOPPER_PULSE	50			// time between hopper pulses in milliseconds
+#define VDP_MEM			0x30000
 
 
 /* from MSX2 driver, may be not accurate for this HW */
@@ -74,13 +77,14 @@ static void tonton_vdp0_interrupt(device_t *, v99x8_device &device, int i)
 
 WRITE8_MEMBER(tonton_state::tonton_outport_w)
 {
-	/* lockout perhaps? */
 	coin_counter_w(machine(), offset, data & 0x01);
+	coin_lockout_global_w(machine(), data & 0x02);	/* Coin Lock */
+	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x02));	/* Hopper Motor */
 
-	// data & 2 is hopper related
-
-	if(data & 0xfe)
-		logerror("%02x %02x\n",data,offset);
+//	if(data & 0xfe)
+//		logerror("%02x %02x\n",data,offset);
+	if (data)
+		logerror("tonton_outport_w %02X @ %04X\n", data, space.device().safe_pc());
 }
 
 
@@ -97,8 +101,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tonton_io, AS_IO, 8, tonton_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+	AM_RANGE(0x00, 0x00) AM_WRITE(tonton_outport_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x00, 0x01) AM_WRITE(tonton_outport_w)
+	AM_RANGE(0x01, 0x01) AM_WRITENOP	// write the same to outport 00h
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW2")
 	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
@@ -123,13 +128,13 @@ static INPUT_PORTS_START( tonton )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN1")
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Reset Button")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_TOGGLE PORT_NAME("Bookkeeping")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Medal In")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Reset Button")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("Unknown 1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("Unknown A")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("Unknown 2")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)	// hopper feedback
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 
 	PORT_START("DSW1")
@@ -240,7 +245,7 @@ static const ay8910_interface ay8910_intf =
 	DEVCB_NULL,					/* Seems unused */
 	DEVCB_NULL,					/* Seems unused */
 	DEVCB_DRIVER_MEMBER(tonton_state,ay_aout_w),	/* Write all bits twice, and then reset them at boot */
-	DEVCB_DRIVER_MEMBER(tonton_state,ay_bout_w)	/* Write all bits twice, and then reset them at boot */
+	DEVCB_DRIVER_MEMBER(tonton_state,ay_bout_w)		/* Write all bits twice, and then reset them at boot */
 };
 
 
@@ -251,7 +256,7 @@ static const ay8910_interface ay8910_intf =
 static MACHINE_CONFIG_START( tonton, tonton_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/6)	/* Guess. According to other MSX2 based gambling games */
+	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)	/* Guess. According to other MSX2 based gambling games */
 	MCFG_CPU_PROGRAM_MAP(tonton_map)
 	MCFG_CPU_IO_MAP(tonton_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tonton_state, tonton_interrupt, "screen", 0, 1)
@@ -262,7 +267,7 @@ static MACHINE_CONFIG_START( tonton, tonton_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MCFG_V9938_ADD("v9938", "screen", 0x40000)
+	MCFG_V9938_ADD("v9938", "screen", VDP_MEM)
 	MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(tonton_vdp0_interrupt)
 
 	MCFG_SCREEN_ADD("screen",RASTER)
@@ -276,9 +281,11 @@ static MACHINE_CONFIG_START( tonton, tonton_state )
 	MCFG_PALETTE_LENGTH(512)
 	MCFG_PALETTE_INIT( v9938 )
 
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", YM2149, MAIN_CLOCK/12)	/* Guess. According to other MSX2 based gambling games */
+	MCFG_SOUND_ADD("aysnd", YM2149, YM2149_CLOCK)	/* Guess. According to other MSX2 based gambling games */
 	MCFG_SOUND_CONFIG(ay8910_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
@@ -296,5 +303,5 @@ ROM_START( tonton )
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  MACHINE  INPUT   INIT  ROT    COMPANY                   FULLNAME                                 FLAGS  */
+/*    YEAR  NAME     PARENT  MACHINE  INPUT   STATE          INIT  ROT    COMPANY                   FULLNAME                                 FLAGS  */
 GAME( 199?, tonton,  0,      tonton,  tonton, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Waku Waku Doubutsu Land TonTon (Japan)", 0 )
