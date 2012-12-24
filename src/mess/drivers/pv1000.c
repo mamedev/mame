@@ -95,6 +95,7 @@ public:
 	UINT8 m_pcg_bank;
 	UINT8 m_force_pattern;
 	UINT8 m_fd_buffer_flag;
+	UINT8 m_border_col;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -153,6 +154,7 @@ WRITE8_MEMBER( pv1000_state::pv1000_io_w )
 		/* ---- -xxx unknown, border color? */
 		m_pcg_bank = (data & 0x20) >> 5;
 		m_force_pattern = ((data & 0x10) >> 4); /* Dig Dug relies on this */
+		m_border_col = data & 7;
 		break;
 	}
 
@@ -280,9 +282,11 @@ UINT32 pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 &b
 {
 	int x, y;
 
+	bitmap.fill(m_border_col); // TODO: might be either black or colored by this register
+
 	for ( y = 0; y < 24; y++ )
 	{
-		for ( x = 0; x < 32; x++ )
+		for ( x = 2; x < 30; x++ ) // left-right most columns are definitely masked by the border color
 		{
 			UINT16 tile = m_p_videoram[ y * 32 + x ];
 
