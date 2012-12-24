@@ -145,7 +145,7 @@ WRITE8_MEMBER( pv1000_state::pv1000_io_w )
 	break;
 
 	case 0x05:
-		m_fd_data = 1;
+		m_fd_data = 0xf;
 		break;
 //	case 0x06 VRAM + PCG location, always fixed at 0xb8xx
 	case 0x07:
@@ -170,28 +170,26 @@ READ8_MEMBER( pv1000_state::pv1000_io_r )
 	case 0x04:
 		/* Bit 1 = 1 => Data is available in port FD */
 		/* Bit 0 = 1 => Buffer at port FD is empty */
+		data = 0;
 		data = ( m_screen->vpos() >= 212 && m_screen->vpos() <= 220 ) ? 1 : 0;
 		data |= m_fd_data ? 2 : 0;
 		break;
 	case 0x05:
+		static const char *const joynames[] = { "IN0", "IN1", "IN2", "IN3" };
+		int i;
+
 		data = 0;
-		if ( m_io_regs[5] & 0x08 )
+
+		for(i=0;i<4;i++)
 		{
-			data = ioport( "IN3" )->read();
+			if(m_io_regs[5] & 1 << i)
+			{
+				data |= ioport(joynames[i])->read();
+				m_fd_data &= ~(1 << i);
+			}
 		}
-		if ( m_io_regs[5] & 0x04 )
-		{
-			data = ioport( "IN2" )->read();
-		}
-		if ( m_io_regs[5] & 0x02 )
-		{
-			data = ioport( "IN1" )->read();
-		}
-		if ( m_io_regs[5] & 0x01 )
-		{
-			data = ioport( "IN0" )->read();
-		}
-		m_fd_data = 0;
+
+		//m_fd_data = 0;
 		break;
 	}
 
