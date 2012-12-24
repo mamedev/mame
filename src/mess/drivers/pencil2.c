@@ -9,6 +9,52 @@
     - Everything - this is just a skeleton
 
 
+    Information found by looking inside the computer
+    ------------------------------------------------
+Main Board PEN-002 11-50332-10
+
+J1 Expansion slot
+J2 Cart slot
+J3 Memory expansion slot
+J4 Printer slot
+
+XTAL 10.738 MHz
+
+U1     uPD780C-1 (Z80A)
+U2     Video chip with heatsink stuck on top, possibly TMS9928
+U3     SN76489AN
+U4     2764 bios rom
+U5     uPD4016C-2 (assumed to be equivalent of 6116 2K x 8bit static RAM)
+U6     74LS04
+U7     74LS74A
+U8-10  74LS138
+U11    74LS00
+U12    74LS273
+U13    74LS74A
+U14-21 TMM416P-3 (4116-3 16k x 1bit dynamic RAM)
+U22    74LS05
+U23-24 SN74LS541
+
+BASIC CART PEN-700 11-50332-31 Rev.0
+SD-BASIC VERSION 2.0 FOR PENCIL II
+(c) 1983 SOUNDIC ELECTRONICS LTD HONG KONG ALL RIGHTS RESERVED
+1 x 2732
+2 x 2764
+The roms were dumped by attaching a cable from the printer port to
+a Super-80 and writing programs in Basic to transfer the bytes.
+Therefore it is not known which rom "202" or "203" is which address range.
+
+
+MEMORY MAP
+0000-1FFF bios rom
+2000-5FFF available for expansion
+6000-7FFF static RAM (2K mirrored)
+8000-FFFF cart slot
+
+The 16k dynamic RAM holds the BASIC program and the video/gfx etc
+but is banked out of view of a BASIC program.
+
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -66,7 +112,7 @@ static TMS9928A_INTERFACE(pencil2_tms9928a_interface)
 
 static MACHINE_CONFIG_START( pencil2, pencil2_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3580000)
+	MCFG_CPU_ADD("maincpu", Z80, 10738000/3)
 	MCFG_CPU_PROGRAM_MAP(pencil2_mem)
 	MCFG_CPU_IO_MAP(pencil2_io)
 
@@ -82,6 +128,7 @@ ROM_START( pencil2 )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "mt.u4", 0x0000, 0x2000, CRC(338d7b59) SHA1(2f89985ac06971e00210ff992bf1e30a296d10e7) )
 	ROM_LOAD( "1-or",  0xa000, 0x1000, CRC(1ddedccd) SHA1(5fc0d30b5997224b67bf286725468194359ced5a) )
+	ROM_RELOAD(        0xb000, 0x1000 )
 	ROM_LOAD( "203",   0x8000, 0x2000, CRC(f502175c) SHA1(cb2190e633e98586758008577265a7a2bc088233) )
 	ROM_LOAD( "202",   0xc000, 0x2000, CRC(5171097d) SHA1(171999bc04dc98c74c0722b2866310d193dc0f82) )
 ROM_END
@@ -89,4 +136,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT     STATE         INIT  COMPANY    FULLNAME       FLAGS */
-COMP( 19??, pencil2,   0,     0,     pencil2,   pencil2, driver_device,  0,  "Hanimex", "Pencil II", GAME_IS_SKELETON)
+COMP( 1983, pencil2,   0,     0,     pencil2,   pencil2, driver_device,  0,  "Hanimex", "Pencil II", GAME_IS_SKELETON)
