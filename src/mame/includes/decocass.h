@@ -167,6 +167,7 @@ public:
 	UINT32 screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(decocass_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(decocass_sound_command_w);
+	DECLARE_READ8_MEMBER( decocass_sound_command_main_r );
 	DECLARE_READ8_MEMBER(decocass_sound_data_r);
 	DECLARE_READ8_MEMBER(decocass_sound_ack_r);
 	DECLARE_WRITE8_MEMBER(decocass_sound_data_w);

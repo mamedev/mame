@@ -45,6 +45,13 @@ WRITE8_MEMBER(decocass_state::decocass_coin_counter_w)
 {
 }
 
+READ8_MEMBER( decocass_state::decocass_sound_command_main_r)
+{
+	// cgraplop2 needs to read something here or it will reset when you coin-up
+	//  could do with further investigation
+	return 0xc0;
+}
+
 WRITE8_MEMBER(decocass_state::decocass_sound_command_w)
 {
 	LOG(2,("CPU %s sound command -> $%02x\n", space.device().tag(), data));
