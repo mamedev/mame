@@ -78,7 +78,6 @@
     - Arquephos: needs extra sound board(s)?
     - Asoko no Koufuku: black screen with BGM, waits at 0x225f6;
     - Aura Battler Dumbine: upd7220: unimplemented FIGD, has layer clearance bugs on gameplay;
-    - Bakasuka Wars: drawing seems busted (either mouse or upd7220)
     - Band-Kun: (how to run this without installing?)
     - Battle Chess: wants some dip-switches to be on in DSW4, too slow during IA thinking?
 	- Bishoujo Audition: Moans with a "(program) ended. remove the floppy disk and turn off the power."
@@ -86,13 +85,12 @@
 	- Bishoujo Shanshinkan: has white rectangles all over the place;
 	- Bishoujo Tsuushin: hangs with a beep while writing some intro text;
 
-    - Dragon Buster: slight issue with window masking;
+    - Dragon Buster: slight issue with window masking, that translates to abuse of the uPD7220 (sets resolution differently for each GDC);
     - Far Side Moon: doesn't detect sound board (tied to 0x00ec ports)
     - Jan Borg Suzume: gets stuck at a pic8259 read;
-    - Jump Hero: right status display isn't shown during gameplay (changes the mode dynamically?)
     - Lovely Horror: Doesn't show kanji, tries to read it thru the 0xa9 port;
     - Quarth: should do a split screen effect, it doesn't hence there are broken gfxs
-    - Quarth: uploads a PCG charset
+    - Quarth: PCG charset is wrong with normal display
     - Runner's High: wrong double height on the title screen;
 	- Sorcerian, Twilight Zone 3: Fails initial booting, issue with 2dd irq?
     - Uchiyama Aki no Chou Bangai: keyboard irq is fussy (sometimes it doesn't register a key press);
@@ -343,6 +341,7 @@
 #include "machine/pc9801_86.h"
 #include "machine/pc9801_118.h"
 #include "machine/pc9801_cbus.h"
+#include "machine/pc9801_kbd.h"
 
 
 #define UPD1990A_TAG "upd1990a"
@@ -481,6 +480,7 @@ public:
 	inline UINT8 m_pc9801rs_grcg_r(UINT32 offset,int vbank);
 	inline void m_pc9801rs_grcg_w(UINT32 offset,int vbank,UINT8 data);
 	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
+	DECLARE_WRITE_LINE_MEMBER( keyb_irq_w );
 
 	DECLARE_WRITE8_MEMBER(sasi_data_w);
 	DECLARE_WRITE_LINE_MEMBER(sasi_io_w);
@@ -3747,6 +3747,20 @@ static MACHINE_CONFIG_FRAGMENT( pc9801_sasi )
 	MCFG_SCSICB_IO_HANDLER(DEVWRITELINE(DEVICE_SELF_OWNER, pc9801_state, sasi_io_w))
 MACHINE_CONFIG_END
 
+WRITE_LINE_MEMBER( pc9801_state::keyb_irq_w )
+{
+	// TODO
+}
+
+static PC9801_KBD_INTERFACE( pc9801_kbd_intf )
+{
+	DEVCB_DRIVER_LINE_MEMBER( pc9801_state, keyb_irq_w )
+};
+
+static MACHINE_CONFIG_FRAGMENT( pc9801_keyboard )
+	MCFG_PC9801_KBD_ADD("kbd", 120, pc9801_kbd_intf )
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_CPU_ADD("maincpu", I8086, 5000000) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(pc9801_map)
@@ -3763,6 +3777,7 @@ static MACHINE_CONFIG_START( pc9801, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
 	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
+	MCFG_FRAGMENT_ADD(pc9801_keyboard)
 	MCFG_FRAGMENT_ADD(pc9801_mouse)
 	MCFG_FRAGMENT_ADD(pc9801_cbus)
 	MCFG_FRAGMENT_ADD(pc9801_sasi)
@@ -3831,6 +3846,7 @@ static MACHINE_CONFIG_START( pc9801rs, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
 	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
+	MCFG_FRAGMENT_ADD(pc9801_keyboard)
 	MCFG_FRAGMENT_ADD(pc9801_mouse)
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
@@ -3896,6 +3912,7 @@ static MACHINE_CONFIG_START( pc9821, pc9801_state )
 	MCFG_I8255_ADD( "ppi8255_sys", ppi_system_intf )
 	MCFG_I8255_ADD( "ppi8255_prn", ppi_printer_intf )
 	MCFG_I8255_ADD( "ppi8255_fdd", ppi_fdd_intf )
+	MCFG_FRAGMENT_ADD(pc9801_keyboard)
 	MCFG_FRAGMENT_ADD(pc9801_mouse)
 	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, pc9801_upd1990a_intf)
 	MCFG_I8251_ADD(UPD8251_TAG, pc9801_uart_interface)
