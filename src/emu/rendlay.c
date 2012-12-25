@@ -408,7 +408,7 @@ static void parse_orientation(running_machine &machine, xml_data_node *orientnod
 		case 90:	orientation = ROT90;	break;
 		case 180:	orientation = ROT180;	break;
 		case 270:	orientation = ROT270;	break;
-		default:	throw emu_fatalerror("Invalid rotation in XML orientation node: %d", rotate); break;
+		default:	throw emu_fatalerror("Invalid rotation in XML orientation node: %d", rotate);
 	}
 	if (strcmp("yes", xml_get_attribute_string_with_subst(machine, *orientnode, "swapxy", "no")) == 0)
 		orientation ^= ORIENTATION_SWAP_XY;

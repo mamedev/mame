@@ -279,7 +279,6 @@ int arm7_tlb_translate(arm_state *cpustate, UINT32 *addr, int flags)
             	cpustate->pendingAbtP = 1;
             }
         	return FALSE;
-            break;
         case COPRO_TLB_COARSE_TABLE:
             // Entry is the physical address of a coarse second-level table
             if ((permission == 1) || (permission == 3))
@@ -349,7 +348,6 @@ int arm7_tlb_translate(arm_state *cpustate, UINT32 *addr, int flags)
             		cpustate->pendingAbtP = 1;
 		        }
             	return FALSE;
-                break;
             case COPRO_TLB_LARGE_PAGE:
                 // Large page descriptor
                 paddr = ( desc_lvl2 & COPRO_TLB_LARGE_PAGE_MASK ) | ( vaddr & ~COPRO_TLB_LARGE_PAGE_MASK );

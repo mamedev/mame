@@ -570,7 +570,6 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 			break;
 		default:
 			throw TRAP(ILLEGAL_INSTRUCTION,-1);
-			break;
 		}
 		break;
 	case 1:
@@ -609,7 +608,6 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 			break;
 		default:
 			throw TRAP(ILLEGAL_INSTRUCTION,-1);
-			break;
 		}
 		break;
 	case 2: /* LAR */
@@ -695,7 +693,6 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 		break;
 	default:
 		throw TRAP(ILLEGAL_INSTRUCTION,-1);
-		break;
 	}
 }
 

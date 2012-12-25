@@ -2872,7 +2872,6 @@ inline int hd61700_cpu_device::check_cond(UINT32 op)
 
 	case 0x07:	// unconditional
 		return 1;
-		break;
 	}
 
 	return 0;

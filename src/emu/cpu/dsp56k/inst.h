@@ -354,7 +354,7 @@ public:
 			case BBB_MIDDLE: m_iVal <<= 4; break;
 			case BBB_LOWER:  m_iVal <<= 0; break;
 
-			case BBB_INVALID: return false; break;
+			case BBB_INVALID: return false;
 		}
 
 		assemble_D_from_P_table(BITSn(word0,0x0020), BITSn(word0,0x001f), dString);
@@ -415,7 +415,7 @@ public:
 			case BBB_MIDDLE: m_iVal <<= 4; break;
 			case BBB_LOWER:  m_iVal <<= 0; break;
 
-			case BBB_INVALID: return false; break;
+			case BBB_INVALID: return false;
 		}
 
 		decode_RR_table(BITSn(word0,0x0003), m_r);
@@ -481,7 +481,7 @@ public:
 			case BBB_MIDDLE: m_iVal <<= 4; break;
 			case BBB_LOWER:  m_iVal <<= 0; break;
 
-			case BBB_INVALID: return false; break;
+			case BBB_INVALID: return false;
 		}
 
 		decode_DDDDD_table(BITSn(word0,0x001f), m_destination);

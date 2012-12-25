@@ -332,7 +332,6 @@ astring &device_state_entry::format(astring &dest, const char *string, bool maxo
 			// other formats unknown
 			default:
 				throw emu_fatalerror("Unknown format character '%c'\n", *fptr);
-				break;
 		}
 	}
 	return dest;

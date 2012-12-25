@@ -1042,10 +1042,10 @@ void wd_fdc_t::gen_w(int reg, UINT8 val)
 UINT8 wd_fdc_t::gen_r(int reg)
 {
 	switch(reg) {
-	case 0: return status_r(); break;
-	case 1: return track_r(); break;
-	case 2: return sector_r(); break;
-	case 3: return data_r(); break;
+	case 0: return status_r();
+	case 1: return track_r();
+	case 2: return sector_r();
+	case 3: return data_r();
 	}
 	return 0xff;
 }

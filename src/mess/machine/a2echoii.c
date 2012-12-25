@@ -82,7 +82,6 @@ UINT8 a2bus_echoii_device::read_c0nx(address_space &space, UINT8 offset)
     {
         case 0:
             return 0x1f | tms5220_status_r(m_tms, space, 0);
-            break;
     }
 
     return 0;

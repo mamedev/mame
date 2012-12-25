@@ -1127,16 +1127,12 @@ bool n64_rdp::ZCompare(UINT32 zcurpixel, UINT32 dzcurpixel, UINT32 sz, UINT16 dz
 	{
 	case 0:
 		return (max || (overflow ? infront : nearer));
-		break;
 	case 1:
 		return (max || (overflow ? infront : nearer));
-		break;
 	case 2:
 		return (infront || max);
-		break;
 	case 3:
 		return (farther && nearer && !max);
-		break;
 	}
 
 	return false;

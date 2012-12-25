@@ -1342,7 +1342,6 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 				else
 					i286_task_switch(cpustate,desc.selector,0);
 				return;
-				break;
 			case 0x04:  // 286 Call Gate
 			case 0x0c:  // 386 Call Gate
 				logerror("JMP: Call gate at %08x\n",cpustate->pc);
@@ -1479,7 +1478,6 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 				else
 					i286_task_switch(cpustate,call_gate.selector,0);
 				return;
-				break;
 			default:  // invalid segment type
 				logerror("JMP: Invalid segment type (%i) to jump to.\n",desc.flags & 0x000f);
 				FAULT(FAULT_GP,segment & 0xfffc)
@@ -1631,7 +1629,6 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 				else
 					i286_task_switch(cpustate,desc.selector,1);
 				return;
-				break;
 			case 0x04:  // 286 call gate
 			case 0x0c:  // 386 call gate
 				if((desc.flags & 0x000f) == 0x04)
@@ -1908,7 +1905,6 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 				else
 					i286_task_switch(cpustate,desc.selector,1);
 				return;
-				break;
 			default:
 				logerror("CALL: Invalid special segment type (%i) to jump to.\n",desc.flags & 0x000f);
 				FAULT(FAULT_GP,selector & ~0x07)  // #GP(selector)

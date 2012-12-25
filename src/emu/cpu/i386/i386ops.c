@@ -1105,7 +1105,6 @@ static void I386OP(repeat)(i386_state *cpustate, int invert_flag)
 		else
 			I386OP(decode_three_bytef2)(cpustate); // sse f2 0f
 		return;
-		break;
 		case 0x26:
 	    cpustate->segment_override=ES;
 		cpustate->segment_prefix=1;

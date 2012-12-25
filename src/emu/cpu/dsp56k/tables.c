@@ -756,45 +756,45 @@ astring regIdAsString(const reg_id& regId)
 {
     switch(regId)
     {
-        case iX:  return "X"; break;
-        case iX0: return "X0"; break;
-        case iX1: return "X1"; break;
-        case iY:  return "Y"; break;
-        case iY0: return "Y0"; break;
-        case iY1: return "Y1"; break;
-        case iA:  return "A"; break;
-        case iA0: return "A0"; break;
-        case iA1: return "A1"; break;
-        case iA2: return "A2"; break;
-        case iB:  return "B"; break;
-        case iB0: return "B0"; break;
-        case iB1: return "B1"; break;
-        case iB2: return "B2"; break;
-        case iR0: return "R0"; break;
-        case iR1: return "R1"; break;
-        case iR2: return "R2"; break;
-        case iR3: return "R3"; break;
-        case iN0: return "N0"; break;
-        case iN1: return "N1"; break;
-        case iN2: return "N2"; break;
-        case iN3: return "N3"; break;
-        case iM0: return "M0"; break;
-        case iM1: return "M1"; break;
-        case iM2: return "M2"; break;
-        case iM3: return "M3"; break;
-        case iLC: return "LC"; break;
-        case iSR: return "SR"; break;
-        case iOMR: return "OMR"; break;
-        case iSP:  return "SP"; break;
-        case iSSH: return "SSH"; break;
-        case iSSL: return "SSL"; break;
-        case iLA:  return "LA"; break;
-        case iMR:  return "MR"; break;
-        case iCCR: return "CCR"; break;
-        case iF:   return "F"; break;
-        case iFHAT: return "^F"; break;
-        case iINVALID: return "!!"; break;
-        case iWEIRD: return "?"; break;
+        case iX:  return "X";
+        case iX0: return "X0";
+        case iX1: return "X1";
+        case iY:  return "Y";
+        case iY0: return "Y0";
+        case iY1: return "Y1";
+        case iA:  return "A";
+        case iA0: return "A0";
+        case iA1: return "A1";
+        case iA2: return "A2";
+        case iB:  return "B";
+        case iB0: return "B0";
+        case iB1: return "B1";
+        case iB2: return "B2";
+        case iR0: return "R0";
+        case iR1: return "R1";
+        case iR2: return "R2";
+        case iR3: return "R3";
+        case iN0: return "N0";
+        case iN1: return "N1";
+        case iN2: return "N2";
+        case iN3: return "N3";
+        case iM0: return "M0";
+        case iM1: return "M1";
+        case iM2: return "M2";
+        case iM3: return "M3";
+        case iLC: return "LC";
+        case iSR: return "SR";
+        case iOMR: return "OMR";
+        case iSP:  return "SP";
+        case iSSH: return "SSH";
+        case iSSL: return "SSL";
+        case iLA:  return "LA";
+        case iMR:  return "MR";
+        case iCCR: return "CCR";
+        case iF:   return "F";
+        case iFHAT: return "^F";
+        case iINVALID: return "!!";
+        case iWEIRD: return "?";
     }
 
     return "INVALID_REG_ID";
@@ -804,27 +804,27 @@ astring opMnemonicAsString(const op_mnem& mnem)
 {
     switch(mnem)
     {
-        case oCC: return "cc"; break;
-        case oGE: return "ge"; break;
-        case oNE: return "ne"; break;
-        case oPL: return "pl"; break;
-        case oNN: return "nn"; break;
-        case oEC: return "ec"; break;
-        case oLC: return "lc"; break;
-        case oGT: return "gt"; break;
-        case oCS: return "cs"; break;
-        case oLT: return "lt"; break;
-        case oEQ: return "eq"; break;
-        case oMI: return "mi"; break;
-        case oNR: return "nr"; break;
-        case oES: return "es"; break;
-        case oLS: return "ls"; break;
-        case oLE: return "le"; break;
+        case oCC: return "cc";
+        case oGE: return "ge";
+        case oNE: return "ne";
+        case oPL: return "pl";
+        case oNN: return "nn";
+        case oEC: return "ec";
+        case oLC: return "lc";
+        case oGT: return "gt";
+        case oCS: return "cs";
+        case oLT: return "lt";
+        case oEQ: return "eq";
+        case oMI: return "mi";
+        case oNR: return "nr";
+        case oES: return "es";
+        case oLS: return "ls";
+        case oLE: return "le";
 
-        case oSS: return "ss"; break;
-        case oSU: return "su"; break;
-        case oUU: return "uu"; break;
-        case oINVALID: return "!!"; break;
+        case oSS: return "ss";
+        case oSU: return "su";
+        case oUU: return "uu";
+        case oINVALID: return "!!";
     }
 
     return "INVALID_OPCODE_MNEMONIC";
