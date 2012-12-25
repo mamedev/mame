@@ -1087,9 +1087,9 @@ MACHINE_CONFIG_END
 
 ROM_START( kingdrby )
 	ROM_REGION( 0x3000, "master", 0 )
-	ROM_LOAD( "im4_d.d6",  0x0000, 0x1000, CRC(20f2d999) SHA1(91db46059f32b4791460df3330260f4e60f016a5) )
-	ROM_LOAD( "im5_d.c6",  0x1000, 0x1000, CRC(c192cecc) SHA1(63436bf3d9c1e34f6549830c8164295b7758d666) )
-	ROM_LOAD( "im6_d.b6",  0x2000, 0x1000, CRC(257f4e0d) SHA1(cd61f3cf70c536aa207ebfdd28be54ac586b5249) )
+	ROM_LOAD( "im4_d.d6", 0x0000, 0x1000, CRC(20f2d999) SHA1(91db46059f32b4791460df3330260f4e60f016a5) )
+	ROM_LOAD( "im5_d.c6", 0x1000, 0x1000, CRC(c192cecc) SHA1(63436bf3d9c1e34f6549830c8164295b7758d666) )
+	ROM_LOAD( "im6_d.b6", 0x2000, 0x1000, CRC(257f4e0d) SHA1(cd61f3cf70c536aa207ebfdd28be54ac586b5249) )
 
 	ROM_REGION( 0x1000, "soundcpu", 0 )
 	ROM_LOAD( "sg1_b.e1", 0x0000, 0x1000, CRC(92ef3c13) SHA1(1bf1e4106b37aadfc02822184510740e18a54d5c) )
@@ -1102,14 +1102,14 @@ ROM_START( kingdrby )
 
 	/* sprites gfxs */
 	ROM_REGION( 0x8000, "gfx1", 0 )
-	ROM_LOAD( "s1.d1",    0x0000, 0x1000, CRC(26974007) SHA1(5079daf9ad7d84f935c256458060db9497daef91) )
-	ROM_LOAD( "s2.e1",    0x1000, 0x1000, CRC(bedebfa7) SHA1(5a2116ed4af6bc4b72199017515980e4a937236c) )
-	ROM_LOAD( "s3.f1",    0x2000, 0x1000, CRC(0aa59571) SHA1(5005ffdd0030e4d4c1d8033fd3c78177c0fbd1b0) )
-	ROM_LOAD( "s4.g1",    0x3000, 0x1000, CRC(ccd5fb0e) SHA1(3ee4377d15e7731586b7a3457dbae52edaed72d3) )
-	ROM_LOAD( "s5.d2",    0x4000, 0x1000, CRC(32613df3) SHA1(21ce057c416e6f1d0a3e112d640b1cf52ba69206) )
-	ROM_LOAD( "s6.e2",    0x5000, 0x1000, CRC(a151c422) SHA1(354efaee64c8cc457f96cba4722f6a0df66e14d3) )
-	ROM_LOAD( "s7.f2",    0x6000, 0x1000, CRC(7cfcee55) SHA1(590ac02941e82371d56113d052eb4d4bcdbf83b0) )
-	ROM_LOAD( "s8.g2",    0x7000, 0x1000, CRC(ad667c05) SHA1(d9bdf3a125eba2d40191b0659c2007ccbc6fd12b) )
+	ROM_LOAD( "s1.d1", 0x0000, 0x1000, CRC(26974007) SHA1(5079daf9ad7d84f935c256458060db9497daef91) )
+	ROM_LOAD( "s2.e1", 0x1000, 0x1000, CRC(bedebfa7) SHA1(5a2116ed4af6bc4b72199017515980e4a937236c) )
+	ROM_LOAD( "s3.f1", 0x2000, 0x1000, CRC(0aa59571) SHA1(5005ffdd0030e4d4c1d8033fd3c78177c0fbd1b0) )
+	ROM_LOAD( "s4.g1", 0x3000, 0x1000, CRC(ccd5fb0e) SHA1(3ee4377d15e7731586b7a3457dbae52edaed72d3) )
+	ROM_LOAD( "s5.d2", 0x4000, 0x1000, CRC(32613df3) SHA1(21ce057c416e6f1d0a3e112d640b1cf52ba69206) )
+	ROM_LOAD( "s6.e2", 0x5000, 0x1000, CRC(a151c422) SHA1(354efaee64c8cc457f96cba4722f6a0df66e14d3) )
+	ROM_LOAD( "s7.f2", 0x6000, 0x1000, CRC(7cfcee55) SHA1(590ac02941e82371d56113d052eb4d4bcdbf83b0) )
+	ROM_LOAD( "s8.g2", 0x7000, 0x1000, CRC(ad667c05) SHA1(d9bdf3a125eba2d40191b0659c2007ccbc6fd12b) )
 
 	/* tile gfxs */
 	ROM_REGION( 0x2000, "gfx2", 0 )
@@ -1118,7 +1118,7 @@ ROM_START( kingdrby )
 
 	/* color proms */
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "147.f8",  0x000, 0x200, CRC(9245c4af) SHA1(813d628ac55913542a4deabe6ac0a4f9db09cf19) )
+	ROM_LOAD( "147.f8", 0x000, 0x200, CRC(9245c4af) SHA1(813d628ac55913542a4deabe6ac0a4f9db09cf19) )
 ROM_END
 
 // might be closer to the original than the cowrace bootleg even if it shares some roms with cowrace?
@@ -1139,7 +1139,7 @@ ROM_START( kingdrbb ) // has 'Made in Taiwan' on the PCB.
 	ROM_LOAD( "kingdrbb_u95.bin", 0x4000, 0x4000, CRC(fa97deb6) SHA1(1630281f0cac3fe3bfaf924e1c6316107200eb4a) )
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "kingdrbb_u39.bin", 0x0000, 0x2000, CRC(4a34cef0) SHA1(b54f1f2ccd3dd773e47bfb044c5aec15c11426c2) )
+	ROM_LOAD( "kingdrbb_u39.bin",  0x0000, 0x2000, CRC(4a34cef0) SHA1(b54f1f2ccd3dd773e47bfb044c5aec15c11426c2) )
 	ROM_LOAD( "kingdrbb_u140.bin", 0x2000, 0x2000, CRC(7e24b674) SHA1(c774efeb8e4e833e73c29007d5294c93df1abef4) )
 
 	ROM_REGION( 0x4000, "raw_prom", 0 )
@@ -1167,13 +1167,13 @@ ROM_START( cowrace )
 	ROM_REGION( 0x8000, "master", 0 )
 	ROM_LOAD( "u3.bin", 0x0000, 0x8000, CRC(c05c3bd3) SHA1(b7199a069ab45edd25e021589b79105cdfa5511a) )
 
+	ROM_REGION( 0x2000, "soundcpu", 0 )
+	ROM_LOAD( "u164.bin", 0x0000, 0x2000, CRC(9affa1c8) SHA1(bfc07693e8f749cbf20ab8cda33975b66f567962) )
+
 	ROM_REGION( 0x8000, "slave", ROMREGION_ERASEFF ) // slave z80?
 	/* I've tried the kingdrbb slave CPU rom ... game works until the auto race in attract mode. We need to locate and dump this on the PCB. */
 	ROM_LOAD( "slave.bin", 0x0000, 0x8000, NO_DUMP )
 	ROM_FILL( 0x0000, 0x8000, 0xff ) // <- to remove once that the above is dumped
-
-	ROM_REGION( 0x2000, "soundcpu", 0 )
-	ROM_LOAD( "u164.bin", 0x0000, 0x2000, CRC(9affa1c8) SHA1(bfc07693e8f749cbf20ab8cda33975b66f567962) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "u94.bin", 0x8000, 0x8000, CRC(945dc115) SHA1(bdd145234e6361c42ed20e8ca4cac64f07332748) )
@@ -1190,7 +1190,73 @@ ROM_START( cowrace )
 	ROM_LOAD( "u149.bin", 0x00000, 0x200, CRC(f41a5eca) SHA1(797f2d95d4e00f96e5a99604935810e1add59689) )
 ROM_END
 
+/*******************************************************************************************
 
-GAMEL( 1981, kingdrby,  0,             kingdrby,   kingdrby, driver_device,   0,       ROT0,   "Tazmi",    "King Derby (1981)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND, layout_kingdrby )
-GAME( 1986, kingdrbb,  kingdrby,      kingdrbb,   kingdrbb, driver_device,   0,       ROT0,   "bootleg (Casino Electronics)",  "King Derby (Taiwan bootleg)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS )
-GAME( 2000, cowrace,   kingdrby,      cowrace,    kingdrbb, driver_device,   0,       ROT0,   "bootleg",  "Cow Race (1986 King Derby hack)", GAME_NOT_WORKING | GAME_WRONG_COLORS )
+   cpu bd
+
+  H6 H5 H4 Z80A       8255
+               2114 2114
+ 10pos
+ rotary sw
+
+ push button
+
+ 8pos dip sw
+                      8255
+   6845  Z80A
+             H3 H2 H1 5101 5101
+
+  video bd
+
+             h16 9  8  7
+             h17 13 12 11
+
+
+       H15 H14       clr
+
+*******************************************************************************************/
+
+ROM_START( kingdrbb2 )
+	ROM_REGION( 0x3000, "master", 0 )
+	ROM_LOAD( "h4", 0x0000, 0x1000, CRC(20f2d999) SHA1(91db46059f32b4791460df3330260f4e60f016a5) ) // = im4_d.d6 kingdrby
+	ROM_LOAD( "h5", 0x1000, 0x1000, CRC(c192cecc) SHA1(63436bf3d9c1e34f6549830c8164295b7758d666) ) // = im5_d.c6 kingdrby
+	ROM_LOAD( "h6", 0x2000, 0x1000, CRC(257f4e0d) SHA1(cd61f3cf70c536aa207ebfdd28be54ac586b5249) ) // = im6_d.b6 kingdrby
+
+	ROM_REGION( 0x1000, "soundcpu", 0 )
+	// not in this set, using kingdrby one...
+	ROM_LOAD( "sg1_b.e1", 0x0000, 0x1000, NO_DUMP CRC(92ef3c13) SHA1(1bf1e4106b37aadfc02822184510740e18a54d5c) )
+
+	ROM_REGION( 0x4000, "slave", 0 )
+	ROM_LOAD( "h1", 0x0000, 0x1000, CRC(444aa020) SHA1(0d40e9499892177b4d8123ad7b6909e8f6e0c8ab) )
+	ROM_LOAD( "h2", 0x1000, 0x1000, CRC(4102d356) SHA1(d9eb2dcc7cbbe2449fe41ef5eef0470d4dcac0c8) )
+	ROM_LOAD( "h3", 0x2000, 0x1000, CRC(b5a95093) SHA1(dd3e0742042fab113092664bde0e1215d009d861) )
+	ROM_COPY( "soundcpu", 0x0000, 0x3000, 0x1000 )
+
+	/* sprites gfxs */
+	ROM_REGION( 0x8000, "gfx1", 0 )	// kingdrby sprites, smaller top roms
+	ROM_LOAD( "7",   0x0000, 0x1000, CRC(26974007) SHA1(5079daf9ad7d84f935c256458060db9497daef91) ) // = s1.d1 kingdrby
+	ROM_LOAD( "8",   0x1000, 0x1000, CRC(bedebfa7) SHA1(5a2116ed4af6bc4b72199017515980e4a937236c) ) // = s2.e1 kingdrby
+	ROM_LOAD( "9",   0x2000, 0x1000, CRC(0aa59571) SHA1(5005ffdd0030e4d4c1d8033fd3c78177c0fbd1b0) ) // = s3.f1 kingdrby
+	ROM_LOAD( "h16", 0x3000, 0x0800, CRC(252ee644) SHA1(cdc14fc0c04d6e92bb16c8025538d46f8110d121) ) // = s4.g1 [1/2] kingdrby
+	ROM_FILL(        0x3800, 0x0800, 0xff )
+	ROM_LOAD( "11",  0x4000, 0x1000, CRC(32613df3) SHA1(21ce057c416e6f1d0a3e112d640b1cf52ba69206) ) // = s5.d2 kingdrby
+	ROM_LOAD( "12",  0x5000, 0x1000, CRC(a151c422) SHA1(354efaee64c8cc457f96cba4722f6a0df66e14d3) ) // = s6.e2 kingdrby
+	ROM_LOAD( "13",  0x6000, 0x1000, CRC(7cfcee55) SHA1(590ac02941e82371d56113d052eb4d4bcdbf83b0) ) // = s7.f2 kingdrby
+	ROM_LOAD( "h17", 0x7000, 0x0800, CRC(dd79b1fa) SHA1(1e0914d1047812cd3cbca1ad8baded7691cd5db4) ) // = s8.g2 [1/2] kingdrby
+	ROM_FILL(        0x7800, 0x0800, 0xff )
+
+	/* tile gfxs */
+	ROM_REGION( 0x2000, "gfx2", 0 )	// kingdrby tiles, but Tazmi logo, Japanese text and upside-down letters removed
+	ROM_LOAD( "h14", 0x0000, 0x1000, CRC(2d040e86) SHA1(5c6f0404c0740c56b9362aa4665fbd59cf8459d6) ) // = s9_a.k8  (95.6%) kingdrby
+	ROM_LOAD( "h15", 0x1000, 0x1000, CRC(eec11348) SHA1(4933895aed31430f289342c36c57e6741c736a93) ) // = s10_a.l8 (78.6%) kingdrby
+
+	/* color proms */
+	ROM_REGION( 0x200, "proms", 0 )	// mostly 00 (black) -> red (80) changes
+	ROM_LOAD( "clr", 0x000, 0x200, CRC(ffabacc9) SHA1(9769fb27fc5b6998e6600cb6050086385caa3f96) )
+ROM_END
+
+
+GAMEL( 1981, kingdrby,  0,        kingdrby, kingdrby, driver_device, 0, ROT0, "Tazmi",                        "King Derby (1981)",           GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND, layout_kingdrby )
+GAME ( 1986, kingdrbb,  kingdrby, kingdrbb, kingdrbb, driver_device, 0, ROT0, "bootleg (Casino Electronics)", "King Derby (Taiwan bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS )
+GAMEL( 198?, kingdrbb2, kingdrby, kingdrby, kingdrby, driver_device, 0, ROT0, "bootleg",                      "King Derby (bootleg set 2)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND, layout_kingdrby )
+GAME ( 2000, cowrace,   kingdrby, cowrace,  kingdrbb, driver_device, 0, ROT0, "bootleg (Gate In)",            "Cow Race (King Derby hack)",  GAME_NOT_WORKING | GAME_WRONG_COLORS )
