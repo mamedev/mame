@@ -45,7 +45,8 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 1
+#define	VERBOSE			0
+#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
 // todo typedef
@@ -412,13 +413,10 @@ inline void upd7220_device::recompute_parameters()
 	visarea.max_x = m_aw * horiz_mult - 1;//horiz_pix_total - (m_hfp * 8) - 1;
 	visarea.max_y = m_al - 1;//vert_pix_total - m_vfp - 1;
 
-	if (LOG)
-	{
-		logerror("uPD7220 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
-		logerror("Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
-		logerror("%d %d %d %d %d\n",m_hs,m_hbp,m_aw,m_hfp,m_pitch);
-		logerror("%d %d %d %d\n",m_vs,m_vbp,m_al,m_vfp);
-	}
+	LOG(("uPD7220 '%s' Screen: %u x %u @ %f Hz\n", tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh)));
+	LOG(("Visible Area: (%u, %u) - (%u, %u)\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y));
+	LOG(("%d %d %d %d %d\n",m_hs,m_hbp,m_aw,m_hfp,m_pitch));
+	LOG(("%d %d %d %d\n",m_vs,m_vbp,m_al,m_vfp));
 
 	if (m_m)
 	{
@@ -522,12 +520,12 @@ inline void upd7220_device::read_vram(UINT8 type, UINT8 mod)
 {
 	if (type == 1)
 	{
-		logerror("uPD7220 invalid type 1 RDAT parameter\n");
+		LOG (("uPD7220 invalid type 1 RDAT parameter\n"));
 		return;
 	}
 
 	if (mod)
-		logerror("uPD7220 RDAT used with mod = %02x?\n",mod);
+		LOG (("uPD7220 RDAT used with mod = %02x?\n",mod));
 
 	for (int i = 0; i < m_figs.m_dc; i++)
 	{
@@ -939,7 +937,7 @@ void upd7220_device::draw_rectangle(int x, int y)
 	UINT16 line_pattern;
 	UINT8 dot;
 
-	logerror("uPD7220 rectangle check: %d %d %02x %08x\n",x,y,m_figs.m_dir,m_ead);
+	LOG(("uPD7220 rectangle check: %d %d %02x %08x\n",x,y,m_figs.m_dir,m_ead));
 
 	line_pattern = check_pattern((m_ra[8]) | (m_ra[9]<<8));
 	rect_type = (m_figs.m_dir & 1) << 2;
@@ -1128,7 +1126,7 @@ void upd7220_device::process_fifo()
 		switch (m_param_ptr)
 		{
 		case 0:
-			if (LOG) logerror("uPD7220 '%s' RESET\n", tag());
+			LOG(("uPD7220 '%s' RESET\n", tag()));
 
 			m_de = 0;
 			m_ra[0] = m_ra[1] = m_ra[2] = 0;
@@ -1151,19 +1149,16 @@ void upd7220_device::process_fifo()
 
 			m_pitch = m_aw;
 
-			if (LOG)
-			{
-				logerror("uPD7220 '%s' Mode: %02x\n", tag(), m_mode);
-				logerror("uPD7220 '%s' AW: %u\n", tag(), m_aw);
-				logerror("uPD7220 '%s' HS: %u\n", tag(), m_hs);
-				logerror("uPD7220 '%s' VS: %u\n", tag(), m_vs);
-				logerror("uPD7220 '%s' HFP: %u\n", tag(), m_hfp);
-				logerror("uPD7220 '%s' HBP: %u\n", tag(), m_hbp);
-				logerror("uPD7220 '%s' VFP: %u\n", tag(), m_vfp);
-				logerror("uPD7220 '%s' AL: %u\n", tag(), m_al);
-				logerror("uPD7220 '%s' VBP: %u\n", tag(), m_vbp);
-				logerror("uPD7220 '%s' PITCH: %u\n", tag(), m_pitch);
-			}
+			LOG(("uPD7220 '%s' Mode: %02x\n", tag(), m_mode));
+			LOG(("uPD7220 '%s' AW: %u\n", tag(), m_aw));
+			LOG(("uPD7220 '%s' HS: %u\n", tag(), m_hs));
+			LOG(("uPD7220 '%s' VS: %u\n", tag(), m_vs));
+			LOG(("uPD7220 '%s' HFP: %u\n", tag(), m_hfp));
+			LOG(("uPD7220 '%s' HBP: %u\n", tag(), m_hbp));
+			LOG(("uPD7220 '%s' VFP: %u\n", tag(), m_vfp));
+			LOG(("uPD7220 '%s' AL: %u\n", tag(), m_al));
+			LOG(("uPD7220 '%s' VBP: %u\n", tag(), m_vbp));
+			LOG(("uPD7220 '%s' PITCH: %u\n", tag(), m_pitch));
 
 			recompute_parameters();
 			break;
@@ -1185,19 +1180,16 @@ void upd7220_device::process_fifo()
 
 			m_pitch = m_aw;
 
-			if (LOG)
-			{
-				logerror("uPD7220 '%s' Mode: %02x\n", tag(), m_mode);
-				logerror("uPD7220 '%s' AW: %u\n", tag(), m_aw);
-				logerror("uPD7220 '%s' HS: %u\n", tag(), m_hs);
-				logerror("uPD7220 '%s' VS: %u\n", tag(), m_vs);
-				logerror("uPD7220 '%s' HFP: %u\n", tag(), m_hfp);
-				logerror("uPD7220 '%s' HBP: %u\n", tag(), m_hbp);
-				logerror("uPD7220 '%s' VFP: %u\n", tag(), m_vfp);
-				logerror("uPD7220 '%s' AL: %u\n", tag(), m_al);
-				logerror("uPD7220 '%s' VBP: %u\n", tag(), m_vbp);
-				logerror("uPD7220 '%s' PITCH: %u\n", tag(), m_pitch);
-			}
+			LOG(("uPD7220 '%s' Mode: %02x\n", tag(), m_mode));
+			LOG(("uPD7220 '%s' AW: %u\n", tag(), m_aw));
+			LOG(("uPD7220 '%s' HS: %u\n", tag(), m_hs));
+			LOG(("uPD7220 '%s' VS: %u\n", tag(), m_vs));
+			LOG(("uPD7220 '%s' HFP: %u\n", tag(), m_hfp));
+			LOG(("uPD7220 '%s' HBP: %u\n", tag(), m_hbp));
+			LOG(("uPD7220 '%s' VFP: %u\n", tag(), m_vfp));
+			LOG(("uPD7220 '%s' AL: %u\n", tag(), m_al));
+			LOG(("uPD7220 '%s' VBP: %u\n", tag(), m_vbp));
+			LOG(("uPD7220 '%s' PITCH: %u\n", tag(), m_pitch));
 
 			recompute_parameters();
 		}
@@ -1206,7 +1198,7 @@ void upd7220_device::process_fifo()
 	case COMMAND_VSYNC: /* vertical sync mode */
 		m_m = m_cr & 0x01;
 
-		if (LOG) logerror("uPD7220 '%s' M: %u\n", tag(), m_m);
+		LOG(("uPD7220 '%s' M: %u\n", tag(), m_m));
 
 		recompute_parameters();
 		break;
@@ -1217,11 +1209,8 @@ void upd7220_device::process_fifo()
 			m_lr = (m_pr[1] & 0x1f) + 1;
 			m_dc = BIT(m_pr[1], 7);
 
-			if (LOG)
-			{
-				logerror("uPD7220 '%s' LR: %u\n", tag(), m_lr);
-				logerror("uPD7220 '%s' DC: %u\n", tag(), m_dc);
-			}
+			LOG(("uPD7220 '%s' LR: %u\n", tag(), m_lr));
+			LOG(("uPD7220 '%s' DC: %u\n", tag(), m_dc));
 		}
 
 		if(m_param_ptr == 3)
@@ -1229,11 +1218,8 @@ void upd7220_device::process_fifo()
 			m_ctop = m_pr[2] & 0x1f;
 			m_sc = BIT(m_pr[2], 5);
 
-			if (LOG)
-			{
-				logerror("uPD7220 '%s' CTOP: %u\n", tag(), m_ctop);
-				logerror("uPD7220 '%s' SC: %u\n", tag(), m_sc);
-			}
+			LOG(("uPD7220 '%s' CTOP: %u\n", tag(), m_ctop));
+			LOG(("uPD7220 '%s' SC: %u\n", tag(), m_sc));
 		}
 
 		if(m_param_ptr == 4)
@@ -1241,24 +1227,21 @@ void upd7220_device::process_fifo()
 			m_br = ((m_pr[3] & 0x07) << 2) | (m_pr[2] >> 6);
 			m_cbot = m_pr[3] >> 3;
 
-			if (LOG)
-			{
-				logerror("uPD7220 '%s' BR: %u\n", tag(), m_br);
-				logerror("uPD7220 '%s' CBOT: %u\n", tag(), m_cbot);
-			}
+			LOG(("uPD7220 '%s' BR: %u\n", tag(), m_br));
+			LOG(("uPD7220 '%s' CBOT: %u\n", tag(), m_cbot));
 		}
 		break;
 
 	case COMMAND_START: /* start display & end idle mode */
 		m_de = 1;
 
-		//if (LOG) logerror("uPD7220 '%s' DE: 1\n", tag());
+		//LOG(("uPD7220 '%s' DE: 1\n", tag()));
 		break;
 
 	case COMMAND_BCTRL: /* display blanking control */
 		m_de = m_cr & 0x01;
 
-		//if (LOG) logerror("uPD7220 '%s' DE: %u\n", tag(), m_de);
+		//LOG(("uPD7220 '%s' DE: %u\n", tag(), m_de));
 		break;
 
 	case COMMAND_ZOOM: /* zoom factors specify */
@@ -1267,8 +1250,8 @@ void upd7220_device::process_fifo()
 			m_gchr = m_pr[1] & 0x0f;
 			m_disp = m_pr[1] >> 4;
 
-			if (LOG) logerror("uPD7220 '%s' GCHR: %01x\n", tag(), m_gchr);
-			if (LOG) logerror("uPD7220 '%s' DISP: %01x\n", tag(), m_disp);
+			LOG(("uPD7220 '%s' GCHR: %01x\n", tag(), m_gchr));
+			LOG(("uPD7220 '%s' DISP: %01x\n", tag(), m_disp));
 		}
 		break;
 
@@ -1279,12 +1262,12 @@ void upd7220_device::process_fifo()
 
 			m_ead = (upper_addr << 16) | (m_pr[2] << 8) | m_pr[1];
 
-			//if (LOG) logerror("uPD7220 '%s' EAD: %06x\n", tag(), m_ead);
+			//LOG(("uPD7220 '%s' EAD: %06x\n", tag(), m_ead));
 
 			if(m_param_ptr == 4)
 			{
 				m_dad = m_pr[3] >> 4;
-				//if (LOG) logerror("uPD7220 '%s' DAD: %01x\n", tag(), m_dad);
+				//LOG(("uPD7220 '%s' DAD: %01x\n", tag(), m_dad));
 			}
 		}
 		break;
@@ -1298,7 +1281,7 @@ void upd7220_device::process_fifo()
 		{
 			if (m_ra_addr < 16)
 			{
-				if (LOG) logerror("uPD7220 '%s' RA%u: %02x\n", tag(), m_ra_addr, data);
+				LOG(("uPD7220 '%s' RA%u: %02x\n", tag(), m_ra_addr, data));
 
 				m_ra[m_ra_addr] = data;
 				m_ra_addr++;
@@ -1313,7 +1296,7 @@ void upd7220_device::process_fifo()
 		{
 			m_pitch = data;
 
-			if (LOG) logerror("uPD7220 '%s' PITCH: %u\n", tag(), m_pitch);
+			LOG(("uPD7220 '%s' PITCH: %u\n", tag(), m_pitch));
 		}
 		break;
 
@@ -1336,7 +1319,7 @@ void upd7220_device::process_fifo()
 		{
 			m_mask = (m_pr[2] << 8) | m_pr[1];
 
-			if (LOG) logerror("uPD7220 '%s' MASK: %04x\n", tag(), m_mask);
+			LOG(("uPD7220 '%s' MASK: %04x\n", tag(), m_mask));
 		}
 		break;
 
@@ -1521,7 +1504,7 @@ WRITE8_MEMBER( upd7220_device::dack_w )
 
 WRITE_LINE_MEMBER( upd7220_device::ext_sync_w )
 {
-	//if (LOG) logerror("uPD7220 '%s' External Synchronization: %u\n", tag(), state);
+	//LOG(("uPD7220 '%s' External Synchronization: %u\n", tag(), state));
 
 	if (state)
 	{
@@ -1676,7 +1659,7 @@ UINT32 upd7220_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 			break;
 
 		case UPD7220_MODE_DISPLAY_INVALID:
-			logerror("uPD7220 '%s' Invalid Display Mode!\n", tag());
+			LOG(("uPD7220 '%s' Invalid Display Mode!\n", tag()));
 		}
 	}
 	return 0;
