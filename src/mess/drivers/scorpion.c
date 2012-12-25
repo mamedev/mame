@@ -299,12 +299,8 @@ WRITE8_MEMBER(scorpion_state::scorpion_port_7ffd_w)
 
 WRITE8_MEMBER(scorpion_state::scorpion_port_1ffd_w)
 {
-	/* if paging not disabled */
-	if ((m_port_7ffd_data & 0x20)==0)
-	{
-		m_port_1ffd_data = data;
-		scorpion_update_memory(machine());
-	}
+	m_port_1ffd_data = data;
+	scorpion_update_memory(machine());
 }
 
 static ADDRESS_MAP_START (scorpion_io, AS_IO, 8, scorpion_state )
