@@ -30,12 +30,12 @@ Other: Z80APIO x 2  (I/O and interrupt controllers)
        8-switch DSW (socketted)
        Volume pot
 
-Memory: Fujitsu MB81464-12 (or compatible) all socketted. The 3rd row or memory
+Memory: Fujitsu MB81464-12 (or compatible) all socketted. The 3rd row of memory
         may or may not be populated.
 
 JP6 - 3 pin jumper: ROM size (1-2 = 27256, 2-3 = 27512)
 JP7 - 3 pin jumper: RAM / ROM for U13 to U16? (1-2 = RAM, 2-3 = ROM)
-J2 - 15 pin connector for harness to connect to the optional Video Billboard PCB
+J2 - 15 pin connector for harness to connect to the optional CRT-254 Video Billboard PCB
 J3 - 65 Pin connector:
 
  #1 - Blue  (video out)    #23 - V-Meter Lamp              #45 - P2 Discard 3 Switch
