@@ -2526,7 +2526,9 @@ ROM_START( blazeon )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "bz_sp1.u20", 0x000000, 0x100000, CRC(0d5809a1) SHA1(e72669f95b050d1967d10a865bab8f3634c9daad) )
+	ROM_LOAD( "bz_sp1.u68", 0x000000, 0x100000, CRC(0d5809a1) SHA1(e72669f95b050d1967d10a865bab8f3634c9daad) )
 	ROM_LOAD( "bz_sp2.u21", 0x100000, 0x100000, CRC(56ead2bd) SHA1(463723f3c533603ce3a95310e9ce12b4e582b52d) )
+	ROM_LOAD( "bz_sp2.u86", 0x100000, 0x100000, CRC(56ead2bd) SHA1(463723f3c533603ce3a95310e9ce12b4e582b52d) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 )	/* Tiles (Scrambled) */
 	ROM_LOAD( "bz_bg.u2", 0x000000, 0x100000, CRC(fc67f19f) SHA1(f5d9e037a736b0932efbfb48587de08bec93df5d) )
@@ -3853,31 +3855,31 @@ DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
 
 ***************************************************************************/
 
-GAME( 1991, berlwall, 0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall,   ROT0,  "Kaneko", "The Berlin Wall", 0 )
-GAME( 1991, berlwallt,berlwall, berlwall, berlwalt, kaneko16_berlwall_state, berlwall,   ROT0,  "Kaneko", "The Berlin Wall (bootleg ?)", 0 )
+GAME( 1991, berlwall, 0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko", "The Berlin Wall", 0 )
+GAME( 1991, berlwallt,berlwall, berlwall, berlwalt, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko", "The Berlin Wall (bootleg ?)", 0 )
 
-GAME( 1991, mgcrystl, 0,        mgcrystl, mgcrystl, kaneko16_state, kaneko16,   ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", 0 )
-GAME( 1991, mgcrystlo,mgcrystl, mgcrystl, mgcrystl, kaneko16_state, kaneko16,   ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", 0 )
-GAME( 1991, mgcrystlj,mgcrystl, mgcrystl, mgcrystl, kaneko16_state, kaneko16,   ROT0,  "Kaneko (Atlus license)", "Magical Crystals (Japan, 92/01/13)", 0 )
-GAME( 1992, blazeon,  0,        blazeon,  blazeon, kaneko16_state,  kaneko16,   ROT0,  "Atlus",  "Blaze On (Japan)", 0 )
-GAME( 1992, explbrkr, 0,        bakubrkr, bakubrkr, kaneko16_state, kaneko16,   ROT90, "Kaneko", "Explosive Breaker", 0 )
-GAME( 1992, bakubrkr, explbrkr, bakubrkr, bakubrkr, kaneko16_state, kaneko16,   ROT90, "Kaneko", "Bakuretsu Breaker", 0 )
+GAME( 1991, mgcrystl, 0,        mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", 0 )
+GAME( 1991, mgcrystlo,mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", 0 )
+GAME( 1991, mgcrystlj,mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko (Atlus license)", "Magical Crystals (Japan, 92/01/13)", 0 )
+GAME( 1992, blazeon,  0,        blazeon,  blazeon,  kaneko16_state,          kaneko16, ROT0,  "Atlus",  "Blaze On (Japan)", 0 )
+GAME( 1992, explbrkr, 0,        bakubrkr, bakubrkr, kaneko16_state,          kaneko16, ROT90, "Kaneko", "Explosive Breaker", 0 )
+GAME( 1992, bakubrkr, explbrkr, bakubrkr, bakubrkr, kaneko16_state,          kaneko16, ROT90, "Kaneko", "Bakuretsu Breaker", 0 )
 
-GAME( 1994, bonkadv,  0,        bonkadv , bonkadv,	kaneko16_gtmr_state, gtmr,		ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", 0 )
-GAME( 1994, bloodwar, 0,        bloodwar, bloodwar, kaneko16_gtmr_state, gtmr,		ROT0,  "Kaneko", "Blood Warrior", 0 )
-GAME( 1994, oedfight, bloodwar, bloodwar, bloodwar, kaneko16_gtmr_state, gtmr,		ROT0,  "Kaneko", "Oedo Fight (Japan Bloodshed Ver.)", 0 )
-GAME( 1994, gtmr,     0,        gtmr,     gtmr,		kaneko16_gtmr_state, gtmr,		ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/07/18)", 0 )
-GAME( 1994, gtmra,    gtmr,     gtmr,     gtmr,		kaneko16_gtmr_state, gtmr,		ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/06/13)", 0 )
-GAME( 1994, gtmre,    gtmr,     gtmre,    gtmr,		kaneko16_gtmr_state, gtmr,		ROT0,  "Kaneko", "Great 1000 Miles Rally: Evolution Model!!! (94/09/06)", 0 )
-GAME( 1994, gtmrusa,  gtmr,     gtmre,    gtmr,		kaneko16_gtmr_state, gtmr,		ROT0,  "Kaneko", "Great 1000 Miles Rally: U.S.A Version! (94/09/06)", 0 ) // U.S.A version seems part of the title, rather than region
-GAME( 1995, gtmr2,    0,        gtmr2,    gtmr2,	kaneko16_gtmr_state, gtmr,		ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/05/24)", 0 )
-GAME( 1995, gtmr2a,   gtmr2,    gtmr2,    gtmr2,	kaneko16_gtmr_state, gtmr,		ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/04/04)", 0 )
-GAME( 1995, gtmr2u,   gtmr2,    gtmr2,    gtmr2,	kaneko16_gtmr_state, gtmr,		ROT0,  "Kaneko", "Great 1000 Miles Rally 2 USA (95/05/18)", 0 )
+GAME( 1994, bonkadv,  0,        bonkadv , bonkadv,  kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", 0 )
+GAME( 1994, bloodwar, 0,        bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Blood Warrior", 0 )
+GAME( 1994, oedfight, bloodwar, bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan Bloodshed Ver.)", 0 )
+GAME( 1994, gtmr,     0,        gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/07/18)", 0 )
+GAME( 1994, gtmra,    gtmr,     gtmr,     gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "1000 Miglia: Great 1000 Miles Rally (94/06/13)", 0 )
+GAME( 1994, gtmre,    gtmr,     gtmre,    gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: Evolution Model!!! (94/09/06)", 0 )
+GAME( 1994, gtmrusa,  gtmr,     gtmre,    gtmr,     kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally: U.S.A Version! (94/09/06)", 0 ) // U.S.A version seems part of the title, rather than region
+GAME( 1995, gtmr2,    0,        gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/05/24)", 0 )
+GAME( 1995, gtmr2a,   gtmr2,    gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Mille Miglia 2: Great 1000 Miles Rally (95/04/04)", 0 )
+GAME( 1995, gtmr2u,   gtmr2,    gtmr2,    gtmr2,    kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Great 1000 Miles Rally 2 USA (95/05/18)", 0 )
 
-GAME( 1992, brapboys, 0,        brapboys, brapboys, kaneko16_shogwarr_state, brapboys,   ROT0,  "Kaneko", "B.Rap Boys (World)", 0 )
-GAME( 1992, brapboysj,brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys,   ROT0,  "Kaneko", "B.Rap Boys Special (Japan)", 0 )
-GAME( 1992, brapboysu,brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys,   ROT0,  "Kaneko", "B.Rap Boys Special (US)", 0 )
-GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr,   ROT0,  "Kaneko", "Shogun Warriors (World)", GAME_NO_COCKTAIL )
-GAME( 1992, shogwarru,shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr,   ROT0,  "Kaneko", "Shogun Warriors (US)", GAME_NO_COCKTAIL )
-GAME( 1992, fjbuster, shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr,   ROT0,  "Kaneko", "Fujiyama Buster (Japan)", GAME_NO_COCKTAIL )
+GAME( 1992, brapboys, 0,        brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys (World)", 0 )
+GAME( 1992, brapboysj,brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (Japan)", 0 )
+GAME( 1992, brapboysu,brapboys, brapboys, brapboys, kaneko16_shogwarr_state, brapboys, ROT0,  "Kaneko", "B.Rap Boys Special (US)", 0 )
+GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (World)", GAME_NO_COCKTAIL )
+GAME( 1992, shogwarru,shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Shogun Warriors (US)", GAME_NO_COCKTAIL )
+GAME( 1992, fjbuster, shogwarr, shogwarr, shogwarr, kaneko16_shogwarr_state, shogwarr, ROT0,  "Kaneko", "Fujiyama Buster (Japan)", GAME_NO_COCKTAIL )
 
