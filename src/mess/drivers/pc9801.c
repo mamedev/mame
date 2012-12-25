@@ -69,7 +69,6 @@
     - Absolutely Mahjong: Transitions are too fast.
     - Agumix Selects!: needs GDC = 5 MHz, interlace doesn't work properly;
     - Alice no Yakata: doesn't set bitmap interlace properly, can't do disk swaps via the File Manager;
-    - Animahjong V3: accesses port 0x88;
     - Anniversary - Memories of Summer: thinks that a button is pressed;
     - Another Genesis: fails loading;
     - Apple Club 1: how to pass an hand?
@@ -82,7 +81,7 @@
     - Bakasuka Wars: drawing seems busted (either mouse or upd7220)
     - Band-Kun: (how to run this without installing?)
     - Battle Chess: wants some dip-switches to be on in DSW4, too slow during IA thinking?
-	- Bishoujo Audition: Moans with a "(program) ended. remove the floppy disk and turn off the poewr."
+	- Bishoujo Audition: Moans with a "(program) ended. remove the floppy disk and turn off the power."
 	- Bishoujo Hunter ZX: Doesn't color cycle at intro (seems stuck?), doesn't clear text selection at new game screen;
 	- Bishoujo Shanshinkan: has white rectangles all over the place;
 	- Bishoujo Tsuushin: hangs with a beep while writing some intro text;
@@ -104,6 +103,7 @@
     - Policenauts: EMS error at boot;
 
     Notes:
+    - Animahjong V3 is your typical game with dual sound board support (generally OPN is used for SFX / samples and OPNA for BGM).
     - Apple Club 1/2 needs data disks to load properly;
     - Beast Lord: needs a titan.fnt, in MS-DOS
 
@@ -3736,7 +3736,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( pc9801_cbus )
 	MCFG_PC9801CBUS_SLOT_ADD("cbus0", pc9801_cbus, "pc9801_26", NULL)
-//	MCFG_PC9801CBUS_SLOT_ADD("cbus1", pc9801_cbus, NULL, NULL)
+	MCFG_PC9801CBUS_SLOT_ADD("cbus1", pc9801_cbus, NULL, NULL)
 //	TODO: six max slots
 MACHINE_CONFIG_END
 

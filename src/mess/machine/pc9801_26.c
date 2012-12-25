@@ -4,6 +4,9 @@
 
 	Legacy sound card for PC-98xx family, composed by a single YM2203
 
+	TODO:
+	- joystick code should be shared between -26, -86 and -118
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -96,10 +99,10 @@ static INPUT_PORTS_START( pc9801_26 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-//	PORT_START("OPN_DSW")
-//	PORT_CONFNAME( 0x01, 0x01, "PC-9801-26: Port Base" )
-//	PORT_CONFSETTING(    0x00, "0x088" )
-//	PORT_CONFSETTING(    0x01, "0x188" )
+	PORT_START("OPN_DSW")
+	PORT_CONFNAME( 0x01, 0x01, "PC-9801-26: Port Base" )
+	PORT_CONFSETTING(    0x00, "0x088" )
+	PORT_CONFSETTING(    0x01, "0x188" )
 INPUT_PORTS_END
 
 ioport_constructor pc9801_26_device::device_input_ports() const
@@ -160,8 +163,7 @@ void pc9801_26_device::install_device(offs_t start, offs_t end, offs_t mask, off
 
 void pc9801_26_device::device_start()
 {
-	UINT16 port_base = 0x100;//(ioport("OPN_DSW")->read() & 1) << 8;
-	install_device(port_base + 0x0088, port_base + 0x008b, 0, 0, read8_delegate(FUNC(pc9801_26_device::pc9801_26_r), this), write8_delegate(FUNC(pc9801_26_device::pc9801_26_w), this) );
+
 }
 
 
@@ -171,6 +173,8 @@ void pc9801_26_device::device_start()
 
 void pc9801_26_device::device_reset()
 {
+	UINT16 port_base = (ioport("OPN_DSW")->read() & 1) << 8;
+	install_device(port_base + 0x0088, port_base + 0x008b, 0, 0, read8_delegate(FUNC(pc9801_26_device::pc9801_26_r), this), write8_delegate(FUNC(pc9801_26_device::pc9801_26_w), this) );
 }
 
 

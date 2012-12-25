@@ -6,7 +6,7 @@
 	YM2203
 
 	TODO:
-	- i/o port base jumper
+	- joystick code should be shared between -26, -86 and -118
 
 ***************************************************************************/
 
@@ -107,10 +107,10 @@ static INPUT_PORTS_START( pc9801_86 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Joystick Button 2")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-//	PORT_START("OPN_DSW")
-//	PORT_CONFNAME( 0x01, 0x01, "PC-9801-86: Port Base" )
-//	PORT_CONFSETTING(    0x00, "0x088" )
-//	PORT_CONFSETTING(    0x01, "0x188" )
+	PORT_START("OPNA_DSW")
+	PORT_CONFNAME( 0x01, 0x00, "PC-9801-86: Port Base" )
+	PORT_CONFSETTING(    0x00, "0x088" )
+	PORT_CONFSETTING(    0x01, "0x188" )
 INPUT_PORTS_END
 
 ioport_constructor pc9801_86_device::device_input_ports() const
@@ -171,9 +171,6 @@ void pc9801_86_device::install_device(offs_t start, offs_t end, offs_t mask, off
 
 void pc9801_86_device::device_start()
 {
-	UINT16 port_base = 0x100;//(ioport("OPN_DSW")->read() & 1) << 8;
-	install_device(port_base + 0x0088, port_base + 0x008f, 0, 0, read8_delegate(FUNC(pc9801_86_device::pc9801_86_r), this), write8_delegate(FUNC(pc9801_86_device::pc9801_86_w), this) );
-//	install_device(0xa460, 0xa463, 0, 0, read8_delegate(FUNC(pc9801_86_device::pc9801_86_ext_r), this), write8_delegate(FUNC(pc9801_86_device::pc9801_86_ext_w), this) );
 
 }
 
@@ -184,6 +181,10 @@ void pc9801_86_device::device_start()
 
 void pc9801_86_device::device_reset()
 {
+	UINT16 port_base = (ioport("OPNA_DSW")->read() & 1) << 8;
+	install_device(port_base + 0x0088, port_base + 0x008f, 0, 0, read8_delegate(FUNC(pc9801_86_device::pc9801_86_r), this), write8_delegate(FUNC(pc9801_86_device::pc9801_86_w), this) );
+//	install_device(0xa460, 0xa463, 0, 0, read8_delegate(FUNC(pc9801_86_device::pc9801_86_ext_r), this), write8_delegate(FUNC(pc9801_86_device::pc9801_86_ext_w), this) );
+
 }
 
 
