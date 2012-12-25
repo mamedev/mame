@@ -488,10 +488,10 @@ UINT16 backfire_pri_callback(UINT16 x)
 {
 	switch (x & 0xc000)
 	{
-		case 0x0000: return 0;   break; // numbers, people, cars when in the air, status display..
-		case 0x4000: return 0xf0;break; // cars most of the time
-		case 0x8000: return 0;   break; // car wheels during jump?
-		case 0xc000: return 0xf0;break; /* car wheels in race? */
+		case 0x0000: return 0;    // numbers, people, cars when in the air, status display..
+		case 0x4000: return 0xf0; // cars most of the time
+		case 0x8000: return 0;    // car wheels during jump?
+		case 0xc000: return 0xf0; // car wheels in race?
 	}
 	return 0;
 }

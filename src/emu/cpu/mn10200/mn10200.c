@@ -2300,7 +2300,6 @@ static UINT32 mn10200_r(mn102_info *mn102, UINT32 adr, int type)
 	case 0x205: case 0x206: case 0x207: case 0x208: case 0x209:
 //      printf("MN10200: timer %d value read = %d\n", adr-0x200, mn102->simple_timer[adr-0x200].cur);
 		return mn102->simple_timer[adr-0x200].cur;
-		break;
 
 	case 0x264:	// port 1 data
 		return mn102->io->read_byte(MN10200_PORT1);

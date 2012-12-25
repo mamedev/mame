@@ -350,16 +350,12 @@ READ8_MEMBER( s6a_state::dips_r )
 		{
 		case 0:
 			return ioport("DSW0")->read() & 15;
-			break;
 		case 1:
 			return ioport("DSW0")->read() << 4;
-			break;
 		case 2:
 			return ioport("DSW1")->read() & 15;
-			break;
 		case 3:
 			return ioport("DSW1")->read() << 4;
-			break;
 		}
 	}
 	return 0xff;
