@@ -144,7 +144,7 @@ private:
 	inline void get_text_partition(int index, UINT32 *sad, UINT16 *len, int *im, int *wd);
 	inline void get_graphics_partition(int index, UINT32 *sad, UINT16 *len, int *im, int *wd);
 
-	void draw_pixel(int x, int y, UINT16 tile_data);
+	void draw_pixel(int x, int y, UINT8 tile_data);
 	void draw_line(int x, int y);
 	void draw_rectangle(int x, int y);
 	void draw_char(int x, int y);

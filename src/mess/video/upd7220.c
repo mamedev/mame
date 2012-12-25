@@ -866,22 +866,28 @@ void upd7220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  draw_pixel -
 //-------------------------------------------------
 
-void upd7220_device::draw_pixel(int x, int y, UINT16 tile_data)
+void upd7220_device::draw_pixel(int x, int y, UINT8 tile_data)
 {
 	UINT32 addr = (y * m_pitch * 2 + (x >> 3)) & 0x3ffff;
-
 	int dad = x & 0x7;
-
 	UINT8 data = readbyte(addr);
+	UINT8 new_pixel = (tile_data) & (0x80 >> (dad));
 
-	if((m_bitmap_mod & 3) == 1)
+	switch(m_bitmap_mod)
 	{
-		writebyte(addr, data ^ ((tile_data) & (0x80 >> (dad))));
-	}
-	else
-	{
-		writebyte(addr, data & ~(0x80 >> (dad)));
-		writebyte(addr, data | ((tile_data) & (0x80 >> (dad))));
+		case 0: //replace
+			writebyte(addr, data & ~(0x80 >> (dad)));
+			writebyte(addr, data | new_pixel);
+			break;
+		case 1: //complement
+			writebyte(addr, data ^ (new_pixel));
+			break;
+		case 2: //reset
+			writebyte(addr, data & ((new_pixel) ? 0xff : ~(0x80 >> (dad))));
+			break;
+		case 3: //set
+			writebyte(addr, data | new_pixel);
+			break;
 	}
 }
 
