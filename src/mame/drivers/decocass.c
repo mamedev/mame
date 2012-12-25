@@ -37,6 +37,7 @@
 #include "includes/decocass.h"
 #include "machine/decocass_tape.h"
 #include "sound/ay8910.h"
+#include "machine/deco222.h"
 
 #define MASTER_CLOCK	XTAL_12MHz
 #define HCLK			(MASTER_CLOCK/2)
@@ -51,44 +52,29 @@
  *
  ***************************************************************************/
 
-INLINE int swap_bits_5_6(int data)
-{
-	return (data & 0x9f) | ((data & 0x20) << 1) | ((data & 0x40) >> 1);
-}
-
-WRITE8_MEMBER(decocass_state::ram_w)
-{
-	m_decrypted[0x0000 + offset] = swap_bits_5_6(data);
-	m_rambase[0x0000 + offset] = data;
-}
 
 WRITE8_MEMBER(decocass_state::charram_w)
 {
-	m_decrypted[0x6000 + offset] = swap_bits_5_6(data);
 	decocass_charram_w(space, offset, data);
 }
 
 WRITE8_MEMBER(decocass_state::fgvideoram_w)
 {
-	m_decrypted[0xc000 + offset] = swap_bits_5_6(data);
 	decocass_fgvideoram_w(space, offset, data);
 }
 
 WRITE8_MEMBER(decocass_state::fgcolorram_w)
 {
-	m_decrypted[0xc400 + offset] = swap_bits_5_6(data);
 	decocass_colorram_w(space, offset, data);
 }
 
 WRITE8_MEMBER(decocass_state::tileram_w)
 {
-	m_decrypted[0xd000 + offset] = swap_bits_5_6(data);
 	decocass_tileram_w(space, offset, data);
 }
 
 WRITE8_MEMBER(decocass_state::objectram_w)
 {
-	m_decrypted[0xd800 + offset] = swap_bits_5_6(data);
 	decocass_objectram_w(space, offset, data);
 }
 
@@ -109,7 +95,7 @@ READ8_MEMBER(decocass_state::mirrorcolorram_r)
 
 
 static ADDRESS_MAP_START( decocass_map, AS_PROGRAM, 8, decocass_state )
-	AM_RANGE(0x0000, 0x5fff) AM_RAM_WRITE(ram_w) AM_SHARE("rambase")
+	AM_RANGE(0x0000, 0x5fff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x6000, 0xbfff) AM_RAM_WRITE(charram_w) AM_SHARE("charram") /* still RMS3 RAM */
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")  /* DSP3 RAM */
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(fgcolorram_w) AM_SHARE("colorram")
@@ -755,7 +741,7 @@ void decocass_state::palette_init()
 static MACHINE_CONFIG_START( decocass, decocass_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, HCLK4)
+	MCFG_CPU_ADD("maincpu", DECO_222, HCLK4) /* the earlier revision board doesn't have the 222 but must have the same thing implemented in logic for the M6502 */
 	MCFG_CPU_PROGRAM_MAP(decocass_map)
 
 	MCFG_CPU_ADD("audiocpu", M6502, HCLK1/3/2)
@@ -777,7 +763,6 @@ static MACHINE_CONFIG_START( decocass, decocass_state )
 
 	MCFG_GFXDECODE(decocass)
 	MCFG_PALETTE_LENGTH(32+2*8+2*4)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1620,22 +1605,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(decocass_state,decocass)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = memregion("maincpu")->base();
-	int A;
-
-	/* allocate memory and mark all RAM regions with their decrypted pointers */
-	m_decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
-	space.set_decrypted_region(0x0000, 0xc7ff, &m_decrypted[0x0000]);
-	space.set_decrypted_region(0xd000, 0xdbff, &m_decrypted[0xd000]);
-	space.set_decrypted_region(0xf000, 0xffff, &m_decrypted[0xf000]);
-
-	/* Swap bits 5 & 6 for opcodes */
-	for (A = 0xf000; A < 0x10000; A++)
-		m_decrypted[A] = swap_bits_5_6(rom[A]);
-
-	save_pointer(NAME(m_decrypted), 0x10000);
-
 	/* Call the state save setup code in machine/decocass.c */
 	decocass_machine_state_save_init();
 	/* and in video/decocass.c, too */
@@ -1644,32 +1613,18 @@ DRIVER_INIT_MEMBER(decocass_state,decocass)
 
 DRIVER_INIT_MEMBER(decocass_state,decocrom)
 {
-	int romlength = memregion("user3")->bytes();
-	UINT8 *rom = memregion("user3")->base();
-	int i;
-
-	m_decrypted2 = auto_alloc_array(machine(), UINT8, romlength);
-
 	/* standard init */
 	DRIVER_INIT_CALL(decocass);
-
-	/* decrypt the ROMs */
-	for (i = 0; i < romlength; i++)
-		m_decrypted2[i] = swap_bits_5_6(rom[i]);
 
 	/* convert charram to a banked ROM */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x6000, 0xafff, "bank1");
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x6000, 0xafff, write8_delegate(FUNC(decocass_state::decocass_de0091_w),this));
 	membank("bank1")->configure_entry(0, m_charram);
 	membank("bank1")->configure_entry(1, memregion("user3")->base());
-	membank("bank1")->configure_decrypted_entry(0, &m_decrypted[0x6000]);
-	membank("bank1")->configure_decrypted_entry(1, m_decrypted2);
 	membank("bank1")->set_entry(0);
 
 	/* install the bank selector */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xe900, 0xe900, write8_delegate(FUNC(decocass_state::decocass_e900_w),this));
-
-	save_pointer(NAME(m_decrypted2), romlength);
 }
 
 READ8_MEMBER(decocass_state::cdsteljn_input_r )

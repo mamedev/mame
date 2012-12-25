@@ -74,8 +74,6 @@ public:
 	UINT8     m_audio_nmi_state;
 
 	/* misc */
-	UINT8     *m_decrypted;
-	UINT8     *m_decrypted2;
 	INT32     m_firsttime;
 	UINT8     m_latch1;
 	UINT8     m_decocass_reset;
@@ -220,7 +218,6 @@ public:
 
 	void decocass_video_state_save_init();
 
-	DECLARE_WRITE8_MEMBER(ram_w);
 	DECLARE_WRITE8_MEMBER(charram_w);
 	DECLARE_WRITE8_MEMBER(fgvideoram_w);
 	DECLARE_WRITE8_MEMBER(fgcolorram_w);
