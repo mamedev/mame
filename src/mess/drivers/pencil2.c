@@ -69,7 +69,7 @@ ToDo:
 - Joysticks (no info)
 - Cart slot (only 1 cart has been dumped, so probably no point coding it)
 - Screen size is wrong in BASIC. Should be 24 lines of text with a wide
-  border all around.
+  border all around. (changed to NTSC to fix it for now)
 
 ****************************************************************************/
 
@@ -288,7 +288,7 @@ static MACHINE_CONFIG_START( pencil2, pencil2_state )
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, pencil2_tms9928a_interface )
-	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" ) // should be PAL but it has issues
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	// sound hardware
