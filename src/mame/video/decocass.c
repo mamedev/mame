@@ -521,7 +521,7 @@ void decocass_state::draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 		for (x=clip.min_x; x<=clip.max_x;x++)
 		{
-			int srccol;
+			int srccol = 0;
 			
 			// 2 bits control the x scroll mode, allowing it to wrap either half of the tilemap, or transition one way or the other between the two halves
 
