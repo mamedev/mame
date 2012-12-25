@@ -1223,6 +1223,7 @@ void upd7220_device::process_fifo()
 		{
 			m_ctop = m_pr[2] & 0x1f;
 			m_sc = BIT(m_pr[2], 5);
+			m_br = (m_pr[2] >> 6); /* guess, assume that blink rate clears upper bits (if any) */
 
 			LOG(("uPD7220 '%s' CTOP: %u\n", tag(), m_ctop));
 			LOG(("uPD7220 '%s' SC: %u\n", tag(), m_sc));

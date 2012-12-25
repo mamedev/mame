@@ -41,7 +41,8 @@
     - Unsupported disk types: *.dsk, *.nfd, *.fdd, *.nhd
     - 46 Okunen Monogatari - The Shinkaron
     - AD&D Champions of Krynn
-    - AI Shougi (asserts upon loading)
+    - AI Shougi (asserts upon loading, 3'5 image?)
+    - Aki no Tsukasa no Fushigi no Kabe (works in PC-9801RS only)
     - Aoki Ookami no Shiroki Mejika - Gengis Khan
     - Arcshu
     - Arcus 2
@@ -58,7 +59,6 @@
 	- Birdy World
 
     - Bokosuka Wars
-    - Dokkin Minako Sensei (2dd image)
     - Jangou 2: floppy fails to load after the title screen;
     - Okuman Chouja 2: fails loading in PC-9801RS only ("packed file is corrupt"). Maybe a 386 core bug?
     - Quarth: fails loading in PC-9801RS only ("packed file is corrupt"). Maybe a 386 core bug?
@@ -68,8 +68,6 @@
     - A Ressha de Ikou 2: missing text (PC-9801RS only);
     - Absolutely Mahjong: Transitions are too fast.
     - Agumix Selects!: needs GDC = 5 MHz, interlace doesn't work properly;
-    - Aki no Tsukasa no Fushigi no Kabe: moans with a kanji error
-       "can't use (this) on a vanilla PC-9801, a PC-9801E nor a PC-9801U. Please turn off the computer and turn it on again."
     - Alice no Yakata: doesn't set bitmap interlace properly, can't do disk swaps via the File Manager;
     - Animahjong V3: accesses port 0x88;
     - Anniversary - Memories of Summer: thinks that a button is pressed;
@@ -443,6 +441,7 @@ public:
 	UINT8 m_pc9821_window_bank;
 	UINT8 m_joy_sel;
 	UINT8 m_ext2_ff;
+	UINT8 m_sys_type;
 
 	DECLARE_READ8_MEMBER(pc9801_xx_r);
 	DECLARE_WRITE8_MEMBER(pc9801_xx_w);
@@ -481,6 +480,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pc9801rs_mouse_freq_w);
 	inline UINT8 m_pc9801rs_grcg_r(UINT32 offset,int vbank);
 	inline void m_pc9801rs_grcg_w(UINT32 offset,int vbank,UINT8 data);
+	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
 
 	DECLARE_WRITE8_MEMBER(sasi_data_w);
 	DECLARE_WRITE_LINE_MEMBER(sasi_io_w);
@@ -2697,6 +2697,12 @@ INPUT_CHANGED_MEMBER(pc9801_state::shift_stroke)
 	}
 }
 
+CUSTOM_INPUT_MEMBER(pc9801_state::system_type_r)
+{
+//  System Type (0x00 stock PC-9801, 0xc0 PC-9801U / PC-98LT, PC-98HA, 0x80 others)
+	return m_sys_type;
+}
+
 static INPUT_PORTS_START( pc9801 )
 	PORT_START("KEY0") // 0x00 - 0x07
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC)  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_state, key_stroke, 0x00) PORT_IMPULSE(1)
@@ -2902,12 +2908,7 @@ static INPUT_PORTS_START( pc9801 )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) //system clock = 5 MHz (0) / 8 MHz (1)
 	PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) // System Type (0x00	stock PC-9801, 0xc0 PC-9801U / PC-98LT, PC-98HA, 0x80 others)
-	PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) //
-	PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pc9801_state, system_type_r, NULL)
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "System Specification" ) PORT_DIPLOCATION("SW1:1") //jumps to daa00 if off, presumably some card booting
@@ -3581,6 +3582,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9801f)
 	}
 	m_fdc_2hd->set_rate(500000);
 	m_fdc_2dd->set_rate(250000);
+	m_sys_type = 0x00 >> 6;
 }
 
 MACHINE_START_MEMBER(pc9801_state,pc9801rs)
@@ -3600,6 +3602,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9801rs)
 	fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(pc9801_state::pc9801rs_fdc_drq), this));
 
 	m_ide_rom = memregion("ide")->base();
+	m_sys_type = 0x80 >> 6;
 }
 
 MACHINE_START_MEMBER(pc9801_state,pc9821)
