@@ -172,6 +172,8 @@ WRITE8_MEMBER(decocass_state::decocass_paletteram_w )
      * RGB output is inverted and A4 is inverted too
      * (ME/ input on 1st paletteram, inverter -> ME/ on 2nd)
      */
+	m_paletteram[offset] = data;
+
 	offset = (offset & 31) ^ 16;
 	colortable_palette_set_color(machine().colortable, offset, MAKE_RGB(pal3bit(~data >> 0), pal3bit(~data >> 3), pal2bit(~data >> 6)));
 }
@@ -200,10 +202,8 @@ WRITE8_MEMBER(decocass_state::decocass_colorram_w )
 
 void decocass_state::mark_bg_tile_dirty(offs_t offset )
 {
-	if (offset & 0x80)
-		m_bg_tilemap_r->mark_tile_dirty(offset);
-	else
-		m_bg_tilemap_l->mark_tile_dirty(offset);
+	m_bg_tilemap_r->mark_tile_dirty(offset);
+	m_bg_tilemap_l->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(decocass_state::decocass_tileram_w )
