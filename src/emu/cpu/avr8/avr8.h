@@ -9,10 +9,14 @@
       the existing opcodes has been shown to wildly corrupt the video output in Craft, so one can assume that the
       existing timing is 100% correct.
 
-      Unimplemented opcodes: CPSR, LD Z+, ST Z+, ST -Z/-Y/-X, ELPM, SPM, SPM Z+, EIJMP, SLEEP, BREAK, WDR, ICALL,
-                             EICALL, JMP, CALL, SBIW
+      Unimplemented opcodes: ELPM, SPM, SPM Z+, EIJMP, SLEEP, BREAK, WDR, EICALL, JMP, CALL
 
     - Changelist -
+      23 Dec. 2012 [Sandro Ronco]
+      - Added CPSE, LD Z+, ST -Z/-Y/-X and ICALL opcodes
+      - Fixed Z flag in CPC, SBC and SBCI opcodes
+      - Fixed V and C flags in SBIW opcode
+
       30 Oct. 2012
       - Added FMUL, FMULS, FMULSU opcodes [MooglyGuy]
       - Fixed incorrect flag calculation in ROR opcode [MooglyGuy]
@@ -71,7 +75,7 @@ public:
 	static void static_set_config(device_t &device, const avr8_config &config);
 
 	// public interfaces
-	void update_interrupt(int source);
+	virtual void update_interrupt(int source);
 	UINT64 get_elapsed_cycles()
 	{
 		return m_elapsed_cycles;
@@ -232,6 +236,8 @@ class atmega644_device : public avr8_device
 public:
 	// construction/destruction
 	atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual void update_interrupt(int source);
 };
 
 /***************************************************************************
@@ -308,6 +314,36 @@ enum
     AVR8_INT_ANALOG_COMP,
     AVR8_INT_TWI,
     AVR8_INT_SPM_RDY,
+
+	// ATMEGA644
+    ATMEGA644_INT_RESET	= 0,
+    ATMEGA644_INT_INT0,
+    ATMEGA644_INT_INT1,
+    ATMEGA644_INT_INT2,
+    ATMEGA644_INT_PCINT0,
+    ATMEGA644_INT_PCINT1,
+    ATMEGA644_INT_PCINT2,
+    ATMEGA644_INT_PCINT3,
+    ATMEGA644_INT_WDT,
+    ATMEGA644_INT_T2COMPA,
+    ATMEGA644_INT_T2COMPB,
+    ATMEGA644_INT_T2OVF,
+    ATMEGA644_INT_T1CAPT,
+    ATMEGA644_INT_T1COMPA,
+    ATMEGA644_INT_T1COMPB,
+    ATMEGA644_INT_T1OVF,
+    ATMEGA644_INT_T0COMPA,
+    ATMEGA644_INT_T0COMPB,
+    ATMEGA644_INT_T0OVF,
+    ATMEGA644_INT_SPI_STC,
+    ATMEGA644_INT_USART_RX,
+    ATMEGA644_INT_USART_UDRE,
+    ATMEGA644_INT_USART_TX,
+    ATMEGA644_INT_ADC,
+    ATMEGA644_INT_EE_RDY,
+    ATMEGA644_INT_ANALOG_COMP,
+    ATMEGA644_INT_TWI,
+    ATMEGA644_INT_SPM_RDY,
 };
 
 // Used by I/O register handling

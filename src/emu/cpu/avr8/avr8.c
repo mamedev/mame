@@ -9,10 +9,14 @@
       the existing opcodes has been shown to wildly corrupt the video output in Craft, so one can assume that the
       existing timing is 100% correct.
 
-      Unimplemented opcodes: CPSR, LD Z+, ST -Z/-Y/-X, ELPM, SPM, SPM Z+, EIJMP, SLEEP, BREAK, WDR, ICALL, EICALL,
-                             JMP, CALL
+      Unimplemented opcodes: ELPM, SPM, SPM Z+, EIJMP, SLEEP, BREAK, WDR, EICALL, JMP, CALL
 
     - Changelist -
+      23 Dec. 2012 [Sandro Ronco]
+      - Added CPSE, LD Z+, ST -Z/-Y/-X and ICALL opcodes
+      - Fixed Z flag in CPC, SBC and SBCI opcodes
+      - Fixed V and C flags in SBIW opcode
+
       30 Oct. 2012
       - Added FMUL, FMULS, FMULSU opcodes [MooglyGuy]
       - Fixed incorrect flag calculation in ROR opcode [MooglyGuy]
@@ -664,8 +668,8 @@ void avr8_device::set_irq_line(UINT16 vector, int state)
 		if(SREG_R(AVR8_SREG_I))
 		{
 			SREG_W(AVR8_SREG_I, 0);
-			push((m_pc >> 8) & 0x00ff);
 			push(m_pc & 0x00ff);
+			push((m_pc >> 8) & 0x00ff);
 			m_pc = vector;
 			m_shifted_pc = vector << 1;
 		}
@@ -709,6 +713,37 @@ void avr8_device::update_interrupt(int source)
     intstate = (m_r[condition.m_intreg] & condition.m_intmask) ? intstate : 0;
 
 	set_irq_line(condition.m_intindex, intstate);
+
+	if (intstate)
+	{
+		m_r[condition.m_regindex] &= ~condition.m_regmask;
+	}
+}
+
+
+static const CInterruptCondition s_mega644_int_conditions[AVR8_INTIDX_COUNT] =
+{
+	{ ATMEGA644_INT_SPI_STC, AVR8_REGIDX_SPCR,   AVR8_SPCR_SPIE_MASK,     AVR8_REGIDX_SPSR,    AVR8_SPSR_SPIF_MASK },
+	{ ATMEGA644_INT_T0COMPB, AVR8_REGIDX_TIMSK0, AVR8_TIMSK0_OCIE0B_MASK, AVR8_REGIDX_TIFR0,   AVR8_TIFR0_OCF0B_MASK },
+	{ ATMEGA644_INT_T0COMPA, AVR8_REGIDX_TIMSK0, AVR8_TIMSK0_OCIE0A_MASK, AVR8_REGIDX_TIFR0,   AVR8_TIFR0_OCF0A_MASK },
+	{ ATMEGA644_INT_T0OVF,   AVR8_REGIDX_TIMSK0, AVR8_TIMSK0_TOIE0_MASK,  AVR8_REGIDX_TIFR0,   AVR8_TIFR0_TOV0_MASK },
+	{ ATMEGA644_INT_T1CAPT,  AVR8_REGIDX_TIMSK1, AVR8_TIMSK1_ICIE1_MASK,  AVR8_REGIDX_TIFR1,   AVR8_TIFR1_ICF1_MASK },
+	{ ATMEGA644_INT_T1COMPB, AVR8_REGIDX_TIMSK1, AVR8_TIMSK1_OCIE1B_MASK, AVR8_REGIDX_TIFR1,   AVR8_TIFR1_OCF1B_MASK },
+	{ ATMEGA644_INT_T1COMPA, AVR8_REGIDX_TIMSK1, AVR8_TIMSK1_OCIE1A_MASK, AVR8_REGIDX_TIFR1,   AVR8_TIFR1_OCF1A_MASK },
+	{ ATMEGA644_INT_T1OVF,   AVR8_REGIDX_TIMSK1, AVR8_TIMSK1_TOIE1_MASK,  AVR8_REGIDX_TIFR1,   AVR8_TIFR1_TOV1_MASK },
+	{ ATMEGA644_INT_T2COMPB, AVR8_REGIDX_TIMSK2, AVR8_TIMSK2_OCIE2B_MASK, AVR8_REGIDX_TIFR2,   AVR8_TIFR2_OCF2B_MASK },
+	{ ATMEGA644_INT_T2COMPA, AVR8_REGIDX_TIMSK2, AVR8_TIMSK2_OCIE2A_MASK, AVR8_REGIDX_TIFR2,   AVR8_TIFR2_OCF2A_MASK },
+	{ ATMEGA644_INT_T2OVF,   AVR8_REGIDX_TIMSK2, AVR8_TIMSK2_TOIE2_MASK,  AVR8_REGIDX_TIFR2,   AVR8_TIFR2_TOV2_MASK }
+};
+
+void atmega644_device::update_interrupt(int source)
+{
+    CInterruptCondition condition = s_mega644_int_conditions[source];
+
+    int intstate = (m_r[condition.m_regindex] & condition.m_regmask) ? 1 : 0;
+    intstate = (m_r[condition.m_intreg] & condition.m_intmask) ? intstate : 0;
+
+	set_irq_line(condition.m_intindex << 1, intstate);
 
 	if (intstate)
 	{
@@ -1010,6 +1045,11 @@ void avr8_device::timer1_tick()
 
                 if (count == ocr1[reg])
                 {
+                    if (reg == 0)
+                    {
+						count = 0;
+						increment = 0;
+                    }
                     m_r[AVR8_REGIDX_TIFR1] |= ocf1[reg];
 					update_interrupt(int1[reg]);
                 }
@@ -1540,6 +1580,41 @@ WRITE8_MEMBER( avr8_device::regs_w )
 {
     switch( offset )
     {
+		case AVR8_REGIDX_R0:
+		case AVR8_REGIDX_R1:
+		case AVR8_REGIDX_R2:
+		case AVR8_REGIDX_R3:
+		case AVR8_REGIDX_R4:
+		case AVR8_REGIDX_R5:
+		case AVR8_REGIDX_R6:
+		case AVR8_REGIDX_R7:
+		case AVR8_REGIDX_R8:
+		case AVR8_REGIDX_R9:
+		case AVR8_REGIDX_R10:
+		case AVR8_REGIDX_R11:
+		case AVR8_REGIDX_R12:
+		case AVR8_REGIDX_R13:
+		case AVR8_REGIDX_R14:
+		case AVR8_REGIDX_R15:
+		case AVR8_REGIDX_R16:
+		case AVR8_REGIDX_R17:
+		case AVR8_REGIDX_R18:
+		case AVR8_REGIDX_R19:
+		case AVR8_REGIDX_R20:
+		case AVR8_REGIDX_R21:
+		case AVR8_REGIDX_R22:
+		case AVR8_REGIDX_R23:
+		case AVR8_REGIDX_R24:
+		case AVR8_REGIDX_R25:
+		case AVR8_REGIDX_R26:
+		case AVR8_REGIDX_R27:
+		case AVR8_REGIDX_R28:
+		case AVR8_REGIDX_R29:
+		case AVR8_REGIDX_R30:
+		case AVR8_REGIDX_R31:
+			m_r[offset] = data;
+			break;
+
 		case AVR8_REGIDX_TCCR0B:
 			verboselog(m_pc, 0, "AVR8: TCCR0B = %02x\n", data );
 			changed_tccr0b(data);
@@ -1707,6 +1782,11 @@ WRITE8_MEMBER( avr8_device::regs_w )
 			m_r[offset] = data;
 			break;
 
+		case AVR8_REGIDX_GPIOR1:
+		case AVR8_REGIDX_GPIOR2:
+			m_r[offset] = data;
+			break;
+
 		case AVR8_REGIDX_PORTA:
 			m_io->write_byte(0x00, data);
 			m_r[AVR8_REGIDX_PORTA] = data;
@@ -1755,6 +1835,40 @@ READ8_MEMBER( avr8_device::regs_r )
 	//printf("offset %04x\n", offset);
     switch( offset )
     {
+		case AVR8_REGIDX_R0:
+		case AVR8_REGIDX_R1:
+		case AVR8_REGIDX_R2:
+		case AVR8_REGIDX_R3:
+		case AVR8_REGIDX_R4:
+		case AVR8_REGIDX_R5:
+		case AVR8_REGIDX_R6:
+		case AVR8_REGIDX_R7:
+		case AVR8_REGIDX_R8:
+		case AVR8_REGIDX_R9:
+		case AVR8_REGIDX_R10:
+		case AVR8_REGIDX_R11:
+		case AVR8_REGIDX_R12:
+		case AVR8_REGIDX_R13:
+		case AVR8_REGIDX_R14:
+		case AVR8_REGIDX_R15:
+		case AVR8_REGIDX_R16:
+		case AVR8_REGIDX_R17:
+		case AVR8_REGIDX_R18:
+		case AVR8_REGIDX_R19:
+		case AVR8_REGIDX_R20:
+		case AVR8_REGIDX_R21:
+		case AVR8_REGIDX_R22:
+		case AVR8_REGIDX_R23:
+		case AVR8_REGIDX_R24:
+		case AVR8_REGIDX_R25:
+		case AVR8_REGIDX_R26:
+		case AVR8_REGIDX_R27:
+		case AVR8_REGIDX_R28:
+		case AVR8_REGIDX_R29:
+		case AVR8_REGIDX_R30:
+		case AVR8_REGIDX_R31:
+			return m_r[offset];
+
 		case AVR8_REGIDX_SPL:
 		case AVR8_REGIDX_SPH:
 		case AVR8_REGIDX_TCNT1L:
@@ -1769,9 +1883,21 @@ READ8_MEMBER( avr8_device::regs_r )
 		case AVR8_REGIDX_DDRC:
 		case AVR8_REGIDX_DDRD:
 		case AVR8_REGIDX_GPIOR0:
+		case AVR8_REGIDX_GPIOR1:
+		case AVR8_REGIDX_GPIOR2:
 		case AVR8_REGIDX_EEDR:
 		case AVR8_REGIDX_SREG:
 			return m_r[offset];
+
+		// TODO: consider the DDRx
+		case AVR8_REGIDX_PINA:
+			return m_io->read_byte(AVR8_REG_A);
+		case AVR8_REGIDX_PINB:
+			return m_io->read_byte(AVR8_REG_B);
+		case AVR8_REGIDX_PINC:
+			return m_io->read_byte(AVR8_REG_C);
+		case AVR8_REGIDX_PIND:
+			return m_io->read_byte(AVR8_REG_D);
 
         default:
 			verboselog(m_pc, 0, "AVR8: Unknown Register Read: %02x\n", (UINT8)offset);
@@ -1919,7 +2045,7 @@ void avr8_device::execute_run()
                         SREG_W(AVR8_SREG_V, (BIT(rd,7) & NOT(BIT(rr,7)) & NOT(BIT(res,7))) | (NOT(BIT(rd,7)) & BIT(rr,7) & BIT(res,7)));
                         SREG_W(AVR8_SREG_N, BIT(res,7));
                         SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-                        SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
+                        SREG_W(AVR8_SREG_Z, (res == 0) ? SREG_R(AVR8_SREG_Z) : 0);
                         SREG_W(AVR8_SREG_C, (NOT(BIT(rd,7)) & BIT(rr,7)) | (BIT(rr,7) & BIT(res,7)) | (BIT(res,7) & NOT(BIT(rd,7))));
                         break;
                     case 0x0800:
@@ -1934,7 +2060,7 @@ void avr8_device::execute_run()
                         SREG_W(AVR8_SREG_V, (BIT(rd,7) & NOT(BIT(rr,7)) & NOT(BIT(res,7))) | (NOT(BIT(rd,7)) & BIT(rr,7) & BIT(res,7)));
                         SREG_W(AVR8_SREG_N, BIT(res,7));
                         SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-                        SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
+                        SREG_W(AVR8_SREG_Z, (res == 0) ? SREG_R(AVR8_SREG_Z) : 0);
                         SREG_W(AVR8_SREG_C, (NOT(BIT(rd,7)) & BIT(rr,7)) | (BIT(rr,7) & BIT(res,7)) | (BIT(res,7) & NOT(BIT(rd,7))));
                         break;
                     case 0x0c00:
@@ -1957,9 +2083,15 @@ void avr8_device::execute_run()
             case 0x1000:
                 switch(op & 0x0c00)
                 {
-                    case 0x0000:    // CPSR Rd,Rr
-                        //output += sprintf( output, "CPSE    R%d, R%d", RD5(op), RR5(op) );
-                        unimplemented_opcode(op);
+                    case 0x0000:    // CPSE Rd,Rr
+                        rd = m_r[RD5(op)];
+                        rr = m_r[RR5(op)];
+                        if (rd == rr)
+                        {
+						    op = (UINT32)m_program->read_word(m_shifted_pc + 2);
+						    opcycles += is_long_opcode(op) ? 2 : 1;
+						    m_pc += is_long_opcode(op) ? 2 : 1;
+						}
                         break;
                     case 0x0400:    // CP Rd,Rr
                         rd = m_r[RD5(op)];
@@ -2056,7 +2188,7 @@ void avr8_device::execute_run()
                 SREG_W(AVR8_SREG_V, (BIT(rd,7) & NOT(BIT(rr,7)) & NOT(BIT(res,7))) | (NOT(BIT(rd,7)) & BIT(rr,7) & BIT(res,7)));
                 SREG_W(AVR8_SREG_N, BIT(res,7));
                 SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
-                SREG_W(AVR8_SREG_Z, (res == 0) ? 1 : 0);
+                SREG_W(AVR8_SREG_Z, (res == 0) ? SREG_R(AVR8_SREG_Z) : 0);
                 SREG_W(AVR8_SREG_C, (NOT(BIT(rd,7)) & BIT(rr,7)) | (BIT(rr,7) & BIT(res,7)) | (BIT(res,7) & NOT(BIT(rd,7))));
                 break;
             case 0x5000:    // SUBI Rd,K
@@ -2129,7 +2261,12 @@ void avr8_device::execute_run()
                                 opcycles = 2;
                                 break;
                             case 0x0001:    // LD Rd,Z+
-                                unimplemented_opcode(op);
+                                pd = ZREG;
+                                m_r[RD5(op)] = m_data->read_byte(pd);
+                                pd++;
+                                m_r[31] = (pd >> 8) & 0x00ff;
+                                m_r[30] = pd & 0x00ff;
+                                opcycles = 2;
                                 break;
                             case 0x0002:    // LD Rd,-Z
                                 pd = ZREG;
@@ -2226,8 +2363,12 @@ void avr8_device::execute_run()
                                 opcycles = 2;
                                 break;
                             case 0x0002:    // ST -Z,Rd
-                                //output += sprintf( output, "ST      -Z , R%d", RD5(op) );
-                                unimplemented_opcode(op);
+                                pd = ZREG;
+                                pd--;
+                                m_data->write_byte(pd, m_r[RD5(op)]);
+                                m_r[31] = (pd >> 8) & 0x00ff;
+                                m_r[30] = pd & 0x00ff;
+                                opcycles = 2;
                                 break;
                             case 0x0009:    // ST Y+,Rd
                                 pd = YREG;
@@ -2238,8 +2379,12 @@ void avr8_device::execute_run()
                                 opcycles = 2;
                                 break;
                             case 0x000a:    // ST -Y,Rd
-                                //output += sprintf( output, "ST      -Y , R%d", RD5(op) );
-                                unimplemented_opcode(op);
+                                pd = YREG;
+                                pd--;
+                                m_data->write_byte(pd, m_r[RD5(op)]);
+                                m_r[29] = (pd >> 8) & 0x00ff;
+                                m_r[28] = pd & 0x00ff;
+                                opcycles = 2;
                                 break;
                             case 0x000c:    // ST X,Rd
                                 m_data->write_byte(XREG, m_r[RD5(op)]);
@@ -2253,8 +2398,12 @@ void avr8_device::execute_run()
                                 opcycles = 2;
                                 break;
                             case 0x000e:    // ST -X,Rd
-                                //output += sprintf( output, "ST      -X , R%d", RD5(op) );
-                                unimplemented_opcode(op);
+                                pd = XREG;
+                                pd--;
+                                m_data->write_byte(pd, m_r[RD5(op)]);
+                                m_r[27] = (pd >> 8) & 0x00ff;
+                                m_r[26] = pd & 0x00ff;
+                                opcycles = 2;
                                 break;
                             case 0x000f:    // PUSH Rd
                                 push(m_r[RD5(op)]);
@@ -2397,8 +2546,8 @@ void avr8_device::execute_run()
                                 break;
                             case 0x000e:    // CALL k
                             case 0x000f:
-								push(((m_pc + 1) >> 8) & 0x00ff);
-								push((m_pc + 1) & 0x00ff);
+								push((m_pc + 2) & 0x00ff);
+								push(((m_pc + 2) >> 8) & 0x00ff);
 								offs = KCONST22(op) << 16;
                                 m_pc++;
                                 m_shifted_pc += 2;
@@ -2485,14 +2634,14 @@ void avr8_device::execute_run()
                                 switch(op & 0x00f0)
                                 {
                                     case 0x0000:    // RET
-                                        m_pc = pop();
-                                        m_pc |= pop() << 8;
+                                        m_pc = pop() << 8;
+                                        m_pc |= pop();
                                         m_pc--;
                                         opcycles = 4;
                                         break;
                                     case 0x0010:    // RETI
-                                        m_pc = pop();
-                                        m_pc |= pop() << 8;
+                                        m_pc = pop() << 8;
+                                        m_pc |= pop();
                                         m_pc--;
                                         SREG_W(AVR8_SREG_I, 1);
                                         opcycles = 4;
@@ -2535,8 +2684,11 @@ void avr8_device::execute_run()
                                 switch(op & 0x00f0)
                                 {
                                     case 0x0000:    // ICALL
-                                        //output += sprintf( output, "ICALL" );
-                                        unimplemented_opcode(op);
+                                        push((m_pc + 1) & 0x00ff);
+                                        push(((m_pc + 1) >> 8) & 0x00ff);
+                                        m_pc = ZREG;
+                                        m_pc--;
+                                        opcycles = 3;
                                         break;
                                     case 0x0010:    // EICALL
                                         //output += sprintf( output, "EICALL" );
@@ -2598,11 +2750,11 @@ void avr8_device::execute_run()
                         pd = rd;
                         pd |= rr << 8;
                         pd -= KCONST6(op);
-                        SREG_W(AVR8_SREG_V, BIT(pd,15) & NOT(BIT(rr,7)));
+                        SREG_W(AVR8_SREG_V, NOT(BIT(pd,15)) & BIT(rr,7));
                         SREG_W(AVR8_SREG_N, BIT(pd,15));
                         SREG_W(AVR8_SREG_S, SREG_R(AVR8_SREG_N) ^ SREG_R(AVR8_SREG_V));
                         SREG_W(AVR8_SREG_Z, (pd == 0) ? 1 : 0);
-                        SREG_W(AVR8_SREG_C, NOT(BIT(pd,15)) & BIT(rr,7));
+                        SREG_W(AVR8_SREG_C, BIT(pd,15) & NOT(BIT(rr,7)));
                         m_r[24 + (DCONST(op) << 1)] = pd & 0x00ff;
                         m_r[25 + (DCONST(op) << 1)] = (pd >> 8) & 0x00ff;
                         opcycles = 2;
@@ -2662,8 +2814,8 @@ void avr8_device::execute_run()
                 break;
             case 0xd000:    // RCALL k
                 offs = (INT32)((op & 0x0800) ? ((op & 0x0fff) | 0xfffff000) : (op & 0x0fff));
-                push(((m_pc + 1) >> 8) & 0x00ff);
                 push((m_pc + 1) & 0x00ff);
+                push(((m_pc + 1) >> 8) & 0x00ff);
                 m_pc += offs;
                 opcycles = 3;
                 break;
