@@ -769,7 +769,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 	for(x=0;x<pitch;x+=x_step)
 	{
-		UINT8 tile_data,secret,reverse,u_line,v_line;
+		UINT8 tile_data,secret,reverse,u_line,v_line,blink;
 		UINT8 color;
 		UINT8 attr;
 		int pen;
@@ -807,7 +807,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 		attr = (state->m_video_ram_1[(tile_addr*2 & 0x1fff) | 0x2000] & 0xff);
 
 		secret = (attr & 1) ^ 1;
-		//blink = attr & 2;
+		blink = attr & 2;
 		reverse = attr & 4;
 		u_line = attr & 8;
 		v_line = (state->m_video_ff[ATTRSEL_REG]) ? 0 : attr & 0x10;
@@ -865,7 +865,11 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 					if(u_line && yi == 7) { tile_data = 0xff; }
 					if(v_line)	{ tile_data|=8; }
 
+					/* TODO: proper blink rate for these two */
 					if(cursor_on && cursor_addr == tile_addr && device->machine().primary_screen->frame_number() & 0x10)
+						tile_data^=0xff;
+
+					if(blink && device->machine().primary_screen->frame_number() & 0x10)
 						tile_data^=0xff;
 
 					if(yi >= char_size)
