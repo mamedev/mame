@@ -37,6 +37,21 @@ Notes: it's important that "user1" is 0xa0000 bytes with empty space filled
 
        ---------------------------------------------------------------------------
 
+       Casino Five: Requires a Keyboard to be attached to switch the game from the
+       "High Score" mode to the "Points Replay" mode by entering a custom code.
+       The Points Replay mode displays additional information on the service mode
+       screen such as Max Bet, Percentage & Points Played / Won. Is the High Score
+       or Points Replay mode controlled via a location in NVRAM or in RAM?
+       Casino Five has optional Custom Ads which require the CRT-254 Video
+       Billboard card & Keyboard to set up.
+
+       ---------------------------------------------------------------------------
+
+       The Pit Boss (2214-04): Has "Custom Ads" display always enabled? How do you
+       disable it, is it controlled (stored) via NVRAM?
+
+       ---------------------------------------------------------------------------
+
 Merit Riviera Notes - There are several known versions:
   Riviera Hi-Score
   Riviera Americana (not dumped)
@@ -870,8 +885,9 @@ static INPUT_PORTS_START( dtrvwh5 )
 	PORT_DIPSETTING(    0x00, "Single Side Cocktail" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( pitboss ) /* PCB pinout maps 12 lamp outputs, Diagnostics & Books Switches - Where are they mapped? */
-	PORT_START("IN0")
+static INPUT_PORTS_START( pitboss ) /* PCB pinout maps 12 lamp outputs - Where are they mapped? */
+
+	PORT_START("IN0") /* Pins #65 through #58 of J3 in decending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("P1/P2 Button 1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("P1/P2 Button 2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("P1/P2 Button 3")
@@ -881,61 +897,52 @@ static INPUT_PORTS_START( pitboss ) /* PCB pinout maps 12 lamp outputs, Diagnost
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_Q) PORT_NAME("P1/P2 Cancel")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) //causes "unauthorized conversion" msg.
 
-	PORT_START("IN1")
+	PORT_START("IN1") /* Pins #65 through #58 of J3 in decending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, "0-4" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_COCKTAIL PORT_CODE(KEYCODE_E) PORT_NAME("P2 Cancel")
-	PORT_DIPNAME( 0x20, 0x20, "0-6" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "0-7" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "0-8" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )	/* AKA Diagnostics - Seems to reset the game */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 )	PORT_COCKTAIL PORT_CODE(KEYCODE_E) PORT_NAME("P2 Cancel")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0xc0, 0xc0, "Hands Per Game" )	PORT_DIPLOCATION("Special:1,2") /* Pins #52 & #51?? Listed as "Switch Common Ground" */
+	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPSETTING(    0xc0, "4" )
+	PORT_DIPSETTING(    0x40, "5" )
+	PORT_DIPSETTING(    0x00, "5" ) /* Duplicate setting - Likely not used */
 
-	PORT_START("IN2")
+	PORT_START("IN2") /* Pins #46 through #41 of J3 in decending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL PORT_CODE(KEYCODE_A) PORT_NAME("P2 Button 1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL PORT_CODE(KEYCODE_S) PORT_NAME("P2 Button 2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_CODE(KEYCODE_D) PORT_NAME("P2 Button 3")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL PORT_CODE(KEYCODE_F) PORT_NAME("P2 Button 4")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_COCKTAIL PORT_CODE(KEYCODE_G) PORT_NAME("P2 Button 5")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_COCKTAIL PORT_CODE(KEYCODE_W) PORT_NAME("P2 Play")
-	PORT_DIPNAME( 0x40, 0x40, "1-7" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "1-8" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, merit_state,rndbit_r, NULL)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Max Double Up Per Winner" )	PORT_DIPLOCATION("SW:4")
+	PORT_DIPNAME( 0x08, 0x08, "Max Double Up" )	PORT_DIPLOCATION("SW:4")
 	PORT_DIPSETTING(    0x08, "Once" )
 	PORT_DIPSETTING(    0x00, "Twice" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW:5")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x40, "Counter Top" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x80, "Free Hands" )		PORT_DIPLOCATION("SW:8")
+	PORT_DIPNAME( 0x80, 0x80, "Free Hands" )	PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(    0x80, "100,000+ & 200,000+" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 INPUT_PORTS_END
@@ -960,39 +967,36 @@ static INPUT_PORTS_START( pitbossb )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( casino5 )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Bet")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Play")
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) // putting this on makes the horse racing game to not work
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN1")
+	PORT_START("IN0") /* Pins #65 through #58 of J3 in decending order */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Points")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Play")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* pulling this LOW makes the horse racing game to not work */
+
+	PORT_START("IN1") /* Pins #65 through #58 of J3 in decending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, "Reset High Scores" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* 1 displays additional screens in attract mode - custom ads screen (requires optional Keyboard to set up) */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )	/* AKA Diagnostics */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* 1 displays additional screens in attract mode - custom ads screen (requires optional Keyboard to set up) */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* Likely controls Percentage out, 75%, 80%, 85% & 90%  as per manual's "Tab Positions" */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
+	PORT_START("IN2") /* Pins #46 through #41 of J3 in decending order (usually P2 controls - Not used!) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* 0 causes "Unathorized conversion" */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* pulling this LOW causes "Unathorized conversion" */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, merit_state,rndbit_r, NULL)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Enable Draw Poker" )		PORT_DIPLOCATION("SW1:1")
@@ -1010,19 +1014,19 @@ static INPUT_PORTS_START( casino5 )
 	PORT_DIPNAME( 0x10, 0x10, "Enable Acey Deucey" )	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "2 Jokers in Deck" )		PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x00, "Bet 4" )
+	PORT_DIPNAME( 0x20, 0x20, "2 Jokers in Deck" )		PORT_DIPLOCATION("SW1:6") /* Only used in "Points Replay" mode ? */
+	PORT_DIPSETTING(    0x00, "Bet 4 Points" )
 	PORT_DIPSETTING(    0x20, "Always" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0x00, "Maximum Bet" )		PORT_DIPLOCATION("SW1:7,8") /* Only used in "Points Replay" mode */
+	PORT_DIPSETTING(    0x40, "1" )
+	PORT_DIPSETTING(    0xc0, "10" )
+	PORT_DIPSETTING(    0x80, "20" )
+	PORT_DIPSETTING(    0x00, "50" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( meritpoker )
-	PORT_START("IN0")
+
+	PORT_START("IN0") /* Pins #65 through #58 of J3 in decending order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME( "Hold 1 / Take / Lo" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
@@ -1032,17 +1036,17 @@ static INPUT_PORTS_START( meritpoker )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME( "Cash Out / Hi-Score" )
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
+	PORT_START("IN1") /* Pins #65 through #58 of J3 in decending order */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )		/* AKA Diagnostics */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
+	PORT_START("IN2") /* Pins #46 through #41 of J3 in decending order (usually P2 controls - Not used!) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* MUST be "LOW" or Riviera Hi-Score rev A will hang */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1208,28 +1212,28 @@ static INPUT_PORTS_START( couple )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x00, "Number of Attempts" )
+	PORT_DIPNAME( 0x01, 0x00, "Number of Attempts" )	PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, "99" )
 	PORT_DIPSETTING(    0x00, "9" )
-	PORT_DIPNAME( 0x02, 0x02, "Tries Per Coin" )
+	PORT_DIPNAME( 0x02, 0x02, "Tries Per Coin" )		PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 /*2 Coins for 2 Credits?I think this is an invalid setting,it doesn't even work correctly*/
 /*  PORT_DIPSETTING(    0x00, DEF_STR( 2C_2C ) ) */
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x20, 0x00, "Sound" )
+	PORT_DIPNAME( 0x20, 0x00, "Sound" )			PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Clear RAM" )
+	PORT_DIPNAME( 0x80, 0x80, "Clear RAM" )			PORT_DIPLOCATION("SW1:8") /* Service Mode shows this as "NOT USED" */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -1287,10 +1291,10 @@ static INPUT_PORTS_START( couplep )
 	PORT_INCLUDE( couple )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x40, 0x40, "Bonus Play" )
+	PORT_DIPNAME( 0x40, 0x40, "Bonus Play" )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, "at 150.000" )
 	PORT_DIPSETTING(    0x00, "at 200.000" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1450,7 +1454,7 @@ MACHINE_CONFIG_END
 
 
 
-ROM_START( pitboss ) /* Program roms on a CTR-202 daughter card */
+ROM_START( pitboss ) /* Program roms on a CTR-202 daughter card - Internal designation: PBVBREV0 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2214-04.u5-0",   0x0000, 0x2000, CRC(10b782e7) SHA1(158819898ad81506c47b76ffe2a949ee7208740f) ) /* Games included in this set are: */
 	ROM_LOAD( "2214-04.u6-0",   0x2000, 0x2000, CRC(c3fd6510) SHA1(8c89fd2cbcb6f12fa6427883700971f7c39f6ccf) ) /* Joker Poker, Blackjack, Foto Finish & The Dice Game */
@@ -1466,11 +1470,11 @@ ROM_START( pitboss ) /* Program roms on a CTR-202 daughter card */
 	ROM_LOAD( "chr7.rom.u40",  0x0000, 0x2000, CRC(db62c5ec) SHA1(a9967eb51436f342902fa3ce9c43d4d1ec5e0f3c) )
 ROM_END
 
-ROM_START( pitbossa )
+ROM_START( pitbossa ) /* Roms also found labeled simply as "PBHD" U5 through U7 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2214-03.u5-0c", 0x0000, 0x2000, CRC(97f870bd) SHA1(b1b01abff0385e3b0585e49f78b93bcf56e434ef) ) /* Games included in this set are: */
-	ROM_LOAD( "2214-03.u6-0",  0x2000, 0x2000, CRC(086e699b) SHA1(a1d1eafaac9262f924f175961aa52c6d8e779bf0) ) /* Joker Poker, Blackjack, Foto Finish & The Dice Game */
-	ROM_LOAD( "2214-03.u7-0",  0x4000, 0x2000, CRC(023e8cb8) SHA1(cdb180a94d801137466c13ddfaf65918cb608c5a) ) /* Roms also found labeled simply as "PBHD" U5 through U7 */
+	ROM_LOAD( "2214-03.u5-0c", 0x0000, 0x2000, CRC(97f870bd) SHA1(b1b01abff0385e3b0585e49f78b93bcf56e434ef) ) /* Internal designation: M4A4REV0 */
+	ROM_LOAD( "2214-03.u6-0",  0x2000, 0x2000, CRC(086e699b) SHA1(a1d1eafaac9262f924f175961aa52c6d8e779bf0) ) /* Games included in this set are: */
+	ROM_LOAD( "2214-03.u7-0",  0x4000, 0x2000, CRC(023e8cb8) SHA1(cdb180a94d801137466c13ddfaf65918cb608c5a) ) /* Joker Poker, Blackjack, Foto Finish & The Dice Game */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
@@ -1481,11 +1485,11 @@ ROM_START( pitbossa )
 	ROM_LOAD( "chr7.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
 ROM_END
 
-ROM_START( pitbossb )
+ROM_START( pitbossb ) /* Roms also found labeled simply as "PSB1" U5 through U7 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u5-0c.rom", 0x0000, 0x2000, CRC(d8902656) SHA1(06da829201f6141a6b23afa0e277a3c7a122c26e) ) /* Games included in this set are: */
-	ROM_LOAD( "u6-0.rom",  0x2000, 0x2000, CRC(bf903b01) SHA1(1f5f69cfd3eb105bd9bad071016931a79defa16b) ) /* Joker Poker, Blackjack, Super Slots & The Dice Game */
-	ROM_LOAD( "u7-0.rom",  0x4000, 0x2000, CRC(306351b9) SHA1(32cd243aa65571ee7fc72971b6a16beeb4ed9d85) )
+	ROM_LOAD( "u5-0c.rom", 0x0000, 0x2000, CRC(d8902656) SHA1(06da829201f6141a6b23afa0e277a3c7a122c26e) ) /* Internal designation: PSB1REV0 */
+	ROM_LOAD( "u6-0.rom",  0x2000, 0x2000, CRC(bf903b01) SHA1(1f5f69cfd3eb105bd9bad071016931a79defa16b) ) /* Games included in this set are: */
+	ROM_LOAD( "u7-0.rom",  0x4000, 0x2000, CRC(306351b9) SHA1(32cd243aa65571ee7fc72971b6a16beeb4ed9d85) ) /* Joker Poker, Blackjack, Super Slots & The Dice Game */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
@@ -1495,12 +1499,14 @@ ROM_START( pitbossb )
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "chr7.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
 ROM_END
+
+/* Known to exist is Pit Boss version M4A2 (confirmed via manual) and likely a M4A3 as well (not confirmed, but M4A4 is dumped) */
 
 ROM_START( pitbossc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "m4a1.u5",   0x0000, 0x2000, CRC(f5284472) SHA1(9170b90d06caa382be29feb2f6e80993bba1e07e) ) /* Games included in this set are: */
-	ROM_LOAD( "m4a1.u6",   0x2000, 0x2000, CRC(dd8df5fe) SHA1(dab8c1077058263729b2589dd9bf9989ad53be1c) ) /* Draw Poker, Blackjack, Acey Deucey & The Dice Game */
-	ROM_LOAD( "m4a1.u7",   0x4000, 0x2000, CRC(5fa5d436) SHA1(9f3fd81eae7f378268f3b4af8fd299ffb97d7fb6) )
+	ROM_LOAD( "m4a1.u5",   0x0000, 0x2000, CRC(f5284472) SHA1(9170b90d06caa382be29feb2f6e80993bba1e07e) ) /* Internal designation: M4A1REV0 */
+	ROM_LOAD( "m4a1.u6",   0x2000, 0x2000, CRC(dd8df5fe) SHA1(dab8c1077058263729b2589dd9bf9989ad53be1c) ) /* Games included in this set are: */
+	ROM_LOAD( "m4a1.u7",   0x4000, 0x2000, CRC(5fa5d436) SHA1(9f3fd81eae7f378268f3b4af8fd299ffb97d7fb6) ) /* Draw Poker, Blackjack, Acey Deucey & The Dice Game */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "chr2.u39",  0x0000, 0x2000, CRC(f9613e7b) SHA1(1e8cafe142a235d65b43c7e46a79ed4f6272b61c) ) /* Shows: */
