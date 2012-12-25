@@ -244,7 +244,7 @@ private:
 	DECLARE_READ8_MEMBER(decocass_nodong_r);
 
 	UINT8* m_type1_map;
-
+	void draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, int which, bool opaque);
 	void draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_center(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mark_bg_tile_dirty(offs_t offset);

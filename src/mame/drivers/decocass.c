@@ -110,12 +110,12 @@ static ADDRESS_MAP_START( decocass_map, AS_PROGRAM, 8, decocass_state )
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(decocass_reset_w)
 
 /* BIO-3 board */
-	AM_RANGE(0xe402, 0xe402) AM_WRITE(decocass_mode_set_w)
-	AM_RANGE(0xe403, 0xe403) AM_WRITE(decocass_back_h_shift_w)
-	AM_RANGE(0xe404, 0xe404) AM_WRITE(decocass_back_vl_shift_w)
-	AM_RANGE(0xe405, 0xe405) AM_WRITE(decocass_back_vr_shift_w)
-	AM_RANGE(0xe406, 0xe406) AM_WRITE(decocass_part_h_shift_w)
-	AM_RANGE(0xe407, 0xe407) AM_WRITE(decocass_part_v_shift_w)
+	AM_RANGE(0xe402, 0xe402) AM_WRITE(decocass_mode_set_w)      /* scroll mode regs + various enable regs */
+	AM_RANGE(0xe403, 0xe403) AM_WRITE(decocass_back_h_shift_w)  /* back (both)  tilemap x scroll */
+	AM_RANGE(0xe404, 0xe404) AM_WRITE(decocass_back_vl_shift_w) /* back (left)  (top@rot0) tilemap y scroll */
+	AM_RANGE(0xe405, 0xe405) AM_WRITE(decocass_back_vr_shift_w) /* back (right) (bot@rot0) tilemap y scroll */
+	AM_RANGE(0xe406, 0xe406) AM_WRITE(decocass_part_h_shift_w) /* headlight */
+	AM_RANGE(0xe407, 0xe407) AM_WRITE(decocass_part_v_shift_w) /* headlight */
 
 	AM_RANGE(0xe410, 0xe410) AM_WRITE(decocass_color_center_bot_w)
 	AM_RANGE(0xe411, 0xe411) AM_WRITE(decocass_center_h_shift_space_w)

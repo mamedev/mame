@@ -2,6 +2,16 @@
 
     DECO Cassette System video
 
+	The video system has clearly been designed for Highway Chase,
+	which unsurprisingly is the first game on the system.  The
+	background 'tilemap' is very much like the road layer on the
+	standalone Highway Chase with a concept of left/right edges
+	with semi-independent scrolling, and the ability to transition
+	between scrolling different sections.
+
+	Additionally it supports the headlight effect also needed for
+	a Highway Chase style game.
+
  ***********************************************************************/
 
 #include "emu.h"
@@ -460,6 +470,80 @@ void decocass_state::draw_missiles(bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
+// we could still massively clean up the background tilemap handling, I have a feeling the
+// code to ignore tiles with 0x80 set on the left tilemap etc. is just a convenient hack
+// to stop garbage tiles appearing when scrolling due to the weird ram layout and clipping rules
+
+// 0 is left edge, 1 is right edge
+void decocass_state::draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, int which, bool opaque)
+{
+	rectangle clip;
+	bitmap_ind16* srcbitmap;
+
+	int scrolly_l = m_back_vl_shift;
+	int scrolly_r = 256 - m_back_vr_shift;
+
+	// bit 0x04 of the mode select effectively selects between two banks of data
+	if (0 == (m_mode_set & 0x04))
+		scrolly_r += 256;
+	else
+		scrolly_l += 256;
+
+	int scrollx = 256 - m_back_h_shift;
+	int scrolly;
+
+	if (which==0)
+	{
+		clip = m_bg_tilemap_l_clip;
+		clip &= cliprect;
+		scrolly = scrolly_l;
+		srcbitmap = &m_bg_tilemap_l->pixmap();
+	}
+	else
+	{
+		clip = m_bg_tilemap_r_clip;
+		clip &= cliprect;
+		scrolly = scrolly_r;
+		srcbitmap = &m_bg_tilemap_r->pixmap();
+	}
+
+	int y,x;
+
+//	printf("m_mode_set %d\n", m_mode_set & 0x3);
+
+	// technically our y drawing probably shouldn't wrap / mask, but simply draw the 128pixel high 'edge' at the requested position
+	//  see note above this funciton
+	for (y=clip.min_y; y<=clip.max_y;y++)
+	{
+		int srcline = (y + scrolly) & 0x1ff;
+		UINT16* src = &srcbitmap->pix16(srcline);
+		UINT16* dst = &bitmap.pix16(y);
+
+		for (x=clip.min_x; x<=clip.max_x;x++)
+		{
+			int srccol;
+			
+			// 2 bits control the x scroll mode, allowing it to wrap either half of the tilemap, or transition one way or the other between the two halves
+
+			switch (m_mode_set & 3)
+			{
+				case 0x00: srccol = ((x + scrollx) & 0xff); break; // hwy normal case 
+				case 0x01: srccol = (x + scrollx + 0x100) & 0x1ff; break; // manhattan building top
+				case 0x02: srccol = ((x + scrollx) & 0xff) + 0x100; break; // manhattan normal case
+				case 0x03: srccol = (x + scrollx) & 0x1ff; break; // hwy, burnrub etc.
+			}
+
+			UINT16 pix = src[srccol];
+
+			if ((pix & 0x3) || opaque)
+			{
+				dst[x] = pix;
+			}
+		}
+	}
+
+}
+
 
 void decocass_state::video_start()
 {
@@ -477,7 +561,7 @@ void decocass_state::video_start()
 	m_bg_tilemap_r_clip = machine().primary_screen->visible_area();
 	m_bg_tilemap_r_clip.min_y = 256 / 2;
 
-	/* background videroam bits D0-D3 are shared with the tileram */
+	/* background videoram bits D0-D3 are shared with the tileram */
 	m_bgvideoram = m_tileram;
 	m_bgvideoram_size = 0x0400;	/* d000-d3ff */
 
@@ -493,8 +577,7 @@ void decocass_state::video_start()
 
 UINT32 decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int scrollx, scrolly_l, scrolly_r;
-	rectangle clip;
+	/* THIS CODE SHOULD NOT BE IN SCREEN UPDATE !! */
 
 	if (0xc0 != (machine().root_device().ioport("IN2")->read() & 0xc0))  /* coin slots assert an NMI */
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
@@ -503,6 +586,9 @@ UINT32 decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind1
 		machine().watchdog_reset();
 	else if (m_watchdog_count-- > 0)
 		machine().watchdog_reset();
+
+	/* (end) THIS CODE SHOULD NOT BE IN SCREEN UPDATE !! */
+
 
 #ifdef MAME_DEBUG
 	{
@@ -525,39 +611,10 @@ UINT32 decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind1
 
 	bitmap.fill(0, cliprect);
 
-	scrolly_l = m_back_vl_shift;
-	scrolly_r = 256 - m_back_vr_shift;
-
-	scrollx = 256 - m_back_h_shift;
-	if (0 == (m_mode_set & 0x02))
-		scrollx += 256;
-
-#if 0
-/* this is wrong */
-	if (0 != m_back_h_shift && 0 == ((m_mode_set ^ (m_mode_set >> 1)) & 1))
-		scrollx += 256;
-#endif
-
-	if (0 == (m_mode_set & 0x04))
-		scrolly_r += 256;
-	else
-		scrolly_l += 256;
-
-	m_bg_tilemap_l->set_scrollx(0, scrollx);
-	m_bg_tilemap_l->set_scrolly(0, scrolly_l);
-
-	m_bg_tilemap_r->set_scrollx(0, scrollx);
-	m_bg_tilemap_r->set_scrolly(0, scrolly_r);
-
 	if (m_mode_set & 0x08)	/* bkg_ena on ? */
 	{
-		clip = m_bg_tilemap_l_clip;
-		clip &= cliprect;
-		m_bg_tilemap_l->draw(bitmap, clip, TILEMAP_DRAW_OPAQUE, 0);
-
-		clip = m_bg_tilemap_r_clip;
-		clip &= cliprect;
-		m_bg_tilemap_r->draw(bitmap, clip, TILEMAP_DRAW_OPAQUE, 0);
+		draw_edge(bitmap,cliprect,0,true);
+		draw_edge(bitmap,cliprect,1,true);
 	}
 
 	if (m_mode_set & 0x20)
@@ -571,13 +628,8 @@ UINT32 decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind1
 		draw_center(bitmap, cliprect);
 		if (m_mode_set & 0x08)	/* bkg_ena on ? */
 		{
-			clip = m_bg_tilemap_l_clip;
-			clip &= cliprect;
-			m_bg_tilemap_l->draw(bitmap, clip, 0, 0);
-
-			clip = m_bg_tilemap_r_clip;
-			clip &= cliprect;
-			m_bg_tilemap_r->draw(bitmap, clip, 0, 0);
+			draw_edge(bitmap,cliprect,0,false);
+			draw_edge(bitmap,cliprect,1,false);
 		}
 	}
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
