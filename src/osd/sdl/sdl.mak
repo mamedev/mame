@@ -76,6 +76,8 @@ USE_DISPATCH_GL = 1
 # (currently defaults disabled due to causing issues with mouse capture, esp. in MESS)
 NO_USE_XINPUT = 1
 
+# uncomment to try the experimental new Qt debugger (Linux only for now)
+#USE_QTDEBUG = 1
 
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
@@ -227,7 +229,10 @@ endif
 ifeq ($(TARGETOS),macosx)
 BASE_TARGETOS = unix
 DEFS += -DSDLMAME_UNIX -DSDLMAME_MACOSX -DSDLMAME_DARWIN
+
+ifndef USE_QTDEBUG
 DEBUGOBJS = $(SDLOBJ)/debugosx.o
+endif
 SYNC_IMPLEMENTATION = ntc
 SDLMAIN = $(SDLOBJ)/SDLMain_tmpl.o
 SDLUTILMAIN = $(SDLOBJ)/SDLMain_tmpl.o
@@ -275,6 +280,7 @@ SDL_NETWORK = pcap
 ifndef GTK_INSTALL_ROOT
 NO_DEBUGGER = 1
 else
+ifndef QT_USEDEBUG
 DEBUGOBJS = $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
 LIBS += -lgtk-win32-2.0 -lgdk-win32-2.0 -lgmodule-2.0 -lglib-2.0 -lgobject-2.0 \
 	-lpango-1.0 -latk-1.0 -lgdk_pixbuf-2.0
@@ -284,11 +290,19 @@ INCPATH += -I$(GTK_INSTALL_ROOT)/include/gtk-2.0 -I$(GTK_INSTALL_ROOT)/include/g
 	-I$(GTK_INSTALL_ROOT)/include/atk-1.0 \
 	-I$(GTK_INSTALL_ROOT)/lib/glib-2.0/include -I$(GTK_INSTALL_ROOT)/lib/gtk-2.0/include
 LDFLAGS += -L$(GTK_INSTALL_ROOT)/lib
+endif
 endif # GTK_INSTALL_ROOT
 
 # enable UNICODE
 DEFS += -Dmain=utf8_main -DUNICODE -D_UNICODE
 LDFLAGS += -municode
+
+# Qt
+ifdef QT_USEDEBUG
+QT_INSTALL_HEADERS = $(shell qmake -query QT_INSTALL_HEADERS)
+INCPATH += -I$(QT_INSTALL_HEADERS)/QtCore -I$(QT_INSTALL_HEADERS)/QtGui -I$(QT_INSTALL_HEADERS)
+QT_LIBS += -L$(shell qmake -query QT_INSTALL_LIBS) -lqtmain -lQtGui -lQtCore -lgdi32 -lcomdlg32 -loleaut32 -limm32 -lwinmm -lwinspool -lmsimg32 -lole32 -luuid -lws2_32 -ladvapi32 -lshell32 -luser32 -lkernel32  -mwindows 
+endif
 
 endif
 
@@ -366,8 +380,14 @@ OSDCLEAN = sdlclean
 # add the debugger includes
 INCPATH += -Isrc/debug
 
+# copy off the include paths before the sdlprefix & sdl-config stuff shows up
+MOCINCPATH := $(INCPATH)
+
 # add the prefix file
 INCPATH += -include $(SDLSRC)/sdlprefix.h
+INCPATH += -I/work/src/m/sdl
+MOCINCPATH += -I/work/src/m/sdl
+
 
 #-------------------------------------------------
 # BASE_TARGETOS specific configurations
@@ -398,6 +418,28 @@ ifeq ($(TARGETOS),macosx)
 OSDCOREOBJS += $(SDLOBJ)/osxutils.o
 SDLOS_TARGETOS = macosx
 
+ifdef USE_QTDEBUG
+MOC = @moc
+$(SDLOBJ)/%.moc.c: $(SDLSRC)/%.h
+	$(MOC) $(MOCINCPATH) $(DEFS) $< -o $@
+
+DEBUGOBJS = \
+	$(SDLOBJ)/debugqt.o \
+	$(SDLOBJ)/debugqtview.o \
+	$(SDLOBJ)/debugqtwindow.o \
+	$(SDLOBJ)/debugqtlogwindow.o \
+	$(SDLOBJ)/debugqtdasmwindow.o \
+	$(SDLOBJ)/debugqtmainwindow.o \
+	$(SDLOBJ)/debugqtmemorywindow.o \
+	$(SDLOBJ)/debugqtwindow.moc.o \
+	$(SDLOBJ)/debugqtlogwindow.moc.o \
+	$(SDLOBJ)/debugqtdasmwindow.moc.o \
+	$(SDLOBJ)/debugqtmainwindow.moc.o \
+	$(SDLOBJ)/debugqtmemorywindow.moc.o
+
+LIBS += -framework QtCore -framework QtGui
+endif
+
 ifndef MACOSX_USE_LIBSDL
 # Compile using framework (compile using libSDL is the exception)
 LIBS += -framework SDL -framework Cocoa -framework OpenGL -lpthread
@@ -417,8 +459,29 @@ endif   # MACOSX_USE_LIBSDL
 else   # ifeq ($(TARGETOS),macosx)
 
 DEFS += -DSDLMAME_UNIX
-DEBUGOBJS = $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
+
+ifdef USE_QTDEBUG
+MOC = @moc-qt4
+$(SDLOBJ)/%.moc.c: $(SDLSRC)/%.h
+	$(MOC) $(MOCINCPATH) $(DEFS) $< -o $@
+
+DEBUGOBJS = \
+	$(SDLOBJ)/debugqt.o \
+	$(SDLOBJ)/debugqtview.o \
+	$(SDLOBJ)/debugqtwindow.o \
+	$(SDLOBJ)/debugqtlogwindow.o \
+	$(SDLOBJ)/debugqtdasmwindow.o \
+	$(SDLOBJ)/debugqtmainwindow.o \
+	$(SDLOBJ)/debugqtmemorywindow.o \
+	$(SDLOBJ)/debugqtwindow.moc.o \
+	$(SDLOBJ)/debugqtlogwindow.moc.o \
+	$(SDLOBJ)/debugqtdasmwindow.moc.o \
+	$(SDLOBJ)/debugqtmainwindow.moc.o \
+	$(SDLOBJ)/debugqtmemorywindow.moc.o
+endif
+
 LIBGL = -lGL
+
 ifeq ($(NO_X11),1)
 NO_DEBUGGER = 1
 endif
@@ -573,6 +636,12 @@ CCOMFLAGS += `pkg-config --cflags-only-other gtk+-2.0` `pkg-config --cflags-only
 LIBS += `pkg-config --libs gtk+-2.0` `pkg-config --libs gconf-2.0`
 #CCOMFLAGS += -DGTK_DISABLE_DEPRECATED
 
+# The newer debugger uses QT
+ifdef USE_QTDEBUG
+INCPATH += `pkg-config QtGui --cflags`
+LIBS += `pkg-config QtGui --libs`
+endif
+
 # some systems still put important things in a different prefix
 LIBS += -L/usr/X11/lib -L/usr/X11R6/lib -L/usr/openwin/lib
 # make sure we can find X headers
@@ -646,6 +715,7 @@ $(SDLOBJ)/draw13.o : $(SDLSRC)/blit13.h
 $(LIBOCORE): $(OSDCOREOBJS)
 
 $(LIBOSD): $(OSDOBJS)
+
 
 #-------------------------------------------------
 # Tools
