@@ -1637,7 +1637,7 @@ void upd7220_device::update_graphics(bitmap_rgb32 &bitmap, const rectangle &clip
 
 		if (m_lr)
 			tsy += y;
-		bsy += (y / 2);
+		bsy += y;
 	}
 }
 
