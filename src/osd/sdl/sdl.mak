@@ -478,6 +478,8 @@ DEBUGOBJS = \
 	$(SDLOBJ)/debugqtdasmwindow.moc.o \
 	$(SDLOBJ)/debugqtmainwindow.moc.o \
 	$(SDLOBJ)/debugqtmemorywindow.moc.o
+else
+DEBUGOBJS = $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
 endif
 
 LIBGL = -lGL
