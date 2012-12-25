@@ -464,8 +464,8 @@ void h6280_device::program_write8z(offs_t addr, UINT8 data)
  ***************************************************************/
 UINT16 h6280_device::program_read16(offs_t addr)
 {
-	return m_program->read_byte(TRANSLATED(addr));
-		   (m_program->read_byte(TRANSLATED(addr + 1)) << 8);
+	return m_program->read_byte(TRANSLATED(addr)) |
+		  (m_program->read_byte(TRANSLATED(addr + 1)) << 8);
 }
 
 /***************************************************************
