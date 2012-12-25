@@ -295,6 +295,7 @@ void esrip_device::device_start()
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
+	m_icount = 0;
 }
 
 
