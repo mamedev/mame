@@ -319,7 +319,7 @@ static void cd_exec_command(running_machine &machine)
 			CDROM_LOG(("%s:CD: Initialize CD system\n", machine.describe_context()))
 			if((cr1 & 0x81) == 0x00) //guess
 			{
-				if(cd_stat != CD_STAT_NODISC && cd_stat != CD_STAT_OPEN)
+				if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
 				{
 					cd_stat = CD_STAT_PAUSE;
 					cd_curfad = 150;
@@ -1345,14 +1345,14 @@ static void cd_exec_command(running_machine &machine)
 			sectorstore = 0;
 			xfertype32 = XFERTYPE32_INVALID;
 			xferdnum = 0;
-			if(cd_stat != CD_STAT_NODISC && cd_stat != CD_STAT_OPEN)
+			if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
 				cd_stat = CD_STAT_PAUSE;	// force to pause
 			cr_standard_return(cd_stat);
 			break;
 
 		case 0xe000:	// appears to be copy protection check.  needs only to return OK.
 			CDROM_LOG(("%s:CD: Verify copy protection\n",   machine.describe_context()))
-			if(cd_stat != CD_STAT_NODISC && cd_stat != CD_STAT_OPEN)
+			if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
 				cd_stat = CD_STAT_PAUSE;
 			cr1 = cd_stat;	// necessary to pass
 			cr2 = 0x4;
@@ -1389,7 +1389,8 @@ TIMER_DEVICE_CALLBACK( stv_sh1_sim )
 
 	cd_stat |= CD_STAT_PERI;
 
-	if(cd_stat != CD_STAT_NODISC && cd_stat != CD_STAT_OPEN)
+	/* TODO: doesn't boot if a disk isn't in? */
+	//if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
 		hirqreg |= SCDQ;
 
 	cr_standard_return(cd_stat);
