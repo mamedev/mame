@@ -278,9 +278,11 @@ SDL_NETWORK = pcap
 
 # do we have GTK ?
 ifndef GTK_INSTALL_ROOT
+ifndef USE_QTDEBUG
 NO_DEBUGGER = 1
+endif
 else
-ifndef QT_USEDEBUG
+ifndef USE_QTDEBUG
 DEBUGOBJS = $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
 LIBS += -lgtk-win32-2.0 -lgdk-win32-2.0 -lgmodule-2.0 -lglib-2.0 -lgobject-2.0 \
 	-lpango-1.0 -latk-1.0 -lgdk_pixbuf-2.0
@@ -298,10 +300,10 @@ DEFS += -Dmain=utf8_main -DUNICODE -D_UNICODE
 LDFLAGS += -municode
 
 # Qt
-ifdef QT_USEDEBUG
+ifdef USE_QTDEBUG
 QT_INSTALL_HEADERS = $(shell qmake -query QT_INSTALL_HEADERS)
 INCPATH += -I$(QT_INSTALL_HEADERS)/QtCore -I$(QT_INSTALL_HEADERS)/QtGui -I$(QT_INSTALL_HEADERS)
-QT_LIBS += -L$(shell qmake -query QT_INSTALL_LIBS) -lqtmain -lQtGui -lQtCore -lgdi32 -lcomdlg32 -loleaut32 -limm32 -lwinmm -lwinspool -lmsimg32 -lole32 -luuid -lws2_32 -ladvapi32 -lshell32 -luser32 -lkernel32  -mwindows 
+LIBS += -L$(shell qmake -query QT_INSTALL_LIBS) -lqtmain -lQtGui4 -lQtCore4 -lcomdlg32 -loleaut32 -limm32 -lwinspool -lmsimg32 -lole32 -luuid -lws2_32 -lshell32 -lkernel32 
 endif
 
 endif
@@ -568,6 +570,27 @@ ifeq ($(findstring 4.4,$(TEST_GCC)),)
 	#if we use new tools
 	LDFLAGS += -static-libstdc++
 endif
+
+ifdef USE_QTDEBUG
+MOC = @moc
+$(SDLOBJ)/%.moc.c: $(SDLSRC)/%.h
+	$(MOC) $(MOCINCPATH) $(DEFS) $< -o $@
+
+DEBUGOBJS = \
+	$(SDLOBJ)/debugqt.o \
+	$(SDLOBJ)/debugqtview.o \
+	$(SDLOBJ)/debugqtwindow.o \
+	$(SDLOBJ)/debugqtlogwindow.o \
+	$(SDLOBJ)/debugqtdasmwindow.o \
+	$(SDLOBJ)/debugqtmainwindow.o \
+	$(SDLOBJ)/debugqtmemorywindow.o \
+	$(SDLOBJ)/debugqtwindow.moc.o \
+	$(SDLOBJ)/debugqtlogwindow.moc.o \
+	$(SDLOBJ)/debugqtdasmwindow.moc.o \
+	$(SDLOBJ)/debugqtmainwindow.moc.o \
+	$(SDLOBJ)/debugqtmemorywindow.moc.o
+endif
+
 LIBS += -lSDL.dll
 LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
 
