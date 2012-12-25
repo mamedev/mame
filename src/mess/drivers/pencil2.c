@@ -63,8 +63,7 @@ SD-BASIC V2.0
 
 ToDo:
 - Keys missing (Shift, Ctrl, F1 to F6, Esc)
-- Printer (out 00)
-- Cassette
+- Cassette isn't working
 - Joysticks
 - Cart slot
 - Screen size is wrong in BASIC. Should be 24 lines of text with a wide
@@ -78,8 +77,8 @@ ToDo:
 #include "sound/sn76496.h"
 #include "machine/ctronics.h"
 //#include "imagedev/cartslot.h"
-//#include "imagedev/cassette.h"
-//#include "sound/wave.h"
+#include "imagedev/cassette.h"
+#include "sound/wave.h"
 
 
 class pencil2_state : public driver_device
@@ -88,10 +87,12 @@ public:
 	pencil2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_printer(*this, "centronics")
+	m_printer(*this, "centronics"),
+	m_cass(*this, CASSETTE_TAG)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(port10_w);
+	DECLARE_WRITE8_MEMBER(port30_w);
 	DECLARE_WRITE8_MEMBER(port80_w);
 	DECLARE_WRITE8_MEMBER(portc0_w);
 	DECLARE_READ8_MEMBER(porte0_r);
@@ -100,6 +101,7 @@ public:
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	required_device<centronics_device> m_printer;
+	required_device<cassette_image_device> m_cass;
 };
 
 static ADDRESS_MAP_START(pencil2_mem, AS_PROGRAM, 8, pencil2_state)
@@ -115,7 +117,7 @@ static ADDRESS_MAP_START(pencil2_io, AS_IO, 8, pencil2_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("centronics", centronics_device, write)
 	AM_RANGE(0x10, 0x1f) AM_WRITE(port10_w)
-	//AM_RANGE(0x30, 0x3f) AM_WRITE(port30_w) cass out
+	AM_RANGE(0x30, 0x3f) AM_WRITE(port30_w)
 	AM_RANGE(0x80, 0x9f) AM_WRITE(port80_w)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
 	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
@@ -125,14 +127,25 @@ ADDRESS_MAP_END
 
 READ8_MEMBER( pencil2_state::porte0_r)
 {
-	char kbdrow[6];
-	sprintf(kbdrow,"X%X",offset);
-	return ioport( kbdrow )->read();
+	if (offset==2)
+		return (m_cass->input() > 0.1);
+	else
+	{
+		char kbdrow[6];
+		sprintf(kbdrow,"X%X",offset);
+		//printf("%X ",offset);
+		return ioport( kbdrow )->read();
+	}
 }
 
 WRITE8_MEMBER( pencil2_state::port10_w )
 {
 	m_printer->strobe_w(BIT(data, 0));
+}
+
+WRITE8_MEMBER( pencil2_state::port30_w )
+{
+	m_cass->output( BIT(data, 0) ? -1.0 : +1.0);
 }
 
 WRITE8_MEMBER( pencil2_state::port80_w )
@@ -281,11 +294,11 @@ static MACHINE_CONFIG_START( pencil2, pencil2_state )
 	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_10_738635MHz/3) // guess
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-//	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
-//	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cassette */
-//	MCFG_CASSETTE_ADD( CASSETTE_TAG, pencil2_cassette_interface )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 
 	/* cartridge */
 //	MCFG_CARTSLOT_ADD("cart")
