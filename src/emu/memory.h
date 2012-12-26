@@ -729,7 +729,8 @@ class memory_share
 public:
 	// construction/destruction
 	memory_share(UINT8 width, size_t bytes, void *ptr = NULL)
-		: m_ptr(ptr),
+		: m_next(NULL),
+		  m_ptr(ptr),
 		  m_bytes(bytes),
 		  m_width(width) { }
 
