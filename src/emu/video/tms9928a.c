@@ -18,8 +18,6 @@
 ** - Colours are incorrect. [fixed by R Nabet ?]
 ** - Sprites 8-31 are ghosted/cloned in mode 3 when using less than
 **   three pattern tables. Exact behaviour is not known.
-** - On TMS99xxA, the colortable mask in mode 3 acts as a nametable
-**   mask as well (does not happen on TMS91xx)
 ** - Address scrambling when setting TMS99xxA to 4K (not on TMS91xx)
 */
 
@@ -92,13 +90,14 @@ static const rgb_t tms9928a_palette[TMS9928A_PALETTE_SIZE] =
 	RGB_WHITE
 };
 
-tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_50hz, bool is_reva )
+tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, bool is_50hz, bool is_reva, bool is_99 )
 	: device_t( mconfig, type, name, tag, owner, clock ),
 	  device_memory_interface(mconfig, *this),
       m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(memmap))
 {
 	m_50hz = is_50hz;
 	m_reva = is_reva;
+	m_99 = is_99;
 //  static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
 }
 
@@ -110,6 +109,7 @@ tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag
 {
 	m_50hz = false;
 	m_reva = true;
+	m_99 = true;
 //  static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
 }
 
@@ -169,6 +169,15 @@ void tms9928a_device::update_backdrop()
 }
 
 
+void tms9928a_device::update_table_masks()
+{
+	m_colourmask = ( (m_Regs[3] & 0x7f) << 3 ) | 7;
+	
+	// on 91xx family, the colour table mask doesn't affect the pattern table mask
+	m_patternmask = ( (m_Regs[4] & 3) << 8 ) | ( m_99 ? (m_colourmask & 0xff) : 0xff );
+}
+
+
 void tms9928a_device::change_register(UINT8 reg, UINT8 val)
 {
 	static const UINT8 Mask[8] =
@@ -194,9 +203,8 @@ void tms9928a_device::change_register(UINT8 reg, UINT8 val)
 		if (val & 2)
 		{
 			m_colour = ((m_Regs[3] & 0x80) * 64) & (m_vram_size - 1);
-			m_colourmask = (m_Regs[3] & 0x7f) * 8 | 7;
 			m_pattern = ((m_Regs[4] & 4) * 2048) & (m_vram_size - 1);
-			m_patternmask = ( (m_Regs[4] & 3) << 8 ) | (m_colourmask & 0xff);
+			update_table_masks();
 		}
 		else
 		{
@@ -220,19 +228,18 @@ void tms9928a_device::change_register(UINT8 reg, UINT8 val)
 		if (m_Regs[0] & 2)
 		{
 			m_colour = ((val & 0x80) * 64) & (m_vram_size - 1);
-			m_colourmask = ( (val & 0x7f) * 8 ) | 7;
+			update_table_masks();
 		}
 		else
 		{
 			m_colour = (val * 64) & (m_vram_size - 1);
 		}
-		m_patternmask = ( (m_Regs[4] & 3) * 256 ) | (m_colourmask & 255);
 		break;
 	case 4:
 		if (m_Regs[0] & 2)
 		{
 			m_pattern = ((val & 4) * 2048) & (m_vram_size - 1);
-			m_patternmask = ( (val & 3) * 256 ) | 255;
+			update_table_masks();
 		}
 		else
 		{
@@ -664,8 +671,8 @@ void tms9928a_device::device_reset()
 	m_colour = 0;
 	m_spritepattern = 0;
 	m_spriteattribute = 0;
-	m_colourmask = 0;
-	m_patternmask = 0;
+	m_colourmask = 0x3fff;
+	m_patternmask = 0x3fff;
 	m_Addr = 0;
 	m_ReadAhead = 0;
 	m_INT = 0;
