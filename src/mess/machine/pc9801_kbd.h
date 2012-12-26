@@ -33,6 +33,7 @@ struct pc9801_kbd_interface
 	devcb_write_line		m_irq_cb;
 };
 
+
 // ======================> pc9801_kbd_device
 
 class pc9801_kbd_device : public device_t,
@@ -46,6 +47,7 @@ public:
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( tx_w );
 	DECLARE_READ8_MEMBER( rx_r );
+	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 protected:
 	// device-level overrides
@@ -59,6 +61,9 @@ protected:
 
 	static const device_timer_id RX_TIMER = 1;
 	emu_timer *			m_rxtimer;
+	UINT8 				m_rx_buf[0x80];
+	UINT8				m_keyb_tx;
+	UINT8				m_keyb_rx;
 };
 
 
