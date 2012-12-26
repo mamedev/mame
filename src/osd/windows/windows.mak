@@ -145,6 +145,10 @@ ifeq ($(OPTIMIZE),0)
 CCOMFLAGS += /RTC1
 endif
 
+ifdef MSVC_ANALYSIS
+CCOMFLAGS += /analyze /wd6011 /wd6328 /wd6204 /wd6244 /wd6385 /wd6308 /wd6246 /wd6031 /wd6326 /analyze:stacksize384112
+endif
+
 # enable exception handling for C++
 CPPONLYFLAGS += /EHsc
 
