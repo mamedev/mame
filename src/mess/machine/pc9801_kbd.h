@@ -64,6 +64,8 @@ protected:
 	UINT8 				m_rx_buf[0x80];
 	UINT8				m_keyb_tx;
 	UINT8				m_keyb_rx;
+	UINT8				m_caps_lock_state;
+	UINT8				m_kana_lock_state;
 };
 
 

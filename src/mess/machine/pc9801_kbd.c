@@ -190,8 +190,8 @@ static INPUT_PORTS_START( pc9801_kbd )
 
 	PORT_START("KEYE") // 0x70 - 0x77
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x70)
-	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CAPS LOCK") //PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x71)
-	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\xe3\x81\x8b\xe3\x81\xaa / KANA LOCK") //PORT_TOGGLE  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x72)
+	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE // PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x71)
+	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\xe3\x81\x8b\xe3\x81\xaa / KANA LOCK") PORT_TOGGLE  //PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x72)
 	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ALT") PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT) PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x73)
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x74)
 	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(" un 6-6")  PORT_CHANGED_MEMBER(DEVICE_SELF, pc9801_kbd_device, key_stroke, 0x75)
@@ -249,6 +249,8 @@ void pc9801_kbd_device::device_reset()
 
 	m_keyb_tx = 0xff;
 	m_keyb_rx = 0;
+	m_caps_lock_state = ioport("KEYE")->read() & (1 << 1);
+	m_kana_lock_state = ioport("KEYE")->read() & (1 << 2);
 }
 
 //-------------------------------------------------
@@ -280,6 +282,24 @@ void pc9801_kbd_device::device_timer(emu_timer &timer, device_timer_id id, int p
 	if(id == RX_TIMER)
 	{
 		int i;
+
+		/* special handling for caps lock / kana lock */
+		if((ioport("KEYE")->read() & (1 << 1)) != m_caps_lock_state)
+		{
+			m_caps_lock_state = ioport("KEYE")->read() & (1 << 1);
+			m_keyb_tx = 0x71;
+			m_irq_func(ASSERT_LINE);
+			return;
+		}
+
+		if((ioport("KEYE")->read() & (1 << 2)) != m_kana_lock_state)
+		{
+			m_kana_lock_state = ioport("KEYE")->read() & (1 << 2);
+			m_keyb_tx = 0x72;
+			m_irq_func(ASSERT_LINE);
+			return;
+		}
+
 
 		/* key up */
 		for(i=0;i<0x80;i++)
