@@ -133,7 +133,7 @@ void isa8_device::device_config_complete()
     	memset(&m_out_drq2_cb, 0, sizeof(m_out_drq2_cb));
     	memset(&m_out_drq3_cb, 0, sizeof(m_out_drq3_cb));
 	}
-	m_maincpu = mconfig().device<cpu_device>(m_cputag);
+	m_maincpu = subdevice<cpu_device>(m_cputag);
 }
 
 //**************************************************************************

@@ -485,7 +485,7 @@ static MACHINE_CONFIG_FRAGMENT( ibm5160_mb_config )
 
 	MCFG_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
 
-	MCFG_ISA8_BUS_ADD("isa", "maincpu", isabus_intf)
+	MCFG_ISA8_BUS_ADD("isa", ":maincpu", isabus_intf)
 
 	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
 
