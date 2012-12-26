@@ -47,7 +47,8 @@ public:
 	m_pia2c(*this, "pia2c"),
 	m_pia30(*this, "pia30"),
 	m_pia34(*this, "pia34"),
-	m_pia40(*this, "pia40")
+	m_pia40(*this, "pia40"),
+	m_ym(*this, "ym2151")
 	{ }
 
 	DECLARE_READ8_MEMBER(dac_r);
@@ -65,7 +66,10 @@ public:
 	DECLARE_WRITE8_MEMBER(pia2c_pb_w);
 	DECLARE_WRITE8_MEMBER(pia34_pa_w);
 	DECLARE_WRITE8_MEMBER(pia34_pb_w);
+	DECLARE_WRITE_LINE_MEMBER(pia34_cb2_w);
 	DECLARE_WRITE8_MEMBER(pia40_pa_w);
+	DECLARE_WRITE_LINE_MEMBER(pia40_ca2_w);
+	DECLARE_WRITE_LINE_MEMBER(pia40_cb2_w);
 	DECLARE_READ8_MEMBER(dips_r);
 	DECLARE_READ8_MEMBER(switch_r);
 	DECLARE_WRITE8_MEMBER(switch_w);
@@ -105,6 +109,7 @@ protected:
 	required_device<pia6821_device> m_pia30;
 	required_device<pia6821_device> m_pia34;
 	required_device<pia6821_device> m_pia40;
+	required_device<ym2151_device> m_ym;
 private:
 	UINT8 m_sound_data;
 	UINT8 m_strobe;
@@ -441,8 +446,11 @@ WRITE8_MEMBER( s11a_state::pia34_pa_w )
 WRITE8_MEMBER( s11a_state::pia34_pb_w )
 {
 	m_pia40->portb_w(data);
-	m_pia40->cb1_w(1);
-	m_pia40->cb1_w(0);
+}
+
+WRITE_LINE_MEMBER( s11a_state::pia34_cb2_w )
+{
+	m_pia40->cb1_w(state);  // MCB2 through CPU interface
 }
 
 static const pia6821_interface pia34_intf =
@@ -456,7 +464,7 @@ static const pia6821_interface pia34_intf =
 	DEVCB_DRIVER_MEMBER(s11a_state, pia34_pa_w),		/* port A out */
 	DEVCB_DRIVER_MEMBER(s11a_state, pia34_pb_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia34_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE),	/* IRQA */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6800_IRQ_LINE)		/* IRQB */
 };
@@ -499,6 +507,17 @@ WRITE8_MEMBER( s11a_state::dac_w )
 	m_dac->write_unsigned8(data);
 }
 
+WRITE_LINE_MEMBER( s11a_state::pia40_ca2_w)
+{
+	if(state == ASSERT_LINE)
+		m_ym->reset();
+}
+
+WRITE_LINE_MEMBER( s11a_state::pia40_cb2_w)
+{
+	m_pia34->cb1_w(state);  // To Widget MCB1 through CPU Data interface
+}
+
 static const pia6821_interface pias_intf =
 {
 	DEVCB_DRIVER_MEMBER(s11a_state, dac_r),		/* port A in */
@@ -509,8 +528,8 @@ static const pia6821_interface pias_intf =
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DRIVER_MEMBER(s11a_state, sound_w),		/* port A out */
 	DEVCB_DRIVER_MEMBER(s11a_state, dac_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pias_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pias_cb2_w),		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia40_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia40_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE)		/* IRQB */
 };
@@ -522,7 +541,10 @@ WRITE8_MEMBER( s11a_state::pia40_pa_w )
 
 WRITE_LINE_MEMBER( s11a_state::ym2151_irq_w)
 {
-	m_pia40->ca1_w(!state);
+	if(state == CLEAR_LINE)
+		m_pia40->ca1_w(1);
+	else
+		m_pia40->ca1_w(0);
 }
 
 static const pia6821_interface pia40_intf =
@@ -596,7 +618,7 @@ static MACHINE_CONFIG_START( s11a, s11a_state )
 	MCFG_PIA6821_ADD("pias", pias_intf)
 
 	/* Add the background music card */
-	MCFG_CPU_ADD("bgcpu", M6809E, 4000000) // MC68B09E
+	MCFG_CPU_ADD("bgcpu", M6809E, 8000000) // MC68B09E
 	MCFG_CPU_PROGRAM_MAP(s11a_bg_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("bg")
