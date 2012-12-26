@@ -564,6 +564,31 @@ ROM_START( spacedem )
 	ROM_LOAD( "sdm-v-3n",    0x0000, 0x0020, CRC(6d8ad169) SHA1(6ccc931774183e14e28bb9b93223d366fd596f30) )
 ROM_END
 
+ROM_START( starwarr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sw51.5e",     0x0000, 0x0800, CRC(a0f5e690) SHA1(03b81d88ef6c3eaf2d23f1526f02d4ae5ba569a1) )
+	ROM_LOAD( "sw52.5f",     0x0800, 0x0800, CRC(303b0294) SHA1(a2f5637e201739b440e7ea0868d2d5745fbb4f5b) )
+	ROM_LOAD( "sw53.5h",     0x1000, 0x0800, CRC(49a26fe5) SHA1(851f62df651aa180b6fa236f4c54ed7791d92a21) )
+	ROM_LOAD( "sw54.5i",     0x1800, 0x0800, CRC(c23025da) SHA1(ccc73ca9754b04e49733661cbd9e788b13163100) )
+	ROM_LOAD( "sw55.5j",     0x2000, 0x0800, CRC(946bee5d) SHA1(6e668cec5986af3d319bf9aa8962a3d9008d0156) )
+	ROM_LOAD( "sw56.5k",     0x2800, 0x0800, CRC(8a2de5f0) SHA1(6e824332be7047bf830545d88f13b30938b40cdb) )
+	ROM_LOAD( "sw57.5m",     0x3000, 0x0800, CRC(4cbe92fc) SHA1(903b617e42f740e94a6edb6a973dc0d57ac0abee) )
+	ROM_LOAD( "sw58.5n",     0x3800, 0x0800, CRC(1a798fbf) SHA1(65ff2fe91c2037378314c4a68b2bd21fd167c64a) )
+
+	ROM_REGION( 0x1000, "audiocpu", 0 )
+    ROM_LOAD( "sw00.snd",    0x0000, 0x0400, CRC(f7a59492) SHA1(22bdc02c72086c38acd9d9675da54ce6ba3f80a3) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )  /* sprites */
+	ROM_LOAD( "sw59.5k",     0x0000, 0x0800, CRC(236e1ff7) SHA1(575b8ed9ab054a864207e0fde3ae93cdcafbebf2) )
+	ROM_LOAD( "sw60.6k",     0x0800, 0x0800, CRC(bf901a4e) SHA1(71207ad1ca60aa617dbbc3cd2e4e42520b7c8513) )
+
+	ROM_REGION( 0x0100, "gfx2", 0 )  /* bullets */
+	ROM_LOAD( "mb7052.4i",   0x0000, 0x0100, CRC(528e8533) SHA1(8e41eee1016c98a4f08acbd902daf8e32aa9d9ab) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mb7051.3n",   0x0000, 0x0020, CRC(465d07af) SHA1(25e246f7674c25d05e5f6e68db88c15aaa10cee1) )
+ROM_END
+
 
 
 /*************************************
@@ -580,3 +605,4 @@ GAME( 1980, spacefbg, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nin
 GAME( 1980, spacebrd, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg (Karateco)", "Space Bird (bootleg)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
 GAME( 1980, spacefbb, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg", "Space Firebird (bootleg)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
 GAME( 1980, spacedem, spacefb, spacefb, spacedem, driver_device, 0, ROT270, "Nintendo (Fortrek license)", "Space Demon", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1980, starwarr, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nintendo (Potomac Mortgage)", "Star Warrior", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
