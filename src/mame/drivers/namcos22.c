@@ -2938,7 +2938,14 @@ void namcos22_state::machine_reset()
 	InitDSP(machine());
 }
 
+void namcos22_state::machine_start()
+{
+	;
+}
+
 static MACHINE_CONFIG_START( namcos22s, namcos22_state )
+
+	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020,SS22_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(namcos22s_am)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos22_state,  namcos22s_interrupt)
@@ -2965,6 +2972,8 @@ static MACHINE_CONFIG_START( namcos22s, namcos22_state )
 //  MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
 	MCFG_NVRAM_HANDLER(namcos22)
+
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos22_state, screen_update_namcos22s)
@@ -2986,8 +2995,64 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( timecris, namcos22s )
 
+	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(timecris_am)
+MACHINE_CONFIG_END
+
+
+TIMER_CALLBACK_MEMBER(namcos22_state::adillor_trackball_interrupt)
+{
+	generic_pulse_irq_line(m_mcu, param ? M37710_LINE_TIMERA2TICK : M37710_LINE_TIMERA3TICK, 1);
+	m_ar_tb_interrupt[param]->adjust(m_ar_tb_reload[param], param);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::adillor_trackball_update)
+{
+	// arbitrary timer for reading trackball
+	for (int axis = 0; axis < 2; axis++)
+	{
+		UINT16 ipt = ioport(axis ? "TRACKY" : "TRACKX")->read();
+		if (ipt > 0 && ipt < 0x8000)
+		{
+			// optical trackball, tied to mcu A2/A3 timer (speed determines frequency)
+			// note that it is rotated by 45 degrees, so instead of axes like (+), they are like (x)
+			// (not yet tested on a real trackball, values below still need to be tweaked)
+			const int cap = 256;
+			const int maxspeed = 500;
+			const int sensitivity = 50;
+			
+			if (ipt > cap) ipt = cap;
+			ipt = cap - ipt;
+
+			attotime freq = attotime::from_usec(maxspeed + sensitivity * ipt);
+			m_ar_tb_reload[axis] = freq;
+			m_ar_tb_interrupt[axis]->adjust(min(freq, m_ar_tb_interrupt[axis]->remaining()), axis);
+			
+		}
+		else
+		{
+			// backwards or not moving
+			m_ar_tb_reload[axis] = attotime::never;
+			m_ar_tb_interrupt[axis]->adjust(attotime::never, axis);
+		}
+	}
+}
+
+MACHINE_START_MEMBER(namcos22_state,adillor)
+{
+	machine_start();
+
+	for (int axis = 0; axis < 2; axis++)
+		m_ar_tb_interrupt[axis] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos22_state::adillor_trackball_interrupt),this));
+}
+
+static MACHINE_CONFIG_DERIVED( adillor, namcos22s )
+
+	/* basic machine hardware */
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ar_tb_upd", namcos22_state, adillor_trackball_update, attotime::from_msec(20))
+	
+	MCFG_MACHINE_START_OVERRIDE(namcos22_state,adillor)
 MACHINE_CONFIG_END
 
 /*********************************************************************************/
@@ -3197,6 +3262,8 @@ ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_START( namcos22, namcos22_state )
+
+	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020,SS22_MASTER_CLOCK/2) /* 25 MHz? */
 	MCFG_CPU_PROGRAM_MAP(namcos22_am)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos22_state,  namcos22_interrupt)
@@ -3220,6 +3287,8 @@ static MACHINE_CONFIG_START( namcos22, namcos22_state )
 //  MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
 	MCFG_NVRAM_HANDLER(namcos22)
+
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos22_state, screen_update_namcos22)
@@ -5111,6 +5180,12 @@ static INPUT_PORTS_START( adillor )
 	PORT_START("MCUP5B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("TRACKX")
+    PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(200) PORT_RESET
+
+	PORT_START("TRACKY")
+    PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(200) PORT_RESET PORT_REVERSE
 INPUT_PORTS_END /* Armadillo Racing */
 
 static INPUT_PORTS_START( propcycl )
@@ -5801,4 +5876,4 @@ GAME( 1996, tokyowar, 0,         namcos22s, tokyowar,  namcos22_state, tokyowar,
 GAME( 1996, aquajet,  0,         namcos22s, aquajet,   namcos22_state, aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30
 GAME( 1996, alpinr2b, 0,         namcos22s, alpiner,   namcos22_state, alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.B)"       , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 97/01/10 17:10:59
 GAME( 1996, alpinr2a, alpinr2b,  namcos22s, alpiner,   namcos22_state, alpiner2, ROT0, "Namco", "Alpine Racer 2 (Rev. ARS2 Ver.A)"       , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/12/06 13:45:05
-GAME( 1996, adillor,  0,         namcos22s, adillor,   namcos22_state, adillor,  ROT0, "Namco", "Armadillo Racing (Rev. AM1 Ver.A)"      , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 97/04/07 19:19:41. needs trackball hookup
+GAME( 1996, adillor,  0,         adillor,   adillor,   namcos22_state, adillor,  ROT0, "Namco", "Armadillo Racing (Rev. AM1 Ver.A)"      , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 97/04/07 19:19:41

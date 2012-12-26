@@ -76,7 +76,8 @@ public:
 	optional_shared_ptr<UINT32> m_czram;
 
 	int m_mbEnableDspIrqs;
-
+	attotime m_ar_tb_reload[2];
+	emu_timer *m_ar_tb_interrupt[2];
 	UINT16 m_mMasterBIOZ;
 	UINT32 *m_mpPointRAM;
 	UINT32 m_old_coin_state;
@@ -254,6 +255,8 @@ public:
 	DECLARE_DRIVER_INIT(alpinesa);
 	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
 	virtual void machine_reset();
+	virtual void machine_start();
+	DECLARE_MACHINE_START(adillor);
 	DECLARE_VIDEO_START(namcos22s);
 	DECLARE_VIDEO_START(namcos22);
 	DECLARE_VIDEO_START(common);
@@ -261,6 +264,8 @@ public:
 	UINT32 screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(namcos22s_interrupt);
 	INTERRUPT_GEN_MEMBER(namcos22_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(adillor_trackball_update);
+	TIMER_CALLBACK_MEMBER(adillor_trackball_interrupt);
 	TIMER_CALLBACK_MEMBER(alpine_steplock_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(dsp_master_serial_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(dsp_slave_serial_irq);
