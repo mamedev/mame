@@ -9,16 +9,14 @@
     Model           Video       Hz
 
     TMS9918         NTSC        60
+    TMS9929?        YPbPr?      50     (not sure. 50Hz non-A model, used in Creativision? or was it a 3rd party clone chip?)
+
     TMS9918A        NTSC        60
-    TMS9118         NTSC        60
-    V9938
-    V9958
-    V9990
-
     TMS9928A        YPbPr       60
-    TMS9128         YPbPr       60
-
     TMS9929A        YPbPr       50
+
+    TMS9118         NTSC        60
+    TMS9128         YPbPr       60
     TMS9129         YPbPr       50
 
 */
