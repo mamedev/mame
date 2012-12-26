@@ -48,38 +48,12 @@
 
 /***************************************************************************
  *
- *  write decrypted opcodes
+ *  swizzled mirror handlers
  *
  ***************************************************************************/
 
-
-WRITE8_MEMBER(decocass_state::charram_w)
-{
-	decocass_charram_w(space, offset, data);
-}
-
-WRITE8_MEMBER(decocass_state::fgvideoram_w)
-{
-	decocass_fgvideoram_w(space, offset, data);
-}
-
-WRITE8_MEMBER(decocass_state::fgcolorram_w)
-{
-	decocass_colorram_w(space, offset, data);
-}
-
-WRITE8_MEMBER(decocass_state::tileram_w)
-{
-	decocass_tileram_w(space, offset, data);
-}
-
-WRITE8_MEMBER(decocass_state::objectram_w)
-{
-	decocass_objectram_w(space, offset, data);
-}
-
-WRITE8_MEMBER(decocass_state::mirrorvideoram_w) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); fgvideoram_w(space, offset, data, mem_mask); }
-WRITE8_MEMBER(decocass_state::mirrorcolorram_w) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); fgcolorram_w(space, offset, data, mem_mask); }
+WRITE8_MEMBER(decocass_state::mirrorvideoram_w) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); decocass_fgvideoram_w(space, offset, data, mem_mask); }
+WRITE8_MEMBER(decocass_state::mirrorcolorram_w) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); decocass_colorram_w(space, offset, data, mem_mask); }
 
 READ8_MEMBER(decocass_state::mirrorvideoram_r)
 {
@@ -96,13 +70,13 @@ READ8_MEMBER(decocass_state::mirrorcolorram_r)
 
 static ADDRESS_MAP_START( decocass_map, AS_PROGRAM, 8, decocass_state )
 	AM_RANGE(0x0000, 0x5fff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x6000, 0xbfff) AM_RAM_WRITE(charram_w) AM_SHARE("charram") /* still RMS3 RAM */
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")  /* DSP3 RAM */
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(fgcolorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x6000, 0xbfff) AM_RAM_WRITE(decocass_charram_w) AM_SHARE("charram") /* still RMS3 RAM */
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(decocass_fgvideoram_w) AM_SHARE("fgvideoram")  /* DSP3 RAM */
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(decocass_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(mirrorvideoram_r, mirrorvideoram_w)
 	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(mirrorcolorram_r, mirrorcolorram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(tileram_w) AM_SHARE("tileram")
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(objectram_w) AM_SHARE("objectram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(decocass_tileram_w) AM_SHARE("tileram")
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(decocass_objectram_w) AM_SHARE("objectram")
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM_WRITE(decocass_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xe300, 0xe300) AM_READ_PORT("DSW1") AM_WRITE(decocass_watchdog_count_w)
 	AM_RANGE(0xe301, 0xe301) AM_READ_PORT("DSW2") AM_WRITE(decocass_watchdog_flip_w)
@@ -1698,8 +1672,8 @@ DRIVER_INIT_MEMBER(decocass_state,cdsteljn)
 /* 27 */ GAME( 1982, cburnrub,  decocass, cburnrub, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette, set 1)", 0 )
          GAME( 1982, cburnrub2, cburnrub, cburnrub, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Burnin' Rubber (DECO Cassette, set 2)", 0 )
          GAME( 1982, cbnj,      cburnrub, cburnrub, decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Bump 'n' Jump (DECO Cassette)", 0 )
-/* 28 */ GAME( 1983, cgraplop,  decocass, cgraplop, cgraplop, decocass_state, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (DECO Cassette, set 1)", 0 )
-         GAME( 1983, cgraplop2, cgraplop, cgraplop2,cgraplop, decocass_state, decocass, ROT270, "Data East Corporation", "Cluster Buster / Graplop (DECO Cassette, set 2)", GAME_NOT_WORKING )
+/* 28 */ GAME( 1983, cgraplop,  decocass, cgraplop, cgraplop, decocass_state, decocass, ROT270, "Data East Corporation", "Cluster Buster (DECO Cassette)", 0 )
+         GAME( 1983, cgraplop2, cgraplop, cgraplop2,cgraplop, decocass_state, decocass, ROT270, "Data East Corporation", "Graplop (no title screen) (DECO Cassette)", 0 ) // a version with title screen exists, see reference videos
 /* 29 */ GAME( 1983, clapapa,   decocass, clapapa,  decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' / La-Pa-Pa (DECO Cassette)" , 0) /* Displays 'La-Pa-Pa during attract */
          GAME( 1983, clapapa2,  clapapa,  clapapa,  decocass, decocass_state, decocass, ROT270, "Data East Corporation", "Rootin' Tootin' (DECO Cassette)" , 0) /* Displays 'Rootin' Tootin' during attract */
 /* 30 */ GAME( 1983, cskater,   decocass, cskater,  cskater, decocass_state,  decocass, ROT270, "Data East Corporation", "Skater (DECO Cassette, Japan)", 0 )

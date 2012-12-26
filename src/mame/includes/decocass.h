@@ -219,11 +219,6 @@ public:
 
 	void decocass_video_state_save_init();
 
-	DECLARE_WRITE8_MEMBER(charram_w);
-	DECLARE_WRITE8_MEMBER(fgvideoram_w);
-	DECLARE_WRITE8_MEMBER(fgcolorram_w);
-	DECLARE_WRITE8_MEMBER(tileram_w);
-	DECLARE_WRITE8_MEMBER(objectram_w);
 	DECLARE_WRITE8_MEMBER(mirrorvideoram_w);
 	DECLARE_WRITE8_MEMBER(mirrorcolorram_w);
 	DECLARE_READ8_MEMBER(mirrorvideoram_r);

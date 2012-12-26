@@ -12,6 +12,115 @@
 	Additionally it supports the headlight effect also needed for
 	a Highway Chase style game.
 
+	---
+
+	Notes with reference to video recordings.
+	These video recordings should be from real hardware because
+	they predate the emulation and include undumped games, so
+	unless they're from some other private / unreleased emulator
+	then they can't be anything else. 
+
+	Mirrored from NicoVideo
+	-=====================-
+
+	mamedev.emulab.it/haze/reference/sm18976245-DISCO_NO1.mp4
+		- no notes
+
+	mamedev.emulab.it/haze/reference/sm18976058-ASTRO_FANTASIA.mp4
+		- different game revision to emulated version, main
+		  boss enemy shown at the top of the scoreboard differs
+		  so notes below could be invalid
+
+		- bullets should be white, not black
+		- BG layer changes to orange colours for first level
+		  (this would require a palette bitplane re-order we
+		   don't currently support)
+
+	mamedev.emulab.it/haze/reference/sm18975592-HWY_CHASE.mp4
+		- road / bg colour should be darkish blue outside of tunnels
+		- road / bg colour should be black in tunnels
+		- headlight should be the same darkish blue as the road
+		  at all times, so only visible in tunnels
+		- our headlight is misplaced (should be simple fix)
+		- center line of road does not exist on hw!
+		- enemies are hidden in tunnels (like madalien)
+		- road / bg flashs regular blue when enemy is hit revealing
+		  them
+		- some glitchy enemies visible even over tunnel bg for
+		  some frames
+		- colours of BG tilemap are glitchy even on hardware eg.
+		  Pink desert after first tunnel, Green water after 2nd
+		  tunnel even when the right palettes exist!
+		- enemy bullets are red
+		
+	mamedev.emulab.it/haze/reference/sm17433759-PRO_BOWLING.mp4
+		- no notes
+
+	mamedev.emulab.it/haze/reference/sm17401258-GRAPLOP.mp4
+		- different game revision to emulated version, this
+		  seems to be a more finished version of cgralop2, the
+		  emulated version lacks a title screen (the parent
+		  cgraplop has a cluster buster title, but that is
+		  again different)
+
+
+	mamedev.emulab.it/haze/reference/sm17387280-BURNIN_RUBBER.mp4
+		- seems to be the cburnrub2 set, or close to it, plain
+		  white title text
+
+	mamedev.emulab.it/haze/reference/sm17370209-NIGHT_STAR.mp4
+		- no notes
+
+	mamedev.emulab.it/haze/reference/sm17203184-HAMBURGER.mp4
+		- no notes
+
+	mamedev.emulab.it/haze/reference/sm17202585-SUPER_DOUBLE_TENNIS.mp4
+		- background colours during high-score / title ar shades of
+		  blue, they appear green in our emulation
+
+	mamedev.emulab.it/haze/reference/sm17202201-SKATER.mp4
+		- shadow handling (headlight sprite) positioning is wrong, the
+		  game also turns on the 'cross' bit, why?
+
+	mamedev.emulab.it/haze/reference/sm17201813-ZEROIZE.mp4
+		- no notes
+
+	mamedev.emulab.it/haze/reference/sm17183561-FISHING.mp4
+		- first title screen has no background, this is not a bug in
+		  our emulation
+		- can show glitchy tiles when constructing the background,
+		  this is not a bug in our emulation either
+
+	mamedev.emulab.it/haze/reference/sm17181931-MISSION_X.mp4
+		- no notes
+
+	mamedev.emulab.it/haze/reference/sm17180950-DSTELEJAN.mp4
+		- no notes
+
+	Mirrored from YouTube
+	-===================-
+
+	mamedev.emulab.it/haze/reference/manhattan01-04.webm
+	mamedev.emulab.it/haze/reference/manhattan05-08.webm
+	mamedev.emulab.it/haze/reference/manhattan09-12.webm
+		- the BG tilemap pen ordering changes between levels, most of
+		  the arrangements aren't supported by our current code, and
+		  I can't find the writes to change it!  Level 1 in the
+		  video uses what we have as palette 1, not 0.
+		  ToDo: list combinations
+
+	mamedev.emulab.it/haze/reference/flashboy.webm
+		- game is not emulated
+
+
+	---
+
+	I'd quite like a reference video for the Cassette Pro Soccer,
+	the game appears ugly (center circle vanishing as soon as you do
+	a long ball etc.) but the ugly backwards scrolling after you kick
+	the ball still happens even on the standalone version, so I'm
+	wondering if it's just a glitchy game.
+
  ***********************************************************************/
 
 #include "emu.h"
@@ -284,7 +393,7 @@ WRITE8_MEMBER(decocass_state::decocass_mode_set_w )
 		(data & 0x04) ? " ptn1/2" : "",
 		(data & 0x08) ? " bkg_ena" : "",
 		(data & 0x10) ? " center_l_on" : "",
-		(data & 0x20) ? " cross_on" : "",
+		(data & 0x20) ? " cross_on" : "",  /* skater enables this, why? */
 		(data & 0x40) ? " tunnel" : "",
 		(data & 0x80) ? " part_h_enable" : ""));
 
