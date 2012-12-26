@@ -73,7 +73,8 @@ class rectangle
 {
 public:
 	// construction/destruction
-	rectangle() { }
+	rectangle()
+		: min_x(0), max_x(0), min_y(0), max_y(0) { }
 	rectangle(INT32 minx, INT32 maxx, INT32 miny, INT32 maxy)
 		: min_x(minx), max_x(maxx), min_y(miny), max_y(maxy) { }
 
