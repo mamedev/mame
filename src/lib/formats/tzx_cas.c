@@ -92,13 +92,13 @@ static void tzx_cas_get_blocks( const UINT8 *casdata, int caslen )
 
 		if (block_count == max_block_count)
 		{
-			void	*old_blocks = blocks;
+			void *old_blocks = blocks;
 			int	old_max_block_count = max_block_count;
 			max_block_count = max_block_count + BLOCK_COUNT_INCREMENTS;
 			blocks = (UINT8**)malloc(max_block_count * sizeof(UINT8*));	// SHOULD NOT BE USING auto_alloc_array()
-			memset(blocks,0,max_block_count);
+			memset(blocks, 0, max_block_count);
 			memcpy(blocks, old_blocks, old_max_block_count * sizeof(UINT8*));
-			if (blocks) free(old_blocks);
+			free(old_blocks);
 		}
 
 		blocks[block_count] = (UINT8*)&casdata[pos];
