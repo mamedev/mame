@@ -38,6 +38,7 @@ public:
 	virtual WRITE8_MEMBER(mem_w);
 	virtual READ8_MEMBER(mem_linear_r);
 	virtual WRITE8_MEMBER(mem_linear_w);
+	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb);
 protected:
     // device-level overrides
     virtual void device_start();
@@ -123,6 +124,7 @@ protected:
 	/**/	UINT8 cursor_skew;
 	/**/	UINT8 cursor_scan_end;
 			UINT32 start_addr;
+			UINT32 start_addr_latch;
 	/**/	UINT8 protect_enable;
 	/**/	UINT8 bandwidth;
 	/**/	UINT8 offset;
@@ -184,6 +186,8 @@ protected:
 		/* oak vga */
 		struct { UINT8 reg; } oak;
 	} vga;
+
+	emu_timer *m_vblank_timer;
 };
 
 

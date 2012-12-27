@@ -26,9 +26,10 @@
     per-game issues:
     - The Incredible Machine: fix partial updates
     - MAME 0.01: fix 92 Hz refresh rate bug (uses VESA register?).
-    - Alien Breed, Bio Menace: jerky H scrolling (uses VGA/EGA mode with pel shift)
     - Virtual Pool: ET4k unrecognized;
     - California Chase (calchase): various gfx bugs, CPU related?
+    - Jazz Jackrabbit: status bar is very jerky, but main screen scrolling is fine?
+	- Catacombs: weird resolution (untested)
 
     ROM declarations:
 
@@ -193,6 +194,14 @@ mach8_device::mach8_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
+
+/* VBLANK callback, start address definitely updates AT vblank, not before. */
+TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
+{
+	vga.crtc.start_addr = vga.crtc.start_addr_latch;
+	m_vblank_timer->adjust( machine().primary_screen->time_until_pos(vga.crtc.vert_blank_start) );
+}
+
 void vga_device::device_start()
 {
 	memset(&vga, 0, sizeof(vga));
@@ -212,6 +221,8 @@ void vga_device::device_start()
 	vga.svga_intf.crtc_regcount = 0x19;
 
 	vga.memory	= auto_alloc_array_clear(machine(), UINT8, vga.svga_intf.vram_size);
+
+	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
 }
 
 void svga_device::device_start()
@@ -370,6 +381,9 @@ void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
 	UINT32 *bitmapline;
 	pen_t pen;
+	int pel_shift = (vga.attribute.pel_shift);
+
+//	popmessage("%08x %02x",EGA_START_ADDRESS,pel_shift);
 
 	/**/
 	for (addr=EGA_START_ADDRESS, pos=0, line=0; line<LINES;
@@ -379,7 +393,7 @@ void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 		{
 			bitmapline = &bitmap.pix32(line + yi);
 
-			for (pos=addr, c=0, column=0; column<EGA_COLUMNS; column++, c+=8, pos=(pos+1)&0xffff)
+			for (pos=addr, c=0, column=0; column<EGA_COLUMNS+1; column++, c+=8, pos=(pos+1)&0xffff)
 			{
 				int data[4];
 
@@ -391,14 +405,15 @@ void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 				for (i = 7; i >= 0; i--)
 				{
 					pen = vga.pens[(data[0]&1) | (data[1]&2) | (data[2]&4) | (data[3]&8)];
-					if(!machine().primary_screen->visible_area().contains(c+i, line + yi))
-						continue;
-					bitmapline[c+i] = pen;
 
 					data[0]>>=1;
 					data[1]>>=1;
 					data[2]>>=1;
 					data[3]>>=1;
+
+					if(!machine().primary_screen->visible_area().contains(c+i-pel_shift, line + yi))
+						continue;
+					bitmapline[c+i-pel_shift] = pen;
 				}
 			}
 		}
@@ -414,10 +429,12 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
 	int yi;
 	int xi;
-	int pel_shift = 0;//vga.attribute.pel_shift; /* TODO: timing bug with this */
+	int pel_shift = (vga.attribute.pel_shift & 6);
 
 	/* line compare is screen sensitive */
 	mask_comp = 0x3ff; //| (LINES & 0x300);
+
+//	popmessage("%02x %02x",vga.attribute.pel_shift,vga.sequencer.data[4] & 0x08);
 
 	curr_addr = 0;
 	if(!(vga.sequencer.data[4] & 0x08))
@@ -431,16 +448,16 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				if((line + yi) == (vga.crtc.line_compare & mask_comp))
 					curr_addr = 0;
 				bitmapline = &bitmap.pix32(line + yi);
-				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=8, pos++)
+				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS+1; column++, c+=8, pos++)
 				{
 					if(pos > 0x80000/4)
 						return;
 
 					for(xi=0;xi<8;xi++)
 					{
-						if(!machine().primary_screen->visible_area().contains(c+xi-pel_shift, line + yi))
+						if(!machine().primary_screen->visible_area().contains(c+xi-(pel_shift), line + yi))
 							continue;
-						bitmapline[c+xi-pel_shift] = machine().pens[vga.memory[(pos & 0xffff)+((xi >> 1)*0x10000)]];
+						bitmapline[c+xi-(pel_shift)] = machine().pens[vga.memory[(pos & 0xffff)+((xi >> 1)*0x10000)]];
 					}
 				}
 			}
@@ -458,14 +475,14 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					curr_addr = 0;
 				bitmapline = &bitmap.pix32(line + yi);
 				//addr %= 0x80000;
-				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS; column++, c+=0x10, pos+=0x8)
+				for (pos=curr_addr, c=0, column=0; column<VGA_COLUMNS+1; column++, c+=0x10, pos+=0x8)
 				{
 					if(pos + 0x08 > 0x80000)
 						return;
 
 					for(xi=0;xi<0x10;xi++)
 					{
-						if(!machine().primary_screen->visible_area().contains(c+xi-pel_shift, line + yi))
+						if(!machine().primary_screen->visible_area().contains(c+xi-(pel_shift), line + yi))
 							continue;
 						bitmapline[c+xi-pel_shift] = machine().pens[vga.memory[(pos+(xi >> 1)) & 0xffff]];
 					}
@@ -939,9 +956,11 @@ UINT32 vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 
 	return 0;
 }
+
 UINT32 svga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT8 cur_mode = pc_vga_choosevideomode();
+
 	switch(cur_mode)
 	{
 		case SCREEN_OFF:   bitmap.fill  (get_black_pen(machine()), cliprect);break;
@@ -1158,7 +1177,7 @@ UINT8 vga_device::crtc_reg_read(UINT8 index)
 			break;
 		case 0x0c:
 		case 0x0d:
-			res  = (vga.crtc.start_addr >> ((index & 1) ^ 1)*8) & 0xff;
+			res  = (vga.crtc.start_addr_latch >> ((index & 1) ^ 1)*8) & 0xff;
 			break;
 		case 0x0e:
 		case 0x0f:
@@ -1231,6 +1250,8 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 
 	machine().primary_screen->configure((hblank_period), (vblank_period), visarea, refresh );
 //  popmessage("%d %d\n",vga.crtc.horz_total * 8,vga.crtc.vert_total);
+
+	m_vblank_timer->adjust( machine().primary_screen->time_until_pos(vga.crtc.vert_blank_start) );
 }
 
 void vga_device::recompute_params()
@@ -1333,8 +1354,8 @@ void vga_device::crtc_reg_write(UINT8 index, UINT8 data)
 			break;
 		case 0x0c:
 		case 0x0d:
-			vga.crtc.start_addr &= ~(0xff << (((index & 1)^1) * 8));
-			vga.crtc.start_addr |= (data << (((index & 1)^1) * 8));
+			vga.crtc.start_addr_latch &= ~(0xff << (((index & 1)^1) * 8));
+			vga.crtc.start_addr_latch |= (data << (((index & 1)^1) * 8));
 			break;
 		case 0x0e:
 		case 0x0f:
@@ -2045,7 +2066,6 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_trident_vga )
 	MCFG_SCREEN_UPDATE_DEVICE("vga", trident_vga_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(0x100)
-
 	MCFG_DEVICE_ADD("vga", TRIDENT_VGA, 0)
 MACHINE_CONFIG_END
 
@@ -2055,7 +2075,6 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_cirrus_vga )
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_vga_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(0x100)
-
 	MCFG_DEVICE_ADD("vga", CIRRUS_VGA, 0)
 MACHINE_CONFIG_END
 
@@ -2660,7 +2679,7 @@ UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 				res = s3.cursor_pattern_y;
 				break;
 			case 0x51:
-				res = (vga.crtc.start_addr & 0x0c0000) >> 18;
+				res = (vga.crtc.start_addr_latch & 0x0c0000) >> 18;
 				break;
 			case 0x55:
 				res = s3.extended_dac_ctrl;
@@ -2669,7 +2688,7 @@ UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 				res = s3.ext_misc_ctrl_2;
 				break;
 			case 0x69:
-				res = vga.crtc.start_addr >> 16;
+				res = vga.crtc.start_addr_latch >> 16;
 				break;
 			case 0x6a:
 				res = svga.bank_r & 0x7f;
@@ -2781,8 +2800,8 @@ void s3_vga_device::s3_crtc_reg_write(UINT8 index, UINT8 data)
 		{
 			case 0x31: // CR31 Memory Configuration Register
 				s3.memory_config = data;
-				vga.crtc.start_addr &= ~0x30000;
-				vga.crtc.start_addr |= ((data & 0x30) << 12);
+				vga.crtc.start_addr_latch &= ~0x30000;
+				vga.crtc.start_addr_latch |= ((data & 0x30) << 12);
 				//popmessage("%02x",data);
 				s3_define_video_mode();
 				break;
@@ -2930,8 +2949,8 @@ bit  0-5  Pattern Display Start Y-Pixel Position.
 				s3.cursor_pattern_y = data;
 				break;
 			case 0x51:
-				vga.crtc.start_addr &= ~0xc0000;
-				vga.crtc.start_addr |= ((data & 0x3) << 18);
+				vga.crtc.start_addr_latch &= ~0xc0000;
+				vga.crtc.start_addr_latch |= ((data & 0x3) << 18);
 				svga.bank_w = (svga.bank_w & 0xcf) | ((data & 0x0c) << 2);
 				svga.bank_r = svga.bank_r;
 				s3_define_video_mode();
@@ -3022,8 +3041,8 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 				//printf("%02x X\n",data);
 				break;
 			case 0x69:
-				vga.crtc.start_addr &= ~0x1f0000;
-				vga.crtc.start_addr |= ((data & 0x1f) << 16);
+				vga.crtc.start_addr_latch &= ~0x1f0000;
+				vga.crtc.start_addr_latch |= ((data & 0x1f) << 16);
 				s3_define_video_mode();
 				break;
 			case 0x6a:
@@ -4996,7 +5015,7 @@ WRITE8_MEMBER(ati_vga_device::ati_port_ext_w)
 		switch(ati.ext_reg_select)
 		{
 		case 0x23:
-			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfffdffff) | ((data & 0x10) << 13);
+			vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & 0xfffdffff) | ((data & 0x10) << 13);
 			vga.crtc.cursor_addr = (vga.crtc.cursor_addr & 0xfffdffff) | ((data & 0x08) << 14);
 			logerror("ATI: ATI23 write %02x\n",data);
 			break;
@@ -5010,7 +5029,7 @@ WRITE8_MEMBER(ati_vga_device::ati_port_ext_w)
 			logerror("ATI: ATI2D (extensions) write %02x\n",data);
 			break;
 		case 0x30:
-			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfffeffff) | ((data & 0x40) << 10);
+			vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & 0xfffeffff) | ((data & 0x40) << 10);
 			vga.crtc.cursor_addr = (vga.crtc.cursor_addr & 0xfffeffff) | ((data & 0x04) << 14);
 			logerror("ATI: ATI30 write %02x\n",data);
 			break;
