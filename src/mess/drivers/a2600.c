@@ -72,6 +72,7 @@ public:
 	unsigned m_modeSS_write_enabled;
 	unsigned m_modeSS_high_ram_enabled;
 	unsigned m_modeSS_diff_adjust;
+	UINT16 m_modeSS_last_address;
 	unsigned m_FVlocked;
 	UINT16 m_current_screen_height;
 	int m_FETimer;
@@ -79,7 +80,6 @@ public:
 	direct_update_delegate m_FE_old_opbase_handler;
 
 	DECLARE_DIRECT_UPDATE_MEMBER(modeF6_opbase);
-	DECLARE_DIRECT_UPDATE_MEMBER(modeSS_opbase);
 	DECLARE_DIRECT_UPDATE_MEMBER(modeDPC_opbase_handler);
 	DECLARE_DIRECT_UPDATE_MEMBER(modeFE_opbase_handler);
 	DECLARE_READ8_MEMBER(modeF8_switch_r);
@@ -888,29 +888,15 @@ DIRECT_UPDATE_MEMBER(a2600_state::modeF6_opbase)
 	return address;
 }
 
-DIRECT_UPDATE_MEMBER(a2600_state::modeSS_opbase)
-{
-	if ( address & 0x1000 )
-	{
-		if ( ! direct.space().debugger_access() )
-		{
-			if ( address & 0x800 )
-			{
-				direct.explicit_configure(( address & 0xf800 ), ( address & 0xf800 ) | 0x7ff, 0x7ff, m_bank_base[2]);
-			}
-			else
-			{
-				direct.explicit_configure(( address & 0xf800 ), ( address & 0xf800 ) | 0x7ff, 0x7ff, m_bank_base[1]);
-			}
-			return ~0;
-		}
-	}
-	return address;
-}
 
 READ8_MEMBER(a2600_state::modeSS_r)
 {
 	UINT8 data = ( offset & 0x800 ) ? m_bank_base[2][offset & 0x7FF] : m_bank_base[1][offset];
+
+	if ( space.debugger_access() )
+	{
+		return data;
+	}
 
 	//logerror("%04X: read from modeSS area offset = %04X\n", machine().device("maincpu")->safe_pc(), offset);
 	/* Check for control register "write" */
@@ -964,6 +950,8 @@ READ8_MEMBER(a2600_state::modeSS_r)
 		}
 		membank("bank1")->set_base(m_bank_base[1] );
 		membank("bank2")->set_base(m_bank_base[2] );
+		// Make sure we do not trigger a spurious RAM write
+		m_modeSS_byte_started -= 5;
 	}
 	else if ( offset == 0xFF9 )
 	{
@@ -978,12 +966,20 @@ READ8_MEMBER(a2600_state::modeSS_r)
 		{
 			data = 0x01;
 		}
+		// Make sure we do not trigger a spurious RAM write
+		m_modeSS_byte_started -= 5;
 	}
 	else
 	{
 		/* Possible RAM write */
 		if ( m_modeSS_write_enabled )
 		{
+			/* Check for dummy read from same address */
+			if ( m_modeSS_last_address == offset )
+			{
+				m_modeSS_diff_adjust += 1;
+			}
+
 			int diff = machine().device<cpu_device>("maincpu")->total_cycles() - m_modeSS_byte_started;
 			//logerror("%04X: offset = %04X, %d\n", machine().device("maincpu")->safe_pc(), offset, diff);
 			if ( diff - m_modeSS_diff_adjust == 5 )
@@ -1007,28 +1003,17 @@ READ8_MEMBER(a2600_state::modeSS_r)
 			{
 				m_modeSS_byte = offset;
 				m_modeSS_byte_started = machine().device<cpu_device>("maincpu")->total_cycles();
-			}
-			/* Check for dummy read from same address */
-			if ( diff == 2 )
-			{
-				m_modeSS_diff_adjust = 1;
-			}
-			else
-			{
 				m_modeSS_diff_adjust = 0;
 			}
+			m_modeSS_last_address = offset;
 		}
 		else if ( offset < 0x0100 )
 		{
 			m_modeSS_byte = offset;
 			m_modeSS_byte_started = machine().device<cpu_device>("maincpu")->total_cycles();
+			m_modeSS_last_address = offset;
+			m_modeSS_diff_adjust = 0;
 		}
-	}
-	/* Because the mame core caches opcode data and doesn't perform reads like normal */
-	/* we have to put in this little hack here to get Suicide Mission to work. */
-	if ( offset != 0xFF8 && ( machine().device("maincpu")->safe_pc() & 0x1FFF ) == 0x1FF8 )
-	{
-		modeSS_r( space, 0xFF8 );
 	}
 	return data;
 }
@@ -1481,6 +1466,7 @@ MACHINE_START_MEMBER(a2600_state,a2600)
 	m_current_reset_bank_counter = 0xFF;
 	m_dpc.oscillator = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2600_state::modeDPC_timer_callback),this));
 	m_cart = CART_MEMBER;
+	m_modeSS_last_address = 0;
 }
 
 
@@ -1835,7 +1821,6 @@ void a2600_state::machine_reset()
 		membank("bank2")->set_base(m_bank_base[2] );
 		m_modeSS_write_enabled = 0;
 		m_modeSS_byte_started = 0;
-		space.set_direct_update_handler(direct_update_delegate(FUNC(a2600_state::modeSS_opbase), this));
 		/* The Supercharger has no motor control so just enable it */
 		machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
 		break;
@@ -1949,6 +1934,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( a2600, a2600_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK_NTSC / 3)	/* actually M6507 */
+	MCFG_M6502_DISABLE_DIRECT()
 	MCFG_CPU_PROGRAM_MAP(a2600_mem)
 
 	MCFG_MACHINE_START_OVERRIDE(a2600_state,a2600)
@@ -1986,6 +1972,7 @@ static MACHINE_CONFIG_START( a2600p, a2600_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK_PAL / 3)    /* actually M6507 */
 	MCFG_CPU_PROGRAM_MAP(a2600_mem)
+	MCFG_M6502_DISABLE_DIRECT()
 
 	MCFG_MACHINE_START_OVERRIDE(a2600_state,a2600)
 

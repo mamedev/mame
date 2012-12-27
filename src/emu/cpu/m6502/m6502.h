@@ -57,6 +57,7 @@ public:
 
 	UINT64 get_cycle();
 	bool get_sync() const { return sync; }
+	void disable_direct() { direct_disabled = true; }
 
 protected:
 	class memory_interface {
