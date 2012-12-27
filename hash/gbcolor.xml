@@ -22074,9 +22074,550 @@ Undumped Pirates:
 	</software>
 
 
-<!-- Other Asian Pirate dumps -->
+<!-- Other Asian Pirate dumps to sort -->
 
-	<software name="zzx3">
+	<software name="pokeruby" supported="no">
+		<description>Pocket Monster Ruby (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="2003 Pocket Monster Carbuncle (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="2003 pocket monster carbuncle (chi)(unl) [raw dump].bin" size="2097152" crc="3a0e9b6f" sha1="025973627743f2f1ae1ff5b8a3f549cbcc227ef3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokerubyh" cloneof="pokeruby">
+		<description>Pocket Monster Ruby (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="2003 Pocket Monster Carbuncle (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="2003 pocket monster carbuncle (chi)(unl) [fixed].bin" size="4194304" crc="4a68fd38" sha1="a115164a97a77455a3f216ccaa83f6fecd710884" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokesaph" supported="no">
+		<description>Pocket Monster Saphire (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="Pokémon - Sapphire Version (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="pocket monster saphire (chi)(unl) [raw dump].bin" size="2097152" crc="71536b8e" sha1="88818c67fb1d9ae5c06e8213f09342d230923113" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokesaphh" cloneof="pokesaph">
+		<description>Pocket Monster Saphire (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="Pokémon - Sapphire Version (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="pocket monster saphire (chi)(unl) [fixed].bin" size="4194304" crc="81d1e6ff" sha1="9fa7da61c61d684f39e43d6899a68309ba8607b3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This dumps is "unconfirmed", in the sense that later redumps have resulted in inconsistent reads (none working except this one) -->
+	<software name="pokesaphc" cloneof="pokesaph" supported="no">
+		<description>Kou Dai Guai Shou - Lan Bao Shi (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="口袋怪獸 - 藍寶石, 2003 口袋怪獸-藍寶石 (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="2003 kou dai guai shou - lan bao shi (chi)(unl) [raw dump].bin" size="2097152" crc="4c76d4d8" sha1="d688201e6031b88f122ec753a37daedfb233b48d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokesaphch" cloneof="pokesaph">
+		<description>Kou Dai Guai Shou - Lan Bao Shi (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="口袋怪獸 - 藍寶石, 2003 口袋怪獸-藍寶石 (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="2003 kou dai guai shou - lan bao shi (chi)(unl) [fixed].bin" size="4194304" crc="3a08c8eb" sha1="3c130359bcc6c4bd9a1d698793642f1b6de3c761" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shuiji2" cloneof="pokesaph" supported="no">
+		<description>Shu Ma Bao Long - Shui Jing Ban II (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="數碼暴龍 - 水晶板II"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="shu ma bao long - shui jing ban ii (chi)(unl) [raw dump].bin" size="2097152" crc="b67999ae" sha1="435c26f47c4e244e8adb3b7f18f2b1d129e163e9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shuiji2h" cloneof="pokesaph">
+		<description>Shu Ma Bao Long - Shui Jing Ban II (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="數碼暴龍 - 水晶板II"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="shu ma bao long - shui jing ban ii (chi)(unl) [fixed].bin" size="4194304" crc="5f2472ad" sha1="e5c10615aeb608c08cc2519f20b2138301cfc568" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="firmbaby" supported="no">
+		<description>The Firmament Baby (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="Space Baby (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="space baby (chi, english)(unl) [raw dump].bin" size="2097152" crc="509f1bb5" sha1="8bdf15e4160e87f83667ecfdbab26ef111a5d5d2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="firmbabyh" cloneof="firmbaby">
+		<description>The Firmament Baby (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="Space Baby (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="space baby (chi, english)(unl) [fixed].bin" size="4194304" crc="66539153" sha1="ddcf6ea0eade0d3c17c746d136e4f74b573c35ba" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="taikong" cloneof="firmbaby" supported="no">
+		<description>Tai Kong Bao Bei (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="太空寶貝"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="tai kong bao bei (chi)(unl) [raw dump].bin" size="2097152" crc="f2d0f0ae" sha1="7c50486fb8718ea5526e6ca5b66b431e4871b505" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="taikongh" cloneof="firmbaby">
+		<description>Tai Kong Bao Bei (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="太空寶貝"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="tai kong bao bei (chi)(unl) [fixed].bin" size="4194304" crc="5b49af92" sha1="7c50486fb8718ea5526e6ca5b66b431e4871b505" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="taichi" supported="no">
+		<description>Xiao Taichi - Shen Hua Li Xian (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="小太极 - 神话历险"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="xiao taichi - shen hua li xian (chi)(unl) [raw dump].bin" size="2097152" crc="322c3816" sha1="c89f8d19a52ab5f183a03d65680bf80d1af4a0ee" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="taichih" cloneof="taichi">
+		<description>Xiao Taichi - Shen Hua Li Xian (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="小太极 - 神话历险"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="xiao taichi - shen hua li xian (chi)(unl) [fixed].bin" size="4194304" crc="fab140ab" sha1="51150a295d9eb840efaa1f67dba94c4bf57a7f5f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crash2" supported="no">
+		<description>2003 Crash Bandicoot II Advance - The Huge Adventure (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="2003 Crash II Advance (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="2003 crash ii advance (chi)(unl) [raw dump].bin" size="2097152" crc="973d38a8" sha1="acdc42716f61bf11ecf08d50a980047f8fb7dc57" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crash2h" cloneof="crash2">
+		<description>2003 Crash Bandicoot II Advance - The Huge Adventure (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="2003 Crash II Advance (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="2003 crash ii advance (chi)(unl) [fixed].bin" size="4194304" crc="0af243bf" sha1="13b1a3f64664cc09f628e53e13c9b66b17e9f500" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bwarr5" supported="no">
+		<description>Bynasty Warriors Advance 5 (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="叁國無雙5 ~ San Guo Wu Shang 5 (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="san guo wu shang 5 (chi)(unl) [raw dump].bin" size="2097152" crc="8a64c933" sha1="e97508fa49564d56550ad467f4c543f3f218db76" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bwarr5h" cloneof="bwarr5">
+		<description>Bynasty Warriors Advance 5 (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="叁國無雙5 ~ San Guo Wu Shang 5 (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="san guo wu shang 5 (chi)(unl) [fixed].bin" size="4194304" crc="9d332731" sha1="3ec4d2e8b6bfa72465bf79cea6643e30d8b38eb2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cjjqx" supported="no">
+		<description>Chao Ji Ji Qi Ren Da Zhan X (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="超級機器人大戰X, Super Robot War X (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="chao ji ji qi ren da zhan x (chi)(unl) [raw dump].bin" size="2097152" crc="279be0cc" sha1="c2a64ba4c1fd60829429330bc13b70d9bd18f023" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cjjqxh" cloneof="cjjqx">
+		<description>Chao Ji Ji Qi Ren Da Zhan X (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="超級機器人大戰X, Super Robot War X (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="chao ji ji qi ren da zhan x (chi)(unl) [fixed].bin" size="4194304" crc="378b182d" sha1="89c414f98721adb9720790b961ea31f70ca4518a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cjjqx1" cloneof="cjjqx" supported="no">
+		<description>Chao Ji Ji Qi Ren Da Zhan X (Chi, Alt)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="超級機器人大戰X, Super Robot War X (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="chao ji ji qi ren da zhan x (chi)(unl)(alt) [raw dump].bin" size="2097152" crc="1feaeb47" sha1="26d5841fc898dab17458dc39e871dab4947a7f2b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cjjqx1h" cloneof="cjjqx">
+		<description>Chao Ji Ji Qi Ren Da Zhan X (Chi, Alt, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="超級機器人大戰X, Super Robot War X (Cart)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="chao ji ji qi ren da zhan x (chi)(unl)(alt) [fixed].bin" size="4194304" crc="0cea6b33" sha1="11b89887245720cfc6a635a94efb55445e3b59db" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jinglw3" supported="no">
+		<description>Jing Ling Wang III (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="精靈王III"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="jing ling wang iii (chi)(unl) [raw dump].bin" size="2097152" crc="f19e780c" sha1="8ef6ceb1b7894f43caa5f422d62d6c437f81e56d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jinglw3h" cloneof="jinglw3">
+		<description>Jing Ling Wang III (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="精靈王III"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="jing ling wang iii (chi)(unl) [fixed].bin" size="2097152" crc="15a4b4ec" sha1="45113307acf16d0c3bb342aff8c804988fdd410d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qbtx" supported="no">
+		<description>Quan Ba Tian Xia (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="拳霸天下"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="quan ba tian xia (chi)(unl) [raw dump].bin" size="4194304" crc="2c922ed6" sha1="c19eb98a9745d2c2ce9e4dba3f17ae0b3dee0f49" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qbtxh" cloneof="qbtx">
+		<description>Quan Ba Tian Xia (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="拳霸天下"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="quan ba tian xia (chi)(unl) [fixed].bin" size="4194304" crc="5bcf90fa" sha1="05e2cb94bcda33380a94415631687d1e6acf4ead" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zhihuanw" supported="no">
+		<description>Zhi Huan Wang - Shou Bu Qu (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="指环王 - 首部曲"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="zhi huan wang - shou bu qu (chi)(unl) [raw dump].bin" size="2097152" crc="8160b3f5" sha1="97d7e0d05205b02c6cb69e68978a3f0fd2e3fde0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zhihuanwh" cloneof="zhihuanw">
+		<description>Zhi Huan Wang - Shou Bu Qu (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="指环王 - 首部曲"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="zhi huan wang - shou bu qu (chi)(unl) [fixed].bin" size="4194304" crc="49e77dd9" sha1="8c8adfbebad81038795e30c778382ffb80e0d88d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xqdz2" supported="no">
+		<description>Xing Qiu Da Zhan II - Ke Long Ren Zhan Yi (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="星球大战2 - 克隆人战役"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="xing qiu da zhan ii - ke long ren zhan yi (chi)(unl) [raw dump].bin" size="2097152" crc="6df86db6" sha1="b6089f2d1064d1851a89ffb20f8e2f8aeb5fe732" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xqdz2h" cloneof="xqdz2">
+		<description>Xing Qiu Da Zhan II - Ke Long Ren Zhan Yi (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="星球大战2 - 克隆人战役"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="xing qiu da zhan ii - ke long ren zhan yi (chi)(unl) [fixed].bin" size="4194304" crc="e8fd000f" sha1="31de5b7ad853002be1a79c97370cb1c8a4c0b467" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mishidem" supported="no">
+		<description>Ha Li Xiao Zi Di Er Bu - Mi Shi De Mi (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="哈利小子第二部 - 密室的秘"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="ha li xiao zi di er bu - mi shi de mi (chi)(unl) [raw dump].bin" size="2097152" crc="859457c8" sha1="3844b61eb455507d634ee7048dc8c9e64216fffe" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mishidemh" cloneof="mishidem">
+		<description>Ha Li Xiao Zi Di Er Bu - Mi Shi De Mi (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="哈利小子第二部 - 密室的秘"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="ha li xiao zi di er bu - mi shi de mi (chi)(unl) [fixed].bin" size="4194304" crc="88a86ff4" sha1="a722f141e45ff5aa51beff93f5d777f2ea90bd83" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hzqibing" supported="no">
+		<description>Hai Zhan Qi Bing (Chi)</description>
+		<year>200?</year>
+		<publisher>Jump Technology ~ Sintax</publisher>
+		<info name="alt_title" value="海戰奇兵"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="hai zhan qi bing (chi)(unl) [raw dump].bin" size="2097152" crc="a962ad73" sha1="36f6454e3e70bb29f27782f2ec4200d5aef5ca98" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hzqibingh" cloneof="hzqibing">
+		<description>Hai Zhan Qi Bing (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Jump Technology ~ Sintax</publisher>
+		<info name="alt_title" value="海戰奇兵"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="hai zhan qi bing (chi)(unl) [fixed].bin" size="4194304" crc="bb78f17e" sha1="b9ab5aa7fdd80b5d27cb48b1f513d899d29345cf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3gokum2" supported="no">
+		<description>Zhen San Guo Wu Shuang 2 - Shin Sangokumusou 2 (Chi)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="真三國無雙2"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="2097152">
+				<rom name="zhen san guo wu shuang 2 - shin sangokumusou 2 (chi)(unl) [raw dump].bin" size="2097152" crc="95c322c9" sha1="e6ab58d212de83cb18e9eadac4cee5d0f6e4e31f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3gokum2h" cloneof="3gokum2">
+		<description>Zhen San Guo Wu Shuang 2 - Shin Sangokumusou 2 (Chi, Hacked)</description>
+		<year>200?</year>
+		<publisher>Sintax</publisher>
+		<info name="alt_title" value="真三國無雙2"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />
+			<dataarea name="rom" size="4194304">
+				<rom name="zhen san guo wu shuang 2 - shin sangokumusou 2 (chi)(unl) [fixed].bin" size="4194304" crc="8de5f8d5" sha1="c0348d41ab8e0c33a214907616463236aa4ad4db" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zzx3" supported="no">
 		<description>Zhi Zhu Xia III (Chi)</description>
 		<year>200?</year>
 		<publisher>Sintax</publisher>
