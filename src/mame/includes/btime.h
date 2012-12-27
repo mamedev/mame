@@ -12,6 +12,7 @@ public:
 		m_rambase(*this, "rambase"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
+		m_paletteram(*this, "paletteram"),
 		m_bnj_backgroundram(*this, "bnj_bgram"),
 		m_zoar_scrollram(*this, "zoar_scrollram"),
 		m_lnc_charbank(*this, "lnc_charbank"),
@@ -24,7 +25,7 @@ public:
 	optional_shared_ptr<UINT8> m_rambase;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
-//  UINT8 *  m_paletteram;    // currently this uses generic palette handling
+	optional_shared_ptr<UINT8> m_paletteram;
 	optional_shared_ptr<UINT8> m_bnj_backgroundram;
 	optional_shared_ptr<UINT8> m_zoar_scrollram;
 	optional_shared_ptr<UINT8> m_lnc_charbank;

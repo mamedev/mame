@@ -139,6 +139,7 @@ VIDEO_START_MEMBER(btime_state,bnj)
 
 WRITE8_MEMBER(btime_state::btime_paletteram_w)
 {
+	m_paletteram[offset] = data;
 	/* RGB output is inverted */
 	paletteram_BBGGGRRR_byte_w(space, offset, ~data);
 }
