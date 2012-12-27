@@ -3503,8 +3503,8 @@ ROM_START( strider2 )
 	ROM_CONTINUE(           0x10000, 0x18000 )
 
 	ROM_REGION( 0x400000, "qsound", 0 ) /* Q Sound Samples */
-	ROM_LOAD16_WORD_SWAP( "hr2-01m.3a", 0x0000000, 0x400000, CRC(6a499efa) SHA1(f722efbdd154a223869112a9493cf7ae21359709) )
-	ROM_RELOAD(                         0x0200000, 0x200000 ) // 2nd half of hr2-01m.3a is ff, assume that highest pin is not connected (no music otherwise)
+	ROM_LOAD16_WORD_SWAP( "hr2-01m.3a", 0x0000000, 0x200000, CRC(510a16d1) SHA1(05f10c2921a4d3b1fab4d0a4ea06351809bdbb07) )
+	ROM_RELOAD(                         0x0200000, 0x200000 )
 ROM_END
 
 /* 97695-1 */
@@ -3527,8 +3527,8 @@ ROM_START( strider2a )
 	ROM_CONTINUE(           0x10000, 0x18000 )
 
 	ROM_REGION( 0x400000, "qsound", 0 ) /* Q Sound Samples */
-	ROM_LOAD16_WORD_SWAP( "hr2-01m.3a", 0x0000000, 0x400000, CRC(6a499efa) SHA1(f722efbdd154a223869112a9493cf7ae21359709) )
-	ROM_RELOAD(                         0x0200000, 0x200000 ) // 2nd half of hr2-01m.3a is ff, assume that highest pin is not connected (no music otherwise)
+	ROM_LOAD16_WORD_SWAP( "hr2-01m.3a", 0x0000000, 0x200000, CRC(510a16d1) SHA1(05f10c2921a4d3b1fab4d0a4ea06351809bdbb07) )
+	ROM_RELOAD(                         0x0200000, 0x200000 )
 ROM_END
 
 /* 97695-1 */
@@ -3551,8 +3551,8 @@ ROM_START( shiryu2 )
 	ROM_CONTINUE(           0x10000, 0x18000 )
 
 	ROM_REGION( 0x400000, "qsound", 0 ) /* Q Sound Samples */
-	ROM_LOAD16_WORD_SWAP( "hr2-01m.3a", 0x0000000, 0x400000, CRC(6a499efa) SHA1(f722efbdd154a223869112a9493cf7ae21359709) )
-	ROM_RELOAD(                         0x0200000, 0x200000 ) // 2nd half of hr2-01m.3a is ff, assume that highest pin is not connected (no music otherwise)
+	ROM_LOAD16_WORD_SWAP( "hr2-01m.3a", 0x0000000, 0x200000, CRC(510a16d1) SHA1(05f10c2921a4d3b1fab4d0a4ea06351809bdbb07) )
+	ROM_RELOAD(                         0x0200000, 0x200000 )
 ROM_END
 
 /* Tecmo */

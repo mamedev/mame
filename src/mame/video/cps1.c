@@ -158,8 +158,8 @@ Cadillacs: Kyouryuu Shin Seiki* (Japan 930201)                     91634B-?   CD
 
 The Punisher* (World 930422)                                 1993  91635B-2   PS63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 The Punisher* (USA 930422)                                         91635B-2   PS63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
+The Punisher* (Hispanic 930422)                                    91635B-2   PS63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 The Punisher* (Japan 930422)                                       91634B-2   PS63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
-The Punisher* (Hispanic 930422)                                    9163??-?   PS63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 
 Saturday Night Slam Masters* (World 930713)                  1993  91635B-2   MB63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
 Saturday Night Slam Masters* (USA 930713)                          91635B-2   MB63B    BPRG1   IOB1  92641C-1     CPS-B-21  DL-0921-10014          IOC1
@@ -181,6 +181,8 @@ Pang! 3: Kaitou Tachi no Karei na Gogo (Japan 950511)              94916-10   CP
 Mega Man: The Power Battle (CPS1, USA 951006)                1995  91635B-2   RCM63B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 Mega Man: The Power Battle (CPS1, Asia 951006)                     91634B-2   RCM63B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 Rockman: The Power Battle (CPS1, Japan 950922)                     91634B-2   RCM63B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
+
+Ganbare! Marine Kun (Japan 2K0411)                           2000  91634B-2   GBPR2    BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
 
 
 @the original number (CPS-B-01) was scratched out and "04" stamped over it.
@@ -1410,8 +1412,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"dinohunt",    CPS_B_21_DEF, mapper_CD63B },	/* Chinese bootleg */
 	{"punisher",    CPS_B_21_QS3, mapper_PS63B },
 	{"punisheru",   CPS_B_21_QS3, mapper_PS63B },
-	{"punisherj",   CPS_B_21_QS3, mapper_PS63B },
 	{"punisherh",   CPS_B_21_QS3, mapper_PS63B },
+	{"punisherj",   CPS_B_21_QS3, mapper_PS63B },
 	{"punipic",     CPS_B_21_QS3, mapper_PS63B },
 	{"punipic2",    CPS_B_21_QS3, mapper_PS63B },
 	{"punipic3",    CPS_B_21_QS3, mapper_PS63B },
@@ -1435,7 +1437,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"pang3r1",     CPS_B_21_DEF, mapper_pang3 },	/* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */	// should use one of these three CP1B1F,CP1B8K,CP1B9K
 	{"pang3j",      CPS_B_21_DEF, mapper_pang3 },	/* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */	// should use one of these three CP1B1F,CP1B8K,CP1B9K
 	{"pang3b",      CPS_B_21_DEF, mapper_pang3 },	/* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */	// should use one of these three CP1B1F,CP1B8K,CP1B9K
-	{"ganbare",     CPS_B_21_DEF, mapper_sfzch },	/* no dump of PAL, using sfzch for now */
+	{"ganbare",     CPS_B_21_DEF, mapper_sfzch },	// wrong, this set uses GBPR2, still not dumped
 
 	/* CPS Changer */
 
