@@ -5,12 +5,14 @@
     preliminary driver by Angelo Salese
 
     TODO:
-    - Z80PIO keyboard irqs doesn't work at all, kludged keyboard inputs to work for now
     - floppy support (but floppy images are unobtainable at current time)
     - cassette device;
     - beeper
     - LCD version has gfx bugs, it must use a different ROM charset for instance (apparently a 8 x 4
       one, 40/80 x 8 tilemap);
+
+    Reading fdc has been commented out, until the code can be modified to
+    work with new upd765 (was causing a hang at boot).
 
 ***************************************************************************************************/
 
@@ -113,30 +115,22 @@ public:
 	UINT32 screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void fdc_irq(bool state);
+	TIMER_CALLBACK_MEMBER(pio_timer);
 };
 
 #define VDP_CLOCK XTAL_3_579545MHz/4
 #define LCD_CLOCK VDP_CLOCK/10
 
+// needed to scan the keyboard, as the pio emulation doesn't do it.
+TIMER_CALLBACK_MEMBER(pasopia7_state::pio_timer)
+{
+	m_pio->port_b_write(keyb_r(generic_space(),0,0xff));
+}
+
 VIDEO_START_MEMBER(pasopia7_state,pasopia7)
 {
 	m_p7_pal = auto_alloc_array(machine(), UINT8, 0x10);
 }
-
-#define keyb_press(_val_,_charset_) \
-	if(machine.input().code_pressed(_val_)) \
-	{ \
-		ram_space->write_byte(0xfda4,0x01); \
-		ram_space->write_byte(0xfce1,_charset_); \
-	} \
-
-#define keyb_shift_press(_val_,_charset_) \
-	if(machine.input().code_pressed(_val_) && machine.input().code_pressed(KEYCODE_LSHIFT)) \
-	{ \
-		ram_space->write_byte(0xfda4,0x01); \
-		ram_space->write_byte(0xfce1,_charset_); \
-	} \
-
 
 static void draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
 {
@@ -618,9 +612,9 @@ READ8_MEMBER( pasopia7_state::pasopia7_io_r )
 //  else if(io_port == 0x3b)                    { SN2 }
 //  else if(io_port == 0x3c)                    { bankswitch }
 	else
-	if(io_port >= 0xe0 && io_port <= 0xe6)
-		return pasopia7_fdc_r(space, offset & 7);
-	else
+//	if(io_port >= 0xe0 && io_port <= 0xe6)
+//		return pasopia7_fdc_r(space, offset & 7);
+//	else
 	{
 		logerror("(PC=%06x) Read i/o address %02x\n",m_maincpu->pc(),io_port);
 	}
@@ -1108,16 +1102,18 @@ DRIVER_INIT_MEMBER(pasopia7_state,p7_raster)
 {
 
 	m_screen_type = 1;
+	machine().scheduler().timer_pulse(attotime::from_hz(500), timer_expired_delegate(FUNC(pasopia7_state::pio_timer),this));
 }
 
 DRIVER_INIT_MEMBER(pasopia7_state,p7_lcd)
 {
 
 	m_screen_type = 0;
+	machine().scheduler().timer_pulse(attotime::from_hz(500), timer_expired_delegate(FUNC(pasopia7_state::pio_timer),this));
 }
 
 
 /* Driver */
 
-COMP( 1983, pasopia7,    0,              0,       p7_raster,     pasopia7, pasopia7_state,   p7_raster,  "Toshiba", "Pasopia 7 (Raster)", GAME_NOT_WORKING )
-COMP( 1983, pasopia7lcd, pasopia7,       0,       p7_lcd,        pasopia7, pasopia7_state,   p7_lcd,     "Toshiba", "Pasopia 7 (LCD)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+COMP( 1983, pasopia7,    0,        0,       p7_raster,     pasopia7, pasopia7_state,   p7_raster,  "Toshiba", "Pasopia 7 (Raster)", GAME_NOT_WORKING )
+COMP( 1983, pasopia7lcd, pasopia7, 0,       p7_lcd,        pasopia7, pasopia7_state,   p7_lcd,     "Toshiba", "Pasopia 7 (LCD)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
