@@ -41,51 +41,51 @@ DIPs   : 8 position (x2)
 Typed from sheet supplied with PCB (* = Default)
 
 DIP SWA
-            1   2   3   4   5   6   7   8
+              1   2   3   4   5   6   7   8
 --------------------------------------------------------------------------------------
-Lives       1   OFF
-        2*  ON
+Lives     1   OFF
+          2*  ON
 
-Special     OFF     OFF
-Effect      ON*     ON
+Special  OFF      OFF
+Effect   ON*      ON
 
-Position 3-5    Not used        OFF OFF OFF
+Not used              OFF OFF OFF
 
-Difficulty  1                       OFF OFF ON
-        2                       ON  OFF ON
-        3                       OFF ON  ON
-        4*                      ON  ON  ON
-        5                       OFF OFF OFF
-        6                       ON  OFF OFF
-        7                       OFF ON  OFF
-        8                       ON  ON  OFF
+Difficulty 1                      OFF OFF ON
+           2                      ON  OFF ON
+           3                      OFF ON  ON
+           4*                     ON  ON  ON
+           5                      OFF OFF OFF
+           6                      ON  OFF OFF
+           7                      OFF ON  OFF
+           8                      ON  ON  OFF
 --------------------------------------------------------------------------------------
 
 
 DIP SWB
             1   2   3   4   5   6   7   8
 --------------------------------------------------------------------------------------
-Position 1    Not Used  OFF
+Not Used    OFF
 
-Freeplay    No*     OFF
-        Yes     ON
+Freeplay  No*   OFF
+         Yes    ON
 
-Position 3  Not Used        OFF
+Not Used            OFF
 
-Demo Sound  No              OFF
-        Yes*                ON
+Demo Sound  No          OFF
+           Yes*         ON
 
-Chute Type  Single*                 OFF
-        Multi                   ON
+Chute Type  Single*         OFF
+            Multi           ON
 
-Coin/Credit 1 Coin 1 Credit*                OFF OFF OFF
-        1 Coin 2 Credit                 ON  OFF OFF
-        1 Coin 3 Credit                 OFF ON  OFF
-        1 Coin 4 Credit                 ON  ON  OFF
-        2 Coin 1 Credit                 OFF OFF ON
-        3 Coin 1 Credit                 ON  OFF ON
-        4 Coin 1 Credit                 OFF ON  ON
-        5 Coin 1 Credit                 ON  ON  ON
+Coin/Credit 1 Coin 1 Credit*    OFF OFF OFF
+            1 Coin 2 Credit     ON  OFF OFF
+            1 Coin 3 Credit     OFF ON  OFF
+            1 Coin 4 Credit     ON  ON  OFF
+            2 Coin 1 Credit     OFF OFF ON
+            3 Coin 1 Credit     ON  OFF ON
+            4 Coin 1 Credit     OFF ON  ON
+            5 Coin 1 Credit     ON  ON  ON
 --------------------------------------------------------------------------------------
 
 ROMs:
@@ -207,22 +207,16 @@ static INPUT_PORTS_START( silkroad )
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x00010000, 0x00000000, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x00010000, 0x00000000, DEF_STR( Lives ) )	PORT_DIPLOCATION("SWA:1")
 	PORT_DIPSETTING(          0x00010000, "1" )
 	PORT_DIPSETTING(          0x00000000, "2" )
-	PORT_DIPNAME( 0x00020000, 0x00000000, "Special Effect" )
+	PORT_DIPNAME( 0x00020000, 0x00000000, "Special Effect" )	PORT_DIPLOCATION("SWA:2")
 	PORT_DIPSETTING(          0x00020000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00040000, 0x00040000, "Unused DIP A-2" )
-	PORT_DIPSETTING(          0x00040000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00080000, 0x00080000, "Unused DIP A-3" )
-	PORT_DIPSETTING(          0x00080000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00100000, 0x00100000, "Unused DIP A-4" )
-	PORT_DIPSETTING(          0x00100000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00e00000, 0x00000000, DEF_STR( Difficulty ) )
+	PORT_DIPUNUSED_DIPLOC( 0x00040000, IP_ACTIVE_LOW, "SWA:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x00080000, IP_ACTIVE_LOW, "SWA:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x00100000, IP_ACTIVE_LOW, "SWA:5" )
+	PORT_DIPNAME( 0x00e00000, 0x00000000, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SWA:6,7,8")
 	PORT_DIPSETTING(          0x00600000, DEF_STR( Easiest ) )			// "1"
 	PORT_DIPSETTING(          0x00400000, DEF_STR( Easier ) )			// "2"
 	PORT_DIPSETTING(          0x00200000, DEF_STR( Easy ) )				// "3"
@@ -231,22 +225,18 @@ static INPUT_PORTS_START( silkroad )
 	PORT_DIPSETTING(          0x00c00000, DEF_STR( Hard ) )				// "6"
 	PORT_DIPSETTING(          0x00a00000, DEF_STR( Harder ) )			// "7"
 	PORT_DIPSETTING(          0x00800000, DEF_STR( Hardest ) )			// "8"
-	PORT_DIPNAME( 0x01000000, 0x01000000, "Unused DIP B-0" )
-	PORT_DIPSETTING(          0x01000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02000000, 0x02000000, DEF_STR( Free_Play ) )
+	PORT_DIPUNUSED_DIPLOC( 0x01000000, IP_ACTIVE_LOW, "SWB:1" )
+	PORT_DIPNAME( 0x02000000, 0x02000000, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SWB:2")
 	PORT_DIPSETTING(          0x02000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04000000, 0x04000000, "Unused DIP B-2" )
-	PORT_DIPSETTING(          0x04000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08000000, 0x00000000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04000000, IP_ACTIVE_LOW, "SWB:3" )
+	PORT_DIPNAME( 0x08000000, 0x00000000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SWB:4")
 	PORT_DIPSETTING(          0x08000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10000000, 0x10000000, "Chute Type" )				// "Coin Box"
-	PORT_DIPSETTING(          0x10000000, DEF_STR( Single ) )			// "1"
-	PORT_DIPSETTING(          0x00000000, "Multi" )						// "2"
-	PORT_DIPNAME( 0xe0000000, 0xe0000000, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x10000000, 0x10000000, "Chute Type" )		PORT_DIPLOCATION("SWB:5")	// "Coin Box"
+	PORT_DIPSETTING(          0x10000000, DEF_STR( Single ) )					// "1"
+	PORT_DIPSETTING(          0x00000000, "Multi" )							// "2"
+	PORT_DIPNAME( 0xe0000000, 0xe0000000, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SWB:6,7,8")
 	PORT_DIPSETTING(          0x00000000, DEF_STR(5C_1C))
 	PORT_DIPSETTING(          0x20000000, DEF_STR(4C_1C))
 	PORT_DIPSETTING(          0x40000000, DEF_STR(3C_1C))
@@ -281,7 +271,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( silkroad, silkroad_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", silkroad_state,  irq4_line_hold)
 
@@ -300,7 +290,7 @@ static MACHINE_CONFIG_START( silkroad, silkroad_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 3579545)
+	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -353,11 +343,12 @@ ROM_START( silkroad )
 	/* Sprites */
 	ROM_LOAD( "rom12.bin",	0x0000000, 0x0200000, CRC(96393d04) SHA1(f512bb8603510d39e649f4ec1c5e2d0e4bf3a2cc) ) // 0
 	ROM_LOAD( "rom08.bin",	0x0800000, 0x0200000, CRC(23f1d462) SHA1(6ca8052b16ccc1fe59716e03f66bd33af5145b37) ) // 0
-	ROM_LOAD( "rom04.bin",	0x1000000, 0x0200000, BAD_DUMP CRC(2cf6ed30) SHA1(e96585cd109debc45960090d73b15db87e91ce0f) ) // 0, check DRIVER_INIT, definitely needs re-checking
+	ROM_LOAD( "rom04.bin",	0x1000000, 0x0200000, CRC(2cf6ed30) SHA1(e96585cd109debc45960090d73b15db87e91ce0f) ) // 0, See DRIVER_INIT
 
 	ROM_LOAD( "rom13.bin",	0x0200000, 0x0200000, CRC(4ca1698e) SHA1(4fffc2f2a5fb434c42463ce904fd811866c53f81) ) // 1
 	ROM_LOAD( "rom09.bin",	0x0a00000, 0x0200000, CRC(ef0b5bf4) SHA1(acd3bc5070de84608c5da0d091094382853cb048) ) // 1
 	ROM_LOAD( "rom05.bin",	0x1200000, 0x0200000, CRC(512d6e25) SHA1(fc0a56663d77bbdfbd4242e14a55563073634582) ) // 1
+
 	ROM_LOAD( "rom14.bin",	0x0400000, 0x0200000, CRC(d00b19c4) SHA1(d5b955dca5d0d251166a7f35a0bbbda6a91ecbd0) ) // 2
 	ROM_LOAD( "rom10.bin",	0x0c00000, 0x0200000, CRC(7d324280) SHA1(cdf6d9342292f693cc5ec1b72816f2788963fcec) ) // 2
 	ROM_LOAD( "rom06.bin",	0x1400000, 0x0200000, CRC(3ac26060) SHA1(98ad8efbbf8020daf7469db3e0fda02af6c4c767) ) // 2
