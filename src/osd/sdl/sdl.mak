@@ -450,7 +450,28 @@ else   # ifeq ($(TARGETOS),macosx)
 DEFS += -DSDLMAME_UNIX
 
 ifdef USE_QTDEBUG
-MOC = @moc-qt4
+MOCTST = $(shell which moc-qt4 2>/dev/null)
+ifeq '$(MOCTST)' ''
+MOCTST = $(shell which moc 2>/dev/null)
+ifeq '$(MOCTST)' ''
+$(error Qt's Meta Object Compiler (moc) wasn't found!)
+else
+MOC = @$(MOCTST)
+endif
+else
+MOC = @$(MOCTST)
+endif
+# Qt on Linux/UNIX
+QMAKE = $(shell which qmake-qt4 2>/dev/null)
+ifeq '$(QMAKE)' ''
+QMAKE = $(shell which qmake 2>/dev/null)
+ifeq '$(QMAKE)' ''
+$(error qmake wasn't found!)
+endif
+endif
+QT_INSTALL_HEADERS = $(shell $(QMAKE) -query QT_INSTALL_HEADERS)
+INCPATH += -I$(QT_INSTALL_HEADERS)/QtCore -I$(QT_INSTALL_HEADERS)/QtGui -I$(QT_INSTALL_HEADERS)
+LIBS += -L$(shell $(QMAKE) -query QT_INSTALL_LIBS) -lQtGui -lQtCore
 else
 DEBUGOBJS = $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
 endif
