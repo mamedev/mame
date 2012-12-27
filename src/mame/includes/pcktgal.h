@@ -14,9 +14,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pcktgal_adpcm_data_w);
 	DECLARE_READ8_MEMBER(pcktgal_adpcm_reset_r);
 	DECLARE_DRIVER_INIT(pcktgal);
-	DECLARE_DRIVER_INIT(deco222);
-	DECLARE_DRIVER_INIT(graphics);
 	virtual void palette_init();
+	virtual void machine_start();
 	UINT32 screen_update_pcktgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_pcktgalb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

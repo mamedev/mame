@@ -19,6 +19,7 @@
 #include "sound/msm5205.h"
 #include "includes/pcktgal.h"
 #include "video/decbac06.h"
+#include "machine/deco222.h"
 
 /***************************************************************************/
 
@@ -217,6 +218,12 @@ static const msm5205_interface msm5205_config =
 
 /***************************************************************************/
 
+
+void pcktgal_state::machine_start()
+{
+	machine().root_device().membank("bank3")->configure_entries(0, 2, machine().root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
+}
+
 static MACHINE_CONFIG_START( pcktgal, pcktgal_state )
 
 	/* basic machine hardware */
@@ -224,7 +231,7 @@ static MACHINE_CONFIG_START( pcktgal, pcktgal_state )
 	MCFG_CPU_PROGRAM_MAP(pcktgal_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pcktgal_state,  nmi_line_pulse)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
+	MCFG_CPU_ADD("audiocpu", DECO_222, 1500000)
 	MCFG_CPU_PROGRAM_MAP(pcktgal_sound_map)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
@@ -263,6 +270,12 @@ static MACHINE_CONFIG_DERIVED( bootleg, pcktgal )
 	MCFG_GFXDECODE(bootleg)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pcktgal_state, screen_update_pcktgalb)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( pcktgal2, pcktgal )
+	MCFG_DEVICE_REMOVE("audiocpu")
+	MCFG_CPU_ADD("audiocpu", M6502, 1500000) /* doesn't use the encrypted 222 */
+	MCFG_CPU_PROGRAM_MAP(pcktgal_sound_map)
 MACHINE_CONFIG_END
 
 /***************************************************************************/
@@ -408,30 +421,13 @@ ROM_END
 
 /***************************************************************************/
 
-DRIVER_INIT_MEMBER(pcktgal_state,deco222)
-{
-	int A;
-	address_space &space = machine().device("audiocpu")->memory().space(AS_PROGRAM);
-	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
-	UINT8 *rom = machine().root_device().memregion("audiocpu")->base();
 
-	space.set_decrypted_region(0x8000, 0xffff, decrypted);
 
-	/* bits 5 and 6 of the opcodes are swapped */
-	for (A = 0x8000;A < 0x18000;A++)
-		decrypted[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x20) << 1) | ((rom[A] & 0x40) >> 1);
-
-	machine().root_device().membank("bank3")->configure_entries(0, 2, machine().root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
-	machine().root_device().membank("bank3")->configure_decrypted_entries(0, 2, &decrypted[0x8000], 0x4000);
-}
-
-DRIVER_INIT_MEMBER(pcktgal_state,graphics)
+DRIVER_INIT_MEMBER(pcktgal_state,pcktgal)
 {
 	UINT8 *rom = machine().root_device().memregion("gfx1")->base();
 	int len = machine().root_device().memregion("gfx1")->bytes();
 	int i,j,temp[16];
-
-	machine().root_device().membank("bank3")->configure_entries(0, 2, machine().root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
 
 	/* Tile graphics roms have some swapped lines, original version only */
 	for (i = 0x00000;i < len;i += 32)
@@ -445,17 +441,13 @@ DRIVER_INIT_MEMBER(pcktgal_state,graphics)
 	}
 }
 
-DRIVER_INIT_MEMBER(pcktgal_state,pcktgal)
-{
-	DRIVER_INIT_CALL(deco222);
-	DRIVER_INIT_CALL(graphics);
-}
+
 
 /***************************************************************************/
 
 GAME( 1987, pcktgal,  0,       pcktgal, pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation", "Pocket Gal (Japan)", 0 )
-GAME( 1987, pcktgalb, pcktgal, bootleg, pcktgal, pcktgal_state, deco222,  ROT0, "bootleg", "Pocket Gal (bootleg)", 0 )
-GAME( 1989, pcktgal2, pcktgal, pcktgal, pcktgal, pcktgal_state, graphics, ROT0, "Data East Corporation", "Pocket Gal 2 (English)", 0 )
-GAME( 1989, pcktgal2j,pcktgal, pcktgal, pcktgal, pcktgal_state, graphics, ROT0, "Data East Corporation", "Pocket Gal 2 (Japanese)", 0 )
-GAME( 1989, spool3,   pcktgal, pcktgal, pcktgal, pcktgal_state, graphics, ROT0, "Data East Corporation", "Super Pool III (English)", 0 )
-GAME( 1990, spool3i,  pcktgal, pcktgal, pcktgal, pcktgal_state, graphics, ROT0, "Data East Corporation (I-Vics license)", "Super Pool III (I-Vics)", 0 )
+GAME( 1987, pcktgalb, pcktgal, bootleg, pcktgal, driver_device, 0,        ROT0, "bootleg", "Pocket Gal (bootleg)", 0 )
+GAME( 1989, pcktgal2, pcktgal, pcktgal2,pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation", "Pocket Gal 2 (English)", 0 )
+GAME( 1989, pcktgal2j,pcktgal, pcktgal2,pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation", "Pocket Gal 2 (Japanese)", 0 )
+GAME( 1989, spool3,   pcktgal, pcktgal2,pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation", "Super Pool III (English)", 0 )
+GAME( 1990, spool3i,  pcktgal, pcktgal2,pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation (I-Vics license)", "Super Pool III (I-Vics)", 0 )
