@@ -1499,6 +1499,9 @@ static MACHINE_CONFIG_DERIVED( sdtennis, btime )
 	MCFG_CPU_CLOCK(HCLK4)
 	MCFG_CPU_PROGRAM_MAP(bnj_map)
 
+	MCFG_CPU_REPLACE("audiocpu", DECO_C10707, HCLK1/3/2)
+	MCFG_CPU_PROGRAM_MAP(audio_map)
+
 	/* video hardware */
 	MCFG_GFXDECODE(bnj)
 	MCFG_PALETTE_LENGTH(16)
