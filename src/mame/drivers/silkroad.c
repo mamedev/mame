@@ -313,8 +313,8 @@ DRIVER_INIT_MEMBER(silkroad_state,silkroad)
 {
 
 	/* why? rom04.bin looks like a bad dump, but it seems not since it was
-       verified as correct... problem with the original which the gfx
-       hardware didn't care about? */
+       verified as correct... problem with the original which the gfx hardware
+       didn't care about? Ideally it should be checked against a different PCB */
 
 	UINT8 *src = machine().root_device().memregion("gfx1")->base()+0x1000000;
 	int len = 0x0200000;
@@ -343,7 +343,7 @@ ROM_START( silkroad )
 	/* Sprites */
 	ROM_LOAD( "rom12.bin",	0x0000000, 0x0200000, CRC(96393d04) SHA1(f512bb8603510d39e649f4ec1c5e2d0e4bf3a2cc) ) // 0
 	ROM_LOAD( "rom08.bin",	0x0800000, 0x0200000, CRC(23f1d462) SHA1(6ca8052b16ccc1fe59716e03f66bd33af5145b37) ) // 0
-	ROM_LOAD( "rom04.bin",	0x1000000, 0x0200000, CRC(2cf6ed30) SHA1(e96585cd109debc45960090d73b15db87e91ce0f) ) // 0, See DRIVER_INIT
+	ROM_LOAD( "rom04.bin",	0x1000000, 0x0200000, BAD_DUMP CRC(2cf6ed30) SHA1(e96585cd109debc45960090d73b15db87e91ce0f) ) // 0, See DRIVER_INIT
 
 	ROM_LOAD( "rom13.bin",	0x0200000, 0x0200000, CRC(4ca1698e) SHA1(4fffc2f2a5fb434c42463ce904fd811866c53f81) ) // 1
 	ROM_LOAD( "rom09.bin",	0x0a00000, 0x0200000, CRC(ef0b5bf4) SHA1(acd3bc5070de84608c5da0d091094382853cb048) ) // 1
