@@ -19,6 +19,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "includes/liberate.h"
+#include "machine/deco222.h"
 
 /*************************************
  *
@@ -825,7 +826,7 @@ static MACHINE_CONFIG_START( liberate, liberate_state )
 	MCFG_CPU_IO_MAP(deco16_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
 
-	MCFG_CPU_ADD("audiocpu",M6502, 1500000)
+	MCFG_CPU_ADD("audiocpu",DECO_222, 1500000) /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
 	MCFG_CPU_PROGRAM_MAP(liberate_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
 
@@ -904,7 +905,7 @@ static MACHINE_CONFIG_START( prosport, liberate_state )
 	MCFG_CPU_IO_MAP(deco16_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000/2)
+	MCFG_CPU_ADD("audiocpu", DECO_222, 1500000/2) /* is it a real 222 (M6502 with bitswapped opcodes), or the same thing in external logic? */
 	MCFG_CPU_PROGRAM_MAP(liberate_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(liberate_state, nmi_line_pulse, 16*60) /* ??? */
 
@@ -1344,20 +1345,6 @@ ROM_END
  *
  *************************************/
 
-static void sound_cpu_decrypt(running_machine &machine)
-{
-	address_space &space = machine.device("audiocpu")->memory().space(AS_PROGRAM);
-	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
-	UINT8 *rom = machine.root_device().memregion("audiocpu")->base();
-	int i;
-
-	/* Bit swapping on sound cpu - Opcodes only */
-	for (i = 0xc000; i < 0x10000; i++)
-		decrypted[i - 0xc000] = ((rom[i] & 0x20) << 1) | ((rom[i] & 0x40) >> 1) | (rom[i] & 0x9f);
-
-	space.set_decrypted_region(0xc000, 0xffff, decrypted);
-}
-
 DRIVER_INIT_MEMBER(liberate_state,prosport)
 {
 	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
@@ -1367,7 +1354,6 @@ DRIVER_INIT_MEMBER(liberate_state,prosport)
 	for (i = 0; i < 0x10000; i++)
 		RAM[i] = ((RAM[i] & 0x0f) << 4) | ((RAM[i] & 0xf0) >> 4);
 
-	sound_cpu_decrypt(machine());
 }
 
 DRIVER_INIT_MEMBER(liberate_state,yellowcb)
@@ -1394,8 +1380,6 @@ DRIVER_INIT_MEMBER(liberate_state,liberate)
 	}
 
 	machine().root_device().membank("bank1")->configure_decrypted_entry(0, decrypted + 0x8000);
-
-	sound_cpu_decrypt(machine());
 }
 
 /*************************************
