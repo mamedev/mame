@@ -4,7 +4,7 @@
 #
 #   SDL-specific makefile
 #
-#   Copyright (c) 1996-2010, Nicola Salmoria and the MAME Team.
+#   Copyright (c) 1996-2013, Nicola Salmoria and the MAME Team.
 #   Visit http://mamedev.org for licensing and usage restrictions.
 #
 #   SDLMAME by Olivier Galibert and R. Belmont
@@ -76,7 +76,7 @@ USE_DISPATCH_GL = 1
 # (currently defaults disabled due to causing issues with mouse capture, esp. in MESS)
 NO_USE_XINPUT = 1
 
-# uncomment to try the experimental new Qt debugger (Linux only for now)
+# uncomment to try the experimental new Qt debugger
 #USE_QTDEBUG = 1
 
 ###########################################################################
@@ -305,7 +305,16 @@ QT_INSTALL_HEADERS = $(shell qmake -query QT_INSTALL_HEADERS)
 INCPATH += -I$(QT_INSTALL_HEADERS)/QtCore -I$(QT_INSTALL_HEADERS)/QtGui -I$(QT_INSTALL_HEADERS)
 LIBS += -L$(shell qmake -query QT_INSTALL_LIBS) -lqtmain -lQtGui4 -lQtCore4 -lcomdlg32 -loleaut32 -limm32 -lwinspool -lmsimg32 -lole32 -luuid -lws2_32 -lshell32 -lkernel32 -mwindows
 endif
+endif
 
+ifeq ($(TARGETOS),macosx)
+ifdef USE_QTDEBUG
+MOC = @moc
+
+QT_INSTALL_LIBS = $(shell qmake -query QT_INSTALL_LIBS)
+INCPATH += -I$(QT_INSTALL_LIBS)/QtGui.framework/Versions/4/Headers -I$(QT_INSTALL_LIBS)/QtCore.framework/Versions/4/Headers -F$(QT_INSTALL_LIBS)
+LIBS += -L$(QT_INSTALL_LIBS) -F$(QT_INSTALL_LIBS) -framework QtCore -framework QtGui
+endif
 endif
 
 ifeq ($(TARGETOS),os2)
@@ -420,28 +429,6 @@ ifeq ($(TARGETOS),macosx)
 OSDCOREOBJS += $(SDLOBJ)/osxutils.o
 SDLOS_TARGETOS = macosx
 
-ifdef USE_QTDEBUG
-MOC = @moc
-$(SDLOBJ)/%.moc.c: $(SDLSRC)/%.h
-	$(MOC) $(MOCINCPATH) $(DEFS) $< -o $@
-
-DEBUGOBJS = \
-	$(SDLOBJ)/debugqt.o \
-	$(SDLOBJ)/debugqtview.o \
-	$(SDLOBJ)/debugqtwindow.o \
-	$(SDLOBJ)/debugqtlogwindow.o \
-	$(SDLOBJ)/debugqtdasmwindow.o \
-	$(SDLOBJ)/debugqtmainwindow.o \
-	$(SDLOBJ)/debugqtmemorywindow.o \
-	$(SDLOBJ)/debugqtwindow.moc.o \
-	$(SDLOBJ)/debugqtlogwindow.moc.o \
-	$(SDLOBJ)/debugqtdasmwindow.moc.o \
-	$(SDLOBJ)/debugqtmainwindow.moc.o \
-	$(SDLOBJ)/debugqtmemorywindow.moc.o
-
-LIBS += -framework QtCore -framework QtGui
-endif
-
 ifndef MACOSX_USE_LIBSDL
 # Compile using framework (compile using libSDL is the exception)
 LIBS += -framework SDL -framework Cocoa -framework OpenGL -lpthread
@@ -464,22 +451,6 @@ DEFS += -DSDLMAME_UNIX
 
 ifdef USE_QTDEBUG
 MOC = @moc-qt4
-$(SDLOBJ)/%.moc.c: $(SDLSRC)/%.h
-	$(MOC) $(MOCINCPATH) $(DEFS) $< -o $@
-
-DEBUGOBJS = \
-	$(SDLOBJ)/debugqt.o \
-	$(SDLOBJ)/debugqtview.o \
-	$(SDLOBJ)/debugqtwindow.o \
-	$(SDLOBJ)/debugqtlogwindow.o \
-	$(SDLOBJ)/debugqtdasmwindow.o \
-	$(SDLOBJ)/debugqtmainwindow.o \
-	$(SDLOBJ)/debugqtmemorywindow.o \
-	$(SDLOBJ)/debugqtwindow.moc.o \
-	$(SDLOBJ)/debugqtlogwindow.moc.o \
-	$(SDLOBJ)/debugqtdasmwindow.moc.o \
-	$(SDLOBJ)/debugqtmainwindow.moc.o \
-	$(SDLOBJ)/debugqtmemorywindow.moc.o
 else
 DEBUGOBJS = $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
 endif
@@ -573,22 +544,6 @@ endif
 
 ifdef USE_QTDEBUG
 MOC = @moc
-$(SDLOBJ)/%.moc.c: $(SDLSRC)/%.h
-	$(MOC) $(MOCINCPATH) $(DEFS) $< -o $@
-
-DEBUGOBJS = \
-	$(SDLOBJ)/debugqt.o \
-	$(SDLOBJ)/debugqtview.o \
-	$(SDLOBJ)/debugqtwindow.o \
-	$(SDLOBJ)/debugqtlogwindow.o \
-	$(SDLOBJ)/debugqtdasmwindow.o \
-	$(SDLOBJ)/debugqtmainwindow.o \
-	$(SDLOBJ)/debugqtmemorywindow.o \
-	$(SDLOBJ)/debugqtwindow.moc.o \
-	$(SDLOBJ)/debugqtlogwindow.moc.o \
-	$(SDLOBJ)/debugqtdasmwindow.moc.o \
-	$(SDLOBJ)/debugqtmainwindow.moc.o \
-	$(SDLOBJ)/debugqtmemorywindow.moc.o
 endif
 
 LIBS += -lSDL.dll
@@ -610,6 +565,25 @@ endif # OS2
 #-------------------------------------------------
 # Debugging
 #-------------------------------------------------
+
+ifdef USE_QTDEBUG
+$(SDLOBJ)/%.moc.c: $(SDLSRC)/%.h
+	$(MOC) $(MOCINCPATH) $(DEFS) $< -o $@
+
+DEBUGOBJS = \
+	$(SDLOBJ)/debugqt.o \
+	$(SDLOBJ)/debugqtview.o \
+	$(SDLOBJ)/debugqtwindow.o \
+	$(SDLOBJ)/debugqtlogwindow.o \
+	$(SDLOBJ)/debugqtdasmwindow.o \
+	$(SDLOBJ)/debugqtmainwindow.o \
+	$(SDLOBJ)/debugqtmemorywindow.o \
+	$(SDLOBJ)/debugqtwindow.moc.o \
+	$(SDLOBJ)/debugqtlogwindow.moc.o \
+	$(SDLOBJ)/debugqtdasmwindow.moc.o \
+	$(SDLOBJ)/debugqtmainwindow.moc.o \
+	$(SDLOBJ)/debugqtmemorywindow.moc.o
+endif
 
 ifeq ($(NO_DEBUGGER),1)
 DEFS += -DNO_DEBUGGER

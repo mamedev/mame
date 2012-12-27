@@ -26,8 +26,8 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 {
     // Tell the MAME debug view how much real estate is available
     QFontMetrics actualFont = fontMetrics();
-    const int fontWidth = actualFont.maxWidth();
-    const int fontHeight = actualFont.height();
+    const int fontWidth = MAX(1, actualFont.maxWidth());
+    const int fontHeight = MAX(1, actualFont.height());
     m_view->set_visible_size(debug_view_xy(width()/fontWidth, height()/fontHeight));
 
 
