@@ -605,4 +605,4 @@ GAME( 1980, spacefbg, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nin
 GAME( 1980, spacebrd, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg (Karateco)", "Space Bird (bootleg)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
 GAME( 1980, spacefbb, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg", "Space Firebird (bootleg)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
 GAME( 1980, spacedem, spacefb, spacefb, spacedem, driver_device, 0, ROT270, "Nintendo (Fortrek license)", "Space Demon", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1980, starwarr, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "Nintendo (Potomac Mortgage)", "Star Warrior", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1980, starwarr, spacefb, spacefb, spacefb, driver_device,  0, ROT270, "bootleg? (Potomac Mortgage)", "Star Warrior", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND )

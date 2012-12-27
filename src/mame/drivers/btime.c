@@ -1239,7 +1239,6 @@ DISCRETE_SOUND_END
 
 MACHINE_START_MEMBER(btime_state,btime)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -1253,7 +1252,6 @@ MACHINE_START_MEMBER(btime_state,btime)
 
 MACHINE_START_MEMBER(btime_state,mmonkey)
 {
-
 	MACHINE_START_CALL_MEMBER(btime);
 
 	save_item(NAME(m_protection_command));
@@ -1264,7 +1262,6 @@ MACHINE_START_MEMBER(btime_state,mmonkey)
 
 MACHINE_RESET_MEMBER(btime_state,btime)
 {
-
 	/* by default, the audio NMI is disabled, except for bootlegs which don't use the enable */
 	m_audio_nmi_enabled = (m_audio_nmi_enable_type == AUDIO_ENABLE_NONE);
 
@@ -1287,7 +1284,6 @@ MACHINE_RESET_MEMBER(btime_state,lnc)
 
 MACHINE_RESET_MEMBER(btime_state,mmonkey)
 {
-
 	MACHINE_RESET_CALL_MEMBER(lnc);
 
 	m_protection_command = 0;
@@ -1747,7 +1743,43 @@ ROM_START( brubber )
 	ROM_LOAD( "bnj10f.bin",   0x1000, 0x1000, CRC(a9ffacb4) SHA1(49d5f9c0b695f474197fbb761bacc065b6b5808a) )
 ROM_END
 
+
+/*
+    Bump 'n Jump (Data East USA)
+
+    Sound Board: 
+        CIS-1
+        DATA EAST-0136
+
+    Video Board:
+        DSP-12
+        DE-0135-2
+*/
+
 ROM_START( bnj )
+ 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ad08.12b",     0xa000, 0x2000, CRC(8d649bd5) SHA1(83105718c2d18ef75ca18ae92b34545cb939bc02) )
+	ROM_LOAD( "ad07.12c",     0xc000, 0x2000, CRC(7a27f5f4) SHA1(f62d752bb7a995e120ed4d642793c543f0ef13ca) )
+	ROM_LOAD( "ad06.12d",     0xe000, 0x2000, CRC(f855a2d2) SHA1(f231ed008537aeeeacbec64f485e9a96ab3441e1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "ad05.6c",      0xe000, 0x1000, CRC(8c02f662) SHA1(1279d564e65fd3ccac25b1f9fbb40d910de2b544) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "ad00.4e",      0x0000, 0x2000, CRC(b864d082) SHA1(cacf71fa6c0f7121d077381a0ff6222f534295ab) )
+	ROM_LOAD( "ad01.4f",      0x2000, 0x2000, CRC(6c31d77a) SHA1(5e52554f594f569527af4768d244cc40a7b4460a) )
+	ROM_LOAD( "ad02.4h",      0x4000, 0x2000, CRC(5824e6fb) SHA1(e98f0eb476b8f033f5cc70a6e503afc4e651fd45) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "ad03.10e",     0x0000, 0x1000, CRC(f4e9eb49) SHA1(b356512d2ebd4e2005e76496b434e5ecebadb251) )
+	ROM_LOAD( "ad04.10f",     0x1000, 0x1000, CRC(a9ffacb4) SHA1(49d5f9c0b695f474197fbb761bacc065b6b5808a) )
+
+	ROM_REGION( 0x002d, "plds", 0 )
+	ROM_LOAD( "pb-5.10k.bin", 0x0000, 0x002c, CRC(dc72a65f) SHA1(d61c149d4df93a2074debf7c5e46557c6b06d10d) ) /* PAL10L8 */
+	ROM_LOAD( "pb-4.2d.bin",  0x002c, 0x0001, NO_DUMP ) /* PAL16R4CN - same as Car Action? */
+ROM_END
+
+ROM_START( bnjm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bnj12b.bin",   0xa000, 0x2000, CRC(ba3e3801) SHA1(56284076d938c33c1492a07281b936681eb09808) )
 	ROM_LOAD( "bnj12c.bin",   0xc000, 0x2000, CRC(fb3a2cdd) SHA1(4a964389cc8035b9264d4cb133eb6d3826e74b95) )
@@ -1978,7 +2010,8 @@ GAME( 1982, protennb, 0,       disco,    disco, btime_state,    protennb, ROT270
 GAME( 1982, wtennis,  0,       wtennis,  wtennis, btime_state,  wtennis,  ROT270, "bootleg", "World Tennis", GAME_SUPPORTS_SAVE )
 GAME( 1982, mmonkey,  0,       mmonkey,  mmonkey, btime_state,  lnc,      ROT270, "Technos Japan / Roller Tron", "Minky Monkey", GAME_SUPPORTS_SAVE )
 GAME( 1982, brubber,  0,       bnj,      bnj, btime_state,      bnj,      ROT270, "Data East", "Burnin' Rubber", GAME_SUPPORTS_SAVE )
-GAME( 1982, bnj,      brubber, bnj,      bnj, btime_state,      bnj,      ROT270, "Data East USA (Bally Midway license)", "Bump 'n' Jump", GAME_SUPPORTS_SAVE )
+GAME( 1982, bnj,      brubber, bnj,      bnj, btime_state,      bnj,      ROT270, "Data East USA", "Bump 'n' Jump", GAME_SUPPORTS_SAVE )
+GAME( 1982, bnjm,     brubber, bnj,      bnj, btime_state,      bnj,      ROT270, "Data East USA (Bally Midway license)", "Bump 'n' Jump (Midway)", GAME_SUPPORTS_SAVE )
 GAME( 1982, caractn,  brubber, bnj,      bnj, btime_state,      bnj,      ROT270, "bootleg", "Car Action", GAME_SUPPORTS_SAVE )
 GAME( 1982, zoar,     0,       zoar,     zoar, btime_state,     zoar,     ROT270, "Data East USA", "Zoar", GAME_SUPPORTS_SAVE )
 GAME( 1982, disco,    0,       disco,    disco, btime_state,    disco,    ROT270, "Data East", "Disco No.1", GAME_SUPPORTS_SAVE )
