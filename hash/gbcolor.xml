@@ -22237,7 +22237,7 @@ Undumped Pirates:
 			<!-- cartridge ram -->
 			<feature name="battery_backed" value="yes" />
 			<dataarea name="rom" size="2097152">
-				<rom name="tai kong bao bei (chi)(unl) [raw dump].bin" size="2097152" crc="f2d0f0ae" sha1="7c50486fb8718ea5526e6ca5b66b431e4871b505" offset="000000" />
+				<rom name="tai kong bao bei (chi)(unl) [raw dump].bin" size="2097152" crc="f2d0f0ae" sha1="bb2f4b475b6a7f355913267f02722f3b15bd0858" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
