@@ -44,7 +44,6 @@ public:
 	optional_device<sn76489_device> m_sn_1;
 	optional_device<sn76489_device> m_sn_2;
 	DECLARE_WRITE8_MEMBER(sound_command_w);
-	DECLARE_WRITE8_MEMBER(pinbo_sound_command_w);
 	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(sound_select_w);
 	DECLARE_WRITE8_MEMBER(lasso_videoram_w);

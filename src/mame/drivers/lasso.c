@@ -48,12 +48,6 @@ INPUT_CHANGED_MEMBER(lasso_state::coin_inserted)
 WRITE8_MEMBER(lasso_state::sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
-	generic_pulse_irq_line(*m_audiocpu, 0, 1);
-}
-
-WRITE8_MEMBER(lasso_state::pinbo_sound_command_w)
-{
-	soundlatch_byte_w(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -176,7 +170,7 @@ static ADDRESS_MAP_START( pinbo_main_map, AS_PROGRAM, 8, lasso_state )
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(lasso_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(pinbo_sound_command_w)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
 	AM_RANGE(0x1801, 0x1801) AM_WRITEONLY AM_SHARE("back_color")
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(pinbo_video_control_w)
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")
