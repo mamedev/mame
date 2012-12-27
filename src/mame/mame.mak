@@ -629,6 +629,7 @@ $(MAMEOBJ)/dataeast.a: \
 	$(DRIVERS)/dec0.o $(MACHINE)/dec0.o $(VIDEO)/dec0.o \
 	$(DRIVERS)/dec8.o $(VIDEO)/dec8.o \
 	$(MACHINE)/deco222.o \
+	$(MACHINE)/decocpu7.o \
 	$(DRIVERS)/deco_ld.o \
 	$(DRIVERS)/deco_mlc.o $(VIDEO)/deco_mlc.o \
 	$(DRIVERS)/deco156.o $(MACHINE)/deco156.o \

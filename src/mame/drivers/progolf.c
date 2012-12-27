@@ -54,7 +54,7 @@ Twenty four 8116 rams.
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
-
+#include "machine/deco222.h"
 
 class progolf_state : public driver_device
 {
@@ -422,7 +422,7 @@ void progolf_state::palette_init()
 
 static MACHINE_CONFIG_START( progolf, progolf_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
+	MCFG_CPU_ADD("maincpu", DECO_222, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MCFG_CPU_PROGRAM_MAP(main_cpu)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", progolf_state,  progolf_interrupt)
 
@@ -452,6 +452,13 @@ static MACHINE_CONFIG_START( progolf, progolf_state )
 
 	MCFG_SOUND_ADD("ay2", AY8910, 12000000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( progolfa, progolf )
+	MCFG_DEVICE_REMOVE("maincpu") /* different encrypted cpu to progolf */
+	MCFG_CPU_ADD("maincpu", M6502, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
+	MCFG_CPU_PROGRAM_MAP(main_cpu)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", progolf_state,  progolf_interrupt)
 MACHINE_CONFIG_END
 
 
@@ -500,19 +507,6 @@ ROM_START( progolfa )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(progolf_state,progolf)
-{
-	int A;
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
-	UINT8* decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
-
-	space.set_decrypted_region(0x0000,0xffff, decrypted);
-
-	/* Swap bits 5 & 6 for opcodes */
-	for (A = 0xb000 ; A < 0x10000 ; A++)
-		decrypted[A] = BITSWAP8(rom[A],7,5,6,4,3,2,1,0);
-}
 
 DRIVER_INIT_MEMBER(progolf_state,progolfa)
 {
@@ -533,6 +527,7 @@ DRIVER_INIT_MEMBER(progolf_state,progolfa)
 	}
 }
 
-/* Maybe progolf is a bootleg? progolfa uses DECO CPU-6 as custom module CPU (the same as Zoar) */
-GAME( 1981, progolf,  0,       progolf, progolf, progolf_state, progolf,  ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
-GAME( 1981, progolfa, progolf, progolf, progolf, progolf_state, progolfa, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+// this uses DECO222 style encryption
+GAME( 1981, progolf,  0,       progolf, progolf, driver_device, 0,       ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
+// this uses DECO CPU-6 as custom module CPU (the same as Zoar, are we sure? our Zoar has different encryption, CPU-6 style)
+GAME( 1981, progolfa, progolf, progolfa,progolf, progolf_state, progolfa, ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )

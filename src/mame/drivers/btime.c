@@ -142,6 +142,8 @@ A few notes:
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
 #include "includes/btime.h"
+#include "machine/decocpu7.h"
+#include "machine/deco222.h"
 
 #define MASTER_CLOCK      XTAL_12MHz
 #define HCLK             (MASTER_CLOCK/2)
@@ -156,103 +158,6 @@ enum
 	AUDIO_ENABLE_AY8910			/* via ay-8910 port A */
 };
 
-class deco_cpu7_device : public m6502_device {
-public:
-	deco_cpu7_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	class mi_decrypt : public mi_default_normal {
-	public:
-		bool had_written;
-
-		virtual ~mi_decrypt() {}
-		virtual UINT8 read_decrypted(UINT16 adr);
-		virtual void write(UINT16 adr, UINT8 val);
-	};
-
-	virtual void device_start();
-	virtual void device_reset();
-
-};
-
-static const device_type DECO_CPU7 = &device_creator<deco_cpu7_device>;
-
-deco_cpu7_device::deco_cpu7_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	m6502_device(mconfig, DECO_CPU7, "DECO CPU-7", tag, owner, clock)
-{
-}
-
-void deco_cpu7_device::device_start()
-{
-	mintf = new mi_decrypt;
-	init();
-}
-
-void deco_cpu7_device::device_reset()
-{
-	m6502_device::device_reset();
-	static_cast<mi_decrypt *>(mintf)->had_written = false;
-}
-
-UINT8 deco_cpu7_device::mi_decrypt::read_decrypted(UINT16 adr)
-{
-	UINT8 res = direct->read_raw_byte(adr);
-	if(had_written) {
-		had_written = false;
-		if((adr & 0x0104) == 0x0104)
-			res = BITSWAP8(res, 6,5,3,4,2,7,1,0);
-	}
-	return res;
-}
-
-void deco_cpu7_device::mi_decrypt::write(UINT16 adr, UINT8 val)
-{
-	program->write_byte(adr, val);
-	had_written = true;
-}
-
-
-class deco_c10707_device : public m6502_device {
-public:
-	deco_c10707_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-
-protected:
-	class mi_decrypt : public mi_default_normal {
-	public:
-		bool had_written;
-
-		virtual ~mi_decrypt() {}
-		virtual UINT8 read_decrypted(UINT16 adr);
-	};
-
-	virtual void device_start();
-	virtual void device_reset();
-
-};
-
-static const device_type DECO_C10707 = &device_creator<deco_c10707_device>;
-
-deco_c10707_device::deco_c10707_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	m6502_device(mconfig, DECO_C10707, "DECO C10707", tag, owner, clock)
-{
-}
-
-void deco_c10707_device::device_start()
-{
-	mintf = new mi_decrypt;
-	init();
-}
-
-void deco_c10707_device::device_reset()
-{
-	m6502_device::device_reset();
-	static_cast<mi_decrypt *>(mintf)->had_written = false;
-}
-
-UINT8 deco_c10707_device::mi_decrypt::read_decrypted(UINT16 adr)
-{
-	return BITSWAP8(direct->read_raw_byte(adr) ,7,5,6,4,3,2,1,0);;
-}
 
 WRITE8_MEMBER(btime_state::audio_nmi_enable_w)
 {
