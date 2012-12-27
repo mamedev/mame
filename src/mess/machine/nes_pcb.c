@@ -613,6 +613,12 @@ static const nes_pcb pcb_list[] =
 	{ "BMC-SUPERHIK-KOF",    UNSUPPORTED_BOARD },// mapper 251
 	{ "BMC-POWERJOY",        BMC_PJOY84 },
 	{ "BMC-POWERFUL-255",    UNSUPPORTED_BOARD },	// mapper 63?
+	{ "UNL-AC08",            UNSUPPORTED_BOARD }, //  used by Green Beret FDS conversions
+	{ "UNL-BB",              UNSUPPORTED_BOARD }, //  used by a few FDS conversions
+	{ "UNL-LH32",            UNSUPPORTED_BOARD }, //  used by Monty no Doki Doki Daidassou FDS conversion
+	{ "UNL-CITYFIGHT",       UNSUPPORTED_BOARD }, //  used by City Fighter IV
+	{ "BMC-G-146",           UNSUPPORTED_BOARD }, // multigame mapper
+	{ "BMC-11160",           UNSUPPORTED_BOARD }, // multigame mapper
 // are there dumps of games with these boards?
 	{ "BMC-13IN1JY110",   UNSUPPORTED_BOARD }, //  [mentioned in FCEUMM source - we need more info]
 	{ "BMC-GK-192",       UNSUPPORTED_BOARD }, //  [mentioned in FCEUMM source - we need more info]

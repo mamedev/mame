@@ -57294,7 +57294,7 @@ from the NEStopia source, hence they would require confirmation. -->
 
 	<software name="crayon2" cloneof="biomirac">
 		<description>Crayon Shin-Chan (Asia, Bio Miracle Bokutte Upa pirate, ripped from multicart?)</description>
-		<year>19??</year>
+		<year>1995</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="KONAMI-VRC-4" />
@@ -58936,7 +58936,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNKNOWN" /> <!-- UNL-BB -->
+			<feature name="pcb" value="UNL-BB" />
 			<dataarea name="chr" size="32768">
 				<rom name="bubble bobble (fds conversion, chr-rom version)(unl)[u][!].chr" size="32768" crc="a0f6ee8e" sha1="01e2ebbc9636bfd43876383bde3b1cb2c478f885" offset="00000" status="baddump" />
 			</dataarea>
@@ -59012,7 +59012,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<year>19??</year>
 		<publisher>Whirlwind Manu</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNKNOWN" /> <!-- UNL-AC08 -->
+			<feature name="pcb" value="UNL-AC08" />
 			<dataarea name="prg" size="163840">
 				<rom name="green beret (fds conversion, whirlwind manu)(unl)[u][!].prg0" size="131072" crc="2a57c5a1" sha1="b33fff06b70a6d8772eacd26b6d0ca12d90c2d60" offset="00000" status="baddump" />
 				<rom name="green beret (fds conversion, whirlwind manu)(unl)[u][!].prg1" size="32768" crc="5ed32c27" sha1="a63894c0706ef6ac260dab01e93c899dcbd2b5e0" offset="0x20000" status="baddump" />
@@ -59028,10 +59028,10 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<year>19??</year>
 		<publisher>Kaiser</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNKNOWN" /> <!-- UNL-AC08 -->
+			<feature name="pcb" value="UNL-AC08" />
 			<dataarea name="prg" size="163840">
-				<rom name="green beret (fds conversion, whirlwind manu)(unl)[u][!].prg0" size="131072" crc="2f7d862f" sha1="e5710b048e6ff0f8d747105a0873fb95a77a8b69" offset="00000" status="baddump" />
-				<rom name="green beret (fds conversion, whirlwind manu)(unl)[u][!].prg1" size="32768" crc="5d5352cc" sha1="76a51bbb801cc68e73aa1480664b3ab2e467e5af" offset="0x20000" status="baddump" />
+				<rom name="green beret (fds conversion, kaiser)(unl)[u][!].prg0" size="131072" crc="2f7d862f" sha1="e5710b048e6ff0f8d747105a0873fb95a77a8b69" offset="00000" status="baddump" />
+				<rom name="green beret (fds conversion, kaiser)(unl)[u][!].prg1" size="32768" crc="5d5352cc" sha1="76a51bbb801cc68e73aa1480664b3ab2e467e5af" offset="0x20000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -59120,7 +59120,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNKNOWN" /> <!-- UNL-LH32 -->
+			<feature name="pcb" value="UNL-LH32" />
 			<dataarea name="prg" size="131072">
 				<rom name="monty no doki doki daidassou (fds conversion)(unl)[u][!].prg" size="131072" crc="09e3dcb4" sha1="ffb4706e49b826c6cdd12e502e8ae94fc9810b7f" offset="00000" status="baddump" />
 			</dataarea>
@@ -59150,7 +59150,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="pcb" value="UNKNOWN" /> <!-- UNL-BB -->
+			<feature name="pcb" value="UNL-BB" />
 			<dataarea name="chr" size="16384">
 				<rom name="prowres (fds conversion, le05 simplified)(unl)[u][!].chr" size="16384" crc="58d4719f" sha1="372c4873696578ab56bdc8ec8133099194a864b7" offset="00000" status="baddump" />
 			</dataarea>
@@ -63782,6 +63782,21 @@ resulting in tons of glitches? -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="juuouki (j) [p1].prg" size="131072" crc="eb722a1d" sha1="30eba3c45d37cb2a774bd1d2cdbea5cdc3e72814" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kid333" cloneof="kaikeya3">
+		<description>Kid 333 (Kaiketsu Yanchamaru 3 - Taiketsu! Zouringen pirate)</description>
+		<year>1993</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="131072">
+				<rom name="kid 333 (unl).chr" size="131072" crc="5e1284cb" sha1="0ec3686493dcfb7aec5e1b1163909775bc75174f" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="kid 333  (unl).prg" size="131072" crc="9be9378e" sha1="04cb32ba35699f10f2637001047eb1e0bb100c29" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

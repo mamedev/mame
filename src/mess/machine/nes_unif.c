@@ -129,7 +129,13 @@ static const unif unif_list[] =
 	{ "BMC-70IN1",                  0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},	// mapper 236?
 	{ "BMC-70IN1B",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},	// mapper 236?
 	{ "BMC-SUPERVISION16IN1",       0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},	// mapper 53
-	{ "BMC-NTD-03",                 0,    0, CHRRAM_0,  BMC_NTD_03}
+	{ "BMC-NTD-03",                 0,    0, CHRRAM_0,  BMC_NTD_03},
+	{ "UNL-AC08",                   0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
+	{ "UNL-BB",                     0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
+	{ "UNL-LH32",                   0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
+	{ "UNL-CITYFIGHT",              0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
+	{ "BMC-G-146",                  0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
+	{ "BMC-11160",                  0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}
 };
 
 const unif *nes_unif_lookup( const char *board )
