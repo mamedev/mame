@@ -20,7 +20,6 @@ public:
 	DECLARE_WRITE8_MEMBER(shootout_videoram_w);
 	DECLARE_WRITE8_MEMBER(shootout_textram_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_DRIVER_INIT(shootouj);
 	DECLARE_DRIVER_INIT(shootout);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
