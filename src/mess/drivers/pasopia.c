@@ -3,8 +3,6 @@
     Toshiba Pasopia
 
     TODO:
-    - just like Pasopia 7, z80pio is broken, hence it doesn't clear irqs
-      after the first one (0xfe79 is the work ram buffer for keyboard).
     - machine emulation needs merging with Pasopia 7 (video emulation is
       completely different tho)
 
@@ -70,10 +68,17 @@ public:
 	bool m_ram_bank;
 	UINT8 *m_p_vram;
 	DECLARE_DRIVER_INIT(pasopia);
+	TIMER_CALLBACK_MEMBER(pio_timer);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 };
+
+// needed to scan the keyboard, as the pio emulation doesn't do it.
+TIMER_CALLBACK_MEMBER(pasopia_state::pio_timer)
+{
+	m_pio->port_b_write(keyb_r(generic_space(),0,0xff));
+}
 
 void pasopia_state::video_start()
 {
@@ -287,12 +292,12 @@ WRITE8_MEMBER( pasopia_state::mux_w )
 
 static Z80PIO_INTERFACE( z80pio_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //doesn't work?
-	DEVCB_DRIVER_MEMBER(pasopia_state, mux_r),
-	DEVCB_DRIVER_MEMBER(pasopia_state, mux_w),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //IRQ
+	DEVCB_DRIVER_MEMBER(pasopia_state, mux_r),	// in port A
+	DEVCB_DRIVER_MEMBER(pasopia_state, mux_w),	// out port A
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pasopia_state, keyb_r),
-	DEVCB_NULL,
+	DEVCB_DRIVER_MEMBER(pasopia_state, keyb_r),	// in port B
+	DEVCB_NULL,					// out port B
 	DEVCB_NULL
 };
 
@@ -344,6 +349,8 @@ We preset all banks here, so that bankswitching will incur no speed penalty.
 	UINT8 *p_ram = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &p_ram[0x00000], 0x10000);
 	membank("bank2")->configure_entry(0, &p_ram[0x10000]);
+
+	machine().scheduler().timer_pulse(attotime::from_hz(500), timer_expired_delegate(FUNC(pasopia_state::pio_timer),this));
 }
 
 static MACHINE_CONFIG_START( pasopia, pasopia_state )
