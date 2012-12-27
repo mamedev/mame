@@ -1316,7 +1316,7 @@ static MACHINE_CONFIG_START( btime, btime_state )
 	MCFG_PALETTE_INIT_OVERRIDE(btime_state,btime)
 	MCFG_VIDEO_START_OVERRIDE(btime_state,btime)
 
-	/* audio hardware */
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ay1", AY8910, HCLK2)
@@ -1393,15 +1393,12 @@ static MACHINE_CONFIG_DERIVED( mmonkey, wtennis )
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,mmonkey)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sdtennis, btime )
+static MACHINE_CONFIG_DERIVED( bnj, btime )
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK4)
 	MCFG_CPU_CLOCK(HCLK4)
 	MCFG_CPU_PROGRAM_MAP(bnj_map)
-
-	MCFG_CPU_REPLACE("audiocpu", DECO_C10707, HCLK1/3/2)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
 	MCFG_GFXDECODE(bnj)
@@ -1410,16 +1407,15 @@ static MACHINE_CONFIG_DERIVED( sdtennis, btime )
 	MCFG_VIDEO_START_OVERRIDE(btime_state,bnj)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_bnj)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bnj, sdtennis )
+static MACHINE_CONFIG_DERIVED( sdtennis, bnj )
 
 	/* basic machine hardware */
-
-	/* video hardware */
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
+	MCFG_CPU_REPLACE("audiocpu", DECO_C10707, HCLK1/3/2)
+	MCFG_CPU_PROGRAM_MAP(audio_map)
 MACHINE_CONFIG_END
 
 
@@ -1430,15 +1426,14 @@ static MACHINE_CONFIG_DERIVED( zoar, btime )
 	MCFG_CPU_PROGRAM_MAP(zoar_map)
 
 	/* video hardware */
-	MCFG_DEVICE_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
-
 	MCFG_GFXDECODE(zoar)
 	MCFG_PALETTE_LENGTH(64)
 
-	MCFG_SCREEN_MODIFY("screen")
+	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(btime_state, screen_update_zoar)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1) // 256 * 240, confirmed
 
+	/* sound hardware */
 	MCFG_SOUND_REPLACE("ay1", AY8910, HCLK1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 	MCFG_SOUND_CONFIG(ay1_intf)
