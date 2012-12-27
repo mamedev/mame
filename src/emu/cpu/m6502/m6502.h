@@ -124,12 +124,16 @@ protected:
         DASM_zpi,    /* zero page indirect (65c02) */
         DASM_zpx,    /* zero page + X */
         DASM_zpy,    /* zero page + Y */
+		DASM_imz,	 /* load immediate byte, store to zero page address (M740) */
+		DASM_spg,	 /* "special page": implied FF00 plus immediate value (M740)*/
+		DASM_biz	 /* bit, zero page (M740) */
 	};
 
 	enum {
 		F_N = 0x80,
 		F_V = 0x40,
 		F_E = 0x20, // 65ce02
+		F_T = 0x20, // M740: replaces A with $00,X in some opcodes when set
 		F_B = 0x10,
 		F_D = 0x08,
 		F_I = 0x04,

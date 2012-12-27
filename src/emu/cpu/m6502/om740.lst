@@ -1,0 +1,110 @@
+# m740 opcodes
+set_imp
+	read_pc_noinc();
+	P |= F_T;
+	prefetch();
+
+clt_imp
+	read_pc_noinc();
+	P &= ~F_T;
+	prefetch();
+
+ldm_imz
+	TMP = read_pc();
+	TMP2 = read_pc();
+	write(TMP2, TMP);
+	prefetch();
+
+jsr_spg
+	TMP = read_pc_noinc();
+	read(SP);
+	write(SP, PC>>8);
+	dec_SP();
+	write(SP, PC);
+	dec_SP();
+	TMP = set_h(TMP, 0xff);
+	PC = TMP;
+	prefetch();
+
+clb_acc
+	read_pc_noinc();
+	A = do_clb(A, (IR>>5) & 7);
+	prefetch();
+
+seb_acc
+	read_pc_noinc();
+	A = do_seb(A, (IR>>5) & 7);
+	prefetch();
+
+clb_biz
+	TMP = read_pc();
+	TMP2 = read(TMP);
+	TMP2 = do_clb(TMP2, (IR>>5) & 7);
+	write(TMP, TMP2);
+	prefetch();
+
+seb_biz
+	TMP = read_pc();
+	TMP2 = read(TMP);
+	TMP2 = do_seb(TMP2, (IR>>5) & 7);
+	write(TMP, TMP2);
+	prefetch();
+
+bbc_biz
+	TMP = read_pc();
+	TMP2 = read(TMP);
+	TMP = read_pc();
+	read_pc_noinc();
+	if(!(TMP2 & (1 << ((IR>>5) & 7)))) {
+		PC += INT8(TMP);
+	}
+	prefetch();
+
+bbs_biz
+	TMP = read_pc();
+	TMP2 = read(TMP);
+	TMP = read_pc();
+	read_pc_noinc();
+	if(TMP2 & (1 << ((IR>>5) & 7))) {
+		PC += INT8(TMP);
+	}
+	prefetch();
+
+bbc_acc
+	TMP = read_pc();
+	read_pc_noinc();
+	if(!(A & (1 << ((IR>>5) & 7)))) {
+		PC += INT8(TMP);
+	}
+	prefetch();
+
+bbs_acc
+	TMP = read_pc();
+	read_pc_noinc();
+	if(A & (1 << ((IR>>5) & 7))) {
+		PC += INT8(TMP);
+	}
+	prefetch();
+
+rrf_zpg
+	TMP = read_pc();
+	TMP2 = read(TMP);
+	TMP2 = do_rrf(TMP2);
+	write(TMP, TMP2);
+	prefetch();
+
+bra_rel
+	TMP = read_pc();
+	read_pc_noinc();
+	if(page_changing(PC, INT8(TMP))) {
+		read_direct(set_l(PC, PC+INT8(TMP)));
+	}
+	PC += INT8(TMP);
+	prefetch();
+
+reset740
+	PC = read_direct(0xfffe);
+	PC = set_h(PC, read_direct(0xffff));
+	prefetch();
+	inst_state = -1;
+

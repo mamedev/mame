@@ -1053,7 +1053,8 @@ CPUOBJS += $(CPUOBJ)/m6502/deco16.o \
            $(CPUOBJ)/m6502/m7501.o \
            $(CPUOBJ)/m6502/m8502.o \
            $(CPUOBJ)/m6502/n2a03.o \
-           $(CPUOBJ)/m6502/r65c02.o
+           $(CPUOBJ)/m6502/r65c02.o \
+		   $(CPUOBJ)/m6502/m740.o
 DASMOBJS +=
 endif
 
@@ -1129,6 +1130,11 @@ $(CPUOBJ)/m6502/r65c02.o:	$(CPUSRC)/m6502/r65c02.c \
 							$(CPUSRC)/m6502/m65c02.h \
 							$(CPUSRC)/m6502/m6502.h
 
+$(CPUOBJ)/m6502/m740.o:		$(CPUSRC)/m6502/m740.c \
+							$(CPUOBJ)/m6502/m740.inc \
+							$(CPUSRC)/m6502/m740.h \
+							$(CPUSRC)/m6502/m6502.h
+
 # rule to generate the C files
 $(CPUOBJ)/m6502/deco16.inc: $(CPUSRC)/m6502/m6502make.py $(CPUSRC)/m6502/odeco16.lst $(CPUSRC)/m6502/ddeco16.lst
 	@echo Generating DECO16 source file...
@@ -1166,6 +1172,9 @@ $(CPUOBJ)/m6502/r65c02.inc: $(CPUSRC)/m6502/m6502make.py $(CPUSRC)/m6502/dr65c02
 	@echo Generating R65C02 source file...
 	$(PYTHON) $(CPUSRC)/m6502/m6502make.py r65c02_device - $(CPUSRC)/m6502/dr65c02.lst $@
 
+$(CPUOBJ)/m6502/m740.inc: $(CPUSRC)/m6502/m6502make.py $(CPUSRC)/m6502/om740.lst $(CPUSRC)/m6502/dm740.lst
+	@echo Generating M740 source file...
+	$(PYTHON) $(CPUSRC)/m6502/m6502make.py m740_device $(CPUSRC)/m6502/om740.lst $(CPUSRC)/m6502/dm740.lst $@
 
 #-------------------------------------------------
 # Motorola 680x
