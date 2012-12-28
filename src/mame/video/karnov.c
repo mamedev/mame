@@ -71,6 +71,7 @@ void karnov_flipscreen_w( running_machine &machine, int data )
 	karnov_state *state = machine.driver_data<karnov_state>();
 	state->m_flipscreen = data;
 	machine.tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	state->flip_screen_set(state->m_flipscreen);
 }
 
 static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
