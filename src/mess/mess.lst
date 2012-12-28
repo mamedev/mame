@@ -293,6 +293,9 @@ intv	  // Mattel Intellivision - 1979 AKA INTV
 intv2	  // Mattel Intellivision II- 1982?
 intvsrs   // Intellivision (Sears License) - 19??
 
+// Milton Bradley
+microvsn  // MicroVision - 1979
+
 // Entex
 advision  // Adventurevision
 

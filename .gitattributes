@@ -5947,6 +5947,7 @@ src/mess/drivers/mes.c svneol=native#text/plain
 src/mess/drivers/microdec.c svneol=native#text/plain
 src/mess/drivers/micronic.c svneol=native#text/plain
 src/mess/drivers/microtan.c svneol=native#text/plain
+src/mess/drivers/microvsn.c svneol=native#text/plain
 src/mess/drivers/mikro80.c svneol=native#text/plain
 src/mess/drivers/mikromik.c svneol=native#text/plain
 src/mess/drivers/mikrosha.c svneol=native#text/plain

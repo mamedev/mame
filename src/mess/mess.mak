@@ -322,6 +322,7 @@ DRVLIBS += \
 	$(MESSOBJ)/magnavox.a \
 	$(MESSOBJ)/matsushi.a \
 	$(MESSOBJ)/mattel.a \
+	$(MESSOBJ)/mb.a \
 	$(MESSOBJ)/mchester.a \
 	$(MESSOBJ)/memotech.a \
 	$(MESSOBJ)/mgu.a \
@@ -1312,6 +1313,9 @@ $(MESSOBJ)/matsushi.a:			\
 	$(MESS_DRIVERS)/jr100.o		\
 	$(MESS_DRIVERS)/jr200.o		\
 	$(MESS_DRIVERS)/myb3k.o         \
+
+$(MESSOBJ)/mb.a:				\
+	$(MESS_DRIVERS)/microvsn.o	\
 
 $(MESSOBJ)/mchester.a:			\
 	$(MESS_DRIVERS)/ssem.o		\
