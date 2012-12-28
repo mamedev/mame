@@ -24,7 +24,7 @@ static ADDRESS_MAP_START(radio86_mem, AS_PROGRAM, 8, radio86_state )
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
     AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x1ffc)
     //AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x1ffc)
-    AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE_LEGACY("i8275", i8275_r, i8275_w) AM_MIRROR(0x1ffe) // video
+    AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x1ffe) // video
     AM_RANGE( 0xe000, 0xffff ) AM_DEVWRITE_LEGACY("dma8257", i8257_w)	 // DMA
     AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
@@ -44,7 +44,7 @@ static ADDRESS_MAP_START(radio86rom_mem, AS_PROGRAM, 8, radio86_state )
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
     AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x1ffc)
     AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x1ffc)
-    AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE_LEGACY("i8275", i8275_r, i8275_w) AM_MIRROR(0x1ffe) // video
+    AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x1ffe) // video
     AM_RANGE( 0xe000, 0xffff ) AM_DEVWRITE_LEGACY("dma8257", i8257_w)	 // DMA
     AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
@@ -55,7 +55,7 @@ static ADDRESS_MAP_START(radio86ram_mem, AS_PROGRAM, 8, radio86_state )
     AM_RANGE( 0xe000, 0xe7ff ) AM_ROM  // System ROM page 2
     AM_RANGE( 0xe800, 0xf5ff ) AM_RAM  // RAM
     AM_RANGE( 0xf700, 0xf703 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
-    AM_RANGE( 0xf780, 0xf7bf ) AM_DEVREADWRITE_LEGACY("i8275", i8275_r, i8275_w) // video
+    AM_RANGE( 0xf780, 0xf7bf ) AM_DEVREADWRITE("i8275", i8275_device, read, write) // video
     AM_RANGE( 0xf684, 0xf687 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 	AM_RANGE( 0xf688, 0xf688 ) AM_WRITE(radio86_pagesel )
     AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE_LEGACY("dma8257", i8257_w)	 // DMA
@@ -69,7 +69,7 @@ static ADDRESS_MAP_START(radio86_16_mem, AS_PROGRAM, 8, radio86_state )
     AM_RANGE( 0x4000, 0x7fff ) AM_READ(radio_cpu_state_r)
     AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x1ffc)
     //AM_RANGE( 0xa000, 0xa003 ) AM_DEVREADWRITE_LEGACY("ppi8255_2", i8255a_r, i8255a_w) AM_MIRROR(0x1ffc)
-    AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE_LEGACY("i8275", i8275_r, i8275_w) AM_MIRROR(0x1ffe) // video
+    AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x1ffe) // video
     AM_RANGE( 0xe000, 0xffff ) AM_DEVWRITE_LEGACY("dma8257", i8257_w)	 // DMA
     AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
@@ -80,7 +80,7 @@ static ADDRESS_MAP_START(mikron2_mem, AS_PROGRAM, 8, radio86_state )
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
     AM_RANGE( 0xc000, 0xc003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x00fc)
     //AM_RANGE( 0xc100, 0xc103 ) AM_DEVREADWRITE_LEGACY("ppi8255_2", i8255a_r, i8255a_w) AM_MIRROR(0x00fc)
-    AM_RANGE( 0xc200, 0xc201 ) AM_DEVREADWRITE_LEGACY("i8275", i8275_r, i8275_w) AM_MIRROR(0x00fe) // video
+    AM_RANGE( 0xc200, 0xc201 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x00fe) // video
     AM_RANGE( 0xc300, 0xc3ff ) AM_DEVWRITE_LEGACY("dma8257", i8257_w)	 // DMA
     AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
@@ -90,7 +90,7 @@ static ADDRESS_MAP_START(impuls03_mem, AS_PROGRAM, 8, radio86_state )
     AM_RANGE( 0x1000, 0x7fff ) AM_RAM  // RAM
     AM_RANGE( 0x8000, 0x8003 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x1ffc)
     AM_RANGE( 0xa000, 0xbfff ) AM_ROM  // Basic ROM
-    AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE_LEGACY("i8275", i8275_r, i8275_w) AM_MIRROR(0x1ffe) // video
+    AM_RANGE( 0xc000, 0xc001 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x1ffe) // video
     AM_RANGE( 0xe000, 0xffff ) AM_DEVWRITE_LEGACY("dma8257", i8257_w)	 // DMA
     AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
@@ -359,11 +359,11 @@ static MACHINE_CONFIG_START( radio86, radio86_state )
 	MCFG_I8275_ADD	( "i8275", radio86_i8275_interface)
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
-	MCFG_SCREEN_UPDATE_DRIVER(radio86_state, screen_update_radio86)
 	MCFG_GFXDECODE(radio86)
 	MCFG_PALETTE_LENGTH(3)
 	MCFG_PALETTE_INIT_OVERRIDE(radio86_state,radio86)

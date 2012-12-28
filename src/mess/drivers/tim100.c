@@ -21,8 +21,6 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	UINT32 screen_update_tim100(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	bitmap_rgb32 m_bitmap;
 	virtual void machine_reset();
 };
 
@@ -31,7 +29,7 @@ static ADDRESS_MAP_START(tim100_mem, AS_PROGRAM, 8, tim100_state)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM // 2764 at U16	
 	AM_RANGE(0x2000, 0x27ff) AM_RAM // 2KB static ram CDM6116A at U15
 
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("i8276", i8275_r, i8275_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("i8276", i8275_device, read, write)
 
 	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("uart_u17", i8251_device, status_r, control_w)
 	AM_RANGE(0x6001, 0x6001) AM_DEVREADWRITE("uart_u17", i8251_device, data_r, data_w)
@@ -78,23 +76,12 @@ static GFXDECODE_START( tim100 )
 GFXDECODE_END
 
 
-
-UINT32 tim100_state::screen_update_tim100(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	device_t *devconf = machine().device("i8276");
-	i8275_update( devconf, bitmap, cliprect);
-	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
-	return 0;
-}
-
-
 // this gets called via a (i8275_dack_w), so does nothing currently
 // once fixed, pixel count needs adjusting
 static I8275_DISPLAY_PIXELS(tim100_display_pixels)
 {
 	tim100_state *state = device->machine().driver_data<tim100_state>();
 	int i;
-	bitmap_rgb32 &bitmap = state->m_bitmap;
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 *charmap = state->memregion("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 15) + (charcode << 4)];
@@ -125,6 +112,8 @@ static const i8275_interface tim100_i8276_interface = {
 	0,
 	DEVCB_CPU_INPUT_LINE("maincpu", I8085_RST65_LINE),
 	DEVCB_NULL,	
+	DEVCB_NULL,
+	DEVCB_NULL,
 	tim100_display_pixels
 };
 
@@ -136,11 +125,11 @@ static MACHINE_CONFIG_START( tim100, tim100_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE("i8276", i8275_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(40*16, 16*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 40*16-1, 0, 16*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tim100_state, screen_update_tim100)
 
 	MCFG_GFXDECODE( tim100 )
 

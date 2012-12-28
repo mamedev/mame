@@ -103,7 +103,6 @@ public:
 	const UINT8 *m_key_rom;
 
 	// video state
-	bitmap_rgb32 m_bitmap;
 	const UINT8 *m_char_rom;
 	int m_llen;
 

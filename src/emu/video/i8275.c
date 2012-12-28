@@ -59,240 +59,160 @@
 
 struct i8275_t
 {
-	devcb_resolved_write_line	out_drq_func;
-	devcb_resolved_write_line	out_irq_func;
-
-	screen_device *screen;
-
-	const i8275_interface *intf;
-
-	UINT8 status_reg;				/* value of status reggister */
-	UINT8 num_of_params;			/* expected number of parameters */
-	UINT8 current_command;			/* command currently executing */
-	UINT8 param_type;				/* parameter type */
-
-	UINT8 cursor_col;				/* current cursor column */
-	UINT8 cursor_row;				/* current cursor row */
-
-	UINT8 light_pen_col;			/* current light pen column */
-	UINT8 light_pen_row;			/* current light pen row */
-
-	/* reset command parameter values*/
-	/* parameter 0 */
-	UINT8 rows_type;
-	UINT8 chars_per_row;
-	/* parameter 1 */
-	UINT8 vert_retrace_rows;
-	UINT8 rows_per_frame;
-	/* parameter 2 */
-	UINT8 undeline_line_num;
-	UINT8 lines_per_row;
-	/* parameter 3 */
-	UINT8 line_counter_mode;
-	UINT8 field_attribute_mode;
-	UINT8 cursor_format;
-	UINT8 hor_retrace_count;
-
-	/* values for start display command */
-	UINT8 burst_space_code;
-	UINT8 burst_count_code;
-
-	/* buffers */
-	UINT8 row_buffer_1[80];
-	UINT8 row_buffer_2[80];
-	UINT8 row_pos;
-	UINT8 buffer_used;
-
-	UINT8 fifo_buffer_1[16];
-	UINT8 fifo_buffer_2[16];
-	UINT8 fifo_write;
-
-	int ypos;
-	int current_row;
-
-	UINT8 cursor_blink_cnt;
-	UINT8 char_blink_cnt;
-
-	UINT8 next_in_fifo;
-
-	UINT8 lineattr;
-	UINT8 rvv;
-	UINT8 gpa;
-	UINT8 hlgt;
-	UINT8 underline;
-	UINT8 blink;
-
-	UINT8 last_data;
 };
 
-INLINE i8275_t *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == I8275);
-
-	return (i8275_t *)downcast<i8275_device *>(device)->token();
-}
-
-
 /* Register Access */
-static UINT8 i8275_get_parameter_light_pen(device_t *device, offs_t offset)
+UINT8 i8275_device::get_parameter_light_pen(offs_t offset)
 {
-	i8275_t *i8275 = get_safe_token(device);
 	UINT8 val = 0;
 
 	switch(offset) {
 		case 0 :
-				val = i8275->light_pen_col;
+				val = m_light_pen_col;
 				break;
 		case 1 :
-				val = i8275->light_pen_row;
+				val = m_light_pen_row;
 				break;
 	}
 	return val;
 }
 
-READ8_DEVICE_HANDLER( i8275_r )
+READ8_MEMBER( i8275_device::read )
 {
 	UINT8 val;
-	i8275_t *i8275 = get_safe_token(device);
 
 	if (offset & 0x01)
 	{
 		/* Status register */
-		val = i8275->status_reg;
+		val = m_status_reg;
 		/* status reset after read */
-		i8275->status_reg &= ~I8275_STATUS_FIFO_OVERRUN;
-		i8275->status_reg &= ~I8275_STATUS_DMA_UNDERRUN;
-		i8275->status_reg &= ~I8275_STATUS_IMPROPER_COMMAND;
-		i8275->status_reg &= ~I8275_STATUS_LIGHT_PEN;
-		i8275->status_reg &= ~I8275_STATUS_INTERRUPT_REQUEST;
+		m_status_reg &= ~I8275_STATUS_FIFO_OVERRUN;
+		m_status_reg &= ~I8275_STATUS_DMA_UNDERRUN;
+		m_status_reg &= ~I8275_STATUS_IMPROPER_COMMAND;
+		m_status_reg &= ~I8275_STATUS_LIGHT_PEN;
+		m_status_reg &= ~I8275_STATUS_INTERRUPT_REQUEST;
 	}
 	else
 	{
 		/* Parameter register */
 		val = 0x00;
-		if (i8275->param_type==I8275_PARAM_READ) {
-			if (i8275->num_of_params > 0) {
-				val = i8275_get_parameter_light_pen(device, 2 - i8275->num_of_params);
-				i8275->num_of_params--;
+		if (m_param_type==I8275_PARAM_READ) {
+			if (m_num_of_params > 0) {
+				val = get_parameter_light_pen(2 - m_num_of_params);
+				m_num_of_params--;
 			} else {
-				i8275->status_reg |= I8275_STATUS_IMPROPER_COMMAND;
+				m_status_reg |= I8275_STATUS_IMPROPER_COMMAND;
 			}
 		} else {
 			LOG(("i8275 : ERROR reading parameter\n"));
-			i8275->status_reg |= I8275_STATUS_IMPROPER_COMMAND;
+			m_status_reg |= I8275_STATUS_IMPROPER_COMMAND;
 		}
 	}
 	return val;
 }
 
-static void i8275_recompute_parameters(device_t *device)
+void i8275_device::recompute_parameters()
 {
-	i8275_t *i8275 = get_safe_token(device);
 	int horiz_pix_total = 0;
 	int vert_pix_total = 0;
 	rectangle visarea;
 
-	horiz_pix_total = (i8275->chars_per_row + 1) * i8275->intf->width;
-	vert_pix_total  = (i8275->lines_per_row + 1) * (i8275->rows_per_frame + 1);
-	if (i8275->rows_type==1) {
+	horiz_pix_total = (m_chars_per_row + 1) * m_width;
+	vert_pix_total  = (m_lines_per_row + 1) * (m_rows_per_frame + 1);
+	if (m_rows_type==1) {
 		vert_pix_total *= 2; // Use of spaced rows
 	}
 
 	visarea.set(0, horiz_pix_total - 1, 0, vert_pix_total - 1);
 
-	i8275->screen->configure(horiz_pix_total, vert_pix_total, visarea,
-				i8275->screen->frame_period().attoseconds);
+	m_screen->configure(horiz_pix_total, vert_pix_total, visarea,
+				m_screen->frame_period().attoseconds);
 }
 
-static void i8275_set_parameter_reset(device_t *device, offs_t offset, UINT8 data)
+void i8275_device::set_parameter_reset(offs_t offset, UINT8 data)
 {
-	i8275_t *i8275 = get_safe_token(device);
 	switch(offset) {
 		case 0 :
-				i8275->rows_type = (data >> 7) & 1;
-				i8275->chars_per_row = data & 0x7f;
+				m_rows_type = (data >> 7) & 1;
+				m_chars_per_row = data & 0x7f;
 				break;
 		case 1 :
-				i8275->vert_retrace_rows = (data >> 6) & 3;
-				i8275->rows_per_frame = data & 0x3f;
+				m_vert_retrace_rows = (data >> 6) & 3;
+				m_rows_per_frame = data & 0x3f;
 				break;
 		case 2 :
-				i8275->undeline_line_num = (data >> 4) & 0x0f;
-				i8275->lines_per_row = data & 0x0f;
+				m_undeline_line_num = (data >> 4) & 0x0f;
+				m_lines_per_row = data & 0x0f;
 				break;
 		case 3 :
-				i8275->line_counter_mode = (data >> 7) & 1;
-				i8275->field_attribute_mode = (data >> 6) & 1;
-				i8275->cursor_format  = (data >> 4) & 3;
-				i8275->hor_retrace_count = data & 0x0f;
+				m_line_counter_mode = (data >> 7) & 1;
+				m_field_attribute_mode = (data >> 6) & 1;
+				m_cursor_format  = (data >> 4) & 3;
+				m_hor_retrace_count = data & 0x0f;
 				break;
 	}
 }
 
-static void i8275_set_parameter_cursor(device_t *device, offs_t offset, UINT8 data)
+void i8275_device::set_parameter_cursor(offs_t offset, UINT8 data)
 {
-	i8275_t *i8275 = get_safe_token(device);
 	switch(offset) {
 		case 0 :
-				i8275->cursor_col = data;
+				m_cursor_col = data;
 				break;
 		case 1 :
-				i8275->cursor_row = data;
+				m_cursor_row = data;
 				break;
 	}
 }
 
 
-WRITE8_DEVICE_HANDLER( i8275_w )
+WRITE8_MEMBER( i8275_device::write )
 {
-	i8275_t *i8275 = get_safe_token(device);
-
 	if (offset & 0x01)
 	{
 		/* Command register */
-		if (i8275->num_of_params != 0) {
-			i8275->status_reg |= I8275_STATUS_IMPROPER_COMMAND;
+		if (m_num_of_params != 0) {
+			m_status_reg |= I8275_STATUS_IMPROPER_COMMAND;
 			return;
 		}
-		i8275->current_command = (data >> 5) & 7;
-		i8275->num_of_params = I8275_PARAM_NONE;
-		i8275->param_type = I8275_PARAM_NONE;
-		switch(i8275->current_command) {
+		m_current_command = (data >> 5) & 7;
+		m_num_of_params = I8275_PARAM_NONE;
+		m_param_type = I8275_PARAM_NONE;
+		switch(m_current_command) {
 			case I8275_COMMAND_RESET		:
-											i8275->num_of_params = I8275_PARAM_RESET;
-											i8275->param_type = I8275_PARAM_WRITE;
+											m_num_of_params = I8275_PARAM_RESET;
+											m_param_type = I8275_PARAM_WRITE;
 											/* set status register */
-											i8275->status_reg &= ~I8275_STATUS_INTERRUPT_ENABLE;
-											i8275->status_reg &= ~I8275_STATUS_VIDEO_ENABLE;
+											m_status_reg &= ~I8275_STATUS_INTERRUPT_ENABLE;
+											m_status_reg &= ~I8275_STATUS_VIDEO_ENABLE;
 											break;
 			case I8275_COMMAND_START_DISPLAY:
-											i8275->burst_space_code = (data >> 2) & 7;
-											i8275->burst_count_code = data & 3;
+											m_burst_space_code = (data >> 2) & 7;
+											m_burst_count_code = data & 3;
 											/* set status register */
-											i8275->status_reg |= I8275_STATUS_VIDEO_ENABLE;
-											i8275->status_reg |= I8275_STATUS_INTERRUPT_ENABLE;
-											i8275_recompute_parameters(device);
+											m_status_reg |= I8275_STATUS_VIDEO_ENABLE;
+											m_status_reg |= I8275_STATUS_INTERRUPT_ENABLE;
+											recompute_parameters();
 											break;
 			case I8275_COMMAND_STOP_DISPLAY :
 											/* set status register */
-											i8275->status_reg &= ~I8275_STATUS_VIDEO_ENABLE;
+											m_status_reg &= ~I8275_STATUS_VIDEO_ENABLE;
 											break;
 			case I8275_COMMAND_READ_LIGHT_PEN:
-											i8275->num_of_params = I8275_PARAM_READ_LIGHT_PEN;
-											i8275->param_type = I8275_PARAM_READ;
+											m_num_of_params = I8275_PARAM_READ_LIGHT_PEN;
+											m_param_type = I8275_PARAM_READ;
 											break;
 			case I8275_COMMAND_LOAD_CURSOR	:
-											i8275->num_of_params = I8275_PARAM_LOAD_CURSOR;
-											i8275->param_type = I8275_PARAM_WRITE;
+											m_num_of_params = I8275_PARAM_LOAD_CURSOR;
+											m_param_type = I8275_PARAM_WRITE;
 											break;
 			case I8275_COMMAND_ENABLE_INTERRUPT	:
 											/* set status register */
-											i8275->status_reg |= I8275_STATUS_INTERRUPT_ENABLE;
+											m_status_reg |= I8275_STATUS_INTERRUPT_ENABLE;
 											break;
 			case I8275_COMMAND_DISABLE_INTERRUPT:
 											/* set status register */
-											i8275->status_reg &= ~I8275_STATUS_INTERRUPT_ENABLE;
+											m_status_reg &= ~I8275_STATUS_INTERRUPT_ENABLE;
 											break;
 			case I8275_COMMAND_PRESET_COUNTERS	:
 											break;
@@ -301,28 +221,27 @@ WRITE8_DEVICE_HANDLER( i8275_w )
 	else
 	{
 		/* Parameter register */
-		if (i8275->param_type==I8275_PARAM_WRITE) {
-			if (i8275->num_of_params > 0) {
-				if (i8275->current_command == I8275_COMMAND_RESET) {
-					i8275_set_parameter_reset(device, 4 - i8275->num_of_params ,data);
+		if (m_param_type==I8275_PARAM_WRITE) {
+			if (m_num_of_params > 0) {
+				if (m_current_command == I8275_COMMAND_RESET) {
+					set_parameter_reset(4 - m_num_of_params ,data);
 				} else {
-					i8275_set_parameter_cursor(device, 2 - i8275->num_of_params, data);
+					set_parameter_cursor(2 - m_num_of_params, data);
 				}
-				i8275->num_of_params--;
+				m_num_of_params--;
 			} else {
-				i8275->status_reg |= I8275_STATUS_IMPROPER_COMMAND;
+				m_status_reg |= I8275_STATUS_IMPROPER_COMMAND;
 			}
 		} else {
 			LOG(("i8275 : ERROR writing parameter\n"));
-			i8275->status_reg |= I8275_STATUS_IMPROPER_COMMAND;
+			m_status_reg |= I8275_STATUS_IMPROPER_COMMAND;
 		}
 	}
 }
 
 
-static void i8275_draw_char_line(device_t *device)
+void i8275_device::draw_char_line()
 {
-	i8275_t *i8275 = get_safe_token(device);
 	int xpos = 0;
 	int line = 0;
 	UINT8 lc = 0;
@@ -330,46 +249,46 @@ static void i8275_draw_char_line(device_t *device)
 	UINT8 lten = 0;
 	UINT8 fifo_read = 0;
 
-	for(line=0;line<=i8275->lines_per_row;line++) {
+	for(line=0;line<=m_lines_per_row;line++) {
 		// If line counter is 1 then select right values
-		lc = (i8275->line_counter_mode==1) ? (line - 1) % i8275->lines_per_row : line;
+		lc = (m_line_counter_mode==1) ? (line - 1) % m_lines_per_row : line;
 		fifo_read = 0;
-		for(xpos=0;xpos<=i8275->chars_per_row;xpos++) {
-			UINT8 chr =	(i8275->buffer_used==0) ? i8275->row_buffer_2[xpos] : i8275->row_buffer_1[xpos];
-			if (i8275->undeline_line_num & 0x08) {
-				vsp = (line==0 || line==i8275->lines_per_row) ? 1 : 0;
+		for(xpos=0;xpos<=m_chars_per_row;xpos++) {
+			UINT8 chr =	(m_buffer_used==0) ? m_row_buffer_2[xpos] : m_row_buffer_1[xpos];
+			if (m_undeline_line_num & 0x08) {
+				vsp = (line==0 || line==m_lines_per_row) ? 1 : 0;
 			}
 
 			if ((chr & 0x80)==0x80) {
 				if ((chr & 0xc0)==0xc0) {
 					// character attribute code
-					i8275->lineattr = 0;
+					m_lineattr = 0;
 				} else {
 					// field attribute code
-					i8275->hlgt = chr & 1;
-					i8275->blink = (chr >> 1) & 1;
-					i8275->gpa = (chr >> 2) & 3;
-					i8275->rvv = (chr >> 4) & 1;
-					i8275->underline = (chr >> 5) & 1;
+					m_hlgt = chr & 1;
+					m_blink = (chr >> 1) & 1;
+					m_gpa = (chr >> 2) & 3;
+					m_rvv = (chr >> 4) & 1;
+					m_underline = (chr >> 5) & 1;
 				}
 
-				if (i8275->field_attribute_mode==0) {
-					chr = (i8275->buffer_used==0) ? i8275->fifo_buffer_2[fifo_read] : i8275->fifo_buffer_1[fifo_read];
+				if (m_field_attribute_mode==0) {
+					chr = (m_buffer_used==0) ? m_fifo_buffer_2[fifo_read] : m_fifo_buffer_1[fifo_read];
 					fifo_read = (fifo_read + 1 ) % 16;
 				} else {
 					vsp = 1;
 				}
 			}
-			if (vsp==0 && i8275->blink) {
-				vsp = (i8275->char_blink_cnt < 32)  ? 1: 0;
+			if (vsp==0 && m_blink) {
+				vsp = (m_char_blink_cnt < 32)  ? 1: 0;
 			}
-			if ((i8275->current_row == i8275->cursor_row) && (xpos ==  i8275->cursor_col - i8275->intf->char_delay)) {
+			if ((m_current_row == m_cursor_row) && (xpos ==  m_cursor_col - m_char_delay)) {
 				int vis = 1;
-				if ((i8275->cursor_format & 2)==0) {
-					vis = (i8275->cursor_blink_cnt<16) ? 1 : 0;
+				if ((m_cursor_format & 2)==0) {
+					vis = (m_cursor_blink_cnt<16) ? 1 : 0;
 				}
-				if ((i8275->cursor_format & 1)==1) {
-					lten = (line == i8275->undeline_line_num) ? vis : 0; //underline
+				if ((m_cursor_format & 1)==1) {
+					lten = (line == m_undeline_line_num) ? vis : 0; //underline
 				} else {
 					lten = vis; // block cursor
 				}
@@ -377,222 +296,124 @@ static void i8275_draw_char_line(device_t *device)
 				lten = 0;
 			}
 
-			i8275->intf->display_pixels(device,
-				xpos * i8275->intf->width, // x position on screen of starting point
-				i8275->ypos, // y position on screen
+			m_display_pixels_func(this, m_bitmap, 
+				xpos * m_width, // x position on screen of starting point
+				m_ypos, // y position on screen
 				lc, // current line of char
 				(chr & 0x7f),  // char code to be displayed
-				i8275->lineattr,  // line attribute code
-				lten | i8275->underline,  // light enable signal
-				i8275->rvv,  // reverse video signal
+				m_lineattr,  // line attribute code
+				lten | m_underline,  // light enable signal
+				m_rvv,  // reverse video signal
 				vsp, // video suppression
-				i8275->gpa,  // general purpose attribute code
-				i8275->hlgt  // highlight
+				m_gpa,  // general purpose attribute code
+				m_hlgt  // highlight
 			);
 			vsp = 0;
 		}
-		i8275->ypos++;
+		m_ypos++;
 	}
-	i8275->current_row++;
+	m_current_row++;
 }
 
-WRITE8_DEVICE_HANDLER( i8275_dack_w )
+WRITE8_MEMBER( i8275_device::dack_w )
 {
-	i8275_t *i8275 = get_safe_token(device);
-
-	if (i8275->next_in_fifo == 1)
+	if (m_next_in_fifo == 1)
 	{
-		i8275->next_in_fifo = 0;
+		m_next_in_fifo = 0;
 
-		if(i8275->buffer_used == 0)
+		if(m_buffer_used == 0)
 		{
-			i8275->fifo_buffer_1[i8275->fifo_write] = data & 0x7f;
+			m_fifo_buffer_1[m_fifo_write] = data & 0x7f;
 		}
 		else
 		{
-			i8275->fifo_buffer_2[i8275->fifo_write] = data & 0x7f;
+			m_fifo_buffer_2[m_fifo_write] = data & 0x7f;
 		}
-		i8275->fifo_write = (i8275->fifo_write + 1) % 16;
+		m_fifo_write = (m_fifo_write + 1) % 16;
 
-		if (i8275->last_data == 0xf1) {
-			i8275->row_pos = i8275->chars_per_row + 1;
+		if (m_last_data == 0xf1) {
+			m_row_pos = m_chars_per_row + 1;
 		}
 	}
 	else
 	{
-		if(i8275->buffer_used == 0)
+		if(m_buffer_used == 0)
 		{
-			i8275->row_buffer_1[i8275->row_pos++] = data;
+			m_row_buffer_1[m_row_pos++] = data;
 		}
 		else
 		{
-			i8275->row_buffer_2[i8275->row_pos++] = data;
+			m_row_buffer_2[m_row_pos++] = data;
 		}
-		if (i8275->field_attribute_mode==0)
+		if (m_field_attribute_mode==0)
 		{
 			if ((data & 0x80)==0x80)
 			{
-				i8275->last_data = data;
-				i8275->next_in_fifo = 1;
+				m_last_data = data;
+				m_next_in_fifo = 1;
 			}
 		}
 	}
 
-	if ((i8275->row_pos - 1)==i8275->chars_per_row )
+	if ((m_row_pos - 1)==m_chars_per_row )
 	{
-		i8275->buffer_used = (i8275->buffer_used==0) ? 1 : 0;
-		i8275->row_pos = 0;
-		i8275->fifo_write = 0;
-		i8275_draw_char_line(device);
+		m_buffer_used = (m_buffer_used==0) ? 1 : 0;
+		m_row_pos = 0;
+		m_fifo_write = 0;
+		draw_char_line();
 	}
-	if (i8275->current_row == (i8275->rows_per_frame + 1))
+	if (m_current_row == (m_rows_per_frame + 1))
 	{
-		i8275->ypos = 0;
-		i8275->current_row = 0;
+		m_ypos = 0;
+		m_current_row = 0;
 
-		i8275->out_drq_func(0);
+		m_out_drq_func(0);
 	}
 }
 
 /* Screen Update */
-void i8275_update(device_t *device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 i8275_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	i8275_t *i8275 = get_safe_token(device);
-	i8275->ypos = 0;
-	i8275->lineattr = 0;
-	i8275->rvv = 0;
-	i8275->gpa = 0;
-	i8275->hlgt = 0;
-	i8275->underline = 0;
-	i8275->blink = 0;
-	i8275->row_pos = 0;
-	i8275->fifo_write = 0;
+	m_ypos = 0;
+	m_lineattr = 0;
+	m_rvv = 0;
+	m_gpa = 0;
+	m_hlgt = 0;
+	m_underline = 0;
+	m_blink = 0;
+	m_row_pos = 0;
+	m_fifo_write = 0;
 
-	if ((i8275->status_reg & I8275_STATUS_VIDEO_ENABLE)==0) {
-		bitmap.fill(get_black_pen(device->machine()), cliprect);
+	if ((m_status_reg & I8275_STATUS_VIDEO_ENABLE)==0) {
+		bitmap.fill(get_black_pen(machine()), cliprect);
 	} else {
 		// if value < 16 it is visible otherwise not
-		i8275->cursor_blink_cnt++;
-		if(i8275->cursor_blink_cnt==32) i8275->cursor_blink_cnt = 0;
+		m_cursor_blink_cnt++;
+		if(m_cursor_blink_cnt==32) m_cursor_blink_cnt = 0;
 		// if value < 32 it is visible otherwise not
-		i8275->char_blink_cnt++;
-		if(i8275->char_blink_cnt==64) i8275->char_blink_cnt = 0;
+		m_char_blink_cnt++;
+		if(m_char_blink_cnt==64) m_char_blink_cnt = 0;
 
-		i8275->out_drq_func(1);
+		m_out_drq_func(1);
 	}
-	if (i8275->status_reg & I8275_STATUS_INTERRUPT_ENABLE) {
-		i8275->status_reg |= I8275_STATUS_INTERRUPT_REQUEST;
+	if (m_status_reg & I8275_STATUS_INTERRUPT_ENABLE) {
+		m_status_reg |= I8275_STATUS_INTERRUPT_REQUEST;
 	}
+
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	
+	return 0;
 }
 
 /* Device Interface */
-
-static DEVICE_START( i8275 )
-{
-	i8275_t *i8275 = get_safe_token(device);
-
-	/* validate arguments */
-	assert(device != NULL);
-	assert(device->tag() != NULL);
-	assert(device->static_config() != NULL);
-
-	i8275->intf = (const i8275_interface*)device->static_config();
-
-	assert(i8275->intf->display_pixels != NULL);
-
-	/* get the screen device */
-	i8275->screen = device->machine().device<screen_device>(i8275->intf->screen_tag);
-
-
-	assert(i8275->screen != NULL);
-
-	/* resolve callbacks */
-	i8275->out_drq_func.resolve(i8275->intf->out_drq_func, *device);
-	i8275->out_irq_func.resolve(i8275->intf->out_irq_func, *device);
-
-	/* register for state saving */
-	device->save_item(NAME(i8275->status_reg));
-	device->save_item(NAME(i8275->num_of_params));
-	device->save_item(NAME(i8275->current_command));
-	device->save_item(NAME(i8275->param_type));
-
-	device->save_item(NAME(i8275->cursor_col));
-	device->save_item(NAME(i8275->cursor_row));
-
-	device->save_item(NAME(i8275->light_pen_col));
-	device->save_item(NAME(i8275->light_pen_row));
-
-	device->save_item(NAME(i8275->rows_type));
-	device->save_item(NAME(i8275->chars_per_row));
-	device->save_item(NAME(i8275->vert_retrace_rows));
-	device->save_item(NAME(i8275->rows_per_frame));
-	device->save_item(NAME(i8275->undeline_line_num));
-	device->save_item(NAME(i8275->lines_per_row));
-	device->save_item(NAME(i8275->line_counter_mode));
-	device->save_item(NAME(i8275->field_attribute_mode));
-	device->save_item(NAME(i8275->cursor_format));
-	device->save_item(NAME(i8275->hor_retrace_count));
-
-	device->save_item(NAME(i8275->burst_space_code));
-	device->save_item(NAME(i8275->burst_count_code));
-}
-
-static DEVICE_RESET( i8275 )
-{
-	i8275_t *i8275 = get_safe_token(device);
-
-	i8275->status_reg = 0;
-	i8275->num_of_params = 0;
-	i8275->current_command = 0;
-	i8275->param_type = 0;
-
-	i8275->cursor_col = 0;
-	i8275->cursor_row = 0;
-
-	i8275->light_pen_col = 0;
-	i8275->light_pen_row = 0;
-
-	i8275->rows_type = 0;
-	i8275->chars_per_row = 0;
-	i8275->vert_retrace_rows = 0;
-	i8275->rows_per_frame = 0;
-	i8275->undeline_line_num = 0;
-	i8275->lines_per_row = 0;
-	i8275->line_counter_mode = 0;
-	i8275->field_attribute_mode = 0;
-	i8275->cursor_format = 0;
-	i8275->hor_retrace_count = 0;
-
-	i8275->burst_space_code = 0;
-	i8275->burst_count_code = 0;
-
-	i8275->row_pos = 0;
-	i8275->buffer_used = 0;
-
-	i8275->fifo_write = 0;
-
-	i8275->ypos = 0;
-	i8275->current_row = 0;
-
-	i8275->cursor_blink_cnt = 0;
-	i8275->char_blink_cnt = 0;
-	i8275->next_in_fifo = 0;
-
-	i8275->lineattr = 0;
-	i8275->rvv = 0;
-	i8275->gpa = 0;
-	i8275->hlgt = 0;
-	i8275->underline = 0;
-	i8275->blink = 0;
-}
 
 const device_type I8275 = &device_creator<i8275_device>;
 
 i8275_device::i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I8275, "Intel 8275", tag, owner, clock)
 {
-	m_token = global_alloc_clear(i8275_t);
 }
+
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -602,7 +423,21 @@ i8275_device::i8275_device(const machine_config &mconfig, const char *tag, devic
 
 void i8275_device::device_config_complete()
 {
+	// inherit a copy of the static data
+	const i8275_interface *intf = reinterpret_cast<const i8275_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<i8275_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_out_drq_cb, 0, sizeof(m_out_drq_cb));
+		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
+		memset(&m_out_hrtc_cb, 0, sizeof(m_out_hrtc_cb));
+		memset(&m_out_vrtc_cb, 0, sizeof(m_out_vrtc_cb));
+	}
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -610,7 +445,42 @@ void i8275_device::device_config_complete()
 
 void i8275_device::device_start()
 {
-	DEVICE_START_NAME( i8275 )(this);
+	/* get the screen device */
+	m_screen = machine().device<screen_device>(m_screen_tag);
+	assert(m_screen != NULL);
+	m_screen->register_screen_bitmap(m_bitmap);
+
+	/* resolve callbacks */
+	m_out_drq_func.resolve(m_out_drq_cb, *this);
+	m_out_irq_func.resolve(m_out_irq_cb, *this);
+	m_out_hrtc_func.resolve(m_out_hrtc_cb, *this);
+	m_out_vrtc_func.resolve(m_out_vrtc_cb, *this);
+
+	/* register for state saving */
+	save_item(NAME(m_status_reg));
+	save_item(NAME(m_num_of_params));
+	save_item(NAME(m_current_command));
+	save_item(NAME(m_param_type));
+
+	save_item(NAME(m_cursor_col));
+	save_item(NAME(m_cursor_row));
+
+	save_item(NAME(m_light_pen_col));
+	save_item(NAME(m_light_pen_row));
+
+	save_item(NAME(m_rows_type));
+	save_item(NAME(m_chars_per_row));
+	save_item(NAME(m_vert_retrace_rows));
+	save_item(NAME(m_rows_per_frame));
+	save_item(NAME(m_undeline_line_num));
+	save_item(NAME(m_lines_per_row));
+	save_item(NAME(m_line_counter_mode));
+	save_item(NAME(m_field_attribute_mode));
+	save_item(NAME(m_cursor_format));
+	save_item(NAME(m_hor_retrace_count));
+
+	save_item(NAME(m_burst_space_code));
+	save_item(NAME(m_burst_count_code));
 }
 
 //-------------------------------------------------
@@ -619,7 +489,47 @@ void i8275_device::device_start()
 
 void i8275_device::device_reset()
 {
-	DEVICE_RESET_NAME( i8275 )(this);
+	m_status_reg = 0;
+	m_num_of_params = 0;
+	m_current_command = 0;
+	m_param_type = 0;
+
+	m_cursor_col = 0;
+	m_cursor_row = 0;
+
+	m_light_pen_col = 0;
+	m_light_pen_row = 0;
+
+	m_rows_type = 0;
+	m_chars_per_row = 0;
+	m_vert_retrace_rows = 0;
+	m_rows_per_frame = 0;
+	m_undeline_line_num = 0;
+	m_lines_per_row = 0;
+	m_line_counter_mode = 0;
+	m_field_attribute_mode = 0;
+	m_cursor_format = 0;
+	m_hor_retrace_count = 0;
+
+	m_burst_space_code = 0;
+	m_burst_count_code = 0;
+
+	m_row_pos = 0;
+	m_buffer_used = 0;
+
+	m_fifo_write = 0;
+
+	m_ypos = 0;
+	m_current_row = 0;
+
+	m_cursor_blink_cnt = 0;
+	m_char_blink_cnt = 0;
+	m_next_in_fifo = 0;
+
+	m_lineattr = 0;
+	m_rvv = 0;
+	m_gpa = 0;
+	m_hlgt = 0;
+	m_underline = 0;
+	m_blink = 0;
 }
-
-

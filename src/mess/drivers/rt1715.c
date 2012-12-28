@@ -28,11 +28,6 @@ public:
 	rt1715_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-	{
-		return 0;
-	}
-
 	int m_led1_val;
 	int m_led2_val;
 	DECLARE_WRITE8_MEMBER(rt1715_floppy_enable);
@@ -165,6 +160,8 @@ static const i8275_interface rt1715_i8275_intf =
 	0,
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	rt1715_display_pixels
 };
 
@@ -197,7 +194,7 @@ static ADDRESS_MAP_START( rt1715_io, AS_IO, 8, rt1715_state )
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("a72", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("a30", z80ctc_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("a29", z80sio_device, read_alt, write_alt)
-	AM_RANGE(0x18, 0x19) AM_DEVREADWRITE_LEGACY("a26", i8275_r, i8275_w)
+	AM_RANGE(0x18, 0x19) AM_DEVREADWRITE("a26", i8275_device, read, write)
 	AM_RANGE(0x20, 0x20) AM_WRITE(rt1715_floppy_enable)
 	AM_RANGE(0x28, 0x28) AM_WRITE(rt1715_rom_disable)
 ADDRESS_MAP_END
@@ -329,9 +326,9 @@ static MACHINE_CONFIG_START( rt1715, rt1715_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE("a26", i8275_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(rt1715_state, screen_update)
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
 

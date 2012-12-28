@@ -97,7 +97,7 @@ READ8_MEMBER( mm1_state::read )
 			break;
 
 		case 2:
-			data = i8275_r(m_crtc, space, offset & 0x01);
+			data = m_crtc->read(space, offset & 0x01);
 			break;
 
 		case 3:
@@ -166,7 +166,7 @@ WRITE8_MEMBER( mm1_state::write )
 			break;
 
 		case 2:
-			i8275_w(m_crtc, space, offset & 0x01, data);
+			m_crtc->write(space, offset & 0x01, data);
 			break;
 
 		case 3:
@@ -540,7 +540,7 @@ static I8237_INTERFACE( dmac_intf )
 	DEVCB_DRIVER_MEMBER(mm1_state, read),
 	DEVCB_DRIVER_MEMBER(mm1_state, write),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(mm1_state, mpsc_dack_r),  DEVCB_DEVICE_MEMBER(UPD765_TAG, upd765_family_device, mdma_r) },
-	{ DEVCB_DEVICE_HANDLER(I8275_TAG, i8275_dack_w), DEVCB_DRIVER_MEMBER(mm1_state, mpsc_dack_w), DEVCB_NULL, DEVCB_DEVICE_MEMBER(UPD765_TAG, upd765_family_device, mdma_w) },
+	{ DEVCB_DEVICE_MEMBER(I8275_TAG, i8275_device, dack_w), DEVCB_DRIVER_MEMBER(mm1_state, mpsc_dack_w), DEVCB_NULL, DEVCB_DEVICE_MEMBER(UPD765_TAG, upd765_family_device, mdma_w) },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(mm1_state, dack3_w) }
 };
 

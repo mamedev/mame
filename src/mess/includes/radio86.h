@@ -17,12 +17,6 @@ public:
 	radio86_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	virtual void video_start();
-
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	bitmap_rgb32 m_bitmap;
-
 	UINT8 m_tape_value;
 	UINT8 m_mikrosha_font_page;
 	int m_keyboard_mask;
@@ -38,7 +32,6 @@ public:
 	DECLARE_DRIVER_INIT(radio86);
 	DECLARE_MACHINE_RESET(radio86);
 	DECLARE_PALETTE_INIT(radio86);
-	UINT32 screen_update_radio86(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(radio86_reset);
 	DECLARE_READ8_MEMBER(radio86_8255_portb_r2);
 	DECLARE_READ8_MEMBER(radio86_8255_portc_r2);

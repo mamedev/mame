@@ -147,7 +147,7 @@ I8257_INTERFACE( radio86_dma )
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER("i8275", i8275_dack_w), DEVCB_NULL }
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_MEMBER("i8275", i8275_device, dack_w), DEVCB_NULL }
 };
 
 TIMER_CALLBACK_MEMBER(radio86_state::radio86_reset)
@@ -241,6 +241,8 @@ const i8275_interface radio86_i8275_interface = {
 	0,
 	DEVCB_DEVICE_LINE("dma8257", i8257_drq2_w),
 	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	radio86_display_pixels
 };
 
@@ -249,6 +251,8 @@ const i8275_interface mikrosha_i8275_interface = {
 	6,
 	0,
 	DEVCB_DEVICE_LINE("dma8257", i8257_drq2_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL,
 	mikrosha_display_pixels
 };
@@ -259,6 +263,8 @@ const i8275_interface apogee_i8275_interface = {
 	0,
 	DEVCB_DEVICE_LINE("dma8257", i8257_drq2_w),
 	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	apogee_display_pixels
 };
 
@@ -267,6 +273,8 @@ const i8275_interface partner_i8275_interface = {
 	6,
 	1,
 	DEVCB_DEVICE_LINE("dma8257", i8257_drq2_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL,
 	partner_display_pixels
 };

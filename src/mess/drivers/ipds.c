@@ -29,10 +29,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ipds_b1_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
-	bitmap_rgb32 m_bitmap;
-	virtual void video_start();
 	virtual void machine_reset();
-	UINT32 screen_update_ipds(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 READ8_MEMBER( ipds_state::ipds_b0_r )
@@ -78,17 +75,10 @@ void ipds_state::machine_reset()
 {
 }
 
-
-void ipds_state::video_start()
-{
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
-}
-
 static I8275_DISPLAY_PIXELS(ipds_display_pixels)
 {
 	int i;
 	ipds_state *state = device->machine().driver_data<ipds_state>();
-	bitmap_rgb32 &bitmap = state->m_bitmap;
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT8 *charmap = state->memregion("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
@@ -113,16 +103,10 @@ const i8275_interface ipds_i8275_interface =
 	0,
 	DEVCB_NULL,
 	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	ipds_display_pixels
 };
-
-UINT32 ipds_state::screen_update_ipds(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	device_t *devconf = machine().device("i8275");
-	i8275_update( devconf, bitmap, cliprect);
-	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
-	return 0;
-}
 
 /* F4 Character Displayer */
 static const gfx_layout ipds_charlayout =
@@ -162,11 +146,11 @@ static MACHINE_CONFIG_START( ipds, ipds_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ipds_state, screen_update_ipds)
 	MCFG_GFXDECODE(ipds)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_green)

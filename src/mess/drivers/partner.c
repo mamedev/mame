@@ -34,7 +34,7 @@ static ADDRESS_MAP_START(partner_mem, AS_PROGRAM, 8, partner_state )
 	AM_RANGE( 0xc000, 0xc7ff ) AM_RAMBANK("bank8")
 	AM_RANGE( 0xc800, 0xcfff ) AM_RAMBANK("bank9")
 	AM_RANGE( 0xd000, 0xd7ff ) AM_RAMBANK("bank10")
-	AM_RANGE( 0xd800, 0xd8ff ) AM_DEVREADWRITE_LEGACY("i8275", i8275_r, i8275_w)  // video
+	AM_RANGE( 0xd800, 0xd8ff ) AM_DEVREADWRITE("i8275", i8275_device, read, write)  // video
 	AM_RANGE( 0xd900, 0xd9ff ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE( 0xda00, 0xdaff ) AM_WRITE(partner_mem_page_w)
 	AM_RANGE( 0xdb00, 0xdbff ) AM_DEVWRITE_LEGACY("dma8257", i8257_w)	 // DMA
@@ -201,11 +201,11 @@ static MACHINE_CONFIG_START( partner, partner_state )
 	MCFG_I8275_ADD	( "i8275", partner_i8275_interface)
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
-	MCFG_SCREEN_UPDATE_DRIVER(radio86_state, screen_update_radio86)
 
 	MCFG_GFXDECODE(partner)
 	MCFG_PALETTE_LENGTH(3)

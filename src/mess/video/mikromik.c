@@ -29,7 +29,7 @@ static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 
 		int color = hlt_in ? 2 : (video_in ^ compl_in);
 
-		state->m_bitmap.pix32(y, x + i) = RGB_MONOCHROME_GREEN_HIGHLIGHT[color];
+		bitmap.pix32(y, x + i) = RGB_MONOCHROME_GREEN_HIGHLIGHT[color];
 	}
 }
 
@@ -39,6 +39,8 @@ static const i8275_interface crtc_intf =
 	8,
 	0,
 	DEVCB_DEVICE_LINE_MEMBER(I8237_TAG, am9517a_device, dreq0_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL,
 	crtc_display_pixels
 };
@@ -89,8 +91,6 @@ void mm1_state::video_start()
 {
 	// find memory regions
 	m_char_rom = memregion("chargen")->base();
-
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
 }
 
 
@@ -101,8 +101,7 @@ void mm1_state::video_start()
 UINT32 mm1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* text */
-	i8275_update(m_crtc, bitmap, cliprect);
-	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	m_crtc->screen_update(screen, bitmap, cliprect);
 
 	/* graphics */
 	m_hgdc->screen_update(screen, bitmap, cliprect);

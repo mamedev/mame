@@ -33,7 +33,7 @@ static ADDRESS_MAP_START(apogee_mem, AS_PROGRAM, 8, apogee_state )
     //AM_RANGE( 0xec00, 0xecff ) AM_RAM  // Timer
     AM_RANGE( 0xed00, 0xed03 ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write) AM_MIRROR(0x00fc)
     //AM_RANGE( 0xee00, 0xee03 ) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write) AM_MIRROR(0x00fc)
-    AM_RANGE( 0xef00, 0xef01 ) AM_DEVREADWRITE_LEGACY("i8275", i8275_r, i8275_w) AM_MIRROR(0x00fe) // video
+    AM_RANGE( 0xef00, 0xef01 ) AM_DEVREADWRITE("i8275", i8275_device, read, write) AM_MIRROR(0x00fe) // video
     AM_RANGE( 0xf000, 0xf0ff ) AM_DEVWRITE_LEGACY("dma8257", i8257_w)	 // DMA
     AM_RANGE( 0xf000, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
@@ -174,11 +174,11 @@ static MACHINE_CONFIG_START( apogee, apogee_state )
 	MCFG_I8275_ADD	( "i8275", apogee_i8275_interface)
     /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(78*6, 30*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
-	MCFG_SCREEN_UPDATE_DRIVER(radio86_state, screen_update_radio86)
 
 	MCFG_GFXDECODE(apogee)
 	MCFG_PALETTE_LENGTH(3)
