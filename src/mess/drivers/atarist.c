@@ -1823,7 +1823,7 @@ WRITE_LINE_MEMBER( st_state::acia_ikbd_irq_w )
 {
 	m_acia_ikbd_irq = state;
 
-	m_mfp->i4_w(m_acia_ikbd_irq & m_acia_midi_irq);
+	m_mfp->i4_w(!(m_acia_ikbd_irq || m_acia_midi_irq));
 }
 
 static ACIA6850_INTERFACE( acia_ikbd_intf )
@@ -1864,7 +1864,7 @@ WRITE_LINE_MEMBER( st_state::acia_midi_irq_w )
 {
 	m_acia_midi_irq = state;
 
-	m_mfp->i4_w(m_acia_ikbd_irq & m_acia_midi_irq);
+	m_mfp->i4_w(!(m_acia_ikbd_irq || m_acia_midi_irq));
 }
 
 static ACIA6850_INTERFACE( acia_midi_intf )
@@ -1914,7 +1914,7 @@ READ8_MEMBER( st_state::mfp_gpio_r )
 	data |= m_blitter_done << 3;
 
 	// keyboard/MIDI interrupt
-	data |= (m_acia_ikbd_irq & m_acia_midi_irq) << 4;
+	data |= (!(m_acia_ikbd_irq || m_acia_midi_irq)) << 4;
 
 	// floppy interrupt request
 	data |= !m_fdc->intrq_r() << 5;
@@ -1984,7 +1984,7 @@ READ8_MEMBER( ste_state::mfp_gpio_r )
 	data |= m_blitter_done << 3;
 
 	// keyboard/MIDI interrupt
-	data |= (m_acia_ikbd_irq & m_acia_midi_irq) << 4;
+	data |= (!(m_acia_ikbd_irq || m_acia_midi_irq)) << 4;
 
 	// floppy interrupt request
 	data |= !m_fdc->intrq_r() << 5;
@@ -2048,7 +2048,7 @@ READ8_MEMBER( stbook_state::mfp_gpio_r )
 	data |= m_blitter_done << 3;
 
 	// keyboard/MIDI interrupt
-	data |= (m_acia_ikbd_irq & m_acia_midi_irq) << 4;
+	data |= (!(m_acia_ikbd_irq || m_acia_midi_irq)) << 4;
 
 	// floppy data request
 	data |= !m_fdc->intrq_r() << 5;
