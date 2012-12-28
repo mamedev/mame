@@ -27,11 +27,15 @@ Note: To start a game, certain switches need to be activated.  You must first pr
 #include "sound/dac.h"
 #include "s11a.lh"
 
+// 6802/8 CPU's input clock is 4MHz
+// but because it has an internal /4 divider, its E clock runs at 1/4 that frequency
+#define E_CLOCK (XTAL_4MHz/4)
+
 // Length of time in cycles between IRQs on the main 6808 CPU
 // This length is determined by the settings of the W14 and W15 jumpers
 // It can be 0x300, 0x380, 0x700 or 0x780 cycles long.
 // IRQ length is always 32 cycles
-#define S11_IRQ_CYCLES 0x700
+#define S11_IRQ_CYCLES 0x380
 
 class s11a_state : public genpin_class
 {
@@ -245,7 +249,7 @@ void s11a_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		if(param == 1)
 		{
 			m_maincpu->set_input_line(M6800_IRQ_LINE,ASSERT_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(32,XTAL_4MHz),0);
+			m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
 			m_pias->cb1_w(0);
 			m_irq_active = true;
 			m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
@@ -254,7 +258,7 @@ void s11a_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		else
 		{
 			m_maincpu->set_input_line(M6800_IRQ_LINE,CLEAR_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,XTAL_4MHz),1);
+			m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
 			m_pias->cb1_w(1);
 			m_irq_active = false;
 			m_pia28->ca1_w(1);
@@ -290,7 +294,7 @@ WRITE_LINE_MEMBER( s11a_state::pia_irq )
 	if(state == CLEAR_LINE)
 	{
 		// restart IRQ timer
-		m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,XTAL_4MHz),1);
+		m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
 		m_irq_active = false;
 	}
 	else
@@ -616,7 +620,7 @@ DRIVER_INIT_MEMBER( s11a_state, s11a )
 	membank("bank1")->set_entry(0);
 	membank("bgbank")->set_entry(0);
 	m_irq_timer = timer_alloc(TIMER_IRQ);
-	m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,XTAL_4MHz),1);
+	m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
 	m_irq_active = false;
 }
 
