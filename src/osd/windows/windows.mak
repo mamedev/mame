@@ -51,6 +51,9 @@
 # uncomment next line to enable a build using Microsoft tools
 # MSVC_BUILD = 1
 
+# uncomment next line to enable code analysis using Microsoft tools
+# MSVC_ANALYSIS = 1
+
 # uncomment next line to use cygwin compiler
 # CYGWIN_BUILD = 1
 
