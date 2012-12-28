@@ -416,6 +416,16 @@ ifeq ($(findstring 4.7,$(TEST_GCC)),4.7)
 	CCOMFLAGS += -Wno-narrowing -Wno-attributes
 endif
 
+# Ubuntu 12.10 GCC 4.7.2 autodetect
+ifeq ($(findstring 4.7.2-2ubuntu1,$(TEST_GCC)),4.7.2-2ubuntu1)
+GCC46TST = $(shell which g++-4.6 2>/dev/null)
+ifeq '$(GCC46TST)' ''
+    $(error Ubuntu 12.10 detected.  Please install the gcc-4.6 and g++-4.6 packages)
+endif
+CC = @gcc-4.6
+LD = @g++-4.6
+endif
+
 #-------------------------------------------------
 # Unix
 #-------------------------------------------------
