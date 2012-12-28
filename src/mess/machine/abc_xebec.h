@@ -51,7 +51,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<scsicb_device> m_sasibus;
+	required_device<scsibus_device> m_sasibus;
 };
 
 

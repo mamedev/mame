@@ -131,7 +131,7 @@ Notes:
 
 #define Z80_TAG		"5a"
 #define Z80PIO_TAG	"3a"
-#define FD1791_TAG	"7a"
+#define MB8876_TAG	"7a"
 
 
 
@@ -346,10 +346,10 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_10828 )
 	MCFG_CPU_CONFIG(daisy_chain)
 
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, pio_intf)
-	MCFG_FD1791x_ADD(FD1791_TAG, XTAL_4MHz/2)
+	MCFG_MB8876x_ADD(MB8876_TAG, XTAL_4MHz/2)
 
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":0", abc_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(FD1791_TAG":1", abc_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":0", abc_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(MB8876_TAG":1", abc_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -414,9 +414,9 @@ luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, cons
 	  device_abcbus_card_interface(mconfig, *this),
 	  m_maincpu(*this, Z80_TAG),
 	  m_pio(*this, Z80PIO_TAG),
-	  m_fdc(*this, FD1791_TAG),
-	  m_floppy0(*this, FD1791_TAG":0"),
-	  m_floppy1(*this, FD1791_TAG":1"),
+	  m_fdc(*this, MB8876_TAG),
+	  m_floppy0(*this, MB8876_TAG":0"),
+	  m_floppy1(*this, MB8876_TAG":1"),
 	  m_sw1(*this, "SW1"),
 	  m_s1(*this, "S1"),
 	  m_cs(false),
