@@ -521,7 +521,7 @@ static ADDRESS_MAP_START( sound_map_2203, AS_PROGRAM, 8, segahang_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x0800) AM_RAM
 	AM_RANGE(0xd000, 0xd001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0xe000, 0xe0ff) AM_MIRROR(0x0f00) AM_DEVREADWRITE_LEGACY("pcm", sega_pcm_r, sega_pcm_w)
+	AM_RANGE(0xe000, 0xe0ff) AM_MIRROR(0x0f00) AM_DEVREADWRITE("pcm", segapcm_device, sega_pcm_r, sega_pcm_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap_2203, AS_IO, 8, segahang_state )
@@ -533,7 +533,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map_2151, AS_PROGRAM, 8, segahang_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x700) AM_DEVREADWRITE_LEGACY("pcm", sega_pcm_r, sega_pcm_w)
+	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x700) AM_DEVREADWRITE("pcm", segapcm_device, sega_pcm_r, sega_pcm_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -899,7 +899,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_board_2203 )
 	MCFG_SOUND_ROUTE(3, "lspeaker",  0.37)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 0.37)
 
-	MCFG_SOUND_ADD("pcm", SEGAPCM, MASTER_CLOCK_8MHz)
+	MCFG_SEGAPCM_ADD("pcm", MASTER_CLOCK_8MHz)
 	MCFG_SOUND_CONFIG(segapcm_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -937,7 +937,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_board_2203x2 )
 	MCFG_SOUND_ROUTE(3, "lspeaker",  0.37)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 0.37)
 
-	MCFG_SOUND_ADD("pcm", SEGAPCM, MASTER_CLOCK_8MHz/2)
+	MCFG_SEGAPCM_ADD("pcm", MASTER_CLOCK_8MHz/2)
 	MCFG_SOUND_CONFIG(segapcm_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -959,7 +959,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_board_2151 )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 
-	MCFG_SOUND_ADD("pcm", SEGAPCM, MASTER_CLOCK_8MHz/2)
+	MCFG_SEGAPCM_ADD("pcm", MASTER_CLOCK_8MHz/2)
 	MCFG_SOUND_CONFIG(segapcm_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1806,7 +1806,7 @@ DRIVER_INIT_MEMBER(segahang_state,endurob2)
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,     INIT,                        MONITOR,COMPANY,FULLNAME,FLAGS
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,     INIT,                   MONITOR,COMPANY,FULLNAME,FLAGS
 GAME( 1985, hangon,    0,        hangon,   hangon,    segahang_state,generic, ROT0,   "Sega", "Hang-On (Rev A)", 0 )
 GAME( 1985, hangon1,   hangon,   hangon,   hangon,    segahang_state,generic, ROT0,   "Sega", "Hang-On", 0 )
 GAME( 1987, shangonro, shangon,  shangonro,shangonro, segahang_state,generic, ROT0,   "Sega", "Super Hang-On (ride-on, Japan, FD1094 317-0038)", 0 )

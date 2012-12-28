@@ -845,7 +845,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segaorun_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE_LEGACY("pcm", sega_pcm_r, sega_pcm_w)
+	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("pcm", segapcm_device, sega_pcm_r, sega_pcm_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1098,7 +1098,7 @@ static MACHINE_CONFIG_START( outrun_base, segaorun_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.43)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 
-	MCFG_SOUND_ADD("pcm", SEGAPCM, SOUND_CLOCK/4)
+	MCFG_SEGAPCM_ADD("pcm", SOUND_CLOCK/4)
 	MCFG_SOUND_CONFIG(segapcm_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
