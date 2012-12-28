@@ -245,7 +245,7 @@ void s11a_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		if(param == 1)
 		{
 			m_maincpu->set_input_line(M6800_IRQ_LINE,ASSERT_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(32,4000000/2),0);
+			m_irq_timer->adjust(attotime::from_ticks(32,XTAL_4MHz/2),0);
 			m_pias->cb1_w(0);
 			m_irq_active = true;
 			m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
@@ -254,7 +254,7 @@ void s11a_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		else
 		{
 			m_maincpu->set_input_line(M6800_IRQ_LINE,CLEAR_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,4000000/2),1);
+			m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,XTAL_4MHz/2),1);
 			m_pias->cb1_w(1);
 			m_irq_active = false;
 			m_pia28->ca1_w(1);
@@ -290,7 +290,7 @@ WRITE_LINE_MEMBER( s11a_state::pia_irq )
 	if(state == CLEAR_LINE)
 	{
 		// restart IRQ timer
-		m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,4000000/2),1);
+		m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,XTAL_4MHz/2),1);
 		m_irq_active = false;
 	}
 	else
@@ -616,13 +616,13 @@ DRIVER_INIT_MEMBER( s11a_state, s11a )
 	membank("bank1")->set_entry(0);
 	membank("bgbank")->set_entry(0);
 	m_irq_timer = timer_alloc(TIMER_IRQ);
-	m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,4000000/2),1);
+	m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,XTAL_4MHz/2),1);
 	m_irq_active = false;
 }
 
 static MACHINE_CONFIG_START( s11a, s11a_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6808, 4000000)
+	MCFG_CPU_ADD("maincpu", M6808, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(s11a_main_map)
 	MCFG_MACHINE_RESET_OVERRIDE(s11a_state, s11a)
 
@@ -642,7 +642,7 @@ static MACHINE_CONFIG_START( s11a, s11a_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* Add the soundcard */
-	MCFG_CPU_ADD("audiocpu", M6802, 3580000)
+	MCFG_CPU_ADD("audiocpu", M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(s11a_audio_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
