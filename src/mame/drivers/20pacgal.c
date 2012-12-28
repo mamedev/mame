@@ -348,6 +348,9 @@ void _20pacgal_state::machine_start()
 	save_item(NAME(m_game_selected));
 	save_item(NAME(m_ram_48000));
 	save_item(NAME(m_irq_mask));
+	save_item(NAME(m_sprite_gfx_ram));
+	save_item(NAME(m_sprite_ram));
+	save_item(NAME(m_sprite_color_lookup));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(_20pacgal_state::set_bankptr), this));
 }
