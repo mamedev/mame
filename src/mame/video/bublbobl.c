@@ -74,8 +74,8 @@ UINT32 bublbobl_state::screen_update_bublbobl(screen_device &screen, bitmap_ind1
 
 				if (flip_screen())
 				{
-					x = 248 - x;
-					y = 248 - y;
+					x = 376 - x;
+					y = 256 - y;
 					flipx = !flipx;
 					flipy = !flipy;
 				}
