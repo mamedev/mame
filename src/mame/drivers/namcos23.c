@@ -2216,7 +2216,7 @@ READ16_MEMBER(namcos23_state::s23_c417_r)
            6:  hokan/tenso unit busy
            5:  point unit busy
            4:  access unit busy
-           3:  c403 busy (inverted)
+           3:  c403 busy, called c444 in 500gp (inverted)
            2:  2nd c435 busy (inverted)
            1:  1st c435 busy (inverted)
            0:  xcpreq
@@ -3033,7 +3033,6 @@ static ADDRESS_MAP_START( s23iobrdmap, AS_PROGRAM, 8, namcos23_state )
 	AM_RANGE(0x6003, 0x6003) AM_READ_PORT("IN3")
 	AM_RANGE(0x6004, 0x6005) AM_WRITENOP
 	AM_RANGE(0x6006, 0x6007) AM_NOP
-
 	AM_RANGE(0xc000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -3216,14 +3215,15 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( s23 )
 	// No idea if start is actually there, but we need buttons to pass error screens
-	// You can go to the pcb test mode by pressing start, and it doesn't crash anymore somehow
-	// Use start1 to select, start1+start2 to exit, up/down to navigate
+	// You can go to the pcb test mode by pressing P1-A, and it doesn't crash anymore somehow
+	// Use P1-A to select, P1-Sel+P1-A to exit, up/down to navigate
 	PORT_START("P1")
-	PORT_BIT( 0x008, IP_ACTIVE_LOW, IPT_START1 )	// P1 A
-	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_START2 )	// P1 SEL
-	PORT_BIT( 0x040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0xd37, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Dev Service P1-A")
+	PORT_BIT( 0x040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_NAME("Dev Service Down")
+	PORT_BIT( 0x080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_NAME("Dev Service Up")
+	PORT_BIT( 0x100, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Dev Service Start")
+	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Dev Service P1-Sel")
+	PORT_BIT( 0xc37, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
 	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )	// 0x100 = freeze?
@@ -3285,70 +3285,6 @@ static INPUT_PORTS_START( timecrs2 )
 	PORT_BIT( 0xfff, 91+733/2, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(91, 91+733) PORT_SENSITIVITY(48) PORT_KEYDELTA(12)
 	PORT_START("LIGHTY") // tuned for CRT - can't shoot below the statusbar?
 	PORT_BIT( 0xfff, 38+247/2, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(38, 38+247) PORT_SENSITIVITY(64) PORT_KEYDELTA(4)
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( ss23 )
-	// No idea if start is actually there, but we need buttons to pass error screens
-	// You can go to the pcb test mode by pressing start, and it doesn't crash anymore somehow
-	// Use start1 to select, start1+start2 to exit, up/down to navigate
-	PORT_START("P1")
-	PORT_BIT( 0x008, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0xd37, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("P2")
-	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN0")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// this is the "coin acceptor connected" signal
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
-
-	PORT_START("IN1")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	// gun trigger
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	// foot pedal
-	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
-
-	PORT_START("DSW")
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x02, 0x02, "Skip POST" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Freeze?" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -4123,8 +4059,8 @@ ROM_START( 500gp )
 		/* COMMON FUJII YASUI WAKAO KURE INOUE
          * 0x000000..0x57ffff: all 0xff
          */
-	ROM_LOAD16_BYTE( "5gp1mtbl.2f",  0x1000000, 0x800000, CRC(66640606) SHA1(c69a0219748241c49315d7464f8156f8068e9cf5) )
-	ROM_LOAD16_BYTE( "5gp1mtbh.2m",  0x1000001, 0x800000, CRC(352360e8) SHA1(d621dfac3385059c52d215f6623901589a8658a3) )
+	ROM_LOAD16_BYTE( "5gp1mtbh.2m",  0x1000000, 0x800000, CRC(352360e8) SHA1(d621dfac3385059c52d215f6623901589a8658a3) )
+	ROM_LOAD16_BYTE( "5gp1mtbl.2f",  0x1000001, 0x800000, CRC(66640606) SHA1(c69a0219748241c49315d7464f8156f8068e9cf5) )
 
 	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
 	ROM_LOAD( "5gp1cgll.4m",  0x0000000, 0x800000, CRC(0cc5bf35) SHA1(b75510a94fa6b6d2ed43566e6e84c7ae62f68194) )
@@ -4666,13 +4602,13 @@ GAME( 1997, timecrs2,  0,        timecrs2,  timecrs2,  namcos23_state, s23, ROT0
 GAME( 1997, timecrs2b, timecrs2, timecrs2,  timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (TSS2 Ver. B)", GAME_FLAGS )
 GAME( 1997, timecrs2c, timecrs2, timecrs2c, timecrs2,  namcos23_state, s23, ROT0, "Namco", "Time Crisis II (TSS4 Ver. A)", GAME_FLAGS )
 GAME( 1998, panicprk,  0,        s23,       s23,       namcos23_state, s23, ROT0, "Namco", "Panic Park (PNP2 Ver. A)",     GAME_FLAGS )
-GAME( 1998, gunwars,   0,        gmen,      ss23,      namcos23_state, s23, ROT0, "Namco", "Gunmen Wars (GM1 Ver. A)",     GAME_FLAGS )
-GAME( 1998, raceon,    0,        gmen,      ss23,      namcos23_state, s23, ROT0, "Namco", "Race On! (RO2 Ver. A)",        GAME_FLAGS )
-GAME( 1998, 500gp,     0,        ss23,      ss23,      namcos23_state, s23, ROT0, "Namco", "500 GP (5GP3 Ver. C)",         GAME_FLAGS )
-GAME( 1999, finfurl2,  0,        gmen,      ss23,      namcos23_state, s23, ROT0, "Namco", "Final Furlong 2 (World)",      GAME_FLAGS )
-GAME( 1999, finfurl2j, finfurl2, gmen,      ss23,      namcos23_state, s23, ROT0, "Namco", "Final Furlong 2 (Japan)",      GAME_FLAGS )
-GAME( 2000, crszone,   0,        ss23e2,    ss23,      namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO4 Ver. B)",   GAME_FLAGS )
-GAME( 2000, crszonea,  crszone,  ss23e2,    ss23,      namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO3 Ver. B)",   GAME_FLAGS )
-GAME( 2000, crszoneb,  crszone,  ss23e2,    ss23,      namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO3 Ver. A)",   GAME_FLAGS )
-GAME( 2000, crszonec,  crszone,  ss23e2,    ss23,      namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO2 Ver. A)",   GAME_FLAGS )
+GAME( 1998, gunwars,   0,        gmen,      s23,       namcos23_state, s23, ROT0, "Namco", "Gunmen Wars (GM1 Ver. A)",     GAME_FLAGS )
+GAME( 1998, raceon,    0,        gmen,      s23,       namcos23_state, s23, ROT0, "Namco", "Race On! (RO2 Ver. A)",        GAME_FLAGS )
+GAME( 1998, 500gp,     0,        ss23,      s23,       namcos23_state, s23, ROT0, "Namco", "500 GP (5GP3 Ver. C)",         GAME_FLAGS )
+GAME( 1999, finfurl2,  0,        gmen,      s23,       namcos23_state, s23, ROT0, "Namco", "Final Furlong 2 (World)",      GAME_FLAGS )
+GAME( 1999, finfurl2j, finfurl2, gmen,      s23,       namcos23_state, s23, ROT0, "Namco", "Final Furlong 2 (Japan)",      GAME_FLAGS )
+GAME( 2000, crszone,   0,        ss23e2,    s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO4 Ver. B)",   GAME_FLAGS )
+GAME( 2000, crszonea,  crszone,  ss23e2,    s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO3 Ver. B)",   GAME_FLAGS )
+GAME( 2000, crszoneb,  crszone,  ss23e2,    s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO3 Ver. A)",   GAME_FLAGS )
+GAME( 2000, crszonec,  crszone,  ss23e2,    s23,       namcos23_state, s23, ROT0, "Namco", "Crisis Zone (CSZO2 Ver. A)",   GAME_FLAGS )
 
