@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( c65_mem , AS_PROGRAM, 8, c65_state )
 
 	AM_RANGE(0x20000, 0x23fff) AM_ROM /* &c65_dos,     maps to 0x8000    */
 	AM_RANGE(0x24000, 0x28fff) AM_ROM /* reserved */
-	AM_RANGE(0x29000, 0x29fff) AM_ROM AM_SHARE("chargen")
+	AM_RANGE(0x29000, 0x29fff) AM_ROM AM_SHARE("c65_chargen")
 	AM_RANGE(0x2a000, 0x2bfff) AM_ROM AM_SHARE("basic")
 	AM_RANGE(0x2c000, 0x2cfff) AM_ROM AM_SHARE("interface")
 	AM_RANGE(0x2d000, 0x2dfff) AM_ROM AM_SHARE("chargen")

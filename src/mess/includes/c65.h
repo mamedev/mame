@@ -41,10 +41,13 @@ class c65_state : public legacy_c64_state
 {
 public:
 	c65_state(const machine_config &mconfig, device_type type, const char *tag)
-		: legacy_c64_state(mconfig, type, tag) { }
+		: legacy_c64_state(mconfig, type, tag),
+		  m_c65_chargen(*this, "c65_chargen"),
+		  m_interface(*this, "interface")
+	{ }
 
-	UINT8 *m_chargen;
-	UINT8 *m_interface;
+	required_shared_ptr<UINT8> m_c65_chargen;
+	required_shared_ptr<UINT8> m_interface;
 	int m_charset_select;
 	int m_c64mode;
 	UINT8 m_6511_port;
