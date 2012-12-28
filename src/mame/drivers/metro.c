@@ -5883,6 +5883,34 @@ ROM_START( toride2gg )
 	ROM_LOAD( "tr2_ja_7.3g", 0x000000, 0x020000, CRC(6ee32315) SHA1(ef4d59576929deab0aa459a67be21d97c2803dea) )
 ROM_END
 
+/***************************************************************************
+
+Toride II Bok Su Oi Jeon Adauchi Gaiden (C)1994 Metro (Yu Jin?)
+MTR5260-A
+
+info by Guru
+
+***************************************************************************/
+
+ROM_START( toride2gk )
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "5", 0x00000, 0x40000, CRC(7e3f943a) SHA1(d9f36ee85ad8ae562433e0173562ededf6c6f3e4) )
+	ROM_LOAD16_BYTE( "6", 0x00001, 0x40000, CRC(92726910) SHA1(529644fb8e4ea8df0dde617afd3e274821513ab4) )
+
+	ROM_REGION( 0x02c000, "audiocpu", 0 )		/* NEC78C10 Code */
+	ROM_LOAD( "8", 0x00000, 0x04000, CRC(fdd29146) SHA1(8e996e1afd33f16d35ebf5a40829feb3e92f781f) )
+	ROM_CONTINUE(  0x10000, 0x1c000 )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
+	ROMX_LOAD( "2", 0x00000, 0x80000, CRC(5e7fb9db) SHA1(37094ea750be8605bd2130d0d5ce5f9c43b0cc77), ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "4", 0x00002, 0x80000, CRC(558c03e7) SHA1(f7fa5aa9eacd8953d998d9b05d5f03e65056bd78), ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "1", 0x00004, 0x80000, CRC(5e819ccd) SHA1(b1d4e800bac0f55286317d2a39c2b245d87a3e50), ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "3", 0x00006, 0x80000, CRC(24029583) SHA1(6e03db0a9835a8cf5c565d10794e8b01c919a679), ROM_GROUPWORD | ROM_SKIP(6))
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
+	ROM_LOAD( "7", 0x00000, 0x20000, CRC(630c6193) SHA1(ddb63724e0b0f7264cb02904e49b24b87beb35a9) )
+ROM_END
+
 ROM_START( toride2j )
 	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "tr2_jk-5.20e", 0x000000, 0x040000, CRC(f2668578) SHA1(1dd18a5597efb25c937697b50fb1262f50580a63) )
@@ -6062,6 +6090,7 @@ GAME( 1994, lastfortk, lastfort, lastfort, lastfero, metro_state, metro,    ROT0
 GAME( 1994, lastfortg, lastfort, lastforg, ladykill, metro_state, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (German)",   GAME_SUPPORTS_SAVE )
 GAME( 1994, toride2g,  0,        toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                  "Toride II Adauchi Gaiden",          GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1994, toride2gg, toride2g, toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                  "Toride II Adauchi Gaiden (German)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1994, toride2gk, toride2g, toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                  "Toride II Bok Su Oi Jeon Adauchi Gaiden (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1994, toride2j,  toride2g, toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                  "Toride II (Japan)",                 GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1994, gunmast,   0,        pururun,  gunmast, metro_state,  daitorid, ROT0,   "Metro",                                  "Gun Master",                        GAME_SUPPORTS_SAVE )
 GAME( 1995, daitorid,  0,        daitorid, daitorid, metro_state, daitorid, ROT0,   "Metro",                                  "Daitoride",                         GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
