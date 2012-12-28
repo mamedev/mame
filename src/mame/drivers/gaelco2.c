@@ -55,17 +55,17 @@ GFXDECODEINFO(0x0400000, 128)
   ============================================================================*/
 
 static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16, gaelco2_state )
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM																				/* ROM */
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE_LEGACY("gaelco", gaelcosnd_r, gaelcosnd_w)		/* Sound Registers */
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")		/* Video RAM */
-	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")								/* Palette */
-	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")														/* Video Registers */
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")																/* DSW #1 + Input 1P */
-	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")																/* DSW #2 + Input 2P */
-	AM_RANGE(0x30004a, 0x30004b) AM_WRITENOP																		/* Sound muting? */
-	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("COIN")																/* COINSW + SERVICESW */
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(gaelco2_coin_w)															/* Coin lockout + counters */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM																				/* Work RAM */
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM																		/* ROM */
+	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)	/* Sound Registers */
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")							/* Video RAM */
+	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")						/* Palette */
+	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")													/* Video Registers */
+	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")														/* DSW #1 + Input 1P */
+	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")														/* DSW #2 + Input 2P */
+	AM_RANGE(0x30004a, 0x30004b) AM_WRITENOP																/* Sound muting? */
+	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("COIN")														/* COINSW + SERVICESW */
+	AM_RANGE(0x500000, 0x500001) AM_WRITE(gaelco2_coin_w)													/* Coin lockout + counters */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM																		/* Work RAM */
 ADDRESS_MAP_END
 
 
@@ -178,7 +178,7 @@ static MACHINE_CONFIG_START( maniacsq, gaelco2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("gaelco", GAELCO_GAE1, 0)
+	MCFG_GAELCO_GAE1_ADD("gaelco", 0)
 	MCFG_SOUND_CONFIG(maniacsq_snd_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -212,26 +212,26 @@ READ16_MEMBER(gaelco2_state::p2_gun_x){return (ioport("LIGHT1_X")->read() * 320 
 READ16_MEMBER(gaelco2_state::p2_gun_y){return (ioport("LIGHT1_Y")->read() * 240 / 0x100) - 4;}
 
 static ADDRESS_MAP_START( bang_map, AS_PROGRAM, 16, gaelco2_state )
-    AM_RANGE(0x000000, 0x0fffff) AM_ROM																			/* ROM */
-    AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE_LEGACY("gaelco", gaelcosnd_r, gaelcosnd_w)	/* Sound Registers */
-    AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")	/* Video RAM */
-    AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")							/* Palette */
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM																		/* ROM */
+	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_cg1v_device, gaelcosnd_r, gaelcosnd_w)	/* Sound Registers */
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")							/* Video RAM */
+	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")						/* Palette */
     AM_RANGE(0x218004, 0x218009) AM_READONLY																/* Video Registers */
-	AM_RANGE(0x218004, 0x218007) AM_WRITEONLY AM_SHARE("vregs")										/* Video Registers */
-	AM_RANGE(0x218008, 0x218009) AM_WRITENOP																	/* CLR INT Video */
+	AM_RANGE(0x218004, 0x218007) AM_WRITEONLY AM_SHARE("vregs")												/* Video Registers */
+	AM_RANGE(0x218008, 0x218009) AM_WRITENOP																/* CLR INT Video */
     AM_RANGE(0x300000, 0x300001) AM_READ_PORT("P1")
-    AM_RANGE(0x300002, 0x300003) AM_READNOP 																	/* Random number generator? */
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(gaelco2_coin2_w)														/* Coin Counters */
-	AM_RANGE(0x300008, 0x300009) AM_WRITE(gaelco2_eeprom_data_w)												/* EEPROM data */
-	AM_RANGE(0x30000a, 0x30000b) AM_WRITE(gaelco2_eeprom_sk_w)													/* EEPROM serial clock */
-	AM_RANGE(0x30000c, 0x30000d) AM_WRITE(gaelco2_eeprom_cs_w)													/* EEPROM chip select */
+	AM_RANGE(0x300002, 0x300003) AM_READNOP 																/* Random number generator? */
+	AM_RANGE(0x300000, 0x300003) AM_WRITE(gaelco2_coin2_w)													/* Coin Counters */
+	AM_RANGE(0x300008, 0x300009) AM_WRITE(gaelco2_eeprom_data_w)											/* EEPROM data */
+	AM_RANGE(0x30000a, 0x30000b) AM_WRITE(gaelco2_eeprom_sk_w)												/* EEPROM serial clock */
+	AM_RANGE(0x30000c, 0x30000d) AM_WRITE(gaelco2_eeprom_cs_w)												/* EEPROM chip select */
     AM_RANGE(0x300010, 0x300011) AM_READ_PORT("P2")
     AM_RANGE(0x300020, 0x300021) AM_READ_PORT("COIN")
-    AM_RANGE(0x310000, 0x310001) AM_READ(p1_gun_x) AM_WRITE(bang_clr_gun_int_w)									/* Gun 1P X */ /* CLR INT Gun */
-    AM_RANGE(0x310002, 0x310003) AM_READ(p2_gun_x)																/* Gun 2P X */
-    AM_RANGE(0x310004, 0x310005) AM_READ(p1_gun_y)																/* Gun 1P Y */
-    AM_RANGE(0x310006, 0x310007) AM_READ(p2_gun_y)																/* Gun 2P Y */
-    AM_RANGE(0xfe0000, 0xfeffff) AM_RAM																			/* Work RAM */
+	AM_RANGE(0x310000, 0x310001) AM_READ(p1_gun_x) AM_WRITE(bang_clr_gun_int_w)								/* Gun 1P X */ /* CLR INT Gun */
+	AM_RANGE(0x310002, 0x310003) AM_READ(p2_gun_x)															/* Gun 2P X */
+	AM_RANGE(0x310004, 0x310005) AM_READ(p1_gun_y)															/* Gun 1P Y */
+	AM_RANGE(0x310006, 0x310007) AM_READ(p2_gun_y)															/* Gun 2P Y */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM																		/* Work RAM */
 ADDRESS_MAP_END
 
 
@@ -311,7 +311,7 @@ static MACHINE_CONFIG_START( bang, gaelco2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("gaelco", GAELCO_CG1V, 0)
+	MCFG_GAELCO_CG1V_ADD("gaelco", 0)
 	MCFG_SOUND_CONFIG(bang_snd_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -430,17 +430,17 @@ ROM_END
 
 
 static ADDRESS_MAP_START( alighunt_map, AS_PROGRAM, 16, gaelco2_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM																				/* ROM */
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE_LEGACY("gaelco", gaelcosnd_r, gaelcosnd_w)		/* Sound Registers */
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")		/* Video RAM */
-	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")								/* Palette */
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM																			/* ROM */
+	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)		/* Sound Registers */
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")								/* Video RAM */
+	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")							/* Palette */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")														/* Video Registers */
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")																/* DSW #1 + Input 1P */
-	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")																/* DSW #2 + Input 2P */
-	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("COIN")																/* COINSW + SERVICESW */
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(gaelco2_coin_w)															/* Coin lockout + counters */
-	AM_RANGE(0x500006, 0x500007) AM_WRITENOP																		/* ??? */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM																				/* Work RAM */
+	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")															/* DSW #1 + Input 1P */
+	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")															/* DSW #2 + Input 2P */
+	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("COIN")															/* COINSW + SERVICESW */
+	AM_RANGE(0x500000, 0x500001) AM_WRITE(gaelco2_coin_w)														/* Coin lockout + counters */
+	AM_RANGE(0x500006, 0x500007) AM_WRITENOP																	/* ??? */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM																			/* Work RAM */
 ADDRESS_MAP_END
 
 
@@ -552,7 +552,7 @@ static MACHINE_CONFIG_START( alighunt, gaelco2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("gaelco", GAELCO_GAE1, 0)
+	MCFG_GAELCO_GAE1_ADD("gaelco", 0)
 	MCFG_SOUND_CONFIG(alighunt_snd_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -641,18 +641,18 @@ READ16_MEMBER(gaelco2_state::dallas_kludge_r)
 }
 
 static ADDRESS_MAP_START( touchgo_map, AS_PROGRAM, 16, gaelco2_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM																					/* ROM */
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE_LEGACY("gaelco", gaelcosnd_r, gaelcosnd_w)			/* Sound Registers */
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")			/* Video RAM */
-	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")									/* Palette */
-	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")															/* Video Registers */
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")																	/* DSW #1 + Input 1P */
-	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")																	/* DSW #2 + Input 2P */
-	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("IN2")																	/* COINSW + Input 3P */
-	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("IN3")																	/* SERVICESW + Input 4P */
-	AM_RANGE(0x500000, 0x50001f) AM_WRITE(touchgo_coin_w)																/* Coin counters */
-	AM_RANGE(0xfefffa, 0xfefffb) AM_RAM_READ(dallas_kludge_r)															/* DS5002FP related patch */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM																					/* Work RAM */
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM																			/* ROM */
+	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)		/* Sound Registers */
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")								/* Video RAM */
+	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")							/* Palette */
+	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")														/* Video Registers */
+	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")															/* DSW #1 + Input 1P */
+	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")															/* DSW #2 + Input 2P */
+	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("IN2")															/* COINSW + Input 3P */
+	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("IN3")															/* SERVICESW + Input 4P */
+	AM_RANGE(0x500000, 0x50001f) AM_WRITE(touchgo_coin_w)														/* Coin counters */
+	AM_RANGE(0xfefffa, 0xfefffb) AM_RAM_READ(dallas_kludge_r)													/* DS5002FP related patch */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM																			/* Work RAM */
 ADDRESS_MAP_END
 
 
@@ -802,7 +802,7 @@ static MACHINE_CONFIG_START( touchgo, gaelco2_state )
 	/* the chip is stereo, but the game sound is mono because the right channel
        output is for cabinet 1 and the left channel output is for cabinet 2 */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("gaelco", GAELCO_GAE1, 0)
+	MCFG_GAELCO_GAE1_ADD("gaelco", 0)
 	MCFG_SOUND_CONFIG(touchgo_snd_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -905,21 +905,21 @@ ROM_END
   ============================================================================*/
 
 static ADDRESS_MAP_START( snowboar_map, AS_PROGRAM, 16, gaelco2_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM																						/* ROM */
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE_LEGACY("gaelco", gaelcosnd_r, gaelcosnd_w)				/* Sound Registers */
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")				/* Video RAM */
-	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")										/* Palette */
-	AM_RANGE(0x212000, 0x213fff) AM_RAM																						/* Extra RAM */
-	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")																/* Video Registers */
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM																			/* ROM */
+	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_cg1v_device, gaelcosnd_r, gaelcosnd_w)		/* Sound Registers */
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")								/* Video RAM */
+	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")							/* Palette */
+	AM_RANGE(0x212000, 0x213fff) AM_RAM																			/* Extra RAM */
+	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")														/* Video Registers */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("P1")
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(gaelco2_coin2_w)																	/* Coin Counters */
-	AM_RANGE(0x300008, 0x300009) AM_WRITE(gaelco2_eeprom_data_w)															/* EEPROM data */
-	AM_RANGE(0x30000a, 0x30000b) AM_WRITE(gaelco2_eeprom_sk_w)																/* EEPROM serial clock */
-	AM_RANGE(0x30000c, 0x30000d) AM_WRITE(gaelco2_eeprom_cs_w)																/* EEPROM chip select */
+	AM_RANGE(0x300000, 0x300003) AM_WRITE(gaelco2_coin2_w)														/* Coin Counters */
+	AM_RANGE(0x300008, 0x300009) AM_WRITE(gaelco2_eeprom_data_w)												/* EEPROM data */
+	AM_RANGE(0x30000a, 0x30000b) AM_WRITE(gaelco2_eeprom_sk_w)													/* EEPROM serial clock */
+	AM_RANGE(0x30000c, 0x30000d) AM_WRITE(gaelco2_eeprom_cs_w)													/* EEPROM chip select */
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("P2")
 	AM_RANGE(0x300020, 0x300021) AM_READ_PORT("COIN")
 	AM_RANGE(0x310000, 0x31ffff) AM_READWRITE(snowboar_protection_r,snowboar_protection_w) AM_SHARE("snowboar_prot")	/* Protection */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM																						/* Work RAM */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM																					/* Work RAM */
 ADDRESS_MAP_END
 
 
@@ -988,7 +988,7 @@ static MACHINE_CONFIG_START( snowboar, gaelco2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("gaelco", GAELCO_CG1V, 0)
+	MCFG_GAELCO_CG1V_ADD("gaelco", 0)
 	MCFG_SOUND_CONFIG(snowboar_snd_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1090,20 +1090,20 @@ ROM_END
   ============================================================================*/
 
 static ADDRESS_MAP_START( wrally2_map, AS_PROGRAM, 16, gaelco2_state )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM																			/* ROM */
-	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE_LEGACY("gaelco", gaelcosnd_r, gaelcosnd_w)	/* Sound Registers */
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")	/* Video RAM */
-	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")							/* Palette */
-	AM_RANGE(0x212000, 0x213fff) AM_RAM																			/* Extra RAM */
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM																		/* ROM */
+	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelco_gae1_device, gaelcosnd_r, gaelcosnd_w)	/* Sound Registers */
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")							/* Video RAM */
+	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE(gaelco2_palette_w) AM_SHARE("paletteram")						/* Palette */
+	AM_RANGE(0x212000, 0x213fff) AM_RAM																		/* Extra RAM */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_SHARE("vregs")													/* Video Registers */
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")															/* DIPSW #2 + Inputs 1P */
-	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")															/* DIPSW #1 */
-	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("IN2")															/* Inputs 2P + COINSW */
-	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("IN3")															/* SERVICESW */
-	AM_RANGE(0x400000, 0x400011) AM_WRITE(wrally2_coin_w)														/* Coin Counters */
-	AM_RANGE(0x400028, 0x400029) AM_WRITE(wrally2_adc_clk)														/* ADCs clock-in line */
-	AM_RANGE(0x400030, 0x400031) AM_WRITE(wrally2_adc_cs)														/* ADCs chip select line */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM																			/* Work RAM */
+	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")														/* DIPSW #2 + Inputs 1P */
+	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")														/* DIPSW #1 */
+	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("IN2")														/* Inputs 2P + COINSW */
+	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("IN3")														/* SERVICESW */
+	AM_RANGE(0x400000, 0x400011) AM_WRITE(wrally2_coin_w)													/* Coin Counters */
+	AM_RANGE(0x400028, 0x400029) AM_WRITE(wrally2_adc_clk)													/* ADCs clock-in line */
+	AM_RANGE(0x400030, 0x400031) AM_WRITE(wrally2_adc_cs)													/* ADCs chip select line */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM																		/* Work RAM */
 ADDRESS_MAP_END
 
 
@@ -1238,7 +1238,7 @@ static MACHINE_CONFIG_START( wrally2, gaelco2_state )
 	/* the chip is stereo, but the game sound is mono because the right channel
        output is for cabinet 1 and the left channel output is for cabinet 2 */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("gaelco", GAELCO_GAE1, 0)
+	MCFG_GAELCO_GAE1_ADD("gaelco", 0)
 	MCFG_SOUND_CONFIG(wrally2_snd_interface)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1439,14 +1439,14 @@ ROM_END
 
 GAME( 1994, aligator,  0,       alighunt, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1994, aligatorun,aligator,alighunt, alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected)", 0 )
-GAME( 1995, touchgo,  0,        touchgo,  touchgo, gaelco2_state,  touchgo,  ROT0, "Gaelco", "Touch & Go (World)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1995, touchgon, touchgo,  touchgo,  touchgo, gaelco2_state,  touchgo,  ROT0, "Gaelco", "Touch & Go (Non North America)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1995, touchgoe, touchgo,  touchgo,  touchgo, gaelco2_state,  touchgo,  ROT0, "Gaelco", "Touch & Go (earlier revision)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1995, wrally2,  0,        wrally2,  wrally2, driver_device,  0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1995, touchgo,  0,        touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (World)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1995, touchgon, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Non North America)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1995, touchgoe, touchgo,  touchgo,  touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (earlier revision)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1995, wrally2,  0,        wrally2,  wrally2,  driver_device, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1996, maniacsq, 0,        maniacsq, maniacsq, driver_device, 0,        ROT0, "Gaelco", "Maniac Square (unprotected)", 0 )
 GAME( 1996, snowboar, 0,        snowboar, snowboar, driver_device, 0,        ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1996, snowboara,snowboar, snowboar, snowboar, gaelco2_state, snowboar, ROT0, "Gaelco", "Snow Board Championship (Version 2.0)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1998, bang,     0,        bang,     bang, gaelco2_state,     bang,     ROT0, "Gaelco", "Bang!", 0 )
-GAME( 1998, bangj,    bang,     bang,     bang, gaelco2_state,     bang,     ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
+GAME( 1998, bang,     0,        bang,     bang,     gaelco2_state, bang,     ROT0, "Gaelco", "Bang!", 0 )
+GAME( 1998, bangj,    bang,     bang,     bang,     gaelco2_state, bang,     ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
 GAME( 1999, grtesoro,  0,       maniacsq, maniacsq, driver_device, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v5.01) (Italy)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1999, grtesoro4, grtesoro,maniacsq, maniacsq, driver_device, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v4.0) (Italy)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
