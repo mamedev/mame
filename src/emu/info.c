@@ -1262,6 +1262,8 @@ void info_xml_creator::output_slots(device_t &device, const char *root_tag)
 	slot_interface_iterator iter(device);
 	for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
 	{
+		if (slot->fixed()) continue;	// or shall we list these as non-configurable?
+
 		if (strcmp(slot->device().tag(), device.tag()))
 		{
 			astring newtag(slot->device().tag()), oldtag(":");
