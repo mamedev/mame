@@ -187,6 +187,8 @@ public:
 	DECLARE_WRITE8_MEMBER(amstrad_ppi_portc_w);
 
 	void aleste_interrupt(bool state);
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 

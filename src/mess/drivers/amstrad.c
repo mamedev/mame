@@ -105,6 +105,7 @@ Some bugs left :
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
 #include "formats/tzx_cas.h"
+#include "formats/dsk_dsk.h"
 
 #include "machine/ram.h"
 
@@ -883,12 +884,15 @@ static MACHINE_CONFIG_START( amstrad_nofdc, amstrad_state )
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
+FLOPPY_FORMATS_MEMBER( amstrad_state::floppy_formats )
+	FLOPPY_DSK_FORMAT
+FLOPPY_FORMATS_END
 
 static MACHINE_CONFIG_DERIVED( amstrad, amstrad_nofdc )
 	MCFG_UPD765A_ADD("upd765", true, true)
 
-	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "3ssdd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", amstrad_floppies, "3ssdd", 0, amstrad_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", amstrad_floppies, "3ssdd", 0, amstrad_state::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","cpc_flop")
 MACHINE_CONFIG_END

@@ -333,7 +333,7 @@ struct sector_header
 	UINT8   sector_size_code;
 	UINT8	fdc_status_reg1;
 	UINT8	fdc_status_reg2;
-	UINT16  data_lenght;
+	UINT16  data_length;
 };
 
 #pragma pack()
@@ -342,6 +342,8 @@ bool dsk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	UINT8 header[100];
 	bool extendformat = FALSE;
+
+	int image_size = io_generic_size(io);
 
 	io_generic_read(io, &header, 0, sizeof(header));
 	if ( memcmp( header, EXT_FORMAT_HEADER, 16 ) ==0) {
@@ -377,19 +379,40 @@ bool dsk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	int counter = 0;
 	for(int track=0; track < tracks; track++) {
 		for(int side=0; side < heads; side++) {
-			// read location of
+			if(track_offsets[(track<<1)+side] >= image_size)
+				continue;
 			track_header tr;
 			io_generic_read(io, &tr,track_offsets[(track<<1)+side],sizeof(tr));
-			//printf("%d,%d %d, %d\n",track,side,tr.track_number, tr.gap3_length);
-			//int sec_location = track_offsets[(track<<1)+side] + 0x100;
-			for(int j=0;j<tr.number_of_sector;j++)
-			{
+			desc_pc_sector sects[256];
+			UINT8 sect_data[65536];
+			int sdatapos = 0;
+			int pos = track_offsets[(track<<1)+side] + 0x100;
+			for(int j=0;j<tr.number_of_sector;j++) {
 				sector_header sector;
 				io_generic_read(io, &sector,track_offsets[(track<<1)+side]+sizeof(tr)+(sizeof(sector)*j),sizeof(sector));
-				//printf("sec %02x %08x\n",sector.sector_id,sec_location);
 
-				//sec_location += sector.data_lenght;
+				sects[j].track       = sector.track;
+				sects[j].head        = sector.side;
+				sects[j].sector      = sector.sector_id;
+				sects[j].size        = sector.sector_size_code;
+				sects[j].actual_size = sector.data_length;
+				sects[j].deleted     = sector.fdc_status_reg1 == 0xb2;
+				sects[j].bad_crc     = sector.fdc_status_reg1 == 0xb5;
+
+				if(!sects[j].deleted) {
+					sects[j].data = sect_data + sdatapos;
+					io_generic_read(io, sects[j].data, pos, sects[j].actual_size);
+					sdatapos += sects[j].actual_size;
+
+				} else
+					sects[j].data = NULL;
+
+				if(extendformat)
+					pos += sector.data_length;
+				else
+					pos += 128 << tr.sector_size_code;
 			}
+			build_pc_track_mfm(track, side, image, 100000, tr.number_of_sector, sects, tr.gap3_length);
 			counter++;
 		}
 	}
