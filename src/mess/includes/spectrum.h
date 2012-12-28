@@ -9,6 +9,7 @@
 
 #include "imagedev/snapquik.h"
 #include "imagedev/cartslot.h"
+#include "machine/upd765.h"
 
 /* Spectrum crystals */
 
@@ -125,6 +126,8 @@ public:
 
 	unsigned int m_previous_border_x, m_previous_border_y;
 	bitmap_ind16 m_border_bitmap;
+
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 

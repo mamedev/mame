@@ -184,6 +184,7 @@ hash/softwarelist.dtd svneol=native#text/plain
 hash/sorcerer_cart.xml svneol=native#text/xml
 hash/spectrum.xml svneol=native#text/xml
 hash/spectrum_cass.xml svneol=native#text/xml
+hash/spectrum_flop.xml svneol=native#text/plain
 hash/st_cart.xml svneol=native#text/xml
 hash/st_flop.xml svneol=native#text/xml
 hash/studio2.xml svneol=native#text/xml

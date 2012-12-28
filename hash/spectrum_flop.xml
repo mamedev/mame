@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- ZX Spectrum Disc images
+    for +3 machines etc.
+-->
+
+
+<softwarelist name="spectrum_flop" description="ZX Spectrum Disc Images">
+	
+	<software name="pacmania" >
+		<description>Pac-Mania (Europe / Australia)</description>
+		<year>1988</year>
+		<publisher>Namco / Grandslam</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195328">
+				<rom name="pac-mania.dsk" size="195328" crc="88f5506b" sha1="827c95935dd3a1dd919989fc6d7a0efa4e5aebc1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
