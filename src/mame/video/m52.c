@@ -152,7 +152,7 @@ void m52_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m52_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
 	m_bg_tilemap->set_transparent_pen(0);
-	m_bg_tilemap->set_scrolldx(128 - 1, -1);
+	m_bg_tilemap->set_scrolldx(127, 127);
 	m_bg_tilemap->set_scrolldy(16, 16);
 	m_bg_tilemap->set_scroll_rows(4); /* only lines 192-256 scroll */
 
@@ -293,15 +293,16 @@ WRITE8_MEMBER(m52_state::alpha1v_flipscreen_w)
  *
  *************************************/
 
-static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int image)
+void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int image)
 {
 	rectangle rect;
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	m52_state *state = machine.driver_data<m52_state>();
+
 	if (state->flip_screen())
 	{
-		xpos = 255 - xpos;
+		xpos = 127 - xpos;
 		ypos = 255 - ypos - BGHEIGHT;
 	}
 
@@ -400,7 +401,7 @@ UINT32 m52_state::screen_update_m52(screen_device &screen, bitmap_ind16 &bitmap,
 			clip.max_y = 255 - temp;
 			flipx = !flipx;
 			flipy = !flipy;
-			sx = 240 - sx;
+			sx = 112 - sx;
 			sy = 257 + 11 - sy;
 		}
 
