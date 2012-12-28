@@ -4547,18 +4547,15 @@ static void Z79_0000_0000_addr(z8000_state *cpustate)
     CHECK_PRIVILEGED_INSTR();
 	GET_ADDR(OP1);
 	UINT16 fcw;
-    printf("LDPS from 0x%x: old pc: 0x%x\n", addr, cpustate->pc);
-    if (segmented_mode(cpustate)) {
-        fcw = RDMEM_W(cpustate, AS_DATA,  addr + 2);
-        set_pc(cpustate, segmented_addr(RDMEM_L(cpustate, AS_DATA, addr + 4)));
-    }
-    else {
-        fcw = RDMEM_W(cpustate, AS_DATA, addr);
-        set_pc(cpustate, RDMEM_W(cpustate, AS_DATA, (UINT16)(addr + 2)));
-    }
-	if ((fcw ^ cpustate->fcw) & F_SEG) printf("ldps 2 (0x%05x): changing from %ssegmented mode to %ssegmented mode\n", cpustate->pc, (fcw & F_SEG) ? "non-" : "", (fcw & F_SEG) ? "" : "non-");
+	if (segmented_mode(cpustate)) {
+		fcw = RDMEM_W(cpustate, AS_DATA,  addr + 2);
+		set_pc(cpustate, segmented_addr(RDMEM_L(cpustate, AS_DATA, addr + 4)));
+	}
+	else {
+		fcw = RDMEM_W(cpustate, AS_DATA, addr);
+		set_pc(cpustate, RDMEM_W(cpustate, AS_DATA, (UINT16)(addr + 2)));
+	}
 	CHANGE_FCW(cpustate, fcw); /* check for user/system mode change */
-    //printf("LDPS: new pc: 0x%x\n", cpustate->pc);
 }
 
 /******************************************

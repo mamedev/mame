@@ -108,25 +108,19 @@ static UINT8 z8000_zsp[256];
 
 INLINE int segmented_mode(z8000_state *cpustate)
 {
-  if (cpustate->device->type() == Z8001 && (cpustate->fcw & F_SEG))
-    return 1;
-  return 0;
+	if (cpustate->device->type() == Z8001 && (cpustate->fcw & F_SEG))
+		return 1;
+	return 0;
 }
 
 INLINE UINT32 addr_add(z8000_state *cpustate, UINT32 addr, UINT32 addend)
 {
-    if (segmented_mode(cpustate))
-        return (addr & 0xffff0000) | ((addr + addend) & 0xffff);
-    else
-        return (addr + addend) & 0xffff;
+	return (addr & 0xffff0000) | ((addr + addend) & 0xffff);
 }
 
 INLINE UINT32 addr_sub(z8000_state *cpustate, UINT32 addr, UINT32 subtrahend)
 {
-    if (segmented_mode(cpustate))
-        return (addr & 0xffff0000) | ((addr - subtrahend) & 0xffff);
-    else
-        return (addr - subtrahend) & 0xffff;
+	return (addr & 0xffff0000) | ((addr - subtrahend) & 0xffff);
 }
 
 /* conversion table for Z8000 DAB opcode */

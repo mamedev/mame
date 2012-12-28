@@ -17,19 +17,19 @@ Triangle    Test CPU registers and instructions
 Square      Test ROM
 4 vertical lines    CPU call or trap instructions failed
 Diamond     Test system RAM
-EC0     8255 parallel interface IC test failed
-EC1     6845 CRT controller IC test failed
-EC2     1797 floppy disk controller chip failed
-EC3     8253 timer IC failed
-EC4     8251 keyboard interface failed
-EC5     8251 keyboard test failed
-EC6     8259 PIC IC test failed
-EK0     Keyboard did not respond
-EK1     Keyboard responds, but self test failed
-ED1     Disk drive 1 test failed
-ED0     Disk drive 0 test failed
-EI0     Non-vectored interrupt error
-EI1     Vectored interrupt error
+E C0     8255 parallel interface IC test failed
+E C1     6845 CRT controller IC test failed
+E C2     1797 floppy disk controller chip failed
+E C3     8253 timer IC failed
+E C4     8251 keyboard interface failed
+E C5     8251 keyboard test failed
+E C6     8259 PIC IC test failed
+E K0     Keyboard did not respond
+E K1     Keyboard responds, but self test failed
+E D1     Disk drive 1 test failed
+E D0     Disk drive 0 test failed
+E I0     Non-vectored interrupt error
+E I1     Vectored interrupt error
 
 *************************************************************************************************/
 
@@ -38,6 +38,7 @@ EI1     Vectored interrupt error
 #include "cpu/z8000/z8000.h"
 #include "cpu/i86/i86.h"
 #include "video/mc6845.h"
+#include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -53,6 +54,7 @@ public:
 	m20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
         m_maincpu(*this, "maincpu"),
+		m_ram(*this, RAM_TAG),
         m_kbdi8251(*this, "i8251_1"),
         m_ttyi8251(*this, "i8251_2"),
         m_i8255(*this, "ppi8255"),
@@ -63,6 +65,7 @@ public:
 		m_p_videoram(*this, "p_videoram"){ }
 
     required_device<z8001_device> m_maincpu;
+	required_device<ram_device> m_ram;
     required_device<i8251_device> m_kbdi8251;
     required_device<i8251_device> m_ttyi8251;
     required_device<i8255_device> m_i8255;
@@ -91,8 +94,10 @@ public:
 private:
 	bool m_kbrecv_in_progress;
 	int m_kbrecv_bitcount;
+	offs_t m_memsize;
 	UINT16 m_kbrecv_data;
 	UINT8 m_port21;
+	void install_memory();
 
 public:
 	DECLARE_DRIVER_INIT(m20);
@@ -281,136 +286,473 @@ WRITE_LINE_MEMBER( m20_state::timer_tick_w )
 	m_maincpu->set_input_line(0, state ? HOLD_LINE /*ASSERT_LINE*/ : CLEAR_LINE);
 }
 
-/* from the M20 hardware reference manual:
-   M20 memory is configured according to the following scheme:
-   Segment   Contents
-         0   PCOS kernel
-         1   Basic interpreter and PCOS utilities
-         2   PCOS variables, Basic stock and tables, user memory
-         3   Screen bitmap
-         4   Diagnostics and Bootstrap
+
+/* Memory map description (by courtesy of Dwight Elvey)
+
+    DRAM0 = motherboard (128K)
+    DRAM1 = first slot from keyboard end
+    DRAM2 = second slot from keyboard end
+    DRAM3 = third slot from keyboard end
+    SRAM0 = memory window for expansion slot
+    ROM0  = ROM
+
+Expansion cards are either 32K or 128K. They cannot be mixed, all installed
+cards need to be the same type.
+
+B/W, 32K cards, 3 cards => 224K of memory:
+<0>0000 D DRAM0  4000 I DRAM0  4000  <8>0000 D DRAM0 18000 I DRAM0  8000
+<0>4000 D DRAM1  4000 I DRAM0  8000  <8>4000 D DRAM0 1C000 I DRAM0  C000
+<0>8000 D DRAM2  0000 I DRAM0  C000  <8>8000 D DRAM2  4000 I DRAM1  4000
+<0>C000 D DRAM2  4000 I DRAM0 10000  <8>C000 D DRAM3  0000 I DRAM2  0000
+<1>0000 D DRAM0 14000 I DRAM0  8000  <9>0000 D DRAM0 18000 I DRAM0 18000
+<1>4000 D DRAM0 18000 I DRAM0  C000  <9>4000 D DRAM0 1C000 I DRAM0 1C000
+<1>8000 D DRAM0 1C000 I DRAM0 10000  <9>8000 D DRAM2  4000 I DRAM2  4000
+<1>C000 D DRAM1  0000 I None         <9>C000 D DRAM3  0000 I DRAM3  0000
+<2>0000 D DRAM0 14000 I DRAM0 14000  <A>0000 D DRAM0  8000 I DRAM0  8000
+<2>4000 D DRAM0 18000 I DRAM0 18000  <A>4000 D DRAM0  C000 I DRAM0  C000
+<2>8000 D DRAM0 1C000 I DRAM0 1C000  <A>8000 D DRAM1  4000 I DRAM1  4000
+<2>C000 D DRAM1  0000 I DRAM1  0000  <A>C000 D DRAM2  0000 I DRAM2  0000
+<3>0000 D DRAM0  0000 I DRAM0  0000  <B>0000 D DRAM3  4000 I DRAM3  4000
+<3>4000 D None        I None         <B>4000 D None        I None
+<3>8000 D None        I None         <B>8000 D None        I None
+<3>C000 D None        I None         <B>C000 D None        I None
+<4>0000 D  ROM0  0000 I  ROM0  0000  <C>0000 D DRAM3  4000 I None
+<4>4000 D DRAM3  0000 I  ROM0 10000  <C>4000 D None        I None
+<4>8000 D DRAM3  4000 I  ROM0 14000  <C>8000 D None        I None
+<4>C000 D None        I  ROM0 18000  <C>C000 D None        I None
+<5>0000 D DRAM0  8000 I  ROM0 10000  <D>0000 D None        I None
+<5>4000 D DRAM0  C000 I  ROM0 14000  <D>4000 D None        I None
+<5>8000 D DRAM0 10000 I  ROM0 18000  <D>8000 D None        I None
+<5>C000 D SRAM0  0000 I SRAM0  0000  <D>C000 D None        I None
+<6>0000 D DRAM0  8000 I DRAM0  8000  <E>0000 D None        I None
+<6>4000 D DRAM0  C000 I DRAM0  C000  <E>4000 D None        I None
+<6>8000 D DRAM0 10000 I DRAM0 10000  <E>8000 D None        I None
+<6>C000 D None        I None         <E>C000 D None        I None
+<7>0000 D  ROM0  0000 I  ROM0  0000  <F>0000 D None        I None
+<7>4000 D  ROM0 10000 I  ROM0 10000  <F>4000 D None        I None
+<7>8000 D  ROM0 14000 I  ROM0 14000  <F>8000 D None        I None
+<7>C000 D  ROM0 18000 I  ROM0 18000  <F>C000 D None        I None
+
+B/W, 128K cards, 3 cards => 512K of memory:
+<0>0000 D DRAM0  4000 I DRAM0  4000  <8>0000 D DRAM0 18000 I DRAM0  8000
+<0>4000 D DRAM1  4000 I DRAM0  8000  <8>4000 D DRAM0 1C000 I DRAM0  C000
+<0>8000 D DRAM2  0000 I DRAM0  C000  <8>8000 D DRAM1  C000 I DRAM1  4000
+<0>C000 D DRAM2  4000 I DRAM0 10000  <8>C000 D DRAM1 10000 I DRAM1  8000
+<1>0000 D DRAM0 14000 I DRAM0  8000  <9>0000 D DRAM0 18000 I DRAM0 18000
+<1>4000 D DRAM0 18000 I DRAM0  C000  <9>4000 D DRAM0 1C000 I DRAM0 1C000
+<1>8000 D DRAM0 1C000 I DRAM0 10000  <9>8000 D DRAM1  C000 I DRAM1  C000
+<1>C000 D DRAM1  0000 I None         <9>C000 D DRAM1 10000 I DRAM1 10000
+<2>0000 D DRAM0 14000 I DRAM0 14000  <A>0000 D DRAM0  8000 I DRAM0  8000
+<2>4000 D DRAM0 18000 I DRAM0 18000  <A>4000 D DRAM0  C000 I DRAM0  C000
+<2>8000 D DRAM0 1C000 I DRAM0 1C000  <A>8000 D DRAM1  4000 I DRAM1  4000
+<2>C000 D DRAM1  0000 I DRAM1  0000  <A>C000 D DRAM1  8000 I DRAM1  8000
+<3>0000 D DRAM0  0000 I DRAM0  0000  <B>0000 D DRAM1 14000 I DRAM1 14000
+<3>4000 D None        I None         <B>4000 D DRAM1 18000 I DRAM1 18000
+<3>8000 D None        I None         <B>8000 D DRAM1 1C000 I DRAM1 1C000
+<3>C000 D None        I None         <B>C000 D DRAM2  0000 I DRAM2  0000
+<4>0000 D  ROM0  0000 I  ROM0  0000  <C>0000 D DRAM2  4000 I DRAM2  4000
+<4>4000 D DRAM3  0000 I None         <C>4000 D DRAM2  8000 I DRAM2  8000
+<4>8000 D DRAM3  4000 I None         <C>8000 D DRAM2  C000 I DRAM2  C000
+<4>C000 D None        I None         <C>C000 D DRAM2 10000 I DRAM2 10000
+<5>0000 D DRAM0  8000 I  ROM0 10000  <D>0000 D DRAM2 14000 I DRAM2 14000
+<5>4000 D DRAM0  C000 I  ROM0 14000  <D>4000 D DRAM2 18000 I DRAM2 18000
+<5>8000 D DRAM0 10000 I  ROM0 18000  <D>8000 D DRAM2 1C000 I DRAM2 1C000
+<5>C000 D SRAM0  0000 I SRAM0  0000  <D>C000 D DRAM3  0000 I DRAM3  0000
+<6>0000 D DRAM0  8000 I DRAM0  8000  <E>0000 D DRAM3  4000 I DRAM3  4000
+<6>4000 D DRAM0  C000 I DRAM0  C000  <E>4000 D DRAM3  8000 I DRAM3  8000
+<6>8000 D DRAM0 10000 I DRAM0 10000  <E>8000 D DRAM3  C000 I DRAM3  C000
+<6>C000 D None        I None         <E>C000 D DRAM3 10000 I DRAM3 10000
+<7>0000 D  ROM0  0000 I  ROM0  0000  <F>0000 D DRAM3 14000 I DRAM3 14000
+<7>4000 D  ROM0 10000 I  ROM0 10000  <F>4000 D DRAM3 18000 I DRAM3 18000
+<7>8000 D  ROM0 14000 I  ROM0 14000  <F>8000 D DRAM3 1C000 I DRAM3 1C000
+<7>C000 D  ROM0 18000 I  ROM0 18000  <F>C000 D DRAM3  0000 I DRAM3  0000
 */
-#if 0
-static ADDRESS_MAP_START(m20_mem, AS_PROGRAM, 16, m20_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x00000, 0x01fff ) AM_RAM AM_SHARE("mainram")
-    AM_RANGE( 0x02000, 0x0ffff ) AM_RAM
-    AM_RANGE( 0x10000, 0x1ffff ) AM_RAM
-    AM_RANGE( 0x20000, 0x2ffff ) AM_RAM
-	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")//base vram
-	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x10000)
-    AM_RANGE( 0x44000, 0x4bfff ) AM_RAM
-    AM_RANGE( 0x50000, 0x5bfff ) AM_RAM
-    AM_RANGE( 0x60000, 0x6ffff ) AM_RAM
-    AM_RANGE( 0x70000, 0x77fff ) AM_RAM
-    AM_RANGE( 0x80000, 0x8ffff ) AM_RAM
-    AM_RANGE( 0x90000, 0x9ffff ) AM_RAM
-    AM_RANGE( 0xa0000, 0xaffff ) AM_RAM
-    AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM
-    AM_RANGE( 0xc0000, 0xc3fff ) AM_RAM
-//  AM_RANGE( 0x34000, 0x37fff ) AM_RAM //extra vram for color mode
-ADDRESS_MAP_END
-#endif
+
 
 static ADDRESS_MAP_START(m20_program_mem, AS_PROGRAM, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
-  AM_RANGE( 0x00000, 0x03fff ) AM_RAM AM_SHARE("dram0_4000") //AM_SHARE("mainram")
-  AM_RANGE( 0x04000, 0x07fff ) AM_RAM AM_SHARE("dram0_8000")
-  AM_RANGE( 0x08000, 0x0bfff ) AM_RAM AM_SHARE("dram0_c000")
-  AM_RANGE( 0x0c000, 0x0ffff ) AM_RAM AM_SHARE("dram0_10000")
-
-  AM_RANGE( 0x10000, 0x13fff ) AM_RAM AM_SHARE("dram0_8000")
-  AM_RANGE( 0x14000, 0x17fff ) AM_RAM AM_SHARE("dram0_c000")
-  AM_RANGE( 0x18000, 0x1bfff ) AM_RAM AM_SHARE("dram0_10000")
-//AM_RANGE( 0x1c000, 0x1ffff ) AM_RAM AM_SHARE("dram0_10000")
-
-  AM_RANGE( 0x20000, 0x23fff ) AM_RAM AM_SHARE("dram0_14000")
-  AM_RANGE( 0x24000, 0x27fff ) AM_RAM AM_SHARE("dram0_18000")
-  AM_RANGE( 0x28000, 0x2bfff ) AM_RAM AM_SHARE("dram0_1c000")
-  AM_RANGE( 0x2c000, 0x2ffff ) AM_RAM AM_SHARE("dram1_0000")
-
   AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")
-
-AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
-//AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_SHARE("maincpu")
-
-  AM_RANGE( 0x60000, 0x63fff ) AM_RAM AM_SHARE("dram0_8000")
-  AM_RANGE( 0x64000, 0x67fff ) AM_RAM AM_SHARE("dram0_c000")
-  AM_RANGE( 0x68000, 0x6bfff ) AM_RAM AM_SHARE("dram0_10000")
-
-  AM_RANGE( 0x80000, 0x83fff ) AM_RAM AM_SHARE("dram0_8000")
-  AM_RANGE( 0x84000, 0x87fff ) AM_RAM AM_SHARE("dram0_c000")
-  AM_RANGE( 0x88000, 0x8bfff ) AM_RAM AM_SHARE("dram1_4000")
-  AM_RANGE( 0x8c000, 0x8ffff ) AM_RAM AM_SHARE("dram2_0000")
-
-  AM_RANGE( 0x90000, 0x93fff ) AM_RAM AM_SHARE("dram0_18000")
-  AM_RANGE( 0x94000, 0x97fff ) AM_RAM AM_SHARE("dram0_1c000")
-  AM_RANGE( 0x98000, 0x9bfff ) AM_RAM AM_SHARE("dram2_4000")
-  AM_RANGE( 0x9c000, 0x9ffff ) AM_RAM AM_SHARE("dram3_0000")
-
-  AM_RANGE( 0xa0000, 0xa3fff ) AM_RAM AM_SHARE("dram0_8000")
-  AM_RANGE( 0xa4000, 0xa7fff ) AM_RAM AM_SHARE("dram0_c000")
-  AM_RANGE( 0xa8000, 0xabfff ) AM_RAM AM_SHARE("dram1_4000")
-  AM_RANGE( 0xac000, 0xaffff ) AM_RAM AM_SHARE("dram2_0000")
-
-  AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM AM_SHARE("dram3_4000")
-
+  AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(m20_data_mem, AS_DATA, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
-
-  AM_RANGE( 0x00000, 0x03fff ) AM_RAM AM_SHARE("dram0_4000")
-  AM_RANGE( 0x04000, 0x07fff ) AM_RAM AM_SHARE("dram1_4000")
-  AM_RANGE( 0x08000, 0x0bfff ) AM_RAM AM_SHARE("dram2_0000")
-  AM_RANGE( 0x0c000, 0x0ffff ) AM_RAM AM_SHARE("dram2_4000")
-
-  AM_RANGE( 0x10000, 0x13fff ) AM_RAM AM_SHARE("dram0_14000")
-  AM_RANGE( 0x14000, 0x17fff ) AM_RAM AM_SHARE("dram0_18000")
-  AM_RANGE( 0x18000, 0x1bfff ) AM_RAM AM_SHARE("dram0_1c000")
-  AM_RANGE( 0x1c000, 0x1ffff ) AM_RAM AM_SHARE("dram1_0000")
-
-  AM_RANGE( 0x20000, 0x23fff ) AM_RAM AM_SHARE("dram0_14000")
-  AM_RANGE( 0x24000, 0x27fff ) AM_RAM AM_SHARE("dram0_18000")
-  AM_RANGE( 0x28000, 0x2bfff ) AM_RAM AM_SHARE("dram0_1c000")
-  AM_RANGE( 0x2c000, 0x2ffff ) AM_RAM AM_SHARE("dram1_0000")
-
   AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("p_videoram")
-
-//AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_SHARE("maincpu")
   AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
-
-  AM_RANGE( 0x44000, 0x47fff ) AM_RAM AM_SHARE("dram3_0000")
-  AM_RANGE( 0x48000, 0x4bfff ) AM_RAM AM_SHARE("dram3_4000")
-
-  AM_RANGE( 0x50000, 0x53fff ) AM_RAM AM_SHARE("dram0_8000")
-  AM_RANGE( 0x54000, 0x57fff ) AM_RAM AM_SHARE("dram0_c000")
-  AM_RANGE( 0x58000, 0x5bfff ) AM_RAM AM_SHARE("dram0_10000")
-
-  AM_RANGE( 0x60000, 0x63fff ) AM_RAM AM_SHARE("dram0_8000")
-  AM_RANGE( 0x64000, 0x67fff ) AM_RAM AM_SHARE("dram0_c000")
-  AM_RANGE( 0x68000, 0x6bfff ) AM_RAM AM_SHARE("dram0_10000")
-
-  AM_RANGE( 0x80000, 0x83fff ) AM_RAM AM_SHARE("dram0_18000")
-  AM_RANGE( 0x84000, 0x87fff ) AM_RAM AM_SHARE("dram0_1c000")
-  AM_RANGE( 0x88000, 0x8bfff ) AM_RAM AM_SHARE("dram2_4000")
-  AM_RANGE( 0x8c000, 0x8ffff ) AM_RAM AM_SHARE("dram3_0000")
-
-  AM_RANGE( 0x90000, 0x93fff ) AM_RAM AM_SHARE("dram0_18000")
-  AM_RANGE( 0x94000, 0x97fff ) AM_RAM AM_SHARE("dram0_1c000")
-  AM_RANGE( 0x98000, 0x9bfff ) AM_RAM AM_SHARE("dram2_4000")
-  AM_RANGE( 0x9c000, 0x9ffff ) AM_RAM AM_SHARE("dram3_0000")
-
-  AM_RANGE( 0xa0000, 0xa3fff ) AM_RAM AM_SHARE("dram0_8000")
-  AM_RANGE( 0xa4000, 0xa7fff ) AM_RAM AM_SHARE("dram0_c000")
-  AM_RANGE( 0xa8000, 0xabfff ) AM_RAM AM_SHARE("dram1_4000")
-  AM_RANGE( 0xac000, 0xaffff ) AM_RAM AM_SHARE("dram2_0000")
-
-  AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM AM_SHARE("dram3_4000")
-
-  AM_RANGE( 0xc0000, 0xc3fff ) AM_RAM AM_SHARE("dram3_4000")
-
 ADDRESS_MAP_END
+
+
+void m20_state::install_memory()
+{
+	m20_state *state = machine().driver_data<m20_state>();
+
+	m_memsize = m_ram->size();
+	UINT8 *memptr = m_ram->pointer();
+	address_space& pspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& dspace = machine().device("maincpu")->memory().space(AS_DATA);
+
+	/* install mainboard memory (aka DRAM0) */
+
+	/* <0>0000 */
+	pspace.install_readwrite_bank(0x0000, 0x3fff, 0x3fff, 0, "dram0_4000");
+	dspace.install_readwrite_bank(0x0000, 0x3fff, 0x3fff, 0, "dram0_4000");
+	/* <0>4000 */
+	pspace.install_readwrite_bank(0x4000, 0x7fff, 0x3fff, 0, "dram0_8000");
+	/* <0>8000 */
+	pspace.install_readwrite_bank(0x8000, 0xbfff, 0x3fff, 0, "dram0_c000");
+	/* <0>C000 */
+	pspace.install_readwrite_bank(0xc000, 0xcfff, 0x3fff, 0, "dram0_10000");
+	/* <1>0000 */
+	pspace.install_readwrite_bank(0x10000, 0x13fff, 0x3fff, 0, "dram0_8000");
+	dspace.install_readwrite_bank(0x10000, 0x13fff, 0x3fff, 0, "dram0_14000");
+	/* <1>4000 */
+	pspace.install_readwrite_bank(0x14000, 0x17fff, 0x3fff, 0, "dram0_c000");
+	dspace.install_readwrite_bank(0x14000, 0x17fff, 0x3fff, 0, "dram0_18000");
+	/* <1>8000 */
+	pspace.install_readwrite_bank(0x18000, 0x1bfff, 0x3fff, 0, "dram0_10000");
+	dspace.install_readwrite_bank(0x18000, 0x1bfff, 0x3fff, 0, "dram0_1c000");
+	/* <1>c000 empty*/
+	/* <2>0000 */
+	pspace.install_readwrite_bank(0x20000, 0x23fff, 0x3fff, 0, "dram0_14000");
+	dspace.install_readwrite_bank(0x20000, 0x23fff, 0x3fff, 0, "dram0_14000");
+	/* <2>4000 */
+	pspace.install_readwrite_bank(0x24000, 0x27fff, 0x3fff, 0, "dram0_18000");
+	dspace.install_readwrite_bank(0x24000, 0x27fff, 0x3fff, 0, "dram0_18000");
+	/* <2>8000 */
+	pspace.install_readwrite_bank(0x28000, 0x28fff, 0x3fff, 0, "dram0_1c000");
+	dspace.install_readwrite_bank(0x28000, 0x28fff, 0x3fff, 0, "dram0_1c000");
+	/* <2>c000 empty*/
+	/* <3>0000 (video buffer)
+	pspace.install_readwrite_bank(0x30000, 0x33fff, 0x3fff, 0, "dram0_0000");
+	dspace.install_readwrite_bank(0x30000, 0x33fff, 0x3fff, 0, "dram0_0000");
+	*/
+
+	/* <5>0000 */
+	dspace.install_readwrite_bank(0x50000, 0x53fff, 0x3fff, 0, "dram0_8000");
+	/* <5>4000 */
+	dspace.install_readwrite_bank(0x54000, 0x57fff, 0x3fff, 0, "dram0_c000");
+	/* <5>8000 */
+	dspace.install_readwrite_bank(0x58000, 0x5bfff, 0x3fff, 0, "dram0_10000");
+	/* <5>c000 expansion bus */
+	/* <6>0000 */
+	pspace.install_readwrite_bank(0x60000, 0x63fff, 0x3fff, 0, "dram0_8000");
+	dspace.install_readwrite_bank(0x60000, 0x63fff, 0x3fff, 0, "dram0_8000");
+	/* <6>4000 */
+	pspace.install_readwrite_bank(0x64000, 0x67fff, 0x3fff, 0, "dram0_c000");
+	dspace.install_readwrite_bank(0x64000, 0x67fff, 0x3fff, 0, "dram0_c000");
+	/* <6>8000 */
+	pspace.install_readwrite_bank(0x68000, 0x6bfff, 0x3fff, 0, "dram0_10000");
+	dspace.install_readwrite_bank(0x68000, 0x6bfff, 0x3fff, 0, "dram0_10000");
+	/* <6>c000 empty*/
+	/* segment <7> expansion ROM? */
+	/* <8>0000 */
+	pspace.install_readwrite_bank(0x80000, 0x83fff, 0x3fff, 0, "dram0_8000");
+	dspace.install_readwrite_bank(0x80000, 0x83fff, 0x3fff, 0, "dram0_18000");
+	/* <8>4000 */
+	pspace.install_readwrite_bank(0x84000, 0x87fff, 0x3fff, 0, "dram0_c000");
+	dspace.install_readwrite_bank(0x84000, 0x87fff, 0x3fff, 0, "dram0_1c000");
+	/* <9>0000 */
+	pspace.install_readwrite_bank(0x90000, 0x93fff, 0x3fff, 0, "dram0_18000");
+	dspace.install_readwrite_bank(0x90000, 0x93fff, 0x3fff, 0, "dram0_18000");
+	/* <9>4000 */
+	pspace.install_readwrite_bank(0x94000, 0x97fff, 0x3fff, 0, "dram0_1c000");
+	dspace.install_readwrite_bank(0x94000, 0x97fff, 0x3fff, 0, "dram0_1c000");
+	/* <A>0000 */
+	pspace.install_readwrite_bank(0xa0000, 0xa3fff, 0x3fff, 0, "dram0_8000");
+	dspace.install_readwrite_bank(0xa0000, 0xa3fff, 0x3fff, 0, "dram0_8000");
+	/* <A>4000 */
+	pspace.install_readwrite_bank(0xa4000, 0xa7fff, 0x3fff, 0, "dram0_c000");
+	dspace.install_readwrite_bank(0xa4000, 0xa7fff, 0x3fff, 0, "dram0_c000");
+
+	//state->membank("dram0_0000")->set_base(memptr);
+	state->membank("dram0_4000")->set_base(memptr + 0x4000);
+	state->membank("dram0_8000")->set_base(memptr + 0x8000);
+	state->membank("dram0_c000")->set_base(memptr + 0xc000);
+	state->membank("dram0_10000")->set_base(memptr + 0x10000);
+	state->membank("dram0_14000")->set_base(memptr + 0x14000);
+	state->membank("dram0_18000")->set_base(memptr + 0x18000);
+	state->membank("dram0_1c000")->set_base(memptr + 0x1c000);
+
+	if (m_memsize > 128 * 1024) {
+
+		/* install memory expansions (DRAM1..DRAM3) */
+
+		if (m_memsize < 256 * 1024) {
+
+			/* 32K expansion cards */
+
+			/* DRAM1, 32K */
+
+			/* prog
+			   AM_RANGE( 0x2c000, 0x2ffff ) AM_RAM AM_SHARE("dram1_0000")
+			   AM_RANGE( 0x88000, 0x8bfff ) AM_RAM AM_SHARE("dram1_4000")
+			   AM_RANGE( 0xa8000, 0xabfff ) AM_RAM AM_SHARE("dram1_4000")
+			*/
+			pspace.install_readwrite_bank(0x2c000, 0x2ffff, 0x3fff, 0, "dram1_0000");
+			pspace.install_readwrite_bank(0x88000, 0x8bfff, 0x3fff, 0, "dram1_4000");
+			pspace.install_readwrite_bank(0xa8000, 0xaffff, 0x3fff, 0, "dram1_4000");
+
+			/*
+			  data
+			  AM_RANGE( 0x04000, 0x07fff ) AM_RAM AM_SHARE("dram1_4000")
+			  AM_RANGE( 0x1c000, 0x1ffff ) AM_RAM AM_SHARE("dram1_0000")
+			  AM_RANGE( 0x2c000, 0x2ffff ) AM_RAM AM_SHARE("dram1_0000")
+			  AM_RANGE( 0xa8000, 0xabfff ) AM_RAM AM_SHARE("dram1_4000")
+			*/
+			dspace.install_readwrite_bank(0x4000, 0x7fff, 0x3fff, 0, "dram1_4000");
+			dspace.install_readwrite_bank(0x1c000, 0x1ffff, 0x3fff, 0, "dram1_0000");
+			dspace.install_readwrite_bank(0x2c000, 0x2ffff, 0x3fff, 0, "dram1_0000");
+			dspace.install_readwrite_bank(0xa8000, 0xabfff, 0x3fff, 0, "dram1_4000");
+
+			state->membank("dram1_0000")->set_base(memptr + 0x20000);
+			state->membank("dram1_4000")->set_base(memptr + 0x24000);
+
+			if (m_memsize > 128 * 1024 + 32768) {
+				/* DRAM2, 32K */
+
+				/* prog
+				   AM_RANGE( 0x8c000, 0x8ffff ) AM_RAM AM_SHARE("dram2_0000")
+				   AM_RANGE( 0x98000, 0x9bfff ) AM_RAM AM_SHARE("dram2_4000")
+				   AM_RANGE( 0xac000, 0xaffff ) AM_RAM AM_SHARE("dram2_0000")
+				*/
+				pspace.install_readwrite_bank(0x8c000, 0x8ffff, 0x3fff, 0, "dram2_0000");
+				pspace.install_readwrite_bank(0x98000, 0x9bfff, 0x3fff, 0, "dram2_4000");
+				pspace.install_readwrite_bank(0xac000, 0xaffff, 0x3fff, 0, "dram2_0000");
+
+				/* data
+				   AM_RANGE( 0x08000, 0x0bfff ) AM_RAM AM_SHARE("dram2_0000")
+				   AM_RANGE( 0x0c000, 0x0ffff ) AM_RAM AM_SHARE("dram2_4000")
+				   AM_RANGE( 0x88000, 0x8bfff ) AM_RAM AM_SHARE("dram2_4000")
+				   AM_RANGE( 0x98000, 0x9bfff ) AM_RAM AM_SHARE("dram2_4000")
+				   AM_RANGE( 0xac000, 0xaffff ) AM_RAM AM_SHARE("dram2_0000")
+				 */
+				dspace.install_readwrite_bank(0x8000, 0xbfff, 0x3fff, 0, "dram2_0000");
+				dspace.install_readwrite_bank(0xc000, 0xffff, 0x3fff, 0, "dram2_4000");
+				dspace.install_readwrite_bank(0x88000, 0x8bfff, 0x3fff, 0, "dram2_4000");
+				dspace.install_readwrite_bank(0x98000, 0x9bfff, 0x3fff, 0, "dram2_4000");
+				dspace.install_readwrite_bank(0xac000, 0xaffff, 0x3fff, 0, "dram2_0000");
+
+				state->membank("dram2_0000")->set_base(memptr + 0x28000);
+				state->membank("dram2_4000")->set_base(memptr + 0x2c000);
+			}
+			if (m_memsize > 128 * 1024 + 2 * 32768) {
+				/* DRAM3, 32K */
+
+				/* prog
+				   AM_RANGE( 0x9c000, 0x9ffff ) AM_RAM AM_SHARE("dram3_0000")
+				   AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM AM_SHARE("dram3_4000")
+				*/
+				pspace.install_readwrite_bank(0x9c000, 0x9ffff, 0x3fff, 0, "dram3_0000");
+				pspace.install_readwrite_bank(0xb0000, 0xb3fff, 0x3fff, 0, "dram3_4000");
+
+				/* data
+				   AM_RANGE( 0x44000, 0x47fff ) AM_RAM AM_SHARE("dram3_0000")
+				   AM_RANGE( 0x48000, 0x4bfff ) AM_RAM AM_SHARE("dram3_4000")
+				   AM_RANGE( 0x8c000, 0x8ffff ) AM_RAM AM_SHARE("dram3_0000")
+				   AM_RANGE( 0x9c000, 0x9ffff ) AM_RAM AM_SHARE("dram3_0000")
+				   AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM AM_SHARE("dram3_4000")
+				   AM_RANGE( 0xc0000, 0xc3fff ) AM_RAM AM_SHARE("dram3_4000")
+				 */
+				dspace.install_readwrite_bank(0x44000, 0x47fff, 0x3fff, 0, "dram3_0000");
+				dspace.install_readwrite_bank(0x48000, 0x4bfff, 0x3fff, 0, "dram3_4000");
+				dspace.install_readwrite_bank(0x8c000, 0x8ffff, 0x3fff, 0, "dram3_0000");
+				dspace.install_readwrite_bank(0x9c000, 0x9ffff, 0x3fff, 0, "dram3_0000");
+				dspace.install_readwrite_bank(0xb0000, 0xb3fff, 0x3fff, 0, "dram3_4000");
+				dspace.install_readwrite_bank(0xc0000, 0xc3fff, 0x3fff, 0, "dram3_4000");
+
+				state->membank("dram3_0000")->set_base(memptr + 0x30000);
+				state->membank("dram3_4000")->set_base(memptr + 0x34000);
+			}
+		}
+		else {
+
+			/* 128K expansion cards */
+
+			/* DRAM1, 128K */
+
+			/* prog
+			   AM_RANGE( 0x2c000, 0x2ffff ) AM_RAM AM_SHARE("dram1_0000")
+			   AM_RANGE( 0x88000, 0x8bfff ) AM_RAM AM_SHARE("dram1_4000")
+			   AM_RANGE( 0x8c000, 0x8ffff ) AM_RAM AM_SHARE("dram1_8000")
+			   AM_RANGE( 0x98000, 0x9bfff ) AM_RAM AM_SHARE("dram1_c000")
+			   AM_RANGE( 0x9c000, 0x9ffff ) AM_RAM AM_SHARE("dram1_10000")
+			   AM_RANGE( 0xa8000, 0xabfff ) AM_RAM AM_SHARE("dram1_4000")
+			   AM_RANGE( 0xac000, 0xaffff ) AM_RAM AM_SHARE("dram1_8000")
+			   AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM AM_SHARE("dram1_14000")
+			   AM_RANGE( 0xb4000, 0xb7fff ) AM_RAM AM_SHARE("dram1_18000")
+			   AM_RANGE( 0xb8000, 0xbbfff ) AM_RAM AM_SHARE("dram1_1c000")
+			*/
+			pspace.install_readwrite_bank(0x2c000, 0x2ffff, 0x3fff, 0, "dram1_0000");
+			pspace.install_readwrite_bank(0x88000, 0x8bfff, 0x3fff, 0, "dram1_4000");
+			pspace.install_readwrite_bank(0x8c000, 0x8ffff, 0x3fff, 0, "dram1_8000");
+			pspace.install_readwrite_bank(0x98000, 0x9bfff, 0x3fff, 0, "dram1_c000");
+			pspace.install_readwrite_bank(0x9c000, 0x9ffff, 0x3fff, 0, "dram1_10000");
+			pspace.install_readwrite_bank(0xa8000, 0xabfff, 0x3fff, 0, "dram1_4000");
+			pspace.install_readwrite_bank(0xac000, 0xaffff, 0x3fff, 0, "dram1_8000");
+			pspace.install_readwrite_bank(0xb0000, 0xb3fff, 0x3fff, 0, "dram1_14000");
+			pspace.install_readwrite_bank(0xb4000, 0xb7fff, 0x3fff, 0, "dram1_18000");
+			pspace.install_readwrite_bank(0xb8000, 0xbbfff, 0x3fff, 0, "dram1_1c000");
+
+			/* data
+			   AM_RANGE( 0x04000, 0x07fff ) AM_RAM AM_SHARE("dram1_4000")
+			   AM_RANGE( 0x1c000, 0x1ffff ) AM_RAM AM_SHARE("dram1_0000")
+			   AM_RANGE( 0x2c000, 0x2ffff ) AM_RAM AM_SHARE("dram1_0000")
+			   AM_RANGE( 0x88000, 0x8bfff ) AM_RAM AM_SHARE("dram1_c000")
+			   AM_RANGE( 0x8c000, 0x8ffff ) AM_RAM AM_SHARE("dram1_10000")
+			   AM_RANGE( 0x98000, 0x9bfff ) AM_RAM AM_SHARE("dram1_c000")
+			   AM_RANGE( 0x9c000, 0x9ffff ) AM_RAM AM_SHARE("dram1_10000")
+			   AM_RANGE( 0xa8000, 0xabfff ) AM_RAM AM_SHARE("dram1_4000")
+			   AM_RANGE( 0xac000, 0xaffff ) AM_RAM AM_SHARE("dram1_8000")
+			   AM_RANGE( 0xb0000, 0xb3fff ) AM_RAM AM_SHARE("dram1_14000")
+			   AM_RANGE( 0xb4000, 0xb7fff ) AM_RAM AM_SHARE("dram1_18000")
+			   AM_RANGE( 0xb8000, 0xbbfff ) AM_RAM AM_SHARE("dram1_1c000")
+			 */
+			dspace.install_readwrite_bank(0x4000, 0x7fff, 0x3fff, 0, "dram1_4000");
+			dspace.install_readwrite_bank(0x1c000, 0x1ffff, 0x3fff, 0, "dram1_0000");
+			dspace.install_readwrite_bank(0x2c000, 0x2ffff, 0x3fff, 0, "dram1_0000");
+			dspace.install_readwrite_bank(0x88000, 0x8bfff, 0x3fff, 0, "dram1_c000");
+			dspace.install_readwrite_bank(0x8c000, 0x8ffff, 0x3fff, 0, "dram1_10000");
+			dspace.install_readwrite_bank(0x98000, 0x9bfff, 0x3fff, 0, "dram1_c000");
+			dspace.install_readwrite_bank(0x9c000, 0x9ffff, 0x3fff, 0, "dram1_10000");
+			dspace.install_readwrite_bank(0xa8000, 0xabfff, 0x3fff, 0, "dram1_4000");
+			dspace.install_readwrite_bank(0xac000, 0xaffff, 0x3fff, 0, "dram1_8000");
+			dspace.install_readwrite_bank(0xb0000, 0xb3fff, 0x3fff, 0, "dram1_14000");
+			dspace.install_readwrite_bank(0xb4000, 0xb7fff, 0x3fff, 0, "dram1_18000");
+			dspace.install_readwrite_bank(0xb8000, 0xbbfff, 0x3fff, 0, "dram1_1c000");
+
+			state->membank("dram1_0000")->set_base(memptr + 0x20000);
+			state->membank("dram1_4000")->set_base(memptr + 0x24000);
+			state->membank("dram1_8000")->set_base(memptr + 0x28000);
+			state->membank("dram1_c000")->set_base(memptr + 0x2c000);
+			state->membank("dram1_10000")->set_base(memptr + 0x30000);
+			state->membank("dram1_14000")->set_base(memptr + 0x34000);
+			state->membank("dram1_18000")->set_base(memptr + 0x38000);
+			state->membank("dram1_1c000")->set_base(memptr + 0x3c000);
+
+			if (m_memsize > 256 * 1024) {
+				/* DRAM2, 128K */
+
+				/* prog
+				   AM_RANGE( 0xbc000, 0xbffff ) AM_RAM AM_SHARE("dram2_0000")
+
+				   AM_RANGE( 0xc0000, 0xc3fff ) AM_RAM AM_SHARE("dram2_4000")
+				   AM_RANGE( 0xc4000, 0xc7fff ) AM_RAM AM_SHARE("dram2_8000")
+				   AM_RANGE( 0xc8000, 0xcbfff ) AM_RAM AM_SHARE("dram2_c000")
+				   AM_RANGE( 0xcc000, 0xcffff ) AM_RAM AM_SHARE("dram2_10000")
+
+				   AM_RANGE( 0xd0000, 0xd3fff ) AM_RAM AM_SHARE("dram2_14000")
+				   AM_RANGE( 0xd4000, 0xd7fff ) AM_RAM AM_SHARE("dram2_18000")
+				   AM_RANGE( 0xd8000, 0xdbfff ) AM_RAM AM_SHARE("dram2_1c000")
+				 */
+				pspace.install_readwrite_bank(0xbc000, 0xbffff, 0x3fff, 0, "dram2_0000");
+				pspace.install_readwrite_bank(0xc0000, 0xc3fff, 0x3fff, 0, "dram2_4000");
+				pspace.install_readwrite_bank(0xc4000, 0xc7fff, 0x3fff, 0, "dram2_8000");
+				pspace.install_readwrite_bank(0xc8000, 0xcbfff, 0x3fff, 0, "dram2_c000");
+				pspace.install_readwrite_bank(0xcc000, 0xcffff, 0x3fff, 0, "dram2_10000");
+				pspace.install_readwrite_bank(0xd0000, 0xd3fff, 0x3fff, 0, "dram2_14000");
+				pspace.install_readwrite_bank(0xd4000, 0xd7fff, 0x3fff, 0, "dram2_18000");
+				pspace.install_readwrite_bank(0xd8000, 0xdbfff, 0x3fff, 0, "dram2_1c000");
+
+				/* data
+				   AM_RANGE( 0x08000, 0x0bfff ) AM_RAM AM_SHARE("dram2_0000")
+				   AM_RANGE( 0x0c000, 0x0ffff ) AM_RAM AM_SHARE("dram2_4000")
+
+				   AM_RANGE( 0xbc000, 0xbffff ) AM_RAM AM_SHARE("dram2_0000")
+
+				   AM_RANGE( 0xc0000, 0xc3fff ) AM_RAM AM_SHARE("dram2_4000")
+				   AM_RANGE( 0xc4000, 0xc7fff ) AM_RAM AM_SHARE("dram2_8000")
+				   AM_RANGE( 0xc8000, 0xcbfff ) AM_RAM AM_SHARE("dram2_c000")
+				   AM_RANGE( 0xcc000, 0xcffff ) AM_RAM AM_SHARE("dram2_10000")
+
+				   AM_RANGE( 0xd0000, 0xd3fff ) AM_RAM AM_SHARE("dram2_14000")
+				   AM_RANGE( 0xd4000, 0xd7fff ) AM_RAM AM_SHARE("dram2_18000")
+				   AM_RANGE( 0xd8000, 0xdbfff ) AM_RAM AM_SHARE("dram2_1c000")
+				*/
+				dspace.install_readwrite_bank(0x8000, 0xbfff, 0x3fff, 0, "dram2_0000");
+				dspace.install_readwrite_bank(0xc000, 0xffff, 0x3fff, 0, "dram2_4000");
+				dspace.install_readwrite_bank(0xbc000, 0xbffff, 0x3fff, 0, "dram2_0000");
+				dspace.install_readwrite_bank(0xc0000, 0xc3fff, 0x3fff, 0, "dram2_4000");
+				dspace.install_readwrite_bank(0xc4000, 0xc7fff, 0x3fff, 0, "dram2_8000");
+				dspace.install_readwrite_bank(0xc8000, 0xcbfff, 0x3fff, 0, "dram2_c000");
+				dspace.install_readwrite_bank(0xcc000, 0xcffff, 0x3fff, 0, "dram2_10000");
+				dspace.install_readwrite_bank(0xd0000, 0xd3fff, 0x3fff, 0, "dram2_14000");
+				dspace.install_readwrite_bank(0xd4000, 0xd7fff, 0x3fff, 0, "dram2_18000");
+				dspace.install_readwrite_bank(0xd8000, 0xdbfff, 0x3fff, 0, "dram2_1c000");
+
+				state->membank("dram2_0000")->set_base(memptr + 0x40000);
+				state->membank("dram2_4000")->set_base(memptr + 0x44000);
+				state->membank("dram2_8000")->set_base(memptr + 0x48000);
+				state->membank("dram2_c000")->set_base(memptr + 0x4c000);
+				state->membank("dram2_10000")->set_base(memptr + 0x50000);
+				state->membank("dram2_14000")->set_base(memptr + 0x54000);
+				state->membank("dram2_18000")->set_base(memptr + 0x58000);
+				state->membank("dram2_1c000")->set_base(memptr + 0x5c000);
+			}
+			if (m_memsize > 384 * 1024) {
+				/* DRAM3, 128K */
+
+				/* prog
+				   AM_RANGE( 0xdc000, 0xdffff ) AM_RAM AM_SHARE("dram3_0000")
+
+				   AM_RANGE( 0xe0000, 0xe3fff ) AM_RAM AM_SHARE("dram3_4000")
+				   AM_RANGE( 0xe4000, 0xe7fff ) AM_RAM AM_SHARE("dram3_8000")
+				   AM_RANGE( 0xe8000, 0xebfff ) AM_RAM AM_SHARE("dram3_c000")
+				   AM_RANGE( 0xec000, 0xeffff ) AM_RAM AM_SHARE("dram3_10000")
+
+				   AM_RANGE( 0xf0000, 0xf3fff ) AM_RAM AM_SHARE("dram3_14000")
+				   AM_RANGE( 0xf4000, 0xf7fff ) AM_RAM AM_SHARE("dram3_18000")
+				   AM_RANGE( 0xf8000, 0xfbfff ) AM_RAM AM_SHARE("dram3_1c000")
+				   AM_RANGE( 0xfc000, 0xfffff ) AM_RAM AM_SHARE("dram3_0000")
+				*/
+				pspace.install_readwrite_bank(0xdc000, 0xdffff, 0x3fff, 0, "dram3_0000");
+				pspace.install_readwrite_bank(0xe0000, 0xe3fff, 0x3fff, 0, "dram3_4000");
+				pspace.install_readwrite_bank(0xe4000, 0xe7fff, 0x3fff, 0, "dram3_8000");
+				pspace.install_readwrite_bank(0xe8000, 0xebfff, 0x3fff, 0, "dram3_c000");
+				pspace.install_readwrite_bank(0xec000, 0xeffff, 0x3fff, 0, "dram3_10000");
+				pspace.install_readwrite_bank(0xf0000, 0xf3fff, 0x3fff, 0, "dram3_14000");
+				pspace.install_readwrite_bank(0xf4000, 0xf7fff, 0x3fff, 0, "dram3_18000");
+				pspace.install_readwrite_bank(0xf8000, 0xfbfff, 0x3fff, 0, "dram3_1c000");
+				pspace.install_readwrite_bank(0xfc000, 0xfffff, 0x3fff, 0, "dram3_0000");
+
+				/* data
+				   AM_RANGE( 0x44000, 0x47fff ) AM_RAM AM_SHARE("dram3_0000")
+				   AM_RANGE( 0x48000, 0x4bfff ) AM_RAM AM_SHARE("dram3_4000")
+				   AM_RANGE( 0xdc000, 0xdffff ) AM_RAM AM_SHARE("dram3_0000")
+
+				   AM_RANGE( 0xe0000, 0xe3fff ) AM_RAM AM_SHARE("dram3_4000")
+				   AM_RANGE( 0xe4000, 0xe7fff ) AM_RAM AM_SHARE("dram3_8000")
+				   AM_RANGE( 0xe8000, 0xebfff ) AM_RAM AM_SHARE("dram3_c000")
+				   AM_RANGE( 0xec000, 0xeffff ) AM_RAM AM_SHARE("dram3_10000")
+
+				   AM_RANGE( 0xf0000, 0xf3fff ) AM_RAM AM_SHARE("dram3_14000")
+				   AM_RANGE( 0xf4000, 0xf7fff ) AM_RAM AM_SHARE("dram3_18000")
+				   AM_RANGE( 0xf8000, 0xfbfff ) AM_RAM AM_SHARE("dram3_1c000")
+				   AM_RANGE( 0xfc000, 0xfffff ) AM_RAM AM_SHARE("dram3_0000")
+				*/
+				dspace.install_readwrite_bank(0x44000, 0x47fff, 0x3fff, 0, "dram3_0000");
+				dspace.install_readwrite_bank(0x48000, 0x4bfff, 0x3fff, 0, "dram3_4000");
+				dspace.install_readwrite_bank(0xdc000, 0xdffff, 0x3fff, 0, "dram3_0000");
+				dspace.install_readwrite_bank(0xe0000, 0xe3fff, 0x3fff, 0, "dram3_4000");
+				dspace.install_readwrite_bank(0xe4000, 0xe7fff, 0x3fff, 0, "dram3_8000");
+				dspace.install_readwrite_bank(0xe8000, 0xebfff, 0x3fff, 0, "dram3_c000");
+				dspace.install_readwrite_bank(0xec000, 0xeffff, 0x3fff, 0, "dram3_10000");
+				dspace.install_readwrite_bank(0xf0000, 0xf3fff, 0x3fff, 0, "dram3_14000");
+				dspace.install_readwrite_bank(0xf4000, 0xf7fff, 0x3fff, 0, "dram3_18000");
+				dspace.install_readwrite_bank(0xf8000, 0xfbfff, 0x3fff, 0, "dram3_1c000");
+				dspace.install_readwrite_bank(0xfc000, 0xfffff, 0x3fff, 0, "dram3_0000");
+
+				state->membank("dram3_0000")->set_base(memptr + 0x60000);
+				state->membank("dram3_4000")->set_base(memptr + 0x64000);
+				state->membank("dram3_8000")->set_base(memptr + 0x68000);
+				state->membank("dram3_c000")->set_base(memptr + 0x6c000);
+				state->membank("dram3_10000")->set_base(memptr + 0x70000);
+				state->membank("dram3_14000")->set_base(memptr + 0x74000);
+				state->membank("dram3_18000")->set_base(memptr + 0x78000);
+				state->membank("dram3_1c000")->set_base(memptr + 0x7c000);
+			}
+		}
+	}
+}
 
 static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -470,17 +812,19 @@ static IRQ_CALLBACK( m20_irq_callback )
 void m20_state::machine_start()
 {
 	m_fd1797->setup_intrq_cb(fd1797_t::line_cb(FUNC(m20_state::fdc_intrq_w), this));
+
+	install_memory();
 }
 
 void m20_state::machine_reset()
 {
 	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-        //  UINT8 *RAM = (UINT8 *)machine().root_device().memshare("mainram")->ptr();
-	UINT8 *RAM = (UINT8 *)machine().root_device().memshare("dram0_4000")->ptr();
+	UINT8 *RAM = (UINT8 *)(m_ram->pointer() + 0x4000);
 
-        //ROM += 0x10000; // don't know why they load at an offset, but let's go with it
-
-	m_port21 = 0xff;
+	if (m_memsize >= 256 * 1024)
+		m_port21 = 0xdf;
+	else
+		m_port21 = 0xff;
 
 	m_maincpu->set_irq_acknowledge_callback(m20_irq_callback);
 
@@ -562,11 +906,11 @@ static unsigned char kbxlat[] =
 WRITE8_MEMBER( m20_state::kbd_put )
 {
 	if (data) {
-        if (data == 0xd) data = 0xc1;
-        else if (data == 0x20) data = 0xc0;
-        else if (data == 8) data = 0x69; /* ^H */
-        else if (data == 3) data = 0x64; /* ^C */
-		else if (data >= '0' && data <= '9') data += 0x4c - '0';
+		if (data == 0xd) data = 0xc1;
+		else if (data == 0x20) data = 0xc0;
+		else if (data == 8) data = 0x69; /* ^H */
+		else if (data == 3) data = 0x64; /* ^C */
+		else if (data >= '0' && data <= '9') data += 0x1c - '0';
 		else {
 			int i;
 			for (i = 0; i < sizeof(kbxlat); i++)
@@ -628,6 +972,10 @@ static MACHINE_CONFIG_START( m20, m20_state )
 	MCFG_CPU_DATA_MAP(m20_data_mem)
 	MCFG_CPU_IO_MAP(m20_io)
 
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("160K")
+	MCFG_RAM_EXTRA_OPTIONS("128K,192K,224K,256K,384K,512K")
+
 #if 0
 	MCFG_CPU_ADD("apb", I8086, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(m20_apb_mem)
@@ -661,31 +1009,13 @@ MACHINE_CONFIG_END
 
 ROM_START(m20)
 	ROM_REGION(0x2000,"maincpu", 0)
-//ROM_REGION(0x12000,"maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "m20", "M20 1.0" )
 	ROMX_LOAD("m20.bin", 0x0000, 0x2000, CRC(5c93d931) SHA1(d51025e087a94c55529d7ee8fd18ff4c46d93230), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "m20-20d", "M20 2.0d" )
 	ROMX_LOAD("m20-20d.bin", 0x0000, 0x2000, CRC(cbe265a6) SHA1(c7cb9d9900b7b5014fcf1ceb2e45a66a91c564d0), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "m20-20f", "M20 2.0f" )
 	ROMX_LOAD("m20-20f.bin", 0x0000, 0x2000, CRC(db7198d8) SHA1(149d8513867081d31c73c2965dabb36d5f308041), ROM_BIOS(3))
-
 ROM_END
-
-#if 0
-ROM_START(m20)
-	ROM_REGION(0x2000,"maincpu", 0)
-//ROM_REGION(0x12000,"maincpu", 0)
-	ROM_SYSTEM_BIOS( 0, "m20", "M20 1.0" )
-	ROMX_LOAD("m20.bin", 0x10000, 0x2000, CRC(5c93d931) SHA1(d51025e087a94c55529d7ee8fd18ff4c46d93230), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "m20-20d", "M20 2.0d" )
-	ROMX_LOAD("m20-20d.bin", 0x10000, 0x2000, CRC(cbe265a6) SHA1(c7cb9d9900b7b5014fcf1ceb2e45a66a91c564d0), ROM_BIOS(2))
-	ROM_SYSTEM_BIOS( 2, "m20-20f", "M20 2.0f" )
-	ROMX_LOAD("m20-20f.bin", 0x10000, 0x2000, CRC(db7198d8) SHA1(149d8513867081d31c73c2965dabb36d5f308041), ROM_BIOS(3))
-
-	ROM_REGION(0x4000,"apb_bios", 0) // Processor board with 8086
-	ROM_LOAD( "apb-1086-2.0.bin", 0x0000, 0x4000, CRC(8c05be93) SHA1(2bb424afd874cc6562e9642780eaac2391308053))
-ROM_END
-#endif
 
 ROM_START(m40)
 	ROM_REGION(0x14000,"maincpu", 0)
