@@ -3,18 +3,18 @@
 #ifndef __MIKROMIKKO__
 #define __MIKROMIKKO__
 
-
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "formats/mm_dsk.h"
 #include "machine/am9517a.h"
 #include "machine/i8212.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "machine/upd765.h"
 #include "machine/upd7201.h"
+#include "machine/upd765.h"
+#include "sound/speaker.h"
 #include "video/i8275.h"
 #include "video/upd7220.h"
-#include "sound/speaker.h"
 
 #define SCREEN_TAG		"screen"
 #define I8085A_TAG		"ic40"
@@ -47,7 +47,8 @@ public:
 		  m_a8(0),
 		  m_recall(0),
 		  m_dack3(1),
-		  m_tc(CLEAR_LINE)
+		  m_tc(CLEAR_LINE),
+		  m_fdc_tc(0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -116,6 +117,7 @@ public:
 	int m_recall;
 	int m_dack3;
 	int m_tc;
+	int m_fdc_tc;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(kbclk_tick);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );

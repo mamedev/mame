@@ -41,18 +41,18 @@
 
     TODO:
 
+	- fix i8275 DMA timing (full screen is transferred in 1 burst, which kills floppy sector DMA)
     - add HRTC/VRTC output to i8275
     - NEC uPD7220 GDC
     - accurate video timing
     - floppy DRQ during RECALL = 0
     - PCB layout
     - NEC uPD7201 MPSC
+    - model M7 5MB hard disk
 
 */
 
 #include "includes/mikromik.h"
-#include "formats/mfi_dsk.h"
-#include "formats/mm_dsk.h"
 
 
 //**************************************************************************
@@ -486,7 +486,13 @@ static I8212_INTERFACE( iop_intf )
 
 void mm1_state::update_tc()
 {
-	m_fdc->tc_w(m_tc && !m_dack3);
+	int fdc_tc = m_tc && !m_dack3;
+
+	if (m_fdc_tc != fdc_tc)
+	{
+		m_fdc_tc = fdc_tc;
+		m_fdc->tc_w(m_fdc_tc);
+	}
 }
 
 WRITE_LINE_MEMBER( mm1_state::dma_hrq_w )
@@ -783,6 +789,18 @@ static MACHINE_CONFIG_DERIVED( mm1m6, mm1 )
 MACHINE_CONFIG_END
 
 
+//-------------------------------------------------
+//  MACHINE_CONFIG( mm1m7 )
+//-------------------------------------------------
+
+static MACHINE_CONFIG_DERIVED( mm1m7, mm1 )
+	// video hardware
+	MCFG_FRAGMENT_ADD(mm1m6_video)
+
+	// TODO hard disk
+MACHINE_CONFIG_END
+
+
 
 //**************************************************************************
 //  ROMS
@@ -820,5 +838,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY           FULLNAME                FLAGS
-COMP( 1981, mm1m6,		0,		0,		mm1m6,		mm1, driver_device,		0,		"Nokia Data",		"MikroMikko 1 M6",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
-COMP( 1981, mm1m7,		mm1m6,	0,		mm1m6,		mm1, driver_device,		0,		"Nokia Data",		"MikroMikko 1 M7",		GAME_NOT_WORKING)
+COMP( 1981, mm1m6,		0,		0,		mm1m6,		mm1, driver_device,		0,		"Nokia Data",		"MikroMikko 1 M6",		GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1981, mm1m7,		mm1m6,	0,		mm1m7,		mm1, driver_device,		0,		"Nokia Data",		"MikroMikko 1 M7",		GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
