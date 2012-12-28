@@ -285,7 +285,7 @@ static void K053936GP_zoom_draw(running_machine &machine,
 	rectangle my_clip;
 	UINT32 startx, starty;
 	int incxx, incxy, incyx, incyy, y, maxy, clip;
-
+											  
 	bitmap_ind16 &src_bitmap = tmap->pixmap();
 	rectangle &src_cliprect = K053936_cliprect[chip];
 	clip = K053936_clip_enabled[chip];
@@ -349,7 +349,15 @@ static void K053936GP_0_zoom_draw(running_machine &machine, bitmap_rgb32 &bitmap
 		tilemap_t *tmap, int tilebpp, int blend, int alpha, int pixeldouble_output)
 {
 	konamigx_state *state = machine.driver_data<konamigx_state>();
-	K053936GP_zoom_draw(machine, 0,state->m_k053936_0_ctrl,state->m_k053936_0_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha, pixeldouble_output);
+
+	if (state->m_k053936_0_ctrl_16)
+	{
+		K053936GP_zoom_draw(machine, 0,state->m_k053936_0_ctrl_16,state->m_k053936_0_linectrl_16,bitmap,cliprect,tmap,tilebpp,blend,alpha, pixeldouble_output);
+	}
+	else
+	{
+		K053936GP_zoom_draw(machine, 0,state->m_k053936_0_ctrl,state->m_k053936_0_linectrl,bitmap,cliprect,tmap,tilebpp,blend,alpha, pixeldouble_output);
+	}
 }
 
 static void K053936GP_1_zoom_draw(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect,
