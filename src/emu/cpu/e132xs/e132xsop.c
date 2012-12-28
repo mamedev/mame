@@ -18,1908 +18,1907 @@
 	decode->same_srcf_dst = 0; \
 
 
-static void hyperstone_op00(hyperstone_state *cpustate)
+void hyperstone_device::op00()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_chk(cpustate, decode);
+	hyperstone_chk(decode);
 }
 
-static void hyperstone_op01(hyperstone_state *cpustate)
+void hyperstone_device::op01()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_chk(cpustate, decode);
+	hyperstone_chk(decode);
 }
 
-static void hyperstone_op02(hyperstone_state *cpustate)
+void hyperstone_device::op02()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_chk(cpustate, decode);
+	hyperstone_chk(decode);
 }
 
-static void hyperstone_op03(hyperstone_state *cpustate)
+void hyperstone_device::op03()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_chk(cpustate, decode);
+	hyperstone_chk(decode);
 }
 
-static void hyperstone_op04(hyperstone_state *cpustate)
+void hyperstone_device::op04()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_movd(cpustate, decode);
+	hyperstone_movd(decode);
 }
 
-static void hyperstone_op05(hyperstone_state *cpustate)
+void hyperstone_device::op05()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_movd(cpustate, decode);
+	hyperstone_movd(decode);
 }
 
-static void hyperstone_op06(hyperstone_state *cpustate)
+void hyperstone_device::op06()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_movd(cpustate, decode);
+	hyperstone_movd(decode);
 }
 
-static void hyperstone_op07(hyperstone_state *cpustate)
+void hyperstone_device::op07()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_movd(cpustate, decode);
+	hyperstone_movd(decode);
 }
 
-static void hyperstone_op08(hyperstone_state *cpustate)
+void hyperstone_device::op08()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_divu(cpustate, decode);
+	hyperstone_divu(decode);
 }
 
-static void hyperstone_op09(hyperstone_state *cpustate)
+void hyperstone_device::op09()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_divu(cpustate, decode);
+	hyperstone_divu(decode);
 }
 
-static void hyperstone_op0a(hyperstone_state *cpustate)
+void hyperstone_device::op0a()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_divu(cpustate, decode);
+	hyperstone_divu(decode);
 }
 
-static void hyperstone_op0b(hyperstone_state *cpustate)
+void hyperstone_device::op0b()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_divu(cpustate, decode);
+	hyperstone_divu(decode);
 }
 
-static void hyperstone_op0c(hyperstone_state *cpustate)
+void hyperstone_device::op0c()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_divs(cpustate, decode);
+	hyperstone_divs(decode);
 }
 
-static void hyperstone_op0d(hyperstone_state *cpustate)
+void hyperstone_device::op0d()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_divs(cpustate, decode);
+	hyperstone_divs(decode);
 }
 
-static void hyperstone_op0e(hyperstone_state *cpustate)
+void hyperstone_device::op0e()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_divs(cpustate, decode);
+	hyperstone_divs(decode);
 }
 
-static void hyperstone_op0f(hyperstone_state *cpustate)
+void hyperstone_device::op0f()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_divs(cpustate, decode);
+	hyperstone_divs(decode);
 }
 
 
 
-static void hyperstone_op10(hyperstone_state *cpustate)
+void hyperstone_device::op10()
 {
 	LOCAL_DECODE_INIT;
 	RRlimdecode(decode, 0, 0);
-	hyperstone_xm(cpustate, decode);
+	hyperstone_xm(decode);
 }
 
-static void hyperstone_op11(hyperstone_state *cpustate)
+void hyperstone_device::op11()
 {
 	LOCAL_DECODE_INIT;
 	RRlimdecode(decode, 0, 1);
-	hyperstone_xm(cpustate, decode);
+	hyperstone_xm(decode);
 }
 
-static void hyperstone_op12(hyperstone_state *cpustate)
+void hyperstone_device::op12()
 {
 	LOCAL_DECODE_INIT;
 	RRlimdecode(decode, 1, 0);
-	hyperstone_xm(cpustate, decode);
+	hyperstone_xm(decode);
 }
 
-static void hyperstone_op13(hyperstone_state *cpustate)
+void hyperstone_device::op13()
 {
 	LOCAL_DECODE_INIT;
 	RRlimdecode(decode, 1, 1);
-	hyperstone_xm(cpustate, decode);
+	hyperstone_xm(decode);
 }
 
-static void hyperstone_op14(hyperstone_state *cpustate)
+void hyperstone_device::op14()
 {
 	LOCAL_DECODE_INIT;
 	RRconstdecode(decode, 0, 0);
-	hyperstone_mask(cpustate, decode);
+	hyperstone_mask(decode);
 }
 
-static void hyperstone_op15(hyperstone_state *cpustate)
+void hyperstone_device::op15()
 {
 	LOCAL_DECODE_INIT;
 	RRconstdecode(decode, 0, 1);
-	hyperstone_mask(cpustate, decode);
+	hyperstone_mask(decode);
 }
 
-static void hyperstone_op16(hyperstone_state *cpustate)
+void hyperstone_device::op16()
 {
 	LOCAL_DECODE_INIT;
 	RRconstdecode(decode, 1, 0);
-	hyperstone_mask(cpustate, decode);
+	hyperstone_mask(decode);
 }
 
-static void hyperstone_op17(hyperstone_state *cpustate)
+void hyperstone_device::op17()
 {
 	LOCAL_DECODE_INIT;
 	RRconstdecode(decode, 1, 1);
-	hyperstone_mask(cpustate, decode);
+	hyperstone_mask(decode);
 }
 
-static void hyperstone_op18(hyperstone_state *cpustate)
+void hyperstone_device::op18()
 {
 	LOCAL_DECODE_INIT;
 	RRconstdecode(decode, 0, 0);
-	hyperstone_sum(cpustate, decode);
+	hyperstone_sum(decode);
 }
 
-static void hyperstone_op19(hyperstone_state *cpustate)
+void hyperstone_device::op19()
 {
 	LOCAL_DECODE_INIT;
 	RRconstdecode(decode, 0, 1);
-	hyperstone_sum(cpustate, decode);
+	hyperstone_sum(decode);
 }
 
-static void hyperstone_op1a(hyperstone_state *cpustate)
+void hyperstone_device::op1a()
 {
 	LOCAL_DECODE_INIT;
 	RRconstdecode(decode, 1, 0);
-	hyperstone_sum(cpustate, decode);
+	hyperstone_sum(decode);
 }
 
-static void hyperstone_op1b(hyperstone_state *cpustate)
+void hyperstone_device::op1b()
 {
 	LOCAL_DECODE_INIT;
 	RRconstdecode(decode, 1, 1);
-	hyperstone_sum(cpustate, decode);
+	hyperstone_sum(decode);
 }
 
-static void hyperstone_op1c(hyperstone_state *cpustate)
+void hyperstone_device::op1c()
 {
 	LOCAL_DECODE_INIT;
 	RRconstdecode(decode, 0, 0);
-	hyperstone_sums(cpustate, decode);
+	hyperstone_sums(decode);
 }
 
-static void hyperstone_op1d(hyperstone_state *cpustate)
+void hyperstone_device::op1d()
 {
 	LOCAL_DECODE_INIT;
 	RRconstdecode(decode, 0, 1);
-	hyperstone_sums(cpustate, decode);
+	hyperstone_sums(decode);
 }
 
-static void hyperstone_op1e(hyperstone_state *cpustate)
+void hyperstone_device::op1e()
 {
 	LOCAL_DECODE_INIT;
 	RRconstdecode(decode, 1, 0);
-	hyperstone_sums(cpustate, decode);
+	hyperstone_sums(decode);
 }
 
-static void hyperstone_op1f(hyperstone_state *cpustate)
+void hyperstone_device::op1f()
 {
 	LOCAL_DECODE_INIT;
 	RRconstdecode(decode, 1, 1);
-	hyperstone_sums(cpustate, decode);
+	hyperstone_sums(decode);
 }
 
 
 
-static void hyperstone_op20(hyperstone_state *cpustate)
+void hyperstone_device::op20()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_cmp(cpustate, decode);
+	hyperstone_cmp(decode);
 }
 
-static void hyperstone_op21(hyperstone_state *cpustate)
+void hyperstone_device::op21()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_cmp(cpustate, decode);
+	hyperstone_cmp(decode);
 }
 
-static void hyperstone_op22(hyperstone_state *cpustate)
+void hyperstone_device::op22()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_cmp(cpustate, decode);
+	hyperstone_cmp(decode);
 }
 
-static void hyperstone_op23(hyperstone_state *cpustate)
+void hyperstone_device::op23()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_cmp(cpustate, decode);
+	hyperstone_cmp(decode);
 }
 
-static void hyperstone_op24(hyperstone_state *cpustate)
+void hyperstone_device::op24()
 {
 	LOCAL_DECODE_INIT;
 	RRdecodewithHflag(decode, 0, 0);
-	hyperstone_mov(cpustate, decode);
+	hyperstone_mov(decode);
 }
 
-static void hyperstone_op25(hyperstone_state *cpustate)
+void hyperstone_device::op25()
 {
 	LOCAL_DECODE_INIT;
 	RRdecodewithHflag(decode, 0, 1);
-	hyperstone_mov(cpustate, decode);
+	hyperstone_mov(decode);
 }
 
-static void hyperstone_op26(hyperstone_state *cpustate)
+void hyperstone_device::op26()
 {
 	LOCAL_DECODE_INIT;
 	RRdecodewithHflag(decode, 1, 0);
-	hyperstone_mov(cpustate, decode);
+	hyperstone_mov(decode);
 }
 
-static void hyperstone_op27(hyperstone_state *cpustate)
+void hyperstone_device::op27()
 {
 	LOCAL_DECODE_INIT;
 	RRdecodewithHflag(decode, 1, 1);
-	hyperstone_mov(cpustate, decode);
+	hyperstone_mov(decode);
 }
 
-static void hyperstone_op28(hyperstone_state *cpustate)
+void hyperstone_device::op28()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_add(cpustate, decode);
+	hyperstone_add(decode);
 }
 
-static void hyperstone_op29(hyperstone_state *cpustate)
+void hyperstone_device::op29()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_add(cpustate, decode);
+	hyperstone_add(decode);
 }
 
-static void hyperstone_op2a(hyperstone_state *cpustate)
+void hyperstone_device::op2a()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_add(cpustate, decode);
+	hyperstone_add(decode);
 }
 
-static void hyperstone_op2b(hyperstone_state *cpustate)
+void hyperstone_device::op2b()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_add(cpustate, decode);
+	hyperstone_add(decode);
 }
 
-static void hyperstone_op2c(hyperstone_state *cpustate)
+void hyperstone_device::op2c()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_adds(cpustate, decode);
+	hyperstone_adds(decode);
 }
 
-static void hyperstone_op2d(hyperstone_state *cpustate)
+void hyperstone_device::op2d()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_adds(cpustate, decode);
+	hyperstone_adds(decode);
 }
 
-static void hyperstone_op2e(hyperstone_state *cpustate)
+void hyperstone_device::op2e()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_adds(cpustate, decode);
+	hyperstone_adds(decode);
 }
 
-static void hyperstone_op2f(hyperstone_state *cpustate)
+void hyperstone_device::op2f()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_adds(cpustate, decode);
+	hyperstone_adds(decode);
 }
 
 
 
-static void hyperstone_op30(hyperstone_state *cpustate)
+void hyperstone_device::op30()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_cmpb(cpustate, decode);
+	hyperstone_cmpb(decode);
 }
 
-static void hyperstone_op31(hyperstone_state *cpustate)
+void hyperstone_device::op31()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_cmpb(cpustate, decode);
+	hyperstone_cmpb(decode);
 }
 
-static void hyperstone_op32(hyperstone_state *cpustate)
+void hyperstone_device::op32()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_cmpb(cpustate, decode);
+	hyperstone_cmpb(decode);
 }
 
-static void hyperstone_op33(hyperstone_state *cpustate)
+void hyperstone_device::op33()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_cmpb(cpustate, decode);
+	hyperstone_cmpb(decode);
 }
 
-static void hyperstone_op34(hyperstone_state *cpustate)
+void hyperstone_device::op34()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_andn(cpustate, decode);
+	hyperstone_andn(decode);
 }
 
-static void hyperstone_op35(hyperstone_state *cpustate)
+void hyperstone_device::op35()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_andn(cpustate, decode);
+	hyperstone_andn(decode);
 }
 
-static void hyperstone_op36(hyperstone_state *cpustate)
+void hyperstone_device::op36()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_andn(cpustate, decode);
+	hyperstone_andn(decode);
 }
 
-static void hyperstone_op37(hyperstone_state *cpustate)
+void hyperstone_device::op37()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_andn(cpustate, decode);
+	hyperstone_andn(decode);
 }
 
-static void hyperstone_op38(hyperstone_state *cpustate)
+void hyperstone_device::op38()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_or(cpustate, decode);
+	hyperstone_or(decode);
 }
 
-static void hyperstone_op39(hyperstone_state *cpustate)
+void hyperstone_device::op39()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_or(cpustate, decode);
+	hyperstone_or(decode);
 }
 
-static void hyperstone_op3a(hyperstone_state *cpustate)
+void hyperstone_device::op3a()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_or(cpustate, decode);
+	hyperstone_or(decode);
 }
 
-static void hyperstone_op3b(hyperstone_state *cpustate)
+void hyperstone_device::op3b()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_or(cpustate, decode);
+	hyperstone_or(decode);
 }
 
-static void hyperstone_op3c(hyperstone_state *cpustate)
+void hyperstone_device::op3c()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_xor(cpustate, decode);
+	hyperstone_xor(decode);
 }
 
-static void hyperstone_op3d(hyperstone_state *cpustate)
+void hyperstone_device::op3d()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_xor(cpustate, decode);
+	hyperstone_xor(decode);
 }
 
-static void hyperstone_op3e(hyperstone_state *cpustate)
+void hyperstone_device::op3e()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_xor(cpustate, decode);
+	hyperstone_xor(decode);
 }
 
-static void hyperstone_op3f(hyperstone_state *cpustate)
+void hyperstone_device::op3f()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_xor(cpustate, decode);
+	hyperstone_xor(decode);
 }
 
 
 
-static void hyperstone_op40(hyperstone_state *cpustate)
+void hyperstone_device::op40()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_subc(cpustate, decode);
+	hyperstone_subc(decode);
 }
 
-static void hyperstone_op41(hyperstone_state *cpustate)
+void hyperstone_device::op41()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_subc(cpustate, decode);
+	hyperstone_subc(decode);
 }
 
-static void hyperstone_op42(hyperstone_state *cpustate)
+void hyperstone_device::op42()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_subc(cpustate, decode);
+	hyperstone_subc(decode);
 }
 
-static void hyperstone_op43(hyperstone_state *cpustate)
+void hyperstone_device::op43()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_subc(cpustate, decode);
+	hyperstone_subc(decode);
 }
 
-static void hyperstone_op44(hyperstone_state *cpustate)
+void hyperstone_device::op44()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_not(cpustate, decode);
+	hyperstone_not(decode);
 }
 
-static void hyperstone_op45(hyperstone_state *cpustate)
+void hyperstone_device::op45()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_not(cpustate, decode);
+	hyperstone_not(decode);
 }
 
-static void hyperstone_op46(hyperstone_state *cpustate)
+void hyperstone_device::op46()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_not(cpustate, decode);
+	hyperstone_not(decode);
 }
 
-static void hyperstone_op47(hyperstone_state *cpustate)
+void hyperstone_device::op47()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_not(cpustate, decode);
+	hyperstone_not(decode);
 }
 
-static void hyperstone_op48(hyperstone_state *cpustate)
+void hyperstone_device::op48()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_sub(cpustate, decode);
+	hyperstone_sub(decode);
 }
 
-static void hyperstone_op49(hyperstone_state *cpustate)
+void hyperstone_device::op49()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_sub(cpustate, decode);
+	hyperstone_sub(decode);
 }
 
-static void hyperstone_op4a(hyperstone_state *cpustate)
+void hyperstone_device::op4a()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_sub(cpustate, decode);
+	hyperstone_sub(decode);
 }
 
-static void hyperstone_op4b(hyperstone_state *cpustate)
+void hyperstone_device::op4b()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_sub(cpustate, decode);
+	hyperstone_sub(decode);
 }
 
-static void hyperstone_op4c(hyperstone_state *cpustate)
+void hyperstone_device::op4c()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_subs(cpustate, decode);
+	hyperstone_subs(decode);
 }
 
-static void hyperstone_op4d(hyperstone_state *cpustate)
+void hyperstone_device::op4d()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_subs(cpustate, decode);
+	hyperstone_subs(decode);
 }
 
-static void hyperstone_op4e(hyperstone_state *cpustate)
+void hyperstone_device::op4e()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_subs(cpustate, decode);
+	hyperstone_subs(decode);
 }
 
-static void hyperstone_op4f(hyperstone_state *cpustate)
+void hyperstone_device::op4f()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_subs(cpustate, decode);
+	hyperstone_subs(decode);
 }
 
 
 
-static void hyperstone_op50(hyperstone_state *cpustate)
+void hyperstone_device::op50()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_addc(cpustate, decode);
+	hyperstone_addc(decode);
 }
 
-static void hyperstone_op51(hyperstone_state *cpustate)
+void hyperstone_device::op51()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_addc(cpustate, decode);
+	hyperstone_addc(decode);
 }
 
-static void hyperstone_op52(hyperstone_state *cpustate)
+void hyperstone_device::op52()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_addc(cpustate, decode);
+	hyperstone_addc(decode);
 }
 
-static void hyperstone_op53(hyperstone_state *cpustate)
+void hyperstone_device::op53()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_addc(cpustate, decode);
+	hyperstone_addc(decode);
 }
 
-static void hyperstone_op54(hyperstone_state *cpustate)
+void hyperstone_device::op54()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_and(cpustate, decode);
+	hyperstone_and(decode);
 }
 
-static void hyperstone_op55(hyperstone_state *cpustate)
+void hyperstone_device::op55()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_and(cpustate, decode);
+	hyperstone_and(decode);
 }
 
-static void hyperstone_op56(hyperstone_state *cpustate)
+void hyperstone_device::op56()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_and(cpustate, decode);
+	hyperstone_and(decode);
 }
 
-static void hyperstone_op57(hyperstone_state *cpustate)
+void hyperstone_device::op57()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_and(cpustate, decode);
+	hyperstone_and(decode);
 }
 
-static void hyperstone_op58(hyperstone_state *cpustate)
+void hyperstone_device::op58()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_neg(cpustate, decode);
+	hyperstone_neg(decode);
 }
 
-static void hyperstone_op59(hyperstone_state *cpustate)
+void hyperstone_device::op59()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_neg(cpustate, decode);
+	hyperstone_neg(decode);
 }
 
-static void hyperstone_op5a(hyperstone_state *cpustate)
+void hyperstone_device::op5a()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_neg(cpustate, decode);
+	hyperstone_neg(decode);
 }
 
-static void hyperstone_op5b(hyperstone_state *cpustate)
+void hyperstone_device::op5b()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_neg(cpustate, decode);
+	hyperstone_neg(decode);
 }
 
-static void hyperstone_op5c(hyperstone_state *cpustate)
+void hyperstone_device::op5c()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_negs(cpustate, decode);
+	hyperstone_negs(decode);
 }
 
-static void hyperstone_op5d(hyperstone_state *cpustate)
+void hyperstone_device::op5d()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_negs(cpustate, decode);
+	hyperstone_negs(decode);
 }
 
-static void hyperstone_op5e(hyperstone_state *cpustate)
+void hyperstone_device::op5e()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_negs(cpustate, decode);
+	hyperstone_negs(decode);
 }
 
-static void hyperstone_op5f(hyperstone_state *cpustate)
+void hyperstone_device::op5f()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_negs(cpustate, decode);
+	hyperstone_negs(decode);
 }
 
 
 
-static void hyperstone_op60(hyperstone_state *cpustate)
+void hyperstone_device::op60()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 0, 0);
-	hyperstone_cmpi(cpustate, decode);
+	hyperstone_cmpi(decode);
 }
 
-static void hyperstone_op61(hyperstone_state *cpustate)
+void hyperstone_device::op61()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 0, 1);
-	hyperstone_cmpi(cpustate, decode);
+	hyperstone_cmpi(decode);
 }
 
-static void hyperstone_op62(hyperstone_state *cpustate)
+void hyperstone_device::op62()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 1, 0);
-	hyperstone_cmpi(cpustate, decode);
+	hyperstone_cmpi(decode);
 }
 
-static void hyperstone_op63(hyperstone_state *cpustate)
+void hyperstone_device::op63()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 1, 1);
-	hyperstone_cmpi(cpustate, decode);
+	hyperstone_cmpi(decode);
 }
 
-static void hyperstone_op64(hyperstone_state *cpustate)
+void hyperstone_device::op64()
 {
 	LOCAL_DECODE_INIT;
 	RimmdecodewithHflag(decode, 0, 0);
-	hyperstone_movi(cpustate, decode);
+	hyperstone_movi(decode);
 }
 
-static void hyperstone_op65(hyperstone_state *cpustate)
+void hyperstone_device::op65()
 {
 	LOCAL_DECODE_INIT;
 	RimmdecodewithHflag(decode, 0, 1);
-	hyperstone_movi(cpustate, decode);
+	hyperstone_movi(decode);
 }
 
-static void hyperstone_op66(hyperstone_state *cpustate)
+void hyperstone_device::op66()
 {
 	LOCAL_DECODE_INIT;
 	RimmdecodewithHflag(decode, 1, 0);
-	hyperstone_movi(cpustate, decode);
+	hyperstone_movi(decode);
 }
 
-static void hyperstone_op67(hyperstone_state *cpustate)
+void hyperstone_device::op67()
 {
 	LOCAL_DECODE_INIT;
 	RimmdecodewithHflag(decode, 1, 1);
-	hyperstone_movi(cpustate, decode);
+	hyperstone_movi(decode);
 }
 
-static void hyperstone_op68(hyperstone_state *cpustate)
+void hyperstone_device::op68()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 0, 0);
-	hyperstone_addi(cpustate, decode);
+	hyperstone_addi(decode);
 }
 
-static void hyperstone_op69(hyperstone_state *cpustate)
+void hyperstone_device::op69()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 0, 1);
-	hyperstone_addi(cpustate, decode);
+	hyperstone_addi(decode);
 }
 
-static void hyperstone_op6a(hyperstone_state *cpustate)
+void hyperstone_device::op6a()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 1, 0);
-	hyperstone_addi(cpustate, decode);
+	hyperstone_addi(decode);
 }
 
-static void hyperstone_op6b(hyperstone_state *cpustate)
+void hyperstone_device::op6b()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 1, 1);
-	hyperstone_addi(cpustate, decode);
+	hyperstone_addi(decode);
 }
 
-static void hyperstone_op6c(hyperstone_state *cpustate)
+void hyperstone_device::op6c()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 0, 0);
-	hyperstone_addsi(cpustate, decode);
+	hyperstone_addsi(decode);
 }
 
-static void hyperstone_op6d(hyperstone_state *cpustate)
+void hyperstone_device::op6d()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 0, 1);
-	hyperstone_addsi(cpustate, decode);
+	hyperstone_addsi(decode);
 }
 
-static void hyperstone_op6e(hyperstone_state *cpustate)
+void hyperstone_device::op6e()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 1, 0);
-	hyperstone_addsi(cpustate, decode);
+	hyperstone_addsi(decode);
 }
 
-static void hyperstone_op6f(hyperstone_state *cpustate)
+void hyperstone_device::op6f()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 1, 1);
-	hyperstone_addsi(cpustate, decode);
+	hyperstone_addsi(decode);
 }
 
 
 
-static void hyperstone_op70(hyperstone_state *cpustate)
+void hyperstone_device::op70()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 0, 0);
-	hyperstone_cmpbi(cpustate, decode);
+	hyperstone_cmpbi(decode);
 }
 
-static void hyperstone_op71(hyperstone_state *cpustate)
+void hyperstone_device::op71()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 0, 1);
-	hyperstone_cmpbi(cpustate, decode);
+	hyperstone_cmpbi(decode);
 }
 
-static void hyperstone_op72(hyperstone_state *cpustate)
+void hyperstone_device::op72()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 1, 0);
-	hyperstone_cmpbi(cpustate, decode);
+	hyperstone_cmpbi(decode);
 }
 
-static void hyperstone_op73(hyperstone_state *cpustate)
+void hyperstone_device::op73()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 1, 1);
-	hyperstone_cmpbi(cpustate, decode);
+	hyperstone_cmpbi(decode);
 }
 
-static void hyperstone_op74(hyperstone_state *cpustate)
+void hyperstone_device::op74()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 0, 0);
-	hyperstone_andni(cpustate, decode);
+	hyperstone_andni(decode);
 }
 
-static void hyperstone_op75(hyperstone_state *cpustate)
+void hyperstone_device::op75()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 0, 1);
-	hyperstone_andni(cpustate, decode);
+	hyperstone_andni(decode);
 }
 
-static void hyperstone_op76(hyperstone_state *cpustate)
+void hyperstone_device::op76()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 1, 0);
-	hyperstone_andni(cpustate, decode);
+	hyperstone_andni(decode);
 }
 
-static void hyperstone_op77(hyperstone_state *cpustate)
+void hyperstone_device::op77()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 1, 1);
-	hyperstone_andni(cpustate, decode);
+	hyperstone_andni(decode);
 }
 
-static void hyperstone_op78(hyperstone_state *cpustate)
+void hyperstone_device::op78()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 0, 0);
-	hyperstone_ori(cpustate, decode);
+	hyperstone_ori(decode);
 }
 
-static void hyperstone_op79(hyperstone_state *cpustate)
+void hyperstone_device::op79()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 0, 1);
-	hyperstone_ori(cpustate, decode);
+	hyperstone_ori(decode);
 }
 
-static void hyperstone_op7a(hyperstone_state *cpustate)
+void hyperstone_device::op7a()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 1, 0);
-	hyperstone_ori(cpustate, decode);
+	hyperstone_ori(decode);
 }
 
-static void hyperstone_op7b(hyperstone_state *cpustate)
+void hyperstone_device::op7b()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 1, 1);
-	hyperstone_ori(cpustate, decode);
+	hyperstone_ori(decode);
 }
 
-static void hyperstone_op7c(hyperstone_state *cpustate)
+void hyperstone_device::op7c()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 0, 0);
-	hyperstone_xori(cpustate, decode);
+	hyperstone_xori(decode);
 }
 
-static void hyperstone_op7d(hyperstone_state *cpustate)
+void hyperstone_device::op7d()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 0, 1);
-	hyperstone_xori(cpustate, decode);
+	hyperstone_xori(decode);
 }
 
-static void hyperstone_op7e(hyperstone_state *cpustate)
+void hyperstone_device::op7e()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 1, 0);
-	hyperstone_xori(cpustate, decode);
+	hyperstone_xori(decode);
 }
 
-static void hyperstone_op7f(hyperstone_state *cpustate)
+void hyperstone_device::op7f()
 {
 	LOCAL_DECODE_INIT;
 	Rimmdecode(decode, 1, 1);
-	hyperstone_xori(cpustate, decode);
+	hyperstone_xori(decode);
 }
 
 
 
-static void hyperstone_op80(hyperstone_state *cpustate)
+void hyperstone_device::op80()
 {
 	LOCAL_DECODE_INIT;
 	Lndecode(decode);
-	hyperstone_shrdi(cpustate, decode);
+	hyperstone_shrdi(decode);
 }
 
-static void hyperstone_op81(hyperstone_state *cpustate)
+void hyperstone_device::op81()
 {
 	LOCAL_DECODE_INIT;
 	Lndecode(decode);
-	hyperstone_shrdi(cpustate, decode);
+	hyperstone_shrdi(decode);
 }
 
-static void hyperstone_op82(hyperstone_state *cpustate)
+void hyperstone_device::op82()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_shrd(cpustate, decode);
+	hyperstone_shrd(decode);
 }
 
-static void hyperstone_op83(hyperstone_state *cpustate)
+void hyperstone_device::op83()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_shr(cpustate, decode);
+	hyperstone_shr(decode);
 }
 
-static void hyperstone_op84(hyperstone_state *cpustate)
+void hyperstone_device::op84()
 {
 	LOCAL_DECODE_INIT;
 	Lndecode(decode);
-	hyperstone_sardi(cpustate, decode);
+	hyperstone_sardi(decode);
 }
 
-static void hyperstone_op85(hyperstone_state *cpustate)
+void hyperstone_device::op85()
 {
 	LOCAL_DECODE_INIT;
 	Lndecode(decode);
-	hyperstone_sardi(cpustate, decode);
+	hyperstone_sardi(decode);
 }
 
-static void hyperstone_op86(hyperstone_state *cpustate)
+void hyperstone_device::op86()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_sard(cpustate, decode);
+	hyperstone_sard(decode);
 }
 
-static void hyperstone_op87(hyperstone_state *cpustate)
+void hyperstone_device::op87()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_sar(cpustate, decode);
+	hyperstone_sar(decode);
 }
 
-static void hyperstone_op88(hyperstone_state *cpustate)
+void hyperstone_device::op88()
 {
 	LOCAL_DECODE_INIT;
 	Lndecode(decode);
-	hyperstone_shldi(cpustate, decode);
+	hyperstone_shldi(decode);
 }
 
-static void hyperstone_op89(hyperstone_state *cpustate)
+void hyperstone_device::op89()
 {
 	LOCAL_DECODE_INIT;
 	Lndecode(decode);
-	hyperstone_shldi(cpustate, decode);
+	hyperstone_shldi(decode);
 }
 
-static void hyperstone_op8a(hyperstone_state *cpustate)
+void hyperstone_device::op8a()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_shld(cpustate, decode);
+	hyperstone_shld(decode);
 }
 
-static void hyperstone_op8b(hyperstone_state *cpustate)
+void hyperstone_device::op8b()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_shl(cpustate, decode);
+	hyperstone_shl(decode);
 }
 
-static void hyperstone_op8c(hyperstone_state *cpustate)
+void hyperstone_device::op8c()
 {
 	LOCAL_DECODE_INIT;
 	no_decode(decode);
-	reserved(cpustate, decode);
+	reserved(decode);
 }
 
-static void hyperstone_op8d(hyperstone_state *cpustate)
+void hyperstone_device::op8d()
 {
 	LOCAL_DECODE_INIT;
 	no_decode(decode);
-	reserved(cpustate, decode);
+	reserved(decode);
 }
 
-static void hyperstone_op8e(hyperstone_state *cpustate)
+void hyperstone_device::op8e()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_testlz(cpustate, decode);
+	hyperstone_testlz(decode);
 }
 
-static void hyperstone_op8f(hyperstone_state *cpustate)
+void hyperstone_device::op8f()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_rol(cpustate, decode);
+	hyperstone_rol(decode);
 }
 
 
 
-static void hyperstone_op90(hyperstone_state *cpustate)
+void hyperstone_device::op90()
 {
 	LOCAL_DECODE_INIT;
 	RRdisdecode(decode, 0, 0);
-	hyperstone_ldxx1(cpustate, decode);
+	hyperstone_ldxx1(decode);
 }
 
-static void hyperstone_op91(hyperstone_state *cpustate)
+void hyperstone_device::op91()
 {
 	LOCAL_DECODE_INIT;
 	RRdisdecode(decode, 0, 1);
-	hyperstone_ldxx1(cpustate, decode);
+	hyperstone_ldxx1(decode);
 }
 
-static void hyperstone_op92(hyperstone_state *cpustate)
+void hyperstone_device::op92()
 {
 	LOCAL_DECODE_INIT;
 	RRdisdecode(decode, 1, 0);
-	hyperstone_ldxx1(cpustate, decode);
+	hyperstone_ldxx1(decode);
 }
 
-static void hyperstone_op93(hyperstone_state *cpustate)
+void hyperstone_device::op93()
 {
 	LOCAL_DECODE_INIT;
 	RRdisdecode(decode, 1, 1);
-	hyperstone_ldxx1(cpustate, decode);
+	hyperstone_ldxx1(decode);
 }
 
-static void hyperstone_op94(hyperstone_state *cpustate)
+void hyperstone_device::op94()
 {
 	LOCAL_DECODE_INIT;
 	RRdisdecode(decode, 0, 0);
-	hyperstone_ldxx2(cpustate, decode);
+	hyperstone_ldxx2(decode);
 }
 
-static void hyperstone_op95(hyperstone_state *cpustate)
+void hyperstone_device::op95()
 {
 	LOCAL_DECODE_INIT;
 	RRdisdecode(decode, 0, 1);
-	hyperstone_ldxx2(cpustate, decode);
+	hyperstone_ldxx2(decode);
 }
 
-static void hyperstone_op96(hyperstone_state *cpustate)
+void hyperstone_device::op96()
 {
 	LOCAL_DECODE_INIT;
 	RRdisdecode(decode, 1, 0);
-	hyperstone_ldxx2(cpustate, decode);
+	hyperstone_ldxx2(decode);
 }
 
-static void hyperstone_op97(hyperstone_state *cpustate)
+void hyperstone_device::op97()
 {
 	LOCAL_DECODE_INIT;
 	RRdisdecode(decode, 1, 1);
-	hyperstone_ldxx2(cpustate, decode);
+	hyperstone_ldxx2(decode);
 }
 
-static void hyperstone_op98(hyperstone_state *cpustate)
+void hyperstone_device::op98()
 {
 	LOCAL_DECODE_INIT;
 	RRdisdecode(decode, 0, 0);
-	hyperstone_stxx1(cpustate, decode);
+	hyperstone_stxx1(decode);
 }
 
-static void hyperstone_op99(hyperstone_state *cpustate)
+void hyperstone_device::op99()
 {
 	LOCAL_DECODE_INIT;
 	RRdisdecode(decode, 0, 1);
-	hyperstone_stxx1(cpustate, decode);
+	hyperstone_stxx1(decode);
 }
 
-static void hyperstone_op9a(hyperstone_state *cpustate)
+void hyperstone_device::op9a()
 {
 	LOCAL_DECODE_INIT;
 	RRdisdecode(decode, 1, 0);
-	hyperstone_stxx1(cpustate, decode);
+	hyperstone_stxx1(decode);
 }
 
-static void hyperstone_op9b(hyperstone_state *cpustate)
+void hyperstone_device::op9b()
 {
 	LOCAL_DECODE_INIT;
 	RRdisdecode(decode, 1, 1);
-	hyperstone_stxx1(cpustate, decode);
+	hyperstone_stxx1(decode);
 }
 
-static void hyperstone_op9c(hyperstone_state *cpustate)
+void hyperstone_device::op9c()
 {
 	LOCAL_DECODE_INIT;
 	RRdisdecode(decode, 0, 0);
-	hyperstone_stxx2(cpustate, decode);
+	hyperstone_stxx2(decode);
 }
 
-static void hyperstone_op9d(hyperstone_state *cpustate)
+void hyperstone_device::op9d()
 {
 	LOCAL_DECODE_INIT;
 	RRdisdecode(decode, 0, 1);
-	hyperstone_stxx2(cpustate, decode);
+	hyperstone_stxx2(decode);
 }
 
-static void hyperstone_op9e(hyperstone_state *cpustate)
+void hyperstone_device::op9e()
 {
 	LOCAL_DECODE_INIT;
 	RRdisdecode(decode, 1, 0);
-	hyperstone_stxx2(cpustate, decode);
+	hyperstone_stxx2(decode);
 }
 
-static void hyperstone_op9f(hyperstone_state *cpustate)
+void hyperstone_device::op9f()
 {
 	LOCAL_DECODE_INIT;
 	RRdisdecode(decode, 1, 1);
-	hyperstone_stxx2(cpustate, decode);
+	hyperstone_stxx2(decode);
 }
 
 
 
-static void hyperstone_opa0(hyperstone_state *cpustate)
+void hyperstone_device::opa0()
 {
 	LOCAL_DECODE_INIT;
 	Rndecode(decode, 0);
-	hyperstone_shri(cpustate, decode);
+	hyperstone_shri(decode);
 }
 
-static void hyperstone_opa1(hyperstone_state *cpustate)
+void hyperstone_device::opa1()
 {
 	LOCAL_DECODE_INIT;
 	Rndecode(decode, 0);
-	hyperstone_shri(cpustate, decode);
+	hyperstone_shri(decode);
 }
 
-static void hyperstone_opa2(hyperstone_state *cpustate)
+void hyperstone_device::opa2()
 {
 	LOCAL_DECODE_INIT;
 	Rndecode(decode, 1);
-	hyperstone_shri(cpustate, decode);
+	hyperstone_shri(decode);
 }
 
-static void hyperstone_opa3(hyperstone_state *cpustate)
+void hyperstone_device::opa3()
 {
 	LOCAL_DECODE_INIT;
 	Rndecode(decode, 1);
-	hyperstone_shri(cpustate, decode);
+	hyperstone_shri(decode);
 }
 
-static void hyperstone_opa4(hyperstone_state *cpustate)
+void hyperstone_device::opa4()
 {
 	LOCAL_DECODE_INIT;
 	Rndecode(decode, 0);
-	hyperstone_sari(cpustate, decode);
+	hyperstone_sari(decode);
 }
 
-static void hyperstone_opa5(hyperstone_state *cpustate)
+void hyperstone_device::opa5()
 {
 	LOCAL_DECODE_INIT;
 	Rndecode(decode, 0);
-	hyperstone_sari(cpustate, decode);
+	hyperstone_sari(decode);
 }
 
-static void hyperstone_opa6(hyperstone_state *cpustate)
+void hyperstone_device::opa6()
 {
 	LOCAL_DECODE_INIT;
 	Rndecode(decode, 1);
-	hyperstone_sari(cpustate, decode);
+	hyperstone_sari(decode);
 }
 
-static void hyperstone_opa7(hyperstone_state *cpustate)
+void hyperstone_device::opa7()
 {
 	LOCAL_DECODE_INIT;
 	Rndecode(decode, 1);
-	hyperstone_sari(cpustate, decode);
+	hyperstone_sari(decode);
 }
 
-static void hyperstone_opa8(hyperstone_state *cpustate)
+void hyperstone_device::opa8()
 {
 	LOCAL_DECODE_INIT;
 	Rndecode(decode, 0);
-	hyperstone_shli(cpustate, decode);
+	hyperstone_shli(decode);
 }
 
-static void hyperstone_opa9(hyperstone_state *cpustate)
+void hyperstone_device::opa9()
 {
 	LOCAL_DECODE_INIT;
 	Rndecode(decode, 0);
-	hyperstone_shli(cpustate, decode);
+	hyperstone_shli(decode);
 }
 
-static void hyperstone_opaa(hyperstone_state *cpustate)
+void hyperstone_device::opaa()
 {
 	LOCAL_DECODE_INIT;
 	Rndecode(decode, 1);
-	hyperstone_shli(cpustate, decode);
+	hyperstone_shli(decode);
 }
 
-static void hyperstone_opab(hyperstone_state *cpustate)
+void hyperstone_device::opab()
 {
 	LOCAL_DECODE_INIT;
 	Rndecode(decode, 1);
-	hyperstone_shli(cpustate, decode);
+	hyperstone_shli(decode);
 }
 
-static void hyperstone_opac(hyperstone_state *cpustate)
+void hyperstone_device::opac()
 {
 	LOCAL_DECODE_INIT;
 	no_decode(decode);
-	reserved(cpustate, decode);
+	reserved(decode);
 }
 
-static void hyperstone_opad(hyperstone_state *cpustate)
+void hyperstone_device::opad()
 {
 	LOCAL_DECODE_INIT;
 	no_decode(decode);
-	reserved(cpustate, decode);
+	reserved(decode);
 }
 
-static void hyperstone_opae(hyperstone_state *cpustate)
+void hyperstone_device::opae()
 {
 	LOCAL_DECODE_INIT;
 	no_decode(decode);
-	reserved(cpustate, decode);
+	reserved(decode);
 }
 
-static void hyperstone_opaf(hyperstone_state *cpustate)
+void hyperstone_device::opaf()
 {
 	LOCAL_DECODE_INIT;
 	no_decode(decode);
-	reserved(cpustate, decode);
+	reserved(decode);
 }
 
 
 
-static void hyperstone_opb0(hyperstone_state *cpustate)
+void hyperstone_device::opb0()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_mulu(cpustate, decode);
+	hyperstone_mulu(decode);
 }
 
-static void hyperstone_opb1(hyperstone_state *cpustate)
+void hyperstone_device::opb1()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_mulu(cpustate, decode);
+	hyperstone_mulu(decode);
 }
 
-static void hyperstone_opb2(hyperstone_state *cpustate)
+void hyperstone_device::opb2()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_mulu(cpustate, decode);
+	hyperstone_mulu(decode);
 }
 
-static void hyperstone_opb3(hyperstone_state *cpustate)
+void hyperstone_device::opb3()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_mulu(cpustate, decode);
+	hyperstone_mulu(decode);
 }
 
-static void hyperstone_opb4(hyperstone_state *cpustate)
+void hyperstone_device::opb4()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_muls(cpustate, decode);
+	hyperstone_muls(decode);
 }
 
-static void hyperstone_opb5(hyperstone_state *cpustate)
+void hyperstone_device::opb5()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_muls(cpustate, decode);
+	hyperstone_muls(decode);
 }
 
-static void hyperstone_opb6(hyperstone_state *cpustate)
+void hyperstone_device::opb6()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_muls(cpustate, decode);
+	hyperstone_muls(decode);
 }
 
-static void hyperstone_opb7(hyperstone_state *cpustate)
+void hyperstone_device::opb7()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_muls(cpustate, decode);
+	hyperstone_muls(decode);
 }
 
-static void hyperstone_opb8(hyperstone_state *cpustate)
+void hyperstone_device::opb8()
 {
 	LOCAL_DECODE_INIT;
 	Rndecode(decode, 0);
-	hyperstone_set(cpustate, decode);
+	hyperstone_set(decode);
 }
 
-static void hyperstone_opb9(hyperstone_state *cpustate)
+void hyperstone_device::opb9()
 {
 	LOCAL_DECODE_INIT;
 	Rndecode(decode, 0);
-	hyperstone_set(cpustate, decode);
+	hyperstone_set(decode);
 }
 
-static void hyperstone_opba(hyperstone_state *cpustate)
+void hyperstone_device::opba()
 {
 	LOCAL_DECODE_INIT;
 	Rndecode(decode, 1);
-	hyperstone_set(cpustate, decode);
+	hyperstone_set(decode);
 }
 
-static void hyperstone_opbb(hyperstone_state *cpustate)
+void hyperstone_device::opbb()
 {
 	LOCAL_DECODE_INIT;
 	Rndecode(decode, 1);
-	hyperstone_set(cpustate, decode);
+	hyperstone_set(decode);
 }
 
-static void hyperstone_opbc(hyperstone_state *cpustate)
+void hyperstone_device::opbc()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 0);
-	hyperstone_mul(cpustate, decode);
+	hyperstone_mul(decode);
 }
 
-static void hyperstone_opbd(hyperstone_state *cpustate)
+void hyperstone_device::opbd()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 0, 1);
-	hyperstone_mul(cpustate, decode);
+	hyperstone_mul(decode);
 }
 
-static void hyperstone_opbe(hyperstone_state *cpustate)
+void hyperstone_device::opbe()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 0);
-	hyperstone_mul(cpustate, decode);
+	hyperstone_mul(decode);
 }
 
-static void hyperstone_opbf(hyperstone_state *cpustate)
+void hyperstone_device::opbf()
 {
 	LOCAL_DECODE_INIT;
 	RRdecode(decode, 1, 1);
-	hyperstone_mul(cpustate, decode);
+	hyperstone_mul(decode);
 }
 
 
 
-static void hyperstone_opc0(hyperstone_state *cpustate)
+void hyperstone_device::opc0()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_fadd(cpustate, decode);
+	hyperstone_fadd(decode);
 }
 
-static void hyperstone_opc1(hyperstone_state *cpustate)
+void hyperstone_device::opc1()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_faddd(cpustate, decode);
+	hyperstone_faddd(decode);
 }
 
-static void hyperstone_opc2(hyperstone_state *cpustate)
+void hyperstone_device::opc2()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_fsub(cpustate, decode);
+	hyperstone_fsub(decode);
 }
 
-static void hyperstone_opc3(hyperstone_state *cpustate)
+void hyperstone_device::opc3()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_fsubd(cpustate, decode);
+	hyperstone_fsubd(decode);
 }
 
-static void hyperstone_opc4(hyperstone_state *cpustate)
+void hyperstone_device::opc4()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_fmul(cpustate, decode);
+	hyperstone_fmul(decode);
 }
 
-static void hyperstone_opc5(hyperstone_state *cpustate)
+void hyperstone_device::opc5()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_fmuld(cpustate, decode);
+	hyperstone_fmuld(decode);
 }
 
-static void hyperstone_opc6(hyperstone_state *cpustate)
+void hyperstone_device::opc6()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_fdiv(cpustate, decode);
+	hyperstone_fdiv(decode);
 }
 
-static void hyperstone_opc7(hyperstone_state *cpustate)
+void hyperstone_device::opc7()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_fdivd(cpustate, decode);
+	hyperstone_fdivd(decode);
 }
 
-static void hyperstone_opc8(hyperstone_state *cpustate)
+void hyperstone_device::opc8()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_fcmp(cpustate, decode);
+	hyperstone_fcmp(decode);
 }
 
-static void hyperstone_opc9(hyperstone_state *cpustate)
+void hyperstone_device::opc9()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_fcmpd(cpustate, decode);
+	hyperstone_fcmpd(decode);
 }
 
-static void hyperstone_opca(hyperstone_state *cpustate)
+void hyperstone_device::opca()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_fcmpu(cpustate, decode);
+	hyperstone_fcmpu(decode);
 }
 
-static void hyperstone_opcb(hyperstone_state *cpustate)
+void hyperstone_device::opcb()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_fcmpud(cpustate, decode);
+	hyperstone_fcmpud(decode);
 }
 
-static void hyperstone_opcc(hyperstone_state *cpustate)
+void hyperstone_device::opcc()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_fcvt(cpustate, decode);
+	hyperstone_fcvt(decode);
 }
 
-static void hyperstone_opcd(hyperstone_state *cpustate)
+void hyperstone_device::opcd()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_fcvtd(cpustate, decode);
+	hyperstone_fcvtd(decode);
 }
 
-static void hyperstone_opce(hyperstone_state *cpustate)
+void hyperstone_device::opce()
 {
 	LOCAL_DECODE_INIT;
 	LLextdecode(decode);
-	hyperstone_extend(cpustate, decode);
+	hyperstone_extend(decode);
 }
 
-static void hyperstone_opcf(hyperstone_state *cpustate)
+void hyperstone_device::opcf()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_do(cpustate, decode);
+	hyperstone_do(decode);
 }
 
 
 
-static void hyperstone_opd0(hyperstone_state *cpustate)
+void hyperstone_device::opd0()
 {
 	LOCAL_DECODE_INIT;
 	LRdecode(decode, 0);
-	hyperstone_ldwr(cpustate, decode);
+	hyperstone_ldwr(decode);
 }
 
-static void hyperstone_opd1(hyperstone_state *cpustate)
+void hyperstone_device::opd1()
 {
 	LOCAL_DECODE_INIT;
 	LRdecode(decode, 1);
-	hyperstone_ldwr(cpustate, decode);
+	hyperstone_ldwr(decode);
 }
 
-static void hyperstone_opd2(hyperstone_state *cpustate)
+void hyperstone_device::opd2()
 {
 	LOCAL_DECODE_INIT;
 	LRdecode(decode, 0);
-	hyperstone_lddr(cpustate, decode);
+	hyperstone_lddr(decode);
 }
 
-static void hyperstone_opd3(hyperstone_state *cpustate)
+void hyperstone_device::opd3()
 {
 	LOCAL_DECODE_INIT;
 	LRdecode(decode, 1);
-	hyperstone_lddr(cpustate, decode);
+	hyperstone_lddr(decode);
 }
 
-static void hyperstone_opd4(hyperstone_state *cpustate)
+void hyperstone_device::opd4()
 {
 	LOCAL_DECODE_INIT;
 	LRdecode(decode, 0);
-	hyperstone_ldwp(cpustate, decode);
+	hyperstone_ldwp(decode);
 }
 
-static void hyperstone_opd5(hyperstone_state *cpustate)
+void hyperstone_device::opd5()
 {
 	LOCAL_DECODE_INIT;
 	LRdecode(decode, 1);
-	hyperstone_ldwp(cpustate, decode);
+	hyperstone_ldwp(decode);
 }
 
-static void hyperstone_opd6(hyperstone_state *cpustate)
+void hyperstone_device::opd6()
 {
 	LOCAL_DECODE_INIT;
 	LRdecode(decode, 0);
-	hyperstone_lddp(cpustate, decode);
+	hyperstone_lddp(decode);
 }
 
-static void hyperstone_opd7(hyperstone_state *cpustate)
+void hyperstone_device::opd7()
 {
 	LOCAL_DECODE_INIT;
 	LRdecode(decode, 1);
-	hyperstone_lddp(cpustate, decode);
+	hyperstone_lddp(decode);
 }
 
-static void hyperstone_opd8(hyperstone_state *cpustate)
+void hyperstone_device::opd8()
 {
 	LOCAL_DECODE_INIT;
 	LRdecode(decode, 0);
-	hyperstone_stwr(cpustate, decode);
+	hyperstone_stwr(decode);
 }
 
-static void hyperstone_opd9(hyperstone_state *cpustate)
+void hyperstone_device::opd9()
 {
 	LOCAL_DECODE_INIT;
 	LRdecode(decode, 1);
-	hyperstone_stwr(cpustate, decode);
+	hyperstone_stwr(decode);
 }
 
-static void hyperstone_opda(hyperstone_state *cpustate)
+void hyperstone_device::opda()
 {
 	LOCAL_DECODE_INIT;
 	LRdecode(decode, 0);
-	hyperstone_stdr(cpustate, decode);
+	hyperstone_stdr(decode);
 }
 
-static void hyperstone_opdb(hyperstone_state *cpustate)
+void hyperstone_device::opdb()
 {
 	LOCAL_DECODE_INIT;
 	LRdecode(decode, 1);
-	hyperstone_stdr(cpustate, decode);
+	hyperstone_stdr(decode);
 }
 
-static void hyperstone_opdc(hyperstone_state *cpustate)
+void hyperstone_device::opdc()
 {
 	LOCAL_DECODE_INIT;
 	LRdecode(decode, 0);
-	hyperstone_stwp(cpustate, decode);
+	hyperstone_stwp(decode);
 }
 
-static void hyperstone_opdd(hyperstone_state *cpustate)
+void hyperstone_device::opdd()
 {
 	LOCAL_DECODE_INIT;
 	LRdecode(decode, 1);
-	hyperstone_stwp(cpustate, decode);
+	hyperstone_stwp(decode);
 }
 
-static void hyperstone_opde(hyperstone_state *cpustate)
+void hyperstone_device::opde()
 {
 	LOCAL_DECODE_INIT;
 	LRdecode(decode, 0);
-	hyperstone_stdp(cpustate, decode);
+	hyperstone_stdp(decode);
 }
 
-static void hyperstone_opdf(hyperstone_state *cpustate)
+void hyperstone_device::opdf()
 {
 	LOCAL_DECODE_INIT;
 	LRdecode(decode, 1);
-	hyperstone_stdp(cpustate, decode);
+	hyperstone_stdp(decode);
 }
 
 
 
-static void hyperstone_ope0(hyperstone_state *cpustate)
+void hyperstone_device::ope0()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_dbv(cpustate, decode);
+	hyperstone_dbv(decode);
 }
 
-static void hyperstone_ope1(hyperstone_state *cpustate)
+void hyperstone_device::ope1()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_dbnv(cpustate, decode);
+	hyperstone_dbnv(decode);
 }
 
-static void hyperstone_ope2(hyperstone_state *cpustate)
+void hyperstone_device::ope2()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_dbe(cpustate, decode);
+	hyperstone_dbe(decode);
 }
 
-static void hyperstone_ope3(hyperstone_state *cpustate)
+void hyperstone_device::ope3()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_dbne(cpustate, decode);
+	hyperstone_dbne(decode);
 }
 
-static void hyperstone_ope4(hyperstone_state *cpustate)
+void hyperstone_device::ope4()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_dbc(cpustate, decode);
+	hyperstone_dbc(decode);
 }
 
-static void hyperstone_ope5(hyperstone_state *cpustate)
+void hyperstone_device::ope5()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_dbnc(cpustate, decode);
+	hyperstone_dbnc(decode);
 }
 
-static void hyperstone_ope6(hyperstone_state *cpustate)
+void hyperstone_device::ope6()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_dbse(cpustate, decode);
+	hyperstone_dbse(decode);
 }
 
-static void hyperstone_ope7(hyperstone_state *cpustate)
+void hyperstone_device::ope7()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_dbht(cpustate, decode);
+	hyperstone_dbht(decode);
 }
 
-static void hyperstone_ope8(hyperstone_state *cpustate)
+void hyperstone_device::ope8()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_dbn(cpustate, decode);
+	hyperstone_dbn(decode);
 }
 
-static void hyperstone_ope9(hyperstone_state *cpustate)
+void hyperstone_device::ope9()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_dbnn(cpustate, decode);
+	hyperstone_dbnn(decode);
 }
 
-static void hyperstone_opea(hyperstone_state *cpustate)
+void hyperstone_device::opea()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_dble(cpustate, decode);
+	hyperstone_dble(decode);
 }
 
-static void hyperstone_opeb(hyperstone_state *cpustate)
+void hyperstone_device::opeb()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_dbgt(cpustate, decode);
+	hyperstone_dbgt(decode);
 }
 
-static void hyperstone_opec(hyperstone_state *cpustate)
+void hyperstone_device::opec()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_dbr(cpustate, decode);
+	hyperstone_dbr(decode);
 }
 
-static void hyperstone_oped(hyperstone_state *cpustate)
+void hyperstone_device::oped()
 {
 	LOCAL_DECODE_INIT;
 	LLdecode(decode);
-	hyperstone_frame(cpustate, decode);
+	hyperstone_frame(decode);
 }
 
-static void hyperstone_opee(hyperstone_state *cpustate)
+void hyperstone_device::opee()
 {
 	LOCAL_DECODE_INIT;
 	LRconstdecode(decode, 0);
-	hyperstone_call(cpustate, decode);
+	hyperstone_call(decode);
 }
 
-static void hyperstone_opef(hyperstone_state *cpustate)
+void hyperstone_device::opef()
 {
 	LOCAL_DECODE_INIT;
 	LRconstdecode(decode, 1);
-	hyperstone_call(cpustate, decode);
+	hyperstone_call(decode);
 }
 
 
 
-static void hyperstone_opf0(hyperstone_state *cpustate)
+void hyperstone_device::opf0()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_bv(cpustate, decode);
+	hyperstone_bv(decode);
 }
 
-static void hyperstone_opf1(hyperstone_state *cpustate)
+void hyperstone_device::opf1()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_bnv(cpustate, decode);
+	hyperstone_bnv(decode);
 }
 
-static void hyperstone_opf2(hyperstone_state *cpustate)
+void hyperstone_device::opf2()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_be(cpustate, decode);
+	hyperstone_be(decode);
 }
 
-static void hyperstone_opf3(hyperstone_state *cpustate)
+void hyperstone_device::opf3()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_bne(cpustate, decode);
+	hyperstone_bne(decode);
 }
 
-static void hyperstone_opf4(hyperstone_state *cpustate)
+void hyperstone_device::opf4()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_bc(cpustate, decode);
+	hyperstone_bc(decode);
 }
 
-static void hyperstone_opf5(hyperstone_state *cpustate)
+void hyperstone_device::opf5()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_bnc(cpustate, decode);
+	hyperstone_bnc(decode);
 }
 
-static void hyperstone_opf6(hyperstone_state *cpustate)
+void hyperstone_device::opf6()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_bse(cpustate, decode);
+	hyperstone_bse(decode);
 }
 
-static void hyperstone_opf7(hyperstone_state *cpustate)
+void hyperstone_device::opf7()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_bht(cpustate, decode);
+	hyperstone_bht(decode);
 }
 
-static void hyperstone_opf8(hyperstone_state *cpustate)
+void hyperstone_device::opf8()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_bn(cpustate, decode);
+	hyperstone_bn(decode);
 }
 
-static void hyperstone_opf9(hyperstone_state *cpustate)
+void hyperstone_device::opf9()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_bnn(cpustate, decode);
+	hyperstone_bnn(decode);
 }
 
-static void hyperstone_opfa(hyperstone_state *cpustate)
+void hyperstone_device::opfa()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_ble(cpustate, decode);
+	hyperstone_ble(decode);
 }
 
-static void hyperstone_opfb(hyperstone_state *cpustate)
+void hyperstone_device::opfb()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_bgt(cpustate, decode);
+	hyperstone_bgt(decode);
 }
 
-static void hyperstone_opfc(hyperstone_state *cpustate)
+void hyperstone_device::opfc()
 {
 	LOCAL_DECODE_INIT;
 	PCreldecode(decode);
-	hyperstone_br(cpustate, decode);
+	hyperstone_br(decode);
 }
 
-static void hyperstone_opfd(hyperstone_state *cpustate)
+void hyperstone_device::opfd()
 {
 	LOCAL_DECODE_INIT;
 	PCadrdecode(decode);
-	hyperstone_trap(cpustate, decode);
+	hyperstone_trap(decode);
 }
 
-static void hyperstone_opfe(hyperstone_state *cpustate)
+void hyperstone_device::opfe()
 {
 	LOCAL_DECODE_INIT;
 	PCadrdecode(decode);
-	hyperstone_trap(cpustate, decode);
+	hyperstone_trap(decode);
 }
 
-static void hyperstone_opff(hyperstone_state *cpustate)
+void hyperstone_device::opff()
 {
 	LOCAL_DECODE_INIT;
 	PCadrdecode(decode);
-	hyperstone_trap(cpustate, decode);
+	hyperstone_trap(decode);
 }
 
-
-static void (*const hyperstone_op[0x100])(hyperstone_state *cpustate) =
+const hyperstone_device::ophandler hyperstone_device::s_opcodetable[256] =
 {
-	hyperstone_op00, hyperstone_op01, hyperstone_op02, hyperstone_op03,
-	hyperstone_op04, hyperstone_op05, hyperstone_op06, hyperstone_op07,
-	hyperstone_op08, hyperstone_op09, hyperstone_op0a, hyperstone_op0b,
-	hyperstone_op0c, hyperstone_op0d, hyperstone_op0e, hyperstone_op0f,
+	&hyperstone_device::op00, &hyperstone_device::op01, &hyperstone_device::op02, &hyperstone_device::op03,
+	&hyperstone_device::op04, &hyperstone_device::op05, &hyperstone_device::op06, &hyperstone_device::op07,
+	&hyperstone_device::op08, &hyperstone_device::op09, &hyperstone_device::op0a, &hyperstone_device::op0b,
+	&hyperstone_device::op0c, &hyperstone_device::op0d, &hyperstone_device::op0e, &hyperstone_device::op0f,
 
-	hyperstone_op10, hyperstone_op11, hyperstone_op12, hyperstone_op13,
-	hyperstone_op14, hyperstone_op15, hyperstone_op16, hyperstone_op17,
-	hyperstone_op18, hyperstone_op19, hyperstone_op1a, hyperstone_op1b,
-	hyperstone_op1c, hyperstone_op1d, hyperstone_op1e, hyperstone_op1f,
+	&hyperstone_device::op10, &hyperstone_device::op11, &hyperstone_device::op12, &hyperstone_device::op13,
+	&hyperstone_device::op14, &hyperstone_device::op15, &hyperstone_device::op16, &hyperstone_device::op17,
+	&hyperstone_device::op18, &hyperstone_device::op19, &hyperstone_device::op1a, &hyperstone_device::op1b,
+	&hyperstone_device::op1c, &hyperstone_device::op1d, &hyperstone_device::op1e, &hyperstone_device::op1f,
 
-	hyperstone_op20, hyperstone_op21, hyperstone_op22, hyperstone_op23,
-	hyperstone_op24, hyperstone_op25, hyperstone_op26, hyperstone_op27,
-	hyperstone_op28, hyperstone_op29, hyperstone_op2a, hyperstone_op2b,
-	hyperstone_op2c, hyperstone_op2d, hyperstone_op2e, hyperstone_op2f,
+	&hyperstone_device::op20, &hyperstone_device::op21, &hyperstone_device::op22, &hyperstone_device::op23,
+	&hyperstone_device::op24, &hyperstone_device::op25, &hyperstone_device::op26, &hyperstone_device::op27,
+	&hyperstone_device::op28, &hyperstone_device::op29, &hyperstone_device::op2a, &hyperstone_device::op2b,
+	&hyperstone_device::op2c, &hyperstone_device::op2d, &hyperstone_device::op2e, &hyperstone_device::op2f,
 
-	hyperstone_op30, hyperstone_op31, hyperstone_op32, hyperstone_op33,
-	hyperstone_op34, hyperstone_op35, hyperstone_op36, hyperstone_op37,
-	hyperstone_op38, hyperstone_op39, hyperstone_op3a, hyperstone_op3b,
-	hyperstone_op3c, hyperstone_op3d, hyperstone_op3e, hyperstone_op3f,
+	&hyperstone_device::op30, &hyperstone_device::op31, &hyperstone_device::op32, &hyperstone_device::op33,
+	&hyperstone_device::op34, &hyperstone_device::op35, &hyperstone_device::op36, &hyperstone_device::op37,
+	&hyperstone_device::op38, &hyperstone_device::op39, &hyperstone_device::op3a, &hyperstone_device::op3b,
+	&hyperstone_device::op3c, &hyperstone_device::op3d, &hyperstone_device::op3e, &hyperstone_device::op3f,
 
-	hyperstone_op40, hyperstone_op41, hyperstone_op42, hyperstone_op43,
-	hyperstone_op44, hyperstone_op45, hyperstone_op46, hyperstone_op47,
-	hyperstone_op48, hyperstone_op49, hyperstone_op4a, hyperstone_op4b,
-	hyperstone_op4c, hyperstone_op4d, hyperstone_op4e, hyperstone_op4f,
+	&hyperstone_device::op40, &hyperstone_device::op41, &hyperstone_device::op42, &hyperstone_device::op43,
+	&hyperstone_device::op44, &hyperstone_device::op45, &hyperstone_device::op46, &hyperstone_device::op47,
+	&hyperstone_device::op48, &hyperstone_device::op49, &hyperstone_device::op4a, &hyperstone_device::op4b,
+	&hyperstone_device::op4c, &hyperstone_device::op4d, &hyperstone_device::op4e, &hyperstone_device::op4f,
 
-	hyperstone_op50, hyperstone_op51, hyperstone_op52, hyperstone_op53,
-	hyperstone_op54, hyperstone_op55, hyperstone_op56, hyperstone_op57,
-	hyperstone_op58, hyperstone_op59, hyperstone_op5a, hyperstone_op5b,
-	hyperstone_op5c, hyperstone_op5d, hyperstone_op5e, hyperstone_op5f,
+	&hyperstone_device::op50, &hyperstone_device::op51, &hyperstone_device::op52, &hyperstone_device::op53,
+	&hyperstone_device::op54, &hyperstone_device::op55, &hyperstone_device::op56, &hyperstone_device::op57,
+	&hyperstone_device::op58, &hyperstone_device::op59, &hyperstone_device::op5a, &hyperstone_device::op5b,
+	&hyperstone_device::op5c, &hyperstone_device::op5d, &hyperstone_device::op5e, &hyperstone_device::op5f,
 
-	hyperstone_op60, hyperstone_op61, hyperstone_op62, hyperstone_op63,
-	hyperstone_op64, hyperstone_op65, hyperstone_op66, hyperstone_op67,
-	hyperstone_op68, hyperstone_op69, hyperstone_op6a, hyperstone_op6b,
-	hyperstone_op6c, hyperstone_op6d, hyperstone_op6e, hyperstone_op6f,
+	&hyperstone_device::op60, &hyperstone_device::op61, &hyperstone_device::op62, &hyperstone_device::op63,
+	&hyperstone_device::op64, &hyperstone_device::op65, &hyperstone_device::op66, &hyperstone_device::op67,
+	&hyperstone_device::op68, &hyperstone_device::op69, &hyperstone_device::op6a, &hyperstone_device::op6b,
+	&hyperstone_device::op6c, &hyperstone_device::op6d, &hyperstone_device::op6e, &hyperstone_device::op6f,
 
-	hyperstone_op70, hyperstone_op71, hyperstone_op72, hyperstone_op73,
-	hyperstone_op74, hyperstone_op75, hyperstone_op76, hyperstone_op77,
-	hyperstone_op78, hyperstone_op79, hyperstone_op7a, hyperstone_op7b,
-	hyperstone_op7c, hyperstone_op7d, hyperstone_op7e, hyperstone_op7f,
+	&hyperstone_device::op70, &hyperstone_device::op71, &hyperstone_device::op72, &hyperstone_device::op73,
+	&hyperstone_device::op74, &hyperstone_device::op75, &hyperstone_device::op76, &hyperstone_device::op77,
+	&hyperstone_device::op78, &hyperstone_device::op79, &hyperstone_device::op7a, &hyperstone_device::op7b,
+	&hyperstone_device::op7c, &hyperstone_device::op7d, &hyperstone_device::op7e, &hyperstone_device::op7f,
 
-	hyperstone_op80, hyperstone_op81, hyperstone_op82, hyperstone_op83,
-	hyperstone_op84, hyperstone_op85, hyperstone_op86, hyperstone_op87,
-	hyperstone_op88, hyperstone_op89, hyperstone_op8a, hyperstone_op8b,
-	hyperstone_op8c, hyperstone_op8d, hyperstone_op8e, hyperstone_op8f,
+	&hyperstone_device::op80, &hyperstone_device::op81, &hyperstone_device::op82, &hyperstone_device::op83,
+	&hyperstone_device::op84, &hyperstone_device::op85, &hyperstone_device::op86, &hyperstone_device::op87,
+	&hyperstone_device::op88, &hyperstone_device::op89, &hyperstone_device::op8a, &hyperstone_device::op8b,
+	&hyperstone_device::op8c, &hyperstone_device::op8d, &hyperstone_device::op8e, &hyperstone_device::op8f,
 
-	hyperstone_op90, hyperstone_op91, hyperstone_op92, hyperstone_op93,
-	hyperstone_op94, hyperstone_op95, hyperstone_op96, hyperstone_op97,
-	hyperstone_op98, hyperstone_op99, hyperstone_op9a, hyperstone_op9b,
-	hyperstone_op9c, hyperstone_op9d, hyperstone_op9e, hyperstone_op9f,
+	&hyperstone_device::op90, &hyperstone_device::op91, &hyperstone_device::op92, &hyperstone_device::op93,
+	&hyperstone_device::op94, &hyperstone_device::op95, &hyperstone_device::op96, &hyperstone_device::op97,
+	&hyperstone_device::op98, &hyperstone_device::op99, &hyperstone_device::op9a, &hyperstone_device::op9b,
+	&hyperstone_device::op9c, &hyperstone_device::op9d, &hyperstone_device::op9e, &hyperstone_device::op9f,
 
-	hyperstone_opa0, hyperstone_opa1, hyperstone_opa2, hyperstone_opa3,
-	hyperstone_opa4, hyperstone_opa5, hyperstone_opa6, hyperstone_opa7,
-	hyperstone_opa8, hyperstone_opa9, hyperstone_opaa, hyperstone_opab,
-	hyperstone_opac, hyperstone_opad, hyperstone_opae, hyperstone_opaf,
+	&hyperstone_device::opa0, &hyperstone_device::opa1, &hyperstone_device::opa2, &hyperstone_device::opa3,
+	&hyperstone_device::opa4, &hyperstone_device::opa5, &hyperstone_device::opa6, &hyperstone_device::opa7,
+	&hyperstone_device::opa8, &hyperstone_device::opa9, &hyperstone_device::opaa, &hyperstone_device::opab,
+	&hyperstone_device::opac, &hyperstone_device::opad, &hyperstone_device::opae, &hyperstone_device::opaf,
 
-	hyperstone_opb0, hyperstone_opb1, hyperstone_opb2, hyperstone_opb3,
-	hyperstone_opb4, hyperstone_opb5, hyperstone_opb6, hyperstone_opb7,
-	hyperstone_opb8, hyperstone_opb9, hyperstone_opba, hyperstone_opbb,
-	hyperstone_opbc, hyperstone_opbd, hyperstone_opbe, hyperstone_opbf,
+	&hyperstone_device::opb0, &hyperstone_device::opb1, &hyperstone_device::opb2, &hyperstone_device::opb3,
+	&hyperstone_device::opb4, &hyperstone_device::opb5, &hyperstone_device::opb6, &hyperstone_device::opb7,
+	&hyperstone_device::opb8, &hyperstone_device::opb9, &hyperstone_device::opba, &hyperstone_device::opbb,
+	&hyperstone_device::opbc, &hyperstone_device::opbd, &hyperstone_device::opbe, &hyperstone_device::opbf,
 
-	hyperstone_opc0, hyperstone_opc1, hyperstone_opc2, hyperstone_opc3,
-	hyperstone_opc4, hyperstone_opc5, hyperstone_opc6, hyperstone_opc7,
-	hyperstone_opc8, hyperstone_opc9, hyperstone_opca, hyperstone_opcb,
-	hyperstone_opcc, hyperstone_opcd, hyperstone_opce, hyperstone_opcf,
+	&hyperstone_device::opc0, &hyperstone_device::opc1, &hyperstone_device::opc2, &hyperstone_device::opc3,
+	&hyperstone_device::opc4, &hyperstone_device::opc5, &hyperstone_device::opc6, &hyperstone_device::opc7,
+	&hyperstone_device::opc8, &hyperstone_device::opc9, &hyperstone_device::opca, &hyperstone_device::opcb,
+	&hyperstone_device::opcc, &hyperstone_device::opcd, &hyperstone_device::opce, &hyperstone_device::opcf,
 
-	hyperstone_opd0, hyperstone_opd1, hyperstone_opd2, hyperstone_opd3,
-	hyperstone_opd4, hyperstone_opd5, hyperstone_opd6, hyperstone_opd7,
-	hyperstone_opd8, hyperstone_opd9, hyperstone_opda, hyperstone_opdb,
-	hyperstone_opdc, hyperstone_opdd, hyperstone_opde, hyperstone_opdf,
+	&hyperstone_device::opd0, &hyperstone_device::opd1, &hyperstone_device::opd2, &hyperstone_device::opd3,
+	&hyperstone_device::opd4, &hyperstone_device::opd5, &hyperstone_device::opd6, &hyperstone_device::opd7,
+	&hyperstone_device::opd8, &hyperstone_device::opd9, &hyperstone_device::opda, &hyperstone_device::opdb,
+	&hyperstone_device::opdc, &hyperstone_device::opdd, &hyperstone_device::opde, &hyperstone_device::opdf,
 
-	hyperstone_ope0, hyperstone_ope1, hyperstone_ope2, hyperstone_ope3,
-	hyperstone_ope4, hyperstone_ope5, hyperstone_ope6, hyperstone_ope7,
-	hyperstone_ope8, hyperstone_ope9, hyperstone_opea, hyperstone_opeb,
-	hyperstone_opec, hyperstone_oped, hyperstone_opee, hyperstone_opef,
+	&hyperstone_device::ope0, &hyperstone_device::ope1, &hyperstone_device::ope2, &hyperstone_device::ope3,
+	&hyperstone_device::ope4, &hyperstone_device::ope5, &hyperstone_device::ope6, &hyperstone_device::ope7,
+	&hyperstone_device::ope8, &hyperstone_device::ope9, &hyperstone_device::opea, &hyperstone_device::opeb,
+	&hyperstone_device::opec, &hyperstone_device::oped, &hyperstone_device::opee, &hyperstone_device::opef,
 
-	hyperstone_opf0, hyperstone_opf1, hyperstone_opf2, hyperstone_opf3,
-	hyperstone_opf4, hyperstone_opf5, hyperstone_opf6, hyperstone_opf7,
-	hyperstone_opf8, hyperstone_opf9, hyperstone_opfa, hyperstone_opfb,
-	hyperstone_opfc, hyperstone_opfd, hyperstone_opfe, hyperstone_opff
+	&hyperstone_device::opf0, &hyperstone_device::opf1, &hyperstone_device::opf2, &hyperstone_device::opf3,
+	&hyperstone_device::opf4, &hyperstone_device::opf5, &hyperstone_device::opf6, &hyperstone_device::opf7,
+	&hyperstone_device::opf8, &hyperstone_device::opf9, &hyperstone_device::opfa, &hyperstone_device::opfb,
+	&hyperstone_device::opfc, &hyperstone_device::opfd, &hyperstone_device::opfe, &hyperstone_device::opff
 };
