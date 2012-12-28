@@ -30,6 +30,7 @@
 
 INPUT_PORTS_EXTERN( coco_analog_control );
 INPUT_PORTS_EXTERN( coco_cart_autostart );
+INPUT_PORTS_EXTERN( coco_rtc );
 
 SLOT_INTERFACE_EXTERN( coco_cart );
 

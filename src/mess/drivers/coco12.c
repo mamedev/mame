@@ -114,6 +114,19 @@ INPUT_PORTS_END
 
 
 //-------------------------------------------------
+//  INPUT_PORTS( coco_rtc )
+//-------------------------------------------------
+
+INPUT_PORTS_START( coco_rtc )
+	PORT_START("real_time_clock")
+	PORT_CONFNAME( 0x03, 0x00, "Real Time Clock" )
+	PORT_CONFSETTING(    0x00, "Disto" )
+	PORT_CONFSETTING(    0x01, "Cloud-9" )
+INPUT_PORTS_END
+
+
+
+//-------------------------------------------------
 //  INPUT_PORTS( coco_keyboard )
 //-------------------------------------------------
 //
@@ -209,6 +222,7 @@ static INPUT_PORTS_START( coco )
 	PORT_INCLUDE( coco_joystick )
 	PORT_INCLUDE( coco_analog_control )
 	PORT_INCLUDE( coco_cart_autostart )
+	PORT_INCLUDE( coco_rtc )
 INPUT_PORTS_END
 
 
