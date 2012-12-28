@@ -80,7 +80,7 @@ WRITE_LINE_MEMBER( coco12_state::field_sync )
 
 READ8_MEMBER( coco12_state::sam_read )
 {
-	UINT8 data = m_sam->mpu_address_space()->read_byte(offset);
+	UINT8 data = m_ram->read(offset);
 	m_vdg->as_w(data & 0x80 ? ASSERT_LINE : CLEAR_LINE);
 	m_vdg->inv_w(data & 0x40 ? ASSERT_LINE : CLEAR_LINE);
 	return data;

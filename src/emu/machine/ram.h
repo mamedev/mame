@@ -58,6 +58,10 @@ public:
 	static UINT32 parse_string(const char *s);
 	UINT32 default_size(void) const;
 	const char *extra_options(void) const { return m_extra_options; }
+	
+	// read/write
+	UINT8 read(offs_t offset)				{ return m_pointer[offset % m_size]; }
+	void write(offs_t offset, UINT8 data)	{ m_pointer[offset % m_size] = data; }
 
 	// inline configuration helpers
 	static void static_set_default_size(device_t &device, const char *default_size)		{ downcast<ram_device &>(device).m_default_size = default_size; }
