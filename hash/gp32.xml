@@ -1,11 +1,32 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- 
+Undumped games (from http://ko.wikipedia.org/wiki/GP32 )
+
+* 핀볼즈드림 ~ Pinball Dreams
+* 겨울은... ~ Winter Is...
+* Story of Bug Eyed Monster
+* 달려라 하니 시리즈 ~ Ride Do Series
+* Tears: Contact
+
+
+Questionable?
+
+* 강행돌파 [same as herknite?!?]
+* Funny Soccer [Euro version of doolysoc?!?]
+* 슈퍼 플라샤 ~ Super Plusha [homebrew?]
+* Gloop Deluxe [homebrew?]
+
+-->
+
 <softwarelist name="gp32" description="GamePark GP32 SmartMedia cards">
 
 	<software name="astonish">
 		<description>Astonishia Story R (Kor)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
+		<info name="alt_title" value="어스토니시아 스토리 R"/>
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="34604032">
@@ -15,8 +36,8 @@
 	</software>
 
 	<software name="blueangl">
-		<description>Blue Angelo: Angels from the Shrine (Eur)</description>
-		<year>2004</year>
+		<description>Blue Angelo - Angels from the Shrine (Euro)</description>
+		<year>2005</year>
 		<publisher>Shibuya Interactive</publisher>
 
 		<part name="cart" interface="sm_memc">
@@ -30,6 +51,7 @@
 		<description>Dooly Soccer 2002 (Kor)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
+		<info name="alt_title" value="둘리축구"/>
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -39,9 +61,10 @@
 	</software>
 
 	<software name="dunguard">
-		<description>Dungeon &amp; Guarder: Dragon Gore (Kor)</description>
+		<description>Dungeon &amp; Guarder (Kor)</description>
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
+		<info name="alt_title" value="던전 앤 가더, Dungeon &amp; Guarder - Dragon Gore (Box/Card)"/>
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -51,9 +74,11 @@
 	</software>
 
 	<software name="dunguarde" cloneof="dunguard">
-		<description>Dungeon &amp; Guarder: Dragon Gore  (Eur)</description>
+		<description>Dungeon &amp; Guarder (Euro)</description>
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
+		<info name="alt_title" value="Dungeon &amp; Guarder - Dragon Gore (Box/Card)"/>
+
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -63,9 +88,10 @@
 	</software>
 
 	<software name="dyhard">
-		<description>Dyhard: With Infinite Stairs (Kor)</description>
+		<description>Dyhard - Infinity (Kor)</description>
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
+		<info name="alt_title" value="다이하드"/>
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -75,7 +101,7 @@
 	</software>
 
 	<software name="dyharde" cloneof="dyhard">
-		<description>Dyhard: With Infinite Stairs (Eur)</description>
+		<description>Dyhard - Infinity (Euro)</description>
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
 
@@ -86,10 +112,11 @@
 		</part>
 	</software>
 
-	<software name="gpfight">
-		<description>GP Fight (Kor)</description>
+	<software name="gpdaenan">
+		<description>GP Daenantu ~ GP!!! Dairantou (Kor)</description>
 		<year>2003</year>
 		<publisher>Gamepark</publisher>
+		<info name="alt_title" value="지피대난투 ~ 支披!!!大乱闘"/>
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -111,9 +138,10 @@
 	</software>
 
 	<software name="herknite">
-		<description>Her Knights: All for Princess: Deadline (Kor)</description>
+		<description>Geunyeoui Gisadan Ganghaengdolpa (Kor)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
+		<info name="alt_title" value="그녀의 기사단 강행돌파"/>
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -123,7 +151,7 @@
 	</software>
 
 	<software name="herknitee" cloneof="herknite">
-		<description>Her Knights: All for the Princess (Eur)</description>
+		<description>Her Knights - All for the Princess (Euro)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 
@@ -138,6 +166,7 @@
 		<description>Kimchiman GP32 (Kor)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
+		<info name="alt_title" value="김치맨"/>
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -146,10 +175,11 @@
 		</part>
 	</software>
 
-	<software name="girlmill">
-		<description>The Little Girl Mill of a Gingko (Kor)</description>
+	<software name="mil">
+		<description>Eunhaengnamu Sonyeo Mil (Kor)</description>
 		<year>2003</year>
 		<publisher>Gamepark</publisher>
+		<info name="alt_title" value="은행나무소녀 밀, The Little Girl Mill of a Gingko 은행나무소녀 밀 (Box)"/>
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -162,6 +192,7 @@
 		<description>Little Wizard (Kor)</description>
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
+		<info name="alt_title" value="리틀위저드"/>
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -171,7 +202,7 @@
 	</software>
 
 	<software name="ltwizarde" cloneof="ltwizard">
-		<description>Little Wizard (Eur)</description>
+		<description>Little Wizard (Euro)</description>
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
 
@@ -183,9 +214,10 @@
 	</software>
 
 	<software name="oneshot">
-		<description>Oneshot Voca (Kor)</description>
+		<description>One-Shot VOCA (Kor)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
+		<info name="alt_title" value="원샷 VOCA"/>
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -198,6 +230,7 @@
 		<description>Princess Maker 2 (Kor)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
+		<info name="alt_title" value="프린세스메이커2"/>
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -210,6 +243,7 @@
 		<description>Rally Pop (Kor)</description>
 		<year>2001</year>
 		<publisher>Gamepark</publisher>
+		<info name="alt_title" value="랠리팝"/>
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -246,6 +280,7 @@
 		<description>Therapy (Kor)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
+		<info name="alt_title" value="테라피"/>
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -255,9 +290,10 @@
 	</software>
 
 	<software name="tomak">
-		<description>Tomak: Save the Earth, Again (Kor)</description>
+		<description>Tomak - Save the Earth, Again (Kor)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
+		<info name="alt_title" value="토막 지구를 지켜라, Again ~ Tomak Jiguleul Jikyeola, Again (Box)"/>
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -267,7 +303,7 @@
 	</software>
 
 	<software name="tomake" cloneof="tomak">
-		<description>Tomak: Save the Earth, Again (Eur) (v1.0)</description>
+		<description>Tomak - Save the Earth, Again (Euro, v1.0)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 
@@ -279,7 +315,7 @@
 	</software>
 
 	<software name="tomake2" cloneof="tomak">
-		<description>Tomak: Save the Earth, Again (Eur) (v2.0)</description>
+		<description>Tomak - Save the Earth, Again (Euro, v2.0)</description>
 		<year>2002</year>
 		<publisher>Gamepark</publisher>
 
@@ -290,10 +326,37 @@
 		</part>
 	</software>
 
+	<software name="treasisl">
+		<description>Treasure Island (Kor)</description>
+		<year>2002</year>
+		<publisher>Gamepark</publisher>
+		<info name="alt_title" value="Woody &amp; Kunta - Treasure Island (Box)"/>
+
+		<part name="cart" interface="sm_memc">
+			<dataarea name="memc" size="17302528">
+				<rom name="woody &amp; kunta - treasure island (korea).smc" size="17302528" crc="de2142bc" sha1="9e768faa8300cd5b3102f433aae53a6f4d3d7f1f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="treasisle" cloneof="treasisl">
+		<description>Treasure Island (Euro)</description>
+		<year>2002</year>
+		<publisher>Gamepark</publisher>
+		<info name="alt_title" value="Woody &amp; Kunta - Treasure Island (Box)"/>
+
+		<part name="cart" interface="sm_memc">
+			<dataarea name="memc" size="17302528">
+				<rom name="woody &amp; kunta - treasure island (europe).smc" size="17302528" crc="ab479052" sha1="cd1df6228293dc8193e779bdba562f3040e21b4a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wbw">
-		<description>W.B.W.: Wanna Be Wizard! (Kor)</description>
+		<description>W.B.W. - Mabeobsaga Doego Sip-eo! (Kor)</description>
 		<year>2004</year>
 		<publisher>Gamepark</publisher>
+		<info name="alt_title" value="W.B.W. - 마법사가 되고 싶어!, W.B.W. - Wanna Be Wizard! (Box/Card)"/>
 
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
@@ -310,30 +373,6 @@
 		<part name="cart" interface="sm_memc">
 			<dataarea name="memc" size="17302528">
 				<rom name="wizard slayer (korea).smc" size="17302528" crc="d7f6d3cf" sha1="a6801cee5cdc2f76d318df1880d8441bf9405de3" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="woodykun">
-		<description>Woody Kunta: Treasure Island (Kor)</description>
-		<year>2002</year>
-		<publisher>Gamepark</publisher>
-
-		<part name="cart" interface="sm_memc">
-			<dataarea name="memc" size="17302528">
-				<rom name="woody &amp; kunta - treasure island (korea).smc" size="17302528" crc="de2142bc" sha1="9e768faa8300cd5b3102f433aae53a6f4d3d7f1f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="woodykune" cloneof="woodykun">
-		<description>Woody Kunta: Treasure Island (Eur)</description>
-		<year>2002</year>
-		<publisher>Gamepark</publisher>
-
-		<part name="cart" interface="sm_memc">
-			<dataarea name="memc" size="17302528">
-				<rom name="woody &amp; kunta - treasure island (europe).smc" size="17302528" crc="ab479052" sha1="cd1df6228293dc8193e779bdba562f3040e21b4a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
