@@ -547,19 +547,29 @@ private:
 
 	void change_mode(UINT8 mode, int state)
 	{
-		/* sanity check, to ensure that we're not changing fixed modes */
+		// sanity check, to ensure that we're not changing fixed modes
 		assert((mode & m_fixed_mode_mask) == 0);
 
-		if (!m_dirty)
-		{
-			video_flush();
-			m_dirty = true;
-		}
-
+		// calculate new mode
+		UINT8 new_mode;
 		if (state)
-			m_mode |= mode;
+			new_mode = m_mode | mode;
 		else
-			m_mode &= ~mode;
+			new_mode = m_mode & ~mode;
+
+		// has the mode changed?
+		if (new_mode != m_mode)
+		{
+			// it has!  check dirty flag
+			if (!m_dirty)
+			{
+				video_flush();
+				m_dirty = true;
+			}
+
+			// and set the new mode
+			m_mode = new_mode;
+		}
 	}
 
 	// setup functions
