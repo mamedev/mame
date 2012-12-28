@@ -4,7 +4,18 @@
 	Known issues:
 	- Background music is not working in some games
 	- Black Knight 2000 randomly goes nuts or resets
-	- Advance button doesn't seem to work well
+	  (some bug possibly relating to the 'lighting draws the "Ball 1"' animation???);
+	  if you insert 2 or more credits and hit start 2 times quickly so it doesn't
+	  play the animation, the game seems more stable afterward; original
+	  game bug or 6802 core bug or something else?
+	  This bug behaves slightly differently in the different sets, depending on whether
+	  nvram is cleared beforehand or not, and whether the last reset was soft or hard.
+	- Black Knight 2000 LG-1 set reports U26 ROM FAILURE. Bad/hacked dump or original bug?  
+	- Advance button doesn't seem to work well (TODO: check if this may have been fixed with the irq and diagnostic button masking changes)
+
+	Known keys necessary to get games to start (so the proper number of balls are detected):
+	- Black Knight 2000: Hold "D" "F" "Y" and press "1" after inserting 1 or more credits. press 'x' to get the main music started.
+	- Cyclone: Nothing. The game doesn't bother to check if the ball is ready before allowing start. Insert 1 or more credits first, of course.
 */
 
 
@@ -879,7 +890,7 @@ ROM_START(bk2k_l4)
 	ROM_LOAD("bk2k_u19.l1", 0x18000, 0x8000, CRC(58e162b2) SHA1(891f810ae18b46593f570d719f0290a1d08a1a10))
 ROM_END
 
-ROM_START(bk2k_lg1)
+ROM_START(bk2k_lg1) // the rom at u26 is reported as bad when the game is booted, but appears to run nonetheless; bad dump or original bug in the LG-1 set fixed in LG-2 and LG-3?
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("bk2kgu26.lg1", 0x4000, 0x4000, CRC(f916d163) SHA1(bd8cbac9345a8debd01c8c68110652f591ad9d51))
 	ROM_LOAD("bk2kgu27.lg1", 0x8000, 0x8000, CRC(4132ac5c) SHA1(5636d4e8fb9bf5a5f4ccafe4ef035ab0e8964e8b))

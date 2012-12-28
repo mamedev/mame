@@ -10,6 +10,9 @@ ToDo:
 - Can coin up but not start
 - Doesn't react to the Advance button very well
 
+	Known keys necessary to get games to start (so the proper number of balls are detected):
+	- Road Kings: press 'Up' (the direction key) and Q, and press "1" after inserting 1 or more credits.
+
 *****************************************************************************************/
 
 
