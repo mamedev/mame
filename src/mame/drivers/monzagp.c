@@ -24,6 +24,7 @@ Lower board (MGP_01):
 1x 6 legs connector (power supply)
 1x 20x2 legs connector for flat cable
 1x trimmer (TIME?????)
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -272,34 +273,69 @@ MACHINE_CONFIG_END
 
 ROM_START( monzagp )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "12.6a",           0x0000, 0x0400, CRC(35715718) SHA1(aa64cedf1f5898b109f643975722cf15a1c752ba) )
-	ROM_LOAD( "13.7a",           0x0400, 0x0400, CRC(4e16bb68) SHA1(fb1d311a40145b3dccbd3d003a683c12898f43ff) )
-	ROM_LOAD( "14.8a",           0x0800, 0x0400, CRC(16a1b36c) SHA1(6bc6bac37febb7c0fe18dc9b0a4e3a71ad1faafd) )
-	ROM_LOAD( "15.9a",           0x0c00, 0x0400, CRC(ee6d9cc6) SHA1(0aa9efe812c1d4865fee2bbb1764a135dd642790) )
+	ROM_LOAD( "12.6a",       0x0000, 0x0400, CRC(35715718) SHA1(aa64cedf1f5898b109f643975722cf15a1c752ba) )
+	ROM_LOAD( "13.7a",       0x0400, 0x0400, CRC(4e16bb68) SHA1(fb1d311a40145b3dccbd3d003a683c12898f43ff) )
+	ROM_LOAD( "14.8a",       0x0800, 0x0400, CRC(16a1b36c) SHA1(6bc6bac37febb7c0fe18dc9b0a4e3a71ad1faafd) )
+	ROM_LOAD( "15.9a",       0x0c00, 0x0400, CRC(ee6d9cc6) SHA1(0aa9efe812c1d4865fee2bbb1764a135dd642790) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
-	ROM_LOAD( "11.8d",          0x0000, 0x0400, CRC(47607a83) SHA1(91ce272c4af3e1994db71d2239b68879dd279347) )
-	ROM_LOAD( "10.7d",          0x0400, 0x0400, CRC(d2bedd67) SHA1(9b75731d2701f5b9ce0446141c5cd55b05671ec1) )
-	ROM_LOAD( "9.10j",          0x0800, 0x0400, CRC(474ab63f) SHA1(6ba623d1768ed92b39e8f76c2f2eed7874955f1b) )
-	ROM_LOAD( "6.4f",           0x0c00, 0x0400, CRC(934d2070) SHA1(e742bfcb910e8747780d32ca66efd7e343190fb4) )
-	ROM_LOAD( "7.3f",           0x1000, 0x0400, CRC(08f29f60) SHA1(9ca454e848aa986ff9eccaead3fec5076df2e4d3) )
-	ROM_LOAD( "8.1f",           0x1400, 0x0400, CRC(99ce2753) SHA1(f4540700ea909ba1be34ac2c33dafd8ec67a2bb7) )
+	ROM_LOAD( "11.8d",       0x0000, 0x0400, CRC(47607a83) SHA1(91ce272c4af3e1994db71d2239b68879dd279347) )
+	ROM_LOAD( "10.7d",       0x0400, 0x0400, CRC(d2bedd67) SHA1(9b75731d2701f5b9ce0446141c5cd55b05671ec1) )
+	ROM_LOAD( "9.10j",       0x0800, 0x0400, CRC(474ab63f) SHA1(6ba623d1768ed92b39e8f76c2f2eed7874955f1b) )
+	ROM_LOAD( "6.4f",        0x0c00, 0x0400, CRC(934d2070) SHA1(e742bfcb910e8747780d32ca66efd7e343190fb4) )
+	ROM_LOAD( "7.3f",        0x1000, 0x0400, CRC(08f29f60) SHA1(9ca454e848aa986ff9eccaead3fec5076df2e4d3) )
+	ROM_LOAD( "8.1f",        0x1400, 0x0400, CRC(99ce2753) SHA1(f4540700ea909ba1be34ac2c33dafd8ec67a2bb7) )
 
 	ROM_REGION( 0x10000, "unk1", 0 )
-	ROM_LOAD( "1.9c",       		0x0000, 0x0400, CRC(005d5fed) SHA1(145a860751ef7d99129b7242aacac7a4e1e14a51) )
-	ROM_LOAD( "2",          		0x0400, 0x0400, NO_DUMP )
-	ROM_LOAD( "3.12f",      		0x0800, 0x0400, CRC(e5591074) SHA1(ac756ee605d932d7c1c3eddbe2b9c6f78dad6ce8) )
-	ROM_LOAD( "4.10f",      		0x0c00, 0x0400, CRC(a426a371) SHA1(d6023bebf6924d1820e631ee53896100e5b256a5) )
-	ROM_LOAD( "5.9f",       		0x1000, 0x0400, CRC(5abd1ef6) SHA1(1bc79225c1be2821930fdb8e821a70c7ac8683ab) )
+	ROM_LOAD( "1.9c",        0x0000, 0x0400, CRC(005d5fed) SHA1(145a860751ef7d99129b7242aacac7a4e1e14a51) )
+	ROM_LOAD( "2.13f",       0x0400, 0x0400, NO_DUMP )
+	ROM_LOAD( "3.12f",       0x0800, 0x0400, CRC(e5591074) SHA1(ac756ee605d932d7c1c3eddbe2b9c6f78dad6ce8) )
+	ROM_LOAD( "4.10f",       0x0c00, 0x0400, CRC(a426a371) SHA1(d6023bebf6924d1820e631ee53896100e5b256a5) )
+	ROM_LOAD( "5.9f",        0x1000, 0x0400, CRC(5abd1ef6) SHA1(1bc79225c1be2821930fdb8e821a70c7ac8683ab) )
 
 	ROM_REGION( 0x0700, "proms", 0 )
-	ROM_LOAD( "63s140.1",        0x0000, 0x0100, CRC(5123c83e) SHA1(d8ff06af421d3dae65bc9b0a081ed56249ef61ab) )
-	ROM_LOAD( "74s287.2",        0x0100, 0x0100, CRC(a5488f72) SHA1(e7cd61a5577e2935b1ffa9dc17ca9da9b1196668) )
-	ROM_LOAD( "63s140.3",        0x0200, 0x0100, CRC(eebbe52a) SHA1(14af033871cad4e35c391bce4435e7cf1ba146f7) )
-	ROM_LOAD( "63s140.4",        0x0300, 0x0100, CRC(b89961a3) SHA1(99070a12e66764d21fd38ce4318ee0929daea465) )
-	ROM_LOAD( "63s140.5",        0x0400, 0x0100, CRC(82c92620) SHA1(51d65156ebb592ff9e6375da7aa279325482fd5f) )
-	ROM_LOAD( "63s140.6",        0x0500, 0x0100, CRC(8274f838) SHA1(c3518c668bda98759b1b1d4690062ced6c639efe) )
-	ROM_LOAD( "74s287.7",        0x0600, 0x0100, CRC(3248ba56) SHA1(d449f4be8df1b4189afca55a4cf0cc2e19eb4dd4) )
+	ROM_LOAD( "63s140.1",    0x0000, 0x0100, CRC(5123c83e) SHA1(d8ff06af421d3dae65bc9b0a081ed56249ef61ab) )
+	ROM_LOAD( "74s287.2",    0x0100, 0x0100, CRC(a5488f72) SHA1(e7cd61a5577e2935b1ffa9dc17ca9da9b1196668) )
+	ROM_LOAD( "63s140.3",    0x0200, 0x0100, CRC(eebbe52a) SHA1(14af033871cad4e35c391bce4435e7cf1ba146f7) )
+	ROM_LOAD( "63s140.4",    0x0300, 0x0100, CRC(b89961a3) SHA1(99070a12e66764d21fd38ce4318ee0929daea465) )
+	ROM_LOAD( "63s140.5",    0x0400, 0x0100, CRC(82c92620) SHA1(51d65156ebb592ff9e6375da7aa279325482fd5f) )
+	ROM_LOAD( "63s140.6",    0x0500, 0x0100, CRC(8274f838) SHA1(c3518c668bda98759b1b1d4690062ced6c639efe) )
+	ROM_LOAD( "74s287.7",    0x0600, 0x0100, CRC(3248ba56) SHA1(d449f4be8df1b4189afca55a4cf0cc2e19eb4dd4) )
 ROM_END
 
-GAME( 1981, monzagp,   0, monzagp, monzagp, driver_device, 0, ROT270, "Olympia", "Monza GP", GAME_NOT_WORKING|GAME_NO_SOUND )
+// bootleg hardware seems identical, just bad quality pcb
+ROM_START( monzagpb )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "m12c.6a",     0x0000, 0x0400, CRC(35715718) SHA1(aa64cedf1f5898b109f643975722cf15a1c752ba) )
+	ROM_LOAD( "m13c.7a",     0x0400, 0x0400, CRC(4e16bb68) SHA1(fb1d311a40145b3dccbd3d003a683c12898f43ff) )
+	ROM_LOAD( "m14.8a",      0x0800, 0x0400, CRC(16a1b36c) SHA1(6bc6bac37febb7c0fe18dc9b0a4e3a71ad1faafd) )
+	ROM_LOAD( "m15bi.9a",    0x0c00, 0x0400, CRC(ee6d9cc6) SHA1(0aa9efe812c1d4865fee2bbb1764a135dd642790) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "m11.8d",      0x0000, 0x0400, CRC(5b4a7ffa) SHA1(50fa073437febe516065cd83fbaf85b596c4f3c8) )
+	ROM_LOAD( "m10.7d",      0x0400, 0x0400, CRC(19db00af) SHA1(c73da9c2fdbdb1b52a7354ba169af43b26fcb4cc) )
+	ROM_LOAD( "m9.10j",      0x0800, 0x0400, CRC(474ab63f) SHA1(6ba623d1768ed92b39e8f76c2f2eed7874955f1b) )
+	ROM_LOAD( "m6.4f",       0x0c00, 0x0400, CRC(934d2070) SHA1(e742bfcb910e8747780d32ca66efd7e343190fb4) )
+	ROM_LOAD( "m7.3f",       0x1000, 0x0400, CRC(08f29f60) SHA1(9ca454e848aa986ff9eccaead3fec5076df2e4d3) )
+	ROM_LOAD( "m8.1f",       0x1400, 0x0400, CRC(99ce2753) SHA1(f4540700ea909ba1be34ac2c33dafd8ec67a2bb7) )
+
+	ROM_REGION( 0x10000, "unk1", 0 )
+	ROM_LOAD( "m1.9c",       0x0000, 0x0400, CRC(005d5fed) SHA1(145a860751ef7d99129b7242aacac7a4e1e14a51) )
+	ROM_LOAD( "m2.13f",      0x0400, 0x0400, CRC(1943122f) SHA1(3d343314fcb594560b4a280e795c8cea4a3200c9) )
+	ROM_LOAD( "m3.12f",      0x0800, 0x0400, CRC(e5591074) SHA1(ac756ee605d932d7c1c3eddbe2b9c6f78dad6ce8) )
+	ROM_LOAD( "m4.10f",      0x0c00, 0x0400, CRC(a426a371) SHA1(d6023bebf6924d1820e631ee53896100e5b256a5) )
+	ROM_LOAD( "m5.9f",       0x1000, 0x0400, CRC(5abd1ef6) SHA1(1bc79225c1be2821930fdb8e821a70c7ac8683ab) )
+
+	ROM_REGION( 0x0700, "proms", 0 )
+	ROM_LOAD( "6300.1",      0x0000, 0x0100, CRC(5123c83e) SHA1(d8ff06af421d3dae65bc9b0a081ed56249ef61ab) )
+	ROM_LOAD( "6300.2",      0x0100, 0x0100, CRC(8274f838) SHA1(c3518c668bda98759b1b1d4690062ced6c639efe) )
+	ROM_LOAD( "6300.3",      0x0200, 0x0100, CRC(eebbe52a) SHA1(14af033871cad4e35c391bce4435e7cf1ba146f7) )
+	ROM_LOAD( "6300.4",      0x0300, 0x0100, CRC(b89961a3) SHA1(99070a12e66764d21fd38ce4318ee0929daea465) )
+	ROM_LOAD( "6300.5",      0x0400, 0x0100, CRC(82c92620) SHA1(51d65156ebb592ff9e6375da7aa279325482fd5f) )
+	ROM_LOAD( "6300.6",      0x0500, 0x0100, CRC(8274f838) SHA1(c3518c668bda98759b1b1d4690062ced6c639efe) )
+	ROM_LOAD( "6300.7",      0x0600, 0x0100, CRC(3248ba56) SHA1(d449f4be8df1b4189afca55a4cf0cc2e19eb4dd4) )
+ROM_END
+
+
+GAME( 1981, monzagp,  0,       monzagp, monzagp, driver_device, 0, ROT270, "Olympia", "Monza GP", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1981, monzagpb, monzagp, monzagp, monzagp, driver_device, 0, ROT270, "bootleg", "Monza GP (bootleg)", GAME_NOT_WORKING|GAME_NO_SOUND )
