@@ -279,7 +279,7 @@ static const struct i80x86_timing i80286_cycles =
 	 2, 2, 7, 7,	/* INC/DEC */
 	 2, 2, 7, 7,	/* NEG/NOT */
 
-	 2, 5, 0,		/* reg shift/rotate */
+	 2, 5, 1,		/* reg shift/rotate */
 	 7, 8, 1,		/* m8 shift/rotate */
 	 7, 8, 1,		/* m16 shift/rotate */
 

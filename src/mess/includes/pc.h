@@ -41,6 +41,10 @@ public:
 	UINT8 m_pc_input;
 	UINT8 m_pcjr_dor;
 	emu_timer *m_pcjr_watchdog;
+	UINT8 m_pcjx_1ff_count;
+	UINT8 m_pcjx_1ff_val;
+	UINT8 m_pcjx_1ff_bankval;
+	UINT8 m_pcjx_1ff_bank[20][2];
 
 	int						m_ppi_portc_switch_high;
 	int						m_ppi_speaker;
@@ -131,6 +135,9 @@ public:
 	DECLARE_READ8_MEMBER(mc1502_wd17xx_drq_r);
 	DECLARE_READ8_MEMBER(mc1502_wd17xx_motor_r);
 	DECLARE_WRITE8_MEMBER(pcjr_fdc_dor_w);
+	DECLARE_READ8_MEMBER(pcjx_port_1ff_r);
+	DECLARE_WRITE8_MEMBER(pcjx_port_1ff_w);
+	void pcjx_set_bank(int unk1, int unk2, int unk3);
 
 	void fdc_interrupt(bool state);
 	void fdc_dma_drq(bool state);

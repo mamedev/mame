@@ -139,7 +139,7 @@ static void PREFIX86(_rotate_shift_Byte)(i8086_state *cpustate, unsigned ModRM, 
 	else
 	{
 		int tmpcf = CF;
-		ICOUNT -= (ModRM >= 0xc0) ? timing.rot_reg_base + timing.rot_reg_bit : timing.rot_m8_base + timing.rot_m8_bit;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.rot_reg_base + (timing.rot_reg_bit * count) : timing.rot_m8_base + (timing.rot_m8_bit * count);
 
 		switch (ModRM & 0x38)
 		{
@@ -333,7 +333,7 @@ static void PREFIX86(_rotate_shift_Word)(i8086_state *cpustate, unsigned ModRM, 
 	else
 	{
 		int tmpcf = CF;
-		ICOUNT -= (ModRM >= 0xc0) ? timing.rot_reg_base + timing.rot_reg_bit : timing.rot_m8_base + timing.rot_m16_bit;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.rot_reg_base + (timing.rot_reg_bit * count) : timing.rot_m8_base + (timing.rot_m16_bit * count);
 
 		switch (ModRM & 0x38)
 		{

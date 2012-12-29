@@ -148,6 +148,7 @@ static struct
 	UINT8	display_enable;
 	UINT8	vsync;
 	UINT8	palette_base;
+	UINT8	*jxkanji;
 } pcjr = { 0 };
 
 
@@ -225,6 +226,46 @@ static MC6845_UPDATE_ROW( t1000_text_blink_update_row )
 	}
 }
 
+static MC6845_UPDATE_ROW( pcjx_text_update_row )
+{
+	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
+	UINT32  *p = &bitmap.pix32(y);
+	int i;
+
+	for ( i = 0; i < x_count; i++ )
+	{
+		UINT16 offset = ( ( ma + i ) << 1 ) & 0x3fff;
+		UINT8 chr = pcjr.displayram[ offset ];
+		UINT8 attr = pcjr.displayram[ offset +1 ];
+		UINT16 fg = pcjr.palette_base + ( attr & 0x07 );
+		UINT16 bg = pcjr.palette_base + ( ( attr >> 4 ) & 0x07 );
+		UINT16 code = chr & 0x1f;
+		if((attr & 0x88) == 0x88)
+		{
+			code = pcjr.displayram[ offset - 2 ] & 0x1f;
+			code = (code << 8) + chr;
+		}
+		else if(attr & 0x80)
+			code = (code << 8) + pcjr.displayram[ offset + 2 ];
+		else
+			code = chr;
+
+		UINT8 data;
+		if(ra < 16)
+			data = pcjr.jxkanji[code * 16 * 2 + (ra * 2) + ((attr & 8)?1:0)];
+		else
+			data = ((i == cursor_x) && (pcjr.pc_framecnt & 8)) ? 0xff: 0;
+
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+	}
+}
 
 static MC6845_UPDATE_ROW( t1000_gfx_4bpp_update_row )
 {
@@ -359,13 +400,13 @@ static MC6845_UPDATE_ROW( t1000_gfx_1bpp_update_row )
 		data = vid[ offset + 1 ];
 
 		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
 	}
 }
 
@@ -474,6 +515,11 @@ static void pc_pcjr_mode_switch( running_machine &machine )
 	switch( pcjr.reg.data[0] & 0x1A )
 	{
 	case 0x08:		/* 01x0x */
+		if(pcjr.jxkanji)
+		{
+			pcjr.update_row = pcjx_text_update_row;
+			break;
+		}
 		if ( pcjr.reg.data[3] & 0x02 )
 		{
 			pcjr.update_row = t1000_text_blink_update_row;
@@ -751,6 +797,28 @@ static void pc_pcjr_bank_w(running_machine &machine, int data)
 	}
 }
 
+static void pc_pcjx_bank_w(running_machine &machine, int data)
+{
+	if (pcjr.bank != data)
+	{
+		int dram, vram;
+		pcjr.bank = data;
+		/* this probably isn't right, but otherwise the memory test stomps on the vram */
+		if ((data&0xc0)==0xc0) /* needed for lemmings */
+		{
+			dram = 0x80000 + ((data & 0x06) << 14);
+			vram = 0x80000 + ((data & 0x30) << (14-3));
+		}
+		else
+		{
+			dram = 0x80000 + ((data & 0x07) << 14);
+			vram = 0x80000 + ((data & 0x38) << (14-3));
+		}
+		machine.root_device().membank( "bank14" )->set_base( machine.device<ram_device>(RAM_TAG)->pointer() + vram );
+		pcjr.displayram = machine.device<ram_device>(RAM_TAG)->pointer() + dram;
+		pc_pcjr_mode_switch(machine);
+	}
+}
 
 static int pc_t1t_bank_r(void)
 {
@@ -835,7 +903,10 @@ WRITE8_HANDLER( pc_pcjr_w )
 		case 12:
 			break;
 		case 15:
-			pc_pcjr_bank_w(space.machine(), data);
+			if(pcjr.jxkanji)
+				pc_pcjx_bank_w(space.machine(), data);
+			else
+				pc_pcjr_bank_w(space.machine(), data);
 			break;
 
 		default:
@@ -844,7 +915,7 @@ WRITE8_HANDLER( pc_pcjr_w )
 }
 
 
- READ8_HANDLER ( pc_T1T_r )
+READ8_HANDLER ( pc_T1T_r )
 {
 	mc6845_device *mc6845;
 	int				data = 0xff;
@@ -960,6 +1031,10 @@ static VIDEO_START( pc_pcjr )
 	pcjr.bank = 0;
 	pcjr.mode_control = 0x08;
 	pcjr.chr_size = 8;
+	if(!strncmp(machine.system().name, "ibmpcjx", 7))
+		pcjr.jxkanji = machine.root_device().memregion("kanji")->base();
+	else
+		pcjr.jxkanji = NULL;
 
 	buswidth = machine.firstcpu->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)

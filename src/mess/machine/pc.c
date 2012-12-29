@@ -527,7 +527,7 @@ static UINT8	nmi_enabled;
 
 WRITE8_MEMBER(pc_state::pc_nmi_enable_w)
 {
-	logerror( "%08X: changing NMI state to %s\n", space.device().safe_pc(), data & 0x80 ? "enabled" : "disabled" );
+	//logerror( "%08X: changing NMI state to %s\n", space.device().safe_pc(), data & 0x80 ? "enabled" : "disabled" ); // this is clogging up the log
 
 	nmi_enabled = data & 0x80;
 }
@@ -582,7 +582,7 @@ static struct {
 READ8_MEMBER(pc_state::pcjr_nmi_enable_r)
 {
 	pcjr_keyb.latch = 0;
-
+	machine().firstcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return nmi_enabled;
 }
 
@@ -602,7 +602,6 @@ TIMER_CALLBACK_MEMBER(pc_state::pcjr_keyb_signal_callback)
 
 static void pcjr_set_keyb_int(running_machine &machine, int state)
 {
-	pc_state *st = machine.driver_data<pc_state>();
 	if ( state )
 	{
 		UINT8	data = pc_keyb_read();
@@ -634,16 +633,9 @@ static void pcjr_set_keyb_int(running_machine &machine, int state)
 		/* Set timer */
 		pcjr_keyb.keyb_signal_timer->adjust( attotime::from_usec(220), 0, attotime::from_usec(220) );
 
-		/* Trigger NMI */
-		if ( ! pcjr_keyb.latch )
-		{
-			pcjr_keyb.latch = 1;
-			if ( nmi_enabled & 0x80 )
-			{
-				st->m_pit8253->machine().firstcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
-			}
-		}
+		pcjr_keyb.latch = 1;
 	}
+	machine.firstcpu->set_input_line(INPUT_LINE_NMI, pcjr_keyb.latch && nmi_enabled);
 }
 
 
@@ -1181,14 +1173,22 @@ WRITE8_MEMBER(pc_state::pcjr_fdc_dor_w)
 	logerror("fdc: dor = %02x\n", data);
 	UINT8 pdor = m_pcjr_dor;
 	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
-	floppy_image_device *floppy = machine().device<floppy_connector>("upd765:0")->get_device();
+	floppy_image_device *floppy0 = fdc->subdevice<floppy_connector>("0")->get_device();
+	floppy_image_device *floppy1 = NULL;
+
+	if(fdc->subdevice("1"))
+		floppy1 = fdc->subdevice<floppy_connector>("1")->get_device();
 	m_pcjr_dor = data;
 
-	if(floppy)
-		floppy->mon_w(!(m_pcjr_dor & 1));
+	if(floppy0)
+		floppy0->mon_w(!(m_pcjr_dor & 1));
+	if(floppy1)
+		floppy1->mon_w(!(m_pcjr_dor & 2));
 
 	if(m_pcjr_dor & 1)
-		fdc->set_floppy(floppy);
+		fdc->set_floppy(floppy0);
+	else if(m_pcjr_dor & 2)
+		fdc->set_floppy(floppy1);
 	else
 		fdc->set_floppy(NULL);
 
@@ -1202,6 +1202,42 @@ WRITE8_MEMBER(pc_state::pcjr_fdc_dor_w)
 		m_pcjr_watchdog->adjust(attotime::never);
 		fdc_interrupt(0);
 	}
+}
+
+// pcjx port 0x1ff, some info from Toshiya Takeda
+
+void pc_state::pcjx_set_bank(int unk1, int unk2, int unk3)
+{
+	logerror("pcjx: 0x1ff 0:%02x 1:%02x 2:%02x\n", unk1, unk2, unk3);
+}
+
+WRITE8_MEMBER(pc_state::pcjx_port_1ff_w)
+{
+	switch(m_pcjx_1ff_count) {
+	case 0:
+		m_pcjx_1ff_bankval = data;
+		m_pcjx_1ff_count++;
+		break;
+	case 1:
+		m_pcjx_1ff_bank[m_pcjx_1ff_bankval & 0x1f][0] = data;
+		m_pcjx_1ff_count++;
+		break;
+	case 2:
+		m_pcjx_1ff_bank[m_pcjx_1ff_bankval & 0x1f][1] = data;
+		m_pcjx_1ff_count = 0;
+		pcjx_set_bank(m_pcjx_1ff_bankval, m_pcjx_1ff_bank[m_pcjx_1ff_bankval & 0x1f][0], data);
+		break;
+	}
+}
+
+
+READ8_MEMBER(pc_state::pcjx_port_1ff_r)
+{
+	if(m_pcjx_1ff_count == 2)
+		pcjx_set_bank(m_pcjx_1ff_bankval, m_pcjx_1ff_bank[m_pcjx_1ff_bankval & 0x1f][0], m_pcjx_1ff_bank[m_pcjx_1ff_bankval & 0x1f][1]);
+
+	m_pcjx_1ff_count = 0;
+	return 0x60; // expansion?
 }
 
 /*
@@ -1475,7 +1511,6 @@ MACHINE_START_MEMBER(pc_state,pcjr)
 	m_pit8253 = machine().device("pit8253");
 }
 
-
 MACHINE_RESET_MEMBER(pc_state,pcjr)
 {
 	device_t *speaker = machine().device(SPEAKER_TAG);
@@ -1497,6 +1532,11 @@ MACHINE_RESET_MEMBER(pc_state,pcjr)
 	m_ppi_shift_enable = 0;
 	m_pcjr_dor = 0;
 	speaker_level_w( speaker, 0 );
+
+	m_pcjx_1ff_count = 0;
+	m_pcjx_1ff_val = 0;
+	m_pcjx_1ff_bankval = 0;
+	memset(m_pcjx_1ff_bank, 0, sizeof(m_pcjx_1ff_bank));
 
 	pcjr_keyb_init(machine());
 }

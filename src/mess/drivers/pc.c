@@ -466,11 +466,12 @@ static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, pc_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ibmpcjx_map, AS_PROGRAM, 8, pc_state )
-	AM_RANGE(0x80000, 0x9ffff) AM_ROM AM_REGION("kanji",0)
+	AM_RANGE(0x80000, 0xb7fff) AM_ROM AM_REGION("kanji",0)
 	AM_IMPORT_FROM( ibmpcjr_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ibmpcjx_io, AS_IO, 8, pc_state )
+	AM_RANGE(0x01ff, 0x01ff) AM_READWRITE(pcjx_port_1ff_r, pcjx_port_1ff_w)
 	AM_IMPORT_FROM( ibmpcjr_io )
 ADDRESS_MAP_END
 
@@ -858,12 +859,26 @@ static const pc_lpt_interface pc_lpt_config =
 	DEVCB_CPU_INPUT_LINE("maincpu", 0)
 };
 
+static const floppy_interface mc1502_floppy_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_5_25_DSHD,
+	LEGACY_FLOPPY_OPTIONS_NAME(pc),
+	"floppy_5_25",
+	NULL
+};
+
 FLOPPY_FORMATS_MEMBER( pc_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( ibmpc_floppies )
 	 SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	 SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START(ibm5150_com)
@@ -1333,6 +1348,10 @@ static MACHINE_CONFIG_DERIVED( ibmpcjx, ibmpcjr )
 	MCFG_CPU_PROGRAM_MAP(ibmpcjx_map)
 	MCFG_CPU_IO_MAP(ibmpcjx_io)
 
+	MCFG_DEVICE_REMOVE("upd765:0");	
+	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "35dd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "35dd", 0, pc_state::floppy_formats)
+
 	MCFG_GFXDECODE(ibmpcjx)
 MACHINE_CONFIG_END
 
@@ -1373,7 +1392,7 @@ static MACHINE_CONFIG_START( mc1502, pc_state )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, mc1502_cassette_interface )	// has no motor control
 
 	MCFG_FD1793_ADD( "vg93", default_wd17xx_interface_2_drives )
-	MCFG_FLOPPY_DRIVE_ADD(FLOPPY_0, ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mc1502_floppy_interface)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1863,17 +1882,24 @@ ROM_END
 
 ROM_START( ibmpcjx )
 	ROM_REGION(0x100000,"maincpu", ROMREGION_ERASEFF)
+	ROM_DEFAULT_BIOS("unk")
 	ROM_SYSTEM_BIOS( 0, "5601jda", "5601jda" )
 	ROMX_LOAD("5601jda.bin", 0xf0000, 0x10000, CRC(b1e12366) SHA1(751feb16b985aa4f1ec1437493ff77e2ebd5e6a6), ROM_BIOS(1))
 	ROMX_LOAD("basicjx.rom",   0xe8000, 0x08000, NO_DUMP, ROM_BIOS(1)) // boot fails due of this.
 	ROM_SYSTEM_BIOS( 1, "unk", "unk" )
 	ROMX_LOAD("ipljx.rom", 0xe0000, 0x20000, CRC(36a7b2de) SHA1(777db50c617725e149bca9b18cf51ce78f6dc548), ROM_BIOS(2))
+	ROM_FILL(0xff195, 1, 0x20) // the bios has a bug that causes an interrupt
+	ROM_FILL(0xff196, 1, 0x06) // to arrive before a flag is set causing the boot to hang
+	ROM_FILL(0xff197, 1, 0x84) // technically this should be fixed in the PIC by delaying
+	ROM_FILL(0xff198, 1, 0x04) // sending an irq after the mask is changed but there is
+	ROM_FILL(0xff199, 1, 0xe6) // a strong possiblility that will cause problems with later
+	ROM_FILL(0xff19a, 1, 0x21) // faster x86 machines.
 
 	ROM_REGION(0x08100,"gfx1", 0) //TODO: needs a different charset
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card
 
-	ROM_REGION(0x20000,"kanji", 0)
-	ROM_LOAD("kanji.rom",     0x00000, 0x20000, BAD_DUMP CRC(a313f241) SHA1(c2a4ea7eb38c5ad51e6482abca8f836a2c06e17a)) // hand-made rom
+	ROM_REGION(0x38000,"kanji", 0)
+	ROM_LOAD("kanji.rom",     0x00000, 0x38000, BAD_DUMP CRC(eaa6e3c3) SHA1(35554587d02d947fae8446964b1886fff5c9d67f)) // hand-made rom
 ROM_END
 
 #ifdef UNUSED_DEFINITION
