@@ -834,7 +834,7 @@ void winwindow_video_window_update(win_window_info *window)
 
 win_monitor_info *winwindow_video_window_monitor(win_window_info *window, const RECT *proposed)
 {
-	win_monitor_info *monitor = NULL;
+	win_monitor_info *monitor;
 
 	// in window mode, find the nearest
 	if (!window->fullscreen)
