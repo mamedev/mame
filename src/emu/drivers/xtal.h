@@ -73,6 +73,7 @@ enum
 	XTAL_5_626MHz		= 5626000,		/* RCA CDP1869 PAL dot clock */
 	XTAL_5_67MHz		= 5670000,		/* RCA CDP1869 NTSC dot clock */
 	XTAL_5_7143MHz		= 5714300,		/* Cidelsa Destroyer */
+	XTAL_5_911MHz		= 5911000,		/* Philips Videopac Plus G7400 */
 	XTAL_5_9904MHz		= 5990400,		/* Luxor ABC 800 keyboard (Keytronic custom part #48-300-008 is equivalent) */
 	XTAL_6MHz   		= 6000000,		/* American Poker II */
 	XTAL_6_5MHz 		= 6500000,		/* Jupiter Ace */

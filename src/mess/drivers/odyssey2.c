@@ -234,7 +234,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( g7400, odyssey2_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8048, 5911000 )
+	MCFG_CPU_ADD("maincpu", I8048, XTAL_5_911MHz )
 	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
 	MCFG_CPU_IO_MAP(g7400_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
