@@ -85,9 +85,6 @@ http://www.arcadeflyers.com/?page=thumbs&db=videodb&id=5531
 This was cancelled, only the flyer exists.
 It was shown only at an amusement show. Possibly a prototype still exists. Possibly not.
 
-Techno Drive                            (C) Namco,        1998
-http://www.bandainamcogames.co.jp/am/em/techno-drive/main/index.php
-
 Tekno Werk                              (C) Namco,        1999
 Some kind of music game similar to Konami's Keyboard Mania series
 
