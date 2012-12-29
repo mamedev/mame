@@ -1,30 +1,25 @@
 /***************************************************************************
-Monza GP
+
+    Monza GP - Olympia
+
 
 Upper board (MGP_02):
 1x Intel P8035L (HMOS Single Component 8BIT Microcontroller - no internal ROM - 64x8 RAM)(main)
 1x National DP8350N (Video Output Graphics Controller - CRT Controller)(main)
 1x oscillator 10535
 
-
-
-
-Upper board (MGP_02):
 6x 2708 (10,11,12,13,14,15)
+4x 2114 (4e,7e,6f,7f)
 
-Lower board (MGP_01):
-9x 2708 (1,2,3,4,5,6,7,8,9)(position 2 is empty, maybe my PCB is missing an EPROM)(EPROM 9 is bad)
-5x MMI63S140N (1,3,4,5,6)
-2x DM74S287N (2,7)
-
-
-
-
-Upper board (MGP_02):
 3x 10x2 legs connectors with flat cable to lower board
 1x 8x2 dip switches
 
+
 Lower board (MGP_01):
+9x 2708 (1,2,3,4,5,6,7,8,9)(position 2 is empty, maybe my PCB is missing an EPROM)
+5x MMI63S140N (1,3,4,5,6)
+2x DM74S287N (2,7)
+
 3x 10x2 legs connectors with flat cable to upper board
 1x 6 legs connector (power supply)
 1x 20x2 legs connector for flat cable
@@ -47,6 +42,7 @@ public:
 	UINT8 *m_vram;
 	int m_screenw;
 	int m_bank;
+
 	DECLARE_READ8_MEMBER(rng_r);
 	DECLARE_WRITE8_MEMBER(port_w);
 	DECLARE_WRITE8_MEMBER(port0_w);
@@ -284,7 +280,7 @@ ROM_START( monzagp )
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "11.8d",          0x0000, 0x0400, CRC(47607a83) SHA1(91ce272c4af3e1994db71d2239b68879dd279347) )
 	ROM_LOAD( "10.7d",          0x0400, 0x0400, CRC(d2bedd67) SHA1(9b75731d2701f5b9ce0446141c5cd55b05671ec1) )
-	ROM_LOAD( "9.10j",          0x0800, 0x0400, BAD_DUMP CRC(474ab63f) SHA1(6ba623d1768ed92b39e8f76c2f2eed7874955f1b) )
+	ROM_LOAD( "9.10j",          0x0800, 0x0400, CRC(474ab63f) SHA1(6ba623d1768ed92b39e8f76c2f2eed7874955f1b) )
 	ROM_LOAD( "6.4f",           0x0c00, 0x0400, CRC(934d2070) SHA1(e742bfcb910e8747780d32ca66efd7e343190fb4) )
 	ROM_LOAD( "7.3f",           0x1000, 0x0400, CRC(08f29f60) SHA1(9ca454e848aa986ff9eccaead3fec5076df2e4d3) )
 	ROM_LOAD( "8.1f",           0x1400, 0x0400, CRC(99ce2753) SHA1(f4540700ea909ba1be34ac2c33dafd8ec67a2bb7) )
