@@ -3,8 +3,8 @@
 #ifndef __GALELCO_H__
 #define __GALELCO_H__
 
-#define GAELCO_NUM_CHANNELS 	0x07
-#define VOLUME_LEVELS			0x10
+const int GAELCO_NUM_CHANNELS = 0x07;
+const int VOLUME_LEVELS = 0x10;
 
 
 //**************************************************************************
