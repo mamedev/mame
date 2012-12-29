@@ -56,23 +56,32 @@ union o2_vdc_t {
 
 struct ef9341_t
 {
+	UINT8	TA;
+	UINT8	TB;
+	UINT8	busy;
+};
+
+struct ef9340_t
+{
 	UINT8	X;
 	UINT8	Y;
 	UINT8	Y0;
 	UINT8	R;
 	UINT8	M;
-	UINT8	TA;
-	UINT8	TB;
-	UINT8	busy;
-	UINT8	ram[1024];
 };
-
 
 class odyssey2_state : public driver_device
 {
 public:
 	odyssey2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_g7400(false)
+		{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 
 	int m_the_voice_lrq_state;
 	UINT8 *m_ram;
@@ -86,52 +95,68 @@ public:
 	UINT8 m_control_status;
 	UINT8 m_collision_status;
 	int m_iff;
-	emu_timer *m_i824x_line_timer;
-	emu_timer *m_i824x_hblank_timer;
 	bitmap_ind16 m_tmp_bitmap;
 	int m_start_vpos;
 	int m_start_vblank;
 	UINT8 m_lum;
 	sound_stream *m_sh_channel;
 	UINT16 m_sh_count;
-	//ef9341_t ef9341;
-	DECLARE_READ8_MEMBER(odyssey2_t0_r);
-	DECLARE_READ8_MEMBER(odyssey2_bus_r);
-	DECLARE_WRITE8_MEMBER(odyssey2_bus_w);
-	DECLARE_READ8_MEMBER(g7400_bus_r);
-	DECLARE_WRITE8_MEMBER(g7400_bus_w);
-	DECLARE_READ8_MEMBER(odyssey2_getp1);
-	DECLARE_WRITE8_MEMBER(odyssey2_putp1);
-	DECLARE_READ8_MEMBER(odyssey2_getp2);
-	DECLARE_WRITE8_MEMBER(odyssey2_putp2);
-	DECLARE_READ8_MEMBER(odyssey2_getbus);
-	DECLARE_WRITE8_MEMBER(odyssey2_putbus);
-	DECLARE_READ8_MEMBER(odyssey2_video_r);
-	DECLARE_WRITE8_MEMBER(odyssey2_video_w);
-	DECLARE_WRITE8_MEMBER(odyssey2_lum_w);
-	DECLARE_READ8_MEMBER(odyssey2_t1_r);
+	DECLARE_READ8_MEMBER(t0_read);
+	DECLARE_READ8_MEMBER(io_read);
+	DECLARE_WRITE8_MEMBER(io_write);
+	DECLARE_READ8_MEMBER(bus_read);
+	DECLARE_WRITE8_MEMBER(bus_write);
+	DECLARE_READ8_MEMBER(g7400_io_read);
+	DECLARE_WRITE8_MEMBER(g7400_io_write);
+	DECLARE_READ8_MEMBER(p1_read);
+	DECLARE_WRITE8_MEMBER(p1_write);
+	DECLARE_READ8_MEMBER(p2_read);
+	DECLARE_WRITE8_MEMBER(p2_write);
+	DECLARE_READ8_MEMBER(video_read);
+	DECLARE_WRITE8_MEMBER(video_write);
+	DECLARE_WRITE8_MEMBER(lum_write);
+	DECLARE_READ8_MEMBER(t1_read);
 	DECLARE_DRIVER_INIT(odyssey2);
 	virtual void machine_reset();
 	virtual void video_start();
+	void video_start_g7400();
 	virtual void palette_init();
 	UINT32 screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(i824x_scanline_callback);
-	TIMER_CALLBACK_MEMBER(i824x_hblank_callback);
+	DECLARE_WRITE_LINE_MEMBER(the_voice_lrq_callback);
+
+	void ef9341_w( UINT8 command, UINT8 b, UINT8 data );
+	UINT8 ef9341_r( UINT8 command, UINT8 b );
+
+protected:
+	ef9340_t m_ef9340;
+	ef9341_t m_ef9341;
+	UINT8	m_ef934x_ram_a[1024];
+	UINT8	m_ef934x_ram_b[1024];
+	bool	m_g7400;
+
+	inline UINT16 ef9340_get_c_addr();
+	inline void ef9340_inc_c();
+
+	void i824x_scanline(int vpos);
+	void er9340_scanline(int vpos);
+
+	/* timers */
+	static const device_timer_id TIMER_LINE = 0;
+	static const device_timer_id TIMER_HBLANK = 1;
+
+	emu_timer *m_line_timer;
+	emu_timer *m_hblank_timer;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+	void switch_banks();
 };
 
 
 /*----------- defined in video/odyssey2.c -----------*/
 
-extern const UINT8 odyssey2_colors[];
-
-
-
-
 
 STREAM_UPDATE( odyssey2_sh_update );
-
-void odyssey2_ef9341_w( running_machine &machine, int command, int b, UINT8 data );
-UINT8 odyssey2_ef9341_r( running_machine &machine, int command, int b );
 
 class odyssey2_sound_device : public device_t,
                                   public device_sound_interface
@@ -150,21 +175,6 @@ private:
 };
 
 extern const device_type ODYSSEY2;
-
-
-/*----------- defined in machine/odyssey2.c -----------*/
-
-
-
-/* i/o ports */
-
-
-
-
-void odyssey2_the_voice_lrq_callback( device_t *device, int state );
-
-
-int odyssey2_cart_verify(const UINT8 *cartdata, size_t size);
 
 
 #endif /* ODYSSEY2_H_ */

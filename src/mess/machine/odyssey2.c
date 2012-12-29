@@ -13,40 +13,41 @@
 
 
 
-static void odyssey2_switch_banks(running_machine &machine)
+void odyssey2_state::switch_banks()
 {
-	odyssey2_state *state = machine.driver_data<odyssey2_state>();
-	switch ( state->m_cart_size )
+	switch ( m_cart_size )
 	{
 		case 12288:
 			/* 12KB cart support (for instance, KTAA as released) */
-			state->membank( "bank1" )->set_base( machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0xC00 );
-			state->membank( "bank2" )->set_base( machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0xC00 + 0x800 );
+			membank( "bank1" )->set_base( memregion("user1")->base() + (m_p1 & 0x03) * 0xC00 );
+			membank( "bank2" )->set_base( memregion("user1")->base() + (m_p1 & 0x03) * 0xC00 + 0x800 );
 			break;
 
 		case 16384:
 			/* 16KB cart support (for instance, full sized version KTAA) */
-			state->membank( "bank1" )->set_base( machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0x1000 + 0x400 );
-			state->membank( "bank2" )->set_base( machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0x1000 + 0xC00 );
+			membank( "bank1" )->set_base( memregion("user1")->base() + (m_p1 & 0x03) * 0x1000 + 0x400 );
+			membank( "bank2" )->set_base( memregion("user1")->base() + (m_p1 & 0x03) * 0x1000 + 0xC00 );
 			break;
 
 		default:
-			state->membank("bank1")->set_base(machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0x800);
-			state->membank("bank2")->set_base(state->memregion("user1")->base() + (state->m_p1 & 0x03) * 0x800 );
+			membank("bank1")->set_base(memregion("user1")->base() + (m_p1 & 0x03) * 0x800);
+			membank("bank2")->set_base(memregion("user1")->base() + (m_p1 & 0x03) * 0x800 );
 			break;
 	}
 }
 
-void odyssey2_the_voice_lrq_callback(device_t *device, int state)
+
+WRITE_LINE_MEMBER(odyssey2_state::the_voice_lrq_callback)
 {
-	odyssey2_state *drvstate = device->machine().driver_data<odyssey2_state>();
-	drvstate->m_the_voice_lrq_state = state;
+	m_the_voice_lrq_state = state;
 }
 
-READ8_MEMBER(odyssey2_state::odyssey2_t0_r)
+
+READ8_MEMBER(odyssey2_state::t0_read)
 {
 	return ( m_the_voice_lrq_state == ASSERT_LINE ) ? 0 : 1;
 }
+
 
 DRIVER_INIT_MEMBER(odyssey2_state,odyssey2)
 {
@@ -77,21 +78,22 @@ DRIVER_INIT_MEMBER(odyssey2_state,odyssey2)
 	m_cart_size = size;
 }
 
+
 void odyssey2_state::machine_reset()
 {
 	/* jump to "last" bank, will work for all sizes due to being mirrored */
 	m_p1 = 0xFF;
 	m_p2 = 0xFF;
-	odyssey2_switch_banks(machine());
+	switch_banks();
 }
 
 /****** External RAM ******************************/
 
-READ8_MEMBER(odyssey2_state::odyssey2_bus_r)
+READ8_MEMBER(odyssey2_state::io_read)
 {
 	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
 	{
-		return odyssey2_video_r(space, offset); /* seems to have higher priority than ram??? */
+		return video_read(space, offset); /* seems to have higher priority than ram??? */
 	}
 	if (!(m_p1 & P1_EXT_RAM_ENABLE))
 	{
@@ -101,7 +103,8 @@ READ8_MEMBER(odyssey2_state::odyssey2_bus_r)
 	return 0;
 }
 
-WRITE8_MEMBER(odyssey2_state::odyssey2_bus_w)
+
+WRITE8_MEMBER(odyssey2_state::io_write)
 {
 	if ((m_p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00)
 	{
@@ -121,15 +124,16 @@ WRITE8_MEMBER(odyssey2_state::odyssey2_bus_w)
 	}
 	else if (!(m_p1 & P1_VDC_ENABLE))
 	{
-		odyssey2_video_w(space, offset, data);
+		video_write(space, offset, data);
 	}
 }
 
-READ8_MEMBER(odyssey2_state::g7400_bus_r)
+
+READ8_MEMBER(odyssey2_state::g7400_io_read)
 {
 	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
 	{
-		return odyssey2_video_r(space, offset); /* seems to have higher priority than ram??? */
+		return video_read(space, offset); /* seems to have higher priority than ram??? */
 	}
 	else if (!(m_p1 & P1_EXT_RAM_ENABLE))
 	{
@@ -137,13 +141,14 @@ READ8_MEMBER(odyssey2_state::g7400_bus_r)
 	}
 	else
 	{
-		//return ef9341_r( offset & 0x02, offset & 0x01 );
+		return ef9341_r( offset & 0x02, offset & 0x01 );
 	}
 
 	return 0;
 }
 
-WRITE8_MEMBER(odyssey2_state::g7400_bus_w)
+
+WRITE8_MEMBER(odyssey2_state::g7400_io_write)
 {
 	if ((m_p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00)
 	{
@@ -151,17 +156,17 @@ WRITE8_MEMBER(odyssey2_state::g7400_bus_w)
 	}
 	else if (!(m_p1 & P1_VDC_ENABLE))
 	{
-		odyssey2_video_w(space, offset, data);
+		video_write(space, offset, data);
 	}
 	else
 	{
-		//ef9341_w( offset & 0x02, offset & 0x01, data );
+		ef9341_w( offset & 0x02, offset & 0x01, data );
 	}
 }
 
 /***** 8048 Ports ************************/
 
-READ8_MEMBER(odyssey2_state::odyssey2_getp1)
+READ8_MEMBER(odyssey2_state::p1_read)
 {
 	UINT8 data = m_p1;
 
@@ -169,18 +174,20 @@ READ8_MEMBER(odyssey2_state::odyssey2_getp1)
 	return data;
 }
 
-WRITE8_MEMBER(odyssey2_state::odyssey2_putp1)
+
+WRITE8_MEMBER(odyssey2_state::p1_write)
 {
 	m_p1 = data;
 
-	odyssey2_switch_banks(machine());
+	switch_banks();
 
-	odyssey2_lum_w ( space, 0, m_p1 >> 7 );
+	lum_write(space, 0, m_p1 >> 7);
 
 	logerror("%.6f p1 written %.2x\n", machine().time().as_double(), data);
 }
 
-READ8_MEMBER(odyssey2_state::odyssey2_getp2)
+
+READ8_MEMBER(odyssey2_state::p2_read)
 {
 	UINT8 h = 0xFF;
 	int i, j;
@@ -218,14 +225,16 @@ READ8_MEMBER(odyssey2_state::odyssey2_getp2)
 	return m_p2;
 }
 
-WRITE8_MEMBER(odyssey2_state::odyssey2_putp2)
+
+WRITE8_MEMBER(odyssey2_state::p2_write)
 {
 	m_p2 = data;
 
 	logerror("%.6f p2 written %.2x\n", machine().time().as_double(), data);
 }
 
-READ8_MEMBER(odyssey2_state::odyssey2_getbus)
+
+READ8_MEMBER(odyssey2_state::bus_read)
 {
 	UINT8 data = 0xff;
 
@@ -243,27 +252,9 @@ READ8_MEMBER(odyssey2_state::odyssey2_getbus)
 	return data;
 }
 
-WRITE8_MEMBER(odyssey2_state::odyssey2_putbus)
+
+WRITE8_MEMBER(odyssey2_state::bus_write)
 {
 	logerror("%.6f bus written %.2x\n", machine().time().as_double(), data);
 }
 
-///////////////////////////////////
-
-#ifdef UNUSED_FUNCTION
-int odyssey2_cart_verify(const UINT8 *cartdata, size_t size)
-{
-	odyssey2_state *state = machine.driver_data<odyssey2_state>();
-	state->m_cart_size = size;
-	if (   (size == 2048)
-	    || (size == 4096)
-	    || (size == 8192)
-		|| (size == 12288)
-		|| (size == 16384))
-	{
-		return IMAGE_VERIFY_PASS;
-	}
-
-	return IMAGE_VERIFY_FAIL;
-}
-#endif
