@@ -16,30 +16,35 @@
 static void odyssey2_switch_banks(running_machine &machine)
 {
 	odyssey2_state *state = machine.driver_data<odyssey2_state>();
-	switch ( state->m_cart_size ) {
-	case 12288:
-		/* 12KB cart support (for instance, KTAA as released) */
-		state->membank( "bank1" )->set_base( machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0xC00 );
-		state->membank( "bank2" )->set_base( machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0xC00 + 0x800 );
-		break;
-	case 16384:
-		/* 16KB cart support (for instance, full sized version KTAA) */
-		state->membank( "bank1" )->set_base( machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0x1000 + 0x400 );
-		state->membank( "bank2" )->set_base( machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0x1000 + 0xC00 );
-		break;
-	default:
-		state->membank("bank1")->set_base(machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0x800);
-		state->membank("bank2")->set_base(state->memregion("user1")->base() + (state->m_p1 & 0x03) * 0x800 );
-		break;
+	switch ( state->m_cart_size )
+	{
+		case 12288:
+			/* 12KB cart support (for instance, KTAA as released) */
+			state->membank( "bank1" )->set_base( machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0xC00 );
+			state->membank( "bank2" )->set_base( machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0xC00 + 0x800 );
+			break;
+
+		case 16384:
+			/* 16KB cart support (for instance, full sized version KTAA) */
+			state->membank( "bank1" )->set_base( machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0x1000 + 0x400 );
+			state->membank( "bank2" )->set_base( machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0x1000 + 0xC00 );
+			break;
+
+		default:
+			state->membank("bank1")->set_base(machine.root_device().memregion("user1")->base() + (state->m_p1 & 0x03) * 0x800);
+			state->membank("bank2")->set_base(state->memregion("user1")->base() + (state->m_p1 & 0x03) * 0x800 );
+			break;
 	}
 }
 
-void odyssey2_the_voice_lrq_callback(device_t *device, int state) {
+void odyssey2_the_voice_lrq_callback(device_t *device, int state)
+{
 	odyssey2_state *drvstate = device->machine().driver_data<odyssey2_state>();
 	drvstate->m_the_voice_lrq_state = state;
 }
 
-READ8_MEMBER(odyssey2_state::odyssey2_t0_r){
+READ8_MEMBER(odyssey2_state::odyssey2_t0_r)
+{
 	return ( m_the_voice_lrq_state == ASSERT_LINE ) ? 0 : 1;
 }
 
@@ -84,42 +89,55 @@ void odyssey2_state::machine_reset()
 
 READ8_MEMBER(odyssey2_state::odyssey2_bus_r)
 {
-    if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
+	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
+	{
 		return odyssey2_video_r(space, offset); /* seems to have higher priority than ram??? */
-
-    else if (!(m_p1 & P1_EXT_RAM_ENABLE))
+	}
+	if (!(m_p1 & P1_EXT_RAM_ENABLE))
+	{
 		return m_ram[offset];
+	}
 
-    return 0;
+	return 0;
 }
 
 WRITE8_MEMBER(odyssey2_state::odyssey2_bus_w)
 {
-    if ((m_p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00) {
+	if ((m_p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00)
+	{
 		m_ram[offset] = data;
-		if ( offset & 0x80 ) {
-			if ( data & 0x20 ) {
+		if ( offset & 0x80 )
+		{
+			if ( data & 0x20 )
+			{
 				logerror("voice write %02X, data = %02X (p1 = %02X)\n", offset, data, m_p1 );
 				sp0256_ALD_w( machine().device("sp0256_speech"), space, 0, offset & 0x7F );
-			} else {
+			}
+			else
+			{
 				/* TODO: Reset sp0256 in this case */
 			}
 		}
 	}
-
-    else if (!(m_p1 & P1_VDC_ENABLE))
+	else if (!(m_p1 & P1_VDC_ENABLE))
+	{
 		odyssey2_video_w(space, offset, data);
+	}
 }
 
 READ8_MEMBER(odyssey2_state::g7400_bus_r)
 {
-	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0) {
+	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
+	{
 		return odyssey2_video_r(space, offset); /* seems to have higher priority than ram??? */
 	}
-	else if (!(m_p1 & P1_EXT_RAM_ENABLE)) {
+	else if (!(m_p1 & P1_EXT_RAM_ENABLE))
+	{
 		return m_ram[offset];
-	} else {
-//      return ef9341_r( offset & 0x02, offset & 0x01 );
+	}
+	else
+	{
+		//return ef9341_r( offset & 0x02, offset & 0x01 );
 	}
 
 	return 0;
@@ -127,13 +145,17 @@ READ8_MEMBER(odyssey2_state::g7400_bus_r)
 
 WRITE8_MEMBER(odyssey2_state::g7400_bus_w)
 {
-	if ((m_p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00) {
+	if ((m_p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00)
+	{
 		m_ram[offset] = data;
 	}
-	else if (!(m_p1 & P1_VDC_ENABLE)) {
+	else if (!(m_p1 & P1_VDC_ENABLE))
+	{
 		odyssey2_video_w(space, offset, data);
-	} else {
-//      ef9341_w( offset & 0x02, offset & 0x01, data );
+	}
+	else
+	{
+		//ef9341_w( offset & 0x02, offset & 0x01, data );
 	}
 }
 
@@ -160,11 +182,11 @@ WRITE8_MEMBER(odyssey2_state::odyssey2_putp1)
 
 READ8_MEMBER(odyssey2_state::odyssey2_getp2)
 {
-    UINT8 h = 0xFF;
-    int i, j;
+	UINT8 h = 0xFF;
+	int i, j;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 
-    if (!(m_p1 & P1_KEYBOARD_SCAN_ENABLE))
+	if (!(m_p1 & P1_KEYBOARD_SCAN_ENABLE))
 	{
 		if ((m_p2 & P2_KEYBOARD_SELECT_MASK) <= 5)  /* read keyboard */
 		{
@@ -182,41 +204,48 @@ READ8_MEMBER(odyssey2_state::odyssey2_getp2)
 			}
 		}
 
-        if (h == 0xFF)  /* active low inputs, so no keypresses */
-            m_p2 = m_p2 | 0xF0;
+		if (h == 0xFF)  /* active low inputs, so no keypresses */
+		{
+			m_p2 = m_p2 | 0xF0;
+		}
     }
-
     else
-        m_p2 = m_p2 | 0xF0;
+	{
+		m_p2 = m_p2 | 0xF0;
+	}
 
-    logerror("%.6f p2 read %.2x\n", machine().time().as_double(), m_p2);
-    return m_p2;
+	logerror("%.6f p2 read %.2x\n", machine().time().as_double(), m_p2);
+	return m_p2;
 }
 
 WRITE8_MEMBER(odyssey2_state::odyssey2_putp2)
 {
-    m_p2 = data;
+	m_p2 = data;
 
-    logerror("%.6f p2 written %.2x\n", machine().time().as_double(), data);
+	logerror("%.6f p2 written %.2x\n", machine().time().as_double(), data);
 }
 
 READ8_MEMBER(odyssey2_state::odyssey2_getbus)
 {
-    UINT8 data = 0xff;
+	UINT8 data = 0xff;
 
-    if ((m_p2 & P2_KEYBOARD_SELECT_MASK) == 1)
+	if ((m_p2 & P2_KEYBOARD_SELECT_MASK) == 1)
+	{
 		data &= ioport("JOY0")->read();       /* read joystick 1 */
+	}
 
-    if ((m_p2 & P2_KEYBOARD_SELECT_MASK) == 0)
+	if ((m_p2 & P2_KEYBOARD_SELECT_MASK) == 0)
+	{
 		data &= ioport("JOY1")->read();       /* read joystick 2 */
+	}
 
-    logerror("%.6f bus read %.2x\n", machine().time().as_double(), data);
-    return data;
+	logerror("%.6f bus read %.2x\n", machine().time().as_double(), data);
+	return data;
 }
 
 WRITE8_MEMBER(odyssey2_state::odyssey2_putbus)
 {
-    logerror("%.6f bus written %.2x\n", machine().time().as_double(), data);
+	logerror("%.6f bus written %.2x\n", machine().time().as_double(), data);
 }
 
 ///////////////////////////////////
@@ -226,15 +255,15 @@ int odyssey2_cart_verify(const UINT8 *cartdata, size_t size)
 {
 	odyssey2_state *state = machine.driver_data<odyssey2_state>();
 	state->m_cart_size = size;
-    if (   (size == 2048)
-        || (size == 4096)
-        || (size == 8192)
+	if (   (size == 2048)
+	    || (size == 4096)
+	    || (size == 8192)
 		|| (size == 12288)
 		|| (size == 16384))
-    {
+	{
 		return IMAGE_VERIFY_PASS;
-    }
+	}
 
-    return IMAGE_VERIFY_FAIL;
+	return IMAGE_VERIFY_FAIL;
 }
 #endif
