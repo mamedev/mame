@@ -42,13 +42,15 @@
 #ifndef __WIN_D3DHLSL__
 #define __WIN_D3DHLSL__
 
-
 #include "aviio.h"
-
 
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
+
+class d3d_render_target;
+class d3d_cache_target;
+class d3d_info;
 
 /* hlsl_options is the information about runtime-mutable Direct3D HLSL options */
 /* in the future this will be moved into an OSD/emu shared buffer */
@@ -116,6 +118,8 @@ public:
 
 	int register_texture(d3d_texture_info *texture);
 	int register_prescaled_texture(d3d_texture_info *texture, int scwidth, int scheight);
+	bool add_render_target(d3d_info* d3d, d3d_texture_info* info, int width, int height, int prescale_x, int prescale_y);
+	bool add_cache_target(d3d_info* d3d, d3d_texture_info* info, int width, int height, int prescale_x, int prescale_y, int screen_index);
 
 	void window_save();
 	void window_record();
@@ -128,6 +132,7 @@ public:
 	void frame_complete();
 
 	void set_texture(d3d_texture_info *texture);
+	void remove_render_target(d3d_texture_info *texture);
 
 	int create_resources();
 	void delete_resources();
@@ -141,7 +146,9 @@ private:
 	void					end_avi_recording();
 	void					begin_avi_recording(const char *name);
 
-	bool					screen_encountered[9];		// whether a given screen was encountered this frame
+	d3d_render_target *		find_render_target(d3d_texture_info *info);
+	d3d_cache_target *		find_cache_target(int screen_index);
+	void					remove_cache_target(d3d_cache_target *cache);
 
 	d3d_base *              d3dintf;					// D3D interface
 	win_window_info *       window;						// D3D window info
@@ -149,6 +156,8 @@ private:
 	bool					master_enable;				// overall enable flag
 	bool					paused;						// whether or not rendering is currently paused
 	int						num_screens;				// number of emulated physical screens
+	int						curr_screen;				// current screen for render target operations
+	int						curr_frame;					// current frame (0/1) of a screen for render target operations
 	int						lastidx;					// index of the last-encountered target
 	bool					write_ini;					// enable external ini saving
 	bool					read_ini;					// enable external ini loading
@@ -159,9 +168,8 @@ private:
 	int						preset;						// preset, if relevant
 	bitmap_argb32			shadow_bitmap;				// shadow mask bitmap for post-processing shader
 	d3d_texture_info *		shadow_texture;				// shadow mask texture for post-processing shader
-	int						registered_targets;			// number of registered HLSL targets (i.e., screens)
-	int						cyclic_target_idx;			// cyclic index of next HLSL target slot
 	hlsl_options *			options;					// current uniform state
+
 	avi_file *				avi_output_file;			// AVI file
 	bitmap_rgb32			avi_snap;					// AVI snapshot
 	int						avi_frame;					// AVI frame
@@ -171,6 +179,7 @@ private:
 	d3d_texture *           avi_copy_texture;			// AVI destination texture in system memory
 	d3d_surface *           avi_final_target;			// AVI upscaled surface
 	d3d_texture *           avi_final_texture;			// AVI upscaled texture
+
 	bool					render_snap;				// whether or not to take HLSL post-render snapshot
 	bool					snap_rendered;				// whether we just rendered our HLSL post-render shot or not
 	d3d_surface *           snap_copy_target;			// snapshot destination surface in system memory
@@ -195,28 +204,9 @@ private:
 	d3d_effect *			yiq_decode_effect;			// pointer to the current YIQ decoder effect object
 	d3d_vertex *			fsfx_vertices;				// pointer to our full-screen-quad object
 
-	// render targets
-	int						raw_target_idx[9];			// Number of targets currently in use
-	int						target_use_count[9];		// Whether or not a target has been used yet
-	d3d_texture_info *		target_in_use[9];			// Target texture that is currently in use
-	int						target_width[9];			// Render target width
-	int						target_height[9];			// Render target height
-	d3d_surface *			last_target[9];				// Render target surface pointer for each screen's previous frame
-	d3d_texture *			last_texture[9];			// Render target texture pointer for each screen's previous frame
-	d3d_surface *			prescaletarget0[9];			// Render target surface pointer (prescale, if necessary)
-	d3d_surface *			target0[9];					// Render target surface pointer (pass 0, if necessary)
-	d3d_surface *			target1[9];					// Render target surface pointer (pass 1, if necessary)
-	d3d_surface *			target2[9];					// Render target surface pointer (pass 2, if necessary)
-	d3d_surface *			target3[9];					// Render target surface pointer (pass 3, if necessary)
-	d3d_surface *			target4[9];					// Render target surface pointer (pass 4, if necessary)
-	d3d_surface *			smalltarget0[9];			// Render target surface pointer (small pass 0, if necessary)
-	d3d_texture *			prescaletexture0[9];		// Render target surface pointer (prescale, if necessary)
-	d3d_texture *			texture0[9];				// Render target texture pointer (pass 0, if necessary)
-	d3d_texture *			texture1[9];				// Render target texture pointer (pass 1, if necessary)
-	d3d_texture *			texture2[9];				// Render target texture pointer (pass 2, if necessary)
-	d3d_texture *			texture3[9];				// Render target texture pointer (pass 3, if necessary)
-	d3d_texture *			texture4[9];				// Render target texture pointer (pass 4, if necessary)
-	d3d_texture *			smalltexture0[9];			// Render target texture pointer (small pass 0, if necessary)
+public:
+	d3d_render_target *		targethead;
+	d3d_cache_target *		cachehead;
 };
 
 #endif

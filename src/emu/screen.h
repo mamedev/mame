@@ -291,6 +291,7 @@ private:
 	bool				m_changed;					// has this bitmap changed?
 	INT32				m_last_partial_scan;		// scanline of last partial update
 	bitmap_argb32		m_screen_overlay_bitmap;	// screen overlay bitmap
+	UINT32				m_unique_id;				// unique id for this screen_device
 
 	// screen timing
 	attoseconds_t		m_frame_period;				// attoseconds per frame
@@ -333,6 +334,10 @@ private:
 		bitmap_t &					m_bitmap;
 	};
 	simple_list<auto_bitmap_item> m_auto_bitmap_list; // list of registered bitmaps
+
+	// static data
+	static UINT32		m_id_counter; // incremented for each constructed screen_device,
+									  // used as a unique identifier during runtime
 };
 
 // device type definition

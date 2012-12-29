@@ -233,6 +233,7 @@ struct render_texinfo
 	UINT32				height;				// height of the image
 	const rgb_t *		palette;			// palette for PALETTE16 textures, LUTs for RGB15/RGB32
 	UINT32				seqid;				// sequence ID
+	UINT64				osddata;			// aux data to pass to osd
 };
 
 
@@ -441,6 +442,9 @@ public:
 	// configure the texture bitmap
 	void set_bitmap(bitmap_t &bitmap, const rectangle &sbounds, texture_format format);
 
+	// set any necessary aux data
+	void set_osd_data(UINT64 data) { m_osddata = data; }
+
 	// generic high-quality bitmap scaler
 	static void hq_scale(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 
@@ -466,6 +470,7 @@ private:
 	texture_format		m_format;					// format of the texture data
 	rgb_t *				m_bcglookup;				// dynamically allocated B/C/G lookup table
 	UINT32				m_bcglookup_entries;		// number of B/C/G lookup entries allocated
+	UINT64				m_osddata;					// aux data to pass to osd
 
 	// scaling state (ARGB32 only)
 	texture_scaler_func	m_scaler;					// scaling callback

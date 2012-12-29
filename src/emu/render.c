@@ -502,6 +502,7 @@ bool render_texture::get_scaled(UINT32 dwidth, UINT32 dheight, render_texinfo &t
 		texinfo.width = swidth;
 		texinfo.height = sheight;
 		texinfo.palette = palbase;
+		texinfo.osddata = m_osddata;
 		texinfo.seqid = ++m_curseq;
 		return true;
 	}

@@ -1719,6 +1719,10 @@ static void primitive_flush_pending(d3d_info *d3d)
 }
 
 
+void texture_destroy(d3d_info *d3d, d3d_texture_info *info)
+{
+}
+
 //============================================================
 //  texture_create
 //============================================================
@@ -2517,14 +2521,34 @@ static d3d_texture_info *texture_find(d3d_info *d3d, const render_primitive *pri
 
 	// find a match
 	for (texture = d3d->texlist; texture != NULL; texture = texture->next)
+	{
 		if (texture->hash == texhash &&
 			texture->texinfo.base == prim->texture.base &&
 			texture->texinfo.width == prim->texture.width &&
 			texture->texinfo.height == prim->texture.height &&
 			((texture->flags ^ prim->flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0)
+		{
 			return texture;
+		}
+	}
 
-	// nothing found
+	// nothing found, check if we need to unregister something with hlsl
+	if (d3d->hlsl != NULL)
+	{
+		for (texture = d3d->texlist; texture != NULL; texture = texture->next)
+		{
+			// Clear our old texture reference
+			if (texture->hash == texhash &&
+			    texture->texinfo.base == prim->texture.base &&
+			    ((texture->flags ^ prim->flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0 &&
+			    (texture->texinfo.width != prim->texture.width ||
+			     texture->texinfo.height != prim->texture.height))
+			{
+				d3d->hlsl->remove_render_target(texture);
+				break;
+			}
+		}
+	}
 	return NULL;
 }
 
@@ -2550,4 +2574,129 @@ static void texture_update(d3d_info *d3d, const render_primitive *prim)
 		texture_set_data(d3d, texture, &prim->texture, prim->flags);
 		texture->texinfo.seqid = prim->texture.seqid;
 	}
+}
+
+
+//============================================================
+//  d3d_cache_target::~d3d_cache_target
+//============================================================
+
+d3d_cache_target::~d3d_cache_target()
+{
+	if (last_texture != NULL)
+	{
+		(*d3dintf->texture.release)(last_texture);
+		last_texture = NULL;
+	}
+	if (last_target != NULL)
+	{
+		(*d3dintf->surface.release)(last_target);
+		last_target = NULL;
+	}
+}
+
+
+//============================================================
+//  d3d_cache_target::init - initializes a target cache
+//============================================================
+
+bool d3d_cache_target::init(d3d_info *d3d, d3d_base *d3dintf, int width, int height, int prescale_x, int prescale_y)
+{
+	HRESULT result = (*d3dintf->device.create_texture)(d3d->device, width * prescale_x, height * prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &last_texture);
+	if (result != D3D_OK)
+		return false;
+	(*d3dintf->texture.get_surface_level)(last_texture, 0, &last_target);
+
+	return true;
+}
+
+//============================================================
+//  d3d_render_target::~d3d_render_target
+//============================================================
+
+d3d_render_target::~d3d_render_target()
+{
+	for (int index = 0; index < 5; index++)
+	{
+		if (texture[index] != NULL)
+		{
+			(*d3dintf->texture.release)(texture[index]);
+			texture[index] = NULL;
+		}
+		if (target[index] != NULL)
+		{
+			(*d3dintf->surface.release)(target[index]);
+			target[index] = NULL;
+		}
+	}
+
+	if (prescaletexture != NULL)
+	{
+		(*d3dintf->texture.release)(prescaletexture);
+		prescaletexture = NULL;
+	}
+	if (prescaletarget != NULL)
+ 	{
+		(*d3dintf->surface.release)(prescaletarget);
+		prescaletarget = NULL;
+	}
+
+	if (smalltexture != NULL)
+	{
+		(*d3dintf->texture.release)(smalltexture);
+		smalltexture = NULL;
+	}
+	if (smalltarget != NULL)
+	{
+		(*d3dintf->surface.release)(smalltarget);
+		smalltarget = NULL;
+	}
+}
+
+
+//============================================================
+//  d3d_render_target::init - initializes a render target
+//============================================================
+
+bool d3d_render_target::init(d3d_info *d3d, d3d_base *d3dintf, int width, int height, int prescale_x, int prescale_y)
+{
+	HRESULT result = (*d3dintf->device.create_texture)(d3d->device, width * prescale_x, height * prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture[0]);
+	if (result != D3D_OK)
+		return false;
+	(*d3dintf->texture.get_surface_level)(texture[0], 0, &target[0]);
+
+	result = (*d3dintf->device.create_texture)(d3d->device, width * prescale_x, height * prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture[1]);
+	if (result != D3D_OK)
+		return false;
+	(*d3dintf->texture.get_surface_level)(texture[1], 0, &target[1]);
+
+	result = (*d3dintf->device.create_texture)(d3d->device, width * prescale_x, height * prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture[2]);
+	if (result != D3D_OK)
+		return false;
+	(*d3dintf->texture.get_surface_level)(texture[2], 0, &target[2]);
+
+	result = (*d3dintf->device.create_texture)(d3d->device, width * prescale_x, height * prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture[3]);
+	if (result != D3D_OK)
+		return false;
+	(*d3dintf->texture.get_surface_level)(texture[3], 0, &target[3]);
+
+	result = (*d3dintf->device.create_texture)(d3d->device, width, height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture[4]);
+	if (result != D3D_OK)
+		return false;
+	(*d3dintf->texture.get_surface_level)(texture[4], 0, &target[4]);
+
+	result = (*d3dintf->device.create_texture)(d3d->device, width, height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &smalltexture);
+	if (result != D3D_OK)
+		return false;
+	(*d3dintf->texture.get_surface_level)(smalltexture, 0, &smalltarget);
+
+	result = (*d3dintf->device.create_texture)(d3d->device, width * prescale_x, height * prescale_y, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &prescaletexture);
+	if (result != D3D_OK)
+		return false;
+	(*d3dintf->texture.get_surface_level)(prescaletexture, 0, &prescaletarget);
+
+	target_width = width * prescale_x;
+	target_height = height * prescale_y;
+
+	return true;
 }

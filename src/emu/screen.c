@@ -62,7 +62,7 @@ const device_type SCREEN = &device_creator<screen_device>;
 
 const attotime screen_device::DEFAULT_FRAME_PERIOD(attotime::from_hz(DEFAULT_FRAME_RATE));
 
-
+UINT32 screen_device::m_id_counter = 0;
 
 //**************************************************************************
 //  SCREEN DEVICE
@@ -103,6 +103,8 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	  m_frame_number(0),
 	  m_partial_updates_this_frame(0)
 {
+	m_unique_id = m_id_counter;
+	m_id_counter++;
 	memset(m_texture, 0, sizeof(m_texture));
 }
 
@@ -288,7 +290,9 @@ void screen_device::device_start()
 
 	// allocate raw textures
 	m_texture[0] = machine().render().texture_alloc();
+	m_texture[0]->set_osd_data((UINT64)((m_unique_id << 1) | 0));
 	m_texture[1] = machine().render().texture_alloc();
+	m_texture[1]->set_osd_data((UINT64)((m_unique_id << 1) | 1));
 
 	// configure the default cliparea
 	render_container::user_settings settings;

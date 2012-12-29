@@ -59,6 +59,55 @@
 //  TYPE DEFINITIONS
 //============================================================
 
+class d3d_info;
+
+/* d3d_cache_target is a simple linked list containing only a rednerable target and texture, used for phosphor effects */
+class d3d_cache_target
+{
+public:
+	// construction/destruction
+	d3d_cache_target() { }
+	~d3d_cache_target();
+
+	bool init(d3d_info *d3d, d3d_base *d3dintf, int width, int height, int prescale_x, int prescale_y);
+
+	d3d_surface *last_target;
+	d3d_texture *last_texture;
+
+	int screen_index;
+	int ref_count;
+
+	d3d_cache_target *next;
+	d3d_cache_target *prev;
+};
+
+/* d3d_render_target is the information about a Direct3D render target chain */
+class d3d_render_target
+{
+public:
+	// construction/destruction
+	d3d_render_target() { }
+	~d3d_render_target();
+
+	bool init(d3d_info *d3d, d3d_base *d3dintf, int width, int height, int prescale_x, int prescale_y);
+
+	int target_width;
+	int target_height;
+	int screen_index;
+	int page_index;
+	d3d_surface *prescaletarget;
+	d3d_texture *prescaletexture;
+	d3d_surface *smalltarget;
+	d3d_texture *smalltexture;
+	d3d_surface *target[5];
+	d3d_texture *texture[5];
+
+	d3d_texture_info *info;
+
+	d3d_render_target *next;
+	d3d_render_target *prev;
+};
+
 /* d3d_info is the information about Direct3D for the current screen */
 struct d3d_info
 {
@@ -122,5 +171,6 @@ struct d3d_info
 //============================================================
 
 d3d_texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsource, UINT32 flags);
+void texture_destroy(d3d_info *d3d, d3d_texture_info *info);
 
 #endif
