@@ -171,6 +171,14 @@ void deco_bac06_device::device_start()
 	m_bppmult = 0x10;
 	m_bppmask = 0x0f;
 	m_rambank = 0;
+
+	save_pointer(NAME(pf_data), 0x4000/2);
+	save_pointer(NAME(pf_rowscroll), 0x2000/2);
+	save_pointer(NAME(pf_colscroll), 0x2000/2);
+	save_pointer(NAME(pf_control_0), 8);
+	save_pointer(NAME(pf_control_1), 8);
+
+	save_item(NAME(m_rambank));
 }
 
 void deco_bac06_device::device_reset()
