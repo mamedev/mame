@@ -193,8 +193,8 @@ hlsl_info::hlsl_info()
 	master_enable = false;
 	prescale_size_x = 1;
 	prescale_size_y = 1;
-	prescale_force_x = 0;
-	prescale_force_y = 0;
+	prescale_force_x = 1;
+	prescale_force_y = 1;
 	preset = -1;
 	shadow_texture = NULL;
 	options = NULL;
@@ -571,7 +571,7 @@ void hlsl_info::begin_avi_recording(const char *name)
 
 
 //============================================================
-//  remove_render_target - remove an active cache target when
+//  remove_cache_target - remove an active cache target when
 //  refcount hits zero
 //============================================================
 
@@ -581,7 +581,7 @@ void hlsl_info::remove_cache_target(d3d_cache_target *cache)
 	{
 		if (cache == cachehead)
 		{
-			cachehead= cachehead->next;
+			cachehead = cachehead->next;
 		}
 
 		if (cache->prev != NULL)
@@ -605,8 +605,20 @@ void hlsl_info::remove_cache_target(d3d_cache_target *cache)
 
 void hlsl_info::remove_render_target(d3d_texture_info *texture)
 {
-	d3d_render_target *rt = find_render_target(texture);
+	remove_render_target(find_render_target(texture));
+}
 
+void hlsl_info::remove_render_target(int width, int height, UINT32 screen_index, UINT32 page_index)
+{
+	d3d_render_target *target = find_render_target(width, height, screen_index, page_index);
+	if (target != NULL)
+	{
+		remove_render_target(target);
+	}
+}
+
+void hlsl_info::remove_render_target(d3d_render_target *rt)
+{
 	if (rt != NULL)
 	{
 		if (rt == targethead)
@@ -624,16 +636,21 @@ void hlsl_info::remove_render_target(d3d_texture_info *texture)
 			rt->next->prev = rt->prev;
 		}
 
-		d3d_cache_target *cache = find_cache_target(rt->screen_index);
+		d3d_cache_target *cache = find_cache_target(rt->screen_index, rt->width, rt->height);
 		if (cache != NULL)
 		{
-			cache->ref_count--;
-			if (cache->ref_count == 0)
-			{
-				remove_cache_target(cache);
-			}
+			remove_cache_target(cache);
 		}
+
+		int screen_index = rt->screen_index;
+		int other_page = 1 - rt->page_index;
+		int width = rt->width;
+		int height = rt->height;
+
 		global_free(rt);
+
+		// Remove other double-buffered page (if it exists)
+		remove_render_target(width, height, screen_index, other_page);
 	}
 }
 
@@ -986,6 +1003,9 @@ int hlsl_info::create_resources()
 		shadow_texture = texture_create(d3d, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
 	}
 
+	prescale_force_x = 1;
+	prescale_force_y = 1;
+
 	if(!read_ini)
 	{
 		prescale_force_x = winoptions.d3d_hlsl_prescale_x();
@@ -1037,6 +1057,14 @@ int hlsl_info::create_resources()
 		options->yiq_q = winoptions.screen_yiq_q();
 		options->yiq_scan_time = winoptions.screen_yiq_scan_time();
 		options->yiq_phase_count = winoptions.screen_yiq_phase_count();
+	}
+	if (!prescale_force_x)
+	{
+		prescale_force_x = 1;
+	}
+	if (!prescale_force_y)
+	{
+		prescale_force_y = 1;
 	}
 	g_slider_list = init_slider_list();
 
@@ -1287,7 +1315,28 @@ d3d_render_target* hlsl_info::find_render_target(d3d_texture_info *info)
 {
 	d3d_render_target *curr = targethead;
 
-	while (curr != NULL && curr->info != info)
+	UINT32 screen_index_data = (UINT32)info->texinfo.osddata;
+	UINT32 screen_index = screen_index_data >> 1;
+	UINT32 page_index = screen_index_data & 1;
+
+	while (curr != NULL && (curr->screen_index != screen_index || curr->page_index != page_index || curr->width != info->texinfo.width || curr->height != info->texinfo.height))
+	{
+		curr = curr->next;
+	}
+
+	return curr;
+}
+
+
+//============================================================
+//  hlsl_info::find_render_target
+//============================================================
+
+d3d_render_target* hlsl_info::find_render_target(int width, int height, UINT32 screen_index, UINT32 page_index)
+{
+	d3d_render_target *curr = targethead;
+
+	while (curr != NULL && (curr->width != width || curr->height != height || curr->screen_index != screen_index || curr->page_index != page_index))
 	{
 		curr = curr->next;
 	}
@@ -1300,11 +1349,11 @@ d3d_render_target* hlsl_info::find_render_target(d3d_texture_info *info)
 //  hlsl_info::find_cache_target
 //============================================================
 
-d3d_cache_target* hlsl_info::find_cache_target(int screen_index)
+d3d_cache_target* hlsl_info::find_cache_target(UINT32 screen_index, int width, int height)
 {
 	d3d_cache_target *curr = cachehead;
 
-	while (curr != NULL && curr->screen_index != screen_index)
+	while (curr != NULL && (curr->screen_index != screen_index || curr->width != width || curr->height != height))
 	{
 		curr = curr->next;
 	}
@@ -1332,7 +1381,7 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 		{
 			return;
 		}
-		d3d_cache_target *ct = find_cache_target(rt->screen_index);
+		d3d_cache_target *ct = find_cache_target(rt->screen_index, poly->texture->texinfo.width, poly->texture->texinfo.height);
 
 		if(options->yiq_enable)
 		{
@@ -1782,60 +1831,35 @@ void hlsl_info::end()
 
 
 //============================================================
-//  hlsl_info::register_texture
+//  hlsl_info::register_prescaled_texture
 //============================================================
 
-int hlsl_info::register_prescaled_texture(d3d_texture_info *texture, int scwidth, int scheight)
+bool hlsl_info::register_prescaled_texture(d3d_texture_info *texture)
 {
-	if (!master_enable || !d3dintf->post_fx_available)
-		return 0;
-
-	d3d_info *d3d = (d3d_info *)window->drawdata;
-
-	// Find the nearest prescale factor that is over our screen size
-	int hlsl_prescale_x = prescale_force_x ? prescale_force_x : 1;
-	if(!prescale_force_x)
-	{
-		while(scwidth * hlsl_prescale_x < d3d->width) hlsl_prescale_x++;
-		prescale_size_x = hlsl_prescale_x;
-	}
-
-	int hlsl_prescale_y = prescale_force_y ? prescale_force_y : 1;
-	if(!prescale_force_y)
-	{
-		while(scheight * hlsl_prescale_y < d3d->height) hlsl_prescale_y++;
-		prescale_size_y = hlsl_prescale_y;
-	}
-
-	if (!add_render_target(d3d, texture, scwidth, scheight, hlsl_prescale_x, hlsl_prescale_y))
-		return 1;
-
-	options->params_dirty = true;
-
-	enumerate_screens();
-
-	return 0;
+	return register_texture(texture, texture->rawwidth, texture->rawheight, texture->xprescale, texture->yprescale);
 }
 
 
 //============================================================
 //  hlsl_info::add_cache_target - register a cache target
 //============================================================
-bool hlsl_info::add_cache_target(d3d_info* d3d, d3d_texture_info* info, int width, int height, int prescale_x, int prescale_y, int screen_index)
+bool hlsl_info::add_cache_target(d3d_info* d3d, d3d_texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index)
 {
 	d3d_cache_target* target = (d3d_cache_target*)global_alloc_clear(d3d_cache_target);
 
-	if (!target->init(d3d, d3dintf, width, height, prescale_x, prescale_y))
+	if (!target->init(d3d, d3dintf, width, height, xprescale, yprescale))
 	{
 		global_free(target);
 		return false;
 	}
 
+	target->width = info->texinfo.width;
+	target->height = info->texinfo.height;
+
 	target->next = cachehead;
 	target->prev = NULL;
 
 	target->screen_index = screen_index;
-	target->ref_count = 1;
 
 	if (cachehead != NULL)
 	{
@@ -1850,11 +1874,20 @@ bool hlsl_info::add_cache_target(d3d_info* d3d, d3d_texture_info* info, int widt
 //  hlsl_info::add_render_target - register a render target
 //============================================================
 
-bool hlsl_info::add_render_target(d3d_info* d3d, d3d_texture_info* info, int width, int height, int prescale_x, int prescale_y)
+bool hlsl_info::add_render_target(d3d_info* d3d, d3d_texture_info* info, int width, int height, int xprescale, int yprescale)
 {
+	if (find_render_target(info))
+	{
+		remove_render_target(info);
+	}
+
+	UINT32 screen_index_data = (UINT32)info->texinfo.osddata;
+	UINT32 screen_index = screen_index_data >> 1;
+	UINT32 page_index = screen_index_data & 1;
+
 	d3d_render_target* target = (d3d_render_target*)global_alloc_clear(d3d_render_target);
 
-	if (!target->init(d3d, d3dintf, width, height, prescale_x, prescale_y))
+	if (!target->init(d3d, d3dintf, width, height, xprescale, yprescale))
 	{
 		global_free(target);
 		return false;
@@ -1862,22 +1895,20 @@ bool hlsl_info::add_render_target(d3d_info* d3d, d3d_texture_info* info, int wid
 
 	target->info = info;
 
-	UINT32 screen_index_data = (UINT32)info->texinfo.osddata;
-	target->screen_index = screen_index_data >> 1;
-	target->page_index = screen_index_data & 1;
+	target->width = info->texinfo.width;
+	target->height = info->texinfo.height;
 
-	d3d_cache_target* cache = find_cache_target(target->screen_index);
+	target->screen_index = screen_index;
+	target->page_index = page_index;
+
+	d3d_cache_target* cache = find_cache_target(target->screen_index, info->texinfo.width, info->texinfo.height);
 	if (cache == NULL)
 	{
-		if (!add_cache_target(d3d, info, width, height, prescale_x, prescale_y, target->screen_index))
+		if (!add_cache_target(d3d, info, width, height, xprescale * prescale_force_x, yprescale * prescale_force_y, target->screen_index))
 		{
 			global_free(target);
 			return false;
 		}
-	}
-	else
-	{
-		cache->ref_count++;
 	}
 
 	target->next = targethead;
@@ -1901,40 +1932,40 @@ void hlsl_info::enumerate_screens()
 	num_screens = iter.count();
 }
 
+
 //============================================================
 //  hlsl_info::register_texture
 //============================================================
 
-int hlsl_info::register_texture(d3d_texture_info *texture)
+bool hlsl_info::register_texture(d3d_texture_info *texture)
 {
-	enumerate_screens();
+	return register_texture(texture, texture->rawwidth, texture->rawheight, 1, 1);
+}
 
+
+//============================================================
+//  hlsl_info::register_texture(d3d_texture_info, int, int, int, int)
+//============================================================
+
+bool hlsl_info::register_texture(d3d_texture_info *texture, int width, int height, int xscale, int yscale)
+{
 	if (!master_enable || !d3dintf->post_fx_available)
 		return 0;
+
+	enumerate_screens();
 
 	d3d_info *d3d = (d3d_info *)window->drawdata;
 
 	// Find the nearest prescale factor that is over our screen size
-	int hlsl_prescale_x = prescale_force_x ? prescale_force_x : 1;
-	if(!prescale_force_x)
-	{
-		while(texture->rawwidth * hlsl_prescale_x < d3d->width) hlsl_prescale_x++;
-		prescale_size_x = hlsl_prescale_x;
-	}
+	int hlsl_prescale_x = prescale_force_x;
+	int hlsl_prescale_y = prescale_force_y;
 
-	int hlsl_prescale_y = prescale_force_y ? prescale_force_y : 1;
-	if(!prescale_force_y)
-	{
-		while(texture->rawheight * hlsl_prescale_y < d3d->height) hlsl_prescale_y++;
-		prescale_size_y = hlsl_prescale_y;
-	}
-
-	if (!add_render_target(d3d, texture, texture->rawwidth, texture->rawheight, hlsl_prescale_x, hlsl_prescale_y))
-		return 1;
+	if (!add_render_target(d3d, texture, width, height, xscale * hlsl_prescale_x, yscale * hlsl_prescale_y))
+		return false;
 
 	options->params_dirty = true;
 
-	return 0;
+	return true;
 }
 
 //============================================================

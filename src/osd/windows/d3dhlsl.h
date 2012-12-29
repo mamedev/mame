@@ -116,10 +116,10 @@ public:
 	void render_quad(d3d_poly_info *poly, int vertnum);
 	void end();
 
-	int register_texture(d3d_texture_info *texture);
-	int register_prescaled_texture(d3d_texture_info *texture, int scwidth, int scheight);
-	bool add_render_target(d3d_info* d3d, d3d_texture_info* info, int width, int height, int prescale_x, int prescale_y);
-	bool add_cache_target(d3d_info* d3d, d3d_texture_info* info, int width, int height, int prescale_x, int prescale_y, int screen_index);
+	bool register_texture(d3d_texture_info *texture);
+	bool register_prescaled_texture(d3d_texture_info *texture);
+	bool add_render_target(d3d_info* d3d, d3d_texture_info* info, int width, int height, int xprescale, int yprescale);
+	bool add_cache_target(d3d_info* d3d, d3d_texture_info* info, int width, int height, int xprescale, int yprescale, int screen_index);
 
 	void window_save();
 	void window_record();
@@ -131,8 +131,11 @@ public:
 
 	void frame_complete();
 
-	void set_texture(d3d_texture_info *texture);
-	void remove_render_target(d3d_texture_info *texture);
+	void 					set_texture(d3d_texture_info *texture);
+	d3d_render_target *		find_render_target(d3d_texture_info *info);
+	void 					remove_render_target(d3d_texture_info *texture);
+	void 					remove_render_target(int width, int height, UINT32 screen_index, UINT32 page_index);
+	void 					remove_render_target(d3d_render_target *rt);
 
 	int create_resources();
 	void delete_resources();
@@ -146,8 +149,10 @@ private:
 	void					end_avi_recording();
 	void					begin_avi_recording(const char *name);
 
-	d3d_render_target *		find_render_target(d3d_texture_info *info);
-	d3d_cache_target *		find_cache_target(int screen_index);
+	bool					register_texture(d3d_texture_info *texture, int width, int height, int xscale, int yscale);
+
+	d3d_render_target* 		find_render_target(int width, int height, UINT32 screen_index, UINT32 page_index);
+	d3d_cache_target *		find_cache_target(UINT32 screen_index, int width, int height);
 	void					remove_cache_target(d3d_cache_target *cache);
 
 	d3d_base *              d3dintf;					// D3D interface

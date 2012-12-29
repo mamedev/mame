@@ -1801,8 +1801,7 @@ d3d_texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsource,
 					texture->d3dfinaltex = texture->d3dtex;
 					texture->type = d3d->dynamic_supported ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
 
-					int ret = d3d->hlsl->register_texture(texture);
-					if (ret != 0)
+					if (d3d->hlsl->enabled() && !d3d->hlsl->register_texture(texture))
 						goto error;
 
 					break;
@@ -1843,10 +1842,10 @@ d3d_texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsource,
 				result = (*d3dintf->device.create_texture)(d3d->device, scwidth, scheight, 1, D3DUSAGE_RENDERTARGET, finalfmt, D3DPOOL_DEFAULT, &texture->d3dfinaltex);
 				if (result == D3D_OK)
 				{
-					int ret = d3d->hlsl->register_prescaled_texture(texture, scwidth, scheight);
-					if (ret != 0)
+					if (d3d->hlsl->enabled() && !d3d->hlsl->register_prescaled_texture(texture))
+					{
 						goto error;
-
+					}
 					break;
 				}
 				(*d3dintf->texture.release)(texture->d3dtex);
@@ -2522,21 +2521,56 @@ static d3d_texture_info *texture_find(d3d_info *d3d, const render_primitive *pri
 	// find a match
 	for (texture = d3d->texlist; texture != NULL; texture = texture->next)
 	{
+		UINT32 test_screen = (UINT32)texture->texinfo.osddata >> 1;
+		UINT32 test_page = (UINT32)texture->texinfo.osddata & 1;
+		UINT32 prim_screen = (UINT32)prim->texture.osddata >> 1;
+		UINT32 prim_page = (UINT32)prim->texture.osddata & 1;
+		if (test_screen != prim_screen || test_page != prim_page)
+		{
+			continue;
+		}
+
 		if (texture->hash == texhash &&
 			texture->texinfo.base == prim->texture.base &&
 			texture->texinfo.width == prim->texture.width &&
 			texture->texinfo.height == prim->texture.height &&
 			((texture->flags ^ prim->flags) & (PRIMFLAG_BLENDMODE_MASK | PRIMFLAG_TEXFORMAT_MASK)) == 0)
 		{
-			return texture;
+			// Reject a texture if it belongs to an out-of-date render target, so as to cause the HLSL system to re-cache
+			if (d3d->hlsl->enabled() && prim->texture.width != 0 && prim->texture.height != 0 && (prim->flags & PRIMFLAG_SCREENTEX_MASK) != 0)
+			{
+				if (d3d->hlsl->find_render_target(texture) != NULL)
+				{
+					return texture;
+				}
+			}
+			else
+			{
+				return texture;
+			}
 		}
 	}
 
 	// nothing found, check if we need to unregister something with hlsl
-	if (d3d->hlsl != NULL)
+	if (d3d->hlsl->enabled())
 	{
+		if (prim->texture.width == 0 || prim->texture.height == 0)
+		{
+			return NULL;
+		}
+
+		UINT32 prim_screen = (UINT32)prim->texture.osddata >> 1;
+		UINT32 prim_page = (UINT32)prim->texture.osddata & 1;
+
 		for (texture = d3d->texlist; texture != NULL; texture = texture->next)
 		{
+			UINT32 test_screen = (UINT32)texture->texinfo.osddata >> 1;
+			UINT32 test_page = (UINT32)texture->texinfo.osddata & 1;
+			if (test_screen != prim_screen || test_page != prim_page)
+			{
+				continue;
+			}
+
 			// Clear our old texture reference
 			if (texture->hash == texhash &&
 			    texture->texinfo.base == prim->texture.base &&

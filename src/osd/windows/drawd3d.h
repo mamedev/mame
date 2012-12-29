@@ -74,8 +74,10 @@ public:
 	d3d_surface *last_target;
 	d3d_texture *last_texture;
 
+	int width;
+	int height;
+
 	int screen_index;
-	int ref_count;
 
 	d3d_cache_target *next;
 	d3d_cache_target *prev;
@@ -93,8 +95,13 @@ public:
 
 	int target_width;
 	int target_height;
+
+	int width;
+	int height;
+
 	int screen_index;
 	int page_index;
+
 	d3d_surface *prescaletarget;
 	d3d_texture *prescaletexture;
 	d3d_surface *smalltarget;
