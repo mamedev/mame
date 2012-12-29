@@ -3,8 +3,8 @@
 #ifndef __GALELCO_H__
 #define __GALELCO_H__
 
-const int GAELCO_NUM_CHANNELS = 0x07;
-const int VOLUME_LEVELS = 0x10;
+#define GAELCO_NUM_CHANNELS 	0x07
+#define GAELCO_VOLUME_LEVELS	0x10
 
 
 //**************************************************************************
@@ -78,7 +78,7 @@ private:
 	UINT16 m_sndregs[0x38];
 
 	// Table for converting from 8 to 16 bits with volume control
-	INT16 m_volume_table[VOLUME_LEVELS][256];
+	INT16 m_volume_table[GAELCO_VOLUME_LEVELS][256];
 };
 
 extern const device_type GAELCO_GAE1;

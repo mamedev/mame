@@ -249,9 +249,9 @@ void gaelco_gae1_device::device_start()
 		m_snd_data = *region();
 
 	/* init volume table */
-	for (vol = 0; vol < VOLUME_LEVELS; vol++){
+	for (vol = 0; vol < GAELCO_VOLUME_LEVELS; vol++){
 		for (j = -128; j <= 127; j++){
-			m_volume_table[vol][(j ^ 0x80) & 0xff] = (vol*j*256)/(VOLUME_LEVELS - 1);
+			m_volume_table[vol][(j ^ 0x80) & 0xff] = (vol*j*256)/(GAELCO_VOLUME_LEVELS - 1);
 		}
 	}
 
