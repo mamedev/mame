@@ -563,8 +563,8 @@ static ADDRESS_MAP_START( srmp6_map, AS_PROGRAM, 16, srmp6_state )
 	//AM_RANGE(0x5fff00, 0x5fffff) AM_WRITE_LEGACY(dma_w) AM_SHARE("dmaram")
 
 	AM_RANGE(0x4c0000, 0x4c006f) AM_READWRITE(video_regs_r, video_regs_w) AM_SHARE("video_regs")	// ? gfx regs ST-0026 NiLe
-	AM_RANGE(0x4e0000, 0x4e00ff) AM_DEVREADWRITE_LEGACY("nile", nile_snd_r, nile_snd_w)
-	AM_RANGE(0x4e0100, 0x4e0101) AM_DEVREADWRITE_LEGACY("nile", nile_sndctrl_r, nile_sndctrl_w)
+	AM_RANGE(0x4e0000, 0x4e00ff) AM_DEVREADWRITE("nile", nile_device, nile_snd_r, nile_snd_w)
+	AM_RANGE(0x4e0100, 0x4e0101) AM_DEVREADWRITE("nile", nile_device, nile_sndctrl_r, nile_sndctrl_w)
 	//AM_RANGE(0x4e0110, 0x4e0111) AM_NOP // ? accessed once ($268dc, written $b.w)
 	//AM_RANGE(0x5fff00, 0x5fff1f) AM_RAM // ? see routine $5ca8, video_regs related ???
 
@@ -689,7 +689,7 @@ static MACHINE_CONFIG_START( srmp6, srmp6_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("nile", NILE, 0)
+	MCFG_NILE_ADD("nile", 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
