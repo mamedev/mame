@@ -834,15 +834,19 @@ void winwindow_video_window_update(win_window_info *window)
 
 win_monitor_info *winwindow_video_window_monitor(win_window_info *window, const RECT *proposed)
 {
-	win_monitor_info *monitor;
+	win_monitor_info *monitor = NULL;
 
 	// in window mode, find the nearest
 	if (!window->fullscreen)
 	{
-		if (proposed != NULL)
-			monitor = winvideo_monitor_from_handle(MonitorFromRect(proposed, MONITOR_DEFAULTTONEAREST));
-		else
-			monitor = winvideo_monitor_from_handle(MonitorFromWindow(window->hwnd, MONITOR_DEFAULTTONEAREST));
+		// result can be NULL when e.g. the color scheme changes
+		do 
+		{
+			if (proposed != NULL)
+				monitor = winvideo_monitor_from_handle(MonitorFromRect(proposed, MONITOR_DEFAULTTONEAREST));
+			else
+				monitor = winvideo_monitor_from_handle(MonitorFromWindow(window->hwnd, MONITOR_DEFAULTTONEAREST));
+		} while (monitor == NULL);
 	}
 
 	// in full screen, just use the configured monitor
