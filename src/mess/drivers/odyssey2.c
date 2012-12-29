@@ -37,6 +37,7 @@ static ADDRESS_MAP_START( g7400_io , AS_IO, 8, odyssey2_state )
 	AM_RANGE( MCS48_PORT_BUS,	MCS48_PORT_BUS) AM_READWRITE(odyssey2_getbus, odyssey2_putbus )
 	AM_RANGE( MCS48_PORT_T0,	MCS48_PORT_T0)  AM_READ(odyssey2_t0_r )
 	AM_RANGE( MCS48_PORT_T1,	MCS48_PORT_T1)  AM_READ(odyssey2_t1_r )
+	//AM_RANGE( MCS_MCS48_PORT_PROG, MCS48_PORT_PROG ) //write to 8243 with low four bits from P2
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( odyssey2 )
