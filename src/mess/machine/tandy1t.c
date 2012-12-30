@@ -205,7 +205,8 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 		tandy_ppi.portb = data;
 		pit8253_gate2_w(space.machine().device("pit8253"), BIT(data, 0));
 		pc_speaker_set_spkrdata( space.machine(), data & 0x02 );
-		pc_keyb_set_clock(data&0x40);
+		// sx enables keyboard from bit 3, others bit 6, hopefully theres no conflict 
+		pc_keyb_set_clock(data&0x48);
 		if ( data & 0x80 )
 		{
 			pc_keyb_clear();
