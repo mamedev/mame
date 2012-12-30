@@ -12,36 +12,82 @@
 <softwarelist name="amigaaga_flop" description="Amiga AGA Floppy Disks list">
 
   <!-- has manual protection -->
-  <software name="pballfna">
+  <software name="pballfna" supported="no">
+    <!-- SPS (CAPS) release 47 -->
     <description>Pinball Fantasies AGA</description>
     <year>1993</year>
     <publisher>21st Century Entertainment</publisher>
-
+ 
     <part name="flop1" interface="floppy_3_5">
       <feature name="part_id" value="Disk 1" />
       <dataarea name="flop" size="1049612">
-        <rom name="pinballfantasiesaga_pf1.ipf" size="1049612" crc="60e23065" sha1="0d401004a02c6e8af2532b0180ce42a3725c69ce" offset="0"/>
+        <rom name="(sps47)pinballfantasiesaga_pf1.ipf" size="1049612" crc="60e23065" sha1="0d401004a02c6e8af2532b0180ce42a3725c69ce" offset="0"/>
       </dataarea>
     </part>
-
     <part name="flop2" interface="floppy_3_5">
       <feature name="part_id" value="Disk 2" />
       <dataarea name="flop" size="1049612">
-        <rom name="pinballfantasiesaga_pf2.ipf" size="1049612" crc="64e3b549" sha1="44d59c0660170eba8dee54d710cfec1f598a7a90" offset="0"/>
+        <rom name="(sps47)pinballfantasiesaga_pf2.ipf" size="1049612" crc="64e3b549" sha1="44d59c0660170eba8dee54d710cfec1f598a7a90" offset="0"/>
       </dataarea>
     </part>
-
     <part name="flop3" interface="floppy_3_5">
       <feature name="part_id" value="Disk 3" />
       <dataarea name="flop" size="1049612">
-        <rom name="pinballfantasiesaga_pf3.ipf" size="1049612" crc="2a0d1c66" sha1="df95ae4ed9bda2d0563958c26fc23fdd5fe6f3d7" offset="0"/>
+        <rom name="(sps47)pinballfantasiesaga_pf3.ipf" size="1049612" crc="2a0d1c66" sha1="df95ae4ed9bda2d0563958c26fc23fdd5fe6f3d7" offset="0"/>
       </dataarea>
     </part>
-
     <part name="flop4" interface="floppy_3_5">
       <feature name="part_id" value="Disk 4" />
       <dataarea name="flop" size="1049612">
-        <rom name="pinballfantasiesaga_pf4.ipf" size="1049612" crc="e5ab9484" sha1="83151b5738844bdc668c80b20dd2d742668063fb" offset="0"/>
+        <rom name="(sps47)pinballfantasiesaga_pf4.ipf" size="1049612" crc="e5ab9484" sha1="83151b5738844bdc668c80b20dd2d742668063fb" offset="0"/>
+      </dataarea>
+    </part>
+
+	<!--
+   <part name="misc" interface="floppy_3_5">
+      <feature name="part_id" value="Misc" />
+      <dataarea name="flop" size="11031">
+        <rom name="(sps47)box.info" size="11031" crc="178a1293" sha1="90cd1dcb7844e55bdb9442c1567051b21118fad9" offset="0"/>
+        <rom name="(sps47)box_front.jpg" size="1324827" crc="c077e445" sha1="9972c1a42adfe2757360f96a2f1ae4f2be4ee3af" offset="0"/>
+        <rom name="(sps47)gameinfo.xml" size="2399" crc="ab6eeba6" sha1="c869d070eb6eef2743cd034764e2c1642aafc1f4" offset="0"/>
+        <rom name="(sps47)pf1.jpg" size="207797" crc="6fba5a4f" sha1="3d7b1b28d9930454bdbf326743699501d384fa7e" offset="0"/>
+        <rom name="(sps47)pf2.jpg" size="218654" crc="f1b24221" sha1="6e142426cd27e75db2d3b1d526b44626ed51c4e4" offset="0"/>
+        <rom name="(sps47)pf3.jpg" size="227653" crc="b8db3a95" sha1="8290e1a42e9becc5b1561f324cd81a54413242d2" offset="0"/>
+        <rom name="(sps47)pf4.jpg" size="215318" crc="956e505f" sha1="5a625b94642c20823c93f2b33f0fbf67fe8a6a53" offset="0"/>
+      </dataarea>
+    </part>
+	-->
+	
+  </software>
+
+  <software name="pballfnaa" cloneof="pballfna" supported="no">
+    <!-- SPS (CAPS) release 2025 -->
+    <description>Pinball Fantasies AGA (alt)</description>
+    <year>1993</year>
+    <publisher>21st Century Entertainment</publisher>
+	
+    <part name="flop1" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 1" />
+      <dataarea name="flop" size="1049612">
+        <rom name="(sps2025)pinballfantasies_pf1.ipf" size="1049612" crc="cd554f84" sha1="232440a7a92854a011557b722d9715d8f256f97b" offset="0"/>
+      </dataarea>
+    </part>
+    <part name="flop2" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 2" />
+      <dataarea name="flop" size="1049612">
+        <rom name="(sps2025)pinballfantasies_pf2.ipf" size="1049612" crc="a676fc1b" sha1="7a337f1ce90eb42783d74159552e7226461858c7" offset="0"/>
+      </dataarea>
+    </part>
+    <part name="flop3" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 3" />
+      <dataarea name="flop" size="1049612">
+        <rom name="(sps2025)pinballfantasies_pf3.ipf" size="1049612" crc="3c2e31fb" sha1="3a4ba2ee0c01246fbab938aa4ecc790cfbdc69f9" offset="0"/>
+      </dataarea>
+    </part>
+    <part name="flop4" interface="floppy_3_5">
+      <feature name="part_id" value="Disk 4" />
+      <dataarea name="flop" size="1049612">
+        <rom name="(sps2025)pinballfantasies_pf4.ipf" size="1049612" crc="4f4bfe3a" sha1="3b320636e0e884b8b8f6800e8ac46f95ec6a28aa" offset="0"/>
       </dataarea>
     </part>
   </software>
@@ -85,38 +131,35 @@
 
   <!-- severe gfx problems -->
   <software name="pballill" supported="no">
+    <!-- SPS (CAPS) release 710 -->
     <description>Pinball Illusions</description>
     <year>1995</year>
     <publisher>21st Century Entertainment</publisher>
-
+	
     <part name="flop1" interface="floppy_3_5">
       <feature name="part_id" value="Disk 1" />
       <dataarea name="flop" size="1049612">
-        <rom name="pinballillusions_disk1.ipf" size="1049612" crc="0cf8949b" sha1="8970859b71aefdb13d47c9b16b279f52405dae4c" offset="0"/>
+        <rom name="(sps710)pinballillusions_disk1.ipf" size="1049612" crc="0cf8949b" sha1="8970859b71aefdb13d47c9b16b279f52405dae4c" offset="0"/>
       </dataarea>
     </part>
-
     <part name="flop2" interface="floppy_3_5">
       <feature name="part_id" value="Disk 2" />
       <dataarea name="flop" size="1049612">
-        <rom name="pinballillusions_disk2.ipf" size="1049612" crc="93ce1135" sha1="5dad662b278a45e4720043407bbf22c0a9932df5" offset="0"/>
+        <rom name="(sps710)pinballillusions_disk2.ipf" size="1049612" crc="93ce1135" sha1="5dad662b278a45e4720043407bbf22c0a9932df5" offset="0"/>
       </dataarea>
     </part>
-
     <part name="flop3" interface="floppy_3_5">
       <feature name="part_id" value="Disk 3" />
       <dataarea name="flop" size="1049612">
-        <rom name="pinballillusions_disk3.ipf" size="1049612" crc="282ea51d" sha1="39f78c077ee27f213ff3f07a991ba165212d780f" offset="0"/>
+        <rom name="(sps710)pinballillusions_disk3.ipf" size="1049612" crc="282ea51d" sha1="39f78c077ee27f213ff3f07a991ba165212d780f" offset="0"/>
       </dataarea>
     </part>
-
     <part name="flop4" interface="floppy_3_5">
       <feature name="part_id" value="Disk 4" />
       <dataarea name="flop" size="1049612">
-        <rom name="pinballillusions_disk4.ipf" size="1049612" crc="e551bc40" sha1="05757f0e6289385df204c2ced4fb0348aa4b39ee" offset="0"/>
+        <rom name="(sps710)pinballillusions_disk4.ipf" size="1049612" crc="e551bc40" sha1="05757f0e6289385df204c2ced4fb0348aa4b39ee" offset="0"/>
       </dataarea>
     </part>
-
   </software>
 
     <!-- simple 1 disk game using AGA mode -->
