@@ -719,7 +719,12 @@ static DEVICE_IMAGE_LOAD( atom_cart )
 	this_cart = atom_cart;
 
 	if( !this_cart->tag )
-		fatalerror("tag '%s' could not be found\n", image.device().tag());
+	{
+		astring errmsg;
+		errmsg.printf("Tag '%s' could not be found", image.device().tag());
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.cstr());
+		return IMAGE_INIT_FAIL;
+	}
 
 	if (image.software_entry() == NULL)
 	{
