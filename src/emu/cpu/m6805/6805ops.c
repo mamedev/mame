@@ -13,9 +13,10 @@ HNZC
 
 */
 
-#define OP_HANDLER(_name) INLINE void _name (m6805_Regs* cpustate)
+#define OP_HANDLER(_name) void m6805_base_device::_name()
+#define DERIVED_OP_HANDLER(_arch,_name) void _arch##_device::_name()
 
-#define OP_HANDLER_BIT(_name) INLINE void _name (m6805_Regs* cpustate, UINT8 bit)
+#define OP_HANDLER_BIT(_name) void m6805_base_device::_name(UINT8 bit)
 
 OP_HANDLER( illegal )
 {
@@ -158,27 +159,23 @@ OP_HANDLER( bms )
 /* $2e BIL relative ---- */
 OP_HANDLER( bil )
 {
-	if(SUBTYPE==SUBTYPE_HD63705)
-	{
-		BRANCH( cpustate->nmi_state!=CLEAR_LINE );
-	}
-	else
-	{
-		BRANCH( cpustate->irq_state[0]!=CLEAR_LINE );
-	}
+	BRANCH(m_irq_state[0] != CLEAR_LINE);
+}
+
+DERIVED_OP_HANDLER( hd63705, bil )
+{
+	BRANCH(m_nmi_state != CLEAR_LINE);
 }
 
 /* $2f BIH relative ---- */
 OP_HANDLER( bih )
 {
-	if(SUBTYPE==SUBTYPE_HD63705)
-	{
-		BRANCH( cpustate->nmi_state==CLEAR_LINE );
-	}
-	else
-	{
-		BRANCH( cpustate->irq_state[0]==CLEAR_LINE );
-	}
+	BRANCH(m_irq_state[0] == CLEAR_LINE);
+}
+
+DERIVED_OP_HANDLER( hd63705, bih )
+{
+	BRANCH(m_nmi_state == CLEAR_LINE);
 }
 
 /* $30 NEG direct -*** */
@@ -789,17 +786,19 @@ OP_HANDLER( rti )
 	PULLBYTE(CC);
 	PULLBYTE(A);
 	PULLBYTE(X);
-	PULLWORD(pPC);
+	PULLWORD(m_pc);
 #if IRQ_LEVEL_DETECT
-	if( m6805.irq_state != CLEAR_LINE && (CC & IFLAG) == 0 )
-		m6805.pending_interrupts |= M6805_INT_IRQ;
+	if( m_irq_state != CLEAR_LINE && (CC & IFLAG) == 0 )
+	{
+		m_pending_interrupts |= M6805_INT_IRQ;
+	}
 #endif
 }
 
 /* $81 RTS inherent ---- */
 OP_HANDLER( rts )
 {
-	PULLWORD(pPC);
+	PULLWORD(m_pc);
 }
 
 /* $82 ILLEGAL */
@@ -807,14 +806,23 @@ OP_HANDLER( rts )
 /* $83 SWI absolute indirect ---- */
 OP_HANDLER( swi )
 {
-	PUSHWORD(cpustate->pc);
-	PUSHBYTE(cpustate->x);
-	PUSHBYTE(cpustate->a);
-	PUSHBYTE(cpustate->cc);
+	PUSHWORD(m_pc);
+	PUSHBYTE(m_x);
+	PUSHBYTE(m_a);
+	PUSHBYTE(m_cc);
 	SEI;
-	if(SUBTYPE==SUBTYPE_HD63705) RM16( cpustate, 0x1ffa, &pPC ); else RM16( cpustate, 0xfffc, &pPC );
+	RM16(0xfffc, &m_pc);
 }
 
+DERIVED_OP_HANDLER( hd63705, swi )
+{
+	PUSHWORD(m_pc);
+	PUSHBYTE(m_x);
+	PUSHBYTE(m_a);
+	PUSHBYTE(m_cc);
+	SEI;
+	RM16(0x1ffa, &m_pc);
+}
 /* $84 ILLEGAL */
 
 /* $85 ILLEGAL */
@@ -1009,7 +1017,7 @@ OP_HANDLER( bsr )
 {
 	UINT8 t;
 	IMMBYTE(t);
-	PUSHWORD(cpustate->pc);
+	PUSHWORD(m_pc);
 	PC += SIGNED(t);
 }
 
@@ -1157,7 +1165,7 @@ OP_HANDLER( jmp_di )
 OP_HANDLER( jsr_di )
 {
 	DIRECT;
-	PUSHWORD(cpustate->pc);
+	PUSHWORD(m_pc);
 	PC = EA;
 }
 
@@ -1312,7 +1320,7 @@ OP_HANDLER( jmp_ex )
 OP_HANDLER( jsr_ex )
 {
 	EXTENDED;
-	PUSHWORD(cpustate->pc);
+	PUSHWORD(m_pc);
 	PC = EA;
 }
 
@@ -1467,7 +1475,7 @@ OP_HANDLER( jmp_ix2 )
 OP_HANDLER( jsr_ix2 )
 {
 	INDEXED2;
-	PUSHWORD(cpustate->pc);
+	PUSHWORD(m_pc);
 	PC = EA;
 }
 
@@ -1622,7 +1630,7 @@ OP_HANDLER( jmp_ix1 )
 OP_HANDLER( jsr_ix1 )
 {
 	INDEXED1;
-	PUSHWORD(cpustate->pc);
+	PUSHWORD(m_pc);
 	PC = EA;
 }
 
@@ -1777,7 +1785,7 @@ OP_HANDLER( jmp_ix )
 OP_HANDLER( jsr_ix )
 {
 	INDEXED;
-	PUSHWORD(cpustate->pc);
+	PUSHWORD(m_pc);
 	PC = EA;
 }
 

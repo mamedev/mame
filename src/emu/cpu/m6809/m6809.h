@@ -30,7 +30,7 @@ struct m6809_config
 extern const device_type M6809;
 extern const device_type M6809E;
 
-// ======================> m6809_device
+// ======================> m6809_base_device
 
 // Used by core CPU interface
 class m6809_base_device : public cpu_device,
@@ -113,8 +113,6 @@ protected:
 	UINT8	m_irq_state[2];
 
 	int 	m_extra_cycles;	/* cycles used up by interrupts */
-
-	device_irq_acknowledge_callback m_irq_callback;
 
 	PAIR	m_ea;		/* effective address */
 
