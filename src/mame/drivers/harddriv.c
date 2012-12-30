@@ -164,6 +164,10 @@
     Metal Maniax (prototype)
         - reworked hardware that is similar but not of the same layout
 
+    TODO:
+        - Fix serial communications between the two DS III/IV sound ADSPs
+          (The auxillary DSP is used to process the output of the sound DSP)
+
 ****************************************************************************
 
 Race Drivin' Compact
@@ -580,42 +584,32 @@ static ADDRESS_MAP_START( ds3_data_map, AS_DATA, 16, harddriv_state )
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE_LEGACY(hdds3_special_r, hdds3_special_w)
 ADDRESS_MAP_END
 
-#if 0
-static ADDRESS_MAP_START( ds3snd_program_map, AS_PROGRAM, 32, harddriv_state )
+
+static ADDRESS_MAP_START( ds3sdsp_program_map, AS_PROGRAM, 32, harddriv_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ds3sdsp_pgm")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ds3sdsp_data_map, AS_DATA, 16, harddriv_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x3800, 0x39ff) AM_RAM						/* internal RAM */
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(hdds3_sdsp_control_r, hdds3_sdsp_control_w)
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE_LEGACY(hdds3_sdsp_special_r, hdds3_sdsp_special_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ds3snd_data_map, AS_DATA, 16, harddriv_state )
+static ADDRESS_MAP_START( ds3xdsp_program_map, AS_PROGRAM, 32, harddriv_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM						/* internal RAM */
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(hdds3_control_r, hdds3_control_w)	/* adsp control regs */
-//
-//  /SIRQ2 = IRQ2
-//  /SRES -> RESET
-//
-//  2xx0 W = SWR0 (POUT)
-//  2xx1 W = SWR1 (SINT)
-//  2xx2 W = SWR2 (TFLAG)
-//  2xx3 W = SWR3 (INTSRC)
-//  2xx4 W = DACL
-//  2xx5 W = DACR
-//  2xx6 W = SRMADL
-//  2xx7 W = SRMADH
-//
-//  2xx0 R = SRD0 (PIN)
-//  2xx1 R = SRD1 (RSAT)
-//  2xx4 R = SROM
-//  2xx7 R = SFWCLR
-//
-//
-//  /XRES -> RESET
-//  communicate over serial I/O
-
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ds3xdsp_pgm")
 ADDRESS_MAP_END
-#endif
+
+static ADDRESS_MAP_START( ds3xdsp_data_map, AS_DATA, 16, harddriv_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x1fff) AM_RAM // TODO
+	AM_RANGE(0x3800, 0x39ff) AM_RAM						/* internal RAM */
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(hdds3_xdsp_control_r, hdds3_xdsp_control_w)
+ADDRESS_MAP_END
+
 
 
 /*************************************
@@ -1314,6 +1308,28 @@ INPUT_PORTS_END
 
 /*************************************
  *
+ *  CPU configuration
+ *
+ *************************************/
+
+static const adsp21xx_config ds3sdsp_config =
+{
+	hdds3sdsp_serial_rx_callback, /* callback for serial receive */
+	hdds3sdsp_serial_tx_callback, /* callback for serial transmit */
+	hdds3sdsp_timer_enable_callback	/* callback for timer fired */
+};
+
+static const adsp21xx_config ds3xdsp_config =
+{
+	hdds3xdsp_serial_rx_callback, /* callback for serial receive */
+	hdds3xdsp_serial_tx_callback, /* callback for serial transmit */
+	hdds3xdsp_timer_enable_callback	/* callback for timer fired */
+};
+
+
+
+/*************************************
+ *
  *  Main board pieces
  *
  *************************************/
@@ -1417,38 +1433,33 @@ static MACHINE_CONFIG_FRAGMENT( adsp )
 MACHINE_CONFIG_END
 
 
-/* DS III board (used by Steel Talons) */
+/* DS III/IV board (used by Steel Talons, Street Drivin' and Hard Drivin's Airborne) */
 static MACHINE_CONFIG_FRAGMENT( ds3 )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("adsp", ADSP2101, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(ds3_program_map)
 	MCFG_CPU_DATA_MAP(ds3_data_map)
-
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
-MACHINE_CONFIG_END
 
+	MCFG_CPU_ADD("ds3sdsp", ADSP2105, XTAL_10MHz)
+	MCFG_ADSP21XX_CONFIG(ds3sdsp_config)
+	MCFG_CPU_PROGRAM_MAP(ds3sdsp_program_map)
+	MCFG_CPU_DATA_MAP(ds3sdsp_data_map)
+	MCFG_TIMER_ADD("ds3sdsp_timer", ds3sdsp_internal_timer_callback)
 
-/* DS IV board (used by Hard Drivin's Airborne) */
-static MACHINE_CONFIG_FRAGMENT( ds4 )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("adsp", ADSP2101, XTAL_12MHz)
-	MCFG_CPU_PROGRAM_MAP(ds3_program_map)
-	MCFG_CPU_DATA_MAP(ds3_data_map)
-
-//  MCFG_CPU_ADD("ds4cpu1", ADSP2105, 10000000)
-//  MCFG_CPU_PROGRAM_MAP(ds3snd_program_map)
-
-//  MCFG_CPU_ADD("ds4cpu2", ADSP2105, 10000000)
-//  MCFG_CPU_PROGRAM_MAP(ds3snd_program_map)
+	MCFG_CPU_ADD("ds3xdsp", ADSP2105, XTAL_10MHz)
+	MCFG_ADSP21XX_CONFIG(ds3xdsp_config)
+	MCFG_CPU_PROGRAM_MAP(ds3xdsp_program_map)
+	MCFG_CPU_DATA_MAP(ds3xdsp_data_map)
+	MCFG_TIMER_ADD("ds3xdsp_timer", ds3xdsp_internal_timer_callback)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_DAC_ADD("dac1")
+	MCFG_SOUND_ADD("ds3dac1", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_DAC_ADD("dac2")
+	MCFG_SOUND_ADD("ds3dac2", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -1529,7 +1540,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( harddrivc, multisync_msp )
 
-	/* basic machine hardware */	/* multisync board with MSP */
+	/* basic machine hardware */		/* multisync board with MSP */
 	MCFG_FRAGMENT_ADD( adsp )			/* ADSP board */
 	MCFG_FRAGMENT_ADD( driversnd )		/* driver sound board */
 MACHINE_CONFIG_END
@@ -1537,29 +1548,29 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( racedriv, driver_nomsp )
 
-	/* basic machine hardware */	/* original driver board without MSP */
+	/* basic machine hardware */		/* original driver board without MSP */
 	MCFG_FRAGMENT_ADD( adsp )			/* ADSP board */
-	MCFG_FRAGMENT_ADD( dsk )				/* DSK board */
+	MCFG_FRAGMENT_ADD( dsk )			/* DSK board */
 	MCFG_FRAGMENT_ADD( driversnd )		/* driver sound board */
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( racedrivc, multisync_nomsp )
 
-	/* basic machine hardware */	/* multisync board without MSP */
+	/* basic machine hardware */		/* multisync board without MSP */
 	MCFG_FRAGMENT_ADD( adsp )			/* ADSP board */
-	MCFG_FRAGMENT_ADD( dsk )				/* DSK board */
+	MCFG_FRAGMENT_ADD( dsk )			/* DSK board */
 	MCFG_FRAGMENT_ADD( driversnd )		/* driver sound board */
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( stunrun, multisync_nomsp )
 
-	/* basic machine hardware */	/* multisync board without MSP */
+	/* basic machine hardware */		/* multisync board without MSP */
 	MCFG_CPU_MODIFY("gsp")
 	MCFG_CPU_CONFIG(gsp_config_multisync_stunrun)
 	MCFG_FRAGMENT_ADD( adsp )			/* ADSP board */
-	MCFG_FRAGMENT_ADD( jsa_ii_mono )		/* JSA II sound board */
+	MCFG_FRAGMENT_ADD( jsa_ii_mono )	/* JSA II sound board */
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1567,27 +1578,37 @@ static MACHINE_CONFIG_DERIVED( stunrun, multisync_nomsp )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( strtdriv, multisync_nomsp )
+static MACHINE_CONFIG_DERIVED( steeltal, multisync_msp )
 
-	/* basic machine hardware */	/* multisync board */
-	MCFG_FRAGMENT_ADD( ds3 )				/* DS III board */
-	MCFG_FRAGMENT_ADD( dsk )				/* DSK board */
+	/* basic machine hardware */		/* multisync board with MSP */
+	MCFG_FRAGMENT_ADD( ds3 )			/* DS III board */
+	MCFG_DEVICE_REMOVE("ds3sdsp")		/* DS III sound components are not present */
+	MCFG_DEVICE_REMOVE("ds3xdsp")
+	MCFG_DEVICE_REMOVE("ds3dac1")
+	MCFG_DEVICE_REMOVE("ds3dac2")
+	MCFG_DEVICE_REMOVE("lspeaker")
+	MCFG_DEVICE_REMOVE("rspeaker")
+
+	MCFG_FRAGMENT_ADD( jsa_iii_mono )	/* JSA III sound board */
+	MCFG_FRAGMENT_ADD( asic65 )			/* ASIC65 on DSPCOM board */
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( steeltal, multisync_msp )
+static MACHINE_CONFIG_DERIVED( strtdriv, multisync_nomsp )
 
-	/* basic machine hardware */	/* multisync board with MSP */
-	MCFG_FRAGMENT_ADD( ds3 )				/* DS III board */
-	MCFG_FRAGMENT_ADD( jsa_iii_mono )	/* JSA III sound board */
-	MCFG_FRAGMENT_ADD( asic65 )			/* ASIC65 on DSPCOM board */
+	/* basic machine hardware */		/* multisync board */
+	MCFG_FRAGMENT_ADD( ds3 )			/* DS III board */
+	MCFG_CPU_MODIFY("ds3xdsp")			/* DS III auxiliary sound DSP has no code */
+	MCFG_DEVICE_DISABLE()
+
+	MCFG_FRAGMENT_ADD( dsk )			/* DSK board */
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( hdrivair, multisync2 )
 
 	/* basic machine hardware */		/* multisync II board */
-	MCFG_FRAGMENT_ADD( ds4 )				/* DS IV board */
+	MCFG_FRAGMENT_ADD( ds3 )			/* DS IV board */
 	MCFG_FRAGMENT_ADD( dsk2 )			/* DSK II board */
 MACHINE_CONFIG_END
 
@@ -3847,14 +3868,24 @@ ROM_START( strtdriv )
 	ROM_LOAD16_BYTE( "136091-0026.30e", 0x000000, 0x020000, CRC(47705109) SHA1(fa40275b71b74be8591282d2fba4215b98fc29c9) )
 	ROM_LOAD16_BYTE( "136091-0025.10e", 0x000001, 0x020000, CRC(ead9254e) SHA1(92152d3ca77b542b3bb3398ccf414df28c95abfd) )
 
-	ROM_REGION16_BE( 0x100000, "user5", 0 )
-	/* DS III sound section (2 x ADSP2105)*/
+	ROM_REGION16_BE( 0x100000, "ds3sdsp", 0 )  /* DS III sound ADSP-2105 */
 	ROM_LOAD( "136091-0033.10j", 0x000000, 0x010000, CRC(57504ab6) SHA1(ec8361b7da964c07ca0da48a87537badc3986fe0) )
-	ROM_LOAD( "136052-1123.12lm", 0x000000, 0x010000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
-	ROM_LOAD( "136052-1124.12k", 0x000000, 0x010000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
-	ROM_LOAD( "136052-3125.12j", 0x000000, 0x010000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
-	ROM_LOAD( "136052-1126.12h", 0x000000, 0x010000, CRC(f46ef09c) SHA1(ba62f73ee3b33d8f26b430ffa468f8792dca23de) )
-	ROM_LOAD( "136077-1017.12t", 0x000000, 0x010000, CRC(e93129a3) SHA1(1221b08c8efbfd8cf6bfbfd956545f10bef48663) )
+
+	ROM_REGION16_BE( 0x100000, "ds3xdsp", 0 )  /* DS III auxillary ADSP-2105 (unused) */
+	ROM_FILL(                    0x000000, 0x010000, 0x00)
+
+	ROM_REGION( 0x80000, "ds3sdsp_data", 0 )
+	ROM_LOAD16_BYTE( "136052-1123.12lm",0x00000, 0x10000, CRC(a88411dc) SHA1(1fd53c7eadffa163d5423df2f8338757e58d5f2e) )
+	ROM_LOAD16_BYTE( "136077-1017.12t", 0x00001, 0x10000, CRC(e93129a3) SHA1(1221b08c8efbfd8cf6bfbfd956545f10bef48663) )
+
+	ROM_FILL(                           0x20000, 0x20000, 0xff) /* 12R */
+	ROM_LOAD16_BYTE( "136052-1124.12k", 0x20000, 0x10000, CRC(071a4309) SHA1(c623bd51d6a4a56503fbf138138854d6a30b11d6) )
+
+	ROM_FILL(                           0x40000, 0x20000, 0xff) /* 12P */
+	ROM_LOAD16_BYTE( "136052-3125.12j", 0x40000, 0x10000, CRC(856548ff) SHA1(e8a17b274185c5e4ecf5f9f1c211e18b3ef2456d) )
+
+	ROM_FILL(                           0x60000, 0x20000, 0xff) /* 12N */
+	ROM_LOAD16_BYTE( "136052-1126.12h", 0x60000, 0x10000, CRC(f46ef09c) SHA1(ba62f73ee3b33d8f26b430ffa468f8792dca23de) )
 
 	ROM_REGION( 0x1000, "eeprom", 0 )
 	ROM_LOAD( "strtdriv-eeprom.bin", 0x0000, 0x1000, CRC(c71c0011) SHA1(1ceaf73df40e531df3bfb26b4fb7cd95fb7bff1d) )
@@ -3875,11 +3906,8 @@ ROM_START( hdrivair )
 	ROM_LOAD16_BYTE( "coprochi.bin",0x1c0000, 0x20000, CRC(5d2ca109) SHA1(e1a94d3fbfd5d542732555bf60268e73d66b3a06) )
 	ROM_LOAD16_BYTE( "coproclo.bin",0x1c0001, 0x20000, CRC(5f98b04d) SHA1(9c4fa4092fd85f1d67be44f2ff91a907a87db51a) )
 
-	ROM_REGION( 0x10000 + 0x10000, "dsp32", 0 )	/* dummy region for ADSP 2105 */
-	ROM_LOAD( "sboot.bin", 0x10000 + 0x00000, 0x10000, CRC(cde4d010) SHA1(853f4b813ff70fe74cd87e92131c46fca045610d) )
-
 	ROM_REGION( 0x10000 + 0x10000, "asic65", 0 )	/* dummy region for ADSP 2105 */
-	ROM_LOAD( "xboot.bin", 0x10000 + 0x00000, 0x10000, CRC(054b46a0) SHA1(038eec17e678f2755239d6795acfda621796802e) )
+	ROM_LOAD( "sboot.bin", 0x000000, 0x010000, CRC(cde4d010) SHA1(853f4b813ff70fe74cd87e92131c46fca045610d) )    
 
 	ROM_REGION( 0xc0000, "user1", 0 )		/* 768k for object ROM */
 	ROM_LOAD16_BYTE( "obj0l.bin",   0x00000, 0x20000, CRC(1f835f2e) SHA1(9d3419f2c1aa65ddfe9ace4e70ca1212d634afbf) )
@@ -3899,16 +3927,21 @@ ROM_START( hdrivair )
 	ROM_LOAD32_BYTE( "roads2.bin",  0x000002, 0x80000, CRC(527923fe) SHA1(839de8486bb7489f059b5a629ab229ad96de7eac) )
 	ROM_LOAD32_BYTE( "roads3.bin",  0x000003, 0x80000, CRC(2f2023b2) SHA1(d474892443db2f0710c2be0d6b90735a2fbee12a) )
 
-	ROM_REGION16_BE( 0x100000, "user5", 0 )
-	/* DS IV sound section (2 x ADSP2105)*/
-	ROM_LOAD16_BYTE( "ds3rom0.bin", 0x00001, 0x80000, CRC(90b8dbb6) SHA1(fff693cb81e88bc00e048bb71406295fe7be5122) )
-	ROM_LOAD16_BYTE( "ds3rom1.bin", 0x00000, 0x80000, CRC(58173812) SHA1(b7e9f724011a362e1fc17aa7a7a95841e01d5430) )
-	ROM_LOAD16_BYTE( "ds3rom2.bin", 0x00001, 0x80000, CRC(5a4b18fa) SHA1(1e9193c1daf14fc0aeca6fab762f5753ec73435f) )
-	ROM_LOAD16_BYTE( "ds3rom3.bin", 0x00000, 0x80000, CRC(63965868) SHA1(d61d9d6709a3a3c37c2652602e97fdee52e0e7cb) )
-	ROM_LOAD16_BYTE( "ds3rom4.bin", 0x00001, 0x80000, CRC(15ffb19a) SHA1(030dc90b7cabcd7fc5f231b09d2aa2eaf6e60b98) )
-	ROM_LOAD16_BYTE( "ds3rom5.bin", 0x00000, 0x80000, CRC(8d0e9b27) SHA1(76556f48bdf14475260c268ebdb16ecb494b2f36) )
-	ROM_LOAD16_BYTE( "ds3rom6.bin", 0x00001, 0x80000, CRC(ce7edbae) SHA1(58e9d8379157bb69e323eb79332d644a32c70a6f) )
-	ROM_LOAD16_BYTE( "ds3rom7.bin", 0x00000, 0x80000, CRC(323eff0b) SHA1(5d4945d77191ee44b4fbf125bc0816217321829e) )
+	ROM_REGION16_BE( 0x10000, "ds3sdsp", 0 ) /* DS IV sound ADSP-2105 */
+	ROM_LOAD( "sboot.bin", 0x00000, 0x10000, CRC(cde4d010) SHA1(853f4b813ff70fe74cd87e92131c46fca045610d) )
+
+	ROM_REGION16_BE( 0x10000, "ds3xdsp", 0 ) /* DS IV auxillary ADSP-2105 */
+	ROM_LOAD( "xboot.bin", 0x00000, 0x10000, CRC(054b46a0) SHA1(038eec17e678f2755239d6795acfda621796802e) )
+
+	ROM_REGION16_BE( 0x400000, "ds3sdsp_data", 0 ) /* DS IV sound data */
+	ROM_LOAD16_BYTE( "ds3rom4.bin", 0x000000, 0x80000, CRC(15ffb19a) SHA1(030dc90b7cabcd7fc5f231b09d2aa2eaf6e60b98) )
+	ROM_LOAD16_BYTE( "ds3rom0.bin", 0x000001, 0x80000, CRC(90b8dbb6) SHA1(fff693cb81e88bc00e048bb71406295fe7be5122) )
+	ROM_LOAD16_BYTE( "ds3rom5.bin", 0x100000, 0x80000, CRC(8d0e9b27) SHA1(76556f48bdf14475260c268ebdb16ecb494b2f36) )
+	ROM_LOAD16_BYTE( "ds3rom1.bin", 0x100001, 0x80000, CRC(58173812) SHA1(b7e9f724011a362e1fc17aa7a7a95841e01d5430) )
+	ROM_LOAD16_BYTE( "ds3rom6.bin", 0x200000, 0x80000, CRC(ce7edbae) SHA1(58e9d8379157bb69e323eb79332d644a32c70a6f) )
+	ROM_LOAD16_BYTE( "ds3rom2.bin", 0x200001, 0x80000, CRC(5a4b18fa) SHA1(1e9193c1daf14fc0aeca6fab762f5753ec73435f) )
+	ROM_LOAD16_BYTE( "ds3rom7.bin", 0x300000, 0x80000, CRC(323eff0b) SHA1(5d4945d77191ee44b4fbf125bc0816217321829e) )
+	ROM_LOAD16_BYTE( "ds3rom3.bin", 0x300001, 0x80000, CRC(63965868) SHA1(d61d9d6709a3a3c37c2652602e97fdee52e0e7cb) )
 
 	ROM_REGION( 0x1000, "eeprom", 0 )
 	ROM_LOAD( "hdrivair-eeprom.bin", 0x0000, 0x1000, CRC(7828df8f) SHA1(4b62ceb1d3f4b8026d77a59118a9002aa006e98e) )
@@ -3954,16 +3987,21 @@ ROM_START( hdrivairp )
 	ROM_LOAD16_BYTE( "roads.2",     0x000002, 0x80000, CRC(ba57f415) SHA1(1daf5a014e9bef15466b282bcca2395fec2b0628) )
 	ROM_LOAD16_BYTE( "roads.3",     0x000003, 0x80000, CRC(1e6a4ca0) SHA1(2cf06d6c73be11cf10515246fca2baa05ce5091b) )
 
-	ROM_REGION16_BE( 0x100000, "user5", 0 )
-	/* DS IV sound section (2 x ADSP2105)*/
-	ROM_LOAD16_BYTE( "ds3rom.0",    0x00001, 0x80000, CRC(90b8dbb6) SHA1(fff693cb81e88bc00e048bb71406295fe7be5122) )
-	ROM_LOAD16_BYTE( "ds3rom.1",    0x00000, 0x80000, CRC(03673d8d) SHA1(13596f7acb58fba78d6e4f2ac7bb21d9d2589668) )
-	ROM_LOAD16_BYTE( "ds3rom.2",    0x00001, 0x80000, CRC(f67754e9) SHA1(3548412ccdfa9b482942c78778f05d67eb7835ea) )
-	ROM_LOAD16_BYTE( "ds3rom.3",    0x00000, 0x80000, CRC(008d3578) SHA1(c9ff50b931c25fe86bde3eb0aae2350c29766438) )
-	ROM_LOAD16_BYTE( "ds3rom.4",    0x00001, 0x80000, CRC(6281efee) SHA1(47d0f3ff973166d818877996c45dccf1d3a85fe1) )
-	ROM_LOAD16_BYTE( "ds3rom.5",    0x00000, 0x80000, CRC(6ef9ed90) SHA1(8bd927a56fe99f7db96d203c1daeb8c8c83f2c17) )
-	ROM_LOAD16_BYTE( "ds3rom.6",    0x00001, 0x80000, CRC(cd4cd6bc) SHA1(95689ab7cb18af54ff09aebf223f6346f13dfd7b) )
-	ROM_LOAD16_BYTE( "ds3rom.7",    0x00000, 0x80000, CRC(3d695e1f) SHA1(4e5dd009ed11d299c546451141920dc1dc74a529) )
+	ROM_REGION( 0x10000, "ds3sdsp", 0 ) /* DS IV sound ADSP-2105 */
+	ROM_LOAD( "sboota.bin", 0x00000, 0x10000, CRC(3ef819cd) SHA1(c547b869a3a37a82fb46584fe0ef0cfe21a4f882) )
+
+	ROM_REGION( 0x10000, "ds3xdsp", 0 ) /* DS IV auxillary ADSP-2105 */
+	ROM_LOAD( "xboota.bin", 0x00000, 0x10000, CRC(d9c49901) SHA1(9f90ae3a47eb1ef00c3ec3661f60402c2eae2108) )
+
+	ROM_REGION16_BE( 0x400000, "ds3sdsp_data", 0 )
+	ROM_LOAD16_BYTE( "ds3rom.5",    0x000000, 0x80000, CRC(6ef9ed90) SHA1(8bd927a56fe99f7db96d203c1daeb8c8c83f2c17) )
+	ROM_LOAD16_BYTE( "ds3rom.1",    0x000001, 0x80000, CRC(03673d8d) SHA1(13596f7acb58fba78d6e4f2ac7bb21d9d2589668) )
+	ROM_LOAD16_BYTE( "ds3rom.6",    0x100000, 0x80000, CRC(cd4cd6bc) SHA1(95689ab7cb18af54ff09aebf223f6346f13dfd7b) )
+	ROM_LOAD16_BYTE( "ds3rom.2",    0x100001, 0x80000, CRC(f67754e9) SHA1(3548412ccdfa9b482942c78778f05d67eb7835ea) )
+	ROM_LOAD16_BYTE( "ds3rom.7",    0x200000, 0x80000, CRC(3d695e1f) SHA1(4e5dd009ed11d299c546451141920dc1dc74a529) )
+	ROM_LOAD16_BYTE( "ds3rom.3",    0x200001, 0x80000, CRC(008d3578) SHA1(c9ff50b931c25fe86bde3eb0aae2350c29766438) )
+	ROM_LOAD16_BYTE( "ds3rom.0",    0x300000, 0x80000, CRC(90b8dbb6) SHA1(fff693cb81e88bc00e048bb71406295fe7be5122) )
+	ROM_LOAD16_BYTE( "ds3rom.4",    0x300001, 0x80000, CRC(6281efee) SHA1(47d0f3ff973166d818877996c45dccf1d3a85fe1) )
 
 	ROM_REGION( 0x1000, "eeprom", 0 )
 	ROM_LOAD( "hdrivair-eeprom.bin", 0x0000, 0x1000, CRC(7828df8f) SHA1(4b62ceb1d3f4b8026d77a59118a9002aa006e98e) )
@@ -4043,17 +4081,16 @@ static void init_ds3(running_machine &machine)
 	state->m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0x820800, 0x820fff, FUNC(hd68k_ds3_girq_state_r));
 	state->m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(0x820000, 0x8207ff, FUNC(hd68k_ds3_gdata_w));
 	state->m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(0x821000, 0x8217ff, FUNC(hd68k_adsp_irq_clear_w));
+
 	state->m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0x822000, 0x8227ff, FUNC(hd68k_ds3_sdata_r));
 	state->m_maincpu->space(AS_PROGRAM).install_legacy_read_handler(0x822800, 0x822fff, FUNC(hd68k_ds3_sirq_state_r));
 	state->m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(0x822000, 0x8227ff, FUNC(hd68k_ds3_sdata_w));
+	state->m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(0x823000, 0x8237ff, FUNC(hd68k_ds3_sirq_clear_w));
 	state->m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(0x823800, 0x823fff, FUNC(hd68k_ds3_control_w));
 
-	/* if we have a sound DSP, boot it */
-	if (state->m_ds4cpu1 != NULL)
-		state->m_ds4cpu1->load_boot_data(state->m_soundcpu->region()->base() + 0x10000, &state->m_soundcpu->region()->u32());
-
-	if (state->m_ds4cpu2 != NULL)
-		state->m_ds4cpu2->load_boot_data(state->m_sounddsp->region()->base() + 0x10000, &state->m_sounddsp->region()->u32());
+	/* predetermine memory regions */
+	state->m_ds3_sdata_memory = (UINT16 *)state->memregion("ds3sdsp_data")->base();
+	state->m_ds3_sdata_memory_size = state->memregion("ds3sdsp_data")->bytes() / 2;
 
 /*
 
@@ -4561,7 +4598,7 @@ GAME( 1991, steeltalg, steeltal, steeltal, steeltal, harddriv_state, steeltal, R
 GAME( 1991, steeltal1, steeltal, steeltal, steeltal, harddriv_state, steeltal1,ROT0, "Atari Games", "Steel Talons (rev 1)", 0 )
 GAME( 1991, steeltalp, steeltal, steeltal, steeltal, harddriv_state, steeltalp,ROT0, "Atari Games", "Steel Talons (prototype)", GAME_NOT_WORKING )
 
-GAME( 1993, strtdriv, 0,        strtdriv, strtdriv, harddriv_state, strtdriv, ROT0, "Atari Games", "Street Drivin' (prototype)", GAME_NO_SOUND )
+GAME( 1993, strtdriv, 0,        strtdriv, strtdriv, harddriv_state, strtdriv, ROT0, "Atari Games", "Street Drivin' (prototype)", 0 )
 
-GAME( 1993, hdrivair,  0,        hdrivair, hdrivair, harddriv_state, hdrivair, ROT0, "Atari Games", "Hard Drivin's Airborne (prototype)", GAME_NO_SOUND )
-GAME( 1993, hdrivairp, hdrivair, hdrivair, hdrivair, harddriv_state, hdrivairp,ROT0, "Atari Games", "Hard Drivin's Airborne (prototype, early rev)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1993, hdrivair,  0,        hdrivair, hdrivair, harddriv_state, hdrivair, ROT0, "Atari Games", "Hard Drivin's Airborne (prototype)", GAME_IMPERFECT_SOUND )
+GAME( 1993, hdrivairp, hdrivair, hdrivair, hdrivair, harddriv_state, hdrivairp,ROT0, "Atari Games", "Hard Drivin's Airborne (prototype, early rev)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

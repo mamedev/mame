@@ -9,6 +9,7 @@
 #include "cpu/tms32010/tms32010.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/dsp32/dsp32.h"
+#include "sound/dac.h"
 #include "machine/atarigen.h"
 
 #define HARDDRIV_MASTER_CLOCK	XTAL_32MHz
@@ -27,17 +28,24 @@ public:
 		  m_sounddsp(*this, "sounddsp"),
 		  m_jsacpu(*this, "jsacpu"),
 		  m_dsp32(*this, "dsp32"),
-		  m_ds4cpu1(*this, "ds4cpu1"),
-		  m_ds4cpu2(*this, "ds4cpu2"),
+		  m_ds3sdsp(*this, "ds3sdsp"),
+		  m_ds3xdsp(*this, "ds3xdsp"),
+		  m_ds3dac1(*this, "ds3dac1"),
+		  m_ds3dac2(*this, "ds3dac2"),
 		  m_msp_ram(*this, "msp_ram"),
 		  m_adsp_data_memory(*this, "adsp_data"),
 		  m_adsp_pgm_memory(*this, "adsp_pgm_memory"),
+		  m_ds3sdsp_data_memory(*this, "ds3sdsp_data"),
+		  m_ds3sdsp_pgm_memory(*this, "ds3sdsp_pgm"),
+		  m_ds3xdsp_pgm_memory(*this, "ds3xdsp_pgm"),
 		  m_sounddsp_ram(*this, "sounddsp_ram"),
 		  m_gsp_vram(*this, "gsp_vram", 16),
 		  m_gsp_control_lo(*this, "gsp_control_lo"),
 		  m_gsp_control_hi(*this, "gsp_control_hi"),
 		  m_gsp_paletteram_lo(*this, "gsp_palram_lo"),
-		  m_gsp_paletteram_hi(*this, "gsp_palram_hi") { }
+		  m_gsp_paletteram_hi(*this, "gsp_palram_hi"),
+		  m_ds3sdsp_internal_timer(*this, "ds3sdsp_timer"),
+		  m_ds3xdsp_internal_timer(*this, "ds3xdsp_timer") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms34010_device> m_gsp;
@@ -47,8 +55,10 @@ public:
 	optional_device<cpu_device> m_sounddsp;
 	optional_device<cpu_device> m_jsacpu;
 	optional_device<dsp32c_device> m_dsp32;
-	optional_device<adsp2105_device> m_ds4cpu1;
-	optional_device<adsp2105_device> m_ds4cpu2;
+	optional_device<adsp2105_device> m_ds3sdsp;
+	optional_device<adsp2105_device> m_ds3xdsp;
+	optional_device<dac_device> m_ds3dac1;
+	optional_device<dac_device> m_ds3dac2;
 
 	UINT8					m_hd34010_host_access;
 	UINT8					m_dsk_pio_access;
@@ -62,6 +72,10 @@ public:
 
 	optional_shared_ptr<UINT16> m_adsp_data_memory;
 	optional_shared_ptr<UINT32> m_adsp_pgm_memory;
+
+	optional_shared_ptr<UINT16> m_ds3sdsp_data_memory;
+	optional_shared_ptr<UINT32> m_ds3sdsp_pgm_memory;
+	optional_shared_ptr<UINT32> m_ds3xdsp_pgm_memory;
 
 	UINT16 *				m_gsp_protection;
 
@@ -95,6 +109,7 @@ public:
 	UINT8					m_gsp_irq_state;
 	UINT8					m_msp_irq_state;
 	UINT8					m_adsp_irq_state;
+	UINT8					m_ds3sdsp_irq_state;
 	UINT8					m_duart_irq_state;
 
 	UINT8					m_last_gsp_shiftreg;
@@ -114,6 +129,9 @@ public:
 	UINT32					m_sim_memory_size;
 	UINT16					m_som_memory[0x8000/2];
 	UINT16 *				m_adsp_pgm_memory_word;
+	
+	UINT16 *				m_ds3_sdata_memory;
+	UINT32					m_ds3_sdata_memory_size;
 
 	UINT8					m_ds3_gcmd;
 	UINT8					m_ds3_gflag;
@@ -125,6 +143,25 @@ public:
 	UINT16					m_ds3_gdata;
 	UINT16					m_ds3_g68data;
 	UINT32					m_ds3_sim_address;
+	
+	UINT8					m_ds3_scmd;
+	UINT8					m_ds3_sflag;
+	UINT8					m_ds3_s68irqs;
+	UINT8					m_ds3_sfirqs;
+	UINT8					m_ds3_s68flag;
+	UINT8					m_ds3_sreset;
+	UINT16					m_ds3_sdata;
+	UINT16					m_ds3_s68data;
+	UINT32					m_ds3_sdata_address;
+	UINT16					m_ds3sdsp_regs[32];
+	UINT16					m_ds3sdsp_timer_en;
+	UINT16					m_ds3sdsp_sdata;
+	optional_device<timer_device> m_ds3sdsp_internal_timer;
+
+	UINT16					m_ds3xdsp_regs[32];
+	UINT16					m_ds3xdsp_timer_en;
+	UINT16					m_ds3xdsp_sdata;
+	optional_device<timer_device> m_ds3xdsp_internal_timer;
 
 	UINT16					m_adc_control;
 	UINT8					m_adc8_select;
@@ -281,22 +318,47 @@ DECLARE_READ16_HANDLER( hd68k_adsp_irq_state_r );
 DECLARE_READ16_HANDLER( hdadsp_special_r );
 DECLARE_WRITE16_HANDLER( hdadsp_special_w );
 
-/* DS III board */
-DECLARE_WRITE16_HANDLER( hd68k_ds3_control_w );
-DECLARE_READ16_HANDLER( hd68k_ds3_girq_state_r );
-DECLARE_READ16_HANDLER( hd68k_ds3_sirq_state_r );
-DECLARE_READ16_HANDLER( hd68k_ds3_gdata_r );
-DECLARE_WRITE16_HANDLER( hd68k_ds3_gdata_w );
-DECLARE_READ16_HANDLER( hd68k_ds3_sdata_r );
-DECLARE_WRITE16_HANDLER( hd68k_ds3_sdata_w );
+/* DS III/IV board */
+TIMER_DEVICE_CALLBACK( ds3sdsp_internal_timer_callback );
+void hdds3sdsp_timer_enable_callback(adsp21xx_device &device, int enable);
 
-DECLARE_READ16_HANDLER( hdds3_special_r );
-DECLARE_WRITE16_HANDLER( hdds3_special_w );
-DECLARE_READ16_HANDLER( hdds3_control_r );
-DECLARE_WRITE16_HANDLER( hdds3_control_w );
+void hdds3sdsp_serial_tx_callback(adsp21xx_device &device, int port, INT32 data);
+INT32 hdds3sdsp_serial_rx_callback(adsp21xx_device &device, int port);
 
-DECLARE_READ16_HANDLER( hd68k_ds3_program_r );
-DECLARE_WRITE16_HANDLER( hd68k_ds3_program_w );
+TIMER_DEVICE_CALLBACK( ds3xdsp_internal_timer_callback );
+void hdds3xdsp_timer_enable_callback(adsp21xx_device &device, int enable);
+
+void hdds3xdsp_serial_tx_callback(adsp21xx_device &device, int port, INT32 data);
+INT32 hdds3xdsp_serial_rx_callback(adsp21xx_device &device, int port);
+
+WRITE16_HANDLER( hd68k_ds3_control_w );
+READ16_HANDLER( hd68k_ds3_girq_state_r );
+
+READ16_HANDLER( hd68k_ds3_gdata_r );
+WRITE16_HANDLER( hd68k_ds3_gdata_w );
+
+READ16_HANDLER( hdds3_special_r );
+WRITE16_HANDLER( hdds3_special_w );
+READ16_HANDLER( hdds3_control_r );
+WRITE16_HANDLER( hdds3_control_w );
+
+READ16_HANDLER( hd68k_ds3_program_r );
+WRITE16_HANDLER( hd68k_ds3_program_w );
+
+
+READ16_HANDLER( hd68k_ds3_sdata_r );
+WRITE16_HANDLER( hd68k_ds3_sdata_w );
+WRITE16_HANDLER( hd68k_ds3_sirq_clear_w );
+READ16_HANDLER( hd68k_ds3_sirq_state_r );
+
+READ16_HANDLER( hdds3_sdsp_special_r );
+WRITE16_HANDLER( hdds3_sdsp_special_w );
+
+READ16_HANDLER( hdds3_sdsp_control_r );
+WRITE16_HANDLER( hdds3_sdsp_control_w );
+READ16_HANDLER( hdds3_xdsp_control_r );
+WRITE16_HANDLER( hdds3_xdsp_control_w );
+
 
 /* DSK board */
 void hddsk_update_pif(dsp32c_device &device, UINT32 pins);
