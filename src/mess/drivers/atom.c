@@ -678,7 +678,7 @@ struct atom_cart_range
 
 static const struct atom_cart_range atom_cart_table[] =
 {
-	{ "cart", 0x0000, "a000" },
+	{ ":cart", 0x0000, "a000" },
 	{ "a0",   0x0000, "a000" },
 	{ "a1",   0x1000, "a000" },
 	{ "a2",   0x2000, "a000" },
@@ -717,6 +717,9 @@ static DEVICE_IMAGE_LOAD( atom_cart )
 	}
 
 	this_cart = atom_cart;
+
+	if( !this_cart->tag )
+		fatalerror("tag '%s' could not be found\n", image.device().tag());
 
 	if (image.software_entry() == NULL)
 	{
