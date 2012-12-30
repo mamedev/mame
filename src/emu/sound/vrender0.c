@@ -12,30 +12,6 @@ reverb
 interrupts
 *************/
 
-struct vr0_state
-{
-	UINT32 *TexBase;
-	UINT32 *FBBase;
-	UINT32 SOUNDREGS[0x10000/4];
-	vr0_interface Intf;
-	sound_stream * stream;
-};
-
-INLINE vr0_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == VRENDER0);
-	return (vr0_state *)downcast<vrender0_device *>(device)->token();
-}
-
-static void VR0_RenderAudio(vr0_state *VR0, int nsamples,stream_sample_t *l,stream_sample_t *r);
-
-static STREAM_UPDATE( VR0_Update )
-{
-	vr0_state *VR0 = (vr0_state *)param;
-	VR0_RenderAudio(VR0, samples,outputs[0],outputs[1]);
-}
-
 //Correct table thanks to Evoga
 //they left a ulaw<->linear conversion tool inside the roms
 static const unsigned short ULawTo16[]=
@@ -75,16 +51,16 @@ static const unsigned short ULawTo16[]=
 };
 
 
-#define STATUS			VR0->SOUNDREGS[0x404/4]
-#define CURSADDR(chan)	(VR0->SOUNDREGS[(0x20/4)*chan+0x00])
-#define DSADDR(chan)	((VR0->SOUNDREGS[(0x20/4)*chan+0x08/4]>>0)&0xffff)
-#define LOOPBEGIN(chan)	(VR0->SOUNDREGS[(0x20/4)*chan+0x0c/4]&0x3fffff)
-#define LOOPEND(chan)	(VR0->SOUNDREGS[(0x20/4)*chan+0x10/4]&0x3fffff)
-#define ENVVOL(chan)	(VR0->SOUNDREGS[(0x20/4)*chan+0x04/4]&0xffffff)
+#define STATUS			m_SOUNDREGS[0x404/4]
+#define CURSADDR(chan)	(m_SOUNDREGS[(0x20/4)*chan+0x00])
+#define DSADDR(chan)	((m_SOUNDREGS[(0x20/4)*chan+0x08/4]>>0)&0xffff)
+#define LOOPBEGIN(chan)	(m_SOUNDREGS[(0x20/4)*chan+0x0c/4]&0x3fffff)
+#define LOOPEND(chan)	(m_SOUNDREGS[(0x20/4)*chan+0x10/4]&0x3fffff)
+#define ENVVOL(chan)	(m_SOUNDREGS[(0x20/4)*chan+0x04/4]&0xffffff)
 
 /*
-#define GETSOUNDREG16(Chan,Offs) space.read_word(VR0->Intf.reg_base+0x20*Chan+Offs)
-#define GETSOUNDREG32(Chan,Offs) space.read_dword(VR0->Intf.reg_base+0x20*Chan+Offs)
+#define GETSOUNDREG16(Chan,Offs) space.read_word(m_Intf.reg_base+0x20*Chan+Offs)
+#define GETSOUNDREG32(Chan,Offs) space.read_dword(m_Intf.reg_base+0x20*Chan+Offs)
 
 #define CURSADDR(chan)  GETSOUNDREG32(chan,0x00)
 #define DSADDR(chan)    GETSOUNDREG16(chan,0x08)
@@ -92,31 +68,66 @@ static const unsigned short ULawTo16[]=
 #define LOOPEND(chan)   (GETSOUNDREG32(chan,0x10)&0x3fffff)
 #define ENVVOL(chan)    (GETSOUNDREG32(chan,0x04)&0xffffff)
 */
-void vr0_snd_set_areas(device_t *device,UINT32 *texture,UINT32 *frame)
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+const device_type VRENDER0 = &device_creator<vrender0_device>;
+
+//-------------------------------------------------
+//  vrender0_device - constructor
+//-------------------------------------------------
+
+vrender0_device::vrender0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, VRENDER0, "VRender0", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_TexBase(NULL),
+	  m_FBBase(NULL),
+	  m_stream(NULL)
 {
-	vr0_state *VR0 = get_safe_token(device);
-	VR0->TexBase=texture;
-	VR0->FBBase=frame;
 }
 
-static DEVICE_START( vrender0 )
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void vrender0_device::device_start()
 {
-	const vr0_interface *intf;
-	vr0_state *VR0 = get_safe_token(device);
+	const vr0_interface *intf = (const vr0_interface *)static_config();
 
-	intf = (const vr0_interface *)device->static_config();
+	memcpy(&(m_Intf),intf,sizeof(vr0_interface));
+	memset(m_SOUNDREGS,0,sizeof(m_SOUNDREGS));
 
-	memcpy(&(VR0->Intf),intf,sizeof(vr0_interface));
-	memset(VR0->SOUNDREGS,0,sizeof(VR0->SOUNDREGS));
+	m_stream = stream_alloc(0, 2, 44100);
 
-	VR0->stream = device->machine().sound().stream_alloc(*device, 0, 2, 44100, VR0, VR0_Update);
-
-	device->save_item(NAME(VR0->SOUNDREGS));
+	save_item(NAME(m_SOUNDREGS));
 }
 
-WRITE32_DEVICE_HANDLER(vr0_snd_write)
+
+//-------------------------------------------------
+//  sound_stream_update - handle update requests
+//  for our sound stream
+//-------------------------------------------------
+
+void vrender0_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	vr0_state *VR0 = get_safe_token(device);
+	VR0_RenderAudio(samples, outputs[0], outputs[1]);
+}
+
+
+
+READ32_MEMBER(vrender0_device::vr0_snd_read)
+{
+	return m_SOUNDREGS[offset];
+}
+
+
+WRITE32_MEMBER(vrender0_device::vr0_snd_write)
+{
 	if(offset==0x404/4)
 	{
 		data&=0xffff;
@@ -134,34 +145,35 @@ WRITE32_DEVICE_HANDLER(vr0_snd_write)
 	}
 	else
 	{
-		COMBINE_DATA(&VR0->SOUNDREGS[offset]);
+		COMBINE_DATA(&m_SOUNDREGS[offset]);
 	}
 }
 
 
-READ32_DEVICE_HANDLER(vr0_snd_read)
+void vrender0_device::set_areas(UINT32 *texture, UINT32 *frame)
 {
-	vr0_state *VR0 = get_safe_token(device);
-	return VR0->SOUNDREGS[offset];
+	m_TexBase=texture;
+	m_FBBase=frame;
 }
 
-static void VR0_RenderAudio(vr0_state *VR0, int nsamples,stream_sample_t *l,stream_sample_t *r)
+
+void vrender0_device::VR0_RenderAudio(int nsamples, stream_sample_t *l, stream_sample_t *r)
 {
 	INT16 *SAMPLES;
 	UINT32 st=STATUS;
 	signed int lsample=0,rsample=0;
-	UINT32 CLK=(VR0->SOUNDREGS[0x600/4]>>0)&0xff;
-	UINT32 NCH=(VR0->SOUNDREGS[0x600/4]>>8)&0xff;
-	UINT32 CT1=(VR0->SOUNDREGS[0x600/4]>>16)&0xff;
-	UINT32 CT2=(VR0->SOUNDREGS[0x600/4]>>24)&0xff;
+	UINT32 CLK=(m_SOUNDREGS[0x600/4]>>0)&0xff;
+	UINT32 NCH=(m_SOUNDREGS[0x600/4]>>8)&0xff;
+	UINT32 CT1=(m_SOUNDREGS[0x600/4]>>16)&0xff;
+	UINT32 CT2=(m_SOUNDREGS[0x600/4]>>24)&0xff;
 	int div;
 	int s;
 
 
 	if(CT1&0x20)
-		SAMPLES=(INT16 *)VR0->TexBase;
+		SAMPLES=(INT16 *)m_TexBase;
 	else
-		SAMPLES=(INT16 *)VR0->FBBase;
+		SAMPLES=(INT16 *)m_FBBase;
 
 	if(CLK)
 		div=((30<<16)|0x8000)/(CLK+1);
@@ -177,9 +189,9 @@ static void VR0_RenderAudio(vr0_state *VR0, int nsamples,stream_sample_t *l,stre
 			signed int sample;
 			UINT32 cur=CURSADDR(i);
 			UINT32 a=LOOPBEGIN(i)+(cur>>10);
-			UINT8 Mode=VR0->SOUNDREGS[(0x20/4)*i+0x8/4]>>24;
-			signed int LVOL=VR0->SOUNDREGS[(0x20/4)*i+0xc/4]>>24;
-			signed int RVOL=VR0->SOUNDREGS[(0x20/4)*i+0x10/4]>>24;
+			UINT8 Mode=m_SOUNDREGS[(0x20/4)*i+0x8/4]>>24;
+			signed int LVOL=m_SOUNDREGS[(0x20/4)*i+0xc/4]>>24;
+			signed int RVOL=m_SOUNDREGS[(0x20/4)*i+0x10/4]>>24;
 
 			INT32 DSADD=(DSADDR(i)*div)>>16;
 
@@ -236,44 +248,3 @@ static void VR0_RenderAudio(vr0_state *VR0, int nsamples,stream_sample_t *l,stre
 		r[s]=rsample;
 	}
 }
-
-
-const device_type VRENDER0 = &device_creator<vrender0_device>;
-
-vrender0_device::vrender0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, VRENDER0, "VRender0", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(vr0_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void vrender0_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void vrender0_device::device_start()
-{
-	DEVICE_START_NAME( vrender0 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void vrender0_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
-}
-
-

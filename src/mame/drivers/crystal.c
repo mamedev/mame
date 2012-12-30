@@ -510,7 +510,7 @@ static ADDRESS_MAP_START( crystal_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_SHARE("vidregs")
 	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_SHARE("textureram")
 	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_SHARE("frameram")
-	AM_RANGE(0x04800000, 0x04800fff) AM_DEVREADWRITE_LEGACY("vrender", vr0_snd_read, vr0_snd_write)
+	AM_RANGE(0x04800000, 0x04800fff) AM_DEVREADWRITE("vrender", vrender0_device, vr0_snd_read, vr0_snd_write)
 
 	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
 	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
@@ -631,7 +631,7 @@ void crystal_state::machine_reset()
 		m_Timer[i]->adjust(attotime::never);
 	}
 
-	vr0_snd_set_areas(machine().device("vrender"), m_textureram, m_frameram);
+	dynamic_cast<vrender0_device*>(machine().device("vrender"))->set_areas(m_textureram, m_frameram);
 #ifdef IDLE_LOOP_SPEEDUP
 	m_FlipCntRead = 0;
 #endif
@@ -864,7 +864,7 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("vrender", VRENDER0, 0)
+	MCFG_SOUND_VRENDER0_ADD("vrender", 0)
 	MCFG_SOUND_CONFIG(vr0_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
