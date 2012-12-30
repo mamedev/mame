@@ -9,7 +9,7 @@
 
 #include "machine/ins8250.h"
 #include "machine/i8255.h"
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 #include "machine/serial.h"
 #include "machine/ser_mouse.h"
 #include "machine/pc_kbdc.h"
@@ -20,13 +20,14 @@ class pc_state : public driver_device
 public:
 	pc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_dma8237(*this, "dma8237")
 		, m_pc_kbdc(*this, "pc_kbdc")
 	{
 	}
 
 	cpu_device *m_maincpu;
 	device_t *m_pic8259;
-	device_t *m_dma8237;
+	optional_device<am9517a_device> m_dma8237;
 	device_t *m_pit8253;
 	optional_device<pc_kbdc_device>  m_pc_kbdc;
 
@@ -37,6 +38,7 @@ public:
 	UINT8	m_memboard[4];		/* used only by ec1840 and ec1841 */
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
+	int m_cur_eop;
 	UINT8 m_pc_spkrdata;
 	UINT8 m_pc_input;
 	UINT8 m_pcjr_dor;
@@ -141,12 +143,14 @@ public:
 
 	void fdc_interrupt(bool state);
 	void fdc_dma_drq(bool state);
+	void pc_select_dma_channel(int channel, bool state);
+	void pc_eop_w(int channel, bool state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 
 /*----------- defined in machine/pc.c -----------*/
 
-extern const i8237_interface ibm5150_dma8237_config;
+extern const struct am9517a_interface ibm5150_dma8237_config;
 extern const struct pit8253_config ibm5150_pit8253_config;
 extern const struct pit8253_config pcjr_pit8253_config;
 extern const struct pit8253_config mc1502_pit8253_config;

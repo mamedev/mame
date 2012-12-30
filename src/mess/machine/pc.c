@@ -36,7 +36,7 @@
 #include "imagedev/cassette.h"
 #include "sound/speaker.h"
 
-#include "machine/8237dma.h"
+#include "machine/am9517a.h"
 #include "machine/wd17xx.h"
 
 #include "machine/ram.h"
@@ -167,28 +167,29 @@ WRITE8_MEMBER(pc_state::pc_page_w)
 
 WRITE_LINE_MEMBER(pc_state::pc_dma_hrq_changed)
 {
-	device_t *device = machine().device("dma8237");
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
-	i8237_hlda_w( device, state );
+	m_dma8237->hack_w(state);
 }
 
 
 READ8_MEMBER(pc_state::pc_dma_read_byte)
 {
-	UINT8 result;
+	if(m_dma_channel == -1)
+		return 0xff;
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0x0F0000;
 
-	result = prog_space.read_byte( page_offset + offset);
-	return result;
+	return prog_space.read_byte( page_offset + offset);
 }
 
 
 WRITE8_MEMBER(pc_state::pc_dma_write_byte)
 {
+	if(m_dma_channel == -1)
+		return;
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0x0F0000;
@@ -223,26 +224,50 @@ WRITE8_MEMBER(pc_state::pc_dma8237_hdc_dack_w)
 WRITE8_MEMBER(pc_state::pc_dma8237_0_dack_w)
 {
 	m_u73_q2 = 0;
-	i8237_dreq0_w( m_dma8237, m_u73_q2 );
+	m_dma8237->dreq0_w( m_u73_q2 );
+}
+
+void pc_state::pc_eop_w(int channel, bool state)
+{
+	switch(channel)
+	{
+		case 2:
+			machine().device<pc_fdc_interface>("fdc")->tc_w(state);
+			break;
+		case 0:
+		case 1:
+		case 3:
+		default:
+			break;
+	}
 }
 
 
 WRITE_LINE_MEMBER(pc_state::pc_dma8237_out_eop)
 {
-	machine().device<pc_fdc_interface>("fdc")->tc_w(state == ASSERT_LINE);
+	m_cur_eop = state == ASSERT_LINE;
+	if(m_dma_channel != -1 && m_cur_eop)
+		pc_eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void set_dma_channel(running_machine &machine, int channel, int state)
+void pc_state::pc_select_dma_channel(int channel, bool state)
 {
-	pc_state *st = machine.driver_data<pc_state>();
+	if(!state) {
+		m_dma_channel = channel;
+		if(m_cur_eop)
+			pc_eop_w(channel, ASSERT_LINE );
 
-	if (!state) st->m_dma_channel = channel;
+	} else if(m_dma_channel == channel) {
+		m_dma_channel = -1;
+		if(m_cur_eop)
+			pc_eop_w(channel, CLEAR_LINE );
+	}
 }
 
-WRITE_LINE_MEMBER(pc_state::pc_dack0_w){ set_dma_channel(machine(), 0, state); }
-WRITE_LINE_MEMBER(pc_state::pc_dack1_w){ set_dma_channel(machine(), 1, state); }
-WRITE_LINE_MEMBER(pc_state::pc_dack2_w){ set_dma_channel(machine(), 2, state); }
-WRITE_LINE_MEMBER(pc_state::pc_dack3_w){ set_dma_channel(machine(), 3, state); }
+WRITE_LINE_MEMBER(pc_state::pc_dack0_w){ pc_select_dma_channel(0, state); }
+WRITE_LINE_MEMBER(pc_state::pc_dack1_w){ pc_select_dma_channel(1, state); }
+WRITE_LINE_MEMBER(pc_state::pc_dack2_w){ pc_select_dma_channel(2, state); }
+WRITE_LINE_MEMBER(pc_state::pc_dack3_w){ pc_select_dma_channel(3, state); }
 
 I8237_INTERFACE( ibm5150_dma8237_config )
 {
@@ -354,7 +379,7 @@ WRITE_LINE_MEMBER(pc_state::ibm5150_pit8253_out1_changed)
 	if ( m_out1 == 0 && state == 1 && m_u73_q2 == 0 )
 	{
 		m_u73_q2 = 1;
-		i8237_dreq0_w( m_dma8237, m_u73_q2 );
+		m_dma8237->dreq0_w( m_u73_q2 );
 	}
 	m_out1 = state;
 }
@@ -1135,7 +1160,7 @@ void pc_state::fdc_interrupt(bool state)
 
 void pc_state::fdc_dma_drq(bool state)
 {
-	i8237_dreq2_w( m_dma8237, state);
+	m_dma8237->dreq2_w( state );
 }
 
 static void pc_set_irq_line(running_machine &machine,int irq, int state)
@@ -1438,8 +1463,9 @@ static IRQ_CALLBACK(pc_irq_callback)
 MACHINE_START_MEMBER(pc_state,pc)
 {
 	m_pic8259 = machine().device("pic8259");
-	m_dma8237 = machine().device("dma8237");
 	m_pit8253 = machine().device("pit8253");
+	m_maincpu = machine().device<cpu_device>("maincpu" );
+	m_maincpu->set_irq_acknowledge_callback(pc_irq_callback);
 
 	pc_fdc_interface *fdc = machine().device<pc_fdc_interface>("fdc");
 	fdc->setup_intrq_cb(pc_fdc_interface::line_cb(FUNC(pc_state::fdc_interrupt), this));
@@ -1450,14 +1476,13 @@ MACHINE_START_MEMBER(pc_state,pc)
 MACHINE_RESET_MEMBER(pc_state,pc)
 {
 	device_t *speaker = machine().device(SPEAKER_TAG);
-	m_maincpu = machine().device<cpu_device>("maincpu" );
-	m_maincpu->set_irq_acknowledge_callback(pc_irq_callback);
 
 	m_u73_q2 = 0;
 	m_out1 = 0;
 	m_pc_spkrdata = 0;
 	m_pc_input = 1;
-	m_dma_channel = 0;
+	m_dma_channel = -1;
+	m_cur_eop = 0;
 	memset(m_dma_offset,0,sizeof(m_dma_offset));
 	m_ppi_portc_switch_high = 0;
 	m_ppi_speaker = 0;
@@ -1479,7 +1504,6 @@ MACHINE_START_MEMBER(pc_state,mc1502)
 	m_maincpu->set_irq_acknowledge_callback(pc_irq_callback);
 
 	m_pic8259 = machine().device("pic8259");
-	m_dma8237 = NULL;
 	m_pit8253 = machine().device("pit8253");
 
 	/*
@@ -1507,7 +1531,6 @@ MACHINE_START_MEMBER(pc_state,pcjr)
 
 
 	m_pic8259 = machine().device("pic8259");
-	m_dma8237 = NULL;
 	m_pit8253 = machine().device("pit8253");
 }
 
@@ -1518,7 +1541,7 @@ MACHINE_RESET_MEMBER(pc_state,pcjr)
 	m_out1 = 0;
 	m_pc_spkrdata = 0;
 	m_pc_input = 1;
-	m_dma_channel = 0;
+	m_dma_channel = -1;
 	memset(m_memboard,0xc,sizeof(m_memboard));	// check
 	memset(m_dma_offset,0,sizeof(m_dma_offset));
 	m_ppi_portc_switch_high = 0;

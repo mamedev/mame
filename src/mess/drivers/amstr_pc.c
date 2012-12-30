@@ -57,7 +57,6 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 #include "formats/pc_dsk.h"
 #include "formats/mfi_dsk.h"
 
-#include "machine/8237dma.h"
 #include "sound/sn76496.h"
 
 #include "machine/ram.h"
@@ -81,7 +80,7 @@ static ADDRESS_MAP_START( ppc640_map, AS_PROGRAM, 16, pc_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ppc512_io, AS_IO, 16, pc_state )
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8_LEGACY("dma8237", i8237_r, i8237_w, 0xffff)
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE8_LEGACY(pc1640_port60_r, pc1640_port60_w, 0xffff)
@@ -110,7 +109,7 @@ static ADDRESS_MAP_START( pc200_map, AS_PROGRAM, 16, pc_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pc200_io, AS_IO, 16, pc_state )
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8_LEGACY("dma8237", i8237_r, i8237_w, 0xffff)
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8_LEGACY("pic8259", pic8259_r, pic8259_w, 0xffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8253", pit8253_r, pit8253_w, 0xffff)
 	AM_RANGE(0x0060, 0x0065) AM_READWRITE8_LEGACY(pc1640_port60_r, pc1640_port60_w, 0xffff)
