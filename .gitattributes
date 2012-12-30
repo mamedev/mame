@@ -7615,6 +7615,7 @@ src/mess/video/dai.c svneol=native#text/plain
 src/mess/video/dgn_beta.c svneol=native#text/plain
 src/mess/video/dl1416.c svneol=native#text/plain
 src/mess/video/dl1416.h svneol=native#text/plain
+src/mess/video/ef9341_chargen.h svneol=native#text/plain
 src/mess/video/ef9345.c svneol=native#text/plain
 src/mess/video/ef9345.h svneol=native#text/plain
 src/mess/video/electron.c svneol=native#text/plain

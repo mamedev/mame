@@ -12,6 +12,7 @@
 
 #include "emu.h"
 #include "includes/odyssey2.h"
+#include "video/ef9341_chargen.h"
 
 
 #define COLLISION_SPRITE_0			0x01
@@ -60,7 +61,17 @@ const UINT8 odyssey2_colors[] =
 	0x50,0xAE,0xFF,   /* Blue */
 	0xa9,0x80,0xff,   /* Violet */
 	0x82,0xfb,0xdb,   /* Lt Grey */
-	0xff,0xff,0xff    /* White */
+	0xff,0xff,0xff,   /* White */
+
+	/* EF9340/EF9341 colors */
+	0x00, 0x00, 0x00,
+	0x00, 0x00, 0xFF,
+	0x00, 0xFF, 0x00,
+	0x00, 0xFF, 0xFF,
+	0xFF, 0x00, 0x00,
+	0xFF, 0x00, 0xFF,
+	0xFF, 0xFF, 0x00,
+	0xFF, 0xFF, 0xFF
 };
 
 static const UINT8 o2_shape[0x40][8]={
@@ -134,7 +145,7 @@ void odyssey2_state::palette_init()
 {
 	int i;
 
-	for ( i = 0; i < 24; i++ )
+	for ( i = 0; i < 32; i++ )
 	{
 		palette_set_color_rgb( machine(), i, odyssey2_colors[i*3], odyssey2_colors[i*3+1], odyssey2_colors[i*3+2] );
 	}
@@ -554,6 +565,10 @@ void odyssey2_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		case TIMER_LINE:
 			// handle i824x line timer
 			i824x_scanline(vpos);
+			if ( m_g7400 )
+			{
+				ef9340_scanline(vpos);
+			}
 			break;
 
 		case TIMER_HBLANK:
@@ -708,17 +723,17 @@ STREAM_UPDATE( odyssey2_sh_update )
     Thomson EF9340/EF9341 extra chips in the g7400
  */
 
-UINT16 odyssey2_state::ef9340_get_c_addr()
+UINT16 odyssey2_state::ef9340_get_c_addr(UINT8 x, UINT8 y)
 {
-	if ( ( m_ef9340.Y & 0x0C ) == 0x0C )
+	if ( ( y & 0x0c ) == 0x0c )
 	{
-		return 0x318 | ( ( m_ef9340.X & 0x38 ) << 2 ) | ( m_ef9340.X & 0x07 );
+		return 0x318 | ( ( x & 0x38 ) << 2 ) | ( x & 0x07 );
 	}
-	if ( m_ef9340.X & 0x20 )
+	if ( x & 0x20 )
 	{
-		return 0x300 | ( ( m_ef9340.Y & 0x07 ) << 5 ) | ( m_ef9340.Y & 0x18 ) | ( m_ef9340.X & 0x07 );
+		return 0x380 | ( ( y & 0x07 ) << 5 ) | ( y & 0x18 ) | ( x & 0x07 );
 	}
-	return ( m_ef9340.Y << 5 ) | m_ef9340.X;
+	return y << 5 | x;
 }
 
 
@@ -849,6 +864,7 @@ void odyssey2_state::ef9341_w( UINT8 command, UINT8 b, UINT8 data )
 	}
 }
 
+
 UINT8 odyssey2_state::ef9341_r( UINT8 command, UINT8 b )
 {
 	UINT8	data = 0xFF;
@@ -880,7 +896,7 @@ UINT8 odyssey2_state::ef9341_r( UINT8 command, UINT8 b )
 }
 
 
-void odyssey2_state::er9340_scanline(int vpos)
+void odyssey2_state::ef9340_scanline(int vpos)
 {
 	if ( vpos < m_start_vpos )
 	{
@@ -889,6 +905,55 @@ void odyssey2_state::er9340_scanline(int vpos)
 
 	if ( vpos < m_start_vblank )
 	{
+		int y = vpos - m_start_vpos;
+		int y_row, slice;
+
+		if ( y < 10 )
+		{
+			// Displaying service row
+			y_row = 31;
+			slice = y;
+		}
+		else
+		{
+			// Displaying regular row
+			y_row = (y - 10) / 10;
+			slice = (y - 10) % 10;
+		}
+		for ( int x = 0; x < 40; x++ )
+		{
+			UINT16 addr = ef9340_get_c_addr( x, y_row );
+			UINT8 a = m_ef934x_ram_a[addr];
+			UINT8 b = m_ef934x_ram_b[addr];
+			UINT8 fg = 24;
+			UINT8 bg = 24;
+			UINT8 char_data = 0x00;
+
+			if ( a & 0x80 )
+			{
+				// Graphics
+			}
+			else
+			{
+				// Alphannumeric
+				if ( b & 0x80 )
+				{
+					// Special (DEL or Extension)
+				}
+				else
+				{
+					// Normal
+					char_data = ef9341_char_set[0][b & 0x7f][slice];
+					fg = 24 + ( a & 0x07 );
+				}
+			}
+
+			for ( int i = 0; i < 8; i++ )
+			{
+				m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN*2 + x*8 + i ) = (char_data & 0x80) ? fg : bg;
+				char_data <<= 1;
+			}
+		}
 	}
 }
 

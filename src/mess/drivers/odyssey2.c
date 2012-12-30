@@ -202,7 +202,7 @@ static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
 	MCFG_GFXDECODE( odyssey2 )
-	MCFG_PALETTE_LENGTH(24)
+	MCFG_PALETTE_LENGTH(32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -231,7 +231,7 @@ static MACHINE_CONFIG_START( videopac, odyssey2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
 	MCFG_GFXDECODE( odyssey2 )
-	MCFG_PALETTE_LENGTH(24)
+	MCFG_PALETTE_LENGTH(32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -261,7 +261,7 @@ static MACHINE_CONFIG_START( g7400, odyssey2_state )
 	MCFG_VIDEO_START_OVERRIDE(odyssey2_state,g7400)
 
 	MCFG_GFXDECODE( odyssey2 )
-	MCFG_PALETTE_LENGTH(24)
+	MCFG_PALETTE_LENGTH(32)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

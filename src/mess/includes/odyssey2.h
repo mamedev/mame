@@ -136,13 +136,14 @@ protected:
 	UINT8	m_ef934x_ext_char_ram[1024];
 	bool	m_g7400;
 
-	inline UINT16 ef9340_get_c_addr();
+	inline UINT16 ef9340_get_c_addr(UINT8 x, UINT8 y);
+	inline UINT16 ef9340_get_c_addr() { return ef9340_get_c_addr( m_ef9340.X, m_ef9340.Y ); };
 	inline void ef9340_inc_c();
 	// Calculate the external chargen address for a character and slice
 	inline UINT16 external_chargen_address(UINT8 b, UINT8 slice);
 
 	void i824x_scanline(int vpos);
-	void er9340_scanline(int vpos);
+	void ef9340_scanline(int vpos);
 
 	/* timers */
 	static const device_timer_id TIMER_LINE = 0;
