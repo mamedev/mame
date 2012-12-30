@@ -803,20 +803,20 @@ public:
 	UINT8 current4way() const { return m_current4way; }
 
 	// configuration
-	direction_t set_axis(ioport_field &field);
+	direction_t add_axis(ioport_field &field);
 
 	// updates
 	void frame_update();
 
 private:
 	// internal state
-	digital_joystick *	m_next;					// next joystick in the list
-	int					m_player;				// player number represented
-	int					m_number;				// joystick number represented
-	ioport_field *		m_field[JOYDIR_COUNT];	// input field for each direction
-	UINT8				m_current;				// current value
-	UINT8				m_current4way;			// current 4-way value
-	UINT8				m_previous;				// previous value
+	digital_joystick *			m_next;											// next joystick in the list
+	int							m_player;										// player number represented
+	int							m_number;										// joystick number represented
+	simple_list<simple_list_wrapper<ioport_field> >	m_field[JOYDIR_COUNT];	// potential input fields for each direction
+	UINT8						m_current;										// current value
+	UINT8						m_current4way;									// current 4-way value
+	UINT8						m_previous;										// previous value
 };
 DECLARE_ENUM_OPERATORS(digital_joystick::direction_t)
 

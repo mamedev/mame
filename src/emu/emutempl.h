@@ -274,6 +274,8 @@ template<class _ObjectType>
 class simple_list_wrapper
 {
 public:
+	template<class U> friend class simple_list;
+
 	// construction/destruction
 	simple_list_wrapper(_ObjectType *object)
 		: m_next(NULL),

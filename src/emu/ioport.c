@@ -893,10 +893,10 @@ digital_joystick::digital_joystick(int player, int number)
 //  digital joystick
 //-------------------------------------------------
 
-digital_joystick::direction_t digital_joystick::set_axis(ioport_field &field)
+digital_joystick::direction_t digital_joystick::add_axis(ioport_field &field)
 {
 	direction_t direction = direction_t((field.type() - (IPT_DIGITAL_JOYSTICK_FIRST + 1)) % 4);
-	m_field[direction] = &field;
+	m_field[direction].append(*global_alloc(simple_list_wrapper<ioport_field>(&field)));
 	return direction;
 }
 
@@ -916,10 +916,10 @@ void digital_joystick::frame_update()
 	// read all the associated ports
 	running_machine *machine = NULL;
 	for (direction_t direction = JOYDIR_UP; direction < JOYDIR_COUNT; direction++)
-		if (m_field[direction] != NULL)
+		for (const simple_list_wrapper<ioport_field> *i = m_field[direction].first(); i != NULL; i = i->next())
 		{
-			machine = &m_field[direction]->machine();
-			if (machine->input().seq_pressed(m_field[direction]->seq(SEQ_TYPE_STANDARD)))
+			machine = &i->object()->machine();
+			if (machine->input().seq_pressed(i->object()->seq(SEQ_TYPE_STANDARD)))
 				m_current |= 1 << direction;
 		}
 
@@ -2326,7 +2326,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 	if (field.is_digital_joystick())
 	{
 		joystick = &field.manager().digjoystick(field.player(), (field.type() - (IPT_DIGITAL_JOYSTICK_FIRST + 1)) / 4);
-		joydir = joystick->set_axis(field);
+		joydir = joystick->add_axis(field);
 	}
 
 	// Name keyboard key names
