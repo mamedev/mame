@@ -725,7 +725,7 @@ STREAM_UPDATE( odyssey2_sh_update )
 
 UINT16 odyssey2_state::ef9340_get_c_addr(UINT8 x, UINT8 y)
 {
-	if ( ( y & 0x0c ) == 0x0c )
+	if ( ( y & 0x18 ) == 0x18 )
 	{
 		return 0x318 | ( ( x & 0x38 ) << 2 ) | ( x & 0x07 );
 	}
