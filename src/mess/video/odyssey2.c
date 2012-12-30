@@ -731,7 +731,7 @@ UINT16 odyssey2_state::ef9340_get_c_addr(UINT8 x, UINT8 y)
 	}
 	if ( x & 0x20 )
 	{
-		return 0x380 | ( ( y & 0x07 ) << 5 ) | ( y & 0x18 ) | ( x & 0x07 );
+		return 0x300 | ( ( y & 0x07 ) << 5 ) | ( y & 0x18 ) | ( x & 0x07 );
 	}
 	return y << 5 | x;
 }
