@@ -618,9 +618,9 @@ ADDRESS_MAP_START( qsound_sub_map, AS_PROGRAM, 8, cps_state )	// used by cps2.c 
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	/* banked (contains music data) */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("qsound_ram1")
-	AM_RANGE(0xd000, 0xd002) AM_DEVWRITE_LEGACY("qsound", qsound_w)
+	AM_RANGE(0xd000, 0xd002) AM_DEVWRITE("qsound", qsound_device, qsound_w)
 	AM_RANGE(0xd003, 0xd003) AM_WRITE(qsound_banksw_w)
-	AM_RANGE(0xd007, 0xd007) AM_DEVREAD_LEGACY("qsound", qsound_r)
+	AM_RANGE(0xd007, 0xd007) AM_DEVREAD("qsound", qsound_device, qsound_r)
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("qsound_ram2")
 ADDRESS_MAP_END
 
@@ -3233,7 +3233,7 @@ static MACHINE_CONFIG_DERIVED( qsound, cps1_12MHz )
 	MCFG_DEVICE_REMOVE("2151")
 	MCFG_DEVICE_REMOVE("oki")
 
-	MCFG_SOUND_ADD("qsound", QSOUND, QSOUND_CLOCK)
+	MCFG_QSOUND_ADD("qsound", QSOUND_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

@@ -34,288 +34,118 @@
 #include "emu.h"
 #include "qsound.h"
 
-/*
-Debug defines
-*/
-#define LOG_WAVE	0
+// Debug defines
+#define LOG_WAVE 0
 #define VERBOSE  0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-/* 8 bit source ROM samples */
-typedef INT8 QSOUND_SRC_SAMPLE;
+
+// device type definition
+const device_type QSOUND = &device_creator<qsound_device>;
 
 
-#define QSOUND_CLOCKDIV 166			 /* Clock divider */
-#define QSOUND_CHANNELS 16
-typedef stream_sample_t QSOUND_SAMPLE;
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
 
-struct QSOUND_CHANNEL
+//-------------------------------------------------
+//  qsound_device - constructor
+//-------------------------------------------------
+
+qsound_device::qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, QSOUND, "Q-Sound", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_data(0),
+	  m_stream(NULL),
+	  m_sample_rom_length(0),
+	  m_sample_rom(NULL),
+	  m_frq_ratio(0.0f),
+	  m_fpRawDataL(NULL),
+	  m_fpRawDataR(NULL)
 {
-	INT32 bank;	   /* bank (x16)    */
-	INT32 address;	/* start address */
-	INT32 pitch;	  /* pitch */
-	INT32 reg3;	   /* unknown (always 0x8000) */
-	INT32 loop;	   /* loop address */
-	INT32 end;		/* end address */
-	INT32 vol;		/* master volume */
-	INT32 pan;		/* Pan value */
-	INT32 reg9;	   /* unknown */
-
-	/* Work variables */
-	INT32 key;		/* Key on / key off */
-
-	INT32 lvol;	   /* left volume */
-	INT32 rvol;	   /* right volume */
-	INT32 lastdt;	 /* last sample value */
-	INT32 offset;	 /* current offset counter */
-};
-
-struct qsound_state
-{
-	/* Private variables */
-	sound_stream * stream;				/* Audio stream */
-	struct QSOUND_CHANNEL channel[QSOUND_CHANNELS];
-	int data;				  /* register latch data */
-	QSOUND_SRC_SAMPLE *sample_rom;	/* Q sound sample ROM */
-	UINT32 sample_rom_length;
-
-	int pan_table[33];		 /* Pan volume table */
-	float frq_ratio;		   /* Frequency ratio */
-
-	FILE *fpRawDataL;
-	FILE *fpRawDataR;
-};
-
-INLINE qsound_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == QSOUND);
-	return (qsound_state *)downcast<qsound_device *>(device)->token();
 }
 
 
-/* Function prototypes */
-static STREAM_UPDATE( qsound_update );
-static void qsound_set_command(qsound_state *chip, int data, int value);
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
 
-static DEVICE_START( qsound )
+void qsound_device::device_start()
 {
-	qsound_state *chip = get_safe_token(device);
 	int i;
 
-	chip->sample_rom = (QSOUND_SRC_SAMPLE *)*device->region();
-	chip->sample_rom_length = device->region()->bytes();
+	m_sample_rom = (QSOUND_SRC_SAMPLE *)*region();
+	m_sample_rom_length = region()->bytes();
 
-	memset(chip->channel, 0, sizeof(chip->channel));
+	memset(m_channel, 0, sizeof(m_channel));
 
-	chip->frq_ratio = 16.0;
+	m_frq_ratio = 16.0;
 
 	/* Create pan table */
 	for (i=0; i<33; i++)
 	{
-		chip->pan_table[i]=(int)((256/sqrt(32.0)) * sqrt((double)i));
+		m_pan_table[i]=(int)((256/sqrt(32.0)) * sqrt((double)i));
 	}
 
 	LOG(("Pan table\n"));
 	for (i=0; i<33; i++)
-		LOG(("%02x ", chip->pan_table[i]));
+		LOG(("%02x ", m_pan_table[i]));
 
-	{
-		/* Allocate stream */
-		chip->stream = device->machine().sound().stream_alloc(
-			*device, 0, 2,
-			device->clock() / QSOUND_CLOCKDIV,
-			chip,
-			qsound_update );
-	}
+	/* Allocate stream */
+	m_stream = stream_alloc(0, 2, clock() / QSOUND_CLOCKDIV);
 
 	if (LOG_WAVE)
 	{
-		chip->fpRawDataR=fopen("qsoundr.raw", "w+b");
-		chip->fpRawDataL=fopen("qsoundl.raw", "w+b");
+		m_fpRawDataR=fopen("qsoundr.raw", "w+b");
+		m_fpRawDataL=fopen("qsoundl.raw", "w+b");
 	}
 
 	/* state save */
 	for (i=0; i<QSOUND_CHANNELS; i++)
 	{
-		device->save_item(NAME(chip->channel[i].bank), i);
-		device->save_item(NAME(chip->channel[i].address), i);
-		device->save_item(NAME(chip->channel[i].pitch), i);
-		device->save_item(NAME(chip->channel[i].loop), i);
-		device->save_item(NAME(chip->channel[i].end), i);
-		device->save_item(NAME(chip->channel[i].vol), i);
-		device->save_item(NAME(chip->channel[i].pan), i);
-		device->save_item(NAME(chip->channel[i].key), i);
-		device->save_item(NAME(chip->channel[i].lvol), i);
-		device->save_item(NAME(chip->channel[i].rvol), i);
-		device->save_item(NAME(chip->channel[i].lastdt), i);
-		device->save_item(NAME(chip->channel[i].offset), i);
+		save_item(NAME(m_channel[i].bank), i);
+		save_item(NAME(m_channel[i].address), i);
+		save_item(NAME(m_channel[i].pitch), i);
+		save_item(NAME(m_channel[i].loop), i);
+		save_item(NAME(m_channel[i].end), i);
+		save_item(NAME(m_channel[i].vol), i);
+		save_item(NAME(m_channel[i].pan), i);
+		save_item(NAME(m_channel[i].key), i);
+		save_item(NAME(m_channel[i].lvol), i);
+		save_item(NAME(m_channel[i].rvol), i);
+		save_item(NAME(m_channel[i].lastdt), i);
+		save_item(NAME(m_channel[i].offset), i);
 	}
 }
 
-static DEVICE_STOP( qsound )
+//-------------------------------------------------
+//  device_stop - device-specific stop
+//-------------------------------------------------
+
+void qsound_device::device_stop()
 {
-	qsound_state *chip = get_safe_token(device);
-	if (chip->fpRawDataR)
+	if (m_fpRawDataR)
 	{
-		fclose(chip->fpRawDataR);
+		fclose(m_fpRawDataR);
 	}
-	chip->fpRawDataR = NULL;
-	if (chip->fpRawDataL)
+	m_fpRawDataR = NULL;
+	if (m_fpRawDataL)
 	{
-		fclose(chip->fpRawDataL);
+		fclose(m_fpRawDataL);
 	}
-	chip->fpRawDataL = NULL;
-}
-
-WRITE8_DEVICE_HANDLER( qsound_w )
-{
-	qsound_state *chip = get_safe_token(device);
-	switch (offset)
-	{
-		case 0:
-			chip->data=(chip->data&0xff)|(data<<8);
-			break;
-
-		case 1:
-			chip->data=(chip->data&0xff00)|data;
-			break;
-
-		case 2:
-			qsound_set_command(chip, data, chip->data);
-			break;
-
-		default:
-			logerror("%s: unexpected qsound write to offset %d == %02X\n", device->machine().describe_context(), offset, data);
-			break;
-	}
-}
-
-READ8_DEVICE_HANDLER( qsound_r )
-{
-	/* Port ready bit (0x80 if ready) */
-	return 0x80;
-}
-
-static void qsound_set_command(qsound_state *chip, int data, int value)
-{
-	int ch=0,reg=0;
-	if (data < 0x80)
-	{
-		ch=data>>3;
-		reg=data & 0x07;
-	}
-	else
-	{
-		if (data < 0x90)
-		{
-			ch=data-0x80;
-			reg=8;
-		}
-		else
-		{
-			if (data >= 0xba && data < 0xca)
-			{
-				ch=data-0xba;
-				reg=9;
-			}
-			else
-			{
-				/* Unknown registers */
-				ch=99;
-				reg=99;
-			}
-		}
-	}
-
-	switch (reg)
-	{
-		case 0: /* Bank */
-			ch=(ch+1)&0x0f;	/* strange ... */
-			chip->channel[ch].bank=(value&0x7f)<<16;
-#ifdef MAME_DEBUG
-			if (!(value & 0x8000))
-				popmessage("Register3=%04x",value);
-#endif
-
-			break;
-		case 1: /* start */
-			chip->channel[ch].address=value;
-			break;
-		case 2: /* pitch */
-			chip->channel[ch].pitch=value * 16;
-			if (!value)
-			{
-				/* Key off */
-				chip->channel[ch].key=0;
-			}
-			break;
-		case 3: /* unknown */
-			chip->channel[ch].reg3=value;
-#ifdef MAME_DEBUG
-			if (value != 0x8000)
-				popmessage("Register3=%04x",value);
-#endif
-			break;
-		case 4: /* loop offset */
-			chip->channel[ch].loop=value;
-			break;
-		case 5: /* end */
-			chip->channel[ch].end=value;
-			break;
-		case 6: /* master volume */
-			if (value==0)
-			{
-				/* Key off */
-				chip->channel[ch].key=0;
-			}
-			else if (chip->channel[ch].key==0)
-			{
-				/* Key on */
-				chip->channel[ch].key=1;
-				chip->channel[ch].offset=0;
-				chip->channel[ch].lastdt=0;
-			}
-			chip->channel[ch].vol=value;
-			break;
-
-		case 7:  /* unused */
-#ifdef MAME_DEBUG
-				popmessage("UNUSED QSOUND REG 7=%04x",value);
-#endif
-
-			break;
-		case 8:
-			{
-			   int pandata=(value-0x10)&0x3f;
-			   if (pandata > 32)
-			   {
-					pandata=32;
-			   }
-			   chip->channel[ch].rvol=chip->pan_table[pandata];
-			   chip->channel[ch].lvol=chip->pan_table[32-pandata];
-			   chip->channel[ch].pan = value;
-			}
-			break;
-		 case 9:
-			chip->channel[ch].reg9=value;
-/*
-#ifdef MAME_DEBUG
-            popmessage("QSOUND REG 9=%04x",value);
-#endif
-*/
-			break;
-	}
-	LOG(("QSOUND WRITE %02x CH%02d-R%02d =%04x\n", data, ch, reg, value));
+	m_fpRawDataL = NULL;
 }
 
 
-static STREAM_UPDATE( qsound_update )
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void qsound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	qsound_state *chip = (qsound_state *)param;
 	int i,j;
 	int rvol, lvol, count;
-	struct QSOUND_CHANNEL *pC=&chip->channel[0];
+	struct QSOUND_CHANNEL *pC=&m_channel[0];
 	stream_sample_t  *datap[2];
 
 	datap[0] = outputs[0];
@@ -350,7 +180,7 @@ static STREAM_UPDATE( qsound_update )
 						/* Reached the end, restart the loop */
 						pC->address = (pC->end - pC->loop) & 0xffff;
 					}
-					pC->lastdt=chip->sample_rom[(pC->bank+pC->address)%(chip->sample_rom_length)];
+					pC->lastdt=m_sample_rom[(pC->bank+pC->address)%(m_sample_rom_length)];
 				}
 
 				(*pOutL) += ((pC->lastdt * lvol) >> 6);
@@ -363,57 +193,151 @@ static STREAM_UPDATE( qsound_update )
 		pC++;
 	}
 
-	if (chip->fpRawDataL)
-		fwrite(datap[0], samples*sizeof(QSOUND_SAMPLE), 1, chip->fpRawDataL);
-	if (chip->fpRawDataR)
-		fwrite(datap[1], samples*sizeof(QSOUND_SAMPLE), 1, chip->fpRawDataR);
+	if (m_fpRawDataL)
+		fwrite(datap[0], samples*sizeof(QSOUND_SAMPLE), 1, m_fpRawDataL);
+	if (m_fpRawDataR)
+		fwrite(datap[1], samples*sizeof(QSOUND_SAMPLE), 1, m_fpRawDataR);
 }
 
-const device_type QSOUND = &device_creator<qsound_device>;
 
-qsound_device::qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, QSOUND, "Q-Sound", tag, owner, clock),
-	  device_sound_interface(mconfig, *this)
+WRITE8_MEMBER( qsound_device::qsound_w )
 {
-	m_token = global_alloc_clear(qsound_state);
+	switch (offset)
+	{
+		case 0:
+			m_data=(m_data&0xff)|(data<<8);
+			break;
+
+		case 1:
+			m_data=(m_data&0xff00)|data;
+			break;
+
+		case 2:
+			qsound_set_command(data, m_data);
+			break;
+
+		default:
+			logerror("%s: unexpected qsound write to offset %d == %02X\n", machine().describe_context(), offset, data);
+			break;
+	}
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
 
-void qsound_device::device_config_complete()
+READ8_MEMBER( qsound_device::qsound_r )
 {
+	/* Port ready bit (0x80 if ready) */
+	return 0x80;
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
 
-void qsound_device::device_start()
+void qsound_device::qsound_set_command(int data, int value)
 {
-	DEVICE_START_NAME( qsound )(this);
+	int ch=0,reg=0;
+	if (data < 0x80)
+	{
+		ch=data>>3;
+		reg=data & 0x07;
+	}
+	else
+	{
+		if (data < 0x90)
+		{
+			ch=data-0x80;
+			reg=8;
+		}
+		else
+		{
+			if (data >= 0xba && data < 0xca)
+			{
+				ch=data-0xba;
+				reg=9;
+			}
+			else
+			{
+				/* Unknown registers */
+				ch=99;
+				reg=99;
+			}
+		}
+	}
+
+	switch (reg)
+	{
+		case 0: /* Bank */
+			ch=(ch+1)&0x0f;	/* strange ... */
+			m_channel[ch].bank=(value&0x7f)<<16;
+#ifdef MAME_DEBUG
+			if (!(value & 0x8000))
+				popmessage("Register3=%04x",value);
+#endif
+
+			break;
+		case 1: /* start */
+			m_channel[ch].address=value;
+			break;
+		case 2: /* pitch */
+			m_channel[ch].pitch=value * 16;
+			if (!value)
+			{
+				/* Key off */
+				m_channel[ch].key=0;
+			}
+			break;
+		case 3: /* unknown */
+			m_channel[ch].reg3=value;
+#ifdef MAME_DEBUG
+			if (value != 0x8000)
+				popmessage("Register3=%04x",value);
+#endif
+			break;
+		case 4: /* loop offset */
+			m_channel[ch].loop=value;
+			break;
+		case 5: /* end */
+			m_channel[ch].end=value;
+			break;
+		case 6: /* master volume */
+			if (value==0)
+			{
+				/* Key off */
+				m_channel[ch].key=0;
+			}
+			else if (m_channel[ch].key==0)
+			{
+				/* Key on */
+				m_channel[ch].key=1;
+				m_channel[ch].offset=0;
+				m_channel[ch].lastdt=0;
+			}
+			m_channel[ch].vol=value;
+			break;
+
+		case 7:  /* unused */
+#ifdef MAME_DEBUG
+				popmessage("UNUSED QSOUND REG 7=%04x",value);
+#endif
+
+			break;
+		case 8:
+			{
+			   int pandata=(value-0x10)&0x3f;
+			   if (pandata > 32)
+			   {
+					pandata=32;
+			   }
+			   m_channel[ch].rvol=m_pan_table[pandata];
+			   m_channel[ch].lvol=m_pan_table[32-pandata];
+			   m_channel[ch].pan = value;
+			}
+			break;
+		 case 9:
+			m_channel[ch].reg9=value;
+/*
+#ifdef MAME_DEBUG
+            popmessage("QSOUND REG 9=%04x",value);
+#endif
+*/
+			break;
+	}
+	LOG(("QSOUND WRITE %02x CH%02d-R%02d =%04x\n", data, ch, reg, value));
 }
-
-//-------------------------------------------------
-//  device_stop - device-specific stop
-//-------------------------------------------------
-
-void qsound_device::device_stop()
-{
-	DEVICE_STOP_NAME( qsound )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void qsound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
-}
-
-

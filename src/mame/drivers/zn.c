@@ -652,9 +652,9 @@ MACHINE_RESET_MEMBER(zn_state,coh1000c)
 static ADDRESS_MAP_START( qsound_map, AS_PROGRAM, 8, zn_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank10")		/* banked (contains music data) */
-	AM_RANGE(0xd000, 0xd002) AM_DEVWRITE_LEGACY("qsound", qsound_w)
+	AM_RANGE(0xd000, 0xd002) AM_DEVWRITE("qsound", qsound_device, qsound_w)
 	AM_RANGE(0xd003, 0xd003) AM_WRITE(qsound_bankswitch_w)
-	AM_RANGE(0xd007, 0xd007) AM_DEVREAD_LEGACY("qsound", qsound_r)
+	AM_RANGE(0xd007, 0xd007) AM_DEVREAD("qsound", qsound_device, qsound_r)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -666,13 +666,13 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_DERIVED( coh1000c, zn1_1mb_vram )
 
 	MCFG_CPU_ADD( "audiocpu", Z80, 8000000 )  /* 8MHz ?? */
-	MCFG_CPU_PROGRAM_MAP( qsound_map)
-	MCFG_CPU_IO_MAP( qsound_portmap)
+	MCFG_CPU_PROGRAM_MAP( qsound_map )
+	MCFG_CPU_IO_MAP( qsound_portmap )
 	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt,  60*4) /* 4 interrupts per frame ?? */
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c )
 
-	MCFG_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
+	MCFG_QSOUND_ADD( "qsound", QSOUND_CLOCK )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -686,7 +686,7 @@ static MACHINE_CONFIG_DERIVED( coh1002c, zn1_2mb_vram )
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000c )
 
-	MCFG_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
+	MCFG_QSOUND_ADD( "qsound", QSOUND_CLOCK )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -865,7 +865,7 @@ static MACHINE_CONFIG_DERIVED( coh3002c, zn2 )
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh3002c )
 
-	MCFG_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
+	MCFG_QSOUND_ADD( "qsound", QSOUND_CLOCK )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -4613,7 +4613,7 @@ ROM_END
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1000c.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1995, cpzn1,    0,        coh1000c, zn, zn_state,   coh1000c, ROT0, "Capcom", "ZN1", GAME_IS_BIOS_ROOT )
+GAME( 1995, cpzn1,    0,         coh1000c, zn, zn_state,   coh1000c, ROT0, "Capcom", "ZN1", GAME_IS_BIOS_ROOT )
 
 GAME( 1995, ts2,       cpzn1,    coh1000c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (USA 951124)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, ts2a,      ts2,      coh1000c, zn6b, zn_state, coh1000c, ROT0, "Capcom / Takara", "Battle Arena Toshinden 2 (USA 951124) Older", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -4634,7 +4634,7 @@ GAME( 1997, sfexpj,    sfexp,    coh1002c, zn6b, zn_state, coh1000c, ROT0, "Capc
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-3002c.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1997, cpzn2,    0,        coh3002c, zn, zn_state,   coh3002c, ROT0, "Capcom", "ZN2", GAME_IS_BIOS_ROOT )
+GAME( 1997, cpzn2,    0,         coh3002c, zn, zn_state,   coh3002c, ROT0, "Capcom", "ZN2", GAME_IS_BIOS_ROOT )
 
 GAME( 1997, rvschool,  cpzn2,    coh3002c, zn6b, zn_state, coh3002c, ROT0, "Capcom", "Rival Schools: United By Fate (Euro 971117)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, rvschoolu, rvschool, coh3002c, zn6b, zn_state, coh3002c, ROT0, "Capcom", "Rival Schools: United By Fate (USA 971117)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -4684,7 +4684,7 @@ GAME( 1996, jdreddb,  jdredd,   coh1000a_ide, jdredd, zn_state, coh1000a, ROT0, 
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1002m.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1997, tps,      0,        coh1002m, zn, zn_state, coh1002m, ROT0, "Tecmo", "TPS", GAME_IS_BIOS_ROOT )
+GAME( 1997, tps,      0,         coh1002m, zn, zn_state, coh1002m, ROT0, "Tecmo", "TPS", GAME_IS_BIOS_ROOT )
 
 GAME( 1997, glpracr2,  tps,      coh1002m, zn, zn_state, coh1002m, ROT0, "Tecmo", "Gallop Racer 2 (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1997, glpracr2j, glpracr2, coh1002m, zn, zn_state, coh1002m, ROT0, "Tecmo", "Gallop Racer 2 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
@@ -4717,7 +4717,7 @@ GAME( 1996, sncwgltd, aerofgts, coh1002v, zn, zn_state, coh1002v, ROT270, "Video
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1000t.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1995, taitofx1, 0,        coh1000ta,zn, zn_state, coh1000ta, ROT0, "Taito", "Taito FX1", GAME_IS_BIOS_ROOT )
+GAME( 1995, taitofx1, 0,         coh1000ta,zn, zn_state, coh1000ta, ROT0, "Taito", "Taito FX1", GAME_IS_BIOS_ROOT )
 
 GAME( 1995, sfchamp,   taitofx1, coh1000ta,zn, zn_state, coh1000ta, ROT0, "Taito", "Super Football Champ (Ver 2.5O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1995, sfchampo,  sfchamp,  coh1000ta,zn, zn_state, coh1000ta, ROT0, "Taito", "Super Football Champ (Ver 2.4O)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
@@ -4745,7 +4745,7 @@ GAME( 1997, gdarius2,  taitofx1, coh1000tb,zn, zn_state, coh1000tb, ROT0, "Taito
 /* A dummy driver, so that the bios can be debugged, and to serve as */
 /* parent for the coh-1002e.353 file, so that we do not have to include */
 /* it in every zip file */
-GAME( 1997, psarc95,  0,        coh1002e, zn, zn_state,   coh1002e, ROT0, "Eighting / Raizing", "PS Arcade 95", GAME_IS_BIOS_ROOT )
+GAME( 1997, psarc95,  0,         coh1002e, zn, zn_state,   coh1002e, ROT0, "Eighting / Raizing", "PS Arcade 95", GAME_IS_BIOS_ROOT )
 
 GAME( 1997, beastrzr,  psarc95,  coh1002e, zn, zn_state,   coh1002e, ROT0, "Eighting / Raizing", "Beastorizer (USA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1997, bldyroar,  beastrzr, coh1002e, zn, zn_state,   coh1002e, ROT0, "Eighting / Raizing", "Bloody Roar (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
