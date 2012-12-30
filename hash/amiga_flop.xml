@@ -1604,70 +1604,70 @@
         <rom name="(sps1814)adventuresofwillybeamish,the_disk1.ipf" size="1049612" crc="b6e51fff" sha1="67504d37ce7fc5dc1e5ba737d66f3d56bee35ba2" offset="0"/>
       </dataarea>
     </part>
-    <part name="flop2" interface="floppy_3_5">
+     <part name="flop2" interface="floppy_3_5">
       <feature name="part_id" value="Disk 2" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps1814)adventuresofwillybeamish,the_disk10.ipf" size="1049612" crc="3c6236d4" sha1="c46997bb8d7b9e90ded360458fc86b962e9d15c7" offset="0"/>
+        <rom name="(sps1814)adventuresofwillybeamish,the_disk2.ipf" size="1049612" crc="8d4c78c7" sha1="8464b768b13ac549b6ff612a3315e45f132339f8" offset="0"/>
       </dataarea>
     </part>
     <part name="flop3" interface="floppy_3_5">
       <feature name="part_id" value="Disk 3" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps1814)adventuresofwillybeamish,the_disk11.ipf" size="1049612" crc="4b94e4d9" sha1="940822081858b01813b6048b57ae25aafc014305" offset="0"/>
+        <rom name="(sps1814)adventuresofwillybeamish,the_disk3.ipf" size="1049612" crc="91709453" sha1="1d447af6a44e5702abe92053a54860bca273f2cc" offset="0"/>
       </dataarea>
     </part>
     <part name="flop4" interface="floppy_3_5">
       <feature name="part_id" value="Disk 4" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps1814)adventuresofwillybeamish,the_disk12.ipf" size="1049612" crc="f7e0038e" sha1="2d2866937ff88e7b842c76f3d3c8ac2b94434d4f" offset="0"/>
+        <rom name="(sps1814)adventuresofwillybeamish,the_disk4.ipf" size="1049612" crc="24d462bf" sha1="0ce35c81d870c4496af3f25f30b7512ac5bd20cb" offset="0"/>
       </dataarea>
     </part>
     <part name="flop5" interface="floppy_3_5">
       <feature name="part_id" value="Disk 5" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps1814)adventuresofwillybeamish,the_disk2.ipf" size="1049612" crc="8d4c78c7" sha1="8464b768b13ac549b6ff612a3315e45f132339f8" offset="0"/>
+        <rom name="(sps1814)adventuresofwillybeamish,the_disk5.ipf" size="1049612" crc="5bd2b9df" sha1="e6f3102783bc241d483beb901172a5e275b2230a" offset="0"/>
       </dataarea>
     </part>
     <part name="flop6" interface="floppy_3_5">
       <feature name="part_id" value="Disk 6" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps1814)adventuresofwillybeamish,the_disk3.ipf" size="1049612" crc="91709453" sha1="1d447af6a44e5702abe92053a54860bca273f2cc" offset="0"/>
+        <rom name="(sps1814)adventuresofwillybeamish,the_disk6.ipf" size="1049612" crc="3167ff64" sha1="2b318fa7a25f5b9507841ee69c795c617fea2604" offset="0"/>
       </dataarea>
     </part>
     <part name="flop7" interface="floppy_3_5">
       <feature name="part_id" value="Disk 7" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps1814)adventuresofwillybeamish,the_disk4.ipf" size="1049612" crc="24d462bf" sha1="0ce35c81d870c4496af3f25f30b7512ac5bd20cb" offset="0"/>
+        <rom name="(sps1814)adventuresofwillybeamish,the_disk7.ipf" size="1049612" crc="170753ad" sha1="a2e033abb0ed30392f8cfc091868011ad35633f9" offset="0"/>
       </dataarea>
     </part>
     <part name="flop8" interface="floppy_3_5">
       <feature name="part_id" value="Disk 8" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps1814)adventuresofwillybeamish,the_disk5.ipf" size="1049612" crc="5bd2b9df" sha1="e6f3102783bc241d483beb901172a5e275b2230a" offset="0"/>
+        <rom name="(sps1814)adventuresofwillybeamish,the_disk8.ipf" size="1049612" crc="737d7f47" sha1="84ddec383535189a9d938e749d8b2c0405a4d0b9" offset="0"/>
       </dataarea>
     </part>
     <part name="flop9" interface="floppy_3_5">
       <feature name="part_id" value="Disk 9" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps1814)adventuresofwillybeamish,the_disk6.ipf" size="1049612" crc="3167ff64" sha1="2b318fa7a25f5b9507841ee69c795c617fea2604" offset="0"/>
+        <rom name="(sps1814)adventuresofwillybeamish,the_disk9.ipf" size="1049612" crc="95a36c19" sha1="432888deaf6692543f0bb50f31af720c800a0fdd" offset="0"/>
       </dataarea>
     </part>
     <part name="flop10" interface="floppy_3_5">
       <feature name="part_id" value="Disk 10" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps1814)adventuresofwillybeamish,the_disk7.ipf" size="1049612" crc="170753ad" sha1="a2e033abb0ed30392f8cfc091868011ad35633f9" offset="0"/>
+        <rom name="(sps1814)adventuresofwillybeamish,the_disk10.ipf" size="1049612" crc="3c6236d4" sha1="c46997bb8d7b9e90ded360458fc86b962e9d15c7" offset="0"/>
       </dataarea>
     </part>
     <part name="flop11" interface="floppy_3_5">
       <feature name="part_id" value="Disk 11" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps1814)adventuresofwillybeamish,the_disk8.ipf" size="1049612" crc="737d7f47" sha1="84ddec383535189a9d938e749d8b2c0405a4d0b9" offset="0"/>
+        <rom name="(sps1814)adventuresofwillybeamish,the_disk11.ipf" size="1049612" crc="4b94e4d9" sha1="940822081858b01813b6048b57ae25aafc014305" offset="0"/>
       </dataarea>
     </part>
     <part name="flop12" interface="floppy_3_5">
       <feature name="part_id" value="Disk 12" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps1814)adventuresofwillybeamish,the_disk9.ipf" size="1049612" crc="95a36c19" sha1="432888deaf6692543f0bb50f31af720c800a0fdd" offset="0"/>
+        <rom name="(sps1814)adventuresofwillybeamish,the_disk12.ipf" size="1049612" crc="f7e0038e" sha1="2d2866937ff88e7b842c76f3d3c8ac2b94434d4f" offset="0"/>
       </dataarea>
     </part>
   </software>
@@ -2685,25 +2685,25 @@
     <part name="flop1" interface="floppy_3_5">
       <feature name="part_id" value="Disk 1" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps1666)ancientartofwarintheskies,the_airbase.ipf" size="1049612" crc="91564b57" sha1="0c46071e4b9d497ce6bc484c2984d325d9452504" offset="0"/>
+        <rom name="(sps1666)ancientartofwarintheskies,the_game.ipf" size="1049612" crc="a4b6d916" sha1="522ae0c1dbb38111505e20240f67054d9cbeee95" offset="0"/>
       </dataarea>
     </part>
     <part name="flop2" interface="floppy_3_5">
       <feature name="part_id" value="Disk 2" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps1666)ancientartofwarintheskies,the_bomb.ipf" size="1049612" crc="94234342" sha1="9f2b2c8fe74f66bccb323bbbb1d2658428b22a60" offset="0"/>
+        <rom name="(sps1666)ancientartofwarintheskies,the_airbase.ipf" size="1049612" crc="91564b57" sha1="0c46071e4b9d497ce6bc484c2984d325d9452504" offset="0"/>
       </dataarea>
     </part>
     <part name="flop3" interface="floppy_3_5">
       <feature name="part_id" value="Disk 3" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps1666)ancientartofwarintheskies,the_dogfight.ipf" size="1049612" crc="8141a959" sha1="e7d19e0dd5e73f7be36547a3d49aba3a805f5035" offset="0"/>
+        <rom name="(sps1666)ancientartofwarintheskies,the_bomb.ipf" size="1049612" crc="94234342" sha1="9f2b2c8fe74f66bccb323bbbb1d2658428b22a60" offset="0"/>
       </dataarea>
     </part>
     <part name="flop4" interface="floppy_3_5">
       <feature name="part_id" value="Disk 4" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps1666)ancientartofwarintheskies,the_game.ipf" size="1049612" crc="a4b6d916" sha1="522ae0c1dbb38111505e20240f67054d9cbeee95" offset="0"/>
+        <rom name="(sps1666)ancientartofwarintheskies,the_dogfight.ipf" size="1049612" crc="8141a959" sha1="e7d19e0dd5e73f7be36547a3d49aba3a805f5035" offset="0"/>
       </dataarea>
     </part>
   </software>
@@ -3523,25 +3523,26 @@
     <part name="flop1" interface="floppy_3_5">
       <feature name="part_id" value="Disk 1" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps794)ashesofempire_grafikdiskette.ipf" size="1049612" crc="c420f291" sha1="fffbd766a38008cebd29fbe9fd062eeaa2bd7c39" offset="0"/>
+        <rom name="(sps794)ashesofempire_introdiskette.ipf" size="1049612" crc="87a7b50a" sha1="4c7427bd8d1603c4132274e32d6540485b9797fe" offset="0"/>
       </dataarea>
     </part>
     <part name="flop2" interface="floppy_3_5">
+      <!-- bootable -->
       <feature name="part_id" value="Disk 2" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps794)ashesofempire_introdiskette.ipf" size="1049612" crc="87a7b50a" sha1="4c7427bd8d1603c4132274e32d6540485b9797fe" offset="0"/>
+        <rom name="(sps794)ashesofempire_programmdiskette.ipf" size="1049612" crc="9f7a0946" sha1="67afa97c7c2400e45c6f7b0156c18faa455ee6cb" offset="0"/>
       </dataarea>
     </part>
     <part name="flop3" interface="floppy_3_5">
       <feature name="part_id" value="Disk 3" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps794)ashesofempire_netzwerkdiskette.ipf" size="1049612" crc="06cc0458" sha1="5149f1b04a84becd2a4a290f9a37db9170829d44" offset="0"/>
+        <rom name="(sps794)ashesofempire_grafikdiskette.ipf" size="1049612" crc="c420f291" sha1="fffbd766a38008cebd29fbe9fd062eeaa2bd7c39" offset="0"/>
       </dataarea>
     </part>
     <part name="flop4" interface="floppy_3_5">
       <feature name="part_id" value="Disk 4" />
       <dataarea name="flop" size="1049612">
-        <rom name="(sps794)ashesofempire_programmdiskette.ipf" size="1049612" crc="9f7a0946" sha1="67afa97c7c2400e45c6f7b0156c18faa455ee6cb" offset="0"/>
+        <rom name="(sps794)ashesofempire_netzwerkdiskette.ipf" size="1049612" crc="06cc0458" sha1="5149f1b04a84becd2a4a290f9a37db9170829d44" offset="0"/>
       </dataarea>
     </part>
   </software>
@@ -5162,13 +5163,13 @@
     <part name="flop1" interface="floppy_3_5">
       <feature name="part_id" value="Disk 1" />
       <dataarea name="flop" size="1049180">
-        <rom name="(sps264)battlechessii_animationsdisk.ipf" size="1049180" crc="4a2139aa" sha1="1ccf73e04c828b66719c692881c0f337a91228d0" offset="0"/>
+        <rom name="(sps264)battlechessii_startupdisk.ipf" size="1049180" crc="cb827f52" sha1="bbb42b37177eb045bf48bacba5ad71eec5827fc6" offset="0"/>
       </dataarea>
     </part>
     <part name="flop2" interface="floppy_3_5">
       <feature name="part_id" value="Disk 2" />
       <dataarea name="flop" size="1049180">
-        <rom name="(sps264)battlechessii_startupdisk.ipf" size="1049180" crc="cb827f52" sha1="bbb42b37177eb045bf48bacba5ad71eec5827fc6" offset="0"/>
+        <rom name="(sps264)battlechessii_animationsdisk.ipf" size="1049180" crc="4a2139aa" sha1="1ccf73e04c828b66719c692881c0f337a91228d0" offset="0"/>
       </dataarea>
     </part>
   </software>
