@@ -95,7 +95,7 @@ const options_entry sdl_options::s_option_entries[] =
 	// performance options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "PERFORMANCE OPTIONS" },
 	{ SDLOPTION_MULTITHREADING ";mt",         "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
-	{ SDLOPTION_NUMPROCESSORS ";np",         "auto",      OPTION_INTEGER,	 "number of processors; this overrides the number the system reports" },
+	{ SDLOPTION_NUMPROCESSORS ";np",         "auto",      OPTION_STRING,	 "number of processors; this overrides the number the system reports" },
 	{ SDLOPTION_SDLVIDEOFPS,                  "0",        OPTION_BOOLEAN,    "show sdl video performance" },
 	{ SDLOPTION_BENCH,                        "0",        OPTION_INTEGER,    "benchmark for the given number of emulated seconds; implies -video none -nosound -nothrottle" },
 	// video options
@@ -362,6 +362,8 @@ int main(int argc, char *argv[])
 	}
 #endif
 
+//	osd_init_midi();	// this is a blues riff in B, watch me for the changes and try to keep up...
+
 	{
 		sdl_osd_interface osd;
 		sdl_options options;
@@ -385,6 +387,8 @@ int main(int argc, char *argv[])
 	FcFini();
 	#endif
 	#endif
+
+//	osd_shutdown_midi();
 
 	exit(res);
 
