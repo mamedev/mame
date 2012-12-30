@@ -79,6 +79,22 @@ DRIVER_INIT_MEMBER(odyssey2_state,odyssey2)
 }
 
 
+void odyssey2_state::machine_start()
+{
+	save_item(NAME(m_ef934x_ram_a));
+	save_item(NAME(m_ef934x_ram_b));
+	save_item(NAME(m_ef9340.X));
+	save_item(NAME(m_ef9340.Y));
+	save_item(NAME(m_ef9340.Y0));
+	save_item(NAME(m_ef9340.R));
+	save_item(NAME(m_ef9340.M));
+	save_item(NAME(m_ef9341.TA));
+	save_item(NAME(m_ef9341.TB));
+	save_item(NAME(m_ef9341.busy));
+	save_item(NAME(m_ef934x_ext_char_ram));
+}
+
+
 void odyssey2_state::machine_reset()
 {
 	/* jump to "last" bank, will work for all sizes due to being mirrored */

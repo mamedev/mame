@@ -721,14 +721,31 @@ UINT16 odyssey2_state::ef9340_get_c_addr()
 	return ( m_ef9340.Y << 5 ) | m_ef9340.X;
 }
 
+
 void odyssey2_state::ef9340_inc_c()
 {
 	m_ef9340.X++;
 	if ( m_ef9340.X >= 40 )
 	{
 		m_ef9340.Y = ( m_ef9340.Y + 1 ) % 24;
+		m_ef9340.X = 0;
 	}
 }
+
+
+UINT16 odyssey2_state::external_chargen_address(UINT8 b, UINT8 slice)
+{
+	UINT8 cc = b & 0x7f;
+
+	if ( slice & 8 )
+	{
+		// 0 0 CCE4 CCE3 CCE2 CCE1 CCE0 CCE6 CCE5 ADR0
+		return ( ( cc << 3 ) & 0xf8 ) | ( ( cc >> 4 ) & 0x06) | ( slice & 0x01 );
+	}
+	// CCE6 CCE5 CCE4 CCE3 CCE2 CCE1 CCE0 ADR2 ADR1 ADR0
+	return  ( cc << 3 ) | ( slice & 0x07 );
+}
+
 
 void odyssey2_state::ef9341_w( UINT8 command, UINT8 b, UINT8 data )
 {
@@ -776,24 +793,52 @@ void odyssey2_state::ef9341_w( UINT8 command, UINT8 b, UINT8 data )
 	{
 		if ( b )
 		{
+			UINT16 addr = ef9340_get_c_addr() & 0x3ff;
+
 			m_ef9341.TB = data;
 			m_ef9341.busy = 0x80;
 			switch ( m_ef9340.M & 0xE0 )
 			{
-			case 0x00:	/* Write */
-				m_ef934x_ram_b[ ef9340_get_c_addr() & 0x3ff ] = m_ef9341.TB;
-				ef9340_inc_c();
-				break;
-			case 0x20:	/* Read */
-				logerror("ef9341 unimplemented data action %02X\n", m_ef9340.M & 0xE0 );
-				ef9340_inc_c();
-				break;
-			case 0x40:	/* Write without increment */
-			case 0x60:	/* Read without increment */
-			case 0x80:	/* Write slice */
-			case 0xA0:	/* Read slice */
-				logerror("ef9341 unimplemented data action %02X\n", m_ef9340.M & 0xE0 );
-				break;
+				case 0x00:	/* Write */
+					m_ef934x_ram_a[addr] = m_ef9341.TA;
+					m_ef934x_ram_b[addr] = m_ef9341.TB;
+					ef9340_inc_c();
+					break;
+
+				case 0x20:	/* Read */
+					m_ef9341.TA = m_ef934x_ram_a[addr];
+					m_ef9341.TB = m_ef934x_ram_b[addr];
+					ef9340_inc_c();
+					break;
+
+				case 0x40:	/* Write without increment */
+					m_ef934x_ram_a[addr] = m_ef9341.TA;
+					m_ef934x_ram_b[addr] = m_ef9341.TB;
+					break;
+
+				case 0x60:	/* Read without increment */
+					m_ef9341.TA = m_ef934x_ram_a[addr];
+					m_ef9341.TB = m_ef934x_ram_b[addr];
+					break;
+
+				case 0x80:	/* Write slice */
+					{
+						UINT8 b = m_ef934x_ram_b[addr];
+						UINT8 slice = ( m_ef9340.M & 0x0f ) % 10;
+
+						if ( b >= 0xa0 )
+						{
+							m_ef934x_ext_char_ram[ external_chargen_address( b, slice ) ] = m_ef9341.TA;
+						}
+
+						// Increment slice number
+						m_ef9340.M = ( m_ef9340.M & 0xf0) | ( ( slice + 1 ) % 10 );
+					}
+					break;
+
+				case 0xA0:	/* Read slice */
+					fatalerror/*logerror*/("ef9341 unimplemented data action %02X\n", m_ef9340.M & 0xE0 );
+					break;
 			}
 			m_ef9341.busy = 0;
 		}
@@ -825,7 +870,6 @@ UINT8 odyssey2_state::ef9341_r( UINT8 command, UINT8 b )
 		if ( b )
 		{
 			data = m_ef9341.TB;
-			m_ef9341.busy = 0x80;
 		}
 		else
 		{

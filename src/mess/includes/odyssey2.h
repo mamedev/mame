@@ -117,6 +117,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lum_write);
 	DECLARE_READ8_MEMBER(t1_read);
 	DECLARE_DRIVER_INIT(odyssey2);
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	void video_start_g7400();
@@ -132,10 +133,13 @@ protected:
 	ef9341_t m_ef9341;
 	UINT8	m_ef934x_ram_a[1024];
 	UINT8	m_ef934x_ram_b[1024];
+	UINT8	m_ef934x_ext_char_ram[1024];
 	bool	m_g7400;
 
 	inline UINT16 ef9340_get_c_addr();
 	inline void ef9340_inc_c();
+	// Calculate the external chargen address for a character and slice
+	inline UINT16 external_chargen_address(UINT8 b, UINT8 slice);
 
 	void i824x_scanline(int vpos);
 	void er9340_scanline(int vpos);
