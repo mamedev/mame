@@ -143,7 +143,7 @@ public:
 	UINT8 m_sgb_rest;
 	UINT8 m_sgb_controller_no;
 	UINT8 m_sgb_controller_mode;
-	UINT8 m_sgb_data[112];
+	UINT8 m_sgb_data[0x100];
 	UINT32 m_sgb_atf;
 
 	/* Cartridge/mapper */
