@@ -631,7 +631,7 @@ void crystal_state::machine_reset()
 		m_Timer[i]->adjust(attotime::never);
 	}
 
-	dynamic_cast<vrender0_device*>(machine().device("vrender"))->set_areas(m_textureram, m_frameram);
+	machine().device<vrender0_device>("vrender")->set_areas(m_textureram, m_frameram);
 #ifdef IDLE_LOOP_SPEEDUP
 	m_FlipCntRead = 0;
 #endif
