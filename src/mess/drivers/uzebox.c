@@ -44,6 +44,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	void line_update();
+	int cart_load(device_image_interface &image);
 	UINT32 screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
@@ -255,6 +256,39 @@ UINT32 uzebox_state::screen_update_uzebox(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
+int uzebox_state::cart_load(device_image_interface &image)
+{
+	UINT8* rom = (UINT8*)(*memregion("maincpu"));
+
+	memset(rom, 0xff, memregion("maincpu")->bytes());
+
+	if (image.software_entry() == NULL)
+	{
+		UINT32 size = image.length();
+		UINT8* data = (UINT8*)auto_alloc_array(machine(), UINT8, size);
+
+		image.fread(data, size);
+
+		if (!strncmp((const char*)data, "UZEBOX", 6))
+			memcpy(rom, data + 0x200, size - 0x200);
+		else
+			memcpy(rom, data, size);
+
+		auto_free(machine(), data);
+	}
+	else
+	{
+		memcpy(rom, image.get_software_region("rom"), image.get_software_region_length("rom"));
+	}
+
+	return IMAGE_INIT_PASS;
+}
+
+static DEVICE_IMAGE_LOAD(uzebox_cart)
+{
+	return image.device().machine().driver_data<uzebox_state>()->cart_load(image);
+}
+
 /****************************************************\
 * Machine definition                                 *
 \****************************************************/
@@ -287,16 +321,17 @@ static MACHINE_CONFIG_START( uzebox, uzebox_state )
 	MCFG_SOUND_ROUTE(0, "avr8", 1.00)
 
 	MCFG_CARTSLOT_ADD("cart1")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,uze")
 	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_LOAD(uzebox_cart)
 	MCFG_CARTSLOT_INTERFACE("uzebox")
 	MCFG_SOFTWARE_LIST_ADD("eprom_list","uzebox")
 MACHINE_CONFIG_END
 
 ROM_START( uzebox )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )  /* Main program store */
-	ROM_CART_LOAD("cart1", 0x0000, 0x10000, ROM_OPTIONAL | ROM_FILL_FF)
 
-	ROM_REGION( 0x200, "eeprom", ROMREGION_ERASE00 )  /* on-die eeprom */
+	ROM_REGION( 0x800, "eeprom", ROMREGION_ERASE00 )  /* on-die eeprom */
 ROM_END
 
 /*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY   FULLNAME */
