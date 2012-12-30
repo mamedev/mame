@@ -34,6 +34,7 @@ Year + Game                     PCB         Video Chip    Issues / Notes
 94  Dharma Doujou (Korea)       MTR527        I4220
 94  Gun Master                  MTR5260-A     I4220
 94  Toride II Adauchi Gaiden    MTR5260-A     I4220
+94  Toride II Adauchi Gaiden(Kr)MTR5260-A     I4220    No YM2151
 95  Daitoride                   MTR5260-A     I4220
 95  Mouse Shooter GoGo          -             I4220    No sound CPU
 95  Pururun                     MTR5260-A     I4220
@@ -5885,8 +5886,35 @@ ROM_END
 
 /***************************************************************************
 
-Toride II Bok Su Oi Jeon Adauchi Gaiden (C)1994 Metro (Yu Jin?)
+Toride II Bok Su Oi Jeon Adauchi Gaiden
+(C)1994 Metro (Yu Jin?)
+
 MTR5260-A
+|----------------------------------------------|
+| TA7222       YM2413  3.579545MHz  *12MHz     |  
+|VOLUME  *UPC3403 *YM3012                 6116 |
+|UPC3403             *YM2151       ROM7   ROM8 |
+|       26.824MHz          M6295               |
+|                    |--------|          78C10 |
+|         62256      |IMAGETEK|                |
+|         62256      |I4220   |                |
+|J                   |        |                |
+|A        6264       |        |          ROM1  |
+|M                   |--------|                |
+|M                                             |
+|A           MB3771                      ROM2  |
+|          |---------|                         |
+|          |68000-12 |                         |
+|          |---------|                         |
+|                     6264               ROM3  |
+|                                              |
+|     MACH110  24MHz  6264                     |
+|SW1                                     ROM4  |
+|                                              |
+|SW2       ROM6       ROM5                     |
+|----------------------------------------------|
+* = Not populated on Toride II
+MB3771 == MM1035 used on other MTR5260-A PCBs
 
 info by Guru
 
