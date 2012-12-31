@@ -68,7 +68,7 @@ bool adf_format::supports_save() const
 int adf_format::identify(io_generic *io, UINT32 form_factor)
 {
 	UINT64 size = io_generic_size(io);
-	if ((size == 901120) || (size == 1802240))
+	if ((size == 901120) || (size == 912384) || (size == 1802240))
 	{
 		return 50;
 	}
@@ -79,6 +79,9 @@ bool adf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
 	desc_s sectors[22];
 	UINT8 sectdata[512*22];
+	bool is_hd = false;
+	int tracks = 80;
+
 	for(int i=0; i<22; i++) {
 		sectors[i].data = sectdata + 512*i;
 		sectors[i].size = 512;
@@ -86,9 +89,25 @@ bool adf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	}
 
 	UINT64 size = io_generic_size(io);
-	if(size == 901120) {
+	if(size == 901120)
+	{
+		is_hd = false;
+		tracks = 80;
+	}
+	else if (size == 912384)
+	{
+		is_hd = false;
+		tracks = 81;
+	}
+	else
+	{
+		is_hd = true;
+		tracks = 80;
+	}
+		
+	if (!is_hd) {
 		image->set_variant(floppy_image::DSDD);
-		for(int track=0; track < 80; track++) {
+		for(int track=0; track < tracks; track++) {
 			for(int side=0; side < 2; side++) {
 				io_generic_read(io, sectdata, (track*2 + side)*512*11, 512*11);
 				generate_track(amiga_11, track, side, sectors, 11, 100000, image);
@@ -96,7 +115,7 @@ bool adf_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		}
 	} else {
 		image->set_variant(floppy_image::DSHD);
-		for(int track=0; track < 80; track++) {
+		for(int track=0; track < tracks; track++) {
 			for(int side=0; side < 2; side++) {
 				io_generic_read(io, sectdata, (track*2 + side)*512*22, 512*22);
 				generate_track(amiga_22, track, side, sectors, 22, 200000, image);
