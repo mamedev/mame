@@ -97,17 +97,23 @@ static ADDRESS_MAP_START( blueprnt_map, AS_PROGRAM, 8, blueprnt_state )
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(blueprnt_sound_command_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ(watchdog_reset_r) AM_WRITE(blueprnt_flipscreen_w)
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(blueprnt_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM // mirror?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, blueprnt_state )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x2fff) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x6002, 0x6002) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0x8002, 0x8002) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sound_io, AS_IO, 8, blueprnt_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x02, 0x02) AM_NOP // nmi mask maybe? grasspin writes it 0/1
+ADDRESS_MAP_END
+
 
 
 /*************************************
@@ -217,6 +223,79 @@ static INPUT_PORTS_START( saturn )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( grasspin )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_8WAY
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_COCKTAIL
+
+	PORT_START("DILSW1")
+	PORT_DIPNAME( 0x01, 0x00, "DSW1:01" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "DSW1:02" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "DSW1:04" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "DSW1:08" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "DSW1:10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x60, 0x60, "Coinage" )
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x20, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x60, "3" )
+	PORT_DIPNAME( 0x80, 0x00, "Leave OFF" )  // won't boot if set to ON?
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DILSW2")
+	PORT_DIPNAME( 0x01, 0x00, "DSW2:01" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "DSW2:02" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "DSW2:04" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "DSW2:08" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "DSW2:10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "DSW2:20" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Leave OFF" ) // won't boot if set to ON?
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "DSW2:80" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
 /*************************************
  *
  *  Graphics definitions
@@ -300,9 +379,11 @@ static MACHINE_CONFIG_START( blueprnt, blueprnt_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 10000000/2/2/2)	// 1.25 MHz (2H)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(blueprnt_state, irq0_line_hold,  4*60)	// IRQs connected to 32V
 									// NMIs are caused by the main CPU
 
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -310,6 +391,7 @@ static MACHINE_CONFIG_START( blueprnt, blueprnt_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_VIDEO_START_OVERRIDE(blueprnt_state, blueprnt)
 	MCFG_SCREEN_UPDATE_DRIVER(blueprnt_state, screen_update_blueprnt)
 
 	MCFG_GFXDECODE(blueprnt)
@@ -328,6 +410,9 @@ static MACHINE_CONFIG_START( blueprnt, blueprnt_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( grasspin, blueprnt )
+	MCFG_VIDEO_START_OVERRIDE(blueprnt_state, grasspin)
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -345,7 +430,9 @@ ROM_START( blueprnt )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "snd-1.3u",  0x0000, 0x1000, CRC(fd38777a) SHA1(0ed230e0fa047d3171e7141e5620b4c750b07629) )
+	ROM_RELOAD(0x1000,0x1000)
 	ROM_LOAD( "snd-2.3v",  0x2000, 0x1000, CRC(33d5bf5b) SHA1(3ac684cd48559cd0eab32f9e7ce3ec6eca88dcd4) )
+	ROM_RELOAD(0x3000,0x1000)
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "bg-1.3c",   0x0000, 0x1000, CRC(ac2a61bc) SHA1(e56708d261648478d1dae4769118546411299e59) )
@@ -367,7 +454,9 @@ ROM_START( blueprntj )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "snd-1.3u",  0x0000, 0x1000, CRC(fd38777a) SHA1(0ed230e0fa047d3171e7141e5620b4c750b07629) )
+	ROM_RELOAD(0x1000,0x1000)
 	ROM_LOAD( "snd-2.3v",  0x2000, 0x1000, CRC(33d5bf5b) SHA1(3ac684cd48559cd0eab32f9e7ce3ec6eca88dcd4) )
+	ROM_RELOAD(0x3000,0x1000)
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "bg-1j.3c",   0x0000, 0x0800, CRC(43718c34) SHA1(5df4794a38866c7f03b264581c8555b9bec3969f) )
@@ -390,7 +479,9 @@ ROM_START( saturnzi )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "r7",           0x0000, 0x1000, CRC(dd43e02f) SHA1(1d95a307cb4ef523f024cb9c60382a2ac8c17b1c) )
+	ROM_RELOAD(0x1000,0x1000)
 	ROM_LOAD( "r8",           0x2000, 0x1000, CRC(7f9d0877) SHA1(335b17d187089e91bd3002778821921e73ec59d2) )
+	ROM_RELOAD(0x3000,0x1000)
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "r10",          0x0000, 0x1000, CRC(35987d61) SHA1(964503c3b17299b27b611943eebca9bc7c93a18c) )
@@ -400,6 +491,30 @@ ROM_START( saturnzi )
 	ROM_LOAD( "r11",          0x0000, 0x1000, CRC(6e4e6e5d) SHA1(f91188712e4b93d5676238c60d5a698891c3167a) )
 	ROM_LOAD( "r12",          0x1000, 0x1000, CRC(46fc049e) SHA1(dc3027c2dcbf7a9b2eeeb165d0b99ce188f26d20) )
 	ROM_LOAD( "r13",          0x2000, 0x1000, CRC(8b3e8c32) SHA1(65e2bf4a9f45be39419d85b2ee46b9c5eeff8f57) )
+ROM_END
+
+ROM_START( grasspin )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "prom_1.4b",     0x0000, 0x1000, CRC(6fd50509) SHA1(61bc99d47c15b479dd74147be8d6df2c1320a0d8) )
+	ROM_LOAD( "jaleco-2.4c",   0x1000, 0x1000, CRC(cd319007) SHA1(9c88fd7459bcf2cc6ce308ba1fe717a989ff89a4) )
+	ROM_LOAD( "jaleco-3.4d",   0x2000, 0x1000, CRC(ac73ccc2) SHA1(d732cc5e8a7db4011110527e579232d799159732) )
+	ROM_LOAD( "jaleco-4.4f",   0x3000, 0x1000, CRC(41f6279d) SHA1(dc260cf0a6b19e10ac038069ad3dbb3b6e63e446) )
+	ROM_LOAD( "jaleco-5.4h",   0x4000, 0x1000, CRC(d20aead9) SHA1(78c1c336fbdce312aed66a8b04cbbb2915d7536b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "jaleco-6.4j",  0x0000, 0x1000, CRC(f58bf3b0) SHA1(a7e30a9bfbd43fb4cc1987ad9fb0f3a023a7735d) )
+	ROM_RELOAD(0x1000,0x1000) // confirmed mirror by hw fluke
+	ROM_LOAD( "jaleco-7.4l",  0x2000, 0x1000, CRC(2d587653) SHA1(c2c08fde75a7ebc60edd461ca18d982fb00f43e2) )
+	ROM_RELOAD(0x3000,0x1000)
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "jaleco-8.3p",   0x0000, 0x1000, CRC(9d6185ca) SHA1(4e36810a6a6ba98d796966531d2f32277a8168d0) )
+	ROM_LOAD( "jaleco-9.4p",   0x1000, 0x1000, CRC(bccca24c) SHA1(95bdd2cfdefb76ca8d3c00b9fe140f97feebdcc1) )
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "jaleco-10.5p",   0x0000, 0x1000, CRC(3a0765c6) SHA1(574fcbca54b8a7e65d4cad29ee381e0536e75f66) )
+	ROM_LOAD( "jaleco-11.6p",   0x1000, 0x1000, CRC(cccfbeb4) SHA1(35555033bb84584fcfd58f9d0782cccb66c54211) )
+	ROM_LOAD( "jaleco-12.7p",   0x2000, 0x1000, CRC(615b3299) SHA1(1c12b456aac99690171b5aa06cbab904f4d16b2e) )
 ROM_END
 
 
@@ -412,3 +527,4 @@ ROM_END
 GAME( 1982, blueprnt,  0,        blueprnt, blueprnt, driver_device, 0, ROT270, "Zilec Electronics / Bally Midway", "Blue Print (Midway)", GAME_SUPPORTS_SAVE )
 GAME( 1982, blueprntj, blueprnt, blueprnt, blueprnt, driver_device, 0, ROT270, "Zilec Electronics / Jaleco",       "Blue Print (Jaleco)", GAME_SUPPORTS_SAVE )
 GAME( 1983, saturnzi,  0,        blueprnt, saturn, driver_device,   0, ROT270, "Zilec Electronics / Jaleco",       "Saturn", GAME_SUPPORTS_SAVE )
+GAME( 1983, grasspin,  0,        grasspin, grasspin, driver_device, 0, ROT90,  "Zilec Electronics / Jaleco",       "Grasspin", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
