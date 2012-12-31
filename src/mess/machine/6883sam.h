@@ -120,7 +120,7 @@ public:
 			if (bit3_carry)
 				counter_carry_bit3();
 		}
-		return m_res_input_func(m_counter);
+		return m_res_input_func((m_counter & m_counter_mask) | m_counter_or);
 	}
 
 	DECLARE_WRITE_LINE_MEMBER( hs_w );
@@ -136,25 +136,60 @@ protected:
 	virtual void device_post_load();
 
 private:
+	// represents an external memory bank - memory or IO that the SAM
+	// points to with the S2/S1/S0 output
 	struct sam_bank
 	{
-		UINT8 *			m_memory;
-		UINT32			m_memory_size;
-		offs_t			m_memory_offset;
-		bool			m_memory_read_only;
-		read8_delegate	m_rhandler;
-		write8_delegate	m_whandler;
+		UINT8 *				m_memory;
+		UINT32				m_memory_size;
+		offs_t				m_memory_offset;
+		bool				m_memory_read_only;
+		read8_delegate		m_rhandler;
+		write8_delegate		m_whandler;
+	};
+
+	// represents one of the memory "spaces" (e.g. - $8000-$9FFF) that
+	// can ultimately point to a bank
+	template<UINT16 _addrstart, UINT16 _addrend>
+	class sam_space
+	{
+	public:
+		sam_space(sam6883_device &owner);
+		void point(const sam_bank *bank, UINT16 offset, UINT16 mask = 0);
+
+	private:
+		sam6883_device &	m_owner;
+		memory_bank *		m_read_bank;
+		memory_bank *		m_write_bank;
+		UINT16				m_mask;
+
+		address_space &cpu_space() const;
+		void point_specific_bank(const sam_bank *bank, UINT16 offset, UINT16 mask, memory_bank *&memory_bank, INT32 addrstart, INT32 addrend, bool is_write);
 	};
 
 	// incidentals
-	address_space *			m_cpu_space;
-	devcb_resolved_read8	m_res_input_func;
-	sam_bank				m_banks[8];
+	address_space *				m_cpu_space;
+	devcb_resolved_read8		m_res_input_func;
+	sam_bank					m_banks[8];
+	sam_space<0x0000, 0x7FFF>	m_space_0000;
+	sam_space<0x8000, 0x9FFF>	m_space_8000;
+	sam_space<0xA000, 0xBFFF>	m_space_A000;
+	sam_space<0xC000, 0xFEFF>	m_space_C000;
+	sam_space<0xFF00, 0xFF1F>	m_space_FF00;
+	sam_space<0xFF20, 0xFF3F>	m_space_FF20;
+	sam_space<0xFF40, 0xFF5F>	m_space_FF40;
+	sam_space<0xFF60, 0xFFBF>	m_space_FF60;
+	sam_space<0xFFE0, 0xFFFF>	m_space_FFE0;
+	UINT16						m_counter_mask;
+	UINT16						m_counter_or;
 
 	// SAM state
-	UINT16					m_counter;
-	UINT8					m_counter_xdiv;
-	UINT8					m_counter_ydiv;
+	UINT16						m_counter;
+	UINT8						m_counter_xdiv;
+	UINT8						m_counter_ydiv;
+
+	// dummy scratch memory
+	UINT8						m_dummy[0x8000];
 
 	// typically called by CPU
     DECLARE_READ8_MEMBER( read );
@@ -219,8 +254,6 @@ private:
 	void horizontal_sync(void);
 	void update_state(void);
 	void update_memory(void);
-	void update_bank(int bank, offs_t addrstart, offs_t addrend, offs_t offset);
-	void install_memory(offs_t addrstart, offs_t addrend, void *memory, bool is_read_only);
 };
 
 extern const device_type SAM6883;

@@ -49,15 +49,36 @@
 
 #include "machine/6883sam.h"
 
+
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
+
+#define LOG_SAM		0
+
 const device_type SAM6883 = &device_creator<sam6883_device>;
 
+
+
+//**************************************************************************
+//  DEVICE SETUP
+//**************************************************************************
 
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
 
 sam6883_device::sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SAM6883, "SAM6883", tag, owner, clock)
+	: device_t(mconfig, SAM6883, "SAM6883", tag, owner, clock),
+	  m_space_0000(*this),
+	  m_space_8000(*this),
+	  m_space_A000(*this),
+	  m_space_C000(*this),
+	  m_space_FF00(*this),
+	  m_space_FF20(*this),
+	  m_space_FF40(*this),
+	  m_space_FF60(*this),
+	  m_space_FFE0(*this)
 {
 	memset(m_banks, '\0', sizeof(m_banks));
 }
@@ -72,18 +93,18 @@ void sam6883_device::device_start()
 {
 	const sam6883_interface *config = (const sam6883_interface *) static_config();
 
-	/* find the CPU */
+	// find the CPU
 	m_cpu = machine().device<cpu_device>(config->m_cpu_tag);
 	m_cpu_space = &m_cpu->space(config->m_cpu_space);
 
-	/* resolve callbacks */
+	// resolve callbacks
 	m_res_input_func.resolve(config->m_input_func, *this);
 
-	/* install SAM handlers */
+	// install SAM handlers
 	m_cpu_space->install_read_handler(0xFFC0, 0xFFDF, 0, 0, read8_delegate(FUNC(sam6883_device::read), this));
 	m_cpu_space->install_write_handler(0xFFC0, 0xFFDF, 0, 0, write8_delegate(FUNC(sam6883_device::write), this));
 
-	/* save state support */
+	// save state support
 	save_item(NAME(m_sam_state));
 	save_item(NAME(m_counter));
 	save_item(NAME(m_counter_xdiv));
@@ -131,19 +152,19 @@ void sam6883_device::configure_bank(int bank, UINT8 *memory, UINT32 memory_size,
 	switch(bank)
 	{
 		case 4:
-			update_bank(4, 0xFF00, 0xFF1F, 0x0000);
+			m_space_FF00.point(&m_banks[4], 0x0000);
 			break;
 		case 5:
-			update_bank(5, 0xFF20, 0xFF3F, 0x0000);
+			m_space_FF20.point(&m_banks[5], 0x0000);
 			break;
 		case 6:
-			update_bank(6, 0xFF40, 0xFF5F, 0x0000);
+			m_space_FF40.point(&m_banks[6], 0x0000);
 			break;
 		case 7:
-			update_bank(7, 0xFF60, 0xFFBF, 0x0000);
+			m_space_FF60.point(&m_banks[7], 0x0000);
 			break;
 		case 2:
-			update_bank(2, 0xFFE0, 0xFFFF, 0x1FE0);
+			m_space_FFE0.point(&m_banks[2], 0x1FE0);
 			break;
 	}
 }
@@ -195,89 +216,85 @@ void sam6883_device::update_state(void)
 
 void sam6883_device::update_memory(void)
 {
-	/* Memory size - allowed restricting memory accesses to something less than
-     * 32k
-     *
-     * This was a SAM switch that occupied 4 addresses:
-     *
-     *      $FFDD   (set)   R1
-     *      $FFDC   (clear) R1
-     *      $FFDB   (set)   R0
-     *      $FFDA   (clear) R0
-     *
-     * R1:R0 formed the following states:
-     *      00  - 4k
-     *      01  - 16k
-     *      10  - 64k
-     *      11  - static RAM (??)
-     *
-     * If something less than 64k was set, the low RAM would be smaller and
-     * mirror the other parts of the RAM
-     *
-     * TODO:  Find out what "static RAM" is
-     * TODO:  This should affect _all_ memory accesses, not just video ram
-     * TODO:  Verify that the CoCo 3 ignored this
-     */
+	// Memory size - allowed restricting memory accesses to something less than
+    // 32k
+    //
+    // This was a SAM switch that occupied 4 addresses:
+    //
+    //      $FFDD   (set)   R1
+    //      $FFDC   (clear) R1
+    //      $FFDB   (set)   R0
+    //      $FFDA   (clear) R0
+    //
+    // R1:R0 formed the following states:
+    //      00  - 4k
+    //      01  - 16k
+    //      10  - 64k
+    //      11  - static RAM (??)
+    //
+    // If something less than 64k was set, the low RAM would be smaller and
+    // mirror the other parts of the RAM
+    //
+    // TODO:  Find out what "static RAM" is
+    // TODO:  This should affect _all_ memory accesses, not just video ram
+    // TODO:  Verify that the CoCo 3 ignored this
 
-	/* update $0000-$7FFF */
-	update_bank(0, 0x0000, 0x7FFF, m_sam_state & SAM_STATE_P1 ? 0x8000 : 0x0000);
+	// for now, lets assume that the caller is nice and made m_memory_size
+	// a power of two
+	UINT16 ram_mask = (UINT16) m_banks[0].m_memory_size - 1;
 
-	if (m_sam_state & SAM_STATE_TY)
+	// switch depending on the M1/M0 variables
+	bool setup_rom = true;
+	switch(m_sam_state & (SAM_STATE_M1|SAM_STATE_M0))
 	{
-		update_bank(0, 0x8000, 0xFEFF, 0x8000);
+		case 0:
+			// 4K mode
+			m_space_0000.point(&m_banks[0], 0x0000, ram_mask);
+			m_counter_mask = 0x0FFF;
+			m_counter_or = 0x0000;
+			break;
+
+		case SAM_STATE_M0:
+			// 16K mode
+			m_space_0000.point(&m_banks[0], 0x0000, ram_mask);
+			m_counter_mask = 0x3FFF;
+			m_counter_or = 0x0000;
+			break;
+
+		case SAM_STATE_M1:
+		case SAM_STATE_M1|SAM_STATE_M0:
+			// 64k mode
+			if (m_sam_state & SAM_STATE_TY)
+			{
+				// full 64k RAM
+				m_space_0000.point(&m_banks[0], 0x0000, ram_mask);
+				m_space_8000.point(&m_banks[0], 0x8000);
+				m_space_A000.point(&m_banks[0], 0xA000);
+				m_space_C000.point(&m_banks[0], 0xC000);
+				m_counter_mask = 0xFFFF;
+				m_counter_or = 0x0000;
+				setup_rom = false;
+			}
+			else
+			{
+				// ROM/RAM
+				UINT16 ram_base = (m_sam_state & SAM_STATE_P1) ? 0x8000 : 0x0000;
+				m_space_0000.point(&m_banks[0], ram_base, ram_mask);
+				m_counter_mask = 0x7FFF;
+				m_counter_or = ram_base;
+			}
+			break;
 	}
-	else
+
+	if (setup_rom)
 	{
-		update_bank(1, 0x8000, 0x9FFF, 0x0000);
-		update_bank(2, 0xA000, 0xBFFF, 0x0000);
-		update_bank(3, 0xC000, 0xFEFF, 0x0000);
+		m_space_8000.point(&m_banks[1], 0x0000);
+		m_space_A000.point(&m_banks[2], 0x0000);
+		m_space_C000.point(&m_banks[3], 0x0000);
 	}
-}
 
-
-
-//-------------------------------------------------
-//  install_memory
-//-------------------------------------------------
-
-void sam6883_device::install_memory(offs_t addrstart, offs_t addrend, void *memory, bool is_read_only)
-{
-	if (addrend >= addrstart)
-	{
-		if (memory == NULL)
-			m_cpu_space->unmap_readwrite(addrstart, addrend);
-		else if (is_read_only)
-			m_cpu_space->install_rom(addrstart, addrend, memory);
-		else
-			m_cpu_space->install_ram(addrstart, addrend, memory);
-	}
-}
-
-
-
-//-------------------------------------------------
-//  update_bank
-//-------------------------------------------------
-
-void sam6883_device::update_bank(int bank, offs_t addrstart, offs_t addrend, offs_t offset)
-{
-	assert((bank >= 0) && (bank < sizeof(m_banks) / sizeof(m_banks[0])));
-
-	if (m_banks[bank].m_memory != NULL)
-	{
-		/* this bank is a memory bank */
-		install_memory(addrstart, MIN(addrend, addrstart + m_banks[bank].m_memory_size - 1), m_banks[bank].m_memory + m_banks[bank].m_memory_offset + offset, m_banks[bank].m_memory_read_only);
-		install_memory(addrstart + m_banks[bank].m_memory_size, addrend, NULL, m_banks[bank].m_memory_read_only);
-	}
-	else
-	{
-		/* this bank uses handlers */
-		assert(offset == 0);	/* changes to the offset are not supported */
-		if (!m_banks[bank].m_rhandler.isnull())
-			m_cpu_space->install_read_handler(addrstart, addrend, 0, 0, m_banks[bank].m_rhandler);
-		if (!m_banks[bank].m_whandler.isnull())
-			m_cpu_space->install_write_handler(addrstart, addrend, 0, 0, m_banks[bank].m_whandler);
-	}
+	// update $FFE0-$FFFF
+	m_space_FFE0.point(&m_banks[2], 0x1FE0);
 }
 
 
@@ -289,31 +306,31 @@ void sam6883_device::update_bank(int bank, offs_t addrstart, offs_t addrend, off
 
 void sam6883_friend_device::update_cpu_clock(void)
 {
-	/* The infamous speed up poke.
-     *
-     * This was a SAM switch that occupied 4 addresses:
-     *
-     *      $FFD9   (set)   R1
-     *      $FFD8   (clear) R1
-     *      $FFD7   (set)   R0
-     *      $FFD6   (clear) R0
-     *
-     * R1:R0 formed the following states:
-     *      00  - slow          0.89 MHz
-     *      01  - dual speed    ???
-     *      1x  - fast          1.78 MHz
-     *
-     * R1 controlled whether the video addressing was speeded up and R0
-     * did the same for the CPU.  On pre-CoCo 3 machines, setting R1 caused
-     * the screen to display garbage because the M6847 could not display
-     * fast enough.
-     *
-     * TODO:  Make the overclock more accurate.  In dual speed, ROM was a fast
-     * access but RAM was not.  I don't know how to simulate this.
-     */
+	// The infamous speed up poke.
+    //
+    // This was a SAM switch that occupied 4 addresses:
+    //
+    //      $FFD9   (set)   R1
+    //      $FFD8   (clear) R1
+    //      $FFD7   (set)   R0
+    //      $FFD6   (clear) R0
+    //
+    // R1:R0 formed the following states:
+    //      00  - slow          0.89 MHz
+    //      01  - dual speed    ???
+    //      1x  - fast          1.78 MHz
+    //
+    // R1 controlled whether the video addressing was speeded up and R0
+    // did the same for the CPU.  On pre-CoCo 3 machines, setting R1 caused
+    // the screen to display garbage because the M6847 could not display
+    // fast enough.
+    //
+    // TODO:  Make the overclock more accurate.  In dual speed, ROM was a fast
+    // access but RAM was not.  I don't know how to simulate this.
+
 	int speed = (m_sam_state & (SAM_STATE_R1|SAM_STATE_R0)) / SAM_STATE_R0;
 
-	/* the line below is weird because we are not strictly emulating the M6809E with emphasis on the 'E' */
+	// the line below is weird because we are not strictly emulating the M6809E with emphasis on the 'E'
 	m_cpu->set_clock_scale(speed ? 2 : 1);
 }
 
@@ -329,7 +346,6 @@ void sam6883_device::set_bank_offset(int bank, offs_t offset)
 	{
 		m_banks[bank].m_memory_offset = offset;
 		update_memory();
-		update_bank(2, 0xFFE0, 0xFFFF, 0x1FE0);
 	}
 }
 
@@ -423,5 +439,117 @@ WRITE_LINE_MEMBER( sam6883_device::hs_w )
 	if (state)
 	{
 		horizontal_sync();
+	}
+}
+
+
+
+//-------------------------------------------------
+//  sam_space::ctor
+//-------------------------------------------------
+
+template<UINT16 _addrstart, UINT16 _addrend>
+sam6883_device::sam_space<_addrstart, _addrend>::sam_space(sam6883_device &owner)
+	: m_owner(owner)
+{
+	m_read_bank = NULL;
+	m_write_bank = NULL;
+	m_mask = 0;
+}
+
+
+
+//-------------------------------------------------
+//  sam_space::cpu_space
+//-------------------------------------------------
+
+template<UINT16 _addrstart, UINT16 _addrend>
+address_space &sam6883_device::sam_space<_addrstart, _addrend>::cpu_space() const
+{
+	assert(m_owner.m_cpu_space != NULL);
+	return *m_owner.m_cpu_space;
+}
+
+
+
+//-------------------------------------------------
+//  sam_space::point
+//-------------------------------------------------
+
+template<UINT16 _addrstart, UINT16 _addrend>
+void sam6883_device::sam_space<_addrstart, _addrend>::point(const sam_bank *bank, UINT16 offset, UINT16 mask)
+{
+	if (LOG_SAM)
+	{
+		logerror("sam6883_device::sam_space::point():  addrstart=0x%04X addrend=0x%04X offset=0x%04X mask=0x%04X bank->m_memory=0x%p bank->m_memory_read_only=%s\n",
+			(unsigned) _addrstart,
+			(unsigned) _addrend,
+			(unsigned) offset,
+			(unsigned) mask,
+			bank->m_memory,
+			bank->m_memory_read_only ? "true" : "false");
+	}
+
+	point_specific_bank(bank, offset, mask, m_read_bank, _addrstart, _addrend, false);
+	point_specific_bank(bank, offset, mask, m_write_bank, _addrstart, _addrend, true);
+}
+
+
+
+//-------------------------------------------------
+//  sam_space::point_specific_bank
+//-------------------------------------------------
+template<UINT16 _addrstart, UINT16 _addrend>
+void sam6883_device::sam_space<_addrstart, _addrend>::point_specific_bank(const sam_bank *bank, UINT16 offset, UINT16 mask, memory_bank *&memory_bank, INT32 addrstart, INT32 addrend, bool is_write)
+{
+	char buffer[16];
+
+	if (bank->m_memory != NULL)
+	{
+		// normalize offset
+		if (mask != 0)
+			offset &= mask;
+
+		// this bank is a memory bank - first ensure that we have a bank
+		if (!memory_bank || !memory_bank->matches_exactly(addrstart, addrend) || (mask != m_mask))
+		{
+			// name the bank
+			snprintf(buffer, ARRAY_LENGTH(buffer), "bank%04X_%c", addrstart, is_write ? 'w' : 'r');
+
+			// install it
+			if (is_write)
+				cpu_space().install_write_bank(addrstart, addrend, mask, 0, buffer);
+			else
+				cpu_space().install_read_bank(addrstart, addrend, mask, 0, buffer);
+			m_mask = mask;
+
+			// and get it
+			memory_bank = cpu_space().device().owner()->membank(buffer);
+		}
+
+		// point the bank
+		if (memory_bank != NULL)
+		{
+			if (is_write && bank->m_memory_read_only)
+				memory_bank->set_base(m_owner.m_dummy);
+			else
+				memory_bank->set_base(bank->m_memory + offset);
+		}
+	}
+	else
+	{
+		// this bank uses handlers
+		assert((offset == 0) && (mask == 0));	// changes to the offset are not supported
+
+		if (is_write)
+		{
+			if (!bank->m_whandler.isnull())
+				cpu_space().install_write_handler(addrstart, addrend, 0, 0, bank->m_whandler);
+		}
+		else
+		{
+			if (!bank->m_rhandler.isnull())
+				cpu_space().install_read_handler(addrstart, addrend, 0, 0, bank->m_rhandler);
+		}
 	}
 }
