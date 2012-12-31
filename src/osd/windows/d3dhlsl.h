@@ -50,7 +50,7 @@
 
 class d3d_render_target;
 class d3d_cache_target;
-class d3d_info;
+struct d3d_info;
 
 /* hlsl_options is the information about runtime-mutable Direct3D HLSL options */
 /* in the future this will be moved into an OSD/emu shared buffer */

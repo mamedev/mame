@@ -59,7 +59,7 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-class d3d_info;
+struct d3d_info;
 
 /* d3d_cache_target is a simple linked list containing only a rednerable target and texture, used for phosphor effects */
 class d3d_cache_target
