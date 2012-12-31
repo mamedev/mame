@@ -1,6 +1,7 @@
 #include "video/poly.h"
 #include "machine/scsibus.h"
 #include "machine/53c810.h"
+#include "audio/dsbz80.h"
 
 typedef float MATRIX[4][4];
 typedef float VECTOR[4];
@@ -21,6 +22,7 @@ public:
 		m_lsi53c810(*this, "scsi:lsi53c810"),
 		m_work_ram(*this, "work_ram"),
 		m_paletteram64(*this, "paletteram64"),
+        m_dsbz80(*this, DSBZ80_TAG),
 		m_soundram(*this, "soundram"){ }
 
 	required_device<cpu_device> m_maincpu;
@@ -28,6 +30,7 @@ public:
 
 	required_shared_ptr<UINT64> m_work_ram;
 	required_shared_ptr<UINT64> m_paletteram64;
+    optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
 	required_shared_ptr<UINT16> m_soundram;
 
     int m_sound_irq_enable;
