@@ -137,7 +137,7 @@ protected:
 	bool	m_g7400;
 
 	inline UINT16 ef9340_get_c_addr(UINT8 x, UINT8 y);
-	//inline UINT16 ef9340_get_c_addr() { return ef9340_get_c_addr( m_ef9340.X, m_ef9340.Y ); };
+//	inline UINT16 ef9340_get_c_addr() { return ef9340_get_c_addr( m_ef9340.X, m_ef9340.Y ); };
 	inline void ef9340_inc_c();
 	// Calculate the external chargen address for a character and slice
 	inline UINT16 external_chargen_address(UINT8 b, UINT8 slice);

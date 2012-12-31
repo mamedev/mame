@@ -808,7 +808,7 @@ void odyssey2_state::ef9341_w( UINT8 command, UINT8 b, UINT8 data )
 	{
 		if ( b )
 		{
-			UINT16 addr = ef9340_get_c_addr() & 0x3ff;
+			UINT16 addr = ef9340_get_c_addr( m_ef9340.X, m_ef9340.Y ) & 0x3ff;
 
 			m_ef9341.TB = data;
 			m_ef9341.busy = 0x80;

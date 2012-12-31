@@ -381,7 +381,7 @@ void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
 	UINT32 *bitmapline;
 	pen_t pen;
-	int pel_shift = (vga.attribute.pel_shift);
+	int pel_shift = (vga.attribute.pel_shift & 7);
 
 //	popmessage("%08x %02x",EGA_START_ADDRESS,pel_shift);
 
