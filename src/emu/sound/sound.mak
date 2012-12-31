@@ -752,7 +752,7 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter YMZ770,$(SOUNDS)),)
-SOUNDOBJS += $(SOUNDOBJ)/ymz770.o
+SOUNDOBJS += $(SOUNDOBJ)/ymz770.o $(SOUNDOBJ)/mpeg_audio.o
 endif
 
 #-------------------------------------------------

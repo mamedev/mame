@@ -5,7 +5,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ymz770.h"
+#include "sound/mpeg_audio.h"
 
 #define DSBZ80_TAG "dsbz80"
 
@@ -16,7 +16,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class dsbz80_device : public device_t
+class dsbz80_device : public device_t, public device_sound_interface
 {
 public:
     // construction/destruction
@@ -28,7 +28,6 @@ public:
     DECLARE_WRITE8_MEMBER(latch_w);
 
     required_device<cpu_device> m_ourcpu;
-    optional_device<ymz770_device> m_ymz770;
 
     DECLARE_WRITE8_MEMBER(mpeg_trigger_w);
     DECLARE_WRITE8_MEMBER(mpeg_start_w);
@@ -44,10 +43,16 @@ protected:
     virtual void device_start();
     virtual void device_reset();
 
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
 private:
+	mpeg_audio *decoder;
+	INT16 audio_buf[1152*2];
     UINT8 m_dsb_latch;
     UINT32 mp_start, mp_end, mp_vol, mp_pan, mp_state, lp_start, lp_end, start, end;
+	int mp_pos, audio_pos, audio_avail;
     int status;
+    int getbit();
 };
 
 

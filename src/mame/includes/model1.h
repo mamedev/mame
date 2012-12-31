@@ -37,6 +37,8 @@ public:
 	struct quad_m1 **m_quadind;
 	int m_sound_irq;
 	int m_to_68k[8];
+	UINT8 m_last_snd_cmd;
+	int m_snd_cmd_state;
 	int m_fifo_wptr;
 	int m_fifo_rptr;
 	int m_last_irq;

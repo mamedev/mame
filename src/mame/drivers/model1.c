@@ -867,10 +867,27 @@ WRITE16_MEMBER(model1_state::snd_latch_to_68k_w)
 	m_fifo_wptr++;
 	if (m_fifo_wptr >= ARRAY_LENGTH(m_to_68k)) m_fifo_wptr = 0;
 
+	if (data == 0xae)
+	{
+		m_snd_cmd_state = 0;
+	}
+
     if (m_dsbz80 != NULL)
     {
-        m_dsbz80->latch_w(space, 0, data);
+//		printf("%d: %02x (last %02x)\n", m_snd_cmd_state, data, m_last_snd_cmd);
+		// HACK: on h/w, who filters out commands the DSB shouldn't see?  Need a wiring diagram.
+		if ((m_snd_cmd_state == 2) && (m_last_snd_cmd == 0x50))
+		{
+			m_dsbz80->latch_w(space, 0, data);
+		}
+		else	// keep in sync but send a "don't care"
+		{
+			m_dsbz80->latch_w(space, 0, 0x70);
+		}
     }
+
+	m_last_snd_cmd = data;
+	m_snd_cmd_state++;
 
 	// signal the 68000 that there's data waiting
 	machine().device("audiocpu")->execute().set_input_line(2, HOLD_LINE);
@@ -1356,7 +1373,7 @@ ROM_START( swa )
     ROM_REGION( 0x20000, "mpegcpu", 0 ) /* Z80 DSB code */
     ROM_LOAD( "epr-16471.bin", 0x000000, 0x020000, CRC(f4ee84a4) SHA1(f12b214e6f195b0e5f49ba9f41d8e54bfcea9acc) )
 
-    ROM_REGION( 0x400000, "ymz770", 0 ) /* DSB MPEG data */
+    ROM_REGION( 0x400000, "mpeg", 0 ) /* DSB MPEG data */
     ROM_LOAD( "mpr-16514.bin", 0x000000, 0x200000, CRC(3175b0be) SHA1(63649d053c8c17ce1746d16d0cc8202be20c302f) )
     ROM_LOAD( "mpr-16515.bin", 0x200000, 0x200000, CRC(3114d748) SHA1(9ef090623cdd2a1d06b5d1bc4b9a07ab4eff5b76) )
 
@@ -1564,6 +1581,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(swa, model1)
     MCFG_DSBZ80_ADD(DSBZ80_TAG)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( model1_vr, model1_state )

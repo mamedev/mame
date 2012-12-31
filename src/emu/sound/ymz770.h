@@ -28,7 +28,7 @@
 //**************************************************************************
 
 // forward definition
-class amm;
+class mpeg_audio;
 
 // ======================> ymz770_device
 
@@ -43,11 +43,12 @@ class ymz770_device : public device_t, public device_sound_interface
 
         bool is_playing, last_block;
 
-        amm *decoder;
+        mpeg_audio *decoder;
 
-        INT16 output_data[0x8fe];
+        INT16 output_data[1152];
         int output_remaining;
         int output_ptr;
+		int pptr;
 
     	UINT8 sequence;
     	UINT8 seqcontrol;
@@ -80,6 +81,7 @@ protected:
     // data
     UINT8 cur_reg;
     UINT8 *rom_base;
+	int rom_size;
 
     ymz_channel channels[8];
 };
