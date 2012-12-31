@@ -145,6 +145,7 @@ public:
 	void fdc_dma_drq(bool state);
 	void pc_select_dma_channel(int channel, bool state);
 	void pc_eop_w(int channel, bool state);
+	void mc1502_fdc_irq_drq(bool state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 };
 

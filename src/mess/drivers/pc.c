@@ -97,7 +97,7 @@ video HW too.
 #include "machine/am9517a.h"
 #include "sound/sn76496.h"
 
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 #include "machine/kb_7007_3.h"
 
 #include "machine/ram.h"
@@ -161,10 +161,7 @@ static ADDRESS_MAP_START(mc1502_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x0100, 0x0100) AM_READWRITE(mc1502_wd17xx_aux_r, mc1502_wd17xx_aux_w)
 	AM_RANGE(0x0108, 0x0108) AM_READ(mc1502_wd17xx_drq_r)			// blocking read!
 	AM_RANGE(0x010a, 0x010a) AM_READ(mc1502_wd17xx_motor_r)
-	AM_RANGE(0x010c, 0x010c) AM_DEVREADWRITE_LEGACY("vg93", wd17xx_status_r, wd17xx_command_w)
-	AM_RANGE(0x010d, 0x010d) AM_DEVREADWRITE_LEGACY("vg93", wd17xx_track_r, wd17xx_track_w)
-	AM_RANGE(0x010e, 0x010e) AM_DEVREADWRITE_LEGACY("vg93", wd17xx_sector_r, wd17xx_sector_w)
-	AM_RANGE(0x010f, 0x010f) AM_DEVREADWRITE_LEGACY("vg93", wd17xx_data_r, wd17xx_data_w)
+	AM_RANGE(0x010c, 0x010f) AM_DEVREADWRITE("vg93", fd1793_t, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zenith_map, AS_PROGRAM, 8, pc_state )
@@ -867,19 +864,6 @@ static const pc_lpt_interface pc_lpt_config =
 	DEVCB_CPU_INPUT_LINE("maincpu", 0)
 };
 
-static const floppy_interface mc1502_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(pc),
-	"floppy_5_25",
-	NULL
-};
-
 FLOPPY_FORMATS_MEMBER( pc_state::floppy_formats )
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
@@ -1398,8 +1382,9 @@ static MACHINE_CONFIG_START( mc1502, pc_state )
 	/* cassette */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, mc1502_cassette_interface )	// has no motor control
 
-	MCFG_FD1793_ADD( "vg93", default_wd17xx_interface_2_drives )
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(mc1502_floppy_interface)
+	MCFG_FD1793x_ADD("vg93", XTAL_8MHz / 8) // clock?
+	MCFG_FLOPPY_DRIVE_ADD("fd0", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fd1", ibmpc_floppies, "525dd", 0, pc_state::floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

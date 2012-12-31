@@ -37,7 +37,7 @@
 #include "sound/speaker.h"
 
 #include "machine/am9517a.h"
-#include "machine/wd17xx.h"
+#include "machine/wd_fdc.h"
 
 #include "machine/ram.h"
 
@@ -1280,16 +1280,22 @@ READ8_MEMBER(pc_state::mc1502_wd17xx_aux_r)
 
 WRITE8_MEMBER(pc_state::mc1502_wd17xx_aux_w)
 {
+	fd1793_t *fdc = machine().device<fd1793_t>("vg93");
+	floppy_image_device *floppy0 = machine().device<floppy_connector>("fd0")->get_device();
+	floppy_image_device *floppy1 = machine().device<floppy_connector>("fd1")->get_device();
+	floppy_image_device *floppy = ((data & 0x10)?floppy1:floppy0);
+	fdc->set_floppy(floppy);
+
 	// master reset
-	wd17xx_mr_w(machine().device("vg93"), BIT(data, 0));
+	if(data & 1)
+		fdc->reset();
 
 	// SIDE ONE
-	wd17xx_set_side(machine().device("vg93"), BIT(data, 1));
+	floppy->ss_w((data & 2)?1:0);
 
 	// bits 2, 3 -- motor on (drive 0, 1)
-
-	// DRIVE SEL
-	wd17xx_set_drive(machine().device("vg93"), BIT(data, 4));
+	floppy0->mon_w(!(data & 4));
+	floppy1->mon_w(!(data & 8));
 }
 
 /*
@@ -1297,17 +1303,21 @@ WRITE8_MEMBER(pc_state::mc1502_wd17xx_aux_w)
  */
 READ8_MEMBER(pc_state::mc1502_wd17xx_drq_r)
 {
-	UINT8 data;
-	UINT64 newpc;
+	fd1793_t *fdc = machine().device<fd1793_t>("vg93");
 
-	data = wd17xx_drq_r(machine().device("vg93"));
-	if (!data && !wd17xx_intrq_r(machine().device("vg93"))) {
-		/* fake cpu halt by resetting PC one insn back */
-		newpc = machine().firstcpu->pc();
-		machine().firstcpu->set_pc( newpc - 1 );
+	if (!fdc->drq_r() && !fdc->intrq_r()) {
+		/* fake cpu wait by resetting PC one insn back */
+		m_maincpu->set_pc(m_maincpu->pc() - 1);
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
-	return data;
+	return fdc->drq_r();
+}
+
+void pc_state::mc1502_fdc_irq_drq(bool state)
+{
+	if(state)
+		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 READ8_MEMBER(pc_state::mc1502_wd17xx_motor_r)
@@ -1516,6 +1526,10 @@ MACHINE_START_MEMBER(pc_state,mc1502)
 	memset(&mc1502_keyb, 0, sizeof(mc1502_keyb));
 	mc1502_keyb.keyb_signal_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::mc1502_keyb_signal_callback),this));
 	mc1502_keyb.keyb_signal_timer->adjust( attotime::from_msec(20), 0, attotime::from_msec(20) );
+
+	fd1793_t *fdc = machine().device<fd1793_t>("vg93");
+	fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(pc_state::mc1502_fdc_irq_drq), this));
+	fdc->setup_intrq_cb(fd1793_t::line_cb(FUNC(pc_state::mc1502_fdc_irq_drq), this));
 }
 
 
