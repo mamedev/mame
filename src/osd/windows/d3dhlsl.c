@@ -193,8 +193,8 @@ hlsl_info::hlsl_info()
 	master_enable = false;
 	prescale_size_x = 1;
 	prescale_size_y = 1;
-	prescale_force_x = 1;
-	prescale_force_y = 1;
+	prescale_force_x = 0;
+	prescale_force_y = 0;
 	preset = -1;
 	shadow_texture = NULL;
 	options = NULL;
@@ -1003,8 +1003,8 @@ int hlsl_info::create_resources()
 		shadow_texture = texture_create(d3d, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
 	}
 
-	prescale_force_x = 1;
-	prescale_force_y = 1;
+	prescale_force_x = 0;
+	prescale_force_y = 0;
 
 	if(!read_ini)
 	{
@@ -1058,14 +1058,7 @@ int hlsl_info::create_resources()
 		options->yiq_scan_time = winoptions.screen_yiq_scan_time();
 		options->yiq_phase_count = winoptions.screen_yiq_phase_count();
 	}
-	if (!prescale_force_x)
-	{
-		prescale_force_x = 1;
-	}
-	if (!prescale_force_y)
-	{
-		prescale_force_y = 1;
-	}
+
 	g_slider_list = init_slider_list();
 
 	const char *fx_dir = downcast<windows_options &>(window->machine().options()).screen_post_fx_dir();
@@ -1904,7 +1897,7 @@ bool hlsl_info::add_render_target(d3d_info* d3d, d3d_texture_info* info, int wid
 	d3d_cache_target* cache = find_cache_target(target->screen_index, info->texinfo.width, info->texinfo.height);
 	if (cache == NULL)
 	{
-		if (!add_cache_target(d3d, info, width, height, xprescale * prescale_force_x, yprescale * prescale_force_y, target->screen_index))
+		if (!add_cache_target(d3d, info, width, height, xprescale, yprescale, target->screen_index))
 		{
 			global_free(target);
 			return false;
@@ -1956,9 +1949,29 @@ bool hlsl_info::register_texture(d3d_texture_info *texture, int width, int heigh
 
 	d3d_info *d3d = (d3d_info *)window->drawdata;
 
-	// Find the nearest prescale factor that is over our screen size
 	int hlsl_prescale_x = prescale_force_x;
 	int hlsl_prescale_y = prescale_force_y;
+
+	// Find the nearest prescale factor that is over our screen size
+	if (hlsl_prescale_x == 0)
+	{
+		hlsl_prescale_x = 1;
+		while (width * xscale * hlsl_prescale_x < d3d->width)
+		{
+			hlsl_prescale_x++;
+		}
+		hlsl_prescale_x--;
+	}
+
+	if (hlsl_prescale_y == 0)
+	{
+		hlsl_prescale_y = 1;
+		while (height * yscale * hlsl_prescale_y < d3d->height)
+		{
+			hlsl_prescale_y++;
+		}
+		hlsl_prescale_y--;
+	}
 
 	if (!add_render_target(d3d, texture, width, height, xscale * hlsl_prescale_x, yscale * hlsl_prescale_y))
 		return false;

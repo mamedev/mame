@@ -1802,7 +1802,9 @@ d3d_texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsource,
 					texture->type = d3d->dynamic_supported ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
 
 					if (d3d->hlsl->enabled() && !d3d->hlsl->register_texture(texture))
+					{
 						goto error;
+					}
 
 					break;
 				}
@@ -1844,6 +1846,7 @@ d3d_texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsource,
 				{
 					if (d3d->hlsl->enabled() && !d3d->hlsl->register_prescaled_texture(texture))
 					{
+						printf("hlsl issue 2\n");
 						goto error;
 					}
 					break;
