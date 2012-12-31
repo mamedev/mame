@@ -25,7 +25,9 @@ const device_type A2BUS_SWYFT = &device_creator<a2bus_swyft_device>;
 
 ROM_START( swyft )
 	ROM_REGION(0x4000, SWYFT_ROM_REGION, 0)
-    ROM_LOAD( "swyftcard rom.bin", 0x000000, 0x004000, CRC(5d6673e9) SHA1(1554bd03c536789f0ff7d1ef6c992265e311935d) )
+    ROM_LOAD( "840-003a.bin", 0x000000, 0x004000, CRC(5d6673e9) SHA1(1554bd03c536789f0ff7d1ef6c992265e311935d) )
+	ROM_REGION(0x1000, "pal16r4", 0)
+    ROM_LOAD( "swyft_pal16r4.jed", 0x0000, 0x08EF, CRC(462a6938) SHA1(38be885539cf91423a246378c411ac8b2f150ec6) ) // swyft3.pal derived by D. Elvey, works as a replacement pal (original is protected?)
 ROM_END
 
 //-------------------------------------------------
