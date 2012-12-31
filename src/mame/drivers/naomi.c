@@ -381,7 +381,7 @@ MushiKing The King of Beetles 2K3 2ND          840-0150C  24217    6 (64Mb)  pre
 Quiz Ah Megamisama                             840-0030C  23227   16 (64Mb)  present  317-0280-JPN
 Shootout Pool                                  840-0098C  23844    4 (64mb)  present  317-0336-COM
 Shootout Pool - Shootout Pool Prize            840-0128C  24065    4 (64mb)  present  317-0367-COM
-Shootout Pool Medal                            ?          24148    4 (64Mb)  ?        ?
+Shootout Pool Medal                            840-0136C  24148    4 (64Mb)  ?        ?
 Touch de UNO! 2                                840-0022C  23071    6 (64Mb)  present  317-0276-JPN
 Virtua Fighter 4 Evolution                     840-0106B  23934   20 (64Mb)  present  317-0339-COM
 Virtua Tennis 2 / Power Smash 2 (Rev A)        840-0084C  22327A  18 (64Mb)  present  317-0320-COM
@@ -1409,7 +1409,7 @@ Sushi Bar
 #include "machine/jvsdev.h"
 #include "machine/jvs13551.h"
 
-#define CPU_CLOCK (200000000)
+#define CPU_CLOCK (65000000)
 static macronix_29l001mc_device *awflash;
 
                                              /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
@@ -8003,13 +8003,13 @@ ROM_END
 /* 0021-01 */ GAME( 2000,virnba, naomi,    naomi,   naomi, dc_state,    naomi,    ROT0, "Sega", "Virtua NBA (JPN, USA, EXP, KOR, AUS)", GAME_FLAGS )
 /* 0022 */ GAME( 2000, tduno2,   naomi,    naomim2, naomi, dc_state,    naomi,    ROT0, "Sega", "Touch de Uno! 2", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0023 */ GAME( 2000, 18wheelr, naomi,    naomim2, 18wheelr, dc_state, naomi,    ROT0, "Sega", "18 Wheeler Deluxe (Rev A) (JPN)", GAME_FLAGS )
-/* 0023 */ GAME( 2000, 18wheels, 18wheelr, naomim2, 18wheelr, dc_state, naomi,    ROT0, "Sega", "18 Wheeler (Rev A) (JPN)", GAME_FLAGS )
 // 0025 Mars TV
 /* 0026 */ GAME( 2000, totd,     naomi,    naomi,   naomi, dc_state,    naomi,    ROT0, "Sega", "The Typing of the Dead (JPN, USA, EXP, KOR, AUS) (Rev A)", GAME_FLAGS )
 /* 0027 */ GAME( 2000, smarinef, naomi,    naomi,   naomi, dc_state,    naomi,    ROT0, "Sega", "Sega Marine Fishing", GAME_FLAGS )
 /* 0028 */ GAME( 2000, vonot,    naomi,    naomim2, naomi, dc_state,    naomi,    ROT0, "Sega", "Virtual On Oratorio Tangram M.S.B.S. ver5.66 2000 Edition", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0030 */ GAME( 2000, qmegamis, naomi,    naomim1, naomi, dc_state,    qmegamis, ROT0, "Sega", "Quiz Ah Megamisama (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0035 */ GAME( 2000, sstrkfgt, naomi,    naomim2, sstrkfgt, dc_state, naomi,    ROT0, "Sega", "Sega Strike Fighter (Rev A)", GAME_FLAGS )
+/* 0036C */ GAME( 2000, 18wheels, 18wheelr, naomim2, 18wheelr, dc_state, naomi,    ROT0, "Sega", "18 Wheeler (Rev A) (JPN)", GAME_FLAGS )
 // 0037 18 Wheeler - American Pro Trucker
 /* 0039 */ GAME( 2000, gram2000, naomi,    naomim1, naomi, dc_state,    gram2000, ROT0, "Sega", "Giant Gram 2000 (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0040 */ GAME( 2000, wwfroyal, naomi,    naomim2, naomi, dc_state,    naomi,    ROT0, "Sega", "WWF Royal Rumble (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
@@ -8020,6 +8020,7 @@ ROM_END
 /* 0047 */ GAME( 2000, samba2k,  naomi,    naomim2, naomi, dc_state,    naomi,    ROT0, "Sega", "Samba de Amigo ver. 2000", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0048 */ GAME( 2001, alienfnt, naomi,    naomim2, naomi, dc_state,    naomi,    ROT0, "Sega", "Alien Front (Rev T)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0048 */ GAME( 2001, alienfnta, alienfnt,naomim2, naomi, dc_state,    naomi,    ROT0, "Sega", "Alien Front (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+/* 004C */ GAME( 1999, ringout,  naomi,    naomim2, naomi, dc_state,    naomi,    ROT0, "Sega", "Ring Out 4x4", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0052 */ GAME( 2000, derbyo2k, naomi,    naomi,   naomi, dc_state,    naomi,    ROT0, "Sega", "Derby Owners Club 2000 (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0064 */ GAME( 2001, wrungp,   naomi,    naomi,   naomi, dc_state,    naomi,    ROT0, "Sega", "Wave Runner GP", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0073 */ GAME( 2001, inunoos,  naomi,    naomi,   naomi, dc_state,    naomi,    ROT0, "Sega", "Inu No Osanpo / Dog Walking (Rev A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
@@ -8038,10 +8039,9 @@ ROM_END
 // 0166 Touch De Zunou (Japan) (Rev A)
 /* 0170 */ GAME( 2007, pokasuka, naomi,    naomim4, naomi, dc_state,    naomi,    ROT0, "Sega", "Pokasuka Ghost", GAME_FLAGS )
 /* 0175 */ GAME( 2007, asndynmt, naomi,    naomim4, naomi, dc_state,    naomi,    ROT0, "Sega", "Asian Dynamite", GAME_FLAGS )
-/* 00?? */ GAME( 1999, ringout,  naomi,    naomim2, naomi, dc_state,    naomi,    ROT0, "Sega", "Ring Out 4x4", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0??? */ GAME( 2001, shootplm, naomi,    naomim1, naomi, dc_state,    naomi,    ROT0, "Sega", "Shootout Pool Medal", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 // 00?? Crackin' DJ Part 2
-// 00?? Touch de Uno!
+// 008C Touch de Uno!
 
 /* 840-xxxxx (Sega Naomi 2 cart games) */
 /* 0046 */ GAME( 2001, wldrider, naomi2,   naomi2,   naomi, dc_state,    naomi2,   ROT0, "Sega", "Wild Riders (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
