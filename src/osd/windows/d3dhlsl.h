@@ -45,6 +45,12 @@
 #include "aviio.h"
 
 //============================================================
+//  CONSTANTS
+//============================================================
+
+#define HLSL_VECTOR			(0)
+
+//============================================================
 //  TYPE DEFINITIONS
 //============================================================
 
@@ -111,6 +117,10 @@ public:
 
 	bool enabled() { return master_enable; }
 
+	bool vector_enabled() { return vector_enable && (bool)HLSL_VECTOR; }
+	d3d_render_target* get_vector_target(d3d_info *d3d);
+	void create_vector_target(d3d_info *d3d, render_primitive *prim);
+
 	void begin();
 	void init_effect_info(d3d_poly_info *poly);
 	void render_quad(d3d_poly_info *poly, int vertnum);
@@ -159,6 +169,7 @@ private:
 	win_window_info *       window;						// D3D window info
 
 	bool					master_enable;				// overall enable flag
+	bool					vector_enable;			    // vector post-processing enable flag
 	bool					paused;						// whether or not rendering is currently paused
 	int						num_screens;				// number of emulated physical screens
 	int						curr_screen;				// current screen for render target operations
@@ -193,20 +204,24 @@ private:
 	d3d_texture *           snap_texture;				// snapshot upscaled texture
 	int						snap_width;					// snapshot width
 	int						snap_height;				// snapshot height
+	bool					lines_pending;				// whether or not we have lines to flush on the next quad
 
 	// HLSL effects
 	d3d_surface *   		backbuffer;					// pointer to our device's backbuffer
 	d3d_effect *			curr_effect;				// pointer to the currently active effect object
-	d3d_effect *			effect;						// pointer to the current primary-effect object
-	d3d_effect *			prescale_effect;			// pointer to the current prescale-effect object
-	d3d_effect *			post_effect;				// pointer to the current post-effect object
-	d3d_effect *			pincushion_effect;			// pointer to the current pincushion-effect object
-	d3d_effect *			focus_effect;				// pointer to the current focus-effect object
-	d3d_effect *			phosphor_effect;			// pointer to the current phosphor-effect object
-	d3d_effect *			deconverge_effect;			// pointer to the current deconvergence-effect object
-	d3d_effect *			color_effect;				// pointer to the current color-effect object
-	d3d_effect *			yiq_encode_effect;			// pointer to the current YIQ encoder effect object
-	d3d_effect *			yiq_decode_effect;			// pointer to the current YIQ decoder effect object
+	d3d_effect *			effect;						// pointer to the primary-effect object
+	d3d_effect *			prescale_effect;			// pointer to the prescale-effect object
+	d3d_effect *			post_effect;				// pointer to the post-effect object
+	d3d_effect *			pincushion_effect;			// pointer to the pincushion-effect object
+	d3d_effect *			focus_effect;				// pointer to the focus-effect object
+	d3d_effect *			phosphor_effect;			// pointer to the phosphor-effect object
+	d3d_effect *			deconverge_effect;			// pointer to the deconvergence-effect object
+	d3d_effect *			color_effect;				// pointer to the color-effect object
+	d3d_effect *			yiq_encode_effect;			// pointer to the YIQ encoder effect object
+	d3d_effect *			yiq_decode_effect;			// pointer to the YIQ decoder effect object
+#if HLSL_VECTOR
+	d3d_effect *			vector_effect;				// pointer to the vector-effect object
+#endif
 	d3d_vertex *			fsfx_vertices;				// pointer to our full-screen-quad object
 
 public:

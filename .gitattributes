@@ -240,6 +240,7 @@ hlsl/pincushion.fx svneol=native#text/plain
 hlsl/post.fx svneol=native#text/plain
 hlsl/prescale.fx svneol=native#text/plain
 hlsl/primary.fx svneol=native#text/plain
+hlsl/vector.fx svneol=native#text/plain
 hlsl/yiq_decode.fx svneol=native#text/plain
 hlsl/yiq_encode.fx svneol=native#text/plain
 keymaps/km_be_LINUX.map svneol=native#text/plain

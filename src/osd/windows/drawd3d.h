@@ -53,8 +53,6 @@
 #define VERTEX_BASE_FORMAT	(D3DFVF_DIFFUSE | D3DFVF_TEX1)
 #define VERTEX_BUFFER_SIZE	(2048*4+4)
 
-
-
 //============================================================
 //  TYPE DEFINITIONS
 //============================================================
@@ -108,8 +106,6 @@ public:
 	d3d_texture *smalltexture;
 	d3d_surface *target[5];
 	d3d_texture *texture[5];
-
-	d3d_texture_info *info;
 
 	d3d_render_target *next;
 	d3d_render_target *prev;

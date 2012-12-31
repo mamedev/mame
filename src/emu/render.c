@@ -1762,6 +1762,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 
 				// set the line type
 				prim->type = render_primitive::LINE;
+				prim->flags |= PRIMFLAG_TYPE_LINE;
 
 				// scale the width by the minimum of X/Y scale factors
 				prim->width = curitem->width() * MIN(container_xform.xscale, container_xform.yscale);
@@ -1774,6 +1775,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 			case CONTAINER_ITEM_QUAD:
 				// set the quad type
 				prim->type = render_primitive::QUAD;
+				prim->flags |= PRIMFLAG_TYPE_QUAD;
 
 				// normalize the bounds
 				normalize_bounds(prim->bounds);

@@ -584,8 +584,19 @@ mtlog_add("drawd3d_window_draw: begin");
 	// first update any textures
 	window->primlist->acquire_lock();
 	for (prim = window->primlist->first(); prim != NULL; prim = prim->next())
+	{
 		if (prim->texture.base != NULL)
+		{
 			texture_update(d3d, prim);
+		}
+		else if(d3d->hlsl->vector_enabled() && PRIMFLAG_GET_VECTORBUF(prim->flags))
+		{
+			if (!d3d->hlsl->get_vector_target(d3d))
+			{
+				d3d->hlsl->create_vector_target(d3d, prim);
+			}
+		}
+	}
 
 	// begin the scene
 mtlog_add("drawd3d_window_draw: begin_scene");
@@ -1846,7 +1857,6 @@ d3d_texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsource,
 				{
 					if (d3d->hlsl->enabled() && !d3d->hlsl->register_prescaled_texture(texture))
 					{
-						printf("hlsl issue 2\n");
 						goto error;
 					}
 					break;
@@ -2588,7 +2598,6 @@ static d3d_texture_info *texture_find(d3d_info *d3d, const render_primitive *pri
 	}
 	return NULL;
 }
-
 
 
 //============================================================

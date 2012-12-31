@@ -191,6 +191,7 @@ static file_error open_next(d3d_info *d3d, emu_file &file, const char *templ, co
 hlsl_info::hlsl_info()
 {
 	master_enable = false;
+	vector_enable = true;
 	prescale_size_x = 1;
 	prescale_size_y = 1;
 	prescale_force_x = 0;
@@ -1062,44 +1063,45 @@ int hlsl_info::create_resources()
 	g_slider_list = init_slider_list();
 
 	const char *fx_dir = downcast<windows_options &>(window->machine().options()).screen_post_fx_dir();
-	char primary_name_cstr[1024];
-	char post_name_cstr[1024];
-	char prescale_name_cstr[1024];
-	char pincushion_name_cstr[1024];
-	char phosphor_name_cstr[1024];
-	char focus_name_cstr[1024];
-	char deconverge_name_cstr[1024];
-	char color_name_cstr[1024];
-	char yiq_encode_name_cstr[1024];
-	char yiq_decode_name_cstr[1024];
 
+	// Replace all this garbage with a proper data-driven system
+	char primary_name_cstr[1024];
 	sprintf(primary_name_cstr, "%s\\primary.fx", fx_dir);
 	TCHAR *primary_name = tstring_from_utf8(primary_name_cstr);
 
+	char post_name_cstr[1024];
 	sprintf(post_name_cstr, "%s\\post.fx", fx_dir);
 	TCHAR *post_name = tstring_from_utf8(post_name_cstr);
 
+	char prescale_name_cstr[1024];
 	sprintf(prescale_name_cstr, "%s\\prescale.fx", fx_dir);
 	TCHAR *prescale_name = tstring_from_utf8(prescale_name_cstr);
 
+	char pincushion_name_cstr[1024];
 	sprintf(pincushion_name_cstr, "%s\\pincushion.fx", fx_dir);
 	TCHAR *pincushion_name = tstring_from_utf8(pincushion_name_cstr);
 
+	char phosphor_name_cstr[1024];
 	sprintf(phosphor_name_cstr, "%s\\phosphor.fx", fx_dir);
 	TCHAR *phosphor_name = tstring_from_utf8(phosphor_name_cstr);
 
+	char focus_name_cstr[1024];
 	sprintf(focus_name_cstr, "%s\\focus.fx", fx_dir);
 	TCHAR *focus_name = tstring_from_utf8(focus_name_cstr);
 
+	char deconverge_name_cstr[1024];
 	sprintf(deconverge_name_cstr, "%s\\deconverge.fx", fx_dir);
 	TCHAR *deconverge_name = tstring_from_utf8(deconverge_name_cstr);
 
+	char color_name_cstr[1024];
 	sprintf(color_name_cstr, "%s\\color.fx", fx_dir);
 	TCHAR *color_name = tstring_from_utf8(color_name_cstr);
 
+	char yiq_encode_name_cstr[1024];
 	sprintf(yiq_encode_name_cstr, "%s\\yiq_encode.fx", fx_dir);
 	TCHAR *yiq_encode_name = tstring_from_utf8(yiq_encode_name_cstr);
 
+	char yiq_decode_name_cstr[1024];
 	sprintf(yiq_decode_name_cstr, "%s\\yiq_decode.fx", fx_dir);
 	TCHAR *yiq_decode_name = tstring_from_utf8(yiq_decode_name_cstr);
 
@@ -1182,6 +1184,22 @@ int hlsl_info::create_resources()
 		mame_printf_verbose("Direct3D: Unable to load yiq_decode.fx\n");
 		return 1;
 	}
+
+	// create the vector shader
+#if HLSL_VECTOR
+	char vector_cstr[1024];
+	sprintf(vector_cstr, "%s\\vector.fx", fx_dir);
+	TCHAR *vector_name = tstring_from_utf8(vector_cstr);
+
+	result = (*d3dintf->device.create_effect)(d3d->device, vector_name, &vector_effect);
+	if(result != D3D_OK)
+	{
+		mame_printf_verbose("Direct3D: Unable to load vector.fx\n");
+		return 1;
+	}
+	if (vector_name)
+		osd_free(vector_name);
+#endif
 
 	if (primary_name)
 		osd_free(primary_name);
@@ -1366,6 +1384,16 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 	UINT num_passes = 0;
 	d3d_info *d3d = (d3d_info *)window->drawdata;
+
+#if HLSL_VECTOR
+	if(PRIMFLAG_GET_VECTOR(poly->flags) && vector_enable)
+	{
+		lines_pending = true;
+	}
+	else if (PRIMFLAG_GET_VECTORBUF(poly->flags) && vector_enable)
+	{
+	}
+#endif
 
 	if(PRIMFLAG_GET_SCREENTEX(d3d->last_texture_flags) && poly->texture != NULL)
 	{
@@ -1782,6 +1810,11 @@ void hlsl_info::render_quad(d3d_poly_info *poly, int vertnum)
 
 		options->params_dirty = false;
 	}
+#if HLSL_VECTOR
+	else if(PRIMFLAG_GET_VECTOR(poly->flags) && vector_enable)
+	{
+	}
+#endif
 	else
 	{
 		(*d3dintf->effect.set_float)(curr_effect, "RawWidth", poly->texture != NULL ? (float)poly->texture->rawwidth : 8.0f);
@@ -1863,20 +1896,48 @@ bool hlsl_info::add_cache_target(d3d_info* d3d, d3d_texture_info* info, int widt
 	return true;
 }
 
+d3d_render_target* hlsl_info::get_vector_target(d3d_info *d3d)
+{
+#if HLSL_VECTOR
+	if (!vector_enable)
+	{
+		return false;
+	}
+
+	return find_render_target(d3d->width, d3d->height, 0, 0);
+#endif
+	return NULL;
+}
+
+void hlsl_info::create_vector_target(d3d_info *d3d, render_primitive *prim)
+{
+#if HLSL_VECTOR
+	if (!add_render_target(d3d, NULL, d3d->width, d3d->height, 1, 1))
+	{
+		vector_enable = false;
+	}
+#endif
+}
+
 //============================================================
 //  hlsl_info::add_render_target - register a render target
 //============================================================
 
 bool hlsl_info::add_render_target(d3d_info* d3d, d3d_texture_info* info, int width, int height, int xprescale, int yprescale)
 {
-	if (find_render_target(info))
+	UINT32 screen_index = 0;
+	UINT32 page_index = 0;
+	if (info != NULL)
 	{
-		remove_render_target(info);
-	}
+		if (find_render_target(info))
+		{
+			remove_render_target(info);
+		}
 
-	UINT32 screen_index_data = (UINT32)info->texinfo.osddata;
-	UINT32 screen_index = screen_index_data >> 1;
-	UINT32 page_index = screen_index_data & 1;
+		UINT32 screen_index_data = (UINT32)info->texinfo.osddata;
+		screen_index = screen_index_data >> 1;
+		page_index = screen_index_data & 1;
+	}
 
 	d3d_render_target* target = (d3d_render_target*)global_alloc_clear(d3d_render_target);
 
@@ -1886,15 +1947,21 @@ bool hlsl_info::add_render_target(d3d_info* d3d, d3d_texture_info* info, int wid
 		return false;
 	}
 
-	target->info = info;
-
-	target->width = info->texinfo.width;
-	target->height = info->texinfo.height;
+	if (info != NULL)
+	{
+		target->width = info->texinfo.width;
+		target->height = info->texinfo.height;
+	}
+	else
+	{
+		target->width = d3d->width;
+		target->height = d3d->height;
+	}
 
 	target->screen_index = screen_index;
 	target->page_index = page_index;
 
-	d3d_cache_target* cache = find_cache_target(target->screen_index, info->texinfo.width, info->texinfo.height);
+	d3d_cache_target* cache = find_cache_target(target->screen_index, target->width, target->height);
 	if (cache == NULL)
 	{
 		if (!add_cache_target(d3d, info, width, height, xprescale, yprescale, target->screen_index))
