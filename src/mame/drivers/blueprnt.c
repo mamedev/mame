@@ -508,8 +508,8 @@ ROM_START( grasspin )
 	ROM_RELOAD(0x3000,0x1000)
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "jaleco-8.3p",   0x0000, 0x1000, CRC(9d6185ca) SHA1(4e36810a6a6ba98d796966531d2f32277a8168d0) )
-	ROM_LOAD( "jaleco-9.4p",   0x1000, 0x1000, CRC(bccca24c) SHA1(95bdd2cfdefb76ca8d3c00b9fe140f97feebdcc1) )
+	ROM_LOAD( "jaleco-9.4p",   0x0000, 0x1000, CRC(bccca24c) SHA1(95bdd2cfdefb76ca8d3c00b9fe140f97feebdcc1) )
+	ROM_LOAD( "jaleco-8.3p",   0x1000, 0x1000, CRC(9d6185ca) SHA1(4e36810a6a6ba98d796966531d2f32277a8168d0) )
 
 	ROM_REGION( 0x3000, "gfx2", 0 )
 	ROM_LOAD( "jaleco-10.5p",   0x0000, 0x1000, CRC(3a0765c6) SHA1(574fcbca54b8a7e65d4cad29ee381e0536e75f66) )
