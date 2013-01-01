@@ -21,6 +21,8 @@ of the games were clocked at around 500KHz, 550KHz, or 300KHz.
 #include "rendlay.h"
 
 
+#define LOG	0
+
 enum cpu_type
 {
 	CPU_TYPE_I8021,
@@ -49,6 +51,8 @@ public:
 	// i8021 interface
 	DECLARE_WRITE8_MEMBER(i8021_p0_write);
 	DECLARE_WRITE8_MEMBER(i8021_p1_write);
+	DECLARE_WRITE8_MEMBER(i8021_p2_write);
+	DECLARE_READ8_MEMBER(i8021_t1_read);
 	DECLARE_READ8_MEMBER(i8021_bus_read);
 
 	// TMS1100 interface
@@ -63,8 +67,15 @@ protected:
 	required_device<cpu_device> m_i8021;
 	required_device<cpu_device> m_tms1100;
 
+	// Timers
+	static const device_timer_id TIMER_PADDLE = 0;
+	emu_timer *m_paddle_timer;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
 	// i8021 variables
 	UINT8	m_p0;
+	UINT8	m_p2;
+	UINT8	m_t1;
 
 	// tms1100 variables
 	UINT16	m_r;
@@ -104,7 +115,11 @@ PALETTE_INIT_MEMBER(microvision_state,microvision)
 
 MACHINE_START_MEMBER(microvision_state, microvision)
 {
+	m_paddle_timer = timer_alloc(TIMER_PADDLE);
+
 	save_item(NAME(m_p0));
+	save_item(NAME(m_p2));
+	save_item(NAME(m_t1));
 	save_item(NAME(m_r));
 	save_item(NAME(m_o));
 	save_item(NAME(m_lcd_latch));
@@ -131,6 +146,11 @@ MACHINE_RESET_MEMBER(microvision_state, microvision)
 
 	m_o = 0;
 	m_r = 0;
+	m_p0 = 0;
+	m_p2 = 0;
+	m_t1 = 0;
+
+	m_paddle_timer->adjust( attotime::never );
 
 	switch ( m_cpu_type )
 	{
@@ -198,7 +218,7 @@ void microvision_state::lcd_write(UINT8 control, UINT8 data)
 		UINT16 row = ( m_lcd_latch[0] << 12 ) | ( m_lcd_latch[1] << 8 ) | ( m_lcd_latch[2] << 4 ) | m_lcd_latch[3];
 		UINT16 col = ( m_lcd_latch[4] << 12 ) | ( m_lcd_latch[5] << 8 ) | ( m_lcd_latch[6] << 4 ) | m_lcd_latch[7];
 
-		//logerror("row = %04x, col = %04x\n", row, col );
+		if (LOG) logerror("row = %04x, col = %04x\n", row, col );
 		for ( int i = 0; i < 16; i++ )
 		{
 			UINT16 temp = row;
@@ -229,6 +249,17 @@ void microvision_state::speaker_write(UINT8 speaker)
 }
 
 
+void microvision_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch ( id )
+	{
+		case TIMER_PADDLE:
+			m_t1 = 0;
+			break;
+	}
+}
+
+
 /*
  x--- ---- KEY3
  -x-- ---- KEY4
@@ -241,7 +272,7 @@ void microvision_state::speaker_write(UINT8 speaker)
 */
 WRITE8_MEMBER( microvision_state::i8021_p0_write )
 {
-	logerror( "p0_write: %02x\n", data );
+	if (LOG) logerror( "p0_write: %02x\n", data );
 
 	m_p0 = data;
 }
@@ -257,9 +288,43 @@ WRITE8_MEMBER( microvision_state::i8021_p0_write )
 */
 WRITE8_MEMBER( microvision_state::i8021_p1_write )
 {
-	logerror( "p1_write: %02x\n", data );
+	if (LOG) logerror( "p1_write: %02x\n", data );
 
 	lcd_write( data & 0x03, data >> 4 );
+}
+
+
+/*
+---- xx-- CAP2 (paddle)
+---- --x- SPKR1
+---- ---x SPKR0
+*/
+WRITE8_MEMBER( microvision_state::i8021_p2_write )
+{
+	if (LOG) logerror( "p2_write: %02x\n", data );
+
+	m_p2 = data;
+
+	speaker_write( m_p2 & 0x03 );
+
+	if ( m_p2 & 0x0c )
+	{
+		m_t1 = 1;
+		// Stop paddle timer
+		m_paddle_timer->adjust( attotime::never );
+	}
+	else
+	{
+		// Start paddle timer (min is 160uS, max is 678uS)
+		UINT8 paddle = 255 - ioport("PADDLE")->read();
+		m_paddle_timer->adjust( attotime::from_usec(160 + ( 518 * paddle ) / 255 ) );
+	}
+}
+
+
+READ8_MEMBER( microvision_state::i8021_t1_read )
+{
+	return m_t1;
 }
 
 
@@ -304,7 +369,7 @@ READ8_MEMBER( microvision_state::tms1100_read_k )
 {
 	UINT8 data = 0;
 
-	//logerror("read_k\n");
+	if (LOG) logerror("read_k\n");
 
 	if ( m_r & 0x100 )
 	{
@@ -324,7 +389,7 @@ READ8_MEMBER( microvision_state::tms1100_read_k )
 
 WRITE16_MEMBER( microvision_state::tms1100_write_o )
 {
-	logerror("write_o: %04x\n", data);
+	if (LOG) logerror("write_o: %04x\n", data);
 
 	m_o = data;
 
@@ -343,7 +408,7 @@ x-- ---- ---- KEY2
 */
 WRITE16_MEMBER( microvision_state::tms1100_write_r )
 {
-	logerror("write_r: %04x\n", data);
+	if (LOG) logerror("write_r: %04x\n", data);
 
 	m_r = data;
 
@@ -425,6 +490,9 @@ static INPUT_PORTS_START( microvision )
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON6)  PORT_CODE(KEYCODE_T) PORT_NAME("B06")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON9)  PORT_CODE(KEYCODE_G) PORT_NAME("B09")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_CODE(KEYCODE_B) PORT_NAME("B12")
+
+	PORT_START("PADDLE")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE) PORT_PLAYER(1) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0, 255)
 INPUT_PORTS_END
 
 
@@ -432,6 +500,8 @@ static ADDRESS_MAP_START( microvision_8021_io, AS_IO, 8, microvision_state )
 	AM_RANGE( 0x00, 0xFF ) AM_WRITE( i8021_p0_write )
 	AM_RANGE( MCS48_PORT_P0, MCS48_PORT_P0 ) AM_WRITE( i8021_p0_write )
 	AM_RANGE( MCS48_PORT_P1, MCS48_PORT_P1 ) AM_WRITE( i8021_p1_write )
+	AM_RANGE( MCS48_PORT_P2, MCS48_PORT_P2 ) AM_WRITE( i8021_p2_write )
+	AM_RANGE( MCS48_PORT_T1, MCS48_PORT_T1 ) AM_READ( i8021_t1_read )
 	AM_RANGE( MCS48_PORT_BUS, MCS48_PORT_BUS ) AM_READ( i8021_bus_read )
 ADDRESS_MAP_END
 
