@@ -64,7 +64,6 @@
 # DIRECTINPUT = 8
 
 
-
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
 ###########################################################################
@@ -292,8 +291,8 @@ OSDCOREOBJS = \
 	$(WINOBJ)/winclip.o \
 	$(WINOBJ)/winsocket.o \
 	$(WINOBJ)/winwork.o \
-	$(WINOBJ)/winptty.o
-
+	$(WINOBJ)/winptty.o \
+    $(WINOBJ)/winmidi.o
 
 
 #-------------------------------------------------
@@ -315,6 +314,7 @@ OSDOBJS = \
 	$(WINOBJ)/winmenu.o \
 	$(WINOBJ)/winmain.o
 
+
 ifdef USE_NETWORK
 OSDOBJS += \
 	$(WINOBJ)/netdev.o \
@@ -330,6 +330,7 @@ endif
 # extra dependencies
 $(WINOBJ)/drawdd.o :	$(SRC)/emu/rendersw.c
 $(WINOBJ)/drawgdi.o :	$(SRC)/emu/rendersw.c
+$(WINOBJ)/winmidi.o:    $(SRC)/osd/portmedia/pmmidi.c
 
 # add debug-specific files
 OSDOBJS += \

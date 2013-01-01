@@ -79,6 +79,9 @@ NO_USE_XINPUT = 1
 # uncomment to try the experimental new Qt debugger
 #USE_QTDEBUG = 1
 
+# uncomment to disable MIDI
+#NO_USE_MIDI = 1
+
 ###########################################################################
 ##################   END USER-CONFIGURABLE OPTIONS   ######################
 ###########################################################################
@@ -185,6 +188,12 @@ ifeq ($(TARGETOS),linux)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = tc
 SDL_NETWORK = taptun
+
+ifndef NO_USE_MIDI
+INCPATH += `pkg-config --cflags alsa`
+LIBS += `pkg-config --libs alsa`
+endif
+
 endif
 
 ifeq ($(TARGETOS),freebsd)
@@ -198,24 +207,28 @@ CCOMFLAGS += -isystem /usr/local/include
 # No clue here. There is a popmessage(NULL) in uimenu.c which
 # triggers a non-null format warning on FreeBSD only.
 CCOMFLAGS += -Wno-format
+NO_USE_MIDI = 1
 endif
 
 ifeq ($(TARGETOS),openbsd)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = ntc
 LIBS += -lutil
+NO_USE_MIDI = 1
 endif
 
 ifeq ($(TARGETOS),netbsd)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = ntc
 LIBS += -lutil
+NO_USE_MIDI = 1
 endif
 
 ifeq ($(TARGETOS),solaris)
 BASE_TARGETOS = unix
 DEFS += -DNO_AFFINITY_NP -UHAVE_VSNPRINTF -DNO_vsnprintf
 SYNC_IMPLEMENTATION = tc
+NO_USE_MIDI = 1
 endif
 
 ifeq ($(TARGETOS),haiku)
@@ -223,12 +236,17 @@ BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = ntc
 NO_X11 = 1
 NO_USE_XINPUT = 1
+NO_USE_MIDI = 1
 LIBS += -lnetwork -lbsd
 endif
 
 ifeq ($(TARGETOS),macosx)
 BASE_TARGETOS = unix
 DEFS += -DSDLMAME_UNIX -DSDLMAME_MACOSX -DSDLMAME_DARWIN
+
+ifndef NO_USE_MIDI
+LIBS += -framework CoreAudio -framework CoreMIDI
+endif
 
 ifndef USE_QTDEBUG
 DEBUGOBJS = $(SDLOBJ)/debugosx.o
@@ -324,6 +342,7 @@ SYNC_IMPLEMENTATION = os2
 NO_DEBUGGER = 1
 NO_X11 = 1
 NO_USE_XINPUT = 1
+NO_USE_MIDI = 1
 # OS/2 can't have OpenGL (aww)
 NO_OPENGL = 1
 endif
@@ -371,7 +390,12 @@ OSDOBJS = \
 	$(SDLOBJ)/drawsdl.o \
 	$(SDLOBJ)/window.o \
 	$(SDLOBJ)/output.o \
-	$(SDLOBJ)/watchdog.o
+	$(SDLOBJ)/watchdog.o \
+	$(SDLOBJ)/sdlmidi.o
+
+ifdef NO_USE_MIDI
+DEFS += "-DDISABLE_MIDI=1"
+endif
 
 # Add SDL2.0 support
 
@@ -764,6 +788,8 @@ TESTKEYSOBJS = \
 testkeys$(EXE): $(TESTKEYSOBJS) $(LIBUTIL) $(LIBOCORE) $(SDLUTILMAIN)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+
+$(SDLOBJ)/sdlmidi.o: $(SRC)/osd/portmedia/pmmidi.c
 
 #-------------------------------------------------
 # clean up

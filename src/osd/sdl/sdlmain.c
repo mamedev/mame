@@ -362,7 +362,7 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-//	osd_init_midi();	// this is a blues riff in B, watch me for the changes and try to keep up...
+	osd_init_midi();	// this is a blues riff in B, watch me for the changes and try to keep up...
 
 	{
 		sdl_osd_interface osd;
@@ -388,7 +388,7 @@ int main(int argc, char *argv[])
 	#endif
 	#endif
 
-//	osd_shutdown_midi();
+	osd_shutdown_midi();
 
 	exit(res);
 

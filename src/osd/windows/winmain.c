@@ -473,6 +473,8 @@ int main(int argc, char *argv[])
 		FreeConsole();
 	}
 
+	osd_init_midi();
+
 	// parse config and cmdline options
 	DWORD result = 0;
 	{
@@ -481,6 +483,8 @@ int main(int argc, char *argv[])
 		cli_frontend frontend(options, osd);
 		result = frontend.execute(argc, argv);
 	}
+
+	osd_shutdown_midi();
 
 	// free symbols
 	symbols = NULL;

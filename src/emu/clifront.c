@@ -91,6 +91,7 @@ const options_entry cli_options::s_option_entries[] =
 	{ CLICOMMAND_VERIFYSOFTWARE ";vsoft", "0",     OPTION_COMMAND,    "verify known software for the system" },
 	{ CLICOMMAND_GETSOFTLIST ";glist",  "0",       OPTION_COMMAND,    "retrieve software list by name" },
 	{ CLICOMMAND_VERIFYSOFTLIST ";vlist", "0",     OPTION_COMMAND,    "verify software list by name" },
+	{ CLICOMMAND_LIST_MIDI_DEVICES ";mlist", "0",  OPTION_COMMAND,    "list available MIDI I/O devices" },
 	{ NULL }
 };
 
@@ -731,6 +732,16 @@ void cli_frontend::listmedia(const char *gamename)
 		if (first)
 			printf("%-13s(none)\n", drivlist.driver().name);
 	}
+}
+
+//-------------------------------------------------
+//  listmididevices - output the list of MIDI devices
+//  available in the current system to be used
+//-------------------------------------------------
+
+void cli_frontend::listmididevices(const char *gamename)
+{
+	osd_list_midi_devices();
 }
 
 
@@ -1644,6 +1655,7 @@ void cli_frontend::execute_commands(const char *exename)
 		{ CLICOMMAND_ROMIDENT,		&cli_frontend::romident },
 		{ CLICOMMAND_GETSOFTLIST,   &cli_frontend::getsoftlist },
 		{ CLICOMMAND_VERIFYSOFTLIST,	&cli_frontend::verifysoftlist },
+		{ CLICOMMAND_LIST_MIDI_DEVICES, &cli_frontend::listmididevices },
 	};
 
 	// find the command

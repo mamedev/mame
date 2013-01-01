@@ -78,7 +78,7 @@
 #define CLICOMMAND_VERIFYSOFTWARE		"verifysoftware"
 #define CLICOMMAND_GETSOFTLIST			"getsoftlist"
 #define CLICOMMAND_VERIFYSOFTLIST		"verifysoftlist"
-
+#define CLICOMMAND_LIST_MIDI_DEVICES	"listmidi"
 
 
 //**************************************************************************
@@ -128,6 +128,7 @@ public:
 	void romident(const char *filename);
 	void getsoftlist(const char *gamename = "*");
 	void verifysoftlist(const char *gamename = "*");
+	void listmididevices(const char *gamename = "*");
 
 private:
 	// internal helpers

@@ -221,6 +221,9 @@ BUILD_FLAC = 1
 # uncomment next line to build jpeglib as part of MAME build
 BUILD_JPEGLIB = 1
 
+# uncomment next line to build PortMidi as part of MAME/MESS build
+BUILD_MIDILIB = 1
+
 # uncomment next line to include the symbols
 # SYMBOLS = 1
 
@@ -658,6 +661,15 @@ SOFTFLOAT = $(OBJ)/libsoftfloat.a
 # add formats emulation library
 FORMATS_LIB = $(OBJ)/libformats.a
 
+# add PortMidi MIDI library
+ifeq ($(BUILD_MIDILIB),1)
+INCPATH += -I$(SRC)/lib/portmidi
+MIDI_LIB = $(OBJ)/portmidi.a
+else
+LIBS += -lportmidi
+MIDI_LIB =
+endif
+
 #-------------------------------------------------
 # 'default' target needs to go here, before the 
 # include files which define additional targets
@@ -752,7 +764,7 @@ $(sort $(OBJDIRS)):
 
 ifndef EXECUTABLE_DEFINED
 
-$(EMULATOR): $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBCPU) $(LIBEMU) $(LIBDASM) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(ZLIB) $(LIBOCORE) $(RESFILE)
+$(EMULATOR): $(EMUINFOOBJ) $(DRIVLISTOBJ) $(DRVLIBS) $(LIBOSD) $(LIBCPU) $(LIBEMU) $(LIBDASM) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(SOFTFLOAT) $(JPEG_LIB) $(FLAC_LIB) $(7Z_LIB) $(FORMATS_LIB) $(ZLIB) $(LIBOCORE) $(MIDI_LIB) $(RESFILE)
 	$(CC) $(CDEFS) $(CFLAGS) -c $(SRC)/version.c -o $(VERSIONOBJ)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $(LDFLAGSEMULATOR) $(VERSIONOBJ) $^ $(LIBS) -o $@
