@@ -211,7 +211,7 @@ static INPUT_PORTS_START( bagman )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(	0x40, "30000" )
 	PORT_DIPSETTING(	0x00, "40000" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) ) /* Cabinet type set through edge connector, not dip switch (verified on real pcb) */
 	PORT_DIPSETTING(	0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
