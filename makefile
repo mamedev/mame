@@ -664,7 +664,7 @@ FORMATS_LIB = $(OBJ)/libformats.a
 # add PortMidi MIDI library
 ifeq ($(BUILD_MIDILIB),1)
 INCPATH += -I$(SRC)/lib/portmidi
-MIDI_LIB = $(OBJ)/portmidi.a
+MIDI_LIB = $(OBJ)/libportmidi.a
 else
 LIBS += -lportmidi
 MIDI_LIB =
