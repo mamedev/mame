@@ -261,7 +261,7 @@ static void fcrash_render_sprites( running_machine &machine, bitmap_ind16 &bitma
 	if (state->m_bootleg_sprite_ram) sprite_ram = state->m_bootleg_sprite_ram;
 
 	/* get end of sprite list marker */
-	for (pos = 0x1ffc; pos >= 0x0000; pos -= 4)
+	for (pos = 0x1ffc - base; pos >= 0x0000; pos -= 4)
 	{
 		if (sprite_ram[base + pos - 1] == state->m_sprite_list_end_marker) last_sprite_offset = pos;
 	}
