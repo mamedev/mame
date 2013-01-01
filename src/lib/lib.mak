@@ -22,7 +22,7 @@ OBJDIRS += \
 	$(LIBOBJ)/libjpeg \
 	$(LIBOBJ)/libflac \
 	$(LIBOBJ)/lib7z \
-
+	$(LIBOBJ)/portmidi \
 
 
 #-------------------------------------------------
@@ -382,3 +382,50 @@ $(OBJ)/lib7z.a: $(LIB7ZOBJS)
 $(LIBOBJ)/lib7z/%.o: $(LIBSRC)/lib7z/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(7ZOPTS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(LIBSRC)/lib7z/ -c $< -o $@
+
+#-------------------------------------------------
+# portmidi library objects
+#-------------------------------------------------
+
+PMOPTS = 
+
+# common objects
+LIBPMOBJS = \
+	$(LIBOBJ)/portmidi/portmidi.o \
+	$(LIBOBJ)/portmidi/porttime.o \
+	$(LIBOBJ)/portmidi/pmutil.o
+
+ifeq ($(TARGETOS),linux)
+PMOPTS = -DPMALSA=1
+
+LIBPMOBJS += \
+	$(LIBOBJ)/portmidi/pmlinux.o \
+	$(LIBOBJ)/portmidi/pmlinuxalsa.o \
+	$(LIBOBJ)/portmidi/finddefaultlinux.o \
+	$(LIBOBJ)/portmidi/ptlinux.o
+
+endif
+
+ifeq ($(TARGETOS),macosx)
+LIBPMOBJS += \
+	$(LIBOBJ)/portmidi/pmmac.o \
+	$(LIBOBJ)/portmidi/pmmacosxcm.o \
+	$(LIBOBJ)/portmidi/finddefault.o \
+	$(LIBOBJ)/portmidi/readbinaryplist.o \
+	$(LIBOBJ)/portmidi/ptmacosx_mach.o \
+	$(LIBOBJ)/portmidi/osxsupport.o
+endif
+
+ifeq ($(TARGETOS),win32)
+LIBPMOBJS += \
+	$(LIBOBJ)/portmidi/pmwin.o \
+	$(LIBOBJ)/portmidi/pmwinmm.o \
+	$(LIBOBJ)/portmidi/ptwinmm.o
+endif
+
+$(OBJ)/portmidi.a: $(LIBPMOBJS)
+
+$(LIBOBJ)/portmidi/%.o: $(LIBSRC)/portmidi/%.c | $(OSPREBUILD)
+	@echo Compiling $<...
+	$(CC) $(CDEFS) $(PMOPTS) $(CCOMFLAGS) $(CONLYFLAGS) -I$(LIBSRC)/portmidi/ -c $< -o $@
+

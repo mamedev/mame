@@ -885,6 +885,18 @@ file_error osd_get_full_path(char **dst, const char *path);
 
 
 /***************************************************************************
+    MIDI I/O INTERFACES
+***************************************************************************/
+struct osd_midi_device;
+
+void osd_init_midi(void);
+void osd_shutdown_midi(void);
+void osd_list_midi_devices(void);
+osd_midi_device *osd_open_midi_input(const char *devname);
+osd_midi_device *osd_open_midi_output(const char *devname);
+void osd_close_midi_channel(osd_midi_device *dev);
+
+/***************************************************************************
     UNCATEGORIZED INTERFACES
 ***************************************************************************/
 
