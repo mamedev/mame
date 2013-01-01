@@ -7,6 +7,9 @@
 #ifndef ODYSSEY2_H_
 #define ODYSSEY2_H_
 
+#include "machine/i8243.h"
+
+
 #define P1_BANK_LO_BIT            (0x01)
 #define P1_BANK_HI_BIT            (0x02)
 #define P1_KEYBOARD_SCAN_ENABLE   (0x04)  /* active low */
@@ -77,11 +80,13 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
+		, m_i8243(*this, "i8243")
 		, m_g7400(false)
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	optional_device<i8243_device> m_i8243;
 
 	int m_the_voice_lrq_state;
 	UINT8 *m_ram;
@@ -124,6 +129,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(the_voice_lrq_callback);
+	DECLARE_WRITE8_MEMBER(i8243_port_w);
 
 	void ef9341_w( UINT8 command, UINT8 b, UINT8 data );
 	UINT8 ef9341_r( UINT8 command, UINT8 b );
@@ -135,6 +141,8 @@ protected:
 	UINT8	m_ef934x_ram_b[1024];
 	UINT8	m_ef934x_ext_char_ram[1024];
 	bool	m_g7400;
+	UINT8	m_g7400_ic674_decode[8];
+	UINT8	m_g7400_ic678_decode[8];
 
 	inline UINT16 ef9340_get_c_addr(UINT8 x, UINT8 y);
 	inline void ef9340_inc_c();

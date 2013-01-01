@@ -101,6 +101,12 @@ void odyssey2_state::machine_reset()
 	m_p1 = 0xFF;
 	m_p2 = 0xFF;
 	switch_banks();
+
+	for ( int i = 0; i < 8; i++ )
+	{
+		m_g7400_ic674_decode[i] = 0;
+		m_g7400_ic678_decode[i] = 0;
+	}
 }
 
 /****** External RAM ******************************/
@@ -245,6 +251,11 @@ READ8_MEMBER(odyssey2_state::p2_read)
 WRITE8_MEMBER(odyssey2_state::p2_write)
 {
 	m_p2 = data;
+
+	if ( m_i8243 )
+	{
+		m_i8243->i8243_p2_w( space, 0, m_p2 & 0x0f );
+	}
 
 	logerror("%.6f p2 written %.2x\n", machine().time().as_double(), data);
 }

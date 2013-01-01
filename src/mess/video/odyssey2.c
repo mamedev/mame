@@ -720,6 +720,46 @@ STREAM_UPDATE( odyssey2_sh_update )
 }
 
 /*
+    i8243 in the g7400
+*/
+
+WRITE8_MEMBER(odyssey2_state::i8243_port_w)
+{
+	switch ( offset & 3 )
+	{
+		case 0:	// "port 4"
+			m_g7400_ic674_decode[4] = BIT(data,0);
+			m_g7400_ic674_decode[5] = BIT(data,1);
+			m_g7400_ic674_decode[6] = BIT(data,2);
+			m_g7400_ic674_decode[7] = BIT(data,3);
+			break;
+
+		case 1: // "port 5"
+			m_g7400_ic674_decode[0] = BIT(data,0);
+			m_g7400_ic674_decode[1] = BIT(data,1);
+			m_g7400_ic674_decode[2] = BIT(data,2);
+			m_g7400_ic674_decode[3] = BIT(data,3);
+			break;
+
+		case 2: // "port 6"
+			m_g7400_ic678_decode[4] = BIT(data,0);
+			m_g7400_ic678_decode[5] = BIT(data,1);
+			m_g7400_ic678_decode[6] = BIT(data,2);
+			m_g7400_ic678_decode[7] = BIT(data,3);
+			break;
+
+		case 3: // "port 7"
+			m_g7400_ic678_decode[0] = BIT(data,0);
+			m_g7400_ic678_decode[1] = BIT(data,1);
+			m_g7400_ic678_decode[2] = BIT(data,2);
+			m_g7400_ic678_decode[3] = BIT(data,3);
+			break;
+
+	}
+}
+
+
+/*
     Thomson EF9340/EF9341 extra chips in the g7400
  */
 
@@ -910,9 +950,25 @@ void odyssey2_state::ef9340_scanline(int vpos)
 
 		if ( y < 10 )
 		{
-			// Displaying service row
-			y_row = 31;
-			slice = y;
+			// Service row
+
+			if ( m_ef9340.R & 0x08 )
+			{
+				// Service row is enabled
+
+				y_row = 31;
+				slice = y;
+			}
+			else
+			{
+				// Service row is disabled
+
+				for ( int i = 0; i < 40 * 8; i++ )
+				{
+					m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN*2 + i ) = 24;
+				}
+				return;
+			}
 		}
 		else
 		{
@@ -920,6 +976,7 @@ void odyssey2_state::ef9340_scanline(int vpos)
 			y_row = (y - 10) / 10;
 			slice = (y - 10) % 10;
 		}
+
 		for ( int x = 0; x < 40; x++ )
 		{
 			UINT16 addr = ef9340_get_c_addr( x, y_row );
