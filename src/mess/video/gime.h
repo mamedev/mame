@@ -155,42 +155,44 @@ private:
 	static const UINT8 hires_font[128][12];
 
 	// callbacks
-	devcb_resolved_write_line m_res_out_irq_func;
-	devcb_resolved_write_line m_res_out_firq_func;
-	devcb_resolved_read8 m_res_in_floating_bus_func;
+	devcb_resolved_write_line	m_res_out_irq_func;
+	devcb_resolved_write_line	m_res_out_firq_func;
+	devcb_resolved_read8		m_res_in_floating_bus_func;
 
 	// device state
-	UINT8 m_gime_registers[16];
-	UINT8 m_mmu[16];
-	UINT8 m_ff22_value;
-	UINT8 m_interrupt_value;
-	UINT8 m_irq;
-	UINT8 m_firq;
-	UINT16 m_timer_value;
-	bool m_is_blinking;
+	UINT8						m_gime_registers[16];
+	UINT8						m_mmu[16];
+	UINT8						m_ff22_value;
+	UINT8						m_interrupt_value;
+	UINT8						m_irq;
+	UINT8						m_firq;
+	UINT16						m_timer_value;
+	bool						m_is_blinking;
 
 	// video state
-	bool m_legacy_video;
-	UINT32 m_video_position;
-	UINT8 m_line_in_row;
-	scanline_record m_scanlines[25+192+26];
-	bool m_displayed_rgb;
+	bool						m_legacy_video;
+	UINT32						m_video_position;
+	UINT8						m_line_in_row;
+	scanline_record				m_scanlines[25+192+26];
+	bool						m_displayed_rgb;
 
 	// palette state
-	UINT8 m_palette_rotated[1024][16];
-	UINT16 m_palette_rotated_position;
-	bool m_palette_rotated_position_used;
+	UINT8						m_palette_rotated[1024][16];
+	UINT16						m_palette_rotated_position;
+	bool						m_palette_rotated_position_used;
 
 	// incidentals
-	ram_device *m_ram;
-	emu_timer *m_gime_clock_timer;
-	cococart_slot_device *m_cart_device;
-	UINT8 *m_rom;
-	UINT8 *m_cart_rom;
-	pixel_t m_composite_palette[64];
-	pixel_t m_composite_bw_palette[64];
-	pixel_t m_rgb_palette[64];
-	UINT8 m_dummy_bank[0x2000];
+	ram_device *				m_ram;
+	emu_timer *					m_gime_clock_timer;
+	cococart_slot_device *		m_cart_device;
+	memory_bank *				m_read_banks[9];
+	memory_bank *				m_write_banks[9];
+	UINT8 *						m_rom;
+	UINT8 *						m_cart_rom;
+	pixel_t						m_composite_palette[64];
+	pixel_t						m_composite_bw_palette[64];
+	pixel_t						m_rgb_palette[64];
+	UINT8						m_dummy_bank[0x2000];
 
 	// timer constants
 	static const device_timer_id TIMER_FRAME = 0;

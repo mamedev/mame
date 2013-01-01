@@ -119,49 +119,60 @@ gime_base_device::gime_base_device(const machine_config &mconfig, device_type ty
 
 void gime_base_device::device_start(void)
 {
-	/* get the config */
+	// get the config
 	const gime_interface *config = (const gime_interface *) static_config();
 	assert(config);
 
-	/* find the RAM device - make sure that it is started */
+	// find the RAM device - make sure that it is started
 	m_ram = machine().device<ram_device>(config->m_ram_tag);
 	if (!m_ram->started())
 		throw device_missing_dependencies();
 
-	/* find the CART device - make sure that it is started */
+	// find the CART device - make sure that it is started
 	m_cart_device = machine().device<cococart_slot_device>(config->m_ext_tag);
 	if (!m_cart_device->started())
 		throw device_missing_dependencies();
 
-	/* find the CPU device - make sure that it is started */
+	// find the CPU device - make sure that it is started
 	m_cpu = machine().device<cpu_device>(config->m_maincpu_tag);
 	if (!m_cpu->started())
 		throw device_missing_dependencies();
 
-	/* inherited device_start - need to do this after checking dependencies */
+	// inherited device_start - need to do this after checking dependencies
 	super::device_start();
 
-	/* initialize variables */
+	// initialize variables
 	memset(m_scanlines, 0, sizeof(m_scanlines));
 	m_interrupt_value = 0x00;
 	m_irq = 0x00;
 	m_firq = 0x00;
 
-	/* allocate timer */
+	// allocate timer
 	m_gime_clock_timer = timer_alloc(TIMER_GIME_CLOCK);
 
-	/* resolve callbacks */
+	// setup banks
+	assert(ARRAY_LENGTH(m_read_banks) == ARRAY_LENGTH(m_write_banks));
+	for (int i = 0; i < ARRAY_LENGTH(m_read_banks); i++)
+	{
+		char buffer[8];
+		snprintf(buffer, ARRAY_LENGTH(buffer), "rbank%d", i);
+		m_read_banks[i] = machine().root_device().membank(buffer);
+		snprintf(buffer, ARRAY_LENGTH(buffer), "wbank%d", i);
+		m_write_banks[i] = machine().root_device().membank(buffer);
+	}
+
+	// resolve callbacks
 	m_res_out_hsync_func.resolve(config->m_out_hsync_func, *this);
 	m_res_out_fsync_func.resolve(config->m_out_fsync_func, *this);
 	m_res_out_irq_func.resolve(config->m_out_irq_func, *this);
 	m_res_out_firq_func.resolve(config->m_out_firq_func, *this);
 	m_res_in_floating_bus_func.resolve(config->m_in_floating_bus_func, *this);
 
-	/* set up ROM/RAM pointers */
+	// set up ROM/RAM pointers
 	m_rom = machine().root_device().memregion(config->m_maincpu_tag)->base();
 	m_cart_rom = m_cart_device->get_cart_base();
 
-	/* populate palettes */
+	// populate palettes
 	for (int color = 0; color < 64; color++)
 	{
 		m_composite_palette[color] = get_composite_color(color);
@@ -169,7 +180,7 @@ void gime_base_device::device_start(void)
 		m_rgb_palette[color] = get_rgb_color(color);
 	}
 
-	/* set up save states */
+	// set up save states
 	save_pointer(NAME(m_gime_registers), ARRAY_LENGTH(m_gime_registers));
 	save_pointer(NAME(m_mmu), ARRAY_LENGTH(m_mmu));
 	save_item(NAME(m_sam_state));
@@ -523,15 +534,12 @@ ATTR_FORCE_INLINE void gime_base_device::update_memory(void)
 
 void gime_base_device::update_memory(int bank)
 {
-	static const char *rbanks[] = { "rbank0", "rbank1", "rbank2", "rbank3", "rbank4", "rbank5", "rbank6", "rbank7", "rbank8" };
-	static const char *wbanks[] = { "wbank0", "wbank1", "wbank2", "wbank3", "wbank4", "wbank5", "wbank6", "wbank7", "wbank8" };
+	// choose bank
+	assert((bank >= 0) && (bank < ARRAY_LENGTH(m_read_banks)) && (bank < ARRAY_LENGTH(m_write_banks)));
+	memory_bank *read_bank = m_read_banks[bank];
+	memory_bank *write_bank = m_write_banks[bank];
 
-	/* look up the bank tags */
-	assert((bank >= 0) && (bank < ARRAY_LENGTH(rbanks)) && (bank < ARRAY_LENGTH(wbanks)));
-	const char *rbank = rbanks[bank];
-	const char *wbank = wbanks[bank];
-
-	/* bank 8 is really $FE00-$FEFF; it is weird so adjust for it */
+	// bank 8 is really $FE00-$FEFF; it is weird so adjust for it
 	offs_t offset;
 	bool force_ram;
 	bool enable_mmu = (m_gime_registers[0] & 0x40) ? true : false;
@@ -548,31 +556,31 @@ void gime_base_device::update_memory(int bank)
 		force_ram = false;
 	}
 
-	/* is the MMU enabled at $FF90? */
+	// is the MMU enabled at $FF90?
 	int block;
 	if (enable_mmu)
 	{
-		/* check TR register at $FF91 */
+		// check TR register at $FF91
 		bank += (m_gime_registers[1] & 0x01) ? 8 : 0;
 
-		/* perform the MMU lookup */
+		// perform the MMU lookup
 		block = m_mmu[bank];
 
-		/* also check $FF9B - relevant for the 2-8 MB upgrade */
+		// also check $FF9B - relevant for the 2-8 MB upgrade
 		block |= ((UINT32) ((m_gime_registers[11] >> 4) & 0x03)) << 8;
 	}
 	else
 	{
-		/* the MMU is not enabled */
+		// the MMU is not enabled
 		block = bank + 56;
 	}
 
-	/* are we actually in ROM? */
+	// are we actually in ROM?
 	UINT8 *memory;
 	bool is_read_only;
 	if (((block & 0x3F) >= 0x3C) && !(m_sam_state & SAM_STATE_TY) && !force_ram)
 	{
-		/* we're in ROM */
+		// we're in ROM
 		static const UINT8 rom_map[4][4] =
 		{
 			{ 0, 1, 6, 7 },
@@ -581,30 +589,30 @@ void gime_base_device::update_memory(int bank)
 			{ 4, 5, 6, 7 }
 		};
 
-		/* look up the block in the ROM map */
+		// look up the block in the ROM map
 		block = rom_map[m_gime_registers[0] & 3][(block & 0x3F) - 0x3C];
 
-		/* are we in onboard ROM or cart ROM? */
+		// are we in onboard ROM or cart ROM?
 		UINT8 *rom_ptr = (block & 4) ? m_cart_rom : m_rom;
-		/* TODO: make this unmapped */
+		// TODO: make this unmapped
 		if (rom_ptr==NULL) rom_ptr = m_rom;
-		/* perform the look up */
+		// perform the look up
 		memory = &rom_ptr[(block & 3) * 0x2000];
 		is_read_only = true;
 	}
 	else
 	{
-		/* we're in RAM */
+		// we're in RAM
 		memory = memory_pointer(block * 0x2000);
 		is_read_only = false;
 	}
 
-	/* compensate for offset */
+	// compensate for offset
 	memory += offset;
 
-	/* set the banks */
-	machine().root_device().membank(rbank)->set_base(memory);
-	machine().root_device().membank(wbank)->set_base(is_read_only ? m_dummy_bank : memory);
+	// set the banks
+	read_bank->set_base(memory);
+	write_bank->set_base(is_read_only ? m_dummy_bank : memory);
 }
 
 
