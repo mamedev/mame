@@ -35,7 +35,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
         their color code.
 
         Tile code with their msbit set are different as they mean:
-        draw a tile filled with a single color (0-1ff)
+        draw a tile filled with a single color (0-fff)
 
 
                             [ 512 Zooming Sprites ]
@@ -62,7 +62,7 @@ TILE_GET_INFO_MEMBER(metro_state::metro_k053936_get_tile_info)
 	SET_TILE_INFO_MEMBER(
 			2,
 			code & 0x7fff,
-			0x1e,
+			0xe,
 			0);
 }
 
@@ -73,7 +73,7 @@ TILE_GET_INFO_MEMBER(metro_state::metro_k053936_gstrik2_get_tile_info)
 	SET_TILE_INFO_MEMBER(
 			2,
 			(code & 0x7fff)>>2,
-			0x1e,
+			0xe,
 			0);
 }
 
@@ -110,12 +110,12 @@ TILEMAP_MAPPER_MEMBER(metro_state::tilemap_scan_gstrik2)
         Offset:     Bits:                   Value:
 
         0.w         fedc ---- ---- ----
-                    ---- ba98 7654 ----     Color Code
+                    ---- ba98 7654 ----     Color Code*
                     ---- ---- ---- 3210     Code High Bits
 
         2.w                                 Code Low Bits
 
-
+* 00-ff, but on later chips supporting it, xf means 256 color tile and palette x
 ***************************************************************************/
 
 
@@ -151,7 +151,7 @@ INLINE UINT8 get_tile_pix( running_machine &machine, UINT16 code, UINT8 x, UINT8
 
 	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
 	{
-		*pix = (code & 0x0fff)+0x1000;
+		*pix = code & 0x0fff;
 
 		if ((*pix & 0xf) != 0xf)
 			return 1;
@@ -159,7 +159,7 @@ INLINE UINT8 get_tile_pix( running_machine &machine, UINT16 code, UINT8 x, UINT8
 			return 0;
 
 	}
-	else if (((tile & 0x00f00000) == 0x00f00000)	&& (state->m_support_8bpp)) /* draw tile as 8bpp */
+	else if (((tile & 0x00f00000) == 0x00f00000)	&& (state->m_support_8bpp)) /* draw tile as 8bpp (e.g. balcube bg) */
 	{
 		gfx_element *gfx1 = machine.gfx[big?3:1];
 		UINT32 tile2 = big ? ((tile & 0xfffff) + 8*(code & 0xf)) :
@@ -184,7 +184,7 @@ INLINE UINT8 get_tile_pix( running_machine &machine, UINT16 code, UINT8 x, UINT8
 			case 0x3: *pix = data[(((big?15:7)-y) * (big?16:8)) + ((big?15:7)-x)]; break;
 		}
 
-		*pix |= ((((tile & 0x0f000000) >> 24) + 0x10)*0x100);
+		*pix |= ((tile & 0x0f000000) >> 24) * 0x100;
 
 		if ((*pix & 0xff) != 0xff)
 			return 1;
@@ -208,7 +208,6 @@ INLINE UINT8 get_tile_pix( running_machine &machine, UINT16 code, UINT8 x, UINT8
 			return 0;
 		}
 
-
 		switch (flipxy)
 		{
 			default:
@@ -218,7 +217,7 @@ INLINE UINT8 get_tile_pix( running_machine &machine, UINT16 code, UINT8 x, UINT8
 			case 0x3: *pix = data[(((big?15:7)-y) * (big?16:8)) + ((big?15:7)-x)]; break;
 		}
 
-		*pix |= (((((tile & 0x0ff00000) >> 20)) + 0x100)*0x10);
+		*pix |= (((tile & 0x0ff00000) >> 20)) * 0x10;
 
 		if ((*pix & 0xf) != 0xf)
 			return 1;
@@ -246,7 +245,6 @@ WRITE16_MEMBER(metro_state::metro_vram_2_w){ metro_vram_w(machine(), offset, dat
 WRITE16_MEMBER(metro_state::metro_window_w)
 {
 	COMBINE_DATA(&m_window[offset]);
-
 }
 
 
@@ -305,19 +303,13 @@ VIDEO_START_MEMBER(metro_state,metro_i4100)
 
 VIDEO_START_MEMBER(metro_state,metro_i4220)
 {
-	expand_gfx1(*this);
+	VIDEO_START_CALL_MEMBER(metro_i4100);
 
 	m_support_8bpp = 1;
-	m_support_16x16 = 0;
-	m_has_zoom = 0;
-
-	m_bg_tilemap_enable[0] = 1;
-	m_bg_tilemap_enable[1] = 1;
-	m_bg_tilemap_enable[2] = 1;
-
-	m_bg_tilemap_enable16[0] = 0;
-	m_bg_tilemap_enable16[1] = 0;
-	m_bg_tilemap_enable16[2] = 0;
+}
+VIDEO_START_MEMBER(metro_state,metro_i4220_offset)
+{
+	VIDEO_START_CALL_MEMBER(metro_i4220);
 
 	m_bg_tilemap_scrolldx[0] = -2;
 	m_bg_tilemap_scrolldx[1] = -2;
@@ -326,28 +318,13 @@ VIDEO_START_MEMBER(metro_state,metro_i4220)
 
 VIDEO_START_MEMBER(metro_state,metro_i4300)
 {
-	expand_gfx1(*this);
+	VIDEO_START_CALL_MEMBER(metro_i4220);
 
-	m_support_8bpp = 1;
 	m_support_16x16 = 1;
-	m_has_zoom = 0;
-
-	m_bg_tilemap_enable[0] = 1;
-	m_bg_tilemap_enable[1] = 1;
-	m_bg_tilemap_enable[2] = 1;
-
-	m_bg_tilemap_enable16[0] = 0;
-	m_bg_tilemap_enable16[1] = 0;
-	m_bg_tilemap_enable16[2] = 0;
-
-	m_bg_tilemap_scrolldx[0] = 0;
-	m_bg_tilemap_scrolldx[1] = 0;
-	m_bg_tilemap_scrolldx[2] = 0;
 }
 
 VIDEO_START_MEMBER(metro_state,blzntrnd)
 {
-
 	VIDEO_START_CALL_MEMBER(metro_i4220);
 
 	m_has_zoom = 1;
@@ -361,7 +338,6 @@ VIDEO_START_MEMBER(metro_state,blzntrnd)
 
 VIDEO_START_MEMBER(metro_state,gstrik2)
 {
-
 	VIDEO_START_CALL_MEMBER(metro_i4220);
 
 	m_has_zoom = 1;
@@ -448,7 +424,7 @@ void metro_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const r
 	int max_sprites = state->m_spriteram.bytes() / 8;
 	int sprites     = state->m_videoregs[0x00/2] % max_sprites;
 
-	int color_start = ((state->m_videoregs[0x08/2] & 0x0f) << 4) + 0x100;
+	int color_start = (state->m_videoregs[0x08/2] & 0x0f) << 4;
 
 	int i, j, pri;
 	static const int primask[4] = { 0x0000, 0xff00, 0xff00 | 0xf0f0, 0xff00 | 0xf0f0 | 0xcccc };
@@ -724,7 +700,7 @@ UINT32 metro_state::screen_update_metro(screen_device &screen, bitmap_ind16 &bit
 
 	/* The background color is selected by a register */
 	machine().priority_bitmap.fill(0, cliprect);
-	bitmap.fill((m_videoregs[0x12/2] & 0x0fff) + 0x1000, cliprect);
+	bitmap.fill(m_videoregs[0x12/2] & 0x0fff, cliprect);
 
 	/*  Screen Control Register:
 
