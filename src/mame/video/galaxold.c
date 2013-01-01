@@ -804,6 +804,8 @@ VIDEO_START_MEMBER(galaxold_state,bongo)
 {
 	VIDEO_START_CALL_MEMBER(galaxold_plain);
 
+	m_bg_tilemap->set_scrolldx(0, 384-256);
+
 	m_modify_spritecode = batman2_modify_spritecode;
 }
 
