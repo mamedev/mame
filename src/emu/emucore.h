@@ -343,12 +343,18 @@ template<class _Dest, class _Source>
 inline _Dest downcast(_Source *src)
 {
 #ifdef MAME_DEBUG
-	if (dynamic_cast<_Dest>(src) != src)
+	try {
+		if (dynamic_cast<_Dest>(src) != src)
+		{
+			if (dynamic_cast<const device_t *>(src) != NULL)
+				report_bad_device_cast(dynamic_cast<const device_t *>(src), typeid(src), typeid(_Dest));
+			else
+				report_bad_cast(typeid(src), typeid(_Dest));
+		}
+	}
+	catch (std::bad_cast &)
 	{
-		if (dynamic_cast<const device_t *>(src) != NULL)
-			report_bad_device_cast(dynamic_cast<const device_t *>(src), typeid(src), typeid(_Dest));
-		else
-			report_bad_cast(typeid(src), typeid(_Dest));
+		report_bad_cast(typeid(src), typeid(_Dest));
 	}
 #endif
 	return static_cast<_Dest>(src);
@@ -358,12 +364,18 @@ template<class _Dest, class _Source>
 inline _Dest downcast(_Source &src)
 {
 #ifdef MAME_DEBUG
-	if (&dynamic_cast<_Dest>(src) != &src)
+	try {
+		if (&dynamic_cast<_Dest>(src) != &src)
+		{
+			if (dynamic_cast<const device_t *>(&src) != NULL)
+				report_bad_device_cast(dynamic_cast<const device_t *>(&src), typeid(src), typeid(_Dest));
+			else
+				report_bad_cast(typeid(src), typeid(_Dest));
+		}
+	}
+	catch (std::bad_cast &)
 	{
-		if (dynamic_cast<const device_t *>(&src) != NULL)
-			report_bad_device_cast(dynamic_cast<const device_t *>(&src), typeid(src), typeid(_Dest));
-		else
-			report_bad_cast(typeid(src), typeid(_Dest));
+		report_bad_cast(typeid(src), typeid(_Dest));
 	}
 #endif
 	return static_cast<_Dest>(src);
@@ -375,7 +387,19 @@ inline _Dest downcast(_Source &src)
 template<class _Dest, class _Source>
 inline _Dest crosscast(_Source *src)
 {
-	_Dest result = dynamic_cast<_Dest>(src);
+	_Dest result;
+#ifdef MAME_DEBUG
+	try
+	{
+#endif
+		result = dynamic_cast<_Dest>(src);
+#ifdef MAME_DEBUG
+	}
+	catch (std::bad_cast &)
+	{
+		report_bad_cast(typeid(src), typeid(_Dest));
+	}
+#endif
 	assert(result != NULL);
 	if (result == NULL)
 		throw std::bad_cast();

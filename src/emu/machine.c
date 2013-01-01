@@ -433,6 +433,11 @@ int running_machine::run(bool firstrun)
 		mame_printf_error("Error performing a late bind of type %s to %s\n", btex.m_actual_type.name(), btex.m_target_type.name());
 		error = MAMERR_FATALERROR;
 	}
+	catch (std::exception &ex)
+	{
+		mame_printf_error("Caught unhandled %s exception: %s\n", typeid(ex).name(), ex.what());
+		error = MAMERR_FATALERROR;
+	}
 
 	// make sure our phase is set properly before cleaning up,
 	// in case we got here via exception
