@@ -7,9 +7,8 @@
 //
 //============================================================
 
-#include "emu.h"
-#include "osdcore.h"
 #include "portmidi/portmidi.h"
+#include "osdcore.h"
 
 void osd_list_midi_devices(void)
 {
