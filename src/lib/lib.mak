@@ -308,21 +308,13 @@ $(LIBOBJ)/libjpeg/%.o: $(LIBSRC)/libjpeg/%.c | $(OSPREBUILD)
 
 ifeq ($(TARGETOS),macosx)
 ifdef BIGENDIAN
-ifeq ($(PTR64),1)
-ARCHFLAGS = -arch ppc64 -DWORDS_BIGENDIAN=1
+ARCHFLAGS = -DWORDS_BIGENDIAN=1
 else
-ARCHFLAGS = -arch ppc -DWORDS_BIGENDIAN=1
-endif
-else	# BIGENDIAN
-ifeq ($(PTR64),1)
-ARCHFLAGS = -arch x86_64 -DWORDS_BIGENDIAN=0
-else
-ARCHFLAGS = -m32 -arch i386 -DWORDS_BIGENDIAN=0
-endif
-endif	# BIGENDIAN
-else    # ifeq ($(TARGETOS),macosx)
 ARCHFLAGS = -DWORDS_BIGENDIAN=0
-endif   # ifeq ($(TARGETOS),macosx)
+endif
+else
+ARCHFLAGS = -DWORDS_BIGENDIAN=0
+endif
 
 FLACOPTS=-DFLAC__NO_ASM -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DHAVE_CONFIG_H=0 -DFLAC__HAS_OGG=0 -Wno-unused-function $(ARCHFLAGS)
 
@@ -423,7 +415,7 @@ LIBPMOBJS += \
 	$(LIBOBJ)/portmidi/ptwinmm.o
 endif
 
-$(OBJ)/portmidi.a: $(LIBPMOBJS)
+$(OBJ)/libportmidi.a: $(LIBPMOBJS)
 
 $(LIBOBJ)/portmidi/%.o: $(LIBSRC)/portmidi/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
