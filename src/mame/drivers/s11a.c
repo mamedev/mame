@@ -13,7 +13,8 @@ ToDo:
 Note: To start a game, certain switches need to be activated.  You must first press and
       hold one of the trough switches (usually the left) and the ball shooter switch for
       about 1 second.  Then you are able to start a game.
-      Example: For Pinbot, you must hold L and V for a second, then press start.
+      For Pinbot, you must hold L and V for a second, then press start.
+      For Millionaire, you must hold [ and ] for a second, then start.
 
 *****************************************************************************************/
 
@@ -25,113 +26,8 @@ Note: To start a game, certain switches need to be activated.  You must first pr
 #include "sound/hc55516.h"
 #include "sound/2151intf.h"
 #include "sound/dac.h"
+#include "includes/s11.h"
 #include "s11a.lh"
-
-// 6802/8 CPU's input clock is 4MHz
-// but because it has an internal /4 divider, its E clock runs at 1/4 that frequency
-#define E_CLOCK (XTAL_4MHz/4)
-
-// Length of time in cycles between IRQs on the main 6808 CPU
-// This length is determined by the settings of the W14 and W15 jumpers
-// It can be 0x300, 0x380, 0x700 or 0x780 cycles long.
-// IRQ length is always 32 cycles
-#define S11_IRQ_CYCLES 0x380
-
-class s11a_state : public genpin_class
-{
-public:
-	s11a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: genpin_class(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_audiocpu(*this, "audiocpu"),
-	m_bgcpu(*this, "bgcpu"),
-	m_dac(*this, "dac"),
-	m_dac1(*this, "dac1"),
-	m_hc55516(*this, "hc55516"),
-	m_pias(*this, "pias"),
-	m_pia21(*this, "pia21"),
-	m_pia24(*this, "pia24"),
-	m_pia28(*this, "pia28"),
-	m_pia2c(*this, "pia2c"),
-	m_pia30(*this, "pia30"),
-	m_pia34(*this, "pia34"),
-	m_pia40(*this, "pia40"),
-	m_ym(*this, "ym2151")
-	{ }
-
-	DECLARE_READ8_MEMBER(dac_r);
-	DECLARE_WRITE8_MEMBER(dac_w);
-	DECLARE_WRITE8_MEMBER(bank_w);
-	DECLARE_WRITE8_MEMBER(bgbank_w);
-	DECLARE_WRITE8_MEMBER(dig0_w);
-	DECLARE_WRITE8_MEMBER(dig1_w);
-	DECLARE_WRITE8_MEMBER(lamp0_w);
-	DECLARE_WRITE8_MEMBER(lamp1_w) { };
-	DECLARE_WRITE8_MEMBER(sol2_w) { }; // solenoids 8-15
-	DECLARE_WRITE8_MEMBER(sol3_w); // solenoids 0-7
-	DECLARE_WRITE8_MEMBER(sound_w);
-	DECLARE_WRITE8_MEMBER(pia2c_pa_w);
-	DECLARE_WRITE8_MEMBER(pia2c_pb_w);
-	DECLARE_WRITE8_MEMBER(pia34_pa_w);
-	DECLARE_WRITE8_MEMBER(pia34_pb_w);
-	DECLARE_WRITE_LINE_MEMBER(pia34_cb2_w);
-	DECLARE_WRITE8_MEMBER(pia40_pa_w);
-	DECLARE_WRITE8_MEMBER(pia40_pb_w);
-	DECLARE_WRITE_LINE_MEMBER(pia40_cb2_w);
-	DECLARE_READ8_MEMBER(dips_r);
-	DECLARE_READ8_MEMBER(switch_r);
-	DECLARE_WRITE8_MEMBER(switch_w);
-	DECLARE_READ_LINE_MEMBER(pias_ca1_r);
-	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
-	DECLARE_READ8_MEMBER(pia28_w7_r);
-	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-	DECLARE_MACHINE_RESET(s11a);
-	DECLARE_DRIVER_INIT(s11a);
-protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
-	required_device<cpu_device> m_bgcpu;
-	required_device<dac_device> m_dac;
-	required_device<dac_device> m_dac1;
-	required_device<hc55516_device> m_hc55516;
-	required_device<pia6821_device> m_pias;
-	required_device<pia6821_device> m_pia21;
-	required_device<pia6821_device> m_pia24;
-	required_device<pia6821_device> m_pia28;
-	required_device<pia6821_device> m_pia2c;
-	required_device<pia6821_device> m_pia30;
-	required_device<pia6821_device> m_pia34;
-	required_device<pia6821_device> m_pia40;
-	required_device<ym2151_device> m_ym;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-private:
-	UINT8 m_sound_data;
-	UINT8 m_strobe;
-	UINT8 m_kbdrow;
-	UINT8 m_diag;
-	UINT32 m_segment1;
-	UINT32 m_segment2;
-	bool m_ca1;
-	emu_timer* m_irq_timer;
-	bool m_irq_active;
-
-	static const device_timer_id TIMER_IRQ = 0;
-};
 
 static ADDRESS_MAP_START( s11a_main_map, AS_PROGRAM, 8, s11a_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
@@ -241,109 +137,28 @@ static INPUT_PORTS_START( s11a )
 	PORT_CONFSETTING( 0x10, "English" )
 INPUT_PORTS_END
 
-void s11a_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch(id)
-	{
-	case TIMER_IRQ:
-		if(param == 1)
-		{
-			m_maincpu->set_input_line(M6800_IRQ_LINE,ASSERT_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
-			m_pias->cb1_w(0);
-			m_irq_active = true;
-			m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
-			m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));  // Up/Down
-		}
-		else
-		{
-			m_maincpu->set_input_line(M6800_IRQ_LINE,CLEAR_LINE);
-			m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
-			m_pias->cb1_w(1);
-			m_irq_active = false;
-			m_pia28->ca1_w(1);
-			m_pia28->cb1_w(1);
-		}
-		break;
-	}
-}
 
 MACHINE_RESET_MEMBER( s11a_state, s11a )
 {
-	membank("bank0")->set_entry(0);
-	membank("bank1")->set_entry(0);
+	MACHINE_RESET_CALL_MEMBER(s11);
 	membank("bgbank")->set_entry(0);
-}
-
-INPUT_CHANGED_MEMBER( s11a_state::main_nmi )
-{
-	// Diagnostic button sends a pulse to NMI pin
-	if (newval==CLEAR_LINE)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-INPUT_CHANGED_MEMBER( s11a_state::audio_nmi )
-{
-	// Diagnostic button sends a pulse to NMI pin
-	if (newval==CLEAR_LINE)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-WRITE_LINE_MEMBER( s11a_state::pia_irq )
-{
-	if(state == CLEAR_LINE)
-	{
-		// restart IRQ timer
-		m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
-		m_irq_active = false;
-	}
-	else
-	{
-		// disable IRQ timer while other IRQs are being handled
-		// (counter is reset every 32 cycles while a PIA IRQ is handled)
-		m_irq_timer->adjust(attotime::zero);
-		m_irq_active = true;
-	}
-}
-
-WRITE8_MEMBER( s11a_state::sol3_w )
-{
-
-}
-
-WRITE8_MEMBER( s11a_state::sound_w )
-{
-	m_sound_data = data;
-}
-
-WRITE_LINE_MEMBER( s11a_state::pia21_ca2_w )
-{
-// sound ns
-	m_ca1 = state;
-	m_pias->ca1_w(m_ca1);
-	m_pia40->cb2_w(m_ca1);
 }
 
 static const pia6821_interface pia21_intf =
 {
-	DEVCB_DRIVER_MEMBER(s11a_state, dac_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(s11_state, dac_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_LINE_GND,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11a_state, sound_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11a_state, sol2_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia21_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia21_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia_irq)		/* IRQB */
+	DEVCB_DRIVER_MEMBER(s11_state, sound_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, sol2_w),		/* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia21_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia21_cb2_w),		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),		/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
 };
-
-WRITE8_MEMBER( s11a_state::lamp0_w )
-{
-	m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
-}
 
 static const pia6821_interface pia24_intf =
 {
@@ -353,87 +168,41 @@ static const pia6821_interface pia24_intf =
 	DEVCB_LINE_GND,		/* line CB1 in */
 	DEVCB_LINE_VCC,		/* line CA2 in */
 	DEVCB_LINE_VCC,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11a_state, lamp0_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11a_state, lamp1_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(s11_state, lamp0_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, lamp1_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia24_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia_irq)		/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia24_cb2_w),		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),		/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
 };
 
 WRITE8_MEMBER( s11a_state::dig0_w )
 {
 	data &= 0x7f;
-	m_strobe = data & 15;
-	m_diag = (data & 0x70) >> 4;
-	output_set_digit_value(60, 0);  // not connected to PA5 or PA6?
-	output_set_digit_value(61, m_diag & 0x01);  // connected to PA4
-	output_set_digit_value(62, 0);
-	m_segment1 = 0;
-	m_segment2 = 0;
-}
-
-WRITE8_MEMBER( s11a_state::dig1_w )
-{
-	m_segment2 |= data;
-	m_segment2 |= 0x20000;
-	if ((m_segment2 & 0x70000) == 0x30000)
-	{
-		output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
-		m_segment2 |= 0x40000;
-	}
-}
-
-READ8_MEMBER( s11a_state::pia28_w7_r)
-{
-	UINT8 ret = 0x80;
-
-	ret |= m_strobe;
-	ret |= m_diag << 4;
-
-	if(BIT(ioport("DIAGS")->read(), 4))  // W7 Jumper
-		ret &= ~0x80;
-
-	return ret;
+	set_strobe(data & 15);
+	set_diag((data & 0x70) >> 4);
+	output_set_digit_value(60, 0);  // +5VDC (always on)
+	output_set_digit_value(61, get_diag() & 0x01);  // connected to PA4
+	output_set_digit_value(62, 0);  // Blanking (pretty much always on)
+	set_segment1(0);
+	set_segment2(0);
 }
 
 static const pia6821_interface pia28_intf =
 {
-	DEVCB_DRIVER_MEMBER(s11a_state, pia28_w7_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(s11_state, pia28_w7_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_DRIVER_MEMBER(s11a_state, dig0_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11a_state, dig1_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia28_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia28_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia_irq)		/* IRQB */
+	DEVCB_DRIVER_MEMBER(s11_state, dig1_w),		/* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia28_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia28_cb2_w),		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),		/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
 };
-
-WRITE8_MEMBER( s11a_state::pia2c_pa_w )
-{
-	m_segment1 |= (data<<8);
-	m_segment1 |= 0x10000;
-	if ((m_segment1 & 0x70000) == 0x30000)
-	{
-		output_set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
-		m_segment1 |= 0x40000;
-	}
-}
-
-WRITE8_MEMBER( s11a_state::pia2c_pb_w )
-{
-	m_segment1 |= data;
-	m_segment1 |= 0x20000;
-	if ((m_segment1 & 0x70000) == 0x30000)
-	{
-		output_set_digit_value(m_strobe, BITSWAP16(m_segment1, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
-		m_segment1 |= 0x40000;
-	}
-}
 
 static const pia6821_interface pia2c_intf =
 {
@@ -443,62 +212,29 @@ static const pia6821_interface pia2c_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11a_state, pia2c_pa_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11a_state, pia2c_pb_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(s11_state, pia2c_pa_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, pia2c_pb_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia_irq)		/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),		/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
 };
-
-READ8_MEMBER( s11a_state::switch_r )
-{
-	char kbdrow[8];
-	sprintf(kbdrow,"X%X",m_kbdrow);
-	return ~ioport(kbdrow)->read();
-}
-
-WRITE8_MEMBER( s11a_state::switch_w )
-{
-	m_kbdrow = data;
-}
 
 static const pia6821_interface pia30_intf =
 {
-	DEVCB_DRIVER_MEMBER(s11a_state, switch_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(s11_state, switch_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
 	DEVCB_LINE_GND,		/* line CA1 in */
 	DEVCB_LINE_GND,		/* line CB1 in */
 	DEVCB_LINE_VCC,		/* line CA2 in */
 	DEVCB_LINE_VCC,		/* line CB2 in */
 	DEVCB_NULL,		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11a_state, switch_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(s11_state, switch_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia30_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia_irq)		/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia30_cb2_w),		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),		/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
 };
-
-WRITE8_MEMBER( s11a_state::pia34_pa_w )
-{
-	m_segment2 |= (data<<8);
-	m_segment2 |= 0x10000;
-	if ((m_segment2 & 0x70000) == 0x30000)
-	{
-		output_set_digit_value(m_strobe+16, BITSWAP16(m_segment2, 7, 15, 12, 10, 8, 14, 13, 9, 11, 6, 5, 4, 3, 2, 1, 0));
-		m_segment2 |= 0x40000;
-	}
-}
-
-WRITE8_MEMBER( s11a_state::pia34_pb_w )
-{
-	m_pia40->portb_w(data);
-}
-
-WRITE_LINE_MEMBER( s11a_state::pia34_cb2_w )
-{
-	m_pia40->cb1_w(state);  // MCB2 through CPU interface
-}
 
 static const pia6821_interface pia34_intf =
 {
@@ -508,120 +244,57 @@ static const pia6821_interface pia34_intf =
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11a_state, pia34_pa_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11a_state, pia34_pb_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(s11_state, pia34_pa_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, pia34_pb_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia34_cb2_w),		/* line CB2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia_irq),		/* IRQA */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia_irq)		/* IRQB */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia34_cb2_w),		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq),		/* IRQA */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia_irq)		/* IRQB */
 };
-
-WRITE8_MEMBER( s11a_state::bank_w )
-{
-	membank("bank0")->set_entry(BIT(data, 1));
-	membank("bank1")->set_entry(BIT(data, 0));
-}
 
 WRITE8_MEMBER( s11a_state::bgbank_w )
 {
 	membank("bgbank")->set_entry(BIT(data, 0));
 }
 
-READ_LINE_MEMBER( s11a_state::pias_ca1_r )
-{
-	return m_ca1;
-}
-
-WRITE_LINE_MEMBER( s11a_state::pias_ca2_w )
-{
-// speech clock
-	hc55516_clock_w(m_hc55516, state);
-}
-
-WRITE_LINE_MEMBER( s11a_state::pias_cb2_w )
-{
-// speech data
-	hc55516_digit_w(m_hc55516, state);
-}
-
-READ8_MEMBER( s11a_state::dac_r )
-{
-	return m_sound_data;
-}
-
-WRITE8_MEMBER( s11a_state::dac_w )
-{
-	m_dac->write_unsigned8(data);
-}
-
-WRITE_LINE_MEMBER( s11a_state::pia40_cb2_w)
-{
-	m_pia34->cb1_w(state);  // To Widget MCB1 through CPU Data interface
-}
-
 static const pia6821_interface pias_intf =
 {
-	DEVCB_DRIVER_MEMBER(s11a_state, dac_r),		/* port A in */
+	DEVCB_DRIVER_MEMBER(s11_state, dac_r),		/* port A in */
 	DEVCB_NULL,		/* port B in */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pias_ca1_r),		/* line CA1 in */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca1_r),		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11a_state, sound_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11a_state, dac_w),		/* port B out */
+	DEVCB_DRIVER_MEMBER(s11_state, sound_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, dac_w),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pia40_cb2_w),		/* line CB2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pia40_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("audiocpu", M6800_IRQ_LINE)		/* IRQB */
 };
-
-WRITE8_MEMBER( s11a_state::pia40_pa_w )
-{
-	m_dac1->write_unsigned8(data);
-}
-
-WRITE8_MEMBER( s11a_state::pia40_pb_w )
-{
-	m_pia34->portb_w(data);
-}
-
-WRITE_LINE_MEMBER( s11a_state::ym2151_irq_w)
-{
-	if(state == CLEAR_LINE)
-		m_pia40->ca1_w(1);
-	else
-		m_pia40->ca1_w(0);
-}
 
 static const pia6821_interface pia40_intf =
 {
 	DEVCB_NULL,		/* port A in */
 	DEVCB_NULL,		/* port B in */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pias_ca1_r),		/* line CA1 in */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca1_r),		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_LINE_VCC,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DRIVER_MEMBER(s11a_state, pia40_pa_w),		/* port A out */
-	DEVCB_DRIVER_MEMBER(s11a_state, pia40_pb_w),		/* port B out */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pias_ca2_w),		/* line CA2 out */
-	DEVCB_DRIVER_LINE_MEMBER(s11a_state, pias_cb2_w),		/* line CB2 out */
+	DEVCB_DRIVER_MEMBER(s11_state, pia40_pa_w),		/* port A out */
+	DEVCB_DRIVER_MEMBER(s11_state, pia40_pb_w),		/* port B out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_ca2_w),		/* line CA2 out */
+	DEVCB_DRIVER_LINE_MEMBER(s11_state, pias_cb2_w),		/* line CB2 out */
 	DEVCB_CPU_INPUT_LINE("bgcpu", M6809_FIRQ_LINE),		/* IRQA */
 	DEVCB_CPU_INPUT_LINE("bgcpu", INPUT_LINE_NMI)		/* IRQB */
 };
 
 DRIVER_INIT_MEMBER( s11a_state, s11a )
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
 	UINT8 *BGROM = memregion("bgcpu")->base();
-	membank("bank0")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
-	membank("bank1")->configure_entries(0, 2, &ROM[0x18000], 0x4000);
 	membank("bgbank")->configure_entries(0, 2, &BGROM[0x10000], 0x8000);
-	membank("bank0")->set_entry(0);
-	membank("bank1")->set_entry(0);
 	membank("bgbank")->set_entry(0);
-	m_irq_timer = timer_alloc(TIMER_IRQ);
-	m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
-	m_irq_active = false;
+	s11_state::init_s11();
 }
 
 static MACHINE_CONFIG_START( s11a, s11a_state )

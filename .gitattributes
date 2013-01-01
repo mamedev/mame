@@ -4163,6 +4163,7 @@ src/mame/includes/route16.h svneol=native#text/plain
 src/mame/includes/rpunch.h svneol=native#text/plain
 src/mame/includes/runaway.h svneol=native#text/plain
 src/mame/includes/rungun.h svneol=native#text/plain
+src/mame/includes/s11.h svneol=native#text/plain
 src/mame/includes/sauro.h svneol=native#text/plain
 src/mame/includes/sbasketb.h svneol=native#text/plain
 src/mame/includes/sbugger.h svneol=native#text/plain
