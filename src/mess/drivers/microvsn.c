@@ -6,6 +6,11 @@
     * Add support for the paddle control
     * Finish support for i8021 based cartridges
 
+Since the microcontrollers were on the cartridges it was possible to have
+different clocks on different games.
+The Connect Four I8021 game is clocked at around 2MHz. The TMS1100 versions
+of the games were clocked at around 500KHz, 550KHz, or 300KHz.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -447,10 +452,10 @@ static const tms0980_config microvision_tms0980_config =
 
 
 static MACHINE_CONFIG_START( microvision, microvision_state )
-	MCFG_CPU_ADD("maincpu1", I8021, 400000)	// totally wild guess, needs to be verified
+	MCFG_CPU_ADD("maincpu1", I8021, 2000000)	// approximately
 	MCFG_CPU_IO_MAP( microvision_8021_io )
-	MCFG_CPU_ADD("maincpu2", TMS1100, 400000)
-	MCFG_CPU_CONFIG( microvision_tms0980_config ) // totally wild guess, needs to be verified
+	MCFG_CPU_ADD("maincpu2", TMS1100, 500000)	// most games seem to be running at approximately this speed
+	MCFG_CPU_CONFIG( microvision_tms0980_config )
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60)
