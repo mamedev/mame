@@ -756,8 +756,17 @@ void wd33c93_device::device_config_complete()
 
 void wd33c93_device::device_start()
 {
-	memset(&regs, 0, sizeof(regs));
+	memset(regs, 0, sizeof(regs));
 	memset(devices, 0, sizeof(devices));
+	memset(fifo, 0, sizeof(fifo));
+	memset(temp_input, 0, sizeof(temp_input));
+
+	sasr = 0;
+	fifo_pos = 0;
+	temp_input_pos = 0;
+	busphase = 0;
+	identify = 0;
+	read_pending = 0;
 
 	// try to open the devices
 	for( device_t *device = owner()->first_subdevice(); device != NULL; device = device->next() )
