@@ -1467,14 +1467,14 @@ mpf1	// 1979 Multitech Micro Professor 1
 mpf1b	   // 1979 Multitech Micro Professor 1B
 
 // Telercas Oy
-tmc1800
+//tmc1800
 tmc2000
 tmc2000e
 //  tmc600s1
 tmc600s2
 
 // OSCOM Oy
-osc1000b
+//osc1000b
 nano
 
 // MIT
