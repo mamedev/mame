@@ -997,11 +997,45 @@ UINT32 s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		int x,y;
 		UINT16 cx = s3.cursor_x & 0x07ff;
 		UINT16 cy = s3.cursor_y & 0x07ff;
+		UINT32 bg_col;
+		UINT32 fg_col;
 
 		if(cur_mode == SCREEN_OFF || cur_mode == TEXT_MODE || cur_mode == MONO_MODE || cur_mode == CGA_MODE || cur_mode == EGA_MODE)
 			return 0;  // cursor only works in VGA or SVGA modes
 
 		src = s3.cursor_start_addr * 1024;  // start address is in units of 1024 bytes
+
+		if(cur_mode == RGB16_MODE)
+		{
+			int r,g,b;
+			UINT16 datax;
+
+			datax = s3.cursor_bg[0]|s3.cursor_bg[1]<<8;
+			r = (datax&0xf800)>>11;
+			g = (datax&0x07e0)>>5;
+			b = (datax&0x001f)>>0;
+			r = (r << 3) | (r & 0x7);
+			g = (g << 2) | (g & 0x3);
+			b = (b << 3) | (b & 0x7);
+			bg_col = (0xff<<24)|(r<<16)|(g<<8)|(b<<0);
+
+			datax = s3.cursor_fg[0]|s3.cursor_fg[1]<<8;
+			r = (datax&0xf800)>>11;
+			g = (datax&0x07e0)>>5;
+			b = (datax&0x001f)>>0;
+			r = (r << 3) | (r & 0x7);
+			g = (g << 2) | (g & 0x3);
+			b = (b << 3) | (b & 0x7);
+			fg_col = (0xff<<24)|(r<<16)|(g<<8)|(b<<0);
+		}
+		else /* TODO: other modes */
+		{
+			bg_col = screen.machine().pens[s3.cursor_bg[0]];
+			fg_col = screen.machine().pens[s3.cursor_fg[0]];
+		}
+
+		//popmessage("%08x %08x",(s3.cursor_bg[0])|(s3.cursor_bg[1]<<8)|(s3.cursor_bg[2]<<16)|(s3.cursor_bg[3]<<24)
+		//					  ,(s3.cursor_fg[0])|(s3.cursor_fg[1]<<8)|(s3.cursor_fg[2]<<16)|(s3.cursor_fg[3]<<24));
 //      for(x=0;x<64;x++)
 //          printf("%08x: %02x %02x %02x %02x\n",src+x*4,vga.memory[src+x*4],vga.memory[src+x*4+1],vga.memory[src+x*4+2],vga.memory[src+x*4+3]);
 		for(y=0;y<64;y++)
@@ -1023,10 +1057,10 @@ UINT32 s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 						// no change
 						break;
 					case 0x02:
-						dst[x] = screen.machine().pens[s3.cursor_bg[0]];
+						dst[x] = bg_col;
 						break;
 					case 0x03:
-						dst[x] = screen.machine().pens[s3.cursor_fg[0]];
+						dst[x] = fg_col;
 						break;
 					}
 				}
@@ -1035,10 +1069,10 @@ UINT32 s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 					switch(val)
 					{
 					case 0x00:
-						dst[x] = screen.machine().pens[s3.cursor_bg[0]];
+						dst[x] = bg_col;
 						break;
 					case 0x01:
-						dst[x] = screen.machine().pens[s3.cursor_fg[0]];
+						dst[x] = fg_col;
 						break;
 					case 0x02:  // screen data
 						// no change
