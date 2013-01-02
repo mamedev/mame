@@ -8,7 +8,7 @@
 
 	<view name="CRT">
 		<screen index="1">
-			<bounds left="0" top="0" right="4" bottom="3" />
+			<bounds left="0" top="0" right="~scr1width~" bottom="~scr1height~" />
 		</screen>
 	</view>
 
@@ -17,7 +17,7 @@
 			<bounds x="0" y="0" width="~scr0width~" height="~scr0height~" />
 		</screen>
 		<screen index="1">
-			<bounds x="~scr0width~" y="0" width="4" height="3" />
+			<bounds x="~scr0width~" y="0" width="~scr1width~" height="~scr1height~" />
 		</screen>
 	</view>
 
@@ -26,7 +26,7 @@
 			<bounds x="0" y="0" width="~scr0width~" height="~scr0height~" />
 		</screen>
 		<screen index="1">
-			<bounds x="0" y="~scr0height~" width="4" height="3" />
+			<bounds x="0" y="~scr0height~" width="~scr1width~" height="~scr1height~" />
 		</screen>
 	</view>
 </mamelayout>
