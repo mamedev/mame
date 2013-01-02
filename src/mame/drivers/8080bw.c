@@ -452,10 +452,6 @@ static INPUT_PORTS_START( spcewars )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, "1500" )
 	PORT_DIPSETTING(    0x08, "2000" )
-
-	/* Dummy port for cocktail mode (not used) */
-	PORT_MODIFY(INVADERS_CAB_TYPE_PORT_TAG)
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( spcewars, mw8080bw_root, _8080bw_state )
@@ -474,6 +470,10 @@ static MACHINE_CONFIG_DERIVED_CLASS( spcewars, mw8080bw_root, _8080bw_state )
 	/* extra audio channel */
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invaders)
 MACHINE_CONFIG_END
 
 
@@ -645,10 +645,10 @@ INPUT_PORTS_END
 /*******************************************************/
 /*                                                     */
 /* bootleg "Space Attack II"                           */
-/* no cocktail mode, only has one controller           */
+/*                                                     */
 /*******************************************************/
 
-static INPUT_PORTS_START( spaceatt )
+static INPUT_PORTS_START( spaceat2 )
 	PORT_INCLUDE( sicv )
 
 	PORT_MODIFY("IN2")
@@ -4334,7 +4334,7 @@ GAMEL(1979, cosmicm2,   invaders, cosmicmo,  cosmicmo,  driver_device, 0, ROT270
 GAMEL(1980?,sinvzen,    invaders, invaders,  sinvzen,   driver_device, 0, ROT270, "Taito / Zenitone-Microsec Ltd.", "Super Invaders (Zenitone-Microsec)", GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1980, ultrainv,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "Taito / Konami", "Ultra Invaders", GAME_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1978, spaceatt,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg (Video Games GmbH)", "Space Attack (bootleg of Space Invaders)", GAME_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1980, spaceat2,   invaders, invaders,  spaceatt,  driver_device, 0, ROT270, "bootleg (Video Games UK)", "Space Attack II (bootleg of Super Invaders)", GAME_SUPPORTS_SAVE, layout_invaders ) // bootleg of Zenitone-Microsec Super Invaders
+GAMEL(1980, spaceat2,   invaders, invaders,  spaceat2,  driver_device, 0, ROT270, "bootleg (Video Games UK)", "Space Attack II (bootleg of Super Invaders)", GAME_SUPPORTS_SAVE, layout_invaders ) // bootleg of Zenitone-Microsec Super Invaders
 GAMEL(1979, spacecom,   invaders, spacecom,  spacecom,  _8080bw_state, spacecom, ROT270, "bootleg", "Space Combat (bootleg of Space Invaders)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_spacecom )
 GAME( 1978, spacerng,   invaders, spacerng,  sitv,      driver_device, 0, ROT90,  "bootleg (Leisure Time Electronics)", "Space Ranger (bootleg of Space Invaders)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // many modifications
 GAMEL(19??, invasion,   invaders, invaders,  invasion,  driver_device, 0, ROT270, "bootleg (Sidam)", "Invasion (Sidam)", GAME_SUPPORTS_SAVE, layout_invaders )
