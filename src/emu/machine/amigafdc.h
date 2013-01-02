@@ -24,6 +24,7 @@ public:
 	void dsklen_w(UINT16 data);
 	void adkcon_set(UINT16 data);
 	void dmacon_set(UINT16 data);
+	UINT16 adkcon_r(void);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 

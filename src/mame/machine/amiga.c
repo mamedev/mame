@@ -1227,6 +1227,9 @@ READ16_HANDLER( amiga_custom_r )
 
 		case REG_DSKPTL:
 			return space.machine().device<amiga_fdc>("fdc")->dskptl_r();
+
+		case REG_ADKCONR:
+			return space.machine().device<amiga_fdc>("fdc")->adkcon_r();
 	}
 
 	if (LOG_CUSTOM)

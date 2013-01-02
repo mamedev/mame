@@ -286,6 +286,11 @@ void amiga_fdc::adkcon_set(UINT16 data)
 	live_run();
 }
 
+UINT16 amiga_fdc::adkcon_r(void)
+{
+	return adkcon;
+}
+
 void amiga_fdc::dsklen_w(UINT16 data)
 {
 	live_sync();

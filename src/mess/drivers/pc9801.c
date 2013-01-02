@@ -78,7 +78,6 @@
     - Arquephos: needs extra sound board(s)?
     - Asoko no Koufuku: black screen with BGM, waits at 0x225f6;
     - Aura Battler Dumbine: upd7220: unimplemented FIGD, has layer clearance bugs on gameplay;
-    - Bakasuka Wars: drawing seems busted (either mouse or upd7220)
     - Band-Kun: (how to run this without installing?)
     - Battle Chess: wants some dip-switches to be on in DSW4, too slow during IA thinking?
 	- Bishoujo Audition: Moans with a "(program) ended. remove the floppy disk and turn off the poewr."
