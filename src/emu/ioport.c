@@ -884,7 +884,6 @@ digital_joystick::digital_joystick(int player, int number)
 	  m_current4way(0),
 	  m_previous(0)
 {
-	memset(m_field, 0, sizeof(m_field));
 }
 
 
