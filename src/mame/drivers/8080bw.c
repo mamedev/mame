@@ -159,6 +159,13 @@
     - Steel Worker, Space Combat
         Holding down the coin button causes the credits to rapidly increase.
 
+    - Solfight
+        On the stage with rolling balls, lots of random dashes appear.
+
+    - Shuttle Invader
+        There's a colour prom on the net (see misfitmame), but no evidence
+        of an actual machine.
+
 
 *****************************************************************************/
 
