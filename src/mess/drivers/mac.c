@@ -896,7 +896,14 @@ static const floppy_interface mac_floppy_interface =
 
 static const cuda_interface mac_cuda_interface =
 {
-    DEVCB_DRIVER_LINE_MEMBER(mac_state, cuda_reset_w)
+    DEVCB_DRIVER_LINE_MEMBER(mac_state, cuda_reset_w),
+    DEVCB_DRIVER_LINE_MEMBER(mac_state, adb_linechange_w)
+};
+
+static const cuda_interface mac_egret_interface =
+{
+    DEVCB_DRIVER_LINE_MEMBER(mac_state, cuda_reset_w),
+    DEVCB_DRIVER_LINE_MEMBER(mac_state, adb_linechange_w)
 };
 
 static MACHINE_CONFIG_START( mac512ke, mac_state )
@@ -1162,7 +1169,7 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_EGRET_ADD(EGRET_341S0850)
+	MCFG_EGRET_ADD(EGRET_341S0850, mac_egret_interface)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 
@@ -1203,7 +1210,7 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_EGRET_REPLACE(EGRET_341S0851)
+	MCFG_EGRET_REPLACE(EGRET_341S0851, mac_egret_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maclc520, maclc3 )
@@ -1233,7 +1240,7 @@ static MACHINE_CONFIG_DERIVED( maciivx, maclc )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,60M,64M")
 
-	MCFG_EGRET_REPLACE(EGRET_341S0851)
+	MCFG_EGRET_REPLACE(EGRET_341S0851, mac_egret_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maciivi, maclc )
@@ -1257,7 +1264,7 @@ static MACHINE_CONFIG_DERIVED( maciivi, maclc )
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,60M,64M")
 
-	MCFG_EGRET_REPLACE(EGRET_341S0851)
+	MCFG_EGRET_REPLACE(EGRET_341S0851, mac_egret_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maciix, macii )
@@ -1497,7 +1504,7 @@ static MACHINE_CONFIG_DERIVED( macclas2, maclc )
 	MCFG_RAM_DEFAULT_SIZE("10M")
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,6M,8M,10M")
 
-	MCFG_EGRET_REPLACE(EGRET_341S0851)
+	MCFG_EGRET_REPLACE(EGRET_341S0851, mac_egret_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( maciici, macii )
@@ -1560,7 +1567,7 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M,48M,64M,128M")
 
-    MCFG_EGRET_ADD(EGRET_344S0100)
+    MCFG_EGRET_ADD(EGRET_344S0100, mac_egret_interface)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 

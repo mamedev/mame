@@ -1183,8 +1183,9 @@ void mac_state::adb_reset()
 	}
 }
 
-void mac_state::adb_linechange(int state, int dtime)
+WRITE_LINE_MEMBER(mac_state::adb_linechange_w)
 {
+	int dtime = 0;
 /*    static const char *states[] =
     {
         "idle",
@@ -1202,6 +1203,15 @@ void mac_state::adb_linechange(int state, int dtime)
         "rcvstartbit",
         "srqnodata"
     };*/
+
+    if (ADB_IS_EGRET)
+    {
+        dtime = m_egret->get_adb_dtime();
+    }
+    else if (ADB_IS_CUDA)
+    {
+		dtime = m_cuda->get_adb_dtime();
+    }
 
 /*    if (m_adb_linestate <= 12)
     {

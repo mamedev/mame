@@ -142,6 +142,7 @@ public:
     DECLARE_WRITE_LINE_MEMBER(drq_539x_1_w);
 
     DECLARE_WRITE_LINE_MEMBER(cuda_reset_w);
+    DECLARE_WRITE_LINE_MEMBER(cuda_adb_linechange_w);
 
     // hack functions
 	DECLARE_READ64_MEMBER ( unk1_r );

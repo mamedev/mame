@@ -144,6 +144,10 @@ WRITE_LINE_MEMBER(macpci_state::cuda_reset_w)
     machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, state);
 }
 
+WRITE_LINE_MEMBER(macpci_state::cuda_adb_linechange_w)
+{
+}
+
 static void mac_driver_init(running_machine &machine, model_t model)
 {
 	macpci_state *mac = machine.driver_data<macpci_state>();

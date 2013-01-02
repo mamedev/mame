@@ -100,7 +100,8 @@ struct cdrom_interface pippin_cdrom =
 
 static const cuda_interface mac_cuda_interface =
 {
-    DEVCB_DRIVER_LINE_MEMBER(macpci_state, cuda_reset_w)
+    DEVCB_DRIVER_LINE_MEMBER(macpci_state, cuda_reset_w),
+    DEVCB_DRIVER_LINE_MEMBER(macpci_state, cuda_adb_linechange_w)
 };
 
 static MACHINE_CONFIG_START( pippin, macpci_state )
@@ -136,7 +137,7 @@ static MACHINE_CONFIG_START( pippin, macpci_state )
 	MCFG_RAM_DEFAULT_SIZE("32M")
 
 	MCFG_VIA6522_ADD("via6522_0", C7M/10, pcimac_via6522_intf)
-//  MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(mac_state::set_scc_interrupt), static_cast<mac_state *>(owner)))
+//  MCFG_SCC8530_ADD("scc", C7M, line_cb_t(FUNC(macpci_state::set_scc_interrupt), static_cast<macpci_state *>(owner)))
     MCFG_CUDA_ADD(CUDA_341S0060, mac_cuda_interface)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END

@@ -230,8 +230,6 @@ public:
 	UINT32 m_se30_vbl_enable;
 	UINT8 m_nubus_irq_state;
 
-	void adb_linechange(int state, int dtime);
-
 	/* used to store the reply to most keyboard commands */
 	int m_keyboard_reply;
 
@@ -385,6 +383,7 @@ public:
     DECLARE_WRITE_LINE_MEMBER(drq_539x_1_w);
 
     DECLARE_WRITE_LINE_MEMBER(cuda_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(adb_linechange_w);
 
 	DECLARE_DIRECT_UPDATE_MEMBER(overlay_opbaseoverride);
 private:
@@ -482,6 +481,7 @@ public:
 	TIMER_CALLBACK_MEMBER(mac_scanline_tick);
 	TIMER_CALLBACK_MEMBER(dafb_vbl_tick);
 	TIMER_CALLBACK_MEMBER(dafb_cursor_tick);
+	DECLARE_READ8_MEMBER(mac_via_in_cb2);
 	DECLARE_WRITE8_MEMBER(mac_via_out_cb2);
 	DECLARE_READ8_MEMBER(mac_adb_via_in_cb2);
 	DECLARE_WRITE8_MEMBER(mac_adb_via_out_cb2);
@@ -493,6 +493,7 @@ public:
 	DECLARE_READ8_MEMBER(mac_via2_in_b);
 	DECLARE_WRITE8_MEMBER(mac_via2_out_a);
 	DECLARE_WRITE8_MEMBER(mac_via2_out_b);
+	DECLARE_WRITE_LINE_MEMBER(mac_kbd_clk_in);
 };
 
 #endif /* MAC_H_ */
