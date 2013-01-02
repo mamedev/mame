@@ -46,6 +46,8 @@ struct io_generic
 
 extern const struct io_procs stdio_ioprocs;
 extern const struct io_procs stdio_ioprocs_noclose;
+extern const struct io_procs corefile_ioprocs;
+extern const struct io_procs corefile_ioprocs_noclose;
 
 
 

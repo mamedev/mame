@@ -5,6 +5,7 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "emuopts.h"
 #include "zippath.h"
 #include "floppy.h"
 #include "formats/imageutl.h"
@@ -233,16 +234,20 @@ void floppy_image_device::device_timer(emu_timer &timer, device_timer_id id, int
 	index_resync();
 }
 
-floppy_image_format_t *floppy_image_device::identify(astring filename) const
+floppy_image_format_t *floppy_image_device::identify(astring filename)
 {
-	FILE *fd;
-	fd = fopen(filename.cstr(), "r");
-	if(!fd)
+	core_file *fd;
+	astring revised_path;
+
+	file_error err = zippath_fopen(filename, OPEN_FLAG_READ, fd, revised_path);
+	if(err) {
+		seterror(IMAGE_ERROR_INVALIDIMAGE, "Unable to open the image file");
 		return 0;
+	}
 
 	io_generic io;
 	io.file = fd;
-	io.procs = &stdio_ioprocs_noclose;
+	io.procs = &corefile_ioprocs_noclose;
 	io.filler = 0xff;
 	int best = 0;
 	floppy_image_format_t *best_format = 0;
@@ -253,7 +258,7 @@ floppy_image_format_t *floppy_image_device::identify(astring filename) const
 			best_format = format;
 		}
 	}
-	fclose(fd);
+	core_fclose(fd);
 	return best_format;
 }
 
@@ -282,6 +287,9 @@ bool floppy_image_device::call_load()
 
 	image = global_alloc(floppy_image(tracks, sides, form_factor));
 	best_format->load(&io, form_factor, image);
+
+	if(!is_readonly())
+		output_format = best_format;
 
 	revolution_start_time = motor_always_on ? machine().time() : attotime::never;
 	revolution_count = 0;
@@ -725,9 +733,50 @@ void ui_menu_control_floppy_image::do_load_create()
 	}
 }
 
+astring ui_menu_control_floppy_image::try_file(astring location, astring name, bool has_crc, UINT32 crc)
+{
+	emu_file fd(machine().options().media_path(), OPEN_FLAG_READ);
+	file_error filerr;
+	if(has_crc)
+		filerr = fd.open(location.cstr(), PATH_SEPARATOR, name.cstr(), crc);
+	else
+		filerr = fd.open(location.cstr(), PATH_SEPARATOR, name.cstr());
+	if(filerr != FILERR_NONE)
+		return "";
+	return fd.fullpath();
+}
+
 void ui_menu_control_floppy_image::hook_load(astring filename, bool softlist)
 {
 	input_filename = filename;
+	if(softlist) {
+		char *swlist_name, *swname, *swpart;
+		software_name_split(filename.cstr(), &swlist_name, &swname, &swpart);
+		software_list *sw_list = software_list_open(machine().options(), swlist_name, FALSE, NULL);
+		software_info *sw_info = software_list_find(sw_list, swname, NULL);
+		software_part *sw_part = software_find_part(sw_info, swpart, NULL);
+		const char *parentname = software_get_clone(machine().options(), swlist_name, sw_info->shortname);
+		for(const rom_entry *region = sw_part->romdata; region; region = rom_next_region(region)) {
+			const rom_entry *romp = region + 1;
+			UINT32 crc = 0;
+			bool has_crc = hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
+			
+			filename = try_file(astring(swlist_name) + PATH_SEPARATOR + astring(swname), ROM_GETNAME(romp), has_crc, crc);
+			if(filename == "")
+				filename = try_file(astring(swlist_name) + PATH_SEPARATOR + astring(parentname), ROM_GETNAME(romp), has_crc, crc);
+			if(filename == "")
+				filename = try_file(swname, ROM_GETNAME(romp), has_crc, crc);
+			if(filename == "")
+				filename = try_file(parentname, ROM_GETNAME(romp), has_crc, crc);
+			if(filename != "")
+				goto found;
+		}
+
+	found:
+		software_list_close(sw_list);
+		global_free(swlist_name);
+	}
+
 	input_format = static_cast<floppy_image_device *>(image)->identify(filename);
 	if(!input_format) {
 		popmessage("Error: %s\n", image->error());

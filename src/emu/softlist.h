@@ -191,6 +191,7 @@ const software_part *software_part_next(const software_part *part);
 const char *software_get_clone(emu_options &options, char *swlist, const char *swname);
 UINT32 software_get_support(emu_options &options, char *swlist, const char *swname);
 const char *software_part_get_feature(const software_part *part, const char *feature_name);
+void software_name_split(const char *swlist_swname, char **swlist_name, char **swname, char **swpart);
 
 bool load_software_part(emu_options &options, device_image_interface *image, const char *path, software_info **sw_info, software_part **sw_part, char **full_sw_name, char**list_name);
 

@@ -183,7 +183,7 @@ INLINE void unknown_attribute_value(software_list *swlist,
 
 #define global_strdup(s)				strcpy(global_alloc_array(char, strlen(s) + 1), s)
 
-static void software_name_split(const char *swlist_swname, char **swlist_name, char **swname, char **swpart )
+void software_name_split(const char *swlist_swname, char **swlist_name, char **swname, char **swpart )
 {
 	const char *split_1st_loc = strchr( swlist_swname, ':' );
 	const char *split_2nd_loc = ( split_1st_loc ) ? strchr( split_1st_loc + 1, ':' ) : NULL;
