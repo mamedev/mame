@@ -120,7 +120,7 @@ WRITE8_MEMBER(uzebox_state::port_b_w)
 	//  ---- ---x   AD725 HSYNC
 
 	// AD725 CE is hard-wired to VCC in early revisions (C1, D1 and E1)
-	//if (m_port_b & 0x10)
+	if ((m_port_b & 0x10) || ioport("AD725_CE")->read() == 0)
 		if ((m_port_b ^ data) & m_port_b & 0x01)
 		{
 			line_update();
@@ -229,6 +229,11 @@ static INPUT_PORTS_START( uzebox )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P2 Button L") PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P2 Button R") PORT_PLAYER(2)
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AD725_CE")
+	PORT_CONFNAME( 0x01, 0x00, "AD725 CE" )
+	PORT_CONFSETTING( 0x00, "VCC" )
+	PORT_CONFSETTING( 0x01, "PB4" )
 INPUT_PORTS_END
 
 /****************************************************\
