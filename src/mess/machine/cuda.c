@@ -132,8 +132,8 @@ void cuda_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 
                 adb_in = (data & 0x80) ? true : false;
 
-				mac_state *mac = machine().driver_data<mac_state>();
-				mac->adb_linechange(((data & 0x80) >> 7) ^ 1, (int)(machine().time().as_ticks(1000000) - last_adb_time));
+                m_adb_dtime = (int)(machine().time().as_ticks(1000000) - last_adb_time);
+				m_out_adb_func(((data & 0x80) >> 7) ^ 1);
 
 				last_adb = data & 0x80;
 				last_adb_time = machine().time().as_ticks(1000000);
@@ -405,6 +405,7 @@ void cuda_device::static_set_type(device_t &device, int type)
 void cuda_device::device_start()
 {
     m_out_reset_func.resolve(m_out_reset_cb, *this);
+    m_out_adb_func.resolve(m_out_adb_cb, *this);
 
 	m_timer = timer_alloc(0, NULL);
     m_prog_timer = timer_alloc(1, NULL);
@@ -426,6 +427,7 @@ void cuda_device::device_start()
 	save_item(NAME(via_clock));
 	save_item(NAME(adb_in));
 	save_item(NAME(reset_line));
+    save_item(NAME(m_adb_dtime));
 	save_item(NAME(pram_loaded));
 	save_item(NAME(pram));
 	save_item(NAME(disk_pram));

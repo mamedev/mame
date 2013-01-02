@@ -21,12 +21,14 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_EGRET_ADD(_type) \
+#define MCFG_EGRET_ADD(_type, _config) \
     MCFG_DEVICE_ADD(EGRET_TAG, EGRET, 0) \
+    MCFG_DEVICE_CONFIG(_config) \
     MCFG_EGRET_TYPE(_type)
 
-#define MCFG_EGRET_REPLACE(_type) \
+#define MCFG_EGRET_REPLACE(_type, _config) \
     MCFG_DEVICE_REPLACE(EGRET_TAG, EGRET, 0) \
+    MCFG_DEVICE_CONFIG(_config) \
     MCFG_EGRET_TYPE(_type)
 
 #define MCFG_EGRET_TYPE(_type) \
@@ -39,9 +41,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+struct egret_interface
+{
+    devcb_write_line    m_out_reset_cb;
+    devcb_write_line    m_out_adb_cb;
+};
+
 // ======================> egret_device
 
-class egret_device :  public device_t, public device_nvram_interface
+class egret_device :  public device_t, public device_nvram_interface, public egret_interface
 {
 public:
     // construction/destruction
@@ -78,6 +86,7 @@ public:
     void set_via_data(UINT8 dat) { via_data = dat; }
     UINT8 get_via_clock() { return via_clock; }
     void set_adb_line(int linestate) { adb_in = (linestate == ASSERT_LINE) ? true : false; }
+    int get_adb_dtime() { return m_adb_dtime; }
 
     int rom_offset;
 
@@ -85,7 +94,7 @@ protected:
     // device-level overrides
     virtual void device_start();
     virtual void device_reset();
-    virtual void device_config_complete() { m_shortname = "egret"; }
+    virtual void device_config_complete();
     virtual machine_config_constructor device_mconfig_additions() const;
     virtual const rom_entry *device_rom_region() const;
 
@@ -105,11 +114,15 @@ private:
     bool egret_controls_power;
     bool adb_in;
     int reset_line;
+    int m_adb_dtime;
     emu_timer *m_timer;
     UINT8 pram[0x100], disk_pram[0x100];
     bool pram_loaded;
 
     void send_port(address_space &space, UINT8 offset, UINT8 data);
+
+	devcb_resolved_write_line	m_out_reset_func;
+    devcb_resolved_write_line   m_out_adb_func;
 };
 
 // device type definition

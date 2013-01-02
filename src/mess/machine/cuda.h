@@ -5,8 +5,6 @@
 
 #include "emu.h"
 
-
-
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
@@ -37,6 +35,9 @@
 #define MCFG_CUDA_TYPE(_type) \
     cuda_device::static_set_type(*device, _type);
 
+#define MCFG_CUDA_REMOVE() \
+    MCFG_DEVICE_REMOVE(CUDA_TAG)
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -44,6 +45,7 @@
 struct cuda_interface
 {
     devcb_write_line    m_out_reset_cb;
+    devcb_write_line    m_out_adb_cb;
 };
 
 // ======================> cuda_device
@@ -85,6 +87,7 @@ public:
     void set_via_data(UINT8 dat) { via_data = dat; }
     UINT8 get_via_clock() { return via_clock; }
     void set_adb_line(int linestate) { adb_in = (linestate == ASSERT_LINE) ? true : false; }
+    int get_adb_dtime() { return m_adb_dtime; }
 
     int rom_offset;
 
@@ -112,6 +115,7 @@ private:
     bool cuda_controls_power;
     bool adb_in;
     int reset_line;
+    int m_adb_dtime;
     emu_timer *m_timer, *m_prog_timer;
     UINT8 pram[0x100], disk_pram[0x100];
     bool pram_loaded;
@@ -119,6 +123,7 @@ private:
     void send_port(address_space &space, UINT8 offset, UINT8 data);
 
 	devcb_resolved_write_line	m_out_reset_func;
+    devcb_resolved_write_line   m_out_adb_func;
 };
 
 // device type definition
