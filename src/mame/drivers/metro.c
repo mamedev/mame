@@ -57,9 +57,6 @@ Year + Game                     PCB         Video Chip    Issues / Notes
 Mouse Shooter GoGo, Bal Cube, Bang Bang Ball & Daitoride (YMF278B) PCBs have
 no PCB number but all look identical to each other.
 
-Not dumped yet:
-94  Toride II
-
 To Do:
 
 -   Wrong color bars in service mode (e.g. balcube, toride2g).
