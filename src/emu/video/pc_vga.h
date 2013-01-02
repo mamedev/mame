@@ -551,6 +551,7 @@ protected:
 		// data for memory-mapped I/O
 		UINT16 mmio_9ae8;
 		UINT16 mmio_bee8;
+		UINT16 mmio_96e8;
 
 		// hardware graphics cursor
 		UINT8 cursor_mode;

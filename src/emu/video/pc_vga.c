@@ -4554,7 +4554,7 @@ WRITE8_MEMBER(s3_vga_device::mem_w)
 {
 	ibm8514a_device* dev = get_8514();
 	// bit 4 of CR53 enables memory-mapped I/O
-	// 0xA0000-0xA7ffff maps to port 0xE2E8 (pixel transfer)
+	// 0xA0000-0xA7fff maps to port 0xE2E8 (pixel transfer)
 	if(s3.cr53 & 0x10)
 	{
 		if(offset < 0x8000)
@@ -4755,6 +4755,17 @@ WRITE8_MEMBER(s3_vga_device::mem_w)
 		case 0xbee9:
 			s3.mmio_bee8 = (s3.mmio_bee8 & 0x00ff) | (data << 8);
 			dev->ibm8514_multifunc_w(space,0,s3.mmio_bee8,0xffff);
+			break;
+		case 0x96e8:
+			s3.mmio_96e8 = (s3.mmio_96e8 & 0xff00) | data;
+			break;
+		case 0x96e9:
+			s3.mmio_96e8 = (s3.mmio_96e8 & 0x00ff) | (data << 8);
+			dev->ibm8514_width_w(space,0,s3.mmio_96e8,0xffff);
+			break;
+		case 0xe2e8:
+			dev->ibm8514.pixel_xfer = (dev->ibm8514.pixel_xfer & 0xffffff00) | data;
+			dev->ibm8514_wait_draw();
 			break;
 		default:
 			if(LOG_8514) logerror("S3: MMIO offset %05x write %02x\n",offset+0xa0000,data);

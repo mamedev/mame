@@ -854,7 +854,7 @@ static void i386_trap(i386_state *cpustate,int irq, int irq_gate, int trap_level
 					REG16(SP) = i386_get_stack_ptr(cpustate,DPL);
 				if(V8086_MODE)
 				{
-					logerror("IRQ (%08x): Interrupt during V8086 task\n",cpustate->pc);
+					//logerror("IRQ (%08x): Interrupt during V8086 task\n",cpustate->pc);
 					if(type & 0x08)
 					{
 						PUSH32(cpustate,cpustate->sreg[GS].selector & 0xffff);
@@ -2301,7 +2301,7 @@ static void i386_protected_mode_iret(i386_state* cpustate, int operand32)
 			newESP = READ32(cpustate, ea+12);
 			newSS = READ32(cpustate, ea+16) & 0xffff;
 			/* Return to v86 mode */
-			logerror("IRET (%08x): Returning to Virtual 8086 mode.\n",cpustate->pc);
+			//logerror("IRET (%08x): Returning to Virtual 8086 mode.\n",cpustate->pc);
 			if(CPL != 0)
 			{
 				UINT32 oldflags = get_flags(cpustate);
