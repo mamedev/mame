@@ -428,9 +428,8 @@ UINT8 amiga_fdc::ciaapra_r()
 {
 	UINT8 ret = 0x3c;
 	if(floppy) {
-		// fixit
-		ret &= ~0x20;
-
+		//if(!floppy->ready_r()) fixit: seems to not work well with multiple disk drives
+			ret &= ~0x20;
 		if(!floppy->trk00_r())
 			ret &= ~0x10;
 		if(!floppy->wpt_r())

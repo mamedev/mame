@@ -1230,6 +1230,10 @@ READ16_HANDLER( amiga_custom_r )
 
 		case REG_ADKCONR:
 			return space.machine().device<amiga_fdc>("fdc")->adkcon_r();
+
+		case REG_DSKDATR:
+			popmessage("DSKDAT R, contact MESSdev");
+			break;
 	}
 
 	if (LOG_CUSTOM)
@@ -1276,6 +1280,10 @@ WRITE16_HANDLER( amiga_custom_w )
 		case REG_ADKCONR:	case REG_POT0DAT:	case REG_POT1DAT:	case REG_POTGOR:
 		case REG_SERDATR:	case REG_DSKBYTR:	case REG_INTENAR:	case REG_INTREQR:
 			/* read-only registers */
+			break;
+
+		case REG_DSKDAT:
+			popmessage("DSKDAT W %04x, contact MESSdev",data);
 			break;
 
 		case REG_DSKSYNC:
