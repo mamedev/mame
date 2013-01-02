@@ -55,7 +55,6 @@
 	- Prophet-64
 	- MSSIAH
 	- Rex Diashow-Maker
-	- Pagefox (English/German)
 
 	If you have any of these, please forward them to messdev :)
 
@@ -948,7 +947,7 @@
 			</dataarea>
 		</part>
 
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="cmdscpuu.d64" size="174848" crc="caad286d" sha1="2c1258505148763f13ab2fcdaf247138a933817e" offset="0" />
 			</dataarea>
@@ -6423,6 +6422,44 @@
 			<dataarea name="roml" size="0x10000">
 				<rom name="fcc_rom1" size="0x8000" crc="2949836a" sha1="9e6283095df9e3f4802ed0c654101f8e37168bf6" offset="0x0000" />
 				<rom name="fcc_rom2" size="0x8000" crc="8fc0f156" sha1="c843729870e7ce59bb64b60ebec028f7200f93d1" offset="0x8000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ide64">
+		<description>IDE64 (v4.1, IDEDOS v0.90)</description>
+		<year>2011</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ide64" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+	
+			<dataarea name="ide64:u3" size="0x20000">
+				<rom name="u3" size="0x20000" crc="a52ff8fa" sha1="65fb2dc7d6bc6e96c4d60aca7eb103e7d1e58412" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pop">
+		<description>Prince of Persia (v1.1)</description>
+		<year>2011</year>
+		<publisher>Mr. SID</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="easyflash" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+	
+			<dataarea name="easyflash:u3" size="0x80000">
+				<rom name="u3" size="0x80000" crc="eef0fd43" sha1="ac7dd49f1b8acb01d074e882006a134c4eca432f" offset="0" />
+			</dataarea>
+
+			<dataarea name="easyflash:u4" size="0x80000">
+				<rom name="u4" size="0x80000" crc="2946a6d0" sha1="768e2bf9a0fab68d65cb942a7248f5c0c7f3a292" offset="0" />
 			</dataarea>
 		</part>
 	</software>
