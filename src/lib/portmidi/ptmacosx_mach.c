@@ -14,7 +14,9 @@
 #include "sys/time.h"
 #include "pthread.h"
 
-//#define NSEC_PER_MSEC 1000000
+#if !defined NSEC_PER_MSEC
+#define NSEC_PER_MSEC 1000000ull
+#endif
 #define THREAD_IMPORTANCE 30
 
 static int time_started_flag = FALSE;
