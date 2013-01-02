@@ -243,7 +243,6 @@ void cirrus_vga_device::device_start()
 	// Avoid an infinite loop when displaying.  0 is not possible anyway.
 	vga.crtc.maximum_scan_line = 1;
 
-
 	// copy over interfaces
 	vga.read_dipswitch = read8_delegate(); //read_dipswitch;
 	vga.svga_intf.vram_size = 0x200000;
@@ -251,6 +250,8 @@ void cirrus_vga_device::device_start()
 	vga.svga_intf.crtc_regcount = 0x19;
 
 	vga.memory	= auto_alloc_array_clear(machine(), UINT8, vga.svga_intf.vram_size);
+
+	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
 }
 
 void ati_vga_device::device_start()
