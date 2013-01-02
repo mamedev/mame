@@ -110,7 +110,8 @@
 		</part>
 	</software>
 
-	<software name="claydemo" supported="no">
+	<software name="claydemo">
+		<!-- this demo is compatible with Uzebox revisions C1, D1 and E1 -->
 		<description>Clay Demo</description>
 		<year>2008</year>
 		<publisher>Belogic</publisher>
@@ -543,7 +544,8 @@
 		</part>
 	</software>
 
-	<software name="snakes" supported="no">
+	<software name="snakes">
+		<!-- this game is compatible with Uzebox revisions C1, D1 and E1 -->
 		<description>Snakes</description>
 		<year>2008</year>
 		<publisher>Belogic</publisher>
@@ -905,7 +907,8 @@
 		</part>
 	</software>
 
-	<software name="scrolld" supported="no">
+	<software name="scrolld">
+		<!-- this demo is compatible with Uzebox revisions C1, D1 and E1 -->
 		<description>Clay's Scroll Demo</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
@@ -950,7 +953,8 @@
 		</part>
 	</software>
 
-	<software name="sprited1" supported="no">
+	<software name="sprited1">
+		<!-- this demo is compatible with Uzebox revisions C1, D1 and E1 -->
 		<description>Sprite Demo 1</description>
 		<year>2010</year>
 		<publisher>Belogic</publisher>
@@ -1084,6 +1088,7 @@
 	</software>
 
 	<software name="vectord2" supported="no">
+		<!-- this demo assumes that the RAM is mirrored at 0x1100-0x20ff and probably doesn't works on real HW -->
 		<description>Vector Demo 2</description>
 		<year>2009</year>
 		<publisher>Belogic</publisher>

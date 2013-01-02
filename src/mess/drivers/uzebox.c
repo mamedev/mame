@@ -119,7 +119,8 @@ WRITE8_MEMBER(uzebox_state::port_b_w)
 	//  ---- -xx-   NC
 	//  ---- ---x   AD725 HSYNC
 
-	if (m_port_b & 0x10)
+	// AD725 CE is hard-wired to VCC in early revisions (C1, D1 and E1)
+	//if (m_port_b & 0x10)
 		if ((m_port_b ^ data) & m_port_b & 0x01)
 		{
 			line_update();
