@@ -152,13 +152,11 @@ MACHINE_RESET_MEMBER( s11b_state, s11b )
 WRITE8_MEMBER( s11b_state::bg_speech_clock_w )
 {
 	hc55516_clock_w(m_bg_hc55516, data);
-	popmessage("BG HC55516 Clock write %02x",data);
 }
 
 WRITE8_MEMBER( s11b_state::bg_speech_digit_w )
 {
 	hc55516_digit_w(m_bg_hc55516, data);
-	popmessage("BG HC55516 Digit write %02x",data);
 }
 
 static const pia6821_interface pia21_intf =
