@@ -27,7 +27,7 @@
 
 void bbc_state::check_interrupts()
 {
-	m_maincpu->set_input_line(M6502_IRQ_LINE, m_via_system_irq || m_via_user_irq || !m_acia_irq || m_ACCCON_IRR);
+	m_maincpu->set_input_line(M6502_IRQ_LINE, m_via_system_irq || m_via_user_irq || m_acia_irq || m_ACCCON_IRR);
 }
 
 /*************************
