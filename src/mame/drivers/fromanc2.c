@@ -271,7 +271,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromanc2_sub_map, AS_PROGRAM, 8, fromanc2_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM								// ROM
-	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank1")						// ROM(BANK) (is this comment correct?  It was in the split address maps in a RAM configuration...
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")						// ROM(BANK)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM								// RAM(WORK)
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank2")						// RAM(BANK)
 ADDRESS_MAP_END
@@ -522,14 +522,17 @@ MACHINE_START_MEMBER(fromanc2_state,fromanc4)
 MACHINE_START_MEMBER(fromanc2_state,fromanc2)
 {
 
+	m_bankedram = auto_alloc_array(machine(), UINT8, 0x4000 * 3);
+
 	membank("bank1")->configure_entries(0, 4, memregion("sub")->base(), 0x4000);
 	membank("bank2")->configure_entry(0, memregion("sub")->base() + 0x08000);
-	membank("bank2")->configure_entries(1, 3, memregion("sub")->base() + 0x14000, 0x4000);
+	membank("bank2")->configure_entries(1, 3, m_bankedram, 0x4000);
 
 	MACHINE_START_CALL_MEMBER(fromanc4);
 
 	save_item(NAME(m_subcpu_int_flag));
 	save_item(NAME(m_subcpu_nmi_flag));
+	save_pointer(NAME(m_bankedram), 0x4000 * 3);	
 }
 
 void fromanc2_state::machine_reset()
@@ -702,7 +705,7 @@ ROM_START( fromanc2 )
 	ROM_REGION( 0x0010000, "audiocpu", 0 )	// SOUND CPU
 	ROM_LOAD( "5-ic85.bin",  0x00000, 0x10000, CRC(d8f19aa3) SHA1(f980c2a021fa1995bc18b6427b361506ca8d9bf2) )
 
-	ROM_REGION( 0x0020000, "sub", 0 )	// SUB CPU + BANK RAM
+	ROM_REGION( 0x0010000, "sub", 0 )	// SUB CPU
 	ROM_LOAD( "3-ic1.bin",   0x00000, 0x10000, CRC(6d02090e) SHA1(08a538f3a578adbf83718e5e592c457b2ad841a6) )
 
 	ROM_REGION( 0x0480000, "gfx1", 0 )	// LAYER4 DATA
@@ -733,7 +736,7 @@ ROM_START( fromancr )
 	ROM_REGION( 0x0010000, "audiocpu", 0 )	// SOUND CPU
 	ROM_LOAD( "5-ic73.bin",  0x0000000, 0x010000, CRC(3e4727fe) SHA1(816c0c2cd2e349900fb9cd63cbced4c621017f37) )
 
-	ROM_REGION( 0x0020000, "sub", 0 )	// SUB CPU + BANK RAM
+	ROM_REGION( 0x0010000, "sub", 0 )	// SUB CPU
 	ROM_LOAD( "4-ic1.bin",   0x0000000, 0x010000, CRC(6d02090e) SHA1(08a538f3a578adbf83718e5e592c457b2ad841a6) )
 
 	ROM_REGION( 0x0800000, "gfx1", 0 )	// BG DATA

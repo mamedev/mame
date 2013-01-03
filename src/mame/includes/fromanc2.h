@@ -8,6 +8,7 @@ public:
 	/* memory pointers */
 	UINT16   *m_paletteram[2];
 	UINT16   *m_videoram[2][4];
+	UINT8    *m_bankedram;
 
 	/* video-related */
 	tilemap_t  *m_tilemap[2][4];
