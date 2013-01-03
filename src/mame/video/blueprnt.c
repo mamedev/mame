@@ -48,14 +48,12 @@ void blueprnt_state::palette_init()
 
 WRITE8_MEMBER(blueprnt_state::blueprnt_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(blueprnt_state::blueprnt_colorram_w)
 {
-
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 
@@ -66,7 +64,6 @@ WRITE8_MEMBER(blueprnt_state::blueprnt_colorram_w)
 
 WRITE8_MEMBER(blueprnt_state::blueprnt_flipscreen_w)
 {
-
 	flip_screen_set(~data & 0x02);
 
 	if (m_gfx_bank != ((data & 0x04) >> 2))
@@ -112,7 +109,6 @@ TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info_grasspin)
 
 VIDEO_START_MEMBER(blueprnt_state,blueprnt)
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blueprnt_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(32);
@@ -122,7 +118,6 @@ VIDEO_START_MEMBER(blueprnt_state,blueprnt)
 
 VIDEO_START_MEMBER(blueprnt_state,grasspin)
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blueprnt_state::get_bg_tile_info_grasspin),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(32);

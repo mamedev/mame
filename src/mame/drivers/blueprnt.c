@@ -354,15 +354,11 @@ static const ay8910_interface ay8910_interface_2 =
 
 void blueprnt_state::machine_start()
 {
-
-	m_audiocpu = machine().device<cpu_device>("audiocpu");
-
 	save_item(NAME(m_dipsw));
 }
 
 void blueprnt_state::machine_reset()
 {
-
 	m_gfx_bank = 0;
 	m_dipsw = 0;
 }
@@ -394,7 +390,6 @@ static MACHINE_CONFIG_START( blueprnt, blueprnt_state )
 
 	MCFG_GFXDECODE(blueprnt)
 	MCFG_PALETTE_LENGTH(128*4+8)
-
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -524,5 +519,5 @@ ROM_END
 
 GAME( 1982, blueprnt,  0,        blueprnt, blueprnt, driver_device, 0, ROT270, "Zilec Electronics / Bally Midway", "Blue Print (Midway)", GAME_SUPPORTS_SAVE )
 GAME( 1982, blueprntj, blueprnt, blueprnt, blueprnt, driver_device, 0, ROT270, "Zilec Electronics / Jaleco",       "Blue Print (Jaleco)", GAME_SUPPORTS_SAVE )
-GAME( 1983, saturnzi,  0,        blueprnt, saturn, driver_device,   0, ROT270, "Zilec Electronics / Jaleco",       "Saturn", GAME_SUPPORTS_SAVE )
+GAME( 1983, saturnzi,  0,        blueprnt, saturn,   driver_device, 0, ROT270, "Zilec Electronics / Jaleco",       "Saturn", GAME_SUPPORTS_SAVE )
 GAME( 1983, grasspin,  0,        grasspin, grasspin, driver_device, 0, ROT90,  "Zilec Electronics / Jaleco",       "Grasspin", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
