@@ -32,7 +32,6 @@
 	- SID Symphony
 	- MSSIAH
 	- Prophet-64
-	- Model 64 Sequencer
 	- Synthetiseur Vocal
 	- 64er MIDI
 	- FB-MIDI
@@ -41,6 +40,7 @@
 	- Datel MIDI
 	- Passport MIDI
 	- Speech Maker
+	- Moog Song Producer
 
 	EPROM burners:
 	- J-R Promenade C1
@@ -6458,6 +6458,23 @@
 
 			<dataarea name="easyflash:u4" size="0x80000">
 				<rom name="u4" size="0x80000" crc="2946a6d0" sha1="768e2bf9a0fab68d65cb942a7248f5c0c7f3a292" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scim64s" supported="no">
+		<description>Model 64 Sequencer</description>
+		<year>1984</year>
+		<publisher>Sequential Circuits</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="scim64s" />
+			<feature name="game" value="0" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x4000">
+				<rom name="seq64.0.1" size="0x4000" crc="fe43ccdc" sha1="7119615cccdeca5d5006eb04bcf788cc609fbc91" offset="0" />
 			</dataarea>
 		</part>
 	</software>
