@@ -670,6 +670,7 @@ static void pce_cd_nec_set_audio_stop_position( running_machine &machine )
 		}
 		else
 		{
+			printf("%08x %08x\n",pce_cd.current_frame,pce_cd.end_frame - pce_cd.current_frame);
 			cdda_start_audio( machine.device( "cdda" ), pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
 			pce_cd.end_mark = 1;
 		}

@@ -3205,11 +3205,9 @@ ROM_START( kokoroj2 )
 	ROMX_LOAD( "mpr-16194.ic27", 0x800004, 0x200000, CRC(39b5efe7) SHA1(2039909a2dd46951d442f1b6377f365525f9f2f1) , ROM_SKIP(6)|ROM_GROUPWORD )
 	ROMX_LOAD( "mpr-16196.ic25", 0x800006, 0x200000, CRC(b8e22e05) SHA1(dd667e2c5d421cba356421825e6aca9b5ca0af45) , ROM_SKIP(6)|ROM_GROUPWORD )
 
-	/* AUDIO CD -- verify that this is an acceptable read and convert to CHD */
-//  ROM_REGION( 0x0017eb, "user1", 0 )
-//  ROM_LOAD( "segaa.cue",     0x0,  0x0017eb, CRC(7dae0d4b) SHA1(05c84e3a2b0fd0630b84b42e8d4c4ffbbb1cf531) )
-//  ROM_REGION( 0x179ce890, "user2", 0 )
-//  ROM_LOAD( "segaa.bin",     0x0,  0x179ce890, CRC(4d6937a4) SHA1(637be0a388e9bde8b12cdf6a0bfb7a0528e763b3) )
+	/* AUDIO CD */
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "cdp-00146", 0, SHA1(0b37e0ea2380ecd9abef2ccd6a8096d76d2ba344) )
 ROM_END
 
 /**************************************************************************************************************************
