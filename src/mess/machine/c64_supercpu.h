@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Triton QD TDOS cartridge emulation
+    CMD SuperCPU v2 + SuperRAM emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -9,13 +9,13 @@
 
 #pragma once
 
-#ifndef __TDOS__
-#define __TDOS__
+#ifndef __SUPERCPU__
+#define __SUPERCPU__
 
 #include "emu.h"
 #include "machine/c64exp.h"
 #include "machine/cbmipt.h"
-#include "machine/mc6852.h"
+#include "cpu/g65816/g65816.h"
 
 
 
@@ -23,19 +23,22 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c64_tdos_cartridge_device
+// ======================> c64_supercpu_device
 
-class c64_tdos_cartridge_device : public device_t,
-								  public device_c64_expansion_card_interface
+class c64_supercpu_device : public device_t,
+					    	public device_c64_expansion_card_interface
 {
 public:
 	// construction/destruction
-	c64_tdos_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c64_supercpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
-	// not really public
+	DECLARE_INPUT_CHANGED_MEMBER( reset );
+
 	DECLARE_READ8_MEMBER( dma_cd_r );
 	DECLARE_WRITE8_MEMBER( dma_cd_w );
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
@@ -45,7 +48,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "c64_tdos"; }
+    virtual void device_config_complete() { m_shortname = "c64_supercpu"; }
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -56,13 +59,17 @@ protected:
 	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
 
 private:
-	required_device<mc6852_device> m_ssda;
+	required_device<legacy_cpu_device> m_maincpu;
 	required_device<c64_expansion_slot_device> m_exp;
+
+	required_shared_ptr<UINT8> m_sram;
+	required_shared_ptr<UINT8> m_dimm;
 };
 
 
 // device type definition
-extern const device_type C64_TDOS;
+extern const device_type C64_SUPERCPU;
+
 
 
 #endif

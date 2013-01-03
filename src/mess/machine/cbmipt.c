@@ -1115,6 +1115,7 @@ SLOT_INTERFACE_START( c64_expansion_cards )
 	SLOT_INTERFACE("reu1750", C64_REU1750)
 	SLOT_INTERFACE("reu1764", C64_REU1764)
 	SLOT_INTERFACE("sfxse", C64_SFX_SOUND_EXPANDER)
+	SLOT_INTERFACE("supercpu", C64_SUPERCPU)
 
 	// the following need ROMs from the software list
 	SLOT_INTERFACE_INTERNAL("standard", C64_STD)

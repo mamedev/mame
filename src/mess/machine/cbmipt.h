@@ -52,6 +52,7 @@
 #include "machine/c64_structured_basic.h"
 #include "machine/c64_super_explode.h"
 #include "machine/c64_super_games.h"
+#include "machine/c64_supercpu.h"
 #include "machine/c64_sw8k.h"
 #include "machine/c64_system3.h"
 #include "machine/c64_tdos.h"

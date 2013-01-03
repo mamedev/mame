@@ -90,24 +90,6 @@ static MC6852_INTERFACE( ssda_intf )
 
 
 //-------------------------------------------------
-//  floppy_interface tdos_floppy_interface
-//-------------------------------------------------
-
-static const floppy_interface tdos_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_2_8",
-	NULL
-};
-
-
-//-------------------------------------------------
 //  C64_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
@@ -158,7 +140,6 @@ static C64_EXPANSION_INTERFACE( expansion_intf )
 
 static MACHINE_CONFIG_FRAGMENT( c64_tdos )
 	MCFG_MC6852_ADD(MC68A52P_TAG, XTAL_6_5MHz, ssda_intf)
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, tdos_floppy_interface)
 
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, 0, expansion_intf, c64_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
