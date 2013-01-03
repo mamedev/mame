@@ -66,17 +66,16 @@ public:
 
 	/* video-related */
 	tilemap_t   *m_k053936_tilemap;
-	int         m_bg_tilemap_enable[3];
-	int         m_bg_tilemap_enable16[3];
-	int         m_bg_tilemap_scrolldx[3];
+	int         m_tilemap_scrolldx[3];
 
 	int         m_support_8bpp;
 	int         m_support_16x16;
 	int         m_has_zoom;
 	int         m_sprite_xoffs;
 	int         m_sprite_yoffs;
+	int         m_sprite_xoffs_dx;
 
-	UINT8 *		m_expanded_gfx1;
+	UINT8       *m_expanded_gfx1;
 
 	/* irq_related */
 	int         m_vblank_bit;
@@ -142,6 +141,11 @@ public:
 	DECLARE_WRITE16_MEMBER(dokyusp_eeprom_bit_w);
 	DECLARE_WRITE16_MEMBER(dokyusp_eeprom_reset_w);
 	DECLARE_WRITE16_MEMBER(mouja_sound_rombank_w);
+
+	// vmetal
+	DECLARE_WRITE8_MEMBER(vmetal_control_w);
+	DECLARE_WRITE8_MEMBER(vmetal_es8712_w);
+
 	DECLARE_DRIVER_INIT(karatour);
 	DECLARE_DRIVER_INIT(daitorid);
 	DECLARE_DRIVER_INIT(blzntrnd);
@@ -156,9 +160,11 @@ public:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_gstrik2);
 	DECLARE_MACHINE_START(metro);
 	DECLARE_MACHINE_RESET(metro);
+	void expand_gfx1();
 	DECLARE_VIDEO_START(metro_i4100);
 	DECLARE_VIDEO_START(metro_i4220);
-	DECLARE_VIDEO_START(metro_i4220_offset);
+	DECLARE_VIDEO_START(metro_i4220_dx_tmap);
+	DECLARE_VIDEO_START(metro_i4220_dx_sprite);
 	DECLARE_VIDEO_START(metro_i4300);
 	DECLARE_VIDEO_START(blzntrnd);
 	DECLARE_VIDEO_START(gstrik2);

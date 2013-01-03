@@ -18,9 +18,9 @@ Sound Chips  :  OKIM6295 + YM2413  or
 
 Other        :  Memory Blitter
 
------------------------------------------------------------------------------
-Year + Game                     PCB         Video Chip    Issues / Notes
------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+Year + Game                     PCB           Video   Issues / Notes
+------------------------------------------------------------------------------------------------
 92  Last Fortress - Toride      VG420         I4100
 92  Last Fortress - Toride (Ger)VG460-(A)     I4100
 92  Pang Pom's                  VG420         I4100
@@ -39,6 +39,7 @@ Year + Game                     PCB         Video Chip    Issues / Notes
 95  Mouse Shooter GoGo          -             I4220    No sound CPU
 95  Pururun                     MTR5260-A     I4220
 95  Puzzli                      MTR5260-A     I4220
+95  Varia Metal                 ES-9309B-B    I4220    No sound CPU but ES-8712 + M6295 + M6585
 96  Bal Cube                    -             I4220    No sound CPU
 96  Bang Bang Ball              -             I4220    No sound CPU
 96  Daitoride (YMF278B)         -             I4220    No sound CPU
@@ -52,13 +53,15 @@ Year + Game                     PCB         Video Chip    Issues / Notes
 97  Mahjong Gakuensai           VG340-A       I4300    No sound CPU
 98  Mahjong Gakuensai 2         VG340-A       I4300    No sound CPU
 00  Puzzlet                     VG2200-(B)    I4300    Z86E02 Zilog Z8 8-bit MCU
------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
 
 Mouse Shooter GoGo, Bal Cube, Bang Bang Ball & Daitoride (YMF278B) PCBs have
 no PCB number but all look identical to each other.
 
 To Do:
 
+-   Tilemaps/sprites offsets may be emulated understanding what appear to be CRT registers
+    at c78880 (sequence of 4 values), c78890 (sequence of 5 values) and c788a0 (start sequence).
 -   Wrong color bars in service mode (e.g. balcube, toride2g).
     They use solid color tiles (80xx), but the right palette is not at 00-ff.
     Related to the unknown table in the RAM mapped just before the palette?
@@ -67,7 +70,6 @@ To Do:
 -   Coin lockout
 -   Some gfx problems in ladykill, 3kokushi, puzzli, gakusai,
     seem related to how we handle windows and wrapping
--   Are the 16x16 tiles used by Mouja a Imagetek I4300-only feature?
 -   Interrupt timing needs figuring out properly, having it incorrect
     causes scrolling glitches in some games.  Test cases Mouse Go Go
     title screen, GunMaster title screen.  Changing it can cause
@@ -75,6 +77,8 @@ To Do:
 -   Bang Bang Ball / Bubble Buster slow to a crawl when you press a
     button between levels, on a real PCB it speeds up instead (related
     to above?)
+-   vmetal: ES8712 sound may not be quite right. Samples are currently looped, but
+    whether they should and how, is unknown. Where does the M6585 hook up to?
 
 Notes:
 
@@ -82,6 +86,8 @@ Notes:
     keeping start 2 pressed.
 -   Sprite zoom in Mouja at the end of a match looks wrong, but it's been verified
     to be the same on the original board
+-   vmetal: has Sega and Taito logos in the roms ?!
+
 
 driver modified by Eisuke Watanabe
 ***************************************************************************/
@@ -93,9 +99,10 @@ driver modified by Eisuke Watanabe
 #include "cpu/upd7810/upd7810.h"
 #include "includes/metro.h"
 #include "machine/eeprom.h"
-#include "sound/2610intf.h"
 #include "sound/2151intf.h"
 #include "sound/2413intf.h"
+#include "sound/2610intf.h"
+#include "sound/es8712.h"
 #include "sound/okim6295.h"
 #include "sound/ymf278b.h"
 #include "video/konicdev.h"
@@ -785,8 +792,8 @@ static ADDRESS_MAP_START( balcube_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x678840, 0x67884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs")	// Tiles Blitter
 	AM_RANGE(0x678860, 0x67886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
 	AM_RANGE(0x678870, 0x67887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll
-	AM_RANGE(0x678880, 0x678881) AM_WRITENOP										// ? increasing
-	AM_RANGE(0x678890, 0x678891) AM_WRITENOP										// ? increasing
+	AM_RANGE(0x678880, 0x678881) AM_WRITENOP										// ? CRT
+	AM_RANGE(0x678890, 0x678891) AM_WRITENOP										// ? CRT
 	AM_RANGE(0x6788a2, 0x6788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w)	// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x6788a4, 0x6788a5) AM_WRITEONLY AM_SHARE("irq_enable")				// IRQ Enable
 	AM_RANGE(0x6788aa, 0x6788ab) AM_WRITEONLY AM_SHARE("rombank")					// Rom Bank
@@ -814,8 +821,8 @@ static ADDRESS_MAP_START( daitoa_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x178840, 0x17884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs")	// Tiles Blitter
 	AM_RANGE(0x178860, 0x17886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
 	AM_RANGE(0x178870, 0x17887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll
-	AM_RANGE(0x178880, 0x178881) AM_WRITENOP										// ? increasing
-	AM_RANGE(0x178890, 0x178891) AM_WRITENOP										// ? increasing
+	AM_RANGE(0x178880, 0x178881) AM_WRITENOP										// ? CRT
+	AM_RANGE(0x178890, 0x178891) AM_WRITENOP										// ? CRT
 	AM_RANGE(0x1788a2, 0x1788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w)	// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x1788a4, 0x1788a5) AM_WRITEONLY AM_SHARE("irq_enable")				// IRQ Enable
 	AM_RANGE(0x1788aa, 0x1788ab) AM_WRITEONLY AM_SHARE("rombank")					// Rom Bank
@@ -856,8 +863,8 @@ static ADDRESS_MAP_START( bangball_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0xe78840, 0xe7884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs")	// Tiles Blitter
 	AM_RANGE(0xe78860, 0xe7886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
 	AM_RANGE(0xe78870, 0xe7887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll
-	AM_RANGE(0xe78880, 0xe78881) AM_WRITENOP										// ? increasing
-	AM_RANGE(0xe78890, 0xe78891) AM_WRITENOP										// ? increasing
+	AM_RANGE(0xe78880, 0xe78881) AM_WRITENOP										// ? CRT
+	AM_RANGE(0xe78890, 0xe78891) AM_WRITENOP										// ? CRT
 	AM_RANGE(0xe788a2, 0xe788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w)	// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0xe788a4, 0xe788a5) AM_WRITEONLY AM_SHARE("irq_enable")				// IRQ Enable
 	AM_RANGE(0xe788aa, 0xe788ab) AM_WRITEONLY AM_SHARE("rombank")					// Rom Bank
@@ -884,8 +891,8 @@ static ADDRESS_MAP_START( batlbubl_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x178840, 0x17884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs")	// Tiles Blitter
 	AM_RANGE(0x178860, 0x17886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
 	AM_RANGE(0x178870, 0x17887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll
-	AM_RANGE(0x178880, 0x178881) AM_WRITENOP										// ? increasing
-	AM_RANGE(0x178890, 0x178891) AM_WRITENOP										// ? increasing
+	AM_RANGE(0x178880, 0x178881) AM_WRITENOP										// ? CRT
+	AM_RANGE(0x178890, 0x178891) AM_WRITENOP										// ? CRT
 	AM_RANGE(0x1788a2, 0x1788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)	// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x1788a4, 0x1788a5) AM_WRITEONLY AM_SHARE("irq_enable")				// IRQ Enable
 	AM_RANGE(0x1788aa, 0x1788ab) AM_WRITEONLY AM_SHARE("rombank")					// Rom Bank
@@ -920,8 +927,8 @@ static ADDRESS_MAP_START( msgogo_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x178840, 0x17884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs")	// Tiles Blitter
 	AM_RANGE(0x178860, 0x17886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
 	AM_RANGE(0x178870, 0x17887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll
-	AM_RANGE(0x178880, 0x178881) AM_WRITENOP										// ? increasing
-	AM_RANGE(0x178890, 0x178891) AM_WRITENOP										// ? increasing
+	AM_RANGE(0x178880, 0x178881) AM_WRITENOP										// ? CRT
+	AM_RANGE(0x178890, 0x178891) AM_WRITENOP										// ? CRT
 	AM_RANGE(0x1788a2, 0x1788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w)	// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x1788a4, 0x1788a5) AM_WRITEONLY AM_SHARE("irq_enable")				// IRQ Enable
 	AM_RANGE(0x1788aa, 0x1788ab) AM_WRITEONLY AM_SHARE("rombank")					// Rom Bank
@@ -954,8 +961,8 @@ static ADDRESS_MAP_START( daitorid_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs")	// Tiles Blitter
 	AM_RANGE(0x478860, 0x47886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
 	AM_RANGE(0x478870, 0x47887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll
-	AM_RANGE(0x478880, 0x478881) AM_WRITENOP										// ? increasing
-	AM_RANGE(0x478890, 0x478891) AM_WRITENOP										// ? increasing
+	AM_RANGE(0x478880, 0x478881) AM_WRITENOP										// ? CRT
+	AM_RANGE(0x478890, 0x478891) AM_WRITENOP										// ? CRT
 	AM_RANGE(0x4788a2, 0x4788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w)	// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x4788a4, 0x4788a5) AM_WRITEONLY AM_SHARE("irq_enable")				// IRQ Enable
 	AM_RANGE(0x4788a8, 0x4788a9) AM_WRITE(metro_soundlatch_w)						// To Sound CPU
@@ -989,8 +996,8 @@ static ADDRESS_MAP_START( dharma_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs")	// Tiles Blitter
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
 	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll Regs
-	AM_RANGE(0x878880, 0x878881) AM_WRITENOP										// ? increasing
-	AM_RANGE(0x878890, 0x878891) AM_WRITENOP										// ? increasing
+	AM_RANGE(0x878880, 0x878881) AM_WRITENOP										// ? CRT
+	AM_RANGE(0x878890, 0x878891) AM_WRITENOP										// ? CRT
 	AM_RANGE(0x8788a4, 0x8788a5) AM_WRITEONLY AM_SHARE("irq_enable")				// IRQ Enable
 	AM_RANGE(0x8788a8, 0x8788a9) AM_WRITE(metro_soundlatch_w)						// To Sound CPU
 	AM_RANGE(0x8788aa, 0x8788ab) AM_WRITEONLY AM_SHARE("rombank")					// Rom Bank
@@ -1044,8 +1051,8 @@ static ADDRESS_MAP_START( karatour_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs")	// Tiles Blitter
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
 	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll
-	AM_RANGE(0x878880, 0x878881) AM_WRITENOP										// ? increasing
-	AM_RANGE(0x878890, 0x878891) AM_WRITENOP										// ? increasing
+	AM_RANGE(0x878880, 0x878881) AM_WRITENOP										// ? CRT
+	AM_RANGE(0x878890, 0x878891) AM_WRITENOP										// ? CRT
 	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w)	// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x8788a4, 0x8788a5) AM_WRITEONLY AM_SHARE("irq_enable")				// IRQ Enable
 	AM_RANGE(0x8788a8, 0x8788a9) AM_WRITE(metro_soundlatch_w)						// To Sound CPU
@@ -1075,8 +1082,8 @@ static ADDRESS_MAP_START( kokushi_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs")	// Tiles Blitter
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
 	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll Regs - WRONG
-//  AM_RANGE(0x878880, 0x878881) AM_WRITENOP                                        // ? increasing
-	AM_RANGE(0x878890, 0x878891) AM_WRITENOP										// ? increasing
+//  AM_RANGE(0x878880, 0x878881) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0x878890, 0x878891) AM_WRITENOP										// ? CRT
 	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w)	// IRQ Cause /  IRQ Acknowledge
 	AM_RANGE(0x8788a4, 0x8788a5) AM_WRITEONLY AM_SHARE("irq_enable")				// IRQ Enable
 	AM_RANGE(0x8788a8, 0x8788a9) AM_WRITE(metro_soundlatch_w)						// To Sound CPU
@@ -1109,8 +1116,8 @@ static ADDRESS_MAP_START( lastfort_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs")	// Tiles Blitter
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
 	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll
-	AM_RANGE(0x878880, 0x878881) AM_WRITENOP										// ? increasing
-	AM_RANGE(0x878890, 0x878891) AM_WRITENOP										// ? increasing
+	AM_RANGE(0x878880, 0x878881) AM_WRITENOP										// ? CRT
+	AM_RANGE(0x878890, 0x878891) AM_WRITENOP										// ? CRT
 	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w)	// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x8788a4, 0x8788a5) AM_WRITEONLY AM_SHARE("irq_enable")				// IRQ Enable
 	AM_RANGE(0x8788a8, 0x8788a9) AM_WRITE(metro_soundlatch_w)						// To Sound CPU
@@ -1150,8 +1157,8 @@ static ADDRESS_MAP_START( lastforg_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x8f8840, 0x8f884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs")	// Tiles Blitter
 	AM_RANGE(0x8f8860, 0x8f886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
 	AM_RANGE(0x8f8870, 0x8f887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll
-	AM_RANGE(0x8f8880, 0x8f8881) AM_WRITENOP										// ? increasing
-	AM_RANGE(0x8f8890, 0x8f8891) AM_WRITENOP										// ? increasing
+	AM_RANGE(0x8f8880, 0x8f8881) AM_WRITENOP										// ? CRT
+	AM_RANGE(0x8f8890, 0x8f8891) AM_WRITENOP										// ? CRT
 	AM_RANGE(0x8f88a2, 0x8f88a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w)	// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x8f88a4, 0x8f88a5) AM_WRITEONLY AM_SHARE("irq_enable")				// IRQ Enable
 	AM_RANGE(0x8f88a8, 0x8f88a9) AM_WRITE(metro_soundlatch_w)						// To Sound CPU
@@ -1439,8 +1446,8 @@ static ADDRESS_MAP_START( pangpoms_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs")	// Tiles Blitter
 	AM_RANGE(0x478860, 0x47886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
 	AM_RANGE(0x478870, 0x47887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll Regs
-	AM_RANGE(0x478880, 0x478881) AM_WRITENOP										// ? increasing
-	AM_RANGE(0x478890, 0x478891) AM_WRITENOP										// ? increasing
+	AM_RANGE(0x478880, 0x478881) AM_WRITENOP										// ? CRT
+	AM_RANGE(0x478890, 0x478891) AM_WRITENOP										// ? CRT
 	AM_RANGE(0x4788a2, 0x4788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)	// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x4788a4, 0x4788a5) AM_WRITEONLY AM_SHARE("irq_enable")				// IRQ Enable
 	AM_RANGE(0x4788a8, 0x4788a9) AM_WRITE(metro_soundlatch_w)						// To Sound CPU
@@ -1482,8 +1489,8 @@ static ADDRESS_MAP_START( poitto_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0xc78840, 0xc7884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs")	// Tiles Blitter
 	AM_RANGE(0xc78860, 0xc7886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
 	AM_RANGE(0xc78870, 0xc7887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll Regs
-	AM_RANGE(0xc78880, 0xc78881) AM_WRITENOP										// ? increasing
-	AM_RANGE(0xc78890, 0xc78891) AM_WRITENOP										// ? increasing
+	AM_RANGE(0xc78880, 0xc78881) AM_WRITENOP										// ? CRT
+	AM_RANGE(0xc78890, 0xc78891) AM_WRITENOP										// ? CRT
 	AM_RANGE(0xc788a2, 0xc788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)	// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0xc788a4, 0xc788a5) AM_WRITEONLY AM_SHARE("irq_enable")				// IRQ Enable
 	AM_RANGE(0xc788a8, 0xc788a9) AM_WRITE(metro_soundlatch_w)						// To Sound CPU
@@ -1518,8 +1525,8 @@ static ADDRESS_MAP_START( skyalert_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs")	// Tiles Blitter
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
 	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll
-	AM_RANGE(0x878880, 0x878881) AM_WRITENOP										// ? increasing
-	AM_RANGE(0x878890, 0x878891) AM_WRITENOP										// ? increasing
+	AM_RANGE(0x878880, 0x878881) AM_WRITENOP										// ? CRT
+	AM_RANGE(0x878890, 0x878891) AM_WRITENOP										// ? CRT
 	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)	// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x8788a4, 0x8788a5) AM_WRITEONLY AM_SHARE("irq_enable")				// IRQ Enable
 	AM_RANGE(0x8788a8, 0x8788a9) AM_WRITE(metro_soundlatch_w)						// To Sound CPU
@@ -1552,8 +1559,8 @@ static ADDRESS_MAP_START( pururun_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0xc78840, 0xc7884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs")	// Tiles Blitter
 	AM_RANGE(0xc78860, 0xc7886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
 	AM_RANGE(0xc78870, 0xc7887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll Regs
-	AM_RANGE(0xc78880, 0xc78881) AM_WRITENOP										// ? increasing
-	AM_RANGE(0xc78890, 0xc78891) AM_WRITENOP										// ? increasing
+	AM_RANGE(0xc78880, 0xc78881) AM_WRITENOP										// ? CRT
+	AM_RANGE(0xc78890, 0xc78891) AM_WRITENOP										// ? CRT
 	AM_RANGE(0xc788a2, 0xc788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)	// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0xc788a4, 0xc788a5) AM_WRITEONLY AM_SHARE("irq_enable")				// IRQ Enable
 	AM_RANGE(0xc788a8, 0xc788a9) AM_WRITE(metro_soundlatch_w)						// To Sound CPU
@@ -1586,8 +1593,8 @@ static ADDRESS_MAP_START( toride2g_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0xc78840, 0xc7884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs")	// Tiles Blitter
 	AM_RANGE(0xc78860, 0xc7886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
 	AM_RANGE(0xc78870, 0xc7887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll Regs
-	AM_RANGE(0xc78880, 0xc78881) AM_WRITENOP										// ? increasing
-	AM_RANGE(0xc78890, 0xc78891) AM_WRITENOP										// ? increasing
+	AM_RANGE(0xc78880, 0xc78881) AM_WRITENOP										// ? CRT
+	AM_RANGE(0xc78890, 0xc78891) AM_WRITENOP										// ? CRT
 	AM_RANGE(0xc788a2, 0xc788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w)	// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0xc788a4, 0xc788a5) AM_WRITEONLY AM_SHARE("irq_enable")				// IRQ Enable
 	AM_RANGE(0xc788a8, 0xc788a9) AM_WRITE(metro_soundlatch_w)						// To Sound CPU
@@ -1653,7 +1660,7 @@ static ADDRESS_MAP_START( blzntrnd_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x278000, 0x2787ff) AM_RAM AM_SHARE("tiletable")						// Tiles Set
 	AM_RANGE(0x278860, 0x27886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
 	AM_RANGE(0x278870, 0x27887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll
-	AM_RANGE(0x278890, 0x278891) AM_WRITENOP										// ? increasing
+	AM_RANGE(0x278890, 0x278891) AM_WRITENOP										// ? CRT
 	AM_RANGE(0x2788a2, 0x2788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)	// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x2788a4, 0x2788a5) AM_WRITEONLY AM_SHARE("irq_enable")				// IRQ Enable
 	AM_RANGE(0x2788aa, 0x2788ab) AM_WRITEONLY AM_SHARE("rombank")					// Rom Bank
@@ -1789,7 +1796,7 @@ static ADDRESS_MAP_START( puzzlet_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x778840, 0x77884f) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs")	// Tiles Blitter
 	AM_RANGE(0x778860, 0x77886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
 	AM_RANGE(0x778870, 0x77887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll
-	AM_RANGE(0x778890, 0x778891) AM_WRITENOP										// ? increasing
+	AM_RANGE(0x778890, 0x778891) AM_WRITENOP										// ? CRT
 	AM_RANGE(0x7788a2, 0x7788a3) AM_WRITE(metro_irq_cause_w)							// IRQ Cause
 	AM_RANGE(0x7788a4, 0x7788a5) AM_WRITE(puzzlet_irq_enable_w) AM_SHARE("irq_enable")	// IRQ Enable
 
@@ -1815,6 +1822,101 @@ static ADDRESS_MAP_START( puzzlet_io_map, AS_IO, 8, metro_state )
 	AM_RANGE(H8_PORT_7,   H8_PORT_7) AM_READ_PORT("IN2")
 	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1) AM_READ_PORT("IN0")		// coin
 	AM_RANGE(H8_PORT_B,   H8_PORT_B) AM_READ_PORT("DSW0") AM_WRITE(puzzlet_portb_w)
+ADDRESS_MAP_END
+
+
+/***************************************************************************
+                                Varia Metal
+***************************************************************************/
+
+WRITE8_MEMBER(metro_state::vmetal_control_w)
+{
+	device_t *device = machine().device("essnd");
+	/* Lower nibble is the coin control bits shown in
+       service mode, but in game mode they're different */
+	coin_counter_w(machine(), 0, data & 0x04);
+	coin_counter_w(machine(), 1, data & 0x08);	/* 2nd coin schute activates coin 0 counter in game mode?? */
+//  coin_lockout_w(machine(), 0, data & 0x01);  /* always on in game mode?? */
+	coin_lockout_w(machine(), 1, data & 0x02);	/* never activated in game mode?? */
+
+	if ((data & 0x40) == 0)
+		device->reset();
+	else
+		es8712_play(device);
+
+	if (data & 0x10)
+		es8712_set_bank_base(device, 0x100000);
+	else
+		es8712_set_bank_base(device, 0x000000);
+
+	if (data & 0xa0)
+		logerror("%s: Writing unknown bits %04x to $200000\n",machine().describe_context(),data);
+}
+
+WRITE8_MEMBER(metro_state::vmetal_es8712_w)
+{
+	/* Many samples in the ADPCM ROM are actually not used.
+
+    Snd         Offset Writes                 Sample Range
+         0000 0004 0002 0006 000a 0008 000c
+    --   ----------------------------------   -------------
+    00   006e 0001 00ab 003c 0002 003a 003a   01ab6e-023a3c
+    01   003d 0002 003a 001d 0002 007e 007e   023a3d-027e1d
+    02   00e2 0003 0005 002e 0003 00f3 00f3   0305e2-03f32e
+    03   000a 0005 001e 00f6 0005 00ec 00ec   051e0a-05ecf6
+    04   00f7 0005 00ec 008d 0006 0060 0060   05ecf7-06608d
+    05   0016 0008 002e 0014 0009 0019 0019   082e16-091914
+    06   0015 0009 0019 0094 000b 0015 0015   091915-0b1594
+    07   0010 000d 0012 00bf 000d 0035 0035   0d1210-0d35bf
+    08   00ce 000e 002f 0074 000f 0032 0032   0e2fce-0f3274
+    09   0000 0000 0000 003a 0000 007d 007d   000000-007d3a
+    0a   0077 0000 00fa 008d 0001 00b6 00b6   00fa77-01b68d
+    0b   008e 0001 00b6 00b3 0002 0021 0021   01b68e-0221b3
+    0c   0062 0002 00f7 0038 0003 00de 00de   02f762-03de38
+    0d   00b9 0005 00ab 00ef 0006 0016 0016   05abb9-0616ef
+    0e   00dd 0007 0058 00db 0008 001a 001a   0758dd-081adb
+    0f   00dc 0008 001a 002e 0008 008a 008a   081adc-088a2e
+    10   00db 0009 00d7 00ff 000a 0046 0046   09d7db-0a46ff
+    11   0077 000c 0003 006d 000c 0080 0080   0c0377-0c806d
+    12   006e 000c 0080 006c 000d 0002 0002   0c806e-0d026c
+    13   006d 000d 0002 002b 000d 0041 0041   0d026d-0d412b
+    14   002c 000d 0041 002a 000d 00be 00be   0d412c-0dbe2a
+    15   002b 000d 00be 0029 000e 0083 0083   0dbe2b-0e8329
+    16   002a 000e 0083 00ee 000f 0069 0069   0e832a-0f69ee
+    */
+
+	device_t *device = machine().device("essnd");
+	es8712_w(device, space, offset, data);
+	logerror("%s: Writing %04x to ES8712 offset %02x\n", machine().describe_context(), data, offset);
+}
+
+static ADDRESS_MAP_START( vmetal_map, AS_PROGRAM, 16, metro_state )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM												// ROM
+	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")	// Layer 0
+	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")	// Layer 1
+	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")	// Layer 2
+	AM_RANGE(0x160000, 0x16ffff) AM_READ(metro_bankedrom_r)							// Banked ROM
+	AM_RANGE(0x170000, 0x171fff) AM_RAM												// ???
+	AM_RANGE(0x172000, 0x173fff) AM_RAM_WRITE(paletteram_GGGGGRRRRRBBBBBx_word_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_SHARE("spriteram")						// Sprites
+	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_SHARE("tiletable")						// Tiles Set
+	AM_RANGE(0x178840, 0x17884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs")	// Tiles Blitter
+	AM_RANGE(0x178860, 0x17886b) AM_WRITE(metro_window_w) AM_SHARE("window")		// Tilemap Window
+	AM_RANGE(0x178870, 0x17887b) AM_WRITEONLY AM_SHARE("scroll")					// Scroll
+	AM_RANGE(0x178880, 0x178881) AM_WRITENOP										// ? CRT
+	AM_RANGE(0x178890, 0x178891) AM_WRITENOP										// ? CRT
+	AM_RANGE(0x1788a2, 0x1788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w)	// IRQ Cause / IRQ Acknowledge
+	AM_RANGE(0x1788a4, 0x1788a5) AM_WRITEONLY AM_SHARE("irq_enable")				// IRQ Enable
+	AM_RANGE(0x1788aa, 0x1788ab) AM_WRITEONLY AM_SHARE("rombank")					// Rom Bank
+	AM_RANGE(0x1788ac, 0x1788ad) AM_WRITEONLY AM_SHARE("screenctrl")				// Screen Control
+	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_SHARE("videoregs")					// Video Registers
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_WRITE8(vmetal_control_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x300000, 0x31ffff) AM_READ(balcube_dsw_r)								// DSW x 3
+	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
+	AM_RANGE(0x400002, 0x400003) AM_DEVWRITE8("oki", okim6295_device, write, 0x00ff)
+	AM_RANGE(0x500000, 0x50000d) AM_WRITE8(vmetal_es8712_w, 0x00ff)
+	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)							// RAM (mirrored)
 ADDRESS_MAP_END
 
 
@@ -3278,6 +3380,79 @@ static INPUT_PORTS_START( toride2g )
 	PORT_BIT(  0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )	// BIT 6 !?
 INPUT_PORTS_END
 
+/***************************************************************************
+                                Varia Metal
+***************************************************************************/
+
+/* verified from M68000 code */
+static INPUT_PORTS_START( vmetal )
+	PORT_START("P1_P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_TILT )             /* 'Tilt' only in "test mode" - no effect ingame */
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )         /* same coinage as COIN1 and COIN2 */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2 )         /* 'Test' only in "test mode" - no effect ingame */
+	PORT_BIT( 0xffe0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW0")
+	// DSW1, stored at 0xff0085.b (cpl'ed)
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C )  )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_1C )  )
+	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C )  )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_2C )  )
+	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_3C )  )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_4C )  )
+	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_5C )  )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C )  )
+	PORT_DIPUNUSED( 0x0008, IP_ACTIVE_LOW )                 /* 0x01 (OFF) or 0x02 (ON) written to 0xff0112.b but NEVER read back - old credits for 2 players game ? */
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Flip_Screen ) )  /* 0x07c1 written to 0x1788ac.w (screen control ?) at first (code at 0x0001b8) */
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )          /* 0x07c1 written to 0xff0114.w (then 0x1788ac.w) during initialisation (code at 0x000436) */
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )           /* 0x07c0 written to 0xff0114.w (then 0x1788ac.w) during initialisation (code at 0x000436) */
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x0040, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x0080, IP_ACTIVE_LOW )
+
+	PORT_START("IN2")
+	// DSW2, stored at 0xff0084.b (cpl'ed)
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Lives ) )
+	PORT_DIPSETTING(      0x0008, "1"  )
+	PORT_DIPSETTING(      0x0004, "2"  )
+	PORT_DIPSETTING(      0x000c, "3"  )
+	PORT_DIPSETTING(      0x0000, "4"  )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Bonus_Life ) )   /* code at 0x0004a4 */
+	PORT_DIPSETTING(      0x0010, "Every 30000" )
+	PORT_DIPSETTING(      0x0000, "Every 60000" )
+	PORT_DIPUNUSED( 0x0020, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x0040, IP_ACTIVE_LOW )
+	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
+INPUT_PORTS_END
+
 
 
 /***************************************************************************
@@ -3302,10 +3477,10 @@ static const gfx_layout layout_8x8x4 =
 };
 
 /* 8x8x8 tiles for later games */
-static GFXLAYOUT_RAW( layout_8x8x8h, 8, 8, 8*8, 32*8 )
+static GFXLAYOUT_RAW( layout_8x8x8, 8, 8, 8*8, 32*8 )
 
 /* 16x16x4 tiles for later games */
-static const gfx_layout layout_16x16x4q =
+static const gfx_layout layout_16x16x4 =
 {
 	16,16,
 	RGN_FRAC(1,1),
@@ -3317,7 +3492,7 @@ static const gfx_layout layout_16x16x4q =
 };
 
 /* 16x16x8 tiles for later games */
-static GFXLAYOUT_RAW( layout_16x16x8o, 16, 16, 16*8, 32*8 )
+static GFXLAYOUT_RAW( layout_16x16x8, 16, 16, 16*8, 32*8 )
 
 static const gfx_layout layout_053936 =
 {
@@ -3352,26 +3527,33 @@ GFXDECODE_END
 
 static GFXDECODE_START( i4220 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
-	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8h,   0x0,  0x10 ) // [1] 8 Bit Tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,  0x0, 0x100 ) // [3] 8 Bit Tiles 16x16
 GFXDECODE_END
 
 static GFXDECODE_START( blzntrnd )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
-	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8h,   0x0,  0x10 ) // [1] 8 Bit Tiles
-	GFXDECODE_ENTRY( "gfx3", 0, layout_053936,   0x0,  0x10 ) // [2] 053936 Tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,  0x0, 0x100 ) // [3] 8 Bit Tiles 16x16
+	GFXDECODE_ENTRY( "gfx2", 0, layout_053936,   0x0,  0x10 ) // [4] 053936 Tiles
 GFXDECODE_END
 
 static GFXDECODE_START( gstrik2 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
-	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8h,   0x0,  0x10 ) // [1] 8 Bit Tiles
-	GFXDECODE_ENTRY( "gfx3", 0, layout_053936_16,0x0,  0x10 ) // [2] 053936 Tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,  0x0, 0x100 ) // [3] 8 Bit Tiles 16x16
+	GFXDECODE_ENTRY( "gfx2", 0, layout_053936_16,0x0,  0x10 ) // [4] 053936 Tiles
 GFXDECODE_END
 
+// same as 14220:
 static GFXDECODE_START( i4300 )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x4,    0x0, 0x100 ) // [0] 4 Bit Tiles
-	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8h,   0x0,  0x10 ) // [1] 8 Bit Tiles
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4q, 0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8o, 0x0, 0x100 ) // [2] 8 Bit Tiles 16x16
+	GFXDECODE_ENTRY( "gfx1", 0, layout_8x8x8,    0x0,  0x10 ) // [1] 8 Bit Tiles
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,  0x0, 0x100 ) // [2] 4 Bit Tiles 16x16
+	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8,  0x0, 0x100 ) // [3] 8 Bit Tiles 16x16
 GFXDECODE_END
 
 
@@ -3396,8 +3578,6 @@ MACHINE_START_MEMBER(metro_state,metro)
 	save_item(NAME(m_gakusai_oki_bank_hi));
 	save_item(NAME(m_sprite_xoffs));
 	save_item(NAME(m_sprite_yoffs));
-	save_item(NAME(m_bg_tilemap_enable));
-	save_item(NAME(m_bg_tilemap_enable16));
 }
 
 MACHINE_RESET_MEMBER(metro_state,metro)
@@ -3433,7 +3613,7 @@ static MACHINE_CONFIG_START( balcube, metro_state )
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
 	MCFG_GFXDECODE(i4220)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_offset)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_tmap)
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	/* sound hardware */
@@ -3466,7 +3646,7 @@ static MACHINE_CONFIG_START( daitoa, metro_state )
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
 	MCFG_GFXDECODE(i4220)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_offset)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_tmap)
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	/* sound hardware */
@@ -3499,7 +3679,7 @@ static MACHINE_CONFIG_START( msgogo, metro_state )
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
 	MCFG_GFXDECODE(i4220)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_offset)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_tmap)
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	/* sound hardware */
@@ -3532,7 +3712,7 @@ static MACHINE_CONFIG_START( bangball, metro_state )
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
 	MCFG_GFXDECODE(i4220)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_offset)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_tmap)
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	/* sound hardware */
@@ -3565,7 +3745,7 @@ static MACHINE_CONFIG_START( batlbubl, metro_state )
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
 	MCFG_GFXDECODE(i4220)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_offset)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_tmap)
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	/* sound hardware */
@@ -3602,7 +3782,7 @@ static MACHINE_CONFIG_START( daitorid, metro_state )
 	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
 
 	MCFG_GFXDECODE(i4220)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_offset)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_tmap)
 	MCFG_PALETTE_LENGTH(0x1000)
 
 	/* sound hardware */
@@ -4204,6 +4384,44 @@ static MACHINE_CONFIG_START( mouja, metro_state )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_START( vmetal, metro_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(vmetal_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
+
+	MCFG_MACHINE_START_OVERRIDE(metro_state,metro)
+	MCFG_MACHINE_RESET_OVERRIDE(metro_state,metro)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58.2328) // VSync 58.2328Hz, HSync 15.32kHz
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
+
+	MCFG_GFXDECODE(i4220)
+	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_sprite)
+	MCFG_PALETTE_LENGTH(0x1000)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
+
+	MCFG_SOUND_ADD("essnd", ES8712, 12000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+
+	// OKI M6585 not hooked up...
+MACHINE_CONFIG_END
+
+
 static const k053936_interface blzntrnd_k053936_intf =
 {
 	0, -69, -21
@@ -4522,7 +4740,7 @@ ROM_START( blzntrnd )
 	ROMX_LOAD( "rom331.bin", 0x1000004, 0x200000, CRC(4d909c28) SHA1(fb9bb824e518f67713799ed2c0159a7bd70f35c4) , ROM_GROUPWORD | ROM_SKIP(6))
 	ROMX_LOAD( "rom375.bin", 0x1000006, 0x200000, CRC(6eb4f97c) SHA1(c7f006230cbf10e706b0362eeed34655a3aef1a5) , ROM_GROUPWORD | ROM_SKIP(6))
 
-	ROM_REGION( 0x200000, "gfx3", 0 )	/* 053936 gfx data */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* 053936 gfx data */
 	ROM_LOAD( "rom9.bin", 0x000000, 0x200000, CRC(37ca3570) SHA1(3374c586bf84583fa33f2793c4e8f2f61a0cab1c) )
 
 	ROM_REGION( 0x080000, "ymsnd.deltat", 0 )	/* Samples */
@@ -4608,7 +4826,7 @@ ROM_START( gstrik2 )
 //  ROMX_LOAD( "chr14.90", 0x1800004, 0x200000, CRC() SHA1() , ROM_GROUPWORD | ROM_SKIP(6))
 //  ROMX_LOAD( "chr15.89", 0x1800006, 0x200000, CRC() SHA1() , ROM_GROUPWORD | ROM_SKIP(6))
 
-	ROM_REGION( 0x200000, "gfx3", 0 )	/* 053936 gfx data */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* 053936 gfx data */
 	ROM_LOAD( "psacrom.60", 0x000000, 0x200000,  CRC(73f1f279) SHA1(1135b2b1eb4c52249bc12ee178340bbb202a94c8) )
 
 	ROM_REGION( 0x200000, "ymsnd.deltat", 0 )	/* Samples */
@@ -4648,7 +4866,7 @@ ROM_START( gstrik2j )
 //  ROMX_LOAD( "chr14.90", 0x1800004, 0x200000, CRC() SHA1() , ROM_GROUPWORD | ROM_SKIP(6))
 //  ROMX_LOAD( "chr15.89", 0x1800006, 0x200000, CRC() SHA1() , ROM_GROUPWORD | ROM_SKIP(6))
 
-	ROM_REGION( 0x200000, "gfx3", 0 )	/* 053936 gfx data */
+	ROM_REGION( 0x200000, "gfx2", 0 )	/* 053936 gfx data */
 	ROM_LOAD( "psacrom.60", 0x000000, 0x200000,  CRC(73f1f279) SHA1(1135b2b1eb4c52249bc12ee178340bbb202a94c8) )
 
 	ROM_REGION( 0x200000, "ymsnd.deltat", 0 )	/* Samples */
@@ -5949,6 +6167,98 @@ ROM_START( toride2j )
 	ROM_LOAD( "tr2_ja_7.3g", 0x000000, 0x020000, CRC(6ee32315) SHA1(ef4d59576929deab0aa459a67be21d97c2803dea) )
 ROM_END
 
+/***************************************************************************
+
+Varia Metal
+Excellent System Ltd, 1995
+
+PCB Layout
+----------
+This game runs on Metro hardware.
+
+ES-9309B-B
+|--------------------------------------------|
+| TA7222   8.U9     DSW1(8)  DSW2(8)         |
+|VOL    M6295  1.000MHz                      |
+|                   |------------|           |
+|          7.U12    |   68000    |           |
+|  uPC3403          |------------|           |
+|J 640kHz  ES-8712                           |
+|A M6585           EPM7032    6B.U18  5B.U19 |
+|M       MM1035                              |
+|M        26.666MHz  16MHz    62256   62256  |
+|A                                           |
+|                 |--------|          1.U29  |
+|         62256   |Imagetek|                 |
+|         62256   |I4220   |          2.U31  |
+|                 |        |                 |
+|                 |--------|          3.U28  |
+|                                            |
+|                  6264               4.U30  |
+|--------------------------------------------|
+Notes:
+      68000   - clock 16.000MHz
+      ES-8712 - ES-8712 Single Channel ADPCM Samples Player. Clock ?? seems to be 16kHz?
+                This chip is branded 'EXCELLENT', may be (or not??) manufactured by Ensonic (SDIP48)
+      M6295   - clock 1.000MHz. Sample rate = 1000000/132
+      M6585   - Oki M6585 ADPCM Voice Synthesizer IC (DIP18). Clock 640kHz.
+                Sample rate = 16kHz (selection - pin 1 LOW, pin 2 HIGH = 16kHz)
+                This is a version-up to the previous M5205 with some additional
+                capabilies and improvements.
+      MM1035  - Mitsumi Monolithic IC MM1035 System Reset and Watchdog Timer (DIP8)
+      uPC3403 - NEC uPC3403 High Performance Quad Operational Amplifier (DIP14)
+      62256   - 32k x8 SRAM (DIP28)
+      6264    - 8k x8 SRAM (DIP28)
+      TA7222  - Toshiba TA7222 5.8 Watt Audio Power Amplifier (SIP10)
+      EPM7032 - Altera EPM7032LC44-15T High Performance EEPROM-based Programmable Logic Device (PLCC44)
+      Custom  - Imagetek I4220 Graphics Controller (QFP208)
+      VSync   - 58.2328Hz
+      HSync   - 15.32kHz
+      ROMs    -
+                6B & 5B are 27C040 EPROM (DIP32)
+                8 is 4M MaskROM (DIP32)
+                All other ROMs are 16M MaskROM (DIP42)
+
+***************************************************************************/
+
+ROM_START( vmetal )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "6b.u18", 0x00000, 0x80000, CRC(4eb939d5) SHA1(741ab05043fc3bd886162d878630e45da9359718) )
+	ROM_LOAD16_BYTE( "5b.u19", 0x00001, 0x80000, CRC(4933ac6c) SHA1(1a3303e32fcb08854d4d6e13f36ca99d92aed4cc) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )
+	ROMX_LOAD( "2.u31", 0x000000, 0x200000, CRC(b36f8d60) SHA1(1676859d0fee4eb9897ce1601a2c9fd9a6dc4a43), ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "4.u30", 0x000002, 0x200000, CRC(5a25a49c) SHA1(c30781202ec882e1ec6adfb560b0a1075b3cce55), ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "1.u29", 0x000004, 0x200000, CRC(b470c168) SHA1(c30462dc134da1e71a94b36ef96ecd65c325b07e), ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "3.u28", 0x000006, 0x200000, CRC(00fca765) SHA1(ca9010bd7f59367e483868018db9a9abf871386e), ROM_GROUPWORD | ROM_SKIP(6))
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* OKI6295 Samples */
+	/* Second half is junk */
+	ROM_LOAD( "8.u9", 0x00000, 0x80000, CRC(c14c001c) SHA1(bad96b5cd40d1c34ef8b702262168ecab8192fb6) )
+
+	ROM_REGION( 0x200000, "essnd", 0 ) /* Samples */
+	ROM_LOAD( "7.u12", 0x00000, 0x200000, CRC(a88c52f1) SHA1(d74a5a11f84ba6b1042b33a2c156a1071b6fbfe1) )
+ROM_END
+
+ROM_START( vmetaln )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "vm6.bin", 0x00000, 0x80000, CRC(cb292ab1) SHA1(41fdfe67e6cb848542fd5aa0dfde3b1936bb3a28) )
+	ROM_LOAD16_BYTE( "vm5.bin", 0x00001, 0x80000, CRC(43ef844e) SHA1(c673f34fcc9e406282c9008795b52d01a240099a) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )
+	ROMX_LOAD( "2.u31", 0x000000, 0x200000, CRC(b36f8d60) SHA1(1676859d0fee4eb9897ce1601a2c9fd9a6dc4a43), ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "4.u30", 0x000002, 0x200000, CRC(5a25a49c) SHA1(c30781202ec882e1ec6adfb560b0a1075b3cce55), ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "1.u29", 0x000004, 0x200000, CRC(b470c168) SHA1(c30462dc134da1e71a94b36ef96ecd65c325b07e), ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "3.u28", 0x000006, 0x200000, CRC(00fca765) SHA1(ca9010bd7f59367e483868018db9a9abf871386e), ROM_GROUPWORD | ROM_SKIP(6))
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* OKI6295 Samples */
+	/* Second half is junk */
+	ROM_LOAD( "8.u9", 0x00000, 0x80000, CRC(c14c001c) SHA1(bad96b5cd40d1c34ef8b702262168ecab8192fb6) )
+
+	ROM_REGION( 0x200000, "essnd", 0 ) /* Samples */
+	ROM_LOAD( "7.u12", 0x00000, 0x200000, CRC(a88c52f1) SHA1(d74a5a11f84ba6b1042b33a2c156a1071b6fbfe1) )
+ROM_END
+
 
 /***************************************************************************
 
@@ -6091,40 +6401,42 @@ DRIVER_INIT_MEMBER(metro_state,puzzlet)
 
 ***************************************************************************/
 
-GAME( 1992, karatour,  0,        karatour, karatour, metro_state, karatour, ROT0,   "Mitchell",                               "The Karate Tournament",             GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1992, pangpoms,  0,        pangpoms, pangpoms, metro_state, metro,    ROT0,   "Metro",                                  "Pang Pom's",                        GAME_SUPPORTS_SAVE )
-GAME( 1992, pangpomsm, pangpoms, pangpoms, pangpoms, metro_state, metro,    ROT0,   "Metro (Mitchell license)",               "Pang Pom's (Mitchell)",             GAME_SUPPORTS_SAVE )
-GAME( 1992, skyalert,  0,        skyalert, skyalert, metro_state, metro,    ROT270, "Metro",                                  "Sky Alert",                         GAME_SUPPORTS_SAVE )
-GAME( 1993, ladykill,  0,        karatour, ladykill, metro_state, karatour, ROT90,  "Yanyaka (Mitchell license)",             "Lady Killer",                       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1993, moegonta,  ladykill, karatour, moegonta, metro_state, karatour, ROT90,  "Yanyaka",                                "Moeyo Gonta!! (Japan)",             GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1993, poitto,    0,        poitto,   poitto,   metro_state, metro,    ROT0,   "Metro / Able Corp.",                     "Poitto!",                           GAME_SUPPORTS_SAVE )
-GAME( 1994, blzntrnd,  0,        blzntrnd, blzntrnd, metro_state, blzntrnd, ROT0,   "Human Amusement",                        "Blazing Tornado",                   GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1994, dharma,    0,        dharma,   dharma,   metro_state, metro,    ROT0,   "Metro",                                  "Dharma Doujou",                     GAME_SUPPORTS_SAVE )
-GAME( 1994, dharmak,   dharma,   dharma,   dharma,   metro_state, dharmak,  ROT0,   "Metro",                                  "Dharma Doujou (Korea)",             GAME_SUPPORTS_SAVE )
-GAME( 1994, lastfort,  0,        lastfort, lastfort, metro_state, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride",            GAME_SUPPORTS_SAVE )
-GAME( 1994, lastforte, lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (Erotic, Rev C)", GAME_SUPPORTS_SAVE )
-GAME( 1994, lastfortea,lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (Erotic, Rev A)", GAME_SUPPORTS_SAVE )
-GAME( 1994, lastfortk, lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (Korea)",    GAME_SUPPORTS_SAVE )
-GAME( 1994, lastfortg, lastfort, lastforg, ladykill, metro_state, metro,    ROT0,   "Metro",                                  "Last Fortress - Toride (German)",   GAME_SUPPORTS_SAVE )
-GAME( 1994, toride2g,  0,        toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                  "Toride II Adauchi Gaiden",          GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1994, toride2gg, toride2g, toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                  "Toride II Adauchi Gaiden (German)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1994, toride2gk, toride2g, toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                  "Toride II Bok Su Oi Jeon Adauchi Gaiden (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1994, toride2j,  toride2g, toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                  "Toride II (Japan)",                 GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1994, gunmast,   0,        pururun,  gunmast,  metro_state, daitorid, ROT0,   "Metro",                                  "Gun Master",                        GAME_SUPPORTS_SAVE )
-GAME( 1995, daitorid,  0,        daitorid, daitorid, metro_state, daitorid, ROT0,   "Metro",                                  "Daitoride",                         GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1996, daitorida, daitorid, daitoa,   daitorid, metro_state, balcube,  ROT0,   "Metro",                                  "Daitoride (YMF278B version)",       GAME_SUPPORTS_SAVE )
-GAME( 1995, dokyusei,  0,        dokyusei, dokyusei, metro_state, gakusai,  ROT0,   "Make Software / Elf / Media Trading",    "Mahjong Doukyuusei",                GAME_SUPPORTS_SAVE )
-GAME( 1995, dokyusp,   0,        dokyusp,  gakusai,  metro_state, gakusai,  ROT0,   "Make Software / Elf / Media Trading",    "Mahjong Doukyuusei Special",        GAME_SUPPORTS_SAVE )
-GAME( 1995, msgogo,    0,        msgogo,   msgogo,   metro_state, balcube,  ROT0,   "Metro",                                  "Mouse Shooter GoGo",                GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1995, pururun,   0,        pururun,  pururun,  metro_state, daitorid, ROT0,   "Metro / Banpresto",                      "Pururun",                           GAME_SUPPORTS_SAVE )
-GAME( 1995, puzzli,    0,        daitorid, puzzli,   metro_state, daitorid, ROT0,   "Metro / Banpresto",                      "Puzzli",                            GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1996, 3kokushi,  0,        3kokushi, 3kokushi, metro_state, karatour, ROT0,   "Mitchell",                               "Sankokushi (Japan)",                GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1996, balcube,   0,        balcube,  balcube,  metro_state, balcube,  ROT0,   "Metro",                                  "Bal Cube",                          GAME_SUPPORTS_SAVE )
-GAME( 1996, bangball,  0,        bangball, bangball, metro_state, balcube,  ROT0,   "Banpresto / Kunihiko Tashiro+Goodhouse", "Bang Bang Ball (v1.05)",            GAME_SUPPORTS_SAVE )
-GAME( 1996, gstrik2,   0,        gstrik2,  gstrik2,  metro_state, blzntrnd, ROT0,   "Human Amusement",                        "Grand Striker 2 (Europe and Oceania)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1996, gstrik2j,  gstrik2,  gstrik2,  gstrik2,  metro_state, blzntrnd, ROT0,   "Human Amusement",                        "Grand Striker 2 (Japan)",           GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // priority between rounds
-GAME( 1999, batlbubl,  bangball, batlbubl, batlbubl, metro_state, balcube,  ROT0,   "Banpresto (Limenko license?)",           "Battle Bubble (v2.00)",             GAME_SUPPORTS_SAVE ) // or bootleg?
-GAME( 1996, mouja,     0,        mouja,    mouja,    metro_state, mouja,    ROT0,   "Etona",                                  "Mouja (Japan)",                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1997, gakusai,   0,        gakusai,  gakusai,  metro_state, gakusai,  ROT0,   "MakeSoft",                               "Mahjong Gakuensai (Japan)",         GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1998, gakusai2,  0,        gakusai2, gakusai,  metro_state, gakusai,  ROT0,   "MakeSoft",                               "Mahjong Gakuensai 2 (Japan)",       GAME_SUPPORTS_SAVE )
-GAME( 2000, puzzlet,   0,        puzzlet,  puzzlet,  metro_state, puzzlet,  ROT0,   "Unies Corporation",                      "Puzzlet (Japan)",                   GAME_NOT_WORKING | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1992, karatour,  0,        karatour, karatour, metro_state, karatour, ROT0,   "Mitchell",                                        "The Karate Tournament",                  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1992, pangpoms,  0,        pangpoms, pangpoms, metro_state, metro,    ROT0,   "Metro",                                           "Pang Pom's",                             GAME_SUPPORTS_SAVE )
+GAME( 1992, pangpomsm, pangpoms, pangpoms, pangpoms, metro_state, metro,    ROT0,   "Metro (Mitchell license)",                        "Pang Pom's (Mitchell)",                  GAME_SUPPORTS_SAVE )
+GAME( 1992, skyalert,  0,        skyalert, skyalert, metro_state, metro,    ROT270, "Metro",                                           "Sky Alert",                              GAME_SUPPORTS_SAVE )
+GAME( 1993, ladykill,  0,        karatour, ladykill, metro_state, karatour, ROT90,  "Yanyaka (Mitchell license)",                      "Lady Killer",                            GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1993, moegonta,  ladykill, karatour, moegonta, metro_state, karatour, ROT90,  "Yanyaka",                                         "Moeyo Gonta!! (Japan)",                  GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1993, poitto,    0,        poitto,   poitto,   metro_state, metro,    ROT0,   "Metro / Able Corp.",                              "Poitto!",                                GAME_SUPPORTS_SAVE )
+GAME( 1994, blzntrnd,  0,        blzntrnd, blzntrnd, metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Blazing Tornado",                        GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1994, dharma,    0,        dharma,   dharma,   metro_state, metro,    ROT0,   "Metro",                                           "Dharma Doujou",                          GAME_SUPPORTS_SAVE )
+GAME( 1994, dharmak,   dharma,   dharma,   dharma,   metro_state, dharmak,  ROT0,   "Metro",                                           "Dharma Doujou (Korea)",                  GAME_SUPPORTS_SAVE )
+GAME( 1994, lastfort,  0,        lastfort, lastfort, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride",                 GAME_SUPPORTS_SAVE )
+GAME( 1994, lastforte, lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Erotic, Rev C)", GAME_SUPPORTS_SAVE )
+GAME( 1994, lastfortea,lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Erotic, Rev A)", GAME_SUPPORTS_SAVE )
+GAME( 1994, lastfortk, lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Korea)",         GAME_SUPPORTS_SAVE )
+GAME( 1994, lastfortg, lastfort, lastforg, ladykill, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (German)",        GAME_SUPPORTS_SAVE )
+GAME( 1994, toride2g,  0,        toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden",               GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1994, toride2gg, toride2g, toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden (German)",      GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1994, toride2gk, toride2g, toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                           "Toride II Bok Su Oi Jeon Adauchi Gaiden (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1994, toride2j,  toride2g, toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                           "Toride II (Japan)",                      GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1994, gunmast,   0,        pururun,  gunmast,  metro_state, daitorid, ROT0,   "Metro",                                           "Gun Master",                             GAME_SUPPORTS_SAVE )
+GAME( 1995, daitorid,  0,        daitorid, daitorid, metro_state, daitorid, ROT0,   "Metro",                                           "Daitoride",                              GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1996, daitorida, daitorid, daitoa,   daitorid, metro_state, balcube,  ROT0,   "Metro",                                           "Daitoride (YMF278B version)",            GAME_SUPPORTS_SAVE )
+GAME( 1995, dokyusei,  0,        dokyusei, dokyusei, metro_state, gakusai,  ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei",                     GAME_SUPPORTS_SAVE )
+GAME( 1995, dokyusp,   0,        dokyusp,  gakusai,  metro_state, gakusai,  ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei Special",             GAME_SUPPORTS_SAVE )
+GAME( 1995, msgogo,    0,        msgogo,   msgogo,   metro_state, balcube,  ROT0,   "Metro",                                           "Mouse Shooter GoGo",                     GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1995, pururun,   0,        pururun,  pururun,  metro_state, daitorid, ROT0,   "Metro / Banpresto",                               "Pururun",                                GAME_SUPPORTS_SAVE )
+GAME( 1995, puzzli,    0,        daitorid, puzzli,   metro_state, daitorid, ROT0,   "Metro / Banpresto",                               "Puzzli",                                 GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1996, 3kokushi,  0,        3kokushi, 3kokushi, metro_state, karatour, ROT0,   "Mitchell",                                        "Sankokushi (Japan)",                     GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1996, balcube,   0,        balcube,  balcube,  metro_state, balcube,  ROT0,   "Metro",                                           "Bal Cube",                               GAME_SUPPORTS_SAVE )
+GAME( 1996, bangball,  0,        bangball, bangball, metro_state, balcube,  ROT0,   "Banpresto / Kunihiko Tashiro+Goodhouse",          "Bang Bang Ball (v1.05)",                 GAME_SUPPORTS_SAVE )
+GAME( 1996, gstrik2,   0,        gstrik2,  gstrik2,  metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Europe and Oceania)",   GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1996, gstrik2j,  gstrik2,  gstrik2,  gstrik2,  metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Japan)",                GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // priority between rounds
+GAME( 1999, batlbubl,  bangball, batlbubl, batlbubl, metro_state, balcube,  ROT0,   "Banpresto (Limenko license?)",                    "Battle Bubble (v2.00)",                  GAME_SUPPORTS_SAVE ) // or bootleg?
+GAME( 1996, mouja,     0,        mouja,    mouja,    metro_state, mouja,    ROT0,   "Etona",                                           "Mouja (Japan)",                          GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1997, gakusai,   0,        gakusai,  gakusai,  metro_state, gakusai,  ROT0,   "MakeSoft",                                        "Mahjong Gakuensai (Japan)",              GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1998, gakusai2,  0,        gakusai2, gakusai,  metro_state, gakusai,  ROT0,   "MakeSoft",                                        "Mahjong Gakuensai 2 (Japan)",            GAME_SUPPORTS_SAVE )
+GAME( 2000, puzzlet,   0,        puzzlet,  puzzlet,  metro_state, puzzlet,  ROT0,   "Unies Corporation",                               "Puzzlet (Japan)",                        GAME_NOT_WORKING | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1995, vmetal,    0,        vmetal,   vmetal,   metro_state, blzntrnd, ROT90,  "Excellent System",                                "Varia Metal",                            GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1995, vmetaln,   vmetal,   vmetal,   vmetal,   metro_state, blzntrnd, ROT90,  "Excellent System (New Ways Trading Co. license)", "Varia Metal (New Ways Trading Co.)",     GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
