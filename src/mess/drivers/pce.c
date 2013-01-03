@@ -674,15 +674,15 @@ ROM_END
 #define rom_sgx rom_pce
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT    INIT   COMPANY  FULLNAME */
-CONS( 1987, pce,    0,      0,      pce,    pce, pce_state,     mess_pce,   "Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_SOUND)
-CONS( 1989, tg16,   pce,    0,      tg16,   pce, pce_state,     tg16,		 "Nippon Electronic Company", "TurboGrafx 16", GAME_IMPERFECT_SOUND)
-CONS( 1989, sgx,    pce,    0,      sgx,    pce, pce_state,     sgx,		 "Nippon Electronic Company", "SuperGrafx", GAME_IMPERFECT_SOUND)
+CONS( 1987, pce,    0,      0,      pce,    pce, pce_state,     mess_pce,    		"Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
+CONS( 1989, tg16,   pce,    0,      tg16,   pce, pce_state,     tg16,		 		"Nippon Electronic Company", "TurboGrafx 16",GAME_IMPERFECT_GRAPHICS |  GAME_IMPERFECT_SOUND)
+CONS( 1989, sgx,    pce,    0,      sgx,    pce, pce_state,     sgx,		 		"Nippon Electronic Company", "SuperGrafx",GAME_IMPERFECT_GRAPHICS |  GAME_IMPERFECT_SOUND)
 
 /* Experimental versions of drivers using newer but slower device implementation of the video chips */
 #define rom_pce_new rom_pce
 #define rom_tg16_new rom_pce
 #define rom_sgx_new rom_pce
-CONS( 1987, pce_new,    0,      0,      pce_new,    pce, pce_state,     mess_pce,   "Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_SOUND)
-CONS( 1989, tg16_new,   pce_new,    0,      tg16_new,   pce, pce_state,     tg16,        "Nippon Electronic Company", "TurboGrafx 16", GAME_IMPERFECT_SOUND)
-CONS( 1989, sgx_new,    pce_new,    0,      sgx_new,    pce, pce_state,     sgx,         "Nippon Electronic Company", "SuperGrafx", GAME_IMPERFECT_SOUND)
+CONS( 1987, pce_new,    0,      0,      pce_new,    pce, pce_state,     mess_pce,   "Nippon Electronic Company", "PC Engine (NEW video core)", GAME_IMPERFECT_SOUND)
+CONS( 1989, tg16_new,   pce_new,    0,      tg16_new,   pce, pce_state,     tg16,   "Nippon Electronic Company", "TurboGrafx 16 (NEW video core)", GAME_IMPERFECT_SOUND)
+CONS( 1989, sgx_new,    pce_new,    0,      sgx_new,    pce, pce_state,     sgx,    "Nippon Electronic Company", "SuperGrafx (NEW video core)", GAME_IMPERFECT_SOUND)
 

@@ -69,6 +69,7 @@ CD Interface Register 0x0f - ADPCM fade in/out register
 
 #define PCE_CD_IRQ_TRANSFER_READY		0x40
 #define PCE_CD_IRQ_TRANSFER_DONE		0x20
+#define PCE_CD_IRQ_BRAM					0x10 /* ??? */
 #define PCE_CD_IRQ_SAMPLE_FULL_PLAY		0x08
 #define PCE_CD_IRQ_SAMPLE_HALF_PLAY		0x04
 
@@ -454,7 +455,7 @@ static void pce_cd_msm5205_int(device_t *device)
 static void pce_cd_reply_status_byte( pce_state *state, UINT8 status )
 {
 	pce_cd_t &pce_cd = state->m_cd;
-logerror("Setting CD in reply_status_byte\n");
+	logerror("Setting CD in reply_status_byte\n");
 	pce_cd.scsi_CD = pce_cd.scsi_IO = pce_cd.scsi_REQ = 1;
 	pce_cd.scsi_MSG = 0;
 	pce_cd.message_after_status = 1;
@@ -1060,56 +1061,15 @@ static void pce_cd_set_irq_line( running_machine &machine, int num, int state )
 {
 	pce_state *drvstate = machine.driver_data<pce_state>();
 	pce_cd_t &pce_cd = drvstate->m_cd;
-	switch( num )
-	{
-	case PCE_CD_IRQ_TRANSFER_DONE:
-		if ( state == ASSERT_LINE )
-		{
-			pce_cd.regs[0x03] |= PCE_CD_IRQ_TRANSFER_DONE;
-		}
-		else
-		{
-			pce_cd.regs[0x03] &= ~ PCE_CD_IRQ_TRANSFER_DONE;
-		}
-		break;
-	case PCE_CD_IRQ_TRANSFER_READY:
-		if ( state == ASSERT_LINE )
-		{
-			pce_cd.regs[0x03] |= PCE_CD_IRQ_TRANSFER_READY;
-		}
-		else
-		{
-			pce_cd.regs[0x03] &= ~ PCE_CD_IRQ_TRANSFER_READY;
-		}
-		break;
-	case PCE_CD_IRQ_SAMPLE_FULL_PLAY:
-		if ( state == ASSERT_LINE )
-		{
-			pce_cd.regs[0x03] |= PCE_CD_IRQ_SAMPLE_FULL_PLAY;
-			//printf("x %02x %02x\n",pce_cd.regs[0x02],pce_cd.regs[0x03]);
-		}
-		else
-		{
-			pce_cd.regs[0x03] &= ~ PCE_CD_IRQ_SAMPLE_FULL_PLAY;
-		}
-		break;
-	case PCE_CD_IRQ_SAMPLE_HALF_PLAY:
-		if ( state == ASSERT_LINE )
-		{
-			pce_cd.regs[0x03] |= PCE_CD_IRQ_SAMPLE_HALF_PLAY;
-			//printf("y %02x %02x\n",pce_cd.regs[0x02],pce_cd.regs[0x03]);
-		}
-		else
-		{
-			pce_cd.regs[0x03] &= ~ PCE_CD_IRQ_SAMPLE_HALF_PLAY;
-		}
-		break;
-	default:
-		break;
-	}
 
-	if ( pce_cd.regs[0x02] & pce_cd.regs[0x03] & ( PCE_CD_IRQ_TRANSFER_DONE | PCE_CD_IRQ_TRANSFER_READY | PCE_CD_IRQ_SAMPLE_HALF_PLAY | PCE_CD_IRQ_SAMPLE_FULL_PLAY) )
+	if(state == ASSERT_LINE)
+		pce_cd.regs[0x03] |= num;
+	else
+		pce_cd.regs[0x03] &= ~num;
+
+	if ( pce_cd.regs[0x02] & pce_cd.regs[0x03] & 0x7c )
 	{
+		//printf("IRQ PEND = %02x MASK = %02x IRQ ENABLE %02X\n",pce_cd.regs[0x02] & pce_cd.regs[0x03] & 0x7c,pce_cd.regs[0x02] & 0x7c,pce_cd.regs[0x03] & 0x7c);
 		machine.device("maincpu")->execute().set_input_line(1, ASSERT_LINE );
 	}
 	else

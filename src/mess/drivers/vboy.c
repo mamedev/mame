@@ -21,7 +21,7 @@
     - telerobo: hangs after winning first match;
     - vlab: doesn't boot (irq issue?)
     - wariolnd: brightness gets suddently darker during intro.
-\
+
 ****************************************************************************/
 
 #include "emu.h"
