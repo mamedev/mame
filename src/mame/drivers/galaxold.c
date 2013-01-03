@@ -2214,7 +2214,7 @@ static MACHINE_CONFIG_DERIVED( ozon1, galaxold_base )
 	MCFG_PALETTE_INIT_OVERRIDE(galaxold_state,rockclim)
 	MCFG_PALETTE_LENGTH(32)
 
-	MCFG_VIDEO_START_OVERRIDE(galaxold_state,galaxold_plain)
+	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ozon1)
 	MCFG_SOUND_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -3081,8 +3081,8 @@ GAME( 1984, bagmanm2, bagman,   bagmanmc, bagmanmc, driver_device,  0,        RO
 GAME( 1982, dkongjrm, dkongjr,  dkongjrm, dkongjrm, driver_device,  0,        ROT90,  "bootleg", "Donkey Kong Jr. (bootleg on Moon Cresta hardware)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1982, porter,   dockman,  porter,   porter,   driver_device,  0,        ROT90,  "bootleg", "Port Man (bootleg on Moon Cresta hardware)", GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL )
 GAME( 1982, tazzmang, tazmania, tazzmang, tazzmang, driver_device,  0,        ROT90,  "bootleg", "Tazz-Mania (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1983, bongo,    0,        bongo,    bongo,    driver_device,  0,        ROT90,  "Jetsoft", "Bongo", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1983, ozon1,    0,        ozon1,    ozon1,    driver_device,  0,        ROT90,  "Proma", "Ozon I", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1983, bongo,    0,        bongo,    bongo,    driver_device,  0,        ROT90,  "Jetsoft", "Bongo", GAME_SUPPORTS_SAVE )
+GAME( 1983, ozon1,    0,        ozon1,    ozon1,    driver_device,  0,        ROT90,  "Proma", "Ozon I", GAME_SUPPORTS_SAVE )
 GAME( 1983, ladybugg, ladybug,  batman2,  ladybugg, galaxold_state, ladybugg, ROT270, "bootleg", "Lady Bug (bootleg on Galaxian hardware)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1982, vstars,   0,        mooncrst, porter,   driver_device,  0,        ROT90,  "Competitive Video?", "Video Stars", GAME_NOT_WORKING )
 

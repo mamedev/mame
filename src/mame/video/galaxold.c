@@ -799,6 +799,12 @@ VIDEO_START_MEMBER(galaxold_state,harem)
 	m_modify_spritecode = harem_modify_spritecode;
 }
 
+VIDEO_START_MEMBER(galaxold_state,ozon1)
+{
+	VIDEO_START_CALL_MEMBER(galaxold_plain);
+
+	m_bg_tilemap->set_scrolldx(0, 384-256);
+}
 
 VIDEO_START_MEMBER(galaxold_state,bongo)
 {
