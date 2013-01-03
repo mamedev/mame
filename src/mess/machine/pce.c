@@ -2,6 +2,19 @@
 
 PC Engine CD HW notes:
 
+TODO:
+- Dragon Ball Z: ADPCM dies after the first upload;
+- Dragon Slayer - The Legend of Heroes: black screen;
+- Mirai Shonen Conan: dies at new game selection;
+- Prince of Persia: black screen;
+- Snatcher: black screen after Konami logo;
+- Steam Heart's: needs transfer ready irq to get past the
+                 gameplay hang, don't know exactly where to
+                 put it;
+- Steam Heart's: bad ADPCM irq, dialogue is cutted due of it;
+
+=============================================================
+
 CD Interface Register 0x00 - CDC status
 x--- ---- busy signal
 -x-- ---- request signal
@@ -524,6 +537,9 @@ static void pce_cd_read_6( running_machine &machine )
 	{
 		pce_cd.data_timer->adjust(attotime::from_hz( PCE_CD_DATA_FRAMES_PER_SECOND ), 0, attotime::from_hz( PCE_CD_DATA_FRAMES_PER_SECOND ));
 	}
+
+	/* TODO: correct place? */
+	pce_cd_set_irq_line( machine, PCE_CD_IRQ_TRANSFER_READY, ASSERT_LINE );
 }
 
 /* 0xD8 - SET AUDIO PLAYBACK START POSITION (NEC) */
@@ -1300,19 +1316,18 @@ WRITE8_MEMBER(pce_state::pce_cd_intf_w)
 		pce_cd.scsi_SEL = 0;
 		pce_cd.adpcm_dma_timer->adjust(attotime::never); // stop ADPCM DMA here
 		/* any write here clears CD transfer irqs */
-		pce_cd.regs[0x03] &= ~0x70;
-		machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE );
+		pce_cd_set_irq_line( machine(), 0x70, CLEAR_LINE );
 		break;
 	case 0x01:	/* CDC command / status / data */
 		break;
 	case 0x02:	/* ADPCM / CD control / IRQ enable/disable */
 				/* bit 6 - transfer ready irq */
 				/* bit 5 - transfer done irq */
-				/* bit 4 - ?? irq */
-				/* bit 3 - ?? irq */
-				/* bit 2 - ?? irq */
+				/* bit 4 - BRAM irq? */
+				/* bit 3 - ADPCM FULL irq */
+				/* bit 2 - ADPCM HALF irq */
 		pce_cd.scsi_ACK = data & 0x80;
-		/* Update register now otherwise it won't catch the irq enable/disable change */
+		/* Update mask register now otherwise it won't catch the irq enable/disable change */
 		pce_cd.regs[0x02] = data;
 		/* Don't set or reset any irq lines, but just verify the current state */
 		pce_cd_set_irq_line( machine(), 0, 0 );
