@@ -992,8 +992,8 @@ floppy_image::floppy_image(int _tracks, int _heads, UINT32 _form_factor)
 
 floppy_image::~floppy_image()
 {
-	for (int i=0;i<tracks;i++) {
-		for (int j=0;j<heads;j++) {
+	for (int i=0;i<MAX_FLOPPY_TRACKS;i++) {
+		for (int j=0;j<MAX_FLOPPY_HEADS;j++) {
 			global_free(cell_data[i][j]);
 		}
 	}
