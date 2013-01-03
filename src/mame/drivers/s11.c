@@ -142,7 +142,8 @@ void s11_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		{
 			m_maincpu->set_input_line(M6800_IRQ_LINE,ASSERT_LINE);
 			m_irq_timer->adjust(attotime::from_ticks(32,E_CLOCK),0);
-			m_pias->cb1_w(0);
+			if(m_pias)
+				m_pias->cb1_w(0);
 			m_irq_active = true;
 			m_pia28->ca1_w(BIT(ioport("DIAGS")->read(), 2));  // Advance
 			m_pia28->cb1_w(BIT(ioport("DIAGS")->read(), 3));  // Up/Down
@@ -151,7 +152,8 @@ void s11_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		{
 			m_maincpu->set_input_line(M6800_IRQ_LINE,CLEAR_LINE);
 			m_irq_timer->adjust(attotime::from_ticks(S11_IRQ_CYCLES,E_CLOCK),1);
-			m_pias->cb1_w(1);
+			if(m_pias)
+				m_pias->cb1_w(1);
 			m_irq_active = false;
 			m_pia28->ca1_w(1);
 			m_pia28->cb1_w(1);
@@ -177,7 +179,8 @@ INPUT_CHANGED_MEMBER( s11_state::audio_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		if(m_audiocpu)
+			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE_LINE_MEMBER( s11_state::pia_irq )
@@ -211,7 +214,8 @@ WRITE_LINE_MEMBER( s11_state::pia21_ca2_w )
 {
 // sound ns
 	m_ca1 = state;
-	m_pias->ca1_w(m_ca1);
+	if(m_pias)
+		m_pias->ca1_w(m_ca1);
 	m_pia40->cb2_w(m_ca1);
 }
 
@@ -420,13 +424,15 @@ READ_LINE_MEMBER( s11_state::pias_ca1_r )
 WRITE_LINE_MEMBER( s11_state::pias_ca2_w )
 {
 // speech clock
-	hc55516_clock_w(m_hc55516, state);
+	if(m_hc55516)
+		hc55516_clock_w(m_hc55516, state);
 }
 
 WRITE_LINE_MEMBER( s11_state::pias_cb2_w )
 {
 // speech data
-	hc55516_digit_w(m_hc55516, state);
+	if(m_hc55516)
+		hc55516_digit_w(m_hc55516, state);
 }
 
 READ8_MEMBER( s11_state::dac_r )
@@ -436,7 +442,8 @@ READ8_MEMBER( s11_state::dac_r )
 
 WRITE8_MEMBER( s11_state::dac_w )
 {
-	m_dac->write_unsigned8(data);
+	if(m_dac)
+		m_dac->write_unsigned8(data);
 }
 
 static const pia6821_interface pias_intf =

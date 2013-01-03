@@ -292,7 +292,7 @@ static const pia6821_interface pia40_intf =
 DRIVER_INIT_MEMBER( s11a_state, s11a )
 {
 	UINT8 *BGROM = memregion("bgcpu")->base();
-	membank("bgbank")->configure_entries(0, 2, &BGROM[0x10000], 0x8000);
+	membank("bgbank")->configure_entries(0, 6, &BGROM[0x10000], 0x8000);
 	membank("bgbank")->set_entry(0);
 	s11_state::init_s11();
 }

@@ -80,12 +80,12 @@ public:
 protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_bgcpu;
-	required_device<dac_device> m_dac;
+	optional_device<dac_device> m_dac;
 	required_device<dac_device> m_dac1;
-	required_device<hc55516_device> m_hc55516;
-	required_device<pia6821_device> m_pias;
+	optional_device<hc55516_device> m_hc55516;
+	optional_device<pia6821_device> m_pias;
 	required_device<pia6821_device> m_pia21;
 	required_device<pia6821_device> m_pia24;
 	required_device<pia6821_device> m_pia28;
@@ -104,8 +104,10 @@ protected:
 	void set_segment1(UINT32 s) { m_segment1 = s; }
 	UINT32 get_segment2() { return m_segment2; }
 	void set_segment2(UINT32 s) { m_segment2 = s; }
+	void set_timer(emu_timer* t) { m_irq_timer = t; }
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	static const device_timer_id TIMER_IRQ = 0;
 private:
 	UINT8 m_sound_data;
 	UINT8 m_strobe;
@@ -116,8 +118,6 @@ private:
 	bool m_ca1;
 	emu_timer* m_irq_timer;
 	bool m_irq_active;
-
-	static const device_timer_id TIMER_IRQ = 0;
 };
 
 class s11a_state : public s11_state
@@ -163,8 +163,29 @@ public:
 protected:
 	required_device<hc55516_device> m_bg_hc55516;
 
+	void set_invert(bool inv) { m_invert = inv; }
+
 private:
 	bool m_invert;  // later System 11B games start expecting inverted data to the display LED segments.
+
+
+};
+
+class s11c_state : public s11b_state
+{
+public:
+	s11c_state(const machine_config &mconfig, device_type type, const char *tag)
+		: s11b_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(bgbank_w);
+
+	DECLARE_MACHINE_RESET(s11c);
+	DECLARE_DRIVER_INIT(s11c);
+
+protected:
+
+private:
 
 
 };
