@@ -2850,27 +2850,56 @@ MACHINE_CONFIG_END
 
 
 
-/* Taito Galactica / Space Missile
+/**************************************************************************************
+
+Taito Galactica / Space Missile
+
 This game was officially only distributed in Brazil.
 Regarding release data, not much information is available online.
 
-ROM dump came from a collection of old 5 1/4 disks (Apple II) that used to be in the possession of an arcade operator in the early 80s.
+ROM dump came from a collection of old 5 1/4 disks (Apple II) that used to be in the
+ possession of an arcade operator in the early 80s.
 
-TODO sound (currently same as invaders):
-- sound mutes when a few aliens are left?
-- port 7 write is used too
-*/
+TODO sound to be verified.
+
+***************************************************************************************/
+
+static ADDRESS_MAP_START( galactic_io_map, AS_IO, 8, _8080bw_state )
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r) AM_WRITE(galactic_sh_port_1_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(galactic_sh_port_2_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(galactic_07_w)
+ADDRESS_MAP_END
+
+
+static MACHINE_CONFIG_DERIVED_CLASS( galactic, mw8080bw_root, _8080bw_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(galactic_io_map)
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
+
+	/* add shifter */
+	MCFG_MB14241_ADD("mb14241")
+
+	/* sound hardware */
+	MCFG_FRAGMENT_ADD(invaders_samples_audio)
+	MCFG_DISCRETE_ADD("discrete", 0, galactic)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invaders)
+MACHINE_CONFIG_END
+
 
 static INPUT_PORTS_START( galactic )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // tilt?
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // gets read into memory (0x2012) then never used
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
@@ -4392,8 +4421,8 @@ GAME( 1981, polarisbr,  polaris,  polaris,   polaris,   driver_device, 0, ROT270
 GAME( 1980, ballbomb,   0,        ballbomb,  ballbomb,  driver_device, 0, ROT270, "Taito", "Balloon Bomber", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )	/* missing clouds */
 GAME( 1980, indianbt,   0,        indianbt,  indianbt,  driver_device, 0, ROT270, "Taito", "Indian Battle", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, steelwkr,   0,        steelwkr,  steelwkr,  driver_device, 0, ROT0  , "Taito", "Steel Worker", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
-GAMEL(1980?,galactic,   0,        invaders,  galactic,  driver_device, 0, ROT270, "Taito do Brasil", "Galactica - Batalha Espacial", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_galactic )
-GAMEL(1980?,spacmiss,   galactic, invaders,  galactic,  driver_device, 0, ROT270, "bootleg?", "Space Missile - Space Fighting Game", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_galactic )
+GAMEL(1980?,galactic,   0,        galactic,  galactic,  driver_device, 0, ROT270, "Taito do Brasil", "Galactica - Batalha Espacial", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_galactic )
+GAMEL(1980?,spacmiss,   galactic, galactic,  galactic,  driver_device, 0, ROT270, "bootleg?", "Space Missile - Space Fighting Game", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_galactic )
 
 // Misc. manufacturers
 GAME( 1979, galxwars,   0,        invadpt2,  galxwars,  driver_device, 0, ROT270, "Universal", "Galaxy Wars (Universal set 1)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
