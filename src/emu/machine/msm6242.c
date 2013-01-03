@@ -104,6 +104,7 @@ void msm6242_device::device_start()
 	save_item(NAME(m_irq_flag));
 	save_item(NAME(m_irq_type));
 	save_item(NAME(m_tick));
+	save_item(NAME(m_last_update_time));
 }
 
 
@@ -247,32 +248,32 @@ void msm6242_device::update_rtc_registers()
 	m_last_update_time = curtime;
 
 	// no delta?  just return
-	if (delta <= 0)
+	if (delta == 0)
 		return;
 
 	// ticks
 	if ((m_tick % 200) != ((delta + m_tick) % 0x200))
 		irq(IRQ_64THSECOND);
 	delta = bump(RTC_TICKS, delta, 0, 0x8000);
-	if (delta <= 0)
+	if (delta == 0)
 		return;
 
 	// seconds
 	irq(IRQ_SECOND);
 	delta = bump(RTC_SECOND, delta, 0, 60);
-	if (delta <= 0)
+	if (delta == 0)
 		return;
 
 	// minutes
 	irq(IRQ_MINUTE);
 	delta = bump(RTC_MINUTE, delta, 0, 60);
-	if (delta <= 0)
+	if (delta == 0)
 		return;
 
 	// hours
 	irq(IRQ_HOUR);
 	delta = bump(RTC_HOUR, delta, 0, 24);
-	if (delta <= 0)
+	if (delta == 0)
 		return;
 
 	// days
