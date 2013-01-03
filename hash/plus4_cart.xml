@@ -148,7 +148,7 @@
 		</part>
 	</software>
 
-	<software name="diag264p" supported="no">
+	<software name="diag264p">
 		<description>Diag 264 (PAL)</description>
 		<year>2012</year>
 		<publisher>crock</publisher>
@@ -161,7 +161,7 @@
 		</part>
 	</software>
 
-	<software name="diag264n" cloneof="diag264p" supported="no">
+	<software name="diag264n" cloneof="diag264p">
 		<description>Diag 264 (NTSC)</description>
 		<year>2012</year>
 		<publisher>crock</publisher>
