@@ -114,8 +114,8 @@ public:
 	UINT32 hash(const char *string) const
 	{
 		UINT32 result = *string++;
-		for (char c = *string++; c != 0; c = *string++)
-			result = ((result << 5) | (result >> 27)) + c;
+		for (UINT8 c = *string++; c != 0; c = *string++)
+			result = (result*33) ^ c;
 		return result;
 	}
 
