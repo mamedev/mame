@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Prophet-64 emulation
+    PROPHET64 cartridge emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -28,8 +28,9 @@ const device_type C64_PROPHET64 = &device_creator<c64_prophet64_cartridge_device
 //-------------------------------------------------
 
 c64_prophet64_cartridge_device::c64_prophet64_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_PROPHET64, "C64 Prophet-64 cartridge", tag, owner, clock),
-	device_c64_expansion_card_interface(mconfig, *this)
+	device_t(mconfig, C64_PROPHET64, "PROPHET64", tag, owner, clock),
+	device_c64_expansion_card_interface(mconfig, *this),
+	m_bank(0)
 {
 }
 
@@ -51,6 +52,7 @@ void c64_prophet64_cartridge_device::device_start()
 
 void c64_prophet64_cartridge_device::device_reset()
 {
+	m_bank = 0;
 	m_exrom = 0;
 }
 

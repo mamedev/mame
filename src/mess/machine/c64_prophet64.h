@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Prophet-64 emulation
+    PROPHET64 cartridge emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,7 +11,6 @@
 
 #ifndef __PROPHET64__
 #define __PROPHET64__
-
 
 #include "emu.h"
 #include "machine/c64exp.h"
@@ -48,6 +47,7 @@ private:
 
 // device type definition
 extern const device_type C64_PROPHET64;
+
 
 
 #endif

@@ -12,7 +12,6 @@
 #ifndef __SFX_SOUND_EXPANDER__
 #define __SFX_SOUND_EXPANDER__
 
-
 #include "emu.h"
 #include "machine/c64exp.h"
 #include "machine/cbmipt.h"
@@ -65,6 +64,7 @@ private:
 
 // device type definition
 extern const device_type C64_SFX_SOUND_EXPANDER;
+
 
 
 #endif
