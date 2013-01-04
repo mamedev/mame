@@ -182,7 +182,7 @@ astring disasmRField(const UINT8& R)
 {
     switch (R)
     {
-        case 0x00: return "r0";
+		case 0x00: return "r0";
         case 0x01: return "r1";
         case 0x02: return "r2";
         case 0x03: return "r3";
@@ -203,7 +203,7 @@ astring disasmRField(const UINT8& R)
         case 0x15: return "c0";
         case 0x16: return "c1";
         case 0x17: return "c2";
-        case 0x18: return "soic";
+		case 0x18: return "sioc";
         case 0x19: return "srta";
         case 0x1a: return "sdx";
         case 0x1b: return "tdms";
@@ -241,7 +241,6 @@ bool disasmSIField(const UINT8& SI)
 }
 
 
-/* execute instructions on this CPU until icount expires */
 CPU_DISASSEMBLE( dsp16a )
 {
     UINT8 opSize = 1;
@@ -430,14 +429,19 @@ CPU_DISASSEMBLE( dsp16a )
 
         // Format 4: Branch Direct Group
         case 0x00: case 0x01:
-        case 0x10: case 0x11:
         {
-            // goto|call JA
+			// goto JA
             const UINT16 JA = (op & 0x0fff) | (pc & 0xf000);
-            if (op & 0x8000) sprintf(buffer, "call 0x%04x", JA);
-            else             sprintf(buffer, "goto 0x%04x", JA);
+			sprintf(buffer, "goto 0x%04x", JA);
             break;
         }
+		case 0x10: case 0x11:
+		{
+			// call JA
+			const UINT16 JA = (op & 0x0fff) | (pc & 0xf000);
+			sprintf(buffer, "call 0x%04x", JA);
+			break;
+		}
 
         // Format 5: Branch Indirect Group
         case 0x18:
@@ -544,7 +548,7 @@ CPU_DISASSEMBLE( dsp16a )
             sprintf(buffer, "do (next %d inst) %d times", NI, K);
             // TODO: Limits on K & NI
             if (NI == 0x00)
-                sprintf(buffer, "redo %d\n", K);
+				sprintf(buffer, "redo %d", K);
             break;
         }
 
