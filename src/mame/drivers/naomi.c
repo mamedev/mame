@@ -8032,6 +8032,7 @@ ROM_END
 // 0123 Star Horse (Rev A)
 /* 0126 */ GAME( 2003, oinori,   naomi,    naomi,   naomi, dc_state,    naomi,    ROT0, "Sega", "Oinori-daimyoujin Matsuri", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0128 */ GAME( 2002, shootpl,  naomi,    naomim1, naomi, dc_state,    naomi,    ROT0, "Sega", "Shootout Pool (JPN, USA, KOR, AUS) / Shootout Pool Prize (EXP)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
+/* 0136C */ GAME( 2002, shootplm, naomi,    naomim1, naomi, dc_state,    naomi,    ROT0, "Sega", "Shootout Pool Medal", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0140 */ GAME( 2004, kick4csh, naomi,    naomim1, naomi, dc_state,    kick4csh, ROT0, "Sega", "Kick '4' Cash", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 0150 */ GAME( 2003, mtkob2,   naomi,    naomim1, naomi, dc_state,    naomi,    ROT0, "Sega", "Mushiking The King Of Beetle 2K3 2nd", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 // 0164 MushiKing The King Of Beetle II ENG
@@ -8039,7 +8040,6 @@ ROM_END
 // 0166 Touch De Zunou (Japan) (Rev A)
 /* 0170 */ GAME( 2007, pokasuka, naomi,    naomim4, naomi, dc_state,    naomi,    ROT0, "Sega", "Pokasuka Ghost", GAME_FLAGS )
 /* 0175 */ GAME( 2007, asndynmt, naomi,    naomim4, naomi, dc_state,    naomi,    ROT0, "Sega", "Asian Dynamite", GAME_FLAGS )
-/* 0??? */ GAME( 2001, shootplm, naomi,    naomim1, naomi, dc_state,    naomi,    ROT0, "Sega", "Shootout Pool Medal", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 // 00?? Crackin' DJ Part 2
 // 008C Touch de Uno!
 
