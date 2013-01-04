@@ -61,13 +61,14 @@ public:
 #define O(o) void o ## _196_full(); void o ## _196_partial()
 
 	O(bmov_direct_2);
-	O(cmpl_direct_2);
 	O(bmovi_direct_2);
-	O(pop_indirect_1);
-	O(pop_indexed_1);
+	O(cmpl_direct_2);
 	O(djnzw_rrel8);
-	O(pusha_none);
 	O(idlpd_none);
+	O(pop_indexed_1);
+	O(pop_indirect_1);
+	O(popa_none);
+	O(pusha_none);
 
 #undef O
 };

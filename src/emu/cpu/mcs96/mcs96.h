@@ -163,6 +163,11 @@ protected:
 	UINT8 do_subb(UINT8 v1, UINT8 v2);
 	UINT16 do_sub(UINT16 v1, UINT16 v2);
 
+	UINT8 do_addcb(UINT8 v1, UINT8 v2);
+	UINT16 do_addc(UINT16 v1, UINT16 v2);
+	UINT8 do_subcb(UINT8 v1, UINT8 v2);
+	UINT16 do_subc(UINT16 v1, UINT16 v2);
+
 	void set_nz8(UINT8 v);
 	void set_nz16(UINT16 v);
 
@@ -233,10 +238,8 @@ protected:
 	O(or_direct_2); O(or_immed_2w); O(or_indexed_2); O(or_indirect_2);
 	O(orb_direct_2); O(orb_immed_2b); O(orb_indexed_2); O(orb_indirect_2);
 	O(pop_direct_1); O(pop_indexed_1); O(pop_indirect_1);
-	O(popa_none);
 	O(popf_none);
 	O(push_direct_1); O(push_immed_1w); O(push_indexed_1); O(push_indirect_1);
-	O(pusha_none);
 	O(pushf_none);
 	O(ret_none);
 	O(rst_none);

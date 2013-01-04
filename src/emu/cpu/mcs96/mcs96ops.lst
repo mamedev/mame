@@ -1218,7 +1218,7 @@ fe8f  div   indexed_2
 9a    cmpb  indirect_2
 	TMP = any_r8(OP1);
 	do_subb(reg_r8(OP2), TMP);
-	post_indirect 2 6 7 // +5 when external
+	post_indirect 1 6 7 // +5 when external
 
 9b    cmpb  indexed_2
 	TMP = any_r8(OP1);
@@ -1352,20 +1352,50 @@ a3    ld    indexed_2
 	post_indexed 6 7 // +5 when external
 
 a4    addc  direct_2
+	TMP = reg_r16(OP1);
+	TMP = do_addc(reg_r16(OP2), TMP);
+	reg_w16(OP2, TMP);
+	next(4);
 
 a5    addc  immed_2w
+	TMP = do_addc(reg_r16(OP2), OP1);
+	reg_w16(OP2, TMP);
+	next(5);
 
 a6    addc  indirect_2
+	TMP = any_r16(OP1);
+	TMP = do_addc(reg_r16(OP2), TMP);
+	reg_w16(OP2, TMP);
+	post_indirect 2 6 7 // +5 when external
 
 a7    addc  indexed_2
+	TMP = any_r16(OP1);
+	TMP = do_addc(reg_r16(OP2), TMP);
+	reg_w16(OP2, TMP);
+	post_indexed 6 7 // +5 when external
 
 a8    subc  direct_2
+	TMP = reg_r16(OP1);
+	TMP = do_subc(reg_r16(OP2), TMP);
+	reg_w16(OP2, TMP);
+	next(4);
 
 a9    subc  immed_2w
+	TMP = do_subc(reg_r16(OP2), OP1);
+	reg_w16(OP2, TMP);
+	next(5);
 
 aa    subc  indirect_2
+	TMP = any_r16(OP1);
+	TMP = do_subc(reg_r16(OP2), TMP);
+	reg_w16(OP2, TMP);
+	post_indirect 2 6 7 // +5 when external
 
 ab    subc  indexed_2
+	TMP = any_r16(OP1);
+	TMP = do_subc(reg_r16(OP2), TMP);
+	reg_w16(OP2, TMP);
+	post_indexed 6 7 // +5 when external
 
 ac    ldbze direct_2
 	reg_w16(OP2, UINT8(reg_r8(OP1)));
@@ -1400,20 +1430,50 @@ b3    ldb   indexed_2
 	post_indexed 6 7 // +5 when external
 
 b4    addcb direct_2
+	TMP = reg_r8(OP1);
+	TMP = do_addcb(reg_r8(OP2), TMP);
+	reg_w8(OP2, TMP);
+	next(4);
 
 b5    addcb immed_2w
+	TMP = do_addcb(reg_r8(OP2), OP1);
+	reg_w8(OP2, TMP);
+	next(4);
 
 b6    addcb indirect_2
+	TMP = any_r8(OP1);
+	TMP = do_addcb(reg_r8(OP2), TMP);
+	reg_w8(OP2, TMP);
+	post_indirect 1 6 7 // +5 when external
 
 b7    addcb indexed_2
+	TMP = any_r8(OP1);
+	TMP = do_addcb(reg_r8(OP2), TMP);
+	reg_w8(OP2, TMP);
+	post_indexed 6 7 // +5 when external
 
 b8    subcb direct_2
+	TMP = reg_r8(OP1);
+	TMP = do_subcb(reg_r8(OP2), TMP);
+	reg_w8(OP2, TMP);
+	next(4);
 
 b9    subcb immed_2w
+	TMP = do_subcb(reg_r8(OP2), OP1);
+	reg_w8(OP2, TMP);
+	next(4);
 
 ba    subcb indirect_2
+	TMP = any_r8(OP1);
+	TMP = do_subcb(reg_r8(OP2), TMP);
+	reg_w8(OP2, TMP);
+	post_indirect 1 6 7 // +5 when external
 
 bb    subcb indexed_2
+	TMP = any_r8(OP1);
+	TMP = do_subcb(reg_r8(OP2), TMP);
+	reg_w8(OP2, TMP);
+	post_indexed 6 7 // +5 when external
 
 bc    ldbse direct_2
 	reg_w16(OP2, INT8(reg_r8(OP1)));
@@ -1727,7 +1787,7 @@ f3    popf  none
 
 f4    pusha none 196
 
-f5    popa  none
+f5    popa  none 196
 
 f6    idlpd none 196
 

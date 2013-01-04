@@ -692,6 +692,66 @@ UINT16 mcs96_device::do_sub(UINT16 v1, UINT16 v2)
 	return diff;
 }
 
+UINT8 mcs96_device::do_addcb(UINT8 v1, UINT8 v2)
+{
+	UINT16 sum = v1+v2+(PSW & F_C ? 1 : 0);
+	PSW &= ~(F_Z|F_N|F_C|F_V);
+	if(!UINT8(sum))
+		PSW |= F_Z;
+	else if(INT8(sum) < 0)
+		PSW |= F_N;
+	if(~(v1^v2) & (v1^sum) & 0x80)
+		PSW |= F_V|F_VT;
+	if(sum & 0xff00)
+		PSW |= F_C;
+	return sum;
+}
+
+UINT16 mcs96_device::do_addc(UINT16 v1, UINT16 v2)
+{
+	UINT32 sum = v1+v2+(PSW & F_C ? 1 : 0);
+	PSW &= ~(F_Z|F_N|F_C|F_V);
+	if(!UINT16(sum))
+		PSW |= F_Z;
+	else if(INT16(sum) < 0)
+		PSW |= F_N;
+	if(~(v1^v2) & (v1^sum) & 0x8000)
+		PSW |= F_V|F_VT;
+	if(sum & 0xffff0000)
+		PSW |= F_C;
+	return sum;
+}
+
+UINT8 mcs96_device::do_subcb(UINT8 v1, UINT8 v2)
+{
+	UINT16 diff = v1 - v2 - (PSW & F_C ? 0 : 1);
+	PSW &= ~(F_N|F_V|F_Z|F_C);
+	if(!UINT8(diff))
+		PSW |= F_Z;
+	else if(INT8(diff) < 0)
+		PSW |= F_N;
+	if((v1^v2) & (v1^diff) & 0x80)
+		PSW |= F_V;
+	if(!(diff & 0xff00))
+		PSW |= F_C;
+	return diff;
+}
+
+UINT16 mcs96_device::do_subc(UINT16 v1, UINT16 v2)
+{
+	UINT32 diff = v1 - v2 - (PSW & F_C ? 0 : 1);
+	PSW &= ~(F_N|F_V|F_Z|F_C);
+	if(!UINT16(diff))
+		PSW |= F_Z;
+	else if(INT16(diff) < 0)
+		PSW |= F_N;
+	if((v1^v2) & (v1^diff) & 0x8000)
+		PSW |= F_V;
+	if(!(diff & 0xffff0000))
+		PSW |= F_C;
+	return diff;
+}
+
 void mcs96_device::set_nz8(UINT8 v)
 {
 	PSW &= ~(F_N|F_V|F_Z|F_C);

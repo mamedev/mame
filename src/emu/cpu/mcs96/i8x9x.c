@@ -81,7 +81,7 @@ void i8x9x_device::commit_hso_cam()
 {
 	for(int i=0; i<8; i++)
 		if(!hso_info[i].active) {
-			if(hso_command != 0x18)
+			if(hso_command != 0x18 && hso_command != 0x19)
 				logerror("%s: hso cam %02x %04x in slot %d (%04x)\n", tag(), hso_command, hso_time, i, PPC);
 			hso_info[i].active = true;
 			hso_info[i].command = hso_command;
@@ -347,7 +347,7 @@ void i8x9x_device::internal_update(UINT64 current_time)
 			UINT16 t = hso_info[i].time;
 			if(((cmd & 0x40) && t == current_timer2) ||
 			   (!(cmd & 0x40) && t == current_timer1)) {
-				if(cmd != 0x18)
+				if(cmd != 0x18 && cmd != 0x19)
 					logerror("%s: hso cam %02x %04x in slot %d triggered\n",
 							 tag(), cmd, t, i);
 				trigger_cam(i, current_time);
