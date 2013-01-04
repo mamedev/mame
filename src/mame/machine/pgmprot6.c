@@ -1,5 +1,5 @@
 /***********************************************************************
- PGM 012 + 28 PGM protection emulation
+ IGS28 + IGS025 PGM protection emulation
 
  these are simulations of the IGS 012 and 025 protection combination
  used on the following PGM games
