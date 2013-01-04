@@ -27,7 +27,7 @@
 #define P	m_p
 #define S	m_sp.b.l
 
-#define TRANSLATED(addr)	((m_mmr[(addr) >> 13 & 7] << 13) | ((addr) & 0x1fff))
+#define TRANSLATED(addr)	((m_mmr[((addr) >> 13) & 7] << 13) | ((addr) & 0x1fff))
 #define H6280_CYCLES(cyc)								\
 	{													\
 		m_icount -= ((cyc) * m_clocks_per_cycle);		\

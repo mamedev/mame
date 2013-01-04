@@ -7,6 +7,22 @@ TODO:
 - Dragon Slayer - The Legend of Heroes: black screen;
 - Mirai Shonen Conan: dies at new game selection;
 - Prince of Persia: black screen;
+Sequence in read_6 command is:
+00000bc1 00000002
+00000bc3 00000010
+00000cf4 00000020
+00001444 00000001
+...
+Ootake does:
+00000ca2 00000002
+00000ca4 00000010
+00000cf4 00000020
+00001444 00000001
+First two values are taken from get dir info command, that's why
+they don't match with our emulation. Program data from 0x1444
+is written to work RAM 0x104800 (so, wpset 0x104800,1,w or bp 4800 shows
+what's the data executed)
+
 - Snatcher: black screen after Konami logo;
 - Steam Heart's: needs transfer ready irq to get past the
                  gameplay hang, don't know exactly where to
@@ -507,8 +523,9 @@ static void pce_cd_read_6( running_machine &machine )
 {
 	pce_state *state = machine.driver_data<pce_state>();
 	pce_cd_t &pce_cd = state->m_cd;
-	UINT32 frame = ( ( pce_cd.command_buffer[1] & 0x1F ) << 16 ) | ( pce_cd.command_buffer[2] << 8 ) | pce_cd.command_buffer[3];
+	UINT32 frame = ( ( pce_cd.command_buffer[1] ) << 16 ) | ( pce_cd.command_buffer[2] << 8 ) | pce_cd.command_buffer[3];
 	UINT32 frame_count = pce_cd.command_buffer[4];
+	printf("%08x %08x\n",frame,frame_count);
 
 	/* Check for presence of a CD */
 	if ( ! pce_cd.cd )
@@ -889,6 +906,7 @@ static void pce_cd_handle_data_output( running_machine &machine )
 
 		if ( pce_cd.command_buffer_index == pce_cd_commands[i].command_size )
 		{
+			//printf("%02x command issued\n",pce_cd.command_buffer[0]);
 			(pce_cd_commands[i].command_handler)( machine );
 			pce_cd.command_buffer_index = 0;
 		}
@@ -947,7 +965,7 @@ static void pce_cd_handle_data_input( running_machine &machine )
 			}
 			else
 			{
-				logerror("Transfer byte from offset %d\n", pce_cd.data_buffer_index);
+				logerror("Transfer byte %02x from offset %d %d\n",pce_cd.data_buffer[pce_cd.data_buffer_index] , pce_cd.data_buffer_index, pce_cd.current_frame);
 				pce_cd.regs[0x01] = pce_cd.data_buffer[pce_cd.data_buffer_index];
 				pce_cd.data_buffer_index++;
 				pce_cd.scsi_REQ = 1;
@@ -1494,7 +1512,7 @@ TIMER_CALLBACK_MEMBER(pce_state::pce_cd_clear_ack)
 	pce_cd_update(machine());
 	if ( pce_cd.scsi_CD )
 	{
-		pce_cd.regs[0x0B] &= 0xFE;
+		pce_cd.regs[0x0B] &= 0xFC;
 	}
 }
 
