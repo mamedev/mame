@@ -70,9 +70,9 @@ READ8_MEMBER(blueprnt_state::blueprnt_sh_dipsw_r)
 READ8_MEMBER(blueprnt_state::grasspin_sh_dipsw_r)
 {
 	// judging from the disasm, it looks like simple protection was added
-	// d6: must be clear
+	// d6: small possibility it's for comms? but the fact that there's a Freeze switch on the pcb rules this out
 	// d7: must be set, or is it directly connected to a dipswitch?
-	return (m_dipsw & 0x3f) | 0x80;
+	return (m_dipsw & 0x7f) | 0x80;
 }
 
 WRITE8_MEMBER(blueprnt_state::blueprnt_sound_command_w)
@@ -259,32 +259,36 @@ static INPUT_PORTS_START( grasspin )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_COCKTAIL
 
 	PORT_START("DILSW1")
-	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "DILSW1:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DILSW1:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DILSW1:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DILSW1:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DILSW1:5" )
-	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coinage ) )		PORT_DIPLOCATION("DILSW1:6,7")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "DILSW1:8" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DILSW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DILSW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DILSW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DILSW1:4" )
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coinage ) )		PORT_DIPLOCATION("DILSW1:2,3") // 2 should be infinite lives according to pcb
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DILSW1:8" )
+	PORT_DIPNAME( 0x80, 0x00, "Freeze" )				PORT_DIPLOCATION("DILSW1:1") // ok
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DILSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("DILSW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("DILSW2:7,8")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DILSW2:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DILSW2:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DILSW2:5" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("DILSW2:6")
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DILSW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DILSW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DILSW2:4" )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("DILSW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DILSW2:7" )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DILSW2:8" )
+	PORT_DIPNAME( 0x40, 0x00, "Freeze" )				PORT_DIPLOCATION("DILSW2:2") // should be flip screen according to pcb
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DILSW2:1" )
 INPUT_PORTS_END
 
 /*************************************
