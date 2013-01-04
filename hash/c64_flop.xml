@@ -390,6 +390,20 @@
 		</part>
 	</software>
 
+	<software name="goliath">
+		<description>Goliath-Prommer (Ger)</description>
+		<year>19??</year>
+		<publisher>Rex-Datentechnik</publisher>
+		<sharedfeat name="requirement" value="c64_user:goliath"/>
+		<info name="serial" value="REX 9655" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="goliath.d64" size="174848" crc="3c4f2931" sha1="5584a2406aab892884207f79065d3320ab0755af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sfxse">
 		<description>SFX Sound Expander Test/Demo Disk</description>
 		<year>1985</year>

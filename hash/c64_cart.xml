@@ -20,7 +20,7 @@
 	- CMD RAMLink
 	- CMD RAMDrive
 	- Commodore REU 1700/1750/1764
-	- Rex RAM-Floppt 256K
+	- Rex RAM-Floppy 256K
 	- Rex Goliath 1MB
 	- RAM-Cart
 
@@ -28,10 +28,13 @@
 	- Lt. Kernal
 
 	Audio:
-	- Currah Speech 64
+	- Currah Speech 64 (Currah, 1984)
+	- Easy Speech 64 (Currah, 1984)
+	- Voice Messenger (Currah, 1984)
+	- Votalker (Votrax, 1986)
+	- ProVoice (Genesis, 1986)
 	- SID Symphony
 	- MSSIAH
-	- Prophet-64
 	- Synthetiseur Vocal
 	- 64er MIDI
 	- FB-MIDI
@@ -39,8 +42,8 @@
 	- JMS MIDI
 	- Datel MIDI
 	- Passport MIDI
-	- Speech Maker
-	- Moog Song Producer
+	- Speech Maker (Adman)
+	- Song Producer (Moog, 1983)
 
 	EPROM burners:
 	- J-R Promenade C1
@@ -50,7 +53,6 @@
 	Missing dumps that exist as .crt but are missing from this list:
 
 	- Ariolasoft Structured BASIC
-	- Prophet-64
 	- MSSIAH
 	- Rex Diashow-Maker
 
@@ -972,7 +974,7 @@
 	<software name="hrdcpytb">
 		<description>Hardcopy+Turbo-Modul (Ger)</description>
 		<year>1985</year>
-		<publisher>Rex Datentechnik</publisher>
+		<publisher>Rex-Datentechnik</publisher>
 		<info name="serial" value="REX 9505" />
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="rex" />
@@ -987,7 +989,7 @@
 	<software name="spdtape">
 		<description>Speed-Tape (Ger)</description>
 		<year>1985</year>
-		<publisher>Rex Datentechnik</publisher>
+		<publisher>Rex-Datentechnik</publisher>
 		<info name="serial" value="REX 9510" />
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="rex" />
@@ -1002,7 +1004,7 @@
 	<software name="rexep256">
 		<description>Eprom Bank 256k (Ger)</description>
 		<year>198?</year>
-		<publisher>Rex Datentechnik</publisher>
+		<publisher>Rex-Datentechnik</publisher>
 		<info name="serial" value="REX 9513" />
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="rex_ep256" />
@@ -1017,7 +1019,7 @@
 	<software name="ppm">
 		<description>Picture-Printer Modul (Ger)</description>
 		<year>1986</year>
-		<publisher>Rex Datentechnik</publisher>
+		<publisher>Rex-Datentechnik</publisher>
 		<info name="serial" value="REX 9545" />
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="rex" />
@@ -1032,7 +1034,7 @@
 	<software name="turbodsk" supported="no">
 		<description>Turbo-Disk</description>
 		<year>198?</year>
-		<publisher>Rex Datentechnik</publisher>
+		<publisher>Rex-Datentechnik</publisher>
 		<info name="serial" value="REX 9583" />
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="rex" />
@@ -1047,12 +1049,14 @@
 	<software name="goliath" supported="no">
 		<description>1MB Goliath Eprom-Cart (Ger)</description>
 		<year>19??</year>
-		<publisher>Rex Datentechnik</publisher>
+		<publisher>Rex-Datentechnik</publisher>
 		<info name="serial" value="REX 9600" />
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="goliath" />
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
+
 			<dataarea name="roml" size="0x4000">
 				<rom name="rex9600.bin" size="0x4000" crc="81adb366" sha1="7d065e0b45258f3b3e3398090f428587c1eec466" offset="0x0000" />
 			</dataarea>
@@ -1062,7 +1066,7 @@
 	<software name="qkbyte2" supported="no">
 		<description>Quickbyte II (Ger)</description>
 		<year>1986</year>
-		<publisher>Rex Datentechnik</publisher>
+		<publisher>Rex-Datentechnik</publisher>
 		<info name="serial" value="REX 9603" />
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="quickbyte2" />
@@ -1092,7 +1096,7 @@
 	<software name="hardcopy">
 		<description>Hardcopy-Modul (Ger)</description>
 		<year>19??</year>
-		<publisher>Rex Datentechnik</publisher>
+		<publisher>Rex-Datentechnik</publisher>
 		<info name="serial" value="REX 9629" />
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="rex" />
@@ -1544,7 +1548,7 @@
 	<software name="exos">
 		<description>ExOS v.3</description>
 		<year>198?</year>
-		<publisher>Rex Datentechnik</publisher>
+		<publisher>Rex-Datentechnik</publisher>
 		<info name="serial" value="REX-9805" />
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="exos" />
@@ -1559,7 +1563,7 @@
 	<software name="exosv4" cloneof="exos">
 		<description>ExOS v.4</description>
 		<year>198?</year>
-		<publisher>Rex Datentechnik</publisher>
+		<publisher>Rex-Datentechnik</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="exos" />
 			<feature name="exrom" value="1" />
@@ -5071,7 +5075,7 @@
 	<software name="formatm">
 		<description>Format- und Hardcopymodul (Ger)</description>
 		<year>19??</year>
-		<publisher>Rex Datentechnik</publisher>
+		<publisher>Rex-Datentechnik</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="rex" />
 			<feature name="exrom" value="0" />
@@ -5191,7 +5195,7 @@
 	<software name="hypra3">
 		<description>Hypra-Disk-Modul II v3.0 (Ger)</description>
 		<year>19??</year>
-		<publisher>Rex Datentechnik</publisher>
+		<publisher>Rex-Datentechnik</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
@@ -5234,7 +5238,7 @@
 	<software name="ramflop4">
 		<description>Ram Floppy v4.0</description>
 		<year>1988</year>
-		<publisher>Rex Datentechnik</publisher>
+		<publisher>Rex-Datentechnik</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
@@ -6475,6 +6479,77 @@
 	
 			<dataarea name="roml" size="0x4000">
 				<rom name="seq64.0.1" size="0x4000" crc="fe43ccdc" sha1="7119615cccdeca5d5006eb04bcf788cc609fbc91" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moogsp" supported="no">
+		<description>Song Producer</description>
+		<year>1983</year>
+		<publisher>Moog</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="moogsp" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+	
+			<dataarea name="roml" size="0x2000">
+				<rom name="moog song producer" size="0x2000" status="nodump" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="moogsp.d64" size="174848" crc="71a59974" sha1="d67c127b4ce3995b7e77cb92e5201768639c3e91" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prophet">
+		<description>PROPHET64</description>
+		<year>2007</year>
+		<publisher>8bit ventures</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="prophet64" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x40000">
+				<rom name="prophet64.bin" size="0x40000" crc="cd55b218" sha1="903c707a058b4690436eea7832373e45c1066849" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ltkernal" supported="no">
+		<description>Lt. Kernal</description>
+		<year>1987</year>
+		<publisher>Xetec</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ltkernal" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x2000">
+				<rom name="u7" size="0x2000" status="nodump" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="SYSGEN (v7.2) - Side 1"/>
+			<dataarea name="flop" size="174848">
+				<rom name="dos72-s1.d64" size="174848" crc="696545d4" sha1="fe698ceaab25c013c9e940e406c3b620f7131934" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="SYSGEN (v7.2) - Side 2"/>
+			<dataarea name="flop" size="174848">
+				<rom name="dos72-s2.d64" size="174848" crc="08938b41" sha1="24a891ad1a418bdd71b05f0a61e3754d4bfa82e6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
