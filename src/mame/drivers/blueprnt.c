@@ -67,6 +67,14 @@ READ8_MEMBER(blueprnt_state::blueprnt_sh_dipsw_r)
 	return m_dipsw;
 }
 
+READ8_MEMBER(blueprnt_state::grasspin_sh_dipsw_r)
+{
+	// judging from the disasm, it looks like simple protection was added
+	// d6: must be clear
+	// d7: must be set, or is it directly connected to a dipswitch?
+	return (m_dipsw & 0x3f) | 0x80;
+}
+
 WRITE8_MEMBER(blueprnt_state::blueprnt_sound_command_w)
 {
 	soundlatch_byte_w(space, offset, data);
@@ -99,8 +107,15 @@ static ADDRESS_MAP_START( blueprnt_map, AS_PROGRAM, 8, blueprnt_state )
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(blueprnt_colorram_w) AM_MIRROR(0x400) AM_SHARE("colorram")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( grasspin_map, AS_PROGRAM, 8, blueprnt_state )
+	AM_RANGE(0xc003, 0xc003) AM_READ(grasspin_sh_dipsw_r)
+	AM_IMPORT_FROM( blueprnt_map )
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, blueprnt_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_MIRROR(0x1000)
+	AM_RANGE(0x2000, 0x2fff) AM_ROM AM_MIRROR(0x1000)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x6002, 0x6002) AM_DEVREAD_LEGACY("ay1", ay8910_r)
@@ -244,54 +259,32 @@ static INPUT_PORTS_START( grasspin )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_COCKTAIL
 
 	PORT_START("DILSW1")
-	PORT_DIPNAME( 0x01, 0x00, "DSW1:01" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DSW1:02" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DSW1:04" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "DSW1:08" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "DSW1:10" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x60, 0x60, "Coinage" )
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "DILSW1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DILSW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DILSW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DILSW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DILSW1:5" )
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coinage ) )		PORT_DIPLOCATION("DILSW1:6,7")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x80, 0x00, "Leave OFF" )  // won't boot if set to ON?
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DILSW1:8" )
 
 	PORT_START("DILSW2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPSETTING(    0x03, "4" )
-	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPSETTING(    0x01, "6" )
-	PORT_DIPNAME( 0x04, 0x00, "DSW2:04" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "DSW2:08" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "DSW2:10" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("DILSW2:1,2")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DILSW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DILSW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DILSW2:5" )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("DILSW2:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x00, "Leave OFF" ) // won't boot if set to ON?
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "DSW2:80" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DILSW2:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DILSW2:8" )
 INPUT_PORTS_END
 
 /*************************************
@@ -404,6 +397,12 @@ static MACHINE_CONFIG_START( blueprnt, blueprnt_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( grasspin, blueprnt )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(grasspin_map)
+
+	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(blueprnt_state, grasspin)
 MACHINE_CONFIG_END
 
@@ -423,9 +422,7 @@ ROM_START( blueprnt )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "snd-1.3u",  0x0000, 0x1000, CRC(fd38777a) SHA1(0ed230e0fa047d3171e7141e5620b4c750b07629) )
-	ROM_RELOAD(0x1000,0x1000)
 	ROM_LOAD( "snd-2.3v",  0x2000, 0x1000, CRC(33d5bf5b) SHA1(3ac684cd48559cd0eab32f9e7ce3ec6eca88dcd4) )
-	ROM_RELOAD(0x3000,0x1000)
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "bg-1.3c",   0x0000, 0x1000, CRC(ac2a61bc) SHA1(e56708d261648478d1dae4769118546411299e59) )
@@ -447,9 +444,7 @@ ROM_START( blueprntj )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "snd-1.3u",  0x0000, 0x1000, CRC(fd38777a) SHA1(0ed230e0fa047d3171e7141e5620b4c750b07629) )
-	ROM_RELOAD(0x1000,0x1000)
 	ROM_LOAD( "snd-2.3v",  0x2000, 0x1000, CRC(33d5bf5b) SHA1(3ac684cd48559cd0eab32f9e7ce3ec6eca88dcd4) )
-	ROM_RELOAD(0x3000,0x1000)
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "bg-1j.3c",   0x0000, 0x0800, CRC(43718c34) SHA1(5df4794a38866c7f03b264581c8555b9bec3969f) )
@@ -472,9 +467,7 @@ ROM_START( saturnzi )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "r7",           0x0000, 0x1000, CRC(dd43e02f) SHA1(1d95a307cb4ef523f024cb9c60382a2ac8c17b1c) )
-	ROM_RELOAD(0x1000,0x1000)
 	ROM_LOAD( "r8",           0x2000, 0x1000, CRC(7f9d0877) SHA1(335b17d187089e91bd3002778821921e73ec59d2) )
-	ROM_RELOAD(0x3000,0x1000)
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "r10",          0x0000, 0x1000, CRC(35987d61) SHA1(964503c3b17299b27b611943eebca9bc7c93a18c) )
@@ -496,9 +489,7 @@ ROM_START( grasspin )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "jaleco-6.4j",  0x0000, 0x1000, CRC(f58bf3b0) SHA1(a7e30a9bfbd43fb4cc1987ad9fb0f3a023a7735d) )
-	ROM_RELOAD(0x1000,0x1000) // confirmed mirror by hw fluke
 	ROM_LOAD( "jaleco-7.4l",  0x2000, 0x1000, CRC(2d587653) SHA1(c2c08fde75a7ebc60edd461ca18d982fb00f43e2) )
-	ROM_RELOAD(0x3000,0x1000)
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "jaleco-9.4p",   0x0000, 0x1000, CRC(bccca24c) SHA1(95bdd2cfdefb76ca8d3c00b9fe140f97feebdcc1) )
@@ -520,4 +511,4 @@ ROM_END
 GAME( 1982, blueprnt,  0,        blueprnt, blueprnt, driver_device, 0, ROT270, "Zilec Electronics / Bally Midway", "Blue Print (Midway)", GAME_SUPPORTS_SAVE )
 GAME( 1982, blueprntj, blueprnt, blueprnt, blueprnt, driver_device, 0, ROT270, "Zilec Electronics / Jaleco",       "Blue Print (Jaleco)", GAME_SUPPORTS_SAVE )
 GAME( 1983, saturnzi,  0,        blueprnt, saturn,   driver_device, 0, ROT270, "Zilec Electronics / Jaleco",       "Saturn", GAME_SUPPORTS_SAVE )
-GAME( 1983, grasspin,  0,        grasspin, grasspin, driver_device, 0, ROT90,  "Zilec Electronics / Jaleco",       "Grasspin", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1983, grasspin,  0,        grasspin, grasspin, driver_device, 0, ROT270, "Zilec Electronics / Jaleco",       "Grasspin", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )

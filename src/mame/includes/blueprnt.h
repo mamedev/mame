@@ -31,6 +31,7 @@ public:
 	int     m_dipsw;
 
 	DECLARE_READ8_MEMBER(blueprnt_sh_dipsw_r);
+	DECLARE_READ8_MEMBER(grasspin_sh_dipsw_r);
 	DECLARE_WRITE8_MEMBER(blueprnt_sound_command_w);
 	DECLARE_WRITE8_MEMBER(blueprnt_coin_counter_w);
 	DECLARE_WRITE8_MEMBER(blueprnt_videoram_w);
