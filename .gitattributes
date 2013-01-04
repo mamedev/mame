@@ -119,6 +119,7 @@ hash/megadriv.xml svneol=native#text/xml
 hash/megaduck.xml svneol=native#text/xml
 hash/megapc.xml svneol=native#text/xml
 hash/megatech.xml svneol=native#text/xml
+hash/mm1_flop.xml svneol=native#text/xml
 hash/mpz80.xml svneol=native#text/xml
 hash/msx.hsi svneol=native#text/plain
 hash/msx1_cart.xml svneol=native#text/xml

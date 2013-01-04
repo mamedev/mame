@@ -776,6 +776,9 @@ static MACHINE_CONFIG_START( mm1, mm1_state )
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
+
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "mm1_flop")
 MACHINE_CONFIG_END
 
 
