@@ -541,6 +541,18 @@ static void pce_cd_read_6( running_machine &machine )
 		pce_cd.end_mark = 0;
 	}
 
+	#if 0 // dirty PoP hack test
+	{
+		static int test;
+
+		if(frame == 0xcf4)
+			test = 1;
+
+		if(test == 1)
+			frame-=0xe1;
+	}
+	#endif
+
 	pce_cd.current_frame = frame;
 	pce_cd.end_frame = frame + frame_count;
 
