@@ -56,10 +56,6 @@ WRITE8_MEMBER(blueprnt_state::blueprnt_colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
-
-	offset+=32;
-	offset &=0x3ff;
-	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(blueprnt_state::blueprnt_flipscreen_w)
@@ -88,20 +84,13 @@ TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info)
 // or flipscreen after startup...  this certainly doesn't work for 'Saturn'
 TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info_grasspin)
 {
-	int attr = m_colorram[tile_index] & 0x3f;
-	attr |= m_colorram[(tile_index+32)&0x3ff] & 0xc0;  // from the next row?
-
-
+	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index];
-
-
 	int color = attr & 0x7f;
 
 	tileinfo.category = (attr & 0x80) ? 1 : 0;
+	if ((attr & 0x40)) code += 0x100;
 
-	if ((attr & 0x40)) code  += m_gfx_bank * 0x100;
-	else code &=0xff;
-	
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
