@@ -38,7 +38,7 @@ Year + Game                PCB        Sound         Chips
 To do:
 
 - Implement the I/O part of IGS003 as an 8255
-- IGS003 parametric bitswap protection in lhb2, nkishusp, vbowl (instead of patching the roms)
+- IGS003 parametric bitswap protection in nkishusp (instead of patching the roms)
 - Interrupt controller at 838000 or a38000 (there's a preliminary implementation for lhb)
 - A few graphical bugs
 
@@ -108,6 +108,13 @@ public:
 	UINT16 m_igs003_reg[2];
 	UINT16 m_lhb_irq_enable;
 	blitter_t m_blitter;
+
+	UINT16 m_igs003_prot_hold;
+	UINT8 m_igs003_prot_x;
+	UINT8 m_igs003_prot_y;
+	UINT8 m_igs003_prot_z;
+	UINT8 m_igs003_prot_h1;
+	UINT8 m_igs003_prot_h2;
 
 	DECLARE_WRITE16_MEMBER(igs011_priority_w);
 	DECLARE_READ16_MEMBER(igs011_layers_r);
@@ -1508,6 +1515,62 @@ WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 //          popmessage("oki %02x",m_lhb2_pen_hi & 0x08);
 			break;
 
+		case 0x40:
+			m_igs003_prot_h2 = m_igs003_prot_h1;
+			m_igs003_prot_h1 = data;
+		break;
+
+		case 0x41: // data written here is the same as reg 40
+		case 0x42:
+		case 0x43:
+		case 0x44:
+		case 0x45:
+		case 0x46:
+		case 0x47:
+		break;
+
+		case 0x48:
+			m_igs003_prot_x = 0; // not 100% sure about these
+			if(!(m_igs003_prot_h2 & 0x0a)) m_igs003_prot_x |= 0x08; // $100de6 - not used?
+			if(!(m_igs003_prot_h2 & 0x90)) m_igs003_prot_x |= 0x04; // $100de7 - not used?
+			if(!(m_igs003_prot_h1 & 0x02)) m_igs003_prot_x |= 0x02; // $100de8
+			if(!(m_igs003_prot_h1 & 0x80)) m_igs003_prot_x |= 0x01; // $100de9
+		break;
+
+		case 0x50: // reset?
+			m_igs003_prot_hold = 0;
+		break;
+
+		case 0x80:
+		case 0x81:
+		case 0x82:
+		case 0x83:
+		case 0x84:
+		case 0x85:
+		case 0x86:
+		case 0x87:
+			{
+				UINT16 old;
+
+				m_igs003_prot_y = m_igs003_reg[0] & 0x07;
+				m_igs003_prot_z = data;
+
+				old = m_igs003_prot_hold;
+
+				m_igs003_prot_hold <<= 1;
+				m_igs003_prot_hold |= BIT(old, 15); // rotate
+				m_igs003_prot_hold ^= 0x2bad;
+				m_igs003_prot_hold ^= BIT(m_igs003_prot_z, m_igs003_prot_y);
+				m_igs003_prot_hold ^= BIT(old, 12);
+				m_igs003_prot_hold ^= BIT(old,  8);
+				m_igs003_prot_hold ^= BIT(old,  3);
+				m_igs003_prot_hold ^= BIT(m_igs003_prot_x, 0) <<  4;
+				m_igs003_prot_hold ^= BIT(m_igs003_prot_x, 1) <<  6;
+				m_igs003_prot_hold ^= BIT(m_igs003_prot_x, 2) << 10;
+				m_igs003_prot_hold ^= BIT(m_igs003_prot_x, 3) << 12;
+			}
+		break;
+
 		default:
 			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
 	}
@@ -1527,8 +1590,8 @@ READ16_MEMBER(igs011_state::lhb2_igs003_r)
 			logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), m_igs003_reg[0]);
 			break;
 
-//      case 0x03:
-//          return 0xff;    // parametric bitswaps?
+		case 0x03:
+			return BITSWAP16(m_igs003_prot_hold, 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff;
 
 		// Protection:
 		// 0544FE: 20 21 22 24 25 26 27 28 2A 2B 2C 2D 2E 30 31 32 33 34
@@ -1725,6 +1788,62 @@ WRITE16_MEMBER(igs011_state::vbowl_igs003_w)
 
 			break;
 
+		case 0x40:
+			m_igs003_prot_h2 = m_igs003_prot_h1;
+			m_igs003_prot_h1 = data;
+		break;
+
+		case 0x41: // repeat data written at $40
+		case 0x42:
+		case 0x43:
+		case 0x44:
+		case 0x45:
+		case 0x46:
+		case 0x47:
+		break;
+
+		case 0x48:
+			m_igs003_prot_x = 0; // not 100% sure about these
+			if(!(m_igs003_prot_h2 & 0x0a)) m_igs003_prot_x |= 0x08;
+			if(!(m_igs003_prot_h2 & 0x90)) m_igs003_prot_x |= 0x04;
+			if(!(m_igs003_prot_h1 & 0x02)) m_igs003_prot_x |= 0x02;
+			if(!(m_igs003_prot_h1 & 0x80)) m_igs003_prot_x |= 0x01;
+		break;
+
+		case 0x50: // reset?
+			m_igs003_prot_hold = 0;
+		break;
+
+		case 0x80:
+		case 0x81:
+		case 0x82:
+		case 0x83:
+		case 0x84:
+		case 0x85:
+		case 0x86:
+		case 0x87:
+			{
+				UINT16 old;
+
+				m_igs003_prot_y = m_igs003_reg[0] & 0x07;
+				m_igs003_prot_z = data;
+
+				old = m_igs003_prot_hold;
+
+				m_igs003_prot_hold <<= 1;
+				m_igs003_prot_hold ^= BIT(old, 15); // rotate
+				m_igs003_prot_hold ^= 0x2bad;
+				m_igs003_prot_hold ^= BIT(old,  5);
+				m_igs003_prot_hold ^= BIT(old,  8);
+				m_igs003_prot_hold ^= BIT(old, 10);
+				m_igs003_prot_hold ^= BIT(m_igs003_prot_z, m_igs003_prot_y);
+				m_igs003_prot_hold ^= BIT(m_igs003_prot_x, 0) <<  4;
+				m_igs003_prot_hold ^= BIT(m_igs003_prot_x, 1) <<  6;
+				m_igs003_prot_hold ^= BIT(m_igs003_prot_x, 2) << 10;
+				m_igs003_prot_hold ^= BIT(m_igs003_prot_x, 3) << 12;
+			}
+		break;
+
 		default:
 //          popmessage("igs003 %x <- %04x",m_igs003_reg[0],data);
 			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", space.device().safe_pc(), m_igs003_reg[0], data);
@@ -1737,8 +1856,8 @@ READ16_MEMBER(igs011_state::vbowl_igs003_r)
 		case 0x00:	return ioport("IN0")->read();
 		case 0x01:	return ioport("IN1")->read();
 
-//      case 0x03:
-//          return 0xff;    // parametric bitswaps?
+		case 0x03:
+			return BITSWAP16(m_igs003_prot_hold, 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff;
 
 		case 0x20:	return 0x49;
 		case 0x21:	return 0x47;
@@ -2072,25 +2191,25 @@ DRIVER_INIT_MEMBER(igs011_state,wlcc)
 
 DRIVER_INIT_MEMBER(igs011_state,lhb2)
 {
-	UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 
 	lhb2_decrypt(machine());
 	lhb2_decrypt_gfx(machine());
-
-	// PROTECTION CHECKS
-	rom[0x034f4/2]	=	0x4e71;		// 0034F4: 660E    bne 3504   (rom test, fills palette with white otherwise)
-	rom[0x03502/2]	=	0x6032;		// 003502: 6732    beq 3536   (rom test, fills palette with white otherwise)
-
-	rom[0x1afea/2]	=	0x6034;		// 01AFEA: 6734    beq 1b020  (fills palette with black otherwise)
-//  rom[0x24b8a/2]  =   0x6036;     // 024B8A: 6736    beq 24bc2  (fills palette with green otherwise)
-//  rom[0x29ef8/2]  =   0x6036;     // 029EF8: 6736    beq 29f30  (fills palette with red otherwise)
-//  rom[0x2e69c/2]  =   0x6036;     // 02E69C: 6736    beq 2e6d4  (fills palette with green otherwise)
-//  rom[0x2fe96/2]  =   0x6036;     // 02FE96: 6736    beq 2fece  (fills palette with red otherwise)
-//  rom[0x325da/2]  =   0x6036;     // 0325DA: 6736    beq 32612  (fills palette with green otherwise)
-	rom[0x3d80a/2]	=	0x6034;		// 03D80A: 6734    beq 3d840  (fills palette with black otherwise)
-//  rom[0x3ed80/2]  =   0x6036;     // 03ED80: 6736    beq 3edb8  (fills palette with red otherwise)
-	rom[0x41d72/2]	=	0x6034;		// 041D72: 6734    beq 41da8  (fills palette with black otherwise)
-	rom[0x44834/2]	=	0x6034;		// 044834: 6734    beq 4486a  (fills palette with black otherwise)
+/*
+    // PROTECTION CHECKS
+    rom[0x034f4/2]  =	0x4e71;	    // 0034F4: 660E    bne 3504   (rom test, fills palette with white otherwise)
+    rom[0x03502/2]  =	0x6032;	    // 003502: 6732    beq 3536   (rom test, fills palette with white otherwise)
+    rom[0x1afea/2]  =	0x6034;	    // 01AFEA: 6734    beq 1b020  (fills palette with black otherwise)
+    rom[0x24b8a/2]  =   0x6036;     // 024B8A: 6736    beq 24bc2  (fills palette with green otherwise)
+    rom[0x29ef8/2]  =   0x6036;     // 029EF8: 6736    beq 29f30  (fills palette with red otherwise)
+    rom[0x2e69c/2]  =   0x6036;     // 02E69C: 6736    beq 2e6d4  (fills palette with green otherwise)
+    rom[0x2fe96/2]  =   0x6036;     // 02FE96: 6736    beq 2fece  (fills palette with red otherwise)
+    rom[0x325da/2]  =   0x6036;     // 0325DA: 6736    beq 32612  (fills palette with green otherwise)
+    rom[0x3d80a/2]  =	0x6034;	    // 03D80A: 6734    beq 3d840  (fills palette with black otherwise)
+    rom[0x3ed80/2]  =   0x6036;     // 03ED80: 6736    beq 3edb8  (fills palette with red otherwise)
+    rom[0x41d72/2]  =	0x6034;	    // 041D72: 6734    beq 41da8  (fills palette with black otherwise)
+    rom[0x44834/2]  =	0x6034;	    // 044834: 6734    beq 4486a  (fills palette with black otherwise)
+*/
 }
 
 DRIVER_INIT_MEMBER(igs011_state,vbowl)
@@ -2109,18 +2228,19 @@ DRIVER_INIT_MEMBER(igs011_state,vbowl)
 
 	// Patch the bad dump so that it doesn't reboot at the end of a game (the patched value is from vbowlj)
 	rom[0x080e0/2] = 0xe549;	// 0080E0: 0449 dc.w $0449; ILLEGAL
-
-	// PROTECTION CHECKS
-//  rom[0x03764/2] = 0x4e75;    // 003764: 4E56 0000 link    A6, #$0
-	rom[0x173ee/2] = 0x600c;	// 0173EE: 670C      beq     $173fc
-	rom[0x1e6e6/2] = 0x600c;	// 01E6E6: 670C      beq     $1e6f4
-	rom[0x1f7ce/2] = 0x600c;	// 01F7CE: 670C      beq     $1f7dc
+/*
+    // PROTECTION CHECKS
+    rom[0x03764/2] = 0x4e75;    // 003764: 4E56 0000 link    A6, #$0
+    rom[0x173ee/2] = 0x600c;	// 0173EE: 670C      beq     $173fc
+    rom[0x1e6e6/2] = 0x600c;	// 01E6E6: 670C      beq     $1e6f4
+    rom[0x1f7ce/2] = 0x600c;	// 01F7CE: 670C      beq     $1f7dc
+*/
 }
 
 
 DRIVER_INIT_MEMBER(igs011_state,vbowlj)
 {
-	UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
+//  UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
 	UINT8  *gfx = (UINT8 *)  machine().root_device().memregion("blitter")->base();
 	int i;
 
@@ -2131,12 +2251,13 @@ DRIVER_INIT_MEMBER(igs011_state,vbowlj)
 		gfx[i * 2 + 1] = (gfx[i] & 0xf0) >> 4;
 		gfx[i * 2 + 0] = (gfx[i] & 0x0f) >> 0;
 	}
-
-	// PROTECTION CHECKS
-//  rom[0x37b4/2] = 0x4e75;     // 0037B4: 4E56 0000 link    A6, #$0
-	rom[0x17720/2] = 0x600c;	// 017720: 670C      beq     1772e
-	rom[0x1e6e6/2] = 0x600c;	// 01E6E6: 670C      beq     $1e6f4
-	rom[0x1f7c8/2] = 0x600c;	// 01F7C8: 670C      beq     1f7d6
+/*
+    // PROTECTION CHECKS
+    rom[0x37b4/2] = 0x4e75;     // 0037B4: 4E56 0000 link    A6, #$0
+    rom[0x17720/2] = 0x600c;	// 017720: 670C      beq     1772e
+    rom[0x1e6e6/2] = 0x600c;	// 01E6E6: 670C      beq     $1e6f4
+    rom[0x1f7c8/2] = 0x600c;	// 01F7C8: 670C      beq     1f7d6
+*/
 }
 
 
