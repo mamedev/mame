@@ -118,7 +118,7 @@ public:
 
     required_device<h6280_device> m_maincpu;
 	required_shared_ptr<UINT8> m_cd_ram;
-	required_shared_ptr<unsigned char> m_user_ram;
+	required_shared_ptr<UINT8> m_user_ram;
 	optional_device<huc6260_device> m_huc6260;
 	UINT8 m_io_port_options;
 	UINT8 m_sys3_card;
