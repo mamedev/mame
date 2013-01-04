@@ -7,7 +7,6 @@
 
 #include "emu.h"
 #include "dma.h"
-#include "includes/psx.h"
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -36,8 +35,8 @@ void psxdma_device::device_reset()
 {
 	int n;
 
-	n_dpcp = 0;
-	n_dicr = 0;
+	m_dpcp = 0;
+	m_dicr = 0;
 
 	for( n = 0; n < 7; n++ )
 	{
@@ -61,7 +60,7 @@ void psxdma_device::device_start()
 
 	for( int index = 0; index < 7; index++ )
 	{
-		psx_dma_channel *dma = &channel[ index ];
+		psx_dma_channel *dma = &m_channel[ index ];
 
 		dma->timer = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( psxdma_device::dma_finished_callback ), this) );
 
@@ -72,13 +71,18 @@ void psxdma_device::device_start()
 		machine().save().save_item( "psxdma", tag(), index, NAME( dma->b_running ) );
 	}
 
-	save_item( NAME(n_dpcp) );
-	save_item( NAME(n_dicr) );
+	save_item( NAME(m_dpcp) );
+	save_item( NAME(m_dicr) );
+
+	/// TODO: access ram through the memory map
+	memory_share *share = machine().root_device().memshare("share1");
+	m_ram = (UINT32 *)share->ptr();
+	m_ramsize = share->bytes();
 }
 
 void psxdma_device::dma_start_timer( int index, UINT32 n_ticks )
 {
-	psx_dma_channel *dma = &channel[ index ];
+	psx_dma_channel *dma = &m_channel[ index ];
 
 	dma->timer->adjust( attotime::from_hz(33868800) * n_ticks, index);
 	dma->n_ticks = n_ticks;
@@ -87,7 +91,7 @@ void psxdma_device::dma_start_timer( int index, UINT32 n_ticks )
 
 void psxdma_device::dma_stop_timer( int index )
 {
-	psx_dma_channel *dma = &channel[ index ];
+	psx_dma_channel *dma = &m_channel[ index ];
 
 	dma->timer->adjust( attotime::never);
 	dma->b_running = 0;
@@ -95,7 +99,7 @@ void psxdma_device::dma_stop_timer( int index )
 
 void psxdma_device::dma_timer_adjust( int index )
 {
-	psx_dma_channel *dma = &channel[ index ];
+	psx_dma_channel *dma = &m_channel[ index ];
 
 	if( dma->b_running )
 	{
@@ -112,35 +116,32 @@ void psxdma_device::dma_interrupt_update()
 	int n_int;
 	int n_mask;
 
-	n_int = ( n_dicr >> 24 ) & 0x7f;
-	n_mask = ( n_dicr >> 16 ) & 0xff;
+	n_int = ( m_dicr >> 24 ) & 0x7f;
+	n_mask = ( m_dicr >> 16 ) & 0xff;
 
 	if( ( n_mask & 0x80 ) != 0 && ( n_int & n_mask ) != 0 )
 	{
 		verboselog( machine(), 2, "dma_interrupt_update( %02x, %02x ) interrupt triggered\n", n_int, n_mask );
-		n_dicr |= 0x80000000;
+		m_dicr |= 0x80000000;
 		m_irq_handler(1);
 	}
 	else if( n_int != 0 )
 	{
 		verboselog( machine(), 2, "dma_interrupt_update( %02x, %02x ) interrupt not enabled\n", n_int, n_mask );
 	}
-	n_dicr &= 0x00ffffff | ( n_dicr << 8 );
+	m_dicr &= 0x00ffffff | ( m_dicr << 8 );
 }
 
 void psxdma_device::dma_finished( int index )
 {
-	psx_state *p_psx = machine().driver_data<psx_state>();
-	UINT32 *p_n_psxram = p_psx->m_p_n_psxram;
-
-	psx_dma_channel *dma = &channel[ index ];
+	psx_dma_channel *dma = &m_channel[ index ];
 
 	if( dma->n_channelcontrol == 0x01000401 && index == 2 )
 	{
 		UINT32 n_size;
 		UINT32 n_total;
 		UINT32 n_address = ( dma->n_base & 0xffffff );
-		UINT32 n_adrmask = p_psx->m_n_psxramsize - 1;
+		UINT32 n_adrmask = m_ramsize - 1;
 		UINT32 n_nextaddress;
 
 		if( n_address != 0xffffff )
@@ -165,9 +166,9 @@ void psxdma_device::dma_finished( int index )
 					return;
 				}
 				n_address &= n_adrmask;
-				n_nextaddress = p_n_psxram[ n_address / 4 ];
+				n_nextaddress = m_ram[ n_address / 4 ];
 				n_size = n_nextaddress >> 24;
-				dma->fn_write( n_address + 4, n_size );
+				dma->fn_write( m_ram, n_address + 4, n_size );
 				//FIXME:
 				// The following conditions will cause an endless loop.
 				// If stopping the transfer is correct I cannot judge
@@ -175,7 +176,7 @@ void psxdma_device::dma_finished( int index )
 				// the hardware.
 				// Mametesters.org: psyforce0105u5red, raystorm0111u1red
 				if ((n_nextaddress & 0xffffff) != 0xffffff)
-					if (n_address == p_n_psxram[ (n_nextaddress & 0xffffff) / 4])
+					if (n_address == m_ram[ (n_nextaddress & 0xffffff) / 4])
 						break;
 				if (n_address == (n_nextaddress & 0xffffff) )
 					break;
@@ -188,7 +189,7 @@ void psxdma_device::dma_finished( int index )
 
 	dma->n_channelcontrol &= ~( ( 1L << 0x18 ) | ( 1L << 0x1c ) );
 
-	n_dicr |= 1 << ( 24 + index );
+	m_dicr |= 1 << ( 24 + index );
 	dma_interrupt_update();
 	dma_stop_timer( index );
 }
@@ -200,21 +201,18 @@ TIMER_CALLBACK_MEMBER(psxdma_device::dma_finished_callback)
 
 void psxdma_device::install_read_handler( int index, psx_dma_read_delegate p_fn_dma_read )
 {
-	channel[ index ].fn_read = p_fn_dma_read;
+	m_channel[ index ].fn_read = p_fn_dma_read;
 }
 
 void psxdma_device::install_write_handler( int index, psx_dma_read_delegate p_fn_dma_write )
 {
-	channel[ index ].fn_write = p_fn_dma_write;
+	m_channel[ index ].fn_write = p_fn_dma_write;
 }
 
 WRITE32_MEMBER( psxdma_device::write )
 {
-	psx_state *p_psx = machine().driver_data<psx_state>();
-
-	UINT32 *p_n_psxram = p_psx->m_p_n_psxram;
 	int index = offset / 4;
-	psx_dma_channel *dma = &channel[ index ];
+	psx_dma_channel *dma = &m_channel[ index ];
 
 	if( index < 7 )
 	{
@@ -231,14 +229,14 @@ WRITE32_MEMBER( psxdma_device::write )
 		case 2:
 			verboselog( machine(), 2, "dmachannelcontrol( %d ) = %08x\n", index, data );
 			dma->n_channelcontrol = data;
-			if( ( dma->n_channelcontrol & ( 1L << 0x18 ) ) != 0 && ( n_dpcp & ( 1 << ( 3 + ( index * 4 ) ) ) ) != 0 )
+			if( ( dma->n_channelcontrol & ( 1L << 0x18 ) ) != 0 && ( m_dpcp & ( 1 << ( 3 + ( index * 4 ) ) ) ) != 0 )
 			{
 				INT32 n_size;
 				UINT32 n_address;
 				UINT32 n_nextaddress;
 				UINT32 n_adrmask;
 
-				n_adrmask = p_psx->m_n_psxramsize - 1;
+				n_adrmask = m_ramsize - 1;
 
 				n_address = ( dma->n_base & n_adrmask );
 				n_size = dma->n_blockcontrol;
@@ -257,7 +255,7 @@ WRITE32_MEMBER( psxdma_device::write )
 					!dma->fn_read.isnull() )
 				{
 					verboselog( machine(), 1, "dma %d read block %08x %08x\n", index, n_address, n_size );
-					dma->fn_read( n_address, n_size );
+					dma->fn_read( m_ram, n_address, n_size );
 					dma_finished( index );
 				}
 				else if (dma->n_channelcontrol == 0x11000000 &&	// CD DMA
@@ -270,14 +268,14 @@ WRITE32_MEMBER( psxdma_device::write )
 					oursize = (oursize > 1) ? oursize : 1;
 					oursize *= (dma->n_blockcontrol&0xffff);
 
-					dma->fn_read( n_address, oursize );
+					dma->fn_read( m_ram, n_address, oursize );
 					dma_finished( index );
 				}
 				else if( dma->n_channelcontrol == 0x01000200 &&
 					!dma->fn_read.isnull() )
 				{
 					verboselog( machine(), 1, "dma %d read block %08x %08x\n", index, n_address, n_size );
-					dma->fn_read( n_address, n_size );
+					dma->fn_read( m_ram, n_address, n_size );
 					if( index == 1 )
 					{
 						dma_start_timer( index, 26000 );
@@ -291,7 +289,7 @@ WRITE32_MEMBER( psxdma_device::write )
 					!dma->fn_write.isnull() )
 				{
 					verboselog( machine(), 1, "dma %d write block %08x %08x\n", index, n_address, n_size );
-					dma->fn_write( n_address, n_size );
+					dma->fn_write( m_ram, n_address, n_size );
 					dma_finished( index );
 				}
 				else if( dma->n_channelcontrol == 0x11050100 &&
@@ -299,7 +297,7 @@ WRITE32_MEMBER( psxdma_device::write )
 				{
 					/* todo: check this is a write not a read... */
 					verboselog( machine(), 1, "dma %d write block %08x %08x\n", index, n_address, n_size );
-					dma->fn_write( n_address, n_size );
+					dma->fn_write( m_ram, n_address, n_size );
 					dma_finished( index );
 				}
 				else if( dma->n_channelcontrol == 0x11150100 &&
@@ -307,7 +305,7 @@ WRITE32_MEMBER( psxdma_device::write )
 				{
 					/* todo: check this is a write not a read... */
 					verboselog( machine(), 1, "dma %d write block %08x %08x\n", index, n_address, n_size );
-					dma->fn_write( n_address, n_size );
+					dma->fn_write( m_ram, n_address, n_size );
 					dma_finished( index );
 				}
 				else if( dma->n_channelcontrol == 0x01000401 &&
@@ -330,11 +328,11 @@ WRITE32_MEMBER( psxdma_device::write )
 						while( n_size > 0 )
 						{
 							n_nextaddress = ( n_address - 4 ) & 0xffffff;
-							p_n_psxram[ n_address / 4 ] = n_nextaddress;
+							m_ram[ n_address / 4 ] = n_nextaddress;
 							n_address = n_nextaddress;
 							n_size--;
 						}
-						p_n_psxram[ n_address / 4 ] = 0xffffff;
+						m_ram[ n_address / 4 ] = 0xffffff;
 					}
 					dma_start_timer( index, 2150 );
 				}
@@ -359,21 +357,21 @@ WRITE32_MEMBER( psxdma_device::write )
 		{
 		case 0x0:
 			verboselog( machine(), 1, "psx_dma_w( %04x, %08x, %08x ) dpcp\n", offset, data, mem_mask );
-			n_dpcp = ( n_dpcp & ~mem_mask ) | data;
+			m_dpcp = ( m_dpcp & ~mem_mask ) | data;
 			break;
 		case 0x1:
 
-			n_dicr = ( n_dicr & ( 0x80000000 | ~mem_mask ) ) |
-				( n_dicr & ~data & 0x7f000000 & mem_mask ) |
+			m_dicr = ( m_dicr & ( 0x80000000 | ~mem_mask ) ) |
+				( m_dicr & ~data & 0x7f000000 & mem_mask ) |
 				( data & 0x00ffffff & mem_mask );
 
-			if( ( n_dicr & 0x80000000 ) != 0 && ( n_dicr & 0x7f000000 ) == 0 )
+			if( ( m_dicr & 0x80000000 ) != 0 && ( m_dicr & 0x7f000000 ) == 0 )
 			{
 				verboselog( machine(), 2, "dma interrupt cleared\n" );
-				n_dicr &= ~0x80000000;
+				m_dicr &= ~0x80000000;
 			}
 
-			verboselog( machine(), 1, "psx_dma_w( %04x, %08x, %08x ) dicr -> %08x\n", offset, data, mem_mask, n_dicr );
+			verboselog( machine(), 1, "psx_dma_w( %04x, %08x, %08x ) dicr -> %08x\n", offset, data, mem_mask, m_dicr );
 			break;
 		default:
 			verboselog( machine(), 0, "psx_dma_w( %04x, %08x, %08x ) Unknown dma control register\n", offset, data, mem_mask );
@@ -385,7 +383,7 @@ WRITE32_MEMBER( psxdma_device::write )
 READ32_MEMBER( psxdma_device::read )
 {
 	int index = offset / 4;
-	psx_dma_channel *dma = &channel[ index ];
+	psx_dma_channel *dma = &m_channel[ index ];
 
 	if( index < 7 )
 	{
@@ -410,11 +408,11 @@ READ32_MEMBER( psxdma_device::read )
 		switch( offset % 4 )
 		{
 		case 0x0:
-			verboselog( machine(), 1, "psx_dma_r dpcp ( %08x )\n", n_dpcp );
-			return n_dpcp;
+			verboselog( machine(), 1, "psx_dma_r dpcp ( %08x )\n", m_dpcp );
+			return m_dpcp;
 		case 0x1:
-			verboselog( machine(), 1, "psx_dma_r dicr ( %08x )\n", n_dicr );
-			return n_dicr;
+			verboselog( machine(), 1, "psx_dma_r dicr ( %08x )\n", m_dicr );
+			return m_dicr;
 		default:
 			verboselog( machine(), 0, "psx_dma_r( %08x, %08x ) Unknown dma control register\n", offset, mem_mask );
 			break;

@@ -122,7 +122,6 @@ Notes:
 #include "cdrom.h"
 #include "cpu/psx/psx.h"
 #include "video/psx.h"
-#include "includes/psx.h"
 #include "machine/eeprom.h"
 #include "machine/intelfsh.h"
 #include "machine/scsibus.h"
@@ -131,11 +130,11 @@ Notes:
 #include "sound/spu.h"
 #include "sound/cdda.h"
 
-class konamigv_state : public psx_state
+class konamigv_state : public driver_device
 {
 public:
 	konamigv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: psx_state(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
 		m_am53cf96(*this, "scsi:am53cf96"){ }
 
 	required_device<am53cf96_device> m_am53cf96;
@@ -207,14 +206,12 @@ static ADDRESS_MAP_START( konamigv_map, AS_PROGRAM, 32, konamigv_state )
 	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 	AM_RANGE(0xa0000000, 0xa01fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
 ADDRESS_MAP_END
 
 /* SCSI */
 
-static void scsi_dma_read( konamigv_state *state, UINT32 n_address, INT32 n_size )
+static void scsi_dma_read( konamigv_state *state, UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
 {
-	UINT32 *p_n_psxram = state->m_p_n_psxram;
 	UINT8 *sector_buffer = state->m_sector_buffer;
 	int i;
 	int n_this;
@@ -257,9 +254,8 @@ static void scsi_dma_read( konamigv_state *state, UINT32 n_address, INT32 n_size
 	}
 }
 
-static void scsi_dma_write( konamigv_state *state, UINT32 n_address, INT32 n_size )
+static void scsi_dma_write( konamigv_state *state, UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
 {
-	UINT32 *p_n_psxram = state->m_p_n_psxram;
 	UINT8 *sector_buffer = state->m_sector_buffer;
 	int i;
 	int n_this;
@@ -294,7 +290,6 @@ static void scsi_dma_write( konamigv_state *state, UINT32 n_address, INT32 n_siz
 
 DRIVER_INIT_MEMBER(konamigv_state,konamigv)
 {
-	psx_driver_init(machine());
 }
 
 MACHINE_START_MEMBER(konamigv_state,konamigv)

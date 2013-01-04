@@ -1033,18 +1033,17 @@ Notes:
 #include "cpu/psx/psx.h"
 #include "cpu/h83002/h8.h"
 #include "video/psx.h"
-#include "includes/psx.h"
 #include "machine/at28c16.h"
 #include "sound/c352.h"
 #include "machine/rtc4543.h"
 
 #define VERBOSE_LEVEL ( 0 )
 
-class namcos12_state : public psx_state
+class namcos12_state : public driver_device
 {
 public:
 	namcos12_state(const machine_config &mconfig, device_type type, const char *tag)
-		: psx_state(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
           m_rtc(*this, "rtc"),
 		  m_sharedram(*this, "sharedram") { }
 
@@ -1182,16 +1181,19 @@ WRITE32_MEMBER(namcos12_state::dmaoffset_w)
 	verboselog( machine(), 1, "dmaoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_dmaoffset );
 }
 
-static void namcos12_rom_read( namcos12_state *state, UINT32 n_address, INT32 n_size )
+static void namcos12_rom_read( namcos12_state *state, UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
 {
 	const char *n_region;
 	int n_offset;
 
-	INT32 n_ramleft;
 	INT32 n_romleft;
 
 	UINT16 *source;
 	UINT16 *destination;
+	INT32 n_ramleft;
+
+	// TODO: the check for going past the end of ram should be in dma.c
+	UINT32 m_n_psxramsize = state->machine().root_device().memshare("share1")->bytes();
 
 	if(state->m_has_tektagt_dma && !state->m_n_dmaoffset)
 	{
@@ -1220,8 +1222,9 @@ static void namcos12_rom_read( namcos12_state *state, UINT32 n_address, INT32 n_
 		n_size = n_romleft;
 	}
 
-	destination = (UINT16 *)state->m_p_n_psxram;
-	n_ramleft = ( state->m_n_psxramsize - n_address ) / 4;
+	destination = (UINT16 *)p_n_psxram;
+
+	n_ramleft = ( m_n_psxramsize - n_address ) / 4;
 	if( n_size > n_ramleft )
 	{
 		verboselog( state->machine(), 1, "namcos12_rom_read dma truncated %d to %d passed end of ram\n", n_size, n_ramleft );
@@ -1248,7 +1251,6 @@ static void namcos12_sub_irq( namcos12_state *state, screen_device &screen, bool
 
 WRITE32_MEMBER(namcos12_state::s12_dma_bias_w)
 {
-
 	m_n_dmabias = data;
 }
 
@@ -1265,7 +1267,6 @@ static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32, namcos12_state )
 	AM_RANGE(0x9fc00000, 0x9fffffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 	AM_RANGE(0xa0000000, 0xa03fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0xbfc00000, 0xbfffffff) AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
 ADDRESS_MAP_END
 
 WRITE32_MEMBER(namcos12_state::system11gun_w)
@@ -1591,9 +1592,6 @@ ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(namcos12_state,namcos12)
 {
-
-	psx_driver_init(machine());
-
 	membank("bank1")->configure_entries(0, memregion( "user2" )->bytes() / 0x200000, memregion( "user2" )->base(), 0x200000 );
 
 	m_s12_porta = 0;

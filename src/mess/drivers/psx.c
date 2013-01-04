@@ -12,7 +12,6 @@
 #include "video/psx.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/chd_cd.h"
-#include "includes/psx.h"
 #include "sound/spu.h"
 #include "debugger.h"
 #include "zlib.h"
@@ -20,11 +19,13 @@
 #include "machine/psxcard.h"
 #include "machine/psxcport.h"
 
-class psx1_state : public psx_state
+class psx1_state : public driver_device
 {
 public:
 	psx1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: psx_state(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+	{
+	}
 
 	UINT8 *m_exe_buffer;
 	int m_exe_size;
@@ -76,7 +77,6 @@ static void psxexe_conv32( UINT32 *p_uint32 )
 
 static int load_psxexe( device_t *cpu, unsigned char *p_n_file, int n_len )
 {
-	psx_state *state = cpu->machine().driver_data<psx_state>();
 	struct PSXEXE_HEADER
 	{
 		UINT8 id[ 8 ];
@@ -138,8 +138,9 @@ static int load_psxexe( device_t *cpu, unsigned char *p_n_file, int n_len )
 		logerror( "psx_exe_load: sp    %08x\n", psxexe_header->s_addr );
 		logerror( "psx_exe_load: len   %08x\n", psxexe_header->s_size );
 
-		p_ram = (UINT8 *)state->m_p_n_psxram;
-		n_ram = state->m_n_psxramsize;
+		memory_share *share = cpu->machine().root_device().memshare("share1");
+		p_ram = (UINT8 *)share->ptr();
+		n_ram = share->bytes();
 
 		p_psxexe = p_n_file + sizeof( struct PSXEXE_HEADER );
 
@@ -212,7 +213,6 @@ static void cpe_set_register( device_t *cpu, int n_reg, int n_value )
 
 static int load_cpe( device_t *cpu, unsigned char *p_n_file, int n_len )
 {
-	psx_state *state = cpu->machine().driver_data<psx_state>();
 	if( n_len >= 4 &&
 		memcmp( p_n_file, "CPE\001", 4 ) == 0 )
 	{
@@ -242,8 +242,9 @@ static int load_cpe( device_t *cpu, unsigned char *p_n_file, int n_len )
 						( (int)p_n_file[ n_offset + 6 ] << 16 ) |
 						( (int)p_n_file[ n_offset + 7 ] << 24 );
 
-					UINT8 *p_ram = (UINT8 *)state->m_p_n_psxram;
-					UINT32 n_ram = state->m_n_psxramsize;
+					memory_share *share = cpu->machine().root_device().memshare("share1");
+					UINT8 *p_ram = (UINT8 *)share->ptr();
+					UINT32 n_ram = share->bytes();
 
 					n_offset += 8;
 
@@ -465,14 +466,14 @@ static QUICKLOAD_LOAD( psx_exe_load )
 
 /* ----------------------------------------------------------------------- */
 
-static void cd_dma_read( psxcd_device *psxcd, UINT32 n_address, INT32 n_size )
+static void cd_dma_read( psxcd_device *psxcd, UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
 {
-	UINT8 *psxram = (UINT8 *)psxcd->machine().root_device().memshare("share1")->ptr();
+	UINT8 *psxram = (UINT8 *) p_n_psxram;
 
 	psxcd->start_dma(psxram + n_address, n_size*4);
 }
 
-static void cd_dma_write( psxcd_device *psxcd, UINT32 n_address, INT32 n_size )
+static void cd_dma_write( psxcd_device *psxcd, UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
 {
 	printf("cd_dma_write?!: addr %x, size %x\n", n_address, n_size);
 }
@@ -500,12 +501,10 @@ static ADDRESS_MAP_START( psx_map, AS_PROGRAM, 32, psx1_state )
 	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 	AM_RANGE(0xa0000000, 0xa01fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
 ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(psx1_state,psx)
 {
-	psx_driver_init(machine());
 }
 
 static INPUT_PORTS_START( psx )

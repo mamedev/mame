@@ -17,8 +17,8 @@ extern const device_type PSX_DMA;
 #define MCFG_PSX_DMA_IRQ_HANDLER(_devcb) \
 	devcb = &psxdma_device::set_irq_handler(*device, DEVCB2_##_devcb);
 
-typedef delegate<void (UINT32, INT32)> psx_dma_read_delegate;
-typedef delegate<void (UINT32, INT32)> psx_dma_write_delegate;
+typedef delegate<void (UINT32 *, UINT32, INT32)> psx_dma_read_delegate;
+typedef delegate<void (UINT32 *, UINT32, INT32)> psx_dma_write_delegate;
 
 struct psx_dma_channel
 {
@@ -61,9 +61,11 @@ private:
 	void write( offs_t offset, UINT32 data, UINT32 mem_mask );
 	UINT32 read( offs_t offset, UINT32 mem_mask );
 
-	psx_dma_channel channel[7];
-	UINT32 n_dpcp;
-	UINT32 n_dicr;
+	psx_dma_channel m_channel[7];
+	UINT32 m_dpcp;
+	UINT32 m_dicr;
+	UINT32 *m_ram;
+	size_t m_ramsize;
 
 	devcb2_write_line m_irq_handler;
 };

@@ -7,7 +7,6 @@
 
 #include "emu.h"
 #include "psxcard.h"
-#include "includes/psx.h"
 
 //
 //

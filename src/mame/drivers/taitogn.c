@@ -320,7 +320,6 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 #include "emu.h"
 #include "cpu/psx/psx.h"
 #include "video/psx.h"
-#include "includes/psx.h"
 #include "machine/at28c16.h"
 #include "machine/intelfsh.h"
 #include "machine/znsec.h"
@@ -330,11 +329,11 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 #include "sound/spu.h"
 #include "audio/taito_zm.h"
 
-class taitogn_state : public psx_state
+class taitogn_state : public driver_device
 {
 public:
 	taitogn_state(const machine_config &mconfig, device_type type, const char *tag) :
-		psx_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_znsec0(*this,"maincpu:sio0:znsec0"),
 		m_znsec1(*this,"maincpu:sio0:znsec1"),
 		m_zndip(*this,"maincpu:sio0:zndip")
@@ -768,7 +767,6 @@ DRIVER_INIT_MEMBER(taitogn_state,coh3002t)
 	m_sndflash[1] = machine().device<intel_te28f160_device>("sndflash1");
 	m_sndflash[2] = machine().device<intel_te28f160_device>("sndflash2");
 
-	psx_driver_init(machine());
 	m_znsec0->init(tt10);
 	m_znsec1->init(tt16);
 
@@ -828,7 +826,6 @@ static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
 	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 	AM_RANGE(0xa0000000, 0xa03fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_WRITENOP AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
 ADDRESS_MAP_END
 
 

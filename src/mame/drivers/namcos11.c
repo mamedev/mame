@@ -273,18 +273,17 @@ Notes:
 #include "cpu/psx/psx.h"
 #include "cpu/m37710/m37710.h"
 #include "video/psx.h"
-#include "includes/psx.h"
 #include "machine/at28c16.h"
 #include "sound/c352.h"
 
 #define C76_SPEEDUP   ( 1 ) /* sound cpu idle skipping */
 #define VERBOSE_LEVEL ( 0 )
 
-class namcos11_state : public psx_state
+class namcos11_state : public driver_device
 {
 public:
 	namcos11_state(const machine_config &mconfig, device_type type, const char *tag)
-		: psx_state(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
 		m_sharedram(*this,"sharedram"),
 		m_keycus(*this,"keycus"),
 		m_maincpu(*this,"maincpu"),
@@ -740,7 +739,6 @@ static ADDRESS_MAP_START( namcos11_map, AS_PROGRAM, 32, namcos11_state )
 	AM_RANGE(0x9fc00000, 0x9fffffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 	AM_RANGE(0xa0000000, 0xa03fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0xbfc00000, 0xbfffffff) AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
 ADDRESS_MAP_END
 
 READ16_MEMBER(namcos11_state::c76_shared_r)
@@ -876,7 +874,6 @@ WRITE16_MEMBER(namcos11_state::c76_speedup_w)
 static void namcos11_init_common(running_machine &machine, int n_daughterboard)
 {
 	namcos11_state *state = machine.driver_data<namcos11_state>();
-	psx_driver_init(machine);
 
 	// C76 idle skipping, large speedboost
 	if (C76_SPEEDUP)

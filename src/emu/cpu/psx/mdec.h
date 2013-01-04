@@ -27,8 +27,8 @@ public:
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
 
-	void dma_write( UINT32 n_address, INT32 n_size );
-	void dma_read( UINT32 n_address, INT32 n_size );
+	void dma_write( UINT32 *ram, UINT32 n_address, INT32 n_size );
+	void dma_read( UINT32 *ram, UINT32 n_address, INT32 n_size );
 
 protected:
 	virtual void device_start();
@@ -38,7 +38,7 @@ protected:
 private:
 	void mdec_cos_precalc();
 	void mdec_idct( INT32 *p_n_src, INT32 *p_n_dst );
-	UINT32 mdec_unpack( UINT32 n_address );
+	UINT32 mdec_unpack( UINT32 *ram, UINT32 n_address );
 	UINT16 mdec_clamp_r5( INT32 n_r ) const;
 	UINT16 mdec_clamp_g5( INT32 n_g ) const;
 	UINT16 mdec_clamp_b5( INT32 n_b ) const;

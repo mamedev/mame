@@ -64,12 +64,8 @@
 #include "emu.h"
 #include "debugger.h"
 #include "psx.h"
-#include "dma.h"
-#include "irq.h"
 #include "mdec.h"
 #include "rcnt.h"
-#include "sio.h"
-#include "includes/psx.h"
 #include "sound/spu.h"
 
 #define LOG_BIOSCALL ( 0 )
@@ -1530,7 +1526,7 @@ static ADDRESS_MAP_START( psxcpu_internal_map, AS_PROGRAM, 32, psxcpu_device )
 	AM_RANGE(0x1f801000, 0x1f80101f) AM_RAM
 	/* 1f801014 spu delay */
 	/* 1f801018 dv delay */
-	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE_LEGACY( psx_com_delay_r, psx_com_delay_w )
+	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE( com_delay_r, com_delay_w )
 	AM_RANGE(0x1f801024, 0x1f80102f) AM_RAM
 	AM_RANGE(0x1f801040, 0x1f80104f) AM_DEVREADWRITE( "sio0", psxsio_device, read, write )
 	AM_RANGE(0x1f801050, 0x1f80105f) AM_DEVREADWRITE( "sio1", psxsio_device, read, write )
@@ -1559,7 +1555,7 @@ static ADDRESS_MAP_START( cxd8661r_internal_map, AS_PROGRAM, 32, psxcpu_device )
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_NOP /* scratchpad */
 	AM_RANGE(0x1f800400, 0x1f800fff) AM_READWRITE( berr_r, berr_w )
 	AM_RANGE(0x1f801000, 0x1f80101f) AM_RAM
-	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE_LEGACY( psx_com_delay_r, psx_com_delay_w )
+	AM_RANGE(0x1f801020, 0x1f801023) AM_READWRITE( com_delay_r, com_delay_w )
 	AM_RANGE(0x1f801024, 0x1f80102f) AM_RAM
 	AM_RANGE(0x1f801040, 0x1f80104f) AM_DEVREADWRITE( "sio0", psxsio_device, read, write )
 	AM_RANGE(0x1f801050, 0x1f80105f) AM_DEVREADWRITE( "sio1", psxsio_device, read, write )
@@ -3175,6 +3171,18 @@ READ32_HANDLER( psxcpu_device::gpu_r )
 WRITE32_HANDLER( psxcpu_device::gpu_w )
 {
 	m_gpu_write_handler( space, offset, data, mem_mask );
+}
+
+WRITE32_HANDLER( psxcpu_device::com_delay_w )
+{
+	COMBINE_DATA( &m_com_delay );
+	//verboselog( p_psx, 1, "psx_com_delay_w( %08x %08x )\n", data, mem_mask );
+}
+
+READ32_HANDLER( psxcpu_device::com_delay_r )
+{
+	//verboselog( p_psx, 1, "psx_com_delay_r( %08x )\n", mem_mask );
+	return m_com_delay;
 }
 
 static MACHINE_CONFIG_FRAGMENT( psx )

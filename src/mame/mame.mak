@@ -1379,7 +1379,6 @@ $(MAMEOBJ)/snk.a: \
 
 $(MAMEOBJ)/sony.a: \
 	$(DRIVERS)/zn.o $(MACHINE)/zndip.o $(MACHINE)/znsec.o \
-	$(MACHINE)/psx.o
 
 $(MAMEOBJ)/stern.a: \
 	$(DRIVERS)/astinvad.o \

@@ -13,7 +13,6 @@
 #include "cpu/psx/psx.h"
 #include "cpu/z80/z80.h"
 #include "video/psx.h"
-#include "includes/psx.h"
 #include "machine/at28c16.h"
 #include "machine/nvram.h"
 #include "machine/mb3773.h"
@@ -30,11 +29,11 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-class zn_state : public psx_state
+class zn_state : public driver_device
 {
 public:
 	zn_state(const machine_config &mconfig, device_type type, const char *tag) :
-		psx_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_gpu(*this, "gpu"),
 		m_znsec0(*this,"maincpu:sio0:znsec0"),
 		m_znsec1(*this,"maincpu:sio0:znsec1"),
@@ -402,7 +401,6 @@ static ADDRESS_MAP_START( zn_map, AS_PROGRAM, 32, zn_state )
 	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 	AM_RANGE(0xa0000000, 0xa03fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_WRITENOP AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( link_map, AS_PROGRAM, 8, zn_state )
@@ -412,8 +410,6 @@ static void zn_driver_init( running_machine &machine )
 {
 	zn_state *state = machine.driver_data<zn_state>();
 	int n_game;
-
-	psx_driver_init(machine);
 
 	n_game = 0;
 	while( zn_config_table[ n_game ].s_name != NULL )
@@ -1359,9 +1355,8 @@ Notes:
       *2                  - Unpopulated DIP28 socket
 */
 
-static void atpsx_dma_read( zn_state *state, UINT32 n_address, INT32 n_size )
+static void atpsx_dma_read( zn_state *state, UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
 {
-	UINT32 *p_n_psxram = state->m_p_n_psxram;
 	device_t *ide = state->machine().device("ide");
 
 	logerror("DMA read: %d bytes (%d words) to %08x\n", n_size<<2, n_size, n_address);
@@ -1384,7 +1379,7 @@ static void atpsx_dma_read( zn_state *state, UINT32 n_address, INT32 n_size )
 	}
 }
 
-static void atpsx_dma_write( zn_state *state, UINT32 n_address, INT32 n_size )
+static void atpsx_dma_write( zn_state *state, UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
 {
 	logerror("DMA write from %08x for %d bytes\n", n_address, n_size<<2);
 }

@@ -6,7 +6,6 @@
  */
 
 #include "rcnt.h"
-#include "includes/psx.h"
 
 #define VERBOSE_LEVEL ( 0 )
 

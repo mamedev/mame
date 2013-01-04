@@ -267,13 +267,14 @@ Utyuu Daisakusen Chocovader Contactee CVC1  Ver.A   KC022A
 #include "emu.h"
 #include "cpu/psx/psx.h"
 #include "video/psx.h"
-#include "includes/psx.h"
 
-class namcos10_state : public psx_state
+class namcos10_state : public driver_device
 {
 public:
 	namcos10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: psx_state(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+	{
+	}
 
 	// memm variant interface
 	DECLARE_WRITE32_MEMBER(key_w);
@@ -325,7 +326,6 @@ static ADDRESS_MAP_START( namcos10_map, AS_PROGRAM, 32, namcos10_state )
 	AM_RANGE(0x9fc00000, 0x9fffffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 	AM_RANGE(0xa0000000, 0xa0ffffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0xbfc00000, 0xbfffffff) AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -402,12 +402,6 @@ static ADDRESS_MAP_START( namcos10_memm_map, AS_PROGRAM, 32, namcos10_state )
 
 	AM_IMPORT_FROM(namcos10_map)
 ADDRESS_MAP_END
-
-
-static void memm_driver_init( running_machine &machine )
-{
-	psx_driver_init(machine);
-}
 
 
 // memn variant interface
@@ -512,8 +506,6 @@ static void memn_driver_init( running_machine &machine )
 
 	state->nand_copy( (UINT32 *)( BIOS + 0x0000000 ), 0x08000, 0x001c000 );
 	state->nand_copy( (UINT32 *)( BIOS + 0x0020000 ), 0x24000, 0x03e0000 );
-
-	psx_driver_init(machine);
 }
 
 static void decrypt_bios( running_machine &machine, const char *regionName, int start, int b15, int b14, int b13, int b12, int b11, int b10, int b9, int b8,
@@ -533,7 +525,6 @@ static void decrypt_bios( running_machine &machine, const char *regionName, int 
 DRIVER_INIT_MEMBER(namcos10_state,mrdrilr2)
 {
 	decrypt_bios( machine(), "user1", 0, 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3 );
-	memm_driver_init(machine());
 }
 
 DRIVER_INIT_MEMBER(namcos10_state,gjspace)

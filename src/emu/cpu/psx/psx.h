@@ -10,10 +10,10 @@
 #ifndef __PSXCPU_H__
 #define __PSXCPU_H__
 
-#include "gte.h"
 #include "dma.h"
+#include "gte.h"
+#include "irq.h"
 #include "sio.h"
-#include "includes/psx.h"
 
 //**************************************************************************
 //  CONSTANTS
@@ -142,6 +142,9 @@ public:
 	DECLARE_WRITE32_MEMBER( gpu_w );
 	DECLARE_READ32_MEMBER( gpu_r );
 
+	DECLARE_WRITE32_MEMBER( com_delay_w );
+	DECLARE_READ32_MEMBER( com_delay_r );
+
 	static psxcpu_device *getcpu( device_t &device, const char *cputag );
 
 protected:
@@ -196,6 +199,7 @@ protected:
 
 	// other internal states
     int m_icount;
+	UINT32 m_com_delay;
 	UINT32 m_delayv;
 	UINT32 m_delayr;
 	UINT32 m_berr;

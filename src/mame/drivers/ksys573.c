@@ -482,7 +482,6 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "cdrom.h"
 #include "cpu/psx/psx.h"
 #include "video/psx.h"
-#include "includes/psx.h"
 #include "machine/intelfsh.h"
 #include "machine/cr589.h"
 #include "machine/timekpr.h"
@@ -529,11 +528,11 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #define MAX_TRANSFER_SIZE ( 63488 )
 
 
-class ksys573_state : public psx_state
+class ksys573_state : public driver_device
 {
 public:
 	ksys573_state(const machine_config &mconfig, device_type type, const char *tag) :
-		psx_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
 		m_psxirq(*this, ":maincpu:irq"),
 		m_cr589(*this, ":cdrom")
 	{
@@ -592,6 +591,8 @@ public:
 
 	int m_hyperbbc_lamp_strobe1;
 	int m_hyperbbc_lamp_strobe2;
+
+	UINT32 *m_p_n_psxram;
 
 	/* memory */
 	UINT8 m_atapi_regs[ATAPI_REG_MAX];
@@ -1233,14 +1234,16 @@ WRITE32_MEMBER(ksys573_state::atapi_reset_w)
 	}
 }
 
-static void cdrom_dma_read( ksys573_state *state, UINT32 n_address, INT32 n_size )
+static void cdrom_dma_read( ksys573_state *state, UINT32 *ram, UINT32 n_address, INT32 n_size )
 {
 	verboselog( state->machine(), 2, "cdrom_dma_read( %08x, %08x )\n", n_address, n_size );
 //  mame_printf_debug("DMA read: address %08x size %08x\n", n_address, n_size);
 }
 
-static void cdrom_dma_write( ksys573_state *state, UINT32 n_address, INT32 n_size )
+static void cdrom_dma_write( ksys573_state *state, UINT32 *ram, UINT32 n_address, INT32 n_size )
 {
+	state->m_p_n_psxram = ram;
+
 	verboselog( state->machine(), 2, "cdrom_dma_write( %08x, %08x )\n", n_address, n_size );
 //  mame_printf_debug("DMA write: address %08x size %08x\n", n_address, n_size);
 
@@ -1364,7 +1367,6 @@ static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32, ksys573_state )
 	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 	AM_RANGE(0xa0000000, 0xa03fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -1424,7 +1426,6 @@ static void update_mode( running_machine &machine )
 
 DRIVER_INIT_MEMBER(ksys573_state,konami573)
 {
-	psx_driver_init(machine());
 	atapi_init(machine());
 
 	save_item( NAME(m_n_security_control) );
@@ -1441,13 +1442,14 @@ MACHINE_RESET_MEMBER(ksys573_state,konami573)
 
 void sys573_vblank(ksys573_state *state, screen_device &screen, bool vblank_state)
 {
-	UINT32 *p_n_psxram = state->m_p_n_psxram;
-
 	update_mode(state->machine());
 
+	/// TODO: emulate the memory controller board
 	if( strcmp( state->machine().system().name, "ddr2ml" ) == 0 )
 	{
 		/* patch out security-plate error */
+
+		UINT32 *p_n_psxram = (UINT32 *)state->machine().root_device().memshare("share1")->ptr();
 
 		/* install cd */
 
@@ -1471,6 +1473,7 @@ void sys573_vblank(ksys573_state *state, screen_device &screen, bool vblank_stat
 	{
 		/* patch out security-plate error */
 
+		UINT32 *p_n_psxram = (UINT32 *)state->machine().root_device().memshare("share1")->ptr();
 		/* 8001f850: jal $8003221c */
 		if( p_n_psxram[ 0x1f850 / 4 ] == 0x0c00c887 )
 		{

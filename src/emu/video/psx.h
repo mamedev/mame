@@ -197,8 +197,8 @@ public:
 	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE32_MEMBER( write );
 	DECLARE_READ32_MEMBER( read );
-	void dma_read( UINT32 n_address, INT32 n_size );
-	void dma_write( UINT32 n_address, INT32 n_size );
+	void dma_read( UINT32 *ram, UINT32 n_address, INT32 n_size );
+	void dma_write( UINT32 *ram, UINT32 n_address, INT32 n_size );
 	void lightgun_set( int, int );
 	int vramSize;
 	void vblank(screen_device &screen, bool vblank_state);

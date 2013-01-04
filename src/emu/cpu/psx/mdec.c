@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "dma.h"
 #include "mdec.h"
-#include "includes/psx.h"
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -170,11 +169,8 @@ INLINE INT32 mdec_unpack_val( UINT16 n_packed )
 	return ( ( (INT32)n_packed ) << 22 ) >> 22;
 }
 
-UINT32 psxmdec_device::mdec_unpack( UINT32 n_address )
+UINT32 psxmdec_device::mdec_unpack( UINT32 *p_n_psxram, UINT32 n_address )
 {
-	psx_state *p_psx = machine().driver_data<psx_state>();
-	UINT32 *p_n_psxram = p_psx->m_p_n_psxram;
-
 	UINT8 n_z;
 	INT32 n_qscale;
 	UINT16 n_packed;
@@ -422,10 +418,8 @@ void psxmdec_device::mdec_yuv2_to_rgb24( void )
 	n_decoded = ( 24 * 16 ) / 2;
 }
 
-void psxmdec_device::dma_write( UINT32 n_address, INT32 n_size )
+void psxmdec_device::dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
 {
-	psx_state *p_psx = machine().driver_data<psx_state>();
-	UINT32 *p_n_psxram = p_psx->m_p_n_psxram;
 	int n_index;
 
 	verboselog( machine(), 2, "mdec0_write( %08x, %08x )\n", n_address, n_size );
@@ -481,10 +475,8 @@ void psxmdec_device::dma_write( UINT32 n_address, INT32 n_size )
 	}
 }
 
-void psxmdec_device::dma_read( UINT32 n_address, INT32 n_size )
+void psxmdec_device::dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
 {
-	psx_state *p_psx = machine().driver_data<psx_state>();
-	UINT32 *p_n_psxram = p_psx->m_p_n_psxram;
 	UINT32 n_this;
 	UINT32 n_nextaddress;
 
@@ -502,7 +494,7 @@ void psxmdec_device::dma_read( UINT32 n_address, INT32 n_size )
 					break;
 				}
 
-				n_nextaddress = mdec_unpack( n_0_address );
+				n_nextaddress = mdec_unpack( p_n_psxram, n_0_address );
 				n_0_size -= n_nextaddress - n_0_address;
 				n_0_address = n_nextaddress;
 

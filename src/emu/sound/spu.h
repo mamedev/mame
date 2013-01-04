@@ -220,8 +220,8 @@ public:
 	// static configuration helpers
 	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<spu_device &>(device).m_irq_handler.set_callback(object); }
 
-	void dma_read( UINT32 n_address, INT32 n_size );
-	void dma_write( UINT32 n_address, INT32 n_size );
+	void dma_read( UINT32 *ram, UINT32 n_address, INT32 n_size );
+	void dma_write( UINT32 *ram, UINT32 n_address, INT32 n_size );
 
 	void reinit_sound();
 	void kill_sound();
