@@ -629,6 +629,31 @@ ROM_START( sprint2a )
 ROM_END
 
 
+ROM_START( sprint2h )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "6290-01.b1", 0x2000, 0x0800, CRC(41fc985e) SHA1(7178846480cbf8d15955ccd987d0b0e902ab9f90) )
+	ROM_RELOAD(             0xe000, 0x0800 )
+	ROM_LOAD( "6291-01.c1", 0x2800, 0x0800, CRC(07f7a920) SHA1(845f65d2bd290eb295ca6bae2575f27aaa08c0dd) )
+	ROM_RELOAD(             0xe800, 0x0800 )
+	ROM_LOAD( "6404.d1",    0x3000, 0x0800, CRC(d2878ff6) SHA1(b742a8896c1bf1cfacf48d06908920d88a2c9ea8) )
+	ROM_RELOAD(             0xf000, 0x0800 )
+	ROM_LOAD( "6405-02.e1", 0x3800, 0x0800, CRC(6de291f1) SHA1(00c2826011d80ac0784649a7bc156a97c26565fd) )
+	ROM_RELOAD(             0xf800, 0x0800 )
+
+	ROM_REGION( 0x0200, "gfx1", 0 ) /* tiles */
+	ROM_LOAD_NIB_HIGH( "6396-01.p4", 0x0000, 0x0200, CRC(801b42dd) SHA1(1db58390d803f404253cbf36d562016441ca568d) )
+	ROM_LOAD_NIB_LOW ( "6397-01.r4", 0x0000, 0x0200, CRC(135ba1aa) SHA1(0465259440f73e1a2c8d8101f29e99b4885420e4) )
+
+	ROM_REGION( 0x0200, "gfx2", 0 ) /* cars */
+	ROM_LOAD_NIB_HIGH( "6399-01.j6", 0x0000, 0x0200, CRC(63d685b2) SHA1(608746163e25dbc14cde43c17aecbb9a14fac875) )
+	ROM_LOAD_NIB_LOW ( "6398-01.k6", 0x0000, 0x0200, CRC(c9e1017e) SHA1(e7279a13e4a812d2e0218be0bc5162f2e56c6b66) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "6400-01.m2", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )	/* SYNC */
+	ROM_LOAD( "6401-01.e2", 0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )	/* address */
+ROM_END
+
+
 ROM_START( dominos )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7352-02.d1",   0x3000, 0x0800, CRC(738b4413) SHA1(3a90ab25bb5f65504692f97da43f03e21392dcd8) )
@@ -652,4 +677,5 @@ ROM_END
 GAME( 1978, sprint1,  0,       sprint1, sprint1, sprint2_state, sprint1, ROT0, "Atari (Kee Games)", "Sprint 1", 0 )
 GAME( 1976, sprint2,  sprint1, sprint2, sprint2, sprint2_state, sprint2, ROT0, "Atari (Kee Games)", "Sprint 2 (set 1)", 0 )
 GAME( 1976, sprint2a, sprint1, sprint2, sprint2, sprint2_state, sprint2, ROT0, "Atari (Kee Games)", "Sprint 2 (set 2)", 0 )
+GAME( 1976, sprint2h, sprint1, sprint2, sprint2, sprint2_state, sprint2, ROT0, "hack", "Sprint 2 (color kit, Italy)", GAME_WRONG_COLORS ) // Italian hack, supposedly is color instead of b/w? how?
 GAME( 1977, dominos,  0,       dominos, dominos, sprint2_state, dominos, ROT0, "Atari", "Dominos", 0 )
