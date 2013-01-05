@@ -683,6 +683,12 @@ default: maketree buildtools emulator
 
 all: default tools
 
+# TODO: move to a .mak file in the regtests folder?
+tests: default tools
+	@echo Running jedutil unittest
+	$(PYTHON) src/regtests/jedutil/jedtest.py
+	#@echo Running chdman unittest
+	#$(PYTHON) src/regtests/chdman/chdtest.py
 
 7Z_LIB = $(OBJ)/lib7z.a 
 
