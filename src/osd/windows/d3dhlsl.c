@@ -2023,7 +2023,7 @@ bool hlsl_info::register_texture(d3d_texture_info *texture, int width, int heigh
 	if (hlsl_prescale_x == 0)
 	{
 		hlsl_prescale_x = 1;
-		while (width * xscale * hlsl_prescale_x < d3d->width)
+		while (width * xscale * hlsl_prescale_x <= d3d->width)
 		{
 			hlsl_prescale_x++;
 		}
@@ -2033,12 +2033,15 @@ bool hlsl_info::register_texture(d3d_texture_info *texture, int width, int heigh
 	if (hlsl_prescale_y == 0)
 	{
 		hlsl_prescale_y = 1;
-		while (height * yscale * hlsl_prescale_y < d3d->height)
+		while (height * yscale * hlsl_prescale_y <= d3d->height)
 		{
 			hlsl_prescale_y++;
 		}
 		hlsl_prescale_y--;
 	}
+
+	hlsl_prescale_x = ((hlsl_prescale_x == 0) ? 1 : hlsl_prescale_x);
+	hlsl_prescale_y = ((hlsl_prescale_y == 0) ? 1 : hlsl_prescale_y);
 
 	if (!add_render_target(d3d, texture, width, height, xscale * hlsl_prescale_x, yscale * hlsl_prescale_y))
 		return false;
