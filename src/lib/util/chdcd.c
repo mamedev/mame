@@ -364,8 +364,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 		if (!memcmp(buffer, "DAOX", 4))
 		{
 			// skip second chunk size and UPC code
-			read_uint32(infile);
-			fseek(infile, 16, SEEK_CUR);
+			fseek(infile, 20, SEEK_CUR);
 
 			fread(&start, 1, 1, infile);
 			fread(&end, 1, 1, infile);
@@ -377,13 +376,13 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 			offset = 0;
 			for (track = start; track <= end; track++)
 			{
-				UINT32 size, mode, unknown;
+				UINT32 size, mode;
 				UINT64 index0, index1, track_end;
 
 				fseek(infile, 12, SEEK_CUR);	// skip ISRC code
 				size = read_uint16(infile);
 				mode = read_uint16(infile);
-				unknown = read_uint16(infile);
+				fseek(infile, 2, SEEK_CUR);
 				index0 = read_uint64(infile);
 				index1 = read_uint64(infile);
 				track_end = read_uint64(infile);
