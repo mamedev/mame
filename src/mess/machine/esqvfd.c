@@ -331,19 +331,21 @@ machine_config_constructor esq2x40_sq1_t::device_mconfig_additions() const
 
 void esq2x40_sq1_t::write_char(int data)
 {
+	if (data == 0x09)	// musical note
+	{
+		data = '^';	// approximate for now
+	}
+
     if (m_Wait87Shift)
     {
-//        printf("87Shift got %02x\n", data);
-        if (data == 0x00)   // clear
-        {
-            m_cursx = m_cursy = 0;
-            memset(m_chars, 0, sizeof(m_chars));
-            memset(m_attrs, 0, sizeof(m_attrs));
-            memset(m_dirty, 1, sizeof(m_dirty));
-        }
-
+		m_cursy = (data >> 4) & 0xf;
+		m_cursx = data & 0xf;
         m_Wait87Shift = false;
     }
+    else if (m_Wait88Shift)
+	{
+		m_Wait88Shift = false;
+	}
     else if ((data >= 0x20) && (data <= 0x7f))
     {
         m_chars[m_cursy][m_cursx] = data - ' ';
@@ -369,6 +371,10 @@ void esq2x40_sq1_t::write_char(int data)
     {
         m_Wait87Shift = true;
     }
+    else if (data == 0x88)
+    {
+        m_Wait88Shift = true;
+    }
     else
     {
 //        printf("SQ-1 unhandled display char %02x\n", data);
@@ -380,4 +386,5 @@ esq2x40_sq1_t::esq2x40_sq1_t(const machine_config &mconfig, const char *tag, dev
     m_rows = 2;
     m_cols = 40;
     m_Wait87Shift = false;
+	m_Wait88Shift = false;
 }
