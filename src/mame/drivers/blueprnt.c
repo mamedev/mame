@@ -405,9 +405,6 @@ static MACHINE_CONFIG_DERIVED( grasspin, blueprnt )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(grasspin_map)
-
-	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(blueprnt_state, grasspin)
 MACHINE_CONFIG_END
 
 /*************************************

@@ -56,6 +56,16 @@ WRITE8_MEMBER(blueprnt_state::blueprnt_colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
+
+	offset-=32;
+	offset &=0x3ff;
+	m_bg_tilemap->mark_tile_dirty(offset);
+
+	offset+=64;
+	offset &=0x3ff;
+	m_bg_tilemap->mark_tile_dirty(offset);
+
+
 }
 
 WRITE8_MEMBER(blueprnt_state::blueprnt_flipscreen_w)
@@ -69,27 +79,35 @@ WRITE8_MEMBER(blueprnt_state::blueprnt_flipscreen_w)
 	}
 }
 
+
+
 TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info)
 {
 	int attr = m_colorram[tile_index];
-	int code = m_videoram[tile_index] + 256 * m_gfx_bank;
-	int color = attr & 0x7f;
+	int bank;
 
-	tileinfo.category = (attr & 0x80) ? 1 : 0;
+	// It looks like the upper bank attribute bit (at least) comes from the previous tile read.
+	// Obviously if the screen is flipped the previous tile the hardware would read is different
+	// to the previous tile when it's not flipped hence the if (flip_screen()) logic
+	//
+	// note, one line still ends up darkened in the cocktail mode of grasspin, but on the real
+	// hardware there was no observable brightness difference between any part of the screen so
+	// I'm not convinced the brightness implementation is correct anyway, it might simply be
+	// tied to the use of upper / lower tiles or priority instead?
+	if (flip_screen())
+	{
+		bank = m_colorram[(tile_index+32)&0x3ff] & 0x40; 
+	}
+	else
+	{
+		bank = m_colorram[(tile_index-32)&0x3ff] & 0x40;
+	}
 
-	SET_TILE_INFO_MEMBER(0, code, color, 0);
-}
-
-// really not sure about this but Grasspin doesn't write the tilebank
-// or flipscreen after startup...  this certainly doesn't work for 'Saturn'
-TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info_grasspin)
-{
-	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index];
 	int color = attr & 0x7f;
 
 	tileinfo.category = (attr & 0x80) ? 1 : 0;
-	if ((attr & 0x40)) code += 0x100;
+	if (bank) code += m_gfx_bank * 0x100;
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
@@ -99,15 +117,6 @@ TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info_grasspin)
 VIDEO_START_MEMBER(blueprnt_state,blueprnt)
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blueprnt_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
-	m_bg_tilemap->set_transparent_pen(0);
-	m_bg_tilemap->set_scroll_cols(32);
-
-	save_item(NAME(m_gfx_bank));
-}
-
-VIDEO_START_MEMBER(blueprnt_state,grasspin)
-{
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blueprnt_state::get_bg_tile_info_grasspin),this), TILEMAP_SCAN_COLS_FLIP_X, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(32);
 
