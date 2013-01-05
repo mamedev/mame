@@ -102,7 +102,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/es5506.h"
-#include "machine/68681.h"
+#include "machine/n68681.h"
 #include "machine/wd_fdc.h"
 #include "machine/hd63450.h"    // compatible with MC68450, which is what these really have
 #include "formats/esq16_dsk.h"
@@ -139,7 +139,7 @@ public:
     { }
 
     required_device<m68000_device> m_maincpu;
-    required_device<duart68681_device> m_duart;
+    required_device<duartn68681_device> m_duart;
     optional_device<wd1772_t> m_fdc;
     optional_device<esq1x22_t> m_epsvfd;
     optional_device<esq2x40_sq1_t> m_sq1vfd;
@@ -154,6 +154,12 @@ public:
     DECLARE_WRITE16_MEMBER(mc68681_w);
     DECLARE_READ16_MEMBER(lower_r);
     DECLARE_WRITE16_MEMBER(lower_w);
+
+	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+	DECLARE_WRITE8_MEMBER(duart_tx_a);
+	DECLARE_WRITE8_MEMBER(duart_tx_b);
+	DECLARE_READ8_MEMBER(duart_input);
+	DECLARE_WRITE8_MEMBER(duart_output);
 
     int m_system_type;
     UINT8 m_duart_io;
@@ -341,7 +347,7 @@ static ADDRESS_MAP_START( vfx_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
 	AM_RANGE(0x260000, 0x2601ff) AM_READWRITE(es5510_dsp_r, es5510_dsp_w)
-    AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff)
+    AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", duartn68681_device, read, write, 0x00ff)
     AM_RANGE(0xc00000, 0xc1ffff) AM_ROM AM_REGION("osrom", 0)
     AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
@@ -350,7 +356,7 @@ static ADDRESS_MAP_START( vfxsd_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
 	AM_RANGE(0x260000, 0x2601ff) AM_READWRITE(es5510_dsp_r, es5510_dsp_w)
-    AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff)
+    AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", duartn68681_device, read, write, 0x00ff)
     AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
     AM_RANGE(0x330000, 0x3bffff) AM_RAM // sequencer memory?
     AM_RANGE(0xc00000, 0xc3ffff) AM_ROM AM_REGION("osrom", 0)
@@ -361,7 +367,7 @@ static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
     AM_RANGE(0x240000, 0x2400ff) AM_DEVREADWRITE_LEGACY("mc68450", hd63450_r, hd63450_w)
-    AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff)
+    AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", duartn68681_device, read, write, 0x00ff)
     AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
     AM_RANGE(0x580000, 0x7fffff) AM_RAM         // sample RAM?
     AM_RANGE(0xc00000, 0xc0ffff) AM_ROM AM_REGION("osrom", 0)
@@ -372,7 +378,7 @@ static ADDRESS_MAP_START( sq1_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_READWRITE(lower_r, lower_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
 	AM_RANGE(0x260000, 0x2601ff) AM_READWRITE(es5510_dsp_r, es5510_dsp_w)
-    AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0x00ff)
+    AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", duartn68681_device, read, write, 0x00ff)
     AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
     AM_RANGE(0x330000, 0x3bffff) AM_RAM // sequencer memory?
     AM_RANGE(0xc00000, 0xc3ffff) AM_ROM AM_REGION("osrom", 0)
@@ -435,31 +441,29 @@ static UINT16 esq5505_read_adc(device_t *device)
     }
 }
 
-static void duart_irq_handler(device_t *device, int state, UINT8 vector)
+WRITE_LINE_MEMBER(esq5505_state::duart_irq_handler)
 {
-    esq5505_state *esq5505 = device->machine().driver_data<esq5505_state>();
-
 //    printf("\nDUART IRQ: state %d vector %d\n", state, vector);
     if (state == ASSERT_LINE)
     {
-        esq5505->m_maincpu->set_input_line_vector(M68K_IRQ_3, vector);
-        esq5505->m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
+        m_maincpu->set_input_line_vector(M68K_IRQ_3, m_duart->get_irq_vector());
+        m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
     }
     else
     {
-        esq5505->m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
+        m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
     }
 };
 
-static UINT8 duart_input(device_t *device)
+READ8_MEMBER(esq5505_state::duart_input)
 {
-	floppy_connector *con = device->machine().device<floppy_connector>("wd1772:0");
+	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
 	floppy_image_device *floppy = con ? con->get_device() : 0;
 	UINT8 result = 0;	// DUART input lines are separate from the output lines
 
 	// on VFX, bit 0 is 1 for 'cartridge present'.
 	// on VFX-SD and later, bit 0 is 1 for floppy present, bit 1 is 1 for cartridge present
-	if (mame_stricmp(device->machine().system().name, "vfx") == 0)
+	if (mame_stricmp(machine().system().name, "vfx") == 0)
 	{
 		// todo: handle VFX cart-in when we support cartridges
 	}
@@ -478,13 +482,12 @@ static UINT8 duart_input(device_t *device)
     return result;
 }
 
-static void duart_output(device_t *device, UINT8 data)
+WRITE8_MEMBER(esq5505_state::duart_output)
 {
-    esq5505_state *state = device->machine().driver_data<esq5505_state>();
-	floppy_connector *con = device->machine().device<floppy_connector>("wd1772:0");
+	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
 	floppy_image_device *floppy = con ? con->get_device() : 0;
 
-    state->m_duart_io = data;
+    m_duart_io = data;
 
 	/*
         EPS:
@@ -505,7 +508,7 @@ static void duart_output(device_t *device, UINT8 data)
 
     if (floppy)
     {
-		if (state->m_system_type == EPS)
+		if (m_system_type == EPS)
 		{
 			floppy->ss_w((data & 2)>>1);
 		}
@@ -515,76 +518,84 @@ static void duart_output(device_t *device, UINT8 data)
 		}
     }
 
-//    printf("DUART output: %02x (PC=%x)\n", data, state->m_maincpu->pc());
+//    printf("DUART output: %02x (PC=%x)\n", data, m_maincpu->pc());
 }
 
-static void duart_tx(device_t *device, int channel, UINT8 data)
+// MIDI send, we don't care yet
+WRITE8_MEMBER(esq5505_state::duart_tx_a)
 {
-    esq5505_state *state = device->machine().driver_data<esq5505_state>();
-
-    if (channel == 1)
-    {
-        printf("ch %d: [%02x] (PC=%x)\n", channel, data, state->m_maincpu->pc());
-
-        switch (state->m_system_type)
-        {
-            case GENERIC:
-                state->m_vfd->write_char(data);
-                break;
-
-            case EPS:
-                state->m_epsvfd->write_char(data);
-                break;
-
-            case SQ1:
-                state->m_sq1vfd->write_char(data);
-                break;
-        }
-
-		if (state->m_bCalibSecondByte)
-        {
-            if (data == 0xfd)   // calibration request
-            {
-                duart68681_rx_data(state->m_duart, 1, (UINT8)(FPTR)0xff);   // this is the correct response for "calibration OK"
-            }
-            state->m_bCalibSecondByte = false;
-        }
-        else if (data == 0xfb)   // request calibration
-        {
-            state->m_bCalibSecondByte = true;
-        }
-        else
-        {
-            // EPS wants a throwaway reply byte for each byte sent to the KPC
-            // VFX-SD and SD-1 definitely don't :)
-            if (state->m_system_type == EPS)
-            {
-				if (data == 0xe7)
-				{
-					duart68681_rx_data(state->m_duart, 1, (UINT8)(FPTR)0x00);   // actual value of response is never checked
-				}
-				else if (data == 0x71)
-				{
-					duart68681_rx_data(state->m_duart, 1, (UINT8)(FPTR)0x00);   // actual value of response is never checked
-				}
-				else
-				{
-					duart68681_rx_data(state->m_duart, 1, data);   // actual value of response is never checked
-				}
-            }
-        }
-    }
 }
 
-static const duart68681_config duart_config =
+WRITE8_MEMBER(esq5505_state::duart_tx_b)
 {
-	duart_irq_handler,
-	duart_tx,
-	duart_input,
-	duart_output,
+/*	if (data >= 'A' && data <= 'z')
+	{
+		printf("ch 1: [%02x](%c) (PC=%x)\n", data, data, m_maincpu->pc());
+	}
+	else
+	{
+		printf("ch 1: [%02x] (PC=%x)\n", data, m_maincpu->pc());
+	}*/
 
-	1000000, 500000,	// IP3, IP4
-	500000, 1000000, // IP5, IP6
+	switch (m_system_type)
+	{
+		case GENERIC:
+			m_vfd->write_char(data);
+			break;
+
+		case EPS:
+			m_epsvfd->write_char(data);
+			break;
+
+		case SQ1:
+			m_sq1vfd->write_char(data);
+			break;
+	}
+
+	if (m_bCalibSecondByte)
+	{
+		if (data == 0xfd)   // calibration request
+		{
+			m_duart->duart68681_rx_data(1, (UINT8)(FPTR)0xff);   // this is the correct response for "calibration OK"
+		}
+		m_bCalibSecondByte = false;
+	}
+	else if (data == 0xfb)   // request calibration
+	{   		
+		m_bCalibSecondByte = true;
+	}
+	else
+	{
+		// EPS wants a throwaway reply byte for each byte sent to the KPC
+		// VFX-SD and SD-1 definitely don't :)
+		if (m_system_type == EPS)
+		{
+			if (data == 0xe7)
+			{
+				m_duart->duart68681_rx_data(1, (UINT8)(FPTR)0x00);   // actual value of response is never checked
+			}
+			else if (data == 0x71)
+			{
+				m_duart->duart68681_rx_data(1, (UINT8)(FPTR)0x00);   // actual value of response is never checked
+			}
+			else
+			{
+				m_duart->duart68681_rx_data(1, data);   // actual value of response is never checked
+			}
+		}
+	}
+}
+
+static const duartn68681_config duart_config =
+{
+	DEVCB_DRIVER_LINE_MEMBER(esq5505_state, duart_irq_handler),
+	DEVCB_DRIVER_MEMBER(esq5505_state, duart_tx_a),
+	DEVCB_DRIVER_MEMBER(esq5505_state, duart_tx_b),
+	DEVCB_DRIVER_MEMBER(esq5505_state, duart_input),
+	DEVCB_DRIVER_MEMBER(esq5505_state, duart_output),
+
+	500000, 500000,	// IP3, IP4
+	1000000, 1000000, // IP5, IP6
 };
 
 static void esq_dma_end(running_machine &machine, int channel, int irq)
@@ -649,23 +660,23 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
                 printf("program to %d\n", program);
             }
 
-            duart68681_rx_data(m_duart, 0, (UINT8)(FPTR)0xc0); // program change
-            duart68681_rx_data(m_duart, 0, program); // program
+			m_duart->duart68681_rx_data(0, (UINT8)(FPTR)0xc0); // program change
+			m_duart->duart68681_rx_data(0, program); // program
         }
         else
         {
-            duart68681_rx_data(m_duart, 0, (UINT8)(FPTR)0x90); // note on
-            duart68681_rx_data(m_duart, 0, (UINT8)(FPTR)param);
-            duart68681_rx_data(m_duart, 0, (UINT8)(FPTR)0x7f);
+			m_duart->duart68681_rx_data(0, (UINT8)(FPTR)0x90); // note on
+			m_duart->duart68681_rx_data(0, (UINT8)(FPTR)param);
+			m_duart->duart68681_rx_data(0, (UINT8)(FPTR)0x7f);
         }
     }
     else if (oldval == 1 && newval == 0)
     {
         if ((UINT8)(FPTR)param != 0x40)
         {
-            duart68681_rx_data(m_duart, 0, (UINT8)(FPTR)0x80); // note off
-            duart68681_rx_data(m_duart, 0, (UINT8)(FPTR)param);
-            duart68681_rx_data(m_duart, 0, (UINT8)(FPTR)0x7f);
+			m_duart->duart68681_rx_data(0, (UINT8)(FPTR)0x80); // note off
+			m_duart->duart68681_rx_data(0, (UINT8)(FPTR)param);
+			m_duart->duart68681_rx_data(0, (UINT8)(FPTR)0x7f);
         }
     }
     #else
@@ -693,14 +704,14 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 		if (oldval == 0 && newval == 1)
 		{
 			printf("key pressed %d\n", val&0x7f);
-			duart68681_rx_data(m_duart, 1, val);
-			duart68681_rx_data(m_duart, 1, 0x00);
+			m_duart->duart68681_rx_data(1, val);
+			m_duart->duart68681_rx_data(1, 0x00);
 		}
 		else if (oldval == 1 && newval == 0)
 		{
 	//        printf("key off %x\n", (UINT8)(FPTR)param);
-			duart68681_rx_data(m_duart, 1, val&0x7f);
-			duart68681_rx_data(m_duart, 1, 0x00);
+			m_duart->duart68681_rx_data(1, val&0x7f);
+			m_duart->duart68681_rx_data(1, 0x00);
 		}
 	}
     #endif
@@ -732,7 +743,7 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 
     MCFG_ESQ2x40_ADD("vfd")
 
-	MCFG_DUART68681_ADD("duart", 4000000, duart_config)
+	MCFG_DUARTN68681_ADD("duart", 4000000, duart_config)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL_10MHz)
@@ -769,7 +780,7 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 
     MCFG_ESQ2x40_ADD("vfd")
 
-	MCFG_DUART68681_ADD("duart", 4000000, duart_config)
+	MCFG_DUARTN68681_ADD("duart", 4000000, duart_config)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL_30_4761MHz / 2)
@@ -1007,5 +1018,6 @@ CONS( 1989, vfx,   0, 0,   vfx,   vfx, esq5505_state, denib,  "Ensoniq", "VFX", 
 CONS( 1989, vfxsd, 0, 0,   vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "VFX-SD", GAME_NOT_WORKING )    // 2x40 VFD
 CONS( 1990, sd1,   0, 0,   vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "SD-1", GAME_NOT_WORKING )      // 2x40 VFD
 CONS( 1990, sd132, sd1, 0, vfx32, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 32", GAME_NOT_WORKING )   // 2x40 VFD
-CONS( 1990, sq1,   0, 0,   sq1,   vfx, esq5505_state, sq1,    "Ensoniq", "SQ-1", GAME_NOT_WORKING )      // LCD of some sort
-CONS( 1990, sqrack,sq1, 0, sq1,   vfx, esq5505_state, sq1,    "Ensoniq", "SQ-Rack", GAME_NOT_WORKING )   // LCD of some sort
+CONS( 1990, sq1,   0, 0,   sq1,   vfx, esq5505_state, sq1,    "Ensoniq", "SQ-1", GAME_NOT_WORKING )      // 2x16 LCD
+CONS( 1990, sqrack,sq1, 0, sq1,   vfx, esq5505_state, sq1,    "Ensoniq", "SQ-Rack", GAME_NOT_WORKING )   // 2x16 LCD                      
+
