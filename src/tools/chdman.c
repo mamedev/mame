@@ -2366,7 +2366,7 @@ static void do_extract_cd(parameters_t &params)
 				progress(false, "Extracting, %.1f%% complete... \r", 100.0 * double(outputoffs) / double(total_bytes));
 
 				// read the data
-				cdrom_read_data(cdrom, cdrom_get_track_start(cdrom, tracknum) + frame, &buffer[bufferoffs], trackinfo.trktype);
+				cdrom_read_data(cdrom, cdrom_get_track_start_phys(cdrom, tracknum) + frame, &buffer[bufferoffs], trackinfo.trktype, true);
 
 				// for CDRWin, audio tracks must be reversed
 				if ((mode == MODE_CUEBIN) && (trackinfo.trktype == CD_TRACK_AUDIO))
@@ -2382,7 +2382,7 @@ static void do_extract_cd(parameters_t &params)
 				// read the subcode data
 				if (trackinfo.subtype != CD_SUB_NONE && (mode == MODE_NORMAL))
 				{
-                    cdrom_read_subcode(cdrom, cdrom_get_track_start(cdrom, tracknum) + frame, &buffer[bufferoffs]);
+                    cdrom_read_subcode(cdrom, cdrom_get_track_start_phys(cdrom, tracknum) + frame, &buffer[bufferoffs], true);
                     bufferoffs += trackinfo.subsize;
 				}
 

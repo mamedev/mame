@@ -600,12 +600,13 @@ static void pce_cd_nec_set_audio_start_position( running_machine &machine )
 		f = bcd_2_dec( pce_cd.command_buffer[4]);
 
 		frame = f + 75 * (s + m * 60);
-		if(frame >= 525) // TODO: seven seconds gap? O_o
-			frame -= 525;
+		// PCE tries to be clever here and set (start of track + track pregap size) to skip the pregap
+		// (I guess it wants the TOC to have the real start sector for data tracks and the start of the pregap for audio?)
+		frame -= pce_cd.toc->tracks[cdrom_get_track(pce_cd.cd, frame)].pregap;
 		break;
 	}
 	case 0x80:
-		frame = pce_cd.toc->tracks[ bcd_2_dec( pce_cd.command_buffer[2] ) - 1 ].physframeofs;
+		frame = pce_cd.toc->tracks[ bcd_2_dec( pce_cd.command_buffer[2] ) - 1 ].logframeofs;
 		break;
 	default:
 		popmessage("CD-DA set start mode 0xc0, contact MESSdev");
@@ -635,7 +636,7 @@ static void pce_cd_nec_set_audio_start_position( running_machine &machine )
 		else
 		{
 			pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
-			pce_cd.end_frame = pce_cd.toc->tracks[ cdrom_get_track(pce_cd.cd, pce_cd.current_frame) + 1 ].physframeofs; //get the end of THIS track
+			pce_cd.end_frame = pce_cd.toc->tracks[ cdrom_get_track(pce_cd.cd, pce_cd.current_frame) + 1 ].logframeofs; //get the end of THIS track
 			cdda_start_audio( machine.device( "cdda" ), pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
 			pce_cd.end_mark = 0;
 			pce_cd.cdda_play_mode = 3;
@@ -680,7 +681,7 @@ static void pce_cd_nec_set_audio_stop_position( running_machine &machine )
 		break;
 	}
 	case 0x80:
-		frame = pce_cd.toc->tracks[ bcd_2_dec( pce_cd.command_buffer[2] ) - 1 ].physframeofs;
+		frame = pce_cd.toc->tracks[ bcd_2_dec( pce_cd.command_buffer[2] ) - 1 ].logframeofs;
 		break;
 	default:
 		popmessage("CD-DA set end mode 0xc0, contact MESSdev");
@@ -822,7 +823,7 @@ static void pce_cd_nec_get_dir_info( running_machine &machine )
 		pce_cd.data_buffer_size = 2;
 		break;
 	case 0x01:		/* Get total disk size in MSF format */
-		frame = toc->tracks[toc->numtrks-1].physframeofs;
+		frame = toc->tracks[toc->numtrks-1].logframeofs;
 		frame += toc->tracks[toc->numtrks-1].frames;
 		msf = lba_to_msf( frame + 150 );
 
@@ -834,13 +835,13 @@ static void pce_cd_nec_get_dir_info( running_machine &machine )
 	case 0x02:		/* Get track information */
 		if ( pce_cd.command_buffer[2] == 0xAA )
 		{
-			frame = toc->tracks[toc->numtrks-1].physframeofs;
+			frame = toc->tracks[toc->numtrks-1].logframeofs;
 			frame += toc->tracks[toc->numtrks-1].frames;
 			pce_cd.data_buffer[3] = 0x04;	/* correct? */
 		} else
 		{
 			track = MAX( bcd_2_dec( pce_cd.command_buffer[2] ), 1 );
-			frame = toc->tracks[track-1].physframeofs;
+			frame = toc->tracks[track-1].logframeofs;
 			pce_cd.data_buffer[3] = ( toc->tracks[track-1].trktype == CD_TRACK_AUDIO ) ? 0x00 : 0x04;
 		}
 		logerror("track = %d, frame = %d\n", track, frame );

@@ -236,9 +236,9 @@ void lc89510_temp_device::CDD_GetTrackPos(void)
 	if(segacd.cd == NULL) // no cd is there, bail out
 		return;
 	CDD_STATUS |= SCD_STATUS;
-	elapsedlba = SCD_CURLBA - segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) ].physframeofs;
+	elapsedlba = SCD_CURLBA - segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) ].logframeofs;
 	msf = lba_to_msf_alt (elapsedlba);
-	//popmessage("%08x %08x",SCD_CURLBA,segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) + 1 ].physframeofs);
+	//popmessage("%08x %08x",SCD_CURLBA,segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) + 1 ].logframeofs);
 	CDD_MIN = to_bcd(((msf & 0x00ff0000)>>16),false);
 	CDD_SEC = to_bcd(((msf & 0x0000ff00)>>8),false);
 	CDD_FRAME = to_bcd(((msf & 0x000000ff)>>0),false);
@@ -263,7 +263,7 @@ void lc89510_temp_device::CDD_Length(void)
 		return;
 	CDD_STATUS |= SCD_STATUS;
 
-	UINT32 startlba = (segacd.toc->tracks[cdrom_get_last_track(segacd.cd)].physframeofs);
+	UINT32 startlba = (segacd.toc->tracks[cdrom_get_last_track(segacd.cd)].logframeofs);
 	UINT32 startmsf = lba_to_msf_alt( startlba );
 
 	CDD_MIN = to_bcd((startmsf&0x00ff0000)>>16,false);
@@ -301,7 +301,7 @@ void lc89510_temp_device::CDD_GetTrackAdr(void)
 	if (track < 1)
 		track = 1;
 
-	UINT32 startlba = (segacd.toc->tracks[track-1].physframeofs);
+	UINT32 startlba = (segacd.toc->tracks[track-1].logframeofs);
 	UINT32 startmsf = lba_to_msf_alt( startlba+150 );
 
 	CDD_MIN = to_bcd((startmsf&0x00ff0000)>>16,false);
@@ -359,7 +359,7 @@ void lc89510_temp_device::CDD_Play(running_machine &machine)
 	CLEAR_CDD_RESULT
 	UINT32 msf = getmsf_from_regs();
 	SCD_CURLBA = msf_to_lba(msf)-150;
-	UINT32 end_msf = segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) + 1 ].physframeofs;
+	UINT32 end_msf = segacd.toc->tracks[ cdrom_get_track(segacd.cd, SCD_CURLBA) + 1 ].logframeofs;
 	SCD_CURTRK = cdrom_get_track(segacd.cd, SCD_CURLBA)+1;
 	LC8951UpdateHeader();
 	SCD_STATUS = CDD_PLAYINGCDDA;

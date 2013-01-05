@@ -112,7 +112,8 @@ struct cdrom_track_info
 	UINT32 padframes;	/* number of frames of padding to add to the end of the track; needed for GDI */
 
 	/* fields used in MAME only */
-	UINT32 physframeofs;	/* frame number on the real CD this track starts at */
+	UINT32 logframeofs;	/* logical frame offset: offset including pre/postgaps */
+	UINT32 physframeofs; /* physical frame offset: offset ignoring pre/postgaps */
 	UINT32 chdframeofs;	/* frame number this track starts at on the CHD */
 };
 
@@ -137,12 +138,13 @@ void cdrom_close(cdrom_file *file);
 cdrom_file *cdrom_open(const char *inputfile);
 
 /* core read access */
-UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 datatype);
-UINT32 cdrom_read_subcode(cdrom_file *file, UINT32 lbasector, void *buffer);
+UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 datatype, bool phys=false);
+UINT32 cdrom_read_subcode(cdrom_file *file, UINT32 lbasector, void *buffer, bool phys=false);
 
 /* handy utilities */
 UINT32 cdrom_get_track(cdrom_file *file, UINT32 frame);
 UINT32 cdrom_get_track_start(cdrom_file *file, UINT32 track);
+UINT32 cdrom_get_track_start_phys(cdrom_file *file, UINT32 track);
 
 /* TOC utilities */
 int cdrom_get_last_track(cdrom_file *file);
