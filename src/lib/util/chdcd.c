@@ -313,7 +313,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 
 	astring path = astring(tocfname);
 
-	infile = fopen(tocfname, "rt");
+	infile = fopen(tocfname, "rb");
 	path = get_file_path(path);
 
 	if (infile == (FILE *)NULL)
@@ -364,13 +364,13 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 		if (!memcmp(buffer, "DAOX", 4))
 		{
 			// skip second chunk size and UPC code
+			read_uint32(infile);
 			fseek(infile, 16, SEEK_CUR);
 
-			read_uint32(infile);
 			fread(&start, 1, 1, infile);
 			fread(&end, 1, 1, infile);
 
-//          printf("TOC type: %08x.  Start track %d  End track: %d\n", toc_type, start, end);
+//          printf("Start track %d  End track: %d\n", start, end);
 
 			outtoc.numtrks = (end-start) + 1;
 
@@ -378,16 +378,16 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 			for (track = start; track <= end; track++)
 			{
 				UINT32 size, mode;
-				UINT64 index0, index1, index2;
+				UINT64 index0, index1, track_end;
 
 				fseek(infile, 12, SEEK_CUR);	// skip ISRC code
 				size = read_uint16(infile);
 				mode = read_uint32(infile);
 				index0 = read_uint64(infile);
 				index1 = read_uint64(infile);
-				index2 = read_uint64(infile);
+				track_end = read_uint64(infile);
 
-//              printf("Track %d: sector size %d mode %x index0 %llx index1 %llx index2 %llx (pregap %d sectors, length %d sectors)\n", track, size, mode, index0, index1, index2, (UINT32)(index1-index0)/size, (UINT32)(index2-index1)/size);
+//              printf("Track %d: sector size %d mode %x index0 %llx index1 %llx track_end %llx (pregap %d sectors, length %d sectors)\n", track, size, mode, index0, index1, track_end, (UINT32)(index1-index0)/size, (UINT32)(track_end-index1)/size);
 				outinfo.track[track-1].fname.cpy(tocfname);
 				outinfo.track[track-1].offset = offset + (UINT32)(index1-index0);
 				outinfo.track[track-1].idx0offs = 0;
@@ -395,24 +395,50 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 
 				switch (mode>>24)
 				{
-					case 0x00:	// 2048 byte data
+					case 0x0000:	// 2048 byte data
 						outtoc.tracks[track-1].trktype = CD_TRACK_MODE1;
 						outinfo.track[track-1].swap = false;
 						break;
+
+					case 0x0300:	// Mode 2 Form 1
+						printf("ERROR: Mode 2 Form 1 tracks not supported, contant MAMEDEV!\n");
+						fclose(infile);
+						return CHDERR_NOT_SUPPORTED;
+
+					case 0x0500:	// raw data
+						printf("ERROR: Raw data tracks not supported, contant MAMEDEV!\n");
+						fclose(infile);
+						return CHDERR_NOT_SUPPORTED;
 
 					case 0x06:	// 2352 byte mode 2 raw
 						outtoc.tracks[track-1].trktype = CD_TRACK_MODE2_RAW;
 						outinfo.track[track-1].swap = false;
 						break;
 
-					case 0x07:	// 2352 byte audio
+					case 0x0700:	// 2352 byte audio
 						outtoc.tracks[track-1].trktype = CD_TRACK_AUDIO;
 						outinfo.track[track-1].swap = true;
 						break;
 
+					case 0x0f00:	// raw data with sub-channel
+						printf("ERROR: Raw data tracks with sub-channel not supported, contant MAMEDEV!\n");
+						fclose(infile);
+						return CHDERR_NOT_SUPPORTED;
+
+					case 0x1000:	// audio with sub-channel
+						printf("ERROR: Audio tracks with sub-channel not supported, contant MAMEDEV!\n");
+						fclose(infile);
+						return CHDERR_NOT_SUPPORTED;
+
+					case 0x1100:	// raw Mode 2 Form 1 with sub-channel
+						printf("ERROR: Raw Mode 2 Form 1 tracks with sub-channel not supported, contant MAMEDEV!\n");
+						fclose(infile);
+						return CHDERR_NOT_SUPPORTED;
+
 					default:
-						printf("ERROR: Unknown track type %x, contact MAMEDEV!\n", mode>>24);
-						break;
+						printf("ERROR: Unknown track type %x, contact MAMEDEV!\n", mode);
+						fclose(infile);
+						return CHDERR_NOT_SUPPORTED;
 				}
 
 				outtoc.tracks[track-1].datasize = size;
@@ -421,7 +447,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 				outtoc.tracks[track-1].subsize = 0;
 
 				outtoc.tracks[track-1].pregap = (UINT32)(index1-index0)/size;
-				outtoc.tracks[track-1].frames = (UINT32)(index2-index1)/size;
+				outtoc.tracks[track-1].frames = (UINT32)(track_end-index1)/size;
 				outtoc.tracks[track-1].postgap = 0;
 				outtoc.tracks[track-1].pgtype = 0;
 				outtoc.tracks[track-1].pgsub = CD_SUB_NONE;
@@ -429,7 +455,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 				outtoc.tracks[track-1].pgsubsize = 0;
 				outtoc.tracks[track-1].padframes = 0;
 
-				offset += (UINT32)index2-index1;
+				offset += (UINT32)track_end-index1;
 			}
 		}
 
@@ -888,7 +914,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				}
 			}
 		}
-		printf("trk %d: %d frames @ offset %d\n", trknum+1, outtoc.tracks[trknum].frames, outinfo.track[trknum].offset);
+		//printf("trk %d: %d frames @ offset %d\n", trknum+1, outtoc.tracks[trknum].frames, outinfo.track[trknum].offset);
 	}
 
 	return CHDERR_NONE;
