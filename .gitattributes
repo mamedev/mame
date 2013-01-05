@@ -8044,8 +8044,11 @@ src/regtests/chdman/chdtest.py svneol=native#text/plain
 src/regtests/chdman/input/createcd_cue_empty/in.bin -text
 src/regtests/chdman/input/createcd_cue_empty/in.cue svneol=native#text/plain
 src/regtests/chdman/input/createcd_iso_empty/in.iso -text
+src/regtests/chdman/input/createcd_toc_empty/data.bin -text
+src/regtests/chdman/input/createcd_toc_empty/in.toc svneol=native#text/plain
 src/regtests/chdman/output/createcd_cue_empty/out.chd -text
 src/regtests/chdman/output/createcd_iso_empty/out.chd -text
+src/regtests/chdman/output/createcd_toc_empty/out.chd -text
 src/regtests/jedutil/baseline/18cv8/18cv8_combinatorial_feedback.txt svneol=native#text/plain
 src/regtests/jedutil/baseline/18cv8/18cv8_register_feedback.txt svneol=native#text/plain
 src/regtests/jedutil/baseline/18cv8/pal10h8-to-peel18cv8.txt svneol=native#text/plain
