@@ -196,6 +196,10 @@ endif
 # (vs. the native framework port).  Normal users should not enable this.
 # MACOSX_USE_LIBSDL = 1
 
+# uncomment and specify path to cppcheck executable to perform
+# static code analysis during compilation
+# CPPCHECK =
+
 
 
 #-------------------------------------------------
@@ -712,6 +716,8 @@ include $(SRC)/tools/tools.mak
 CCOMFLAGS += $(INCPATH)
 CDEFS = $(DEFS)
 
+# TODO: -x c++ should not be hard-coded
+CPPCHECKFLAGS = $(CDEFS) $(INCPATH) -x c++ --enable=style
 
 
 #-------------------------------------------------
@@ -787,18 +793,30 @@ endif
 $(OBJ)/%.o: $(SRC)/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
+ifdef CPPCHECK
+	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
+endif
 
 $(OBJ)/%.o: $(OBJ)/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
+ifdef CPPCHECK
+	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
+endif
 
 $(OBJ)/%.pp: $(SRC)/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -E $< -o $@
+ifdef CPPCHECK
+	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
+endif
 
 $(OBJ)/%.s: $(SRC)/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -S $< -o $@
+ifdef CPPCHECK
+	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
+endif
 
 $(OBJ)/%.lh: $(SRC)/%.lay $(FILE2STR_TARGET)
 	@echo Converting $<...
@@ -812,6 +830,9 @@ $(OBJ)/%.fh: $(SRC)/%.png $(PNG2BDC_TARGET) $(FILE2STR_TARGET)
 $(DRIVLISTOBJ): $(DRIVLISTSRC)
 	@echo Compiling $<...
 	$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
+ifdef CPPCHECK
+	@$(CPPCHECK) $(CPPCHECKFLAGS) $<
+endif
 
 $(DRIVLISTSRC): $(SRC)/$(TARGET)/$(SUBTARGET).lst $(MAKELIST_TARGET)
 	@echo Building driver list $<...
