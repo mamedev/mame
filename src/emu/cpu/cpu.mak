@@ -197,7 +197,8 @@ CPUOBJS += $(CPUOBJ)/dsp16/dsp16.o
 DASMOBJS += $(CPUOBJ)/dsp16/dsp16dis.o
 endif
 
-$(CPUOBJ)/dsp16/dsp16.o:	$(CPUSRC)/dsp16/dsp16.c \
+$(CPUOBJ)/dsp16/dsp16.o:	$(CPUSRC)/dsp16/dsp16ops.c \
+							$(CPUSRC)/dsp16/dsp16.c \
 							$(CPUSRC)/dsp16/dsp16.h
 
 

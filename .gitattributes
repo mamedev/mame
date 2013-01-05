@@ -346,6 +346,7 @@ src/emu/cpu/drcumlsh.h svneol=native#text/plain
 src/emu/cpu/dsp16/dsp16.c svneol=native#text/plain
 src/emu/cpu/dsp16/dsp16.h svneol=native#text/plain
 src/emu/cpu/dsp16/dsp16dis.c svneol=native#text/plain
+src/emu/cpu/dsp16/dsp16ops.c svneol=native#text/plain
 src/emu/cpu/dsp32/dsp32.c svneol=native#text/plain
 src/emu/cpu/dsp32/dsp32.h svneol=native#text/plain
 src/emu/cpu/dsp32/dsp32dis.c svneol=native#text/plain

@@ -88,7 +88,7 @@ protected:
 	UINT8 m_c0;
 	UINT8 m_c1;
 	UINT8 m_c2;
-	// Serial, parallel, etc.
+	// Serial and parallel interfaces
 	UINT16 m_sioc;
 	UINT16 m_pioc;
 
@@ -108,7 +108,13 @@ protected:
     int m_icount;
 
 	// operations
-	void execute_one(const UINT16 op, UINT8& cycles, UINT8& pcAdvance);
+	void execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance);
+
+	void* registerFromRTable(const UINT8& R);
+
+	// helpers
+	void* addressYL();
+	//void writeYxRegister(const UINT16& value);
 };
 
 

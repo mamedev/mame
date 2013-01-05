@@ -137,7 +137,14 @@ void dsp16_device::device_start()
 
 void dsp16_device::device_reset()
 {
-    m_pc = m_ppc = 0x0000;
+	// Page 7-5
+	m_pc = 0x0000;
+	m_sioc = 0x0000;
+	m_pioc = 0x0008;
+	m_rb = 0x0000;
+	m_re = 0x0000;
+	// AUC is not affected by reset
+	m_ppc = m_pc;
 }
 
 
@@ -163,7 +170,7 @@ void dsp16_device::state_string_export(const device_state_entry &entry, astring 
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-		string.printf("(see below)");
+		string.printf("(multiple below)");
 			break;
 
 		// Placeholder for a better view later (TODO)
@@ -294,248 +301,4 @@ void dsp16_device::execute_run()
 	} while (m_icount > 0);
 }
 
-
-void dsp16_device::execute_one(const UINT16 op, UINT8& cycles, UINT8& pcAdvance)
-{
-	cycles = 1;
-	pcAdvance = 1;
-
-	const UINT8 opcode = (op >> 11) & 0x1f;
-	switch(opcode)
-	{
-		// Format 1: Multiply/ALU Read/Write Group
-		case 0x06:
-		{
-			// F1, Y
-			//const UINT8 Y = (op & 0x000f);
-			//const UINT8 S = (op & 0x0200) >> 9;
-			//const UINT8 D = (op & 0x0400) >> 10;
-			//const UINT8 F1 = (op & 0x01e0) >> 5;
-			break;
-		}
-		case 0x04: case 0x1c:
-		{
-			// F1 Y=a0[1] | F1 Y=a1[1]
-			//const UINT8 Y = (op & 0x000f);
-			//const UINT8 S = (op & 0x0200) >> 9;
-			//const UINT8 D = (op & 0x0400) >> 10;
-			//const UINT8 F1 = (op & 0x01e0) >> 5;
-			break;
-		}
-		case 0x16:
-		{
-			// F1, x = Y
-			//const UINT8 Y = (op & 0x000f);
-			//const UINT8 S = (op & 0x0200) >> 9;
-			//const UINT8 D = (op & 0x0400) >> 10;
-			//const UINT8 F1 = (op & 0x01e0) >> 5;
-			break;
-		}
-		case 0x17:
-		{
-			// F1, y[l] = Y
-			//const UINT8 Y = (op & 0x000f);
-			//const UINT8 X = (op & 0x0010) >> 4;
-			//const UINT8 S = (op & 0x0200) >> 9;
-			//const UINT8 D = (op & 0x0400) >> 10;
-			//const UINT8 F1 = (op & 0x01e0) >> 5;
-			break;
-		}
-		case 0x1f:
-		{
-			// F1, y = Y, x = *pt++[i]
-			//const UINT8 Y = (op & 0x000f);
-			//const UINT8 X = (op & 0x0010) >> 4;
-			//const UINT8 S = (op & 0x0200) >> 9;
-			//const UINT8 D = (op & 0x0400) >> 10;
-			//const UINT8 F1 = (op & 0x01e0) >> 5;
-			break;
-		}
-		case 0x19: case 0x1b:
-		{
-			// F1, y = a0|1, x = *pt++[i]
-			//const UINT8 Y = (op & 0x000f);
-			//const UINT8 X = (op & 0x0010) >> 4;
-			//const UINT8 S = (op & 0x0200) >> 9;
-			//const UINT8 D = (op & 0x0400) >> 10;
-			//const UINT8 F1 = (op & 0x01e0) >> 5;
-			break;
-		}
-		case 0x14:
-		{
-			// F1, Y = y[1]
-			//const UINT8 Y = (op & 0x000f);
-			//const UINT8 X = (op & 0x0010) >> 4;
-			//const UINT8 S = (op & 0x0200) >> 9;
-			//const UINT8 D = (op & 0x0400) >> 10;
-			//const UINT8 F1 = (op & 0x01e0) >> 5;
-			break;
-		}
-
-		// Format 1a: Multiply/ALU Read/Write Group (major typo in docs on p3-51)
-		case 0x07:
-		{
-			// F1, At[1] = Y
-			//const UINT8 Y = (op & 0x000f);
-			//const UINT8 S = (op & 0x0200) >> 9;
-			//const UINT8 aT = (op & 0x0400) >> 10;
-			//const UINT8 F1 = (op & 0x01e0) >> 5;
-			break;
-		}
-
-		// Format 2: Multiply/ALU Read/Write Group
-		case 0x15:
-		{
-			// F1, Z : y[1]
-			//const UINT8 Z = (op & 0x000f);
-			//const UINT8 X = (op & 0x0010) >> 4;
-			//const UINT8 S = (op & 0x0200) >> 9;
-			//const UINT8 D = (op & 0x0400) >> 10;
-			//const UINT8 F1 = (op & 0x01e0) >> 5;
-			break;
-		}
-		case 0x1d:
-		{
-			// F1, Z : y, x=*pt++[i]
-			//const UINT8 Z = (op & 0x000f);
-			//const UINT8 X = (op & 0x0010) >> 4;
-			//const UINT8 S = (op & 0x0200) >> 9;
-			//const UINT8 D = (op & 0x0400) >> 10;
-			//const UINT8 F1 = (op & 0x01e0) >> 5;
-			break;
-		}
-
-		// Format 2a: Multiply/ALU Read/Write Group
-		case 0x05:
-		{
-			// F1, Z : aT[1]
-			//const UINT8 Z = (op & 0x000f);
-			//const UINT8 X = (op & 0x0010) >> 4;
-			//const UINT8 S = (op & 0x0200) >> 9;
-			//const UINT8 aT = (op & 0x0400) >> 10;
-			//const UINT8 F1 = (op & 0x01e0) >> 5;
-			break;
-		}
-
-		// Format 3: Special Functions
-		case 0x12:
-		case 0x13:
-		{
-			// if|ifc CON F2
-			//const UINT8 CON = (op & 0x001f);
-			//const UINT8 S = (op & 0x0200) >> 9;
-			//const UINT8 D = (op & 0x0400) >> 10;
-			//const UINT8 F2 = (op & 0x01e0) >> 5;
-			break;
-		}
-
-		// Format 4: Branch Direct Group
-		case 0x00: case 0x01:
-		{
-			// goto JA
-			const UINT16 JA = (op & 0x0fff) | (m_pc & 0xf000);
-			m_pc = JA;
-			pcAdvance = 0;
-			break;
-		}
-
-		case 0x10: case 0x11:
-		{
-			// call JA
-			//const UINT16 JA = (op & 0x0fff) | (m_pc & 0xf000);
-			break;
-		}
-
-		// Format 5: Branch Indirect Group
-		case 0x18:
-		{
-			// goto B
-			//const UINT8 B = (op & 0x0700) >> 8;
-			break;
-		}
-
-		// Format 6: Contitional Branch Qualifier/Software Interrupt (icall)
-		case 0x1a:
-		{
-			// if CON [goto/call/return]
-			//const UINT8 CON = (op & 0x001f);
-			break;
-		}
-
-		// Format 7: Data Move Group
-		case 0x09: case 0x0b:
-		{
-			// R = aS
-			//const UINT8 R = (op & 0x03f0) >> 4;
-			//const UINT8 S = (op & 0x1000) >> 12;
-			break;
-		}
-		case 0x08:
-		{
-			// aT = R
-			//const UINT8 R  = (op & 0x03f0) >> 4;
-			//const UINT8 aT = (op & 0x0400) >> 10;
-			break;
-		}
-		case 0x0f:
-		{
-			// R = Y
-			//const UINT8 Y = (op & 0x000f);
-			//const UINT8 R = (op & 0x03f0) >> 4;
-			break;
-		}
-		case 0x0c:
-		{
-			// Y = R
-			//const UINT8 Y = (op & 0x000f);
-			//const UINT8 R = (op & 0x03f0) >> 4;
-			break;
-		}
-		case 0x0d:
-		{
-			// Z : R
-			//const UINT8 Z = (op & 0x000f);
-			//const UINT8 R = (op & 0x03f0) >> 4;
-			break;
-		}
-
-		// Format 8: Data Move (immediate operand - 2 words)
-		case 0x0a:
-		{
-			// R = N
-			//const UINT8 R = (op & 0x03f0) >> 4;
-			pcAdvance++;
-			break;
-		}
-
-		// Format 9: Short Immediate Group
-		case 0x02: case 0x03:
-		{
-			// R = M
-			//const UINT8 M = (op & 0x00ff);
-			//const UINT8 R = (op & 0x0e00) >> 9;
-			break;
-		}
-
-		// Format 10: do - redo
-		case 0x0e:
-		{
-			// do|redo K
-			//const UINT8 K = (op & 0x007f);
-			//const UINT8 NI = (op & 0x0780) >> 7;
-			break;
-		}
-
-		// RESERVED
-		case 0x1e:
-		{
-			break;
-		}
-
-		// UNKNOWN
-		default:
-		{
-			break;
-		}
-	}
-}
+#include "dsp16ops.c"
