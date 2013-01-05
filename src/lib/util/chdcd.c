@@ -377,12 +377,13 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 			offset = 0;
 			for (track = start; track <= end; track++)
 			{
-				UINT32 size, mode;
+				UINT32 size, mode, unknown;
 				UINT64 index0, index1, track_end;
 
 				fseek(infile, 12, SEEK_CUR);	// skip ISRC code
 				size = read_uint16(infile);
-				mode = read_uint32(infile);
+				mode = read_uint16(infile);
+				unknown = read_uint16(infile);
 				index0 = read_uint64(infile);
 				index1 = read_uint64(infile);
 				track_end = read_uint64(infile);
@@ -393,7 +394,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 				outinfo.track[track-1].idx0offs = 0;
 				outinfo.track[track-1].idx1offs = 0;
 
-				switch (mode>>24)
+				switch (mode)
 				{
 					case 0x0000:	// 2048 byte data
 						outtoc.tracks[track-1].trktype = CD_TRACK_MODE1;
@@ -410,7 +411,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 						fclose(infile);
 						return CHDERR_NOT_SUPPORTED;
 
-					case 0x06:	// 2352 byte mode 2 raw
+					case 0x0600:	// 2352 byte mode 2 raw
 						outtoc.tracks[track-1].trktype = CD_TRACK_MODE2_RAW;
 						outinfo.track[track-1].swap = false;
 						break;
