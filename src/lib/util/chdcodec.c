@@ -181,7 +181,6 @@ public:
 
 private:
 	// internal state
-	CLzmaProps				m_props;
 	CLzmaDec				m_decoder;
 	chd_lzma_allocator		m_allocator;
 };
