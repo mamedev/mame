@@ -518,10 +518,8 @@ void ide_controller_device::continue_read()
 	/* reset the totals */
 	buffer_offset = 0;
 
-	/* clear just the busy flag
-	   the buffer ready flag stays set until all sectors are read
-	*/
-//	status &= ~IDE_STATUS_BUFFER_READY;
+	/* clear the buffer ready and busy flag */
+	status &= ~IDE_STATUS_BUFFER_READY;
 	status &= ~IDE_STATUS_BUSY;
 
 	if (master_password_enable || user_password_enable)
@@ -542,7 +540,6 @@ void ide_controller_device::continue_read()
 		read_next_sector();
 	else
 	{
-		status &= ~IDE_STATUS_BUFFER_READY; /* now clear it */
 		bus_master_status &= ~IDE_BUSMASTER_STATUS_ACTIVE;
 		dma_active = 0;
 	}
@@ -699,7 +696,7 @@ void ide_controller_device::read_first_sector()
 void ide_controller_device::read_next_sector()
 {
 	/* mark ourselves busy */
-//	status |= IDE_STATUS_BUSY;
+	status |= IDE_STATUS_BUSY;
 
 	if (command == IDE_COMMAND_READ_MULTIPLE_BLOCK)
 	{
@@ -1183,10 +1180,6 @@ UINT32 ide_controller_device::ide_controller_read(int bank, offs_t offset, int s
 			status &= ~IDE_STATUS_DRIVE_READY;
 		}
 	}
-	else
-	{
-		return 0;
-	}
 
 	switch (BANK(bank, offset))
 	{
@@ -1439,17 +1432,9 @@ void ide_controller_device::ide_controller_write(int bank, offs_t offset, int si
 			//if (data == 0x04)
 			if (data & 0x04)
 			{
-//				status |= IDE_STATUS_BUSY;
-//				status &= ~IDE_STATUS_DRIVE_READY;
-//				reset_timer->adjust(attotime::from_msec(5));
-				device_reset(); /* deliver instantly to support buggy BIOSes that don't poll properly */
-				sector_count = 1;
-				drive[0].cur_sector = 1;
-				drive[0].cur_head = 0;
-				drive[0].cur_cylinder = 0;
-				drive[1].cur_sector = 1;
-				drive[1].cur_head = 0;
-				drive[1].cur_cylinder = 0;
+				status |= IDE_STATUS_BUSY;
+				status &= ~IDE_STATUS_DRIVE_READY;
+				reset_timer->adjust(attotime::from_msec(5));
 			}
 			break;
 	}
