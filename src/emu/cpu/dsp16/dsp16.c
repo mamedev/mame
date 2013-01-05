@@ -86,8 +86,8 @@ void dsp16_device::device_start()
 	state_add(DSP16_X,        "X",         m_x);
 	state_add(DSP16_Y,        "Y",         m_y);
 	state_add(DSP16_P,        "P",         m_p);
-	state_add(DSP16_A0,       "A0",        m_a0).mask(0xfffffffff);
-	state_add(DSP16_A1,       "A1",        m_a1).mask(0xfffffffff);
+	state_add(DSP16_A0,       "A0",        m_a0).mask(U64(0xfffffffff));
+	state_add(DSP16_A1,       "A1",        m_a1).mask(U64(0xfffffffff));
 	state_add(DSP16_AUC,      "AUC",       m_auc); //.formatstr("%6s");
 	state_add(DSP16_PSW,      "PSW",       m_psw); //.formatstr("%16s");
 	state_add(DSP16_C0,       "C0",        m_c0);
