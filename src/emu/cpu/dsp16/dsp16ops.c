@@ -4,8 +4,35 @@
 // The YL register is the lower half of the 32 bit Y register
 void* dsp16_device::addressYL()
 {
-	return (((UINT8*)&m_y)+0x4);
+	return (((UINT8*)&m_y) + 2);
 }
+
+
+void dsp16_device::writeRegister(void* reg, const UINT16 &value)
+{
+	if (reg == &m_auc || reg == &m_c0 || reg == &m_c1 || reg == &m_c2)
+	{
+		*(UINT8*)reg = value & 0x00ff;	// 8 bit registers
+	}
+	else if (reg == &m_i)
+	{
+		m_i = value & 0x0fff;	// 12 bit register
+	}
+	else if (reg == &m_y)
+	{
+		//writeYxRegister(value);	// TODO - check a flag to see if clearing yl is necessary
+		m_y = (value << 16) | (m_y & 0x0000ffff);	// Temporary
+	}
+	else if (reg == addressYL())
+	{
+		m_y = value | (m_y & 0xffff0000);			// Temporary
+	}
+	else
+	{
+		*(UINT16*)reg = value;	// The rest
+	}
+}
+
 
 void* dsp16_device::registerFromRTable(const UINT8 &R)
 {
@@ -258,23 +285,7 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 			const UINT8 R = (op & 0x03f0) >> 4;
 			const UINT16 iVal = opcode_read(1);
 			void* reg = registerFromRTable(R);
-			if (reg == &m_auc || reg == &m_c0 || reg == &m_c1 || reg == &m_c2)
-			{
-				*(UINT8*)reg = iVal & 0x00ff;	// 8 bit registers
-			}
-			else if (reg == &m_i)
-			{
-				*(UINT16*)reg = iVal & 0x0fff;	// 12 bit register
-			}
-			else if (reg == &m_y || reg == addressYL())
-			{
-				*(UINT16*)reg = iVal;		// Temporary
-				//writeYxRegister(iVal);	// TODO
-			}
-			else
-			{
-				*(UINT16*)reg = iVal;			// The rest
-			}
+			writeRegister(reg, iVal);
 
 			cycles = 2;
 			pcAdvance = 2;

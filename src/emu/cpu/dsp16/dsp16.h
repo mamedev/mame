@@ -115,6 +115,7 @@ protected:
 	// helpers
 	void* addressYL();
 	//void writeYxRegister(const UINT16& value);
+	void writeRegister(void* reg, const UINT16& value);
 };
 
 
