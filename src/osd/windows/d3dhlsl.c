@@ -777,7 +777,7 @@ void hlsl_info::init_fsfx_quad(void *vertbuf)
 //  hlsl_info::create_resources
 //============================================================
 
-int hlsl_info::create_resources()
+int hlsl_info::create_resources(bool reset)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
 		return 0;
@@ -802,182 +802,185 @@ int hlsl_info::create_resources()
 
 	windows_options &winoptions = downcast<windows_options &>(window->machine().options());
 
-	options = (hlsl_options*)global_alloc_clear(hlsl_options);
-
-	options->params_dirty = true;
-	strcpy(options->shadow_mask_texture, downcast<windows_options &>(window->machine().options()).screen_shadow_mask_texture()); // unsafe
-
-	write_ini = downcast<windows_options &>(window->machine().options()).hlsl_write_ini();
-	read_ini = downcast<windows_options &>(window->machine().options()).hlsl_read_ini();
-
-	if(read_ini)
+	if (!reset)
 	{
-		emu_file ini_file(downcast<windows_options &>(window->machine().options()).screen_post_fx_dir(), OPEN_FLAG_READ | OPEN_FLAG_CREATE_PATHS);
-		file_error filerr = open_next((d3d_info*)window->drawdata, ini_file, downcast<windows_options &>(window->machine().options()).hlsl_ini_name(), "ini", 0);
+		options = (hlsl_options*)global_alloc_clear(hlsl_options);
 
-		read_ini = false;
-		if (filerr == FILERR_NONE)
+		options->params_dirty = true;
+		strcpy(options->shadow_mask_texture, downcast<windows_options &>(window->machine().options()).screen_shadow_mask_texture()); // unsafe
+
+		write_ini = downcast<windows_options &>(window->machine().options()).hlsl_write_ini();
+		read_ini = downcast<windows_options &>(window->machine().options()).hlsl_read_ini();
+
+		if(read_ini)
 		{
-			ini_file.seek(0, SEEK_END);
-			if (ini_file.tell() >= 1000)
+			emu_file ini_file(downcast<windows_options &>(window->machine().options()).screen_post_fx_dir(), OPEN_FLAG_READ | OPEN_FLAG_CREATE_PATHS);
+			file_error filerr = open_next((d3d_info*)window->drawdata, ini_file, downcast<windows_options &>(window->machine().options()).hlsl_ini_name(), "ini", 0);
+
+			read_ini = false;
+			if (filerr == FILERR_NONE)
 			{
-				read_ini = true;
-				ini_file.seek(0, SEEK_SET);
+				ini_file.seek(0, SEEK_END);
+				if (ini_file.tell() >= 1000)
+				{
+					read_ini = true;
+					ini_file.seek(0, SEEK_SET);
 
-				int en = 0;
-				char buf[1024];
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "hlsl_enable %d\n", &en);
-				master_enable = en == 1;
+					int en = 0;
+					char buf[1024];
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "hlsl_enable %d\n", &en);
+					master_enable = en == 1;
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "hlsl_prescale_x %d\n", &prescale_force_x);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "hlsl_prescale_x %d\n", &prescale_force_x);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "hlsl_prescale_y %d\n", &prescale_force_y);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "hlsl_prescale_y %d\n", &prescale_force_y);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "hlsl_preset %d\n", &preset);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "hlsl_preset %d\n", &preset);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "hlsl_snap_width %d\n", &snap_width);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "hlsl_snap_width %d\n", &snap_width);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "hlsl_snap_height %d\n", &snap_height);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "hlsl_snap_height %d\n", &snap_height);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "shadow_mask_alpha %f\n", &options->shadow_mask_alpha);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "shadow_mask_alpha %f\n", &options->shadow_mask_alpha);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "shadow_mask_texture %s\n", options->shadow_mask_texture);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "shadow_mask_texture %s\n", options->shadow_mask_texture);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "shadow_mask_x_count %d\n", &options->shadow_mask_count_x);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "shadow_mask_x_count %d\n", &options->shadow_mask_count_x);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "shadow_mask_y_count %d\n", &options->shadow_mask_count_y);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "shadow_mask_y_count %d\n", &options->shadow_mask_count_y);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "shadow_mask_usize %f\n", &options->shadow_mask_u_size);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "shadow_mask_usize %f\n", &options->shadow_mask_u_size);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "shadow_mask_vsize %f\n", &options->shadow_mask_v_size);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "shadow_mask_vsize %f\n", &options->shadow_mask_v_size);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "curvature %f\n", &options->curvature);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "curvature %f\n", &options->curvature);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "pincushion %f\n", &options->pincushion);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "pincushion %f\n", &options->pincushion);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "scanline_alpha %f\n", &options->scanline_alpha);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "scanline_alpha %f\n", &options->scanline_alpha);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "scanline_size %f\n", &options->scanline_scale);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "scanline_size %f\n", &options->scanline_scale);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "scanline_height %f\n", &options->scanline_height);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "scanline_height %f\n", &options->scanline_height);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "scanline_bright_scale %f\n", &options->scanline_bright_scale);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "scanline_bright_scale %f\n", &options->scanline_bright_scale);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "scanline_bright_offset %f\n", &options->scanline_bright_offset);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "scanline_bright_offset %f\n", &options->scanline_bright_offset);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "scanline_jitter %f\n", &options->scanline_offset);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "scanline_jitter %f\n", &options->scanline_offset);
 
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "defocus %f %f\n", &options->defocus[0], &options->defocus[1]);
+					ini_file.gets(buf, 1024);
+					for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+					sscanf(buf, "defocus %f %f\n", &options->defocus[0], &options->defocus[1]);
 
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "converge_x %f %f %f\n", &options->converge_x[0], &options->converge_x[1], &options->converge_x[2]);
+					ini_file.gets(buf, 1024);
+					for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+					sscanf(buf, "converge_x %f %f %f\n", &options->converge_x[0], &options->converge_x[1], &options->converge_x[2]);
 
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "converge_y %f %f %f\n", &options->converge_y[0], &options->converge_y[1], &options->converge_y[2]);
+					ini_file.gets(buf, 1024);
+					for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+					sscanf(buf, "converge_y %f %f %f\n", &options->converge_y[0], &options->converge_y[1], &options->converge_y[2]);
 
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "radial_converge_x %f %f %f\n", &options->radial_converge_x[0], &options->radial_converge_x[1], &options->radial_converge_x[2]);
+					ini_file.gets(buf, 1024);
+					for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+					sscanf(buf, "radial_converge_x %f %f %f\n", &options->radial_converge_x[0], &options->radial_converge_x[1], &options->radial_converge_x[2]);
 
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "radial_converge_y %f %f %f\n", &options->radial_converge_y[0], &options->radial_converge_y[1], &options->radial_converge_y[2]);
+					ini_file.gets(buf, 1024);
+					for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+					sscanf(buf, "radial_converge_y %f %f %f\n", &options->radial_converge_y[0], &options->radial_converge_y[1], &options->radial_converge_y[2]);
 
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "red_ratio %f %f %f\n", &options->red_ratio[0], &options->red_ratio[1], &options->red_ratio[2]);
+					ini_file.gets(buf, 1024);
+					for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+					sscanf(buf, "red_ratio %f %f %f\n", &options->red_ratio[0], &options->red_ratio[1], &options->red_ratio[2]);
 
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "grn_ratio %f %f %f\n", &options->grn_ratio[0], &options->grn_ratio[1], &options->grn_ratio[2]);
+					ini_file.gets(buf, 1024);
+					for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+					sscanf(buf, "grn_ratio %f %f %f\n", &options->grn_ratio[0], &options->grn_ratio[1], &options->grn_ratio[2]);
 
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "blu_ratio %f %f %f\n", &options->blu_ratio[0], &options->blu_ratio[1], &options->blu_ratio[2]);
+					ini_file.gets(buf, 1024);
+					for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+					sscanf(buf, "blu_ratio %f %f %f\n", &options->blu_ratio[0], &options->blu_ratio[1], &options->blu_ratio[2]);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "saturation %f\n", &options->saturation);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "saturation %f\n", &options->saturation);
 
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "offset %f %f %f\n", &options->offset[0], &options->offset[1], &options->offset[2]);
+					ini_file.gets(buf, 1024);
+					for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+					sscanf(buf, "offset %f %f %f\n", &options->offset[0], &options->offset[1], &options->offset[2]);
 
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "scale %f %f %f\n", &options->scale[0], &options->scale[1], &options->scale[2]);
+					ini_file.gets(buf, 1024);
+					for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+					sscanf(buf, "scale %f %f %f\n", &options->scale[0], &options->scale[1], &options->scale[2]);
 
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "power %f %f %f\n", &options->power[0], &options->power[1], &options->power[2]);
+					ini_file.gets(buf, 1024);
+					for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+					sscanf(buf, "power %f %f %f\n", &options->power[0], &options->power[1], &options->power[2]);
 
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "floor %f %f %f\n", &options->floor[0], &options->floor[1], &options->floor[2]);
+					ini_file.gets(buf, 1024);
+					for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+					sscanf(buf, "floor %f %f %f\n", &options->floor[0], &options->floor[1], &options->floor[2]);
 
-				ini_file.gets(buf, 1024);
-				for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
-				sscanf(buf, "phosphor_life %f %f %f\n", &options->phosphor[0], &options->phosphor[1], &options->phosphor[2]);
+					ini_file.gets(buf, 1024);
+					for(int idx = 0; idx < strlen(buf); idx++) if(buf[idx] == ',') buf[idx] = ' ';
+					sscanf(buf, "phosphor_life %f %f %f\n", &options->phosphor[0], &options->phosphor[1], &options->phosphor[2]);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_enable %d\n", &en);
-				options->yiq_enable = en == 1;
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "yiq_enable %d\n", &en);
+					options->yiq_enable = en == 1;
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_cc %f\n", &options->yiq_cc);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "yiq_cc %f\n", &options->yiq_cc);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_a %f\n", &options->yiq_a);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "yiq_a %f\n", &options->yiq_a);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_b %f\n", &options->yiq_b);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "yiq_b %f\n", &options->yiq_b);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_o %f\n", &options->yiq_o);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "yiq_o %f\n", &options->yiq_o);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_p %f\n", &options->yiq_p);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "yiq_p %f\n", &options->yiq_p);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_n %f\n", &options->yiq_n);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "yiq_n %f\n", &options->yiq_n);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_y %f\n", &options->yiq_y);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "yiq_y %f\n", &options->yiq_y);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_i %f\n", &options->yiq_i);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "yiq_i %f\n", &options->yiq_i);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_q %f\n", &options->yiq_q);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "yiq_q %f\n", &options->yiq_q);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_scan_time %f\n", &options->yiq_scan_time);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "yiq_scan_time %f\n", &options->yiq_scan_time);
 
-				ini_file.gets(buf, 1024);
-				sscanf(buf, "yiq_phase_count %d\n", &options->yiq_phase_count);
+					ini_file.gets(buf, 1024);
+					sscanf(buf, "yiq_phase_count %d\n", &options->yiq_phase_count);
+				}
 			}
 		}
 	}
@@ -2055,12 +2058,12 @@ bool hlsl_info::register_texture(d3d_texture_info *texture, int width, int heigh
 //  hlsl_info::delete_resources
 //============================================================
 
-void hlsl_info::delete_resources()
+void hlsl_info::delete_resources(bool reset)
 {
 	if (!master_enable || !d3dintf->post_fx_available)
 		return;
 
-	if(write_ini)
+	if(write_ini && !reset)
 	{
 		emu_file file(downcast<windows_options &>(window->machine().options()).screen_post_fx_dir(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		file_error filerr = open_next((d3d_info*)window->drawdata, file, downcast<windows_options &>(window->machine().options()).hlsl_ini_name(), "ini", 0);
@@ -2116,6 +2119,11 @@ void hlsl_info::delete_resources()
 		file.printf("yiq_phase_count        %d\n", options->yiq_phase_count);
 	}
 
+	while (targethead != NULL)
+	{
+		remove_render_target(targethead);
+	}
+
 	if (effect != NULL)
 	{
 		(*d3dintf->effect.release)(effect);
@@ -2165,10 +2173,6 @@ void hlsl_info::delete_resources()
 	{
 		(*d3dintf->effect.release)(yiq_decode_effect);
 		yiq_decode_effect = NULL;
-	}
-
-	for (int index = 0; index < 9; index++)
-	{
 	}
 
 	if (avi_copy_texture != NULL)

@@ -803,7 +803,7 @@ try_again:
 		d3d->default_texture = texture_create(d3d, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
 	}
 
-	int ret = d3d->hlsl->create_resources();
+	int ret = d3d->hlsl->create_resources(false);
 	if (ret != 0)
 	    return ret;
 
@@ -900,7 +900,7 @@ static int device_create_resources(d3d_info *d3d)
 static void device_delete(d3d_info *d3d)
 {
 	// free our effects
-	d3d->hlsl->delete_resources();
+	d3d->hlsl->delete_resources(false);
 
 	// delete the HLSL interface
 	global_free(d3d->hlsl);
@@ -1144,16 +1144,27 @@ static int device_test_cooperative(d3d_info *d3d)
 
 		// free all existing resources and call reset on the device
 		device_delete_resources(d3d);
+		d3d->hlsl->delete_resources(true);
 		result = (*d3dintf->device.reset)(d3d->device, &d3d->presentation);
 
 		// if it didn't work, punt to GDI
 		if (result != D3D_OK)
+		{
+			printf("Unable to reset, result %08x\n", (UINT32)result);
 			return 1;
+		}
 
 		// try to create the resources again; if that didn't work, delete the whole thing
 		if (device_create_resources(d3d))
 		{
 			mame_printf_verbose("Direct3D: failed to recreate resources for device; failing permanently\n");
+			device_delete(d3d);
+			return 1;
+		}
+
+		if (d3d->hlsl->create_resources(true))
+		{
+			mame_printf_verbose("Direct3D: failed to recreate HLSL resources for device; failing permanently\n");
 			device_delete(d3d);
 			return 1;
 		}

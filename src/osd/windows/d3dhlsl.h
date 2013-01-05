@@ -147,8 +147,8 @@ public:
 	void 					remove_render_target(int width, int height, UINT32 screen_index, UINT32 page_index);
 	void 					remove_render_target(d3d_render_target *rt);
 
-	int create_resources();
-	void delete_resources();
+	int create_resources(bool reset);
+	void delete_resources(bool reset);
 
 	// slider-related functions
 	slider_state *init_slider_list();
