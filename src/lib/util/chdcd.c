@@ -388,7 +388,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 				index2 = read_uint64(infile);
 
 //              printf("Track %d: sector size %d mode %x index0 %llx index1 %llx index2 %llx (pregap %d sectors, length %d sectors)\n", track, size, mode, index0, index1, index2, (UINT32)(index1-index0)/size, (UINT32)(index2-index1)/size);
-				outinfo.track[track-1].fname.cpy(path).cat(tocfname);
+				outinfo.track[track-1].fname.cpy(tocfname);
 				outinfo.track[track-1].offset = offset + (UINT32)(index1-index0);
 				outinfo.track[track-1].idx0offs = 0;
 				outinfo.track[track-1].idx1offs = 0;
