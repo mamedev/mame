@@ -1409,7 +1409,7 @@ Sushi Bar
 #include "machine/jvsdev.h"
 #include "machine/jvs13551.h"
 
-#define CPU_CLOCK (65000000)
+#define CPU_CLOCK (200000000)
 static macronix_29l001mc_device *awflash;
 
                                              /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
@@ -7946,6 +7946,24 @@ ROM_START( claychal )
     ROM_LOAD( "cckey.bin",    0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
 ROM_END
 
+ROM_START( basschal )
+	AW_BIOS
+
+	ROM_REGION( 0x8000100, "rom_board", ROMREGION_ERASE)
+	ROM_LOAD( "u3.bin",  0x0000000, 0x1000100, CRC(f690d722) SHA1(03c2b53dda8cc11ba94468e7bd2fcb4e20a95c2d) ) 
+	ROM_LOAD( "u1.bin",  0x1000000, 0x1000100, CRC(d744d326) SHA1(fa3f25d683411c5ba63ed188cfcdba05d9cd9910) ) 
+	ROM_LOAD( "u4.bin",  0x2000000, 0x1000100, CRC(ac58d81d) SHA1(97a61895f543ee00e1f377af0793ad8f83ac34c4) ) 
+	ROM_LOAD( "u2.bin",  0x3000000, 0x1000100, CRC(15351d45) SHA1(6e3cbf356f7a4f4adb32f1b216fbd4fe51ac915f) ) 
+	ROM_LOAD( "u15.bin", 0x4000000, 0x1000100, CRC(1da03c68) SHA1(060b5bad3f79f934c8359a7ae9f9d1bd43c08087) ) 
+	ROM_LOAD( "u17.bin", 0x5000000, 0x1000100, CRC(77cc6fe6) SHA1(3e0567f80738f83113bd6ac01f2b5fc5cea9fb3d) ) 
+	ROM_LOAD( "u14.bin", 0x6000000, 0x1000100, CRC(9f33f186) SHA1(d656f3c11dba50620158394866054e08cdc7f4f0) ) 
+	ROM_LOAD( "u16.bin", 0x7000000, 0x1000100, CRC(5f0a3bd1) SHA1(39c66fce9ef0660491372e1aa4faff5b21524177) ) 
+
+	ROM_REGION( 4, "rom_key", 0 )	// same as claychal.  lazy!
+    ROM_LOAD( "cckey.bin",    0x000000, 0x000004, CRC(553dd361) SHA1(a60a26b5ee786cf0bb3d09bb6f00374598fbd7cc) )
+ROM_END
+
+
 /* All games have the regional titles at the start of the IC22 rom in the following order
 
   JAPAN
@@ -8279,3 +8297,4 @@ GAME( 2005, xtrmhunt, awbios,   aw2c,    aw2c, dc_state,  atomiswave, ROT0, "Sam
 GAME( 2006, mslug6,   awbios,   aw2c,    aw2c, dc_state,  atomiswave, ROT0, "Sega / SNK Playmore",             "Metal Slug 6", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2006, xtrmhnt2, awbios,   aw2c,    aw2c, dc_state,  atomiswave, ROT0, "Sega",                            "Extreme Hunting 2", GAME_FLAGS )
 GAME( 2008, claychal, awbios,   aw2c,    aw2c, dc_state,  atomiswave, ROT0, "Sega",                            "Sega Clay Challenge", GAME_FLAGS )
+GAME( 2009, basschal, awbios,   aw2c,    aw2c, dc_state,  atomiswave, ROT0, "Sega",                            "Sega Bass Fishing Challenge", GAME_FLAGS )
