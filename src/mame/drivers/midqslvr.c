@@ -603,7 +603,7 @@ static const struct pic8259_interface midqslvr_pic8259_1_config =
 {
 	DEVCB_DRIVER_LINE_MEMBER(midqslvr_state,midqslvr_pic8259_1_set_int_line),
 	DEVCB_LINE_VCC,
-	DEVCB_MEMBER(midqslvr_state,get_slave_ack)
+	DEVCB_DRIVER_MEMBER(midqslvr_state,get_slave_ack)
 };
 
 static const struct pic8259_interface midqslvr_pic8259_2_config =

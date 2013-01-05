@@ -595,7 +595,7 @@ static const struct pic8259_interface xtom3d_pic8259_1_config =
 {
 	DEVCB_DRIVER_LINE_MEMBER(xtom3d_state,xtom3d_pic8259_1_set_int_line),
 	DEVCB_LINE_VCC,
-	DEVCB_MEMBER(xtom3d_state,get_slave_ack)
+	DEVCB_DRIVER_MEMBER(xtom3d_state,get_slave_ack)
 };
 
 static const struct pic8259_interface xtom3d_pic8259_2_config =

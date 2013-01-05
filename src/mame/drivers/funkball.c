@@ -1054,7 +1054,7 @@ static const struct pic8259_interface funkball_pic8259_1_config =
 {
 	DEVCB_DRIVER_LINE_MEMBER(funkball_state,funkball_pic8259_1_set_int_line),
 	DEVCB_LINE_VCC,
-	DEVCB_MEMBER(funkball_state,get_slave_ack)
+	DEVCB_DRIVER_MEMBER(funkball_state,get_slave_ack)
 };
 
 static const struct pic8259_interface funkball_pic8259_2_config =
