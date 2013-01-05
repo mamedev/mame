@@ -88,7 +88,7 @@ protected:
     virtual machine_config_constructor device_mconfig_additions() const;
 
 private:
-    bool m_Wait87Shift;
+    bool m_Wait87Shift, m_Wait88Shift;
 };
 
 extern const device_type ESQ1x22;
