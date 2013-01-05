@@ -364,12 +364,19 @@ READ8_HANDLER(kbdc8042_8_r)
 	switch (offset) {
 	case 0:
 		data = kbdc8042.data;
-		if (kbdc8042.type != KBDC8042_AT386 || (data != 0x55))
+		if ((kbdc8042.status_read_mode != 3) || (data != 0xfa))
 		{
-			/* at386 self test doesn't like this */
-			at_8042_clear_keyboard_received();
+			if (kbdc8042.type != KBDC8042_AT386 || (data != 0x55))
+			{
+				/* at386 self test doesn't like this */
+				at_8042_clear_keyboard_received();
+			}
+			at_8042_check_keyboard(space.machine());
 		}
-		at_8042_check_keyboard(space.machine());
+		else
+		{
+			kbdc8042.status_read_mode = 4;
+		}
 		break;
 
 	case 1:
@@ -428,6 +435,10 @@ READ8_HANDLER(kbdc8042_8_r)
 		case 2:
 			data |= kbdc8042.inport<<4;
 			break;
+		case 4:
+			at_8042_receive(space.machine(), 0xaa);
+			kbdc8042.status_read_mode = 0;
+			break;
 		}
 		break;
 	}
@@ -447,6 +458,18 @@ WRITE8_HANDLER(kbdc8042_8_w)
 		kbdc8042.status_read_mode = 0;
 		switch (kbdc8042.operation_write_state) {
 		case 0:
+			if ((data == 0xf4) || (data == 0xff)) /* keyboard enable or keyboard reset */
+			{
+				at_8042_receive(space.machine(), 0xfa); /* ACK, delivered a bit differently */
+
+				if (data == 0xff)
+				{
+					kbdc8042.status_read_mode = 3; /* keyboard buffer to be written again after next read */
+				}
+
+				break;
+			}
+
 			/* normal case */
 			kbdc8042.data = data;
 			kbdc8042.sending=1;

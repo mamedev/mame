@@ -5,10 +5,6 @@
     "Savage Quest" (c) 1999 Interactive Light, developed by Angel Studios.
     Skeleton by R. Belmont
 
-    TODO:
-    - BIOS ROM checksum error;
-    - floppy drive error, system halt;
-
     H/W is a white-box PC consisting of:
     Pentium II 450 CPU
     DFI P2XBL motherboard (i440BX chipset)
@@ -21,6 +17,10 @@
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
+
+- update by Peter Ferrie:
+- split BIOS region into 16kb blocks and implement missing PAM registers
+
 
 ***************************************************************************/
 
@@ -52,12 +52,16 @@ public:
 		  m_pic8259_2(*this, "pic8259_2")
 	{ }
 
-	UINT32 *m_bios_ram;
+	UINT32 *m_bios_f0000_ram;
+	UINT32 *m_bios_e0000_ram;
+	UINT32 *m_bios_e4000_ram;
+	UINT32 *m_bios_e8000_ram;
+	UINT32 *m_bios_ec000_ram;
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
 	UINT8 m_mxtc_config_reg[256];
-	UINT8 m_piix4_config_reg[4][256];
+	UINT8 m_piix4_config_reg[8][256];
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -68,7 +72,11 @@ public:
 	required_device<pic8259_device> m_pic8259_2;
 
 	DECLARE_READ8_MEMBER( get_slave_ack );
-	DECLARE_WRITE32_MEMBER( bios_ram_w );
+	DECLARE_WRITE32_MEMBER( bios_f0000_ram_w );
+	DECLARE_WRITE32_MEMBER( bios_e0000_ram_w );
+	DECLARE_WRITE32_MEMBER( bios_e4000_ram_w );
+	DECLARE_WRITE32_MEMBER( bios_e8000_ram_w );
+	DECLARE_WRITE32_MEMBER( bios_ec000_ram_w );
 
 protected:
 
@@ -118,11 +126,55 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 		{
 			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
 			{
-				state->membank("bank1")->set_base(state->m_bios_ram);
+				state->membank("bios_f0000")->set_base(state->m_bios_f0000_ram);
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				state->membank("bank1")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x20000);
+				state->membank("bios_f0000")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x30000);
+			}
+			break;
+		}
+
+		case 0x5e:		// PAM5
+		{
+			if (data & 0x10)		// enable RAM access to region 0xe4000 - 0xe7fff
+			{
+				state->membank("bios_e4000")->set_base(state->m_bios_e4000_ram);
+			}
+			else					// disable RAM access (reads go to BIOS ROM)
+			{
+				state->membank("bios_e4000")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x24000);
+			}
+
+			if (data & 1)		// enable RAM access to region 0xe0000 - 0xe3fff
+			{
+				state->membank("bios_e0000")->set_base(state->m_bios_e0000_ram);
+			}
+			else					// disable RAM access (reads go to BIOS ROM)
+			{
+				state->membank("bios_e0000")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x20000);
+			}
+			break;
+		}
+
+		case 0x5f:		// PAM6
+		{
+			if (data & 0x10)		// enable RAM access to region 0xec000 - 0xeffff
+			{
+				state->membank("bios_ec000")->set_base(state->m_bios_ec000_ram);
+			}
+			else					// disable RAM access (reads go to BIOS ROM)
+			{
+				state->membank("bios_ec000")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x2c000);
+			}
+
+			if (data & 1)		// enable RAM access to region 0xe8000 - 0xebfff
+			{
+				state->membank("bios_e8000")->set_base(state->m_bios_e8000_ram);
+			}
+			else					// disable RAM access (reads go to BIOS ROM)
+			{
+				state->membank("bios_e8000")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x28000);
 			}
 			break;
 		}
@@ -243,13 +295,57 @@ static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int functi
 	}
 }
 
-WRITE32_MEMBER(savquest_state::bios_ram_w)
+WRITE32_MEMBER(savquest_state::bios_f0000_ram_w)
 {
 	//if (m_mxtc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
 	#if 1
 	if (m_mxtc_config_reg[0x59] & 0x20)		// write to RAM if this region is write-enabled
 	{
-		COMBINE_DATA(m_bios_ram + offset);
+		COMBINE_DATA(m_bios_f0000_ram + offset);
+	}
+	#endif
+}
+
+WRITE32_MEMBER(savquest_state::bios_e0000_ram_w)
+{
+	//if (m_mxtc_config_reg[0x5e] & 2)       // write to RAM if this region is write-enabled
+	#if 1
+	if (m_mxtc_config_reg[0x5e] & 2)		// write to RAM if this region is write-enabled
+	{
+		COMBINE_DATA(m_bios_e0000_ram + offset);
+	}
+	#endif
+}
+
+WRITE32_MEMBER(savquest_state::bios_e4000_ram_w)
+{
+	//if (m_mxtc_config_reg[0x5e] & 0x20)       // write to RAM if this region is write-enabled
+	#if 1
+	if (m_mxtc_config_reg[0x5e] & 0x20)		// write to RAM if this region is write-enabled
+	{
+		COMBINE_DATA(m_bios_e4000_ram + offset);
+	}
+	#endif
+}
+
+WRITE32_MEMBER(savquest_state::bios_e8000_ram_w)
+{
+	//if (m_mxtc_config_reg[0x5f] & 2)       // write to RAM if this region is write-enabled
+	#if 1
+	if (m_mxtc_config_reg[0x5f] & 2)		// write to RAM if this region is write-enabled
+	{
+		COMBINE_DATA(m_bios_e8000_ram + offset);
+	}
+	#endif
+}
+
+WRITE32_MEMBER(savquest_state::bios_ec000_ram_w)
+{
+	//if (m_mxtc_config_reg[0x5f] & 0x20)       // write to RAM if this region is write-enabled
+	#if 1
+	if (m_mxtc_config_reg[0x5f] & 0x20)		// write to RAM if this region is write-enabled
+	{
+		COMBINE_DATA(m_bios_ec000_ram + offset);
 	}
 	#endif
 }
@@ -398,8 +494,11 @@ static ADDRESS_MAP_START(savquest_map, AS_PROGRAM, 32, savquest_state)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
-	AM_RANGE(0x000e0000, 0x000fffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x000e0000, 0x000fffff) AM_WRITE(bios_ram_w)
+	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bios_f0000") AM_WRITE(bios_f0000_ram_w)
+	AM_RANGE(0x000e0000, 0x000e3fff) AM_ROMBANK("bios_e0000") AM_WRITE(bios_e0000_ram_w)
+	AM_RANGE(0x000e4000, 0x000e7fff) AM_ROMBANK("bios_e4000") AM_WRITE(bios_e4000_ram_w)
+	AM_RANGE(0x000e8000, 0x000ebfff) AM_ROMBANK("bios_e8000") AM_WRITE(bios_e8000_ram_w)
+	AM_RANGE(0x000ec000, 0x000effff) AM_ROMBANK("bios_ec000") AM_WRITE(bios_ec000_ram_w)
 	AM_RANGE(0x00100000, 0x01ffffff) AM_RAM
 //  AM_RANGE(0x02000000, 0x02000003) // protection dongle lies there?
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
@@ -467,7 +566,7 @@ static const struct pic8259_interface savquest_pic8259_1_config =
 {
 	DEVCB_DRIVER_LINE_MEMBER(savquest_state,savquest_pic8259_1_set_int_line),
 	DEVCB_LINE_VCC,
-	DEVCB_MEMBER(savquest_state,get_slave_ack)
+	DEVCB_DRIVER_MEMBER(savquest_state,get_slave_ack)
 };
 
 static const struct pic8259_interface savquest_pic8259_2_config =
@@ -515,7 +614,11 @@ static IRQ_CALLBACK(irq_callback)
 
 void savquest_state::machine_start()
 {
-	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x20000/4);
+	m_bios_f0000_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
+	m_bios_e0000_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);
+	m_bios_e4000_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);
+	m_bios_e8000_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);
+	m_bios_ec000_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);
 
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, savquest_set_keyb_int);
 
@@ -527,7 +630,11 @@ void savquest_state::machine_start()
 
 void savquest_state::machine_reset()
 {
-	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("bios")->base() + 0x20000);
+	machine().root_device().membank("bios_f0000")->set_base(machine().root_device().memregion("bios")->base() + 0x30000);
+	machine().root_device().membank("bios_e0000")->set_base(machine().root_device().memregion("bios")->base() + 0x20000);
+	machine().root_device().membank("bios_e4000")->set_base(machine().root_device().memregion("bios")->base() + 0x24000);
+	machine().root_device().membank("bios_e8000")->set_base(machine().root_device().memregion("bios")->base() + 0x28000);
+	machine().root_device().membank("bios_ec000")->set_base(machine().root_device().memregion("bios")->base() + 0x2c000);
 }
 
 static MACHINE_CONFIG_START( savquest, savquest_state )

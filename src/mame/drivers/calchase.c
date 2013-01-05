@@ -104,6 +104,10 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
  255 heads as parameter. Perhaps a bad dump?
 
  TODO: A lot of work to do yet!!!
+
+- update by peter ferrie:
+- corrected memory map to 64kb blocks
+- corrected access to PAM register
  */
 
 
@@ -131,6 +135,7 @@ public:
 		  { }
 
 	UINT32 *m_bios_ram;
+	UINT32 *m_bios_ext_ram;
 	int m_dma_channel;
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
@@ -149,6 +154,7 @@ public:
 	DECLARE_WRITE8_MEMBER(at_page8_w);
 	DECLARE_READ8_MEMBER(pc_dma_read_byte);
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
+	DECLARE_WRITE32_MEMBER(bios_ext_ram_w);
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
 	DECLARE_READ16_MEMBER(calchase_iocard1_r);
 	DECLARE_READ16_MEMBER(calchase_iocard2_r);
@@ -336,32 +342,26 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 	calchase_state *state = busdevice->machine().driver_data<calchase_state>();
 //  mame_printf_debug("%s:MXTC: write %d, %02X, %02X\n", machine.describe_context(), function, reg, data);
 
-	switch(reg)
-	{
-		//case 0x59:
-		case 0x63:	// PAM0
-		{
-			//if (data & 0x10)     // enable RAM access to region 0xf0000 - 0xfffff
-			if ((data & 0x50) | (data & 0xA0))
-			{
-				state->membank("bank1")->set_base(state->m_bios_ram);
-			}
-			else				// disable RAM access (reads go to BIOS ROM)
-			{
-				//Execution Hack to avoid crash when switch back from Shadow RAM to Bios ROM, since i386 emu haven't yet pipelined execution structure.
-				//It happens when exit from BIOS SETUP.
-				#if 0
-				if ((state->m_mxtc_config_reg[0x63] & 0x50) | ( state->m_mxtc_config_reg[0x63] & 0xA0)) // Only DO if comes a change to disable ROM.
-				{
-					if ( busdevice->machine(->safe_pc().device("maincpu"))==0xff74e) busdevice->machine().device("maincpu")->state().set_pc(0xff74d);
-				}
-				#endif
+	/*
+    memory banking with North Bridge:
+    0x63 (PAM)  xx-- ---- BIOS extension 0xe0000 - 0xeffff
+                --xx ---- BIOS area 0xf0000-0xfffff
+                ---- xx-- ISA add-on BIOS 0xc0000 - 0xcffff
+                ---- --xx ISA add-on BIOS 0xd0000 - 0xdffff
 
-				state->membank("bank1")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x10000);
-				state->membank("bank1")->set_base(busdevice->machine().root_device().memregion("bios")->base());
-			}
-			break;
-		}
+    10 -> 1 = Write Enable, 0 = Read Enable
+    */
+
+	if (reg == 0x63)
+	{
+		if (data & 0x20)		// enable RAM access to region 0xf0000 - 0xfffff
+			state->membank("bios_bank")->set_base(state->m_bios_ram);
+		else					// disable RAM access (reads go to BIOS ROM)
+			state->membank("bios_bank")->set_base(state->memregion("bios")->base() + 0x10000);
+		if (data & 0x80)		// enable RAM access to region 0xe0000 - 0xeffff
+			state->membank("bios_ext")->set_base(state->m_bios_ext_ram);
+		else
+			state->membank("bios_ext")->set_base(state->memregion("bios")->base() + 0);
 	}
 
 	state->m_mxtc_config_reg[reg] = data;
@@ -489,10 +489,17 @@ static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int functi
 
 WRITE32_MEMBER(calchase_state::bios_ram_w)
 {
-	//if (m_mxtc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
-	       if (m_mxtc_config_reg[0x63] & 0x50)
+	if (m_mxtc_config_reg[0x63] & 0x10)       // write to RAM if this region is write-enabled
 	{
 		COMBINE_DATA(m_bios_ram + offset);
+	}
+}
+
+WRITE32_MEMBER(calchase_state::bios_ext_ram_w)
+{
+	if (m_mxtc_config_reg[0x63] & 0x40)       // write to RAM if this region is write-enabled
+	{
+		COMBINE_DATA(m_bios_ext_ram + offset);
 	}
 }
 
@@ -555,8 +562,8 @@ static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32, calchase_state )
 	//GRULL AM_RANGE(0x000e0000, 0x000effff) AM_RAM
 	//GRULL-AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	//GRULL AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
-	AM_RANGE(0x000e0000, 0x000fffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x000e0000, 0x000fffff) AM_WRITE(bios_ram_w)
+	AM_RANGE(0x000e0000, 0x000effff) AM_ROMBANK("bios_ext") AM_WRITE(bios_ext_ram_w)
+	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bios_bank") AM_WRITE(bios_ram_w)
 	AM_RANGE(0x00100000, 0x03ffffff) AM_RAM  // 64MB
 	AM_RANGE(0x02000000, 0x28ffffff) AM_NOP
 	//AM_RANGE(0x04000000, 0x040001ff) AM_RAM
@@ -804,6 +811,9 @@ static IRQ_CALLBACK(irq_callback)
 
 void calchase_state::machine_start()
 {
+	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
+	m_bios_ext_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
+
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
 
 	m_pit8254 = machine().device( "pit8254" );
@@ -877,7 +887,8 @@ static const struct pit8253_config calchase_pit8254_config =
 void calchase_state::machine_reset()
 {
 	//machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("bios")->base() + 0x10000);
-	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("bios")->base());
+	machine().root_device().membank("bios_bank")->set_base(machine().root_device().memregion("bios")->base() + 0x10000);
+	machine().root_device().membank("bios_ext")->set_base(machine().root_device().memregion("bios")->base() + 0);
 }
 
 static void set_gate_a20(running_machine &machine, int a20)
