@@ -401,12 +401,12 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 						break;
 
 					case 0x0300:	// Mode 2 Form 1
-						printf("ERROR: Mode 2 Form 1 tracks not supported, contant MAMEDEV!\n");
+						printf("ERROR: Mode 2 Form 1 tracks not supported\n");
 						fclose(infile);
 						return CHDERR_NOT_SUPPORTED;
 
 					case 0x0500:	// raw data
-						printf("ERROR: Raw data tracks not supported, contant MAMEDEV!\n");
+						printf("ERROR: Raw data tracks not supported\n");
 						fclose(infile);
 						return CHDERR_NOT_SUPPORTED;
 
@@ -421,17 +421,17 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 						break;
 
 					case 0x0f00:	// raw data with sub-channel
-						printf("ERROR: Raw data tracks with sub-channel not supported, contant MAMEDEV!\n");
+						printf("ERROR: Raw data tracks with sub-channel not supported\n");
 						fclose(infile);
 						return CHDERR_NOT_SUPPORTED;
 
 					case 0x1000:	// audio with sub-channel
-						printf("ERROR: Audio tracks with sub-channel not supported, contant MAMEDEV!\n");
+						printf("ERROR: Audio tracks with sub-channel not supported\n");
 						fclose(infile);
 						return CHDERR_NOT_SUPPORTED;
 
 					case 0x1100:	// raw Mode 2 Form 1 with sub-channel
-						printf("ERROR: Raw Mode 2 Form 1 tracks with sub-channel not supported, contant MAMEDEV!\n");
+						printf("ERROR: Raw Mode 2 Form 1 tracks with sub-channel not supported\n");
 						fclose(infile);
 						return CHDERR_NOT_SUPPORTED;
 
