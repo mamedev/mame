@@ -164,7 +164,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	if (offset < 4)
 	{
 		osd_close(file);
-		printf("ERROR: unexpected offset %lu (%s)\n", actual, filename);
+		printf("ERROR: unexpected RIFF offset %lu (%s)\n", actual, filename);
 		return 0;
 	}
 	if (memcmp(&buf[0], "RIFF", 4) != 0)
@@ -180,7 +180,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	if (offset < 8)
 	{
 		osd_close(file);
-		printf("ERROR: unexpected offset %lu (%s)\n", actual, filename);
+		printf("ERROR: unexpected size offset %lu (%s)\n", actual, filename);
 		return 0;
 	}
 	filesize = LITTLE_ENDIANIZE_INT32(filesize);
@@ -191,7 +191,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	if (offset < 12)
 	{
 		osd_close(file);
-		printf("ERROR: unexpected offset %lu (%s)\n", actual, filename);
+		printf("ERROR: unexpected WAVE offset %lu (%s)\n", actual, filename);
 		return 0;
 	}
 	if (memcmp(&buf[0], "WAVE", 4) != 0)
