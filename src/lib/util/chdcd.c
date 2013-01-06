@@ -154,7 +154,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	filerr = osd_open(filename, OPEN_FLAG_READ, &file, &fsize);
 	if (filerr != FILERR_NONE)
 	{
-		osd_close(file);
+		printf("ERROR: could not open (%s)\n", filename);
 		return 0;
 	}
 
@@ -162,24 +162,44 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	osd_read(file, buf, 0, 4, &actual);
 	offset += actual;
 	if (offset < 4)
+	{
+		osd_close(file);
+		printf("ERROR: unexpected offset %d (%s)\n", actual, filename);
 		return 0;
+	}
 	if (memcmp(&buf[0], "RIFF", 4) != 0)
+	{
+		osd_close(file);
+		printf("ERROR: could not find RIFF header (%s)\n", filename);
 		return 0;
+	}
 
 	/* get the total size */
 	osd_read(file, &filesize, offset, 4, &actual);
 	offset += actual;
 	if (offset < 8)
+	{
+		osd_close(file);
+		printf("ERROR: unexpected offset %d (%s)\n", actual, filename);
 		return 0;
+	}
 	filesize = LITTLE_ENDIANIZE_INT32(filesize);
 
 	/* read the RIFF file type and make sure it's a WAVE file */
 	osd_read(file, buf, offset, 4, &actual);
 	offset += actual;
 	if (offset < 12)
+	{
+		osd_close(file);
+		printf("ERROR: unexpected offset %d (%s)\n", actual, filename);
 		return 0;
+	}
 	if (memcmp(&buf[0], "WAVE", 4) != 0)
+	{
+		osd_close(file);
+		printf("ERROR:could not find WAVE header (%s)\n", filename);
 		return 0;
+	}
 
 	/* seek until we find a format tag */
 	while (1)
@@ -195,7 +215,11 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 		/* seek to the next block */
 		offset += length;
 		if (offset >= filesize)
+		{
+			osd_close(file);
+			printf("ERROR:could not find fmt tag (%s)\n", filename);
 			return 0;
+		}
 	}
 
 	/* read the format -- make sure it is PCM */
@@ -203,21 +227,33 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	offset += actual;
 	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
 	if (temp16 != 1)
+	{
+		osd_close(file);
+		printf("ERROR: unsupported format %d - only PCM is supported (%s)\n", temp16, filename);
 		return 0;
+	}
 
 	/* number of channels -- only mono is supported */
 	osd_read(file, &temp16, offset, 2, &actual);
 	offset += actual;
 	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
 	if (temp16 != 2)
+	{
+		osd_close(file);
+		printf("ERROR: unsupported number of channels %d - only mono is supported (%s)\n", temp16, filename);
 		return 0;
+	}
 
 	/* sample rate */
 	osd_read(file, &rate, offset, 4, &actual);
 	offset += actual;
 	rate = LITTLE_ENDIANIZE_INT32(rate);
 	if (rate != 44100)
+	{
+		osd_close(file);
+		printf("ERROR: unsupported samplerate %d - only 44100 is supported (%s)\n", rate, filename);
 		return 0;
+	}
 
 	/* bytes/second and block alignment are ignored */
 	osd_read(file, buf, offset, 6, &actual);
@@ -227,7 +263,11 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	osd_read(file, &bits, offset, 2, &actual);
 	offset += actual;
 	if (bits != 16)
+	{
+		osd_close(file);
+		printf("ERROR: unsupported bits/sample %d - only 16 is supported (%s)\n", bits, filename);
 		return 0;
+	}
 
 	/* seek past any extra data */
 	offset += length - 16;
@@ -246,14 +286,18 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 		/* seek to the next block */
 		offset += length;
 		if (offset >= filesize)
+		{
+			osd_close(file);
+			printf("ERROR: could not find data tag (%s)\n", filename);
 			return 0;
+		}
 	}
+
+	osd_close(file);
 
 	/* if there was a 0 length data block, we're done */
 	if (length == 0)
 		return 0;
-
-	osd_close(file);
 
 	*dataoffs = offset;
 
@@ -333,7 +377,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 	{
 		printf("ERROR: Not a Nero 5.5 or later image!\n");
 		fclose(infile);
-		return CHDERR_FILE_NOT_FOUND;
+		return CHDERR_UNSUPPORTED_VERSION;
 	}
 
 	chain_offs = buffer[11] | (buffer[10]<<8) | (buffer[9]<<16) | (buffer[8]<<24);
@@ -342,7 +386,7 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 	{
 		printf("ERROR: File size is > 4GB, this version of CHDMAN cannot handle it.");
 		fclose(infile);
-		return CHDERR_FILE_NOT_FOUND;
+		return CHDERR_UNSUPPORTED_FORMAT;
 	}
 
 //  printf("NER5 detected, chain offset: %x\n", chain_offs);
@@ -403,12 +447,12 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 					case 0x0300:	// Mode 2 Form 1
 						printf("ERROR: Mode 2 Form 1 tracks not supported\n");
 						fclose(infile);
-						return CHDERR_NOT_SUPPORTED;
+						return CHDERR_UNSUPPORTED_FORMAT;
 
 					case 0x0500:	// raw data
 						printf("ERROR: Raw data tracks not supported\n");
 						fclose(infile);
-						return CHDERR_NOT_SUPPORTED;
+						return CHDERR_UNSUPPORTED_FORMAT;
 
 					case 0x0600:	// 2352 byte mode 2 raw
 						outtoc.tracks[track-1].trktype = CD_TRACK_MODE2_RAW;
@@ -423,22 +467,22 @@ chd_error chdcd_parse_nero(const char *tocfname, cdrom_toc &outtoc, chdcd_track_
 					case 0x0f00:	// raw data with sub-channel
 						printf("ERROR: Raw data tracks with sub-channel not supported\n");
 						fclose(infile);
-						return CHDERR_NOT_SUPPORTED;
+						return CHDERR_UNSUPPORTED_FORMAT;
 
 					case 0x1000:	// audio with sub-channel
 						printf("ERROR: Audio tracks with sub-channel not supported\n");
 						fclose(infile);
-						return CHDERR_NOT_SUPPORTED;
+						return CHDERR_UNSUPPORTED_FORMAT;
 
 					case 0x1100:	// raw Mode 2 Form 1 with sub-channel
 						printf("ERROR: Raw Mode 2 Form 1 tracks with sub-channel not supported\n");
 						fclose(infile);
-						return CHDERR_NOT_SUPPORTED;
+						return CHDERR_UNSUPPORTED_FORMAT;
 
 					default:
 						printf("ERROR: Unknown track type %x, contact MAMEDEV!\n", mode);
 						fclose(infile);
-						return CHDERR_NOT_SUPPORTED;
+						return CHDERR_UNSUPPORTED_FORMAT;
 				}
 
 				outtoc.tracks[track-1].datasize = size;
@@ -520,7 +564,7 @@ chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 		outinfo.track[0].swap = false;
 	} else {
 		printf("ERROR: Unrecognized track type\n");
-		return CHDERR_FILE_NOT_FOUND;
+		return CHDERR_UNSUPPORTED_FORMAT;
 	}
 
 	outtoc.tracks[0].subtype = CD_SUB_NONE;
@@ -720,21 +764,14 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 					wavlen = parse_wav_sample(lastfname, &wavoffs);
 					if (!wavlen)
 					{
-						file_error err;
-						core_file *fhand;
-
-						err = core_fopen(lastfname, OPEN_FLAG_READ, &fhand);
-						if (err != FILERR_NONE) printf("holy moley!\n");
-						else core_fclose(fhand);
-
 						printf("ERROR: couldn't read [%s] or not a valid .WAV\n", lastfname.cstr());
-						return CHDERR_FILE_NOT_FOUND;
+						return CHDERR_INVALID_DATA;
 					}
 				}
 				else
 				{
 					printf("ERROR: Unhandled track type %s\n", token);
-					return CHDERR_FILE_NOT_FOUND;
+					return CHDERR_UNSUPPORTED_FORMAT;
 				}
 			}
 			else if (!strcmp(token, "TRACK"))
@@ -774,7 +811,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				if (outtoc.tracks[trknum].datasize == 0)
 				{
 					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
-					return CHDERR_FILE_NOT_FOUND;
+					return CHDERR_UNSUPPORTED_FORMAT;
 				}
 
 				/* next (optional) token on the line is the subcode type */
@@ -897,7 +934,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 					if (!outtoc.tracks[trknum].frames)
 					{
 						printf("ERROR: unable to determine size of track %d, missing INDEX 01 markers?\n", trknum+1);
-						return CHDERR_FILE_NOT_FOUND;
+						return CHDERR_INVALID_DATA;
 					}
 				}
 				else	/* data files are different */
@@ -1079,7 +1116,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 				if (outtoc.tracks[trknum].datasize == 0)
 				{
 					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
-					return CHDERR_FILE_NOT_FOUND;
+					return CHDERR_UNSUPPORTED_FORMAT;
 				}
 
 				/* next (optional) token on the line is the subcode type */
