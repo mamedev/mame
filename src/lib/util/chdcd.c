@@ -229,7 +229,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	if (temp16 != 1)
 	{
 		osd_close(file);
-		printf("ERROR: unsupported format %d - only PCM is supported (%s)\n", temp16, filename);
+		printf("ERROR: unsupported format %u - only PCM is supported (%s)\n", temp16, filename);
 		return 0;
 	}
 
@@ -240,7 +240,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	if (temp16 != 2)
 	{
 		osd_close(file);
-		printf("ERROR: unsupported number of channels %d - only stereo is supported (%s)\n", temp16, filename);
+		printf("ERROR: unsupported number of channels %u - only stereo is supported (%s)\n", temp16, filename);
 		return 0;
 	}
 
@@ -265,7 +265,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	if (bits != 16)
 	{
 		osd_close(file);
-		printf("ERROR: unsupported bits/sample %d - only 16 is supported (%s)\n", bits, filename);
+		printf("ERROR: unsupported bits/sample %u - only 16 is supported (%s)\n", bits, filename);
 		return 0;
 	}
 

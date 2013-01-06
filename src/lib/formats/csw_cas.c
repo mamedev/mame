@@ -77,17 +77,17 @@ int 		bsize=0;
 	}
 
 	SampleRate=get_leuint32(casdata+0x19);
-	LOG_FORMATS("Sample rate %d\n",SampleRate);
+	LOG_FORMATS("Sample rate %u\n",SampleRate);
 
 	NumberOfPulses=get_leuint32(casdata+0x1d);
-	LOG_FORMATS("Number Of Pulses %d\n",NumberOfPulses);
+	LOG_FORMATS("Number Of Pulses %u\n",NumberOfPulses);
 
 
 	CompressionType=casdata[0x21];
 	Flags=casdata[0x22];
 	HeaderExtensionLength=casdata[0x23];
 
-	LOG_FORMATS("CompressionType %d   Flast %d   HeaderExtensionLength %d\n",CompressionType,Flags,HeaderExtensionLength);
+	LOG_FORMATS("CompressionType %u   Flast %u   HeaderExtensionLength %u\n",CompressionType,Flags,HeaderExtensionLength);
 
 	mycaslen=caslen;
 	//from here on down for now I am assuming it is compressed csw file.
@@ -189,10 +189,10 @@ int		i;
 	LOG_FORMATS("Length %d\n",length);
 
 	SampleRate=get_leuint32(bytes+0x19);
-	LOG_FORMATS("Sample rate %d\n",SampleRate);
+	LOG_FORMATS("Sample rate %u\n",SampleRate);
 
 	NumberOfPulses=get_leuint32(bytes+0x1d);
-	LOG_FORMATS("Number Of Pulses %d\n",NumberOfPulses);
+	LOG_FORMATS("Number Of Pulses %u\n",NumberOfPulses);
 
 	CompressionType=bytes[0x21];
 	Flags=bytes[0x22];
@@ -205,7 +205,7 @@ int		i;
 		Bit=100;
 	}
 
-	LOG_FORMATS("CompressionType %d   Flast %d   HeaderExtensionLength %d\n",CompressionType,Flags,HeaderExtensionLength);
+	LOG_FORMATS("CompressionType %u   Flast %u   HeaderExtensionLength %u\n",CompressionType,Flags,HeaderExtensionLength);
 
 
 	//from here on down for now I am assuming it is compressed csw file.

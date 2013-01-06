@@ -65,7 +65,7 @@ static FLOPPY_CONSTRUCT( atarist_st_construct )
 	geometry.tracks = tracks;
 	geometry.sectors = sectors;
 
-	if (LOG) LOG_FORMATS("ST Heads %u Tracks %u Sectors %u\n", heads, tracks, sectors);
+	if (LOG) LOG_FORMATS("ST Heads %d Tracks %d Sectors %d\n", heads, tracks, sectors);
 
 	return basicdsk_construct(floppy, &geometry);
 }

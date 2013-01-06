@@ -992,14 +992,6 @@ void esrip_device::tonr(UINT16 inst)
 		TODI  = 0x5
 	};
 
-	enum
-	{
-		NRY = 0,
-		NRA = 1,
-		NRS = 4,
-		NRAS = 5,
-	};
-
 	UINT16 r = 0;
 	UINT16 s = 0;
 	UINT16	res = 0;

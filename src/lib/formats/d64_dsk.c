@@ -279,7 +279,7 @@ static int get_sector_error_code(floppy_image_legacy *floppy, int head, int dos_
 
 	if (sector_error != ERROR_00)
 	{
-		LOG_FORMATS("D64 error %s head %u track %u sector %u\n", ERROR_CODE[sector_error], head, dos_track, sector);
+		LOG_FORMATS("D64 error %s head %d track %d sector %d\n", ERROR_CODE[sector_error], head, dos_track, sector);
 	}
 
 	return sector_error;
@@ -725,8 +725,8 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 	tag->has_errors = has_errors;
 
 	LOG_FORMATS("D64 size: %04x\n", (UINT32)floppy_image_size(floppy));
-	LOG_FORMATS("D64 heads: %u\n", heads);
-	LOG_FORMATS("D64 tracks: %u\n", dos_tracks);
+	LOG_FORMATS("D64 heads: %d\n", heads);
+	LOG_FORMATS("D64 tracks: %d\n", dos_tracks);
 	LOG_FORMATS("D64 DOS version: %s\n", DOS_VERSION[dos]);
 	LOG_FORMATS("D64 error codes: %s\n", has_errors ? "yes" : "no");
 
@@ -761,7 +761,7 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 					/* also store an error entry for each sector */
 					errors_size += DOS25_SECTORS_PER_TRACK[track];
 
-					LOG_FORMATS("D64 head %u track %u offset %05x", head, track + 1, tag->track_offset[head][track]);
+					LOG_FORMATS("D64 head %d track %d offset %05x", head, track + 1, tag->track_offset[head][track]);
 					if (has_errors) LOG_FORMATS(" errors %05x", tag->error_offset[head][track]);
 					LOG_FORMATS(" speed %u\n", tag->speed_zone[track]);
 				}
@@ -793,7 +793,7 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 						errors_size += DOS2_SECTORS_PER_TRACK[track / 2];
 					}
 
-					LOG_FORMATS("D64 head %u track %.1f offset %05x", head, get_dos_track(track), tag->track_offset[head][track]);
+					LOG_FORMATS("D64 head %d track %.1f offset %05x", head, get_dos_track(track), tag->track_offset[head][track]);
 					if (has_errors) LOG_FORMATS(" errors %05x", tag->error_offset[head][track]);
 					LOG_FORMATS(" speed %u\n", tag->speed_zone[track]);
 				}
@@ -821,7 +821,7 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 	/* read errors */
 	if (tag->has_errors)
 	{
-		LOG_FORMATS("D64 error blocks: %u %u\n", errors_size, track_offset);
+		LOG_FORMATS("D64 error blocks: %d %d\n", errors_size, track_offset);
 		floppy_image_read(floppy, tag->error, track_offset, errors_size);
 	}
 	else

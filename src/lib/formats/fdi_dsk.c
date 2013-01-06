@@ -261,7 +261,7 @@ FLOPPY_CONSTRUCT( fdi_dsk_construct )
 		UINT8 type = header.track[track].type;
 		int size = header.track[track].size * 256;
 
-		if (LOG) LOG_FORMATS("FDI track %u type %02x size %u offset %u\n", track, type, size, offset);
+		if (LOG) LOG_FORMATS("FDI track %d type %02x size %d offset %d\n", track, type, size, offset);
 
 		tag->track_offset[track] = offset;
 		tag->track_type[track] = type;

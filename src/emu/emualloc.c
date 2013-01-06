@@ -610,5 +610,5 @@ void memory_entry::report_unfreed()
 	release_lock();
 
 	if (total > 0)
-		fprintf(stderr, "a total of %d bytes were not freed\n", total);
+		fprintf(stderr, "a total of %u bytes were not freed\n", total);
 }

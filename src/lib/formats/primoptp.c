@@ -90,15 +90,15 @@ static int primo_cassette_calculate_size_in_samples(const UINT8 *bytes, int leng
 	while (i < length)
 	{
 		size_in_samples += PRIMO_PAUSE_LENGTH;
-		LOG_FORMATS ("Samples (pause): %d\n", size_in_samples);
+		LOG_FORMATS ("Samples (pause): %u\n", size_in_samples);
 
 		size_in_samples += PRIMO_FILE_PILOT_LENGTH;
-		LOG_FORMATS ("Samples (file pilot): %d\n", size_in_samples);
+		LOG_FORMATS ("Samples (file pilot): %u\n", size_in_samples);
 
 		/* file size with header */
 		file_size = *(b+1) + *(b+2)*256;
 		b += 3;
-		LOG_FORMATS ("File size (with header): %d\n", file_size);
+		LOG_FORMATS ("File size (with header): %u\n", file_size);
 
 		/* b is now set on the first data byte of file
            it means first byte (type) of block */
@@ -107,7 +107,7 @@ static int primo_cassette_calculate_size_in_samples(const UINT8 *bytes, int leng
 		while (j < file_size-3)
 		{
 			size_in_samples += PRIMO_BLOCK_PILOT_LENGTH;
-			LOG_FORMATS ("Samples (block pilot): %d\n", size_in_samples);
+			LOG_FORMATS ("Samples (block pilot): %u\n", size_in_samples);
 
 			/* block size without header but including CRC byte */
 			block_size = *(b+1) + *(b+2)*256;
@@ -121,9 +121,9 @@ static int primo_cassette_calculate_size_in_samples(const UINT8 *bytes, int leng
 			size_in_samples += number_of_1 * PRIMO_BIT_1_LENGTH;
 			size_in_samples += number_of_0 * PRIMO_BIT_0_LENGTH;
 
-			LOG_FORMATS ("Samples (block data): %d\n", size_in_samples);
+			LOG_FORMATS ("Samples (block data): %u\n", size_in_samples);
 
-			LOG_FORMATS ("\tBlock size: %d\n", block_size);
+			LOG_FORMATS ("\tBlock size: %u\n", block_size);
 
 			b += block_size;
 
@@ -169,7 +169,7 @@ static int primo_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 		file_size = *(b+1) + *(b+2)*256;
 		b += 3;
 
-		LOG_FORMATS ("File size: %d\n", file_size);
+		LOG_FORMATS ("File size: %u\n", file_size);
 
 		/* b is now set on the first data byte of file
            it means first byte (block type) of block header */
