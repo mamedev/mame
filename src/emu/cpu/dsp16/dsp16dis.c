@@ -523,7 +523,7 @@ CPU_DISASSEMBLE( dsp16a )
             // R = N
             const UINT8 R = (op & 0x03f0) >> 4;
             astring rString = disasmRField(R);
-            sprintf(buffer, "%s = 0x%x", rString.cstr(), op2);
+			sprintf(buffer, "%s = 0x%04x", rString.cstr(), op2);
             opSize = 2;
             break;
         }

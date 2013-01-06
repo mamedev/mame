@@ -13,15 +13,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-//#define MCFG_DSP16_CONFIG(_config)
-//  dsp16_device::static_set_config(*device, _config);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -95,6 +86,14 @@ protected:
     // internal stuff
 	UINT16 m_ppc;
 
+	// This core handles the cache as more of a loop than 15 seperate memory elements.
+	// It's a bit of a hack, but it's easier this way.
+	UINT16 m_cacheStart;
+	UINT16 m_cacheEnd;
+	UINT16 m_cacheRedoNextPC;
+	UINT16 m_cacheIterations;
+	static const UINT16 CACHE_INVALID = 0xffff;
+
 	// memory access
 	inline UINT32 program_read(UINT32 addr);
 	inline void program_write(UINT32 addr, UINT32 data);
@@ -108,13 +107,14 @@ protected:
     int m_icount;
 
 	// operations
-	void execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance);
+	void execute_one(const UINT16& op, UINT8& cycles, INT16& pcAdvance);
 
+	// table decoders
+	void* registerFromRImmediateField(const UINT8& R);
 	void* registerFromRTable(const UINT8& R);
 
 	// helpers
 	void* addressYL();
-	//void writeYxRegister(const UINT16& value);
 	void writeRegister(void* reg, const UINT16& value);
 };
 

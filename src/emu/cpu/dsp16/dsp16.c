@@ -10,6 +10,11 @@
 #include "debugger.h"
 #include "dsp16.h"
 
+//
+// TODO:
+//  * Store the cache in 15 unique memory locations as it is on-chip.
+//  * Modify cycle counts when running from within the cache
+//
 
 //**************************************************************************
 //  DEVICE INTERFACE
@@ -52,6 +57,10 @@ dsp16_device::dsp16_device(const machine_config &mconfig, const char *tag, devic
 	  m_sioc(0),
 	  m_pioc(0),
 	  m_ppc(0),
+	  m_cacheStart(CACHE_INVALID),
+	  m_cacheEnd(CACHE_INVALID),
+	  m_cacheRedoNextPC(CACHE_INVALID),
+	  m_cacheIterations(0),
 	  m_program(NULL),
 	  m_direct(NULL),
 	  m_icount(0)
@@ -69,6 +78,7 @@ void dsp16_device::device_start()
 {
 	// register state with the debugger
 	state_add(STATE_GENPC,    "GENPC",     m_pc).noshow();
+	//state_add(STATE_GENPCBASE, "GENPCBASE", m_ppc).noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_psw).callimport().callexport().formatstr("%10s").noshow();
 	state_add(DSP16_PC,       "PC",        m_pc);
 	state_add(DSP16_I,        "I",         m_i);
@@ -96,6 +106,7 @@ void dsp16_device::device_start()
 	state_add(DSP16_SIOC,     "SIOC",      m_sioc).formatstr("%16s");
 	state_add(DSP16_PIOC,     "PIOC",      m_pioc); //.formatstr("%16s");
 
+	// register our state for saving
 	save_item(NAME(m_i));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_pt));
@@ -121,6 +132,11 @@ void dsp16_device::device_start()
 	save_item(NAME(m_c2));
 	save_item(NAME(m_sioc));
 	save_item(NAME(m_pioc));
+	save_item(NAME(m_ppc));
+	save_item(NAME(m_cacheStart));
+	save_item(NAME(m_cacheEnd));
+	save_item(NAME(m_cacheRedoNextPC));
+	save_item(NAME(m_cacheIterations));
 
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
@@ -145,6 +161,12 @@ void dsp16_device::device_reset()
 	m_re = 0x0000;
 	// AUC is not affected by reset
 	m_ppc = m_pc;
+
+	// Hacky cache emulation.
+	m_cacheStart = CACHE_INVALID;
+	m_cacheEnd = CACHE_INVALID;
+	m_cacheRedoNextPC = CACHE_INVALID;
+	m_cacheIterations = 0;
 }
 
 
@@ -170,7 +192,7 @@ void dsp16_device::state_string_export(const device_state_entry &entry, astring 
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-		string.printf("(multiple below)");
+		string.printf("(below)");
 			break;
 
 		// Placeholder for a better view later (TODO)
@@ -290,11 +312,13 @@ void dsp16_device::execute_run()
 
 		// instruction fetch & execute
 		UINT8 cycles;
-		UINT8 pcAdvance;
+		INT16 pcAdvance;
 		const UINT16 op = opcode_read();
+		printf("%d ", m_cacheIterations);
 		execute_one(op, cycles, pcAdvance);
+		printf("%d\n", m_cacheIterations);
 
-		// step forward
+		// step
 		m_pc += pcAdvance;
 		m_icount -= cycles;
 
