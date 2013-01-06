@@ -46,6 +46,9 @@
 #define MCFG_SANYO_LE26FV10N1TS_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SANYO_LE26FV10N1TS, 0)
 
+#define MCFG_SST_28SF040_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SST_28SF040, 0)
+
 #define MCFG_SHARP_LH28F400_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SHARP_LH28F400, 0)
 
@@ -90,6 +93,7 @@ public:
 		FLASH_MACRONIX_29L001MC,
 		FLASH_PANASONIC_MN63F805MNP,
 		FLASH_SANYO_LE26FV10N1TS,
+		FLASH_SST_28SF040,
 
 		// 16-bit variants
 		FLASH_SHARP_LH28F400 = 0x1000,
@@ -252,6 +256,11 @@ public:
 	sanyo_le26fv10n1ts_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
+class sst_28sf040_device : public intelfsh8_device
+{
+public:
+	sst_28sf040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
 
 // 16-bit variants
 class sharp_lh28f400_device : public intelfsh16_device
@@ -298,6 +307,7 @@ extern const device_type INTEL_E28F400;
 extern const device_type MACRONIX_29L001MC;
 extern const device_type PANASONIC_MN63F805MNP;
 extern const device_type SANYO_LE26FV10N1TS;
+extern const device_type SST_28SF040;
 
 extern const device_type SHARP_LH28F400;
 extern const device_type INTEL_E28F008SA;

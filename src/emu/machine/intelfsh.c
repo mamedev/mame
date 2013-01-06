@@ -88,6 +88,7 @@ const device_type INTEL_E28F400 = &device_creator<intel_e28f400_device>;
 const device_type MACRONIX_29L001MC = &device_creator<macronix_29l001mc_device>;
 const device_type PANASONIC_MN63F805MNP = &device_creator<panasonic_mn63f805mnp_device>;
 const device_type SANYO_LE26FV10N1TS = &device_creator<sanyo_le26fv10n1ts_device>;
+const device_type SST_28SF040 = &device_creator<sst_28sf040_device>;
 
 const device_type SHARP_LH28F400 = &device_creator<sharp_lh28f400_device>;
 const device_type INTEL_E28F008SA = &device_creator<intel_e28f008sa_device>;
@@ -274,6 +275,13 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_sector_is_4k = true;
 		map = ADDRESS_MAP_NAME( memory_map8_1Mb );
 		break;
+	case FLASH_SST_28SF040:
+		m_bits = 8;
+		m_size = 0x80000;
+		m_maker_id = MFG_SST;
+		m_device_id = 0x04;
+		map = ADDRESS_MAP_NAME( memory_map8_4Mb );
+		break;
 	}
 
 	int addrbits;
@@ -326,6 +334,9 @@ panasonic_mn63f805mnp_device::panasonic_mn63f805mnp_device(const machine_config 
 
 sanyo_le26fv10n1ts_device::sanyo_le26fv10n1ts_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, SANYO_LE26FV10N1TS, "Sanyo LE26FV10N1TS Flash", tag, owner, clock, FLASH_SANYO_LE26FV10N1TS) { }
+
+sst_28sf040_device::sst_28sf040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: intelfsh8_device(mconfig, SST_28SF040, "SST 28SF040 Flash", tag, owner, clock, FLASH_SST_28SF040) { }
 
 sharp_lh28f400_device::sharp_lh28f400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh16_device(mconfig, SHARP_LH28F400, "Sharp LH28F400 Flash", tag, owner, clock, FLASH_SHARP_LH28F400) { }
@@ -846,7 +857,10 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 			break;
 		}
 		m_status = 0x80;
-		m_flash_mode = FM_READSTATUS;
+		if (m_type == FLASH_SST_28SF040)
+			m_flash_mode = FM_NORMAL;
+		else
+			m_flash_mode = FM_READSTATUS;
 		break;
 	case FM_WRITEPAGEATMEL:
 		switch( m_bits )
@@ -876,15 +890,27 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 	case FM_CLEARPART1:
 		if( ( data & 0xff ) == 0xd0 )
 		{
-			// clear the 64k block containing the current address to all 0xffs
-			UINT32 base = address * ((m_bits == 16) ? 2 : 1);
-			for (offs_t offs = 0; offs < 64 * 1024; offs++)
-				m_addrspace[0]->write_byte((base & ~0xffff) + offs, 0xff);
+			if (m_type == FLASH_SST_28SF040)
+			{
+				// clear the 256 bytes block containing the current address to all 0xffs
+				UINT32 base = address * ((m_bits == 16) ? 2 : 1);
+				for (offs_t offs = 0; offs < 256; offs++)
+					m_addrspace[0]->write_byte((base & ~0xff) + offs, 0xff);
+
+				m_timer->adjust( attotime::from_msec( 4 ) );
+			}
+			else
+			{
+				// clear the 64k block containing the current address to all 0xffs
+				UINT32 base = address * ((m_bits == 16) ? 2 : 1);
+				for (offs_t offs = 0; offs < 64 * 1024; offs++)
+					m_addrspace[0]->write_byte((base & ~0xffff) + offs, 0xff);
+
+				m_timer->adjust( attotime::from_seconds( 1 ) );
+			}
 
 			m_status = 0x00;
 			m_flash_mode = FM_READSTATUS;
-
-			m_timer->adjust( attotime::from_seconds( 1 ) );
 			break;
 		}
 		else

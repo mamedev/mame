@@ -13,7 +13,6 @@
         - RCV336ACFW 33.6kbps modem
 
     TODO:
-    - SST-28SF040 flash
     - RCV336ACFW modem
     - Add similar models (Mivo 100/150/200/250/350)
     - New Mail led
@@ -60,6 +59,8 @@ public:
 	DECLARE_WRITE8_MEMBER( flash_0x4000_write_handler );
 	DECLARE_READ8_MEMBER( flash_0x8000_read_handler );
 	DECLARE_WRITE8_MEMBER( flash_0x8000_write_handler );
+	DECLARE_READ8_MEMBER( modem_r );
+	DECLARE_WRITE8_MEMBER( modem_w );
 
 	void lcd_w(UINT16 offset, int column, UINT8 data);
 	UINT8 lcd_r(UINT16 offset, int column);
@@ -104,10 +105,7 @@ WRITE8_MEMBER( mstation_state::flash_0x0000_write_handler )
 
 READ8_MEMBER( mstation_state::flash_0x4000_read_handler )
 {
-	if (m_flash_at_0x4000 == 1)
-		return 0x00;	//TODO: read from SST-28SF040
-	else
-		return m_flashes[m_flash_at_0x4000]->read(((m_bank1[0] & 0x3f)<<14) | offset);
+	return m_flashes[m_flash_at_0x4000]->read(((m_bank1[0] & 0x3f)<<14) | offset);
 }
 
 WRITE8_MEMBER( mstation_state::flash_0x4000_write_handler )
@@ -123,6 +121,15 @@ READ8_MEMBER( mstation_state::flash_0x8000_read_handler )
 WRITE8_MEMBER( mstation_state::flash_0x8000_write_handler )
 {
 	m_flashes[m_flash_at_0x8000]->write(((m_bank2[0] & 0x3f)<<14) | offset, data);
+}
+
+READ8_MEMBER( mstation_state::modem_r )
+{
+	return 0xff;
+}
+
+WRITE8_MEMBER( mstation_state::modem_w )
+{
 }
 
 
@@ -208,6 +215,11 @@ void mstation_state::refresh_memory(UINT8 bank, UINT8 chip_select)
 			program.install_readwrite_handler(bank * 0x4000, bank * 0x4000 + 0x3fff, 0, 0, read8_delegate(FUNC(mstation_state::lcd_right_r), this), write8_delegate(FUNC(mstation_state::lcd_right_w), this));
 			active_flash = -1;
 			break;
+		case 5:	// modem
+			program.install_readwrite_handler(bank * 0x4000, bank * 0x4000 + 0x3fff, 0x07, 0, read8_delegate(FUNC(mstation_state::modem_r), this), write8_delegate(FUNC(mstation_state::modem_w), this));
+			active_flash = -1;
+			break;
+
 		default:
 			logerror("Unknown chip %02x mapped at %04x - %04x\n", chip_select, bank * 0x4000, bank * 0x4000 + 0x3fff);
 			program.unmap_readwrite(bank * 0x4000, bank * 0x4000 + 0x3fff);
@@ -254,7 +266,7 @@ WRITE8_MEMBER( mstation_state::port2_w )
 
     bit 7: power down request
     bit 5: real time clock
-    bit 6: unknown
+    bit 6: modem
     bit 4: 1 sec int
     bit 3: unknown
     bit 0: unknown
@@ -285,10 +297,10 @@ WRITE8_MEMBER( mstation_state::irq_w )
 READ8_MEMBER( mstation_state::battery_status_r )
 {
 	/*
-      bit 0-6 - unknown
-      bit 7   - battery status
+      bit 0-3 - unknown
+      bit 4-7 - battery status
     */
-	return 0x80;
+	return 0xf0;
 }
 
 WRITE8_MEMBER( mstation_state::kb_w )
@@ -328,6 +340,7 @@ static ADDRESS_MAP_START(mstation_io , AS_IO, 8, mstation_state)
 	AM_RANGE( 0x07, 0x08 ) AM_READWRITE(bank2_r, bank2_w)
 	AM_RANGE( 0x09, 0x09 ) AM_READ(battery_status_r)
 	AM_RANGE( 0x10, 0x1f ) AM_DEVREADWRITE("rtc", rp5c01_device, read, write)
+	//AM_RANGE( 0x2c, 0x2c ) printer
 ADDRESS_MAP_END
 
 
@@ -473,7 +486,6 @@ WRITE_LINE_MEMBER( mstation_state::rtc_irq )
 
 TIMER_DEVICE_CALLBACK_MEMBER(mstation_state::mstation_1hz_timer)
 {
-
 	m_irq |= (1<<4);
 
 	refresh_ints();
@@ -481,7 +493,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(mstation_state::mstation_1hz_timer)
 
 TIMER_DEVICE_CALLBACK_MEMBER(mstation_state::mstation_kb_timer)
 {
-
 	m_irq |= (1<<1);
 
 	refresh_ints();
@@ -516,7 +527,7 @@ static MACHINE_CONFIG_START( mstation, mstation_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_AMD_29F080_ADD("flash0")
-	MCFG_AMD_29F080_ADD("flash1")	//SST-28SF040
+	MCFG_SST_28SF040_ADD("flash1")
 
 	// IRQ 4 is generated every second, used for auto power off
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("1hz_timer", mstation_state, mstation_1hz_timer, attotime::from_hz(1))
