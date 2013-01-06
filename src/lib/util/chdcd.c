@@ -164,7 +164,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	if (offset < 4)
 	{
 		osd_close(file);
-		printf("ERROR: unexpected RIFF offset %lu (%s)\n", actual, filename);
+		printf("ERROR: unexpected RIFF offset %lu (%s)\n", offset, filename);
 		return 0;
 	}
 	if (memcmp(&buf[0], "RIFF", 4) != 0)
@@ -180,7 +180,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	if (offset < 8)
 	{
 		osd_close(file);
-		printf("ERROR: unexpected size offset %lu (%s)\n", actual, filename);
+		printf("ERROR: unexpected size offset %lu (%s)\n", offset, filename);
 		return 0;
 	}
 	filesize = LITTLE_ENDIANIZE_INT32(filesize);
@@ -191,13 +191,13 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	if (offset < 12)
 	{
 		osd_close(file);
-		printf("ERROR: unexpected WAVE offset %lu (%s)\n", actual, filename);
+		printf("ERROR: unexpected WAVE offset %lu (%s)\n", offset, filename);
 		return 0;
 	}
 	if (memcmp(&buf[0], "WAVE", 4) != 0)
 	{
 		osd_close(file);
-		printf("ERROR:could not find WAVE header (%s)\n", filename);
+		printf("ERROR: could not find WAVE header (%s)\n", filename);
 		return 0;
 	}
 
@@ -217,7 +217,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 		if (offset >= filesize)
 		{
 			osd_close(file);
-			printf("ERROR:could not find fmt tag (%s)\n", filename);
+			printf("ERROR: could not find fmt tag (%s)\n", filename);
 			return 0;
 		}
 	}
@@ -297,7 +297,10 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 
 	/* if there was a 0 length data block, we're done */
 	if (length == 0)
+	{
+		printf("ERROR: empty data block (%s)\n", filename);
 		return 0;
+	}
 
 	*dataoffs = offset;
 

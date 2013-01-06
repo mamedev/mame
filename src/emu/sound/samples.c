@@ -462,14 +462,20 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	UINT32 filesize;
 	offset += file.read(&filesize, 4);
 	if (offset < 8)
+	{
+		mame_printf_warning("Unexpected size offset %u (%s)\n", offset, file.filename());
 		return false;
+	}
 	filesize = LITTLE_ENDIANIZE_INT32(filesize);
 
 	// read the RIFF file type and make sure it's a WAVE file
 	char buf[32];
 	offset += file.read(buf, 4);
 	if (offset < 12)
+	{
+		mame_printf_warning("Unexpected WAVE offset %u (%s)\n", offset, file.filename());
 		return false;
+	}
 	if (memcmp(&buf[0], "WAVE", 4) != 0)
 		return false;
 
@@ -487,7 +493,10 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 		file.seek(length, SEEK_CUR);
 		offset += length;
 		if (offset >= filesize)
+		{
+			mame_printf_warning("Could not find fmt tag (%s)\n", file.filename());
 			return false;
+		}
 	}
 
 	// read the format -- make sure it is PCM
@@ -495,13 +504,19 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	offset += file.read(&temp16, 2);
 	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
 	if (temp16 != 1)
+	{
+		mame_printf_warning("unsupported format %u - only PCM is supported (%s)\n", temp16, file.filename());
 		return false;
+	}
 
 	// number of channels -- only mono is supported
 	offset += file.read(&temp16, 2);
 	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
 	if (temp16 != 1)
+	{
+		mame_printf_warning("unsupported number of channels %u - only mono is supported (%s)\n", temp16, file.filename());
 		return false;
+	}
 
 	// sample rate
 	UINT32 rate;
@@ -516,7 +531,10 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 	offset += file.read(&bits, 2);
 	bits = LITTLE_ENDIANIZE_INT16(bits);
 	if (bits != 8 && bits != 16)
+	{
+		mame_printf_warning("unsupported bits/sample %u - only 8 and 16 are supported (%s)\n", bits, file.filename());
 		return false;
+	}
 
 	// seek past any extra data
 	file.seek(length - 16, SEEK_CUR);
@@ -535,12 +553,18 @@ bool samples_device::read_wav_sample(emu_file &file, sample_t &sample)
 		file.seek(length, SEEK_CUR);
 		offset += length;
 		if (offset >= filesize)
+		{
+			mame_printf_warning("Could not find data tag (%s)\n", file.filename());
 			return false;
+		}
 	}
 
 	// if there was a 0 length data block, we're done
 	if (length == 0)
+	{
+		mame_printf_warning("empty data block (%s)\n", file.filename());
 		return false;
+	}
 
 	// fill in the sample data
 	sample.frequency = rate;
