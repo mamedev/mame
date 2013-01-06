@@ -409,6 +409,19 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="metalx" supported="no">
+		<description>Metal X</description>
+		<year>1990</year>
+		<publisher>FMサークル事務局 (FM Circle Jimukyoku)</publisher>
+		<info name="release" value="199008xx"/>
+		<info name="alt_title" value="メタルエックス"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="473776">
+				<rom name="metalx.d77" size="473776" crc="5f93cd68" sha1="a651931d03fbb018187fd0f851e6e1ae3c6b4fd4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mike">
 		<description>Shonen Mike no Hitori Tabi</description>
 		<year>1986</year>
@@ -612,6 +625,45 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="10208">
 				<rom name="psy-o-blade (disk 6).d77" size="10208" crc="f12070dc" sha1="54e0feebe1b3939389cc40a941e3562650d2461a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psyoblada" cloneof="psyoblad">
+		<description>Psy-O-Blade (Alt)</description>
+		<year>1988</year>
+		<publisher>T&amp;E Soft</publisher>
+		<info name="release" value="198812xx"/>
+		<info name="alt_title" value="サイオブレード"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program" />
+			<dataarea name="flop" size="392368">
+				<rom name="psy-o-blade_prg.d77" size="392368" crc="83ae5479" sha1="c163bed2cb12102b060a6bef7070cf6666d08698" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="392368">
+				<rom name="psy-o-blade_a.d77" size="392368" crc="bf9a4fbc" sha1="110c2e30364ae7fce824dca9d959d8b27f0633b0" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="392368">
+				<rom name="psy-o-blade_b.d77" size="392368" crc="4f080ee3" sha1="d10c214cbd5fae8a8f5e4e7671f8940b8c9e7f09" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="392368">
+				<rom name="psy-o-blade_c.d77" size="392368" crc="c7f27e62" sha1="70d7d29a6eb2a315321865b98eb1273e4976a26a" offset="0"/>
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="392368">
+				<rom name="psy-o-blade_d.d77" size="392368" crc="487c163c" sha1="1d763245b4a3d784a5b2abdffc86b459abea39be" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

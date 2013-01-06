@@ -69,7 +69,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * ECCジュニアの はじめてえいご Vol.5 - Merry Christmas, Patty! メリークリスマス、パティちゃん - ECC Junior no Hajimete Eigo Vol. 5 - Merry Christmas, Patty! - Merry Christmas, Patty-chan (Sega Toys - 200207xx - HPC-6107)
 * ECCジュニアの はじめてえいご Vol.6 - Patty Goes to the Amusement Park パティちゃん遊園地に行く - ECC Junior no Hajimete Eigo Vol. 6 - Patty Goes to the Amusement Park - Patty-chan Yuuenchi ni Iku (Sega Toys - 200207xx - HPC-6108)
 * おせわしましょ! あかちゃんピコ - Osewashimasho! Akachan Pico (Sega Toys - 20020701 - HPC-6109)
-* ミニモニ。テレビにでるんだぴょん! - Mini Moni. Terebi ni Derundapyon! (Sega Toys - 20020613 - HPC-6110)
 * コスメピコ もっとかわいくなりたいな - Kosume Pico Motto Kawai Kunaritaina! (Sega Toys - 20020604 - HPC-6112)
 * トミカ・ピコ レスキューパーキング きんきゅうしゅつどう! はたらくのりもの <初回･トミカ付属> - Tomica Pico Rescue Parking Kinkyuushutsudou! Hataraku Norimono ~Shokai-Tomica Fuzoku~ (Sega Toys - 200207xx - HPC-6114)
 * ハローキティのたのしいおみせやさん - Hello Kitty no Tanoshii Omiseyasan (Sega Toys - 200211xx - HPC-6117)
@@ -1524,6 +1523,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="minimoni">
+		<description>Mini Moni. - Terebi ni Derundapyon! (Jpn)</description>
+		<year>2002</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6110" />
+		<info name="release" value="20020613"/>
+		<info name="alt_title" value="ミニモニ。テレビにでるんだぴょん!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="epoxy block u1.ic1" size="2097152" crc="67069e42" sha1="f508bc6891d1dd2cbe52007c1d0645de685b478a" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mkaraoke">
 		<description>Minna de Karaoke! Issho ni Utaou Suki na Uta! (Jpn)</description>
 		<year>1997</year>
@@ -1756,7 +1771,23 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
-	<software name="pokeadv">
+	<software name="pokehkk">
+		<description>Pocket Monsters Advance Generation - Hiragana Katakana Kakechatta! (Jpn)</description>
+		<year>2003</year>
+		<publisher>Sega Toys</publisher>
+		<info name="serial" value="HPC-6134"/>
+		<info name="release" value="20031117"/>
+		<info name="alt_title" value="ポケットモンスター アドバンスジェネレーション ひらがなカタカナ かけちゃった!"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
+			<dataarea name="rom" size="2097152">
+				<rom name="epoxy block u1.ic1" size="2097152" crc="ada52e72" sha1="1fac4b9c373d441c0ba27e8a976b113cadaddfc3" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pokewai">
 		<description>Pocket Monsters Advance Generation - Minna De Pico - Pokemon Waiwai Battle! (Jpn)</description>
 		<year>2004</year>
 		<publisher>Sega Toys</publisher>
@@ -3550,17 +3581,6 @@ Remaining hoarded / unavailable dumps
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="????">
 				<rom name="Hello Kitty to McDonald de Asobo! (J) [!p].bin" size="????" crc="d81acb46" sha1="e4a51f8894157dc8ef845931366d2ab482d43839" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pokemnag">
-		<description>Pocket Monster Advance Generation - Hiragana Katakana Kakechatta! (Jpn)</description>
-		<year>199?</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="????">
-				<rom name="Pocket Monster Advance Generation - Hiragana Katakana Kakechatta! (J) [!p].bin" size="????" crc="b98fd3d5" sha1="08fe3ab34e4f0328d2240b540e40979c0d74dfd6"/>
 			</dataarea>
 		</part>
 	</software>

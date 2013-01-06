@@ -1324,6 +1324,18 @@ Titles, serial #s, publishers and release dates taken from:
 		</part>
 	</software>
 
+	<software name="ninjakun">
+		<description>Ninja-kun</description>
+		<year>1986</year>
+		<publisher>日本デクスタ (Nihon Dexter)</publisher>
+		<info name="alt_title" value="忍者くん"/>
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="6740260">
+				<rom name="ninjakun.t77" size="6740260" crc="13d364c3" sha1="cd988e2e12653a77c2933279d625160d872300cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nobunaga">
 		<description>Nobunaga no Yabou</description>
 		<year>1983</year>
