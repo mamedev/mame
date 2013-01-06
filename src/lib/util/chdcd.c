@@ -483,7 +483,7 @@ chd_error chdcd_parse_iso(const char *tocfname, cdrom_toc &outtoc, chdcd_track_i
 	FILE *infile;
 	astring path = astring(tocfname);
 
-	infile = fopen(tocfname, "rt");
+	infile = fopen(tocfname, "rb");
 	path = get_file_path(path);
 
 	if (infile == (FILE *)NULL)
