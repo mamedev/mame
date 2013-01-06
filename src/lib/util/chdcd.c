@@ -164,7 +164,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	if (offset < 4)
 	{
 		osd_close(file);
-		printf("ERROR: unexpected offset %d (%s)\n", actual, filename);
+		printf("ERROR: unexpected offset %lu (%s)\n", actual, filename);
 		return 0;
 	}
 	if (memcmp(&buf[0], "RIFF", 4) != 0)
@@ -180,7 +180,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	if (offset < 8)
 	{
 		osd_close(file);
-		printf("ERROR: unexpected offset %d (%s)\n", actual, filename);
+		printf("ERROR: unexpected offset %lu (%s)\n", actual, filename);
 		return 0;
 	}
 	filesize = LITTLE_ENDIANIZE_INT32(filesize);
@@ -191,7 +191,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	if (offset < 12)
 	{
 		osd_close(file);
-		printf("ERROR: unexpected offset %d (%s)\n", actual, filename);
+		printf("ERROR: unexpected offset %lu (%s)\n", actual, filename);
 		return 0;
 	}
 	if (memcmp(&buf[0], "WAVE", 4) != 0)
@@ -233,14 +233,14 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 		return 0;
 	}
 
-	/* number of channels -- only mono is supported */
+	/* number of channels -- only stereo is supported */
 	osd_read(file, &temp16, offset, 2, &actual);
 	offset += actual;
 	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
 	if (temp16 != 2)
 	{
 		osd_close(file);
-		printf("ERROR: unsupported number of channels %d - only mono is supported (%s)\n", temp16, filename);
+		printf("ERROR: unsupported number of channels %d - only stereo is supported (%s)\n", temp16, filename);
 		return 0;
 	}
 
@@ -251,7 +251,7 @@ static UINT32 parse_wav_sample(const char *filename, UINT32 *dataoffs)
 	if (rate != 44100)
 	{
 		osd_close(file);
-		printf("ERROR: unsupported samplerate %d - only 44100 is supported (%s)\n", rate, filename);
+		printf("ERROR: unsupported samplerate %u - only 44100 is supported (%s)\n", rate, filename);
 		return 0;
 	}
 
