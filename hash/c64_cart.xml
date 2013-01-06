@@ -6419,12 +6419,11 @@
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="fcc" />
-			<feature name="exrom" value="1" />
+			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 
-			<dataarea name="roml" size="0x10000">
-				<rom name="fcc_rom1" size="0x8000" crc="2949836a" sha1="9e6283095df9e3f4802ed0c654101f8e37168bf6" offset="0x0000" />
-				<rom name="fcc_rom2" size="0x8000" crc="8fc0f156" sha1="c843729870e7ce59bb64b60ebec028f7200f93d1" offset="0x8000" />
+			<dataarea name="roml" size="0x8000">
+				<rom name="fcc_rom2" size="0x8000" crc="8fc0f156" sha1="c843729870e7ce59bb64b60ebec028f7200f93d1" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

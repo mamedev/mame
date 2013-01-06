@@ -847,6 +847,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c64_easyflash.o	\
 	$(MESS_MACHINE)/c64_epyx_fast_load.o	\
 	$(MESS_MACHINE)/c64_exos.o	\
+	$(MESS_MACHINE)/c64_fcc.o	\
 	$(MESS_MACHINE)/c64_final.o	\
 	$(MESS_MACHINE)/c64_final3.o	\
 	$(MESS_MACHINE)/c64_fun_play.o	\

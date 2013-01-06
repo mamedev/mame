@@ -22,6 +22,7 @@
 #include "machine/c64_easyflash.h"
 #include "machine/c64_epyx_fast_load.h"
 #include "machine/c64_exos.h"
+#include "machine/c64_fcc.h"
 #include "machine/c64_final.h"
 #include "machine/c64_final3.h"
 #include "machine/c64_fun_play.h"
