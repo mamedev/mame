@@ -1,8 +1,17 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="c128_cart" description="Commodore 128 cartridges">
+<!--
 
-	<software name="c128diag" supported="no">
+Missing dumps:
+
+- Dead Test (Rev 781220)
+- QuickSilver 128
+- Partner 128 (Timeworks, 1985)
+- Super Snapshot
+
+-->
+	<software name="c128diag">
 		<description>C128 Diagnostic v1.1</description>
 		<year>1987</year>
 		<publisher>Commodore</publisher>
@@ -17,7 +26,7 @@
 		</part>
 	</software>
 
-	<software name="c128diaga" cloneof="c128diag" supported="no">
+	<software name="c128diaga" cloneof="c128diag">
 		<description>C128 Diagnostic</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
@@ -28,6 +37,22 @@
 
 			<dataarea name="roml" size="0x4000">
 				<rom name="325099-01.u1" size="0x4000" crc="285e5bf8" sha1="a110dd331eefe251effdcfa272faf5680db51973" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c128dg40">
+		<description>C128/40 Diagnostic (Rev 588121)</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+	
+			<dataarea name="roml" size="0x2000">
+				<rom name="c128diag.bin" size="0x2000" crc="b11107be" sha1="c7149ed420d95faa1ab2ecb4a536f5e6effd45e3" offset="0" />
 			</dataarea>
 		</part>
 	</software>

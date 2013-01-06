@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="c64_cart" description="Commodore 64 cartridges">
+
 <!--
 
 	Hardware to be emulated
@@ -64,7 +66,6 @@
 	http://members.optusnet.com.au/spacetaxi64/SPEED-UP-CARTS/SPEED-C64-CPU.htm
 
 -->
-<softwarelist name="c64_cart" description="Commodore 64 cartridges">
 
 	<software name="vw64">
 		<description>VizaWrite 64</description>
@@ -6550,6 +6551,22 @@
 			<feature name="part_id" value="SYSGEN (v7.2) - Side 2"/>
 			<dataarea name="flop" size="174848">
 				<rom name="dos72-s2.d64" size="174848" crc="08938b41" sha1="24a891ad1a418bdd71b05f0a61e3754d4bfa82e6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quiktest">
+		<description>Commodore 64 Diagnostic</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x2000">
+				<rom name="sean's diag cart for c64 cs=87e7" size="0x2000" crc="653ec679" sha1="b2d3e90113d7360c7d01a1f017a8edd8ae4441b7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
