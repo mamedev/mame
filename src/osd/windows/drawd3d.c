@@ -787,22 +787,6 @@ try_again:
 		}
 	}
 
-	if (d3d->default_bitmap.valid())
-	{
-		render_texinfo texture;
-
-		// fake in the basic data so it looks like it came from render.c
-		texture.base = d3d->default_bitmap.raw_pixptr(0);
-		texture.rowpixels = d3d->default_bitmap.rowpixels();
-		texture.width = d3d->default_bitmap.width();
-		texture.height = d3d->default_bitmap.height();
-		texture.palette = NULL;
-		texture.seqid = 0;
-
-		// now create it
-		d3d->default_texture = texture_create(d3d, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
-	}
-
 	int ret = d3d->hlsl->create_resources(false);
 	if (ret != 0)
 	    return ret;
@@ -870,6 +854,22 @@ static int device_create_resources(d3d_info *d3d)
 	// clear the buffer
 	result = (*d3dintf->device.clear)(d3d->device, 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0,0,0,0), 0, 0);
 	result = (*d3dintf->device.present)(d3d->device, NULL, NULL, NULL, NULL, 0);
+
+	if (d3d->default_bitmap.valid())
+	{
+		render_texinfo texture;
+
+		// fake in the basic data so it looks like it came from render.c
+		texture.base = d3d->default_bitmap.raw_pixptr(0);
+		texture.rowpixels = d3d->default_bitmap.rowpixels();
+		texture.width = d3d->default_bitmap.width();
+		texture.height = d3d->default_bitmap.height();
+		texture.palette = NULL;
+		texture.seqid = 0;
+
+		// now create it
+		d3d->default_texture = texture_create(d3d, &texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32));
+	}
 
 	// experimental: if we have a vector bitmap, create a texture for it
 	if (d3d->vector_bitmap.valid())
@@ -952,6 +952,7 @@ static void device_delete_resources(d3d_info *d3d)
 	d3d->vertexbuf = NULL;
 
 	global_free(d3d->default_texture);
+	d3d->default_texture = NULL;
 }
 
 
