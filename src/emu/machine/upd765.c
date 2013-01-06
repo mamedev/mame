@@ -960,9 +960,14 @@ void upd765_family_device::live_run(attotime limit)
 				else if(cur_live.byte_counter < 16) {
 					cur_live.crc = 0xcdb4;
 					live_write_mfm(0xfe);
-				} else if(cur_live.byte_counter < 20)
-					live_write_mfm(fifo_pop(true));
-				else if(cur_live.byte_counter < 22)
+				} else if(cur_live.byte_counter < 20) {
+					UINT8 byte = fifo_pop(true);
+					command[12+cur_live.byte_counter-16] = byte;
+					live_write_mfm(byte);
+					if(cur_live.byte_counter == 19)
+						logerror("%s: formatting sector %02x %02x %02x %02x\n",
+								 tag(), command[12], command[13], command[14], command[15]);
+				} else if(cur_live.byte_counter < 22)
 					live_write_mfm(cur_live.crc >> 8);
 				else if(cur_live.byte_counter < 44)
 					live_write_mfm(0x4e);
@@ -991,9 +996,14 @@ void upd765_family_device::live_run(attotime limit)
 				else if(cur_live.byte_counter < 7) {
 					cur_live.crc = 0xffff;
 					live_write_raw(0xf57e);
-				} else if(cur_live.byte_counter < 11)
-					live_write_fm(fifo_pop(true));
-				else if(cur_live.byte_counter < 13)
+				} else if(cur_live.byte_counter < 11) {
+					UINT8 byte = fifo_pop(true);
+					command[12+cur_live.byte_counter-7] = byte;
+					live_write_fm(byte);
+					if(cur_live.byte_counter == 10)
+						logerror("%s: formatting sector %02x %02x %02x %02x\n",
+								 tag(), command[12], command[13], command[14], command[15]);
+				} else if(cur_live.byte_counter < 13)
 					live_write_fm(cur_live.crc >> 8);
 				else if(cur_live.byte_counter < 24)
 					live_write_fm(0xff);
