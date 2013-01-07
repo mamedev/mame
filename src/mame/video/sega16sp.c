@@ -1037,7 +1037,7 @@ sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconf
 	: sega_16bit_sprite_device(mconfig, SEGA_OUTRUN_SPRITES, "Sega Out Run Sprites", tag, owner),
 	  m_is_xboard(false)
 {
-	set_origin(190, 0x00);
+	set_origin(189, 0x00);
 }
 
 sega_outrun_sprite_device::sega_outrun_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, bool xboard_variant)
