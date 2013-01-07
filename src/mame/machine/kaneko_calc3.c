@@ -67,20 +67,6 @@ void kaneko_calc3_device::device_start()
 	save_item(NAME(m_calc3.poll_addr));
 	save_item(NAME(m_calc3.checksumaddress));
 	save_pointer(NAME(m_calc3_mcuram), 0x10000/2);
-
-
-
-struct calc3_t
-{
-
-	int data_header[2];
-
-
-};
-
-
-
-
 }
 
 void kaneko_calc3_device::device_reset()
