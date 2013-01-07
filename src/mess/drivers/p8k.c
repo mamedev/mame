@@ -436,7 +436,7 @@ DRIVER_INIT_MEMBER(p8k_state,p8k)
 
 WRITE8_MEMBER( p8k_state::kbd_put_16 )
 {
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
+	address_space &mem = m_maincpu->space(AS_DATA);
 	// keyboard int handler is at 0x0700
 	m_term_data = data;
 	// This is another dire hack..
@@ -531,13 +531,22 @@ READ16_MEMBER( p8k_state::portff82_r )
 WRITE16_MEMBER( p8k_state::portff82_w )
 {
 	if (offset == 1) // FF83
-		m_terminal->write(space, 0, data);
+	{
+		address_space &mem = m_maincpu->space(AS_PROGRAM);
+		m_terminal->write(mem, 0, data);
+	}
 }
 
 static ADDRESS_MAP_START(p8k_16_memmap, AS_PROGRAM, 16, p8k_state)
-	AM_RANGE(0x00000, 0x03fff) AM_ROM
-	AM_RANGE(0x04000, 0x07fff) AM_RAM
-	AM_RANGE(0x08000, 0xfffff) AM_RAM
+	AM_RANGE(0x00000, 0x03fff) AM_ROM AM_SHARE("share0")
+	AM_RANGE(0x04000, 0x07fff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x08000, 0xfffff) AM_RAM AM_SHARE("share2")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(p8k_16_datamap, AS_DATA, 16, p8k_state)
+	AM_RANGE(0x00000, 0x03fff) AM_ROM AM_SHARE("share0")
+	AM_RANGE(0x04000, 0x07fff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x08000, 0xfffff) AM_RAM AM_SHARE("share2")
 ADDRESS_MAP_END
 
 
@@ -742,6 +751,7 @@ static MACHINE_CONFIG_START( p8k_16, p8k_state )
 	MCFG_CPU_ADD("maincpu", Z8001, XTAL_4MHz )
 	MCFG_CPU_CONFIG(p8k_16_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(p8k_16_memmap)
+	MCFG_CPU_DATA_MAP(p8k_16_datamap)
 	MCFG_CPU_IO_MAP(p8k_16_iomap)
 	MCFG_MACHINE_RESET_OVERRIDE(p8k_state,p8k_16)
 
