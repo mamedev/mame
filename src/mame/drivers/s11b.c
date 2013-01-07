@@ -151,7 +151,9 @@ MACHINE_RESET_MEMBER( s11b_state, s11b )
 
 WRITE8_MEMBER( s11b_state::bg_speech_clock_w )
 {
-	hc55516_clock_w(m_bg_hc55516, data);
+	// pulses clock input?
+	hc55516_clock_w(m_bg_hc55516, 1);
+	hc55516_clock_w(m_bg_hc55516, 0);
 }
 
 WRITE8_MEMBER( s11b_state::bg_speech_digit_w )
