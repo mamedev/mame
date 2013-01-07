@@ -846,13 +846,13 @@ DISCRETE_SOUND_END
 static const double schaser_effect_rc[8] =
 {
 	0,
-	(RES_K(82) + RES_K(20)) * CAP_U(1),
-	(RES_K(39) + RES_K(20)) * CAP_U(1),
-	(1.0/ (1.0/RES_K(82) + 1.0/RES_K(39)) + RES_K(20)) * CAP_U(1),
 	(RES_K(15) + RES_K(20)) * CAP_U(1),
-	(1.0/ (1.0/RES_K(82) + 1.0/RES_K(15)) + RES_K(20)) * CAP_U(1),
-	(1.0/ (1.0/RES_K(39) + 1.0/RES_K(15)) + RES_K(20)) * CAP_U(1),
-	(1.0/ (1.0/RES_K(82) + 1.0/RES_K(39) + 1.0/RES_K(15)) + RES_K(20)) * CAP_U(1)
+	(RES_K(39) + RES_K(20)) * CAP_U(1),
+	(1.0/ (1.0/RES_K(15) + 1.0/RES_K(39)) + RES_K(20)) * CAP_U(1),
+	(RES_K(82) + RES_K(20)) * CAP_U(1),
+	(1.0/ (1.0/RES_K(15) + 1.0/RES_K(82)) + RES_K(20)) * CAP_U(1),
+	(1.0/ (1.0/RES_K(15) + 1.0/RES_K(82)) + RES_K(20)) * CAP_U(1),
+	(1.0/ (1.0/RES_K(15) + 1.0/RES_K(39) + 1.0/RES_K(82)) + RES_K(20)) * CAP_U(1)
 };
 
 WRITE8_MEMBER(_8080bw_state::schaser_sh_port_1_w)
@@ -864,9 +864,11 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_1_w)
        bit 2 - Effect Sound A (SX2)
        bit 3 - Effect Sound B (SX3)
        bit 4 - Effect Sound C (SX4)
-       bit 5 - Explosion (SX5) */
+       bit 5 - Explosion (SX5)
 
-    //printf( "schaser_sh_port_1_w: %02x\n", data );
+        Note that the schematic has SX2 and SX4 the wrong way around.
+        See MT 2662 for video proof. */
+
 	discrete_sound_w(m_discrete, space, SCHASER_DOT_EN, data & 0x01);
 	discrete_sound_w(m_discrete, space, SCHASER_DOT_SEL, data & 0x02);
 
@@ -928,8 +930,6 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_2_w)
        bit 3 - Field Control A (SX9)
        bit 4 - Field Control B (SX10)
        bit 5 - Flip Screen */
-
-	//printf( "schaser_sh_port_2_w: %02x\n", data );
 
 	discrete_sound_w(m_discrete, space, SCHASER_MUSIC_BIT, BIT(data, 0));
 
