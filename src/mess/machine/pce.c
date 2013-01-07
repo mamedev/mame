@@ -6,27 +6,10 @@ TODO:
 - Dragon Ball Z: ADPCM dies after the first upload;
 - Dragon Slayer - The Legend of Heroes: black screen;
 - Mirai Shonen Conan: dies at new game selection;
-- Prince of Persia: black screen;
-Sequence in read_6 command is:
-00000bc1 00000002
-00000bc3 00000010
-00000cf4 00000020
-00001444 00000001
-...
-Ootake does:
-00000ca2 00000002
-00000ca4 00000010
-00000cf4 00000020
-00001444 00000001
-First two values are taken from get dir info command, that's why
-they don't match with our emulation. Program data from 0x1444
-is written to work RAM 0x104800 (so, wpset 0x104800,1,w or bp 4800 shows
-what's the data executed)
-
-- Snatcher: black screen after Konami logo;
+- Snatcher: black screen after Konami logo, tries set up CD-DA
+            while transferring data?
 - Steam Heart's: needs transfer ready irq to get past the
-                 gameplay hang, don't know exactly where to
-                 put it;
+                 gameplay hang, don't know exactly when it should fire
 - Steam Heart's: bad ADPCM irq, dialogue is cutted due of it;
 
 =============================================================
@@ -523,7 +506,7 @@ static void pce_cd_read_6( running_machine &machine )
 {
 	pce_state *state = machine.driver_data<pce_state>();
 	pce_cd_t &pce_cd = state->m_cd;
-	UINT32 frame = ( ( pce_cd.command_buffer[1] ) << 16 ) | ( pce_cd.command_buffer[2] << 8 ) | pce_cd.command_buffer[3];
+	UINT32 frame = ( ( pce_cd.command_buffer[1] & 0x1f ) << 16 ) | ( pce_cd.command_buffer[2] << 8 ) | pce_cd.command_buffer[3];
 	UINT32 frame_count = pce_cd.command_buffer[4];
 	printf("%08x %08x\n",frame,frame_count);
 
