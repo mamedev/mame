@@ -106,15 +106,51 @@ void wd177x_format::build_sector_description(const format &f, UINT8 *sectdata, d
 	}
 }
 
-bool wd177x_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+floppy_image_format_t::desc_e* wd177x_format::get_desc_fm(const format &f, int &current_size)
 {
-	int type = find_size(io, form_factor);
-	if(type == -1)
-		return false;
+	static floppy_image_format_t::desc_e desc[25] = {
+		/* 00 */ { FM, 0xff, f.gap_1 },
+		/* 01 */ { SECTOR_LOOP_START, 0, f.sector_count-1 },
+		/* 02 */ {   FM, 0x00, 6 },
+		/* 03 */ {   CRC_CCITT_FM_START, 1 },
+		/* 04 */ {     RAW, 0x4489, 0 }, // TODO remove
+		/* 05 */ {     FM, 0xfe, 1 },
+		/* 06 */ {     TRACK_ID_FM },
+		/* 07 */ {     HEAD_ID_FM },
+		/* 08 */ {     SECTOR_ID_FM },
+		/* 09 */ {     SIZE_ID_FM },
+		/* 10 */ {   CRC_END, 1 },
+		/* 11 */ {   CRC, 1 },
+		/* 12 */ {   FM, 0xff, f.gap_2 },
+		/* 13 */ {   FM, 0x00, 6 },
+		/* 14 */ {   CRC_CCITT_FM_START, 2 },
+		/* 15 */ {     RAW, 0x4489, 0 }, // TODO remove
+		/* 16 */ {     FM, 0xfb, 1 },
+		/* 17 */ {     SECTOR_DATA_FM, -1 },
+		/* 18 */ {   CRC_END, 2 },
+		/* 19 */ {   CRC, 2 },
+		/* 20 */ {   FM, 0xff, f.gap_3 },
+		/* 21 */ { SECTOR_LOOP_END },
+		/* 22 */ { FM, 0x00, 0 },
+		/* 23 */ { RAWBITS, 0x9254, 0 },
+		/* 24 */ { END }
+	};
 
-	const format &f = formats[type];
+	current_size = f.gap_1*16;
+	if(f.sector_base_size)
+		current_size += f.sector_base_size * f.sector_count * 16;
+	else {
+		for(int j=0; j != f.sector_count; j++)
+			current_size += f.per_sector_size[j] * 16;
+	}
+	current_size += (6+1+4+2+f.gap_2+6+1+2+f.gap_3) * f.sector_count * 16;
 
-	floppy_image_format_t::desc_e desc[] = {
+	return desc;
+}
+
+floppy_image_format_t::desc_e* wd177x_format::get_desc_mfm(const format &f, int &current_size)
+{
+	static floppy_image_format_t::desc_e desc[25] = {
 		/* 00 */ { MFM, 0x4e, f.gap_1 },
 		/* 01 */ { SECTOR_LOOP_START, 0, f.sector_count-1 },
 		/* 02 */ {   MFM, 0x00, 12 },
@@ -142,7 +178,7 @@ bool wd177x_format::load(io_generic *io, UINT32 form_factor, floppy_image *image
 		/* 24 */ { END }
 	};
 
-	int current_size = f.gap_1*16;
+	current_size = f.gap_1*16;
 	if(f.sector_base_size)
 		current_size += f.sector_base_size * f.sector_count * 16;
 	else {
@@ -150,6 +186,30 @@ bool wd177x_format::load(io_generic *io, UINT32 form_factor, floppy_image *image
 			current_size += f.per_sector_size[j] * 16;
 	}
 	current_size += (12+3+1+4+2+f.gap_2+12+3+1+2+f.gap_3) * f.sector_count * 16;
+
+	return desc;
+}
+
+bool wd177x_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+{
+	int type = find_size(io, form_factor);
+	if(type == -1)
+		return false;
+
+	const format &f = formats[type];
+	floppy_image_format_t::desc_e *desc;
+	int current_size;
+
+	switch (f.encoding)
+	{
+	case floppy_image::FM: 
+		desc = get_desc_fm(f, current_size);
+		break;
+	case floppy_image::MFM:
+	default:
+		desc = get_desc_mfm(f, current_size);
+		break;
+	}
 
 	int total_size = 200000000/f.cell_size;
 	int remaining_size = total_size - current_size;
@@ -308,7 +368,16 @@ void wd177x_format::check_compatibility(floppy_image *image, int *candidates, in
 
 	// Extract the sectors
 	generate_bitstream_from_track(0, 0, formats[candidates[0]].cell_size, bitstream, track_size, image);
-	extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
+
+	switch (formats[candidates[0]].encoding)
+	{
+	case floppy_image::FM: 
+		extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
+		break;
+	case floppy_image::MFM:
+		extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
+		break;
+	}
 
 	// Check compatibility with every candidate, copy in-place
 	int *ok_cands = candidates;
@@ -343,7 +412,6 @@ void wd177x_format::check_compatibility(floppy_image *image, int *candidates, in
 	candidates_count = ok_cands - candidates;
 }
 
-
 void wd177x_format::extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head)
 {
 	UINT8 bitstream[500000/8];
@@ -353,7 +421,16 @@ void wd177x_format::extract_sectors(floppy_image *image, const format &f, desc_s
 
 	// Extract the sectors
 	generate_bitstream_from_track(track, head, f.cell_size, bitstream, track_size, image);
-	extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
+
+	switch (f.encoding)
+	{
+	case floppy_image::FM: 
+		extract_sectors_from_bitstream_fm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
+		break;
+	case floppy_image::MFM:
+		extract_sectors_from_bitstream_mfm_pc(bitstream, track_size, sectors, sectdata, sizeof(sectdata));
+		break;
+	}
 
 	for(int i=0; i<f.sector_count; i++) {
 		desc_s &ds = sdesc[i];

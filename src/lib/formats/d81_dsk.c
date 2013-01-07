@@ -129,7 +129,7 @@ const char *d81_format::extensions() const
 // Unverified gap sizes
 const d81_format::format d81_format::formats[] = {
 	{
-	floppy_image::FF_35, floppy_image::DSDD,
+	floppy_image::FF_35, floppy_image::DSDD, floppy_image::MFM,
 	2000, 10, 80, 2, 512, {}, 1, {}, 32, 22, 35
 	},
 	{}

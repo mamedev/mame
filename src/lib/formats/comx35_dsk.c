@@ -43,7 +43,27 @@
 
     TODO:
 
-    - implement 70 track image detection
+    - implement 70 track image detection (first byte of file = 0x01 -> single sided)
+	- format double sided, single track density
+
+		:exp:fd:wd1770: track description 
+		40xff 6x00 
+		fe 4x00 f7 17x00 fb 128x00 f7 17x00 
+		fe 2x00 07 00 f7 17x00 fb 128x00 f7 17x00 
+		fe 2x00 0e 00 f7 17x00 fb 128x00 f7 16x00 
+		fe 2x00 05 00 f7 17x00 fb 128x00 f7 17x00 
+		fe 2x00 0c 00 f7 17x00 fb 128x00 f7 16x00 
+		fe 2x00 03 00 f7 17x00 fb 128x00 f7 17x00 
+		fe 2x00 0a 00 f7 17x00 fb 128x00 f7 16x00 
+		fe 2x00 01 00 f7 17x00 fb 128x00 f7 17x00 
+		fe 2x00 08 00 f7 17x00 fb 128x00 f7 17x00 
+		fe 2x00 0f 00 f7 17x00 fb 128x00 f7 16x00 
+		fe 2x00 06 00 f7 17x00 fb 128x00 f7 17x00 
+		fe 2x00 0d 00 f7 17x00 fb 128x00 f7 16x00 
+		fe 2x00 04 00 f7 17x00 fb 128x00 f7 17x00 
+		fe 2x00 0b 00 f7 17x00 fb 128x00 f7 16x00 
+		fe 2x00 02 00 f7 17x00 fb 128x00 f7 17x00 
+		fe 2x00 09 00 f7 17x00 fb 128x00 f7 3476x00
 
 */
 
@@ -71,103 +91,19 @@ const char *comx35_format::extensions() const
 
 // Unverified gap sizes
 const comx35_format::format comx35_format::formats[] = {
-	{   //  70K 5 1/4 inch single density single sided 35 tracks
-		floppy_image::FF_525, floppy_image::SSSD,
-		2000, 16, 35, 1, 128, {}, 0, {}, 100, 22, 84
+	{   //  70K 5 1/4 inch single density, single sided, 35 tracks
+		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
+		4000, 16, 35, 1, 128, {}, -1, { 0,7,14,5,12,3,10,1,8,15,6,13,4,11,2,9 }, 40, 11, 10
 	},
-	{   //  140K 5 1/4 inch single density double sided 35 tracks
-		floppy_image::FF_525, floppy_image::DSSD,
-		2000, 16, 35, 2, 128, {}, 0, {}, 100, 22, 84
+	{   //  140K 5 1/4 inch single density, double sided, 35 tracks
+		floppy_image::FF_525, floppy_image::DSSD, floppy_image::FM,
+		4000, 16, 35, 2, 128, {}, -1, { 0,7,14,5,12,3,10,1,8,15,6,13,4,11,2,9 }, 40, 11, 10
 	},
-	/*{   //  140K 5 1/4 inch quad density single sided 70 tracks
-        floppy_image::FF_525, floppy_image::SSQD,
-        2000, 16, 70, 1, 128, {}, 0, {}, 100, 22, 84
+	/*{   //  140K 5 1/4 inch single density, double track density, single sided, 70 tracks
+        floppy_image::FF_525, floppy_image::SSQD, floppy_image::FM,
+        4000, 16, 70, 1, 128, {}, -1, { 0,7,14,5,12,3,10,1,8,15,6,13,4,11,2,9 }, 40, 11, 10
     },*/
 	{}
 };
 
 const floppy_format_type FLOPPY_COMX35_FORMAT = &floppy_image_format_creator<comx35_format>;
-
-
-#ifdef UNUSED_CODE
-
-/*********************************************************************
-
-    formats/comx35_dsk.c
-
-    COMX35 disk images
-
-*********************************************************************/
-
-#include "formats/comx35_dsk.h"
-#include "formats/basicdsk.h"
-
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
-
-/*-------------------------------------------------
-    FLOPPY_IDENTIFY( comx35_dsk_identify )
--------------------------------------------------*/
-
-static FLOPPY_IDENTIFY( comx35_dsk_identify )
-{
-	*vote = ((floppy_image_size(floppy) == (35*1*16*128)) || (floppy_image_size(floppy) == (35*2*16*128))) ? 100 : 0;
-
-	return FLOPPY_ERROR_SUCCESS;
-}
-
-/*-------------------------------------------------
-    FLOPPY_CONSTRUCT( comx35_dsk_construct )
--------------------------------------------------*/
-
-static FLOPPY_CONSTRUCT( comx35_dsk_construct )
-{
-	UINT8 header[1];
-	int heads = 1;
-	int cylinders = 35;
-
-	switch (floppy_image_size(floppy))
-	{
-	case 35*1*16*128:
-		heads = 1;
-		cylinders = 35;
-		break;
-
-	case 35*2*16*128:
-		floppy_image_read(floppy, header, 0x12, 1);
-
-		if (header[0] == 0x01)
-		{
-			heads = 1;
-			cylinders = 70;
-		}
-		else
-		{
-			heads = 2;
-			cylinders = 35;
-		}
-		break;
-	}
-
-	struct basicdsk_geometry geometry;
-	memset(&geometry, 0, sizeof(geometry));
-
-	geometry.heads = heads;
-	geometry.first_sector_id = 0;
-	geometry.sector_length = 128;
-	geometry.tracks = cylinders;
-	geometry.sectors = 16;
-
-	return basicdsk_construct(floppy, &geometry);
-}
-
-/*-------------------------------------------------
-    FLOPPY_OPTIONS( comx35 )
--------------------------------------------------*/
-
-LEGACY_FLOPPY_OPTIONS_START( comx35 )
-	LEGACY_FLOPPY_OPTION( comx35, "img", "COMX35 floppy disk image", comx35_dsk_identify, comx35_dsk_construct, NULL, NULL )
-LEGACY_FLOPPY_OPTIONS_END
-
-#endif

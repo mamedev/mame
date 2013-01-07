@@ -65,11 +65,11 @@ const char *tvc_format::extensions() const
 const tvc_format::format tvc_format::formats[] =
 {
 	{   //  720K 5.25 inch
-		floppy_image::FF_525,  floppy_image::DSQD,
+		floppy_image::FF_525,  floppy_image::DSQD, floppy_image::MFM,
 		2000, 9, 80, 2, 512, {}, 1, {}, 100, 22, 20
 	},
 	{   //  360K 5.25 inch
-		floppy_image::FF_525,  floppy_image::SSQD,
+		floppy_image::FF_525,  floppy_image::SSQD, floppy_image::MFM,
 		2000, 9, 80, 1, 512, {}, 1, {}, 100, 22, 20
 	},
 	{}

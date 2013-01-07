@@ -1102,6 +1102,7 @@ bool floppy_image_format_t::extension_matches(const char *file_name) const
 bool floppy_image_format_t::type_no_data(int type) const
 {
 	return type == CRC_CCITT_START ||
+		type == CRC_CCITT_FM_START ||
 		type == CRC_AMIGA_START ||
 		type == CRC_MACHEAD_START ||
 		type == CRC_END ||
@@ -1115,7 +1116,7 @@ bool floppy_image_format_t::type_data_mfm(int type, int p1, const gen_crc_info *
 	return !type_no_data(type) &&
 		type != RAW &&
 		type != RAWBITS &&
-		(type != CRC || (crcs[p1].type != CRC_CCITT && crcs[p1].type != CRC_AMIGA));
+		(type != CRC || (crcs[p1].type != CRC_CCITT && crcs[p1].type != CRC_CCITT_FM && crcs[p1].type != CRC_AMIGA));
 }
 
 void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs)
@@ -1128,6 +1129,9 @@ void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs)
 		switch(desc[i].type) {
 		case CRC_CCITT_START:
 			crcs[desc[i].p1].type = CRC_CCITT;
+			break;
+		case CRC_CCITT_FM_START:
+			crcs[desc[i].p1].type = CRC_CCITT_FM;
 			break;
 		case CRC_AMIGA_START:
 			crcs[desc[i].p1].type = CRC_AMIGA;
@@ -1149,6 +1153,7 @@ int floppy_image_format_t::crc_cells_size(int type) const
 {
 	switch(type) {
 	case CRC_CCITT: return 32;
+	case CRC_CCITT_FM: return 32;
 	case CRC_AMIGA: return 64;
 	case CRC_MACHEAD: return 8;
 	default: return 0;
@@ -1242,6 +1247,12 @@ void floppy_image_format_t::fixup_crc_ccitt(UINT32 *buffer, const gen_crc_info *
 	mfm_w(buffer, offset, 16, calc_crc_ccitt(buffer, crc->start, crc->end));
 }
 
+void floppy_image_format_t::fixup_crc_ccitt_fm(UINT32 *buffer, const gen_crc_info *crc)
+{
+	int offset = crc->write;
+	fm_w(buffer, offset, 16, calc_crc_ccitt(buffer, crc->start, crc->end));
+}
+
 void floppy_image_format_t::fixup_crc_machead(UINT32 *buffer, const gen_crc_info *crc)
 {
 	UINT8 v = 0;
@@ -1258,6 +1269,7 @@ void floppy_image_format_t::fixup_crcs(UINT32 *buffer, gen_crc_info *crcs)
 			switch(crcs[i].type) {
 			case CRC_AMIGA:   fixup_crc_amiga(buffer, crcs+i); break;
 			case CRC_CCITT:   fixup_crc_ccitt(buffer, crcs+i); break;
+			case CRC_CCITT_FM:   fixup_crc_ccitt_fm(buffer, crcs+i); break;
 			case CRC_MACHEAD: fixup_crc_machead(buffer, crcs+i); break;
 			}
 			if(crcs[i].fixup_mfm_clock) {
@@ -1339,6 +1351,11 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 	while(desc[index].type != END) {
 		//      printf("%d.%d.%d (%d) - %d %d\n", desc[index].type, desc[index].p1, desc[index].p2, index, offset, offset/8);
 		switch(desc[index].type) {
+		case FM:
+			for(int i=0; i<desc[index].p2; i++)
+				fm_w(buffer, offset, 8, desc[index].p1);
+			break;
+
 		case MFM:
 			for(int i=0; i<desc[index].p2; i++)
 				mfm_w(buffer, offset, 8, desc[index].p1);
@@ -1361,12 +1378,20 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			mfm_w(buffer, offset, 8, track);
 			break;
 
+		case TRACK_ID_FM:
+			fm_w(buffer, offset, 8, track);
+			break;
+
 		case TRACK_ID_GCR6:
 			raw_w(buffer, offset, 8, gcr6fw_tb[track & 0x3f]);
 			break;
 
 		case HEAD_ID:
 			mfm_w(buffer, offset, 8, head);
+			break;
+
+		case HEAD_ID_FM:
+			fm_w(buffer, offset, 8, head);
 			break;
 
 		case HEAD_ID_SWAP:
@@ -1381,6 +1406,10 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			mfm_w(buffer, offset, 8, sect[sector_idx].sector_id);
 			break;
 
+		case SECTOR_ID_FM:
+			fm_w(buffer, offset, 8, sect[sector_idx].sector_id);
+			break;
+
 		case SECTOR_ID_GCR6:
 			raw_w(buffer, offset, 8, gcr6fw_tb[sect[sector_idx].sector_id]);
 			break;
@@ -1390,6 +1419,14 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			int id;
 			for(id = 0; size > 128; size >>=1, id++);
 			mfm_w(buffer, offset, 8, id);
+			break;
+		}
+
+		case SIZE_ID_FM: {
+			int size = sect[sector_idx].size;
+			int id;
+			for(id = 0; size > 128; size >>=1, id++);
+			fm_w(buffer, offset, 8, id);
 			break;
 		}
 
@@ -1446,6 +1483,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 
 		case CRC_AMIGA_START:
 		case CRC_CCITT_START:
+		case CRC_CCITT_FM_START:
 		case CRC_MACHEAD_START:
 			crcs[desc[index].p1].start = offset;
 			break;
@@ -1463,6 +1501,13 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			const desc_s *csect = sect + (desc[index].p1 >= 0 ? desc[index].p1 : sector_idx);
 			for(int i=0; i != csect->size; i++)
 				mfm_w(buffer, offset, 8, csect->data[i]);
+			break;
+		}
+
+		case SECTOR_DATA_FM: {
+			const desc_s *csect = sect + (desc[index].p1 >= 0 ? desc[index].p1 : sector_idx);
+			for(int i=0; i != csect->size; i++)
+				fm_w(buffer, offset, 8, csect->data[i]);
 			break;
 		}
 

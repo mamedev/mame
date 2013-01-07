@@ -301,18 +301,23 @@ protected:
 	//! Opcodes of the format description language used by generate_track()
 	enum {
 		END,                    //!< End of description
+		FM,						//!< One byte in p1 to be fm-encoded, msb first, repeated p2 times
 		MFM,                    //!< One byte in p1 to be mfm-encoded, msb first, repeated p2 times
 		MFMBITS,                //!< A value of p2 bits in p1 to be mfm-encoded, msb first
 		RAW,                    //!< One 16 bits word in p1 to be written raw, msb first, repeated p2 times
 		RAWBITS,                //!< A value of p2 bits in p1 to be copied as-is, msb first
 		TRACK_ID,               //!< Track id byte, mfm-encoded
+		TRACK_ID_FM,            //!< Track id byte, fm-encoded
 		TRACK_ID_GCR6,          //!< Track id low 6 bits, gcr6-encoded
 		HEAD_ID,                //!< Head id byte, mfm-encoded
+		HEAD_ID_FM,             //!< Head id byte, fm-encoded
 		HEAD_ID_SWAP,           //!< Head id byte swapped (0->1, 1->0), mfm-encoded
 		TRACK_HEAD_ID_GCR6,     //!< Track id 7th bit + head, gc6-encoded
 		SECTOR_ID,              //!< Sector id byte, mfm-encoded
+		SECTOR_ID_FM,           //!< Sector id byte, fm-encoded
 		SECTOR_ID_GCR6,         //!< Sector id byte, gcr6-encoded
 		SIZE_ID,                //!< Sector size code on one byte [log2(size/128)], mfm-encoded
+		SIZE_ID_FM,             //!< Sector size code on one byte [log2(size/128)], fm-encoded
 		SECTOR_INFO_GCR6,       //!< Sector info byte, gcr6-encoded
 		OFFSET_ID_O,            //!< Offset (track*2+head) byte, odd bits, mfm-encoded
 		OFFSET_ID_E,            //!< Offset (track*2+head) byte, even bits, mfm-encoded
@@ -322,11 +327,13 @@ protected:
 		REMAIN_E,               //!< Remaining sector count, even bits, mfm-encoded, total sector count in p1
 
 		SECTOR_DATA,            //!< Sector data to mfm-encode, which in p1, -1 for the current one per the sector id
+		SECTOR_DATA_FM,         //!< Sector data to fm-encode, which in p1, -1 for the current one per the sector id
 		SECTOR_DATA_O,          //!< Sector data to mfm-encode, odd bits only, which in p1, -1 for the current one per the sector id
 		SECTOR_DATA_E,          //!< Sector data to mfm-encode, even bits only, which in p1, -1 for the current one per the sector id
 		SECTOR_DATA_MAC,        //!< Transformed sector data + checksum, mac style, id in p1, -1 for the current one per the sector id
 
 		CRC_CCITT_START,        //!< Start a CCITT CRC calculation, with the usual x^16 + x^12 + x^5 + 1 (11021) polynomial, p1 = crc id
+		CRC_CCITT_FM_START,     //!< Start a CCITT CRC calculation, with the usual x^16 + x^12 + x^5 + 1 (11021) polynomial, p1 = crc id
 		CRC_AMIGA_START,        //!< Start an amiga checksum calculation, p1 = crc id
 		CRC_MACHEAD_START,      //!< Start of the mac gcr6 sector header checksum calculation (xor of pre-encode 6-bits values, gcr6-encoded)
 		CRC_END,                //!< End the checksum, p1 = crc id
@@ -542,7 +549,7 @@ protected:
 	void gcr6_decode(UINT8 e0, UINT8 e1, UINT8 e2, UINT8 e3, UINT8 &va, UINT8 &vb, UINT8 &vc);
 
 private:
-	enum { CRC_NONE, CRC_AMIGA, CRC_CCITT, CRC_MACHEAD };
+	enum { CRC_NONE, CRC_AMIGA, CRC_CCITT, CRC_CCITT_FM, CRC_MACHEAD };
 	enum { MAX_CRC_COUNT = 64 };
 
 	//! Holds data used internally for generating CRCs.
@@ -560,6 +567,7 @@ private:
 	int crc_cells_size(int type) const;
 	void fixup_crc_amiga(UINT32 *buffer, const gen_crc_info *crc);
 	void fixup_crc_ccitt(UINT32 *buffer, const gen_crc_info *crc);
+	void fixup_crc_ccitt_fm(UINT32 *buffer, const gen_crc_info *crc);
 	void fixup_crc_machead(UINT32 *buffer, const gen_crc_info *crc);
 	void fixup_crcs(UINT32 *buffer, gen_crc_info *crcs);
 	void collect_crcs(const desc_e *desc, gen_crc_info *crcs);
@@ -649,6 +657,13 @@ public:
 		DSQD  = 0x44515344, //!< "DSQD", Double-sided quad-density (720K in 5.25, means DD+80 tracks)
 		DSHD  = 0x44485344, //!< "DSHD", Double-sided high-density (1440K)
 		DSED  = 0x44455344, //!< "DSED", Double-sided extra-density (2880K)
+	};
+
+	//! Encodings
+	enum {
+		FM   = 0x2020464D, //!< "  FM", frequency modulation
+		MFM  = 0x204D464D, //!< " MFM", modified frequency modulation
+		M2FM = 0x4D32464D, //!< "M2FM", modified modified frequency modulation
 	};
 
 // construction/destruction
