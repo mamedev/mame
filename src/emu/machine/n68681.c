@@ -783,7 +783,7 @@ void duart68681_channel::write_MR(UINT8 data)
 
 void duart68681_channel::recalc_framing()
 {
-	int parity, stopbits;
+	int parity = 0, stopbits = 0;
 
 	switch ((MR2 >> 2) & 3)
 	{
