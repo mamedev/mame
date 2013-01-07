@@ -1119,6 +1119,7 @@ $(MESSOBJ)/ensoniq.a:			\
 	$(MESS_DRIVERS)/esqkt.o     \
 	$(MESS_DRIVERS)/esqmr.o     \
     $(MESS_MACHINE)/esqvfd.o    \
+	$(MESS_MACHINE)/esqpanel.o	\
 
 $(MESSOBJ)/entex.a:				\
 	$(MESS_VIDEO)/advision.o	\
