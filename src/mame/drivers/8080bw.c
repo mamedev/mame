@@ -123,15 +123,8 @@
         there at all
 
     - Space Chaser (schaser)
-      1. The "missile" sound is incorrect. This is how it should be:
-         It should be a constant "klunkity-klunk", and should only be
-         heard while missiles are seen to be moving.  When the red
-         missiles speed up, there should be more "klunks per second"
-         with the pitch staying constant.
-        8/8/8 D.R. - Who says?  According to the schematic the sounds are
-         correct.  Make a video showing otherwise or trace SX0 & SX1 on
-         a real PCB to find the difference.
-         Currently it beeps every time a player eats a dot.  Seems right.
+      1. Strange bug; sometimes the missile sound continues into the
+         music/explosion.
       2. If "Hard" mode is selected, numerous bugs appear which
          seems to be an emulation fault. Every revision we have
          shows the problem, whereas the real hardware works fine.
@@ -161,10 +154,6 @@
 
     - Solfight
         On the stage with rolling balls, lots of random dashes appear.
-
-    - Shuttle Invader
-        There's a colour prom on the net (see misfitmame), but no evidence
-        of an actual machine.
 
 
 *****************************************************************************/
