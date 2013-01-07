@@ -1269,7 +1269,7 @@ void floppy_image_format_t::fixup_crcs(UINT32 *buffer, gen_crc_info *crcs)
 			switch(crcs[i].type) {
 			case CRC_AMIGA:   fixup_crc_amiga(buffer, crcs+i); break;
 			case CRC_CCITT:   fixup_crc_ccitt(buffer, crcs+i); break;
-			case CRC_CCITT_FM:   fixup_crc_ccitt_fm(buffer, crcs+i); break;
+			case CRC_CCITT_FM:fixup_crc_ccitt_fm(buffer, crcs+i); break;
 			case CRC_MACHEAD: fixup_crc_machead(buffer, crcs+i); break;
 			}
 			if(crcs[i].fixup_mfm_clock) {

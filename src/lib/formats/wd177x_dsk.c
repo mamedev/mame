@@ -106,34 +106,32 @@ void wd177x_format::build_sector_description(const format &f, UINT8 *sectdata, d
 	}
 }
 
-floppy_image_format_t::desc_e* wd177x_format::get_desc_fm(const format &f, int &current_size)
+floppy_image_format_t::desc_e* wd177x_format::get_desc_fm(const format &f, int &current_size, int &end_gap_index)
 {
-	static floppy_image_format_t::desc_e desc[25] = {
+	static floppy_image_format_t::desc_e desc[23] = {
 		/* 00 */ { FM, 0xff, f.gap_1 },
 		/* 01 */ { SECTOR_LOOP_START, 0, f.sector_count-1 },
 		/* 02 */ {   FM, 0x00, 6 },
 		/* 03 */ {   CRC_CCITT_FM_START, 1 },
-		/* 04 */ {     RAW, 0x4489, 0 }, // TODO remove
-		/* 05 */ {     FM, 0xfe, 1 },
-		/* 06 */ {     TRACK_ID_FM },
-		/* 07 */ {     HEAD_ID_FM },
-		/* 08 */ {     SECTOR_ID_FM },
-		/* 09 */ {     SIZE_ID_FM },
-		/* 10 */ {   CRC_END, 1 },
-		/* 11 */ {   CRC, 1 },
-		/* 12 */ {   FM, 0xff, f.gap_2 },
-		/* 13 */ {   FM, 0x00, 6 },
-		/* 14 */ {   CRC_CCITT_FM_START, 2 },
-		/* 15 */ {     RAW, 0x4489, 0 }, // TODO remove
-		/* 16 */ {     FM, 0xfb, 1 },
-		/* 17 */ {     SECTOR_DATA_FM, -1 },
-		/* 18 */ {   CRC_END, 2 },
-		/* 19 */ {   CRC, 2 },
-		/* 20 */ {   FM, 0xff, f.gap_3 },
-		/* 21 */ { SECTOR_LOOP_END },
-		/* 22 */ { FM, 0x00, 0 },
-		/* 23 */ { RAWBITS, 0x9254, 0 },
-		/* 24 */ { END }
+		/* 04 */ {     FM, 0xfe, 1 },
+		/* 05 */ {     TRACK_ID_FM },
+		/* 06 */ {     HEAD_ID_FM },
+		/* 07 */ {     SECTOR_ID_FM },
+		/* 08 */ {     SIZE_ID_FM },
+		/* 09 */ {   CRC_END, 1 },
+		/* 10 */ {   CRC, 1 },
+		/* 11 */ {   FM, 0xff, f.gap_2 },
+		/* 12 */ {   FM, 0x00, 6 },
+		/* 13 */ {   CRC_CCITT_FM_START, 2 },
+		/* 14 */ {     FM, 0xfb, 1 },
+		/* 15 */ {     SECTOR_DATA_FM, -1 },
+		/* 16 */ {   CRC_END, 2 },
+		/* 17 */ {   CRC, 2 },
+		/* 18 */ {   FM, 0xff, f.gap_3 },
+		/* 19 */ { SECTOR_LOOP_END },
+		/* 20 */ { FM, 0x00, 0 },
+		/* 21 */ { RAWBITS, 0xffff, 0 },
+		/* 22 */ { END }
 	};
 
 	current_size = f.gap_1*16;
@@ -145,10 +143,12 @@ floppy_image_format_t::desc_e* wd177x_format::get_desc_fm(const format &f, int &
 	}
 	current_size += (6+1+4+2+f.gap_2+6+1+2+f.gap_3) * f.sector_count * 16;
 
+	end_gap_index = 20;
+
 	return desc;
 }
 
-floppy_image_format_t::desc_e* wd177x_format::get_desc_mfm(const format &f, int &current_size)
+floppy_image_format_t::desc_e* wd177x_format::get_desc_mfm(const format &f, int &current_size, int &end_gap_index)
 {
 	static floppy_image_format_t::desc_e desc[25] = {
 		/* 00 */ { MFM, 0x4e, f.gap_1 },
@@ -187,6 +187,8 @@ floppy_image_format_t::desc_e* wd177x_format::get_desc_mfm(const format &f, int 
 	}
 	current_size += (12+3+1+4+2+f.gap_2+12+3+1+2+f.gap_3) * f.sector_count * 16;
 
+	end_gap_index = 22;
+
 	return desc;
 }
 
@@ -199,15 +201,16 @@ bool wd177x_format::load(io_generic *io, UINT32 form_factor, floppy_image *image
 	const format &f = formats[type];
 	floppy_image_format_t::desc_e *desc;
 	int current_size;
+	int end_gap_index;
 
 	switch (f.encoding)
 	{
 	case floppy_image::FM: 
-		desc = get_desc_fm(f, current_size);
+		desc = get_desc_fm(f, current_size, end_gap_index);
 		break;
 	case floppy_image::MFM:
 	default:
-		desc = get_desc_mfm(f, current_size);
+		desc = get_desc_mfm(f, current_size, end_gap_index);
 		break;
 	}
 
@@ -217,9 +220,9 @@ bool wd177x_format::load(io_generic *io, UINT32 form_factor, floppy_image *image
 		throw emu_fatalerror("wd177x_format: Incorrect track layout, max_size=%d, current_size=%d", total_size, current_size);
 
 	// Fixup the end gap
-	desc[22].p2 = remaining_size / 16;
-	desc[23].p2 = remaining_size & 15;
-	desc[23].p1 >>= 16-(remaining_size & 15);
+	desc[end_gap_index].p2 = remaining_size / 16;
+	desc[end_gap_index + 1].p2 = remaining_size & 15;
+	desc[end_gap_index + 1].p1 >>= 16-(remaining_size & 15);
 
 	int track_size = compute_track_size(f);
 
