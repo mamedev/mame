@@ -715,41 +715,242 @@ WRITE8_MEMBER( sb16_device::mpu401_w )
 
 }
 
-READ8_MEMBER( sb_device::mixer_r )
+void sb16_device::mixer_set()
 {
-	if(offset == 0)
-		return m_mixer_index;
-	switch(m_mixer_index)
-	{
-		case 0: // reset
-			return 0;
-		default:
-			if(m_dsp.version >= 0x0400)
-			{
-				switch(m_mixer_index)
-				{
-					case 0x82: // irqs
-						return m_dsp.irq_active;
-				}
-			}
-	}
-	logerror("SB: Unimplemented read mixer command %02x\n", m_mixer_index);
-	return 0;
+	ymf262_device *ymf = subdevice<ymf262_device>("ymf262");
+	float lmain = m_mixer.main_vol[0]/248.0;
+	float rmain = m_mixer.main_vol[1]/248.0;
+	m_dacl->set_output_gain(ALL_OUTPUTS, lmain*(m_mixer.dac_vol[0]/248.0));
+	m_dacr->set_output_gain(ALL_OUTPUTS, rmain*(m_mixer.dac_vol[1]/248.0));
+	ymf->set_output_gain(0, lmain*(m_mixer.fm_vol[0]/248.0));
+	ymf->set_output_gain(1, rmain*(m_mixer.fm_vol[1]/248.0));
+	ymf->set_output_gain(2, lmain*(m_mixer.fm_vol[0]/248.0));
+	ymf->set_output_gain(3, rmain*(m_mixer.fm_vol[1]/248.0));
 }
 
-WRITE8_MEMBER( sb_device::mixer_w )
+void sb16_device::mixer_reset()
+{
+	m_mixer.status = 0x80;
+	m_mixer.main_vol[0] = 0xc0;
+	m_mixer.main_vol[1] = 0xc0;
+	m_mixer.dac_vol[0] = 0xc0;
+	m_mixer.dac_vol[1] = 0xc0;
+	m_mixer.fm_vol[0] = 0xc0;
+	m_mixer.fm_vol[1] = 0xc0;
+	m_mixer.cd_vol[0] = 0x00;
+	m_mixer.cd_vol[1] = 0x00;
+	m_mixer.line_vol[0] = 0x00;
+	m_mixer.line_vol[1] = 0x00;
+	m_mixer.mic_vol = 0x00;
+	m_mixer.pc_speaker_vol = 0x00;
+	m_mixer.output_ctl = 0x1f;
+	m_mixer.input_ctl[0] = 0x15;
+	m_mixer.input_ctl[1] = 0x0b;
+	m_mixer.input_gain[0] = 0x00;
+	m_mixer.input_gain[1] = 0x00;
+	m_mixer.output_gain[0] = 0x00;
+	m_mixer.output_gain[1] = 0x00;
+	m_mixer.agc = 0x00;
+	m_mixer.treble[0] = 0x80;
+	m_mixer.treble[1] = 0x80;
+	m_mixer.bass[0] = 0x80;
+	m_mixer.bass[1] = 0x80;
+	mixer_set();
+}
+
+READ8_MEMBER( sb16_device::mixer_r )
+{
+	if(offset == 0)
+		return m_mixer.status;
+	return m_mixer.data;
+}
+
+WRITE8_MEMBER( sb16_device::mixer_w )
 {
 	if(offset == 0)
 	{
-		m_mixer_index = data;
+		switch(data)
+		{
+			case 0x00:
+				mixer_reset();
+				return;
+			case 0x01:
+				m_mixer.data = m_mixer.status;
+				break;
+			case 0x04:
+				m_mixer.data = (m_mixer.dac_vol[0] & 0xf0) | (m_mixer.dac_vol[1] >> 4);
+				break;
+			case 0x0a:
+				m_mixer.data = m_mixer.mic_vol >> 5;
+				break;
+			case 0x22:
+				m_mixer.data = (m_mixer.main_vol[0] & 0xf0) | (m_mixer.main_vol[1] >> 4);
+				break;
+			case 0x26:
+				m_mixer.data = (m_mixer.fm_vol[0] & 0xf0) | (m_mixer.fm_vol[1] >> 4);
+				break;
+			case 0x28:
+				m_mixer.data = (m_mixer.cd_vol[0] & 0xf0) | (m_mixer.cd_vol[1] >> 4);
+				break;
+			case 0x2e:
+				m_mixer.data = (m_mixer.line_vol[0] & 0xf0) | (m_mixer.line_vol[1] >> 4);
+				break;
+			case 0x30:
+			case 0x31:
+				m_mixer.data = m_mixer.main_vol[data & 1];
+				break;
+			case 0x32:
+			case 0x33:
+				m_mixer.data = m_mixer.dac_vol[data & 1];
+				break;
+			case 0x34:
+			case 0x35:
+				m_mixer.data = m_mixer.fm_vol[data & 1];
+				break;
+			case 0x36:
+			case 0x37:
+				m_mixer.data = m_mixer.cd_vol[data & 1];
+				break;
+			case 0x38:
+			case 0x39:
+				m_mixer.data = m_mixer.line_vol[data & 1];
+				break;
+			case 0x3a:
+				m_mixer.data = m_mixer.mic_vol;
+				break;
+			case 0x3b:
+				m_mixer.data = m_mixer.pc_speaker_vol;
+				break;
+			case 0x3c:
+				m_mixer.data = m_mixer.output_ctl;
+				break;
+			case 0x3d:
+			case 0x3e:
+				m_mixer.data = m_mixer.input_ctl[(data + 1) & 1];
+				break;
+			case 0x3f:
+			case 0x40:
+				m_mixer.data = m_mixer.input_gain[(data + 1) & 1];
+				break;
+			case 0x41:
+			case 0x42:
+				m_mixer.data = m_mixer.output_gain[(data + 1) & 1];
+				break;
+			case 0x43:
+				m_mixer.data = m_mixer.agc;
+				break;
+			case 0x44:
+			case 0x45:
+				m_mixer.data = m_mixer.treble[data & 1];
+				break;
+			case 0x46:
+			case 0x47:
+				m_mixer.data = m_mixer.bass[data & 1];
+				break;
+			case 0x80:
+				m_mixer.data = 0x12; // irq5
+				break;
+			case 0x81:
+				m_mixer.data = 0x22;  // dma1&5
+				break;
+			case 0x82:
+				m_mixer.data = m_dsp.irq_active | 0x20;
+				break;
+			default:
+				logerror("SB: Unimplemented mixer index %02x\n", data);
+				m_mixer.status = data | 0x80;
+				m_mixer.data = 0x0a;
+				return;
+		}
+		m_mixer.status = data;
 		return;
 	}
-	switch(m_mixer_index)
+	switch(m_mixer.status)
 	{
-		case 0: // reset
+		case 0x04:
+			m_mixer.dac_vol[0] = (data & 0xf0) | 8;
+			m_mixer.dac_vol[1] = (data << 4) | 8;
+			break;
+		case 0x0a:
+			m_mixer.mic_vol = (data << 5) | 0x18;
+			break;
+		case 0x22:
+			m_mixer.main_vol[0] = (data & 0xf0) | 8;
+			m_mixer.main_vol[1] = (data << 4) | 8;
+			break;
+		case 0x26:
+			m_mixer.fm_vol[0] = (data & 0xf0) | 8;
+			m_mixer.fm_vol[1] = (data << 4) | 8;
+			break;
+		case 0x28:
+			m_mixer.cd_vol[0] = (data & 0xf0) | 8;
+			m_mixer.cd_vol[1] = (data << 4) | 8;
+			break;
+		case 0x2e:
+			m_mixer.line_vol[0] = (data & 0xf0) | 8;
+			m_mixer.line_vol[1] = (data << 4) | 8;
+			break;
+		case 0x30:
+		case 0x31:
+			m_mixer.main_vol[m_mixer.status & 1] = data & 0xf8;
+			break;
+		case 0x32:
+		case 0x33:
+			m_mixer.dac_vol[m_mixer.status & 1] = data & 0xf8;
+			break;
+		case 0x34:
+		case 0x35:
+			m_mixer.fm_vol[m_mixer.status & 1] = data & 0xf8;
+			break;
+		case 0x36:
+		case 0x37:
+			m_mixer.cd_vol[m_mixer.status & 1] = data & 0xf8;
+			break;
+		case 0x38:
+		case 0x39:
+			m_mixer.line_vol[m_mixer.status & 1] = data & 0xf8;
+			break;
+		case 0x3a:
+			m_mixer.mic_vol = data & 0xf8;
+			break;
+		case 0x3b:
+			m_mixer.pc_speaker_vol = data & 0xc0;
+			break;
+		case 0x3c:
+			m_mixer.output_ctl = data & 0x1f;
+			break;
+		case 0x3d:
+		case 0x3e:
+			m_mixer.input_ctl[(m_mixer.status + 1) & 1] = data & 0x7f;
+			break;
+		case 0x3f:
+		case 0x40:
+			m_mixer.input_gain[(m_mixer.status + 1) & 1] = data & 0xc0;
+			break;
+		case 0x41:
+		case 0x42:
+			m_mixer.output_gain[(m_mixer.status + 1) & 1] = data & 0xc0;
+			break;
+		case 0x43:
+			m_mixer.agc = data & 1;
+			break;
+		case 0x44:
+		case 0x45:
+			m_mixer.treble[m_mixer.status & 1] = data & 0xf0;
+			break;
+		case 0x46:
+		case 0x47:
+			m_mixer.bass[m_mixer.status & 1] = data & 0xf0;
+			break;
+		case 0x80:
+		case 0x81:
+			// don't support these yet
+			break;
+		default:
 			return;
 	}
-	logerror("SB: Unimplemented write mixer command %02x\n", m_mixer_index);
+	m_mixer.data = data;
+	mixer_set();
 	return;
 }
 
@@ -837,7 +1038,7 @@ void sb8_device::device_start()
 	m_isa->install_device(                   0x022e, 0x022f, 0, 0, read8_delegate(FUNC(sb_device::dsp_rbuf_status_r), this), write8_delegate(FUNC(sb_device::dsp_rbuf_status_w), this) );
 	if(m_dsp.version >= 0x0301)
 	{
-		m_isa->install_device(0x0224, 0x0225, 0, 0, read8_delegate(FUNC(sb_device::mixer_r), this), write8_delegate(FUNC(sb_device::mixer_w), this));
+		//m_isa->install_device(0x0224, 0x0225, 0, 0, read8_delegate(FUNC(sb8_device::mixer_r), this), write8_delegate(FUNC(sb8_device::mixer_w), this));
 		m_isa->install_device(subdevice("ymf262"),    0x0388, 0x038b, 0, 0, FUNC(ymf262_r), FUNC(ymf262_w) );
 		m_isa->install_device(subdevice("ymf262"),    0x0220, 0x0223, 0, 0, FUNC(ymf262_r), FUNC(ymf262_w) );
 		m_isa->install_device(subdevice("ymf262"),    0x0228, 0x0229, 0, 0, FUNC(ymf262_r), FUNC(ymf262_w) );
@@ -874,7 +1075,7 @@ void isa8_sblaster1_5_device::device_start()
 void sb16_device::device_start()
 {
 	m_isa->install_device(                   0x0200, 0x0207, 0, 0, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("joy")));
-	m_isa->install_device(                   0x0224, 0x0225, 0, 0, read8_delegate(FUNC(sb_device::mixer_r), this), write8_delegate(FUNC(sb_device::mixer_w), this));
+	m_isa->install_device(                   0x0224, 0x0225, 0, 0, read8_delegate(FUNC(sb16_device::mixer_r), this), write8_delegate(FUNC(sb16_device::mixer_w), this));
 	m_isa->install_device(                   0x0226, 0x0227, 0, 0, read8_delegate(FUNC(sb_device::dsp_reset_r), this), write8_delegate(FUNC(sb_device::dsp_reset_w), this));
 	m_isa->install_device(                   0x022a, 0x022b, 0, 0, read8_delegate(FUNC(sb_device::dsp_data_r), this), write8_delegate(FUNC(sb_device::dsp_data_w), this) );
 	m_isa->install_device(                   0x022c, 0x022d, 0, 0, read8_delegate(FUNC(sb_device::dsp_wbuf_status_r), this), write8_delegate(FUNC(sb_device::dsp_cmd_w), this) );
@@ -913,8 +1114,8 @@ void sb_device::device_reset()
     m_dsp.rbuf_status = 0;
 	m_dsp.frequency = 8000; // per stereo-fx
 	m_dsp.irq_active = 0;
-	m_mixer_index = 0;
 	m_dsp.dma_no_irq = false;
+	mixer_reset();
 }
 
 UINT8 sb_device::dack_r(int line)

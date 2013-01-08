@@ -53,6 +53,39 @@ struct sb8_dsp_state
 	UINT8 adpcm_count;
 };
 
+struct sb8_mixer
+{
+	UINT8 status;
+	UINT8 main_vol;
+	UINT8 dac_vol;
+	UINT8 fm_vol;
+	UINT8 mic_vol;
+	UINT8 in_filter;
+	UINT8 stereo_sel;
+	UINT8 cd_vol;
+	UINT8 line_vol;
+};
+
+struct sb16_mixer
+{
+	UINT8 data;
+	UINT8 status;
+	UINT8 main_vol[2];
+	UINT8 dac_vol[2];
+	UINT8 fm_vol[2];
+	UINT8 cd_vol[2];
+	UINT8 line_vol[2];
+	UINT8 mic_vol;
+	UINT8 pc_speaker_vol;
+	UINT8 output_ctl;
+	UINT8 input_ctl[2];
+	UINT8 input_gain[2];
+	UINT8 output_gain[2];
+	UINT8 agc;
+	UINT8 treble[2];
+	UINT8 bass[2];
+};
+
 // ======================> sb8_device (parent)
 
 class sb_device :
@@ -79,8 +112,6 @@ public:
         DECLARE_READ8_MEMBER(dsp_wbuf_status_r);
         DECLARE_WRITE8_MEMBER(dsp_rbuf_status_w);
         DECLARE_WRITE8_MEMBER(dsp_cmd_w);
-		DECLARE_READ8_MEMBER(mixer_r);
-		DECLARE_WRITE8_MEMBER(mixer_w);
 
 protected:
         // device-level overrides
@@ -91,11 +122,11 @@ protected:
 		virtual void drq16_w(int state) { }
 		virtual void drq_w(int state) { }
 		virtual void irq_w(int state, int source) { }
+		virtual void mixer_reset() {}
 		void adpcm_decode(UINT8 sample, int size);
 
         struct sb8_dsp_state m_dsp;
         UINT8 m_dack_out;
-		UINT8 m_mixer_index;
 
         emu_timer *m_timer;
 };
@@ -154,6 +185,8 @@ public:
         sb16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name);
         DECLARE_READ8_MEMBER(mpu401_r);
         DECLARE_WRITE8_MEMBER(mpu401_w);
+		DECLARE_READ8_MEMBER(mixer_r);
+		DECLARE_WRITE8_MEMBER(mixer_w);
 protected:
         virtual void device_start();
 		virtual UINT16 dack16_r(int line);
@@ -163,10 +196,13 @@ protected:
 		virtual void drq16_w(int state) { m_isa->drq5_w(state); }
 		virtual void drq_w(int state) { m_isa->drq1_w(state); }
 		virtual void irq_w(int state, int source) { (state?m_dsp.irq_active|=source:m_dsp.irq_active&=~source); m_isa->irq5_w(m_dsp.irq_active);  }
+		virtual void mixer_reset();
+		void mixer_set();
 private:
 		UINT8 m_mpu_queue[16];
 		UINT8 m_tail;
 		UINT8 m_head;
+		struct sb16_mixer m_mixer;
 };
 
 class isa16_sblaster16_device : public sb16_device
