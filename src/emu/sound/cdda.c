@@ -18,6 +18,7 @@ struct cdda_info
 	UINT8 *				audio_cache;
 	UINT32				audio_samples;
 	UINT32				audio_bptr;
+	INT16				audio_volume[2];
 };
 
 INLINE cdda_info *get_safe_token(device_t *device)
@@ -40,6 +41,8 @@ static STREAM_UPDATE( cdda_update )
 {
 	cdda_info *info = (cdda_info *)param;
 	get_audio_data(info, &outputs[0][0], &outputs[1][0], samples);
+	info->audio_volume[0] = (INT16)outputs[0][0];
+	info->audio_volume[1] = (INT16)outputs[1][0];
 }
 
 
@@ -310,6 +313,19 @@ void cdda_set_channel_volume(device_t *device, int channel, int volume)
 	cdda_info *cdda = get_safe_token(device);
 
 	cdda->stream->set_output_gain(channel,volume / 100.0);
+}
+
+
+/*-------------------------------------------------
+    cdda_get_channel_volume - sets CD-DA volume level
+    for either speaker, used for volume control display
+-------------------------------------------------*/
+
+INT16 cdda_get_channel_volume(device_t *device, int channel)
+{
+	cdda_info *cdda = get_safe_token(device);
+
+	return cdda->audio_volume[channel];
 }
 
 const device_type CDDA = &device_creator<cdda_device>;

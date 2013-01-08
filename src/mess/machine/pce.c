@@ -1612,7 +1612,10 @@ READ8_MEMBER(pce_state::pce_cd_intf_r)
 	case 0x04:	/* CD reset */
 		break;
 	case 0x05:	/* Convert PCM data / PCM data */
+		data = cdda_get_channel_volume(machine().device( "cdda" ),(pce_cd.regs[0x03] & 2) ? 0 : 1) & 0xff;
+		break;
 	case 0x06:	/* PCM data */
+		data = cdda_get_channel_volume(machine().device( "cdda" ),(pce_cd.regs[0x03] & 2) ? 0 : 1) >> 8;
 		break;
 	case 0x07:	/* BRAM unlock / CD status */
 		data = ( pce_cd.bram_locked ? ( data & 0x7F ) : ( data | 0x80 ) );

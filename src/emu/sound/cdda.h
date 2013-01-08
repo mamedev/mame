@@ -13,6 +13,7 @@ void cdda_stop_audio(device_t *device);
 void cdda_pause_audio(device_t *device, int pause);
 void cdda_set_volume(device_t *device, int volume);
 void cdda_set_channel_volume(device_t *device, int channel, int volume);
+INT16 cdda_get_channel_volume(device_t *device, int channel);
 
 UINT32 cdda_get_audio_lba(device_t *device);
 int cdda_audio_active(device_t *device);
