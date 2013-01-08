@@ -18,23 +18,50 @@
     Assassins Collection discs
     ==========================
     
-    The Assassins discs were popular multi-game PD discs 
-    I imagine there should be a single version for each release, so we'll need to clean things up later
+    The Assassins discs were popular multi-game PD discs, there were various collections of games, utlities etc.
+    
+    The software contained on them was always the freely distributable versions, not the registered ones in the
+    case of the shareware titles.
     
     For the Assassins PD Game Discs
     
+    For the early discs (1 - 45 at least) there should be 2 distinct versions of the images, the original releases
+    and later ones where the menu was fixed to work on A1200 machines (several games still didn't however)
+    
+    It appears for the many dumps we have are of the LATER release only, even where there are alt sets.  If anybody
+    has the original releases in cases where they are missing then they should be dumped and added to this list!
+    The releases are easy to identify, the newer ones have a message warning that there might be issues with some
+    games on A1200 machines, the original releases don't warn you, and in some cases even the menu fails to load on
+    an A1200.   TODO: properly identify the sets we DO have and where we're likely missing ones.
+    
+    Confirmed original release as Missing:
+     001
+     002
+     003
+     004
+     005
+     006
+     007
+     008
+     009
+     010
+    
     the 912384 byte images are now marked in TOSEC as overdump (although before they were marked as the main sets)
-    the 901120 byte [h ALE] marked images are often the same as the above but trimmed down.. are they really hacked?
+    the 901120 byte [h ALE] marked images are often the same as the above but trimmed down.. some have obviously
+    been hacked, but later ones don't appear to have been, or the hacks are less obvious.
      (ALE was Amiga Legal Emulation, a site offering the collection)
      
     Images 251-261 were converted from another collection and are not in TOSEC, the original files were DMS which
     can apparently be problematic due to a faulty compressor in some cases, but all other images from the same
     collection decompressed to match exactly what we have here, so chances are they're ok.
-    
+      
     How many discs were actually released? 251-261 only surfaced more recently.  I think I might have had a newer
     Catalogue disc the one here, although I'm not certain of this.  Check listings from magazines etc. to see if
     anything is missing?    
-    
+   
+    The startup text mentions 'new wave' discs with only A1200 compatible games, are they just talking about the
+    newer discs or was another collection released?  
+   
     -->
     
   <software name="ass12f14" supported="no"> <!-- TOSEC 2012-12-28 -->
@@ -889,8 +916,9 @@
 	  </part>
   </software>
 
+  <!-- this was also given as an Christmas gift to regular buyers, along with a Christmas card, I don't remember if that version mentioned Amiga Action tho -->
   <software name="assxmas" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games - Merry Christmas (19xx)(Assassins, The)(PD)</description>
+	  <description>PD Games - Merry Christmas (Santa + Rudolph, Obstickle) (Assassins, The)(PD)</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1274,7 +1302,7 @@
   </software>
 
   <software name="asspd001" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 001 (19xx)(Assassins, The)(PD)</description>
+	  <description>PD Games Volume 001 (Tanx, Roller-Pede, Amigoids, Cave Runner, Avatris) (Assassins, The)(PD)</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1286,7 +1314,7 @@
   </software>
 
   <software name="asspd001a" cloneof="asspd001" supported="no">
-	  <description>PD Games Volume 001 (19xx)(Assassins, The)(PD)[a]</description>
+	  <description>PD Games Volume 001 (Tanx, Roller-Pede, Amigoids, Cave Runner, Avatris) (Assassins, The)(PD)[a]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1298,7 +1326,7 @@
   </software>
 
   <software name="asspd001b" cloneof="asspd001" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 001 (19xx)(Assassins, The)(PD)[h ALE]</description>
+	  <description>PD Games Volume 001 (Tanx, Roller-Pede, Amigoids, Cave Runner, Avatris) (Assassins, The)(PD)[h ALE]</description> <!-- additional startup message inserted -->
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1310,7 +1338,7 @@
   </software>
 
   <software name="asspd001c" cloneof="asspd001" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 001 (19xx)(Assassins, The)(PD)[o]</description>
+	  <description>PD Games Volume 001 (Tanx, Roller-Pede, Amigoids, Cave Runner, Avatris) (Assassins, The)(PD)[o]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1322,7 +1350,7 @@
   </software>
 
   <software name="asspd002" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 002 (19xx)(Assassins, The)(PD)[a2]</description>
+	  <description>PD Games Volume 002 (Girl Action, Missile Command, Invaders, Bally 2, Maze Game, Think Ahead) (Assassins, The)(PD)[a2]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1334,7 +1362,7 @@
   </software>
 
   <software name="asspd002a" cloneof="asspd002" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 002 (19xx)(Assassins, The)(PD)[a]</description>
+	  <description>PD Games Volume 002 (Girl Action, Missile Command, Invaders, Bally 2, Maze Game, Think Ahead) (Assassins, The)(PD)[a]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1346,7 +1374,7 @@
   </software>
 
   <software name="asspd002b" cloneof="asspd002" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 002 (19xx)(Assassins, The)(PD)[h ALE]</description>
+	  <description>PD Games Volume 002 (Girl Action, Missile Command, Invaders, Bally 2, Maze Game, Think Ahead) (Assassins, The)(PD)[h ALE]</description> <!-- additional startup message inserted -->
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1358,7 +1386,7 @@
   </software>
 
   <software name="asspd002c" cloneof="asspd002" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 002 (19xx)(Assassins, The)(PD)[o]</description>
+	  <description>PD Games Volume 002 (Girl Action, Missile Command, Invaders, Bally 2, Maze Game, Think Ahead) (Assassins, The)(PD)[o]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1370,7 +1398,7 @@
   </software>
 
   <software name="asspd003" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 003 (19xx)(Assassins, The)(PD)[a2]</description>
+	  <description>PD Games Volume 003 (Megaball, Drip) (Assassins, The)(PD)[a2]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1382,7 +1410,7 @@
   </software>
 
   <software name="asspd003a" cloneof="asspd003" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 003 (19xx)(Assassins, The)(PD)[a]</description>
+	  <description>PD Games Volume 003 (Megaball, Drip) (Assassins, The)(PD)[a]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1394,7 +1422,7 @@
   </software>
 
   <software name="asspd003b" cloneof="asspd003" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 003 (19xx)(Assassins, The)(PD)[h ALE]</description>
+	  <description>PD Games Volume 003 (Megaball, Drip) (Assassins, The)(PD)[h ALE]</description> <!-- additional startup message inserted -->
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1406,7 +1434,7 @@
   </software>
 
   <software name="asspd003c" cloneof="asspd003" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 003 (19xx)(Assassins, The)(PD)[o]</description>
+	  <description>PD Games Volume 003 (Megaball, Drip) (Assassins, The)(PD)[o]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1418,7 +1446,7 @@
   </software>
 
   <software name="asspd004" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 004 (19xx)(Assassins, The)(PD)[a2]</description>
+	  <description>PD Games Volume 004 (Jumper, Gomoku, Cracker, Jumpy, Turbo Duel, Klondike) (Assassins, The)(PD)[a2]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1430,7 +1458,7 @@
   </software>
 
   <software name="asspd004a" cloneof="asspd004" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 004 (19xx)(Assassins, The)(PD)[a]</description>
+	  <description>PD Games Volume 004 (Jumper, Gomoku, Cracker, Jumpy, Turbo Duel, Klondike) (Assassins, The)(PD)[a]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1442,7 +1470,7 @@
   </software>
 
   <software name="asspd004b" cloneof="asspd004" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 004 (19xx)(Assassins, The)(PD)[h ALE]</description>
+	  <description>PD Games Volume 004 (Jumper, Gomoku, Cracker, Jumpy, Turbo Duel, Klondike) (Assassins, The)(PD)[h ALE]</description> <!-- additional startup message inserted -->
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1454,7 +1482,7 @@
   </software>
 
   <software name="asspd004c" cloneof="asspd004" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 004 (19xx)(Assassins, The)(PD)[o]</description>
+	  <description>PD Games Volume 004 (Jumper, Gomoku, Cracker, Jumpy, Turbo Duel, Klondike) (Assassins, The)(PD)[o]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1466,7 +1494,7 @@
   </software>
 
   <software name="asspd005" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 005 (19xx)(Assassins, The)(PD)[a2]</description>
+	  <description>PD Games Volume 005 (Go Looly, Retaliator, Raid) (Assassins, The)(PD)[a2]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1478,7 +1506,7 @@
   </software>
 
   <software name="asspd005a" cloneof="asspd005" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 005 (19xx)(Assassins, The)(PD)[a]</description>
+	  <description>PD Games Volume 005 (Go Looly, Retaliator, Raid) (Assassins, The)(PD)[a]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1490,7 +1518,7 @@
   </software>
 
   <software name="asspd005b" cloneof="asspd005" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 005 (19xx)(Assassins, The)(PD)[h ALE]</description>
+	  <description>PD Games Volume 005 (Go Looly, Retaliator, Raid) (Assassins, The)(PD)[h ALE]</description> <!-- additional startup message inserted -->
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1502,7 +1530,7 @@
   </software>
 
   <software name="asspd005c" cloneof="asspd005" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 005 (19xx)(Assassins, The)(PD)[o]</description>
+	  <description>PD Games Volume 005 (Go Looly, Retaliator, Raid) (Assassins, The)(PD)[o]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1514,7 +1542,7 @@
   </software>
 
   <software name="asspd006" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 006 (19xx)(Assassins, The)(PD)[a2]</description>
+	  <description>PD Games Volume 006 (Downhill Challenge, Pacman 87, Metagalactic Llamas, Welltrix) (Assassins, The)(PD)[a2]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1526,7 +1554,7 @@
   </software>
 
   <software name="asspd006a" cloneof="asspd006" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 006 (19xx)(Assassins, The)(PD)[a]</description>
+	  <description>PD Games Volume 006 (Downhill Challenge, Pacman 87, Metagalactic Llamas, Welltrix) (Assassins, The)(PD)[a]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1538,7 +1566,7 @@
   </software>
 
   <software name="asspd006b" cloneof="asspd006" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 006 (19xx)(Assassins, The)(PD)[h ALE]</description>
+	  <description>PD Games Volume 006 (Downhill Challenge, Pacman 87, Metagalactic Llamas, Welltrix) (Assassins, The)(PD)[h ALE]</description> <!-- additional startup message inserted -->
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1550,7 +1578,7 @@
   </software>
 
   <software name="asspd006c" cloneof="asspd006" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 006 (19xx)(Assassins, The)(PD)[o]</description>
+	  <description>PD Games Volume 006 (Downhill Challenge, Pacman 87, Metagalactic Llamas, Welltrix) (Assassins, The)(PD)[o]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1562,7 +1590,7 @@
   </software>
 
   <software name="asspd007" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 007 (19xx)(Assassins, The)(PD)[a2]</description>
+	  <description>PD Games Volume 007 (Destination Moonbase, Trix, Nightworks, Clauds Runner) (Assassins, The)(PD)[a2]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1574,7 +1602,7 @@
   </software>
 
   <software name="asspd007a" cloneof="asspd007" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 007 (19xx)(Assassins, The)(PD)[a]</description>
+	  <description>PD Games Volume 007 (Destination Moonbase, Trix, Nightworks, Clauds Runner) (Assassins, The)(PD)[a]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1586,7 +1614,7 @@
   </software>
 
   <software name="asspd007b" cloneof="asspd007" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 007 (19xx)(Assassins, The)(PD)[h ALE]</description>
+	  <description>PD Games Volume 007 (Destination Moonbase, Trix, Nightworks, Clauds Runner) (Assassins, The)(PD)[h ALE]</description> <!-- additional startup message inserted -->
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1598,7 +1626,7 @@
   </software>
 
   <software name="asspd007c" cloneof="asspd007" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 007 (19xx)(Assassins, The)(PD)[o]</description>
+	  <description>PD Games Volume 007 (Destination Moonbase, Trix, Nightworks, Clauds Runner) (Assassins, The)(PD)[o]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1610,7 +1638,7 @@
   </software>
 
   <software name="asspd008" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 008 (19xx)(Assassins, The)(PD)[a2]</description>
+	  <description>PD Games Volume 008 (Air Ace II, H-Ball, Number Fumbler, Snake-Pit) (Assassins, The)(PD)[a2]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1622,7 +1650,7 @@
   </software>
 
   <software name="asspd008a" cloneof="asspd008" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 008 (19xx)(Assassins, The)(PD)[a]</description>
+	  <description>PD Games Volume 008 (Air Ace II, H-Ball, Number Fumbler, Snake-Pit) (Assassins, The)(PD)[a]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1634,7 +1662,7 @@
   </software>
 
   <software name="asspd008b" cloneof="asspd008" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 008 (19xx)(Assassins, The)(PD)[h ALE]</description>
+	  <description>PD Games Volume 008 (Air Ace II, H-Ball, Number Fumbler, Snake-Pit) (Assassins, The)(PD)[h ALE]</description> <!-- additional startup message inserted -->
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1646,7 +1674,7 @@
   </software>
 
   <software name="asspd008c" cloneof="asspd008" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 008 (19xx)(Assassins, The)(PD)[o]</description>
+	  <description>PD Games Volume 008 (Air Ace II, H-Ball, Number Fumbler, Snake-Pit) (Assassins, The)(PD)[o]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1658,7 +1686,7 @@
   </software>
 
   <software name="asspd009" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 009 (19xx)(Assassins, The)(PD)[a2]</description>
+	  <description>PD Games Volume 009 (Blizzard 512KB, Battle Pong) (Assassins, The)(PD)[a2]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1670,7 +1698,7 @@
   </software>
 
   <software name="asspd009a" cloneof="asspd009" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 009 (19xx)(Assassins, The)(PD)[a]</description>
+	  <description>PD Games Volume 009 (Blizzard 512KB, Battle Pong) (Assassins, The)(PD)[a]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1682,7 +1710,7 @@
   </software>
 
   <software name="asspd009b" cloneof="asspd009" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 009 (19xx)(Assassins, The)(PD)[h ALE]</description>
+	  <description>PD Games Volume 009 (Blizzard 512KB, Battle Pong) (Assassins, The)(PD)[h ALE]</description> <!-- additional startup message inserted -->
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1693,8 +1721,9 @@
 	  </part>
   </software>
 
+  <!-- bad? not bootable? -->
   <software name="asspd009c" cloneof="asspd009" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 009 (19xx)(Assassins, The)(PD)[o]</description>
+	  <description>PD Games Volume 009 (Blizzard 512KB, Battle Pong) (Assassins, The)(PD)[o]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1706,7 +1735,7 @@
   </software>
 
   <software name="asspd010" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 010 (19xx)(Assassins, The)(PD)[a2]</description>
+	  <description>PD Games Volume 010 (Pick Out, Escape, Sys, Pipeline) (Assassins, The)(PD)[a2]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1718,7 +1747,7 @@
   </software>
 
   <software name="asspd010a" cloneof="asspd010" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 010 (19xx)(Assassins, The)(PD)[a]</description>
+	  <description>PD Games Volume 010 (Pick Out, Escape, Sys, Pipeline) (Assassins, The)(PD)[a]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1730,7 +1759,7 @@
   </software>
 
   <software name="asspd010b" cloneof="asspd010" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 010 (19xx)(Assassins, The)(PD)[h ALE]</description>
+	  <description>PD Games Volume 010 (Pick Out, Escape, Sys, Pipeline) (Assassins, The)(PD)[h ALE]</description> <!-- additional startup message inserted -->
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -1742,7 +1771,7 @@
   </software>
 
   <software name="asspd010c" cloneof="asspd010" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 010 (19xx)(Assassins, The)(PD)[o]</description>
+	  <description>PD Games Volume 010 (Pick Out, Escape, Sys, Pipeline) (Assassins, The)(PD)[o]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -2726,7 +2755,7 @@
   </software>
 
   <software name="asspd034" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 034 (19xx)(Assassins, The)(PD)[a2]</description>
+	  <description>PD Games Volume 034 (19xx)(Assassins, The)(PD) (older menu, not for A1200)</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -2738,7 +2767,7 @@
   </software>
 
   <software name="asspd034a" cloneof="asspd034" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 034 (19xx)(Assassins, The)(PD)[a]</description>
+	  <description>PD Games Volume 034 (19xx)(Assassins, The)(PD)</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -2774,7 +2803,7 @@
   </software>
 
   <software name="asspd035" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 035 (19xx)(Assassins, The)(PD)[a]</description>
+	  <description>PD Games Volume 035 (19xx)(Assassins, The)(PD) (older menu, not for A1200)</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -2798,7 +2827,7 @@
   </software>
 
   <software name="asspd035b" cloneof="asspd035" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 035 (19xx)(Assassins, The)(PD)[o]</description>
+	  <description>PD Games Volume 035 (19xx)(Assassins, The)(PD) (older menu, not for A1200)[o]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
@@ -2822,7 +2851,7 @@
   </software>
 
   <software name="asspd036a" cloneof="asspd036" supported="no"> <!-- TOSEC 2012-12-28 -->
-	  <description>PD Games Volume 036 (19xx)(Assassins, The)(PD)[h ALE]</description>
+	  <description>PD Games Volume 036 (19xx)(Assassins, The)(PD) (older menu) [h ALE]</description>
 	  <year>199?</year>
 	  <publisher>&lt;unknown&gt;</publisher>
 	  <part name="flop1" interface="floppy_3_5">
