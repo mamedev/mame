@@ -223,6 +223,7 @@ cdrom_file *cdrom_open(const char *inputfile)
 
 	/* fill out dummy entries for the last track to help our search */
 	file->cdtoc.tracks[i].physframeofs = physofs;
+	file->cdtoc.tracks[i].logframeofs = logofs;
 	file->cdtoc.tracks[i].chdframeofs = 0;
 
 	return file;
@@ -305,6 +306,7 @@ cdrom_file *cdrom_open(chd_file *chd)
 
 	/* fill out dummy entries for the last track to help our search */
 	file->cdtoc.tracks[i].physframeofs = physofs;
+	file->cdtoc.tracks[i].logframeofs = logofs;
 	file->cdtoc.tracks[i].chdframeofs = chdofs;
 
 	return file;
@@ -393,6 +395,7 @@ UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 
 
 	/* copy out the requested sector */
 	UINT32 tracktype = file->cdtoc.tracks[tracknum].trktype;
+
 	if ((datatype == tracktype) || (datatype == CD_TRACK_RAW_DONTCARE))
 	{
 		return (read_partial_sector(file, buffer, chdsector, tracknum, 0, file->cdtoc.tracks[tracknum].datasize) == CHDERR_NONE);
