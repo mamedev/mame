@@ -83,7 +83,7 @@ const char *mm2_format::extensions() const
 // Unverified gap sizes
 const mm1_format::format mm1_format::formats[] = {
 	{
-		floppy_image::FF_525, floppy_image::DSQD,
+		floppy_image::FF_525, floppy_image::DSQD, floppy_image::MFM,
 		2000, // 2us, 300rpm
 		8, 80, 2,
 		512, {},
@@ -96,7 +96,7 @@ const mm1_format::format mm1_format::formats[] = {
 // Unverified gap sizes
 const mm2_format::format mm2_format::formats[] = {
 	{
-		floppy_image::FF_525, floppy_image::DSDD,
+		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, // 2us, 300rpm
 		9, 40, 2,
 		512, {},
@@ -106,7 +106,7 @@ const mm2_format::format mm2_format::formats[] = {
 	// 40 tracks but 18 sectors implying HD density at 300rpm, i.e. on
 	// 3.5" media?  That makes no sense
 	{
-		floppy_image::FF_525, floppy_image::DSHD,
+		floppy_image::FF_525, floppy_image::DSHD, floppy_image::MFM,
 		1000, // 1us, 300rpm, otherwise it just won't fit
 		18, 40, 2, // That line is just nonsense
 		512, {},

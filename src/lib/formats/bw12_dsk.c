@@ -64,7 +64,7 @@ const char *bw12_format::extensions() const
 // Unverified gap sizes
 const bw12_format::format bw12_format::formats[] = {
 	{ // 180KB BW 12
-		floppy_image::FF_525, floppy_image::SSDD,
+		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
 		2000, // 2us, 300rpm
 		18, 40, 1,
 		256, {},
@@ -72,7 +72,7 @@ const bw12_format::format bw12_format::formats[] = {
 		80, 50, 22, 80
 	},
 	{ // 360KB BW 12
-		floppy_image::FF_525, floppy_image::DSDD,
+		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, // 2us, 300rpm
 		18, 40, 2,
 		256, {},
@@ -80,7 +80,7 @@ const bw12_format::format bw12_format::formats[] = {
 		80, 50, 22, 80
 	},
 	{ // SVI-328
-		floppy_image::FF_525, floppy_image::SSDD,
+		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
 		2000, // 2us, 300rpm
 		17, 40, 1,
 		256, {},
@@ -88,7 +88,7 @@ const bw12_format::format bw12_format::formats[] = {
 		80, 50, 22, 80
 	},
 	{ // SVI-328
-		floppy_image::FF_525, floppy_image::DSDD,
+		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, // 2us, 300rpm
 		17, 40, 2,
 		256, {},
@@ -96,7 +96,7 @@ const bw12_format::format bw12_format::formats[] = {
 		80, 50, 22, 80
 	},
 	{ // Kaypro II
-		floppy_image::FF_525, floppy_image::SSDD,
+		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
 		2000, // 2us, 300rpm
 		10, 40, 1,
 		512, {},

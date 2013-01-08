@@ -385,7 +385,7 @@ WRITE8_MEMBER(upd765_family_device::fifo_w)
 		if(cmd == C_INVALID) {
 			logerror("%s: Invalid on %02x\n", tag(), command[0]);
 			main_phase = PHASE_RESULT;
-			result[0] = 0x80;
+			result[0] = ST0_UNK;
 			result_pos = 1;
 			return;
 		}

@@ -74,7 +74,6 @@ public:
 
 	DECLARE_READ8_MEMBER( ls259_r );
 	DECLARE_WRITE8_MEMBER( ls259_w );
-	void fdc_intrq_w(bool state);
 	DECLARE_READ8_MEMBER( pia_pa_r );
 	DECLARE_READ_LINE_MEMBER( pia_cb1_r );
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
@@ -100,7 +99,6 @@ public:
 	int m_key_shift;
 
 	/* floppy state */
-	int m_fdc_int;
 	int m_motor_on;
 	int m_motor0;
 	int m_motor1;

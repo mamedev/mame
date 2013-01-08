@@ -64,7 +64,7 @@ const char *m5_format::extensions() const
 // Unverified gap sizes
 const m5_format::format m5_format::formats[] = {
 	{
-		floppy_image::FF_525, floppy_image::DSDD,
+		floppy_image::FF_525, floppy_image::DSDD, floppy_image::MFM,
 		2000, // 2us, 300rpm
 		18, 40, 2,
 		256, {},

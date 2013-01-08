@@ -65,7 +65,7 @@ const char *kc85_format::extensions() const
 // 640-800K on HD which handles 1.2M, really?
 const kc85_format::format kc85_format::formats[] = {
 	{
-		floppy_image::FF_525, floppy_image::DSHD,
+		floppy_image::FF_525, floppy_image::DSHD, floppy_image::MFM,
 		1200, // 1us, 360rpm
 		5, 80, 2,
 		1024, {},
@@ -73,7 +73,7 @@ const kc85_format::format kc85_format::formats[] = {
 		80, 50, 22, 80
 	},
 	{
-		floppy_image::FF_525, floppy_image::DSHD,
+		floppy_image::FF_525, floppy_image::DSHD, floppy_image::MFM,
 		1200, // 1us, 360rpm
 		9, 80, 2,
 		512, {},
@@ -81,7 +81,7 @@ const kc85_format::format kc85_format::formats[] = {
 		80, 50, 22, 80
 	},
 	{
-		floppy_image::FF_525, floppy_image::DSHD,
+		floppy_image::FF_525, floppy_image::DSHD, floppy_image::MFM,
 		1200, // 1us, 360rpm
 		16, 80, 2,
 		256, {},

@@ -17,6 +17,7 @@ public:
 	struct format {
 		UINT32 form_factor;      // See floppy_image for possible values
 		UINT32 variant;          // See floppy_image for possible values
+		UINT32 encoding;		 // See floppy_image for possible values
 
 		int cell_size;           // See floppy_image_format_t for details
 		int sector_count;
@@ -42,6 +43,8 @@ public:
 
 private:
 	const format *formats;
+	floppy_image_format_t::desc_e* get_desc_fm(const format &f, int &current_size, int &end_gap_index);
+	floppy_image_format_t::desc_e* get_desc_mfm(const format &f, int &current_size, int &end_gap_index);
 	int find_size(io_generic *io, UINT32 form_factor);
 	int compute_track_size(const format &f) const;
 	void build_sector_description(const format &d, UINT8 *sectdata, desc_s *sectors) const;

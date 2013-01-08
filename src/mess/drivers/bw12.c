@@ -29,7 +29,7 @@
 
     TODO:
 
-    - Osborne 1 DD disk format
+	- floppy is broken
     - floppy motor off timer
 
 */
@@ -95,7 +95,8 @@ void bw12_state::set_floppy_motor_off_timer()
 
         */
 
-		m_floppy_timer->adjust(attotime::zero);
+		//m_floppy_timer->adjust(attotime::zero);
+        floppy_motor_off();
 	}
 }
 
@@ -384,13 +385,6 @@ void bw12_state::video_start()
 	m_char_rom = memregion("chargen")->base();
 }
 
-/* UPD765 Interface */
-
-void bw12_state::fdc_intrq_w(bool state)
-{
-	m_fdc_int = state;
-}
-
 /* PIA6821 Interface */
 
 READ8_MEMBER( bw12_state::pia_pa_r )
@@ -419,7 +413,7 @@ READ8_MEMBER( bw12_state::pia_pa_r )
 	data |= (m_pit_out2 << 4);
 	data |= (m_key_stb << 5);
 	data |= (m_key_sin << 6);
-	data |= (m_fdc_int << 7);
+	data |= (m_fdc->get_irq() ? 1 : 0) << 7;
 
 	return data;
 }
@@ -595,7 +589,6 @@ void bw12_state::machine_start()
 	save_item(NAME(m_key_sin));
 	save_item(NAME(m_key_stb));
 	save_item(NAME(m_key_shift));
-	save_item(NAME(m_fdc_int));
 	save_item(NAME(m_motor_on));
 	save_item(NAME(m_motor0));
 	save_item(NAME(m_motor1));
@@ -719,5 +712,5 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY               FULLNAME        FLAGS */
-COMP( 1984,	bw12,   0,      0,      bw12,	bw12, driver_device,   0,      "Bondwell Holding",   "Bondwell 12",	GAME_SUPPORTS_SAVE )
-COMP( 1984,	bw14,   bw12,   0,      bw14,	bw12, driver_device,   0,      "Bondwell Holding",   "Bondwell 14",	GAME_SUPPORTS_SAVE )
+COMP( 1984,	bw12,   0,      0,      bw12,	bw12, driver_device,   0,      "Bondwell Holding",   "Bondwell 12",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1984,	bw14,   bw12,   0,      bw14,	bw12, driver_device,   0,      "Bondwell Holding",   "Bondwell 14",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

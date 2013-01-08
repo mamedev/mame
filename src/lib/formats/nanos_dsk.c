@@ -65,7 +65,7 @@ const char *nanos_format::extensions() const
 // 800K on HD which handles 1.2M, really?
 const nanos_format::format nanos_format::formats[] = {
 	{
-		floppy_image::FF_525, floppy_image::DSHD,
+		floppy_image::FF_525, floppy_image::DSHD, floppy_image::MFM,
 		1200, // 1us, 360rpm
 		5, 80, 2,
 		1024, {},

@@ -63,11 +63,11 @@ const char *bw2_format::extensions() const
 
 const bw2_format::format bw2_format::formats[] = {
 	{   // 340K 3 1/2 inch double density
-		floppy_image::FF_35, floppy_image::SSDD,
+		floppy_image::FF_35, floppy_image::SSDD, floppy_image::MFM,
 		2000, 17, 80, 1, 256, {}, 0, {}, 80, 20, 22, 14
 	},
 	{   // 360K 3 1/2 inch double density
-		floppy_image::FF_35, floppy_image::SSDD,
+		floppy_image::FF_35, floppy_image::SSDD, floppy_image::MFM,
 		2000, 18, 80, 1, 256, {}, 0, {}, 80, 20, 22, 14
 	},
 	{}

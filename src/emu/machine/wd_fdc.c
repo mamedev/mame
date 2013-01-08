@@ -1383,7 +1383,7 @@ void wd_fdc_t::live_run(attotime limit)
 				cur_live.state = READ_HEADER_BLOCK_HEADER;
 			}
 
-			if(dden && (cur_live.shift_reg == 0xf57e || cur_live.shift_reg == 0xf57e)) {
+			if(dden && (cur_live.shift_reg == 0xf57e || cur_live.shift_reg == 0xf57f)) {
 				cur_live.crc = cur_live.shift_reg == 0xf57e ? 0xef21 : 0xff00;
 				cur_live.data_separator_phase = false;
 				cur_live.bit_counter = 0;
@@ -1860,8 +1860,7 @@ void wd_fdc_t::live_run(attotime limit)
 					cur_live.byte_counter = 0;
 					cur_live.data_bit_context = cur_live.data_reg & 1;
 					pll_start_writing(cur_live.tm);
-					if(dden)
-						live_write_fm(0x00);
+					live_write_fm(0x00);
 				}
 				break;
 
@@ -1971,7 +1970,7 @@ const int wd_fdc_digital_t::wd_digital_step_times[4] = { 12000, 24000, 40000, 60
 void wd_fdc_digital_t::pll_reset(bool fm, attotime when)
 {
 	cur_pll.reset(when);
-	cur_pll.set_clock(clocks_to_attotime(1));
+	cur_pll.set_clock(clocks_to_attotime(fm ? 2 : 1)); // HACK
 }
 
 void wd_fdc_digital_t::pll_start_writing(attotime tm)

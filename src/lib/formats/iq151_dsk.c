@@ -64,7 +64,7 @@ const char *iq151_format::extensions() const
 // Unverified gap sizes.  May be FM.
 const iq151_format::format iq151_format::formats[] = {
 	{
-		floppy_image::FF_8, floppy_image::SSSD,
+		floppy_image::FF_8, floppy_image::SSSD, floppy_image::MFM,
 		2000, // maybe
 		26, 77, 1,
 		128, {},

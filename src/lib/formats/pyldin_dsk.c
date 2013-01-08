@@ -65,7 +65,7 @@ const char *pyldin_format::extensions() const
 // 720K on HD which handles 1.2M, really?
 const pyldin_format::format pyldin_format::formats[] = {
 	{
-		floppy_image::FF_525, floppy_image::DSHD,
+		floppy_image::FF_525, floppy_image::DSHD, floppy_image::MFM,
 		1200, // 1us, 360rpm
 		9, 80, 2,
 		512, {},

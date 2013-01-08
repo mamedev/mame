@@ -64,7 +64,7 @@ const char *apollo_format::extensions() const
 // Unverified gap sizes
 const apollo_format::format apollo_format::formats[] = {
 	{
-		floppy_image::FF_525, floppy_image::DSHD,
+		floppy_image::FF_525, floppy_image::DSHD, floppy_image::MFM,
 		1200, // 1us, 360rpm
 		8, 77, 2,
 		1024, {},
