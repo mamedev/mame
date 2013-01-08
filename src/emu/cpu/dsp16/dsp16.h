@@ -51,6 +51,7 @@ protected:
 
 	// address spaces
 	const address_space_config m_program_config;
+	const address_space_config m_data_config;
 
 	// CPU registers
 	// ROM Address Arithmetic Unit (XAAU)
@@ -83,7 +84,7 @@ protected:
 	UINT16 m_sioc;
 	UINT16 m_pioc;
 
-    // internal stuff
+	// internal stuff
 	UINT16 m_ppc;
 
 	// This core handles the cache as more of a loop than 15 seperate memory elements.
@@ -95,23 +96,29 @@ protected:
 	static const UINT16 CACHE_INVALID = 0xffff;
 
 	// memory access
-	inline UINT32 program_read(UINT32 addr);
-	inline void program_write(UINT32 addr, UINT32 data);
+	inline UINT32 data_read(const UINT16& addr);
+	inline void data_write(const UINT16& addr, const UINT16& data);
 	inline UINT32 opcode_read(const UINT8 pcOffset=0);
 
 	// address spaces
-    address_space* m_program;
-    direct_read_data* m_direct;
+	address_space* m_program;
+	address_space* m_data;
+	direct_read_data* m_direct;
 
 	// other internal states
-    int m_icount;
+	int m_icount;
 
 	// operations
-	void execute_one(const UINT16& op, UINT8& cycles, INT16& pcAdvance);
+	void execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance);
 
 	// table decoders
 	void* registerFromRImmediateField(const UINT8& R);
 	void* registerFromRTable(const UINT8& R);
+	void* registerFromYFieldUpper(const UINT8& Y);
+
+	// execution
+	void executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& S);
+	void executeYFieldPost(const UINT8& Y);
 
 	// helpers
 	void* addressYL();

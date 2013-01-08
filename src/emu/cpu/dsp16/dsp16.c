@@ -31,6 +31,7 @@ const device_type DSP16 = &device_creator<dsp16_device>;
 dsp16_device::dsp16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, DSP16, "DSP16", tag, owner, clock),
 	  m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1),
+	  m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1),
 	  m_i(0),
 	  m_pc(0),
 	  m_pt(0),
@@ -62,10 +63,11 @@ dsp16_device::dsp16_device(const machine_config &mconfig, const char *tag, devic
 	  m_cacheRedoNextPC(CACHE_INVALID),
 	  m_cacheIterations(0),
 	  m_program(NULL),
+	  m_data(NULL),
 	  m_direct(NULL),
 	  m_icount(0)
 {
-    // Allocate & setup
+	// Allocate & setup
 }
 
 
@@ -140,6 +142,7 @@ void dsp16_device::device_start()
 
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
+	m_data = &space(AS_DATA);
 	m_direct = &m_program->direct();
 
 	// set our instruction counter
@@ -178,7 +181,9 @@ void dsp16_device::device_reset()
 
 const address_space_config *dsp16_device::memory_space_config(address_spacenum spacenum) const
 {
-	return (spacenum == AS_PROGRAM) ? &m_program_config : NULL;
+	return (spacenum == AS_PROGRAM) ? &m_program_config :
+		   (spacenum == AS_DATA) ? &m_data_config :
+		   NULL;
 }
 
 
@@ -242,14 +247,14 @@ offs_t dsp16_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
     MEMORY ACCESSORS
 ***************************************************************************/
 
-inline UINT32 dsp16_device::program_read(UINT32 addr)
+inline UINT32 dsp16_device::data_read(const UINT16& addr)
 {
-	return m_program->read_dword(addr << 1);
+	return m_data->read_word(addr << 1);
 }
 
-inline void dsp16_device::program_write(UINT32 addr, UINT32 data)
+inline void dsp16_device::data_write(const UINT16& addr, const UINT16& data)
 {
-	m_program->write_dword(addr << 1, data & 0xffff);
+	m_data->write_word(addr << 1, data & 0xffff);
 }
 
 inline UINT32 dsp16_device::opcode_read(const UINT8 pcOffset)
@@ -312,11 +317,9 @@ void dsp16_device::execute_run()
 
 		// instruction fetch & execute
 		UINT8 cycles;
-		INT16 pcAdvance;
+		UINT8 pcAdvance;
 		const UINT16 op = opcode_read();
-		printf("%d ", m_cacheIterations);
 		execute_one(op, cycles, pcAdvance);
-		printf("%d\n", m_cacheIterations);
 
 		// step
 		m_pc += pcAdvance;
