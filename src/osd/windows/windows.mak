@@ -179,7 +179,7 @@ CCOMFLAGS += /wd4350
 LDFLAGS += /ENTRY:wmainCRTStartup
 
 # add some VC++-specific defines
-DEFS += -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DXML_STATIC -Dsnprintf=_snprintf
+DEFS += -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE -DXML_STATIC -Dsnprintf=_snprintf -DWIN32
 
 OSDCLEAN = msvcclean
 
