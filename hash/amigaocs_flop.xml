@@ -36,6 +36,57 @@
 	
 -->
 
+
+
+<!-- Virus Warning
+  
+  The following original discs were mastered with viruses on them
+  ref: http://eab.abime.net/showthread.php?t=65171
+  
+  0011 - Espionage - The Computer Game
+  Espionage.ipf  -  NorthStar 2 Bootblock
+
+  0206 - Backgammon
+  Backgammon.ipf - SCA Bootblock
+
+  0712 - The President is Missing
+  PresidentIsMissing,The.ipf - Byte Warrior (DASA) Bootblock
+
+  1246 - Chase H.Q. II: Special Criminal Investigation
+  ChaseHQII-SpecialCriminalInvestigation_Disk2.ipf - Lamer Exterminator Bootblock
+
+  1255 - Ooze - Als die Geister mürbe wurden
+  Ooze.ipf - PvL Virus Protector v5.0 Bootblock
+
+  1304 - Beam
+  Beam.ipf - NorthStar 2 Bootblock
+
+  1589 - Legend of Faerghail 
+  LegendOfFaerghail_Disk3.ipf - Byte Bandit Bootblock
+
+  1612 - StarRay
+  StarRay_BootDisk.ipf - SCA Bootblock
+
+  2669 - The Shortgrey
+  Shortgrey,The_Disquette0.ipf (and 1,2,4) - SADDAM disk-validator
+
+  2768 - Zombi
+  Zombi.ipf - Lamer Exterminator Bootblock
+
+  The following original discs are virus damaged, but still work
+
+  2159 - Astatin
+  Astatin.ipf - Sector 1086 is destroyed by The Lamer Exterminator virus (No file damage)
+
+  2804 - Chariots of Wrath
+  ChariotsOfWrath.ipf - Sector 1369 is destroyed by The Lamer Exterminator virus (No file damage)
+
+
+  These viruses can be dangerous even to an emulated machine as they will still transfer between
+  any non-write protected discs you insert as long as they're memory resident.
+
+ -->
+
 <softwarelist name="amigaocs_flop" description="Amiga OCS Floppy Disks list">
 
 
