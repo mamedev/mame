@@ -691,7 +691,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a500ntsc, ntsc )
 	MCFG_FRAGMENT_ADD(amiga_cartslot)
-	MCFG_SOFTWARE_LIST_ADD("flop_common","amiga_flop")
+
+	MCFG_SOFTWARE_LIST_ADD("flop_misc","amiga_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_ocs","amigaocs_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_ecs","amigaecs_flop")
 MACHINE_CONFIG_END
 
@@ -768,7 +770,9 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( a500p, pal )
 	MCFG_FRAGMENT_ADD(amiga_cartslot)
-	MCFG_SOFTWARE_LIST_ADD("flop_common","amiga_flop")
+
+	MCFG_SOFTWARE_LIST_ADD("flop_misc","amiga_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_ocs","amigaocs_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_ecs","amigaecs_flop")
 MACHINE_CONFIG_END
 
@@ -879,10 +883,12 @@ static MACHINE_CONFIG_START( a1200n, a1200_state )
 
 	MCFG_AMIGA_KEYBOARD_ADD("kbd")
 
-	MCFG_SOFTWARE_LIST_ADD("flop_common","amiga_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga1200_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_misc","amiga_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_ocs","amigaocs_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_ecs","amigaecs_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_aga","amigaaga_flop")
+	
 
 
 MACHINE_CONFIG_END
@@ -977,7 +983,8 @@ static MACHINE_CONFIG_START( a3000n, amiga_state )
 
 	MCFG_AMIGA_KEYBOARD_ADD("kbd")
 
-	MCFG_SOFTWARE_LIST_ADD("flop_common","amiga_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_misc","amiga_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_ocs","amigaocs_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_ecs","amigaecs_flop")
 	MCFG_SOFTWARE_LIST_ADD("flop_list","amiga3000_flop")
 MACHINE_CONFIG_END
