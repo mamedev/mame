@@ -36,7 +36,7 @@
 	
 -->
 
-<softwarelist name="amiga_flop" description="Amiga OCS Floppy Disks list">
+<softwarelist name="amigaocs_flop" description="Amiga OCS Floppy Disks list">
 
 
   <!-- these are not listed in SPS? -->
