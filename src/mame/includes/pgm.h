@@ -66,6 +66,7 @@ public:
 
 	DECLARE_READ16_MEMBER(pgm_videoram_r);
 	DECLARE_WRITE16_MEMBER(pgm_videoram_w);
+	DECLARE_WRITE16_MEMBER(pgm_coin_counter_w);
 	DECLARE_READ16_MEMBER(z80_ram_r);
 	DECLARE_WRITE16_MEMBER(z80_ram_w);
 	DECLARE_WRITE16_MEMBER(z80_reset_w);
