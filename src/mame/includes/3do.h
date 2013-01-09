@@ -174,7 +174,7 @@ public:
 	MADAM m_madam;
 	CLIO m_clio;
 	SVF m_svf;
-	UINT8 m_video_bits[512];
+//	UINT8 m_video_bits[512];
 	DECLARE_READ32_MEMBER(_3do_nvarea_r);
 	DECLARE_WRITE32_MEMBER(_3do_nvarea_w);
 	DECLARE_READ32_MEMBER(_3do_slow2_r);

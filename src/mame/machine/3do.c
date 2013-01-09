@@ -579,6 +579,12 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 		return m_clio.seed;
 	case 0x003c/4:
 		return m_clio.random;
+	case 0x0040/4:
+	case 0x0044/4:
+		return m_clio.irq0;
+	case 0x0048/4:
+	case 0x004c/4:
+		return m_clio.irq0_enable;
 	case 0x0080/4:
 		return m_clio.hdelay;
 	case 0x0084/4:
@@ -968,10 +974,10 @@ void _3do_clio_init( running_machine &machine, screen_device *screen )
 VIDEO_START_MEMBER(_3do_state,_3do)
 {
 	/* We only keep the odd bits and get rid of the even bits */
-	for ( int i = 0; i < 512; i++ )
-	{
-		m_video_bits[i] = ( i & 1 ) | ( ( i & 4 ) >> 1 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x100 ) >> 4 );
-	}
+//	for ( int i = 0; i < 512; i++ )
+//	{
+//		m_video_bits[i] = ( i & 1 ) | ( ( i & 4 ) >> 1 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x100 ) >> 4 );
+//	}
 }
 
 
@@ -980,35 +986,41 @@ UINT32 _3do_state::screen_update__3do(screen_device &screen, bitmap_rgb32 &bitma
 {
 	UINT32 *source_p = m_vram + 0x1c0000 / 4;
 
-	for ( int i = 0; i < 120; i++ )
+	for ( int y = 0; y < 120; y++ )
 	{
-		UINT32	*dest_p0 = &bitmap.pix32(22 + i * 2, 254 );
-		UINT32	*dest_p1 = &bitmap.pix32(22 + i * 2 + 1, 254 );
+		UINT32	*dest_p0 = &bitmap.pix32(22 + y * 2, 254 );
+		UINT32	*dest_p1 = &bitmap.pix32(22 + y * 2 + 1, 254 );
 
-		for ( int j = 0; j < 320; j++ )
+		for ( int x = 0; x < 320; x++ )
 		{
 			/* Odd numbered bits go to lower half, even numbered bits to upper half */
-			UINT32 lower = *source_p & 0x55555555;
-			UINT32 upper = ( *source_p >> 1 ) & 0x55555555;
-			UINT32 rgb = 0;
+			UINT32 lower = *source_p & 0xffff;
+			UINT32 upper = ( *source_p >> 16 ) & 0xffff;
+			int r, g, b;
 
-			rgb = ( ( m_video_bits[upper & 0x1ff] << 3 ) << 8 );
-			rgb |= ( ( m_video_bits[ ( upper >> 10 ) & 0x1ff ] << 3 ) << 0 );
-			rgb |= ( ( m_video_bits[ ( upper >> 20 ) & 0x1ff ] << 3 ) << 16 );
+			r = (upper & 0x7c00) >> 10;
+			g = (upper & 0x03e0) >> 5;
+			b = (upper & 0x001f) >> 0;
+			r = (r << 3) | (r & 7);
+			g = (g << 3) | (g & 7);
+			b = (b << 3) | (b & 7);
 
-			dest_p0[0] = rgb;
-			dest_p0[1] = rgb;
-			dest_p0[2] = rgb;
-			dest_p0[3] = rgb;
+			dest_p0[0] = r << 16 | g << 8 | b;
+			dest_p0[1] = r << 16 | g << 8 | b;
+			dest_p0[2] = r << 16 | g << 8 | b;
+			dest_p0[3] = r << 16 | g << 8 | b;
 
-			rgb = ( ( m_video_bits[lower & 0x1ff] << 3 ) << 8 );
-			rgb |= ( ( m_video_bits[ ( lower >> 10 ) & 0x1ff ] << 3 ) << 0 );
-			rgb |= ( ( m_video_bits[ ( lower >> 20 ) & 0x1ff ] << 3 ) << 16 );
+			r = (lower & 0x7c00) >> 10;
+			g = (lower & 0x03e0) >> 5;
+			b = (lower & 0x001f) >> 0;
+			r = (r << 3) | (r & 7);
+			g = (g << 3) | (g & 7);
+			b = (b << 3) | (b & 7);
 
-			dest_p1[0] = rgb;
-			dest_p1[1] = rgb;
-			dest_p1[2] = rgb;
-			dest_p1[3] = rgb;
+			dest_p1[0] = r << 16 | g << 8 | b;
+			dest_p1[1] = r << 16 | g << 8 | b;
+			dest_p1[2] = r << 16 | g << 8 | b;
+			dest_p1[3] = r << 16 | g << 8 | b;
 
 			source_p++;
 			dest_p0 += 4;
