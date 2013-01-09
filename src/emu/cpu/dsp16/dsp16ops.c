@@ -4,7 +4,7 @@
 // The YL register is the lower half of the 32 bit Y register
 void* dsp16_device::addressYL()
 {
-	return (((UINT8*)&m_y) + 2);
+	return (void*)(((UINT8*)&m_y) + 2);
 }
 
 
@@ -127,7 +127,7 @@ void dsp16_device::executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& 
 	{
 		case 0x00: printf("UNIMPLEMENTED F1 operation @ PC 0x%04x\n", m_pc); break;
 		case 0x01: printf("UNIMPLEMENTED F1 operation @ PC 0x%04x\n", m_pc); break;
-		case 0x02: m_p = (INT32)((INT16)m_x * (INT16)m_y); break;
+		case 0x02: m_p = (INT32)((INT16)m_x * (INT16)((m_y & 0xffff0000) >> 16)); break;
 		case 0x03: printf("UNIMPLEMENTED F1 operation @ PC 0x%04x\n", m_pc); break;
 		case 0x04: printf("UNIMPLEMENTED F1 operation @ PC 0x%04x\n", m_pc); break;
 		case 0x05: printf("UNIMPLEMENTED F1 operation @ PC 0x%04x\n", m_pc); break;
@@ -227,12 +227,24 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		}
 		case 0x17:
 		{
-			// F1, y[l] = Y
-			//const UINT8 Y = (op & 0x000f);
-			//const UINT8 X = (op & 0x0010) >> 4;
-			//const UINT8 S = (op & 0x0200) >> 9;
-			//const UINT8 D = (op & 0x0400) >> 10;
-			//const UINT8 F1 = (op & 0x01e0) >> 5;
+			// F1, y[l] = Y  :  (page 3-44)
+			const UINT8 Y = (op & 0x000f);
+			const UINT8 X = (op & 0x0010) >> 4;
+			const UINT8 S = (op & 0x0200) >> 9;
+			const UINT8 D = (op & 0x0400) >> 10;
+			const UINT8 F1 = (op & 0x01e0) >> 5;
+			executeF1Field(F1, D, S);
+			UINT16* sourceReg = (UINT16*)registerFromYFieldUpper(Y);
+			UINT16 sourceValue = data_read(*sourceReg);
+			switch (X)
+			{
+				case 0x00: writeRegister(addressYL(), sourceValue); break;
+				case 0x01: writeRegister(&m_y, sourceValue); break;
+				default: break;
+			}
+			executeYFieldPost(Y);
+			cycles = 1;
+			pcAdvance = 1;
 			break;
 		}
 		case 0x1f:
@@ -279,14 +291,28 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 			break;
 		}
 
-		// Format 1a: Multiply/ALU Read/Write Group (major typo in docs on p3-51)
+		// Format 1a: Multiply/ALU Read/Write Group (TODO: Figure out major typo in docs on p3-51)
 		case 0x07:
 		{
-			// F1, At[1] = Y
-			//const UINT8 Y = (op & 0x000f);
-			//const UINT8 S = (op & 0x0200) >> 9;
-			//const UINT8 aT = (op & 0x0400) >> 10;
-			//const UINT8 F1 = (op & 0x01e0) >> 5;
+			// F1, At[1] = Y  :  (page 3-50)
+			const UINT8 Y = (op & 0x000f);
+			const UINT8 S = (op & 0x0200) >> 9;
+			const UINT8 aT = (op & 0x0400) >> 10;
+			const UINT8 F1 = (op & 0x01e0) >> 5;
+			executeF1Field(F1, !aT, S);
+			UINT64* destinationReg = NULL;
+			switch(aT)
+			{
+				case 0: destinationReg = &m_a1; break;
+				case 1: destinationReg = &m_a0; break;
+				default: break;
+			}
+			UINT16 sourceAddress = *((UINT16*)registerFromYFieldUpper(Y));
+			INT64 sourceValueSigned = (INT16)data_read(sourceAddress);
+			*destinationReg = sourceValueSigned & U64(0xffffffffff);
+			executeYFieldPost(Y);
+			cycles = 1;
+			pcAdvance = 1;
 			break;
 		}
 
