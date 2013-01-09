@@ -50,18 +50,21 @@ failure = False
 
 for root, dirs, files in os.walk(inputPath):
 	for d in dirs:
+		if d.startswith("."):
+			continue
+	
 		inFile = os.path.join(root, d, "in")
 		# TODO: make this better
 		outFile = os.path.join(root, d, "out.chd").replace("input", "output")
 		tempFilePath = os.path.join(tempPath, d)
 		tempFile = os.path.join(tempFilePath, "out.chd")
-		cmd = ""
+		cmd = []
 		if not os.path.exists(tempFilePath):
 			os.makedirs(tempFilePath)
 		if d.startswith("createcd"):
 			ext = d.split("_", 2)[1]
 			inFile += "." + ext
-			cmd = chdmanBin + " createcd -f -i " + inFile + " -o " + tempFile
+			cmd = [chdmanBin, "createcd", "-f", "-i", inFile, "-o", tempFile]
 		else:
 			print "unsupported mode"
 			continue
