@@ -964,7 +964,10 @@ UINT32 mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 			m_end_update(this, bitmap, cliprect, param);
 	}
 	else
-		logerror("M6845: Invalid screen parameters - display disabled!!!\n");
+	{
+		if (LOG)  logerror("M6845: Invalid screen parameters - display disabled!!!\n");
+	}
+
 	return 0;
 }
 
