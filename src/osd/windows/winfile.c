@@ -103,6 +103,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 		filerr = FILERR_OUT_OF_MEMORY;
 		goto error;
 	}
+	memset(*file, 0x00, sizeof(**file) + sizeof(TCHAR) * _tcslen(t_path));
 
 	if (win_check_socket_path(path))
 	{
