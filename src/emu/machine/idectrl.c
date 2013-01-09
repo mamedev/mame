@@ -1180,6 +1180,10 @@ UINT32 ide_controller_device::ide_controller_read(int bank, offs_t offset, int s
 			status &= ~IDE_STATUS_DRIVE_READY;
 		}
 	}
+	else
+	{
+		return 0;
+	}
 
 	switch (BANK(bank, offset))
 	{
