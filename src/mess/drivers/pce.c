@@ -66,55 +66,6 @@ Super System Card:
 #include "video/huc6270.h"
 #include "video/huc6202.h"
 
-
-static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, pce_state )
-	AM_RANGE( 0x000000, 0x07FFFF) AM_ROMBANK("bank1")
-	AM_RANGE( 0x080000, 0x087FFF) AM_ROMBANK("bank2")
-	AM_RANGE( 0x088000, 0x0CFFFF) AM_ROMBANK("bank3")
-	AM_RANGE( 0x0D0000, 0x0FFFFF) AM_ROMBANK("bank4")
-	AM_RANGE( 0x100000, 0x10FFFF) AM_RAM AM_SHARE("cd_ram")
-	AM_RANGE( 0x110000, 0x1EDFFF) AM_NOP
-	AM_RANGE( 0x1EE000, 0x1EE7FF) AM_ROMBANK("bank10") AM_WRITE(pce_cd_bram_w )
-	AM_RANGE( 0x1EE800, 0x1EFFFF) AM_NOP
-	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000) AM_SHARE("user_ram")
-	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE_LEGACY(vdc_0_r, vdc_0_w )
-	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE_LEGACY(vce_r, vce_w )
-	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE(C6280_TAG, c6280_device, c6280_r, c6280_w )
-	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_DEVREADWRITE("maincpu", h6280_device, timer_r, timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE(mess_pce_joystick_r, mess_pce_joystick_w )
-	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_DEVREADWRITE("maincpu", h6280_device, irq_status_r, irq_status_w )
-	AM_RANGE( 0x1FF800, 0x1FFBFF) AM_READWRITE(pce_cd_intf_r, pce_cd_intf_w )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pce_io , AS_IO, 8, pce_state )
-	AM_RANGE( 0x00, 0x03) AM_READWRITE_LEGACY(vdc_0_r, vdc_0_w )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sgx_mem , AS_PROGRAM, 8, pce_state )
-	AM_RANGE( 0x000000, 0x07FFFF) AM_ROMBANK("bank1")
-	AM_RANGE( 0x080000, 0x087FFF) AM_ROMBANK("bank2")
-	AM_RANGE( 0x088000, 0x0CFFFF) AM_ROMBANK("bank3")
-	AM_RANGE( 0x0D0000, 0x0FFFFF) AM_ROMBANK("bank4")
-	AM_RANGE( 0x100000, 0x10FFFF) AM_RAM AM_SHARE("cd_ram")
-	AM_RANGE( 0x110000, 0x1EDFFF) AM_NOP
-	AM_RANGE( 0x1EE000, 0x1EE7FF) AM_ROMBANK("bank10") AM_WRITE(pce_cd_bram_w )
-	AM_RANGE( 0x1EE800, 0x1EFFFF) AM_NOP
-	AM_RANGE( 0x1F0000, 0x1F7FFF) AM_RAM AM_SHARE("user_ram")
-	AM_RANGE( 0x1FE000, 0x1FE007) AM_READWRITE_LEGACY(vdc_0_r, vdc_0_w ) AM_MIRROR(0x03E0)
-	AM_RANGE( 0x1FE008, 0x1FE00F) AM_READWRITE_LEGACY(vpc_r, vpc_w ) AM_MIRROR(0x03E0)
-	AM_RANGE( 0x1FE010, 0x1FE017) AM_READWRITE_LEGACY(vdc_1_r, vdc_1_w ) AM_MIRROR(0x03E0)
-	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE_LEGACY(vce_r, vce_w )
-	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE(C6280_TAG, c6280_device, c6280_r, c6280_w )
-	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_DEVREADWRITE("maincpu", h6280_device, timer_r, timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE(mess_pce_joystick_r, mess_pce_joystick_w )
-	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_DEVREADWRITE("maincpu", h6280_device, irq_status_r, irq_status_w )
-	AM_RANGE( 0x1FF800, 0x1FFBFF) AM_READWRITE(pce_cd_intf_r, pce_cd_intf_w )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sgx_io , AS_IO, 8, pce_state )
-	AM_RANGE( 0x00, 0x03) AM_READWRITE_LEGACY(sgx_vdc_r, sgx_vdc_w )
-ADDRESS_MAP_END
-
 /* todo: alternate forms of input (multitap, mouse, etc.) */
 static INPUT_PORTS_START( pce )
 
@@ -344,106 +295,7 @@ static MACHINE_CONFIG_FRAGMENT( sgx_cartslot )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sgx")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pce_common, pce_state )
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(pce_mem)
-	MCFG_CPU_IO_MAP(pce_io)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", pce_interrupt, "screen", 0, 1)
-
-//  MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
-	MCFG_MACHINE_START_OVERRIDE(pce_state, pce )
-	MCFG_MACHINE_RESET_OVERRIDE(pce_state, mess_pce )
-
-    /* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, VDC_WPF, 70, 70 + 512 + 32, VDC_LPF, 14, 14+242)
-	MCFG_SCREEN_UPDATE_STATIC( pce )
-
-	/* MCFG_GFXDECODE( pce ) */
-	MCFG_PALETTE_LENGTH(1024)
-	MCFG_PALETTE_INIT( vce )
-
-	MCFG_VIDEO_START( pce )
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD(C6280_TAG, C6280, MAIN_CLOCK/6)
-	MCFG_SOUND_CONFIG(c6280_config)
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
-
-	MCFG_SOUND_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
-	MCFG_SOUND_CONFIG( pce_cd_msm5205_interface )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 0.50 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 0.50 )
-
-	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( pce, pce_common )
-	MCFG_FRAGMENT_ADD( pce_cartslot )
-	MCFG_FRAGMENT_ADD( pce_cdslot )
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( tg16, pce_common )
-	MCFG_FRAGMENT_ADD( tg16_cartslot )
-	MCFG_FRAGMENT_ADD( pce_cdslot )
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( sgx, pce_state )
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(sgx_mem)
-	MCFG_CPU_IO_MAP(sgx_io)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", sgx_interrupt, "screen", 0, 1)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
-	MCFG_MACHINE_START_OVERRIDE(pce_state, pce )
-	MCFG_MACHINE_RESET_OVERRIDE(pce_state, mess_pce )
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, VDC_WPF, 70, 70 + 512 + 32, VDC_LPF, 14, 14+242)
-	MCFG_SCREEN_UPDATE_STATIC( pce )
-
-	MCFG_PALETTE_LENGTH(1024)
-	MCFG_PALETTE_INIT( vce )
-
-	MCFG_VIDEO_START( pce )
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD(C6280_TAG, C6280, MAIN_CLOCK/6)
-	MCFG_SOUND_CONFIG(c6280_config)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-
-	MCFG_SOUND_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
-	MCFG_SOUND_CONFIG( pce_cd_msm5205_interface )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 0.00 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 0.00 )
-
-	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
-
-	MCFG_FRAGMENT_ADD( sgx_cartslot )
-	MCFG_FRAGMENT_ADD( pce_cdslot )
-MACHINE_CONFIG_END
-
-
-
-static ADDRESS_MAP_START( pce_mem_new , AS_PROGRAM, 8, pce_state )
+static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, pce_state )
 	AM_RANGE( 0x000000, 0x07FFFF) AM_ROMBANK("bank1")
 	AM_RANGE( 0x080000, 0x087FFF) AM_ROMBANK("bank2")
 	AM_RANGE( 0x088000, 0x0CFFFF) AM_ROMBANK("bank3")
@@ -462,12 +314,12 @@ static ADDRESS_MAP_START( pce_mem_new , AS_PROGRAM, 8, pce_state )
 	AM_RANGE( 0x1FF800, 0x1FFBFF) AM_READWRITE( pce_cd_intf_r, pce_cd_intf_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pce_io_new , AS_IO, 8, pce_state )
+static ADDRESS_MAP_START( pce_io , AS_IO, 8, pce_state )
 	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sgx_mem_new , AS_PROGRAM, 8, pce_state )
+static ADDRESS_MAP_START( sgx_mem , AS_PROGRAM, 8, pce_state )
 	AM_RANGE( 0x000000, 0x07FFFF) AM_ROMBANK("bank1")
 	AM_RANGE( 0x080000, 0x087FFF) AM_ROMBANK("bank2")
 	AM_RANGE( 0x088000, 0x0CFFFF) AM_ROMBANK("bank3")
@@ -489,7 +341,7 @@ static ADDRESS_MAP_START( sgx_mem_new , AS_PROGRAM, 8, pce_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sgx_io_new , AS_IO, 8, pce_state )
+static ADDRESS_MAP_START( sgx_io , AS_IO, 8, pce_state )
 	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6202", huc6202_device, io_read, io_write )
 ADDRESS_MAP_END
 
@@ -564,11 +416,11 @@ static const huc6260_interface sgx_huc6260_config =
 	DEVCB_DEVICE_LINE_MEMBER( "huc6202", huc6202_device, hsync_changed )
 };
 
-static MACHINE_CONFIG_START( pce_common_new, pce_state )
+static MACHINE_CONFIG_START( pce_common, pce_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(pce_mem_new)
-	MCFG_CPU_IO_MAP(pce_io_new)
+	MCFG_CPU_PROGRAM_MAP(pce_mem)
+	MCFG_CPU_IO_MAP(pce_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(pce_state, pce )
@@ -604,23 +456,23 @@ static MACHINE_CONFIG_START( pce_common_new, pce_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pce_new, pce_common_new )
+static MACHINE_CONFIG_DERIVED( pce, pce_common )
 	MCFG_FRAGMENT_ADD( pce_cartslot )
 	MCFG_FRAGMENT_ADD( pce_cdslot )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tg16_new, pce_common_new )
+static MACHINE_CONFIG_DERIVED( tg16, pce_common )
 	MCFG_FRAGMENT_ADD( tg16_cartslot )
 	MCFG_FRAGMENT_ADD( pce_cdslot )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sgx_new, pce_state )
+static MACHINE_CONFIG_START( sgx, pce_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
-	MCFG_CPU_PROGRAM_MAP(sgx_mem_new)
-	MCFG_CPU_IO_MAP(sgx_io_new)
+	MCFG_CPU_PROGRAM_MAP(sgx_mem)
+	MCFG_CPU_IO_MAP(sgx_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_MACHINE_START_OVERRIDE(pce_state, pce )
@@ -673,16 +525,7 @@ ROM_END
 #define rom_tg16 rom_pce
 #define rom_sgx rom_pce
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT    INIT   COMPANY  FULLNAME */
-CONS( 1987, pce,    0,      0,      pce,    pce, pce_state,     mess_pce,    		"Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
-CONS( 1989, tg16,   pce,    0,      tg16,   pce, pce_state,     tg16,		 		"Nippon Electronic Company", "TurboGrafx 16",GAME_IMPERFECT_GRAPHICS |  GAME_IMPERFECT_SOUND)
-CONS( 1989, sgx,    pce,    0,      sgx,    pce, pce_state,     sgx,		 		"Nippon Electronic Company", "SuperGrafx",GAME_IMPERFECT_GRAPHICS |  GAME_IMPERFECT_SOUND)
-
-/* Experimental versions of drivers using newer but slower device implementation of the video chips */
-#define rom_pce_new rom_pce
-#define rom_tg16_new rom_pce
-#define rom_sgx_new rom_pce
-CONS( 1987, pce_new,    0,      0,      pce_new,    pce, pce_state,     mess_pce,   "Nippon Electronic Company", "PC Engine (NEW video core)", GAME_IMPERFECT_SOUND)
-CONS( 1989, tg16_new,   pce_new,    0,      tg16_new,   pce, pce_state,     tg16,   "Nippon Electronic Company", "TurboGrafx 16 (NEW video core)", GAME_IMPERFECT_SOUND)
-CONS( 1989, sgx_new,    pce_new,    0,      sgx_new,    pce, pce_state,     sgx,    "Nippon Electronic Company", "SuperGrafx (NEW video core)", GAME_IMPERFECT_SOUND)
+CONS( 1987, pce,    0,      0,      pce,    pce, pce_state,     mess_pce,   "Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_SOUND)
+CONS( 1989, tg16,   pce,    0,      tg16,   pce, pce_state,     tg16,       "Nippon Electronic Company", "TurboGrafx 16", GAME_IMPERFECT_SOUND)
+CONS( 1989, sgx,    pce,    0,      sgx,    pce, pce_state,     sgx,        "Nippon Electronic Company", "SuperGrafx", GAME_IMPERFECT_SOUND)
 
