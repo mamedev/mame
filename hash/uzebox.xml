@@ -791,7 +791,7 @@
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
 			<dataarea name="rom" size="58940">
-				<rom name="arkanoid.bin" size="58940" crc="52661b71" sha1="8ae1c36d1f1a1934d4c970007651172ffdd99b8a" offset="0" />
+				<rom name="arkanoid (alt).bin" size="58940" crc="52661b71" sha1="8ae1c36d1f1a1934d4c970007651172ffdd99b8a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -802,7 +802,7 @@
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
 			<dataarea name="rom" size="13742">
-				<rom name="bitmap-demo.bin" size="13742" crc="18e01286" sha1="cd01182154a63076bbcbda907f51cce9d4c8dd86" offset="0" />
+				<rom name="bitmap-demo (alt).bin" size="13742" crc="18e01286" sha1="cd01182154a63076bbcbda907f51cce9d4c8dd86" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -813,7 +813,7 @@
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
 			<dataarea name="rom" size="48176">
-				<rom name="chess4uzebox.bin" size="48176" crc="255bbf0c" sha1="065d1870dd8fef52b126e68b913dd03e7245b585" offset="0" />
+				<rom name="chess4uzebox (alt).bin" size="48176" crc="255bbf0c" sha1="065d1870dd8fef52b126e68b913dd03e7245b585" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -824,7 +824,7 @@
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
 			<dataarea name="rom" size="15384">
-				<rom name="controller-tester.bin" size="15384" crc="214e6617" sha1="60ed5d6d18f58eba5259cb2a143896130c4c3edb" offset="0" />
+				<rom name="controller-tester (alt).bin" size="15384" crc="214e6617" sha1="60ed5d6d18f58eba5259cb2a143896130c4c3edb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -835,7 +835,7 @@
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
 			<dataarea name="rom" size="29790">
-				<rom name="emuze.bin" size="29790" crc="5687e52b" sha1="8df9a35dbe49b48fda9140256b0fb6a18b1c456f" offset="0" />
+				<rom name="emuze (alt).bin" size="29790" crc="5687e52b" sha1="8df9a35dbe49b48fda9140256b0fb6a18b1c456f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -857,7 +857,7 @@
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
 			<dataarea name="rom" size="62144">
-				<rom name="lolo-wip.bin" size="62144" crc="b31d5944" sha1="7ebc597599b5232d5db1718a14f145a34d14dd69" offset="0" />
+				<rom name="lolo-wip (alt).bin" size="62144" crc="b31d5944" sha1="7ebc597599b5232d5db1718a14f145a34d14dd69" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -868,7 +868,7 @@
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
 			<dataarea name="rom" size="19238">
-				<rom name="maze.bin" size="19238" crc="2516adbf" sha1="fbcd91ce115f94c69adb07ea4a3e12e007990667" offset="0" />
+				<rom name="maze (alt).bin" size="19238" crc="2516adbf" sha1="fbcd91ce115f94c69adb07ea4a3e12e007990667" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -879,7 +879,7 @@
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
 			<dataarea name="rom" size="60546">
-				<rom name="megatris.bin" size="60546" crc="a00f3b32" sha1="edfd556e465b275aee36626bd506738f3e8f21db" offset="0" />
+				<rom name="megatris (alt).bin" size="60546" crc="a00f3b32" sha1="edfd556e465b275aee36626bd506738f3e8f21db" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -902,7 +902,7 @@
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
 			<dataarea name="rom" size="62588">
-				<rom name="pacman.bin" size="62588" crc="e07c2e87" sha1="e50327981c201012c63898e19f8825f4bfc0fe6e" offset="0" />
+				<rom name="pacman (alt).bin" size="62588" crc="e07c2e87" sha1="e50327981c201012c63898e19f8825f4bfc0fe6e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -925,7 +925,7 @@
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
 			<dataarea name="rom" size="65536">
-				<rom name="redbull.bin" size="65536" crc="ffe9a0fa" sha1="197c5e255101c2bae0960f7e586d248d0d526095" offset="0" />
+				<rom name="redbull (alt).bin" size="65536" crc="ffe9a0fa" sha1="197c5e255101c2bae0960f7e586d248d0d526095" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -937,7 +937,7 @@
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
 			<dataarea name="rom" size="14130">
-				<rom name="sd-card-demo.bin" size="14130" crc="d97ec156" sha1="3928b9c6c3f51fb0912200303cb610a28f91e950" offset="0" />
+				<rom name="sd-card-demo (alt).bin" size="14130" crc="d97ec156" sha1="3928b9c6c3f51fb0912200303cb610a28f91e950" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -948,7 +948,7 @@
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
 			<dataarea name="rom" size="40524">
-				<rom name="space-invaders.bin" size="40524" crc="8ed98301" sha1="10c4a93d148163801fb75c904dab0f79ecaaf6d9" offset="0" />
+				<rom name="space-invaders (alt).bin" size="40524" crc="8ed98301" sha1="10c4a93d148163801fb75c904dab0f79ecaaf6d9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -982,7 +982,7 @@
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
 			<dataarea name="rom" size="55706">
-				<rom name="super-mario-demo.bin" size="55706" crc="73acd5bf" sha1="c780457243fbd20d2dc3006a0dcbae040bad9b72" offset="0" />
+				<rom name="super-mario-demo (alt).bin" size="55706" crc="73acd5bf" sha1="c780457243fbd20d2dc3006a0dcbae040bad9b72" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1005,7 +1005,7 @@
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
 			<dataarea name="rom" size="7430">
-				<rom name="video-demo.bin" size="7430" crc="6b8c8fae" sha1="c7bbc62fe170c5179d44993bbb0869a5ba09ae4b" offset="0" />
+				<rom name="video-demo (alt).bin" size="7430" crc="6b8c8fae" sha1="c7bbc62fe170c5179d44993bbb0869a5ba09ae4b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1016,7 +1016,7 @@
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
 			<dataarea name="rom" size="42422">
-				<rom name="whack-a-mole.bin" size="42422" crc="32f7d6e7" sha1="76ff170ea8f1dec2c68d1b1b86742b01f3a57abf" offset="0" />
+				<rom name="whack-a-mole (alt).bin" size="42422" crc="32f7d6e7" sha1="76ff170ea8f1dec2c68d1b1b86742b01f3a57abf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1027,7 +1027,7 @@
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
 			<dataarea name="rom" size="58542">
-				<rom name="arkanoid.bin" size="58542" crc="aa90ca49" sha1="b6b3e0b841a7bdf3c7d076488e70de6e4696ff0f" offset="0" />
+				<rom name="arkanoid (alt2).bin" size="58542" crc="aa90ca49" sha1="b6b3e0b841a7bdf3c7d076488e70de6e4696ff0f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1060,7 +1060,7 @@
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
 			<dataarea name="rom" size="15456">
-				<rom name="maze.bin" size="15456" crc="47dbed06" sha1="a39f56c9697654af3b3503dd9ddd64da572f0181" offset="0" />
+				<rom name="maze (alt 2).bin" size="15456" crc="47dbed06" sha1="a39f56c9697654af3b3503dd9ddd64da572f0181" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1105,7 +1105,7 @@
 		<publisher>Belogic</publisher>
 		<part name="cart" interface="uzebox">
 			<dataarea name="rom" size="40128">
-				<rom name="whack-a-mole.bin" size="40128" crc="bbd75c6e" sha1="8600b21b3b00a3759adb210435db5b3558f78f38" offset="0" />
+				<rom name="whack-a-mole (alt2).bin" size="40128" crc="bbd75c6e" sha1="8600b21b3b00a3759adb210435db5b3558f78f38" offset="0" />
 			</dataarea>
 		</part>
 	</software>
