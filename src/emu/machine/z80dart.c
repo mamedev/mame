@@ -639,6 +639,7 @@ void z80dart_device::dart_channel::reset()
 	// disable transmitter
 	m_wr[5] &= ~WR5_TX_ENABLE;
 	m_tx_state = STATE_START;
+	m_rr[0] |= RR0_TX_BUFFER_EMPTY;
 
 	// reset external lines
 	RTS(1);

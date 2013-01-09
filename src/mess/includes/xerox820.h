@@ -47,7 +47,11 @@ public:
 		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FD1771_TAG":0"),
 		  m_floppy1(*this, FD1771_TAG":1"),
-		  m_video_ram(*this, "video_ram")
+		  m_video_ram(*this, "video_ram"),
+		  m_fdc_irq(0),
+		  m_fdc_drq(0),
+		  m_8n5(0),
+		  m_400_460(0)
 	{ }
 
 	virtual void machine_start();
@@ -64,6 +68,8 @@ public:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 
+	DECLARE_READ8_MEMBER( fdc_r );
+	DECLARE_WRITE8_MEMBER( fdc_w );
 	DECLARE_WRITE8_MEMBER( scroll_w );
 	//DECLARE_WRITE8_MEMBER( x120_system_w );
 	DECLARE_READ8_MEMBER( kbpio_pa_r );
@@ -74,6 +80,7 @@ public:
 
 	void scan_keyboard();
 	void bankswitch(int bank);
+	void update_nmi();
 	void fdc_intrq_w(bool state);
 	void fdc_drq_w(bool state);
 

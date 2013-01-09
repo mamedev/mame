@@ -387,6 +387,7 @@ WRITE8_MEMBER(upd765_family_device::fifo_w)
 			main_phase = PHASE_RESULT;
 			result[0] = ST0_UNK;
 			result_pos = 1;
+			command_pos = 0;
 			return;
 		}
 		start_command(cmd);

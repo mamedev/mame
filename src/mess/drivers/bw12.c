@@ -29,7 +29,6 @@
 
     TODO:
 
-	- floppy is broken
     - floppy motor off timer
 
 */
@@ -126,30 +125,21 @@ void bw12_state::ls259_w(int address, int data)
 
 	case 5: /* MOTOR 0 */
 		m_motor0 = data;
-
-		if (data)
-		{
-			m_floppy0->mon_w(0);
-		}
-
-		set_floppy_motor_off_timer();
 		break;
 
 	case 6: /* MOTOR 1 */
 		m_motor1 = data;
-
-		if (data)
-		{
-			m_floppy1->mon_w(0);
-		}
-
-		set_floppy_motor_off_timer();
 		break;
 
 	case 7: /* FDC TC */
 		m_fdc->tc_w(data);
 		break;
 	}
+
+	m_motor_on = m_motor0 || m_motor1;
+
+	m_floppy0->mon_w(!m_motor_on);
+	m_floppy1->mon_w(!m_motor_on);
 }
 
 WRITE8_MEMBER( bw12_state::ls259_w )
@@ -664,7 +654,7 @@ static MACHINE_CONFIG_START( common, bw12_state )
 
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD(FLOPPY_TIMER_TAG, bw12_state, floppy_motor_off_tick)
-	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
+	MCFG_UPD765A_ADD(UPD765_TAG, false, true)
 	MCFG_PIA6821_ADD(PIA6821_TAG, pia_intf)
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_16MHz/4, sio_intf)
 	MCFG_PIT8253_ADD(PIT8253_TAG, pit_intf)
@@ -676,8 +666,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bw12, common )
 	/* floppy drives */
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", bw12_floppies, "525dd", 0, bw12_state::bw12_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw12_floppies, "525dd", 0, bw12_state::bw12_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", bw12_floppies, "525dd", 0, bw12_state::bw12_floppy_formats)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "bw12")
@@ -689,8 +679,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bw14, common )
 	/* floppy drives */
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", bw14_floppies, "525dd", 0, bw12_state::bw14_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", bw14_floppies, "525dd", 0, bw12_state::bw14_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", bw14_floppies, "525dd", 0, bw12_state::bw14_floppy_formats)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -712,5 +702,5 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY               FULLNAME        FLAGS */
-COMP( 1984,	bw12,   0,      0,      bw12,	bw12, driver_device,   0,      "Bondwell Holding",   "Bondwell 12",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1984,	bw14,   bw12,   0,      bw14,	bw12, driver_device,   0,      "Bondwell Holding",   "Bondwell 14",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1984,	bw12,   0,      0,      bw12,	bw12, driver_device,   0,      "Bondwell Holding",   "Bondwell 12",	GAME_SUPPORTS_SAVE )
+COMP( 1984,	bw14,   bw12,   0,      bw14,	bw12, driver_device,   0,      "Bondwell Holding",   "Bondwell 14",	GAME_SUPPORTS_SAVE )

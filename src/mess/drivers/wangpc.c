@@ -12,6 +12,7 @@
 
     TODO:
 
+	- with quantum perfect cpu gets stuck @ 49c3 mov ss,cs:[52ah]
     - hard disk
 
 */
@@ -33,60 +34,17 @@ enum
 
 
 //**************************************************************************
-//  DIRECT MEMORY ACCESS
+//  IMPLEMENTATION
 //**************************************************************************
 
-void wangpc_state::select_drive(int drive, bool select)
+void wangpc_state::select_drive()
 {
-	if (LOG) logerror("%s: %sselect drive %u\n", machine().describe_context(), select ? "" : "De", drive + 1);
+	floppy_image_device *floppy = NULL;
 
-	int state = select ? 0 : 1;
+	if (m_ds1) floppy = m_floppy0;
+	if (m_ds2) floppy = m_floppy1;
 
-	if (!drive)
-	{
-		m_ds1 = state;
-		if(state)
-			m_fdc->set_floppy(m_floppy0);
-	}
-	else
-	{
-		m_ds2 = state;
-		if(state)
-			m_fdc->set_floppy(m_floppy1);
-	}
-	if(!m_ds1 && !m_ds2)
-		m_fdc->set_floppy(NULL);
-}
-
-void wangpc_state::set_motor(int drive, bool motor)
-{
-	if (LOG) logerror("%s: Motor %u %s\n", machine().describe_context(), drive + 1, motor ? "on" : "off");
-
-	int state = motor ? 0 : 1;
-
-	if (!drive)
-	{
-		m_floppy0->mon_w(state);
-	}
-	else
-	{
-		m_floppy1->mon_w(state);
-	}
-}
-
-void wangpc_state::fdc_reset()
-{
-    if (LOG) logerror("%s: FDC reset\n", machine().describe_context());
-
-	m_fdc->reset();
-}
-
-void wangpc_state::fdc_tc()
-{
-    if (LOG) logerror("%s: FDC TC\n", machine().describe_context());
-
-	m_fdc->tc_w(true);
-	m_fdc->tc_w(false);
+	m_fdc->set_floppy(floppy);
 }
 
 WRITE8_MEMBER( wangpc_state::fdc_ctrl_w )
@@ -125,143 +83,140 @@ WRITE8_MEMBER( wangpc_state::fdc_ctrl_w )
 
 READ8_MEMBER( wangpc_state::deselect_drive1_r )
 {
-	select_drive(0, false);
+	m_ds1 = false;
+	select_drive();
 
 	return 0xff;
 }
-
 
 WRITE8_MEMBER( wangpc_state::deselect_drive1_w )
 {
-	select_drive(0, false);
+	deselect_drive1_r(space, offset);
 }
-
 
 READ8_MEMBER( wangpc_state::select_drive1_r )
 {
-	select_drive(0, true);
+	m_ds1 = true;
+	select_drive();
 
 	return 0xff;
 }
-
 
 WRITE8_MEMBER( wangpc_state::select_drive1_w )
 {
-	select_drive(0, true);
+	select_drive1_r(space, offset);
 }
-
 
 READ8_MEMBER( wangpc_state::deselect_drive2_r )
 {
-	select_drive(1, false);
+	m_ds2 = false;
+	select_drive();
 
 	return 0xff;
 }
-
 
 WRITE8_MEMBER( wangpc_state::deselect_drive2_w )
 {
-	select_drive(1, false);
+	deselect_drive2_r(space, offset);
 }
-
 
 READ8_MEMBER( wangpc_state::select_drive2_r )
 {
-	select_drive(1, true);
+	m_ds2 = true;
+	select_drive();
 
 	return 0xff;
 }
-
 
 WRITE8_MEMBER( wangpc_state::select_drive2_w )
 {
-	select_drive(1, true);
+	select_drive2_r(space, offset);
 }
-
 
 READ8_MEMBER( wangpc_state::motor1_off_r )
 {
-	set_motor(0, false);
+	if (LOG) logerror("%s: Drive 1 motor OFF\n", machine().describe_context());
+
+	m_floppy0->mon_w(1);
 
 	return 0xff;
 }
-
 
 WRITE8_MEMBER( wangpc_state::motor1_off_w )
 {
-	set_motor(0, false);
+	motor1_off_r(space, offset);
 }
-
 
 READ8_MEMBER( wangpc_state::motor1_on_r )
 {
-	set_motor(0, true);
+	if (LOG) logerror("%s: Drive 1 motor ON\n", machine().describe_context());
+
+	m_floppy0->mon_w(0);
 
 	return 0xff;
 }
-
 
 WRITE8_MEMBER( wangpc_state::motor1_on_w )
 {
-	set_motor(0, true);
+	motor1_on_r(space, offset);
 }
-
 
 READ8_MEMBER( wangpc_state::motor2_off_r )
 {
-	set_motor(1, false);
+	if (LOG) logerror("%s: Drive 2 motor OFF\n", machine().describe_context());
+
+	m_floppy1->mon_w(1);
 
 	return 0xff;
 }
-
 
 WRITE8_MEMBER( wangpc_state::motor2_off_w )
 {
-	set_motor(1, false);
+	motor2_off_r(space, offset);
 }
-
 
 READ8_MEMBER( wangpc_state::motor2_on_r )
 {
-	set_motor(1, true);
+	if (LOG) logerror("%s: Drive 2 motor ON\n", machine().describe_context());
+
+	m_floppy1->mon_w(0);
 
 	return 0xff;
 }
-
 
 WRITE8_MEMBER( wangpc_state::motor2_on_w )
 {
-	set_motor(1, true);
+	motor2_on_r(space, offset);
 }
-
 
 READ8_MEMBER( wangpc_state::fdc_reset_r )
 {
-	fdc_reset();
+    if (LOG) logerror("%s: FDC reset\n", machine().describe_context());
+
+	m_fdc->reset();
 
 	return 0xff;
 }
-
 
 WRITE8_MEMBER( wangpc_state::fdc_reset_w )
 {
-	fdc_reset();
+	fdc_reset_r(space, offset);
 }
-
 
 READ8_MEMBER( wangpc_state::fdc_tc_r )
 {
-	fdc_tc();
+    if (LOG) logerror("%s: FDC TC\n", machine().describe_context());
+
+	m_fdc->tc_w(1);
+	m_fdc->tc_w(0);
 
 	return 0xff;
 }
 
-
 WRITE8_MEMBER( wangpc_state::fdc_tc_w )
 {
-	fdc_tc();
+	fdc_tc_r(space, offset);
 }
-
 
 
 //-------------------------------------------------
@@ -559,7 +514,7 @@ READ8_MEMBER( wangpc_state::option_id_r )
 	UINT8 data = 0;
 
 	// FDC interrupt
-	data |= (m_fdc_dd0 | m_fdc_dd1 | (int) m_fdc->get_irq()) << 7;
+	data |= (m_fdc_dd0 || m_fdc_dd1 || (int) m_fdc->get_irq()) << 7;
 
 	return data;
 }
@@ -668,7 +623,7 @@ void wangpc_state::update_fdc_tc()
 	if (m_enable_eop)
 		m_fdc->tc_w(m_fdc_tc);
 	else
-		m_fdc->tc_w(false);
+		m_fdc->tc_w(0);
 }
 
 WRITE_LINE_MEMBER( wangpc_state::hrq_w )
@@ -682,11 +637,11 @@ WRITE_LINE_MEMBER( wangpc_state::eop_w )
 {
 	if (m_dack == 2)
 	{
-		m_fdc_tc = !state;
+		m_fdc_tc = state;
 		update_fdc_tc();
 	}
 
-	if (!state)
+	if (state)
 	{
 		if (LOG) logerror("EOP set\n");
 
@@ -1035,6 +990,10 @@ static SLOT_INTERFACE_START( wangpc_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
+FLOPPY_FORMATS_MEMBER( wangpc_state::floppy_formats )
+	FLOPPY_PC_FORMAT
+FLOPPY_FORMATS_END
+
 void wangpc_state::fdc_irq(bool state)
 {
     if (LOG) logerror("FDC INT %u\n", state);
@@ -1242,6 +1201,7 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_CPU_ADD(I8086_TAG, I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(wangpc_mem)
 	MCFG_CPU_IO_MAP(wangpc_io)
+	//MCFG_QUANTUM_PERFECT_CPU(I8086_TAG)
 
 	// devices
 	MCFG_AM9517A_ADD(AM9517A_TAG, 4000000, dmac_intf)
@@ -1251,8 +1211,8 @@ static MACHINE_CONFIG_START( wangpc, wangpc_state )
 	MCFG_IM6402_ADD(IM6402_TAG, uart_intf)
 	MCFG_MC2661_ADD(SCN2661_TAG, 0, epci_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", wangpc_floppies, "525dd", 0, wangpc_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", wangpc_floppies, "525dd", 0, wangpc_state::floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_WANGPC_KEYBOARD_ADD()
 

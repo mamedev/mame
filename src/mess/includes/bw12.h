@@ -44,8 +44,8 @@ public:
 		  m_crtc(*this, MC6845_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_floppy0(*this, UPD765_TAG ":0:525dd"),
-		  m_floppy1(*this, UPD765_TAG ":1:525dd"),
+		  m_floppy0(*this, UPD765_TAG ":1:525dd"),
+		  m_floppy1(*this, UPD765_TAG ":2:525dd"),
 		  m_floppy_timer(*this, FLOPPY_TIMER_TAG),
 		  m_video_ram(*this, "video_ram")
 	{ }

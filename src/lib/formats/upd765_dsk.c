@@ -108,7 +108,7 @@ void upd765_format::build_sector_description(const format &f, UINT8 *sectdata, d
 
 floppy_image_format_t::desc_e* upd765_format::get_desc_fm(const format &f, int &current_size, int &end_gap_index)
 {
-	static floppy_image_format_t::desc_e desc[29] = {
+	static floppy_image_format_t::desc_e desc[26] = {
 		/* 00 */ { FM, 0xff, f.gap_4a },
 		/* 01 */ { FM, 0x00, 6 },
 		/* 02 */ { RAW, 0xf77a, 1 },

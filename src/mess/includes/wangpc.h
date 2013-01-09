@@ -10,10 +10,10 @@
 #include "machine/ctronics.h"
 #include "machine/i8255.h"
 #include "machine/im6402.h"
-#include "machine/pic8259.h"
-#include "machine/pit8253.h"
-#include "machine/ram.h"
 #include "machine/mc2661.h"
+#include "machine/pit8253.h"
+#include "machine/pic8259.h"
+#include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/wangpcbus.h"
 #include "machine/wangpckb.h"
@@ -71,8 +71,8 @@ public:
 		  m_fdc_dd0(0),
 		  m_fdc_dd1(0),
 		  m_fdc_tc(0),
-		  m_ds1(1),
-		  m_ds2(1)
+		  m_ds1(false),
+		  m_ds2(false)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -93,10 +93,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	void select_drive(int drive, bool select);
-	void set_motor(int drive, bool motor);
-	void fdc_reset();
-	void fdc_tc();
+	void select_drive();
 	void check_level1_interrupts();
 	void check_level2_interrupts();
 	void update_fdc_drq();
@@ -165,6 +162,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( busy_w );
 	DECLARE_WRITE_LINE_MEMBER( bus_irq2_w );
 
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);
 
@@ -195,7 +194,7 @@ public:
 	int m_ds1;
 	int m_ds2;
 
-	int m_led[6]; // HACK until keyboard works
+	int m_led[6];
 };
 
 

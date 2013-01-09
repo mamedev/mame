@@ -170,6 +170,16 @@ void xerox820ii_state::bankswitch(int bank)
 	}
 }
 
+READ8_MEMBER( xerox820_state::fdc_r )
+{
+	return m_fdc->gen_r(offset) ^ 0xff;
+}
+
+WRITE8_MEMBER( xerox820_state::fdc_w )
+{
+	m_fdc->gen_w(offset, data ^ 0xff);
+}
+
 WRITE8_MEMBER( xerox820_state::scroll_w )
 {
 	m_scroll = (offset >> 8) & 0x1f;
@@ -241,7 +251,7 @@ static ADDRESS_MAP_START( xerox820_io, AS_IO, 8, xerox820_state )
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0xff02) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_c_r, z80dart_c_w)
 	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80PIO_GP_TAG, z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff03) AM_DEVWRITE(COM8116_TAG, com8116_device, stt_w)
-	AM_RANGE(0x10, 0x13) AM_MIRROR(0xff00) AM_DEVREADWRITE(FD1771_TAG, wd_fdc_t, read, write)
+	AM_RANGE(0x10, 0x13) AM_MIRROR(0xff00) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x14, 0x14) AM_MIRROR(0xff03) AM_MASK(0xff00) AM_WRITE(scroll_w)
 	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80PIO_KB_TAG, z80pio_device, read_alt, write_alt)
@@ -652,28 +662,26 @@ static SLOT_INTERFACE_START( xerox820_floppies )
 	SLOT_INTERFACE( "sa850", FLOPPY_8_DSDD ) // Shugart SA-850
 SLOT_INTERFACE_END
 
+void xerox820_state::update_nmi()
+{
+	int halt = m_maincpu->state_int(Z80_HALT);
+	int state = (halt && (m_fdc_irq || m_fdc_drq)) ? ASSERT_LINE : CLEAR_LINE;
+
+	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
+}
+
 void xerox820_state::fdc_intrq_w(bool state)
 {
 	m_fdc_irq = state;
 
-	int halt = m_maincpu->state_int(Z80_HALT);
-
-	if (halt && (m_fdc_irq || m_fdc_drq))
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	else
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	update_nmi();
 }
 
 void xerox820_state::fdc_drq_w(bool state)
 {
 	m_fdc_drq = state;
 
-	int halt = m_maincpu->state_int(Z80_HALT);
-
-	if (halt && (m_fdc_irq || m_fdc_drq))
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	else
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	update_nmi();
 }
 
 /* COM8116 Interface */
@@ -749,7 +757,6 @@ void xerox820_state::machine_start()
 	// floppy callbacks
 	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(xerox820_state::fdc_intrq_w), this));
 	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(xerox820_state::fdc_drq_w), this));
-	m_fdc->dden_w(1);
 
 	// state saving
 	save_item(NAME(m_keydata));
