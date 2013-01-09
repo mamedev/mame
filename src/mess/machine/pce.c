@@ -659,8 +659,8 @@ static void pce_cd_nec_set_audio_stop_position( running_machine &machine )
 		f = bcd_2_dec( pce_cd.command_buffer[4]);
 
 		frame = f + 75 * (s + m * 60);
-		if(frame >= 525) // TODO: seven seconds gap? O_o
-			frame -= 525;
+//		if(frame >= 525) // TODO: seven seconds gap? O_o
+//			frame -= 525;
 		break;
 	}
 	case 0x80:

@@ -217,9 +217,11 @@ adam	  // Coleco Adam
 pce	   // PC/Engine NEC 1987-1993
 tg16	  // Turbo Grafix-16  NEC 1989-1993
 sgx	   // SuperGrafX NEC 1989
+//pce_new
+//tg16_new
+//sgx_new
 pcfx	  // PC-FX NEC 1994
 pcfxga	// PC-FX NEC 199? (PC-FX on a PC ISA Card)
-//pce_new
 
 // Arcadia 2001 family
 advsnha		// Advision Home Arcade
