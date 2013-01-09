@@ -2125,6 +2125,8 @@ $(DRIVERS)/icecold.o:	$(LAYOUT)/icecold.lh
 
 $(DRIVERS)/igspoker.o:	$(LAYOUT)/igspoker.lh
 
+$(DRIVERS)/imolagp.o:	$(LAYOUT)/imolagp.lh
+
 $(DRIVERS)/jankenmn.o:	$(LAYOUT)/jankenmn.lh
 
 $(DRIVERS)/jpmimpct.o:	$(LAYOUT)/jpmimpct.lh

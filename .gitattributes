@@ -4524,6 +4524,7 @@ src/mame/layout/gunfight.lay svneol=native#text/plain
 src/mame/layout/gypsyjug.lay svneol=native#text/plain
 src/mame/layout/icecold.lay svneol=native#text/plain
 src/mame/layout/igspoker.lay svneol=native#text/plain
+src/mame/layout/imolagp.lay svneol=native#text/plain
 src/mame/layout/invad2ct.lay svneol=native#text/plain
 src/mame/layout/invaders.lay svneol=native#text/plain
 src/mame/layout/jankenmn.lay svneol=native#text/plain

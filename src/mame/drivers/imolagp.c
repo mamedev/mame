@@ -78,6 +78,8 @@ Known issues:
 #include "machine/i8255.h"
 #include "sound/ay8910.h"
 
+#include "imolagp.lh"
+
 
 #define HLE_COM
 
@@ -623,6 +625,6 @@ ROM_START( imolagpo )
 ROM_END
 
 
-/*    YEAR, NAME,     PARENT,  MACHINE, INPUT,   INIT,              MONITOR, COMPANY,    FULLNAME */
-GAME( 1981, imolagp,  0,       imolagp, imolagp, driver_device, 0,  ROT90,   "Alberici", "Imola Grand Prix (set 1)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1981, imolagpo, imolagp, imolagp, imolagp, driver_device, 0,  ROT90,   "Alberici", "Imola Grand Prix (set 2)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+/*    YEAR,  NAME,     PARENT,  MACHINE, INPUT,    INIT,              MONITOR, COMPANY, FULLNAME, FLAGS */
+GAMEL(1983?, imolagp,  0,       imolagp, imolagp,  driver_device, 0,  ROT90,   "RB Bologna", "Imola Grand Prix (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE, layout_imolagp ) // made by Alberici? year not shown, PCB labels suggests it's from 1983
+GAMEL(1983?, imolagpo, imolagp, imolagp, imolagpo, driver_device, 0,  ROT90,   "RB Bologna", "Imola Grand Prix (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE, layout_imolagp ) // "
