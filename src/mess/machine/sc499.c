@@ -1098,9 +1098,12 @@ int sc499_device::block_is_filemark()
 void sc499_device::block_set_filemark()
 {
 	static const UINT8 fm_pattern[] = {0xDE, 0xAF, 0xFA, 0xED};
+	int i;
 
-	memcpy(m_ctape_block_buffer, fm_pattern, 4);
-	memcpy(m_ctape_block_buffer+4, m_ctape_block_buffer, SC499_CTAPE_BLOCK_SIZE-4);
+	for (i = 0; i < SC499_CTAPE_BLOCK_SIZE; i += 4)
+	{
+		memcpy(m_ctape_block_buffer + i, fm_pattern, 4);
+	}
 }
 
 //**************************************************************************

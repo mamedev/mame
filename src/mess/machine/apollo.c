@@ -435,7 +435,7 @@ READ8_MEMBER(apollo_state::apollo_dma_read_byte){
 		offset &= 0x3ff;
 	}
 
-	data = space.read_byte(page_offset + offset);
+	data = machine().firstcpu->space(AS_PROGRAM).read_byte(page_offset + offset);
 
 	if (VERBOSE > 1 || offset < 4 || (offset & 0xff) == 0 || (offset & 0xff) == 0xff)
 	{
@@ -455,7 +455,7 @@ WRITE8_MEMBER(apollo_state::apollo_dma_write_byte){
 		offset &= 0x3ff;
 	}
     // FIXME: MSB not available, writing only LSB
-	space.write_byte(page_offset + offset, data);
+	machine().firstcpu->space(AS_PROGRAM).write_byte(page_offset + offset, data);
 
 	if (VERBOSE > 1 || offset < 4 || (offset & 0xff) == 0 || (offset & 0xff) == 0xff)
 	{
@@ -477,7 +477,7 @@ READ8_MEMBER(apollo_state::apollo_dma_read_word){
 		offset = (offset << 1) & 0x3ff;
 	}
 
-	data = space.read_byte(page_offset + offset);
+	data = machine().firstcpu->space(AS_PROGRAM).read_byte(page_offset + offset);
 
 	SLOG1(("dma read word at offset %x+%03x = %04x", page_offset, offset , data));
     // FIXME: MSB will get lost
@@ -501,7 +501,7 @@ WRITE8_MEMBER(apollo_state::apollo_dma_write_word){
 		offset = (offset << 1) & 0x3ff;
 	}
 
-	space.write_byte(page_offset + offset, data);
+	machine().firstcpu->space(AS_PROGRAM).write_byte(page_offset + offset, data);
 	SLOG1(("dma write word at offset %x+%03x = %02x", page_offset, offset, data));
 }
 
@@ -1104,6 +1104,7 @@ static TIMER_CALLBACK(kbd_timer_callback)
 
 #if defined(APOLLO_FOR_LINUX)
 	device_t *device = (device_t *) ptr;
+	address_space &space = device->machine().device(MAINCPU)->memory().space(AS_PROGRAM);
 	UINT8 data;
 
 #define SRA 0x01
@@ -1274,9 +1275,6 @@ static DEVICE_RESET(apollo_sio2)
 //##########################################################################
 // machine/apollo_fdc.c - APOLLO DS3500 Floppy disk controller
 //##########################################################################
-
-#undef VERBOSE
-#define VERBOSE 0
 
 FLOPPY_FORMATS_MEMBER( apollo_state::floppy_formats )
 	FLOPPY_APOLLO_FORMAT

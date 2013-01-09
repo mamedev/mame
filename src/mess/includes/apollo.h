@@ -35,7 +35,7 @@
 #define DLOG(x) { logerror ("%s - %s: ", apollo_cpu_context(device->machine().device(MAINCPU)), device->tag()); LOG(x) }
 #define DLOG1(x) { if (VERBOSE > 0) DLOG(x) }
 #define DLOG2(x) { if (VERBOSE > 1) DLOG(x) }
-#define MLOG(x)  { logerror ("%s: ", apollo_cpu_context(machine.device(MAINCPU))); LOG(x) }
+#define MLOG(x)  { logerror ("%s: ", apollo_cpu_context(machine().device(MAINCPU))); LOG(x) }
 #define MLOG1(x) { if (VERBOSE > 0) MLOG(x) }
 #define MLOG2(x) { if (VERBOSE > 1) MLOG(x) }
 #define SLOG(x)  { logerror ("%s: ", apollo_cpu_context(&space.device())); LOG(x) }
