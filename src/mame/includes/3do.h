@@ -164,10 +164,11 @@ class _3do_state : public driver_device
 public:
 	_3do_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu"),
 		m_dram(*this, "dram"),
 		m_vram(*this, "vram"){ }
 
-	legacy_cpu_device* m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT32> m_dram;
 	required_shared_ptr<UINT32> m_vram;
 	SLOW2 m_slow2;
@@ -188,6 +189,10 @@ public:
 	virtual void machine_reset();
 	DECLARE_VIDEO_START(_3do);
 	UINT32 screen_update__3do(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+private:
+	void m_3do_request_fiq0(UINT32 irq_req);
+	void m_3do_request_fiq1(UINT32 irq_req);
 };
 
 /*----------- defined in machine/3do.c -----------*/

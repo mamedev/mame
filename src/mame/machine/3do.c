@@ -55,10 +55,64 @@ Expansion bus stuff:
 
 #include "emu.h"
 #include "includes/3do.h"
+#include "cpu/arm7/arm7core.h"
 
+#define	VERBOSE			1
+#define LOG(x) do { if (VERBOSE) printf x; } while (0)
 
+/*
+0x80000000 Second Priority (?)
+0x40000000 SW irq
+0x20000000 DMA<->EXP
+0x1fff0000 DMA RAM->DSPP *
+0x0000f000 DMA DSPP->RAM *
+0x00000800 DSPP
+0x00000400 Timer  1
+0x00000200 Timer  3
+0x00000100 Timer  5
+0x00000080 Timer  7
+0x00000040 Timer  9
+0x00000020 Timer 11
+0x00000010 Timer 13
+0x00000008 Timer 15
+0x00000004 Expansion Bus
+0x00000002 Vertical 1
+0x00000001 Vertical 0
+*/
+void _3do_state::m_3do_request_fiq0(UINT32 irq_req)
+{
+	m_clio.irq0 |= irq_req;
 
+	if(m_clio.irq0 & m_clio.irq0_enable)
+		m_maincpu->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
 
+	if((m_clio.irq0 & m_clio.irq0_enable) == 0)
+		m_maincpu->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
+}
+
+/*
+0x00000400 DSPPOVER (Red rev. only)
+0x00000200 DSPPUNDER (Red rev. only)
+0x00000100 BadBits
+0x00000080 DMA<-External
+0x00000040 DMA->External
+0x00000020 DMA<-Uncle
+0x00000010 DMA->Uncle
+0x00000008 DMA RAM->DSPP N
+0x00000004 SlowBus
+0x00000002 Disk Inserted
+0x00000001 DMA Player bus
+*/
+void _3do_state::m_3do_request_fiq1(UINT32 irq_req)
+{
+	m_clio.irq1 |= irq_req;
+
+	if(m_clio.irq1 & m_clio.irq1_enable)
+		m_maincpu->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
+
+	if((m_clio.irq1 & m_clio.irq1_enable) == 0)
+		m_maincpu->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
+}
 
 
 READ32_MEMBER(_3do_state::_3do_nvarea_r){
@@ -585,6 +639,12 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 	case 0x0048/4:
 	case 0x004c/4:
 		return m_clio.irq0_enable;
+	case 0x0060/4:
+	case 0x0064/4:
+		return m_clio.irq1;
+	case 0x0068/4:
+	case 0x006c/4:
+		return m_clio.irq1_enable;
 	case 0x0080/4:
 		return m_clio.hdelay;
 	case 0x0084/4:
@@ -744,16 +804,24 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 		m_clio.seed = data;
 		break;
 	case 0x0040/4:
+		LOG(("%08x PEND0\n",data));
 		m_clio.irq0 |= data;
+		m_3do_request_fiq0(0);
 		break;
 	case 0x0044/4:
+		LOG(("%08x PEND0 CLEAR\n",data));
 		m_clio.irq0 &= ~data;
+		m_3do_request_fiq0(0);
 		break;
 	case 0x0048/4:
+		LOG(("%08x MASK0\n",data));
 		m_clio.irq0_enable |= data;
+		m_3do_request_fiq0(0);
 		break;
 	case 0x004c/4:
+		LOG(("%08x MASK0 CLEAR\n",data));
 		m_clio.irq0_enable &= ~data;
+		m_3do_request_fiq0(0);
 		break;
 	case 0x0050/4:
 		m_clio.mode |= data;
@@ -768,16 +836,24 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 		m_clio.spare = data;
 		break;
 	case 0x0060/4:
+		LOG(("%08x PEND1\n",data));
 		m_clio.irq1 |= data;
+		m_3do_request_fiq1(0);
 		break;
 	case 0x0064/4:
+		LOG(("%08x PEND1 CLEAR\n",data));
 		m_clio.irq1 &= ~data;
+		m_3do_request_fiq1(0);
 		break;
 	case 0x0068/4:
+		LOG(("%08x MASK1\n",data));
 		m_clio.irq1_enable |= data;
+		m_3do_request_fiq1(0);
 		break;
 	case 0x006c/4:
+		LOG(("%08x MASK1 CLEAR\n",data));
 		m_clio.irq1_enable &= ~data;
+		m_3do_request_fiq1(0);
 		break;
 	case 0x0080/4:
 		m_clio.hdelay = data;
@@ -981,7 +1057,6 @@ VIDEO_START_MEMBER(_3do_state,_3do)
 }
 
 
-/* This is incorrect! Just testing stuff */
 UINT32 _3do_state::screen_update__3do(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT32 *source_p = m_vram + 0x1c0000 / 4;
@@ -993,11 +1068,12 @@ UINT32 _3do_state::screen_update__3do(screen_device &screen, bitmap_rgb32 &bitma
 
 		for ( int x = 0; x < 320; x++ )
 		{
-			/* Odd numbered bits go to lower half, even numbered bits to upper half */
+			/* Every dword contains two pixels, upper word is top pixel, lower is bottom. */
 			UINT32 lower = *source_p & 0xffff;
 			UINT32 upper = ( *source_p >> 16 ) & 0xffff;
 			int r, g, b;
 
+			/* Format is RGB555 */
 			r = (upper & 0x7c00) >> 10;
 			g = (upper & 0x03e0) >> 5;
 			b = (upper & 0x001f) >> 0;

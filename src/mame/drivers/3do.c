@@ -131,9 +131,6 @@ INPUT_PORTS_END
 
 void _3do_state::machine_reset()
 {
-
-	m_maincpu = downcast<legacy_cpu_device*>( machine().device<cpu_device>("maincpu") );
-
 	membank("bank2")->set_base(memregion("user1")->base());
 
 	/* configure overlay */
