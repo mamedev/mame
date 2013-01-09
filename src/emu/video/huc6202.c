@@ -75,13 +75,13 @@ READ16_MEMBER( huc6202_device::next_pixel )
 	}
 	else
 	{
-		UINT8	prio_type = m_prio[ m_prio_map[ m_map_index ] ].prio_type;
+		UINT8	prio_index = m_prio_map[ m_map_index ];
 
-		if ( m_prio[ prio_type ].dev0_enabled && data_0 != huc6270_device::HUC6270_SPRITE )
+		if ( m_prio[ prio_index ].dev0_enabled && data_0 != huc6270_device::HUC6270_SPRITE )
 		{
-			if ( m_prio[ prio_type ].dev1_enabled && data_1 != huc6270_device::HUC6270_SPRITE )
+			if ( m_prio[ prio_index ].dev1_enabled && data_1 != huc6270_device::HUC6270_SPRITE )
 			{
-				switch ( prio_type )
+				switch ( m_prio[ prio_index ].prio_type )
 				{
 				case 0:		/* Back - BG1 SP1 BG0 SP0 - Front */
 					data = ( data_0 & 0x0F ) ? data_0 : data_1;
@@ -151,7 +151,7 @@ READ16_MEMBER( huc6202_device::next_pixel )
 		else
 		{
 			/* Only device 1 is enabled */
-			if ( m_prio[ prio_type ].dev1_enabled && data_1 != huc6270_device::HUC6270_SPRITE )
+			if ( m_prio[ prio_index ].dev1_enabled && data_1 != huc6270_device::HUC6270_SPRITE )
 			{
 				data = data_1;
 			}
