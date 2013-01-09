@@ -126,6 +126,9 @@ inline bitstream_in::bitstream_in(const void *src, UINT32 srclength)
 
 inline UINT32 bitstream_in::peek(int numbits)
 {
+	if (numbits == 0)
+		return 0;
+
 	// fetch data if we need more
 	if (numbits > m_bits)
 	{
