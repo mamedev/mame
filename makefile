@@ -684,7 +684,7 @@ default: maketree buildtools emulator
 all: default tools
 
 # TODO: move to a .mak file in the regtests folder?
-tests: maketree jedutil.exe chdman.exe
+tests: maketree jedutil$(EXE) chdman$(EXE)
 	@echo Running jedutil unittest
 	$(PYTHON) src/regtests/jedutil/jedtest.py
 	@echo Running chdman unittest
