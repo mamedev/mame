@@ -8068,6 +8068,8 @@ src/osd/windows/winutil.c svneol=native#text/plain
 src/osd/windows/winutil.h svneol=native#text/plain
 src/osd/windows/winwork.c svneol=native#text/plain
 src/regtests/chdman/chdtest.py svneol=native#text/plain
+src/regtests/chdman/input/createcd_cue_audio_silence_wav/in.cue svneol=native#text/plain
+src/regtests/chdman/input/createcd_cue_audio_silence_wav/silence.wav -text
 src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks/in.cue svneol=native#text/plain
 src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks/silence.wav -text
 src/regtests/chdman/input/createcd_cue_empty/in.bin -text
@@ -8076,6 +8078,7 @@ src/regtests/chdman/input/createcd_iso_empty/in.iso -text
 src/regtests/chdman/input/createcd_nrg_empty/in.nrg -text
 src/regtests/chdman/input/createcd_toc_empty/data.bin -text
 src/regtests/chdman/input/createcd_toc_empty/in.toc svneol=native#text/plain
+src/regtests/chdman/output/createcd_cue_audio_silence_wav/out.chd -text
 src/regtests/chdman/output/createcd_cue_audio_silence_wav_20_tracks/out.chd -text
 src/regtests/chdman/output/createcd_cue_empty/out.chd -text
 src/regtests/chdman/output/createcd_iso_empty/out.chd -text
