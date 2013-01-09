@@ -467,7 +467,7 @@ static const struct pic8259_interface queen_pic8259_1_config =
 {
 	DEVCB_DRIVER_LINE_MEMBER(queen_state,queen_pic8259_1_set_int_line),
 	DEVCB_LINE_VCC,
-	DEVCB_MEMBER(queen_state,get_slave_ack)
+	DEVCB_DRIVER_MEMBER(queen_state,get_slave_ack)
 };
 
 static const struct pic8259_interface queen_pic8259_2_config =
@@ -535,7 +535,7 @@ void queen_state::machine_reset()
 
 
 static MACHINE_CONFIG_START( queen, queen_state )
-	MCFG_CPU_ADD("maincpu", PENTIUM, 533000000/16) // Celeron or Pentium 3, 533 Mhz
+	MCFG_CPU_ADD("maincpu", PENTIUM3, 533000000/16) // Celeron or Pentium 3, 533 Mhz
 	MCFG_CPU_PROGRAM_MAP(queen_map)
 	MCFG_CPU_IO_MAP(queen_io)
 

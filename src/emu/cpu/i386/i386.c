@@ -4294,7 +4294,9 @@ static CPU_RESET( pentium3 )
 	cpustate->cpu_version = REG32(EDX);
 
 	// [ 0:0] FPU on chip
-	cpustate->feature_flags = 0x00000001;		// TODO: enable relevant flags here
+	// [ 4:4] Time Stamp Counter
+	// [ D:D] PTE Global Bit
+	cpustate->feature_flags = 0x00002011;		// TODO: enable relevant flags here
 
 	CHANGE_PC(cpustate,cpustate->eip);
 }
