@@ -61,14 +61,14 @@ Expansion bus stuff:
 #define LOG(x) do { if (VERBOSE) printf x; } while (0)
 
 /*
-0x80000000 Second Priority (?)
+0x80000000 Second Priority
 0x40000000 SW irq
 0x20000000 DMA<->EXP
 0x1fff0000 DMA RAM->DSPP *
 0x0000f000 DMA DSPP->RAM *
 0x00000800 DSPP
 0x00000400 Timer  1
-0x00000200 Timer  3
+0x00000200 Timer  3 <- needed to surpass current hang point
 0x00000100 Timer  5
 0x00000080 Timer  7
 0x00000040 Timer  9
@@ -79,15 +79,23 @@ Expansion bus stuff:
 0x00000002 Vertical 1
 0x00000001 Vertical 0
 */
-void _3do_state::m_3do_request_fiq0(UINT32 irq_req)
+void _3do_state::m_3do_request_fiq(UINT32 irq_req, UINT8 type)
 {
-	m_clio.irq0 |= irq_req;
+	if(type)
+		m_clio.irq1 |= irq_req;
+	else
+		m_clio.irq0 |= irq_req;
 
-	if(m_clio.irq0 & m_clio.irq0_enable)
-		m_maincpu->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
+	if(m_clio.irq1)
+		m_clio.irq0 |= 1 << 31; // Second Priority
+	else
+		m_clio.irq0 &= ~(1 << 31);
 
-	if((m_clio.irq0 & m_clio.irq0_enable) == 0)
-		m_maincpu->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
+	if((m_clio.irq0 & m_clio.irq0_enable) || (m_clio.irq1 & m_clio.irq1_enable))
+	{
+		printf("Go irq %08x & %08x %08x & %08x\n",m_clio.irq0, m_clio.irq0_enable, m_clio.irq1, m_clio.irq1_enable);
+		generic_pulse_irq_line(m_maincpu, ARM7_FIRQ_LINE, 1);
+	}
 }
 
 /*
@@ -103,16 +111,6 @@ void _3do_state::m_3do_request_fiq0(UINT32 irq_req)
 0x00000002 Disk Inserted
 0x00000001 DMA Player bus
 */
-void _3do_state::m_3do_request_fiq1(UINT32 irq_req)
-{
-	m_clio.irq1 |= irq_req;
-
-	if(m_clio.irq1 & m_clio.irq1_enable)
-		m_maincpu->set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
-
-	if((m_clio.irq1 & m_clio.irq1_enable) == 0)
-		m_maincpu->set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
-}
 
 
 READ32_MEMBER(_3do_state::_3do_nvarea_r){
@@ -608,7 +606,8 @@ void _3do_madam_init( running_machine &machine )
 
 READ32_MEMBER(_3do_state::_3do_clio_r)
 {
-	logerror( "%08X: CLIO read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset * 4 );
+	if (!space.debugger_access())
+		logerror( "%08X: CLIO read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset * 4 );
 
 	switch( offset )
 	{
@@ -759,6 +758,7 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 		return m_clio.uncle_rom;
 
 	default:
+	if (!space.debugger_access())
 		logerror( "%08X: unhandled CLIO read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset * 4 );
 		break;
 	}
@@ -806,22 +806,22 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 	case 0x0040/4:
 		LOG(("%08x PEND0\n",data));
 		m_clio.irq0 |= data;
-		m_3do_request_fiq0(0);
+		m_3do_request_fiq(0,0);
 		break;
 	case 0x0044/4:
 		LOG(("%08x PEND0 CLEAR\n",data));
 		m_clio.irq0 &= ~data;
-		m_3do_request_fiq0(0);
+		m_3do_request_fiq(0,0);
 		break;
 	case 0x0048/4:
 		LOG(("%08x MASK0\n",data));
 		m_clio.irq0_enable |= data;
-		m_3do_request_fiq0(0);
+		m_3do_request_fiq(0,0);
 		break;
 	case 0x004c/4:
 		LOG(("%08x MASK0 CLEAR\n",data));
 		m_clio.irq0_enable &= ~data;
-		m_3do_request_fiq0(0);
+		m_3do_request_fiq(0,0);
 		break;
 	case 0x0050/4:
 		m_clio.mode |= data;
@@ -838,22 +838,22 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 	case 0x0060/4:
 		LOG(("%08x PEND1\n",data));
 		m_clio.irq1 |= data;
-		m_3do_request_fiq1(0);
+		m_3do_request_fiq(0,1);
 		break;
 	case 0x0064/4:
 		LOG(("%08x PEND1 CLEAR\n",data));
 		m_clio.irq1 &= ~data;
-		m_3do_request_fiq1(0);
+		m_3do_request_fiq(0,1);
 		break;
 	case 0x0068/4:
 		LOG(("%08x MASK1\n",data));
 		m_clio.irq1_enable |= data;
-		m_3do_request_fiq1(0);
+		m_3do_request_fiq(0,1);
 		break;
 	case 0x006c/4:
 		LOG(("%08x MASK1 CLEAR\n",data));
 		m_clio.irq1_enable &= ~data;
-		m_3do_request_fiq1(0);
+		m_3do_request_fiq(0,1);
 		break;
 	case 0x0080/4:
 		m_clio.hdelay = data;

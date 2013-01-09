@@ -191,8 +191,7 @@ public:
 	UINT32 screen_update__3do(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
-	void m_3do_request_fiq0(UINT32 irq_req);
-	void m_3do_request_fiq1(UINT32 irq_req);
+	void m_3do_request_fiq(UINT32 irq_req, UINT8 type);
 };
 
 /*----------- defined in machine/3do.c -----------*/
