@@ -178,7 +178,7 @@ static const cassette_interface ut88_cassette_interface =
 	rku_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	NULL,
+	"ut88_cass",
 	NULL
 };
 
@@ -212,6 +212,7 @@ static MACHINE_CONFIG_START( ut88, ut88_state )
 	/* Devices */
 	MCFG_I8255A_ADD( "ppi8255", ut88_ppi8255_interface )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, ut88_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","ut88")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ut88mini, ut88_state )
@@ -230,6 +231,7 @@ static MACHINE_CONFIG_START( ut88mini, ut88_state )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, ut88_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","ut88")
 MACHINE_CONFIG_END
 
 /* ROM definition */

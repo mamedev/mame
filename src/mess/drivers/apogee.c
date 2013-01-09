@@ -136,7 +136,7 @@ static const cassette_interface apogee_cassette_interface =
 	rka_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	NULL,
+	"apogee_cass",
 	NULL
 };
 
@@ -191,6 +191,7 @@ static MACHINE_CONFIG_START( apogee, apogee_state )
 	MCFG_I8257_ADD("dma8257", XTAL_16MHz / 9, radio86_dma)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, apogee_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","apogee")
 MACHINE_CONFIG_END
 
 /* ROM definition */

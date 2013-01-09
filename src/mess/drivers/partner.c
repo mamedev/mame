@@ -143,7 +143,7 @@ static const cassette_interface partner_cassette_interface =
 	rkp_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	NULL,
+	"partner_cass",
 	NULL
 };
 
@@ -165,7 +165,7 @@ static const floppy_interface partner_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(partner),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 
@@ -218,10 +218,12 @@ static MACHINE_CONFIG_START( partner, partner_state )
 	MCFG_I8257_ADD("dma8257", XTAL_16MHz / 9, partner_dma)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, partner_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","partner_cass")
 
 	MCFG_FD1793_ADD("wd1793", partner_wd17xx_interface )
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(partner_floppy_interface)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","partner_flop")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

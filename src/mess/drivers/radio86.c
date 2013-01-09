@@ -322,7 +322,7 @@ static const cassette_interface radio86_cassette_interface =
 	rkr_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	NULL,
+	"radio86_cass",
 	NULL
 };
 
@@ -375,6 +375,7 @@ static MACHINE_CONFIG_START( radio86, radio86_state )
 	MCFG_I8257_ADD("dma8257", XTAL_16MHz / 9, radio86_dma)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, radio86_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","radio86")
 MACHINE_CONFIG_END
 
 

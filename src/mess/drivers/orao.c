@@ -167,7 +167,7 @@ static const cassette_interface orao_cassette_interface =
 	orao_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	NULL,
+	"orao_cass",
 	NULL
 };
 
@@ -197,6 +197,7 @@ static MACHINE_CONFIG_START( orao, orao_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, orao_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","orao")
 MACHINE_CONFIG_END
 
 /* ROM definition */

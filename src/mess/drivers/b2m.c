@@ -222,6 +222,7 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 
 	MCFG_FLOPPY_DRIVE_ADD("fd0", b2m_floppies, "525qd", 0, b2m_state::b2m_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", b2m_floppies, "525qd", 0, b2m_state::b2m_floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","b2m")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -250,6 +251,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
-COMP( 1989, b2m,	0,		0,		b2m,		b2m, b2m_state,		b2m,	 "BNPO",					 "Bashkiria-2M",	 GAME_SUPPORTS_SAVE)
-COMP( 1989, b2mrom,	b2m,	0,		b2mrom,		b2m, b2m_state,		b2m,	 "BNPO",					 "Bashkiria-2M ROM-disk",	 GAME_SUPPORTS_SAVE)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT               INIT     COMPANY   FULLNAME   FLAGS */
+COMP( 1989, b2m,	0,		0,		b2m,		b2m,   b2m_state,   b2m,     "BNPO",   "Bashkiria-2M",	 GAME_SUPPORTS_SAVE)
+COMP( 1989, b2mrom,	b2m,	0,		b2mrom,		b2m,   b2m_state,   b2m,     "BNPO",   "Bashkiria-2M ROM-disk",	 GAME_SUPPORTS_SAVE)

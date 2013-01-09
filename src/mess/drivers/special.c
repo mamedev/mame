@@ -375,7 +375,7 @@ static const cassette_interface special_cassette_interface =
 	rks_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	NULL,
+	"special_cass",
 	NULL
 };
 
@@ -412,9 +412,10 @@ static MACHINE_CONFIG_START( special, special_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, special_cassette_interface )
 	MCFG_PIT8253_ADD( "pit8253", specimx_pit8253_intf )
 	MCFG_I8255_ADD( "ppi8255", specialist_ppi8255_interface )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, special_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","special_cass")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( specialp, special )
@@ -452,6 +453,7 @@ static MACHINE_CONFIG_DERIVED( specimx, special )
 
 	MCFG_FLOPPY_DRIVE_ADD("fd0", specimx_floppies, "525qd", 0, special_state::specimx_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", specimx_floppies, "525qd", 0, special_state::specimx_floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","special_flop")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

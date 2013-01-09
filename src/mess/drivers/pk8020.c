@@ -240,6 +240,7 @@ static MACHINE_CONFIG_START( pk8020, pk8020_state )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, pk8020_cassette_interface )
 
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(pk8020_floppy_interface)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","korvet_flop")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -292,8 +293,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
-COMP( 1987, korvet,  0, 	 0,	pk8020, 	pk8020, driver_device,	0,       "<unknown>", "PK8020 Korvet",	 0)
-COMP( 1987, neiva,   korvet,	 0,	pk8020, 	pk8020, driver_device,	0,       "<unknown>", "PK8020 Neiva",	 0)
-COMP( 1987, kontur,  korvet,	 0,	pk8020, 	pk8020, driver_device,	0,       "<unknown>", "PK8020 Kontur",	 0)
-COMP( 1987, bk8t,	 korvet,	 0,	pk8020, 	pk8020, driver_device,	0,       "<unknown>", "BK-8T",	 0)
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT                  INIT    COMPANY      FULLNAME   FLAGS */
+COMP( 1987, korvet,  0,      0,	     pk8020,     pk8020, driver_device, 0,      "<unknown>", "PK8020 Korvet",	 0)
+COMP( 1987, neiva,   korvet, 0,	     pk8020,     pk8020, driver_device, 0,      "<unknown>", "PK8020 Neiva",	 0)
+COMP( 1987, kontur,  korvet, 0,	     pk8020,     pk8020, driver_device, 0,      "<unknown>", "PK8020 Kontur",	 0)
+COMP( 1987, bk8t,	 korvet, 0,	     pk8020,     pk8020, driver_device, 0,      "<unknown>", "BK-8T",	 0)

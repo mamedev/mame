@@ -420,7 +420,7 @@ static const cassette_interface lviv_cassette_interface =
 	lviv_lvt_format,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
+	"lviv_cass",
 	NULL
 };
 
@@ -461,6 +461,7 @@ static MACHINE_CONFIG_START( lviv, lviv_state )
 	MCFG_SNAPSHOT_ADD("snapshot", lviv, "sav", 0)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, lviv_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","lviv")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

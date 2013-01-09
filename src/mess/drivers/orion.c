@@ -81,7 +81,7 @@ static const cassette_interface orion_cassette_interface =
 	rko_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	NULL,
+	"orion_cass",
 	NULL
 };
 
@@ -124,6 +124,7 @@ static MACHINE_CONFIG_START( orion128, orion_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, orion_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","orion_cass")
 
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
 
@@ -131,8 +132,11 @@ static MACHINE_CONFIG_START( orion128, orion_state )
 	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd2", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd3", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","orion_flop")
 
 	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_INTERFACE("orion_cart")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","orion_cart")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -190,6 +194,7 @@ static MACHINE_CONFIG_START( orionz80, orion_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, orion_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","orion_cass")
 
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
 
@@ -197,8 +202,11 @@ static MACHINE_CONFIG_START( orionz80, orion_state )
 	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd2", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd3", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","orion_flop")
 
 	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_INTERFACE("orion_cart")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","orion_cart")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -246,6 +254,7 @@ static MACHINE_CONFIG_START( orionpro, orion_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, orion_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","orion_cass")
 
 	MCFG_FD1793x_ADD("fd1793", XTAL_8MHz / 8)
 
@@ -253,8 +262,12 @@ static MACHINE_CONFIG_START( orionpro, orion_state )
 	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd2", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd3", orion_floppies, "525qd", 0, orion_state::orion_floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","orionpro_flop")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("flop128_list","orion_flop")
 
 	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_INTERFACE("orion_cart")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","orion_cart")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

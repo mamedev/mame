@@ -573,6 +573,7 @@ static MACHINE_CONFIG_START( pyl601, pyl601_state )
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", pyl601_floppies, "525hd", 0, pyl601_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", pyl601_floppies, "525hd", 0, pyl601_state::floppy_formats)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","pyl601")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

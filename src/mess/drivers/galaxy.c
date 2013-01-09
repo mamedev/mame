@@ -159,7 +159,7 @@ static const cassette_interface galaxy_cassette_interface =
 	gtp_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	NULL,
+	"galaxy_cass",
 	NULL
 };
 
@@ -211,6 +211,7 @@ static MACHINE_CONFIG_START( galaxy, galaxy_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, galaxy_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -249,6 +250,7 @@ static MACHINE_CONFIG_START( galaxyp, galaxy_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, galaxy_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","galaxy")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

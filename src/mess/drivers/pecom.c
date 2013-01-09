@@ -169,7 +169,7 @@ static const cassette_interface pecom_cassette_interface =
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
+	"pecom_cass",
 	NULL
 };
 
@@ -188,6 +188,7 @@ static MACHINE_CONFIG_START( pecom64, pecom_state )
 	MCFG_FRAGMENT_ADD(pecom_video)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, pecom_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","pecom")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

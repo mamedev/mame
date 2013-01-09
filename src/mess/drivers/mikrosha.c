@@ -146,7 +146,7 @@ static const cassette_interface mikrosha_cassette_interface =
 	rkm_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	NULL,
+	"mikrosha_cass",
 	NULL
 };
 
@@ -230,6 +230,7 @@ static MACHINE_CONFIG_START( mikrosha, mikrosha_state )
 	MCFG_I8257_ADD("dma8257", XTAL_16MHz / 9, radio86_dma)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, mikrosha_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","mikrosha")
 MACHINE_CONFIG_END
 
 

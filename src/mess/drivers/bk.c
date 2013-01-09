@@ -165,7 +165,7 @@ static const cassette_interface bk0010_cassette_interface =
 	/*rk8_cassette_formats*/cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
-	NULL,
+	"bk0010_cass",
 	NULL
 };
 
@@ -194,6 +194,7 @@ static MACHINE_CONFIG_START( bk0010, bk_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, bk0010_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","bk0010")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bk0010fd, bk0010 )
