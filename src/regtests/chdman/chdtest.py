@@ -72,16 +72,16 @@ for root, dirs, files in os.walk(inputPath):
 		if not exitcode == 0:
 			print d + " - command failed with " + str(exitcode) + " (" + stderr + ")"
 			failure = True
-		exitcode, stdout, stderr = runProcess(chdmanBin + " verify -i " + tempFile)
+		exitcode, stdout, stderr = runProcess([chdmanBin, "verify", "-i", tempFile])
 		if not exitcode == 0:
 			print d + " - verify failed with " + str(exitcode) + " (" + stderr + ")"
 			failure = True
 		# TODO: store exected output of reference file as well and compare
-		exitcode, info1, stderr = runProcess(chdmanBin + " info -v -i " + tempFile)
+		exitcode, info1, stderr = runProcess([chdmanBin, "info", "-v", "-i", tempFile])
 		if not exitcode == 0:
 			print d + " - info (temp) failed with " + str(exitcode) + " (" + stderr + ")"
 			failure = True
-		exitcode, info2, stderr = runProcess(chdmanBin + " info -v -i " + outFile)
+		exitcode, info2, stderr = runProcess([chdmanBin, "info", "-v", "-i", outFile])
 		if not exitcode == 0:
 			print d + " - info (output) failed with " + str(exitcode) + " (" + stderr + ")"
 			failure = True
