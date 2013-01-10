@@ -458,7 +458,16 @@ READ32_MEMBER(_3do_state::_3do_madam_r){
 
 
 WRITE32_MEMBER(_3do_state::_3do_madam_w){
-	logerror( "%08X: MADAM write offset = %08X, data = %08X, mask = %08X\n", machine().device("maincpu")->safe_pc(), offset*4, data, mem_mask );
+
+	if(offset == 0)
+	{
+		if(data == 0x0a)
+			logerror( "%08X: MADAM write offset = %08X, data = %08X (\\n), mask = %08X\n", machine().device("maincpu")->safe_pc(), offset*4, data, mem_mask );
+		else
+			logerror( "%08X: MADAM write offset = %08X, data = %08X (%c), mask = %08X\n", machine().device("maincpu")->safe_pc(), offset*4, data, data, mem_mask );
+	}
+	else
+		logerror( "%08X: MADAM write offset = %08X, data = %08X, mask = %08X\n", machine().device("maincpu")->safe_pc(), offset*4, data, mem_mask );
 
 	switch( offset ) {
 	case 0x0000/4:
@@ -652,8 +661,11 @@ void _3do_madam_init( running_machine &machine )
 READ32_MEMBER(_3do_state::_3do_clio_r)
 {
 	if (!space.debugger_access())
-		if(offset != 0x40/4 && offset != 0x44/4 && offset != 0x48/4 && offset != 0x4c/4)
-			logerror( "%08X: CLIO read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset * 4 );
+	{
+		if(offset != 0x200/4 && offset != 0x40/4 && offset != 0x44/4 && offset != 0x48/4 && offset != 0x4c/4 &&
+		   offset != 0x118/4 && offset != 0x11c/4)
+	   logerror( "%08X: CLIO read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset * 4 );
+	}
 
 	switch( offset )
 	{
@@ -757,7 +769,8 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 
 WRITE32_MEMBER(_3do_state::_3do_clio_w)
 {
-	if(offset != 0x40/4 && offset != 0x44/4 && offset != 0x48/4 && offset != 0x4c/4)
+	if(offset != 0x200/4 && offset != 0x40/4 && offset != 0x44/4 && offset != 0x48/4 && offset != 0x4c/4 &&
+	   offset != 0x118/4 && offset != 0x11c/4)
 		logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", machine().device("maincpu")->safe_pc(), offset*4, data, mem_mask );
 
 	switch( offset )
@@ -926,6 +939,24 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 	case 0x0560/4: case 0x0564/4: case 0x0568/4: case 0x056c/4:
 	case 0x0570/4: case 0x0574/4: case 0x0578/4: case 0x057c/4:
 		m_clio.poll = ( m_clio.poll & 0xf8 ) | ( data & 0x07 );
+		break;
+
+	// DSPP operation
+	/*
+	---- x--- DSPPError
+	---- -x-- DSPPReset
+	---- --x- DSPPSleep
+	---- ---x DSPPGW
+	(Red revision)
+	---x ---- DSPPError
+	---- x--- DSPPReset
+	---- -x-- DSPPSleep
+	---- --x- DSPPGW-Step
+	---- ---x DSPPGW
+	*/
+	case 0x17fc/4:
+		/* TODO: DSPP enabled just before enabling DSPP irq! */
+		//printf("%08x\n",data);
 		break;
 
 	case 0xc000/4:
