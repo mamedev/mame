@@ -98,6 +98,7 @@ Part list of Goldstar 3DO Interactive Multiplayer
 #include "cpu/arm7/arm7.h"
 
 
+
 #define X2_CLOCK_PAL	59000000
 #define X2_CLOCK_NTSC	49090000
 #define X601_CLOCK		XTAL_16_9344MHz
@@ -108,7 +109,7 @@ static ADDRESS_MAP_START( 3do_mem, AS_PROGRAM, 32, _3do_state )
 	AM_RANGE(0x00200000, 0x003FFFFF) AM_RAM	AM_SHARE("vram")									/* VRAM */
 	AM_RANGE(0x03000000, 0x030FFFFF) AM_ROMBANK("bank2")									/* BIOS */
 	AM_RANGE(0x03100000, 0x0313FFFF) AM_RAM													/* Brooktree? */
-	AM_RANGE(0x03140000, 0x0315FFFF) AM_READWRITE(_3do_nvarea_r, _3do_nvarea_w)				/* NVRAM */
+	AM_RANGE(0x03140000, 0x0315FFFF) AM_READWRITE8(_3do_nvarea_r, _3do_nvarea_w, 0x000000ff)				/* NVRAM */
 	AM_RANGE(0x03180000, 0x031BFFFF) AM_READWRITE(_3do_slow2_r, _3do_slow2_w)				/* Slow bus - additional expansion */
 	AM_RANGE(0x03200000, 0x0320FFFF) AM_READWRITE(_3do_svf_r, _3do_svf_w)					/* special vram access1 */
 	AM_RANGE(0x03300000, 0x033FFFFF) AM_READWRITE(_3do_madam_r, _3do_madam_w)				/* address decoder */
@@ -151,11 +152,32 @@ struct cdrom_interface _3do_cdrom =
 	NULL
 };
 
+static NVRAM_HANDLER( _3do )
+{
+	_3do_state *state = machine.driver_data<_3do_state>();
+	UINT8 *nvram = state->m_nvram;
+
+	if (read_or_write)
+		file->write(nvram,0x8000);
+	else
+	{
+		if (file)
+			file->read(nvram,0x8000);
+		else
+		{
+			/* fill in the default values */
+			memset(nvram,0xff,0x8000);
+		}
+	}
+}
+
 static MACHINE_CONFIG_START( 3do, _3do_state )
 
 	/* Basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", ARM7_BE, XTAL_50MHz/4 )
 	MCFG_CPU_PROGRAM_MAP( 3do_mem)
+
+	MCFG_NVRAM_HANDLER(_3do)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x16", _3do_state, timer_x16_cb, attotime::from_hz(12000)) // TODO: timing
 

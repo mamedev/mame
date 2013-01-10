@@ -133,7 +133,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( _3do_state::timer_x16_cb )
 		{
 			m_clio.timer_count[i]--;
 
-			if(m_clio.timer_count[i] == 0) // timer hit
+			if(m_clio.timer_count[i] == 0xffffffff) // timer hit
 			{
 				if(i & 1) // odd timer irq fires
 					m_3do_request_fiq(8 << (7-(i >> 1)),0);
@@ -141,20 +141,14 @@ TIMER_DEVICE_CALLBACK_MEMBER( _3do_state::timer_x16_cb )
 				if(timer_flag & 2)
 					m_clio.timer_count[i] = m_clio.timer_backup[i];
 				else
-					m_clio.timer_ctrl &= (~1 << i*4);
+					m_clio.timer_ctrl &= ~(1 << i*4);
 			}
 		}
 	}
 }
 
-READ32_MEMBER(_3do_state::_3do_nvarea_r){
-	logerror( "%08X: NVRAM read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset );
-	return 0;
-}
-
-WRITE32_MEMBER(_3do_state::_3do_nvarea_w){
-	logerror( "%08X: NVRAM write offset = %08X, data = %08X, mask = %08X\n", machine().device("maincpu")->safe_pc(), offset, data, mem_mask );
-}
+READ8_MEMBER(_3do_state::_3do_nvarea_r) { return m_nvram[offset]; }
+WRITE8_MEMBER(_3do_state::_3do_nvarea_w) { m_nvram[offset] = data; }
 
 
 
@@ -642,7 +636,8 @@ void _3do_madam_init( running_machine &machine )
 READ32_MEMBER(_3do_state::_3do_clio_r)
 {
 	if (!space.debugger_access())
-		logerror( "%08X: CLIO read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset * 4 );
+		if(offset != 0x40/4 && offset != 0x44/4 && offset != 0x48/4 && offset != 0x4c/4)
+			logerror( "%08X: CLIO read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset * 4 );
 
 	switch( offset )
 	{
@@ -746,7 +741,8 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 
 WRITE32_MEMBER(_3do_state::_3do_clio_w)
 {
-	logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", machine().device("maincpu")->safe_pc(), offset*4, data, mem_mask );
+	if(offset != 0x40/4 && offset != 0x44/4 && offset != 0x48/4 && offset != 0x4c/4)
+		logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", machine().device("maincpu")->safe_pc(), offset*4, data, mem_mask );
 
 	switch( offset )
 	{
@@ -844,7 +840,7 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 		m_clio.adbctl = data;
 		break;
 
-	/* only lower 16-bits are uploaded */
+	/* only lower 16-bits can be written */
 	case 0x0100/4:	case 0x0108/4:	case 0x0110/4:	case 0x0118/4:
 	case 0x0120/4:	case 0x0128/4:	case 0x0130/4:	case 0x0138/4:
 	case 0x0140/4:	case 0x0148/4:	case 0x0150/4:  case 0x0158/4:
