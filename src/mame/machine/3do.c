@@ -462,6 +462,10 @@ WRITE32_MEMBER(_3do_state::_3do_madam_w){
 
 	switch( offset ) {
 	case 0x0000/4:
+		if(data == 0x0a)
+			printf("\n");
+		else
+			printf("%c",data);
 		break;
 	case 0x0004/4:	/* 03300004 - Memory configuration 29 = 2MB DRAM, 1MB VRAM */
 		m_madam.msysbits = data;

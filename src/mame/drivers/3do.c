@@ -197,12 +197,13 @@ static MACHINE_CONFIG_START( 3do_pal, _3do_state )
 	MCFG_CPU_ADD("maincpu", ARM7_BE, XTAL_50MHz/4 )
 	MCFG_CPU_PROGRAM_MAP( 3do_mem)
 
+	MCFG_NVRAM_HANDLER(_3do)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x16", _3do_state, timer_x16_cb, attotime::from_hz(12000)) // TODO: timing
 
 	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS( X2_CLOCK_PAL / 2, 1592, 254, 1534, 263, 22, 262 ) // TODO: proper params
 	MCFG_SCREEN_UPDATE_DRIVER(_3do_state, screen_update__3do)
-	MCFG_SCREEN_SIZE( 640, 625 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
-	MCFG_SCREEN_REFRESH_RATE( 50 )
 
 	MCFG_CDROM_ADD( "cdrom", _3do_cdrom)
 MACHINE_CONFIG_END
