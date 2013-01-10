@@ -6655,7 +6655,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
-				<rom name="sns-p-abue-0.u1" size="2097152" crc="15cf4bd5" sha1="00f649f44816ff432ee2b29d7290f2e9544857b5" offset="0x000000" />
+				<rom name="sns-p-abue-0.u1" size="2097152" crc="0b37c518" sha1="de34cfe6766ab21a2e9ac61351a1058522cddf8b" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
