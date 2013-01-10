@@ -21,6 +21,7 @@ Year + Game          PCB ID         CPU                Video        Chips       
 04? Stone Age        L1             ASTRO V102PX-012?  ASTRO V05x2  ASTRO F02 2004-09-04                    Encrypted
 05? Zoo              M1.1           ASTRO V102PX-005?  ASTRO V06    ASTRO F02 2005-02-18                    Encrypted
 05? Win Win Bingo    M1.2           ASTRO V102PX-006?  ASTRO V06    ASTRO F02 2005-09-17                    Encrypted
+05? Hacher (hack)    M1.2           ?                  ?            ASTRO F02 2005-02-18                    Encrypted
 07? Western Venture  CS350P032      ASTRO V102?        ASTRO V07    ASTRO F01 2007-06-03                    Encrypted
 -------------------------------------------------------------------------------------------------------------------
 
@@ -912,8 +913,10 @@ ROM_START( winbingo )
 	ROM_LOAD16_BYTE( "f29c51001t.u25", 0x00001, 0x20000, CRC(4ebeec72) SHA1(c603265e6319cff94a0c75017a12c6d86787f906) )
 
 	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASE )
-	ROM_LOAD( "mxf291610mc.u26",          0x000000, 0x200000, CRC(ad1f61e7) SHA1(845aa01d49c50bcadaed16d76c0dd9131a425b46) )
-	ROM_LOAD( "mx29f1610mc.u30.bad.dump", 0x200000, 0x0a0000, BAD_DUMP CRC(6da439c5) SHA1(6afc0c800fe57b9b34ca317f4d1c040b11d3d988) ) /* Should be same as U30 below?? */
+	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(ad1f61e7) SHA1(845aa01d49c50bcadaed16d76c0dd9131a425b46) )
+	ROM_LOAD( "mx29f1610mc.u30", 0x200000, 0x200000, CRC(31613d99) SHA1(1c720f8d981c3e9cb9d9b3b27eb95e7f72ccfc93) )
+//	ROM_LOAD( "mx29f1610mc.u30.bad.dump", 0x200000, 0x0a0000, BAD_DUMP CRC(6da439c5) SHA1(6afc0c800fe57b9b34ca317f4d1c040b11d3d988) )
+//  U30 is a bad dump in this set, so use U30 from winbingoa (since U26 is the same too)
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "mx27c4000pc.u35", 0x00000, 0x80000, CRC(445d81c0) SHA1(cacb9c262740c31ea42f406e9f960a1edd1b3ead) )
@@ -931,6 +934,31 @@ ROM_START( winbingoa )
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "mx27c4000pc(__alt).u35", 0x00000, 0x80000, CRC(e48ed57d) SHA1(11995b90e70e010b292ba9db2da0af4ebf795c1a) )
 ROM_END
+
+/***************************************************************************
+
+Hacher (graphics hack of Win Win Bingo Ver. EN.01.6?)
+ 
+ASTRO M1.2 PCB with Astro F02 2005-02-18
+
+***************************************************************************/
+
+ROM_START( hacher )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "w-w-en-01-6.rom1", 0x00000, 0x20000, CRC(994acd32) SHA1(ee137ca96f4e2d22f2bae32051bbf2bd487e8c5a) )
+	ROM_LOAD16_BYTE( "w-w-en-01-6.rom2", 0x00001, 0x20000, CRC(b45c3f64) SHA1(c8f26fc3f9e2c46d8083d249f79ff8a3d47b67d0) )
+
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD( "wb3.bin", 0x000000, 0x200000, CRC(d97e5056) SHA1(662fefc2dcac31023fa063fbf891b05a139e48d8) )
+	ROM_LOAD( "wb4.bin", 0x200000, 0x200000, BAD_DUMP CRC(5cd7dcd9) SHA1(69e5fd0c8c5c14938c02f4f50e5b16fc0fbff7e4) ) // FIXED BITS (xxxxxxxxxxxxx1xx)
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "win-win-bingo.ic5", 0x00000, 0x80000, CRC(445d81c0) SHA1(cacb9c262740c31ea42f406e9f960a1edd1b3ead) ) // = mx27c4000pc.u35 winbingo
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(e097ae26) SHA1(90a670b5f1931e892d0a134aa8bf7d36d6222dcb) )
+ROM_END
+
 
 /***************************************************************************
 
@@ -1110,14 +1138,15 @@ DRIVER_INIT_MEMBER(astrocorp_state,showhanc)
 #endif
 }
 
-GAME( 2000,  showhand,  0,        showhand, showhand, astrocorp_state, showhand, ROT0, "Astro Corp.", "Show Hand (Italy)",                GAME_SUPPORTS_SAVE )
-GAME( 2000,  showhanc,  showhand, showhanc, showhanc, astrocorp_state, showhanc, ROT0, "Astro Corp.", "Wang Pai Dui Jue (China)",         GAME_SUPPORTS_SAVE )
-GAME( 2002,  skilldrp,  0,        skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.", "Skill Drop Georgia (Ver. G1.0S)",  GAME_SUPPORTS_SAVE )
-GAME( 2003,  speeddrp,  0,        speeddrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.", "Speed Drop (Ver. 1.06)",           GAME_SUPPORTS_SAVE )
+GAME( 2000,  showhand,  0,        showhand, showhand, astrocorp_state, showhand, ROT0, "Astro Corp.",        "Show Hand (Italy)",                GAME_SUPPORTS_SAVE )
+GAME( 2000,  showhanc,  showhand, showhanc, showhanc, astrocorp_state, showhanc, ROT0, "Astro Corp.",        "Wang Pai Dui Jue (China)",         GAME_SUPPORTS_SAVE )
+GAME( 2002,  skilldrp,  0,        skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.",        "Skill Drop Georgia (Ver. G1.0S)",  GAME_SUPPORTS_SAVE )
+GAME( 2003,  speeddrp,  0,        speeddrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.",        "Speed Drop (Ver. 1.06)",           GAME_SUPPORTS_SAVE )
 
 // Encrypted games (not working):
-GAME( 2004?, astoneag,  0,        skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.", "Stone Age (Astro, Ver. ENG.03.A)", GAME_NOT_WORKING )
-GAME( 2005?, winbingo,  0,        skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.", "Win Win Bingo (set 1)",            GAME_NOT_WORKING )
-GAME( 2005?, winbingoa, winbingo, skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.", "Win Win Bingo (set 2)",            GAME_NOT_WORKING )
-GAME( 2005?, zoo,       0,        showhand, showhand, driver_device,   0,        ROT0, "Astro Corp.", "Zoo (Ver. ZO.02.D)",               GAME_NOT_WORKING )
-GAME( 2007?, westvent,  0,        skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.", "Western Venture (Ver. AA.02.D)",   GAME_NOT_WORKING )
+GAME( 2004?, astoneag,  0,        skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.",        "Stone Age (Astro, Ver. ENG.03.A)", GAME_NOT_WORKING )
+GAME( 2005?, winbingo,  0,        skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.",        "Win Win Bingo (set 1)",            GAME_NOT_WORKING )
+GAME( 2005?, winbingoa, winbingo, skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.",        "Win Win Bingo (set 2)",            GAME_NOT_WORKING )
+GAME( 2005?, hacher,    winbingo, skilldrp, skilldrp, driver_device,   0,        ROT0, "bootleg (Gametron)", "Hacher (hack of Win Win Bingo)",   GAME_NOT_WORKING )
+GAME( 2005?, zoo,       0,        showhand, showhand, driver_device,   0,        ROT0, "Astro Corp.",        "Zoo (Ver. ZO.02.D)",               GAME_NOT_WORKING )
+GAME( 2007?, westvent,  0,        skilldrp, skilldrp, driver_device,   0,        ROT0, "Astro Corp.",        "Western Venture (Ver. AA.02.D)",   GAME_NOT_WORKING )
