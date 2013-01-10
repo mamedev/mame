@@ -723,17 +723,6 @@
 		</part>
 	</software>
 
-	<software name="descript">
-		<description>DESCRIPT</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="partner_cass">
-			<dataarea name="cass" size="228">
-				<rom name="descript.ion" size="228" crc="edd5ba75" sha1="252e4b0679565fb31a2d4943d0c9ed45c54f6349" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dumpcor1">
 		<description>DUMPCOR1</description>
 		<year>19??</year>
