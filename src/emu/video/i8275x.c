@@ -181,8 +181,8 @@ void i8275x_device::device_reset()
 
 void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	int y = m_screen->vpos();
-	int x = m_screen->hpos();
+	//int y = m_screen->vpos();
+	//int x = m_screen->hpos();
 	int rc = m_scanline / SCANLINES_PER_ROW;
 	int lc = m_scanline % SCANLINES_PER_ROW;
 
@@ -194,7 +194,7 @@ void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		break;
 
 	case TIMER_DRQ_ON:
-		logerror("I8275 '%s' y %u x %u DRQ 1\n", tag(), y, x);
+		//logerror("I8275 '%s' y %u x %u DRQ 1\n", tag(), y, x);
 		m_out_drq_func(1);
 		m_drq_off_timer->adjust(clocks_to_attotime(DMA_BURST_COUNT));
 		break;
@@ -204,17 +204,17 @@ void i8275x_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		{
 			m_status |= ST_DU;
 			m_du = true;
-			logerror("I8275 '%s' y %u x %u DRQ 0\n", tag(), y, x);
+			//logerror("I8275 '%s' y %u x %u DRQ 0\n", tag(), y, x);
 			m_out_drq_func(0);
 		}
 		else if (m_buffer_idx == CHARACTERS_PER_ROW)
 		{
-			logerror("I8275 '%s' y %u x %u DRQ 0\n", tag(), y, x);
+			//logerror("I8275 '%s' y %u x %u DRQ 0\n", tag(), y, x);
 			m_out_drq_func(0);
 		}
 		else if (DMA_BURST_SPACE > 0)
 		{
-			logerror("I8275 '%s' y %u x %u DRQ 0\n", tag(), y, x);
+			//logerror("I8275 '%s' y %u x %u DRQ 0\n", tag(), y, x);
 			m_out_drq_func(0);
 			m_drq_on_timer->adjust(clocks_to_attotime(DMA_BURST_SPACE));
 		}
@@ -488,7 +488,7 @@ WRITE8_MEMBER( i8275x_device::write )
 
 WRITE8_MEMBER( i8275x_device::dack_w )
 {
-	logerror("DACK write %02x %u\n", data, m_buffer_idx);
+	//logerror("DACK write %02x %u\n", data, m_buffer_idx);
 
 	if (m_fifo_next)
 	{
