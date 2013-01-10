@@ -1115,13 +1115,13 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	}
 	else
 	{
-		// if we are loading from softlist, take sram from the xml
-		state->m_cart[0].sram = image.get_software_region("sram") ? image.get_software_region_length("sram") : 0;
+		// if we are loading from softlist, take memory length from the xml
+		state->m_cart[0].sram = image.get_software_region("nvram") ? image.get_software_region_length("nvram") : 0;
 
 		if (state->m_cart[0].sram > 0)
 		{
 			if (state->m_cart[0].sram > state->m_cart[0].sram_max)
-				fatalerror("Found more SRAM than max allowed (found: %x, max: %x), check xml file!\n", state->m_cart[0].sram, state->m_cart[0].sram_max);
+				fatalerror("Found more memory than max allowed (found: %x, max: %x), check xml file!\n", state->m_cart[0].sram, state->m_cart[0].sram_max);
 		}
 		// TODO: Eventually sram handlers should point to the allocated cart:sram region!
 		// For now, we only use the region as a placeholder to carry size info...
