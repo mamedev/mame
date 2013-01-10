@@ -123,18 +123,31 @@
         there at all
 
     - Space Chaser (schaser)
-      1. Strange bug; sometimes the missile sound continues into the
-         music/explosion.
-      2. If "Hard" mode is selected, numerous bugs appear which
-         seems to be an emulation fault. Every revision we have
-         shows the problem, whereas the real hardware works fine.
-         - You start with 9000 points (instead of 0).
-         - On the screen where you are awarded your Bonus, you will
-           instead get (or sometimes lose) a random amount.
-         - At the end, if you got the High Score, it could be changed
-           to something else.
-         All these bugs can be cured by a simple 1-byte patch:
-         ROM_FILL( 0x47e5, 1, 0xc3), but why is it necessary?
+      1. Schematic has SX2 & 4 swapped by mistake.
+
+      2. Dipswitch 4 we have listed as "Easy/Hard", however the manual says
+         it should not be used. The Hard position displays many bugs.
+
+      3. Confirmation of these on a real machine (schaserb set) have been
+         received from the owner of the PCB.
+        "Hi Rob,
+         I seem to get the same bugs as you with Dip4 set to off.  Score starts at 9000,
+         2 missiles on first level etc..  It makes no mention of dip4 adjusting the hardness
+         in the manual, are you guys sure that's what it was intended for "in the factory"?
+         However you were correct in thinking the schematics were wrong.  My multimeter found
+         the following:
+         15k resistor - pin 7
+         39k - pin 10
+         82k - pin 12
+         It looks like they have Sx2 and Sx4 the wrong way round on a latter page of the schematics."
+
+      4. The "Hard" mode bug can be fixed with a single byte patch: ROM_FILL( 0x47e5, 1, 0xc3)
+
+      5. I have seen real machines with Hard mode set, that worked properly, thus there
+         must be yet another romset still waiting to be found.
+
+      6. Strange bug; sometimes the missile sound continues into and past the
+         music/explosion. This didn't happen on the real machines I played.
 
     - Space Chaser (schasercv)
          These cheats exist in this game:
