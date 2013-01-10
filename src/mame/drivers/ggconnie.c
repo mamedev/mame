@@ -21,16 +21,23 @@
 #include "video/vdc.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/c6280.h"
+#include "sound/okim6295.h"
 
 
 class ggconnie_state : public pce_common_state
 {
 public:
 	ggconnie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pce_common_state(mconfig, type, tag) { }
+		: pce_common_state(mconfig, type, tag),
+		m_oki(*this, "oki")
+		{ }
 
+	required_device <okim6295_device> m_oki;
 	DECLARE_WRITE8_MEMBER(lamp_w);
 	DECLARE_WRITE8_MEMBER(output_w);
+	DECLARE_READ8_MEMBER(rtc_r);
+	DECLARE_WRITE8_MEMBER(rtc_w);
+	DECLARE_WRITE8_MEMBER(oki_bank_w);
 };
 
 
@@ -125,6 +132,43 @@ WRITE8_MEMBER(ggconnie_state::output_w)
 	// written in "Output Test" in test mode
 }
 
+/* TODO: unknown type */
+READ8_MEMBER(ggconnie_state::rtc_r)
+{
+	system_time systime;
+	machine().base_datetime(systime);
+
+	switch(offset)
+	{
+		case 0x00:  return (systime.local_time.second % 10) & 0xf;
+		case 0x01:	return (systime.local_time.second / 10) & 0xf;
+		case 0x02:	return (systime.local_time.minute % 10) & 0xf;
+		case 0x03:	return (systime.local_time.minute / 10) & 0xf;
+		case 0x04:  return (systime.local_time.hour % 10) & 0xf;
+		case 0x05:	return (systime.local_time.hour / 10) & 0xf;
+		case 0x07:	return ((systime.local_time.day+1) % 10) & 0xf;
+		case 0x08:	return ((systime.local_time.day+1) / 10) & 0xf;
+		case 0x09:	return ((systime.local_time.month+1) % 10) & 0xf;
+		case 0x0a:	return ((systime.local_time.month+1) / 10) & 0xf;
+		case 0x0b:	return ((systime.local_time.year-1996) % 10) & 0xf;
+		case 0x0c:	return (((systime.local_time.year-1996) % 100) / 10) & 0xf;
+	}
+
+	return 0;
+}
+
+WRITE8_MEMBER(ggconnie_state::rtc_w)
+{
+
+}
+
+/* TODO: banking not understood (is the ROM dumped correctly btw?) */
+WRITE8_MEMBER(ggconnie_state::oki_bank_w)
+{
+	m_oki->set_bank_base((data) ? 0x40000 : 0x00000);
+}
+
+
 static ADDRESS_MAP_START( sgx_mem , AS_PROGRAM, 8, ggconnie_state )
 	AM_RANGE( 0x000000, 0x0fffff) AM_ROM
 	AM_RANGE( 0x110000, 0x1edfff) AM_NOP
@@ -141,6 +185,9 @@ static ADDRESS_MAP_START( sgx_mem , AS_PROGRAM, 8, ggconnie_state )
 	AM_RANGE( 0x1fe400, 0x1fe7ff) AM_READWRITE_LEGACY(vce_r, vce_w)
 	AM_RANGE( 0x1fe800, 0x1febff) AM_DEVREADWRITE("c6280", c6280_device, c6280_r, c6280_w)
 	AM_RANGE( 0x1fec00, 0x1fefff) AM_DEVREADWRITE("maincpu", h6280_device, timer_r, timer_w)
+	AM_RANGE( 0x1f7300, 0x1f7300) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE( 0x1f7400, 0x1f74ff) AM_WRITE(oki_bank_w)
+	AM_RANGE( 0x1f7500, 0x1f750f) AM_READWRITE(rtc_r,rtc_w)
 	AM_RANGE( 0x1ff000, 0x1ff000) AM_READ_PORT("IN0") AM_WRITE(lamp_w)
 	AM_RANGE( 0x1ff400, 0x1ff7ff) AM_DEVREADWRITE("maincpu", h6280_device, irq_status_r, irq_status_w )
 ADDRESS_MAP_END
@@ -181,6 +228,9 @@ static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
+	MCFG_OKIM6295_ADD("oki", PCE_MAIN_CLOCK/12, OKIM6295_PIN7_HIGH) /* unknown clock / pin 7 */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 MACHINE_CONFIG_END
 
 ROM_START(ggconnie)
@@ -189,7 +239,7 @@ ROM_START(ggconnie)
 	ROM_LOAD( "prg1_u4.bin", 0x80000, 0x80000, CRC(513f0b18) SHA1(44c61dc1a06bb4c8b4840ea6a372f92114888490) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "adpcm_u31.bin", 0x0000, 0x80000, CRC(de514c2b) SHA1(da73aa825d73646f556f6d4dbb46f43acf7c3357) )
+	ROM_LOAD( "adpcm_u31.bin", 0x00000, 0x80000, CRC(de514c2b) SHA1(da73aa825d73646f556f6d4dbb46f43acf7c3357) )
 ROM_END
 
 GAME( 1996, ggconnie, 0, ggconnie, ggconnie, pce_common_state, pce_common, ROT0, "Eighting", "Go! Go! Connie chan Jaka Jaka Janken", GAME_NO_SOUND | GAME_NOT_WORKING )
