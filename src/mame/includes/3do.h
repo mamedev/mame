@@ -125,6 +125,11 @@ struct SVF {
 	UINT32	color;
 };
 
+struct DSPP {
+	UINT16 *N;
+	UINT16 *EI;
+	UINT16 *EO;
+};
 
 class _3do_state : public driver_device
 {
@@ -142,7 +147,9 @@ public:
 	MADAM m_madam;
 	CLIO m_clio;
 	SVF m_svf;
+	DSPP m_dspp;
 	UINT8 m_nvram[0x8000];
+
 //	UINT8 m_video_bits[512];
 	DECLARE_READ8_MEMBER(_3do_nvarea_r);
 	DECLARE_WRITE8_MEMBER(_3do_nvarea_w);

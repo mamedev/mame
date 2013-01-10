@@ -667,6 +667,24 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 	   logerror( "%08X: CLIO read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset * 4 );
 	}
 
+	/* TODO: for debug, to be removed once that we write the CPU core */
+	if(offset >= 0x3800/4 && offset <= 0x39ff/4)
+	{
+		UINT32 res = 0;
+		offset &= (0xff/4);
+		res = (m_dspp.EO[(offset<<1)+0] << 16);
+		res |= (m_dspp.EO[(offset<<1)+1] & 0xffff);
+		return res;
+	}
+
+	if(offset >= 0x3c00/4 && offset <= 0x3fff/4)
+	{
+		UINT16 res;
+		offset &= (0x1ff/4);
+		res = m_dspp.EO[offset] & 0xffff;
+		return res;
+	}
+
 	switch( offset )
 	{
 	case 0x0000/4:
@@ -772,6 +790,37 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 	if(offset != 0x200/4 && offset != 0x40/4 && offset != 0x44/4 && offset != 0x48/4 && offset != 0x4c/4 &&
 	   offset != 0x118/4 && offset != 0x11c/4)
 		logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", machine().device("maincpu")->safe_pc(), offset*4, data, mem_mask );
+
+	/* TODO: for debug, to be removed once that we write the CPU core */
+	if(offset >= 0x1800/4 && offset <= 0x1fff/4)
+	{
+		offset &= (0x3ff/4);
+		m_dspp.N[(offset<<1)+0] = data >> 16;
+		m_dspp.N[(offset<<1)+1] = data & 0xffff;
+		return;
+	}
+
+	if(offset >= 0x2000/4 && offset <= 0x2fff/4)
+	{
+		offset &= (0x7ff/4);
+		m_dspp.N[offset] = data & 0xffff;
+		return;
+	}
+
+	if(offset >= 0x3000/4 && offset <= 0x31ff/4)
+	{
+		offset &= (0xff/4);
+		m_dspp.EI[(offset<<1)+0] = data >> 16;
+		m_dspp.EI[(offset<<1)+1] = data & 0xffff;
+		return;
+	}
+
+	if(offset >= 0x3400/4 && offset <= 0x37ff/4)
+	{
+		offset &= (0x1ff/4);
+		m_dspp.EI[offset] = data & 0xffff;
+		return;
+	}
 
 	switch( offset )
 	{
@@ -983,6 +1032,13 @@ void _3do_clio_init( running_machine &machine, screen_device *screen )
 	state->m_clio.cstatbits = 0x01;	/* bit 0 = reset of clio caused by power on */
 	state->m_clio.unclerev = 0x03800000;
 	state->m_clio.expctl = 0x80;	/* ARM has the expansion bus */
+	state->m_dspp.N = auto_alloc_array(machine, UINT16, 0x800 );
+	state->m_dspp.EI = auto_alloc_array(machine, UINT16, 0x200 );
+	state->m_dspp.EO = auto_alloc_array(machine, UINT16, 0x200 );
+
+	state_save_register_global_pointer(machine, state->m_dspp.N, 0x800);
+	state_save_register_global_pointer(machine, state->m_dspp.EI, 0x200);
+	state_save_register_global_pointer(machine, state->m_dspp.EO, 0x200);
 }
 
 
