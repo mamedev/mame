@@ -80,42 +80,9 @@ struct CLIO {
 	UINT32	adbio;			/* 03400084 */
 	UINT32	adbctl;			/* 03400088 */
 							/* Timers */
-	UINT32	timer0;			/* 03400100 */
-	UINT32	timerback0;		/* 03400104 */
-	UINT32	timer1;			/* 03400108 */
-	UINT32	timerback1;		/* 0340010c */
-	UINT32	timer2;			/* 03400110 */
-	UINT32	timerback2;		/* 03400114 */
-	UINT32	timer3;			/* 03400118 */
-	UINT32	timerback3;		/* 0340011c */
-	UINT32	timer4;			/* 03400120 */
-	UINT32	timerback4;		/* 03400124 */
-	UINT32	timer5;			/* 03400128 */
-	UINT32	timerback5;		/* 0340012c */
-	UINT32	timer6;			/* 03400130 */
-	UINT32	timerback6;		/* 03400134 */
-	UINT32	timer7;			/* 03400138 */
-	UINT32	timerback7;		/* 0340013c */
-	UINT32	timer8;			/* 03400140 */
-	UINT32	timerback8;		/* 03400144 */
-	UINT32	timer9;			/* 03400148 */
-	UINT32	timerback9;		/* 0340014c */
-	UINT32	timer10;		/* 03400150 */
-	UINT32	timerback10;	/* 03400154 */
-	UINT32	timer11;		/* 03400158 */
-	UINT32	timerback11;	/* 0340015c */
-	UINT32	timer12;		/* 03400160 */
-	UINT32	timerback12;	/* 03400164 */
-	UINT32	timer13;		/* 03400168 */
-	UINT32	timerback13;	/* 0340016c */
-	UINT32	timer14;		/* 03400170 */
-	UINT32	timerback14;	/* 03400174 */
-	UINT32	timer15;		/* 03400178 */
-	UINT32	timerback15;	/* 0340017c */
-	UINT32	settm0;			/* 03400200 */
-	UINT32	clrtm0;			/* 03400204 */
-	UINT32	settm1;			/* 03400208 */
-	UINT32	clrtm1;			/* 0340020c */
+	UINT32	timer_count[16];/* 034001** & 8 */
+	UINT32	timer_backup[16];	/* 034001**+4 & 8 */
+	UINT64	timer_ctrl;		/* 03400200 */
 	UINT32	slack;			/* 03400220 */
 							/* DMA */
 	UINT32	dmareqdis;		/* 03400308 */
@@ -189,6 +156,8 @@ public:
 	virtual void machine_reset();
 	DECLARE_VIDEO_START(_3do);
 	UINT32 screen_update__3do(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	TIMER_DEVICE_CALLBACK_MEMBER( timer_x16_cb );
 
 private:
 	void m_3do_request_fiq(UINT32 irq_req, UINT8 type);

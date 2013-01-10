@@ -61,6 +61,7 @@ Expansion bus stuff:
 #define LOG(x) do { if (VERBOSE) printf x; } while (0)
 
 /*
+IRQ0
 0x80000000 Second Priority
 0x40000000 SW irq
 0x20000000 DMA<->EXP
@@ -78,6 +79,21 @@ Expansion bus stuff:
 0x00000004 Expansion Bus
 0x00000002 Vertical 1
 0x00000001 Vertical 0
+
+---
+IRQ1
+0x00000400 DSPPOVER (Red rev. only)
+0x00000200 DSPPUNDER (Red rev. only)
+0x00000100 BadBits
+0x00000080 DMA<-External
+0x00000040 DMA->External
+0x00000020 DMA<-Uncle
+0x00000010 DMA->Uncle
+0x00000008 DMA RAM->DSPP N
+0x00000004 SlowBus
+0x00000002 Disk Inserted
+0x00000001 DMA Player bus
+
 */
 void _3do_state::m_3do_request_fiq(UINT32 irq_req, UINT8 type)
 {
@@ -93,25 +109,43 @@ void _3do_state::m_3do_request_fiq(UINT32 irq_req, UINT8 type)
 
 	if((m_clio.irq0 & m_clio.irq0_enable) || (m_clio.irq1 & m_clio.irq1_enable))
 	{
-		printf("Go irq %08x & %08x %08x & %08x\n",m_clio.irq0, m_clio.irq0_enable, m_clio.irq1, m_clio.irq1_enable);
+		//printf("Go irq %08x & %08x %08x & %08x\n",m_clio.irq0, m_clio.irq0_enable, m_clio.irq1, m_clio.irq1_enable);
 		generic_pulse_irq_line(m_maincpu, ARM7_FIRQ_LINE, 1);
 	}
 }
 
-/*
-0x00000400 DSPPOVER (Red rev. only)
-0x00000200 DSPPUNDER (Red rev. only)
-0x00000100 BadBits
-0x00000080 DMA<-External
-0x00000040 DMA->External
-0x00000020 DMA<-Uncle
-0x00000010 DMA->Uncle
-0x00000008 DMA RAM->DSPP N
-0x00000004 SlowBus
-0x00000002 Disk Inserted
-0x00000001 DMA Player bus
-*/
+/* TODO: timer frequency is unknown, everything else is guesswork. */
+TIMER_DEVICE_CALLBACK_MEMBER( _3do_state::timer_x16_cb )
+{
+	/*
+		x--- fablode flag (wtf?)
+		-x-- cascade flag (TODO: not knowing the timing also means that this one would be VERY slow if implemented)
+		--x- reload flag
+		---x decrement flag (enable)
+	*/
+	UINT8 timer_flag;
 
+	for(int i = 0;i < 16; i++)
+	{
+		timer_flag = (m_clio.timer_ctrl >> i*4) & 0xf;
+
+		if(timer_flag & 1)
+		{
+			m_clio.timer_count[i]--;
+
+			if(m_clio.timer_count[i] == 0) // timer hit
+			{
+				if(i & 1) // odd timer irq fires
+					m_3do_request_fiq(8 << (7-(i >> 1)),0);
+
+				if(timer_flag & 2)
+					m_clio.timer_count[i] = m_clio.timer_backup[i];
+				else
+					m_clio.timer_ctrl &= (~1 << i*4);
+			}
+		}
+	}
+}
 
 READ32_MEMBER(_3do_state::_3do_nvarea_r){
 	logerror( "%08X: NVRAM read offset = %08X\n", machine().device("maincpu")->safe_pc(), offset );
@@ -440,6 +474,7 @@ WRITE32_MEMBER(_3do_state::_3do_madam_w){
 		break;
 	case 0x0028/4:
 		m_madam.statbits = data;
+		break; // <- this was a fall-through?
 	case 0x0040/4:
 		m_madam.diag = 1;
 		break;
@@ -651,79 +686,23 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 	case 0x0088/4:
 		return m_clio.adbctl;
 
-	case 0x0100/4:
-		return m_clio.timer0;
-	case 0x0104/4:
-		return m_clio.timerback0;
-	case 0x0108/4:
-		return m_clio.timer1;
-	case 0x010c/4:
-		return m_clio.timerback1;
-	case 0x0110/4:
-		return m_clio.timer2;
-	case 0x0114/4:
-		return m_clio.timerback2;
-	case 0x0118/4:
-		return m_clio.timer3;
-	case 0x011c/4:
-		return m_clio.timerback3;
-	case 0x0120/4:
-		return m_clio.timer4;
-	case 0x0124/4:
-		return m_clio.timerback4;
-	case 0x0128/4:
-		return m_clio.timer5;
-	case 0x012c/4:
-		return m_clio.timerback5;
-	case 0x0130/4:
-		return m_clio.timer6;
-	case 0x0134/4:
-		return m_clio.timerback6;
-	case 0x0138/4:
-		return m_clio.timer7;
-	case 0x013c/4:
-		return m_clio.timerback7;
-	case 0x0140/4:
-		return m_clio.timer8;
-	case 0x0144/4:
-		return m_clio.timerback8;
-	case 0x0148/4:
-		return m_clio.timer9;
-	case 0x014c/4:
-		return m_clio.timerback9;
-	case 0x0150/4:
-		return m_clio.timer10;
-	case 0x0154/4:
-		return m_clio.timerback10;
-	case 0x0158/4:
-		return m_clio.timer11;
-	case 0x015c/4:
-		return m_clio.timerback11;
-	case 0x0160/4:
-		return m_clio.timer12;
-	case 0x0164/4:
-		return m_clio.timerback12;
-	case 0x0168/4:
-		return m_clio.timer13;
-	case 0x016c/4:
-		return m_clio.timerback13;
-	case 0x0170/4:
-		return m_clio.timer14;
-	case 0x0174/4:
-		return m_clio.timerback14;
-	case 0x0178/4:
-		return m_clio.timer15;
-	case 0x017c/4:
-		return m_clio.timerback15;
+	case 0x0100/4:	case 0x0108/4:	case 0x0110/4:	case 0x0118/4:
+	case 0x0120/4:	case 0x0128/4:	case 0x0130/4:	case 0x0138/4:
+	case 0x0140/4:	case 0x0148/4:	case 0x0150/4:  case 0x0158/4:
+	case 0x0160/4:	case 0x0168/4:	case 0x0170/4:	case 0x0178/4:
+		return m_clio.timer_count[((offset & 0x3f) >> 1)+0];
+	case 0x0104/4:	case 0x010c/4:	case 0x0114/4:	case 0x011c/4:
+	case 0x0124/4:	case 0x012c/4:	case 0x0134/4:	case 0x013c/4:
+	case 0x0144/4:	case 0x014c/4:	case 0x0154/4:	case 0x015c/4:
+	case 0x0164/4:	case 0x016c/4:	case 0x0174/4:	case 0x017c/4:
+		return m_clio.timer_backup[((offset & 0x3f) >> 1)];
 
 	case 0x0200/4:
-		return m_clio.settm0;
 	case 0x0204/4:
-		return m_clio.clrtm0;
+		return m_clio.timer_ctrl;
 	case 0x0208/4:
-		return m_clio.settm1;
 	case 0x020c/4:
-		return m_clio.clrtm1;
+		return m_clio.timer_ctrl >> 32;
 
 	case 0x0220/4:
 		return m_clio.slack;
@@ -809,7 +788,7 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 		m_3do_request_fiq(0,0);
 		break;
 	case 0x0044/4:
-		LOG(("%08x PEND0 CLEAR\n",data));
+		//LOG(("%08x PEND0 CLEAR\n",data));
 		m_clio.irq0 &= ~data;
 		m_3do_request_fiq(0,0);
 		break;
@@ -865,113 +844,31 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 		m_clio.adbctl = data;
 		break;
 
-	case 0x0100/4:
-		m_clio.timer0 = data & 0x0000ffff;
+	/* only lower 16-bits are uploaded */
+	case 0x0100/4:	case 0x0108/4:	case 0x0110/4:	case 0x0118/4:
+	case 0x0120/4:	case 0x0128/4:	case 0x0130/4:	case 0x0138/4:
+	case 0x0140/4:	case 0x0148/4:	case 0x0150/4:  case 0x0158/4:
+	case 0x0160/4:	case 0x0168/4:	case 0x0170/4:	case 0x0178/4:
+		m_clio.timer_count[((offset & 0x3f) >> 1)] = data & 0xffff;
 		break;
-	case 0x0104/4:
-		m_clio.timerback0 = data & 0x0000ffff;
-		break;
-	case 0x0108/4:
-		m_clio.timer1 = data & 0x0000ffff;
-		break;
-	case 0x010c/4:
-		m_clio.timerback1 = data & 0x0000ffff;
-		break;
-	case 0x0110/4:
-		m_clio.timer2 = data & 0x0000ffff;
-		break;
-	case 0x0114/4:
-		m_clio.timerback2 = data & 0x0000ffff;
-		break;
-	case 0x0118/4:
-		m_clio.timer3 = data & 0x0000ffff;
-		break;
-	case 0x011c/4:
-		m_clio.timerback3 = data & 0x0000ffff;
-		break;
-	case 0x0120/4:
-		m_clio.timer4 = data & 0x0000ffff;
-		break;
-	case 0x0124/4:
-		m_clio.timerback4 = data & 0x0000ffff;
-		break;
-	case 0x0128/4:
-		m_clio.timer5 = data & 0x0000ffff;
-		break;
-	case 0x012c/4:
-		m_clio.timerback5 = data & 0x0000ffff;
-		break;
-	case 0x0130/4:
-		m_clio.timer6 = data & 0x0000ffff;
-		break;
-	case 0x0134/4:
-		m_clio.timerback6 = data & 0x0000ffff;
-		break;
-	case 0x0138/4:
-		m_clio.timer7 = data & 0x0000ffff;
-		break;
-	case 0x013c/4:
-		m_clio.timerback7 = data & 0x0000ffff;
-		break;
-	case 0x0140/4:
-		m_clio.timer8 = data & 0x0000ffff;
-		break;
-	case 0x0144/4:
-		m_clio.timerback8 = data & 0x0000ffff;
-		break;
-	case 0x0148/4:
-		m_clio.timer9 = data & 0x0000ffff;
-		break;
-	case 0x014c/4:
-		m_clio.timerback9 = data & 0x0000ffff;
-		break;
-	case 0x0150/4:
-		m_clio.timer10 = data & 0x0000ffff;
-		break;
-	case 0x0154/4:
-		m_clio.timerback10 = data & 0x0000ffff;
-		break;
-	case 0x0158/4:
-		m_clio.timer11 = data & 0x0000ffff;
-		break;
-	case 0x015c/4:
-		m_clio.timerback11 = data & 0x0000ffff;
-		break;
-	case 0x0160/4:
-		m_clio.timer12 = data & 0x0000ffff;
-		break;
-	case 0x0164/4:
-		m_clio.timerback12 = data & 0x0000ffff;
-		break;
-	case 0x0168/4:
-		m_clio.timer13 = data & 0x0000ffff;
-		break;
-	case 0x016c/4:
-		m_clio.timerback13 = data & 0x0000ffff;
-		break;
-	case 0x0170/4:
-		m_clio.timer14 = data & 0x0000ffff;
-		break;
-	case 0x0174/4:
-		m_clio.timerback14 = data & 0x0000ffff;
-		break;
-	case 0x0178/4:
-		m_clio.timer15 = data & 0x0000ffff;
-		break;
-	case 0x017c/4:
-		m_clio.timerback15 = data & 0x0000ffff;
+	case 0x0104/4:	case 0x010c/4:	case 0x0114/4:	case 0x011c/4:
+	case 0x0124/4:	case 0x012c/4:	case 0x0134/4:	case 0x013c/4:
+	case 0x0144/4:	case 0x014c/4:	case 0x0154/4:	case 0x015c/4:
+	case 0x0164/4:	case 0x016c/4:	case 0x0174/4:	case 0x017c/4:
+		m_clio.timer_backup[((offset & 0x3f) >> 1)] = data & 0xffff;
 		break;
 
 	case 0x0200/4:
-		m_clio.settm0 = data;
+		m_clio.timer_ctrl |= (UINT64)data;
 		break;
 	case 0x0204/4:
-		m_clio.clrtm0 = data;
+		m_clio.timer_ctrl &= ~(UINT64)data;
 		break;
 	case 0x0208/4:
-		m_clio.settm0 = data;
+		m_clio.timer_ctrl |= ((UINT64)data << 32);
 		break;
 	case 0x020c/4:
+		m_clio.timer_ctrl &= ~((UINT64)data << 32);
 		break;
 
 	case 0x0220/4:

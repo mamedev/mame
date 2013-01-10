@@ -157,6 +157,7 @@ static MACHINE_CONFIG_START( 3do, _3do_state )
 	MCFG_CPU_ADD( "maincpu", ARM7_BE, XTAL_50MHz/4 )
 	MCFG_CPU_PROGRAM_MAP( 3do_mem)
 
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_x16", _3do_state, timer_x16_cb, attotime::from_hz(12000)) // TODO: timing
 
 	MCFG_VIDEO_START_OVERRIDE(_3do_state, _3do )
 
