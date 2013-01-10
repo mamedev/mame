@@ -41,8 +41,6 @@
 
     TODO:
 
-	- fix i8275 DMA timing (full screen is transferred in 1 burst, which kills floppy sector DMA)
-    - add HRTC/VRTC output to i8275
     - NEC uPD7220 GDC
     - accurate video timing
     - floppy DRQ during RECALL = 0
@@ -59,7 +57,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 #define MMU_IOEN	0x01
 #define MMU_RAMEN	0x02
@@ -540,7 +538,7 @@ static I8237_INTERFACE( dmac_intf )
 	DEVCB_DRIVER_MEMBER(mm1_state, read),
 	DEVCB_DRIVER_MEMBER(mm1_state, write),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(mm1_state, mpsc_dack_r),  DEVCB_DEVICE_MEMBER(UPD765_TAG, upd765_family_device, mdma_r) },
-	{ DEVCB_DEVICE_MEMBER(I8275_TAG, i8275_device, dack_w), DEVCB_DRIVER_MEMBER(mm1_state, mpsc_dack_w), DEVCB_NULL, DEVCB_DEVICE_MEMBER(UPD765_TAG, upd765_family_device, mdma_w) },
+	{ DEVCB_DEVICE_MEMBER(I8275_TAG, i8275x_device, dack_w), DEVCB_DRIVER_MEMBER(mm1_state, mpsc_dack_w), DEVCB_NULL, DEVCB_DEVICE_MEMBER(UPD765_TAG, upd765_family_device, mdma_w) },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(mm1_state, dack3_w) }
 };
 
@@ -841,5 +839,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY           FULLNAME                FLAGS
-COMP( 1981, mm1m6,		0,		0,		mm1m6,		mm1, driver_device,		0,		"Nokia Data",		"MikroMikko 1 M6",		GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1981, mm1m7,		mm1m6,	0,		mm1m7,		mm1, driver_device,		0,		"Nokia Data",		"MikroMikko 1 M7",		GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1981, mm1m6,		0,		0,		mm1m6,		mm1, driver_device,		0,		"Nokia Data",		"MikroMikko 1 M6",		GAME_SUPPORTS_SAVE )
+COMP( 1981, mm1m7,		mm1m6,	0,		mm1m7,		mm1, driver_device,		0,		"Nokia Data",		"MikroMikko 1 M7",		GAME_SUPPORTS_SAVE )
