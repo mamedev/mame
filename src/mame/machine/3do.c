@@ -119,11 +119,14 @@ TIMER_DEVICE_CALLBACK_MEMBER( _3do_state::timer_x16_cb )
 {
 	/*
 		x--- fablode flag (wtf?)
-		-x-- cascade flag (TODO: not knowing the timing also means that this one would be VERY slow if implemented)
+		-x-- cascade flag
 		--x- reload flag
 		---x decrement flag (enable)
 	*/
 	UINT8 timer_flag;
+	UINT8 carry_val;
+
+	carry_val = 1;
 
 	for(int i = 0;i < 16; i++)
 	{
@@ -131,18 +134,27 @@ TIMER_DEVICE_CALLBACK_MEMBER( _3do_state::timer_x16_cb )
 
 		if(timer_flag & 1)
 		{
-			m_clio.timer_count[i]--;
+			if(timer_flag & 4)
+				m_clio.timer_count[i]-=carry_val;
+			else
+				m_clio.timer_count[i]--;
 
 			if(m_clio.timer_count[i] == 0xffffffff) // timer hit
 			{
 				if(i & 1) // odd timer irq fires
 					m_3do_request_fiq(8 << (7-(i >> 1)),0);
 
+				carry_val = 1;
+
 				if(timer_flag & 2)
+				{
 					m_clio.timer_count[i] = m_clio.timer_backup[i];
+				}
 				else
 					m_clio.timer_ctrl &= ~(1 << i*4);
 			}
+			else
+				carry_val = 0;
 		}
 	}
 }
@@ -870,6 +882,7 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 	case 0x0220/4:
 		m_clio.slack = data & 0x000003ff;
 		break;
+
 
 	case 0x0308/4:
 		m_clio.dmareqdis = data;
