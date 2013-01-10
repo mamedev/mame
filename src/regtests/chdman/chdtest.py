@@ -65,6 +65,13 @@ for root, dirs, files in os.walk(inputPath):
 			ext = d.split("_", 2)[1]
 			inFile += "." + ext
 			cmd = [chdmanBin, "createcd", "-f", "-i", inFile, "-o", tempFile]
+		elif d.startswith("createhd"):
+			inFile += ".params"
+			f = open(inFile, 'r')
+			paramsstr = f.read()
+			f.close()
+			params = paramsstr.split(" ")
+			cmd = [chdmanBin, "createhd", "-f", "-o", tempFile] + params
 		else:
 			print "unsupported mode"
 			continue
