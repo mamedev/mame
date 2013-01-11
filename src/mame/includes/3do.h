@@ -161,6 +161,7 @@ public:
 	DECLARE_WRITE32_MEMBER(_3do_madam_w);
 	DECLARE_READ32_MEMBER(_3do_clio_r);
 	DECLARE_WRITE32_MEMBER(_3do_clio_w);
+	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_VIDEO_START(_3do);
 	UINT32 screen_update__3do(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -168,18 +169,14 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER( timer_x16_cb );
 
 private:
+	void m_3do_slow2_init( void );
+	void m_3do_madam_init( void );
+	void m_3do_clio_init( screen_device *screen );
+
 	void m_3do_request_fiq(UINT32 irq_req, UINT8 type);
 };
 
 /*----------- defined in machine/3do.c -----------*/
-
-
-void _3do_slow2_init( running_machine &machine );
-
-
-void _3do_madam_init( running_machine &machine );
-
-void _3do_clio_init( running_machine &machine, screen_device *screen );
 
 
 #endif /* _3DO_H_ */

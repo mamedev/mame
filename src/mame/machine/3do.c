@@ -225,13 +225,6 @@ WRITE32_MEMBER(_3do_state::_3do_slow2_w)
 }
 
 
-void _3do_slow2_init( running_machine &machine )
-{
-	_3do_state *state = machine.driver_data<_3do_state>();
-	state->m_slow2.cg_input = 0;
-	state->m_slow2.cg_output = 0x00000005 - 1;
-}
-
 
 READ32_MEMBER(_3do_state::_3do_svf_r)
 {
@@ -649,13 +642,6 @@ WRITE32_MEMBER(_3do_state::_3do_madam_w){
 }
 
 
-void _3do_madam_init( running_machine &machine )
-{
-	_3do_state *state = machine.driver_data<_3do_state>();
-	memset( &state->m_madam, 0, sizeof(MADAM) );
-	state->m_madam.revision = 0x01020000;
-	state->m_madam.msysbits = 0x51;
-}
 
 
 READ32_MEMBER(_3do_state::_3do_clio_r)
@@ -1023,25 +1009,6 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 }
 
 
-void _3do_clio_init( running_machine &machine, screen_device *screen )
-{
-	_3do_state *state = machine.driver_data<_3do_state>();
-	memset( &state->m_clio, 0, sizeof(CLIO) );
-	state->m_clio.screen = screen;
-	state->m_clio.revision = 0x02022000 /* 0x04000000 */;
-	state->m_clio.cstatbits = 0x01; /* bit 0 = reset of clio caused by power on */
-	state->m_clio.unclerev = 0x03800000;
-	state->m_clio.expctl = 0x80;    /* ARM has the expansion bus */
-	state->m_dspp.N = auto_alloc_array(machine, UINT16, 0x800 );
-	state->m_dspp.EI = auto_alloc_array(machine, UINT16, 0x200 );
-	state->m_dspp.EO = auto_alloc_array(machine, UINT16, 0x200 );
-
-	state_save_register_global_pointer(machine, state->m_dspp.N, 0x800);
-	state_save_register_global_pointer(machine, state->m_dspp.EI, 0x200);
-	state_save_register_global_pointer(machine, state->m_dspp.EO, 0x200);
-}
-
-
 /* 9 -> 5 bits translation */
 
 VIDEO_START_MEMBER(_3do_state,_3do)
@@ -1102,4 +1069,39 @@ UINT32 _3do_state::screen_update__3do(screen_device &screen, bitmap_rgb32 &bitma
 	}
 
 	return 0;
+}
+
+/*
+ *
+ * Machine Inits
+ *
+ */
+
+void _3do_state::m_3do_madam_init( void )
+{
+	memset( &m_madam, 0, sizeof(MADAM) );
+	m_madam.revision = 0x01020000;
+	m_madam.msysbits = 0x51;
+}
+
+void _3do_state::m_3do_slow2_init( void )
+{
+	m_slow2.cg_input = 0;
+	m_slow2.cg_output = 0x00000005 - 1;
+}
+
+void _3do_state::m_3do_clio_init( screen_device *screen )
+{
+	memset( &m_clio, 0, sizeof(CLIO) );
+	m_clio.screen = screen;
+	m_clio.revision = 0x02022000 /* 0x04000000 */;
+	m_clio.unclerev = 0x03800000;
+	m_clio.expctl = 0x80;    /* ARM has the expansion bus */
+	m_dspp.N = auto_alloc_array(machine(), UINT16, 0x800 );
+	m_dspp.EI = auto_alloc_array(machine(), UINT16, 0x200 );
+	m_dspp.EO = auto_alloc_array(machine(), UINT16, 0x200 );
+
+	state_save_register_global_pointer(machine(), m_dspp.N, 0x800);
+	state_save_register_global_pointer(machine(), m_dspp.EI, 0x200);
+	state_save_register_global_pointer(machine(), m_dspp.EO, 0x200);
 }

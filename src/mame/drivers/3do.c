@@ -129,8 +129,7 @@ static INPUT_PORTS_START( 3do )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 INPUT_PORTS_END
 
-
-void _3do_state::machine_reset()
+void _3do_state::machine_start()
 {
 	membank("bank2")->set_base(memregion("user1")->base());
 
@@ -138,12 +137,17 @@ void _3do_state::machine_reset()
 	membank("bank1")->configure_entry(0, m_dram);
 	membank("bank1")->configure_entry(1, memregion("user1")->base());
 
+	m_3do_slow2_init();
+	m_3do_madam_init();
+	m_3do_clio_init( downcast<screen_device *>(machine().device("screen")));
+}
+
+void _3do_state::machine_reset()
+{
 	/* start with overlay enabled */
 	membank("bank1")->set_entry(1);
 
-	_3do_slow2_init(machine());
-	_3do_madam_init(machine());
-	_3do_clio_init(machine(), downcast<screen_device *>(machine().device("screen")));
+	m_clio.cstatbits = 0x01; /* bit 0 = reset of clio caused by power on */
 }
 
 struct cdrom_interface _3do_cdrom =
