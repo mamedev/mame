@@ -173,6 +173,7 @@ const device_type C1541C = &device_creator<c1541c_device>;
 const device_type C1541II = &device_creator<c1541ii_device>;
 const device_type SX1541 = &device_creator<sx1541_device>;
 const device_type FSD2 = &device_creator<fsd2_device>;
+const device_type CSD1 = &device_creator<csd1_device>;
 const device_type C1541_DOLPHIN_DOS = &device_creator<c1541_dolphin_dos_device>;
 const device_type C1541_PROFESSIONAL_DOS_V1 = &device_creator<c1541_professional_dos_v1_device>;
 const device_type C1541_PROLOGIC_DOS_CLASSIC = &device_creator<c1541_prologic_dos_classic_device>;
@@ -211,6 +212,10 @@ void base_c1541_device::device_config_complete()
 
 	case TYPE_FSD2:
 		m_shortname = "fsd2";
+		break;
+
+	case TYPE_CSD1:
+		m_shortname = "csd1";
 		break;
 
 	case TYPE_1541_DOLPHIN_DOS:
@@ -338,6 +343,17 @@ ROM_END
 
 
 //-------------------------------------------------
+//  ROM( csd1 )
+//-------------------------------------------------
+
+ROM_START( csd1 )
+	ROM_REGION( 0x4000, M6502_TAG, 0 )
+	ROM_LOAD( "ic14", 0x0000, 0x2000, CRC(adb6980e) SHA1(13051587dfe43b04ce1bf354b89438ddf6d8d76b) )
+	ROM_LOAD( "ic15", 0x2000, 0x2000, CRC(b0cecfa1) SHA1(c67e79a7ffefc9e9eafc238cb6ff6bb718f19afb) )
+ROM_END
+
+
+//-------------------------------------------------
 //  ROM( c1541dd )
 //-------------------------------------------------
 
@@ -399,6 +415,9 @@ const rom_entry *base_c1541_device::device_rom_region() const
 
 	case TYPE_FSD2: // aka Excelerator PLUS / Oceanic OC-118N
 		return ROM_NAME( fsd2 );
+
+	case TYPE_CSD1:
+		return ROM_NAME( csd1 );
 
 	case TYPE_1541_DOLPHIN_DOS:
 		return ROM_NAME( c1541dd );
@@ -1039,6 +1058,14 @@ sx1541_device::sx1541_device(const machine_config &mconfig, const char *tag, dev
 
 fsd2_device::fsd2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: base_c1541_device(mconfig, FSD2, "FSD-2", tag, owner, clock, TYPE_FSD2) { }
+
+
+//-------------------------------------------------
+//  csd1_device - constructor
+//-------------------------------------------------
+
+csd1_device::csd1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: base_c1541_device(mconfig, CSD1, "CSD-1", tag, owner, clock, TYPE_CSD1) { }
 
 
 //-------------------------------------------------
