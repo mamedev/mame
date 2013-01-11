@@ -76,9 +76,9 @@ int main(int argc, char *argv[])
 	int removed_newlines = 0;
 	int src = 0;
 	int dst = 0;
-	bool in_c_comment = false;
-	bool in_cpp_comment = false;
-	int indent_c_comment = 0;
+	bool in_multiline_comment = false;
+	bool in_singleline_comment = false;
+	int indent_multiline_comment = 0;
 	int in_c_string = FALSE;
 	int hichars = 0;
 	bool is_c_file;
@@ -88,6 +88,7 @@ int main(int argc, char *argv[])
 	int bytes;
 	int col = 0;
 	int escape = 0;
+	int consume = 0;
 	const int tab_size = 4;
 
 	/* print usage info */
@@ -117,77 +118,90 @@ int main(int argc, char *argv[])
 	{
 		UINT8 ch = original[src++];
 
-		/* check for invalid upper-ASCII chars, but only for non-xml files (swlists might contain UTF-8 chars) */
-		if (!is_xml_file && ch != 13 && ch != 10 && ch != 9 && (ch > 127 || ch < 32))
+		if (consume == 0)
 		{
-			ch = '?';
-			hichars++;
-		}
-
-		/* C-specific handling */
-		if (is_c_file)
-		{
-			/* check for string/char literals */
-			if ((ch == '"' || ch == '\'') && !in_c_comment && !in_cpp_comment )
+			/* C-specific handling */
+			if (is_c_file)
 			{
-				if (ch == in_c_string && !escape)
-					in_c_string = 0;
-				else if (!in_c_string)
-					in_c_string = ch;
+				/* check for string/char literals */
+				if ((ch == '"' || ch == '\'') && !in_multiline_comment && !in_singleline_comment )
+				{
+					if (ch == in_c_string && !escape)
+						in_c_string = 0;
+					else if (!in_c_string)
+						in_c_string = ch;
+				}
+
+				/* Update escape state */
+				if (in_c_string)
+					escape = (ch == '\\') ? !escape : 0;
+
+				if (!in_c_string && !in_singleline_comment)
+				{
+					/* track whether or not we are within a C-style comment */
+					if (!in_multiline_comment && ch == '/' && original[src] == '*')
+					{
+						in_multiline_comment = true;
+						if (col > 0 && modified[dst-1] == 0x09)
+						{
+							indent_multiline_comment = col;
+						}
+						else
+						{
+							indent_multiline_comment = 0;
+						}
+						consume = 2;
+					}
+					else if (in_multiline_comment && ch == '*' && original[src] == '/')
+					{
+						in_multiline_comment = false;
+						indent_multiline_comment = 0;
+						consume = 2;
+					}
+
+					/* track whether or not we are within a C++-style comment */
+					else if (!in_multiline_comment && ch == '/' && original[src] == '/')
+					{
+						in_singleline_comment = true;
+						consume = 2;
+					}
+				}
 			}
 
-			/* Update escape state */
-			if (in_c_string)
-				escape = (ch == '\\') ? !escape : 0;
-
-			if (!in_c_string && !in_cpp_comment)
+			if (is_xml_file)
 			{
-				int consume = TRUE;
-
-				/* track whether or not we are within a C-style comment */
-				if (!in_c_comment && ch == '/' && original[src] == '*')
+				/* track whether or not we are within a XML comment */
+				if (!in_multiline_comment && ch == '<' && original[src] == '!' && original[src+1] == '-' && original[src+2] == '-')
 				{
-					in_c_comment = true;
+					in_multiline_comment = true;
 					if (col > 0 && modified[dst-1] == 0x09)
 					{
-						indent_c_comment = col;
+						indent_multiline_comment = col;
 					}
 					else
 					{
-						indent_c_comment = 0;
+						indent_multiline_comment = 0;
 					}
+					consume = 4;
 				}
-				else if (in_c_comment && ch == '*' && original[src] == '/')
+				else if (in_multiline_comment && ch == '-' && original[src] == '-' && original[src+1] == '>')
 				{
-					in_c_comment = false;
-					indent_c_comment = 0;
-				}
-
-				/* track whether or not we are within a C++-style comment */
-				else if (!in_c_comment && ch == '/' && original[src] == '/')
-					in_cpp_comment = true;
-				else
-					consume = FALSE;
-
-				if (consume)
-				{
-					modified[dst++] = ch;
-					col++;
-					ch = original[src++];
+					in_multiline_comment = false;
+					indent_multiline_comment = 0;
+					consume = 3;
 				}
 			}
 		}
 
-		/* if we hit a LF without a CR, back up and act like we hit a CR */
-		if (ch == 0x0a)
+		if (consume != 0)
 		{
-			src--;
-			ch = 0x0d;
-			fixed_nix_style = 1;
+			modified[dst++] = ch;
+			col++;
+			consume--;
 		}
 
-		/* if we hit a CR, clean up from there */
-		if (ch == 0x0d)
+		/* if we hit a CR or LF, clean up from there */
+		else if (ch == 0x0d || ch == 0x0a)
 		{
 			/* remove all extra spaces/tabs at the end */
 			while (dst > 0 && (modified[dst-1] == ' ' || modified[dst-1] == 0x09))
@@ -202,13 +216,15 @@ int main(int argc, char *argv[])
 			col = 0;
 
 			/* skip over any LF in the source file */
-			if (original[src] == 0x0a)
+			if (ch == 0x0d && original[src] == 0x0a)
 				src++;
+			else if (ch == 0x0a)
+				fixed_nix_style = 1;
 			else
 				fixed_mac_style = 1;
 
 			/* we are no longer in a C++-style comment */
-			in_cpp_comment = false;
+			in_singleline_comment = false;
 
 			if (in_c_string)
 			{
@@ -223,7 +239,7 @@ int main(int argc, char *argv[])
 			int spaces = tab_size - (col % tab_size);
 
 			/* convert tabs to spaces, if not used for indenting */
-			if ((in_c_comment && col >= indent_c_comment) || (col != 0 && modified[dst-1] != 0x09))
+			if ((in_multiline_comment && col >= indent_multiline_comment) || (col != 0 && modified[dst-1] != 0x09))
 			{
 				while (spaces > 0)
 				{
@@ -261,7 +277,7 @@ int main(int argc, char *argv[])
 			}
 
 			/* convert spaces to tabs, if used for indenting */
-			while (spaces > 0 && (!in_c_comment || col < indent_c_comment) && (col == 0 || modified[dst-1] == 0x09))
+			while (spaces > 0 && (!in_multiline_comment || col < indent_multiline_comment) && (col == 0 || modified[dst-1] == 0x09))
 			{
 				modified[dst++] = 0x09;
 				spaces -= tab_size;
@@ -280,15 +296,22 @@ int main(int argc, char *argv[])
 		/* otherwise, copy the source character */
 		else
 		{
+			/* check for invalid upper-ASCII chars, but only for non-xml files (swlists might contain UTF-8 chars) */
+			if (!is_xml_file && (ch < 32 || ch > 127))
+			{
+				ch = '?';
+				hichars++;
+			}
+
 			modified[dst++] = ch;
 			col++;
 		}
 	}
 
 	/* if we didn't find an end of comment, we screwed up */
-	if (in_c_comment)
+	if (in_multiline_comment)
 	{
-		printf("Error: unmatched C-style comment (%s)!\n", argv[1]);
+		printf("Error: unmatched multi-line comment (%s)!\n", argv[1]);
 		return 1;
 	}
 
