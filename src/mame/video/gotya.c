@@ -76,7 +76,6 @@ WRITE8_MEMBER(gotya_state::gotya_colorram_w)
 
 WRITE8_MEMBER(gotya_state::gotya_video_control_w)
 {
-
 	/* bit 0 - scroll bit 8
 	   bit 1 - flip screen
 	   bit 2 - sound disable ??? */

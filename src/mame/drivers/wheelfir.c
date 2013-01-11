@@ -312,7 +312,6 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_scanline_cnt_w)
 
 WRITE16_MEMBER(wheelfir_state::wheelfir_blit_w)
 {
-
 	COMBINE_DATA(&m_blitter_data[offset]);
 
 	if(!ACCESSING_BITS_8_15 && offset==0x6)  //LSB only!
@@ -381,7 +380,6 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_blit_w)
 
 	if(offset==0xf && data==0xffff)
 	{
-
 		machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
 
 		{
@@ -410,7 +408,6 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_blit_w)
 
 			if(page>=0x400000) /* src set to  unav. page before direct write to the framebuffer */
 			{
-
 					m_direct_write_x0=dst_x0;
 					m_direct_write_x1=dst_x1;
 					m_direct_write_y0=dst_y0;
@@ -421,17 +418,14 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_blit_w)
 
 			if(x_dst_step<0)
 			{
-
 				if(dst_x0<=dst_x1)
 				{
-
 					return;
 				}
 
 			}
 			else
 			{
-
 				if(dst_x0>=dst_x1)
 				{
 					return;
@@ -448,7 +442,6 @@ WRITE16_MEMBER(wheelfir_state::wheelfir_blit_w)
 			}
 			else
 			{
-
 				if(dst_y0>=dst_y1)
 				{
 					return;
@@ -579,7 +572,6 @@ void wheelfir_state::video_start()
 
 UINT32 wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(0, cliprect);
 
 	for(int y=0;y<NUM_SCANLINES;++y)
@@ -589,7 +581,6 @@ UINT32 wheelfir_state::screen_update_wheelfir(screen_device &screen, bitmap_ind1
 
 		for (int x=0;x<336;x++)
 		{
-
 			dest[x] = source[ (x+(m_scanlines[y].x)) &511];
 
 		}
@@ -772,7 +763,6 @@ void wheelfir_state::machine_reset()
 
 void wheelfir_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>( "maincpu");
 	m_subcpu = machine().device<cpu_device>(  "subcpu");
 	m_screen = machine().device(  "screen");

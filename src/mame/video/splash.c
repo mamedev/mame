@@ -72,7 +72,6 @@ TILE_GET_INFO_MEMBER(splash_state::get_tile_info_splash_tilemap1)
 
 WRITE16_MEMBER(splash_state::splash_vram_w)
 {
-
 	COMBINE_DATA(&m_videoram[offset]);
 	m_bg_tilemap[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 1);
 }
@@ -167,7 +166,6 @@ static void draw_bitmap(running_machine &machine, bitmap_ind16 &bitmap, const re
 
 void splash_state::video_start()
 {
-
 	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(splash_state::get_tile_info_splash_tilemap0),this), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
 	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(splash_state::get_tile_info_splash_tilemap1),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
@@ -256,7 +254,6 @@ static void funystrp_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 
 UINT32 splash_state::screen_update_splash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	/* set scroll registers */
 	m_bg_tilemap[0]->set_scrolly(0, m_vregs[0]);
 	m_bg_tilemap[1]->set_scrolly(0, m_vregs[1]);
@@ -271,7 +268,6 @@ UINT32 splash_state::screen_update_splash(screen_device &screen, bitmap_ind16 &b
 
 UINT32 splash_state::screen_update_funystrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	/* set scroll registers */
 	m_bg_tilemap[0]->set_scrolly(0, m_vregs[0]);
 	m_bg_tilemap[1]->set_scrolly(0, m_vregs[1]);

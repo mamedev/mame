@@ -3,12 +3,10 @@
 
 /* berlwall, blazeon etc. */
 #define MCFG_DEVICE_ADD_VU002_SPRITES \
-	MCFG_DEVICE_ADD("kan_spr", KANEKO_VU002_SPRITE, 0) \
-
+	MCFG_DEVICE_ADD("kan_spr", KANEKO_VU002_SPRITE, 0)
 /* gtmr, gtmr2, bloodwar etc. */
 #define MCFG_DEVICE_ADD_KC002_SPRITES \
-	MCFG_DEVICE_ADD("kan_spr", KANEKO_KC002_SPRITE, 0) \
-
+	MCFG_DEVICE_ADD("kan_spr", KANEKO_KC002_SPRITE, 0)
 
 
 struct kaneko16_priority_t

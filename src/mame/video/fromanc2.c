@@ -381,7 +381,6 @@ WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_2_w)
 
 VIDEO_START_MEMBER(fromanc2_state,fromanc2)
 {
-
 	m_tilemap[0][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromanc2_state::fromanc2_get_v0_l0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[0][1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromanc2_state::fromanc2_get_v0_l1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[0][2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromanc2_state::fromanc2_get_v0_l2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
@@ -430,7 +429,6 @@ VIDEO_START_MEMBER(fromanc2_state,fromanc2)
 
 VIDEO_START_MEMBER(fromanc2_state,fromancr)
 {
-
 	m_tilemap[0][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v0_l0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[0][1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v0_l1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap[0][2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v0_l2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
@@ -474,7 +472,6 @@ VIDEO_START_MEMBER(fromanc2_state,fromancr)
 
 VIDEO_START_MEMBER(fromanc2_state,fromanc4)
 {
-
 	m_tilemap[0][0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v0_l0_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
 	m_tilemap[0][1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v0_l1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);
 	m_tilemap[0][2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromanc2_state::fromancr_get_v0_l2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 256, 64);

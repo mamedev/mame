@@ -93,7 +93,6 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_7)
 
 WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram_w)
 {
-
 	m_tileram[offset] = data;
 	m_joetilemap->mark_tile_dirty(offset);
 }
@@ -101,49 +100,42 @@ WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram_w)
 
 WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram2_w)
 {
-
 	m_tileram_2[offset] = data;
 	m_joetilemap2->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram3_w)
 {
-
 	m_tileram_3[offset] = data;
 	m_joetilemap3->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram4_w)
 {
-
 	m_tileram_4[offset] = data;
 	m_joetilemap4->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram5_w)
 {
-
 	m_tileram_5[offset] = data;
 	m_joetilemap5->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram6_w)
 {
-
 	m_tileram_6[offset] = data;
 	m_joetilemap6->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_MEMBER(ashnojoe_state::ashnojoe_tileram7_w)
 {
-
 	m_tileram_7[offset] = data;
 	m_joetilemap7->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_MEMBER(ashnojoe_state::joe_tilemaps_xscroll_w)
 {
-
 	switch( offset )
 	{
 	case 0:
@@ -167,7 +159,6 @@ WRITE16_MEMBER(ashnojoe_state::joe_tilemaps_xscroll_w)
 
 WRITE16_MEMBER(ashnojoe_state::joe_tilemaps_yscroll_w)
 {
-
 	switch( offset )
 	{
 	case 0:
@@ -191,7 +182,6 @@ WRITE16_MEMBER(ashnojoe_state::joe_tilemaps_yscroll_w)
 
 void ashnojoe_state::video_start()
 {
-
 	m_joetilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info),this),  TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_joetilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_2),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_joetilemap3 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ashnojoe_state::get_joe_tile_info_3),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
@@ -209,7 +199,6 @@ void ashnojoe_state::video_start()
 
 UINT32 ashnojoe_state::screen_update_ashnojoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	//m_tilemap_reg[0] & 0x10 // ?? on coin insertion
 
 	flip_screen_set(m_tilemap_reg[0] & 1);

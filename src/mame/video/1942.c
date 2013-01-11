@@ -140,14 +140,12 @@ void _1942_state::video_start()
 
 WRITE8_MEMBER(_1942_state::c1942_fgvideoram_w)
 {
-
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_MEMBER(_1942_state::c1942_bgvideoram_w)
 {
-
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty((offset & 0x0f) | ((offset >> 1) & 0x01f0));
 }
@@ -155,7 +153,6 @@ WRITE8_MEMBER(_1942_state::c1942_bgvideoram_w)
 
 WRITE8_MEMBER(_1942_state::c1942_palette_bank_w)
 {
-
 	if (m_palette_bank != data)
 	{
 		m_palette_bank = data;
@@ -165,7 +162,6 @@ WRITE8_MEMBER(_1942_state::c1942_palette_bank_w)
 
 WRITE8_MEMBER(_1942_state::c1942_scroll_w)
 {
-
 	m_scroll[offset] = data;
 	m_bg_tilemap->set_scrollx(0, m_scroll[0] | (m_scroll[1] << 8));
 }
@@ -235,7 +231,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 _1942_state::screen_update_1942(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(machine(), bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);

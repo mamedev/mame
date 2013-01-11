@@ -6,7 +6,6 @@ static UINT8 I386OP(shift_rotate8)(i386_state *cpustate, UINT8 modrm, UINT32 val
 	if( shift == 0 ) {
 		CYCLES_RM(cpustate,modrm, 3, 7);
 	} else if( shift == 1 ) {
-
 		switch( (modrm >> 3) & 0x7 )
 		{
 			case 0:         /* ROL rm8, 1 */
@@ -58,7 +57,6 @@ static UINT8 I386OP(shift_rotate8)(i386_state *cpustate, UINT8 modrm, UINT32 val
 		}
 
 	} else {
-
 		switch( (modrm >> 3) & 0x7 )
 		{
 			case 0:         /* ROL rm8, i8 */

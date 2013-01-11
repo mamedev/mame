@@ -32,7 +32,6 @@
 
 TILE_GET_INFO_MEMBER(hitme_state::get_hitme_tile_info)
 {
-
 	/* the code is the low 6 bits */
 	UINT8 code = m_videoram[tile_index] & 0x3f;
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
@@ -41,7 +40,6 @@ TILE_GET_INFO_MEMBER(hitme_state::get_hitme_tile_info)
 
 WRITE8_MEMBER(hitme_state::hitme_vidram_w)
 {
-
 	/* mark this tile dirty */
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
@@ -308,7 +306,6 @@ void hitme_state::machine_start()
 
 void hitme_state::machine_reset()
 {
-
 	m_timeout_time = attotime::zero;
 }
 

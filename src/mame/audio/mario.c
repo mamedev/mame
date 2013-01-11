@@ -516,7 +516,6 @@ WRITE8_MEMBER(mario_state::mario_sh_p2_w)
 
 WRITE8_MEMBER(mario_state::masao_sh_irqtrigger_w)
 {
-
 	if (m_last == 1 && data == 0)
 	{
 		/* setting bit 0 high then low triggers IRQ on the sound CPU */
@@ -548,7 +547,6 @@ WRITE8_MEMBER(mario_state::mario_sh2_w)
 /* Misc samples */
 WRITE8_MEMBER(mario_state::mario_sh3_w)
 {
-
 	switch (offset)
 	{
 		case 0: /* death */

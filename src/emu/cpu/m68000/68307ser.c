@@ -28,7 +28,6 @@ READ8_HANDLER( m68307_internal_serial_r )
 		}
 		else
 		{
-
 			int pc = space.device().safe_pc();
 
 			switch (offset)
@@ -170,5 +169,4 @@ WRITE8_HANDLER( m68307_internal_serial_w )
 
 void m68307_serial::reset(void)
 {
-
 }

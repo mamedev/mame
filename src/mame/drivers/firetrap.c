@@ -407,7 +407,6 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(firetrap_state::coin_inserted)
 {
-
 	/* coin insertion causes an IRQ */
 	if(newval)
 	{
@@ -583,7 +582,6 @@ static const msm5205_interface msm5205_config =
 
 INTERRUPT_GEN_MEMBER(firetrap_state::firetrap_irq)
 {
-
 	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

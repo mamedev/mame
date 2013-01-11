@@ -124,7 +124,6 @@ static void set_palette(running_machine &machine, mystston_state *state)
 
 WRITE8_MEMBER(mystston_state::mystston_video_control_w)
 {
-
 	*m_video_control = data;
 
 	/* D0-D1 - foreground text color */
@@ -149,7 +148,6 @@ WRITE8_MEMBER(mystston_state::mystston_video_control_w)
 
 TILE_GET_INFO_MEMBER(mystston_state::get_bg_tile_info)
 {
-
 	int page = (*m_video_control & 0x04) << 8;
 	int code = ((m_bg_videoram[page | 0x200 | tile_index] & 0x01) << 8) | m_bg_videoram[page | tile_index];
 	int flags = (tile_index & 0x10) ? TILE_FLIPY : 0;
@@ -160,7 +158,6 @@ TILE_GET_INFO_MEMBER(mystston_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(mystston_state::get_fg_tile_info)
 {
-
 	int code = ((m_fg_videoram[0x400 | tile_index] & 0x07) << 8) | m_fg_videoram[tile_index];
 	int color = ((*m_video_control & 0x01) << 1) | ((*m_video_control & 0x02) >> 1);
 
@@ -216,7 +213,6 @@ static void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_el
 
 VIDEO_START_MEMBER(mystston_state,mystston)
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mystston_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X, 16, 16, 16, 32);
 
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mystston_state::get_fg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X,  8,  8, 32, 32);
@@ -236,7 +232,6 @@ VIDEO_START_MEMBER(mystston_state,mystston)
 
 VIDEO_RESET_MEMBER(mystston_state,mystston)
 {
-
 	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(FIRST_INT_VPOS - 1, INT_HPOS), FIRST_INT_VPOS);
 }
 
@@ -250,7 +245,6 @@ VIDEO_RESET_MEMBER(mystston_state,mystston)
 
 UINT32 mystston_state::screen_update_mystston(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	int flip = (*m_video_control & 0x80) ^ ((machine().root_device().ioport("DSW1")->read() & 0x20) << 2);
 
 	set_palette(machine(), this);

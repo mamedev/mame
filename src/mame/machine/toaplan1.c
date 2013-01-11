@@ -41,7 +41,6 @@ static const UINT8 toaplan1_credits_for_coin[TOAPLAN1_REGION_OTHER+1][2][4] =
 
 INTERRUPT_GEN_MEMBER(toaplan1_state::toaplan1_interrupt)
 {
-
 	if (m_intenable)
 		device.execute().set_input_line(4, HOLD_LINE);
 }
@@ -57,7 +56,6 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_intenable_w)
 
 WRITE16_MEMBER(toaplan1_state::demonwld_dsp_addrsel_w)
 {
-
 	/* This sets the main CPU RAM address the DSP should */
 	/*  read/write, via the DSP IO port 0 */
 	/* Top three bits of data need to be shifted left 9 places */
@@ -126,7 +124,6 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_bio_w)
 
 READ16_MEMBER(toaplan1_state::demonwld_BIO_r)
 {
-
 	return m_dsp_BIO;
 }
 
@@ -320,7 +317,6 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_reset_sound)
 
 WRITE8_MEMBER(toaplan1_state::rallybik_coin_w)
 {
-
 	switch (data) {
 		case 0x08: if (m_coin_count) { coin_counter_w(machine(), 0, 1); coin_counter_w(machine(), 0, 0); } break;
 		case 0x09: if (m_coin_count) { coin_counter_w(machine(), 2, 1); coin_counter_w(machine(), 2, 0); } break;
@@ -379,7 +375,6 @@ WRITE16_MEMBER(toaplan1_state::samesame_coin_w)
 
 MACHINE_RESET_MEMBER(toaplan1_state,toaplan1)
 {
-
 	m_intenable = 0;
 	m_coin_count = 0;
 	m_unk_reset_port = 0;
@@ -397,14 +392,12 @@ void toaplan1_driver_savestate(running_machine &machine)
 
 MACHINE_RESET_MEMBER(toaplan1_state,zerowing)/* Hack for ZeroWing and OutZone. See the video driver */
 {
-
 	MACHINE_RESET_CALL_MEMBER(toaplan1);
 	m_unk_reset_port = 1;
 }
 
 MACHINE_RESET_MEMBER(toaplan1_state,demonwld)
 {
-
 	MACHINE_RESET_CALL_MEMBER(toaplan1);
 	m_dsp_addr_w = 0;
 	m_main_ram_seg = 0;
@@ -425,7 +418,6 @@ void demonwld_driver_savestate(running_machine &machine)
 
 MACHINE_RESET_MEMBER(toaplan1_state,vimana)
 {
-
 	MACHINE_RESET_CALL_MEMBER(toaplan1);
 	m_vimana_coins[0] = m_vimana_coins[1] = 0;
 	m_vimana_credits = 0;

@@ -85,13 +85,11 @@ void dogfgt_state::video_start()
 
 WRITE8_MEMBER(dogfgt_state::dogfgt_plane_select_w)
 {
-
 	m_bm_plane = data;
 }
 
 READ8_MEMBER(dogfgt_state::dogfgt_bitmapram_r)
 {
-
 	if (m_bm_plane > 2)
 	{
 		popmessage("bitmapram_r offs %04x plane %d\n", offset, m_bm_plane);
@@ -127,7 +125,6 @@ WRITE8_MEMBER(dogfgt_state::internal_bitmapram_w)
 
 WRITE8_MEMBER(dogfgt_state::dogfgt_bitmapram_w)
 {
-
 	if (m_bm_plane > 2)
 	{
 		popmessage("bitmapram_w offs %04x plane %d\n", offset, m_bm_plane);
@@ -139,14 +136,12 @@ WRITE8_MEMBER(dogfgt_state::dogfgt_bitmapram_w)
 
 WRITE8_MEMBER(dogfgt_state::dogfgt_bgvideoram_w)
 {
-
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_MEMBER(dogfgt_state::dogfgt_scroll_w)
 {
-
 	m_scroll[offset] = data;
 	m_bg_tilemap->set_scrollx(0, m_scroll[0] + 256 * m_scroll[1] + 256);
 	m_bg_tilemap->set_scrolly(0, m_scroll[2] + 256 * m_scroll[3]);
@@ -154,7 +149,6 @@ WRITE8_MEMBER(dogfgt_state::dogfgt_scroll_w)
 
 WRITE8_MEMBER(dogfgt_state::dogfgt_1800_w)
 {
-
 	/* bits 0 and 1 are probably text color (not verified because PROM is missing) */
 	m_pixcolor = ((data & 0x01) << 1) | ((data & 0x02) >> 1);
 

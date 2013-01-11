@@ -53,7 +53,6 @@ public:
 
 void skeetsht_state::machine_reset()
 {
-
 	m_ay = machine().device("aysnd");
 	m_tms = machine().device("tms");
 }
@@ -121,7 +120,6 @@ static void skeetsht_tms_irq(device_t *device, int state)
 
 WRITE8_MEMBER(skeetsht_state::tms_w)
 {
-
 	if ((offset & 1) == 0)
 		m_lastdataw = data;
 	else
@@ -130,7 +128,6 @@ WRITE8_MEMBER(skeetsht_state::tms_w)
 
 READ8_MEMBER(skeetsht_state::tms_r)
 {
-
 	if ((offset & 1) == 0)
 		m_lastdatar = tms34010_host_r(m_tms, offset >> 1);
 
@@ -146,13 +143,11 @@ READ8_MEMBER(skeetsht_state::tms_r)
 
 READ8_MEMBER(skeetsht_state::hc11_porta_r)
 {
-
 	return m_porta_latch;
 }
 
 WRITE8_MEMBER(skeetsht_state::hc11_porta_w)
 {
-
 	if (!(data & 0x8) && (m_porta_latch & 8))
 		m_ay_sel = m_porta_latch & 0x10;
 
@@ -161,7 +156,6 @@ WRITE8_MEMBER(skeetsht_state::hc11_porta_w)
 
 WRITE8_MEMBER(skeetsht_state::ay8910_w)
 {
-
 	if (m_ay_sel)
 		ay8910_data_w(m_ay, space, 0, data);
 	else

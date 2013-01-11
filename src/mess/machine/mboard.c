@@ -119,7 +119,6 @@ data:  0 0000 0000  all fields occupied
 
 void mboard_state::write_board(UINT8 data)
 {
-
 	Line18_REED=data;
 
 	if (read_board_flag && !strcmp(machine().system().name,"glasgow") ) //HACK
@@ -371,7 +370,6 @@ void mboard_state::check_board_buttons()
 
 	if ((data != 0xff) && (!mouse_down) )
 	{
-
 		pos2num_res = pos_to_num(data);
 		field=64-(board_row*8+8-pos2num_res);
 
@@ -434,7 +432,6 @@ void mboard_state::check_board_buttons()
 /* check additional buttons */
 	if (data == 0xff)
 	{
-
 		port_input=machine().root_device().ioport("B_BUTTONS")->read();
 		if (port_input==0x01)
 		{

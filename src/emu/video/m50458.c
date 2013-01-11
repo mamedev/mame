@@ -92,7 +92,6 @@ WRITE16_MEMBER( m50458_device::vreg_123_w)
 
 WRITE16_MEMBER( m50458_device::vreg_124_w)
 {
-
 }
 
 WRITE16_MEMBER( m50458_device::vreg_125_w)

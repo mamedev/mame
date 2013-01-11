@@ -431,7 +431,6 @@ READ64_MEMBER(triforce_state::gc_pi_r)
 
 WRITE64_MEMBER(triforce_state::gc_pi_w)
 {
-
 }
 
 READ64_MEMBER(triforce_state::gc_exi_r)
@@ -441,7 +440,6 @@ READ64_MEMBER(triforce_state::gc_exi_r)
 
 WRITE64_MEMBER(triforce_state::gc_exi_w)
 {
-
 }
 
 static ADDRESS_MAP_START( gc_map, AS_PROGRAM, 64, triforce_state )
@@ -454,7 +452,6 @@ ADDRESS_MAP_END
 
 void triforce_state::video_start()
 {
-
 }
 
 UINT32 triforce_state::screen_update_triforce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -559,8 +556,7 @@ MACHINE_CONFIG_END
 #define TRIFORCE_BIOS \
 	ROM_REGION( 0x200000, "maincpu", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "Triforce Bios" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "triforce_bootrom.bin", 0x000000, 0x200000, CRC(d1883221) SHA1(c3cb7227e4dbc2af861e76d00cb59726105a2e4c) ) \
-
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "triforce_bootrom.bin", 0x000000, 0x200000, CRC(d1883221) SHA1(c3cb7227e4dbc2af861e76d00cb59726105a2e4c) )
 ROM_START( triforce )
 	TRIFORCE_BIOS
 ROM_END

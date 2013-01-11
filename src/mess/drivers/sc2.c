@@ -94,7 +94,6 @@ INPUT_PORTS_END
 
 void sc2_state::machine_start()
 {
-
 	save_item(NAME(m_led_7seg_data));
 	save_item(NAME(m_kp_matrix));
 	save_item(NAME(m_led_selected));
@@ -104,7 +103,6 @@ void sc2_state::machine_start()
 
 void sc2_state::machine_reset()
 {
-
 	m_kp_matrix = 0;
 	m_led_selected = 0;
 	m_digit_data = 0;

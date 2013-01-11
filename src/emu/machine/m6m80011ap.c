@@ -29,7 +29,6 @@ m6m80011ap_device::m6m80011ap_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, M6M80011AP, "m6m80011ap", tag, owner, clock),
 		device_nvram_interface(mconfig, *this)
 {
-
 }
 
 
@@ -49,7 +48,6 @@ void m6m80011ap_device::device_validity_check(validity_checker &valid) const
 
 void m6m80011ap_device::device_start()
 {
-
 }
 
 

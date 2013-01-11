@@ -154,7 +154,6 @@ WRITE8_MEMBER(jedi_state::main_irq_ack_w)
 
 void jedi_state::machine_start()
 {
-
 	/* set a timer to run the interrupts */
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jedi_state::generate_interrupt),this));
 	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(32), 32);
@@ -176,7 +175,6 @@ void jedi_state::machine_start()
 
 void jedi_state::machine_reset()
 {
-
 	/* init globals */
 	m_a2d_select = 0;
 	m_nvram_enabled = 0;
@@ -221,7 +219,6 @@ READ8_MEMBER(jedi_state::a2d_data_r)
 
 WRITE8_MEMBER(jedi_state::a2d_select_w)
 {
-
 	m_a2d_select = offset;
 }
 
@@ -241,7 +238,6 @@ WRITE8_MEMBER(jedi_state::jedi_coin_counter_w)
 
 WRITE8_MEMBER(jedi_state::nvram_data_w)
 {
-
 	if (m_nvram_enabled)
 		m_nvram[offset] = data;
 }
@@ -249,7 +245,6 @@ WRITE8_MEMBER(jedi_state::nvram_data_w)
 
 WRITE8_MEMBER(jedi_state::nvram_enable_w)
 {
-
 	m_nvram_enabled = ~offset & 1;
 }
 

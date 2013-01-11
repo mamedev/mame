@@ -106,7 +106,6 @@ static void draw_sprite(running_machine &machine, const UINT8 *source, bitmap_in
 	}
 	else
 	{
-
 		/* Chinese Hero */
 		color >>= 1;
 

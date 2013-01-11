@@ -258,7 +258,6 @@ VIDEO_START_MEMBER(cischeat_state,cischeat)
 /* 16 colour codes for the tiles */
 VIDEO_START_MEMBER(cischeat_state,f1gpstar)
 {
-
 	VIDEO_START_CALL_MEMBER(cischeat);
 
 	m_bits_per_color_code = 4;

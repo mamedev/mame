@@ -514,7 +514,6 @@ CRTC command params:
 
 void pc8801_state::video_start()
 {
-
 }
 
 void pc8801_state::draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect)
@@ -2429,7 +2428,6 @@ INTERRUPT_GEN_MEMBER(pc8801_state::pc8801_vrtc_irq)
 
 void pc8801_state::machine_start()
 {
-
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pc8801_irq_callback);
 	machine().device<upd765a_device>("upd765")->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc8801_state::fdc_irq_w), this));
 
@@ -2575,7 +2573,6 @@ void pc8801_state::fdc_irq_w(bool state)
 
 READ8_MEMBER(pc8801_state::opn_porta_r)
 {
-
 	if(machine().root_device().ioport("BOARD_CONFIG")->read() & 2)
 	{
 		UINT8 shift,res;

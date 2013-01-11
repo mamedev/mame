@@ -102,7 +102,6 @@ WRITE8_MEMBER(hotstuff_state::ioboard_data_w)
 
 WRITE8_MEMBER(hotstuff_state::ioboard_reg_w)
 {
-
 	m_ioboard.index = data;
 	printf("REG %02x\n",data);
 }

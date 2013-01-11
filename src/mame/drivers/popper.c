@@ -146,7 +146,6 @@ READ8_MEMBER(popper_state::popper_soundcpu_nmi_r)
 
 WRITE8_MEMBER(popper_state::nmi_mask_w)
 {
-
 	m_nmi_mask = data & 1;
 }
 
@@ -312,7 +311,6 @@ GFXDECODE_END
 
 void popper_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_flipscreen));
@@ -322,7 +320,6 @@ void popper_state::machine_start()
 
 void popper_state::machine_reset()
 {
-
 	m_flipscreen = 0;
 	m_e002 = 0;
 	m_gfx_bank = 0;
@@ -330,7 +327,6 @@ void popper_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(popper_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

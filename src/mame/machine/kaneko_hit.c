@@ -107,7 +107,6 @@ void kaneko_hit_device::device_start()
 
 void kaneko_hit_device::device_reset()
 {
-
 }
 
 

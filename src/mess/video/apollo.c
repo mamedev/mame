@@ -120,7 +120,6 @@ INLINE screen_data_t *get_safe_token(device_t *device) {
  ***************************************************************************/
 
 static void log_cr1(const char * text, device_t *device, screen_data_t *screen_data) {
-
 	DLOG1(("%s: cr0=%02x cr1=%02x sr=%02x pixel_clock=%3d/%3d bl=%d vb=%d vs=%d hs=%d hc=%d vck=%d hck=%d pck=%d vd=%d",
 			text,
 			screen_data->cr0,
@@ -422,7 +421,6 @@ static UINT32 get_source_data(screen_data_t *screen_data, UINT32 src_data) {
 }
 
 static UINT16 rop(screen_data_t *screen_data, UINT16 dest_data) {
-
 	UINT32 src_data = get_source_data(screen_data, screen_data->guard_latch);
 
 	if ((screen_data->cr1 & CR1_ROP_EN)

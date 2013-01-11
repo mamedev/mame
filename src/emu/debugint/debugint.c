@@ -628,7 +628,6 @@ static int dview_on_mouse(DView *dv, int mx, int my, int button)
 
 INLINE void map_attr_to_fg_bg(unsigned char attr, rgb_t *fg, rgb_t *bg)
 {
-
 	*bg = MAKE_ARGB(0xff,0xff,0xff,0xff);
 	*fg = MAKE_ARGB(0xff,0x00,0x00,0x00);
 
@@ -1413,7 +1412,6 @@ static void update_views(void)
 
 void debugint_wait_for_debugger(device_t &device, bool firststop)
 {
-
 	if (firststop && list == NULL)
 	{
 		DView *dv;

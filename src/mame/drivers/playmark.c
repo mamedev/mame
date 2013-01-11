@@ -82,7 +82,6 @@ static const eeprom_interface eeprom_intf =
 
 WRITE16_MEMBER(playmark_state::wbeachvl_coin_eeprom_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bits 0-3 are coin counters? (only 0 used?) */
@@ -100,7 +99,6 @@ WRITE16_MEMBER(playmark_state::wbeachvl_coin_eeprom_w)
 
 WRITE16_MEMBER(playmark_state::hotmind_coin_eeprom_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		coin_counter_w(machine(), 0,data & 0x20);
@@ -119,7 +117,6 @@ WRITE16_MEMBER(playmark_state::hrdtimes_coin_w)
 
 WRITE16_MEMBER(playmark_state::playmark_snd_command_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		m_snd_command = (data & 0xff);
@@ -148,7 +145,6 @@ READ8_MEMBER(playmark_state::playmark_snd_command_r)
 
 READ8_MEMBER(playmark_state::playmark_snd_flag_r)
 {
-
 	if (m_snd_flag)
 	{
 		m_snd_flag = 0;
@@ -1028,7 +1024,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(playmark_state,playmark)
 {
-
 	m_oki = machine().device<okim6295_device>("oki");
 	m_eeprom = machine().device<eeprom_device>("eeprom");
 
@@ -1049,7 +1044,6 @@ MACHINE_START_MEMBER(playmark_state,playmark)
 
 MACHINE_RESET_MEMBER(playmark_state,playmark)
 {
-
 	m_bgscrollx = 0;
 	m_bgscrolly = 0;
 	m_bg_enable = 0;

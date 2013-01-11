@@ -54,7 +54,6 @@ public:
 
 void bingoc_state::video_start()
 {
-
 }
 
 UINT32 bingoc_state::screen_update_bingoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -76,7 +75,6 @@ READ16_MEMBER(bingoc_state::bingoc_rand_r)
 */
 READ8_MEMBER(bingoc_state::sound_test_r)
 {
-
 	if(machine().input().code_pressed_once(KEYCODE_Z))
 		m_x++;
 

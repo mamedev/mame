@@ -395,7 +395,6 @@ static corvus_cmd_t corvus_prep_cmd[0x82];      // Prep Command sizes and their 
 //      nada
 //
 static void dump_buffer(UINT8 *buffer, UINT16 length) {
-
 	UINT16  offset;
 	char    ascii_dump[16];
 
@@ -436,7 +435,6 @@ static void dump_buffer(UINT8 *buffer, UINT16 length) {
 //      Whether the command was invalid or not (TRUE = invalid command)
 //
 static UINT8 parse_hdc_command(UINT8 data) {
-
 	corvus_hdc_t *c = &corvus_hdc;
 
 	c->awaiting_modifier = FALSE;               // This is the case by definition
@@ -545,7 +543,6 @@ static UINT8 parse_hdc_command(UINT8 data) {
 //      status: Command status
 //
 static UINT8 corvus_write_sector(running_machine &machine, UINT8 drv, UINT32 sector, UINT8 *buffer, int len) {
-
 	corvus_hdc_t
 			*c = &corvus_hdc;
 	hard_disk_file
@@ -606,7 +603,6 @@ static UINT8 corvus_write_sector(running_machine &machine, UINT8 drv, UINT32 sec
 //      status: Corvus status
 //
 static UINT8 corvus_write_logical_sector(running_machine &machine, dadr_t *dadr, UINT8 *buffer, int len) {
-
 	corvus_hdc_t
 			*c = &corvus_hdc;
 	UINT8   status;             // Status returned from Physical Sector read
@@ -656,7 +652,6 @@ static UINT8 corvus_write_logical_sector(running_machine &machine, dadr_t *dadr,
 //      status: Corvus status
 //
 static UINT8 corvus_read_sector(running_machine &machine, UINT8 drv, UINT32 sector, UINT8 *buffer, int len) {
-
 	corvus_hdc_t
 			*c = &corvus_hdc;
 	hard_disk_file
@@ -706,7 +701,6 @@ static UINT8 corvus_read_sector(running_machine &machine, UINT8 drv, UINT32 sect
 //      status: Corvus status
 //
 static UINT8 corvus_read_logical_sector(running_machine &machine, dadr_t *dadr, UINT8 *buffer, int len) {
-
 	corvus_hdc_t
 			*c = &corvus_hdc;
 	UINT8   status;                             // Status returned from Physical Sector read
@@ -757,7 +751,6 @@ static UINT8 corvus_read_logical_sector(running_machine &machine, dadr_t *dadr, 
 //      Fills in the semaphore result code
 //
 static UINT8 corvus_lock_semaphore(running_machine &machine, UINT8 *name) {
-
 	corvus_hdc_t
 			*c = &corvus_hdc;
 	semaphore_table_block_t
@@ -835,7 +828,6 @@ static UINT8 corvus_lock_semaphore(running_machine &machine, UINT8 *name) {
 //      Fills in the semaphore result code
 //
 static UINT8 corvus_unlock_semaphore(running_machine &machine, UINT8 *name) {
-
 	corvus_hdc_t
 			*c = &corvus_hdc;
 	semaphore_table_block_t
@@ -903,7 +895,6 @@ static UINT8 corvus_unlock_semaphore(running_machine &machine, UINT8 *name) {
 //
 //
 static UINT8 corvus_init_semaphore_table( running_machine &machine ) {
-
 	semaphore_table_block_t
 			semaphore_table;
 	UINT8   status;
@@ -933,7 +924,6 @@ static UINT8 corvus_init_semaphore_table( running_machine &machine ) {
 //      Status of command
 //
 static UINT8 corvus_get_drive_parameters(running_machine &machine, UINT8 drv) {
-
 	corvus_hdc_t
 			*c = &corvus_hdc;
 	UINT16  capacity;                           // Number of usable 512-byte blocks
@@ -1042,7 +1032,6 @@ static UINT8 corvus_get_drive_parameters(running_machine &machine, UINT8 drv) {
 //      status: Status of read operation
 //
 static UINT8 corvus_read_boot_block(running_machine &machine, UINT8 block) {
-
 	corvus_hdc_t    *c = &corvus_hdc;           // Pick up global controller structure
 
 	LOG(("corvus_read_boot_block: Reading boot block: %d\n", block));
@@ -1066,7 +1055,6 @@ static UINT8 corvus_read_boot_block(running_machine &machine, UINT8 block) {
 //      Status of command
 //
 static UINT8 corvus_read_firmware_block(running_machine &machine, UINT8 head, UINT8 sector) {
-
 	corvus_hdc_t
 			*c = &corvus_hdc;   // Pick up global controller structure
 	UINT16  relative_sector;    // Relative sector on drive for Physical Read
@@ -1097,7 +1085,6 @@ static UINT8 corvus_read_firmware_block(running_machine &machine, UINT8 head, UI
 //      Status of command
 //
 static UINT8 corvus_write_firmware_block(running_machine &machine, UINT8 head, UINT8 sector, UINT8 *buffer) {
-
 	corvus_hdc_t
 			*c = &corvus_hdc;   // Pick up global controller structure
 	UINT16  relative_sector;    // Relative sector on drive for Physical Read
@@ -1126,7 +1113,6 @@ static UINT8 corvus_write_firmware_block(running_machine &machine, UINT8 head, U
 //      Status of command
 //
 static UINT8 corvus_format_drive(running_machine &machine, UINT8 *pattern, UINT16 len) {
-
 	corvus_hdc_t
 			*c = &corvus_hdc;
 	UINT32  sector;
@@ -1206,7 +1192,6 @@ static hard_disk_file *corvus_hdc_file(running_machine &machine, int id) {
 //      Nothing
 //
 static void corvus_process_command_packet(running_machine &machine, UINT8 invalid_command_flag) {
-
 	corvus_hdc_t    *c = &corvus_hdc;
 
 	if (VERBOSE_RESPONSES)
@@ -1434,7 +1419,6 @@ static TIMER_CALLBACK(corvus_hdc_callback)
 //      NULL if there's no file to attach to
 //
 UINT8 corvus_hdc_init(running_machine &machine) {
-
 	corvus_hdc_t            *c = &corvus_hdc;   // Pick up global controller structure
 	hard_disk_file  *disk;              // Structures for interface to CHD routines
 	hard_disk_info  *info;
@@ -1577,7 +1561,6 @@ UINT8 corvus_hdc_init(running_machine &machine) {
 //      Value in the controller status register
 //
 READ8_HANDLER ( corvus_hdc_status_r ) {
-
 	corvus_hdc_t *c = &corvus_hdc;
 
 	return c->status;
@@ -1599,7 +1582,6 @@ READ8_HANDLER ( corvus_hdc_status_r ) {
 //      Value in the controller data register
 //
 READ8_HANDLER ( corvus_hdc_data_r ) {
-
 	corvus_hdc_t *c = &corvus_hdc;
 	UINT8 result;
 
@@ -1649,7 +1631,6 @@ READ8_HANDLER ( corvus_hdc_data_r ) {
 //      Nothing
 //
 WRITE8_HANDLER ( corvus_hdc_data_w ) {
-
 	corvus_hdc_t    *c = &corvus_hdc;
 
 	//

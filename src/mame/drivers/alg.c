@@ -115,7 +115,6 @@ VIDEO_START_MEMBER(alg_state,alg)
 
 MACHINE_START_MEMBER(alg_state,alg)
 {
-
 	m_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(alg_state::response_timer),this));
 	m_serial_timer_active = FALSE;
 }
@@ -136,7 +135,6 @@ MACHINE_RESET_MEMBER(alg_state,alg)
 
 TIMER_CALLBACK_MEMBER(alg_state::response_timer)
 {
-
 	/* if we still have data to send, do it now */
 	if (m_laserdisc->data_available_r() == ASSERT_LINE)
 	{
@@ -212,7 +210,6 @@ CUSTOM_INPUT_MEMBER(alg_state::lightgun_pos_r)
 
 CUSTOM_INPUT_MEMBER(alg_state::lightgun_trigger_r)
 {
-
 	/* read the trigger control based on the input select */
 	return (ioport("TRIGGERS")->read() >> m_input_select) & 1;
 }
@@ -220,7 +217,6 @@ CUSTOM_INPUT_MEMBER(alg_state::lightgun_trigger_r)
 
 CUSTOM_INPUT_MEMBER(alg_state::lightgun_holster_r)
 {
-
 	/* read the holster control based on the input select */
 	return (ioport("TRIGGERS")->read() >> (2 + m_input_select)) & 1;
 }

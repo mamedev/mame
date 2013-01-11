@@ -1881,7 +1881,6 @@ READ8_MEMBER(apple2gs_state::apple2gs_read_vector)
 
 MACHINE_RESET_MEMBER(apple2gs_state,apple2gs)
 {
-
 	apple2gs_refresh_delegates();
 
 	m_cur_slot6_image = NULL;
@@ -1929,7 +1928,6 @@ MACHINE_RESET_MEMBER(apple2gs_state,apple2gs)
 
 MACHINE_START_MEMBER(apple2gs_state,apple2gscommon)
 {
-
 	apple2gs_refresh_delegates();
 	apple2_init_common(machine());
 

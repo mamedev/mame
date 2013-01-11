@@ -42,7 +42,6 @@ struct hd44780_interface
 class hd44780_device :  public device_t,
 						public hd44780_interface
 {
-
 public:
 	// construction/destruction
 	hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

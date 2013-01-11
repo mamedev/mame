@@ -125,7 +125,6 @@ WRITE8_MEMBER(cliffhgr_state::cliff_test_led_w)
 
 WRITE8_MEMBER(cliffhgr_state::cliff_port_bank_w)
 {
-
 	/* writing 0x0f clears the LS174 flip flop */
 	if (data == 0x0f)
 		m_port_bank = 0;

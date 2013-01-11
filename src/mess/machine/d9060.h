@@ -43,7 +43,6 @@
 class base_d9060_device :  public device_t,
 							public device_ieee488_interface
 {
-
 public:
 	enum
 	{

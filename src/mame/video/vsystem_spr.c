@@ -149,7 +149,6 @@ void vsystem_spr_device::device_start()
 
 void vsystem_spr_device::device_reset()
 {
-
 }
 
 void vsystem_spr_device::get_sprite_attributes(UINT16* ram)

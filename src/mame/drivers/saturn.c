@@ -1939,7 +1939,6 @@ READ32_MEMBER(saturn_state::saturn_null_ram_r)
 
 WRITE32_MEMBER(saturn_state::saturn_null_ram_w)
 {
-
 }
 
 READ32_MEMBER(saturn_state::saturn_cart_dram0_r)

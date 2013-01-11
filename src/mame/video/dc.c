@@ -931,7 +931,6 @@ static void tex_get_info(running_machine &machine,texinfo *t, pvrta_state *sa)
 
 		switch (miptype)
 		{
-
 			case 0: // 4bpp
 				//printf("4bpp\n");
 				t->address += mipmap_4_8_offset[(t->sizes)&7]>>1;
@@ -1055,7 +1054,6 @@ WRITE64_HANDLER( pvr_ta_w )
 		}
 		if (dat & 2)
 		{
-
 			#if DEBUG_PVRTA
 			mame_printf_verbose("pvr_ta_w:  Core Pipeline soft reset\n");
 			#endif
@@ -1294,35 +1292,30 @@ WRITE64_HANDLER( pvr_ta_w )
 
 TIMER_CALLBACK_MEMBER(dc_state::transfer_opaque_list_irq)
 {
-
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPLST;
 	dc_update_interrupt_status(machine());
 }
 
 TIMER_CALLBACK_MEMBER(dc_state::transfer_opaque_modifier_volume_list_irq)
 {
-
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_OPMV;
 	dc_update_interrupt_status(machine());
 }
 
 TIMER_CALLBACK_MEMBER(dc_state::transfer_translucent_list_irq)
 {
-
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRLST;
 	dc_update_interrupt_status(machine());
 }
 
 TIMER_CALLBACK_MEMBER(dc_state::transfer_translucent_modifier_volume_list_irq)
 {
-
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_TRMV;
 	dc_update_interrupt_status(machine());
 }
 
 TIMER_CALLBACK_MEMBER(dc_state::transfer_punch_through_list_irq)
 {
-
 	dc_sysctrl_regs[SB_ISTNRM] |= (1 << 21);
 	dc_update_interrupt_status(machine());
 }
@@ -1933,7 +1926,6 @@ static void render_tri_sorted(running_machine &machine, bitmap_rgb32 &bitmap, te
 			render_span(machine, bitmap, ti, v1->y, v2->y, v1->x, v0->x, v1->u, v0->u, v1->v, v0->v, v1->w, v0->w, dx12dy, dx02dy, du12dy, du02dy, dv12dy, dv02dy, dw12dy, dw02dy);
 
 	} else if(!dy12) {
-
 		if(v2->x > v1->x)
 			render_span(machine, bitmap, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, dx01dy, dx02dy, du01dy, du02dy, dv01dy, dv02dy, dw01dy, dw02dy);
 		else
@@ -1948,7 +1940,6 @@ static void render_tri_sorted(running_machine &machine, bitmap_rgb32 &bitmap, te
 						v1->x, v0->x + dx02dy*dy01, v1->u, v0->u + du02dy*dy01, v1->v, v0->v + dv02dy*dy01, v1->w, v0->w + dw02dy*dy01,
 						dx12dy, dx02dy, du12dy, du02dy, dv12dy, dv02dy, dw12dy, dw02dy);
 		} else {
-
 			render_span(machine, bitmap, ti, v0->y, v1->y,
 						v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w,
 						dx02dy, dx01dy, du02dy, du01dy, dv02dy, dv01dy, dw02dy, dw01dy);
@@ -2575,7 +2566,6 @@ TIMER_CALLBACK_MEMBER(dc_state::endofrender_isp)
 
 void dc_state::video_start()
 {
-
 	memset(pvrctrl_regs, 0, sizeof(pvrctrl_regs));
 	memset(pvrta_regs, 0, sizeof(pvrta_regs));
 	memset(state_ta.grab, 0, sizeof(state_ta.grab));
@@ -2631,7 +2621,6 @@ void dc_state::video_start()
 
 UINT32 dc_state::screen_update_dc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 	/******************
 	  MAME note
 	*******************

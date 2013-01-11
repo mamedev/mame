@@ -316,7 +316,6 @@ enum
 
 WRITE8_MEMBER(snk_state::marvins_soundlatch_w)
 {
-
 	m_marvins_sound_busy_flag = 1;
 	soundlatch_byte_w(space, offset, data);
 	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
@@ -324,14 +323,12 @@ WRITE8_MEMBER(snk_state::marvins_soundlatch_w)
 
 READ8_MEMBER(snk_state::marvins_soundlatch_r)
 {
-
 	m_marvins_sound_busy_flag = 0;
 	return soundlatch_byte_r(space, 0);
 }
 
 CUSTOM_INPUT_MEMBER(snk_state::marvins_sound_busy)
 {
-
 	return m_marvins_sound_busy_flag;
 }
 
@@ -345,7 +342,6 @@ READ8_MEMBER(snk_state::marvins_sound_nmi_ack_r)
 
 TIMER_CALLBACK_MEMBER(snk_state::sgladiat_sndirq_update_callback)
 {
-
 	switch(param)
 	{
 		case CMDIRQ_BUSY_ASSERT:
@@ -415,7 +411,6 @@ READ8_MEMBER(snk_state::sgladiat_sound_irq_ack_r)
 
 TIMER_CALLBACK_MEMBER(snk_state::sndirq_update_callback)
 {
-
 	switch(param)
 	{
 		case YM1IRQ_ASSERT:
@@ -496,7 +491,6 @@ WRITE8_MEMBER(snk_state::snk_soundlatch_w)
 
 CUSTOM_INPUT_MEMBER(snk_state::snk_sound_busy)
 {
-
 	return (m_sound_status & 4) ? 1 : 0;
 }
 
@@ -504,7 +498,6 @@ CUSTOM_INPUT_MEMBER(snk_state::snk_sound_busy)
 
 READ8_MEMBER(snk_state::snk_sound_status_r)
 {
-
 	return m_sound_status;
 }
 
@@ -797,19 +790,16 @@ WRITE8_MEMBER(snk_state::tdfever_coin_counter_w)
 
 WRITE8_MEMBER(snk_state::countryc_trackball_w)
 {
-
 	m_countryc_trackball = data & 1;
 }
 
 CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_x)
 {
-
 	return ioport(m_countryc_trackball ? "TRACKBALLX2" : "TRACKBALLX1")->read();
 }
 
 CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_y)
 {
-
 	return ioport(m_countryc_trackball ? "TRACKBALLY2" : "TRACKBALLY1")->read();
 }
 
@@ -2185,8 +2175,7 @@ static INPUT_PORTS_START( tnk3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12) \
-
+	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL

@@ -49,21 +49,18 @@ READ8_MEMBER(skyraid_state::skyraid_port_0_r)
 
 WRITE8_MEMBER(skyraid_state::skyraid_range_w)
 {
-
 	m_analog_range = data & 0x3f;
 }
 
 
 WRITE8_MEMBER(skyraid_state::skyraid_offset_w)
 {
-
 	m_analog_offset = data & 0x3f;
 }
 
 
 WRITE8_MEMBER(skyraid_state::skyraid_scroll_w)
 {
-
 	m_scroll = data;
 }
 

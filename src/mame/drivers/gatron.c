@@ -406,7 +406,6 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
-
 	8, 16,
 	RGN_FRAC(1,3),  /* 256 tiles */
 	3,

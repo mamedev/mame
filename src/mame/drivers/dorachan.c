@@ -132,7 +132,6 @@ WRITE8_MEMBER(dorachan_state::dorachan_ctrl_w)
 
 CUSTOM_INPUT_MEMBER(dorachan_state::dorachan_v128_r)
 {
-
 	/* to avoid resetting (when player 2 starts) bit 0 need to be inverted when screen is flipped */
 	return ((machine().primary_screen->vpos() >> 7) & 0x01) ^ m_flip_screen;
 }
@@ -225,7 +224,6 @@ INPUT_PORTS_END
 
 void dorachan_state::machine_start()
 {
-
 	m_main_cpu = machine().device("maincpu");
 
 	save_item(NAME(m_flip_screen));
@@ -233,7 +231,6 @@ void dorachan_state::machine_start()
 
 void dorachan_state::machine_reset()
 {
-
 	m_flip_screen = 0;
 }
 

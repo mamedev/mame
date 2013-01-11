@@ -146,7 +146,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 WRITE16_MEMBER(mcatadv_state::mcat_soundlatch_w)
 {
-
 	soundlatch_byte_w(space, 0, data);
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

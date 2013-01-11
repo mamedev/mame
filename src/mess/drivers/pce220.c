@@ -618,7 +618,6 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(pce220_state::kb_irq)
 {
-
 	if (m_irq_mask & IRQ_FLAG_KEY)
 	{
 		m_maincpu->set_input_line(0, newval ? ASSERT_LINE : CLEAR_LINE );
@@ -629,7 +628,6 @@ INPUT_CHANGED_MEMBER(pce220_state::kb_irq)
 
 INPUT_CHANGED_MEMBER(pce220_state::on_irq)
 {
-
 	if (m_irq_mask & IRQ_FLAG_ON)
 	{
 		m_maincpu->set_input_line(0, newval ? ASSERT_LINE : CLEAR_LINE );
@@ -903,7 +901,6 @@ void pcg850v_state::machine_reset()
 
 TIMER_DEVICE_CALLBACK_MEMBER(pce220_state::pce220_timer_callback)
 {
-
 	m_timer_status = !m_timer_status;
 
 	if (m_irq_mask & IRQ_FLAG_TIMER)

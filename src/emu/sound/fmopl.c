@@ -399,7 +399,6 @@ static const UINT32 sl_tab[16]={
 
 #define RATE_STEPS (8)
 static const unsigned char eg_inc[15*RATE_STEPS]={
-
 /*cycle:0 1  2 3  4 5  6 7*/
 
 /* 0 */ 0,1, 0,1, 0,1, 0,1, /* rates 00..12 0 (increment by 0 or 1) */
@@ -600,7 +599,6 @@ static const UINT8 lfo_am_table[LFO_AM_TAB_ELEMENTS] = {
 
 /* LFO Phase Modulation table (verified on real YM3812) */
 static const INT8 lfo_pm_table[8*8*2] = {
-
 /* FNUM2/FNUM = 00 0xxxxxxx (0x0000) */
 0, 0, 0, 0, 0, 0, 0, 0, /*LFO PM depth = 0*/
 0, 0, 0, 0, 0, 0, 0, 0, /*LFO PM depth = 1*/
@@ -1038,7 +1036,6 @@ INLINE void OPL_CALC_RH( FM_OPL *OPL, OPL_CH *CH, unsigned int noise )
 	env = volume_calc(SLOT7_1);
 	if( env < ENV_QUIET )
 	{
-
 		/* high hat phase generation:
 		    phase = d0 or 234 (based on frequency only)
 		    phase = 34 or 2d0 (based on noise)

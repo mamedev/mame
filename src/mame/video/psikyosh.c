@@ -90,8 +90,7 @@ do                                                                              
 	if (srcdata != 0)                                                                               \
 		(DEST) = MAKE_ARGB_RGB(alpha,paldata[srcdata]);                                             \
 }                                                                                                   \
-while (0)                                                                                           \
-
+while (0)
 // combine in 'alphatable' value to store in ARGB
 #define PIXEL_OP_REMAP_TRANS0_ALPHATABLESTORE32(DEST, PRIORITY, SOURCE)                             \
 do                                                                                                  \
@@ -100,8 +99,7 @@ do                                                                              
 	if (srcdata != 0)                                                                               \
 		(DEST) = MAKE_ARGB_RGB(alphatable[srcdata], paldata[srcdata]);                              \
 }                                                                                                   \
-while (0)                                                                                           \
-
+while (0)
 // take ARGB pixel with stored alpha and blend in to RGB32 bitmap
 #define PIXEL_OP_COPY_TRANSPEN_ARGBRENDER32(DEST, PRIORITY, SOURCE)                             \
 do                                                                                                  \
@@ -110,8 +108,7 @@ do                                                                              
 	if (srcdata != transpen)                                                                        \
 		(DEST) = alpha_blend_r32((DEST), srcdata, RGB_ALPHA(srcdata));                              \
 }                                                                                                   \
-while (0)                                                                                           \
-
+while (0)
 // take RGB pixel with separate alpha and blend in to RGB32 bitmap
 #define PIXEL_OP_COPY_TRANSPEN_ALPHARENDER32(DEST, PRIORITY, SOURCE)                                \
 do                                                                                                  \
@@ -120,8 +117,7 @@ do                                                                              
 	if (srcdata != transpen)                                                                        \
 		(DEST) = alpha_blend_r32((DEST), srcdata, alpha);                               \
 }                                                                                                   \
-while (0)                                                                                           \
-
+while (0)
 // take ARGB pixel with stored alpha and copy in to RGB32 bitmap, scipping BG_TRANSPEN
 #define PIXEL_OP_COPY_TRANSPEN_RENDER32(DEST, PRIORITY, SOURCE)                             \
 do                                                                                                  \
@@ -130,8 +126,7 @@ do                                                                              
 	if (srcdata != transpen)                                                                        \
 		(DEST) = srcdata;                                                                           \
 }                                                                                                   \
-while (0)                                                                                           \
-
+while (0)
 // drawgfxm.h macro to render alpha into 32-bit buffer
 #define PIXEL_OP_REMAP_TRANS0_ALPHATABLE32(DEST, PRIORITY, SOURCE)                                  \
 do                                                                                                  \
@@ -140,8 +135,7 @@ do                                                                              
 	if (srcdata != 0)                                                                               \
 		(DEST) = alpha_blend_r32((DEST), paldata[srcdata], alphatable[srcdata]);                    \
 }                                                                                                   \
-while (0)                                                                                           \
-
+while (0)
 /*-------------------------------------------------
     draw_scanline32_alpha - take an RGB-encoded UINT32
     scanline and alpha-blend it into the destination bitmap
@@ -1173,7 +1167,6 @@ static void psikyosh_prelineblend( running_machine &machine, bitmap_rgb32 &bitma
 
 	g_profiler.start(PROFILER_USER8);
 	for (y = cliprect.min_y; y <= cliprect.max_y; y += 1) {
-
 		dstline = &bitmap.pix32(y);
 
 		/* linefill[y] & 0xff does what? */
@@ -1201,7 +1194,6 @@ static void psikyosh_postlineblend( running_machine &machine, bitmap_rgb32 &bitm
 
 	g_profiler.start(PROFILER_USER8);
 	for (y = cliprect.min_y; y <= cliprect.max_y; y += 1) {
-
 		dstline = &bitmap.pix32(y);
 
 		if (lineblend[y] & 0x80) /* solid */

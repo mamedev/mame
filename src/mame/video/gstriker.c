@@ -364,7 +364,6 @@ UINT32 gstriker_state::screen_update_gstriker(screen_device &screen, bitmap_ind1
 
 VIDEO_START_MEMBER(gstriker_state,gstriker)
 {
-
 	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
 
 	// Initalize the chip for the score plane
@@ -382,7 +381,6 @@ VIDEO_START_MEMBER(gstriker_state,gstriker)
 
 VIDEO_START_MEMBER(gstriker_state,twrldc94)
 {
-
 	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
 
 	// Initalize the chip for the score plane
@@ -400,7 +398,6 @@ VIDEO_START_MEMBER(gstriker_state,twrldc94)
 
 VIDEO_START_MEMBER(gstriker_state,vgoalsoc)
 {
-
 	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
 
 	// Initalize the chip for the score plane

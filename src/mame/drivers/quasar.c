@@ -56,7 +56,6 @@ WRITE8_MEMBER(quasar_state::io_page_select_w)
 
 WRITE8_MEMBER(quasar_state::quasar_video_w)
 {
-
 	switch (m_page)
 	{
 	case 0:  m_video_ram[offset] = data; break;
@@ -303,7 +302,6 @@ static const s2636_interface s2636_2_config =
 
 MACHINE_START_MEMBER(quasar_state,quasar)
 {
-
 	MACHINE_START_CALL_MEMBER(cvs);
 
 	/* register state save */
@@ -314,7 +312,6 @@ MACHINE_START_MEMBER(quasar_state,quasar)
 
 MACHINE_RESET_MEMBER(quasar_state,quasar)
 {
-
 	MACHINE_RESET_CALL_MEMBER(cvs);
 
 	m_effectcontrol = 0;

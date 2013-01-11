@@ -48,7 +48,6 @@ void gbusters_state::video_start()
 
 UINT32 gbusters_state::screen_update_gbusters(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	k052109_tilemap_update(m_k052109);
 
 	/* sprite priority 3 = disable */

@@ -583,7 +583,6 @@ void necdsp_device::exec_ld(UINT32 opcode) {
 }
 
 UINT8 necdsp_device::snesdsp_read(bool mode) {
-
 	if (!mode)
 	{
 		return regs.sr >> 8;

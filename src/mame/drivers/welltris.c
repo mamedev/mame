@@ -332,7 +332,6 @@ WRITE16_MEMBER(welltris_state::sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-
 		m_pending_command = 1;
 		soundlatch_byte_w(space, 0, data & 0xff);
 		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -346,7 +345,6 @@ CUSTOM_INPUT_MEMBER(welltris_state::pending_sound_r)
 
 WRITE8_MEMBER(welltris_state::pending_command_clear_w)
 {
-
 	m_pending_command = 0;
 }
 
@@ -697,7 +695,6 @@ DRIVER_INIT_MEMBER(welltris_state,welltris)
 
 DRIVER_INIT_MEMBER(welltris_state,quiz18k)
 {
-
 }
 
 

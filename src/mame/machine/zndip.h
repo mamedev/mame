@@ -8,8 +8,7 @@
 extern const device_type ZNDIP;
 
 #define MCFG_ZNDIP_DATA_HANDLER(_devcb) \
-	devcb = &zndip_device::set_data_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &zndip_device::set_data_handler(*device, DEVCB2_##_devcb);
 class zndip_device : public psxsiodev_device
 {
 public:

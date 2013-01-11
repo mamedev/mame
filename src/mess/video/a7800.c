@@ -105,7 +105,6 @@ static void maria_draw_scanline(running_machine &machine)
 	/* Step through DL's */
 	while ((READ_MEM(dl + 1) & 0x5F) != 0)
 	{
-
 		/* Extended header */
 		if (!(READ_MEM(dl+1) & 0x1F))
 		{

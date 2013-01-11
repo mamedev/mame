@@ -82,7 +82,6 @@ void flkatck_state::video_start()
 
 WRITE8_MEMBER(flkatck_state::flkatck_k007121_w)
 {
-
 	m_k007121_ram[offset] = data;
 	if (offset < 0x1000)    /* tiles */
 	{
@@ -95,7 +94,6 @@ WRITE8_MEMBER(flkatck_state::flkatck_k007121_w)
 
 WRITE8_MEMBER(flkatck_state::flkatck_k007121_regs_w)
 {
-
 	switch (offset)
 	{
 		case 0x04:  /* ROM bank select */

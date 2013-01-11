@@ -1,7 +1,6 @@
 /*************************************************************************************
 
-  /\/\<< Kasino '89 >>/\/\
-
+  /\/\<< Kasino '89 >>/\/
   6-players electronic roulette.
   Video field + phisical LEDs roulette.
 
@@ -268,7 +267,6 @@ void kas89_state::machine_start()
 
 void kas89_state::machine_reset()
 {
-
 	m_main_nmi_enable = 0;
 }
 

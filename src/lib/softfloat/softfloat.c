@@ -162,7 +162,6 @@ static int64 roundAndPackInt64( flag zSign, bits64 absZ0, bits64 absZ1 )
 
 INLINE bits32 extractFloat32Frac( float32 a )
 {
-
 	return a & 0x007FFFFF;
 
 }
@@ -173,7 +172,6 @@ INLINE bits32 extractFloat32Frac( float32 a )
 
 INLINE int16 extractFloat32Exp( float32 a )
 {
-
 	return ( a>>23 ) & 0xFF;
 
 }
@@ -184,7 +182,6 @@ INLINE int16 extractFloat32Exp( float32 a )
 
 INLINE flag extractFloat32Sign( float32 a )
 {
-
 	return a>>31;
 
 }
@@ -220,7 +217,6 @@ static void
 
 INLINE float32 packFloat32( flag zSign, int16 zExp, bits32 zSig )
 {
-
 	return ( ( (bits32) zSign )<<31 ) + ( ( (bits32) zExp )<<23 ) + zSig;
 
 }
@@ -324,7 +320,6 @@ static float32
 
 INLINE bits64 extractFloat64Frac( float64 a )
 {
-
 	return a & LIT64( 0x000FFFFFFFFFFFFF );
 
 }
@@ -335,7 +330,6 @@ INLINE bits64 extractFloat64Frac( float64 a )
 
 INLINE int16 extractFloat64Exp( float64 a )
 {
-
 	return ( a>>52 ) & 0x7FF;
 
 }
@@ -346,7 +340,6 @@ INLINE int16 extractFloat64Exp( float64 a )
 
 INLINE flag extractFloat64Sign( float64 a )
 {
-
 	return a>>63;
 
 }
@@ -382,7 +375,6 @@ static void
 
 INLINE float64 packFloat64( flag zSign, int16 zExp, bits64 zSig )
 {
-
 	return ( ( (bits64) zSign )<<63 ) + ( ( (bits64) zExp )<<52 ) + zSig;
 
 }
@@ -725,7 +717,6 @@ static floatx80
 
 INLINE bits64 extractFloat128Frac1( float128 a )
 {
-
 	return a.low;
 
 }
@@ -737,7 +728,6 @@ INLINE bits64 extractFloat128Frac1( float128 a )
 
 INLINE bits64 extractFloat128Frac0( float128 a )
 {
-
 	return a.high & LIT64( 0x0000FFFFFFFFFFFF );
 
 }
@@ -749,7 +739,6 @@ INLINE bits64 extractFloat128Frac0( float128 a )
 
 INLINE int32 extractFloat128Exp( float128 a )
 {
-
 	return ( a.high>>48 ) & 0x7FFF;
 
 }
@@ -760,7 +749,6 @@ INLINE int32 extractFloat128Exp( float128 a )
 
 INLINE flag extractFloat128Sign( float128 a )
 {
-
 	return a.high>>63;
 
 }
@@ -1794,7 +1782,6 @@ float32 float32_sqrt( float32 a )
 
 flag float32_eq( float32 a, float32 b )
 {
-
 	if (    ( ( extractFloat32Exp( a ) == 0xFF ) && extractFloat32Frac( a ) )
 			|| ( ( extractFloat32Exp( b ) == 0xFF ) && extractFloat32Frac( b ) )
 		) {
@@ -1863,7 +1850,6 @@ flag float32_lt( float32 a, float32 b )
 
 flag float32_eq_signaling( float32 a, float32 b )
 {
-
 	if (    ( ( extractFloat32Exp( a ) == 0xFF ) && extractFloat32Frac( a ) )
 			|| ( ( extractFloat32Exp( b ) == 0xFF ) && extractFloat32Frac( b ) )
 		) {
@@ -2714,7 +2700,6 @@ float64 float64_sqrt( float64 a )
 
 flag float64_eq( float64 a, float64 b )
 {
-
 	if (    ( ( extractFloat64Exp( a ) == 0x7FF ) && extractFloat64Frac( a ) )
 			|| ( ( extractFloat64Exp( b ) == 0x7FF ) && extractFloat64Frac( b ) )
 		) {
@@ -2783,7 +2768,6 @@ flag float64_lt( float64 a, float64 b )
 
 flag float64_eq_signaling( float64 a, float64 b )
 {
-
 	if (    ( ( extractFloat64Exp( a ) == 0x7FF ) && extractFloat64Frac( a ) )
 			|| ( ( extractFloat64Exp( b ) == 0x7FF ) && extractFloat64Frac( b ) )
 		) {
@@ -3653,7 +3637,6 @@ floatx80 floatx80_sqrt( floatx80 a )
 
 flag floatx80_eq( floatx80 a, floatx80 b )
 {
-
 	if (    (    ( extractFloatx80Exp( a ) == 0x7FFF )
 				&& (bits64) ( extractFloatx80Frac( a )<<1 ) )
 			|| (    ( extractFloatx80Exp( b ) == 0x7FFF )
@@ -3749,7 +3732,6 @@ flag floatx80_lt( floatx80 a, floatx80 b )
 
 flag floatx80_eq_signaling( floatx80 a, floatx80 b )
 {
-
 	if (    (    ( extractFloatx80Exp( a ) == 0x7FFF )
 				&& (bits64) ( extractFloatx80Frac( a )<<1 ) )
 			|| (    ( extractFloatx80Exp( b ) == 0x7FFF )
@@ -4773,7 +4755,6 @@ float128 float128_sqrt( float128 a )
 
 flag float128_eq( float128 a, float128 b )
 {
-
 	if (    (    ( extractFloat128Exp( a ) == 0x7FFF )
 				&& ( extractFloat128Frac0( a ) | extractFloat128Frac1( a ) ) )
 			|| (    ( extractFloat128Exp( b ) == 0x7FFF )
@@ -4868,7 +4849,6 @@ flag float128_lt( float128 a, float128 b )
 
 flag float128_eq_signaling( float128 a, float128 b )
 {
-
 	if (    (    ( extractFloat128Exp( a ) == 0x7FFF )
 				&& ( extractFloat128Frac0( a ) | extractFloat128Frac1( a ) ) )
 			|| (    ( extractFloat128Exp( b ) == 0x7FFF )

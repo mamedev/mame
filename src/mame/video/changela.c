@@ -19,7 +19,6 @@ Todo: Priority between tree0 and tree1.
 
 void changela_state::video_start()
 {
-
 	m_memory_devices = auto_alloc_array(machine(), UINT8, 4 * 0x800); /* 0 - not connected, 1,2,3 - RAMs*/
 	m_tree_ram = auto_alloc_array(machine(), UINT8, 2 * 0x20);
 

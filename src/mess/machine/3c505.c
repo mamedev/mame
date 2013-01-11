@@ -864,7 +864,6 @@ int threecom3c505_device::ethernet_packet_is_for_me(const UINT8 mac_address[])
 
 void threecom3c505_device::recv_cb(UINT8 *data, int length)
 {
-
 	if (length < ETHERNET_ADDR_SIZE || !ethernet_packet_is_for_me(data))
 	{
 		// skip packet

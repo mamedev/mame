@@ -322,7 +322,6 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(pntnpuzl_state::coin_inserted)
 {
-
 	/* TODO: change this! */
 	if(newval)
 		generic_pulse_irq_line(m_maincpu, (UINT8)(FPTR)param, 1);

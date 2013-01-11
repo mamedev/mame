@@ -1796,7 +1796,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *
 
 UINT32 galaxold_state::screen_update_galaxold(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	(*m_draw_background)(machine(), bitmap, cliprect);
 
 	if (m_stars_on)

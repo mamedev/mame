@@ -191,8 +191,6 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 
 	if (sh2->active_dma_count[dma] > 0)
 	{
-
-
 		// process current DMA
 		switch(sh2->active_dma_size[dma])
 		{
@@ -432,7 +430,6 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 	{
 		if(!sh2->dma_timer_active[dma] && !(sh2->m[0x63+4*dma] & 2))
 		{
-
 			sh2->active_dma_incd[dma] = (sh2->m[0x63+4*dma] >> 14) & 3;
 			sh2->active_dma_incs[dma] = (sh2->m[0x63+4*dma] >> 12) & 3;
 			sh2->active_dma_size[dma] = (sh2->m[0x63+4*dma] >> 10) & 3;

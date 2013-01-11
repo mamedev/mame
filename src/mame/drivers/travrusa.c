@@ -291,7 +291,6 @@ GFXDECODE_END
 
 void travrusa_state::machine_reset()
 {
-
 	m_scrollx[0] = 0;
 	m_scrollx[1] = 0;
 }

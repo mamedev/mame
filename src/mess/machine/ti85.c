@@ -287,7 +287,6 @@ READ8_MEMBER(ti85_state::ti85_port_0006_r)
 
 READ8_MEMBER(ti85_state::ti8x_serial_r)
 {
-
 	//ti85_update_serial(m_serial);
 	return (m_white_out<<3)
 		| (m_red_out<<2)
@@ -339,7 +338,6 @@ READ8_MEMBER(ti85_state::ti83_port_0003_r )
 
 READ8_MEMBER(ti85_state::ti8x_plus_serial_r)
 {
-
 	//ti85_update_serial(m_serial);
 	return (m_white_out<<3)
 		| (m_red_out<<2)
@@ -403,7 +401,6 @@ WRITE8_MEMBER(ti85_state::ti85_port_0006_w)
 
 WRITE8_MEMBER(ti85_state::ti8x_serial_w)
 {
-
 	speaker_level_w(m_speaker, ( (data>>2)|(data>>3) ) & 0x01);
 	m_red_out=(data>>2)&0x01;
 	m_white_out=(data>>3)&0x01;
@@ -456,7 +453,6 @@ WRITE8_MEMBER(ti85_state::ti83_port_0003_w)
 
 WRITE8_MEMBER(ti85_state::ti8x_plus_serial_w)
 {
-
 	speaker_level_w(m_speaker,( (data>>0)|(data>>1) )&0x01 );
 	m_red_out=(data>>0)&0x01;
 	m_white_out=(data>>1)&0x01;

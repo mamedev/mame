@@ -21,7 +21,6 @@ printer_image_device::printer_image_device(const machine_config &mconfig, const 
 	: device_t(mconfig, PRINTER, "Printer", tag, owner, clock),
 		device_image_interface(mconfig, *this)
 {
-
 }
 
 //-------------------------------------------------

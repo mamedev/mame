@@ -21,14 +21,12 @@ static KONAMI_SETLINES_CALLBACK( gbusters_banking );
 
 INTERRUPT_GEN_MEMBER(gbusters_state::gbusters_interrupt)
 {
-
 	if (k052109_is_irq_enabled(m_k052109))
 		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 READ8_MEMBER(gbusters_state::bankedram_r)
 {
-
 	if (m_palette_selected)
 		return m_generic_paletteram_8[offset];
 	else
@@ -37,7 +35,6 @@ READ8_MEMBER(gbusters_state::bankedram_r)
 
 WRITE8_MEMBER(gbusters_state::bankedram_w)
 {
-
 	if (m_palette_selected)
 		paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, offset, data);
 	else
@@ -46,7 +43,6 @@ WRITE8_MEMBER(gbusters_state::bankedram_w)
 
 WRITE8_MEMBER(gbusters_state::gbusters_1f98_w)
 {
-
 	/* bit 0 = enable char ROM reading through the video RAM */
 	k052109_set_rmrd_line(m_k052109, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 
@@ -62,7 +58,6 @@ WRITE8_MEMBER(gbusters_state::gbusters_1f98_w)
 
 WRITE8_MEMBER(gbusters_state::gbusters_coin_counter_w)
 {
-
 	/* bit 0 select palette RAM  or work RAM at 5800-5fff */
 	m_palette_selected = ~data & 0x01;
 
@@ -122,7 +117,6 @@ WRITE8_MEMBER(gbusters_state::gbusters_snd_bankswitch_w)
 /* special handlers to combine 052109 & 051960 */
 READ8_MEMBER(gbusters_state::k052109_051960_r)
 {
-
 	if (k052109_get_rmrd_line(m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
@@ -138,7 +132,6 @@ READ8_MEMBER(gbusters_state::k052109_051960_r)
 
 WRITE8_MEMBER(gbusters_state::k052109_051960_w)
 {
-
 	if (offset >= 0x3800 && offset < 0x3808)
 		k051937_w(m_k051960, space, offset - 0x3800, data);
 	else if (offset < 0x3c00)

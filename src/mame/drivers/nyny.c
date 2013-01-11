@@ -173,7 +173,6 @@ WRITE_LINE_MEMBER(nyny_state::main_cpu_firq)
 
 INTERRUPT_GEN_MEMBER(nyny_state::update_pia_1)
 {
-
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA0 (COIN1) */
@@ -221,7 +220,6 @@ WRITE8_MEMBER(nyny_state::pia_2_port_a_w)
 
 WRITE8_MEMBER(nyny_state::pia_2_port_b_w)
 {
-
 	/* bits 0-3 go to bits 8-11 of the star delay counter */
 	m_star_delay_counter = (m_star_delay_counter & 0x00ff) | ((data & 0x0f) << 8);
 
@@ -448,7 +446,6 @@ static const mc6845_interface mc6845_intf =
 
 WRITE8_MEMBER(nyny_state::audio_1_command_w)
 {
-
 	soundlatch_byte_w(space, 0, data);
 	m_audiocpu->set_input_line(M6800_IRQ_LINE, HOLD_LINE);
 }
@@ -456,7 +453,6 @@ WRITE8_MEMBER(nyny_state::audio_1_command_w)
 
 WRITE8_MEMBER(nyny_state::audio_1_answer_w)
 {
-
 	soundlatch3_byte_w(space, 0, data);
 	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
@@ -501,7 +497,6 @@ static const ay8910_interface ay8910_64_interface =
 
 WRITE8_MEMBER(nyny_state::audio_2_command_w)
 {
-
 	soundlatch2_byte_w(space, 0, (data & 0x60) >> 5);
 	m_audiocpu2->execute().set_input_line(M6800_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -528,7 +523,6 @@ READ8_MEMBER(nyny_state::nyny_pia_1_2_r)
 
 WRITE8_MEMBER(nyny_state::nyny_pia_1_2_w)
 {
-
 	/* the address bits are directly connected to the chip selects */
 	if (BIT(offset, 2))  m_pia1->write(space, offset & 0x03, data);
 	if (BIT(offset, 3))  m_pia2->write_alt(space, offset & 0x03, data);
@@ -677,7 +671,6 @@ INPUT_PORTS_END
 
 void nyny_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_audiocpu2 = machine().device("audio2");
@@ -695,7 +688,6 @@ void nyny_state::machine_start()
 
 void nyny_state::machine_reset()
 {
-
 	m_flipscreen = 0;
 	m_star_enable = 0;
 	m_star_delay_counter = 0;

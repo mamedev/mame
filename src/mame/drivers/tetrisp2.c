@@ -178,7 +178,6 @@ WRITE16_MEMBER(tetrisp2_state::rockn_soundvolume_w)
 
 WRITE16_MEMBER(tetrisp2_state::nndmseal_sound_bank_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		UINT8 *rom = memregion("okisource")->base();

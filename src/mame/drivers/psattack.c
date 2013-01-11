@@ -113,17 +113,14 @@ ADDRESS_MAP_END
 
 void psattack_state::machine_start()
 {
-
 }
 
 void psattack_state::machine_reset()
 {
-
 }
 
 void psattack_state::video_start()
 {
-
 }
 
 
@@ -134,12 +131,10 @@ UINT32 psattack_state::screen_update_psattack(screen_device &screen, bitmap_ind1
 
 void psattack_state::screen_eof_psattack(screen_device &screen, bool state)
 {
-
 }
 
 INTERRUPT_GEN_MEMBER(psattack_state::psattack_interrupt)
 {
-
 }
 
 static INPUT_PORTS_START(psattack)
@@ -221,7 +216,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(psattack_state,psattack)
 {
-
 }
 
 GAME( 2004, psattack, 0, psattack, psattack, psattack_state, psattack, ROT0, "Uniana", "P's Attack", GAME_IS_SKELETON )

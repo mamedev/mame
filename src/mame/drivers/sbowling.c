@@ -120,7 +120,6 @@ WRITE8_MEMBER(sbowling_state::sbw_videoram_w)
 
 UINT32 sbowling_state::screen_update_sbowling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(0x18, cliprect);
 	m_sb_tilemap->draw(bitmap, cliprect, 0, 0);
 	copybitmap_trans(bitmap, *m_tmpbitmap, 0, 0, 0, 0, cliprect, m_color_prom_address);
@@ -129,19 +128,16 @@ UINT32 sbowling_state::screen_update_sbowling(screen_device &screen, bitmap_ind1
 
 void sbowling_state::video_start()
 {
-
 	m_tmpbitmap = auto_bitmap_ind16_alloc(machine(),32*8,32*8);
 	m_sb_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sbowling_state::get_sb_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 WRITE8_MEMBER(sbowling_state::pix_shift_w)
 {
-
 	m_pix_sh = data;
 }
 WRITE8_MEMBER(sbowling_state::pix_data_w)
 {
-
 	m_pix[0] = m_pix[1];
 	m_pix[1] = data;
 }
@@ -215,7 +211,6 @@ WRITE8_MEMBER(sbowling_state::graph_control_w)
 
 READ8_MEMBER(sbowling_state::controls_r)
 {
-
 	if (m_sbw_system & 2)
 		return ioport("TRACKY")->read();
 	else

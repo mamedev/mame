@@ -626,7 +626,6 @@ ADDRESS_MAP_END
 
 void nss_state::machine_start()
 {
-
 	MACHINE_START_CALL_LEGACY(snes);
 
 	m_is_nss = 1;
@@ -827,7 +826,6 @@ INTERRUPT_GEN_MEMBER(nss_state::nss_vblank_irq)
 
 void nss_state::machine_reset()
 {
-
 	MACHINE_RESET_CALL_LEGACY( snes );
 
 	/* start with both CPUs disabled */

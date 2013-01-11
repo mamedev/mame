@@ -143,7 +143,6 @@ void carpolo_state::palette_init()
 
 void carpolo_state::video_start()
 {
-
 	m_sprite_sprite_collision_bitmap1 = auto_bitmap_ind16_alloc(machine(), SPRITE_WIDTH*2, SPRITE_HEIGHT*2);
 	m_sprite_sprite_collision_bitmap2 = auto_bitmap_ind16_alloc(machine(), SPRITE_WIDTH*2, SPRITE_HEIGHT*2);
 

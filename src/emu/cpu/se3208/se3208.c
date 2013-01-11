@@ -1635,7 +1635,6 @@ static _OP DecodeOp(UINT16 Opcode)
 							{
 								if(Opcode&(1<<8))
 								{
-
 								}
 								else
 								{

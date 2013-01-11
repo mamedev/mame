@@ -14,8 +14,7 @@
 	AM_RANGE(_BASE+0x000c1e, _BASE+0x000c1f) AM_DEVWRITE(name,kaneko_grap2_device,galpani3_regs1_go_w) \
 	AM_RANGE(_BASE+0x000c00, _BASE+0x000c1f) AM_DEVREAD(name,kaneko_grap2_device,galpani3_regs1_r) \
 	AM_RANGE(_BASE+0x080000, _BASE+0x0801ff) AM_DEVREADWRITE(name,kaneko_grap2_device, pal_r, galpani3_framebuffer1_palette_w ) \
-	AM_RANGE(_BASE+0x100000, _BASE+0x17ffff) AM_DEVREADWRITE(name,kaneko_grap2_device, framebuffer_r, framebuffer_w ) \
-
+	AM_RANGE(_BASE+0x100000, _BASE+0x17ffff) AM_DEVREADWRITE(name,kaneko_grap2_device, framebuffer_r, framebuffer_w )
 
 
 class kaneko_grap2_device : public device_t

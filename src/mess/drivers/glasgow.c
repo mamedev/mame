@@ -287,7 +287,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(glasgow_state::update_nmi32)
 
 void glasgow_state::machine_start()
 {
-
 	mboard_key_selector = 0;
 	m_irq_flag = 0;
 	m_lcd_shift_counter = 3;
@@ -299,7 +298,6 @@ void glasgow_state::machine_start()
 
 MACHINE_START_MEMBER(glasgow_state,dallas32)
 {
-
 	m_lcd_shift_counter = 3;
 	beep_set_frequency(m_beep, 44);
 

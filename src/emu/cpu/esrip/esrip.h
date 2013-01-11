@@ -25,8 +25,7 @@
 ***************************************************************************/
 
 #define MCFG_CPU_ESRIP_CONFIG(_config) \
-	esrip_device::static_set_config(*device, _config); \
-
+	esrip_device::static_set_config(*device, _config);
 
 /***************************************************************************
     REGISTER ENUMERATION

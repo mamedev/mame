@@ -49,11 +49,9 @@ enum
 	MCFG_IRQ_FUNC(_irqf)
 
 #define MCFG_ASC_TYPE(_type) \
-	asc_device::static_set_type(*device, _type); \
-
+	asc_device::static_set_type(*device, _type);
 #define MCFG_IRQ_FUNC(_irqf) \
-	asc_device::static_set_irqf(*device, _irqf); \
-
+	asc_device::static_set_irqf(*device, _irqf);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

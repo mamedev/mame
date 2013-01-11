@@ -43,7 +43,6 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_vfd(*this, "vfd")
 	{
-
 		m_NMIENABLE = 0;
 	}
 

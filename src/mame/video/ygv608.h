@@ -281,7 +281,6 @@ struct SPRITE_ATTR {
 
 
 struct YGV608 {
-
 	union {
 	UINT8       b[8];
 	YGV_PORTS   s;

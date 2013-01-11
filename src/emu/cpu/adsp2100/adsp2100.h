@@ -213,8 +213,7 @@ enum
 //**************************************************************************
 
 #define MCFG_ADSP21XX_CONFIG(_config) \
-	adsp21xx_device::static_set_config(*device, _config); \
-
+	adsp21xx_device::static_set_config(*device, _config);
 
 
 //**************************************************************************

@@ -254,7 +254,6 @@ VIDEO_START_MEMBER(tmnt_state,tmnt)
 
 VIDEO_START_MEMBER(tmnt_state,lgtnfght)/* also tmnt2, ssriders */
 {
-
 	k05324x_set_z_rejection(m_k053245, 0);
 
 	m_dim_c = m_dim_v = m_lastdim = m_lasten = 0;
@@ -267,7 +266,6 @@ VIDEO_START_MEMBER(tmnt_state,lgtnfght)/* also tmnt2, ssriders */
 
 VIDEO_START_MEMBER(tmnt_state,glfgreat)
 {
-
 	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tmnt_state::glfgreat_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
 	m_roz_tilemap->set_transparent_pen(0);
 
@@ -281,7 +279,6 @@ VIDEO_START_MEMBER(tmnt_state,glfgreat)
 
 VIDEO_START_MEMBER(tmnt_state,prmrsocr)
 {
-
 	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tmnt_state::prmrsocr_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 512, 256);
 	m_roz_tilemap->set_transparent_pen(0);
 
@@ -293,7 +290,6 @@ VIDEO_START_MEMBER(tmnt_state,prmrsocr)
 
 VIDEO_START_MEMBER(tmnt_state,blswhstl)
 {
-
 	m_blswhstl_rombank = -1;
 	save_item(NAME(m_blswhstl_rombank));
 }
@@ -318,7 +314,6 @@ WRITE16_MEMBER(tmnt_state::tmnt_paletteram_word_w)
 
 WRITE16_MEMBER(tmnt_state::tmnt_0a0000_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0/1 = coin counters */
@@ -343,7 +338,6 @@ WRITE16_MEMBER(tmnt_state::tmnt_0a0000_w)
 
 WRITE16_MEMBER(tmnt_state::punkshot_0a0020_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = coin counter */
@@ -362,7 +356,6 @@ WRITE16_MEMBER(tmnt_state::punkshot_0a0020_w)
 
 WRITE16_MEMBER(tmnt_state::lgtnfght_0a0018_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
@@ -382,7 +375,6 @@ WRITE16_MEMBER(tmnt_state::lgtnfght_0a0018_w)
 
 WRITE16_MEMBER(tmnt_state::blswhstl_700300_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
@@ -406,7 +398,6 @@ WRITE16_MEMBER(tmnt_state::blswhstl_700300_w)
 
 READ16_MEMBER(tmnt_state::glfgreat_rom_r)
 {
-
 	if (m_glfgreat_roz_rom_mode)
 		return memregion("gfx3")->base()[m_glfgreat_roz_char_bank * 0x80000 + offset];
 	else if (offset < 0x40000)
@@ -420,7 +411,6 @@ READ16_MEMBER(tmnt_state::glfgreat_rom_r)
 
 WRITE16_MEMBER(tmnt_state::glfgreat_122000_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
@@ -452,7 +442,6 @@ WRITE16_MEMBER(tmnt_state::glfgreat_122000_w)
 
 WRITE16_MEMBER(tmnt_state::ssriders_eeprom_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
@@ -472,7 +461,6 @@ WRITE16_MEMBER(tmnt_state::ssriders_eeprom_w)
 
 WRITE16_MEMBER(tmnt_state::ssriders_1c0300_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
@@ -489,7 +477,6 @@ WRITE16_MEMBER(tmnt_state::ssriders_1c0300_w)
 
 WRITE16_MEMBER(tmnt_state::prmrsocr_122000_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0,1 = coin counter */
@@ -512,7 +499,6 @@ WRITE16_MEMBER(tmnt_state::prmrsocr_122000_w)
 
 READ16_MEMBER(tmnt_state::prmrsocr_rom_r)
 {
-
 	if(m_glfgreat_roz_char_bank)
 		return memregion("gfx3")->base()[offset];
 	else
@@ -524,7 +510,6 @@ READ16_MEMBER(tmnt_state::prmrsocr_rom_r)
 
 WRITE16_MEMBER(tmnt_state::tmnt_priority_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 2/3 = priority; other bits unused */
@@ -559,7 +544,6 @@ WRITE16_MEMBER(tmnt_state::tmnt_priority_w)
 
 UINT32 tmnt_state::screen_update_mia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	k052109_tilemap_update(m_k052109);
 
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
@@ -573,7 +557,6 @@ UINT32 tmnt_state::screen_update_mia(screen_device &screen, bitmap_ind16 &bitmap
 
 UINT32 tmnt_state::screen_update_tmnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	k052109_tilemap_update(m_k052109);
 
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 2, TILEMAP_DRAW_OPAQUE,0);
@@ -588,7 +571,6 @@ UINT32 tmnt_state::screen_update_tmnt(screen_device &screen, bitmap_ind16 &bitma
 
 UINT32 tmnt_state::screen_update_punkshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_sprite_colorbase = k053251_get_palette_index(m_k053251, K053251_CI1);
 	m_layer_colorbase[0] = k053251_get_palette_index(m_k053251, K053251_CI2);
 	m_layer_colorbase[1] = k053251_get_palette_index(m_k053251, K053251_CI4);
@@ -649,7 +631,6 @@ UINT32 tmnt_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16 &b
 
 READ16_MEMBER(tmnt_state::glfgreat_ball_r)
 {
-
 #ifdef MAME_DEBUG
 popmessage("%04x", m_glfgreat_pixel);
 #endif

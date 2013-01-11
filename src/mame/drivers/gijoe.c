@@ -65,7 +65,6 @@ READ16_MEMBER(gijoe_state::control2_r)
 
 WRITE16_MEMBER(gijoe_state::control2_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0  is data */
@@ -110,14 +109,12 @@ static void gijoe_objdma( running_machine &machine )
 
 TIMER_CALLBACK_MEMBER(gijoe_state::dmaend_callback)
 {
-
 	if (m_cur_control2 & 0x0020)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(gijoe_state::gijoe_interrupt)
 {
-
 	// global interrupt masking (*this game only)
 	if (!k056832_is_irq_enabled(m_k056832, 0))
 		return;
@@ -271,7 +268,6 @@ static const k053247_interface gijoe_k053247_intf =
 
 void gijoe_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k054539 = machine().device("k054539");

@@ -9420,7 +9420,6 @@ DRIVER_INIT_MEMBER(goldnpkr_state,royale)
 
 DRIVER_INIT_MEMBER(goldnpkr_state,flcnw)
 {
-
 	/* Attempt to decrypt the MCU program (we're sooo close!) */
 
 	UINT8 *ROM = machine().root_device().memregion("mcu")->base();

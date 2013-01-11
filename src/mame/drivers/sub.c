@@ -253,7 +253,6 @@ WRITE8_MEMBER(sub_state::subm_to_sound_w)
 
 WRITE8_MEMBER(sub_state::nmi_mask_w)
 {
-
 	m_nmi_en = data & 1;
 }
 
@@ -421,7 +420,6 @@ void sub_state::palette_init()
 
 INTERRUPT_GEN_MEMBER(sub_state::subm_sound_irq)
 {
-
 	if(m_nmi_en)
 		machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

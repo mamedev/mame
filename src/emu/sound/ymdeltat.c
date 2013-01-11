@@ -484,7 +484,6 @@ INLINE void YM_DELTAT_synthesis_from_external_memory(YM_DELTAT *DELTAT)
 		step = DELTAT->now_step >> YM_DELTAT_SHIFT;
 		DELTAT->now_step &= (1<<YM_DELTAT_SHIFT)-1;
 		do{
-
 			if ( DELTAT->now_addr == (DELTAT->limit<<1) )
 				DELTAT->now_addr = 0;
 
@@ -566,7 +565,6 @@ INLINE void YM_DELTAT_synthesis_from_CPU_memory(YM_DELTAT *DELTAT)
 		step = DELTAT->now_step >> YM_DELTAT_SHIFT;
 		DELTAT->now_step &= (1<<YM_DELTAT_SHIFT)-1;
 		do{
-
 			if( DELTAT->now_addr&1 )
 			{
 				data = DELTAT->now_data & 0x0f;
@@ -616,7 +614,6 @@ INLINE void YM_DELTAT_synthesis_from_CPU_memory(YM_DELTAT *DELTAT)
 /* ADPCM B (Delta-T control type) */
 void YM_DELTAT_ADPCM_CALC(YM_DELTAT *DELTAT)
 {
-
 /*
 some examples:
 value:   START, REC, MEMDAT, REPEAT, SPOFF, x,x,RESET   meaning:

@@ -260,7 +260,6 @@ WRITE8_MEMBER(shougi_state::shougi_mcu_halt_on_w)
 
 WRITE8_MEMBER(shougi_state::nmi_disable_and_clear_line_w)
 {
-
 	m_nmi_enabled = 0; /* disable NMIs */
 
 	/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
@@ -270,13 +269,11 @@ WRITE8_MEMBER(shougi_state::nmi_disable_and_clear_line_w)
 
 WRITE8_MEMBER(shougi_state::nmi_enable_w)
 {
-
 	m_nmi_enabled = 1; /* enable NMIs */
 }
 
 INTERRUPT_GEN_MEMBER(shougi_state::shougi_vblank_nmi)
 {
-
 	if ( m_nmi_enabled == 1 )
 	{
 		/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */

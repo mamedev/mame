@@ -105,7 +105,6 @@ WRITE8_MEMBER(tagteam_state::tagteam_mirrorcolorram_w)
 
 WRITE8_MEMBER(tagteam_state::tagteam_control_w)
 {
-
 	// d0-3: color for blank screen, applies to h/v borders too
 	// (not implemented yet, and tagteam doesn't have a global screen on/off bit)
 

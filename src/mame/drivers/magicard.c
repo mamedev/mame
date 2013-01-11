@@ -411,7 +411,6 @@ TODO: check this register,doesn't seem to be 100% correct.
 
 void magicard_state::video_start()
 {
-
 }
 
 UINT32 magicard_state::screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

@@ -219,7 +219,6 @@ static void run_mproc(running_machine &machine)
 	/* loop until finished */
 	while (M_STOP > 0)
 	{
-
 		/* each step of the matrix processor takes five clock cycles */
 		mptime += 5;
 

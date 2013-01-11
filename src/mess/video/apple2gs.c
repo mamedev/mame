@@ -114,7 +114,6 @@ UINT32 apple2gs_state::screen_update_apple2gs(screen_device &screen, bitmap_ind1
 		/* call legacy Apple II video rendering at scanline 0 to draw into the off-screen buffer */
 		if (beamy == 0)
 		{
-
 			// check if DHR should be monochrome 560x192
 			if (m_newvideo & 0x20)
 			{

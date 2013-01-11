@@ -345,7 +345,6 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
 	}
 
 	switch(state->packet[0]){
-
 		case 0:
 		{
 			state->state = STATE_SILENCE;
@@ -451,12 +450,10 @@ static STREAM_UPDATE( upd1771c_update )
 			//    (int)state->t_timbre,(int)state->t_offset,(int)state->t_volume,(int)state->t_period,(int)state->t_tpos);
 
 			while ( --samples >= 0 ){
-
 				*buffer++ = (WAVEFORMS[state->t_timbre][state->t_tpos])*state->t_volume * 2;
 
 				state->t_ppos++;
 				if (state->t_ppos >= state->t_period){
-
 					state->t_tpos++;
 					if (state->t_tpos == 32)
 						state->t_tpos = state->t_offset;
@@ -469,7 +466,6 @@ static STREAM_UPDATE( upd1771c_update )
 		case STATE_NOISE:
 		{
 			while (--samples >= 0 ){
-
 				*buffer = 0;
 
 				//"wavetable-LFSR" component
@@ -486,7 +482,6 @@ static STREAM_UPDATE( upd1771c_update )
 				//mix in each of the noise's 3 pulse components
 				char res[3];
 				for (size_t i=0;i<3;++i){
-
 					res[i] = state->n_value[i]* 127;
 					state->n_ppos[i]++;
 					if (state->n_ppos[i] >= state->n_period[i]){

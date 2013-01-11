@@ -359,7 +359,6 @@ void inufuku_state::machine_start()
 
 void inufuku_state::machine_reset()
 {
-
 	m_pending_command = 1;
 	m_bg_scrollx = 0;
 	m_bg_scrolly = 0;

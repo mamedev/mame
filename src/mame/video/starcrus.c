@@ -402,7 +402,6 @@ static int collision_check_s2p1p2(running_machine &machine)
 
 UINT32 starcrus_state::screen_update_starcrus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(0, cliprect);
 
 	/* Draw ship 1 */
@@ -478,6 +477,5 @@ UINT32 starcrus_state::screen_update_starcrus(screen_device &screen, bitmap_ind1
 
 READ8_MEMBER(starcrus_state::starcrus_coll_det_r)
 {
-
 	return m_collision_reg ^ 0xff;
 }

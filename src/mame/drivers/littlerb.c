@@ -165,7 +165,6 @@ public:
 
 		if ((!(m_spritelist[2] & 0x1000)) && (!(m_spritelist[1] & 0x1000)))
 		{
-
 		}
 		else
 		{
@@ -365,7 +364,6 @@ READ16_MEMBER(littlerb_state::littlerb_vdp_r)
 #define LOG_VDP 1
 WRITE16_MEMBER(littlerb_state::littlerb_vdp_w)
 {
-
 	if (offset!=2)
 	{
 		if (m_type2_writes)
@@ -667,8 +665,6 @@ static void littlerb_draw_sprites(running_machine &machine)
 
 	for (offs=0;offs<(state->m_listoffset);)
 	{
-
-
 		UINT32 read_dword = ((spriteregion[offs+1])<<16)+ (spriteregion[offs+0]);
 
 		littlerb_printf("read %08x\n", read_dword);

@@ -495,7 +495,6 @@ static const ay8910_interface ay8910_config =
 
 void kyugo_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_subcpu = machine().device<cpu_device>("sub");
 

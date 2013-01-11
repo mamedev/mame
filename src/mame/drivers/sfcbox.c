@@ -256,7 +256,6 @@ READ8_MEMBER( sfcbox_state::port_83_r )
 
 WRITE8_MEMBER( sfcbox_state::port_83_w )
 {
-
 }
 
 WRITE8_MEMBER( sfcbox_state::snes_map_0_w )
@@ -470,7 +469,6 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(sfcbox_state,sfcbox)
 {
-
 	MACHINE_START_CALL_LEGACY(snes);
 
 	m_is_sfcbox = 1;
@@ -478,7 +476,6 @@ MACHINE_START_MEMBER(sfcbox_state,sfcbox)
 
 MACHINE_RESET_MEMBER(sfcbox_state,sfcbox)
 {
-
 	MACHINE_RESET_CALL_LEGACY( snes );
 
 	/* start with both CPUs disabled */
@@ -524,8 +521,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x10000, "krom", 0 ) \
 	ROM_LOAD( "krom1.ic1", 0x00000, 0x10000, CRC(c9010002) SHA1(f4c74086a83b728b1c1af3a021a60efa80eff5a4) ) \
 	ROM_REGION( 0x100000, "user3", 0 ) \
-	ROM_LOAD( "atrom-4s-0.rom5", 0x00000, 0x80000, CRC(ad3ec05c) SHA1(a3d336db585fe02a37c323422d9db6a33fd489a6) ) \
-
+	ROM_LOAD( "atrom-4s-0.rom5", 0x00000, 0x80000, CRC(ad3ec05c) SHA1(a3d336db585fe02a37c323422d9db6a33fd489a6) )
 
 ROM_START( sfcbox )
 	SFCBOX_BIOS

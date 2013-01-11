@@ -234,7 +234,6 @@ static casserr_t to7_k7_load( cassette_image *cass )
 	/* loop over regular blocks */
 	while ( pos < size )
 	{
-
 	rebounce:
 		/* skip 0xff filler */
 		for ( sz = 0; pos < size; pos++, sz++ )
@@ -561,7 +560,6 @@ static casserr_t mo5_k5_load( cassette_image *cass )
 	/* loop over regular blocks */
 	while ( pos < size )
 	{
-
 	rebounce:
 		/* skip DCMOTO header*/
 		if ( dcmoto )

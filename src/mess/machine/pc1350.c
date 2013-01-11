@@ -21,7 +21,6 @@ void pc1350_outb(device_t *device, int data)
 
 void pc1350_outc(device_t *device, int data)
 {
-
 }
 
 int pc1350_ina(device_t *device)

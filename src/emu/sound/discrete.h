@@ -4272,8 +4272,7 @@ DECLARE_READ8_DEVICE_HANDLER( discrete_sound_r );
 	MCFG_DISCRETE_INTF(_intf)
 
 #define MCFG_DISCRETE_INTF(_intf) \
-	discrete_device::static_set_intf(*device, (const discrete_block *)&(_intf##_discrete_interface)); \
-
+	discrete_device::static_set_intf(*device, (const discrete_block *)&(_intf##_discrete_interface));
 #define MCFG_SOUND_CONFIG_DISCRETE(name) MCFG_SOUND_CONFIG(name##_discrete_interface)
 
 //**************************************************************************
@@ -4530,7 +4529,6 @@ discrete_base_node * discrete_node_factory<C>::Create(discrete_device * pdev, co
 
 #define DISCRETE_SOUND_EXTERN(name) extern const discrete_block name##_discrete_interface[]
 #define DISCRETE_SOUND_START(name) const discrete_block name##_discrete_interface[] = {
-
 #define DSC_SND_ENTRY(_nod, _class, _dss, _num, _iact, _iinit, _custom, _name) { _nod,  new discrete_node_factory< DISCRETE_CLASS_NAME(_class) >, _dss, _num, _iact, _iinit, _custom, _name, # _class }
 
 

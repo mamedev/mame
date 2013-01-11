@@ -369,7 +369,6 @@ WRITE8_MEMBER(hp48_state::hp48_io_w)
 
 	switch( offset )
 	{
-
 	/* CRC register */
 	case 0x04: m_crc = (m_crc & 0xfff0) | data; break;
 	case 0x05: m_crc = (m_crc & 0xff0f) | (data << 4); break;
@@ -483,7 +482,6 @@ READ8_MEMBER(hp48_state::hp48_io_r)
 
 	switch( offset )
 	{
-
 	/* CRC register */
 	case 0x04: data = m_crc & 0xf; break;
 	case 0x05: data = (m_crc >> 4) & 0xf; break;

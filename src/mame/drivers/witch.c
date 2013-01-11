@@ -765,8 +765,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	int flipy=0;
 
 	for(i=0;i<0x800;i+=0x20) {
-
-
 		sx     = state->m_sprite_ram[i+1];
 		if(sx!=0xF8) {
 			tileno = (state->m_sprite_ram[i]<<2)  | (( state->m_sprite_ram[i+0x800] & 0x07 ) << 10 );

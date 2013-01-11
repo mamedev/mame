@@ -302,7 +302,6 @@ GFXDECODE_END
 
 void gng_state::machine_start()
 {
-
 	UINT8 *rombase = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &rombase[0x10000], 0x2000);
 	membank("bank1")->configure_entry(4, &rombase[0x4000]);
@@ -313,7 +312,6 @@ void gng_state::machine_start()
 
 void gng_state::machine_reset()
 {
-
 	m_scrollx[0] = 0;
 	m_scrollx[1] = 0;
 	m_scrolly[0] = 0;

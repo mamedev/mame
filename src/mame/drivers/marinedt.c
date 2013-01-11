@@ -158,14 +158,12 @@ public:
 
 WRITE8_MEMBER(marinedt_state::tx_tileram_w)
 {
-
 	m_tx_tileram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 READ8_MEMBER(marinedt_state::marinedt_port1_r)
 {
-
 	//might need to be reversed for cocktail stuff
 
 	/* x/y multiplexed */
@@ -623,7 +621,6 @@ UINT32 marinedt_state::screen_update_marinedt(screen_device &screen, bitmap_ind1
 
 void marinedt_state::machine_start()
 {
-
 	save_item(NAME(m_obj1_a));
 	save_item(NAME(m_obj1_x));
 	save_item(NAME(m_obj1_y));
@@ -646,7 +643,6 @@ void marinedt_state::machine_start()
 
 void marinedt_state::machine_reset()
 {
-
 	m_obj1_a = 0;
 	m_obj1_x = 0;
 	m_obj1_y = 0;

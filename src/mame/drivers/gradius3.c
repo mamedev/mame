@@ -34,7 +34,6 @@ READ16_MEMBER(gradius3_state::k052109_halfword_r)
 
 WRITE16_MEMBER(gradius3_state::k052109_halfword_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 		k052109_w(m_k052109, space, offset, data & 0xff);
 
@@ -51,7 +50,6 @@ READ16_MEMBER(gradius3_state::k051937_halfword_r)
 
 WRITE16_MEMBER(gradius3_state::k051937_halfword_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 		k051937_w(m_k051960, space, offset, data & 0xff);
 }
@@ -69,7 +67,6 @@ WRITE16_MEMBER(gradius3_state::k051960_halfword_w)
 
 WRITE16_MEMBER(gradius3_state::cpuA_ctrl_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 	{
 		data >>= 8;
@@ -94,7 +91,6 @@ WRITE16_MEMBER(gradius3_state::cpuA_ctrl_w)
 
 WRITE16_MEMBER(gradius3_state::cpuB_irqenable_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 		m_irqBmask = (data >> 8) & 0x07;
 }
@@ -119,7 +115,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(gradius3_state::gradius3_sub_scanline)
 
 WRITE16_MEMBER(gradius3_state::cpuB_irqtrigger_w)
 {
-
 	if (m_irqBmask & 4)
 	{
 		logerror("%04x trigger cpu B irq 4 %02x\n",space.device().safe_pc(),data);
@@ -286,7 +281,6 @@ static const k051960_interface gradius3_k051960_intf =
 
 void gradius3_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_subcpu = machine().device<cpu_device>("sub");
@@ -301,7 +295,6 @@ void gradius3_state::machine_start()
 
 void gradius3_state::machine_reset()
 {
-
 	/* start with cpu B halted */
 	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_irqAen = 0;

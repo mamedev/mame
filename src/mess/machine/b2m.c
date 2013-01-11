@@ -288,7 +288,6 @@ DRIVER_INIT_MEMBER(b2m_state,b2m)
 
 WRITE8_MEMBER(b2m_state::b2m_palette_w)
 {
-
 	UINT8 b = (3 - ((data >> 6) & 3)) * 0x55;
 	UINT8 g = (3 - ((data >> 4) & 3)) * 0x55;
 	UINT8 r = (3 - ((data >> 2) & 3)) * 0x55;

@@ -89,6 +89,5 @@ extern const device_type PCE220SERIAL;
 #define PCE220SERIAL_TAG        "serial"
 
 #define MCFG_PCE220_SERIAL_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PCE220SERIAL, 0) \
-
+	MCFG_DEVICE_ADD(_tag, PCE220SERIAL, 0)
 #endif /* __PCE220_SER_H__ */

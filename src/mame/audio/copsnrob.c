@@ -180,7 +180,6 @@ static const discrete_dac_r1_ladder copsnrob_motor23_cv_dac =
 
 static const discrete_555_cc_desc copsnrob_motor01_555cc =
 {
-
 	DISC_555_OUT_COUNT_R | DISCRETE_555_CC_TO_DISCHARGE_PIN,
 	5,                          /* v_pos */
 	DEFAULT_555_CC_SOURCE,

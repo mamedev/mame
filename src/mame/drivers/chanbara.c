@@ -113,28 +113,24 @@ void chanbara_state::palette_init()
 
 WRITE8_MEMBER(chanbara_state::chanbara_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(chanbara_state::chanbara_colorram_w)
 {
-
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(chanbara_state::chanbara_videoram2_w)
 {
-
 	m_videoram2[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(chanbara_state::chanbara_colorram2_w)
 {
-
 	m_colorram2[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset);
 }
@@ -209,7 +205,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 chanbara_state::screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg2_tilemap->set_scrolly(0, m_scroll | (m_scrollhi << 8));
 	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(machine(), bitmap, cliprect);
@@ -389,7 +384,6 @@ static const ym2203_interface ym2203_config =
 
 void chanbara_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_scroll));
@@ -398,7 +392,6 @@ void chanbara_state::machine_start()
 
 void chanbara_state::machine_reset()
 {
-
 	m_scroll = 0;
 	m_scrollhi = 0;
 }

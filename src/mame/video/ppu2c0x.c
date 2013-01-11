@@ -291,7 +291,6 @@ inline void ppu2c0x_device::writebyte(offs_t address, UINT8 data)
 
 void ppu2c0x_device::init_palette( running_machine &machine, int first_entry )
 {
-
 	/* This routine builds a palette using a transformation from */
 	/* the YUV (Y, B-Y, R-Y) to the RGB color space */
 
@@ -646,7 +645,6 @@ void ppu2c0x_device::draw_background( UINT8 *line_priority )
 				plane2 = plane2 << 1;
 				if ((start_x + i) >= 0 && (start_x + i) < VISIBLE_SCREEN_WIDTH)
 				{
-
 					if (pix)
 					{
 						pen = paldata[pix];
@@ -1054,7 +1052,6 @@ READ8_MEMBER( ppu2c0x_device::palette_read )
 
 READ8_MEMBER( ppu2c0x_device::read )
 {
-
 	if (offset >= PPU_MAX_REG)
 	{
 		logerror("PPU %s: Attempting to read past the chip: offset %x\n", this->tag(), offset);
@@ -1305,7 +1302,6 @@ void ppu2c0x_device::render( bitmap_ind16 &bitmap, int flipx, int flipy, int sx,
 
 int ppu2c0x_device::get_pixel( int x, int y )
 {
-
 	if (x >= VISIBLE_SCREEN_WIDTH)
 		x = VISIBLE_SCREEN_WIDTH - 1;
 

@@ -59,7 +59,6 @@ public:
 
 READ16_MEMBER(galaxygame_state::ke_r)
 {
-
 	UINT16 ret;
 
 	switch( offset )
@@ -86,7 +85,6 @@ READ16_MEMBER(galaxygame_state::ke_r)
 
 WRITE16_MEMBER(galaxygame_state::ke_w)
 {
-
 	switch( offset )
 	{
 		case 0: // DIV

@@ -196,7 +196,6 @@ void hcastle_state::machine_start()
 
 void hcastle_state::machine_reset()
 {
-
 	m_pf2_bankbase = 0;
 	m_pf1_bankbase = 0;
 	m_gfx_bank = 0;

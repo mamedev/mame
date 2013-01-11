@@ -147,7 +147,6 @@ WRITE8_MEMBER(thepit_state::thepit_sound_enable_w)
 
 WRITE8_MEMBER(thepit_state::nmi_mask_w)
 {
-
 	m_nmi_mask = data & 1;
 }
 
@@ -637,7 +636,6 @@ static const ay8910_interface ay8910_config =
 
 INTERRUPT_GEN_MEMBER(thepit_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

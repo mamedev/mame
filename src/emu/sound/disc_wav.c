@@ -164,7 +164,6 @@ DISCRETE_STEP(dss_counter)
 
 DISCRETE_RESET(dss_counter)
 {
-
 	if ((int)DSS_COUNTER__CLOCK_TYPE & DISC_COUNTER_IS_7492)
 	{
 		m_is_7492    = 1;

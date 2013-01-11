@@ -62,50 +62,38 @@
 
 #define MCFG_TIMER_ADD(_tag, _callback) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_generic(*device, timer_device_expired_delegate(&_callback, #_callback)); \
-
+	timer_device::static_configure_generic(*device, timer_device_expired_delegate(&_callback, #_callback));
 #define MCFG_TIMER_ADD_NONE(_tag) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_generic(*device, timer_device_expired_delegate()); \
-
+	timer_device::static_configure_generic(*device, timer_device_expired_delegate());
 #define MCFG_TIMER_ADD_PERIODIC(_tag, _callback, _period) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_periodic(*device, timer_device_expired_delegate(&_callback, #_callback), _period); \
-
+	timer_device::static_configure_periodic(*device, timer_device_expired_delegate(&_callback, #_callback), _period);
 #define MCFG_TIMER_ADD_SCANLINE(_tag, _callback, _screen, _first_vpos, _increment) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_scanline(*device, timer_device_expired_delegate(&_callback, #_callback), _screen, _first_vpos, _increment); \
-
+	timer_device::static_configure_scanline(*device, timer_device_expired_delegate(&_callback, #_callback), _screen, _first_vpos, _increment);
 #define MCFG_TIMER_DRIVER_ADD(_tag, _class, _callback) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_generic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL, (_class *)0)); \
-
+	timer_device::static_configure_generic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL, (_class *)0));
 #define MCFG_TIMER_DRIVER_ADD_PERIODIC(_tag, _class, _callback, _period) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_periodic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL, (_class *)0), _period); \
-
+	timer_device::static_configure_periodic(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL, (_class *)0), _period);
 #define MCFG_TIMER_DRIVER_ADD_SCANLINE(_tag, _class, _callback, _screen, _first_vpos, _increment) \
 	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
-	timer_device::static_configure_scanline(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL, (_class *)0), _screen, _first_vpos, _increment); \
-
+	timer_device::static_configure_scanline(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL, (_class *)0), _screen, _first_vpos, _increment);
 #define MCFG_TIMER_MODIFY(_tag) \
 	MCFG_DEVICE_MODIFY(_tag)
 
 #define MCFG_TIMER_CALLBACK(_callback) \
-	timer_device::static_set_callback(*device, timer_device_expired_delegate(&_callback, #_callback)); \
-
+	timer_device::static_set_callback(*device, timer_device_expired_delegate(&_callback, #_callback));
 #define MCFG_TIMER_DRIVER_CALLBACK(_class, _callback) \
-	timer_device::static_set_callback(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL, (_class *)0)); \
-
+	timer_device::static_set_callback(*device, timer_device_expired_delegate(&_class::_callback, #_class "::" #_callback, NULL, (_class *)0));
 #define MCFG_TIMER_START_DELAY(_start_delay) \
-	timer_device::static_set_start_delay(*device, _start_delay); \
-
+	timer_device::static_set_start_delay(*device, _start_delay);
 #define MCFG_TIMER_PARAM(_param) \
-	timer_device::static_set_param(*device, _param); \
-
+	timer_device::static_set_param(*device, _param);
 #define MCFG_TIMER_PTR(_ptr) \
-	timer_device::static_set_ptr(*device, (void *)(_ptr)); \
-
+	timer_device::static_set_ptr(*device, (void *)(_ptr));
 
 
 //**************************************************************************

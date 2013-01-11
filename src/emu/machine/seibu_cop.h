@@ -16,8 +16,7 @@ Template for skeleton device
 //**************************************************************************
 
 #define MCFG_SEIBU_COP_ADD(_tag,_freq) \
-	MCFG_DEVICE_ADD(_tag, SEIBU_COP, _freq) \
-
+	MCFG_DEVICE_ADD(_tag, SEIBU_COP, _freq)
 #define SEIBU_COP_INTERFACE(_name) \
 	const seibu_cop_interface (_name) =
 

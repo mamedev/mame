@@ -87,32 +87,23 @@ private:
 	MCFG_DEVICE_ADD(_tag, SCSICB, 0)
 
 #define MCFG_SCSICB_BSY_HANDLER(_devcb) \
-	devcb = &scsicb_device::set_bsy_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &scsicb_device::set_bsy_handler(*device, DEVCB2_##_devcb);
 #define MCFG_SCSICB_SEL_HANDLER(_devcb) \
-	devcb = &scsicb_device::set_sel_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &scsicb_device::set_sel_handler(*device, DEVCB2_##_devcb);
 #define MCFG_SCSICB_CD_HANDLER(_devcb) \
-	devcb = &scsicb_device::set_cd_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &scsicb_device::set_cd_handler(*device, DEVCB2_##_devcb);
 #define MCFG_SCSICB_IO_HANDLER(_devcb) \
-	devcb = &scsicb_device::set_io_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &scsicb_device::set_io_handler(*device, DEVCB2_##_devcb);
 #define MCFG_SCSICB_MSG_HANDLER(_devcb) \
-	devcb = &scsicb_device::set_msg_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &scsicb_device::set_msg_handler(*device, DEVCB2_##_devcb);
 #define MCFG_SCSICB_REQ_HANDLER(_devcb) \
-	devcb = &scsicb_device::set_req_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &scsicb_device::set_req_handler(*device, DEVCB2_##_devcb);
 #define MCFG_SCSICB_ACK_HANDLER(_devcb) \
-	devcb = &scsicb_device::set_ack_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &scsicb_device::set_ack_handler(*device, DEVCB2_##_devcb);
 #define MCFG_SCSICB_ATN_HANDLER(_devcb) \
-	devcb = &scsicb_device::set_atn_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &scsicb_device::set_atn_handler(*device, DEVCB2_##_devcb);
 #define MCFG_SCSICB_RST_HANDLER(_devcb) \
-	devcb = &scsicb_device::set_rst_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &scsicb_device::set_rst_handler(*device, DEVCB2_##_devcb);
 // device type definition
 extern const device_type SCSICB;
 

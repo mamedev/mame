@@ -169,7 +169,6 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(tp84_state::sub_irq_mask_w)
 {
-
 	m_sub_irq_mask = data & 1;
 }
 
@@ -280,7 +279,6 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(tp84_state::sub_vblank_irq)
 {
-
 	if(m_sub_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }

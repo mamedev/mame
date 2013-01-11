@@ -166,7 +166,6 @@ READ8_MEMBER(ggconnie_state::rtc_r)
 
 WRITE8_MEMBER(ggconnie_state::rtc_w)
 {
-
 }
 
 /* TODO: banking not understood (is the ROM dumped correctly btw?) */

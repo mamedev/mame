@@ -249,7 +249,6 @@ bool emu_options::add_slot_options(bool isfirst)
 
 		// retrieve info about the device instance
 		if (!exists(slot->device().tag() + 1)) {
-
 			// add the option
 			entry[0].name = slot->device().tag() + 1;
 			entry[0].description = NULL;

@@ -121,7 +121,6 @@ timekeeper_device::timekeeper_device(const machine_config &mconfig, device_type 
 	: device_t(mconfig, type, name, tag, owner, clock),
 		device_nvram_interface(mconfig, *this)
 {
-
 }
 
 m48t02_device::m48t02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)

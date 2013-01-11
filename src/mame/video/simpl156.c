@@ -10,7 +10,6 @@
 
 void simpl156_state::video_start()
 {
-
 	/* allocate the ram as 16-bit (we do it here because the CPU is 32-bit) */
 	m_pf1_rowscroll = auto_alloc_array_clear(machine(), UINT16, 0x800/2);
 	m_pf2_rowscroll = auto_alloc_array_clear(machine(), UINT16, 0x800/2);
@@ -27,7 +26,6 @@ void simpl156_state::video_start()
 
 UINT32 simpl156_state::screen_update_simpl156(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	machine().priority_bitmap.fill(0);
 
 	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);

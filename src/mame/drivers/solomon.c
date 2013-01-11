@@ -40,7 +40,6 @@ READ8_MEMBER(solomon_state::solomon_0xe603_r)
 
 WRITE8_MEMBER(solomon_state::nmi_mask_w)
 {
-
 	m_nmi_mask = data & 1;
 }
 
@@ -195,7 +194,6 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(solomon_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

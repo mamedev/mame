@@ -135,7 +135,6 @@ static int gtp_cas_fill_wave( INT16 *buffer, int length, UINT8 *bytes ) {
 		int block_size = bytes[n+2]*256 + bytes[n+1];
 		n+=5;
 		if (block_type==GTP_BLOCK_STANDARD) {
-
 			// Interblock pause
 			wave_data = WAVE_NULL;
 			gtp_output_wave(&buffer,INTERBLOCK_PAUSE);

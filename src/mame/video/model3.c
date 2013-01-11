@@ -115,7 +115,6 @@ static void model3_exit(running_machine &machine)
 
 void model3_state::video_start()
 {
-
 	m_poly = poly_alloc(machine(), 4000, sizeof(poly_extra_data), 0);
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_exit), &machine()));
 
@@ -809,7 +808,6 @@ void real3d_vrom_texture_dma(address_space &space, UINT32 src, UINT32 dst, int l
 {
 	model3_state *state = space.machine().driver_data<model3_state>();
 	if((dst & 0xff) == 0) {
-
 		UINT32 address, header;
 
 		if (byteswap) {

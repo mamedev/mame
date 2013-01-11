@@ -165,7 +165,6 @@ WRITE8_MEMBER( fp_state::ls_w )
 
 WRITE8_MEMBER( fp_state::contrast_w )
 {
-
 }
 
 

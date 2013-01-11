@@ -2729,7 +2729,6 @@ static void sharcop_push_pop_stacks(SHARC_REGS *cpustate)
 
 static void sharcop_nop(SHARC_REGS *cpustate)
 {
-
 }
 
 /*****************************************************************************/

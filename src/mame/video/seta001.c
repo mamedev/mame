@@ -75,7 +75,6 @@ void seta001_device::device_start()
 
 void seta001_device::device_reset()
 {
-
 }
 
 READ16_DEVICE_HANDLER( spritectrl_r16 )
@@ -262,7 +261,6 @@ void seta001_device::seta001_draw_background( running_machine &machine, bitmap_i
 
 	for (col = 0; col < numcol; col++)
 	{
-
 		scrollx = scrollram[col * 0x10 + 4];
 		scrolly = scrollram[col * 0x10];
 

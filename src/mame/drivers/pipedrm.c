@@ -590,7 +590,6 @@ static const ym2610_interface ym2610_config =
 
 MACHINE_START_MEMBER(fromance_state,pipedrm)
 {
-
 	m_subcpu = machine().device<cpu_device>("sub");
 
 	/* initialize main Z80 bank */
@@ -879,7 +878,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(fromance_state,pipedrm)
 {
-
 	/* sprite RAM lives at the end of palette RAM */
 	m_spriteram.set_target(&m_generic_paletteram_8[0xc00], 0x400);
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0xcc00, 0xcfff, m_spriteram);

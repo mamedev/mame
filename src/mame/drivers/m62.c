@@ -930,14 +930,12 @@ GFXDECODE_END
 
 void m62_state::machine_start()
 {
-
 	save_item(NAME(m_ldrun2_bankswap));
 	save_item(NAME(m_bankcontrol));
 }
 
 void m62_state::machine_reset()
 {
-
 	m_flipscreen = 0;
 	m_m62_background_hscroll = 0;
 	m_m62_background_vscroll = 0;

@@ -504,7 +504,6 @@ READ16_MEMBER( scn2674_device::mpu4_vid_scn2674_r )
 
 	switch (offset)
 	{
-
 		/*  Status / Irq Register
 
 		    --RV ZSRs
@@ -660,7 +659,6 @@ void scn2674_device::scn2674_line(running_machine &machine)
 
 	if (m_linecounter==296)//front porch
 	{
-
 		m_scn2674_status_register |= 0x10;
 		if (m_scn2674_irq_mask&0x10)
 		{

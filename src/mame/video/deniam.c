@@ -26,7 +26,6 @@ static void deniam_common_init( running_machine &machine )
 
 DRIVER_INIT_MEMBER(deniam_state,logicpro)
 {
-
 	deniam_common_init(machine());
 
 	m_bg_scrollx_offs = 0x00d;
@@ -37,7 +36,6 @@ DRIVER_INIT_MEMBER(deniam_state,logicpro)
 
 DRIVER_INIT_MEMBER(deniam_state,karianx)
 {
-
 	deniam_common_init(machine());
 
 	m_bg_scrollx_offs = 0x10d;

@@ -38,7 +38,6 @@ TILE_GET_INFO_MEMBER(cbasebal_state::get_fg_tile_info)
 
 void cbasebal_state::video_start()
 {
-
 	m_textram = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_scrollram = auto_alloc_array(machine(), UINT8, 0x1000);
 
@@ -61,7 +60,6 @@ void cbasebal_state::video_start()
 
 WRITE8_MEMBER(cbasebal_state::cbasebal_textram_w)
 {
-
 	m_textram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
@@ -73,7 +71,6 @@ READ8_MEMBER(cbasebal_state::cbasebal_textram_r)
 
 WRITE8_MEMBER(cbasebal_state::cbasebal_scrollram_w)
 {
-
 	m_scrollram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
@@ -85,7 +82,6 @@ READ8_MEMBER(cbasebal_state::cbasebal_scrollram_r)
 
 WRITE8_MEMBER(cbasebal_state::cbasebal_gfxctrl_w)
 {
-
 	/* bit 0 is unknown - toggles continuously */
 
 	/* bit 1 is flip screen */
@@ -170,7 +166,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 cbasebal_state::screen_update_cbasebal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (m_bg_on)
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	else

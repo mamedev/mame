@@ -116,28 +116,24 @@ UINT32 gameplan_state::screen_update_leprechn(screen_device &screen, bitmap_rgb3
 
 WRITE8_MEMBER(gameplan_state::video_data_w)
 {
-
 	m_video_data = data;
 }
 
 
 WRITE8_MEMBER(gameplan_state::gameplan_video_command_w)
 {
-
 	m_video_command = data & 0x07;
 }
 
 
 WRITE8_MEMBER(gameplan_state::leprechn_video_command_w)
 {
-
 	m_video_command = (data >> 3) & 0x07;
 }
 
 
 TIMER_CALLBACK_MEMBER(gameplan_state::clear_screen_done_callback)
 {
-
 	/* indicate that the we are done clearing the screen */
 	m_via_0->write_ca1(0);
 }
@@ -145,7 +141,6 @@ TIMER_CALLBACK_MEMBER(gameplan_state::clear_screen_done_callback)
 
 WRITE_LINE_MEMBER(gameplan_state::video_command_trigger_w)
 {
-
 	if (state == 0)
 	{
 		switch (m_video_command)
@@ -259,7 +254,6 @@ const via6522_interface trvquest_via_0_interface =
 
 TIMER_CALLBACK_MEMBER(gameplan_state::via_0_ca1_timer_callback)
 {
-
 	/* !VBLANK is connected to CA1 */
 	m_via_0->write_ca1(param);
 
@@ -278,7 +272,6 @@ TIMER_CALLBACK_MEMBER(gameplan_state::via_0_ca1_timer_callback)
 
 VIDEO_START_MEMBER(gameplan_state,common)
 {
-
 	m_videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
 	m_videoram = auto_alloc_array(machine(), UINT8, m_videoram_size);
 

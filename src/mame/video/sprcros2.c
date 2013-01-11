@@ -62,21 +62,18 @@ void sprcros2_state::palette_init()
 
 WRITE8_MEMBER(sprcros2_state::sprcros2_fgvideoram_w)
 {
-
 	m_fgvideoram[offset] = data;
 	m_fgtilemap->mark_tile_dirty(offset&0x3ff);
 }
 
 WRITE8_MEMBER(sprcros2_state::sprcros2_bgvideoram_w)
 {
-
 	m_bgvideoram[offset] = data;
 	m_bgtilemap->mark_tile_dirty(offset&0x3ff);
 }
 
 WRITE8_MEMBER(sprcros2_state::sprcros2_bgscrollx_w)
 {
-
 	if(m_port7&0x02)
 		m_bgtilemap->set_scrollx(0, 0x100-data);
 	else
@@ -85,7 +82,6 @@ WRITE8_MEMBER(sprcros2_state::sprcros2_bgscrollx_w)
 
 WRITE8_MEMBER(sprcros2_state::sprcros2_bgscrolly_w)
 {
-
 	m_bgtilemap->set_scrolly(0, data);
 }
 
@@ -133,7 +129,6 @@ TILE_GET_INFO_MEMBER(sprcros2_state::get_sprcros2_fgtile_info)
 
 void sprcros2_state::video_start()
 {
-
 	m_bgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sprcros2_state::get_sprcros2_bgtile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sprcros2_state::get_sprcros2_fgtile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
@@ -149,7 +144,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	{
 		if (state->m_spriteram[offs])
 		{
-
 			//offs
 			//76543210
 			//x------- unused
@@ -190,7 +184,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 UINT32 sprcros2_state::screen_update_sprcros2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bgtilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(machine(), bitmap, cliprect);
 	m_fgtilemap->draw(bitmap, cliprect, 0, 0);

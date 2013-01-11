@@ -700,7 +700,6 @@ static void swapf(pic16c62x_state *cpustate)
 
 static void tris(pic16c62x_state *cpustate)
 {
-
 	switch(cpustate->opcode.b.l & 0x7)
 	{
 		case 05:    STORE_REGFILE(cpustate, 0x85, cpustate->W); break;

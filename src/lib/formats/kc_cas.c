@@ -45,7 +45,6 @@ INLINE int kc_cas_cycle(INT16 *buffer, int sample_pos, int len)
 
 	if (buffer)
 	{
-
 		for (int i=0; i<num_samples; i++)
 			buffer[ sample_pos + i ] = SMPHI;
 

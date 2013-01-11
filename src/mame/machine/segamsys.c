@@ -979,7 +979,6 @@ static void sms_copy_to_renderbuffer(int scanline, struct sms_vdp* chip)
 
 static void sms_draw_scanline(int scanline, struct sms_vdp* chip)
 {
-
 	if (scanline>=0 && scanline<sms_mode_table[chip->screen_mode].sms2_height)
 	{
 		sms_render_spriteline(scanline, chip);
@@ -1188,7 +1187,6 @@ SCREEN_VBLANK(sms)
 
 VIDEO_START(sms)
 {
-
 }
 
 
@@ -1686,8 +1684,6 @@ void megatech_set_genz80_as_sms_standard_map(running_machine &machine, const cha
 
 	if (mapper == MAPPER_STANDARD )
 	{
-
-
 		machine.device(tag)->memory().space(AS_PROGRAM).install_legacy_write_handler(0xfffc, 0xffff, FUNC(mt_sms_standard_rom_bank_w));
 
 	}

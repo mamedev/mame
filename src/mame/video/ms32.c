@@ -64,7 +64,6 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_extra_tile_info)
 
 void ms32_state::video_start()
 {
-
 	m_priram_8   = auto_alloc_array_clear(machine(), UINT8, 0x2000);
 	m_palram_16  = auto_alloc_array_clear(machine(), UINT16, 0x20000);
 	m_rozram_16  = auto_alloc_array_clear(machine(), UINT16, 0x10000);
@@ -506,7 +505,6 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 
 				if (primask == 0x00)
 				{
-
 					if (src_tilepri==0x00)
 					{
 						if (spridat & 0xff)

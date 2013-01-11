@@ -362,7 +362,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(nanos_state::keyboard_callback)
 	m_key_pressed = 0xff;
 	for(i = 0; i < 7; i++)
 	{
-
 		code =  machine().root_device().ioport(keynames[i])->read();
 		if (code != 0)
 		{

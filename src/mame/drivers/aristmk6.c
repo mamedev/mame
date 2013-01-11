@@ -28,7 +28,6 @@ void aristmk6_state::video_start()
 
 UINT32 aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 	int x,y,count;
 	const UINT8 *blit_ram = memregion("maincpu")->base();
 

@@ -134,7 +134,6 @@ static const struct kbdc8042_interface at8042 =
 
 void pcat_dyn_state::machine_start()
 {
-
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pcat_irq_callback);
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, pcat_dyn_set_keyb_int);
 	kbdc8042_init(machine(), &at8042);

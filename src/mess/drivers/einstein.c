@@ -204,7 +204,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(einstein_state::einstein_keyboard_timer_callback)
 
 WRITE8_MEMBER(einstein_state::einstein_keyboard_line_write)
 {
-
 	if (VERBOSE_KEYBOARD)
 		logerror("einstein_keyboard_line_write: %02x\n", data);
 
@@ -216,7 +215,6 @@ WRITE8_MEMBER(einstein_state::einstein_keyboard_line_write)
 
 READ8_MEMBER(einstein_state::einstein_keyboard_data_read)
 {
-
 	/* re-scan the keyboard */
 	einstein_scan_keyboard(machine());
 
@@ -339,7 +337,6 @@ READ8_MEMBER(einstein_state::einstein_kybintmsk_r)
 
 WRITE8_MEMBER(einstein_state::einstein_kybintmsk_w)
 {
-
 	logerror("%s: einstein_kybintmsk_w %02x\n", machine().describe_context(), data);
 
 	/* set mask from bit 0 */
@@ -359,7 +356,6 @@ WRITE8_MEMBER(einstein_state::einstein_kybintmsk_w)
 /* writing 0 enables the /ADC interrupt */
 WRITE8_MEMBER(einstein_state::einstein_adcintmsk_w)
 {
-
 	logerror("%s: einstein_adcintmsk_w %02x\n", machine().describe_context(), data);
 
 	if (data & 0x01)
@@ -378,7 +374,6 @@ WRITE8_MEMBER(einstein_state::einstein_adcintmsk_w)
 /* writing 0 enables the /FIRE interrupt */
 WRITE8_MEMBER(einstein_state::einstein_fire_int_w)
 {
-
 	logerror("%s: einstein_fire_int_w %02x\n", machine().describe_context(), data);
 
 	if (data & 0x01)
@@ -446,7 +441,6 @@ void einstein_state::machine_reset()
 
 MACHINE_RESET_MEMBER(einstein_state,einstein2)
 {
-
 	/* call standard initialization first */
 	einstein_state::machine_reset();
 
@@ -472,7 +466,6 @@ MACHINE_START_MEMBER(einstein_state,einstein2)
 
 UINT32 einstein_state::screen_update_einstein2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 	if (&screen == m_color_screen)
 	{
 		tms9929a_device *tms9929a = machine().device<tms9929a_device>( "tms9929a" );

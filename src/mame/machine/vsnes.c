@@ -69,7 +69,6 @@ READ8_MEMBER(vsnes_state::gun_in0_r)
 
 READ8_MEMBER(vsnes_state::vsnes_in0_r)
 {
-
 	int ret = (m_input_latch[0]) & 1;
 
 	/* shift */
@@ -138,7 +137,6 @@ READ8_MEMBER(vsnes_state::vsnes_in1_1_r)
 
 MACHINE_RESET_MEMBER(vsnes_state,vsnes)
 {
-
 	m_last_bank = 0xff;
 	m_sound_fix = 0;
 	m_input_latch[0] = m_input_latch[1] = 0;
@@ -154,7 +152,6 @@ MACHINE_RESET_MEMBER(vsnes_state,vsnes)
 
 MACHINE_RESET_MEMBER(vsnes_state,vsdual)
 {
-
 	m_input_latch[0] = m_input_latch[1] = 0;
 	m_input_latch[2] = m_input_latch[3] = 0;
 
@@ -358,7 +355,6 @@ WRITE8_MEMBER(vsnes_state::gun_in0_w)
 	/* here we do things a little different */
 	if (data & 1)
 	{
-
 		/* load up the latches */
 		m_input_latch[0] = ioport("IN0")->read();
 
@@ -948,7 +944,6 @@ WRITE8_MEMBER(vsnes_state::mapper68_rom_banking)
 
 DRIVER_INIT_MEMBER(vsnes_state,platoon)
 {
-
 	/* when starting a mapper 68 game  the first 16K ROM bank in the cart is loaded into $8000
 	the LAST 16K ROM bank is loaded into $C000. The last 16K of ROM cannot be swapped. */
 

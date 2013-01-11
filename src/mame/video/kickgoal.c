@@ -118,7 +118,6 @@ static void kickgoal_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 
 VIDEO_START_MEMBER(kickgoal_state,kickgoal)
 {
-
 	m_sprbase = 0x0000;
 
 	m_fg_base = 0x7000;
@@ -139,7 +138,6 @@ VIDEO_START_MEMBER(kickgoal_state,kickgoal)
 
 VIDEO_START_MEMBER(kickgoal_state,actionhw)
 {
-
 	m_sprbase = 0x4000;
 	m_fg_base = 0x7000 * 2;
 
@@ -162,7 +160,6 @@ VIDEO_START_MEMBER(kickgoal_state,actionhw)
 
 UINT32 kickgoal_state::screen_update_kickgoal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	/* set scroll */
 	m_fgtm->set_scrollx(0, m_scrram[0]);
 	m_fgtm->set_scrolly(0, m_scrram[1]);

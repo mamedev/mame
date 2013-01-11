@@ -10,7 +10,6 @@
 
 WRITE8_MEMBER(n8080_state::n8080_video_control_w)
 {
-
 	m_sheriff_color_mode = (data >> 3) & 3;
 	m_sheriff_color_data = (data >> 0) & 7;
 	flip_screen_set_no_update(data & 0x20);
@@ -56,7 +55,6 @@ void spacefev_start_red_cannon( running_machine &machine )
 
 TIMER_CALLBACK_MEMBER(n8080_state::spacefev_stop_red_cannon)
 {
-
 	m_spacefev_red_cannon = 0;
 	m_cannon_timer->adjust(attotime::never);
 }
@@ -89,7 +87,6 @@ static void helifire_next_line( running_machine &machine )
 
 VIDEO_START_MEMBER(n8080_state,spacefev)
 {
-
 	m_cannon_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(n8080_state::spacefev_stop_red_cannon),this));
 
 	flip_screen_set_no_update(0);
@@ -101,7 +98,6 @@ VIDEO_START_MEMBER(n8080_state,spacefev)
 
 VIDEO_START_MEMBER(n8080_state,sheriff)
 {
-
 	flip_screen_set_no_update(0);
 
 	save_item(NAME(m_sheriff_color_mode));

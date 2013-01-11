@@ -83,21 +83,18 @@ void exedexes_state::palette_init()
 
 WRITE8_MEMBER(exedexes_state::exedexes_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(exedexes_state::exedexes_colorram_w)
 {
-
 	m_colorram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(exedexes_state::exedexes_c804_w)
 {
-
 	/* bits 0 and 1 are coin counters */
 	coin_counter_w(machine(), 0, data & 0x01);
 	coin_counter_w(machine(), 1, data & 0x02);
@@ -113,7 +110,6 @@ WRITE8_MEMBER(exedexes_state::exedexes_c804_w)
 
 WRITE8_MEMBER(exedexes_state::exedexes_gfxctrl_w)
 {
-
 	/* bit 4 is bg enable */
 	m_sc2on = data & 0x10;
 
@@ -170,7 +166,6 @@ TILEMAP_MAPPER_MEMBER(exedexes_state::exedexes_fg_tilemap_scan)
 
 void exedexes_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(exedexes_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(exedexes_state::exedexes_bg_tilemap_scan),this), 32, 32, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(exedexes_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(exedexes_state::exedexes_fg_tilemap_scan),this), 16, 16, 128, 128);
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(exedexes_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);

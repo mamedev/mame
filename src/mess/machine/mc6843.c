@@ -44,7 +44,6 @@
 
 struct mc6843_t
 {
-
 	/* interface */
 	const mc6843_interface* iface;
 
@@ -256,7 +255,6 @@ static int mc6843_address_search( device_t *device, chrn_id* id )
 
 	while ( 1 )
 	{
-
 		if ( ( ! floppy_drive_get_next_id( img, mc6843->side, id ) ) || ( id->flags & ID_FLAG_CRC_ERROR_IN_ID_FIELD ) || ( id->N != 0 ) )
 		{
 			/* read address error */
@@ -421,7 +419,6 @@ READ8_DEVICE_HANDLER ( mc6843_r )
 	UINT8 data = 0;
 
 	switch ( offset ) {
-
 	case 0: /* Data Input Register (DIR) */
 	{
 		int cmd = mc6843->CMR & 0x0f;
@@ -560,7 +557,6 @@ WRITE8_DEVICE_HANDLER ( mc6843_w )
 {
 	mc6843_t* mc6843 = get_safe_token( device );
 	switch ( offset ) {
-
 	case 0: /* Data Output Register (DOR) */
 	{
 		int cmd = mc6843->CMR & 0x0f;

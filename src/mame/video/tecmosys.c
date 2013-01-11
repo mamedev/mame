@@ -10,7 +10,6 @@
 
 TILE_GET_INFO_MEMBER(tecmosys_state::get_bg0tile_info)
 {
-
 	SET_TILE_INFO_MEMBER(
 			1,
 			m_bg0tilemap_ram[2*tile_index+1],
@@ -20,7 +19,6 @@ TILE_GET_INFO_MEMBER(tecmosys_state::get_bg0tile_info)
 
 TILE_GET_INFO_MEMBER(tecmosys_state::get_bg1tile_info)
 {
-
 	SET_TILE_INFO_MEMBER(
 			2,
 			m_bg1tilemap_ram[2*tile_index+1],
@@ -30,7 +28,6 @@ TILE_GET_INFO_MEMBER(tecmosys_state::get_bg1tile_info)
 
 TILE_GET_INFO_MEMBER(tecmosys_state::get_bg2tile_info)
 {
-
 	SET_TILE_INFO_MEMBER(
 			3,
 			m_bg2tilemap_ram[2*tile_index+1],
@@ -40,7 +37,6 @@ TILE_GET_INFO_MEMBER(tecmosys_state::get_bg2tile_info)
 
 TILE_GET_INFO_MEMBER(tecmosys_state::get_fg_tile_info)
 {
-
 	SET_TILE_INFO_MEMBER(
 			0,
 			m_fgtilemap_ram[2*tile_index+1],
@@ -287,7 +283,6 @@ static void tecmosys_do_final_mix(running_machine &machine, bitmap_rgb32 &bitmap
 
 UINT32 tecmosys_state::screen_update_tecmosys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(machine().pens[0x4000], cliprect);
 
 

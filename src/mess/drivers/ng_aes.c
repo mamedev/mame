@@ -303,7 +303,6 @@ READ16_MEMBER(ng_aes_state::neocd_control_r)
 	UINT32 sekAddress = 0xff0000+ (offset*2);
 
 	switch (sekAddress & 0xFFFF) {
-
 		case 0x0016:
 			return m_tempcdc->nff0016_r();
 
@@ -330,7 +329,6 @@ READ16_MEMBER(ng_aes_state::neocd_control_r)
 
 WRITE16_MEMBER(ng_aes_state::neocd_control_w)
 {
-
 	UINT32 sekAddress = 0xff0000+ (offset*2);
 	UINT16 wordValue = data;
 
@@ -713,7 +711,6 @@ static INT32 SekIdle(INT32 nCycles)
 
 void ng_aes_state::NeoCDDoDMA(address_space& curr_space)
 {
-
 	// The LC8953 chip has a programmable DMA controller, which is not properly emulated.
 	// Since the software only uses it in a limited way, we can apply a simple heuristic
 	// to determnine the requested operation.
@@ -725,7 +722,6 @@ void ng_aes_state::NeoCDDoDMA(address_space& curr_space)
 //  bprintf(PRINT_IMPORTANT, _T("  - DMA controller transfer started (PC: 0x%06X)\n"), SekGetPC(-1));
 
 	switch (NeoCDDMAMode) {
-
 		case 0xCFFD: {
 //          bprintf(PRINT_NORMAL, _T("    adr : 0x%08X - 0x%08X <- address, skip odd bytes\n"), NeoCDDMAAddress1, NeoCDDMAAddress1 + NeoCDDMACount * 8);
 
@@ -1333,8 +1329,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* having this ACTIVE_HIGH causes you to start with 2 credits using USA bios roms */    \
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) /* what is this? */                              \
 	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_calendar_status, NULL)         \
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_audio_result, NULL) \
-
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_audio_result, NULL)
 #define STANDARD_IN4                                                                            \
 	PORT_START("IN4")                                                                           \
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )                                             \

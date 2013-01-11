@@ -92,7 +92,6 @@ public:
 
 WRITE8_MEMBER(trvmadns_state::trvmadns_banking_w)
 {
-
 	UINT8 *rom;
 	int address = 0;
 

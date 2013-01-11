@@ -514,7 +514,6 @@ WRITE16_MEMBER(taitoair_state::dsp_rasterize_w)
 
 READ16_MEMBER(taitoair_state::dsp_x_return_r)
 {
-
 	/* Construct a frustum from the system's most recently set left and bottom extents */
 	float m[16];
 	airInfernoFrustum(m_frustumLeft, m_frustumBottom, m);
@@ -534,7 +533,6 @@ READ16_MEMBER(taitoair_state::dsp_x_return_r)
 
 READ16_MEMBER(taitoair_state::dsp_y_return_r)
 {
-
 	/* Construct a frustum from the system's most recently set left and bottom extents */
 	float m[16];
 	airInfernoFrustum(m_frustumLeft, m_frustumBottom, m);
@@ -565,7 +563,6 @@ void taitoair_state::video_start()
 
 UINT32 taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	tc0080vco_tilemap_update(m_tc0080vco);
 
 	bitmap.fill(0, cliprect);

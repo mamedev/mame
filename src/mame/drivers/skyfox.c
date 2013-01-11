@@ -213,14 +213,12 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(skyfox_state::skyfox_interrupt)
 {
-
 	/* Scroll the bg */
 	m_bg_pos += (m_bg_ctrl >> 1) & 0x7; // maybe..
 }
 
 void skyfox_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_bg_pos));
@@ -229,7 +227,6 @@ void skyfox_state::machine_start()
 
 void skyfox_state::machine_reset()
 {
-
 	m_bg_pos = 0;
 	m_bg_ctrl = 0;
 }

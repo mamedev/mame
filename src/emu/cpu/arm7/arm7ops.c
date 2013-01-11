@@ -291,7 +291,6 @@ static void HandleCoProcDO(arm_state *cpustate, UINT32 insn)
 // Co-Processor Register Transfer - To/From Arm to Co-Proc
 static void HandleCoProcRT(arm_state *cpustate, UINT32 insn)
 {
-
 	/* xxxx 1110 oooL nnnn dddd cccc ppp1 mmmm */
 
 	// Load (MRC) data from Co-Proc to ARM7 register
@@ -544,7 +543,6 @@ static void HandleMemSingle(arm_state *cpustate, UINT32 insn)
 	}
 	else
 	{
-
 	/* Do post-indexing writeback */
 	if (!(insn & INSN_SDT_P)/* && (insn & INSN_SDT_W)*/)
 	{
@@ -557,7 +555,6 @@ static void HandleMemSingle(arm_state *cpustate, UINT32 insn)
 				// todo: check for offs... ?
 			}
 			else {
-
 				if ((insn & INSN_SDT_W) != 0)
 					LOG(("%08x:  RegisterWritebackIncrement %d %d %d\n", R15, (insn & INSN_SDT_P) != 0, (insn & INSN_SDT_W) != 0, (insn & INSN_SDT_U) != 0));
 
@@ -669,7 +666,6 @@ static void HandleHalfWordDT(arm_state *cpustate, UINT32 insn)
 
 			if (cpustate->pendingAbtD == 0)
 			{
-
 			// PC?
 			if (rd == eR15)
 			{
@@ -698,7 +694,6 @@ static void HandleHalfWordDT(arm_state *cpustate, UINT32 insn)
 
 			if (cpustate->pendingAbtD == 0)
 			{
-
 			if (rd == eR15)
 			{
 				R15 = newval + 8;
@@ -761,7 +756,6 @@ static void HandleHalfWordDT(arm_state *cpustate, UINT32 insn)
 	}
 	else
 	{
-
 	// SJE: No idea if this writeback code works or makes sense here..
 
 	/* Do post-indexing writeback */
@@ -776,7 +770,6 @@ static void HandleHalfWordDT(arm_state *cpustate, UINT32 insn)
 				// todo: check for offs... ?
 			}
 			else {
-
 				if ((insn & INSN_SDT_W) != 0)
 					LOG(("%08x:  RegisterWritebackIncrement %d %d %d\n", R15, (insn & INSN_SDT_P) != 0, (insn & INSN_SDT_W) != 0, (insn & INSN_SDT_U) != 0));
 
@@ -1085,7 +1078,6 @@ static void HandleALU(arm_state *cpustate, UINT32 insn)
 		{
 			// Rd = 15 and S Flag IS set, Result is placed in R15, and current mode SPSR moved to CPSR
 			if (rdn == eR15) {
-
 				if (MODE32)
 				{
 				// When Rd is R15 and the S flag is set the result of the operation is placed in R15 and the SPSR corresponding to

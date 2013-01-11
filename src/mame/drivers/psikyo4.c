@@ -254,7 +254,6 @@ WRITE32_MEMBER(psikyo4_state::ps4_bgpen_2_dword_w)
 
 WRITE32_MEMBER(psikyo4_state::ps4_screen1_brt_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		/* Need separate brightness for both screens if displaying together */
@@ -284,7 +283,6 @@ WRITE32_MEMBER(psikyo4_state::ps4_screen1_brt_w)
 
 WRITE32_MEMBER(psikyo4_state::ps4_screen2_brt_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		/* Need separate brightness for both screens if displaying together */
@@ -662,7 +660,6 @@ static const ymf278b_interface ymf278b_config =
 
 void psikyo4_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_oldbrt1));
@@ -671,7 +668,6 @@ void psikyo4_state::machine_start()
 
 void psikyo4_state::machine_reset()
 {
-
 	m_oldbrt1 = -1;
 	m_oldbrt2 = -1;
 }

@@ -148,7 +148,6 @@ TILE_GET_INFO_MEMBER(m52_state::get_tile_info)
 
 void m52_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m52_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 
 	m_bg_tilemap->set_transparent_pen(0);
@@ -196,7 +195,6 @@ WRITE8_MEMBER(m52_state::m52_scroll_w)
 
 WRITE8_MEMBER(m52_state::m52_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -204,7 +202,6 @@ WRITE8_MEMBER(m52_state::m52_videoram_w)
 
 WRITE8_MEMBER(m52_state::m52_colorram_w)
 {
-
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }

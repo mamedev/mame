@@ -595,7 +595,6 @@ static const UINT8 nspirit_crc[CRC_LEN] =   {   0xfe,0x94,0x6e,0x4e, 0xc8,0x33,0
 /* Image Fight */
 static const UINT8 imgfight_code[CODE_LEN] =
 {
-
 	0x68,0x00,0xa0,             // push 0a000h
 	0x1f,                       // pop ds
 	0xc6,0x06,0x38,0x38,0x50,   // mov [3838h], byte 050h

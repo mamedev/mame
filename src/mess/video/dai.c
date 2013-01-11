@@ -113,11 +113,9 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 
 		switch (display_mode)
 		{
-
 		case 0x00:  /* 4 colour grahics modes */
 			switch (horizontal_resolution)
 			{
-
 			case 0x00:  /* 88 pixels */
 				switch (unit_mode)
 				{
@@ -278,7 +276,6 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 		case 0x01:  /* 4 colour characters */
 			switch (horizontal_resolution)
 			{
-
 			case 0x00:  /* 11 chars */
 				switch (unit_mode)
 				{
@@ -444,7 +441,6 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 				case 0x02:  /* 16 colour graphics */
 			switch (horizontal_resolution)
 			{
-
 			case 0x00:  /* 88 pixels */
 				switch (unit_mode)
 				{
@@ -604,7 +600,6 @@ UINT32 dai_state::screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap,
 		case 0x03:  /* 16 colour characters */
 			switch (horizontal_resolution)
 			{
-
 			case 0x00:  /* 11 chars */
 				switch (unit_mode)
 				{

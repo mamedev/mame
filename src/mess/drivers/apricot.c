@@ -186,7 +186,6 @@ static const wd17xx_interface apricot_wd17xx_intf =
 
 UINT32 apricot_state::screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 	if (!m_display_on)
 		m_crtc->screen_update( screen, bitmap, cliprect);
 	else

@@ -10,7 +10,6 @@
 //
 namespace DSP56K
 {
-
 class Opcode;
 
 class ParallelMove

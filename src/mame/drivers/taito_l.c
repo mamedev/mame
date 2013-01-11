@@ -142,7 +142,6 @@ static void state_register( running_machine &machine )
 
 MACHINE_START_MEMBER(taitol_state,taito_l)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -354,7 +353,6 @@ READ8_MEMBER(taitol_state::irq_enable_r)
 
 WRITE8_MEMBER(taitol_state::rombankswitch_w)
 {
-
 	if (m_cur_rombank != data)
 	{
 		if (data > m_high)
@@ -371,7 +369,6 @@ WRITE8_MEMBER(taitol_state::rombankswitch_w)
 
 WRITE8_MEMBER(taitol_state::rombank2switch_w)
 {
-
 	data &= 0xf;
 
 	if (m_cur_rombank2 != data)
@@ -401,7 +398,6 @@ READ8_MEMBER(taitol_state::rombank2switch_r)
 
 WRITE8_MEMBER(taitol_state::rambankswitch_w)
 {
-
 	if (m_cur_rambank[offset] != data)
 	{
 		m_cur_rambank[offset] = data;
@@ -510,7 +506,6 @@ WRITE8_MEMBER(taitol_state::mcu_control_w)
 
 READ8_MEMBER(taitol_state::mcu_data_r)
 {
-
 //  logerror("mcu read (%04x) [%02x, %04x]\n", space.device().safe_pc(), last_data, last_data_adr);
 	if (m_mcu_pos == m_mcu_reply_len)
 		return 0;
@@ -533,7 +528,6 @@ WRITE8_MEMBER(taitol_state::sound_w)
 
 READ8_MEMBER(taitol_state::mux_r)
 {
-
 	switch (m_mux_ctrl)
 	{
 	case 0:
@@ -554,7 +548,6 @@ READ8_MEMBER(taitol_state::mux_r)
 
 WRITE8_MEMBER(taitol_state::mux_w)
 {
-
 	switch (m_mux_ctrl)
 	{
 	case 4:
@@ -622,7 +615,6 @@ WRITE8_MEMBER(taitol_state::champwr_msm5205_volume_w)
 
 READ8_MEMBER(taitol_state::horshoes_tracky_reset_r)
 {
-
 	/* reset the trackball counter */
 	m_tracky = ioport("AN0")->read();
 	return 0;
@@ -630,7 +622,6 @@ READ8_MEMBER(taitol_state::horshoes_tracky_reset_r)
 
 READ8_MEMBER(taitol_state::horshoes_trackx_reset_r)
 {
-
 	/* reset the trackball counter */
 	m_trackx = ioport("AN1")->read();
 	return 0;
@@ -1767,7 +1758,6 @@ static void irqhandler( device_t *device, int irq )
 
 WRITE8_MEMBER(taitol_state::portA_w)
 {
-
 	if (m_cur_bank != (data & 0x03))
 	{
 		int bankaddress;

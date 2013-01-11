@@ -993,7 +993,6 @@ TIMER_CALLBACK_MEMBER(vii_state::tmb2_tick)
 
 void vii_state::machine_start()
 {
-
 	memset(m_video_regs, 0, 0x100 * sizeof(UINT16));
 	memset(m_io_regs, 0, 0x100 * sizeof(UINT16));
 	m_current_bank = 0;
@@ -1156,28 +1155,24 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(vii_state,vii)
 {
-
 	m_spg243_mode = SPG243_VII;
 	m_centered_coordinates = 1;
 }
 
 DRIVER_INIT_MEMBER(vii_state,batman)
 {
-
 	m_spg243_mode = SPG243_BATMAN;
 	m_centered_coordinates = 1;
 }
 
 DRIVER_INIT_MEMBER(vii_state,vsmile)
 {
-
 	m_spg243_mode = SPG243_VSMILE;
 	m_centered_coordinates = 1;
 }
 
 DRIVER_INIT_MEMBER(vii_state,walle)
 {
-
 	m_spg243_mode = SPG243_BATMAN;
 	m_centered_coordinates = 0;
 }

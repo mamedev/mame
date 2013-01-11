@@ -138,7 +138,6 @@ UINT32 nsmpoker_state::screen_update_nsmpoker(screen_device &screen, bitmap_ind1
 
 void nsmpoker_state::palette_init()
 {
-
 }
 
 

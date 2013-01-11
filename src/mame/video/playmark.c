@@ -106,7 +106,6 @@ TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_bg_tile_info)
 
 VIDEO_START_MEMBER(playmark_state,bigtwin)
 {
-
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
@@ -124,7 +123,6 @@ VIDEO_START_MEMBER(playmark_state,bigtwin)
 
 VIDEO_START_MEMBER(playmark_state,bigtwinb)
 {
-
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwinb_get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -146,7 +144,6 @@ VIDEO_START_MEMBER(playmark_state,bigtwinb)
 
 VIDEO_START_MEMBER(playmark_state,wbeachvl)
 {
-
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::wbeachvl_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::wbeachvl_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::wbeachvl_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
@@ -165,7 +162,6 @@ VIDEO_START_MEMBER(playmark_state,wbeachvl)
 
 VIDEO_START_MEMBER(playmark_state,excelsr)
 {
-
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::bigtwin_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
@@ -182,7 +178,6 @@ VIDEO_START_MEMBER(playmark_state,excelsr)
 
 VIDEO_START_MEMBER(playmark_state,hotmind)
 {
-
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -205,7 +200,6 @@ VIDEO_START_MEMBER(playmark_state,hotmind)
 
 VIDEO_START_MEMBER(playmark_state,hrdtimes)
 {
-
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -234,42 +228,36 @@ VIDEO_START_MEMBER(playmark_state,hrdtimes)
 
 WRITE16_MEMBER(playmark_state::wbeachvl_txvideoram_w)
 {
-
 	COMBINE_DATA(&m_videoram1[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_MEMBER(playmark_state::wbeachvl_fgvideoram_w)
 {
-
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_MEMBER(playmark_state::wbeachvl_bgvideoram_w)
 {
-
 	COMBINE_DATA(&m_videoram3[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_MEMBER(playmark_state::hrdtimes_txvideoram_w)
 {
-
 	COMBINE_DATA(&m_videoram1[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(playmark_state::hrdtimes_fgvideoram_w)
 {
-
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(playmark_state::hrdtimes_bgvideoram_w)
 {
-
 	COMBINE_DATA(&m_videoram3[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -295,7 +283,6 @@ WRITE16_MEMBER(playmark_state::bigtwin_paletteram_w)
 
 WRITE16_MEMBER(playmark_state::bigtwin_scroll_w)
 {
-
 	data = COMBINE_DATA(&m_scroll[offset]);
 
 	switch (offset)
@@ -314,7 +301,6 @@ WRITE16_MEMBER(playmark_state::bigtwin_scroll_w)
 
 WRITE16_MEMBER(playmark_state::wbeachvl_scroll_w)
 {
-
 	data = COMBINE_DATA(&m_scroll[offset]);
 
 	switch (offset)
@@ -332,7 +318,6 @@ WRITE16_MEMBER(playmark_state::wbeachvl_scroll_w)
 
 WRITE16_MEMBER(playmark_state::excelsr_scroll_w)
 {
-
 	data = COMBINE_DATA(&m_scroll[offset]);
 
 	switch (offset)
@@ -351,7 +336,6 @@ WRITE16_MEMBER(playmark_state::excelsr_scroll_w)
 
 WRITE16_MEMBER(playmark_state::hrdtimes_scroll_w)
 {
-
 	data = COMBINE_DATA(&m_scroll[offset]);
 
 	switch (offset)
@@ -495,7 +479,6 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 playmark_state::screen_update_bigtwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	machine().priority_bitmap.fill(0, cliprect);
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
@@ -509,7 +492,6 @@ UINT32 playmark_state::screen_update_bigtwin(screen_device &screen, bitmap_ind16
 
 UINT32 playmark_state::screen_update_bigtwinb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	// video enabled
 	if (m_scroll[6] & 1)
 	{
@@ -525,7 +507,6 @@ UINT32 playmark_state::screen_update_bigtwinb(screen_device &screen, bitmap_ind1
 
 UINT32 playmark_state::screen_update_excelsr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	machine().priority_bitmap.fill(0, cliprect);
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 1);
@@ -538,7 +519,6 @@ UINT32 playmark_state::screen_update_excelsr(screen_device &screen, bitmap_ind16
 
 UINT32 playmark_state::screen_update_wbeachvl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (m_fg_rowscroll_enable)
 	{
 		int i;
@@ -564,7 +544,6 @@ UINT32 playmark_state::screen_update_wbeachvl(screen_device &screen, bitmap_ind1
 
 UINT32 playmark_state::screen_update_hrdtimes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	machine().priority_bitmap.fill(0, cliprect);
 
 	// video enabled

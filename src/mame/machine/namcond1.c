@@ -77,7 +77,6 @@ READ16_MEMBER(namcond1_state::namcond1_cuskey_r)
 
 WRITE16_MEMBER(namcond1_state::namcond1_shared_ram_w)
 {
-
 	switch( offset )
 	{
 		default :

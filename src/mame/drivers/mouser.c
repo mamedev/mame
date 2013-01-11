@@ -27,7 +27,6 @@ WRITE8_MEMBER(mouser_state::mouser_nmi_enable_w)
 
 INTERRUPT_GEN_MEMBER(mouser_state::mouser_nmi_interrupt)
 {
-
 	if (BIT(m_nmi_enable, 0))
 		nmi_line_pulse(device);
 }
@@ -183,7 +182,6 @@ GFXDECODE_END
 
 void mouser_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -193,7 +191,6 @@ void mouser_state::machine_start()
 
 void mouser_state::machine_reset()
 {
-
 	m_sound_byte = 0;
 	m_nmi_enable = 0;
 }

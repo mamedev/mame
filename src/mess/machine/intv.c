@@ -547,7 +547,6 @@ static int intv_load_rom_file(device_image_interface &image)
 
 DEVICE_IMAGE_LOAD( intv_cart )
 {
-
 	if (image.software_entry() == NULL)
 		return intv_load_rom_file(image);
 	else

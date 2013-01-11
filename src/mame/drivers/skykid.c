@@ -424,7 +424,6 @@ static const namco_interface namco_config =
 
 INTERRUPT_GEN_MEMBER(skykid_state::main_vblank_irq)
 {
-
 	if(m_main_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
@@ -432,7 +431,6 @@ INTERRUPT_GEN_MEMBER(skykid_state::main_vblank_irq)
 
 INTERRUPT_GEN_MEMBER(skykid_state::mcu_vblank_irq)
 {
-
 	if(m_mcu_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }

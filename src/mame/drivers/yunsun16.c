@@ -556,7 +556,6 @@ GFXDECODE_END
 
 void yunsun16_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_sprites_scrolldx));
@@ -565,7 +564,6 @@ void yunsun16_state::machine_start()
 
 void yunsun16_state::machine_reset()
 {
-
 	m_sprites_scrolldx = -0x40;
 	m_sprites_scrolldy = -0x0f;
 }

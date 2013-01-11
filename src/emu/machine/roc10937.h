@@ -15,42 +15,34 @@
 #define MCFG_ROC10937_ADD(_tag,_val,_reversed) \
 		MCFG_DEVICE_ADD(_tag, ROC10937,60)\
 		MCFG_ROC10937_PORT(_val) \
-		MCFG_ROC10937_REVERSE(_reversed) \
-
+		MCFG_ROC10937_REVERSE(_reversed)
 #define MCFG_ROC10937_PORT(_val) \
-	roc10937_t::static_set_value(*device, _val); \
-
+	roc10937_t::static_set_value(*device, _val);
 #define MCFG_ROC10937_REVERSE(_reversed) \
-	roc10937_t::static_set_zero(*device, _reversed); \
-
+	roc10937_t::static_set_zero(*device, _reversed);
 #define MCFG_ROC10937_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
 #define MCFG_ROC10957_ADD(_tag,_val,_reversed) \
 		MCFG_DEVICE_ADD(_tag, ROC10957,60)\
 		MCFG_ROC10957_PORT(_val) \
-		MCFG_ROC10957_REVERSE(_reversed) \
-
+		MCFG_ROC10957_REVERSE(_reversed)
 #define MCFG_ROC10957_PORT(_val) \
-	roc10957_t::static_set_value(*device, _val); \
-
+	roc10957_t::static_set_value(*device, _val);
 #define MCFG_ROC10957_REVERSE(_reversed) \
-	roc10957_t::static_set_zero(*device, _reversed); \
-
+	roc10957_t::static_set_zero(*device, _reversed);
 #define MCFG_ROC10957_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
 #define MCFG_MSC1937_ADD(_tag,_val,_reversed) \
 		MCFG_DEVICE_ADD(_tag, ROC10937,60)\
 		MCFG_MSC1937_PORT(_val) \
-		MCFG_MSC1937_REVERSE(_reversed) \
-
+		MCFG_MSC1937_REVERSE(_reversed)
 #define MCFG_MSC1937_PORT(_val) \
 	MCFG_ROC10937_PORT(_val)
 
 #define MCFG_MSC1937_REVERSE(_reversed) \
-	roc10937_t::static_set_zero(*device, _reversed); \
-
+	roc10937_t::static_set_zero(*device, _reversed);
 #define MCFG_MSC1937_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 

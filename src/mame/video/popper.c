@@ -57,7 +57,6 @@ void popper_state::palette_init()
 
 WRITE8_MEMBER(popper_state::popper_ol_videoram_w)
 {
-
 	m_ol_videoram[offset] = data;
 	m_ol_p123_tilemap->mark_tile_dirty(offset);
 	m_ol_p0_tilemap->mark_tile_dirty(offset);
@@ -65,7 +64,6 @@ WRITE8_MEMBER(popper_state::popper_ol_videoram_w)
 
 WRITE8_MEMBER(popper_state::popper_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_p123_tilemap->mark_tile_dirty(offset);
 	m_p0_tilemap->mark_tile_dirty(offset);
@@ -73,7 +71,6 @@ WRITE8_MEMBER(popper_state::popper_videoram_w)
 
 WRITE8_MEMBER(popper_state::popper_ol_attribram_w)
 {
-
 	m_ol_attribram[offset] = data;
 	m_ol_p123_tilemap->mark_tile_dirty(offset);
 	m_ol_p0_tilemap->mark_tile_dirty(offset);
@@ -81,7 +78,6 @@ WRITE8_MEMBER(popper_state::popper_ol_attribram_w)
 
 WRITE8_MEMBER(popper_state::popper_attribram_w)
 {
-
 	m_attribram[offset] = data;
 	m_p123_tilemap->mark_tile_dirty(offset);
 	m_p0_tilemap->mark_tile_dirty(offset);
@@ -89,7 +85,6 @@ WRITE8_MEMBER(popper_state::popper_attribram_w)
 
 WRITE8_MEMBER(popper_state::popper_flipscreen_w)
 {
-
 	m_flipscreen = data;
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
@@ -106,7 +101,6 @@ WRITE8_MEMBER(popper_state::popper_e002_w)
 
 WRITE8_MEMBER(popper_state::popper_gfx_bank_w)
 {
-
 	if (m_gfx_bank != data)
 	{
 		m_gfx_bank = data;

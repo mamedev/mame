@@ -444,7 +444,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 VIDEO_START_MEMBER(seta2_state,seta2)
 {
-
 	machine().gfx[2]->set_granularity(16);
 	machine().gfx[3]->set_granularity(16);
 	machine().gfx[4]->set_granularity(16);
@@ -461,7 +460,6 @@ VIDEO_START_MEMBER(seta2_state,seta2)
 
 VIDEO_START_MEMBER(seta2_state,seta2_xoffset)
 {
-
 	VIDEO_START_CALL_MEMBER(seta2);
 
 	m_xoffset = 0x200;
@@ -469,7 +467,6 @@ VIDEO_START_MEMBER(seta2_state,seta2_xoffset)
 
 VIDEO_START_MEMBER(seta2_state,seta2_yoffset)
 {
-
 	VIDEO_START_CALL_MEMBER(seta2);
 
 	m_yoffset = 0x10;
@@ -477,7 +474,6 @@ VIDEO_START_MEMBER(seta2_state,seta2_yoffset)
 
 UINT32 seta2_state::screen_update_seta2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	// Black or pen 0?
 	bitmap.fill(machine().pens[0], cliprect);
 
@@ -492,7 +488,6 @@ void seta2_state::screen_eof_seta2(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-
 		// Buffer sprites by 1 frame
 		memcpy(m_buffered_spriteram, m_spriteram, m_spriteram.bytes());
 	}

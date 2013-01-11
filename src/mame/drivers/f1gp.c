@@ -67,7 +67,6 @@ WRITE8_MEMBER(f1gp_state::f1gp_sh_bankswitch_w)
 
 WRITE16_MEMBER(f1gp_state::sound_command_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		m_pending_command = 1;
@@ -415,7 +414,6 @@ static const k053936_interface f1gp2_k053936_intf =
 
 MACHINE_START_MEMBER(f1gp_state,f1gpb)
 {
-
 	save_item(NAME(m_pending_command));
 	save_item(NAME(m_roz_bank));
 	save_item(NAME(m_flipscreen));
@@ -437,7 +435,6 @@ MACHINE_START_MEMBER(f1gp_state,f1gp)
 
 MACHINE_RESET_MEMBER(f1gp_state,f1gp)
 {
-
 	m_pending_command = 0;
 	m_roz_bank = 0;
 	m_flipscreen = 0;

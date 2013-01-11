@@ -459,7 +459,6 @@ READ8_MEMBER(smc777_state::key_r)
 /* TODO: the packet commands strikes me as something I've already seen before, don't remember where however ... */
 WRITE8_MEMBER(smc777_state::key_w)
 {
-
 	if(offset == 1) //keyboard command
 		m_keyb_cmd = data;
 	else
@@ -479,7 +478,6 @@ WRITE8_MEMBER(smc777_state::border_col_w)
 
 READ8_MEMBER(smc777_state::system_input_r)
 {
-
 	printf("System FF R %02x\n",m_system_data & 0x0f);
 
 	switch(m_system_data & 0x0f)
@@ -516,13 +514,11 @@ WRITE8_MEMBER(smc777_state::system_output_w)
 /* presumably SMC-777 specific */
 READ8_MEMBER(smc777_state::smc777_joystick_r)
 {
-
 	return ioport("JOY_1P")->read();
 }
 
 WRITE8_MEMBER(smc777_state::smc777_color_mode_w)
 {
-
 	switch(data & 0x0f)
 	{
 		case 0x06: m_pal_mode = (data & 0x10) ^ 0x10; break;
@@ -609,13 +605,11 @@ WRITE8_MEMBER(smc777_state::smc777_mem_w)
 
 READ8_MEMBER(smc777_state::smc777_irq_mask_r)
 {
-
 	return m_irq_mask;
 }
 
 WRITE8_MEMBER(smc777_state::smc777_irq_mask_w)
 {
-
 	if(data & 0xfe)
 		printf("Irq mask = %02x\n",data & 0xfe);
 
@@ -958,15 +952,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(smc777_state::keyboard_callback)
 
 void smc777_state::machine_start()
 {
-
-
 	beep_set_frequency(machine().device(BEEPER_TAG),300); //guesswork
 	beep_set_state(machine().device(BEEPER_TAG),0);
 }
 
 void smc777_state::machine_reset()
 {
-
 	m_raminh = 1;
 	m_raminh_pending_change = 1;
 	m_raminh_prefetch = 0xff;
@@ -1049,7 +1040,6 @@ static const floppy_interface smc777_floppy_interface =
 
 INTERRUPT_GEN_MEMBER(smc777_state::smc777_vblank_irq)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(0,HOLD_LINE);
 }

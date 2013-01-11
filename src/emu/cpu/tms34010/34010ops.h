@@ -68,8 +68,7 @@ INLINE void TMS34010_WRMEM_DWORD(tms34010_state *tms, offs_t A,UINT32 V)
 	{                                                                               \
 		old = (UINT32)TMS34010_RDMEM_WORD(T, offset) & ~((MASK) << shift);          \
 		TMS34010_WRMEM_WORD(T, offset, ((masked_data & (MASK)) << shift) | old);        \
-	}                                                                               \
-
+	}
 #define WFIELDMAC_BIG(T,MASK,MAX)                                                       \
 	UINT32 shift = offset & 0x0f;                                                   \
 	UINT32 masked_data = data & (MASK);                                             \
@@ -84,24 +83,21 @@ INLINE void TMS34010_WRMEM_DWORD(tms34010_state *tms, offs_t A,UINT32 V)
 		shift = 32 - shift;                                                         \
 		old = (UINT32)TMS34010_RDMEM_WORD(T, offset + 4) & ~((MASK) >> shift);          \
 		TMS34010_WRMEM_WORD(T, offset, (masked_data >> shift) | old);                   \
-	}                                                                               \
-
+	}
 #define WFIELDMAC_8(T)                                                                  \
 	if (offset & 0x07)                                                              \
 	{                                                                               \
 		WFIELDMAC(T,0xff,9);                                                            \
 	}                                                                               \
 	else                                                                            \
-		TMS34010_WRMEM(T, TOBYTE(offset), data);                                        \
-
+		TMS34010_WRMEM(T, TOBYTE(offset), data);
 #define RFIELDMAC_8(T)                                                              \
 	if (offset & 0x07)                                                              \
 	{                                                                               \
 		RFIELDMAC(T,0xff,9);                                                            \
 	}                                                                               \
 	else                                                                            \
-		return TMS34010_RDMEM(T, TOBYTE(offset));                                       \
-
+		return TMS34010_RDMEM(T, TOBYTE(offset));
 #define WFIELDMAC_32(T)                                                             \
 	if (offset & 0x0f)                                                              \
 	{                                                                               \
@@ -115,8 +111,7 @@ INLINE void TMS34010_WRMEM_DWORD(tms34010_state *tms, offs_t A,UINT32 V)
 		TMS34010_WRMEM_DWORD(T, TOBYTE(offset+0x20),(data>>(0x20-shift))|hiword);       \
 	}                                                                               \
 	else                                                                            \
-		TMS34010_WRMEM_DWORD(T, TOBYTE(offset),data);                                   \
-
+		TMS34010_WRMEM_DWORD(T, TOBYTE(offset),data);
 
 
 /***************************************************************************
@@ -130,8 +125,7 @@ INLINE void TMS34010_WRMEM_DWORD(tms34010_state *tms, offs_t A,UINT32 V)
 	if (shift >= MAX)                                                               \
 		ret = (TMS34010_RDMEM_DWORD(T, offset) >> shift) & (MASK);                      \
 	else                                                                            \
-		ret = (TMS34010_RDMEM_WORD(T, offset) >> shift) & (MASK);                       \
-
+		ret = (TMS34010_RDMEM_WORD(T, offset) >> shift) & (MASK);
 #define RFIELDMAC_BIG(T,MASK,MAX)                                                       \
 	UINT32 shift = offset & 0x0f;                                                   \
 	offset = TOBYTE(offset & 0xfffffff0);                                           \
@@ -139,8 +133,7 @@ INLINE void TMS34010_WRMEM_DWORD(tms34010_state *tms, offs_t A,UINT32 V)
 	ret = (UINT32)TMS34010_RDMEM_DWORD(T, offset) >> shift;                         \
 	if (shift >= MAX)                                                               \
 		ret |= (TMS34010_RDMEM_WORD(T, offset + 4) << (32 - shift));                    \
-	ret &= MASK;                                                                    \
-
+	ret &= MASK;
 #define RFIELDMAC_32(T)                                                             \
 	if (offset&0x0f)                                                                \
 	{                                                                               \
@@ -150,8 +143,7 @@ INLINE void TMS34010_WRMEM_DWORD(tms34010_state *tms, offs_t A,UINT32 V)
 						(TMS34010_RDMEM_DWORD (T, TOBYTE(offset+0x20))<<(0x20-shift)));\
 	}                                                                               \
 	else                                                                            \
-		return TMS34010_RDMEM_DWORD(T, TOBYTE(offset));                             \
-
+		return TMS34010_RDMEM_DWORD(T, TOBYTE(offset));
 
 
 #endif /* __34010OPS_H__ */

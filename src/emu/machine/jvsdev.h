@@ -5,8 +5,7 @@
 
 #define MCFG_JVS_DEVICE_ADD(_tag, _type, _host) \
 	MCFG_DEVICE_ADD(_tag, _type, 0) \
-	jvs_device::static_set_jvs_host_tag(*device, _host); \
-
+	jvs_device::static_set_jvs_host_tag(*device, _host);
 class jvs_host;
 
 class jvs_device : public device_t

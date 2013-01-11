@@ -43,28 +43,24 @@ void ssozumo_state::palette_init()
 
 WRITE8_MEMBER(ssozumo_state::ssozumo_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(ssozumo_state::ssozumo_colorram_w)
 {
-
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(ssozumo_state::ssozumo_videoram2_w)
 {
-
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(ssozumo_state::ssozumo_colorram2_w)
 {
-
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
@@ -104,7 +100,6 @@ WRITE8_MEMBER(ssozumo_state::ssozumo_paletteram_w)
 
 WRITE8_MEMBER(ssozumo_state::ssozumo_scroll_w)
 {
-
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
@@ -132,7 +127,6 @@ TILE_GET_INFO_MEMBER(ssozumo_state::get_fg_tile_info)
 
 void ssozumo_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ssozumo_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS_FLIP_X,
 			16, 16, 16, 32);
 
@@ -178,7 +172,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 ssozumo_state::screen_update_ssozumo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(machine(), bitmap, cliprect);

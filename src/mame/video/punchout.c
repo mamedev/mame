@@ -353,7 +353,6 @@ static void punchout_copy_bot_palette(running_machine &machine, int bank)
 
 UINT32 punchout_state::screen_update_punchout_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	punchout_copy_top_palette(machine(), BIT(*m_palettebank,1));
 
 	m_bg_top_tilemap->draw(bitmap, cliprect, 0, 0);
@@ -386,7 +385,6 @@ UINT32 punchout_state::screen_update_punchout_bottom(screen_device &screen, bitm
 
 UINT32 punchout_state::screen_update_armwrest_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	punchout_copy_top_palette(machine(), BIT(*m_palettebank,1));
 
 	m_bg_top_tilemap->draw(bitmap, cliprect, 0, 0);
@@ -399,7 +397,6 @@ UINT32 punchout_state::screen_update_armwrest_top(screen_device &screen, bitmap_
 
 UINT32 punchout_state::screen_update_armwrest_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	punchout_copy_bot_palette(machine(), BIT(*m_palettebank,0));
 
 	m_bg_bot_tilemap->draw(bitmap, cliprect, 0, 0);

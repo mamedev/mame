@@ -1222,7 +1222,6 @@ READ16_MEMBER(x68k_state::x68k_mfp_r)
 
 READ16_MEMBER(x68k_state::x68k_mfp_r)
 {
-
 	// Initial settings indicate that IRQs are generated for FM (YM2151), Receive buffer error or full,
 	// MFP Timer C, and the power switch
 //  logerror("MFP: [%08x] Reading offset %i\n",space.device().safe_pc(),offset);
@@ -1286,7 +1285,6 @@ READ16_MEMBER(x68k_state::x68k_mfp_r)
 
 WRITE16_MEMBER(x68k_state::x68k_mfp_w)
 {
-
 	/* For the Interrupt registers, the bits are set out as such:
 	   Reg A - bit 7: GPIP7 (HSync)
 	           bit 6: GPIP6 (CRTC CIRQ)
@@ -2375,7 +2373,6 @@ void x68k_state::floppy_unload(floppy_image_device *dev)
 
 TIMER_CALLBACK_MEMBER(x68k_state::x68k_net_irq)
 {
-
 	m_current_vector[2] = 0xf9;
 	m_current_irq_line = 2;
 	machine().device("maincpu")->execute().set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);

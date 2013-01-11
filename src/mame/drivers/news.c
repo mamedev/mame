@@ -115,13 +115,11 @@ GFXDECODE_END
 
 void news_state::machine_start()
 {
-
 	save_item(NAME(m_bgpic));
 }
 
 void news_state::machine_reset()
 {
-
 	m_bgpic = 0;
 }
 

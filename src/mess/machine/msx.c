@@ -842,7 +842,6 @@ static void msx_memory_init (running_machine &machine)
 	state->layout = layout;
 
 	for (; layout->entry != MSX_LAYOUT_LAST; layout++) {
-
 		switch (layout->entry) {
 		case MSX_LAYOUT_SLOT_ENTRY:
 			prim = layout->slot_primary;
@@ -895,7 +894,6 @@ static void msx_memory_init (running_machine &machine)
 
 			if (!st) {
 				switch (slot->mem_type) {
-
 				case MSX_MEM_HANDLER:
 				case MSX_MEM_ROM:
 					mem = machine.root_device().memregion("maincpu")->base() + option;

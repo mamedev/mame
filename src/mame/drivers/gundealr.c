@@ -373,7 +373,6 @@ void gundealr_state::machine_start()
 
 void gundealr_state::machine_reset()
 {
-
 	m_flipscreen = 0;
 	m_scroll[0] = 0;
 	m_scroll[1] = 0;

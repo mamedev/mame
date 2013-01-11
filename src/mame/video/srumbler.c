@@ -92,7 +92,6 @@ WRITE8_MEMBER(srumbler_state::srumbler_4009_w)
 
 WRITE8_MEMBER(srumbler_state::srumbler_scroll_w)
 {
-
 	m_scroll[offset] = data;
 
 	m_bg_tilemap->set_scrollx(0,m_scroll[0] | (m_scroll[1] << 8));

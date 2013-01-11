@@ -301,7 +301,6 @@ static SCREEN_UPDATE_IND16( nevada )
 /***************************************************************************/
 static PALETTE_INIT( nevada )
 {
-
 	// Palette init
 }
 
@@ -692,7 +691,6 @@ static const duart68681_config nevada_duart40_68681_config =
 
 static MACHINE_RESET( nevada )
 {
-
 	nevada_state *state = machine.driver_data<nevada_state>();
 
 	state->m_duart18_68681 = machine.device( "duart18_68681" );

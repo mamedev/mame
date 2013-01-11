@@ -650,7 +650,6 @@ static int deco16_pf_update(
 	/* Rowscroll enable */
 	if (rowscroll_ptr && (control1 & 0x60) == 0x40)
 	{
-
 		/* Several different rowscroll styles */
 		switch ((control0 >> 3) & 0xf)
 		{
@@ -688,7 +687,6 @@ static int deco16_pf_update(
 	}
 	else if (rowscroll_ptr && (control1 & 0x60) == 0x20)  /* Column scroll */
 	{
-
 		/* Column scroll ranges from 8 pixel columns to 512 pixel columns */
 		int mask = (0x40 >> (control0 & 7)) - 1;
 		if (mask == -1)

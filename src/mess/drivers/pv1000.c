@@ -390,7 +390,6 @@ void pv1000_state::machine_start()
 
 void pv1000_state::machine_reset()
 {
-
 	m_io_regs[5] = 0;
 	m_fd_data = 0;
 	m_irq_on_timer->adjust( m_screen->time_until_pos(195, 0 ) );

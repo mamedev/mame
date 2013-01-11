@@ -250,7 +250,6 @@ GFXDECODE_END
 
 UINT32 carrera_state::screen_update_carrera(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	int x,y;
 	int count = 0;
 

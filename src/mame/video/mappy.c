@@ -320,7 +320,6 @@ TILE_GET_INFO_MEMBER(mappy_state::mappy_get_tile_info)
 
 VIDEO_START_MEMBER(mappy_state,superpac)
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mappy_state::superpac_get_tile_info),this),tilemap_mapper_delegate(FUNC(mappy_state::superpac_tilemap_scan),this),8,8,36,28);
 	machine().primary_screen->register_screen_bitmap(m_sprite_bitmap);
 
@@ -329,7 +328,6 @@ VIDEO_START_MEMBER(mappy_state,superpac)
 
 VIDEO_START_MEMBER(mappy_state,phozon)
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mappy_state::phozon_get_tile_info),this),tilemap_mapper_delegate(FUNC(mappy_state::superpac_tilemap_scan),this),8,8,36,28);
 
 	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, machine().gfx[0], 15);
@@ -339,7 +337,6 @@ VIDEO_START_MEMBER(mappy_state,phozon)
 
 VIDEO_START_MEMBER(mappy_state,mappy)
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mappy_state::mappy_get_tile_info),this),tilemap_mapper_delegate(FUNC(mappy_state::mappy_tilemap_scan),this),8,8,36,60);
 
 	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, machine().gfx[0], 31);
@@ -356,14 +353,12 @@ VIDEO_START_MEMBER(mappy_state,mappy)
 
 WRITE8_MEMBER(mappy_state::superpac_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_MEMBER(mappy_state::mappy_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
@@ -381,7 +376,6 @@ READ8_MEMBER(mappy_state::superpac_flipscreen_r)
 
 WRITE8_MEMBER(mappy_state::mappy_scroll_w)
 {
-
 	m_scroll = offset >> 3;
 }
 
@@ -563,7 +557,6 @@ UINT32 mappy_state::screen_update_superpac(screen_device &screen, bitmap_ind16 &
 
 UINT32 mappy_state::screen_update_phozon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	/* flip screen control is embedded in RAM */
 	flip_screen_set(m_spriteram[0x1f7f-0x800] & 1);
 

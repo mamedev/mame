@@ -445,7 +445,6 @@ void osborne1_state::machine_reset()
 
 DRIVER_INIT_MEMBER(osborne1_state,osborne1)
 {
-
 	m_empty_4K = auto_alloc_array(machine(), UINT8, 0x1000 );
 	memset( m_empty_4K, 0xFF, 0x1000 );
 

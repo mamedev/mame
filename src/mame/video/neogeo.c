@@ -845,7 +845,6 @@ WRITE16_MEMBER(neogeo_state::neogeo_video_register_w)
 
 void neogeo_state::video_start()
 {
-
 	/* allocate memory not directly mapped */
 	m_palettes[0] = auto_alloc_array(machine(), UINT16, NUM_PENS);
 	m_palettes[1] = auto_alloc_array(machine(), UINT16, NUM_PENS);
@@ -917,7 +916,6 @@ void neogeo_state::video_reset()
 
 UINT32 neogeo_state::screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 	/* fill with background color first */
 	bitmap.fill(m_pens[0x0fff], cliprect);
 

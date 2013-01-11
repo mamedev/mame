@@ -877,7 +877,6 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 
 		switch ((mmu_entry_t)state->m_mmu_regs[the_seg][segment].type)
 		{
-
 		case RAM_r:
 		case RAM_rw:
 			if (seg_offset > state->m_mmu_regs[the_seg][segment].slim)
@@ -1408,7 +1407,6 @@ READ16_MEMBER(lisa_state::lisa_r)
 
 		switch (m_mmu_regs[the_seg][segment].type)
 		{
-
 		case RAM_stack_r:
 		case RAM_stack_rw:
 			if (address <= m_mmu_regs[the_seg][segment].slim)
@@ -1612,7 +1610,6 @@ WRITE16_MEMBER(lisa_state::lisa_w)
 
 		switch (m_mmu_regs[the_seg][segment].type)
 		{
-
 		case RAM_stack_rw:
 			if (address <= m_mmu_regs[the_seg][segment].slim)
 			{

@@ -73,7 +73,6 @@ coco_vhd_image_device::coco_vhd_image_device(const machine_config &mconfig, cons
 	: device_t(mconfig, COCO_VHD, "Virtual Hard Disk", tag, owner, clock),
 		device_image_interface(mconfig, *this)
 {
-
 }
 
 //-------------------------------------------------

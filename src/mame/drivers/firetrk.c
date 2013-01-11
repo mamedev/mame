@@ -51,7 +51,6 @@ INPUT_CHANGED_MEMBER(firetrk_state::gear_changed)
 
 INTERRUPT_GEN_MEMBER(firetrk_state::firetrk_interrupt)
 {
-
 	/* NMI interrupts are disabled during service mode in firetrk and montecar */
 	if (!m_in_service_mode)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

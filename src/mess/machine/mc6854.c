@@ -356,7 +356,6 @@ static TIMER_CALLBACK(mc6854_tfifo_cb)
 
 		switch ( mc6854->tstate )
 		{
-
 		case 2: /* 8-bit address field */
 			if ( ( data & 1 ) || ( ! AEX ) )
 				mc6854->tstate = 3;
@@ -464,7 +463,6 @@ static void mc6854_rfifo_push( device_t *device, UINT8 d )
 
 	switch ( mc6854->rstate )
 	{
-
 	case 0:
 	case 1:
 	case 2: /* 8-bit address field */
@@ -804,7 +802,6 @@ READ8_DEVICE_HANDLER ( mc6854_r )
 	mc6854_t* mc6854 = get_safe_token( device );
 	switch ( offset )
 	{
-
 	case 0: /* status register 1 */
 		mc6854_update_sr1( mc6854 );
 		LOG(( "%f $%04x mc6854_r: get SR1=$%02X (rda=%i,s2rq=%i,fd=%i,cts=%i,tu=%i,tdra=%i,irq=%i)\n",
@@ -847,7 +844,6 @@ WRITE8_DEVICE_HANDLER ( mc6854_w )
 	mc6854_t* mc6854 = get_safe_token( device );
 	switch ( offset )
 	{
-
 	case 0: /* control register 1 */
 		mc6854->cr1 = data;
 		LOG(( "%f $%04x mc6854_w: set CR1=$%02X (ac=%i,irq=%c%c,%sreset=%c%c)\n",

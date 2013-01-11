@@ -425,7 +425,6 @@ INPUT_PORTS_END
 
 void toratora_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_pia_u1 = machine().device<pia6821_device>("pia_u1");
 	m_pia_u2 = machine().device<pia6821_device>("pia_u2");
@@ -438,7 +437,6 @@ void toratora_state::machine_start()
 
 void toratora_state::machine_reset()
 {
-
 	m_timer = 0xff;
 	m_last = 0;
 	m_clear_tv = 0;

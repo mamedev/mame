@@ -949,7 +949,6 @@ static CPU_EXECUTE(mn10200)
 		case 0xf1:
 			opcode = mn102_read_byte(mn102, mn102->pc+1);
 			switch(opcode>>6) {
-
 				// mov (di, an), am
 				case 0:
 				mn102->cycles -= 3;
@@ -1483,7 +1482,6 @@ static CPU_EXECUTE(mn10200)
 		case 0xf5:
 			opcode = mn102_read_byte(mn102, mn102->pc+1);
 			switch(opcode) {
-
 				// and imm8, dn
 				case 0x00: case 0x01: case 0x02: case 0x03:
 				mn102->cycles -= 2;

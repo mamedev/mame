@@ -110,7 +110,6 @@ READ8_MEMBER(nascom1_state::nascom1_port_00_r)
 
 WRITE8_MEMBER(nascom1_state::nascom1_port_00_w)
 {
-
 	machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(
 		( data & 0x10 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR );
 

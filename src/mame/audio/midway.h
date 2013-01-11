@@ -69,20 +69,15 @@ extern const device_type MIDWAY_SQUAWK_N_TALK;
 //**************************************************************************
 
 #define MCFG_MIDWAY_SSIO_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MIDWAY_SSIO, 0) \
-
+	MCFG_DEVICE_ADD(_tag, MIDWAY_SSIO, 0)
 #define MCFG_MIDWAY_CHIP_SQUEAK_DELUXE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MIDWAY_CHIP_SQUEAK_DELUXE, 0) \
-
+	MCFG_DEVICE_ADD(_tag, MIDWAY_CHIP_SQUEAK_DELUXE, 0)
 #define MCFG_MIDWAY_SOUNDS_GOOD_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MIDWAY_SOUNDS_GOOD, 0) \
-
+	MCFG_DEVICE_ADD(_tag, MIDWAY_SOUNDS_GOOD, 0)
 #define MCFG_MIDWAY_TURBO_CHIP_SQUEAK_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MIDWAY_TURBO_CHIP_SQUEAK, 0) \
-
+	MCFG_DEVICE_ADD(_tag, MIDWAY_TURBO_CHIP_SQUEAK, 0)
 #define MCFG_MIDWAY_SQUAWK_N_TALK_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MIDWAY_SQUAWK_N_TALK, 0) \
-
+	MCFG_DEVICE_ADD(_tag, MIDWAY_SQUAWK_N_TALK, 0)
 
 
 //**************************************************************************

@@ -25,14 +25,11 @@
 #define MCFG_I8243_ADD(_tag, _read, _write) \
 	MCFG_DEVICE_ADD(_tag, I8243, 0) \
 	MCFG_I8243_READHANDLER(_read) \
-	MCFG_I8243_WRITEHANDLER(_write) \
-
+	MCFG_I8243_WRITEHANDLER(_write)
 #define MCFG_I8243_READHANDLER(_devcb) \
-	devcb = &i8243_device::set_read_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &i8243_device::set_read_handler(*device, DEVCB2_##_devcb);
 #define MCFG_I8243_WRITEHANDLER(_devcb) \
-	devcb = &i8243_device::set_write_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &i8243_device::set_write_handler(*device, DEVCB2_##_devcb);
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/

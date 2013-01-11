@@ -365,7 +365,6 @@ void rastan_state::machine_start()
 
 void rastan_state::machine_reset()
 {
-
 	m_sprite_ctrl = 0;
 	m_sprites_flipscreen = 0;
 	m_adpcm_pos = 0;

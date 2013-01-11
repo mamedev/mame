@@ -1850,7 +1850,6 @@ ide_slot_device::ide_slot_device(const machine_config &mconfig, const char *tag,
 		device_slot_interface(mconfig, *this),
 		m_dev(NULL)
 {
-
 }
 
 //-------------------------------------------------

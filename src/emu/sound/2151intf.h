@@ -20,11 +20,9 @@
 	MCFG_DEVICE_ADD(_tag, YM2151, _clock)
 
 #define MCFG_YM2151_IRQ_HANDLER(_devcb) \
-	devcb = &ym2151_device::set_irq_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &ym2151_device::set_irq_handler(*device, DEVCB2_##_devcb);
 #define MCFG_YM2151_PORT_WRITE_HANDLER(_devcb) \
-	devcb = &ym2151_device::set_port_write_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &ym2151_device::set_port_write_handler(*device, DEVCB2_##_devcb);
 
 
 //**************************************************************************

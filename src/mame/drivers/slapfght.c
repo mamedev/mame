@@ -736,7 +736,6 @@ static const ay8910_interface ay8910_interface_2 =
 
 INTERRUPT_GEN_MEMBER(slapfght_state::vblank_irq)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }

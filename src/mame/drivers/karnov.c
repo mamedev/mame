@@ -330,7 +330,6 @@ static void chelnov_i8751_w( running_machine &machine, int data )
 
 WRITE16_MEMBER(karnov_state::karnov_control_w)
 {
-
 	/* Mnemonics filled in from the schematics, brackets are my comments */
 	switch (offset << 1)
 	{
@@ -403,7 +402,6 @@ WRITE16_MEMBER(karnov_state::karnov_control_w)
 
 READ16_MEMBER(karnov_state::karnov_control_r)
 {
-
 	switch (offset << 1)
 	{
 		case 0:
@@ -766,7 +764,6 @@ static const ym3526_interface ym3526_config =
 
 void karnov_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -784,7 +781,6 @@ void karnov_state::machine_start()
 
 void karnov_state::machine_reset()
 {
-
 	memset(m_ram, 0, 0x4000 / 2); /* Chelnov likes ram clear on reset.. */
 
 	m_i8751_return = 0;

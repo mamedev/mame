@@ -92,7 +92,6 @@ ADDRESS_MAP_END
 
 void murogmbl_state::video_start()
 {
-
 }
 
 UINT32 murogmbl_state::screen_update_murogmbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

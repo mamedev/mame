@@ -89,8 +89,7 @@ do                                                                              
 		(PRIORITY) = 31;                                                            \
 	}                                                                               \
 }                                                                                   \
-while (0)                                                                           \
-
+while (0)
 
 static void pdrawgfx_transpen_additive(bitmap_rgb32 &dest, const rectangle &cliprect, gfx_element *gfx,
 		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
@@ -361,7 +360,6 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 				}
 				else // inline chain mode, used by ss64
 				{
-
 					tileno=(source[4]&0x0007ffff);
 					pal =(source[3]&0x00ff0000)>>16;
 
@@ -566,9 +564,7 @@ static void transition_control(running_machine &machine, bitmap_rgb32 &bitmap, c
 			SET_TILE_INFO_MEMBER(2,tileno>>2, pal,TILE_FLIPYX(flip));                 \
 		}                                                                      \
 	}                                                                          \
-}                                                                              \
-																				\
-
+}
 TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile0_8x8_info)
 {
 	int offset = 0x00000;
@@ -1239,7 +1235,6 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_rgb32 &bitmap, co
 
 				for (yy=0;yy<448;yy++)
 				{
-
 					dstptr = &bitmap.pix32(yy);
 
 					tmp = xtopleft;
@@ -1309,7 +1304,6 @@ static void hng64_drawtilemap(running_machine& machine, bitmap_rgb32 &bitmap, co
 			}
 			else
 			{
-
 				xtopleft = (hng64_videoram[(0x40000+(scrollbase<<4))/4]);
 				xmiddle   = (hng64_videoram[(0x40004+(scrollbase<<4))/4]); // middle screen point
 				ytopleft = (hng64_videoram[(0x40008+(scrollbase<<4))/4]);
@@ -3291,7 +3285,6 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine &machine,
 	// First work on the bottom half of the triangle
 	// I'm using y_min as the incrementer because it saves space and we don't need it anymore
 	for (; y_min < y_mid; y_min++) {
-
 		// We always want to fill left to right, so we have 2 main cases
 		// Compute the integer starting and ending points and the appropriate z by
 		// interpolating.  Remember the pixels are in the middle of the grid, i.e. (0.5,0.5,0.5)
@@ -3374,7 +3367,6 @@ static void RasterizeTriangle_SMOOTH_TEX_PC(running_machine &machine,
 	// We've seen this loop before haven't we?
 	// I'm using y_mid as the incrementer because it saves space and we don't need it anymore
 	for (; y_mid <= y_max; y_mid++) {
-
 		if (x1_interp < x2_interp) {
 			x_start    = ((((int)x1_interp) + 0.5) >= x1_interp) ? (int)x1_interp : ((int)x1_interp) + 1;
 			x_end      = ((((int)x2_interp) + 0.5) <  x2_interp) ? (int)x2_interp : ((int)x2_interp) - 1;

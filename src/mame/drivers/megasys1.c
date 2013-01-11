@@ -1381,7 +1381,6 @@ READ16_MEMBER(megasys1_state::protection_peekaboo_r)
 
 WRITE16_MEMBER(megasys1_state::protection_peekaboo_w)
 {
-
 	COMBINE_DATA(&m_protection_val);
 
 	if ((m_protection_val & 0x90) == 0x90)
@@ -4003,7 +4002,6 @@ READ16_MEMBER(megasys1_state::stdragon_mcu_hs_r)
 
 WRITE16_MEMBER(megasys1_state::stdragon_mcu_hs_w)
 {
-
 	COMBINE_DATA(&m_mcu_hs_ram[offset]);
 
 	if(MCU_HS_SEQ(0x0000,0x0055,0x00aa,0x00ff) && offset == 0x8/2)

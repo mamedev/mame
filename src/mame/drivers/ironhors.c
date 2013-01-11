@@ -38,7 +38,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::ironhors_irq)
 
 WRITE8_MEMBER(ironhors_state::ironhors_sh_irqtrigger_w)
 {
-
 	m_soundcpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
@@ -357,7 +356,6 @@ static const ym2203_interface ym2203_config =
 
 void ironhors_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_soundcpu = machine().device<cpu_device>("soundcpu");
 
@@ -368,7 +366,6 @@ void ironhors_state::machine_start()
 
 void ironhors_state::machine_reset()
 {
-
 	m_palettebank = 0;
 	m_charbank = 0;
 	m_spriterambank = 0;
@@ -433,7 +430,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_irq)
 
 READ8_MEMBER(ironhors_state::farwest_soundlatch_r)
 {
-
 	return soundlatch_byte_r(m_soundcpu->space(AS_PROGRAM), 0);
 }
 

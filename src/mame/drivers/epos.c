@@ -36,7 +36,6 @@
 
 WRITE8_MEMBER(epos_state::dealer_decrypt_rom)
 {
-
 	if (offset & 0x04)
 		m_counter = (m_counter + 1) & 0x03;
 	else
@@ -367,14 +366,12 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(epos_state,epos)
 {
-
 	save_item(NAME(m_palette));
 	save_item(NAME(m_counter));
 }
 
 void epos_state::machine_reset()
 {
-
 	m_palette = 0;
 	m_counter = 0;
 }

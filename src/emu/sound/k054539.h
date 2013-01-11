@@ -11,8 +11,7 @@
 
 #define MCFG_K054539_ADD(_tag, _clock, _interface) \
 	MCFG_DEVICE_ADD(_tag, K054539, _clock) \
-	k054539_device::static_set_interface(*device, _interface); \
-
+	k054539_device::static_set_interface(*device, _interface);
 struct k054539_interface
 {
 	const char *rgnoverride;

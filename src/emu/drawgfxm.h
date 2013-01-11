@@ -82,8 +82,7 @@ do                                                                              
 {                                                                                   \
 	(DEST) = SOURCE;                                                                \
 }                                                                                   \
-while (0)                                                                           \
-
+while (0)
 
 /*-------------------------------------------------
     PIXEL_OP_COPY_TRANSPEN - render all pixels
@@ -98,8 +97,7 @@ do                                                                              
 	if (srcdata != transpen)                                                        \
 		(DEST) = SOURCE;                                                            \
 }                                                                                   \
-while (0)                                                                           \
-
+while (0)
 
 /*-------------------------------------------------
     PIXEL_OP_REMAP_OPAQUE - render all pixels
@@ -112,8 +110,7 @@ do                                                                              
 {                                                                                   \
 	(DEST) = paldata[SOURCE];                                                       \
 }                                                                                   \
-while (0)                                                                           \
-
+while (0)
 #define PIXEL_OP_REMAP_OPAQUE_PRIORITY(DEST, PRIORITY, SOURCE)                      \
 do                                                                                  \
 {                                                                                   \
@@ -121,8 +118,7 @@ do                                                                              
 		(DEST) = paldata[SOURCE];                                                   \
 	(PRIORITY) = 31;                                                                \
 }                                                                                   \
-while (0)                                                                           \
-
+while (0)
 
 /*-------------------------------------------------
     PIXEL_OP_REMAP_TRANSPEN - render all pixels
@@ -137,8 +133,7 @@ do                                                                              
 	if (srcdata != transpen)                                                        \
 		(DEST) = paldata[srcdata];                                                  \
 }                                                                                   \
-while (0)                                                                           \
-
+while (0)
 #define PIXEL_OP_REMAP_TRANSPEN_PRIORITY(DEST, PRIORITY, SOURCE)                    \
 do                                                                                  \
 {                                                                                   \
@@ -150,8 +145,7 @@ do                                                                              
 		(PRIORITY) = 31;                                                            \
 	}                                                                               \
 }                                                                                   \
-while (0)                                                                           \
-
+while (0)
 
 /*-------------------------------------------------
     PIXEL_OP_REBASE_TRANSPEN - render all pixels
@@ -166,8 +160,7 @@ do                                                                              
 	if (srcdata != transpen)                                                        \
 		(DEST) = color + srcdata;                                                   \
 }                                                                                   \
-while (0)                                                                           \
-
+while (0)
 #define PIXEL_OP_REBASE_TRANSPEN_PRIORITY(DEST, PRIORITY, SOURCE)                   \
 do                                                                                  \
 {                                                                                   \
@@ -179,8 +172,7 @@ do                                                                              
 		(PRIORITY) = 31;                                                            \
 	}                                                                               \
 }                                                                                   \
-while (0)                                                                           \
-
+while (0)
 
 /*-------------------------------------------------
     PIXEL_OP_REMAP_TRANSMASK - render all pixels
@@ -195,8 +187,7 @@ do                                                                              
 	if (((transmask >> srcdata) & 1) == 0)                                          \
 		(DEST) = paldata[srcdata];                                                  \
 }                                                                                   \
-while (0)                                                                           \
-
+while (0)
 #define PIXEL_OP_REMAP_TRANSMASK_PRIORITY(DEST, PRIORITY, SOURCE)                   \
 do                                                                                  \
 {                                                                                   \
@@ -208,8 +199,7 @@ do                                                                              
 		(PRIORITY) = 31;                                                            \
 	}                                                                               \
 }                                                                                   \
-while (0)                                                                           \
-
+while (0)
 
 /*-------------------------------------------------
     PIXEL_OP_REMAP_TRANSTABLE - look up each pen in
@@ -233,8 +223,7 @@ do                                                                              
 			(DEST) = shadowtable[DEST];                                             \
 	}                                                                               \
 }                                                                                   \
-while (0)                                                                           \
-
+while (0)
 #define PIXEL_OP_REMAP_TRANSTABLE32(DEST, PRIORITY, SOURCE)                         \
 do                                                                                  \
 {                                                                                   \
@@ -248,8 +237,7 @@ do                                                                              
 			(DEST) = shadowtable[rgb_to_rgb15(DEST)];                               \
 	}                                                                               \
 }                                                                                   \
-while (0)                                                                           \
-
+while (0)
 #define PIXEL_OP_REMAP_TRANSTABLE16_PRIORITY(DEST, PRIORITY, SOURCE)                \
 do                                                                                  \
 {                                                                                   \
@@ -271,8 +259,7 @@ do                                                                              
 		}                                                                           \
 	}                                                                               \
 }                                                                                   \
-while (0)                                                                           \
-
+while (0)
 #define PIXEL_OP_REMAP_TRANSTABLE32_PRIORITY(DEST, PRIORITY, SOURCE)                \
 do                                                                                  \
 {                                                                                   \
@@ -294,8 +281,7 @@ do                                                                              
 		}                                                                           \
 	}                                                                               \
 }                                                                                   \
-while (0)                                                                           \
-
+while (0)
 
 /*-------------------------------------------------
     PIXEL_OP_REMAP_TRANSPEN_ALPHA - render all
@@ -312,8 +298,7 @@ do                                                                              
 	if (srcdata != transpen)                                                        \
 		(DEST) = alpha_blend_r32((DEST), paldata[srcdata], alpha);                  \
 }                                                                                   \
-while (0)                                                                           \
-
+while (0)
 #define PIXEL_OP_REMAP_TRANSPEN_ALPHA32_PRIORITY(DEST, PRIORITY, SOURCE)            \
 do                                                                                  \
 {                                                                                   \
@@ -325,8 +310,7 @@ do                                                                              
 		(PRIORITY) = 31;                                                            \
 	}                                                                               \
 }                                                                                   \
-while (0)                                                                           \
-
+while (0)
 
 
 /***************************************************************************

@@ -820,7 +820,6 @@ static void AICA_UpdateReg(aica_state *AICA, address_space &space, int reg)
 
 static void AICA_UpdateSlotRegR(aica_state *AICA, int slot,int reg)
 {
-
 }
 
 static void AICA_UpdateRegR(aica_state *AICA, address_space &space, int reg)

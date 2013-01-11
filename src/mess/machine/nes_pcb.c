@@ -1906,7 +1906,6 @@ READ8_MEMBER(nes_carts_state::exrom_l_r)
 
 WRITE8_MEMBER(nes_carts_state::exrom_l_w)
 {
-
 	//  LOG_MMC(("Mapper 5 write, offset: %04x, data: %02x\n", offset + 0x4100, data));
 	/* Send $5000-$5015 to the sound chip */
 	if ((offset >= 0xf00) && (offset <= 0xf15))
@@ -2408,7 +2407,6 @@ static void ntbrom_mirror( running_machine &machine, int mirror, int mirr0, int 
 
 WRITE8_MEMBER(nes_carts_state::ntbrom_w)
 {
-
 	LOG_MMC(("ntbrom_w, offset %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x7000)
@@ -10695,7 +10693,6 @@ static void bmc_ball11_set_banks( running_machine &machine )
 
 WRITE8_MEMBER(nes_carts_state::bmc_ball11_m_w)
 {
-
 	LOG_MMC(("bmc_ball11_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	m_mmc_reg[0] = ((data >> 1) & 0x01) | ((data >> 3) & 0x02);
@@ -10704,7 +10701,6 @@ WRITE8_MEMBER(nes_carts_state::bmc_ball11_m_w)
 
 WRITE8_MEMBER(nes_carts_state::bmc_ball11_w)
 {
-
 	LOG_MMC(("bmc_ball11_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6000)
@@ -11524,7 +11520,6 @@ static void someri_mmc1_set_chr( running_machine &machine )
 
 WRITE8_MEMBER(nes_carts_state::someri_mmc1_w)
 {
-
 	assert(m_mmc_cmd1 == 2);
 
 	if (data & 0x80)

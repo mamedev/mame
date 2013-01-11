@@ -1314,7 +1314,6 @@ static void execute_op(mcs51_state_t *mcs51_state, UINT8 op)
 
 	switch( op )
 	{
-
 		case 0x00:  nop(mcs51_state, op);                           break;  //NOP
 		case 0x01:  ajmp(mcs51_state, op);                      break;  //AJMP code addr
 		case 0x02:  ljmp(mcs51_state, op);                      break;  //LJMP code addr
@@ -2338,7 +2337,6 @@ static void ds5002fp_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 
 {
 	switch (offset)
 	{
-
 		case ADDR_TA:
 			mcs51_state->ds5002fp.previous_ta = TA;
 			/*  init the time window after having wrote 0xaa */

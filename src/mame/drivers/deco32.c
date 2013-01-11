@@ -638,7 +638,6 @@ WRITE32_MEMBER(deco32_state::tattass_control_w)
 
 READ32_MEMBER(deco32_state::nslasher_prot_r)
 {
-
 	switch (offset<<1) {
 	case 0x280: return ioport("IN0")->read() << 16| 0xffff; /* IN0 */
 	case 0x4c4: return ioport("IN1")->read() << 16| 0xffff; /* IN1 */
@@ -670,7 +669,6 @@ WRITE32_MEMBER(deco32_state::nslasher_prot_w)
 
 	/* Only sound port of chip is used - no protection */
 	if (offset==0x700/4) {
-
 		/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
 		soundlatch_byte_w(space,0,(data>>16)&0xff);
 		m_nslasher_sound_irq |= 0x02;

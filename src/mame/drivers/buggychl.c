@@ -93,7 +93,6 @@ WRITE8_MEMBER(buggychl_state::bankswitch_w)
 
 TIMER_CALLBACK_MEMBER(buggychl_state::nmi_callback)
 {
-
 	if (m_sound_nmi_enable)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
@@ -376,7 +375,6 @@ void buggychl_state::machine_start()
 
 void buggychl_state::machine_reset()
 {
-
 	machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 
 	m_sound_nmi_enable = 0;

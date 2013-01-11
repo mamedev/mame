@@ -329,7 +329,6 @@ cdp1869_device::cdp1869_device(const machine_config &mconfig, const char *tag, d
 		m_stream(NULL),
 		m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, NULL, *ADDRESS_MAP_NAME(cdp1869))
 {
-
 }
 
 

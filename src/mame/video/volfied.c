@@ -30,7 +30,6 @@ READ16_MEMBER(volfied_state::volfied_video_ram_r)
 
 WRITE16_MEMBER(volfied_state::volfied_video_ram_w)
 {
-
 	mem_mask &= m_video_mask;
 
 	COMBINE_DATA(&m_video_ram[offset]);
@@ -124,7 +123,6 @@ static void refresh_pixel_layer( running_machine &machine, bitmap_ind16 &bitmap 
 
 UINT32 volfied_state::screen_update_volfied(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	machine().priority_bitmap.fill(0, cliprect);
 	refresh_pixel_layer(machine(), bitmap);
 	pc090oj_draw_sprites(m_pc090oj, bitmap, cliprect, 0);

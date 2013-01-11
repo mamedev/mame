@@ -65,7 +65,6 @@ public:
 
 void laserbas_state::video_start()
 {
-
 	save_item(NAME(m_vram1));
 	save_item(NAME(m_vram2));
 }
@@ -92,7 +91,6 @@ UINT32 laserbas_state::screen_update_laserbas(screen_device &screen, bitmap_ind1
 
 READ8_MEMBER(laserbas_state::vram_r)
 {
-
 	if(!m_vrambank)
 		return m_vram1[offset];
 	else
@@ -101,7 +99,6 @@ READ8_MEMBER(laserbas_state::vram_r)
 
 WRITE8_MEMBER(laserbas_state::vram_w)
 {
-
 	if(!m_vrambank)
 		m_vram1[offset] = data;
 	else
@@ -111,7 +108,6 @@ WRITE8_MEMBER(laserbas_state::vram_w)
 #if 0
 READ8_MEMBER(laserbas_state::read_unk)
 {
-
 	m_count ^= 0x80;
 	return m_count | 0x7f;
 }
@@ -119,7 +115,6 @@ READ8_MEMBER(laserbas_state::read_unk)
 
 WRITE8_MEMBER(laserbas_state::vrambank_w)
 {
-
 	/* either bit 2 or 3 controls flip screen */
 
 	m_vrambank = data & 0x40;
@@ -127,13 +122,11 @@ WRITE8_MEMBER(laserbas_state::vrambank_w)
 
 READ8_MEMBER(laserbas_state::protram_r)
 {
-
 	return m_protram[offset];
 }
 
 WRITE8_MEMBER(laserbas_state::protram_w)
 {
-
 	m_protram[offset] = data;
 }
 
@@ -233,14 +226,12 @@ INPUT_PORTS_END
 
 void laserbas_state::machine_start()
 {
-
 	save_item(NAME(m_vrambank));
 	save_item(NAME(m_count));
 }
 
 void laserbas_state::machine_reset()
 {
-
 	m_vrambank = 0;
 	m_count = 0;
 }

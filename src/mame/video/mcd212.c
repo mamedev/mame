@@ -1650,7 +1650,6 @@ void mcd212_ab_init(mcd212_ab_t *mcd212_ab)
 
 void cdi_state::video_start()
 {
-
 	mcd212_ab_init(&m_mcd212_ab);
 	mcd212_init(machine(), &m_mcd212_regs);
 	m_mcd212_regs.scan_timer = machine().scheduler().timer_alloc(FUNC(mcd212_perform_scan));

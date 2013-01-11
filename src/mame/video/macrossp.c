@@ -8,7 +8,6 @@
 
 WRITE32_MEMBER(macrossp_state::macrossp_scra_videoram_w)
 {
-
 	COMBINE_DATA(&m_scra_videoram[offset]);
 
 	m_scra_tilemap->mark_tile_dirty(offset);
@@ -44,7 +43,6 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_scra_tile_info)
 
 WRITE32_MEMBER(macrossp_state::macrossp_scrb_videoram_w)
 {
-
 	COMBINE_DATA(&m_scrb_videoram[offset]);
 
 	m_scrb_tilemap->mark_tile_dirty(offset);
@@ -80,7 +78,6 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_scrb_tile_info)
 
 WRITE32_MEMBER(macrossp_state::macrossp_scrc_videoram_w)
 {
-
 	COMBINE_DATA(&m_scrc_videoram[offset]);
 
 	m_scrc_tilemap->mark_tile_dirty(offset);
@@ -116,7 +113,6 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_scrc_tile_info)
 
 WRITE32_MEMBER(macrossp_state::macrossp_text_videoram_w)
 {
-
 	COMBINE_DATA(&m_text_videoram[offset]);
 
 	m_text_tilemap->mark_tile_dirty(offset);
@@ -139,7 +135,6 @@ TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_text_tile_info)
 
 void macrossp_state::video_start()
 {
-
 	m_spriteram_old = auto_alloc_array_clear(machine(), UINT32, m_spriteram.bytes() / 4);
 	m_spriteram_old2 = auto_alloc_array_clear(machine(), UINT32, m_spriteram.bytes() / 4);
 
@@ -174,7 +169,6 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 
 	while (source < finish)
 	{
-
 		/*
 
 		 --hh hhyy yyyy yyyy   CCww wwxx xxxx xxxx
@@ -424,7 +418,6 @@ void macrossp_state::screen_eof_macrossp(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-
 		/* looks like sprites are *two* frames ahead, like nmk16 */
 		memcpy(m_spriteram_old2, m_spriteram_old, m_spriteram.bytes());
 		memcpy(m_spriteram_old, m_spriteram, m_spriteram.bytes());

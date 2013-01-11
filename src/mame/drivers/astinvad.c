@@ -250,7 +250,6 @@ TIMER_CALLBACK_MEMBER(astinvad_state::kamizake_int_gen)
 
 MACHINE_START_MEMBER(astinvad_state,kamikaze)
 {
-
 	m_samples = machine().device<samples_device>("samples");
 
 	m_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astinvad_state::kamizake_int_gen),this));
@@ -263,7 +262,6 @@ MACHINE_START_MEMBER(astinvad_state,kamikaze)
 
 MACHINE_RESET_MEMBER(astinvad_state,kamikaze)
 {
-
 	m_screen_flip = 0;
 	m_screen_red = 0;
 	m_sound_state[0] = 0;
@@ -273,7 +271,6 @@ MACHINE_RESET_MEMBER(astinvad_state,kamikaze)
 
 MACHINE_START_MEMBER(astinvad_state,spaceint)
 {
-
 	m_samples = machine().device<samples_device>("samples");
 
 	save_item(NAME(m_screen_flip));
@@ -282,7 +279,6 @@ MACHINE_START_MEMBER(astinvad_state,spaceint)
 
 MACHINE_RESET_MEMBER(astinvad_state,spaceint)
 {
-
 	m_screen_flip = 0;
 	m_sound_state[0] = 0;
 	m_sound_state[1] = 0;
@@ -319,7 +315,6 @@ READ8_MEMBER(astinvad_state::kamikaze_ppi_r)
 
 WRITE8_MEMBER(astinvad_state::kamikaze_ppi_w)
 {
-
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
 		m_ppi8255_0->write(space, offset, data);
@@ -749,7 +744,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(astinvad_state,kamikaze)
 {
-
 	/* the flip screen logic adds 32 to the Y after flipping */
 	m_flip_yoffs = 32;
 }
@@ -757,7 +751,6 @@ DRIVER_INIT_MEMBER(astinvad_state,kamikaze)
 
 DRIVER_INIT_MEMBER(astinvad_state,spcking2)
 {
-
 	/* don't have the schematics, but the blanking must center the screen here */
 	m_flip_yoffs = 0;
 }

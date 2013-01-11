@@ -53,7 +53,6 @@ READ8_MEMBER(altair_state::sio_status_r)
 
 WRITE8_MEMBER(altair_state::sio_command_w)
 {
-
 }
 
 READ8_MEMBER(altair_state::sio_data_r)

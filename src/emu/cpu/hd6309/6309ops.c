@@ -697,8 +697,7 @@ OP_HANDLER( lble )
 		case 13: if (promote) dst16Reg = &z16; else dst8Reg = &z8; break;   \
 		case 14: if (promote) dst16Reg = &W; else dst8Reg = &E; break;      \
 		default: if (promote) dst16Reg = &W; else dst8Reg = &F; break;      \
-	}                                                                       \
-
+	}
 /* $1030 addr_r r1 + r2 -> r2 */
 
 OP_HANDLER( addr_r )

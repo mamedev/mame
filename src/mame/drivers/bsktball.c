@@ -211,7 +211,6 @@ GFXDECODE_END
 
 void bsktball_state::machine_start()
 {
-
 	save_item(NAME(m_nmi_on));
 //  save_item(NAME(m_i256v));
 	save_item(NAME(m_ld1));
@@ -228,7 +227,6 @@ void bsktball_state::machine_start()
 
 void bsktball_state::machine_reset()
 {
-
 	m_nmi_on = 0;
 //  m_i256v = 0;
 	m_ld1 = 0;

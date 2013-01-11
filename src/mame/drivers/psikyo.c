@@ -187,7 +187,6 @@ static const UINT8 s1945j_table[256] = {
 
 WRITE32_MEMBER(psikyo_state::s1945_mcu_w)
 {
-
 	// Accesses are always bytes, so resolve it
 	int suboff;
 
@@ -258,7 +257,6 @@ WRITE32_MEMBER(psikyo_state::s1945_mcu_w)
 
 READ32_MEMBER(psikyo_state::s1945_mcu_r)
 {
-
 	switch (offset)
 	{
 	case 0:
@@ -1014,7 +1012,6 @@ GFXDECODE_END
 
 void psikyo_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_soundlatch));
@@ -1026,7 +1023,6 @@ void psikyo_state::machine_start()
 
 void psikyo_state::machine_reset()
 {
-
 	m_soundlatch = 0;
 	m_z80_nmi = 0;
 	m_mcu_status = 0;
@@ -1797,7 +1793,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(psikyo_state,sngkace)
 {
-
 	{
 		UINT8 *RAM = memregion("ymsnd")->base();
 		int len = memregion("ymsnd")->bytes();
@@ -1862,7 +1857,6 @@ static void s1945_mcu_init( running_machine &machine )
 
 DRIVER_INIT_MEMBER(psikyo_state,tengai)
 {
-
 	/* input ports */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),this));
 
@@ -1884,7 +1878,6 @@ DRIVER_INIT_MEMBER(psikyo_state,tengai)
 
 DRIVER_INIT_MEMBER(psikyo_state,gunbird)
 {
-
 	/* input ports */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::gunbird_input_r),this));
 
@@ -1901,7 +1894,6 @@ DRIVER_INIT_MEMBER(psikyo_state,gunbird)
 
 DRIVER_INIT_MEMBER(psikyo_state,s1945)
 {
-
 	/* input ports */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),this));
 
@@ -1923,7 +1915,6 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945)
 
 DRIVER_INIT_MEMBER(psikyo_state,s1945a)
 {
-
 	/* input ports */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),this));
 
@@ -1945,7 +1936,6 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945a)
 
 DRIVER_INIT_MEMBER(psikyo_state,s1945j)
 {
-
 	/* input ports*/
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),this));
 
@@ -1967,7 +1957,6 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945j)
 
 DRIVER_INIT_MEMBER(psikyo_state,s1945jn)
 {
-
 	/* input ports */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::gunbird_input_r),this));
 
@@ -1983,7 +1972,6 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945jn)
 
 DRIVER_INIT_MEMBER(psikyo_state,s1945bl)
 {
-
 	/* input ports */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::gunbird_input_r),this));
 

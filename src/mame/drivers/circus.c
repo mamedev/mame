@@ -263,7 +263,6 @@ GFXDECODE_END
 ***************************************************************************/
 void circus_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_samples = machine().device<samples_device>("samples");
 
@@ -274,7 +273,6 @@ void circus_state::machine_start()
 
 void circus_state::machine_reset()
 {
-
 	m_clown_x = 0;
 	m_clown_y = 0;
 	m_clown_z = 0;

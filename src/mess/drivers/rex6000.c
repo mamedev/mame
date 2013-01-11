@@ -412,7 +412,6 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(rex6000_state::trigger_irq)
 {
-
 	if (!(m_irq_mask & IRQ_FLAG_KEYCHANGE))
 	{
 		m_irq_flag |= IRQ_FLAG_KEYCHANGE;
@@ -517,7 +516,6 @@ UINT32 rex6000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::irq_timer1)
 {
-
 	if (!(m_irq_mask & IRQ_FLAG_IRQ2))
 	{
 		m_irq_flag |= IRQ_FLAG_IRQ2;
@@ -529,7 +527,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::irq_timer1)
 
 TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::irq_timer2)
 {
-
 	if (!(m_irq_mask & IRQ_FLAG_IRQ1))
 	{
 		m_irq_flag |= IRQ_FLAG_IRQ1;
@@ -540,7 +537,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::irq_timer2)
 
 TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::sec_timer)
 {
-
 	if (!(m_irq_mask & IRQ_FLAG_1HZ))
 	{
 		m_irq_flag |= IRQ_FLAG_1HZ;

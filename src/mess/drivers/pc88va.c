@@ -157,7 +157,6 @@ public:
 
 void pc88va_state::video_start()
 {
-
 }
 
 static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)

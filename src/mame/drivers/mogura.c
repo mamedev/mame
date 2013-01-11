@@ -192,7 +192,6 @@ GFXDECODE_END
 
 void mogura_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_dac1 = machine().device<dac_device>("dac1");
 	m_dac2 = machine().device<dac_device>("dac2");

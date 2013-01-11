@@ -135,7 +135,6 @@ public:
 
 VIDEO_START_MEMBER(highvdeo_state,tourvisn)
 {
-
 }
 
 UINT32 highvdeo_state::screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

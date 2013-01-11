@@ -268,7 +268,6 @@ static void blit_area( running_machine &machine, UINT8 plane, UINT16 src, UINT8 
 
 WRITE8_MEMBER(arabian_state::arabian_blitter_w)
 {
-
 	/* write the data */
 	m_blitter[offset] = data;
 

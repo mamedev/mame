@@ -110,7 +110,6 @@ INTERRUPT_GEN_MEMBER(segas1x_bootleg_state::sys16_interrupt)
 
 WRITE16_MEMBER(segas1x_bootleg_state::sound_command_nmi_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
@@ -148,7 +147,6 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(segas1x_bootleg_state::sound_command_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
@@ -158,7 +156,6 @@ WRITE16_MEMBER(segas1x_bootleg_state::sound_command_w)
 
 WRITE16_MEMBER(segas1x_bootleg_state::sys16_coinctrl_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		m_coinctrl = data & 0xff;
@@ -286,7 +283,6 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(segas1x_bootleg_state::sys16_tilebank_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		switch (offset & 1)
@@ -381,7 +377,6 @@ static const msm5205_interface tturfbl_msm5205_interface  =
 
 READ8_MEMBER(segas1x_bootleg_state::tturfbl_soundbank_r)
 {
-
 	if (m_soundbank_ptr)
 		return m_soundbank_ptr[offset & 0x3fff];
 	return 0x80;
@@ -664,28 +659,24 @@ static void datsu_set_pages( running_machine &machine )
 
 WRITE16_MEMBER(segas1x_bootleg_state::datsu_page0_w)
 {
-
 	COMBINE_DATA(&m_datsu_page[0]);
 	datsu_set_pages(machine());
 }
 
 WRITE16_MEMBER(segas1x_bootleg_state::datsu_page1_w)
 {
-
 	COMBINE_DATA(&m_datsu_page[1]);
 	datsu_set_pages(machine());
 }
 
 WRITE16_MEMBER(segas1x_bootleg_state::datsu_page2_w)
 {
-
 	COMBINE_DATA(&m_datsu_page[2]);
 	datsu_set_pages(machine());
 }
 
 WRITE16_MEMBER(segas1x_bootleg_state::datsu_page3_w)
 {
-
 	COMBINE_DATA(&m_datsu_page[3]);
 	datsu_set_pages(machine());
 }
@@ -868,7 +859,6 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(segas1x_bootleg_state::eswat_tilebank0_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		m_eswat_tilebank0 = data & 0xff;
@@ -933,7 +923,6 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(segas1x_bootleg_state::beautyb_unkx_r)
 {
-
 	m_beautyb_unkx++;
 	m_beautyb_unkx &= 0x7f;
 	return m_beautyb_unkx;
@@ -1002,7 +991,6 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(segas1x_bootleg_state::sys18_refreshenable_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		m_refreshenable = data & 0x02;
@@ -1011,7 +999,6 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys18_refreshenable_w)
 
 WRITE16_MEMBER(segas1x_bootleg_state::sys18_tilebank_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		m_tile_bank0 = (data >> 0) & 0x0f;
@@ -1021,7 +1008,6 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys18_tilebank_w)
 
 READ8_MEMBER(segas1x_bootleg_state::system18_bank_r)
 {
-
 	if (m_sound_bank != NULL)
 		return m_sound_bank[offset];
 
@@ -1105,7 +1091,6 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(segas1x_bootleg_state::sound_command_irq_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
@@ -1196,7 +1181,6 @@ static const msm5205_interface shdancbl_msm5205_interface  =
 
 READ8_MEMBER(segas1x_bootleg_state::shdancbl_soundbank_r)
 {
-
 	if (m_soundbank_ptr)
 		return m_soundbank_ptr[offset & 0x3fff];
 	return 0xff;
@@ -3236,7 +3220,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,common)
 {
-
 	m_bg1_trans = 0;
 	m_splittab_bg_x = 0;
 	m_splittab_bg_y = 0;
@@ -3262,7 +3245,6 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,common)
 /* Sys16A */
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,shinobl)
 {
-
 	DRIVER_INIT_CALL(common);
 
 	m_spritebank_type = 1;
@@ -3270,7 +3252,6 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,shinobl)
 
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,passsht)
 {
-
 	DRIVER_INIT_CALL(common);
 
 	m_spritebank_type = 1;
@@ -3279,7 +3260,6 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,passsht)
 
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,wb3bbl)
 {
-
 	DRIVER_INIT_CALL(common);
 
 	m_spritebank_type = 1;
@@ -3359,7 +3339,6 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,bayrouteb2)
 
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,goldnaxeb2)
 {
-
 	DRIVER_INIT_CALL(common);
 
 	m_spritebank_type = 1;
@@ -3381,7 +3360,6 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,dduxbl)
 
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,eswatbl)
 {
-
 	DRIVER_INIT_CALL(common);
 	//m_splittab_fg_x = &sys16_textram[0x0f80];
 
@@ -3390,7 +3368,6 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,eswatbl)
 
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,fpointbl)
 {
-
 	DRIVER_INIT_CALL(common);
 	//sys16_video_config(fpoint_update_proc, -0xb8, NULL);
 

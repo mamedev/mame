@@ -49,7 +49,6 @@ void lethalen_tile_callback( running_machine &machine, int layer, int *code, int
 
 void lethal_state::video_start()
 {
-
 	// this game uses external linescroll RAM
 	k056832_SetExtLinescroll(m_k056832);
 
@@ -77,7 +76,6 @@ void lethal_state::video_start()
 
 WRITE8_MEMBER(lethal_state::lethalen_palette_control)
 {
-
 	switch (offset)
 	{
 		case 0: // 40c8 - PCU1 from schematics
@@ -102,7 +100,6 @@ WRITE8_MEMBER(lethal_state::lethalen_palette_control)
 
 UINT32 lethal_state::screen_update_lethalen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(7168, cliprect);
 	machine().priority_bitmap.fill(0, cliprect);
 

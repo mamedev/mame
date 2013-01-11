@@ -58,14 +58,12 @@ So this is the correct behavior of real hardware, not an emulation bug.
 
 INTERRUPT_GEN_MEMBER(nemesis_state::nemesis_interrupt)
 {
-
 	if (m_irq_on)
 		device.execute().set_input_line(1, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(nemesis_state::blkpnthr_interrupt)
 {
-
 	if (m_irq_on)
 		device.execute().set_input_line(2, HOLD_LINE);
 }
@@ -1509,7 +1507,6 @@ static const k007232_interface k007232_config =
 
 void nemesis_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_vlm = machine().device("vlm");
@@ -1529,7 +1526,6 @@ void nemesis_state::machine_start()
 
 void nemesis_state::machine_reset()
 {
-
 	m_irq_on = 0;
 	m_irq1_on = 0;
 	m_irq2_on = 0;

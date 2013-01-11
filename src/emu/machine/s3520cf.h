@@ -16,8 +16,7 @@ Template for skeleton device
 //**************************************************************************
 
 #define MCFG_S3520CF_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, S3520CF, XTAL_32_768kHz) \
-
+	MCFG_DEVICE_ADD(_tag, S3520CF, XTAL_32_768kHz)
 
 //**************************************************************************
 //  TYPE DEFINITIONS

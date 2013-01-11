@@ -251,7 +251,6 @@ void rockrage_state::machine_start()
 
 void rockrage_state::machine_reset()
 {
-
 	m_vreg = 0;
 	m_layer_colorbase[0] = 0x00;
 	m_layer_colorbase[1] = 0x10;

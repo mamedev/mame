@@ -133,7 +133,6 @@ WRITE16_MEMBER(miragemi_state::okim1_rombank_w)
 
 WRITE16_MEMBER(miragemi_state::okim0_rombank_w)
 {
-
 	/*bits 4-6 used on POST? */
 	m_oki_bgm->set_bank_base(0x40000 * (data & 0x7));
 }
@@ -305,13 +304,11 @@ static const deco16ic_interface mirage_deco16ic_tilegen1_intf =
 
 void miragemi_state::machine_start()
 {
-
 	save_item(NAME(m_mux_data));
 }
 
 void miragemi_state::machine_reset()
 {
-
 	m_mux_data = 0;
 }
 

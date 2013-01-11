@@ -36,7 +36,6 @@ inputs + notes by stephh
 
 INPUT_CHANGED_MEMBER(fcombat_state::coin_inserted)
 {
-
 	/* coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -105,7 +104,6 @@ READ8_MEMBER(fcombat_state::e300_r)
 
 WRITE8_MEMBER(fcombat_state::ee00_w)
 {
-
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, fcombat_state )
@@ -259,7 +257,6 @@ GFXDECODE_END
 
 void fcombat_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_cocktail_flip));
@@ -274,7 +271,6 @@ void fcombat_state::machine_start()
 
 void fcombat_state::machine_reset()
 {
-
 	m_cocktail_flip = 0;
 	m_char_palette = 0;
 	m_sprite_palette = 0;

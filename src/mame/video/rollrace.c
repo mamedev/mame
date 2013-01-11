@@ -55,7 +55,6 @@ void rollrace_state::palette_init()
 
 WRITE8_MEMBER(rollrace_state::rollrace_charbank_w)
 {
-
 	m_ra_charbank[offset&1] = data;
 	m_ra_chrbank = m_ra_charbank[0] | (m_ra_charbank[1] << 1) ;
 }
@@ -73,7 +72,6 @@ WRITE8_MEMBER(rollrace_state::rollrace_spritebank_w)
 
 WRITE8_MEMBER(rollrace_state::rollrace_backgroundpage_w)
 {
-
 	m_ra_bkgpage = data & 0x1f;
 	m_ra_bkgflip = ( data & 0x80 ) >> 7;
 
@@ -150,7 +148,6 @@ UINT32 rollrace_state::screen_update_rollrace(screen_device &screen, bitmap_ind1
 
 		if(sx && sy)
 		{
-
 		if(m_ra_flipx)
 			sx = 224 - sx;
 		if(m_ra_flipy)
@@ -178,7 +175,6 @@ UINT32 rollrace_state::screen_update_rollrace(screen_device &screen, bitmap_ind1
 	/* draw foreground characters */
 	for (offs = 0x3ff; offs >= 0; offs--)
 	{
-
 		sx =  offs % 32;
 		sy =  offs / 32;
 

@@ -70,6 +70,5 @@ extern const device_type PRINTER;
 
 
 #define MCFG_PRINTER_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PRINTER, 0) \
-
+	MCFG_DEVICE_ADD(_tag, PRINTER, 0)
 #endif /* __PRINTER_H__ */

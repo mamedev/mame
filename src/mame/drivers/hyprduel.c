@@ -97,7 +97,6 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_irq_cause_w)
 
 WRITE16_MEMBER(hyprduel_state::hyprduel_subcpu_control_w)
 {
-
 	switch (data)
 	{
 		case 0x0d:
@@ -618,7 +617,6 @@ GFXDECODE_END
 
 void hyprduel_state::machine_reset()
 {
-
 	/* start with cpu2 halted */
 	machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_subcpu_resetline = 1;
@@ -631,7 +629,6 @@ void hyprduel_state::machine_reset()
 
 MACHINE_START_MEMBER(hyprduel_state,hyprduel)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_subcpu = machine().device<cpu_device>("sub");
 
@@ -643,7 +640,6 @@ MACHINE_START_MEMBER(hyprduel_state,hyprduel)
 
 MACHINE_START_MEMBER(hyprduel_state,magerror)
 {
-
 	MACHINE_START_CALL_MEMBER(hyprduel);
 	m_magerror_irq_timer->adjust(attotime::zero, 0, attotime::from_hz(968));        /* tempo? */
 }
@@ -780,7 +776,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(hyprduel_state,hyprduel)
 {
-
 	m_int_num = 0x02;
 
 	/* cpu synchronization (severe timings) */
@@ -792,7 +787,6 @@ DRIVER_INIT_MEMBER(hyprduel_state,hyprduel)
 
 DRIVER_INIT_MEMBER(hyprduel_state,magerror)
 {
-
 	m_int_num = 0x01;
 	m_magerror_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hyprduel_state::magerror_irq_callback),this));
 }

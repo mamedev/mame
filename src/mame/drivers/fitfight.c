@@ -721,13 +721,11 @@ GFXDECODE_END
 
 void fitfight_state::machine_start()
 {
-
 	save_item(NAME(m_fof_700000_data));
 }
 
 void fitfight_state::machine_reset()
 {
-
 	m_fof_700000_data = 0;
 }
 

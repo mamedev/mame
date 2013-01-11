@@ -12,8 +12,7 @@
 	MCFG_DEVICE_CONFIG(_config)
 
 #define MCFG_DUART68681_CHANNEL_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, DUART68681CHANNEL, 0) \
-
+	MCFG_DEVICE_ADD(_tag, DUART68681CHANNEL, 0)
 // forward declaration
 class duartn68681_device;
 

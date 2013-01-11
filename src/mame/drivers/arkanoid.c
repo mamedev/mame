@@ -974,7 +974,6 @@ static const ay8910_interface hexa_ay8910_config =
 
 MACHINE_START_MEMBER(arkanoid_state,arkanoid)
 {
-
 	m_mcu = machine().device("mcu");
 
 	save_item(NAME(m_bootleg_cmd));
@@ -998,7 +997,6 @@ MACHINE_START_MEMBER(arkanoid_state,arkanoid)
 
 MACHINE_RESET_MEMBER(arkanoid_state,arkanoid)
 {
-
 	m_port_a_in = 0;
 	m_port_a_out = 0;
 	m_z80write = 0;

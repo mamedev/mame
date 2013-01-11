@@ -168,7 +168,6 @@ void st_state::shifter_tick()
 
 TIMER_CALLBACK_MEMBER(st_state::atarist_shifter_tick)
 {
-
 	shifter_tick();
 }
 
@@ -299,7 +298,6 @@ void st_state::glue_tick()
 
 TIMER_CALLBACK_MEMBER(st_state::atarist_glue_tick)
 {
-
 	glue_tick();
 }
 
@@ -752,7 +750,6 @@ void st_state::blitter_tick()
 
 TIMER_CALLBACK_MEMBER(st_state::atarist_blitter_tick)
 {
-
 	blitter_tick();
 }
 

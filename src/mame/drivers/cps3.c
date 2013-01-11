@@ -911,7 +911,6 @@ static void cps3_draw_tilemapsprite_line(running_machine &machine, int tmnum, in
 
 		for (x=0;x<(cliprect.max_x/16)+2;x++)
 		{
-
 			UINT32 dat;
 			int tileno;
 			int colour;
@@ -1016,7 +1015,6 @@ UINT32 cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitma
 
 			for (j=0;j<(length)*4;j+=4)
 			{
-
 				UINT32 value1 =     (m_spriteram[start+j+0]);
 				UINT32 value2 =     (m_spriteram[start+j+1]);
 				UINT32 value3 =     (m_spriteram[start+j+2]);

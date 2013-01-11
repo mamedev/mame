@@ -236,7 +236,6 @@ WRITE16_MEMBER(konamigx_state::K053990_martchmp_word_w)
 
 void konamigx_esc_alert(UINT32 *srcbase, int srcoffs, int count, int mode) // (WARNING: assumed big endianess)
 {
-
 // hand-filled but should be close
 static const UINT8 ztable[7][8] =
 {
@@ -290,7 +289,6 @@ static const UINT8 ptable[7][8] =
 	}
 	else
 	{
-
 #define EXTRACT_ODD         \
 if((data1=obj[0])&0x8000)   \
 {                           \

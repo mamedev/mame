@@ -905,7 +905,6 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER(jpmimpct_state::hopper_b_r)
 {
-
 	int retval;
 	// B0 = 100p Hopper Out Verif
 	// B1 = Hopper High
@@ -932,7 +931,6 @@ READ8_MEMBER(jpmimpct_state::hopper_b_r)
 
 READ8_MEMBER(jpmimpct_state::hopper_c_r)
 {
-
 	int retval;
 	// C0-C2 = Alpha
 	// C3
@@ -970,7 +968,6 @@ READ8_MEMBER(jpmimpct_state::hopper_c_r)
 
 WRITE8_MEMBER(jpmimpct_state::payen_a_w)
 {
-
 	m_motor[0] = (data & 0x01);
 	m_payen = (data & 0x10);
 	m_slidesout = (data & 0x10);

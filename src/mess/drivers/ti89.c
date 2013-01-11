@@ -233,7 +233,6 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(ti68k_state::ti68k_on_key)
 {
-
 	m_on_key = newval;
 
 	if (m_on_key)

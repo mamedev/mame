@@ -188,7 +188,6 @@ MACHINE_START_MEMBER(kangaroo_state,kangaroo_mcu)
 
 void kangaroo_state::machine_reset()
 {
-
 	/* I think there is a bug in the startup checks of the game. At the very */
 	/* beginning, during the RAM check, it goes one byte too far, and ends up */
 	/* trying to write, and re-read, location dfff. To the best of my knowledge, */

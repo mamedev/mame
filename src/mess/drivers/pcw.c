@@ -507,15 +507,12 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 		/* screen on */
 		case 7:
 		{
-
-
 		}
 		break;
 
 		/* screen off */
 		case 8:
 		{
-
 		}
 		break;
 
@@ -593,7 +590,6 @@ READ8_MEMBER(pcw_state::pcw_expansion_r)
 
 		case 0x09f:
 		{
-
 			/* kempston joystick */
 			return ioport("KEMPSTON")->read();
 		}
@@ -611,7 +607,6 @@ READ8_MEMBER(pcw_state::pcw_expansion_r)
 
 		case 0x087:
 		{
-
 			return 0x0ff;
 		}
 
@@ -704,7 +699,6 @@ READ8_MEMBER(pcw_state::pcw_printer_status_r)
  */
 TIMER_CALLBACK_MEMBER(pcw_state::pcw_stepper_callback)
 {
-
 	//popmessage("PRN: P2 bits %s %s %s\nSerial: %02x\nHeadpos: %i",m_printer_p2 & 0x40 ? " " : "6",m_printer_p2 & 0x20 ? " " : "5",m_printer_p2 & 0x10 ? " " : "4",m_printer_shift_output,m_printer_headpos);
 	if((m_printer_p2 & 0x10) == 0)  // print head motor active
 	{
@@ -764,7 +758,6 @@ TIMER_CALLBACK_MEMBER(pcw_state::pcw_stepper_callback)
 
 TIMER_CALLBACK_MEMBER(pcw_state::pcw_pins_callback)
 {
-
 	pcw_printer_fire_pins(machine(),m_printer_pins);
 	m_printer_p2 |= 0x40;
 }
@@ -795,7 +788,6 @@ READ8_MEMBER(pcw_state::mcu_printer_p2_r)
 
 WRITE8_MEMBER(pcw_state::mcu_printer_p2_w)
 {
-
 	//logerror("PRN: MCU writing %02x to P2\n",data);
 	m_printer_p2 = data & 0x70;
 
@@ -835,7 +827,6 @@ READ8_MEMBER(pcw_state::mcu_printer_t1_r)
 // Print head location (0 if at left margin, otherwise 1)
 READ8_MEMBER(pcw_state::mcu_printer_t0_r)
 {
-
 	if(m_printer_headpos == 0)
 		return 0;
 	else

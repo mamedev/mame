@@ -294,7 +294,6 @@ WRITE8_MEMBER(dynax_state::hnoridur_palbank_w)
 
 WRITE8_MEMBER(dynax_state::hnoridur_palette_w)
 {
-
 	switch (m_hnoridur_bank)
 	{
 		case 0x10:
@@ -687,7 +686,6 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(dynax_state::yarunara_input_w)
 {
-
 	switch (offset)
 	{
 		case 0: m_input_sel = data;
@@ -1129,7 +1127,6 @@ READ8_MEMBER(dynax_state::htengoku_dsw_r)
 
 WRITE8_MEMBER(dynax_state::htengoku_coin_w)
 {
-
 	switch (m_input_sel)
 	{
 		case 0x0c:
@@ -1168,7 +1165,6 @@ READ8_MEMBER(dynax_state::htengoku_input_r)
 
 READ8_MEMBER(dynax_state::htengoku_coin_r)
 {
-
 	switch (m_input_sel)
 	{
 		case 0x00:  return ioport("COINS")->read();
@@ -1182,7 +1178,6 @@ READ8_MEMBER(dynax_state::htengoku_coin_r)
 
 WRITE8_MEMBER(dynax_state::htengoku_rombank_w)
 {
-
 	membank("bank1")->set_entry(data & 0x07);
 	m_hnoridur_bank = data;
 }
@@ -1252,7 +1247,6 @@ WRITE8_MEMBER(dynax_state::tenkai_ipsel_w)
 
 WRITE8_MEMBER(dynax_state::tenkai_ip_w)
 {
-
 	switch (m_input_sel)
 	{
 	case 0x0c:
@@ -1327,7 +1321,6 @@ WRITE8_MEMBER(dynax_state::tenkai_dswsel_w)
 
 READ8_MEMBER(dynax_state::tenkai_dsw_r)
 {
-
 	if (!BIT(m_dsw_sel, 0)) return ioport("DSW0")->read();
 	if (!BIT(m_dsw_sel, 1)) return ioport("DSW1")->read();
 	if (!BIT(m_dsw_sel, 2)) return ioport("DSW2")->read();
@@ -1415,7 +1408,6 @@ READ8_MEMBER(dynax_state::tenkai_p8_r)
 
 READ8_MEMBER(dynax_state::tenkai_8000_r)
 {
-
 	if (m_rombank < 0x10)
 		return m_romptr[offset];
 	else if ((m_rombank == 0x10) && (offset < 0x10))
@@ -1433,7 +1425,6 @@ READ8_MEMBER(dynax_state::tenkai_8000_r)
 
 WRITE8_MEMBER(dynax_state::tenkai_8000_w)
 {
-
 	if ((m_rombank == 0x10) && (offset < 0x10))
 	{
 		msm6242_device *rtc = machine().device<msm6242_device>("rtc");
@@ -1571,7 +1562,6 @@ WRITE8_MEMBER(dynax_state::gekisha_p4_w)
 
 READ8_MEMBER(dynax_state::gekisha_8000_r)
 {
-
 	if (m_gekisha_rom_enable)
 		return m_romptr[offset];
 
@@ -1592,7 +1582,6 @@ READ8_MEMBER(dynax_state::gekisha_8000_r)
 
 WRITE8_MEMBER(dynax_state::gekisha_8000_w)
 {
-
 	if (!m_gekisha_rom_enable)
 	{
 		switch (offset + 0x8000)
@@ -4817,7 +4806,6 @@ void mjelctrn_update_irq( running_machine &machine )
 
 INTERRUPT_GEN_MEMBER(dynax_state::mjelctrn_vblank_interrupt)
 {
-
 	// This is a kludge to avoid losing blitter interrupts
 	// there should be a vblank ack mechanism
 	if (!m_blitter_irq)

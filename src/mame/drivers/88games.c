@@ -24,14 +24,12 @@
 
 INTERRUPT_GEN_MEMBER(_88games_state::k88games_interrupt)
 {
-
 	if (k052109_is_irq_enabled(m_k052109))
 		irq0_line_hold(device);
 }
 
 READ8_MEMBER(_88games_state::bankedram_r)
 {
-
 	if (m_videobank)
 		return m_ram[offset];
 	else
@@ -45,7 +43,6 @@ READ8_MEMBER(_88games_state::bankedram_r)
 
 WRITE8_MEMBER(_88games_state::bankedram_w)
 {
-
 	if (m_videobank)
 		m_ram[offset] = data;
 	else
@@ -54,7 +51,6 @@ WRITE8_MEMBER(_88games_state::bankedram_w)
 
 WRITE8_MEMBER(_88games_state::k88games_5f84_w)
 {
-
 	/* bits 0/1 coin counters */
 	coin_counter_w(machine(), 0, data & 0x01);
 	coin_counter_w(machine(), 1, data & 0x02);
@@ -94,7 +90,6 @@ WRITE8_MEMBER(_88games_state::speech_msg_w)
 /* special handlers to combine 052109 & 051960 */
 READ8_MEMBER(_88games_state::k052109_051960_r)
 {
-
 	if (k052109_get_rmrd_line(m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
@@ -110,7 +105,6 @@ READ8_MEMBER(_88games_state::k052109_051960_r)
 
 WRITE8_MEMBER(_88games_state::k052109_051960_w)
 {
-
 	if (offset >= 0x3800 && offset < 0x3808)
 		k051937_w(m_k051960, space, offset - 0x3800, data);
 	else if (offset < 0x3c00)
@@ -306,7 +300,6 @@ static KONAMI_SETLINES_CALLBACK( k88games_banking )
 
 void _88games_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k052109 = machine().device("k052109");
 	m_k051960 = machine().device("k051960");
@@ -325,7 +318,6 @@ void _88games_state::machine_start()
 
 void _88games_state::machine_reset()
 {
-
 	konami_configure_set_lines(machine().device("maincpu"), k88games_banking);
 	m_generic_paletteram_8.set_target(&memregion("maincpu")->base()[0x20000], 0x1000);
 

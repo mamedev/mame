@@ -111,7 +111,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		{
 			for (x = 0; x < spr_size; x++)
 			{
-
 				ex = xflip ? (spr_size - 1 - x) : x;
 				ey = yflip ? (spr_size - 1 - y) : y;
 
@@ -125,7 +124,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 void drtomy_state::video_start()
 {
-
 	m_tilemap_bg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(drtomy_state::get_tile_info_bg),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_tilemap_fg = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(drtomy_state::get_tile_info_fg),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
@@ -134,7 +132,6 @@ void drtomy_state::video_start()
 
 UINT32 drtomy_state::screen_update_drtomy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_tilemap_bg->draw(bitmap, cliprect, 0, 0);
 	m_tilemap_fg->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(machine(), bitmap, cliprect);
@@ -285,13 +282,11 @@ INPUT_PORTS_END
 
 void drtomy_state::machine_start()
 {
-
 	save_item(NAME(m_oki_bank));
 }
 
 void drtomy_state::machine_reset()
 {
-
 	m_oki_bank = 0;
 }
 

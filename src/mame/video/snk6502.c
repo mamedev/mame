@@ -76,21 +76,18 @@ PALETTE_INIT_MEMBER(snk6502_state,snk6502)
 
 WRITE8_MEMBER(snk6502_state::snk6502_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(snk6502_state::snk6502_videoram2_w)
 {
-
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(snk6502_state::snk6502_colorram_w)
 {
-
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -98,7 +95,6 @@ WRITE8_MEMBER(snk6502_state::snk6502_colorram_w)
 
 WRITE8_MEMBER(snk6502_state::snk6502_charram_w)
 {
-
 	if (m_charram[offset] != data)
 	{
 		m_charram[offset] = data;
@@ -144,13 +140,11 @@ WRITE8_MEMBER(snk6502_state::snk6502_flipscreen_w)
 
 WRITE8_MEMBER(snk6502_state::snk6502_scrollx_w)
 {
-
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
 WRITE8_MEMBER(snk6502_state::snk6502_scrolly_w)
 {
-
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
@@ -173,7 +167,6 @@ TILE_GET_INFO_MEMBER(snk6502_state::get_fg_tile_info)
 
 VIDEO_START_MEMBER(snk6502_state,snk6502)
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk6502_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk6502_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
@@ -184,7 +177,6 @@ VIDEO_START_MEMBER(snk6502_state,snk6502)
 
 VIDEO_START_MEMBER(snk6502_state,pballoon)
 {
-
 	VIDEO_START_CALL_MEMBER( snk6502 );
 
 	m_bg_tilemap->set_scrolldy(-16, -16);
@@ -194,7 +186,6 @@ VIDEO_START_MEMBER(snk6502_state,pballoon)
 
 UINT32 snk6502_state::screen_update_snk6502(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
@@ -272,7 +263,6 @@ WRITE8_MEMBER(snk6502_state::satansat_b002_w)
 
 WRITE8_MEMBER(snk6502_state::satansat_backcolor_w)
 {
-
 	/* bits 0-1 select background color. Other bits unused. */
 
 	if (m_backcolor != (data & 0x03))
@@ -304,7 +294,6 @@ TILE_GET_INFO_MEMBER(snk6502_state::satansat_get_fg_tile_info)
 
 VIDEO_START_MEMBER(snk6502_state,satansat)
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk6502_state::satansat_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk6502_state::satansat_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 

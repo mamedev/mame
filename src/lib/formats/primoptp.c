@@ -140,7 +140,6 @@ static int primo_cassette_calculate_size_in_samples(const UINT8 *bytes, int leng
 
 static int primo_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 {
-
 	int i = 0, j = 0, k;
 
 	INT16 *p = buffer;
@@ -177,7 +176,6 @@ static int primo_cassette_fill_wave(INT16 *buffer, int length, UINT8 *bytes)
 		j = 0;
 		while (j < file_size-3)
 		{
-
 			/* block pilot */
 			for (k=0; k<96; k++)
 				p = primo_output_byte (p, 0xff);

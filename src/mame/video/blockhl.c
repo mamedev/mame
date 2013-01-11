@@ -43,7 +43,6 @@ void blockhl_sprite_callback( running_machine &machine, int *code, int *color, i
 
 void blockhl_state::video_start()
 {
-
 	m_generic_paletteram_8.allocate(0x800);
 
 	m_layer_colorbase[0] = 0;
@@ -54,7 +53,6 @@ void blockhl_state::video_start()
 
 UINT32 blockhl_state::screen_update_blockhl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	machine().priority_bitmap.fill(0, cliprect);
 
 	k052109_tilemap_update(m_k052109);

@@ -94,7 +94,6 @@ void cloak_state::set_current_bitmap_videoram_pointer()
 
 WRITE8_MEMBER(cloak_state::cloak_clearbmp_w)
 {
-
 	machine().primary_screen->update_now();
 	m_bitmap_videoram_selected = data & 0x01;
 	set_current_bitmap_videoram_pointer();
@@ -127,7 +126,6 @@ READ8_MEMBER(cloak_state::graph_processor_r)
 
 WRITE8_MEMBER(cloak_state::graph_processor_w)
 {
-
 	switch (offset)
 	{
 		case 0x03: m_bitmap_videoram_address_x = data; break;
@@ -163,7 +161,6 @@ TILE_GET_INFO_MEMBER(cloak_state::get_bg_tile_info)
 
 void cloak_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cloak_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bitmap_videoram1 = auto_alloc_array(machine(), UINT8, 256*256);

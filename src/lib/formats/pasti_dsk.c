@@ -530,7 +530,6 @@ void pasti_format::map_sectors_in_track(wd_obs &obs, wd_sect_info *sect_infos)
 			tdata[(i+1) % tsize] == 0xa1 &&
 			(tdata[(i+2) % tsize] == 0xfe ||
 			tdata[(i+2) % tsize] == 0xff)) {
-
 			UINT8 hbyte = tdata[(i+2) % tsize];
 			int hpos = (i+3) % tsize;
 			int j;

@@ -3711,7 +3711,6 @@ static void stv_vdp2_draw_basic_tilemap(running_machine &machine, bitmap_rgb32 &
 			/* 1 word per tile mode with supplement bits */
 			if (stv2_current_tilemap.pattern_data_size ==1)
 			{
-
 				data = state->m_vdp2_vram[newbase + offs/2];
 				data = (offs&1) ? (data & 0x0000ffff) : ((data & 0xffff0000) >> 16);
 
@@ -3737,7 +3736,6 @@ static void stv_vdp2_draw_basic_tilemap(running_machine &machine, bitmap_rgb32 &
 			/* 2 words per tile, no supplement bits */
 			else
 			{
-
 				data = state->m_vdp2_vram[newbase + offs];
 				tilecode = (data & 0x00007fff);
 				pal   = (data &    0x007f0000)>>16;
@@ -5586,7 +5584,6 @@ static void refresh_palette_data(running_machine &machine)
 		break;
 		case 0:
 		{
-
 			for(bank=0;bank<2;bank++)
 			{
 				for(c_i=0;c_i<0x400;c_i++)

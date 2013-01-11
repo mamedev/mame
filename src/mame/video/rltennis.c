@@ -112,7 +112,6 @@ enum
 
 WRITE16_MEMBER(rltennis_state::rlt_blitter_w)
 {
-
 	int old_data=m_blitter[offset];
 	COMBINE_DATA(&m_blitter[offset]);
 	int new_data=m_blitter[offset];
@@ -196,7 +195,6 @@ WRITE16_MEMBER(rltennis_state::rlt_blitter_w)
 		{
 			for( y=dst_y0, idx_y=0 ; idx_y<=blit_h1;y+=y_dst_step, idx_y++)
 			{
-
 				int xx=src_x0+(x_src_step*idx_x);
 				int yy=src_y0+(y_src_step*idx_y);
 

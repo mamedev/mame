@@ -151,7 +151,6 @@ via6522_device::via6522_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, VIA6522, "6522 VIA", tag, owner, clock),
 		m_irq(CLEAR_LINE)
 {
-
 }
 
 

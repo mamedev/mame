@@ -549,7 +549,6 @@ static void RunBlit(address_space &space)
 					}
 					if( blitter.source.addr0 < blitter.step )
 					{
-
 						blitter.source.addr0 -=blitter.step ;
 						blitter.source.addr0 +=blitter.source.addr1;
 

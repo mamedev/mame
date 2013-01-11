@@ -586,7 +586,6 @@ void docastle_state::machine_reset()
 
 void docastle_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_slave = machine().device<cpu_device>("slave");
 

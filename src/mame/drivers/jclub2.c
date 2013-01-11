@@ -718,12 +718,10 @@ MACHINE_CONFIG_END
 
 VIDEO_START_MEMBER(darkhors_state,jclub2)
 {
-
 }
 
 UINT32 darkhors_state::screen_update_jclub2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	// this isn't an st0020..
 	m_gdfs_st0020->st0020_draw_all(machine(), bitmap, cliprect);
 
@@ -783,7 +781,6 @@ static const st0016_interface st0016_config =
 
 VIDEO_START_MEMBER(darkhors_state,jclub2o)
 {
-
 }
 
 UINT32 darkhors_state::screen_update_jclub2o(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -123,7 +123,6 @@ WRITE8_MEMBER(mario_state::mario_z80dma_rdy_w)
 
 WRITE8_MEMBER(mario_state::nmi_mask_w)
 {
-
 	m_nmi_mask = data & 1;
 }
 
@@ -325,7 +324,6 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(mario_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

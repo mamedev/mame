@@ -56,7 +56,6 @@ TILE_GET_INFO_MEMBER(m10_state::get_tile_info)
 
 WRITE8_MEMBER(m10_state::m10_colorram_w)
 {
-
 	if (m_colorram[offset] != data)
 	{
 		m_tx_tilemap->mark_tile_dirty(offset);
@@ -67,7 +66,6 @@ WRITE8_MEMBER(m10_state::m10_colorram_w)
 
 WRITE8_MEMBER(m10_state::m10_chargen_w)
 {
-
 	if (m_chargen[offset] != data)
 	{
 		m_chargen[offset] = data;
@@ -78,7 +76,6 @@ WRITE8_MEMBER(m10_state::m10_chargen_w)
 
 WRITE8_MEMBER(m10_state::m15_chargen_w)
 {
-
 	if (m_chargen[offset] != data)
 	{
 		m_chargen[offset] = data;
@@ -100,7 +97,6 @@ INLINE void plot_pixel_m10( running_machine &machine, bitmap_ind16 &bm, int x, i
 
 VIDEO_START_MEMBER(m10_state,m10)
 {
-
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this), tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);
 	m_tx_tilemap->set_transparent_pen(0);
 	m_tx_tilemap->set_scrolldx(0, 62);
@@ -114,7 +110,6 @@ VIDEO_START_MEMBER(m10_state,m10)
 
 VIDEO_START_MEMBER(m10_state,m15)
 {
-
 	machine().gfx[0] = auto_alloc(machine(), gfx_element(machine(), charlayout, m_chargen, 8, 0));
 
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m10_state::get_tile_info),this),tilemap_mapper_delegate(FUNC(m10_state::tilemap_scan),this), 8, 8, 32, 32);

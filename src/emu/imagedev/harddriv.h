@@ -83,10 +83,8 @@ extern const device_type HARDDISK;
 ***************************************************************************/
 
 #define MCFG_HARDDISK_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, HARDDISK, 0) \
-
+	MCFG_DEVICE_ADD(_tag, HARDDISK, 0)
 #define MCFG_HARDDISK_CONFIG_ADD(_tag,_config) \
 	MCFG_DEVICE_ADD(_tag, HARDDISK, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
-
+	MCFG_DEVICE_CONFIG(_config)
 #endif /* HARDDRIV_H */

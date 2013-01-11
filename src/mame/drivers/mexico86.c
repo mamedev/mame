@@ -448,7 +448,6 @@ void mexico86_state::machine_start()
 
 void mexico86_state::machine_reset()
 {
-
 	/*TODO: check the PCB and see how the halt / reset lines are connected. */
 	if (machine().device("sub") != NULL)
 		machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, (ioport("DSW1")->read() & 0x80) ? ASSERT_LINE : CLEAR_LINE);

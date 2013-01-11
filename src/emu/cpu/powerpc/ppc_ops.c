@@ -429,32 +429,26 @@ static void ppc_crxor(UINT32 op)
 #ifndef PPC_DRC
 static void ppc_dcbf(UINT32 op)
 {
-
 }
 
 static void ppc_dcbi(UINT32 op)
 {
-
 }
 
 static void ppc_dcbst(UINT32 op)
 {
-
 }
 
 static void ppc_dcbt(UINT32 op)
 {
-
 }
 
 static void ppc_dcbtst(UINT32 op)
 {
-
 }
 
 static void ppc_dcbz(UINT32 op)
 {
-
 }
 #endif
 
@@ -512,7 +506,6 @@ static void ppc_divwux(UINT32 op)
 #ifndef PPC_DRC
 static void ppc_eieio(UINT32 op)
 {
-
 }
 
 static void ppc_eqvx(UINT32 op)
@@ -544,12 +537,10 @@ static void ppc_extshx(UINT32 op)
 
 static void ppc_icbi(UINT32 op)
 {
-
 }
 
 static void ppc_isync(UINT32 op)
 {
-
 }
 
 static void ppc_lbz(UINT32 op)
@@ -1506,7 +1497,6 @@ static void ppc_subfzex(UINT32 op)
 #ifndef PPC_DRC
 static void ppc_sync(UINT32 op)
 {
-
 }
 #endif
 

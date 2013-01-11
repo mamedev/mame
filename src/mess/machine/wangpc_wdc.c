@@ -295,7 +295,6 @@ UINT8 wangpc_wdc_device::wangpcbus_dack_r(address_space &space, int line)
 
 void wangpc_wdc_device::wangpcbus_dack_w(address_space &space, int line, UINT8 data)
 {
-
 }
 
 

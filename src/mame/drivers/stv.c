@@ -138,7 +138,6 @@ READ8_MEMBER(saturn_state::magzun_ioga_r)
 
 WRITE8_MEMBER(saturn_state::magzun_ioga_w)
 {
-
 	switch(offset)
 	{
 		case 0x13: m_serial_tx = (data << 8) | (m_serial_tx & 0xff); break;
@@ -181,7 +180,6 @@ READ8_MEMBER(saturn_state::stvmp_ioga_r)
 
 WRITE8_MEMBER(saturn_state::stvmp_ioga_w)
 {
-
 	switch(offset)
 	{
 		case 0x09: m_mux_data = data ^ 0xff; break;
@@ -208,7 +206,6 @@ READ32_MEMBER(saturn_state::stv_ioga_r32)
 
 WRITE32_MEMBER(saturn_state::stv_ioga_w32)
 {
-
 	if(ACCESSING_BITS_16_23)
 		stv_ioga_w(space,offset*4+1,data >> 16);
 	if(ACCESSING_BITS_0_7)
@@ -366,7 +363,6 @@ DRIVER_INIT_MEMBER(saturn_state,critcrsh)
 
 READ32_MEMBER(saturn_state::magzun_hef_hack_r)
 {
-
 	if(space.device().safe_pc()==0x604bf20) return 0x00000001; //HWEF
 
 	if(space.device().safe_pc()==0x604bfbe) return 0x00000002; //HREF
@@ -376,7 +372,6 @@ READ32_MEMBER(saturn_state::magzun_hef_hack_r)
 
 READ32_MEMBER(saturn_state::magzun_rx_hack_r)
 {
-
 	if(space.device().safe_pc()==0x604c006) return 0x40;
 
 	return m_workram_h[0x0ff3b4/4];
@@ -491,7 +486,6 @@ CPU0: Aids Screen
 
 DRIVER_INIT_MEMBER(saturn_state,puyosun)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x6021cf0);
 
 	sh2drc_add_pcflush(machine().device("slave"), 0x60236fe);
@@ -514,7 +508,6 @@ CPU0 Data East Logo:
 
 DRIVER_INIT_MEMBER(saturn_state,mausuke)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x60461A0);
 
 	DRIVER_INIT_CALL(stv);
@@ -525,7 +518,6 @@ DRIVER_INIT_MEMBER(saturn_state,mausuke)
 
 DRIVER_INIT_MEMBER(saturn_state,cottonbm)
 {
-
 //  sh2drc_add_pcflush(machine().device("maincpu"), 0x6030ee2);
 //  sh2drc_add_pcflush(machine().device("slave"), 0x6032b52);
 
@@ -536,7 +528,6 @@ DRIVER_INIT_MEMBER(saturn_state,cottonbm)
 
 DRIVER_INIT_MEMBER(saturn_state,cotton2)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x6031c7a);
 	sh2drc_add_pcflush(machine().device("slave"), 0x60338ea);
 
@@ -575,7 +566,6 @@ DRIVER_INIT_MEMBER(saturn_state,diehard)
 
 DRIVER_INIT_MEMBER(saturn_state,fhboxers)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x60041c2);
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x600bb0a);
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x600b31e);
@@ -587,7 +577,6 @@ DRIVER_INIT_MEMBER(saturn_state,fhboxers)
 
 DRIVER_INIT_MEMBER(saturn_state,groovef)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x6005e7c);
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x6005e86);
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x60a4970);
@@ -602,7 +591,6 @@ DRIVER_INIT_MEMBER(saturn_state,groovef)
 
 DRIVER_INIT_MEMBER(saturn_state,danchih)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x6028b28);
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x6028c8e);
 	sh2drc_add_pcflush(machine().device("slave"), 0x602ae26);
@@ -614,7 +602,6 @@ DRIVER_INIT_MEMBER(saturn_state,danchih)
 
 DRIVER_INIT_MEMBER(saturn_state,danchiq)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x6028b28);
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x6028c8e);
 	sh2drc_add_pcflush(machine().device("slave"), 0x602ae26);
@@ -652,7 +639,6 @@ bp 6001d22 (60ffef0)
 
 READ32_MEMBER(saturn_state::astrass_hack_r)
 {
-
 	if(space.device().safe_pc() == 0x60011ba) return 0x00000000;
 
 	return m_workram_h[0x000770/4];
@@ -672,7 +658,6 @@ DRIVER_INIT_MEMBER(saturn_state,astrass)
 
 DRIVER_INIT_MEMBER(saturn_state,thunt)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x602A024);
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x6013EEA);
 	sh2drc_add_pcflush(machine().device("slave"), 0x602AAF8);
@@ -684,7 +669,6 @@ DRIVER_INIT_MEMBER(saturn_state,thunt)
 
 DRIVER_INIT_MEMBER(saturn_state,sandor)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x602a0f8);
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x6013fbe);
 	sh2drc_add_pcflush(machine().device("slave"), 0x602abcc);
@@ -695,7 +679,6 @@ DRIVER_INIT_MEMBER(saturn_state,sandor)
 
 DRIVER_INIT_MEMBER(saturn_state,grdforce)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x6041e32);
 	sh2drc_add_pcflush(machine().device("slave"), 0x6043aa2);
 
@@ -706,7 +689,6 @@ DRIVER_INIT_MEMBER(saturn_state,grdforce)
 
 DRIVER_INIT_MEMBER(saturn_state,batmanfr)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x60121c0);
 	sh2drc_add_pcflush(machine().device("slave"), 0x60125bc);
 
@@ -718,7 +700,6 @@ DRIVER_INIT_MEMBER(saturn_state,batmanfr)
 
 DRIVER_INIT_MEMBER(saturn_state,colmns97)
 {
-
 	sh2drc_add_pcflush(machine().device("slave"), 0x60298a2);
 
 	DRIVER_INIT_CALL(stv);
@@ -728,7 +709,6 @@ DRIVER_INIT_MEMBER(saturn_state,colmns97)
 
 DRIVER_INIT_MEMBER(saturn_state,winterht)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x6098aea);
 	sh2drc_add_pcflush(machine().device("slave"), 0x609ae4e);
 
@@ -739,7 +719,6 @@ DRIVER_INIT_MEMBER(saturn_state,winterht)
 
 DRIVER_INIT_MEMBER(saturn_state,seabass)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x602cbfa);
 	sh2drc_add_pcflush(machine().device("slave"), 0x60321ee);
 
@@ -750,7 +729,6 @@ DRIVER_INIT_MEMBER(saturn_state,seabass)
 
 DRIVER_INIT_MEMBER(saturn_state,vfremix)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x602c30c);
 	sh2drc_add_pcflush(machine().device("slave"), 0x604c332);
 
@@ -761,7 +739,6 @@ DRIVER_INIT_MEMBER(saturn_state,vfremix)
 
 DRIVER_INIT_MEMBER(saturn_state,sss)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x6026398);
 	sh2drc_add_pcflush(machine().device("slave"), 0x6028cd6);
 
@@ -774,7 +751,6 @@ DRIVER_INIT_MEMBER(saturn_state,sss)
 
 DRIVER_INIT_MEMBER(saturn_state,othellos)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x602bcbe);
 	sh2drc_add_pcflush(machine().device("slave"), 0x602d92e);
 
@@ -785,7 +761,6 @@ DRIVER_INIT_MEMBER(saturn_state,othellos)
 
 DRIVER_INIT_MEMBER(saturn_state,sasissu)
 {
-
 	sh2drc_add_pcflush(machine().device("slave"), 0x60710be);
 
 	DRIVER_INIT_CALL(stv);
@@ -810,7 +785,6 @@ DRIVER_INIT_MEMBER(saturn_state,suikoenb)
 
 DRIVER_INIT_MEMBER(saturn_state,sokyugrt)
 {
-
 	DRIVER_INIT_CALL(stv);
 
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
@@ -818,7 +792,6 @@ DRIVER_INIT_MEMBER(saturn_state,sokyugrt)
 
 DRIVER_INIT_MEMBER(saturn_state,znpwfv)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x6012ec2);
 	sh2drc_add_pcflush(machine().device("slave"), 0x60175a6);
 
@@ -828,7 +801,6 @@ DRIVER_INIT_MEMBER(saturn_state,znpwfv)
 
 DRIVER_INIT_MEMBER(saturn_state,twcup98)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x605edde);
 	sh2drc_add_pcflush(machine().device("slave"), 0x6062bca);
 
@@ -840,7 +812,6 @@ DRIVER_INIT_MEMBER(saturn_state,twcup98)
 
 DRIVER_INIT_MEMBER(saturn_state,smleague)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x6063bf4);
 	sh2drc_add_pcflush(machine().device("slave"), 0x6062bca);
 
@@ -853,7 +824,6 @@ DRIVER_INIT_MEMBER(saturn_state,smleague)
 
 DRIVER_INIT_MEMBER(saturn_state,finlarch)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x6064d60);
 
 	DRIVER_INIT_CALL(stv);
@@ -865,7 +835,6 @@ DRIVER_INIT_MEMBER(saturn_state,finlarch)
 
 DRIVER_INIT_MEMBER(saturn_state,maruchan)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x601ba46);
 	sh2drc_add_pcflush(machine().device("slave"), 0x601ba46);
 
@@ -876,7 +845,6 @@ DRIVER_INIT_MEMBER(saturn_state,maruchan)
 
 DRIVER_INIT_MEMBER(saturn_state,pblbeach)
 {
-
 	//sh2drc_add_pcflush(machine().device("maincpu"), 0x605eb78);
 
 	DRIVER_INIT_CALL(stv);
@@ -894,7 +862,6 @@ DRIVER_INIT_MEMBER(saturn_state,shanhigw)
 
 DRIVER_INIT_MEMBER(saturn_state,elandore)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x604eac0);
 	sh2drc_add_pcflush(machine().device("slave"), 0x605340a);
 
@@ -906,7 +873,6 @@ DRIVER_INIT_MEMBER(saturn_state,elandore)
 
 DRIVER_INIT_MEMBER(saturn_state,rsgun)
 {
-
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x6034d04);
 	sh2drc_add_pcflush(machine().device("slave"), 0x6036152);
 
@@ -1000,8 +966,7 @@ ROM_LOAD16_WORD_SWAP_BIOS( x, "saturn.bin", 0x000000, 0x080000, CRC(653ff2d8) SH
 	ROM_REGION( 0x080000, "slave", 0 ) /* SH2 code */ \
 	ROM_COPY( "maincpu",0,0,0x080000) \
 	\
-	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */ \
-
+	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
 
 ROM_START( stvbios )
 	STV_BIOS

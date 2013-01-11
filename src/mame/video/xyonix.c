@@ -43,20 +43,17 @@ TILE_GET_INFO_MEMBER(xyonix_state::get_xyonix_tile_info)
 
 WRITE8_MEMBER(xyonix_state::xyonix_vidram_w)
 {
-
 	m_vidram[offset] = data;
 	m_tilemap->mark_tile_dirty((offset-1)&0x0fff);
 }
 
 void xyonix_state::video_start()
 {
-
 	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(xyonix_state::get_xyonix_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 80, 32);
 }
 
 UINT32 xyonix_state::screen_update_xyonix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

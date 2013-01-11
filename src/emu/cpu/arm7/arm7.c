@@ -517,8 +517,7 @@ static CPU_EXIT( arm7 )
 
 #define UNEXECUTED() \
 	R15 += 4; \
-	ARM7_ICOUNT +=2; /* Any unexecuted instruction only takes 1 cycle (page 193) */ \
-
+	ARM7_ICOUNT +=2; /* Any unexecuted instruction only takes 1 cycle (page 193) */
 static CPU_EXECUTE( arm7 )
 {
 	UINT32 pc;

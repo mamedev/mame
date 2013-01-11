@@ -20,7 +20,6 @@ WRITE16_MEMBER(glass_state::clr_int_w)
 
 INTERRUPT_GEN_MEMBER(glass_state::glass_interrupt)
 {
-
 	if (m_cause_interrupt)
 	{
 		device.execute().set_input_line(6, HOLD_LINE);
@@ -171,7 +170,6 @@ INPUT_PORTS_END
 
 void glass_state::machine_start()
 {
-
 	save_item(NAME(m_cause_interrupt));
 	save_item(NAME(m_current_bit));
 	save_item(NAME(m_current_command));

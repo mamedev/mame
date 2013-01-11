@@ -116,7 +116,6 @@ WRITE8_MEMBER(lkage_state::lkage_sh_nmi_disable_w)
 
 WRITE8_MEMBER(lkage_state::lkage_sh_nmi_enable_w)
 {
-
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
 	{
@@ -493,7 +492,6 @@ static const ym2203_interface ym2203_config =
 
 void lkage_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_mcu = machine().device("mcu");
@@ -526,7 +524,6 @@ void lkage_state::machine_start()
 
 void lkage_state::machine_reset()
 {
-
 	m_bg_tile_bank = m_fg_tile_bank = m_tx_tile_bank =0;
 
 	m_mcu_ready = 3;

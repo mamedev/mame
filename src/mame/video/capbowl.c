@@ -91,7 +91,6 @@ READ8_MEMBER(capbowl_state::capbowl_tms34061_r)
 
 WRITE8_MEMBER(capbowl_state::bowlrama_blitter_w)
 {
-
 	switch (offset)
 	{
 		case 0x08:    /* Write address high byte (only 2 bits used) */

@@ -280,7 +280,6 @@ static const UINT16 *const palette_data_lookup[] =
 
 TIMER_CALLBACK_MEMBER(volfied_state::volfied_timer_callback)
 {
-
 	// Palette commands - palette data written to bank 0: $10 - $af
 	if (m_current_cmd >= 0x1 && m_current_cmd < 0x12)
 	{
@@ -339,7 +338,6 @@ WRITE16_MEMBER(volfied_state::volfied_cchip_bank_w)
 
 WRITE16_MEMBER(volfied_state::volfied_cchip_ram_w)
 {
-
 	m_cchip_ram[(m_current_bank * 0x400) + offset] = data;
 
 //  if (offset != 0x8)
@@ -429,7 +427,6 @@ READ16_MEMBER(volfied_state::volfied_cchip_ctrl_r)
 
 READ16_MEMBER(volfied_state::volfied_cchip_ram_r)
 {
-
 	/* Check for input ports */
 	if (m_current_bank == 0)
 	{

@@ -33,7 +33,6 @@ Year   Game                PCB            NOTES
 
 WRITE16_MEMBER(gaelco_state::bigkarnk_sound_command_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
@@ -73,7 +72,6 @@ WRITE16_MEMBER(gaelco_state::OKIM6295_bankswitch_w)
 
 WRITE16_MEMBER(gaelco_state::gaelco_vram_encrypted_w)
 {
-
 	// mame_printf_debug("gaelco_vram_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
 	COMBINE_DATA(&m_videoram[offset]);
@@ -84,7 +82,6 @@ WRITE16_MEMBER(gaelco_state::gaelco_vram_encrypted_w)
 
 WRITE16_MEMBER(gaelco_state::gaelco_encrypted_w)
 {
-
 	// mame_printf_debug("gaelco_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
 	COMBINE_DATA(&m_screen[offset]);
@@ -94,7 +91,6 @@ WRITE16_MEMBER(gaelco_state::gaelco_encrypted_w)
 
 WRITE16_MEMBER(gaelco_state::thoop_vram_encrypted_w)
 {
-
 	// mame_printf_debug("gaelco_vram_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
 	COMBINE_DATA(&m_videoram[offset]);
@@ -104,7 +100,6 @@ WRITE16_MEMBER(gaelco_state::thoop_vram_encrypted_w)
 
 WRITE16_MEMBER(gaelco_state::thoop_encrypted_w)
 {
-
 	// mame_printf_debug("gaelco_encrypted_w!!\n");
 	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
 	COMBINE_DATA(&m_screen[offset]);
@@ -497,7 +492,6 @@ GFXDECODEINFO(0x100000,64)
 
 void gaelco_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }
 

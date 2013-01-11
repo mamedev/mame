@@ -61,17 +61,13 @@ extern const device_type BUFFERED_SPRITERAM64;
 //**************************************************************************
 
 #define MCFG_BUFFERED_SPRITERAM8_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, BUFFERED_SPRITERAM8, 0) \
-
+	MCFG_DEVICE_ADD(_tag, BUFFERED_SPRITERAM8, 0)
 #define MCFG_BUFFERED_SPRITERAM16_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, BUFFERED_SPRITERAM16, 0) \
-
+	MCFG_DEVICE_ADD(_tag, BUFFERED_SPRITERAM16, 0)
 #define MCFG_BUFFERED_SPRITERAM32_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, BUFFERED_SPRITERAM32, 0) \
-
+	MCFG_DEVICE_ADD(_tag, BUFFERED_SPRITERAM32, 0)
 #define MCFG_BUFFERED_SPRITERAM64_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, BUFFERED_SPRITERAM64, 0) \
-
+	MCFG_DEVICE_ADD(_tag, BUFFERED_SPRITERAM64, 0)
 
 
 //**************************************************************************

@@ -397,7 +397,6 @@ static const mc6845_interface mc6845_intf =
 
 INTERRUPT_GEN_MEMBER(fp1100_state::fp1100_vblank_irq)
 {
-
 	if(irq_mask & 0x10)
 		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xf0);
 }

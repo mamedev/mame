@@ -303,7 +303,6 @@ WRITE8_MEMBER(twincobr_state::wardner_coin_dsp_w)
 
 MACHINE_RESET_MEMBER(twincobr_state,twincobr)
 {
-
 	m_toaplan_main_cpu = 0;     /* 68000 */
 	twincobr_display(machine(), 0);
 	m_intenable = 0;

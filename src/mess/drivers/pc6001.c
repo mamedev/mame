@@ -897,29 +897,21 @@ ADDRESS_MAP_END
 */
 
 #define BASICROM(_v_) \
-	0x10000+0x2000*_v_ \
-
+	0x10000+0x2000*_v_
 #define VOICEROM(_v_) \
-	0x18000+0x2000*_v_ \
-
+	0x18000+0x2000*_v_
 #define TVROM(_v_) \
-	0x1c000+0x2000*_v_ \
-
+	0x1c000+0x2000*_v_
 #define KANJIROM(_v_) \
-	0x20000+0x2000*_v_ \
-
+	0x20000+0x2000*_v_
 #define WRAM(_v_) \
-	0x28000+0x2000*_v_ \
-
+	0x28000+0x2000*_v_
 #define EXWRAM(_v_) \
-	0x38000+0x2000*_v_ \
-
+	0x38000+0x2000*_v_
 #define EXROM(_v_) \
-	0x48000+0x2000*_v_ \
-
+	0x48000+0x2000*_v_
 #define INVALID(_v_) \
-	0x4c000+0x2000*_v_ \
-
+	0x4c000+0x2000*_v_
 /* FIXME: some comments aren't right */
 static const UINT32 banksw_table_r0[0x10*4][4] = {
 	/* 0 */
@@ -1499,29 +1491,21 @@ ADDRESS_MAP_END
 /* PC-6001 SR */
 
 #define SR_SYSROM_1(_v_) \
-	0x10000+(0x1000*_v_) \
-
+	0x10000+(0x1000*_v_)
 #define SR_SYSROM_2(_v_) \
-	0x20000+(0x1000*_v_) \
-
+	0x20000+(0x1000*_v_)
 #define SR_CGROM1(_v_) \
-	0x30000+(0x1000*_v_) \
-
+	0x30000+(0x1000*_v_)
 #define SR_EXROM0(_v_) \
-	0x40000+(0x1000*_v_) \
-
+	0x40000+(0x1000*_v_)
 #define SR_EXROM1(_v_) \
-	0x50000+(0x1000*_v_) \
-
+	0x50000+(0x1000*_v_)
 #define SR_EXRAM0(_v_) \
-	0x60000+(0x1000*_v_) \
-
+	0x60000+(0x1000*_v_)
 #define SR_WRAM0(_v_) \
-	0x70000+(0x1000*_v_) \
-
+	0x70000+(0x1000*_v_)
 #define SR_NULL(_v_) \
-	0x80000+(0x1000*_v_) \
-
+	0x80000+(0x1000*_v_)
 READ8_MEMBER(pc6001_state::pc6001sr_bank_rn_r)
 {
 	return m_sr_bank_r[offset];
@@ -1568,8 +1552,7 @@ WRITE8_MEMBER(pc6001_state::pc6001sr_bank_wn_w)
 		ROM[offset+(SR_WRAM0(bank_num))] = data; \
 	else \
 		ROM[offset+(SR_EXRAM0(bank_num))] = data; \
-} \
-
+}
 WRITE8_MEMBER(pc6001_state::sr_work_ram0_w){ SR_WRAM_BANK_W(0); }
 WRITE8_MEMBER(pc6001_state::sr_work_ram1_w){ SR_WRAM_BANK_W(1); }
 WRITE8_MEMBER(pc6001_state::sr_work_ram2_w){ SR_WRAM_BANK_W(2); }

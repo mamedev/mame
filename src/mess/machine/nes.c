@@ -208,7 +208,6 @@ int nes_ppu_vidaccess( device_t *device, int address, int data )
 
 void nes_state::machine_reset()
 {
-
 	/* Reset the mapper variables. Will also mark the char-gen ram as dirty */
 	if (m_disk_expansion && m_pcb_id == NO_BOARD)
 		m_ppu->set_hblank_callback(fds_irq);
@@ -1645,7 +1644,6 @@ READ8_MEMBER(nes_state::nes_fds_r)
 
 WRITE8_MEMBER(nes_state::nes_fds_w)
 {
-
 	switch (offset)
 	{
 		case 0x00:
@@ -1714,7 +1712,6 @@ static void nes_unload_proc( device_image_interface &image )
 
 DRIVER_INIT_MEMBER(nes_state,famicom)
 {
-
 	/* clear some of the variables we don't use */
 	m_trainer = 0;
 	m_battery = 0;

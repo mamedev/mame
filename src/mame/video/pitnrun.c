@@ -180,7 +180,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 	for (offs = 0 ; offs < 0x100; offs+=4)
 	{
-
 		pal=spriteram[offs+2]&0x3;
 
 		sy = 256-spriteram[offs+0]-16;

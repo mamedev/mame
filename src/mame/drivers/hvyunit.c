@@ -140,7 +140,6 @@ public:
 
 void hvyunit_state::machine_start()
 {
-
 	m_master_cpu = machine().device("master");
 	m_slave_cpu = machine().device("slave");
 	m_sound_cpu = machine().device("soundcpu");
@@ -152,7 +151,6 @@ void hvyunit_state::machine_start()
 
 void hvyunit_state::machine_reset()
 {
-
 	m_mermaid_int0_l = 1;
 	m_mermaid_to_z80_full = 0;
 	m_z80_to_mermaid_full = 0;
@@ -167,7 +165,6 @@ void hvyunit_state::machine_reset()
 
 TILE_GET_INFO_MEMBER(hvyunit_state::get_bg_tile_info)
 {
-
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0x0f) << 8);
 	int color = (attr >> 4);
@@ -225,7 +222,6 @@ WRITE8_MEMBER(hvyunit_state::master_bankswitch_w)
 
 WRITE8_MEMBER(hvyunit_state::mermaid_data_w)
 {
-
 	m_data_to_mermaid = data;
 	m_z80_to_mermaid_full = 1;
 	m_mermaid_int0_l = 0;
@@ -234,14 +230,12 @@ WRITE8_MEMBER(hvyunit_state::mermaid_data_w)
 
 READ8_MEMBER(hvyunit_state::mermaid_data_r)
 {
-
 	m_mermaid_to_z80_full = 0;
 	return m_data_to_z80;
 }
 
 READ8_MEMBER(hvyunit_state::mermaid_status_r)
 {
-
 	return (!m_mermaid_to_z80_full << 2) | (m_z80_to_mermaid_full << 3);
 }
 
@@ -254,28 +248,24 @@ READ8_MEMBER(hvyunit_state::mermaid_status_r)
 
 WRITE8_MEMBER(hvyunit_state::trigger_nmi_on_sound_cpu2)
 {
-
 	soundlatch_byte_w(space, 0, data);
 	m_sound_cpu->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(hvyunit_state::hu_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(hvyunit_state::hu_colorram_w)
 {
-
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(hvyunit_state::slave_bankswitch_w)
 {
-
 	unsigned char *ROM = memregion("slave")->base();
 	int bank = (data & 0x03);
 	m_port0_data = data;
@@ -331,7 +321,6 @@ READ8_MEMBER(hvyunit_state::mermaid_p0_r)
 
 WRITE8_MEMBER(hvyunit_state::mermaid_p0_w)
 {
-
 	if (!BIT(m_mermaid_p[0], 1) && BIT(data, 1))
 	{
 		m_mermaid_to_z80_full = 1;
@@ -346,7 +335,6 @@ WRITE8_MEMBER(hvyunit_state::mermaid_p0_w)
 
 READ8_MEMBER(hvyunit_state::mermaid_p1_r)
 {
-
 	if (BIT(m_mermaid_p[0], 0) == 0)
 		return m_data_to_mermaid;
 	else
@@ -355,7 +343,6 @@ READ8_MEMBER(hvyunit_state::mermaid_p1_r)
 
 WRITE8_MEMBER(hvyunit_state::mermaid_p1_w)
 {
-
 	if (data == 0xff)
 	{
 		m_mermaid_int0_l = 1;
@@ -367,7 +354,6 @@ WRITE8_MEMBER(hvyunit_state::mermaid_p1_w)
 
 READ8_MEMBER(hvyunit_state::mermaid_p2_r)
 {
-
 	switch ((m_mermaid_p[0] >> 2) & 3)
 	{
 		case 0: return ioport("IN1")->read();
@@ -379,13 +365,11 @@ READ8_MEMBER(hvyunit_state::mermaid_p2_r)
 
 WRITE8_MEMBER(hvyunit_state::mermaid_p2_w)
 {
-
 	m_mermaid_p[2] = data;
 }
 
 READ8_MEMBER(hvyunit_state::mermaid_p3_r)
 {
-
 	UINT8 dsw = 0;
 	UINT8 dsw1 = ioport("DSW1")->read();
 	UINT8 dsw2 = ioport("DSW2")->read();
@@ -403,7 +387,6 @@ READ8_MEMBER(hvyunit_state::mermaid_p3_r)
 
 WRITE8_MEMBER(hvyunit_state::mermaid_p3_w)
 {
-
 	m_mermaid_p[3] = data;
 	m_slave_cpu->execute().set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 }

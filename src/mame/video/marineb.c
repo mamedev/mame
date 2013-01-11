@@ -47,7 +47,6 @@ void marineb_state::palette_init()
 
 TILE_GET_INFO_MEMBER(marineb_state::get_tile_info)
 {
-
 	UINT8 code = m_videoram[tile_index];
 	UINT8 col = m_colorram[tile_index];
 
@@ -67,7 +66,6 @@ TILE_GET_INFO_MEMBER(marineb_state::get_tile_info)
 
 void marineb_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(marineb_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_cols(32);
 
@@ -87,7 +85,6 @@ void marineb_state::video_start()
 
 WRITE8_MEMBER(marineb_state::marineb_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -95,7 +92,6 @@ WRITE8_MEMBER(marineb_state::marineb_videoram_w)
 
 WRITE8_MEMBER(marineb_state::marineb_colorram_w)
 {
-
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -135,7 +131,6 @@ WRITE8_MEMBER(marineb_state::marineb_palette_bank_1_w)
 
 WRITE8_MEMBER(marineb_state::marineb_flipscreen_x_w)
 {
-
 	m_flipscreen_x = data ^ m_marineb_active_low_flipscreen;
 	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
 }
@@ -143,7 +138,6 @@ WRITE8_MEMBER(marineb_state::marineb_flipscreen_x_w)
 
 WRITE8_MEMBER(marineb_state::marineb_flipscreen_y_w)
 {
-
 	m_flipscreen_y = data ^ m_marineb_active_low_flipscreen;
 	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
 }

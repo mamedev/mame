@@ -131,7 +131,6 @@ WRITE8_MEMBER(rt1715_state::rt1715_rom_disable)
 
 static I8275_DISPLAY_PIXELS( rt1715_display_pixels )
 {
-
 }
 
 /* F4 Character Displayer */

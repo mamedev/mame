@@ -64,7 +64,6 @@ void pdp1_state::screen_eof_pdp1(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-
 		crt_eof(m_crt);
 	}
 }

@@ -680,7 +680,6 @@ static void topspeed_postload(running_machine &machine)
 
 void topspeed_state::machine_start()
 {
-
 	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
@@ -703,7 +702,6 @@ void topspeed_state::machine_start()
 
 void topspeed_state::machine_reset()
 {
-
 	m_cpua_ctrl = 0xff;
 	m_ioc220_port = 0;
 	m_banknum = -1;

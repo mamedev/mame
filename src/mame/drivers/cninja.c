@@ -76,7 +76,6 @@ READ16_MEMBER(cninja_state::cninja_irq_r)
 {
 	switch (offset)
 	{
-
 	case 1: /* Raster IRQ scanline position */
 		return m_scanline;
 

@@ -30,7 +30,6 @@
 
 struct mc6846_t
 {
-
 	const mc6846_interface* iface;
 
 	/* registers */
@@ -179,7 +178,6 @@ INLINE void mc6846_timer_launch ( device_t *device )
 
 	switch( MODE )
 	{
-
 	case 0x00:
 	case 0x10: /* continuous */
 		mc6846->cto = 0;

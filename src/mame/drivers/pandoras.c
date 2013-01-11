@@ -37,14 +37,12 @@ Boards:
 
 INTERRUPT_GEN_MEMBER(pandoras_state::pandoras_master_interrupt)
 {
-
 	if (m_irq_enable_a)
 		device.execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(pandoras_state::pandoras_slave_interrupt)
 {
-
 	if (m_irq_enable_b)
 		device.execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
@@ -87,7 +85,6 @@ WRITE8_MEMBER(pandoras_state::pandoras_int_control_w)
 
 WRITE8_MEMBER(pandoras_state::pandoras_cpua_irqtrigger_w)
 {
-
 	if (!m_firq_old_data_a && data)
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 
@@ -96,7 +93,6 @@ WRITE8_MEMBER(pandoras_state::pandoras_cpua_irqtrigger_w)
 
 WRITE8_MEMBER(pandoras_state::pandoras_cpub_irqtrigger_w)
 {
-
 	if (!m_firq_old_data_b && data)
 		m_subcpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 
@@ -110,7 +106,6 @@ WRITE8_MEMBER(pandoras_state::pandoras_i8039_irqtrigger_w)
 
 WRITE8_MEMBER(pandoras_state::i8039_irqen_and_status_w)
 {
-
 	/* bit 7 enables IRQ */
 	if ((data & 0x80) == 0)
 		m_mcu->set_input_line(0, CLEAR_LINE);
@@ -292,7 +287,6 @@ GFXDECODE_END
 
 void pandoras_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_subcpu = machine().device<cpu_device>("sub");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
@@ -307,7 +301,6 @@ void pandoras_state::machine_start()
 
 void pandoras_state::machine_reset()
 {
-
 	m_firq_old_data_a = 0;
 	m_firq_old_data_b = 0;
 	m_irq_enable_a = 0;

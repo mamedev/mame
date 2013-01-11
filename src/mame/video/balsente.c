@@ -18,7 +18,6 @@
 
 void balsente_state::video_start()
 {
-
 	/* reset the system */
 	m_palettebank_vis = 0;
 	m_sprite_bank[0] = memregion("gfx1")->base();
@@ -43,7 +42,6 @@ void balsente_state::video_start()
 
 WRITE8_MEMBER(balsente_state::balsente_videoram_w)
 {
-
 	/* expand the two pixel values into two bytes */
 	m_videoram[offset] = data;
 
@@ -61,7 +59,6 @@ WRITE8_MEMBER(balsente_state::balsente_videoram_w)
 
 WRITE8_MEMBER(balsente_state::balsente_palette_select_w)
 {
-
 	/* only update if changed */
 	if (m_palettebank_vis != (data & 3))
 	{

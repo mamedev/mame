@@ -35,7 +35,6 @@ TILE_GET_INFO_MEMBER(mitchell_state::get_tile_info)
 
 VIDEO_START_MEMBER(mitchell_state,pang)
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mitchell_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap->set_transparent_pen(15);
 
@@ -62,14 +61,12 @@ VIDEO_START_MEMBER(mitchell_state,pang)
 
 WRITE8_MEMBER(mitchell_state::pang_video_bank_w)
 {
-
 	/* Bank handler (sets base pointers for video write) (doesn't apply to mgakuen) */
 	m_video_bank = data;
 }
 
 WRITE8_MEMBER(mitchell_state::mstworld_video_bank_w)
 {
-
 	/* Monsters World seems to freak out if more bits are used.. */
 	m_video_bank = data & 1;
 }
@@ -77,7 +74,6 @@ WRITE8_MEMBER(mitchell_state::mstworld_video_bank_w)
 
 WRITE8_MEMBER(mitchell_state::mgakuen_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
@@ -99,7 +95,6 @@ READ8_MEMBER(mitchell_state::mgakuen_objram_r)
 
 WRITE8_MEMBER(mitchell_state::pang_videoram_w)
 {
-
 	if (m_video_bank)
 		mgakuen_objram_w(space, offset, data);
 	else
@@ -108,7 +103,6 @@ WRITE8_MEMBER(mitchell_state::pang_videoram_w)
 
 READ8_MEMBER(mitchell_state::pang_videoram_r)
 {
-
 	if (m_video_bank)
 		return mgakuen_objram_r(space, offset);
 	else
@@ -121,7 +115,6 @@ READ8_MEMBER(mitchell_state::pang_videoram_r)
 
 WRITE8_MEMBER(mitchell_state::pang_colorram_w)
 {
-
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -137,7 +130,6 @@ READ8_MEMBER(mitchell_state::pang_colorram_r)
 
 WRITE8_MEMBER(mitchell_state::pang_gfxctrl_w)
 {
-
 logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 {
 #if 0
@@ -176,7 +168,6 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 
 WRITE8_MEMBER(mitchell_state::pangbl_gfxctrl_w)
 {
-
 logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 {
 #if 0
@@ -213,7 +204,6 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 
 WRITE8_MEMBER(mitchell_state::mstworld_gfxctrl_w)
 {
-
 logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 {
 	char baf[40];
@@ -248,7 +238,6 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",space.device().safe_pc(),data);
 
 WRITE8_MEMBER(mitchell_state::pang_paletteram_w)
 {
-
 	if (m_paletteram_bank)
 		paletteram_xxxxRRRRGGGGBBBB_byte_le_w(space, offset + 0x800, data);
 	else
@@ -257,7 +246,6 @@ WRITE8_MEMBER(mitchell_state::pang_paletteram_w)
 
 READ8_MEMBER(mitchell_state::pang_paletteram_r)
 {
-
 	if (m_paletteram_bank)
 		return m_generic_paletteram_8[offset + 0x800];
 
@@ -312,7 +300,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 mitchell_state::screen_update_pang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(0, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(machine(), bitmap, cliprect);

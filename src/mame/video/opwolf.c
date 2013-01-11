@@ -12,7 +12,6 @@
 
 WRITE16_MEMBER(opwolf_state::opwolf_spritectrl_w)
 {
-
 	if (offset == 0)
 	{
 		/* bits 0 and 1 always set */

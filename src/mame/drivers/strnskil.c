@@ -26,7 +26,6 @@ Notes:
 
 READ8_MEMBER(strnskil_state::strnskil_d800_r)
 {
-
 /* bit0: interrupt type?, bit1: CPU2 busack? */
 
 	return (m_irq_source);

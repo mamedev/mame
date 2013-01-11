@@ -158,7 +158,6 @@ VIDEO_START_MEMBER(zaxxon_state,razmataz)
 
 VIDEO_START_MEMBER(zaxxon_state,congo)
 {
-
 	/* allocate our own spriteram since it is not accessible by the main CPU */
 	m_spriteram.allocate(0x100);
 
@@ -180,7 +179,6 @@ VIDEO_START_MEMBER(zaxxon_state,congo)
 
 WRITE8_MEMBER(zaxxon_state::zaxxon_flipscreen_w)
 {
-
 	/* low bit controls flip; background and sprite flip are handled at render time */
 	flip_screen_set_no_update(~data & 1);
 	m_fg_tilemap->set_flip(flip_screen() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
@@ -189,7 +187,6 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_flipscreen_w)
 
 WRITE8_MEMBER(zaxxon_state::zaxxon_fg_color_w)
 {
-
 	/* low bit selects high color palette index */
 	m_fg_color = (data & 1) * 0x80;
 	m_fg_tilemap->set_palette_offset(m_fg_color + (m_congo_color_bank << 8));
@@ -198,7 +195,6 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_fg_color_w)
 
 WRITE8_MEMBER(zaxxon_state::zaxxon_bg_position_w)
 {
-
 	/* 11 bits of scroll position are stored */
 	if (offset == 0)
 		m_bg_position = (m_bg_position & 0x700) | ((data << 0) & 0x0ff);
@@ -209,7 +205,6 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_bg_position_w)
 
 WRITE8_MEMBER(zaxxon_state::zaxxon_bg_color_w)
 {
-
 	/* low bit selects high color palette index */
 	m_bg_color = (data & 1) * 0x80;
 }
@@ -217,7 +212,6 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_bg_color_w)
 
 WRITE8_MEMBER(zaxxon_state::zaxxon_bg_enable_w)
 {
-
 	/* low bit enables/disables the background layer */
 	m_bg_enable = data & 1;
 }
@@ -225,7 +219,6 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_bg_enable_w)
 
 WRITE8_MEMBER(zaxxon_state::congo_fg_bank_w)
 {
-
 	/* low bit controls the topmost character bit */
 	m_congo_fg_bank = data & 1;
 	m_fg_tilemap->mark_all_dirty();
@@ -234,7 +227,6 @@ WRITE8_MEMBER(zaxxon_state::congo_fg_bank_w)
 
 WRITE8_MEMBER(zaxxon_state::congo_color_bank_w)
 {
-
 	/* low bit controls the topmost bit into the color PROM */
 	m_congo_color_bank = data & 1;
 	m_fg_tilemap->set_palette_offset(m_fg_color + (m_congo_color_bank << 8));
@@ -250,7 +242,6 @@ WRITE8_MEMBER(zaxxon_state::congo_color_bank_w)
 
 WRITE8_MEMBER(zaxxon_state::zaxxon_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
@@ -258,7 +249,6 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_videoram_w)
 
 WRITE8_MEMBER(zaxxon_state::congo_colorram_w)
 {
-
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
@@ -462,7 +452,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 zaxxon_state::screen_update_zaxxon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	draw_background(machine(), bitmap, cliprect, TRUE);
 	draw_sprites(machine(), bitmap, cliprect, 0x140, 0x180);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
@@ -472,7 +461,6 @@ UINT32 zaxxon_state::screen_update_zaxxon(screen_device &screen, bitmap_ind16 &b
 
 UINT32 zaxxon_state::screen_update_futspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	draw_background(machine(), bitmap, cliprect, TRUE);
 	draw_sprites(machine(), bitmap, cliprect, 0x180, 0x180);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
@@ -482,7 +470,6 @@ UINT32 zaxxon_state::screen_update_futspy(screen_device &screen, bitmap_ind16 &b
 
 UINT32 zaxxon_state::screen_update_razmataz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	draw_background(machine(), bitmap, cliprect, FALSE);
 	draw_sprites(machine(), bitmap, cliprect, 0x140, 0x180);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
@@ -492,7 +479,6 @@ UINT32 zaxxon_state::screen_update_razmataz(screen_device &screen, bitmap_ind16 
 
 UINT32 zaxxon_state::screen_update_congo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	draw_background(machine(), bitmap, cliprect, TRUE);
 	draw_sprites(machine(), bitmap, cliprect, 0x280, 0x180);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);

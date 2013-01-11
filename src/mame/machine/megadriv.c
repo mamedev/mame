@@ -499,12 +499,10 @@ static void megadrive_io_write_tx_port(running_machine &machine, int portnum, UI
 
 static void megadrive_io_write_rx_port(running_machine &machine, int portnum, UINT16 data)
 {
-
 }
 
 static void megadrive_io_write_sctrl_port(running_machine &machine, int portnum, UINT16 data)
 {
-
 }
 
 
@@ -605,7 +603,6 @@ static WRITE16_HANDLER( megadriv_68k_write_z80_ram )
 
 	if ((genz80.z80_has_bus==0) && (genz80.z80_is_reset==0))
 	{
-
 		if (!ACCESSING_BITS_0_7) // byte (MSB) access
 		{
 			genz80.z80_prgram[(offset<<1)] = (data & 0xff00) >> 8;

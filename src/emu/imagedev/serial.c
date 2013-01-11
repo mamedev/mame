@@ -22,7 +22,6 @@ serial_image_device::serial_image_device(const machine_config &mconfig, const ch
 		device_serial_interface(mconfig, *this),
 		device_image_interface(mconfig, *this)
 {
-
 }
 
 //-------------------------------------------------

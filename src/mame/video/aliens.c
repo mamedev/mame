@@ -55,7 +55,6 @@ void aliens_sprite_callback( running_machine &machine, int *code, int *color, in
 
 void aliens_state::video_start()
 {
-
 	m_generic_paletteram_8.allocate(0x400);
 
 	m_layer_colorbase[0] = 0;
@@ -74,7 +73,6 @@ void aliens_state::video_start()
 
 UINT32 aliens_state::screen_update_aliens(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	k052109_tilemap_update(m_k052109);
 
 	machine().priority_bitmap.fill(0, cliprect);

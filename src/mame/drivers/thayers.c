@@ -747,7 +747,6 @@ void thayers_state::machine_start()
 
 void thayers_state::machine_reset()
 {
-
 	m_laserdisc_data = 0;
 
 	m_rx_bit = 0;

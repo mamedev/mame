@@ -410,7 +410,6 @@ READ16_MEMBER(taitob_state::eep_latch_r)
 
 WRITE16_MEMBER(taitob_state::eeprom_w)
 {
-
 	COMBINE_DATA(&m_eep_latch);
 
 	if (ACCESSING_BITS_8_15)
@@ -449,7 +448,6 @@ READ16_MEMBER(taitob_state::player_34_coin_ctrl_r)
 
 WRITE16_MEMBER(taitob_state::player_34_coin_ctrl_w)
 {
-
 	COMBINE_DATA(&m_coin_word);
 
 	/* coin counters and lockout */
@@ -2004,7 +2002,6 @@ static const tc0140syt_interface taitob_tc0140syt_intf =
 
 void taitob_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_mb87078 = machine().device("mb87078");
@@ -2019,7 +2016,6 @@ void taitob_state::machine_start()
 
 void taitob_state::machine_reset()
 {
-
 	m_eep_latch = 0;
 	m_coin_word = 0;
 }

@@ -170,7 +170,6 @@ WRITE8_MEMBER(malzak_state::portc0_w)
 
 READ8_MEMBER(malzak_state::collision_r)
 {
-
 	// High 4 bits seem to refer to the row affected.
 	if(++m_collision_counter > 15)
 		m_collision_counter = 0;
@@ -331,7 +330,6 @@ static SAA5050_INTERFACE( malzac_saa5050_intf )
 
 void malzak_state::machine_start()
 {
-
 	membank("bank1")->configure_entries(0, 2, memregion("user2")->base(), 0x400);
 
 	m_s2636_0 = machine().device("s2636_0");
@@ -345,7 +343,6 @@ void malzak_state::machine_start()
 
 void malzak_state::machine_reset()
 {
-
 	memset(m_playfield_code, 0, 256 * sizeof(int));
 
 	m_malzak_x = 0;

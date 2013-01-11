@@ -831,7 +831,6 @@ static void SCSP_UpdateReg(scsp_state *scsp, address_space &space, int reg)
 
 static void SCSP_UpdateSlotRegR(scsp_state *scsp, int slot,int reg)
 {
-
 }
 
 static void SCSP_UpdateRegR(scsp_state *scsp, address_space &space, int reg)

@@ -136,7 +136,6 @@ WRITE8_MEMBER(m10_state::ic8j1_output_changed)
 
 WRITE8_MEMBER(m10_state::ic8j2_output_changed)
 {
-
 	/* written from /Q to A with slight delight */
 	LOG(("ic8j2: %d\n", data));
 	ttl74123_a_w(m_ic8j2, space, 0, data);
@@ -192,7 +191,6 @@ PALETTE_INIT_MEMBER(m10_state,m10)
 
 MACHINE_START_MEMBER(m10_state,m10)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_ic8j1 = machine().device("ic8j1");
 	m_ic8j2 = machine().device("ic8j2");
@@ -205,7 +203,6 @@ MACHINE_START_MEMBER(m10_state,m10)
 
 MACHINE_RESET_MEMBER(m10_state,m10)
 {
-
 	m_bottomline = 0;
 	m_flip = 0;
 	m_last = 0;
@@ -238,7 +235,6 @@ MACHINE_RESET_MEMBER(m10_state,m10)
 
 WRITE8_MEMBER(m10_state::m10_ctrl_w)
 {
-
 #if DEBUG
 	if (data & 0x40)
 		popmessage("ctrl: %02x",data);
@@ -314,7 +310,6 @@ WRITE8_MEMBER(m10_state::m10_ctrl_w)
 
 WRITE8_MEMBER(m10_state::m11_ctrl_w)
 {
-
 #if DEBUG
 	if (data & 0x4c)
 		popmessage("M11 ctrl: %02x",data);
@@ -346,7 +341,6 @@ WRITE8_MEMBER(m10_state::m11_ctrl_w)
 
 WRITE8_MEMBER(m10_state::m15_ctrl_w)
 {
-
 #if DEBUG
 	if (data & 0xf0)
 		popmessage("M15 ctrl: %02x",data);

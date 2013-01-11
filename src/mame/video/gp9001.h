@@ -92,13 +92,11 @@ extern const device_type GP9001_VDP;
 /* vdp map 0, gfx region 0 */
 #define MCFG_DEVICE_ADD_VDP0 \
 	MCFG_DEVICE_ADD("gp9001vdp0", GP9001_VDP, 0) \
-	gp9001vdp_device::static_set_gfx_region(*device, 0); \
-
+	gp9001vdp_device::static_set_gfx_region(*device, 0);
 /* vdp map 1, gfx region 2 */
 #define MCFG_DEVICE_ADD_VDP1 \
 	MCFG_DEVICE_ADD("gp9001vdp1", GP9001_VDP, 0) \
-	gp9001vdp_device::static_set_gfx_region(*device, 2); \
-
+	gp9001vdp_device::static_set_gfx_region(*device, 2);
 
 // access to VDP
 DECLARE_READ16_DEVICE_HANDLER( gp9001_vdp_r );

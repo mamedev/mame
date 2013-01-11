@@ -21,13 +21,11 @@
 #define MCFG_NUBUS_BUS_ADD(_tag, _cputag, _config) \
 	MCFG_DEVICE_ADD(_tag, NUBUS, 0) \
 	MCFG_DEVICE_CONFIG(_config) \
-	nubus_device::static_set_cputag(*device, _cputag); \
-
+	nubus_device::static_set_cputag(*device, _cputag);
 #define MCFG_NUBUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot, _def_inp) \
 	MCFG_DEVICE_ADD(_tag, NUBUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
-	nubus_slot_device::static_set_nubus_slot(*device, _nbtag, _tag); \
-
+	nubus_slot_device::static_set_nubus_slot(*device, _nbtag, _tag);
 #define MCFG_NUBUS_SLOT_REMOVE(_tag)    \
 	MCFG_DEVICE_REMOVE(_tag)
 

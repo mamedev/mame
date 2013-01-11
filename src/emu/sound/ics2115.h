@@ -10,15 +10,13 @@
 
 #define MCFG_ICS2115_ADD(_tag, _clock, _irqf) \
 	MCFG_DEVICE_ADD(_tag, ICS2115, _clock) \
-	MCFG_IRQ_FUNC(_irqf) \
-
+	MCFG_IRQ_FUNC(_irqf)
 #define MCFG_ICS2115_REPLACE(_tag, _clock, _irqf) \
 	MCFG_DEVICE_REPLACE(_tag, ICS2115, _clock) \
 	MCFG_IRQ_FUNC(_irqf)
 
 #define MCFG_IRQ_FUNC(_irqf) \
-	ics2115_device::static_set_irqf(*device, _irqf); \
-
+	ics2115_device::static_set_irqf(*device, _irqf);
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************

@@ -1272,7 +1272,6 @@ READ8_HANDLER ( to7_midi_r )
 
 	switch ( offset )
 	{
-
 	case 0: /* get status */
 		/* bit 0:     data received */
 		/* bit 1:     ready to transmit data */
@@ -1325,7 +1324,6 @@ WRITE8_HANDLER ( to7_midi_w )
 
 	switch ( offset )
 	{
-
 	case 0: /* set control */
 		/* bits 0-1: clock divide (ignored) or reset */
 		if ( (data & 3) == 3 )
@@ -2311,7 +2309,6 @@ READ8_HANDLER  ( to9_vreg_r )
 {
 	switch ( offset )
 	{
-
 	case 0: /* palette data */
 	{
 		UINT8 c =  to9_palette_data[ to9_palette_idx ];
@@ -2343,7 +2340,6 @@ WRITE8_HANDLER ( to9_vreg_w )
 
 	switch ( offset )
 	{
-
 	case 0: /* palette data */
 	{
 		UINT16 color, idx;
@@ -2656,7 +2652,6 @@ READ8_HANDLER ( to9_kbd_r )
 
 	switch ( offset )
 	{
-
 	case 0: /* get status */
 		/* bit 0:     data received */
 		/* bit 1:     ready to transmit data (always 1) */
@@ -2704,7 +2699,6 @@ WRITE8_HANDLER ( to9_kbd_w )
 
 	switch ( offset )
 	{
-
 	case 0: /* set control */
 		/* bits 0-1: clock divide (ignored) or reset */
 		if ( (data & 3) == 3 )
@@ -2941,7 +2935,6 @@ static TIMER_CALLBACK(to9_kbd_timer_cb)
 
 		switch ( to9_kbd_byte_count )
 		{
-
 		case 0: /* key */
 			to9_kbd_send( machine, to9_kbd_get_key(machine), 0 );
 			break;
@@ -3882,7 +3875,6 @@ READ8_HANDLER ( to8_gatearray_r )
 
 	switch ( offset )
 	{
-
 	case 0: /* system 2 / lightpen register 1 */
 		if ( to7_lightpen )
 			res = (count >> 8) & 0xff;
@@ -3937,7 +3929,6 @@ WRITE8_HANDLER ( to8_gatearray_w )
 
 	switch ( offset )
 	{
-
 	case 0: /* switch */
 		to7_lightpen = data & 1;
 		break;
@@ -3990,7 +3981,6 @@ READ8_HANDLER  ( to8_vreg_r )
 
 	switch ( offset )
 	{
-
 	case 0: /* palette data */
 	{
 		UINT8 c =  to9_palette_data[ to9_palette_idx ];
@@ -4024,7 +4014,6 @@ WRITE8_HANDLER ( to8_vreg_w )
 
 	switch ( offset )
 	{
-
 	case 0: /* palette data */
 	{
 		UINT16 color, idx;
@@ -4533,7 +4522,6 @@ static void mo6_update_cart_bank (running_machine &machine)
 				}
 								else
 								{
-
 					if (old_cart_bank < 12)
 										{
 						if ( bank_is_read_only )
@@ -4941,7 +4929,6 @@ READ8_HANDLER ( mo6_gatearray_r )
 
 	switch ( offset )
 	{
-
 	case 0: /* system 2 / lightpen register 1 */
 		if ( to7_lightpen )
 			res = (count >> 8) & 0xff;
@@ -4996,7 +4983,6 @@ WRITE8_HANDLER ( mo6_gatearray_w )
 
 	switch ( offset )
 	{
-
 	case 0: /* switch */
 		to7_lightpen = data & 1;
 		break;
@@ -5041,7 +5027,6 @@ READ8_HANDLER ( mo6_vreg_r )
 
 	switch ( offset )
 	{
-
 	case 0: /* palette data */
 	case 1: /* palette address */
 		return to8_vreg_r( space, offset );
@@ -5066,7 +5051,6 @@ WRITE8_HANDLER ( mo6_vreg_w )
 
 	switch ( offset )
 	{
-
 	case 0: /* palette data */
 	case 1: /* palette address */
 		to8_vreg_w( space, offset, data );

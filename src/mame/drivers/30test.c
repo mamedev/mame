@@ -222,14 +222,12 @@ INPUT_PORTS_END
 
 void namco_30test_state::machine_start()
 {
-
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_oki_bank));
 }
 
 void namco_30test_state::machine_reset()
 {
-
 }
 
 static const hc11_config namco_30test_config =

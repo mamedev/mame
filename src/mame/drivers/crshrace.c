@@ -161,7 +161,6 @@ WRITE8_MEMBER(crshrace_state::crshrace_sh_bankswitch_w)
 
 WRITE16_MEMBER(crshrace_state::sound_command_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		m_pending_command = 1;
@@ -440,7 +439,6 @@ static const k053936_interface crshrace_k053936_intf =
 
 void crshrace_state::machine_start()
 {
-
 	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x8000);
 
 	save_item(NAME(m_roz_bank));
@@ -451,7 +449,6 @@ void crshrace_state::machine_start()
 
 void crshrace_state::machine_reset()
 {
-
 	m_roz_bank = 0;
 	m_gfxctrl = 0;
 	m_flipscreen = 0;

@@ -179,7 +179,6 @@ static TMS9928A_INTERFACE(tms9918_interface)
 
 MACHINE_START_MEMBER(tm990189_state,tm990_189_v)
 {
-
 	m_displayena_timer = machine().scheduler().timer_alloc(FUNC_NULL);
 
 	m_joy1x_timer = machine().scheduler().timer_alloc(FUNC_NULL);
@@ -476,7 +475,6 @@ void tm990_189_rs232_image_device::device_config_complete()
 
 void tm990_189_rs232_image_device::device_start()
 {
-
 }
 
 void tm990_189_rs232_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)

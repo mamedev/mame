@@ -219,8 +219,6 @@ WRITE8_MEMBER(odyssey2_state::video_write)
 		m_sh_channel->update();
 
 	if (offset == 0xa0) {
-
-
 		if (    m_o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY
 				&& !(data & VDC_CONTROL_REG_STROBE_XY))
 		{
@@ -409,11 +407,8 @@ void odyssey2_state::i824x_scanline(int vpos)
 
 					for ( j = 0; j < ARRAY_LENGTH( m_o2_vdc.s.quad[0].single ); j++, x += 8 )
 					{
-
-
 						if ( y <= ( vpos - m_start_vpos ) && ( vpos - m_start_vpos ) < y + char_height * 2 )
 						{
-
 						UINT16 color = 16 + ( ( m_o2_vdc.s.quad[i].single[j].color & 0x0E ) >> 1 );
 
 

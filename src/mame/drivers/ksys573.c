@@ -705,7 +705,6 @@ READ32_MEMBER(ksys573_state::jamma_r)
 
 READ32_MEMBER(ksys573_state::control_r)
 {
-
 	verboselog( machine(), 2, "control_r( %08x, %08x ) %08x\n", offset, mem_mask, m_control );
 
 	return m_control;
@@ -1291,7 +1290,6 @@ WRITE32_MEMBER(ksys573_state::security_w)
 
 READ32_MEMBER(ksys573_state::security_r)
 {
-
 	UINT32 data = m_n_security_control;
 	verboselog( machine(), 2, "security_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
@@ -1768,7 +1766,6 @@ static void gn845pwbb_clk_w( running_machine &machine, int offset, int data )
 
 CUSTOM_INPUT_MEMBER(ksys573_state::gn845pwbb_read)
 {
-
 	return ioport("STAGE")->read() & m_stage_mask;
 }
 
@@ -1861,7 +1858,6 @@ static void gn845pwbb_output_callback( running_machine &machine, int offset, int
 
 DRIVER_INIT_MEMBER(ksys573_state,ddr)
 {
-
 	DRIVER_INIT_CALL(konami573);
 
 	m_stage_mask = 0xffffffff;
@@ -2606,7 +2602,6 @@ static void salarymc_lamp_callback( running_machine &machine, int data )
 
 DRIVER_INIT_MEMBER(ksys573_state,salarymc)
 {
-
 	DRIVER_INIT_CALL(konami573);
 
 	m_security_callback = salarymc_lamp_callback;
@@ -2648,7 +2643,6 @@ static void hyperbbc_lamp_callback( running_machine &machine, int data )
 
 DRIVER_INIT_MEMBER(ksys573_state,hyperbbc)
 {
-
 	DRIVER_INIT_CALL(konami573);
 
 	m_security_callback = hyperbbc_lamp_callback;
@@ -2985,7 +2979,6 @@ WRITE32_MEMBER(ksys573_state::gunmania_w)
 
 CUSTOM_INPUT_MEMBER(ksys573_state::gunmania_tank_shutter_sensor)
 {
-
 	if( m_tank_shutter_position == 0 )
 	{
 		return 1;
@@ -2996,7 +2989,6 @@ CUSTOM_INPUT_MEMBER(ksys573_state::gunmania_tank_shutter_sensor)
 
 CUSTOM_INPUT_MEMBER(ksys573_state::gunmania_cable_holder_sensor)
 {
-
 	return m_cable_holder_release;
 }
 

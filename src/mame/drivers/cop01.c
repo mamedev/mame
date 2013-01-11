@@ -103,13 +103,11 @@ CUSTOM_INPUT_MEMBER(cop01_state::mightguy_area_r)
 
 WRITE8_MEMBER(cop01_state::cop01_irq_ack_w)
 {
-
 	m_maincpu->set_input_line(0, CLEAR_LINE );
 }
 
 READ8_MEMBER(cop01_state::cop01_sound_irq_ack_w)
 {
-
 	m_audiocpu->set_input_line(0, CLEAR_LINE );
 	return 0;
 }
@@ -427,7 +425,6 @@ GFXDECODE_END
 
 void cop01_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -438,7 +435,6 @@ void cop01_state::machine_start()
 
 void cop01_state::machine_reset()
 {
-
 	m_pulse = 0;
 	m_timer = 0;
 	m_vreg[0] = 0;

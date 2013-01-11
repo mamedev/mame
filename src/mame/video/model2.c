@@ -1033,7 +1033,6 @@ static void model2_3d_frame_end( model2_state *state, bitmap_rgb32 &bitmap, cons
 		{
 			for( i = 0; i < raster->tri_list_index; i++ )
 			{
-
 				fprintf( f, "index: %d\n", i );
 				fprintf( f, "v0.x = %f, v0.y = %f, v0.z = %f\n", raster->tri_list[i].v[0].x, raster->tri_list[i].v[0].y, raster->tri_list[i].v[0].pz );
 				fprintf( f, "v1.x = %f, v1.y = %f, v1.z = %f\n", raster->tri_list[i].v[1].x, raster->tri_list[i].v[1].y, raster->tri_list[i].v[1].pz );

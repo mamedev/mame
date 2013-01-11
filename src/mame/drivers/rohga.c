@@ -117,7 +117,6 @@
 
 READ16_MEMBER(rohga_state::rohga_irq_ack_r)
 {
-
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 	return 0;
 }

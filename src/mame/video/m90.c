@@ -361,7 +361,6 @@ UINT32 m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap,
 
 	if (video_enable)
 	{
-
 		if (pf2_enable)
 		{
 			// use the playfield 2 y-offset table for each scanline

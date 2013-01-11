@@ -370,7 +370,6 @@ void fuuki32_state::screen_eof_fuuki32(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-
 		/* Buffer sprites and tilebank by 2 frames */
 		m_spr_buffered_tilebank[1] = m_spr_buffered_tilebank[0];
 		m_spr_buffered_tilebank[0] = m_tilebank[0];

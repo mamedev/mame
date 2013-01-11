@@ -17,10 +17,8 @@ lc89510_device::lc89510_device(const machine_config &mconfig, const char *tag, d
 
 void lc89510_device::device_start()
 {
-
 }
 
 void lc89510_device::device_reset()
 {
-
 }

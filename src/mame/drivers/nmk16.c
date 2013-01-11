@@ -515,8 +515,7 @@ life,but the game looks pretty much hard without it.
 		m_mainram[(_offs_+2-0x10)/2] = 0x4ef9;/*JMP*/\
 		m_mainram[(_offs_+4-0x10)/2] = 0x0000;/*HI-DWORD*/\
 		m_mainram[(_offs_+6-0x10)/2] = _pc_;  /*LO-DWORD*/\
-	} \
-
+	}
 #define PROT_INPUT(_offs_,_protvalue_,_protinput_,_input_) \
 	if(m_mainram[_offs_] == _protvalue_) \
 	{ \
@@ -4543,7 +4542,6 @@ DRIVER_INIT_MEMBER(nmk16_state,ssmissin)
 
 DRIVER_INIT_MEMBER(nmk16_state,bjtwin)
 {
-
 	/* Patch rom to enable test mode */
 
 /*  008F54: 33F9 0008 0000 000F FFFC move.w  $80000.l, $ffffc.l

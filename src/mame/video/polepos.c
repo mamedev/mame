@@ -290,7 +290,6 @@ WRITE8_MEMBER(polepos_state::polepos_view_w)
 
 WRITE16_MEMBER(polepos_state::polepos_view16_hscroll_w)
 {
-
 	COMBINE_DATA(&m_scroll);
 	m_bg_tilemap->set_scrollx(0,m_scroll);
 }

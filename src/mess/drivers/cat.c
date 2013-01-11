@@ -312,7 +312,6 @@ static IRQ_CALLBACK(cat_int_ack)
 
 MACHINE_START_MEMBER(cat_state,cat)
 {
-
 	m_duart_inp = 0x0e;
 	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cat_state::keyboard_callback),this));
 	machine().device<nvram_device>("nvram")->set_base(m_p_sram, 0x4000);

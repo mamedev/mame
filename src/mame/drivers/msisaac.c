@@ -432,7 +432,6 @@ static const msm5232_interface msm5232_config =
 
 void msisaac_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	/* video */
@@ -453,7 +452,6 @@ void msisaac_state::machine_start()
 
 void msisaac_state::machine_reset()
 {
-
 	MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	/* video */

@@ -14,7 +14,6 @@
 
 WRITE16_MEMBER(rbisland_state::rbisland_spritectrl_w)
 {
-
 	if (offset == 0)
 	{
 		/* bits 0 and 1 always set */
@@ -27,7 +26,6 @@ WRITE16_MEMBER(rbisland_state::rbisland_spritectrl_w)
 
 WRITE16_MEMBER(rbisland_state::jumping_spritectrl_w)
 {
-
 	if (offset == 0)
 	{
 		/* bits 0 and 1 are set after 15 seconds */
@@ -71,7 +69,6 @@ the Y settings are active low.
 
 VIDEO_START_MEMBER(rbisland_state,jumping)
 {
-
 	pc080sn_set_trans_pen(m_pc080sn, 1, 15);
 
 	m_sprite_ctrl = 0;

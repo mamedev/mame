@@ -157,7 +157,6 @@ READ16_MEMBER(toypop_state::toypop_merged_background_r)
 
 WRITE16_MEMBER(toypop_state::toypop_merged_background_w)
 {
-
 	// 0xabcd is written as 0x0a0b0c0d in the background image
 	if (ACCESSING_BITS_8_15)
 		m_bg_image[2*offset] = ((data & 0xf00) >> 8) | ((data & 0xf000) >> 4);

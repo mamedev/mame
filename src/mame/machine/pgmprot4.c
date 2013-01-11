@@ -35,7 +35,6 @@
 
 void pgm_dw3_decrypt(running_machine &machine)
 {
-
 //  int i;
 //  UINT16 *src=(UINT16 *) (OP_ROM+0x100000);
 
@@ -67,7 +66,6 @@ void pgm_dw3_decrypt(running_machine &machine)
 
 void pgm_killbld_decrypt(running_machine &machine)
 {
-
 //  int i;
 //  UINT16 *src=(UINT16 *) (OP_ROM+0x100000);
 
@@ -378,7 +376,6 @@ static READ16_HANDLER( killbld_igs025_prot_r )
 		}
 		else if (state->m_kb_cmd == 5)
 		{
-
 			UINT8 kb_region_sequence[11] = {0x17, 0x14, 0x91, 0x89, 0x21, 0xD5, 0x7C, 0x65, 0x8F, 0x8E, 0xE1};
 			UINT8 ret;
 
@@ -408,7 +405,6 @@ static READ16_HANDLER( killbld_igs025_prot_r )
 
 MACHINE_RESET_MEMBER(pgm_022_025_state,killbld)
 {
-
 	MACHINE_RESET_CALL_MEMBER(pgm);
 	/* fill the protection ram with a5 + auto dma */
 	IGS022_reset(machine());
@@ -447,8 +443,6 @@ DRIVER_INIT_MEMBER(pgm_022_025_state,killbld)
 
 MACHINE_RESET_MEMBER(pgm_022_025_state,dw3)
 {
-
-
 	MACHINE_RESET_CALL_MEMBER(pgm);
 	/* fill the protection ram with a5 + auto dma */
 	IGS022_reset(machine());

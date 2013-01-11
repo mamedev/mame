@@ -151,7 +151,6 @@ WRITE8_MEMBER(quizshow_state::quizshow_lamps3_w)
 
 WRITE8_MEMBER(quizshow_state::quizshow_tape_control_w)
 {
-
 	// d2: enable user category select (changes tape head position)
 	output_set_lamp_value(10, data >> 2 & 1);
 	m_category_enable = (data & 0xc) == 0xc;
@@ -366,7 +365,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(quizshow_state::quizshow_clock_timer_cb)
 
 void quizshow_state::machine_reset()
 {
-
 	m_category_enable = 0;
 	m_tape_head_pos = 0;
 }

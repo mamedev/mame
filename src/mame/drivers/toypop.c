@@ -52,7 +52,6 @@ WRITE16_MEMBER(toypop_state::toypop_m68000_sharedram_w)
 
 READ8_MEMBER(toypop_state::toypop_main_interrupt_enable_r)
 {
-
 	m_main_irq_mask = 1;
 	return 0;
 }
@@ -121,7 +120,6 @@ INTERRUPT_GEN_MEMBER(toypop_state::toypop_main_vblank_irq)
 
 INTERRUPT_GEN_MEMBER(toypop_state::toypop_sound_timer_irq)
 {
-
 	if(m_sound_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
@@ -148,7 +146,6 @@ WRITE8_MEMBER(toypop_state::toypop_m68000_assert_w)
 
 void toypop_state::machine_reset()
 {
-
 	m_main_irq_mask = 0;
 	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 

@@ -98,7 +98,6 @@ PtError Pt_Start(int resolution, PtCallback *callback, void *userData)
 	startTime = CFAbsoluteTimeGetCurrent();
 
 	if (callback) {
-
 		params->resolution = resolution;
 		params->callback = callback;
 		params->userData = userData;

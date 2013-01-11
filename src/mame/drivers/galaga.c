@@ -735,7 +735,6 @@ WRITE8_MEMBER(bosco_state::bosco_flip_screen_w)
 
 WRITE8_MEMBER(galaga_state::bosco_latch_w)
 {
-
 	switch (offset)
 	{
 		case 0x00:  /* IRQ1 */
@@ -874,7 +873,6 @@ TIMER_CALLBACK_MEMBER(galaga_state::cpu3_interrupt_callback)
 
 MACHINE_START_MEMBER(galaga_state,galaga)
 {
-
 	/* create the interrupt timer */
 	m_cpu3_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(galaga_state::cpu3_interrupt_callback),this));
 	m_custom_mod = 0;
@@ -897,7 +895,6 @@ static void bosco_latch_reset(running_machine &machine)
 
 MACHINE_RESET_MEMBER(galaga_state,galaga)
 {
-
 	/* Reset all latches */
 	bosco_latch_reset(machine());
 
@@ -1637,14 +1634,12 @@ static const samples_interface battles_samples_interface =
 
 INTERRUPT_GEN_MEMBER(galaga_state::main_vblank_irq)
 {
-
 	if(m_main_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(galaga_state::sub_vblank_irq)
 {
-
 	if(m_sub_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }

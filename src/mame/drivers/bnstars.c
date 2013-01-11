@@ -535,7 +535,6 @@ void bnstars_state::video_start()
 
 UINT32 bnstars_state::screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	machine().priority_bitmap.fill(0, cliprect);
 
 	bitmap.fill(0, cliprect);   /* bg color */
@@ -559,7 +558,6 @@ UINT32 bnstars_state::screen_update_bnstars_left(screen_device &screen, bitmap_i
 
 UINT32 bnstars_state::screen_update_bnstars_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	machine().priority_bitmap.fill(0, cliprect);
 
 	bitmap.fill(0x8000+0, cliprect);    /* bg color */

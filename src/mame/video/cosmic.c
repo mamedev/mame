@@ -584,7 +584,6 @@ UINT32 cosmic_state::screen_update_magspot(screen_device &screen, bitmap_ind16 &
 
 UINT32 cosmic_state::screen_update_devzone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(0, cliprect);
 
 	if (m_background_enable)
@@ -598,7 +597,6 @@ UINT32 cosmic_state::screen_update_devzone(screen_device &screen, bitmap_ind16 &
 
 UINT32 cosmic_state::screen_update_nomnlnd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	/* according to the video summation logic on pg4, the trees and river
 	   have the highest priority */
 

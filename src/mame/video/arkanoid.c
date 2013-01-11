@@ -119,7 +119,6 @@ WRITE8_MEMBER(arkanoid_state::tetrsark_d008_w)
 
 WRITE8_MEMBER(arkanoid_state::hexa_d008_w)
 {
-
 	/* bit 0 = flipx (or y?) */
 	if (flip_screen_x() != (data & 0x01))
 	{
@@ -160,7 +159,6 @@ TILE_GET_INFO_MEMBER(arkanoid_state::get_bg_tile_info)
 
 VIDEO_START_MEMBER(arkanoid_state,arkanoid)
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(arkanoid_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
@@ -198,7 +196,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 arkanoid_state::screen_update_arkanoid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
@@ -206,7 +203,6 @@ UINT32 arkanoid_state::screen_update_arkanoid(screen_device &screen, bitmap_ind1
 
 UINT32 arkanoid_state::screen_update_hexa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -57,8 +57,7 @@ extern const device_type TICKET_DISPENSER;
 #define MCFG_TICKET_DISPENSER_ADD(_tag, _period_in_msec, _motor_sense, _status_sense) \
 	MCFG_DEVICE_ADD(_tag, TICKET_DISPENSER, 0) \
 	ticket_dispenser_device::static_set_period(*device, _period_in_msec); \
-	ticket_dispenser_device::static_set_senses(*device, _motor_sense, _status_sense); \
-
+	ticket_dispenser_device::static_set_senses(*device, _motor_sense, _status_sense);
 
 
 //**************************************************************************

@@ -820,7 +820,6 @@ READ8_MEMBER(tumbleb_state::prot_io_r)
 // probably not endian safe
 WRITE8_MEMBER(tumbleb_state::prot_io_w)
 {
-
 	switch (offset)
 	{
 		case 0x00:
@@ -1946,7 +1945,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(tumbleb_state,tumbleb)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_oki = machine().device("oki");
@@ -1962,7 +1960,6 @@ MACHINE_START_MEMBER(tumbleb_state,tumbleb)
 
 MACHINE_RESET_MEMBER(tumbleb_state,tumbleb)
 {
-
 	m_music_command = 0;
 	m_music_bank = 0;
 	m_music_is_playing = 0;
@@ -2122,7 +2119,6 @@ MACHINE_CONFIG_END
 
 MACHINE_RESET_MEMBER(tumbleb_state,htchctch)
 {
-
 	/* copy protection data every reset */
 	UINT16 *PROTDATA = (UINT16*)memregion("user1")->base();
 	int i, len = memregion("user1")->bytes();

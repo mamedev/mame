@@ -73,22 +73,17 @@
 //============================================================
 
 #define NET_ALIAS(_alias, _name)                                                    \
-	netlist.register_alias(# _alias, # _name);                                      \
-
+	netlist.register_alias(# _alias, # _name);
 #define NET_NEW(_type , _name)  net_create_device_by_classname(# _type, &netlist, # _name)
 
 #define NET_REGISTER_DEV(_type, _name)                                              \
-		netlist.register_dev(NET_NEW(_type, _name));                                \
-
+		netlist.register_dev(NET_NEW(_type, _name));
 #define NET_REMOVE_DEV(_name)                                                       \
-		netlist.remove_dev(# _name);                                                \
-
+		netlist.remove_dev(# _name);
 #define NET_REGISTER_SIGNAL(_type, _name)                                           \
-		NET_REGISTER_DEV(_type ## _ ## sig, _name)                                  \
-
+		NET_REGISTER_DEV(_type ## _ ## sig, _name)
 #define NET_CONNECT(_name, _input, _output)                                         \
-		netlist.register_link(# _name "." # _input, # _output);                     \
-
+		netlist.register_link(# _name "." # _input, # _output);
 #define NETDEV_PARAM(_name, _val)                                                   \
 		netlist.find_param(# _name).initial(_val);
 
@@ -96,17 +91,14 @@
 
 #define NETLIST_START(_name) \
 ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
-{ \
-
+{
 #define NETLIST_END  }
 
 #define NETLIST_INCLUDE(_name)                                                      \
-		NETLIST_NAME(_name)(netlist);                                               \
-
+		NETLIST_NAME(_name)(netlist);
 
 #define NETLIST_MEMREGION(_name)                                                    \
-		netlist.parse((char *)downcast<netlist_t &>(netlist.netlist()).machine().root_device().memregion(_name)->base());       \
-
+		netlist.parse((char *)downcast<netlist_t &>(netlist.netlist()).machine().root_device().memregion(_name)->base());
 #if defined(__GNUC__) && (__GNUC__ >= 3)
 #if !defined(__ppc__) && !defined (__PPC__) && !defined(__ppc64__) && !defined(__PPC64__)
 #define ATTR_ALIGN __attribute__ ((aligned(128)))
@@ -131,8 +123,7 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 	{                                                                               \
 	public:                                                                         \
 		_name () : net_signal_t<_num_input, _check>() { }                           \
-	};                                                                              \
-
+	};
 #define NETLIB_DEVICE(_name, _priv)                                                 \
 	class _name : public net_device_t                                               \
 	{                                                                               \
@@ -142,8 +133,7 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 		ATTR_COLD void start();                                                     \
 	protected:                                                                      \
 		_priv                                                                       \
-	}                                                                               \
-
+	}
 #define NETLIB_SUBDEVICE(_name, _priv)                                              \
 	class _name : public net_core_device_t                                          \
 	{                                                                               \
@@ -152,8 +142,7 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 		ATTR_HOT void update();                                                     \
 	/*protected:*/                                                                  \
 		_priv                                                                       \
-	}                                                                               \
-
+	}
 #define NETLIB_DEVICE_WITH_PARAMS(_name, _priv)                                     \
 	class _name : public net_device_t                                               \
 	{                                                                               \
@@ -164,21 +153,17 @@ ATTR_COLD void NETLIST_NAME(_name)(netlist_setup_t &netlist) \
 		ATTR_COLD void start();                                                     \
 	/* protected: */                                                                \
 		_priv                                                                       \
-	}                                                                               \
-
+	}
 // MAME specific
 
 #define MCFG_NETLIST_ADD(_tag, _setup )                                             \
 	MCFG_DEVICE_ADD(_tag, NETLIST, NETLIST_CLOCK)                                   \
-	MCFG_NETLIST_SETUP(_setup)                                                      \
-
+	MCFG_NETLIST_SETUP(_setup)
 #define MCFG_NETLIST_REPLACE(_tag, _setup)                                          \
 	MCFG_DEVICE_REPLACE(_tag, NETLIST, NETLIST_CLOCK)                               \
-	MCFG_NETLIST_SETUP(_setup)                                                      \
-
+	MCFG_NETLIST_SETUP(_setup)
 #define MCFG_NETLIST_SETUP(_setup)                                                  \
-	netlist_mame_device::static_set_constructor(*device, NETLIST_NAME(_setup));     \
-
+	netlist_mame_device::static_set_constructor(*device, NETLIST_NAME(_setup));
 
 // ----------------------------------------------------------------------------------------
 // Type definitions
@@ -971,12 +956,10 @@ private:
 
 #define NETDEV_TTL_CONST(_name, _v)                                                 \
 		NET_REGISTER_DEV(netdev_ttl_const, _name)                                   \
-		NETDEV_PARAM(_name.CONST, _v)                                               \
-
+		NETDEV_PARAM(_name.CONST, _v)
 #define NETDEV_ANALOG_CONST(_name, _v)                                              \
 		NET_REGISTER_DEV(netdev_analog_const, _name)                                \
-		NETDEV_PARAM(_name.CONST, _v)                                               \
-
+		NETDEV_PARAM(_name.CONST, _v)
 
 NETLIB_DEVICE_WITH_PARAMS(netdev_ttl_const,
 	ttl_output_t m_Q;

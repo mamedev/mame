@@ -36,7 +36,6 @@ i8212_device::i8212_device(const machine_config &mconfig, const char *tag, devic
 		m_md(I8212_MODE_INPUT),
 		m_stb(0)
 {
-
 }
 
 

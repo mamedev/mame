@@ -1062,7 +1062,6 @@ static void sfbonus_draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap,
 
 UINT32 sfbonus_state::screen_update_sfbonus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	int globalyscroll = (m_vregs[2] | m_vregs[3]<<8);
 	int globalxscroll = (m_vregs[0] | m_vregs[1]<<8);
 	UINT8* front_rowscroll = &m_videoram[0x200];
@@ -5848,7 +5847,6 @@ DRIVER_INIT_MEMBER(sfbonus_state,sfbonus_common)
 			printf("X %02x %02x %02x %02x %02x %02x %02x %02x\n", ROM[0x50], ROM[0x51], ROM[0x52], ROM[0x53], ROM[0x54], ROM[0x55],ROM[0x56],ROM[0x57]);
 
 			{
-
 				int x;
 				int y;
 				for (y = 0; y < 0x8; y++)
@@ -5889,7 +5887,6 @@ void sfbonus_state::sfbonus_bitswap(
 						UINT8 xor6, UINT8 b60, UINT8 b61, UINT8 b62, UINT8 b63, UINT8 b64, UINT8 b65, UINT8 b66,UINT8 b67,
 						UINT8 xor7, UINT8 b70, UINT8 b71, UINT8 b72, UINT8 b73, UINT8 b74, UINT8 b75, UINT8 b76,UINT8 b77 )
 {
-
 	int i;
 	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 

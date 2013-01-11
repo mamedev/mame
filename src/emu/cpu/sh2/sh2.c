@@ -169,7 +169,6 @@ INLINE UINT32 RL(sh2_state *sh2, offs_t A)
 
 INLINE void WB(sh2_state *sh2, offs_t A, UINT8 V)
 {
-
 	if (A >= 0xe0000000)
 	{
 		sh2_internal_w(sh2->internal, (A & 0x1fc)>>2, V << (((~A) & 3)*8), 0xff << (((~A) & 3)*8));

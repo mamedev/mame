@@ -25,7 +25,6 @@ Notes:
 
 WRITE8_MEMBER(goindol_state::goindol_bankswitch_w)
 {
-
 	membank("bank1")->set_entry(data & 0x03);
 
 	if (m_char_bank != ((data & 0x10) >> 4))
@@ -41,7 +40,6 @@ WRITE8_MEMBER(goindol_state::goindol_bankswitch_w)
 
 READ8_MEMBER(goindol_state::prot_f422_r)
 {
-
 	/* bit 7 = vblank? */
 	m_prot_toggle ^= 0x80;
 
@@ -51,7 +49,6 @@ READ8_MEMBER(goindol_state::prot_f422_r)
 
 WRITE8_MEMBER(goindol_state::prot_fc44_w)
 {
-
 	logerror("%04x: prot_fc44_w(%02x)\n", space.device().safe_pc(), data);
 	m_ram[0x0419] = 0x5b;
 	m_ram[0x041a] = 0x3f;
@@ -60,21 +57,18 @@ WRITE8_MEMBER(goindol_state::prot_fc44_w)
 
 WRITE8_MEMBER(goindol_state::prot_fd99_w)
 {
-
 	logerror("%04x: prot_fd99_w(%02x)\n", space.device().safe_pc(), data);
 	m_ram[0x0421] = 0x3f;
 }
 
 WRITE8_MEMBER(goindol_state::prot_fc66_w)
 {
-
 	logerror("%04x: prot_fc66_w(%02x)\n", space.device().safe_pc(), data);
 	m_ram[0x0423] = 0x06;
 }
 
 WRITE8_MEMBER(goindol_state::prot_fcb0_w)
 {
-
 	logerror("%04x: prot_fcb0_w(%02x)\n", space.device().safe_pc(), data);
 	m_ram[0x0425] = 0x06;
 }
@@ -229,7 +223,6 @@ void goindol_state::machine_start()
 
 void goindol_state::machine_reset()
 {
-
 	m_char_bank = 0;
 	m_prot_toggle = 0;
 }

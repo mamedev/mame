@@ -176,14 +176,12 @@ WRITE_LINE_MEMBER(coleco_state::coleco_vdp_interrupt)
 
 TIMER_CALLBACK_MEMBER(coleco_state::paddle_d7reset_callback)
 {
-
 	m_joy_d7_state[param] = 0;
 	m_joy_analog_state[param] = 0;
 }
 
 TIMER_CALLBACK_MEMBER(coleco_state::paddle_irqreset_callback)
 {
-
 	m_joy_irq_state[param] = 0;
 
 	if (!m_joy_irq_state[param ^ 1])
@@ -192,7 +190,6 @@ TIMER_CALLBACK_MEMBER(coleco_state::paddle_irqreset_callback)
 
 TIMER_CALLBACK_MEMBER(coleco_state::paddle_pulse_callback)
 {
-
 	if (m_joy_analog_reload[param])
 	{
 		m_joy_analog_state[param] = m_joy_analog_reload[param];

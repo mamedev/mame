@@ -238,7 +238,6 @@ GFXDECODE_END
 
 void _1942_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_palette_bank));
@@ -247,7 +246,6 @@ void _1942_state::machine_start()
 
 void _1942_state::machine_reset()
 {
-
 	m_palette_bank = 0;
 	m_scroll[0] = 0;
 	m_scroll[1] = 0;

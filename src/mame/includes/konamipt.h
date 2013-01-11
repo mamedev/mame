@@ -276,8 +276,7 @@ because they just need a few lines of code */
 	KONAMI8_SYSTEM_10       \
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    \
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    \
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )    \
-
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 /**************************** Coinage Dip Swicthes ****************************/
 
 /* Konami games from 80s-90s basically use only two kind of coinage dips. The only

@@ -292,7 +292,6 @@ UINT32 dcon_state::screen_update_dcon(screen_device &screen, bitmap_ind16 &bitma
 
 UINT32 dcon_state::screen_update_sdgndmps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	machine().priority_bitmap.fill(0, cliprect);
 
 	/* Gfx banking */

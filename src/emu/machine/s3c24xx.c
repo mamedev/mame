@@ -3377,7 +3377,6 @@ static READ32_DEVICE_HANDLER( s3c24xx_nand_r )
 #if defined(DEVICE_S3C2440)
 		case S3C24XX_NFMECC0 :
 		{
-
 			data = (s3c24xx->nand.mecc[3] << 24) | (s3c24xx->nand.mecc[2] << 16) | (s3c24xx->nand.mecc[1] << 8) | (s3c24xx->nand.mecc[0] << 0);
 		}
 		break;

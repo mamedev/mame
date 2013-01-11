@@ -32,14 +32,12 @@ static KONAMI_SETLINES_CALLBACK( blockhl_banking );
 
 INTERRUPT_GEN_MEMBER(blockhl_state::blockhl_interrupt)
 {
-
 	if (k052109_is_irq_enabled(m_k052109) && m_rombank == 0)    /* kludge to prevent crashes */
 		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 READ8_MEMBER(blockhl_state::bankedram_r)
 {
-
 	if (m_palette_selected)
 		return m_generic_paletteram_8[offset];
 	else
@@ -48,7 +46,6 @@ READ8_MEMBER(blockhl_state::bankedram_r)
 
 WRITE8_MEMBER(blockhl_state::bankedram_w)
 {
-
 	if (m_palette_selected)
 		paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, offset, data);
 	else
@@ -64,7 +61,6 @@ WRITE8_MEMBER(blockhl_state::blockhl_sh_irqtrigger_w)
 /* special handlers to combine 052109 & 051960 */
 READ8_MEMBER(blockhl_state::k052109_051960_r)
 {
-
 	if (k052109_get_rmrd_line(m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
@@ -80,7 +76,6 @@ READ8_MEMBER(blockhl_state::k052109_051960_r)
 
 WRITE8_MEMBER(blockhl_state::k052109_051960_w)
 {
-
 	if (offset >= 0x3800 && offset < 0x3808)
 		k051937_w(m_k051960, space, offset - 0x3800, data);
 	else if (offset < 0x3c00)
@@ -202,7 +197,6 @@ void blockhl_state::machine_start()
 
 void blockhl_state::machine_reset()
 {
-
 	konami_configure_set_lines(machine().device("maincpu"), blockhl_banking);
 
 	m_palette_selected = 0;

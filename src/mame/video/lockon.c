@@ -64,7 +64,6 @@ WRITE16_MEMBER(lockon_state::lockon_crtc_w)
 
 TIMER_CALLBACK_MEMBER(lockon_state::cursor_callback)
 {
-
 	if (m_main_inten)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 
@@ -604,7 +603,6 @@ static void objects_draw( running_machine &machine )
 /* The mechanism used by the object CPU to update the object ASICs palette RAM */
 WRITE16_MEMBER(lockon_state::lockon_tza112_w)
 {
-
 	if (m_iden)
 	{
 		m_obj_pal_latch = data & 0xff;
@@ -615,7 +613,6 @@ WRITE16_MEMBER(lockon_state::lockon_tza112_w)
 
 READ16_MEMBER(lockon_state::lockon_obj_4000_r)
 {
-
 	m_object->execute().set_input_line(NEC_INPUT_LINE_POLL, CLEAR_LINE);
 	return 0xffff;
 }
@@ -659,7 +656,6 @@ WRITE16_MEMBER(lockon_state::lockon_fb_clut_w)
 /* Rotation control register */
 WRITE16_MEMBER(lockon_state::lockon_rotate_w)
 {
-
 	switch (offset & 7)
 	{
 		case 0: m_xsal  = data & 0x1ff; break;
@@ -895,7 +891,6 @@ static void hud_draw( running_machine &machine, bitmap_ind16 &bitmap, const rect
 
 void lockon_state::video_start()
 {
-
 	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lockon_state::get_lockon_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap->set_transparent_pen(0);
 
@@ -920,7 +915,6 @@ void lockon_state::video_start()
 
 UINT32 lockon_state::screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	/* If screen output is disabled, fill with black */
 	if (!BIT(m_ctrl_reg, 7))
 	{
@@ -945,7 +939,6 @@ void lockon_state::screen_eof_lockon(screen_device &screen, bool state)
 	// on falling edge
 	if (!state)
 	{
-
 		/* Swap the frame buffers */
 		bitmap_ind16 *tmp = m_front_buffer;
 		m_front_buffer = m_back_buffer;

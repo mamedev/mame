@@ -116,7 +116,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(zodiack_state::zodiack_scanline)
 
 INTERRUPT_GEN_MEMBER(zodiack_state::zodiack_sound_nmi_gen)
 {
-
 	if (m_sound_nmi_enabled)
 		nmi_line_pulse(device);
 }

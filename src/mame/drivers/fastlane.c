@@ -38,7 +38,6 @@ WRITE8_MEMBER(fastlane_state::k007121_registers_w)
 
 WRITE8_MEMBER(fastlane_state::fastlane_bankswitch_w)
 {
-
 	/* bits 0 & 1 coin counters */
 	coin_counter_w(machine(), 0,data & 0x01);
 	coin_counter_w(machine(), 1,data & 0x02);

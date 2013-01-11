@@ -11,7 +11,6 @@
 
 TILE_GET_INFO_MEMBER(cabal_state::get_back_tile_info)
 {
-
 	int tile = m_videoram[tile_index];
 	int color = (tile>>12)&0xf;
 
@@ -26,7 +25,6 @@ TILE_GET_INFO_MEMBER(cabal_state::get_back_tile_info)
 
 TILE_GET_INFO_MEMBER(cabal_state::get_text_tile_info)
 {
-
 	int tile = m_colorram[tile_index];
 	int color = (tile>>10);
 
@@ -42,7 +40,6 @@ TILE_GET_INFO_MEMBER(cabal_state::get_text_tile_info)
 
 void cabal_state::video_start()
 {
-
 	m_background_layer = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cabal_state::get_back_tile_info),this),TILEMAP_SCAN_ROWS,16,16,16,16);
 	m_text_layer       = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cabal_state::get_text_tile_info),this),TILEMAP_SCAN_ROWS,  8,8,32,32);
 

@@ -40,7 +40,6 @@ a physical DSW B but only read when SWA:3,4 are both set to OFF. Currently,
 
 WRITE8_MEMBER(cosmic_state::panic_sound_output_w)
 {
-
 	/* Sound Enable / Disable */
 	if (offset == 11)
 	{
@@ -115,7 +114,6 @@ WRITE8_MEMBER(cosmic_state::panic_sound_output2_w)
 
 WRITE8_MEMBER(cosmic_state::cosmicg_output_w)
 {
-
 	/* Sound Enable / Disable */
 	if (offset == 12)
 	{
@@ -178,7 +176,6 @@ WRITE8_MEMBER(cosmic_state::cosmicg_output_w)
 
 WRITE8_MEMBER(cosmic_state::cosmica_sound_output_w)
 {
-
 	/* Sound Enable / Disable */
 	if (offset == 11)
 	{
@@ -960,7 +957,6 @@ static const samples_interface cosmicg_samples_interface =
 
 MACHINE_START_MEMBER(cosmic_state,cosmic)
 {
-
 	m_samples = machine().device<samples_device>("samples");
 	m_dac = machine().device<dac_device>("dac");
 
@@ -976,7 +972,6 @@ MACHINE_START_MEMBER(cosmic_state,cosmic)
 
 MACHINE_RESET_MEMBER(cosmic_state,cosmic)
 {
-
 	m_pixel_clock = 0;
 	m_background_enable = 0;
 	m_color_registers[0] = 0;

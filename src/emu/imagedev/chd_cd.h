@@ -74,6 +74,5 @@ extern const device_type CDROM;
 
 #define MCFG_CDROM_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, CDROM, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
-
+	MCFG_DEVICE_CONFIG(_config)
 #endif /* CHD_CD_H */

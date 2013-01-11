@@ -18,13 +18,11 @@
 #define MCFG_V9938_ADD(_tag, _screen, _vramsize) \
 	MCFG_DEVICE_ADD(_tag, V9938, 0) \
 	v9938_device::static_set_screen(*device, _screen); \
-	v9938_device::static_set_vram_size(*device, _vramsize); \
-
+	v9938_device::static_set_vram_size(*device, _vramsize);
 #define MCFG_V9958_ADD(_tag, _screen, _vramsize) \
 	MCFG_DEVICE_ADD(_tag, V9958, 0) \
 	v9938_device::static_set_screen(*device, _screen); \
-	v9938_device::static_set_vram_size(*device, _vramsize); \
-
+	v9938_device::static_set_vram_size(*device, _vramsize);
 #define MCFG_V99X8_INTERRUPT_CALLBACK_STATIC(_func) \
 	v9938_device::static_set_interrupt_callback(*device, v99x8_interrupt_delegate(_func, #_func, (device_t *)0), device->tag());
 

@@ -673,7 +673,6 @@ TIMER_CALLBACK_MEMBER(x07_state::cassette_tick)
 
 TIMER_CALLBACK_MEMBER(x07_state::cassette_poll)
 {
-
 	if ((m_cassette->get_state() & 0x03) == CASSETTE_PLAY)
 		cassette_load();
 	else if ((m_cassette->get_state() & 0x03) == CASSETTE_RECORD)
@@ -721,7 +720,6 @@ void x07_state::cassette_save()
 
 	if (m_cass_clk % 10 == 0)
 	{
-
 		if (m_bit_count < 4)
 		{
 			switch (m_bit_count & 3)
@@ -1378,7 +1376,6 @@ TIMER_CALLBACK_MEMBER(x07_state::rstb_clear)
 
 TIMER_CALLBACK_MEMBER(x07_state::beep_stop)
 {
-
 	beep_set_state(m_beep, 0);
 }
 

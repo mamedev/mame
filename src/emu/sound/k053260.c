@@ -134,7 +134,6 @@ static STREAM_UPDATE( k053260_update )
 	}
 
 		for ( j = 0; j < samples; j++ ) {
-
 			dataL = dataR = 0;
 
 			for ( i = 0; i < 4; i++ ) {
@@ -142,7 +141,6 @@ static STREAM_UPDATE( k053260_update )
 				if ( play[i] ) {
 					/* see if we're done */
 					if ( ( pos[i] >> BASE_SHIFT ) >= end[i] ) {
-
 						ppcm_data[i] = 0;
 						if ( loop[i] )
 							pos[i] = 0;
@@ -160,7 +158,6 @@ static STREAM_UPDATE( k053260_update )
 						{
 							int newdata;
 							if ( pos[i] & 0x8000 ){
-
 								newdata = ((rom[i][pos[i] >> BASE_SHIFT]) >> 4) & 0x0f; /*high nybble*/
 							}
 							else{
@@ -261,7 +258,6 @@ static DEVICE_START( k053260 )
 
 INLINE void check_bounds( k053260_state *ic, int channel )
 {
-
 	int channel_start = ( ic->channels[channel].bank << 16 ) + ic->channels[channel].start;
 	int channel_end = channel_start + ic->channels[channel].size - 1;
 

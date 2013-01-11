@@ -114,8 +114,6 @@ WRITE8_MEMBER(pachifev_state::controls_w)
 {
 	if(!data)
 	{
-
-
 		/*end of input read*/
 		m_power=0;
 		m_max_power=m_input_power;
@@ -305,7 +303,6 @@ static const msm5205_interface msm5205_config =
 
 void pachifev_state::machine_reset()
 {
-
 	m_power=0;
 	m_max_power=0;
 	m_input_power=0;
@@ -358,7 +355,6 @@ static TMS9928A_INTERFACE(pachifev_tms9928a_interface)
 
 void pachifev_state::machine_start()
 {
-
 	save_item(NAME(m_power));
 	save_item(NAME(m_max_power));
 	save_item(NAME(m_input_power));

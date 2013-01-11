@@ -14,7 +14,6 @@ bit 0 = ? (unused?)
 */
 WRITE8_MEMBER(mexico86_state::mexico86_f008_w)
 {
-
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
 
 	if (m_mcu != NULL)
@@ -152,7 +151,6 @@ static void mcu_simulate( running_machine &machine )
 
 INTERRUPT_GEN_MEMBER(mexico86_state::kikikai_interrupt)
 {
-
 	if (m_mcu_running)
 		mcu_simulate(machine());
 
@@ -225,14 +223,12 @@ INTERRUPT_GEN_MEMBER(mexico86_state::mexico86_m68705_interrupt)
 
 READ8_MEMBER(mexico86_state::mexico86_68705_port_a_r)
 {
-
 	//logerror("%04x: 68705 port A read %02x\n", space.device().safe_pc(), m_port_a_in);
 	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
 WRITE8_MEMBER(mexico86_state::mexico86_68705_port_a_w)
 {
-
 	//logerror("%04x: 68705 port A write %02x\n", space.device().safe_pc(), data);
 	m_port_a_out = data;
 }

@@ -85,7 +85,6 @@ TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
 
 void suprgolf_state::video_start()
 {
-
 	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(suprgolf_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
 	m_paletteram = auto_alloc_array(machine(), UINT8, 0x1000);
 	m_bg_vram = auto_alloc_array(machine(), UINT8, 0x2000*0x20);
@@ -141,7 +140,6 @@ UINT32 suprgolf_state::screen_update_suprgolf(screen_device &screen, bitmap_ind1
 
 READ8_MEMBER(suprgolf_state::suprgolf_videoram_r)
 {
-
 	if (m_palette_switch)
 		return m_paletteram[offset];
 	else
@@ -150,7 +148,6 @@ READ8_MEMBER(suprgolf_state::suprgolf_videoram_r)
 
 WRITE8_MEMBER(suprgolf_state::suprgolf_videoram_w)
 {
-
 	if(m_palette_switch)
 	{
 		int r,g,b,datax;
@@ -173,13 +170,11 @@ WRITE8_MEMBER(suprgolf_state::suprgolf_videoram_w)
 
 READ8_MEMBER(suprgolf_state::suprgolf_vregs_r)
 {
-
 	return m_vreg_bank;
 }
 
 WRITE8_MEMBER(suprgolf_state::suprgolf_vregs_w)
 {
-
 	//printf("%02x\n",data);
 
 	//bits 0,1,2 and probably 3 controls the background vram banking
@@ -195,7 +190,6 @@ WRITE8_MEMBER(suprgolf_state::suprgolf_vregs_w)
 
 READ8_MEMBER(suprgolf_state::suprgolf_bg_vram_r)
 {
-
 	return m_bg_vram[offset+m_bg_bank*0x2000];
 }
 
@@ -246,19 +240,16 @@ WRITE8_MEMBER(suprgolf_state::suprgolf_bg_vram_w)
 
 WRITE8_MEMBER(suprgolf_state::suprgolf_pen_w)
 {
-
 	m_vreg_pen = data;
 }
 
 WRITE8_MEMBER(suprgolf_state::adpcm_data_w)
 {
-
 	m_msm5205next = data;
 }
 
 READ8_MEMBER(suprgolf_state::rom_bank_select_r)
 {
-
 	return m_rom_bank;
 }
 
@@ -482,7 +473,6 @@ GFXDECODE_END
 
 void suprgolf_state::machine_reset()
 {
-
 	m_msm_nmi_mask = 0;
 }
 

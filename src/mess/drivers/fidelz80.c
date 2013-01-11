@@ -1083,13 +1083,11 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(fidelz80_state::fidelz80_trigger_reset)
 {
-
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 INPUT_CHANGED_MEMBER(fidelz80_state::abc_trigger_reset)
 {
-
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 	m_i8041->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }

@@ -240,7 +240,6 @@ GFXDECODE_END
 
 void gotcha_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_banksel));

@@ -170,7 +170,6 @@ WRITE8_MEMBER(primo_state::primo_ki_1_w)
 
 WRITE8_MEMBER(primo_state::primo_ki_2_w)
 {
-
 	// bit 7, 6 - not used
 
 	// bit 5 - SCLK

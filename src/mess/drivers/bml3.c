@@ -613,7 +613,6 @@ INTERRUPT_GEN_MEMBER(bml3_state::bml3_irq)
 
 INTERRUPT_GEN_MEMBER(bml3_state::bml3_timer_firq)
 {
-
 	if(!m_firq_mask)
 	{
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
@@ -631,7 +630,6 @@ void bml3_state::palette_init()
 
 void bml3_state::machine_start()
 {
-
 	beep_set_frequency(machine().device(BEEPER_TAG),1200); //guesswork
 	beep_set_state(machine().device(BEEPER_TAG),0);
 	m_extram = auto_alloc_array(machine(),UINT8,0x10000);

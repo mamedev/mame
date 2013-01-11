@@ -62,7 +62,6 @@ void lemmings_state::screen_eof_lemmings(screen_device &screen, bool state)
 // RAM based
 WRITE16_MEMBER(lemmings_state::lemmings_pixel_0_w)
 {
-
 	int sx, sy, src, old;
 
 	old = m_pixel_0_data[offset];

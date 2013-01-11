@@ -487,7 +487,6 @@ WRITE8_MEMBER(superqix_state::pbillian_z80_mcu_w)
 
 READ8_MEMBER(superqix_state::pbillian_from_mcu_r)
 {
-
 	switch (m_from_z80)
 	{
 		case 0x01:
@@ -981,14 +980,12 @@ static const ay8910_interface bootleg_ay8910_interface_2 =
 
 INTERRUPT_GEN_MEMBER(superqix_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(superqix_state::sqix_timer_irq)
 {
-
 	if (m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }

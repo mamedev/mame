@@ -464,7 +464,6 @@ READ32_MEMBER(apollo_state::ram_with_parity_r){
 }
 
 WRITE32_MEMBER(apollo_state::ram_with_parity_w){
-
 	COMBINE_DATA(m_messram_ptr+offset);
 
 	if (apollo_csr_get_control_register() & APOLLO_CSR_CR_FORCE_BAD_PARITY) {

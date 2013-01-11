@@ -253,7 +253,6 @@ WRITE8_MEMBER(cclimber_state::toprollr_rombank_w)
 
 MACHINE_RESET_MEMBER(cclimber_state,cclimber)
 {
-
 	/* Disable interrupts, River Patrol / Silver Land needs this otherwise returns bad RAM on POST */
 	m_nmi_mask = 0;
 
@@ -263,7 +262,6 @@ MACHINE_RESET_MEMBER(cclimber_state,cclimber)
 
 WRITE8_MEMBER(cclimber_state::nmi_mask_w)
 {
-
 	m_nmi_mask = data & 1;
 }
 
@@ -975,7 +973,6 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(cclimber_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

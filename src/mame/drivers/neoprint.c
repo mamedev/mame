@@ -148,7 +148,6 @@ WRITE16_MEMBER(neoprint_state::neoprint_calendar_w)
 
 READ8_MEMBER(neoprint_state::neoprint_unk_r)
 {
-
 	/* ---x ---- tested in irq routine, odd/even field number? */
 	/* ---- xx-- one of these two must be high */
 	/* ---- --xx checked right before entering into attract mode, presumably printer/camera related */
@@ -210,8 +209,6 @@ READ8_MEMBER(neoprint_state::audio_command_r)
 
 WRITE8_MEMBER(neoprint_state::audio_result_w)
 {
-
-
 	//if (LOG_CPU_COMM && (m_audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", space.device().safe_pc(), data);
 
 	m_audio_result = data;

@@ -220,7 +220,6 @@ GFXDECODE_END
 
 void othldrby_state::machine_start()
 {
-
 	save_item(NAME(m_toggle));
 	save_item(NAME(m_vram_addr));
 	save_item(NAME(m_vreg_addr));
@@ -229,7 +228,6 @@ void othldrby_state::machine_start()
 
 void othldrby_state::machine_reset()
 {
-
 	m_toggle = 0xff;
 	m_vram_addr = 0;
 	m_vreg_addr = 0;

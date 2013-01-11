@@ -28,7 +28,6 @@ WRITE8_MEMBER(bogeyman_state::bogeyman_8910_latch_w)
 
 WRITE8_MEMBER(bogeyman_state::bogeyman_8910_control_w)
 {
-
 	// bit 0 is flipscreen
 	flip_screen_set(data & 0x01);
 
@@ -204,21 +203,18 @@ GFXDECODE_END
 
 void bogeyman_state::machine_start()
 {
-
 	save_item(NAME(m_psg_latch));
 	save_item(NAME(m_last_write));
 }
 
 void bogeyman_state::machine_reset()
 {
-
 	m_psg_latch = 0;
 	m_last_write = 0;
 }
 
 WRITE8_MEMBER(bogeyman_state::bogeyman_colbank_w)
 {
-
 	if((data & 1) != (m_colbank & 1))
 	{
 		m_colbank = data & 1;

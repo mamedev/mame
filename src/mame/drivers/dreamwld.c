@@ -269,7 +269,6 @@ TILE_GET_INFO_MEMBER(dreamwld_state::get_dreamwld_bg2_tile_info)
 
 void dreamwld_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 64,32);
 	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(dreamwld_state::get_dreamwld_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16, 64,32);
 	m_bg2_tilemap->set_transparent_pen(0);
@@ -567,7 +566,6 @@ GFXDECODE_END
 
 void dreamwld_state::machine_start()
 {
-
 	save_item(NAME(m_protindex));
 	save_item(NAME(m_tilebank));
 	save_item(NAME(m_tilebankold));
@@ -575,7 +573,6 @@ void dreamwld_state::machine_start()
 
 void dreamwld_state::machine_reset()
 {
-
 	m_tilebankold[0] = m_tilebankold[1] = -1;
 	m_tilebank[0] = m_tilebank[1] = 0;
 	m_protindex = 0;

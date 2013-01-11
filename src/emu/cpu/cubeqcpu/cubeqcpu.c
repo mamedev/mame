@@ -983,7 +983,6 @@ static CPU_EXECUTE( cquestrot )
 				}
 				case RAMU:
 				{
-
 					UINT16 q15 = BIT(cpustate->q, 15);
 					UINT16 r15 = BIT(cpustate->f, 15);
 					UINT16 r0 = 0;

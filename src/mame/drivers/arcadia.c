@@ -154,7 +154,6 @@ WRITE8_MEMBER(arcadia_amiga_state::arcadia_cia_0_portb_w)
 	/* writing a 0 in the low bit clears one of the coins */
 	if ((data & 1) == 0)
 	{
-
 		if (coin_counter[0] > 0)
 			coin_counter[0]--;
 		else if (coin_counter[1] > 0)

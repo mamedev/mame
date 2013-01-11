@@ -245,7 +245,6 @@ static imgtoolerr_t vzdos_searchentry(imgtool_image *image, const char *fname, i
 	*entry = -1;
 
 	for (i = 0; i < MAX_DIRENTS; i++) {
-
 		ret = vzdos_get_dirent(image, i, &ent);
 		if (ret) return (imgtoolerr_t)ret;
 
@@ -402,11 +401,9 @@ static imgtoolerr_t vzdos_diskimage_nextenum(imgtool_directory *enumeration, img
 	vz_iterator *iter = (vz_iterator *) imgtool_directory_extrabytes(enumeration);
 
 	if (iter->eof == 1 || iter->index > MAX_DIRENTS) {
-
 		ent->eof = 1;
 
 	} else {
-
 		const char *type;
 		int ret, len;
 		vzdos_dirent dirent;
@@ -550,18 +547,15 @@ static imgtoolerr_t vzdos_diskimage_deletefile(imgtool_partition *partition, con
 	ret = vzdos_get_dirent(img, index + 1, &next_entry);
 
 	if (ret == IMGTOOLERR_FILENOTFOUND) {
-
 		/* we are the last directory entry, just delete it */
 		ret = vzdos_clear_dirent(img, index);
 		if (ret) return ret;
 
 	} else if (ret) {
-
 		/* an error occurred */
 		return ret;
 
 	} else {
-
 		ret = vzdos_set_dirent(img, index++, next_entry);
 		if (ret) return ret;
 
@@ -578,7 +572,6 @@ static imgtoolerr_t vzdos_diskimage_deletefile(imgtool_partition *partition, con
 
 	/* clear sectors and trackmap entries */
 	while (filesize > 0) {
-
 		filesize -= DATA_SIZE;
 
 		/* clear trackmap entry */
@@ -672,7 +665,6 @@ static imgtoolerr_t vzdos_writefile(imgtool_partition *partition, int offset, im
 
 	/* write data to disk */
 	while (filesize > 0) {
-
 		toread = filesize > DATA_SIZE ? DATA_SIZE : filesize;
 		stream_read(sourcef, buffer, toread);
 
@@ -754,7 +746,6 @@ static imgtoolerr_t vzdos_diskimage_suggesttransfer(imgtool_partition *partition
 	vzdos_dirent entry;
 
 	if (fname) {
-
 		ret = vzdos_get_dirent_fname(image, fname, &entry);
 		if (ret) return ret;
 

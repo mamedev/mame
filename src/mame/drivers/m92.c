@@ -219,7 +219,6 @@ MACHINE_START_MEMBER(m92_state,m92)
 
 MACHINE_RESET_MEMBER(m92_state,m92)
 {
-
 	m_sprite_buffer_busy = 1;
 }
 

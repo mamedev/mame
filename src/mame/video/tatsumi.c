@@ -286,7 +286,6 @@ INLINE void roundupt_drawgfxzoomrotate(tatsumi_state *state,
 
 							if (flipx)
 							{
-
 							}
 
 
@@ -466,7 +465,6 @@ static void mycopyrozbitmap_core(bitmap_rgb32 &bitmap,bitmap_rgb32 &srcbitmap,
 
 	if (sx <= ex)
 	{
-
 		while (sy <= ey)
 		{
 			x = sx;
@@ -783,7 +781,6 @@ pos is 11.5 fixed point
 	visible_line=0;
 
 	for (/*y=0*/; y<256; y++) {
-
 		int shift=data[0];
 		int shift2=data[2];
 		int pal=4; //(data[3]>>8)&0xf;

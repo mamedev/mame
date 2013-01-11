@@ -78,7 +78,6 @@ void ti990_4_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(ti990_4_state::ti990_4_line_interrupt)
 {
-
 #if VIDEO_911
 	vdt911_keyboard(m_terminal);
 #else
@@ -132,7 +131,6 @@ static const vdt911_init_params_t vdt911_intf =
 
 void ti990_4_state::video_start()
 {
-
 	m_terminal = machine().device("vdt911");
 }
 
@@ -151,7 +149,6 @@ static const asr733_init_params_t asr733_intf =
 
 void ti990_4_state::video_start()
 {
-
 	m_terminal = machine().device("asr733");
 }
 

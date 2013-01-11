@@ -38,8 +38,7 @@ Public domain */
 #define SetFinishedGroupSize(p, size) \
 	{  *(p) |= ((((size) - 1) & kNumExtra0Mask) << kNumBitsMax); \
 	if ((size) > (1 << kNumExtra0Bits)) { \
-	*(p) |= 0x40000000;  *((p) + 1) |= ((((size) - 1)>> kNumExtra0Bits) << kNumBitsMax); } } \
-
+	*(p) |= 0x40000000;  *((p) + 1) |= ((((size) - 1)>> kNumExtra0Bits) << kNumBitsMax); } }
 static void SetGroupSize(UInt32 *p, UInt32 size)
 {
 	if (--size == 0)

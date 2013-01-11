@@ -595,7 +595,6 @@ static void internal_timer_update(running_machine &machine,
 		/* if we have real changes, update things */
 		if (diff != 0)
 		{
-
 			/* if we're going off, make sure our timers are gone */
 			if ((diff & 0x8000) && !(new_control & 0x8000))
 			{
@@ -1645,7 +1644,6 @@ static void decode_subbios(device_t *device,offs_t pc, UINT8 raw_flag)
 
 		case 10   :
 		{
-
 			set_type("t_acoustics");
 
 			switch(bx)
@@ -2944,7 +2942,6 @@ TIMER_CALLBACK_MEMBER(rmnimbus_state::mouse_callback)
 		if ((intstate_x==1) && (state->m_intstate_x==0))
 //        if (intstate_x!=state->m_intstate_x)
 		{
-
 			xint=mxa ? EXTERNAL_INT_MOUSE_XR : EXTERNAL_INT_MOUSE_XL;
 
 			external_int(machine(),0,xint);

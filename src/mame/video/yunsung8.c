@@ -64,7 +64,6 @@ READ8_MEMBER(yunsung8_state::yunsung8_videoram_r)
 
 WRITE8_MEMBER(yunsung8_state::yunsung8_videoram_w)
 {
-
 	if (offset < 0x0800)        // c000-c7ff    Banked Palette RAM
 	{
 		int bank = m_videobank & 2;
@@ -171,7 +170,6 @@ TILE_GET_INFO_MEMBER(yunsung8_state::get_tile_info_1)
 
 void yunsung8_state::video_start()
 {
-
 	m_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(yunsung8_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 8, 8, DIM_NX_0, DIM_NY_0 );
 	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(yunsung8_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 8, 8, DIM_NX_1, DIM_NY_1 );
 

@@ -127,7 +127,6 @@ CUSTOM_INPUT_MEMBER(champbas_state::champbas_watchdog_bit2)
 
 WRITE8_MEMBER(champbas_state::irq_enable_w)
 {
-
 	m_irq_mask = data & 1;
 
 	if (!m_irq_mask)
@@ -172,7 +171,6 @@ WRITE8_MEMBER(champbas_state::champbas_mcu_switch_w)
 
 WRITE8_MEMBER(champbas_state::champbas_mcu_halt_w)
 {
-
 	// MCU not present/not used in champbas
 	if (m_mcu == NULL)
 		return;
@@ -576,7 +574,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(champbas_state,champbas)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_mcu = machine().device(CPUTAG_MCU);
 
@@ -598,14 +595,12 @@ MACHINE_START_MEMBER(champbas_state,exctsccr)
 
 MACHINE_RESET_MEMBER(champbas_state,champbas)
 {
-
 	m_palette_bank = 0;
 	m_gfx_bank = 0; // talbot has only 1 bank
 }
 
 INTERRUPT_GEN_MEMBER(champbas_state::vblank_irq)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }

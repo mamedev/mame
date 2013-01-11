@@ -102,7 +102,6 @@ READ8_MEMBER(mrflea_state::mrflea_io_r)
 
 READ8_MEMBER(mrflea_state::mrflea_main_status_r)
 {
-
 	/*  0x01: main CPU command pending
 	    0x08: io cpu ready */
 	return m_status ^ 0x08;
@@ -110,7 +109,6 @@ READ8_MEMBER(mrflea_state::mrflea_main_status_r)
 
 READ8_MEMBER(mrflea_state::mrflea_io_status_r)
 {
-
 	/*  0x08: IO CPU command pending
 	    0x01: main cpu ready */
 	return m_status ^ 0x01;
@@ -329,7 +327,6 @@ static const ay8910_interface mrflea_ay8910_interface_1 =
 
 void mrflea_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_subcpu = machine().device<cpu_device>("sub");
 
@@ -342,7 +339,6 @@ void mrflea_state::machine_start()
 
 void mrflea_state::machine_reset()
 {
-
 	m_gfx_bank = 0;
 	m_io = 0;
 	m_main = 0;

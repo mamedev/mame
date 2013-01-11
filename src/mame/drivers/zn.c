@@ -1203,7 +1203,6 @@ READ32_MEMBER(zn_state::taitofx1b_sound_r)
 
 DRIVER_INIT_MEMBER(zn_state,coh1000tb)
 {
-
 	m_taitofx1_eeprom_size1 = 0x400; m_taitofx1_eeprom1 = auto_alloc_array( machine(), UINT8, m_taitofx1_eeprom_size1 );
 	m_taitofx1_eeprom_size2 = 0x200; m_taitofx1_eeprom2 = auto_alloc_array( machine(), UINT8, m_taitofx1_eeprom_size2 );
 
@@ -2025,7 +2024,6 @@ READ32_MEMBER(zn_state::nbajamex_80_r)
 
 DRIVER_INIT_MEMBER(zn_state,coh1000a)
 {
-
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank ( 0x1f000000, 0x1f1fffff, "bank1" );
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler( 0x1fbfff00, 0x1fbfff03, write32_delegate(FUNC(zn_state::acpsx_00_w),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler( 0x1fbfff10, 0x1fbfff13, write32_delegate(FUNC(zn_state::acpsx_10_w),this));

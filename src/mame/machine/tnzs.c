@@ -662,7 +662,6 @@ MACHINE_RESET_MEMBER(tnzs_state,tnzs)
 
 MACHINE_RESET_MEMBER(tnzs_state,jpopnics)
 {
-
 	m_screenflip = 0;
 	m_mcu_type = -1;
 }
@@ -699,7 +698,6 @@ MACHINE_START_MEMBER(tnzs_state,jpopnics)
 
 MACHINE_START_MEMBER(tnzs_state,tnzs)
 {
-
 	MACHINE_START_CALL_MEMBER( jpopnics );
 
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
@@ -723,7 +721,6 @@ MACHINE_START_MEMBER(tnzs_state,tnzs)
 
 WRITE8_MEMBER(tnzs_state::tnzs_ramrom_bankswitch_w)
 {
-
 //  logerror("PC %04x: writing %02x to bankswitch\n", space.device().safe_pc(),data);
 
 	/* bit 4 resets the second CPU */

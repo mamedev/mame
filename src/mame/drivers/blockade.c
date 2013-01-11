@@ -85,7 +85,6 @@ READ8_MEMBER(blockade_state::blockade_input_port_0_r)
 
 WRITE8_MEMBER(blockade_state::blockade_coin_latch_w)
 {
-
 	if (data & 0x80)
 	{
 		if (BLOCKADE_LOG) mame_printf_debug("Reset Coin Latch\n");
@@ -453,14 +452,12 @@ void blockade_state::palette_init()
 
 void blockade_state::machine_start()
 {
-
 	save_item(NAME(m_coin_latch));
 	save_item(NAME(m_just_been_reset));
 }
 
 void blockade_state::machine_reset()
 {
-
 	m_coin_latch = 1;
 	m_just_been_reset = 0;
 }

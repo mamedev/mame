@@ -28,7 +28,6 @@
 class c2n_device :  public device_t,
 					public device_pet_datassette_port_interface
 {
-
 public:
 	// construction/destruction
 	c2n_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);

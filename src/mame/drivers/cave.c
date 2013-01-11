@@ -1792,7 +1792,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(cave_state,cave)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -1807,7 +1806,6 @@ MACHINE_START_MEMBER(cave_state,cave)
 
 MACHINE_RESET_MEMBER(cave_state,cave)
 {
-
 	memset(m_soundbuf_data, 0, 32);
 	m_soundbuf_len = 0;
 
@@ -2711,8 +2709,7 @@ BP962A.U77  23C16000    GFX
 	ROM_LOAD( "bp962a.u48", 0x000000, 0x200000, CRC(ae00a1ce) SHA1(5e8c74df0ac77efb3080406870856f958be14f79) ) \
 	\
 	ROM_REGION( 0x200000, "oki2", 0 )   \
-	ROM_LOAD( "bp962a.u47", 0x000000, 0x200000, CRC(6d4e9737) SHA1(81c7ecdfc2d38d0b35e26745866f6672f566f936) ) \
-
+	ROM_LOAD( "bp962a.u47", 0x000000, 0x200000, CRC(6d4e9737) SHA1(81c7ecdfc2d38d0b35e26745866f6672f566f936) )
 /* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
 ROM_START( agallet )
 	ROMS_AGALLET
@@ -3652,8 +3649,7 @@ U55
 	ROM_LOAD( "bp943a-0.u63", 0x000000, 0x200000, CRC(c1fed98a) SHA1(c276505f80a49b129862966a19db507f97153e45) ) \
 	\
 	ROM_REGION( 0x080000, "oki", 0 ) \
-	ROM_LOAD( "bp943a-4.u64", 0x000000, 0x080000, CRC(3fc7f29a) SHA1(feb21b918243c0a03dfa4a80cc80b86be4f62680) ) \
-
+	ROM_LOAD( "bp943a-4.u64", 0x000000, 0x080000, CRC(3fc7f29a) SHA1(feb21b918243c0a03dfa4a80cc80b86be4f62680) )
 /* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
 ROM_START( mazinger )
 	ROMS_MAZINGER
@@ -4179,8 +4175,7 @@ BPSM.U77    23C16000    GFX
 	ROM_LOAD( "bpsm.u47", 0x000000, 0x080000, CRC(0f2901b9) SHA1(ebd3e9e39e8d2bc91688dac19b99548a28b4733c) ) \
 	ROM_RELOAD(           0x080000, 0x080000             ) \
 	ROM_RELOAD(           0x100000, 0x080000             ) \
-	ROM_RELOAD(           0x180000, 0x080000             ) \
-
+	ROM_RELOAD(           0x180000, 0x080000             )
 /* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
 ROM_START( sailormn )
 	ROMS_SAILORMN
@@ -4264,8 +4259,7 @@ ROM_END
 	ROM_LOAD( "bpsm.u47", 0x000000, 0x080000, CRC(0f2901b9) SHA1(ebd3e9e39e8d2bc91688dac19b99548a28b4733c) ) \
 	ROM_RELOAD(           0x080000, 0x080000             ) \
 	ROM_RELOAD(           0x100000, 0x080000             ) \
-	ROM_RELOAD(           0x180000, 0x080000             ) \
-
+	ROM_RELOAD(           0x180000, 0x080000             )
 /* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
 ROM_START( sailormno )
 	ROMS_SAILORMNO

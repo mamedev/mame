@@ -128,8 +128,7 @@ WRITE16_MEMBER(esd16_state::esd_eeprom_w)
 	AM_RANGE(_BASE + 0x8, _BASE + 0x9) AM_WRITE(esd16_tilemap0_color_w) \
 	AM_RANGE(_BASE + 0xa, _BASE + 0xb) AM_WRITENOP /* Unknown */ \
 	AM_RANGE(_BASE + 0xc, _BASE + 0xd) AM_WRITE(esd16_sound_command_w) \
-	AM_RANGE(_BASE + 0xe, _BASE + 0xf) AM_WRITENOP /* n/c */ \
-
+	AM_RANGE(_BASE + 0xe, _BASE + 0xf) AM_WRITENOP /* n/c */
 #define ESD16_IO_AREA_EEPROM( _BASE ) \
 	AM_RANGE(_BASE + 0x0, _BASE + 0x1) AM_WRITENOP /* Irq Ack */ \
 	AM_RANGE(_BASE + 0x2, _BASE + 0x3) AM_READ_PORT("P1_P2") \
@@ -138,26 +137,21 @@ WRITE16_MEMBER(esd16_state::esd_eeprom_w)
 	AM_RANGE(_BASE + 0x8, _BASE + 0x9) AM_WRITE(esd16_tilemap0_color_w) \
 	AM_RANGE(_BASE + 0xa, _BASE + 0xb) AM_WRITENOP /* Unknown */ \
 	AM_RANGE(_BASE + 0xc, _BASE + 0xd) AM_WRITE(esd16_sound_command_w) \
-	AM_RANGE(_BASE + 0xe, _BASE + 0xf) AM_WRITE(esd_eeprom_w) \
-
+	AM_RANGE(_BASE + 0xe, _BASE + 0xf) AM_WRITE(esd_eeprom_w)
 #define ESD16_VID_ATTR_AREA( _BASE ) \
 	AM_RANGE(_BASE + 0x0, _BASE + 0x3) AM_WRITEONLY AM_SHARE("scroll_0") \
 	AM_RANGE(_BASE + 0x4, _BASE + 0x7) AM_WRITEONLY AM_SHARE("scroll_1") \
 	AM_RANGE(_BASE + 0x8, _BASE + 0x9) AM_WRITEONLY AM_SHARE("platform_x") \
 	AM_RANGE(_BASE + 0xa, _BASE + 0xb) AM_WRITEONLY AM_SHARE("platform_y") \
 	AM_RANGE(_BASE + 0xc, _BASE + 0xd) AM_WRITENOP \
-	AM_RANGE(_BASE + 0xe, _BASE + 0xf) AM_WRITEONLY AM_SHARE("head_layersize") \
-
+	AM_RANGE(_BASE + 0xe, _BASE + 0xf) AM_WRITEONLY AM_SHARE("head_layersize")
 #define ESD16_PALETTE_AREA( _BASE ) \
-	AM_RANGE(_BASE + 0x000, _BASE + 0xfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram") \
-
+	AM_RANGE(_BASE + 0x000, _BASE + 0xfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 #define ESD16_SPRITE_AREA( _BASE ) \
-	AM_RANGE(_BASE + 0x000, _BASE + 0x7ff) AM_WRITEONLY AM_SHARE("spriteram") AM_MIRROR(0x000800) \
-
+	AM_RANGE(_BASE + 0x000, _BASE + 0x7ff) AM_WRITEONLY AM_SHARE("spriteram") AM_MIRROR(0x000800)
 #define ESD16_VRAM_AREA( _BASE ) \
 	AM_RANGE(_BASE + 0x00000, _BASE + 0x03fff) AM_WRITE(esd16_vram_0_w) AM_SHARE("vram_0") AM_MIRROR(0x4000) \
-	AM_RANGE(_BASE + 0x20000, _BASE + 0x23fff) AM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1") AM_MIRROR(0x4000) \
-
+	AM_RANGE(_BASE + 0x20000, _BASE + 0x23fff) AM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1") AM_MIRROR(0x4000)
 /*** Memory Maps ***/
 
 static ADDRESS_MAP_START( multchmp_map, AS_PROGRAM, 16, esd16_state )
@@ -252,7 +246,6 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(esd16_state::esd16_sound_command_r)
 {
-
 	/* Clear IRQ only after reading the command, or some get lost */
 	m_audio_cpu->execute().set_input_line(0, CLEAR_LINE);
 	return soundlatch_byte_r(space, 0);
@@ -599,7 +592,6 @@ void esd16_state::machine_start()
 
 void esd16_state::machine_reset()
 {
-
 	m_tilemap0_color = 0;
 }
 

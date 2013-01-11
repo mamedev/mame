@@ -120,7 +120,6 @@ int find_project_string(running_machine &machine, int addrxor, int mode)
 
 		if (found!=0)
 		{
-
 			int end=0;
 			int count = 0;
 			int blankcount = 0;
@@ -23533,8 +23532,7 @@ ROM_END
 
 #define sc4milro_sound \
 	ROM_REGION( 0x100000, "ymz", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "millionaires row s16 sound (8meg)", 0x000000, 0x100000, CRC(4086df3f) SHA1(7fd358d901db48d1f8edc4b22789c73b5fb84874) ) \
-
+	ROM_LOAD( "millionaires row s16 sound (8meg)", 0x000000, 0x100000, CRC(4086df3f) SHA1(7fd358d901db48d1f8edc4b22789c73b5fb84874) )
 ROM_START( sc4milro )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "millionaires row s16 v1-0 lo (4meg)", 0x00001, 0x080000, CRC(8436aab9) SHA1(815000121e93c9a8e4f6c6d6d12a06c4484eb50c) )

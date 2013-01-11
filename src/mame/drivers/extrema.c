@@ -63,8 +63,7 @@ ROM_END
 
 #define MISSING_DISK \
 	DISK_REGION( "ide" ) \
-	DISK_IMAGE( "extrema_hdd", 0, NO_DUMP ) \
-
+	DISK_IMAGE( "extrema_hdd", 0, NO_DUMP )
 
 ROM_START( adults )
 	ROM_REGION( 0x100000, "maincpu", 0 )

@@ -283,7 +283,6 @@ static void cntsteer_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 
 UINT32 cntsteer_state::screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (m_disable_roz)
 		bitmap.fill(machine().pens[8 * m_bg_color_bank], cliprect);
 	else
@@ -333,7 +332,6 @@ UINT32 cntsteer_state::screen_update_zerotrgt(screen_device &screen, bitmap_ind1
 
 UINT32 cntsteer_state::screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (m_disable_roz)
 		bitmap.fill(machine().pens[8 * m_bg_color_bank], cliprect);
 	else
@@ -818,7 +816,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(cntsteer_state,cntsteer)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_subcpu = machine().device<cpu_device>("subcpu");
@@ -838,7 +835,6 @@ MACHINE_START_MEMBER(cntsteer_state,cntsteer)
 
 MACHINE_START_MEMBER(cntsteer_state,zerotrgt)
 {
-
 	save_item(NAME(m_nmimask));
 	MACHINE_START_CALL_MEMBER(cntsteer);
 }
@@ -846,7 +842,6 @@ MACHINE_START_MEMBER(cntsteer_state,zerotrgt)
 
 MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
 {
-
 	m_flipscreen = 0;
 	m_bg_bank = 0;
 	m_scrolly = 0;
@@ -863,7 +858,6 @@ MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
 
 MACHINE_RESET_MEMBER(cntsteer_state,zerotrgt)
 {
-
 	m_nmimask = 0;
 	MACHINE_RESET_CALL_MEMBER(cntsteer);
 }

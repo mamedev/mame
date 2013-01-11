@@ -456,7 +456,6 @@ READ8_MEMBER(balsente_state::balsente_m6850_r)
 
 TIMER_CALLBACK_MEMBER(balsente_state::m6850_data_ready_callback)
 {
-
 	/* set the output data byte and indicate that we're ready to go */
 	m_m6850_output = param;
 	m_m6850_data_ready = 1;
@@ -466,7 +465,6 @@ TIMER_CALLBACK_MEMBER(balsente_state::m6850_data_ready_callback)
 
 TIMER_CALLBACK_MEMBER(balsente_state::m6850_w_callback)
 {
-
 	/* indicate that the transmit buffer is no longer empty and update the I/O state */
 	m_m6850_status &= ~0x02;
 	m6850_update_io(machine());
@@ -479,7 +477,6 @@ TIMER_CALLBACK_MEMBER(balsente_state::m6850_w_callback)
 
 WRITE8_MEMBER(balsente_state::balsente_m6850_w)
 {
-
 	/* control register is at offset 0 */
 	if (offset == 0)
 	{
@@ -528,7 +525,6 @@ READ8_MEMBER(balsente_state::balsente_m6850_sound_r)
 
 WRITE8_MEMBER(balsente_state::balsente_m6850_sound_w)
 {
-
 	/* control register is at offset 0 */
 	if (offset == 0)
 		m_m6850_sound_control = data;
@@ -602,7 +598,6 @@ TIMER_CALLBACK_MEMBER(balsente_state::adc_finished)
 
 READ8_MEMBER(balsente_state::balsente_adc_data_r)
 {
-
 	/* just return the last value read */
 	return m_adc_value;
 }
@@ -925,7 +920,6 @@ void balsente_state::update_counter_0_timer()
 
 READ8_MEMBER(balsente_state::balsente_counter_state_r)
 {
-
 	/* bit D0 is the inverse of the flip-flop state */
 	int result = !m_counter_0_ff;
 
@@ -1049,7 +1043,6 @@ WRITE8_MEMBER(balsente_state::balsente_chip_select_w)
 
 WRITE8_MEMBER(balsente_state::balsente_dac_data_w)
 {
-
 	/* LSB or MSB? */
 	if (offset & 1)
 		m_dac_value = (m_dac_value & 0xfc0) | ((data >> 2) & 0x03f);
@@ -1087,7 +1080,6 @@ CUSTOM_INPUT_MEMBER(balsente_state::nstocker_bits_r)
 
 WRITE8_MEMBER(balsente_state::spiker_expand_w)
 {
-
 	/* offset 0 is the bit pattern */
 	if (offset == 0)
 		m_spiker_expand_bits = data;

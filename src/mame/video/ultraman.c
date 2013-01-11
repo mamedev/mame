@@ -71,7 +71,6 @@ void ultraman_state::video_start()
 
 WRITE16_MEMBER(ultraman_state::ultraman_gfxctrl_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		/*  bit 0: enable wraparound for scr #1
@@ -122,7 +121,6 @@ WRITE16_MEMBER(ultraman_state::ultraman_gfxctrl_w)
 
 UINT32 ultraman_state::screen_update_ultraman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	k051316_zoom_draw(m_k051316_3, bitmap, cliprect, 0, 0);
 	k051316_zoom_draw(m_k051316_2, bitmap, cliprect, 0, 0);
 	k051960_sprites_draw(m_k051960, bitmap, cliprect, 0, 0);

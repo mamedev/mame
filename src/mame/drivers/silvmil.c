@@ -31,8 +31,6 @@ public:
 			m_bg_videoram(*this, "bg_videoram"),
 			m_fg_videoram(*this, "fg_videoram"),
 			m_spriteram(*this, "spriteram")  {
-
-
 	}
 
 	/* memory pointers */
@@ -151,7 +149,6 @@ void silvmil_state::video_start()
 
 UINT32 silvmil_state::screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_layer->draw(bitmap, cliprect, 0, 0);
 	m_fg_layer->draw(bitmap, cliprect, 0, 0);
 	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
@@ -277,7 +274,6 @@ GFXDECODE_END
 
 void silvmil_state::machine_start()
 {
-
 }
 
 void silvmil_state::machine_reset()

@@ -144,7 +144,6 @@ TILE_GET_INFO_MEMBER(calorie_state::get_fg_tile_info)
 
 void calorie_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(calorie_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(calorie_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
@@ -426,13 +425,11 @@ GFXDECODE_END
 
 void calorie_state::machine_start()
 {
-
 	save_item(NAME(m_bg_bank));
 }
 
 void calorie_state::machine_reset()
 {
-
 	m_bg_bank = 0;
 }
 

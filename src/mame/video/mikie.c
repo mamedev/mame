@@ -90,21 +90,18 @@ void mikie_state::palette_init()
 
 WRITE8_MEMBER(mikie_state::mikie_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(mikie_state::mikie_colorram_w)
 {
-
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(mikie_state::mikie_palettebank_w)
 {
-
 	if (m_palettebank != (data & 0x07))
 	{
 		m_palettebank = data & 0x07;

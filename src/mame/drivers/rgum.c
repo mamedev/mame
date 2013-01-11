@@ -85,7 +85,6 @@ ADDRESS_MAP_END
 
 CUSTOM_INPUT_MEMBER(rgum_state::rgum_heartbeat_r)
 {
-
 	m_hbeat ^= 1;
 
 	return m_hbeat;

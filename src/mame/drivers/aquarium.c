@@ -44,7 +44,6 @@ Notes:
 
 READ16_MEMBER(aquarium_state::aquarium_coins_r)
 {
-
 	int data;
 	data = (ioport("SYSTEM")->read() & 0x7fff);
 	data |= m_aquarium_snd_ack;
@@ -290,7 +289,6 @@ GFXDECODE_END
 
 void aquarium_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_aquarium_snd_ack));

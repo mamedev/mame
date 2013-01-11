@@ -1845,7 +1845,6 @@ static void d68040_fpu(void)
 
 		case 0x5:   // control to ea
 		{
-
 			strcpy(g_dasm_str, "fmovem.l   ");
 			if (w2 & 0x1000) strcat(g_dasm_str, "fpcr");
 			if (w2 & 0x0800) strcat(g_dasm_str, "/fpsr");

@@ -2272,7 +2272,6 @@ re-used here so that they have to be entered only once
 *************************************************************/
 #define pre_loop \
 while ((cnt-=delta) > 0) {
-
 	#define post_loop \
 }
 
@@ -2524,8 +2523,7 @@ void v99x8_device::srch_engine()
 
 	#define post_srch(MX) \
 	{ m_stat_reg[2]|=0x10; /* Border detected */ break; } \
-	if ((SX+=TX) & MX) { m_stat_reg[2] &= 0xEF; /* Border not detected */ break; } \
-
+	if ((SX+=TX) & MX) { m_stat_reg[2] &= 0xEF; /* Border not detected */ break; }
 	switch (m_mode) {
 	default:
 	case V9938_MODE_GRAPHIC4: pre_loop if ((VDPpoint5(MXD, SX, SY)==CL) ^ANX)  post_srch(256) post_loop
@@ -2761,7 +2759,6 @@ void v99x8_device::lmmm_engine()
 void v99x8_device::lmcm_engine()
 {
 	if ((m_stat_reg[2]&0x80)!=0x80) {
-
 		m_stat_reg[7]=m_cont_reg[44]=VDP_POINT(((m_mode >= 5) && (m_mode <= 8)) ? (m_mode-5) : 0, m_mmc.MXS, m_mmc.ASX, m_mmc.SY);
 		m_vdp_ops_count-=get_vdp_timing_value(lmmv_timing);
 		m_stat_reg[2]|=0x80;
@@ -2997,7 +2994,6 @@ void v99x8_device::ymmm_engine()
 void v99x8_device::hmmc_engine()
 {
 	if ((m_stat_reg[2]&0x80)!=0x80) {
-
 		m_vram_space->write_byte(VDP_VRMP(((m_mode >= 5) && (m_mode <= 8)) ? (m_mode-5) : 0, m_mmc.MXD, m_mmc.ADX, m_mmc.DY), m_cont_reg[44]);
 		m_vdp_ops_count -= get_vdp_timing_value(hmmv_timing);
 		m_stat_reg[2]|=0x80;

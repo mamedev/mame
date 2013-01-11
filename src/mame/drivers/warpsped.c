@@ -116,7 +116,6 @@ WRITE8_MEMBER(warpspeed_state::warpspeed_hardware_w)
 
 TILE_GET_INFO_MEMBER(warpspeed_state::get_warpspeed_text_tile_info)
 {
-
 	UINT8 code = m_videoram[tile_index] & 0x3f;
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
@@ -133,7 +132,6 @@ TILE_GET_INFO_MEMBER(warpspeed_state::get_warpspeed_starfield_tile_info)
 
 WRITE8_MEMBER(warpspeed_state::warpspeed_vidram_w)
 {
-
 	m_videoram[offset] = data;
 	m_text_tilemap->mark_tile_dirty(offset);
 }
@@ -211,7 +209,6 @@ static void warpspeed_draw_circles(bitmap_ind16 &bitmap, warpspeed_state *state)
 
 UINT32 warpspeed_state::screen_update_warpspeed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_starfield_tilemap->draw(bitmap, cliprect, 0, 0);
 	warpspeed_draw_circles(bitmap, this);
 	m_text_tilemap->draw(bitmap, cliprect, 0, 0);

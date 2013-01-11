@@ -160,7 +160,6 @@ WRITE8_MEMBER(ladybug_state::ladybug_flipscreen_w)
 
 WRITE8_MEMBER(ladybug_state::sraider_io_w)
 {
-
 	// bit7 = flip
 	// bit6 = grid red
 	// bit5 = grid green
@@ -209,7 +208,6 @@ TILE_GET_INFO_MEMBER(ladybug_state::get_grid_tile_info)
 
 VIDEO_START_MEMBER(ladybug_state,ladybug)
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ladybug_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_rows(32);
 	m_bg_tilemap->set_transparent_pen(0);
@@ -217,7 +215,6 @@ VIDEO_START_MEMBER(ladybug_state,ladybug)
 
 VIDEO_START_MEMBER(ladybug_state,sraider)
 {
-
 	m_grid_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ladybug_state::get_grid_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_grid_tilemap->set_scroll_rows(32);
 	m_grid_tilemap->set_transparent_pen(0);
@@ -310,7 +307,6 @@ void ladybug_state::screen_eof_sraider(screen_device &screen, bool state)/* upda
 
 UINT32 ladybug_state::screen_update_sraider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	// this part is boilerplate from ladybug, not sure if hardware does this,
 	// since it's not used
 

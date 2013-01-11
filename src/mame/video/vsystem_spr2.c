@@ -76,7 +76,6 @@ void vsystem_spr2_device::device_start()
 
 void vsystem_spr2_device::device_reset()
 {
-
 }
 
 

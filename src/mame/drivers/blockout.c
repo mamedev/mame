@@ -76,7 +76,6 @@
 
 WRITE16_MEMBER(blockout_state::blockout_sound_command_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, offset, data & 0xff);
@@ -86,13 +85,11 @@ WRITE16_MEMBER(blockout_state::blockout_sound_command_w)
 
 WRITE16_MEMBER(blockout_state::blockout_irq6_ack_w)
 {
-
 	m_maincpu->set_input_line(6, CLEAR_LINE);
 }
 
 WRITE16_MEMBER(blockout_state::blockout_irq5_ack_w)
 {
-
 	m_maincpu->set_input_line(5, CLEAR_LINE);
 }
 
@@ -274,7 +271,6 @@ WRITE_LINE_MEMBER(blockout_state::irq_handler)
 
 void blockout_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -283,7 +279,6 @@ void blockout_state::machine_start()
 
 void blockout_state::machine_reset()
 {
-
 	m_color = 0;
 }
 

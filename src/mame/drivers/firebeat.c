@@ -1190,7 +1190,6 @@ static void atapi_command_reg_w(running_machine &machine, int reg, UINT16 data)
 				//if (state->m_atapi_drivesel==1) logerror("!!!ATAPI COMMAND %x\n", state->m_atapi_data[0]&0xff);
 				switch (state->m_atapi_data[0]&0xff)
 				{
-
 					case 0x55:  // MODE SELECT
 						state->m_atapi_cdata_wait = state->m_atapi_data[4]/2;
 						state->m_atapi_data_ptr = 0;

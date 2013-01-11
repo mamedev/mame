@@ -233,7 +233,6 @@ static const ym2203_interface ym2203_config =
 
 void volfied_state::machine_start()
 {
-
 	volfied_cchip_init(machine());
 
 	m_maincpu = machine().device<cpu_device>("maincpu");

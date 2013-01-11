@@ -39,7 +39,6 @@ UINT32 crshrace_state::crshrace_tile_callback( UINT32 code )
 
 void crshrace_state::video_start()
 {
-
 	m_tilemap1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(crshrace_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_tilemap2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(crshrace_state::get_tile_info2),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
@@ -57,21 +56,18 @@ void crshrace_state::video_start()
 
 WRITE16_MEMBER(crshrace_state::crshrace_videoram1_w)
 {
-
 	COMBINE_DATA(&m_videoram1[offset]);
 	m_tilemap1->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(crshrace_state::crshrace_videoram2_w)
 {
-
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_tilemap2->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(crshrace_state::crshrace_roz_bank_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		if (m_roz_bank != (data & 0xff))
@@ -85,7 +81,6 @@ WRITE16_MEMBER(crshrace_state::crshrace_roz_bank_w)
 
 WRITE16_MEMBER(crshrace_state::crshrace_gfxctrl_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		m_gfxctrl = data & 0xdf;
@@ -116,7 +111,6 @@ static void draw_fg(running_machine &machine, bitmap_ind16 &bitmap, const rectan
 
 UINT32 crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (m_gfxctrl & 0x04)   /* display disable? */
 	{
 		bitmap.fill(get_black_pen(machine()), cliprect);

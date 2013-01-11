@@ -120,7 +120,6 @@ TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_3)
 
 void umipoker_state::video_start()
 {
-
 	m_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_0),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_1),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 	m_tilemap_2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_2),this),TILEMAP_SCAN_ROWS,8,8,64,32);
@@ -135,7 +134,6 @@ void umipoker_state::video_start()
 
 UINT32 umipoker_state::screen_update_umipoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_tilemap_0->set_scrolly(0, m_umipoker_scrolly[0]);
 	m_tilemap_1->set_scrolly(0, m_umipoker_scrolly[1]);
 	m_tilemap_2->set_scrolly(0, m_umipoker_scrolly[2]);
@@ -160,7 +158,6 @@ READ8_MEMBER(umipoker_state::z80_rom_readback_r)
 
 READ8_MEMBER(umipoker_state::z80_shared_ram_r)
 {
-
 	machine().scheduler().synchronize(); // force resync
 
 	return m_z80_wram[offset];
@@ -168,7 +165,6 @@ READ8_MEMBER(umipoker_state::z80_shared_ram_r)
 
 WRITE8_MEMBER(umipoker_state::z80_shared_ram_w)
 {
-
 	machine().scheduler().synchronize(); // force resync
 
 	m_z80_wram[offset] = data;
@@ -190,14 +186,12 @@ WRITE16_MEMBER(umipoker_state::umipoker_scrolly_3_w){ COMBINE_DATA(&m_umipoker_s
 
 WRITE16_MEMBER(umipoker_state::umipoker_vram_0_w)
 {
-
 	COMBINE_DATA(&m_vram_0[offset]);
 	m_tilemap_0->mark_tile_dirty(offset >> 1);
 }
 
 WRITE16_MEMBER(umipoker_state::umipoker_vram_1_w)
 {
-
 	COMBINE_DATA(&m_vram_1[offset]);
 	m_tilemap_1->mark_tile_dirty(offset >> 1);
 }
@@ -205,14 +199,12 @@ WRITE16_MEMBER(umipoker_state::umipoker_vram_1_w)
 
 WRITE16_MEMBER(umipoker_state::umipoker_vram_2_w)
 {
-
 	COMBINE_DATA(&m_vram_2[offset]);
 	m_tilemap_2->mark_tile_dirty(offset >> 1);
 }
 
 WRITE16_MEMBER(umipoker_state::umipoker_vram_3_w)
 {
-
 	COMBINE_DATA(&m_vram_3[offset]);
 	m_tilemap_3->mark_tile_dirty(offset >> 1);
 }
@@ -649,7 +641,6 @@ GFXDECODE_END
 
 void umipoker_state::machine_start()
 {
-
 }
 
 void umipoker_state::machine_reset()

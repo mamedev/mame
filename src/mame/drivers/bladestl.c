@@ -67,7 +67,6 @@ READ8_MEMBER(bladestl_state::trackball_r)
 
 WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 {
-
 	/* bits 0 & 1 = coin counters */
 	coin_counter_w(machine(), 0,data & 0x01);
 	coin_counter_w(machine(), 1,data & 0x02);
@@ -88,7 +87,6 @@ WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 
 WRITE8_MEMBER(bladestl_state::bladestl_sh_irqtrigger_w)
 {
-
 	soundlatch_byte_w(space, offset, data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 	//logerror("(sound) write %02x\n", data);

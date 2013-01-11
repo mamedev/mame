@@ -76,7 +76,6 @@ READ16_MEMBER(thunderj_state::special_port2_r)
 
 WRITE16_MEMBER(thunderj_state::latch_w)
 {
-
 	/* reset extra CPU */
 	if (ACCESSING_BITS_0_7)
 	{

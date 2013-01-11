@@ -23,7 +23,6 @@ WRITE8_MEMBER(bombjack_state::bombjack_colorram_w)
 
 WRITE8_MEMBER(bombjack_state::bombjack_background_w)
 {
-
 	if (m_background_image != data)
 	{
 		m_background_image = data;
@@ -76,7 +75,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-
 /*
  abbbbbbb cdefgggg hhhhhhhh iiiiiiii
 

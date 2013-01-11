@@ -126,7 +126,6 @@ static READ32_HANDLER( twcup98_prot_r )
 			#endif
 			switch(a_bus[3])
 			{
-
 			}
 		}
 		return a_bus[offset];
@@ -622,7 +621,6 @@ void write_prot_data(UINT32 data, UINT32 mem_mask, int offset, int which)
 					*/
 
 					{
-
 						FILE* fp;
 						if (which==1) fp = fopen("table1x","wb");
 						else fp = fopen("table1","wb");

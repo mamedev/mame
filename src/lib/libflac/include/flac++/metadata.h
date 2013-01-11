@@ -73,7 +73,6 @@
 
 namespace FLAC {
 	namespace Metadata {
-
 		// ============================================================
 		//
 		//  Metadata objects

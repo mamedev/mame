@@ -122,7 +122,6 @@ void ksayakyu_state::video_start()
 
 UINT32 ksayakyu_state::screen_update_ksayakyu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(0, cliprect);
 
 	if (m_video_ctrl & 1)

@@ -174,7 +174,6 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(baraduke_state::soundkludge_r)
 {
-
 	return ((m_counter++) >> 4) & 0xff;
 }
 

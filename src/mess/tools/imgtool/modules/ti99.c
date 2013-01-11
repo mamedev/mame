@@ -5141,7 +5141,6 @@ static imgtoolerr_t win_image_deletefile(imgtool_partition *partition, const cha
 		{
 			if (cursibFDR_index <= endsibFDR_index)
 			{
-
 				for (i = 0; i < 54; i++)
 				{
 					cur_AU = get_UINT16BE(fdr.clusters[i][0]);

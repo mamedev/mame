@@ -125,8 +125,6 @@ WRITE8_MEMBER(jrpacman_state::jrpacman_interrupt_vector_w)
 
 WRITE8_MEMBER(jrpacman_state::irq_mask_w)
 {
-
-
 	m_irq_mask = data & 1;
 }
 
@@ -283,7 +281,6 @@ static const namco_interface namco_config =
 
 INTERRUPT_GEN_MEMBER(jrpacman_state::vblank_irq)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }

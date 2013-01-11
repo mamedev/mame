@@ -45,7 +45,6 @@ UINT32 ddz_state::screen_update_ddz(screen_device &screen, bitmap_rgb32 &bitmap,
 
 void ddz_state::screen_eof_ddz(screen_device &screen, bool state)
 {
-
 }
 
 INTERRUPT_GEN_MEMBER(ddz_state::ddz_interrupt)

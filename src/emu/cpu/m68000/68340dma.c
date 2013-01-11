@@ -34,5 +34,4 @@ WRITE32_HANDLER( m68340_internal_dma_w )
 
 void m68340_dma::reset(void)
 {
-
 }

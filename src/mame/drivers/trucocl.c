@@ -39,7 +39,6 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 
 WRITE8_MEMBER(trucocl_state::irq_enable_w)
 {
-
 	m_irq_mask = (data & 1) ^ 1;
 }
 
@@ -124,7 +123,6 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(trucocl_state::trucocl_interrupt)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 

@@ -31,11 +31,9 @@ TODO:
 //**************************************************************************
 
 #define MCFG_CDISLAVE_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MACHINE_CDISLAVE, 0) \
-
+	MCFG_DEVICE_ADD(_tag, MACHINE_CDISLAVE, 0)
 #define MCFG_CDISLAVE_REPLACE(_tag) \
-	MCFG_DEVICE_REPLACE(_tag, MACHINE_CDISLAVE, 0) \
-
+	MCFG_DEVICE_REPLACE(_tag, MACHINE_CDISLAVE, 0)
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************

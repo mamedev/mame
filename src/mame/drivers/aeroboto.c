@@ -41,7 +41,6 @@ READ8_MEMBER(aeroboto_state::aeroboto_201_r)
 
 INTERRUPT_GEN_MEMBER(aeroboto_state::aeroboto_interrupt)
 {
-
 	if (!m_disable_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);
 	else
@@ -56,14 +55,12 @@ READ8_MEMBER(aeroboto_state::aeroboto_irq_ack_r)
 
 READ8_MEMBER(aeroboto_state::aeroboto_2973_r)
 {
-
 	m_mainram[0x02be] = 0;
 	return 0xff;
 }
 
 WRITE8_MEMBER(aeroboto_state::aeroboto_1a2_w)
 {
-
 	m_mainram[0x01a2] = data;
 	if (data)
 		m_disable_irq = 1;
@@ -224,7 +221,6 @@ static const ay8910_interface ay8910_config =
 
 void aeroboto_state::machine_start()
 {
-
 	m_stars_rom = memregion("gfx2")->base();
 	m_stars_length = memregion("gfx2")->bytes();
 
@@ -234,7 +230,6 @@ void aeroboto_state::machine_start()
 
 void aeroboto_state::machine_reset()
 {
-
 	m_disable_irq = 0;
 	m_count = 0;
 

@@ -36,7 +36,6 @@ const device_type PC9801_KBD = &device_creator<pc9801_kbd_device>;
 pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, PC9801_KBD, "pc9801_kbd", tag, owner, clock)
 {
-
 }
 
 //-------------------------------------------------

@@ -503,7 +503,6 @@ public:
 
 TILE_GET_INFO_MEMBER(majorpkr_state::bg_get_tile_info)
 {
-
 	int code = m_videoram[0x800 + 2 * tile_index] + (m_videoram[0x800 + 2 * tile_index + 1] << 8);
 
 	SET_TILE_INFO_MEMBER(
@@ -515,7 +514,6 @@ TILE_GET_INFO_MEMBER(majorpkr_state::bg_get_tile_info)
 
 TILE_GET_INFO_MEMBER(majorpkr_state::fg_get_tile_info)
 {
-
 	int code = m_videoram[2 * tile_index] + (m_videoram[2 * tile_index + 1] << 8);
 
 	SET_TILE_INFO_MEMBER(
@@ -528,7 +526,6 @@ TILE_GET_INFO_MEMBER(majorpkr_state::fg_get_tile_info)
 
 void majorpkr_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(majorpkr_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 36, 28);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(majorpkr_state::fg_get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 36, 28);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -539,7 +536,6 @@ void majorpkr_state::video_start()
 
 UINT32 majorpkr_state::screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	rectangle custom_clip;
@@ -575,7 +571,6 @@ WRITE8_MEMBER(majorpkr_state::rom_bank_w)
 
 WRITE8_MEMBER(majorpkr_state::palette_bank_w)
 {
-
 	m_palette_bank=data;
 }
 
@@ -628,7 +623,6 @@ WRITE8_MEMBER(majorpkr_state::vram_w)
 
 WRITE8_MEMBER(majorpkr_state::vidreg_w)
 {
-
 /*  If bit6 is active, the screen is drawn upside down.
     (also 0xfc and 0x11 are written to the CRTC registers 0xc0 and 0xd0)
     So, the CRTC display start address = 0xfc11
@@ -655,7 +649,6 @@ WRITE8_MEMBER(majorpkr_state::vidreg_w)
 
 READ8_MEMBER(majorpkr_state::mux_port_r)
 {
-
 	switch( (m_mux_data & 0xf0) )       /* 00-10-20-30-0F-1F-2F-3F */
 	{
 		case 0x00: return ioport("DSW1")->read();   /* confirmed */
@@ -669,7 +662,6 @@ READ8_MEMBER(majorpkr_state::mux_port_r)
 
 READ8_MEMBER(majorpkr_state::mux_port2_r)
 {
-
 	if ((m_mux_data & 0x0f) == 4)
 	{
 		return ioport("IN0-1")->read();
@@ -682,7 +674,6 @@ READ8_MEMBER(majorpkr_state::mux_port2_r)
 
 WRITE8_MEMBER(majorpkr_state::mux_sel_w)
 {
-
 	m_mux_data = data;  /* 00-10-20-30-0F-1F-2F-3F */
 }
 

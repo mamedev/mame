@@ -432,7 +432,6 @@ void slapshot_state::screen_eof_taito_no_buffer(screen_device &screen, bool stat
 	// rising edge
 	if (state)
 	{
-
 		taito_update_sprites_active_area(machine());
 
 		m_prepare_sprites = 1;

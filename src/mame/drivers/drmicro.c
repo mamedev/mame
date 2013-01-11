@@ -25,14 +25,12 @@ Quite similar to Appoooh
 
 INTERRUPT_GEN_MEMBER(drmicro_state::drmicro_interrupt)
 {
-
 	if (m_nmi_enable)
 			device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_MEMBER(drmicro_state::nmi_enable_w)
 {
-
 	m_nmi_enable = data & 1;
 	m_flipscreen = (data & 2) ? 1 : 0;
 	flip_screen_set(data & 2);
@@ -239,7 +237,6 @@ static const sn76496_config psg_intf =
 
 void drmicro_state::machine_start()
 {
-
 	m_msm = machine().device("msm");
 
 	save_item(NAME(m_nmi_enable));
@@ -249,7 +246,6 @@ void drmicro_state::machine_start()
 
 void drmicro_state::machine_reset()
 {
-
 	m_nmi_enable = 0;
 	m_pcm_adr = 0;
 	m_flipscreen = 0;

@@ -37,7 +37,6 @@ WRITE8_MEMBER(homerun_state::homerun_scrollx_w)
 
 WRITE8_MEMBER(homerun_state::homerun_banking_w)
 {
-
 	// games do mid-screen gfx bank switching
 	int vpos = machine().primary_screen->vpos();
 	machine().primary_screen->update_partial(vpos);
@@ -141,7 +140,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 homerun_state::screen_update_homerun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_tilemap->set_scrolly(0, m_scrolly);
 	m_tilemap->set_scrollx(0, m_scrollx);
 

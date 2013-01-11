@@ -99,8 +99,7 @@ C102 - Controls CPU access to ROZ Memory Area.
 //**************************************************************************
 
 #define MCFG_NAMCO_C45_ROAD_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, NAMCO_C45_ROAD, 0) \
-
+	MCFG_DEVICE_ADD(_tag, NAMCO_C45_ROAD, 0)
 
 
 //**************************************************************************

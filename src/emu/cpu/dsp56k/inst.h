@@ -13,7 +13,6 @@
 //
 namespace DSP56K
 {
-
 #define ADDRESS(X) ((X)<<1)
 #define UNIMPLEMENTED_OPCODE() mame_printf_error("Unimplemented opcode:  PC=%04x | %s;\n", PC, __PRETTY_FUNCTION__);
 

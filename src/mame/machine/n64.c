@@ -1842,7 +1842,6 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 			////printf("Write mempak at %04x\n", address);
 			if (address >= 0x8000)
 			{
-
 			}
 			else
 			{

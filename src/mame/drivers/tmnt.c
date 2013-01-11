@@ -647,7 +647,6 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(tmnt_state::ssriders_soundkludge_w)
 {
-
 	/* I think this is more than just a trigger */
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }

@@ -33,7 +33,6 @@ There are 63 stars in each set, 126 displayed at any one time
 
 const struct star star_seed_tab[252]=
 {
-
 /* also shared by Bosconian */
 
 /* star set 0 */
@@ -453,14 +452,12 @@ VIDEO_START_MEMBER(galaga_state,galaga)
 
 WRITE8_MEMBER(galaga_state::galaga_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 WRITE8_MEMBER(galaga_state::gatsbee_bank_w)
 {
-
 	m_galaga_gfxbank = data & 0x1;
 	m_fg_tilemap->mark_all_dirty();
 }
@@ -564,7 +561,6 @@ static void draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rec
 
 UINT32 galaga_state::screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	draw_stars(machine(),bitmap,cliprect);
 	draw_sprites(machine(),bitmap,cliprect);

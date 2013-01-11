@@ -202,7 +202,6 @@ WRITE_LINE_MEMBER( s11_state::pia_irq )
 
 WRITE8_MEMBER( s11_state::sol3_w )
 {
-
 }
 
 WRITE8_MEMBER( s11_state::sound_w )

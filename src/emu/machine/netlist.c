@@ -382,7 +382,6 @@ void netlist_base_t::set_clock_freq(UINT64 clockfreq)
 
 ATTR_HOT ATTR_ALIGN void netlist_base_t::process_list(INT32 &atime)
 {
-
 	while ( (atime > 0) && (m_queue.is_not_empty()))
 	{
 		queue_t::entry_t e = m_queue.pop();
@@ -795,7 +794,6 @@ static inline void update_dev(const net_input_t *inp, const UINT32 mask)
 
 ATTR_HOT inline void net_output_t::update_devs()
 {
-
 	const UINT32 masks[4] = { 1, 5, 3, 1 };
 	m_Q = m_new_Q;
 	m_Q_analog = m_new_Q_analog;
@@ -900,7 +898,6 @@ void netlist_mame_device::device_config_complete()
 
 void netlist_mame_device::device_start()
 {
-
 	//double dt = clocks_to_attotime(1).as_double();
 	m_netlist = global_alloc_clear(netlist_t(*this));
 	m_netlist->set_clock_freq(this->clock());
@@ -942,12 +939,10 @@ void netlist_mame_device::device_stop()
 
 void netlist_mame_device::device_post_load()
 {
-
 }
 
 void netlist_mame_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-
 }
 
 void netlist_mame_device::save_state()

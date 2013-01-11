@@ -1097,7 +1097,6 @@ static const z80_daisy_config meritm_daisy_chain[] =
 
 MACHINE_START_MEMBER(meritm_state,merit_common)
 {
-
 	m_z80pio_0->strobe_a(1);
 	m_z80pio_0->strobe_b(1);
 	m_z80pio_1->strobe_a(1);

@@ -591,7 +591,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 
 	switch( size ) {
-
 	case SZ_8X8 :
 		code = ( (int)ygv608.regs.s.sba << 8 ) | (int)sa->sn;
 		if (spf != 0)
@@ -1320,7 +1319,6 @@ static void HandleRomTransfers(running_machine &machine)
 
 	/* scroll table */
 	if( ygv608.ports.s.tl ) {
-
 	int dest = (int)ygv608.regs.s.sca;
 	if( ygv608.regs.s.p2_b_a )
 		dest += 0x100;
@@ -1337,7 +1335,6 @@ static void HandleRomTransfers(running_machine &machine)
 
 	/* sprite attribute table */
 	if( ygv608.ports.s.ts ) {
-
 	int dest = (int)ygv608.regs.s.saa;
 
 	/* fudge a transfer for now... */
@@ -1379,7 +1376,6 @@ void nvsram( offs_t offset, UINT16 data )
 static void SetPreShortcuts( int reg, int data )
 {
 	switch( reg ) {
-
 		case 7 :
 			if( ( ( data >> MD_SHIFT ) & MD_MASK ) != (ygv608.regs.s.r7 & r7_md))
 				ygv608.tilemap_resize = 1;

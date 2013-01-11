@@ -112,7 +112,6 @@ TIMER_CALLBACK_MEMBER(dai_state::dai_timer)
 
 void dai_state::machine_start()
 {
-
 	membank("bank2")->configure_entries(0, 4, memregion("maincpu")->base() + 0x010000, 0x1000);
 	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(dai_state::dai_bootstrap_callback),this));
 	machine().scheduler().timer_pulse(attotime::from_hz(100), timer_expired_delegate(FUNC(dai_state::dai_timer),this)); /* timer for tms5501 */

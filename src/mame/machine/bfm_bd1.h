@@ -4,11 +4,9 @@
 
 #define MCFG_BFMBD1_ADD(_tag,_val) \
 		MCFG_DEVICE_ADD(_tag, BFM_BD1,60)\
-		MCFG_BD1_PORT(_val) \
-
+		MCFG_BD1_PORT(_val)
 #define MCFG_BD1_PORT(_val) \
-	bfm_bd1_t::static_set_value(*device, _val); \
-
+	bfm_bd1_t::static_set_value(*device, _val);
 #define MCFG_BFMBD1_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 

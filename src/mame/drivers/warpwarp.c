@@ -141,7 +141,6 @@ TODO:
 /* Interrupt Gen */
 INTERRUPT_GEN_MEMBER(warpwarp_state::vblank_irq)
 {
-
 	if(m_ball_on)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }

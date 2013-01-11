@@ -91,7 +91,6 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(galivan_state::blit_trigger_w)
 {
-
 	nb_1414m4_exec(space,(m_videoram[0] << 8) | (m_videoram[1] & 0xff),m_videoram,m_scrollx,m_scrolly,m_tx_tilemap);
 }
 
@@ -377,7 +376,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(galivan_state,galivan)
 {
-
 	/* configure ROM banking */
 	UINT8 *rombase = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &rombase[0x10000], 0x2000);
@@ -393,7 +391,6 @@ MACHINE_START_MEMBER(galivan_state,galivan)
 
 MACHINE_START_MEMBER(galivan_state,ninjemak)
 {
-
 	/* configure ROM banking */
 	UINT8 *rombase = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &rombase[0x10000], 0x2000);
@@ -408,7 +405,6 @@ MACHINE_START_MEMBER(galivan_state,ninjemak)
 
 MACHINE_RESET_MEMBER(galivan_state,galivan)
 {
-
 	machine().device("maincpu")->reset();
 
 //  m_layers = 0x60;
@@ -421,7 +417,6 @@ MACHINE_RESET_MEMBER(galivan_state,galivan)
 
 MACHINE_RESET_MEMBER(galivan_state,ninjemak)
 {
-
 	machine().device("maincpu")->reset();
 
 	m_scrollx = 0;
@@ -1048,7 +1043,6 @@ WRITE8_MEMBER(galivan_state::youmab_81_w)
 /* scrolling is tied to a serial port, reads from 0xe43d-0xe43e-0xe43f-0xe440 */
 WRITE8_MEMBER(galivan_state::youmab_84_w)
 {
-
 	m_shift_val &= ~((0x80 >> 7) << m_shift_scroll);
 	m_shift_val |= (((data & 0x80) >> 7) << m_shift_scroll);
 
@@ -1061,7 +1055,6 @@ WRITE8_MEMBER(galivan_state::youmab_84_w)
 
 WRITE8_MEMBER(galivan_state::youmab_86_w)
 {
-
 	/* latch values */
 	{
 		m_scrolly = (m_shift_val & 0x0003ff);

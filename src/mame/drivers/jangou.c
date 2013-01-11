@@ -143,7 +143,6 @@ void jangou_state::palette_init()
 
 void jangou_state::video_start()
 {
-
 	save_item(NAME(m_blit_buffer));
 }
 
@@ -255,7 +254,6 @@ WRITE8_MEMBER(jangou_state::blitter_process_w)
 /* What is the bit 5 (0x20) for?*/
 WRITE8_MEMBER(jangou_state::blit_vregs_w)
 {
-
 	//  printf("%02x %02x\n", offset, data);
 	m_pen_data[offset] = data & 0xf;
 }
@@ -331,7 +329,6 @@ WRITE8_MEMBER(jangou_state::cvsd_w)
 
 TIMER_CALLBACK_MEMBER(jangou_state::cvsd_bit_timer_callback)
 {
-
 	/* Data is shifted out at the MSB */
 	hc55516_digit_w(m_cvsd, (m_cvsd_shiftreg >> 7) & 1);
 	m_cvsd_shiftreg <<= 1;
@@ -377,7 +374,6 @@ READ8_MEMBER(jangou_state::master_com_r)
 
 WRITE8_MEMBER(jangou_state::master_com_w)
 {
-
 	m_nsc->execute().set_input_line(0, HOLD_LINE);
 	m_nsc_latch = data;
 }
@@ -920,7 +916,6 @@ static SOUND_START( jangou )
 
 MACHINE_START_MEMBER(jangou_state,common)
 {
-
 	m_cpu_0 = machine().device("cpu0");
 	m_cpu_1 = machine().device("cpu1");
 	m_cvsd = machine().device("cvsd");
@@ -933,7 +928,6 @@ MACHINE_START_MEMBER(jangou_state,common)
 
 void jangou_state::machine_start()
 {
-
 	MACHINE_START_CALL_MEMBER(common);
 
 	save_item(NAME(m_cvsd_shiftreg));
@@ -942,7 +936,6 @@ void jangou_state::machine_start()
 
 MACHINE_START_MEMBER(jangou_state,jngolady)
 {
-
 	MACHINE_START_CALL_MEMBER(common);
 
 	save_item(NAME(m_adpcm_byte));
@@ -966,7 +959,6 @@ MACHINE_RESET_MEMBER(jangou_state,common)
 
 void jangou_state::machine_reset()
 {
-
 	MACHINE_RESET_CALL_MEMBER(common);
 
 	m_cvsd_shiftreg = 0;
@@ -975,7 +967,6 @@ void jangou_state::machine_reset()
 
 MACHINE_RESET_MEMBER(jangou_state,jngolady)
 {
-
 	MACHINE_RESET_CALL_MEMBER(common);
 
 	m_adpcm_byte = 0;

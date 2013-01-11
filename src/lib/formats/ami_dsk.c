@@ -174,7 +174,6 @@ bool adf_format::save(io_generic *io, floppy_image *image)
 				if(g32(trackbuf, track_size, i) == 0x44894489 &&
 					(g32(trackbuf, track_size, i+384) & 0x55555555) == checksum(trackbuf, track_size, i+32, 10) &&
 					(g32(trackbuf, track_size, i+448) & 0x55555555) == checksum(trackbuf, track_size, i+480, 256)) {
-
 					UINT32 head = ((g32(trackbuf, track_size, i+32) & 0x55555555) << 1) | (g32(trackbuf, track_size, i+64) & 0x55555555);
 					int sect = (head >> 8) & 0xff;
 					if(sect > (hd ? 22 : 11))

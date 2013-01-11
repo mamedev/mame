@@ -91,19 +91,16 @@ WRITE16_MEMBER(suna16_state::bestbest_flipscreen_w)
 
 void suna16_state::video_start()
 {
-
 	m_paletteram = auto_alloc_array(machine(), UINT16, machine().total_colors());
 }
 
 READ16_MEMBER(suna16_state::suna16_paletteram16_r)
 {
-
 	return m_paletteram[offset + m_color_bank * 256];
 }
 
 WRITE16_MEMBER(suna16_state::suna16_paletteram16_w)
 {
-
 	offset += m_color_bank * 256;
 	data = COMBINE_DATA(&m_paletteram[offset]);
 	palette_set_color_rgb( machine(), offset, pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
@@ -219,7 +216,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 suna16_state::screen_update_suna16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	/* Suna Quiz indicates the background is the last pen */
 	bitmap.fill(0xff, cliprect);
 	draw_sprites(machine(), bitmap, cliprect, m_spriteram, 0);

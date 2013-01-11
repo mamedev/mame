@@ -187,7 +187,6 @@ WRITE8_MEMBER(moo_state::sound_bankswitch_w)
 /* of RAM, but they put 0x10000 there. The CPU can access them all. */
 READ16_MEMBER(moo_state::K053247_scattered_word_r)
 {
-
 	if (offset & 0x0078)
 		return m_spriteram[offset];
 	else
@@ -199,7 +198,6 @@ READ16_MEMBER(moo_state::K053247_scattered_word_r)
 
 WRITE16_MEMBER(moo_state::K053247_scattered_word_w)
 {
-
 	if (offset & 0x0078)
 		COMBINE_DATA(m_spriteram + offset);
 	else
@@ -422,7 +420,6 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(moo_state,moo)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("soundcpu");
 	m_k054539 = machine().device("k054539");

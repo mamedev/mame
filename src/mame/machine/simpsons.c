@@ -13,7 +13,6 @@
 
 WRITE8_MEMBER(simpsons_state::simpsons_eeprom_w)
 {
-
 	if (data == 0xff)
 		return;
 
@@ -33,7 +32,6 @@ WRITE8_MEMBER(simpsons_state::simpsons_eeprom_w)
 
 WRITE8_MEMBER(simpsons_state::simpsons_coin_counter_w)
 {
-
 	/* bit 0,1 coin counters */
 	coin_counter_w(machine(), 0, data & 0x01);
 	coin_counter_w(machine(), 1, data & 0x02);
@@ -77,7 +75,6 @@ static void simpsons_postload(running_machine &machine)
 
 void simpsons_state::machine_start()
 {
-
 	m_generic_paletteram_8.allocate(0x1000);
 	m_xtraram = auto_alloc_array_clear(machine(), UINT8, 0x1000);
 	m_spriteram = auto_alloc_array_clear(machine(), UINT16, 0x1000 / 2);

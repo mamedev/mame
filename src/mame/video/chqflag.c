@@ -54,7 +54,6 @@ void chqflag_zoom_callback_1( running_machine &machine, int *code, int *color, i
 
 void chqflag_state::video_start()
 {
-
 	m_generic_paletteram_8.allocate(0x800);
 
 	m_sprite_colorbase = 0;
@@ -70,7 +69,6 @@ void chqflag_state::video_start()
 
 UINT32 chqflag_state::screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(0, cliprect);
 
 	k051316_zoom_draw(m_k051316_2, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);

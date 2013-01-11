@@ -24,14 +24,12 @@ TILE_GET_INFO_MEMBER(angelkds_state::get_tx_tile_info)
 
 WRITE8_MEMBER(angelkds_state::angelkds_txvideoram_w)
 {
-
 	m_txvideoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(angelkds_state::angelkds_txbank_write)
 {
-
 	if (m_txbank != data)
 	{
 		m_txbank = data;
@@ -55,14 +53,12 @@ TILE_GET_INFO_MEMBER(angelkds_state::get_bgtop_tile_info)
 
 WRITE8_MEMBER(angelkds_state::angelkds_bgtopvideoram_w)
 {
-
 	m_bgtopvideoram[offset] = data;
 	m_bgtop_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(angelkds_state::angelkds_bgtopbank_write)
 {
-
 	if (m_bgtopbank != data)
 	{
 		m_bgtopbank = data;
@@ -72,7 +68,6 @@ WRITE8_MEMBER(angelkds_state::angelkds_bgtopbank_write)
 
 WRITE8_MEMBER(angelkds_state::angelkds_bgtopscroll_write)
 {
-
 	m_bgtop_tilemap->set_scrollx(0, data);
 }
 
@@ -92,7 +87,6 @@ TILE_GET_INFO_MEMBER(angelkds_state::get_bgbot_tile_info)
 
 WRITE8_MEMBER(angelkds_state::angelkds_bgbotvideoram_w)
 {
-
 	m_bgbotvideoram[offset] = data;
 	m_bgbot_tilemap->mark_tile_dirty(offset);
 }
@@ -100,7 +94,6 @@ WRITE8_MEMBER(angelkds_state::angelkds_bgbotvideoram_w)
 
 WRITE8_MEMBER(angelkds_state::angelkds_bgbotbank_write)
 {
-
 	if (m_bgbotbank != data)
 	{
 		m_bgbotbank = data;
@@ -110,14 +103,12 @@ WRITE8_MEMBER(angelkds_state::angelkds_bgbotbank_write)
 
 WRITE8_MEMBER(angelkds_state::angelkds_bgbotscroll_write)
 {
-
 	m_bgbot_tilemap->set_scrollx(0, data);
 }
 
 
 WRITE8_MEMBER(angelkds_state::angelkds_layer_ctrl_write)
 {
-
 	m_layer_ctrl = data;
 }
 
@@ -245,7 +236,6 @@ WRITE8_MEMBER(angelkds_state::angelkds_paletteram_w)
 
 void angelkds_state::video_start()
 {
-
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(angelkds_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tx_tilemap->set_transparent_pen(0);
 

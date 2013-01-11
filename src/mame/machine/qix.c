@@ -204,7 +204,6 @@ const pia6821_interface slither_pia_2_intf =
 
 void qix_state::machine_reset()
 {
-
 	/* reset the coin counter register */
 	m_coinctrl = 0x00;
 }
@@ -212,7 +211,6 @@ void qix_state::machine_reset()
 
 MACHINE_START_MEMBER(qix_state,qixmcu)
 {
-
 	/* set up save states */
 	save_item(NAME(m_68705_port_in));
 	save_item(NAME(m_coinctrl));
@@ -323,7 +321,6 @@ READ8_MEMBER(qix_state::qix_video_firq_ack_r)
 
 READ8_MEMBER(qix_state::qixmcu_coin_r)
 {
-
 	logerror("6809:qixmcu_coin_r = %02X\n", m_68705_port_out[0]);
 	return m_68705_port_out[0];
 }
@@ -331,7 +328,6 @@ READ8_MEMBER(qix_state::qixmcu_coin_r)
 
 WRITE8_MEMBER(qix_state::qixmcu_coin_w)
 {
-
 	logerror("6809:qixmcu_coin_w = %02X\n", data);
 	/* this is a callback called by pia6821_device::write(), so I don't need to synchronize */
 	/* the CPUs - they have already been synchronized by qix_pia_w() */
@@ -341,7 +337,6 @@ WRITE8_MEMBER(qix_state::qixmcu_coin_w)
 
 WRITE8_MEMBER(qix_state::qixmcu_coinctrl_w)
 {
-
 	/* if (!(data & 0x04)) */
 	if (data & 0x04)
 	{
@@ -369,7 +364,6 @@ WRITE8_MEMBER(qix_state::qixmcu_coinctrl_w)
 
 READ8_MEMBER(qix_state::qix_68705_portA_r)
 {
-
 	UINT8 ddr = m_68705_ddr[0];
 	UINT8 out = m_68705_port_out[0];
 	UINT8 in = m_68705_port_in[0];
@@ -380,7 +374,6 @@ READ8_MEMBER(qix_state::qix_68705_portA_r)
 
 READ8_MEMBER(qix_state::qix_68705_portB_r)
 {
-
 	UINT8 ddr = m_68705_ddr[1];
 	UINT8 out = m_68705_port_out[1];
 	UINT8 in = (ioport("COIN")->read() & 0x0f) | ((ioport("COIN")->read() & 0x80) >> 3);
@@ -390,7 +383,6 @@ READ8_MEMBER(qix_state::qix_68705_portB_r)
 
 READ8_MEMBER(qix_state::qix_68705_portC_r)
 {
-
 	UINT8 ddr = m_68705_ddr[2];
 	UINT8 out = m_68705_port_out[2];
 	UINT8 in = (m_coinctrl & 0x08) | ((ioport("COIN")->read() & 0x70) >> 4);
@@ -407,7 +399,6 @@ READ8_MEMBER(qix_state::qix_68705_portC_r)
 
 WRITE8_MEMBER(qix_state::qix_68705_portA_w)
 {
-
 	logerror("68705:portA_w = %02X\n", data);
 	m_68705_port_out[0] = data;
 }
@@ -415,7 +406,6 @@ WRITE8_MEMBER(qix_state::qix_68705_portA_w)
 
 WRITE8_MEMBER(qix_state::qix_68705_portB_w)
 {
-
 	m_68705_port_out[1] = data;
 	coin_lockout_w(machine(), 0, (~data >> 6) & 1);
 	coin_counter_w(machine(), 0, (data >> 7) & 1);
@@ -424,7 +414,6 @@ WRITE8_MEMBER(qix_state::qix_68705_portB_w)
 
 WRITE8_MEMBER(qix_state::qix_68705_portC_w)
 {
-
 	m_68705_port_out[2] = data;
 }
 
@@ -486,7 +475,6 @@ WRITE8_MEMBER(qix_state::qix_coinctl_w)
 
 WRITE8_MEMBER(qix_state::slither_76489_1_w)
 {
-
 	/* write to the sound chip */
 	m_sn2->write(machine().device<legacy_cpu_device>("maincpu")->space(), 0, data);
 
@@ -506,13 +494,11 @@ WRITE8_MEMBER(qix_state::slither_76489_1_w)
 
 READ8_MEMBER(qix_state::slither_trak_lr_r)
 {
-
 	return ioport(m_flip ? "AN3" : "AN1")->read();
 }
 
 
 READ8_MEMBER(qix_state::slither_trak_ud_r)
 {
-
 	return ioport(m_flip ? "AN2" : "AN0")->read();
 }

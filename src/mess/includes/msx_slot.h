@@ -24,7 +24,6 @@ struct msx_slot_layout {
 
 #define MSX_LAYOUT_INIT(msx) \
 static const msx_slot_layout msx_slot_layout_##msx[] = {
-
 #define MSX_LAYOUT_SLOT(prim, sec, page, extend, type, size, option) \
 	{                               \
 		MSX_LAYOUT_SLOT_ENTRY,      \
@@ -161,7 +160,6 @@ extern const msx_slot msx_slot_list[];
 
 #define MSX_SLOT_START \
 const msx_slot msx_slot_list[] = {
-
 #define MSX_SLOT_ROM(type, ent) { \
 	type,                           \
 	MSX_MEM_ROM,                    \

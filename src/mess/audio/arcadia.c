@@ -102,7 +102,6 @@ void arcadia_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 			m_pos++;
 
 			if (m_pos >= m_size){
-
 				//calculate new noise bit ( taps: 0000T000T)
 				unsigned char newBit = m_lfsr & 1;         //first tap
 				newBit = (newBit ^ ((m_lfsr & 0x10)?1:0) );//xor with second tap

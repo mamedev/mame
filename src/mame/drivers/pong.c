@@ -579,7 +579,6 @@ private:
 
 void pong_state::machine_start()
 {
-
 	m_bitmap = auto_bitmap_rgb32_alloc(machine(),H_TOTAL * HRES_MULT,V_TOTAL);
 
 	m_maincpu->setup().register_callback("sound_cb", net_output_delegate(&pong_state::sound_cb, "pong_state::sound_cb", this));
@@ -607,7 +606,6 @@ UINT32 pong_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, c
 
 INPUT_CHANGED_MEMBER(pong_state::input_changed)
 {
-
 	static const double NE555_R = RES_K(5);
 	static const double PRE_R = RES_R(470);
 

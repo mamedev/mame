@@ -52,7 +52,6 @@ Notes:
 
 WRITE8_MEMBER(carjmbre_state::nmi_mask_w)
 {
-
 	m_nmi_mask = data & 1;
 }
 
@@ -185,14 +184,12 @@ GFXDECODE_END
 
 void carjmbre_state::machine_reset()
 {
-
 	m_flipscreen = 0;
 	m_bgcolor = 0;
 }
 
 INTERRUPT_GEN_MEMBER(carjmbre_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

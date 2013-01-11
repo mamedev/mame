@@ -370,7 +370,6 @@ WRITE8_MEMBER(hec2hrp_state::hector_sn_3000_w)
 /* Color Interface */
 WRITE8_MEMBER(hec2hrp_state::hector_color_a_w)
 {
-
 	if (data & 0x40)
 	{
 		/* Bit 6 => motor ON/OFF => for cassette state!*/
@@ -448,7 +447,6 @@ static cassette_image_device *cassette_device_image(running_machine &machine)
 /*******************  READ PIO 8255 *******************/
 READ8_MEMBER(hec2hrp_state::hector_io_8255_r)
 {
-
 	/* 8255 in mode 0 */
 	UINT8 data =0;
 	UINT8 data_l=0;

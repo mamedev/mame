@@ -474,11 +474,9 @@ void m20_state::install_memory()
 	state->membank("dram0_1c000")->set_base(memptr + 0x1c000);
 
 	if (m_memsize > 128 * 1024) {
-
 		/* install memory expansions (DRAM1..DRAM3) */
 
 		if (m_memsize < 256 * 1024) {
-
 			/* 32K expansion cards */
 
 			/* DRAM1, 32K */
@@ -565,7 +563,6 @@ void m20_state::install_memory()
 			}
 		}
 		else {
-
 			/* 128K expansion cards */
 
 			/* DRAM1, 128K */

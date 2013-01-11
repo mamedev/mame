@@ -61,8 +61,7 @@ const int AUTO_ALLOC_INPUT  = 65535;
 //**************************************************************************
 
 #define MCFG_SOUND_ADD(_tag, _type, _clock) \
-	MCFG_DEVICE_ADD(_tag, _type, _clock) \
-
+	MCFG_DEVICE_ADD(_tag, _type, _clock)
 #define MCFG_SOUND_MODIFY(_tag) \
 	MCFG_DEVICE_MODIFY(_tag)
 
@@ -76,18 +75,14 @@ const int AUTO_ALLOC_INPUT  = 65535;
 	MCFG_DEVICE_CONFIG(_config)
 
 #define MCFG_SOUND_ROUTE(_output, _target, _gain) \
-	device_sound_interface::static_add_route(*device, _output, _target, _gain); \
-
+	device_sound_interface::static_add_route(*device, _output, _target, _gain);
 #define MCFG_SOUND_ROUTE_EX(_output, _target, _gain, _input) \
-	device_sound_interface::static_add_route(*device, _output, _target, _gain, _input); \
-
+	device_sound_interface::static_add_route(*device, _output, _target, _gain, _input);
 #define MCFG_SOUND_ROUTES_RESET() \
-	device_sound_interface::static_reset_routes(*device); \
-
+	device_sound_interface::static_reset_routes(*device);
 
 #define MCFG_MIXER_ROUTE(_output, _target, _gain, _mixoutput) \
-	device_sound_interface::static_add_route(*device, _output, _target, _gain, AUTO_ALLOC_INPUT, _mixoutput); \
-
+	device_sound_interface::static_add_route(*device, _output, _target, _gain, AUTO_ALLOC_INPUT, _mixoutput);
 
 
 //**************************************************************************

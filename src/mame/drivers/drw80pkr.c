@@ -287,7 +287,6 @@ READ8_MEMBER(drw80pkr_state::drw80pkr_io_r)
 
 		if ((m_attract_mode == 0x01 && m_p1 == 0xef) || m_p1 == 0xf7)
 		{
-
 			// TODO: Get Input Port Values
 			kbdin = ((ioport("IN1")->read() & 0xaf ) << 8) + ioport("IN0")->read();
 

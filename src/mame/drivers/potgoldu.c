@@ -41,18 +41,15 @@ public:
 
 void potgold_state::video_start()
 {
-
 }
 
 static void scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
 {
-
 }
 
 
 void potgold_state::machine_reset()
 {
-
 }
 
 

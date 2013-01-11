@@ -10,7 +10,6 @@
 
 WRITE8_MEMBER(bsktball_state::bsktball_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -52,7 +51,6 @@ static void draw_sprites( running_machine &machine,  bitmap_ind16 &bitmap, const
 
 UINT32 bsktball_state::screen_update_bsktball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(machine(), bitmap, cliprect);
 	return 0;

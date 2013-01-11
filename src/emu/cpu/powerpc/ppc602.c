@@ -32,12 +32,10 @@ static void ppc_esa(UINT32 op)
 #ifndef PPC_DRC
 static void ppc_tlbli(UINT32 op)
 {
-
 }
 
 static void ppc_tlbld(UINT32 op)
 {
-
 }
 #endif
 

@@ -211,7 +211,6 @@ TILE_GET_INFO_MEMBER(looping_state::get_tile_info)
 
 void looping_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(looping_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 
 	m_bg_tilemap->set_scroll_cols(0x20);

@@ -506,7 +506,6 @@ GFXDECODE_END
 
 void atarifb_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_CTRLD));
@@ -530,7 +529,6 @@ void atarifb_state::machine_start()
 
 void atarifb_state::machine_reset()
 {
-
 	m_CTRLD = 0;
 	m_sign_x_1 = 0;
 	m_sign_y_1 = 0;

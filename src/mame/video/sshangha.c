@@ -30,7 +30,6 @@ void sshangha_state::video_start()
 
 UINT32 sshangha_state::screen_update_sshangha(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 	machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, m_spriteram, 0x800, true);
 
 	// I'm pretty sure only the original has the 2nd spriteram, used for the Japanese text on the 2nd scene (non-scrolling text) in the intro of the quest (3rd in JPN) mode
@@ -49,7 +48,6 @@ UINT32 sshangha_state::screen_update_sshangha(screen_device &screen, bitmap_rgb3
 		machine().device<decospr_device>("spritegen1")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0200, 0x0200, 0x100, 0x1ff);
 	}
 	else {
-
 		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 		machine().device<decospr_device>("spritegen1")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0200, 0x0200, 0x100, 0x1ff);
 		deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);

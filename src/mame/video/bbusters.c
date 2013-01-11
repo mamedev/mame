@@ -50,21 +50,18 @@ TILE_GET_INFO_MEMBER(bbusters_state::get_pf2_tile_info)
 
 WRITE16_MEMBER(bbusters_state::bbusters_video_w)
 {
-
 	COMBINE_DATA(&m_videoram[offset]);
 	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(bbusters_state::bbusters_pf1_w)
 {
-
 	COMBINE_DATA(&m_pf1_data[offset]);
 	m_pf1_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(bbusters_state::bbusters_pf2_w)
 {
-
 	COMBINE_DATA(&m_pf2_data[offset]);
 	m_pf2_tilemap->mark_tile_dirty(offset);
 }
@@ -73,7 +70,6 @@ WRITE16_MEMBER(bbusters_state::bbusters_pf2_w)
 
 VIDEO_START_MEMBER(bbusters_state,bbuster)
 {
-
 	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bbusters_state::get_bbusters_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_pf1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bbusters_state::get_pf1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
 	m_pf2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bbusters_state::get_pf2_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 128, 32);
@@ -84,7 +80,6 @@ VIDEO_START_MEMBER(bbusters_state,bbuster)
 
 VIDEO_START_MEMBER(bbusters_state,mechatt)
 {
-
 	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bbusters_state::get_bbusters_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_pf1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bbusters_state::get_pf1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
 	m_pf2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bbusters_state::get_pf2_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 256, 32);
@@ -160,7 +155,6 @@ static void bbusters_draw_block(running_machine &machine, bitmap_ind16 &dest,int
 	int sx, ex = state->m_scale_line_count;
 
 	while (state->m_scale_line_count) {
-
 		if (dy>=16 && dy<240) {
 			UINT16 *destline = &dest.pix16(dy);
 			UINT8 srcline=*state->m_scale_table_ptr;
@@ -273,7 +267,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const U
 
 UINT32 bbusters_state::screen_update_bbuster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_pf1_tilemap->set_scrollx(0, m_pf1_scroll_data[0]);
 	m_pf1_tilemap->set_scrolly(0, m_pf1_scroll_data[1]);
 	m_pf2_tilemap->set_scrollx(0, m_pf2_scroll_data[0]);
@@ -290,7 +283,6 @@ UINT32 bbusters_state::screen_update_bbuster(screen_device &screen, bitmap_ind16
 
 UINT32 bbusters_state::screen_update_mechatt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_pf1_tilemap->set_scrollx(0, m_pf1_scroll_data[0]);
 	m_pf1_tilemap->set_scrolly(0, m_pf1_scroll_data[1]);
 	m_pf2_tilemap->set_scrollx(0, m_pf2_scroll_data[0]);

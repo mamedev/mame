@@ -143,7 +143,6 @@ static void plot_pixel_pal(running_machine &machine, int x, int y, int addr)
 
 WRITE16_MEMBER(sliver_state::fifo_data_w)
 {
-
 	if (m_tmp_counter < 8)
 	{
 		COMBINE_DATA(&m_tempbuf[m_tmp_counter]);
@@ -199,7 +198,6 @@ static void blit_gfx(running_machine &machine)
 
 WRITE16_MEMBER(sliver_state::fifo_clear_w)
 {
-
 	m_bitmap_fg.fill(0);
 	m_fptr=0;
 	m_tmp_counter=0;
@@ -213,7 +211,6 @@ WRITE16_MEMBER(sliver_state::fifo_flush_w)
 
 WRITE16_MEMBER(sliver_state::jpeg1_w)
 {
-
 	COMBINE_DATA(&m_jpeg1);
 }
 
@@ -233,7 +230,6 @@ static void render_jpeg(running_machine &machine)
 
 	/* Access libJPEG */
 	{
-
 		struct jpeg_decompress_struct cinfo;
 		struct jpeg_error_mgr jerr;
 		JSAMPARRAY buffer;
@@ -276,7 +272,6 @@ static void render_jpeg(running_machine &machine)
 
 WRITE16_MEMBER(sliver_state::jpeg2_w)
 {
-
 	COMBINE_DATA(&m_jpeg2);
 
 	render_jpeg(machine());
@@ -285,13 +280,11 @@ WRITE16_MEMBER(sliver_state::jpeg2_w)
 
 WRITE16_MEMBER(sliver_state::io_offset_w)
 {
-
 	COMBINE_DATA(&m_io_offset);
 }
 
 WRITE16_MEMBER(sliver_state::io_data_w)
 {
-
 	if (m_io_offset < IO_SIZE)
 	{
 		int tmpx, tmpy;
@@ -369,14 +362,12 @@ ADDRESS_MAP_END
 
 void sliver_state::video_start()
 {
-
 	machine().primary_screen->register_screen_bitmap(m_bitmap_bg);
 	machine().primary_screen->register_screen_bitmap(m_bitmap_fg);
 }
 
 UINT32 sliver_state::screen_update_sliver(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 	copybitmap      (bitmap, m_bitmap_bg, 0, 0, 0, 0, cliprect);
 	copybitmap_trans(bitmap, m_bitmap_fg, 0, 0, 0, 0, cliprect, 0);
 	return 0;

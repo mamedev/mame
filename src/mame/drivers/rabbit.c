@@ -283,7 +283,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 	while( source>=finish )
 	{
-
 		xpos = (source[0]&0x00000fff);
 		ypos = (source[0]&0x0fff0000)>>16;
 

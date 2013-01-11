@@ -115,7 +115,6 @@ TILE_GET_INFO_MEMBER(armedf_state::get_bg_tile_info)
 
 VIDEO_START_MEMBER(armedf_state,terraf)
 {
-
 	m_sprite_offy = (m_scroll_type & 2 ) ? 0 : 128;  /* legion, legiono, crazy climber 2 */
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(armedf_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
@@ -137,7 +136,6 @@ VIDEO_START_MEMBER(armedf_state,terraf)
 
 VIDEO_START_MEMBER(armedf_state,armedf)
 {
-
 	m_sprite_offy = (m_scroll_type & 2 ) ? 0 : 128;  /* legion, legiono, crazy climber 2 */
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(armedf_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 32);
@@ -164,20 +162,17 @@ VIDEO_START_MEMBER(armedf_state,armedf)
 
 READ8_MEMBER(armedf_state::nb1414m4_text_videoram_r)
 {
-
 	return m_text_videoram[offset];
 }
 
 WRITE8_MEMBER(armedf_state::nb1414m4_text_videoram_w)
 {
-
 	m_text_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 READ8_MEMBER(armedf_state::armedf_text_videoram_r)
 {
-
 	return m_text_videoram[offset];
 }
 

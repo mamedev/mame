@@ -46,7 +46,6 @@ WRITE8_MEMBER(ojankohs_state::ojankohs_rombank_w)
 
 WRITE8_MEMBER(ojankohs_state::ojankoy_rombank_w)
 {
-
 	membank("bank1")->set_entry(data & 0x1f);
 
 	m_adpcm_reset = BIT(data, 5);
@@ -94,7 +93,6 @@ static void ojankohs_adpcm_int( device_t *device )
 
 WRITE8_MEMBER(ojankohs_state::ojankoc_ctrl_w)
 {
-
 	membank("bank1")->set_entry(data & 0x0f);
 
 	m_adpcm_reset = BIT(data, 4);
@@ -791,7 +789,6 @@ static const msm5205_interface msm5205_config =
 
 MACHINE_START_MEMBER(ojankohs_state,common)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_msm = machine().device("msm");
 
@@ -836,7 +833,6 @@ MACHINE_START_MEMBER(ojankohs_state,ojankoc)
 
 void ojankohs_state::machine_reset()
 {
-
 	m_portselect = 0;
 
 	m_adpcm_reset = 0;

@@ -390,7 +390,6 @@ static const ay8910_interface ay8910_config =
 
 void bking_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	/* video */
@@ -415,7 +414,6 @@ void bking_state::machine_start()
 
 MACHINE_START_MEMBER(bking_state,bking3)
 {
-
 	bking_state::machine_start();
 
 	/* misc */
@@ -426,7 +424,6 @@ MACHINE_START_MEMBER(bking_state,bking3)
 
 void bking_state::machine_reset()
 {
-
 	/* video */
 	m_pc3259_output[0] = 0;
 	m_pc3259_output[1] = 0;
@@ -452,7 +449,6 @@ void bking_state::machine_reset()
 
 MACHINE_RESET_MEMBER(bking_state,bking3)
 {
-
 	machine().device("mcu")->execute().set_input_line(0, CLEAR_LINE);
 
 	bking_state::machine_reset();

@@ -77,7 +77,6 @@ public:
 
 VIDEO_START_MEMBER(astrocorp_state,astrocorp)
 {
-
 	machine().primary_screen->register_screen_bitmap(m_bitmap);
 
 	save_item(NAME(m_bitmap));
@@ -157,7 +156,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 astrocorp_state::screen_update_astrocorp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (m_screen_enable & 1)
 		copybitmap(bitmap, m_bitmap, 0,0,0,0, cliprect);
 	else
@@ -173,7 +171,6 @@ UINT32 astrocorp_state::screen_update_astrocorp(screen_device &screen, bitmap_in
 
 WRITE16_MEMBER(astrocorp_state::astrocorp_draw_sprites_w)
 {
-
 	UINT16 old = m_draw_sprites;
 	UINT16 now = COMBINE_DATA(&m_draw_sprites);
 

@@ -167,7 +167,6 @@ UINT32 pcw_state::screen_update_pcw(screen_device &screen, bitmap_ind16 &bitmap,
 
 UINT32 pcw_state::screen_update_pcw_printer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	// printer output
 	INT32 feed;
 	rectangle rect(0, PCW_PRINTER_WIDTH - 1, 0, PCW_PRINTER_HEIGHT - 1);

@@ -111,11 +111,9 @@ enum
 	psxcpu_device::getcpu( *owner, cputag )->subdevice<psxdma_device>("dma")->install_write_handler( channel, handler );
 
 #define MCFG_PSX_GPU_READ_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_gpu_read_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &psxcpu_device::set_gpu_read_handler(*device, DEVCB2_##_devcb);
 #define MCFG_PSX_GPU_WRITE_HANDLER(_devcb) \
-	devcb = &psxcpu_device::set_gpu_write_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &psxcpu_device::set_gpu_write_handler(*device, DEVCB2_##_devcb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

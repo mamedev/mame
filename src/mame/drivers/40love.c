@@ -272,7 +272,6 @@ WRITE8_MEMBER(fortyl_state::fortyl_coin_counter_w)
 
 WRITE8_MEMBER(fortyl_state::bank_select_w)
 {
-
 	if ((data != 0x02) && (data != 0xfd))
 	{
 //      logerror("WRONG BANK SELECT = %x !!!!\n",data);
@@ -975,7 +974,6 @@ static const msm5232_interface msm5232_config =
 
 MACHINE_START_MEMBER(fortyl_state,40love)
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	/* video */
@@ -995,7 +993,6 @@ MACHINE_START_MEMBER(fortyl_state,40love)
 
 MACHINE_START_MEMBER(fortyl_state,undoukai)
 {
-
 	MACHINE_START_CALL_MEMBER(40love);
 
 	/* fake mcu */
@@ -1009,7 +1006,6 @@ MACHINE_START_MEMBER(fortyl_state,undoukai)
 
 MACHINE_RESET_MEMBER(fortyl_state,common)
 {
-
 	MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	/* video */

@@ -109,7 +109,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(speeddrv_state,speeddrv)
 {
-
 }
 
 GAME( 2004,  speeddrv,  0,  speeddrv,  speeddrv, speeddrv_state,  speeddrv,  ROT0,  "IGS",    "Speed Driver",    GAME_IS_SKELETON )

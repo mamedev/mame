@@ -73,7 +73,6 @@ TILE_GET_INFO_MEMBER(nycaptor_state::get_tile_info)
 
 void nycaptor_state::video_start()
 {
-
 	m_spriteram = auto_alloc_array(machine(), UINT8, 160);
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(nycaptor_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32 );
 
@@ -102,7 +101,6 @@ READ8_MEMBER(nycaptor_state::nycaptor_videoram_r)
 
 WRITE8_MEMBER(nycaptor_state::nycaptor_palette_w)
 {
-
 	if (m_gametype == 2) //colt
 		return;
 
@@ -114,7 +112,6 @@ WRITE8_MEMBER(nycaptor_state::nycaptor_palette_w)
 
 READ8_MEMBER(nycaptor_state::nycaptor_palette_r)
 {
-
 	if (offset & 0x100)
 		return m_generic_paletteram2_8[(offset & 0xff) + (m_palette_bank << 8)];
 	else
@@ -123,7 +120,6 @@ READ8_MEMBER(nycaptor_state::nycaptor_palette_r)
 
 WRITE8_MEMBER(nycaptor_state::nycaptor_gfxctrl_w)
 {
-
 	if (m_gfxctrl == data)
 		return;
 
@@ -239,7 +235,6 @@ static void nycaptor_setmask( running_machine &machine )
 
 UINT32 nycaptor_state::screen_update_nycaptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 #if NYCAPTOR_DEBUG
 	nycaptor_setmask(machine());
 	if (m_mask & 0x1000)

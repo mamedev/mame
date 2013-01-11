@@ -147,7 +147,6 @@ void lastfght_state::video_start()
 
 UINT32 lastfght_state::screen_update_lastfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 #ifdef MAME_DEBUG
 #if 1
 	// gfx roms viewer (toggle with enter, use pgup/down to browse)
@@ -189,7 +188,6 @@ UINT32 lastfght_state::screen_update_lastfght(screen_device &screen, bitmap_ind1
 
 WRITE16_MEMBER(lastfght_state::colordac_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		m_colorram[m_clr_offset] = data;
@@ -211,7 +209,6 @@ WRITE16_MEMBER(lastfght_state::colordac_w)
 // high byte of a 16 bit register
 WRITE16_MEMBER(lastfght_state::lastfght_hi_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 		logerror("%06x: 600000.b = %02x\n", space.device().safe_pc(), data >> 8);
 	if (ACCESSING_BITS_0_7)
@@ -224,7 +221,6 @@ WRITE16_MEMBER(lastfght_state::lastfght_hi_w)
 // screen x
 WRITE16_MEMBER(lastfght_state::lastfght_x_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 		logerror("%06x: 800008.b = %02x\n", space.device().safe_pc(), data >> 8);
 	if (ACCESSING_BITS_0_7)
@@ -237,7 +233,6 @@ WRITE16_MEMBER(lastfght_state::lastfght_x_w)
 // screen y, screen width - 1
 WRITE16_MEMBER(lastfght_state::lastfght_yw_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 	{
 		m_y = m_hi | (data >> 8);
@@ -253,7 +248,6 @@ WRITE16_MEMBER(lastfght_state::lastfght_yw_w)
 // screen height - 1
 WRITE16_MEMBER(lastfght_state::lastfght_h_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 	{
 		m_h = m_hi | (data >> 8);
@@ -266,7 +260,6 @@ WRITE16_MEMBER(lastfght_state::lastfght_h_w)
 // source delta x << 6, source x << 6
 WRITE16_MEMBER(lastfght_state::lastfght_sx_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 	{
 		m_dsx = m_hi | (data >> 8);
@@ -282,7 +275,6 @@ WRITE16_MEMBER(lastfght_state::lastfght_sx_w)
 // source y << 6, source y1 << 6
 WRITE16_MEMBER(lastfght_state::lastfght_sy_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 	{
 		m_sy = m_hi | (data >> 8);
@@ -298,7 +290,6 @@ WRITE16_MEMBER(lastfght_state::lastfght_sy_w)
 // source rom (0x200000 bytes), source page (512x256 bytes)
 WRITE16_MEMBER(lastfght_state::lastfght_sr_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 	{
 		m_sp = (m_hi >> 8) >> 4;
@@ -314,7 +305,6 @@ WRITE16_MEMBER(lastfght_state::lastfght_sr_w)
 // source x1 << 6, source delta y << 6
 WRITE16_MEMBER(lastfght_state::lastfght_sd_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 	{
 		m_sx1 = m_hi | (data >> 8);
@@ -330,7 +320,6 @@ WRITE16_MEMBER(lastfght_state::lastfght_sd_w)
 // start blit
 WRITE16_MEMBER(lastfght_state::lastfght_blit_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 	{
 		int x, y, addr;
@@ -368,7 +357,6 @@ WRITE16_MEMBER(lastfght_state::lastfght_blit_w)
 // toggle framebuffer
 WRITE16_MEMBER(lastfght_state::lastfght_dest_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 		m_dest ^= 1;
 }
@@ -530,13 +518,11 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(lastfght_state::unknown_interrupt)
 {
-
 	m_maincpu->set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
 }
 
 void lastfght_state::machine_start()
 {
-
 	save_item(NAME(m_clr_offset));
 	save_item(NAME(m_dest));
 	save_item(NAME(m_hi));
@@ -557,7 +543,6 @@ void lastfght_state::machine_start()
 
 void lastfght_state::machine_reset()
 {
-
 	m_clr_offset = 0;
 	m_dest = 0;
 	m_hi = 0;

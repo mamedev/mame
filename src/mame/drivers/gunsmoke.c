@@ -285,7 +285,6 @@ void gunsmoke_state::machine_start()
 
 void gunsmoke_state::machine_reset()
 {
-
 	m_chon = 0;
 	m_objon = 0;
 	m_bgon = 0;

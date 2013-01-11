@@ -9,7 +9,6 @@
 
 WRITE16_MEMBER(suprslam_state::suprslam_screen_videoram_w)
 {
-
 	m_screen_videoram[offset] = data;
 	m_screen_tilemap->mark_tile_dirty(offset);
 }
@@ -30,7 +29,6 @@ TILE_GET_INFO_MEMBER(suprslam_state::get_suprslam_tile_info)
 /* BG LAYER */
 WRITE16_MEMBER(suprslam_state::suprslam_bg_videoram_w)
 {
-
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -57,7 +55,6 @@ UINT32 suprslam_state::suprslam_tile_callback( UINT32 code )
 
 void suprslam_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_screen_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(suprslam_state::get_suprslam_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 

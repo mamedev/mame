@@ -191,7 +191,6 @@ INPUT_PORTS_END
 
 void cdi_state::machine_start()
 {
-
 	scc68070_register_globals(machine(), &m_scc68070_regs);
 }
 

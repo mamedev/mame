@@ -43,7 +43,6 @@ READ8_MEMBER(ladyfrog_state::ladyfrog_videoram_r)
 
 WRITE8_MEMBER(ladyfrog_state::ladyfrog_palette_w)
 {
-
 	if (offset & 0x100)
 		paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w(space, (offset & 0xff) + (m_palette_bank << 8), data);
 	else
@@ -52,7 +51,6 @@ WRITE8_MEMBER(ladyfrog_state::ladyfrog_palette_w)
 
 READ8_MEMBER(ladyfrog_state::ladyfrog_palette_r)
 {
-
 	if (offset & 0x100)
 		return m_generic_paletteram2_8[(offset & 0xff) + (m_palette_bank << 8)];
 	else
@@ -87,7 +85,6 @@ READ8_MEMBER(ladyfrog_state::ladyfrog_scrlram_r)
 
 WRITE8_MEMBER(ladyfrog_state::ladyfrog_scrlram_w)
 {
-
 	m_scrlram[offset] = data;
 	m_bg_tilemap->set_scrolly(offset, data);
 }
@@ -129,7 +126,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 VIDEO_START_MEMBER(ladyfrog_state,ladyfrog_common)
 {
-
 	m_spriteram = auto_alloc_array(machine(), UINT8, 160);
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ladyfrog_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
@@ -143,7 +139,6 @@ VIDEO_START_MEMBER(ladyfrog_state,ladyfrog_common)
 
 void ladyfrog_state::video_start()
 {
-
 	// weird, there are sprite tiles at 0x000 and 0x400, but they don't contain all the sprites!
 	m_spritetilebase = 0x800;
 	VIDEO_START_CALL_MEMBER(ladyfrog_common);
@@ -151,7 +146,6 @@ void ladyfrog_state::video_start()
 
 VIDEO_START_MEMBER(ladyfrog_state,toucheme)
 {
-
 	m_spritetilebase = 0x000;
 	VIDEO_START_CALL_MEMBER(ladyfrog_common);
 }
@@ -159,7 +153,6 @@ VIDEO_START_MEMBER(ladyfrog_state,toucheme)
 
 UINT32 ladyfrog_state::screen_update_ladyfrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(machine(), bitmap, cliprect);
 	return 0;

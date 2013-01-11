@@ -11,16 +11,14 @@ INPUT_PORTS_EXTERN( mpu4 );
 
 #define M4RHFEVC_EXTRA_ROMS \
 	ROM_REGION( 0x080000, "msm6376", 0 ) \
-	ROM_LOAD( "rhfs1.bin", 0x0000, 0x03de5e, CRC(0dddd05f) SHA1(908a58752fb1cf76667695a40bcaa7778201c3a2) ) \
-
+	ROM_LOAD( "rhfs1.bin", 0x0000, 0x03de5e, CRC(0dddd05f) SHA1(908a58752fb1cf76667695a40bcaa7778201c3a2) )
 #define M4RHFEVC_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHFEVC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 
 M4RHFEVC_SET( 199?, m4rhfevc,       0,          "rhb6a58e.bin", 0x0000, 0x010000, CRC(c5a1ec02) SHA1(3a4dc552fffc34673e590e903a5c15a409f9aeec), "Concept Games Ltd","Red Hot Fever (Concept Games Ltd) (MPU4) (set 1)" )
@@ -54,16 +52,14 @@ M4RHFEVC_SET( 199?, m4rhfevc__y,    m4rhfevc,   "lxled1.bin",   0x0000, 0x010000
 
 #define M4PULWNC_EXTRA_ROMS \
 	ROM_REGION( 0x080000, "msm6376", 0 ) \
-	ROM_LOAD( "paws1.bin", 0x0000, 0x03e72f, CRC(124b14ba) SHA1(b6b84c306c83b3159d88992ad88a10aff161fce8) ) \
-
+	ROM_LOAD( "paws1.bin", 0x0000, 0x03e72f, CRC(124b14ba) SHA1(b6b84c306c83b3159d88992ad88a10aff161fce8) )
 #define M4PULWNC_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PULWNC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 
 
@@ -104,16 +100,14 @@ M4PULWNC_SET( 199?, m4pulwnc__4,    m4pulwnc,   "tchm02.bin",   0x0000, 0x010000
 
 #define M4SPNWNC_EXTRA_ROMS \
 	ROM_REGION( 0x080000, "msm6376", 0 ) \
-	ROM_LOAD( "sawsnd1", 0x0000, 0x080000, CRC(7957381f) SHA1(8fd45e5bf67248607f7d98032e08516ded493d74) ) \
-
+	ROM_LOAD( "sawsnd1", 0x0000, 0x080000, CRC(7957381f) SHA1(8fd45e5bf67248607f7d98032e08516ded493d74) )
 #define M4SPNWNC_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SPNWNC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 M4SPNWNC_SET( 199?, m4spnwnc,       0,          "saw01.bin", 0x0000, 0x010000, CRC(5350e50e) SHA1(0d7ba3280eddb4400545729c55bcfaff7918d553), "Concept Games Ltd","Spin-A-Win (Concept Games Ltd) (MPU4) (set 1)" )
 M4SPNWNC_SET( 199?, m4spnwnc__a,    m4spnwnc,   "saw02.bin", 0x0000, 0x010000, CRC(daf85100) SHA1(ff89adb0d6530bcf5ff0807f48c6008198948d50), "Concept Games Ltd","Spin-A-Win (Concept Games Ltd) (MPU4) (set 2)" )
@@ -121,16 +115,14 @@ M4SPNWNC_SET( 199?, m4spnwnc__b,    m4spnwnc,   "saw03.bin", 0x0000, 0x010000, C
 
 #define M4NUDGWC_EXTRA_ROMS \
 	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "naws1.bin", 0x0000, 0x02373f, CRC(b2ea8c50) SHA1(a02181f8f4636e69287073f4ffb8604ff2f14b9c) ) \
-
+	ROM_LOAD( "naws1.bin", 0x0000, 0x02373f, CRC(b2ea8c50) SHA1(a02181f8f4636e69287073f4ffb8604ff2f14b9c) )
 #define M4NUDGWC_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4NUDGWC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4default_big ,ROT0,company,title,GAME_FLAGS )
 
 M4NUDGWC_SET( 199?, m4nudgwc,       0,          "naw02.bin",    0x0000, 0x010000, CRC(eb3ff27d) SHA1(ff0a80a75162380c6cc2d1b31f0bb0579faa1a2c), "Concept Games Ltd","Nudge-A-Win (Concept Games Ltd) (MPU4) (set 1)" )
 M4NUDGWC_SET( 199?, m4nudgwc__a,    m4nudgwc,   "nawhc6.bin",   0x0000, 0x010000, CRC(f9389823) SHA1(e1db35200c9ed9d59cf817901cf75bdbb48507b2), "Concept Games Ltd","Nudge-A-Win (Concept Games Ltd) (MPU4) (set 2)" )

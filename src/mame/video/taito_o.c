@@ -141,7 +141,6 @@ static void parentj_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 
 UINT32 taitoo_state::screen_update_parentj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	tc0080vco_tilemap_update(m_tc0080vco);
 
 	bitmap.fill(0, cliprect);

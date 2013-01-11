@@ -6,7 +6,6 @@
 
 namespace DSP56K
 {
-
 /* IPR Accessor Implementations */
 void IPR_set(dsp56k_core* cpustate, UINT16 value)
 {

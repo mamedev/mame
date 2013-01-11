@@ -207,7 +207,6 @@ static const sn76496_config psg_intf =
 
 void exedexes_state::machine_start()
 {
-
 	save_item(NAME(m_chon));
 	save_item(NAME(m_objon));
 	save_item(NAME(m_sc1on));
@@ -216,7 +215,6 @@ void exedexes_state::machine_start()
 
 void exedexes_state::machine_reset()
 {
-
 	m_chon = 0;
 	m_objon = 0;
 	m_sc1on = 0;

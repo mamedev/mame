@@ -329,7 +329,6 @@ static const ym3812_interface ym3812_config =
 
 void crospang_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_bestri_tilebank));
@@ -338,7 +337,6 @@ void crospang_state::machine_start()
 
 void crospang_state::machine_reset()
 {
-
 	m_bestri_tilebank = 0;
 
 }

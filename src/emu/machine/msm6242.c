@@ -67,7 +67,6 @@ msm6242_device::msm6242_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, msm6242, "msm6242", tag, owner, clock),
 		device_rtc_interface(mconfig, *this)
 {
-
 }
 
 

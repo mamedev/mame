@@ -31,7 +31,6 @@
 class softbox_device :  public device_t,
 						public device_ieee488_interface
 {
-
 public:
 	// construction/destruction
 	softbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

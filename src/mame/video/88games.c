@@ -56,7 +56,6 @@ void _88games_zoom_callback( running_machine &machine, int *code, int *color, in
 
 UINT32 _88games_state::screen_update_88games(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	k052109_tilemap_update(m_k052109);
 
 	if (m_k88games_priority)

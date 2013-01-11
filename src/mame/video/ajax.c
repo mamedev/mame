@@ -70,7 +70,6 @@ void ajax_zoom_callback( running_machine &machine, int *code, int *color, int *f
 
 void ajax_state::video_start()
 {
-
 	m_layer_colorbase[0] = 64;
 	m_layer_colorbase[1] = 0;
 	m_layer_colorbase[2] = 32;
@@ -88,7 +87,6 @@ void ajax_state::video_start()
 
 UINT32 ajax_state::screen_update_ajax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	k052109_tilemap_update(m_k052109);
 
 	machine().priority_bitmap.fill(0, cliprect);

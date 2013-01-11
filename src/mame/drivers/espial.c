@@ -46,7 +46,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 void espial_state::machine_reset()
 {
-
 	m_flipscreen = 0;
 
 	m_main_nmi_enabled = FALSE;
@@ -55,7 +54,6 @@ void espial_state::machine_reset()
 
 void espial_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -89,7 +87,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(espial_state::espial_scanline)
 
 INTERRUPT_GEN_MEMBER(espial_state::espial_sound_nmi_gen)
 {
-
 	if (m_sound_nmi_enabled)
 		nmi_line_pulse(device);
 }

@@ -219,7 +219,6 @@ static UINT8 duart_r(running_machine &machine, int chip, int reg)
 			}
 			else
 			{
-
 			}
 			break;
 		}

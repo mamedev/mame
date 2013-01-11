@@ -109,7 +109,6 @@ static void set_pixel_lookup(bbc_state *state)
 
 WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
 {
-
 	// Make sure vpos is never <0 2008-10-11 PHS.
 	int vpos=machine().primary_screen->vpos();
 	if(vpos==0)
@@ -320,7 +319,6 @@ WRITE8_MEMBER(bbc_state::bbc_6845_w)
 
 READ8_MEMBER(bbc_state::bbc_6845_r)
 {
-
 	mc6845_device *mc6845 = machine().device<mc6845_device>("mc6845");
 
 	switch (offset&1)

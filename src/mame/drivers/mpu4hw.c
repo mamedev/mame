@@ -527,7 +527,6 @@ READ8_MEMBER(mpu4_state::bankswitch_r)
 
 WRITE8_MEMBER(mpu4_state::bankset_w)
 {
-
 //  printf("bankset_w %02x\n", data);
 
 	// m_pageset is never even set??
@@ -2253,7 +2252,6 @@ WRITE8_MEMBER(mpu4_state::bwb_characteriser_w)
 
 READ8_MEMBER(mpu4_state::bwb_characteriser_r)
 {
-
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 
 

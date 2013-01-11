@@ -63,17 +63,13 @@
 
 // configure devices
 #define MCFG_DEVICE_CONFIG(_config) \
-	device_t::static_set_static_config(*device, &(_config)); \
-
+	device_t::static_set_static_config(*device, &(_config));
 #define MCFG_DEVICE_CONFIG_CLEAR() \
-	device_t::static_set_static_config(*device, NULL); \
-
+	device_t::static_set_static_config(*device, NULL);
 #define MCFG_DEVICE_CLOCK(_clock) \
-	device_t::static_set_clock(*device, _clock); \
-
+	device_t::static_set_clock(*device, _clock);
 #define MCFG_DEVICE_INPUT_DEFAULTS(_config) \
-	device_t::static_set_input_default(*device, DEVICE_INPUT_DEFAULTS_NAME(_config)); \
-
+	device_t::static_set_input_default(*device, DEVICE_INPUT_DEFAULTS_NAME(_config));
 
 // macros for defining read_line/write_line functions
 #define READ_LINE_DEVICE_HANDLER(name)      int  name(ATTR_UNUSED device_t *device)

@@ -140,7 +140,6 @@ WRITE8_MEMBER(albazc_state::hanaroku_out_2_w)
 
 WRITE8_MEMBER(albazc_state::albazc_vregs_w)
 {
-
 	#ifdef UNUSED_FUNCTION
 	{
 		static UINT8 x[5];

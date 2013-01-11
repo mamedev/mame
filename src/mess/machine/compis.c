@@ -1302,7 +1302,6 @@ static IRQ_CALLBACK( compis_irq_callback )
 
 DRIVER_INIT_MEMBER(compis_state,compis)
 {
-
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(compis_irq_callback);
 	memset (&m_compis, 0, sizeof (m_compis) );
 }

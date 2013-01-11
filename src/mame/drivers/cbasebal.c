@@ -29,7 +29,6 @@
 
 WRITE8_MEMBER(cbasebal_state::cbasebal_bankswitch_w)
 {
-
 	/* bits 0-4 select ROM bank */
 	//logerror("%04x: bankswitch %02x\n", space.device().safe_pc(), data);
 	membank("bank1")->set_entry(data & 0x1f);
@@ -43,7 +42,6 @@ WRITE8_MEMBER(cbasebal_state::cbasebal_bankswitch_w)
 
 READ8_MEMBER(cbasebal_state::bankedram_r)
 {
-
 	switch (m_rambank)
 	{
 	case 2:
@@ -61,7 +59,6 @@ READ8_MEMBER(cbasebal_state::bankedram_r)
 
 WRITE8_MEMBER(cbasebal_state::bankedram_w)
 {
-
 	switch (m_rambank)
 	{
 	case 2:
@@ -241,7 +238,6 @@ GFXDECODE_END
 
 void cbasebal_state::machine_start()
 {
-
 	membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	save_item(NAME(m_rambank));
@@ -257,7 +253,6 @@ void cbasebal_state::machine_start()
 
 void cbasebal_state::machine_reset()
 {
-
 	m_rambank = 0;
 	m_tilebank = 0;
 	m_spritebank = 0;

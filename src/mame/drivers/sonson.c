@@ -227,7 +227,6 @@ GFXDECODE_END
 
 void sonson_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_last_irq));
@@ -235,7 +234,6 @@ void sonson_state::machine_start()
 
 void sonson_state::machine_reset()
 {
-
 	m_last_irq = 0;
 }
 

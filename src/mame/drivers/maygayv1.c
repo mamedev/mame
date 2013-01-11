@@ -292,7 +292,6 @@ READ16_MEMBER(maygayv1_state::i82716_r)
 
 void maygayv1_state::video_start()
 {
-
 }
 
 
@@ -1236,14 +1235,12 @@ ROM_END
 	ROM_REGION( 0x10000, "soundcpu", 0 ) \
 	ROM_LOAD( "reels.bin", 0x00000, 0x10000, NO_DUMP ) \
 	ROM_REGION( 0x20000, "upd", 0 ) \
-	ROM_LOAD( "upd.bin", 0x00000, 0x20000, NO_DUMP ) \
-
+	ROM_LOAD( "upd.bin", 0x00000, 0x20000, NO_DUMP )
 #define MV1_MISSING_ROMSU1U4 \
 	ROM_LOAD16_BYTE( "u2.bin", 0x80000, 0x20000, NO_DUMP ) \
 	ROM_LOAD16_BYTE( "u1.bin", 0x80001, 0x20000, NO_DUMP ) \
 	ROM_LOAD16_BYTE( "u4.bin", 0xc0000, 0x20000, NO_DUMP ) \
-	ROM_LOAD16_BYTE( "u3.bin", 0xc0001, 0x20000, NO_DUMP ) \
-
+	ROM_LOAD16_BYTE( "u3.bin", 0xc0001, 0x20000, NO_DUMP )
 
 ROM_START( mv1bon )
 	ROM_REGION( 0x100000, "maincpu", 0 )

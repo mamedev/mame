@@ -42,7 +42,6 @@ ramdac_device::ramdac_device(const machine_config &mconfig, const char *tag, dev
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(ramdac_palram))
 {
-
 }
 
 //-------------------------------------------------

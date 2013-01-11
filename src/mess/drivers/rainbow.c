@@ -197,7 +197,6 @@ INPUT_PORTS_END
 
 void rainbow_state::machine_reset()
 {
-
 	m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	m_zflip = true;
@@ -393,7 +392,6 @@ WRITE_LINE_MEMBER(rainbow_state::kbd_txready_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(rainbow_state::keyboard_tick)
 {
-
 	m_kbd8251->transmit_clock();
 	m_kbd8251->receive_clock();
 }

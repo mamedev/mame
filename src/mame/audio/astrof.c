@@ -181,7 +181,6 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(astrof_state::tomahawk_audio_w)
 {
-
 	/* D0 - sonar */
 
 	/* D1 - UFO explosion */

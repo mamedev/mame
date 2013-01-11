@@ -108,7 +108,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(eolith_state::eolith_speedup)
 
 CUSTOM_INPUT_MEMBER(eolith_state::eolith_speedup_getvblank)
 {
-
 //  printf("%s:eolith speedup_read data %02x\n",machine().describe_context(), eolith_vblank);
 
 

@@ -513,7 +513,6 @@ static const tms34010_config tms_config =
 
 void skimaxx_state::machine_reset()
 {
-
 }
 
 /*************************************

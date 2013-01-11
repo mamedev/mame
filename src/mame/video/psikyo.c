@@ -94,7 +94,6 @@ TILE_GET_INFO_MEMBER(psikyo_state::get_tile_info_1)
 
 WRITE32_MEMBER(psikyo_state::psikyo_vram_0_w)
 {
-
 	COMBINE_DATA(&m_vram_0[offset]);
 	if (ACCESSING_BITS_16_31)
 	{
@@ -115,7 +114,6 @@ WRITE32_MEMBER(psikyo_state::psikyo_vram_0_w)
 
 WRITE32_MEMBER(psikyo_state::psikyo_vram_1_w)
 {
-
 	COMBINE_DATA(&m_vram_1[offset]);
 	if (ACCESSING_BITS_16_31)
 	{
@@ -159,7 +157,6 @@ void psikyo_switch_banks( running_machine &machine, int tmap, int bank )
 
 VIDEO_START_MEMBER(psikyo_state,psikyo)
 {
-
 	/* The Hardware is Capable of Changing the Dimensions of the Tilemaps, its safer to create
 	   the various sized tilemaps now as opposed to later */
 

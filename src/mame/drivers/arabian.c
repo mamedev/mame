@@ -60,7 +60,6 @@
 
 WRITE8_MEMBER(arabian_state::ay8910_porta_w)
 {
-
 	/*
 	    bit 7 = ENA
 	    bit 6 = ENB
@@ -99,7 +98,6 @@ WRITE8_MEMBER(arabian_state::ay8910_portb_w)
 
 READ8_MEMBER(arabian_state::mcu_port_r_r)
 {
-
 	UINT8 val = m_mcu_port_r[offset];
 
 	/* RAM mode is enabled */
@@ -111,7 +109,6 @@ READ8_MEMBER(arabian_state::mcu_port_r_r)
 
 WRITE8_MEMBER(arabian_state::mcu_port_r_w)
 {
-
 	if (offset == 0)
 	{
 		UINT32 ram_addr = ((m_mcu_port_p & 7) << 8) | m_mcu_port_o;
@@ -342,7 +339,6 @@ static const ay8910_interface ay8910_config =
 
 void arabian_state::machine_start()
 {
-
 	save_item(NAME(m_mcu_port_o));
 	save_item(NAME(m_mcu_port_p));
 	save_item(NAME(m_mcu_port_r));
@@ -350,7 +346,6 @@ void arabian_state::machine_start()
 
 void arabian_state::machine_reset()
 {
-
 	m_video_control = 0;
 }
 

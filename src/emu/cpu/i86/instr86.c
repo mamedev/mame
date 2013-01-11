@@ -2954,7 +2954,6 @@ static void PREFIX86(_f6pre)(i8086_state *cpustate)
 	case 0x38:  /* IDIV AL, Ew */
 		ICOUNT -= (ModRM >= 0xc0) ? timing.idiv_r8 : timing.idiv_m8;
 		{
-
 			INT16 result;
 
 			result = cpustate->regs.w[AX];

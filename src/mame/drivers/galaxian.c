@@ -841,7 +841,6 @@ static void monsterz_set_latch(running_machine &machine)
 
 WRITE8_MEMBER(galaxian_state::monsterz_porta_1_w)
 {
-
 	// d7 high: set latch + advance address high bits (and reset low bits?)
 	if (data & 0x80)
 	{
@@ -852,7 +851,6 @@ WRITE8_MEMBER(galaxian_state::monsterz_porta_1_w)
 
 WRITE8_MEMBER(galaxian_state::monsterz_portb_1_w)
 {
-
 	// d3 high: set latch + advance address low bits
 	if (data & 0x08)
 	{
@@ -2932,7 +2930,6 @@ void galaxian_state::tenspot_set_game_bank(running_machine& machine, int bank, i
 
 	if (from_game)
 	{
-
 		for (x=0;x<0x200;x++)
 		{
 			machine.gfx[0]->mark_dirty(x);
@@ -3218,7 +3215,6 @@ DRIVER_INIT_MEMBER(galaxian_state,mshuttlj)
 
 DRIVER_INIT_MEMBER(galaxian_state,fantastc)
 {
-
 	/* video extensions */
 	common_init(machine(), galaxian_draw_bullet, galaxian_draw_background, NULL, upper_extend_sprite_info);
 

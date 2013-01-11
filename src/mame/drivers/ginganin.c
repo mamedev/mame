@@ -228,7 +228,6 @@ GFXDECODE_END
 
 void ginganin_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_layers_ctrl));
@@ -237,7 +236,6 @@ void ginganin_state::machine_start()
 
 void ginganin_state::machine_reset()
 {
-
 	m_layers_ctrl = 0;
 	m_flipscreen = 0;
 }

@@ -70,7 +70,6 @@ public:
 
 void jongkyo_state::video_start()
 {
-
 }
 
 UINT32 jongkyo_state::screen_update_jongkyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -474,7 +473,6 @@ static const ay8910_interface ay8910_config =
 
 void jongkyo_state::machine_start()
 {
-
 	save_item(NAME(m_videoram2));
 	save_item(NAME(m_rom_bank));
 	save_item(NAME(m_mux_data));
@@ -482,7 +480,6 @@ void jongkyo_state::machine_start()
 
 void jongkyo_state::machine_reset()
 {
-
 	m_rom_bank = 0;
 	m_mux_data = 0;
 }

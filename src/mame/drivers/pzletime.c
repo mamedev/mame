@@ -84,7 +84,6 @@ TILE_GET_INFO_MEMBER(pzletime_state::get_txt_tile_info)
 
 void pzletime_state::video_start()
 {
-
 	m_mid_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pzletime_state::get_mid_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 16);
 	m_txt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pzletime_state::get_txt_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 
@@ -176,7 +175,6 @@ WRITE16_MEMBER(pzletime_state::eeprom_w)
 
 WRITE16_MEMBER(pzletime_state::ticket_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 		m_ticket = data & 1;
 }
@@ -309,13 +307,11 @@ void pzletime_state::palette_init()
 
 void pzletime_state::machine_start()
 {
-
 	save_item(NAME(m_ticket));
 }
 
 void pzletime_state::machine_reset()
 {
-
 	m_ticket = 0;
 }
 

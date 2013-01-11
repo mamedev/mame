@@ -63,7 +63,6 @@
 
 INTERRUPT_GEN_MEMBER(tutankhm_state::tutankhm_interrupt)
 {
-
 	/* flip flops cause the interrupt to be signalled every other frame */
 	m_irq_toggle ^= 1;
 	if (m_irq_toggle && m_irq_enable)
@@ -73,7 +72,6 @@ INTERRUPT_GEN_MEMBER(tutankhm_state::tutankhm_interrupt)
 
 WRITE8_MEMBER(tutankhm_state::irq_enable_w)
 {
-
 	m_irq_enable = data & 1;
 	if (!m_irq_enable)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -195,7 +193,6 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(tutankhm_state,tutankhm)
 {
-
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x1000);
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
@@ -208,7 +205,6 @@ MACHINE_START_MEMBER(tutankhm_state,tutankhm)
 
 MACHINE_RESET_MEMBER(tutankhm_state,tutankhm)
 {
-
 	m_irq_toggle = 0;
 	m_irq_enable = 0;
 	m_flip_x = 0;

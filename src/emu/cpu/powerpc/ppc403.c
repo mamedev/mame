@@ -489,27 +489,22 @@ static void ppc403_dma_set_irq_line(int dma, int state)
 #ifndef PPC_DRC
 static void ppc_dccci(UINT32 op)
 {
-
 }
 
 static void ppc_dcread(UINT32 op)
 {
-
 }
 
 static void ppc_icbt(UINT32 op)
 {
-
 }
 
 static void ppc_iccci(UINT32 op)
 {
-
 }
 
 static void ppc_icread(UINT32 op)
 {
-
 }
 
 static void ppc_rfci(UINT32 op)
@@ -732,7 +727,6 @@ void ppc403_install_spu_tx_handler(SPU_TX_HANDLER tx_handler)
 
 void ppc403_spu_rx_dma(UINT8 *data, int length)
 {
-
 }
 
 void ppc403_install_spu_rx_dma_handler(PPC_DMA_HANDLER rx_dma_handler, UINT8 *buffer)
@@ -797,7 +791,6 @@ static void ppc403_dma_exec(int ch)
 				}
 				else                            /* mem to peripheral */
 				{
-
 					/* check if the serial port is hooked to channel 2 or 3 */
 					if( (ch == 2 && ((ppc.spu.sptc >> 5) & 0x3) == 2) ||
 						(ch == 3 && ((ppc.spu.sptc >> 5) & 0x3) == 3) )

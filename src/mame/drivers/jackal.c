@@ -136,7 +136,6 @@ WRITE8_MEMBER(jackal_state::jackal_zram_w)
 
 WRITE8_MEMBER(jackal_state::jackal_voram_w)
 {
-
 	if ((offset & 0xf800) == 0)
 		jackal_mark_tile_dirty(machine(), offset & 0x3ff);
 
@@ -309,7 +308,6 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(jackal_state::jackal_interrupt)
 {
-
 	if (m_irq_enable)
 	{
 		device.execute().set_input_line(0, HOLD_LINE);

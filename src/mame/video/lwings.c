@@ -80,7 +80,6 @@ TILE_GET_INFO_MEMBER(lwings_state::get_bg2_tile_info)
 
 void lwings_state::video_start()
 {
-
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::lwings_get_bg1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 
@@ -89,7 +88,6 @@ void lwings_state::video_start()
 
 VIDEO_START_MEMBER(lwings_state,trojan)
 {
-
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::trojan_get_bg1_tile_info),this),TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(lwings_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(lwings_state::get_bg2_memory_offset),this), 16, 16, 32, 16);
@@ -103,7 +101,6 @@ VIDEO_START_MEMBER(lwings_state,trojan)
 
 VIDEO_START_MEMBER(lwings_state,avengers)
 {
-
 	VIDEO_START_CALL_MEMBER(trojan);
 	m_bg2_avenger_hw = 1;
 }
@@ -146,7 +143,6 @@ WRITE8_MEMBER(lwings_state::trojan_bg2_scrollx_w)
 
 WRITE8_MEMBER(lwings_state::trojan_bg2_image_w)
 {
-
 	if (m_bg2_image != data)
 	{
 		m_bg2_image = data;
@@ -259,7 +255,6 @@ static void trojan_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,
 
 UINT32 lwings_state::screen_update_lwings(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 	lwings_draw_sprites(machine(), bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
@@ -268,7 +263,6 @@ UINT32 lwings_state::screen_update_lwings(screen_device &screen, bitmap_ind16 &b
 
 UINT32 lwings_state::screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	trojan_draw_sprites(machine(), bitmap, cliprect);

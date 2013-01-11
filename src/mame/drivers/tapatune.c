@@ -77,7 +77,6 @@ public:
 
 WRITE16_MEMBER(tapatune_state::palette_w)
 {
-
 	//logerror("Palette write: offset = %02x, data = %04x, mask = %04x\n", offset, data, mem_mask );
 	switch(offset)
 	{
@@ -94,7 +93,6 @@ WRITE16_MEMBER(tapatune_state::palette_w)
 
 READ16_MEMBER(tapatune_state::read_from_z80)
 {
-
 	//logerror("Reading data from Z80: index = %02x, data = %02x\n", m_z80_to_68k_index, m_z80_to_68k_data );
 
 	switch( offset )
@@ -108,7 +106,6 @@ READ16_MEMBER(tapatune_state::read_from_z80)
 
 WRITE16_MEMBER(tapatune_state::write_to_z80)
 {
-
 	switch( offset )
 	{
 		case 0:

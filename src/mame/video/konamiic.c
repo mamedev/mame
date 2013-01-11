@@ -2565,13 +2565,11 @@ WRITE16_HANDLER( K056832_b_word_w )
 
 static int K056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap, int page, int flags)
 {
-
 	if (K056832_PageTileMode[page]) return(0);
 	if (!K056832_linemap_enabled) return(1);
 
 
 	{
-
 		rectangle zerorect;
 		tilemap_t *tmap;
 		UINT32 *dirty;
@@ -2608,8 +2606,6 @@ static int K056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap
 
         */
 		{
-
-
 			bitmap_ind16 *pixmap;
 
 			UINT8 code_transparent, code_opaque;
@@ -2641,8 +2637,6 @@ static int K056832_update_linemap(running_machine &machine, bitmap_rgb32 &bitmap
 
 			for (line=0; line<256; line++)
 			{
-
-
 				tile_data tileinfo = {0};
 
 				dst_ptr = &pixmap->pix16(line);

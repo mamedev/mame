@@ -53,7 +53,6 @@ READ8_MEMBER(fastfred_state::fastfred_custom_io_r)
 
 READ8_MEMBER(fastfred_state::flyboy_custom1_io_r)
 {
-
 	switch (space.device().safe_pc())
 	{
 		case 0x049d: return 0xad;   /* compare */
@@ -81,7 +80,6 @@ READ8_MEMBER(fastfred_state::flyboy_custom1_io_r)
 
 READ8_MEMBER(fastfred_state::flyboy_custom2_io_r)
 {
-
 	switch (space.device().safe_pc())
 	{
 		case 0x0395: return 0xf7;   /* $C900 compare         */
@@ -164,13 +162,11 @@ READ8_MEMBER(fastfred_state::imago_sprites_offset_r)
 
 WRITE8_MEMBER(fastfred_state::nmi_mask_w)
 {
-
 	m_nmi_mask = data & 1;
 }
 
 WRITE8_MEMBER(fastfred_state::sound_nmi_mask_w)
 {
-
 	m_sound_nmi_mask = data & 1;
 }
 
@@ -628,14 +624,12 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(fastfred_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(fastfred_state::sound_timer_irq)
 {
-
 	if(m_sound_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

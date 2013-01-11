@@ -18,14 +18,11 @@
 	MCFG_ES5503_ADC_FUNC(_adcf)
 
 #define MCFG_ES5503_OUTPUT_CHANNELS(_channels) \
-	es5503_device::static_set_channels(*device, _channels); \
-
+	es5503_device::static_set_channels(*device, _channels);
 #define MCFG_ES5503_IRQ_FUNC(_irqf) \
-	es5503_device::static_set_irqf(*device, _irqf); \
-
+	es5503_device::static_set_irqf(*device, _irqf);
 #define MCFG_ES5503_ADC_FUNC(_adcf) \
-	es5503_device::static_set_adcf(*device, _adcf); \
-
+	es5503_device::static_set_adcf(*device, _adcf);
 // ======================> es5503_device
 
 class es5503_device : public device_t,

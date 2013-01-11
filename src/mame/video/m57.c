@@ -112,7 +112,6 @@ void m57_state::palette_init()
 
 TILE_GET_INFO_MEMBER(m57_state::get_tile_info)
 {
-
 	UINT8 attr = m_videoram[tile_index * 2 + 0];
 	UINT16 code = m_videoram[tile_index * 2 + 1] | ((attr & 0xc0) << 2);
 
@@ -128,7 +127,6 @@ TILE_GET_INFO_MEMBER(m57_state::get_tile_info)
 
 WRITE8_MEMBER(m57_state::m57_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
@@ -142,7 +140,6 @@ WRITE8_MEMBER(m57_state::m57_videoram_w)
 
 void m57_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m57_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_rows(256);
 
@@ -158,7 +155,6 @@ void m57_state::video_start()
 
 WRITE8_MEMBER(m57_state::m57_flipscreen_w)
 {
-
 	/* screen flip is handled both by software and hardware */
 	m_flipscreen = (data & 0x01) ^ (~ioport("DSW2")->read() & 0x01);
 	m_bg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);

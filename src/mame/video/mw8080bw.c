@@ -313,7 +313,6 @@ void mw8080bw_state::screen_eof_phantom2(screen_device &screen, bool state)
 	// falling edge
 	if (!state)
 	{
-
 		m_phantom2_cloud_counter += MW8080BW_VTOTAL;
 
 		if (m_phantom2_cloud_counter >= PHANTOM2_CLOUD_COUNTER_END)

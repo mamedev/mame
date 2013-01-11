@@ -428,7 +428,6 @@ WRITE8_MEMBER(flstory_state::sound_control_2_w)
 
 WRITE8_MEMBER(flstory_state::sound_control_3_w)/* unknown */
 {
-
 	m_snd_ctrl3 = data & 0xff;
 	//  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", m_snd_ctrl0, m_snd_ctrl1, m_snd_ctrl2, m_snd_ctrl3);
 }
@@ -1003,7 +1002,6 @@ static const msm5232_interface msm5232_config =
 
 void flstory_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_mcu = machine().device("mcu");
@@ -1042,7 +1040,6 @@ void flstory_state::machine_start()
 
 MACHINE_RESET_MEMBER(flstory_state,flstory)
 {
-
 	MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	/* video */

@@ -77,7 +77,6 @@
 
 namespace FLAC {
 	namespace Encoder {
-
 		/** \ingroup flacpp_encoder
 		 *  \brief
 		 *  This class wraps the ::FLAC__StreamEncoder.  If you are

@@ -657,7 +657,6 @@ static GFXDECODE_START( playch10 )
 GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(playch10_state::playch10_interrupt){
-
 	/* LS161A, Sheet 1 - bottom left of Z80 */
 	if ( !m_pc10_dog_di && !m_pc10_nmi_enable ) {
 		device.execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE );
@@ -739,8 +738,7 @@ MACHINE_CONFIG_END
 	ROM_SYSTEM_BIOS( 0, "dual",   "Dual Monitor Version" ) \
 	ROM_LOAD_BIOS( 0, "pch1-c.8t", 0x00000, 0x4000, CRC(d52fa07a) SHA1(55cabf52ae10c050c2229081a80b9fe5454ab8c5) ) \
 	ROM_SYSTEM_BIOS( 1, "single", "Single Monitor Version" ) \
-	ROM_LOAD_BIOS( 1, "pck1-c.8t", 0x00000, 0x4000, CRC(503ee8b1) SHA1(3bd20bc71cac742d1b8c1430a6426d0a19db7ad0) ) \
-
+	ROM_LOAD_BIOS( 1, "pck1-c.8t", 0x00000, 0x4000, CRC(503ee8b1) SHA1(3bd20bc71cac742d1b8c1430a6426d0a19db7ad0) )
 #define BIOS_GFX                                            \
 	ROM_REGION( 0x6000, "gfx1", 0 ) \
 	ROM_LOAD( "pch1-c.8p",    0x00000, 0x2000, CRC(30c15e23) SHA1(69166afdb2fe827c7f1919cdf4197caccbd961fa) )   \

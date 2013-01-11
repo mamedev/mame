@@ -183,7 +183,6 @@ void sandscrp_state::screen_eof_sandscrp(screen_device &screen, bool state)
 /* Reads the cause of the interrupt */
 READ16_MEMBER(sandscrp_state::sandscrp_irq_cause_r)
 {
-
 	return  ( m_sprite_irq  ?  0x08  : 0 ) |
 			( m_unknown_irq ?  0x10  : 0 ) |
 			( m_vblank_irq  ?  0x20  : 0 ) ;
@@ -193,7 +192,6 @@ READ16_MEMBER(sandscrp_state::sandscrp_irq_cause_r)
 /* Clear the cause of the interrupt */
 WRITE16_MEMBER(sandscrp_state::sandscrp_irq_cause_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 //      m_sprite_flipx  =   data & 1;
@@ -225,14 +223,12 @@ WRITE16_MEMBER(sandscrp_state::sandscrp_coin_counter_w)
 
 READ16_MEMBER(sandscrp_state::sandscrp_latchstatus_word_r)
 {
-
 	return  (m_latch1_full ? 0x80 : 0) |
 			(m_latch2_full ? 0x40 : 0) ;
 }
 
 WRITE16_MEMBER(sandscrp_state::sandscrp_latchstatus_word_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		m_latch1_full = data & 0x80;
@@ -242,14 +238,12 @@ WRITE16_MEMBER(sandscrp_state::sandscrp_latchstatus_word_w)
 
 READ16_MEMBER(sandscrp_state::sandscrp_soundlatch_word_r)
 {
-
 	m_latch2_full = 0;
 	return soundlatch2_byte_r(space,0);
 }
 
 WRITE16_MEMBER(sandscrp_state::sandscrp_soundlatch_word_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		m_latch1_full = 1;
@@ -301,21 +295,18 @@ WRITE8_MEMBER(sandscrp_state::sandscrp_bankswitch_w)
 
 READ8_MEMBER(sandscrp_state::sandscrp_latchstatus_r)
 {
-
 	return  (m_latch2_full ? 0x80 : 0) |    // swapped!?
 			(m_latch1_full ? 0x40 : 0) ;
 }
 
 READ8_MEMBER(sandscrp_state::sandscrp_soundlatch_r)
 {
-
 	m_latch1_full = 0;
 	return soundlatch_byte_r(space,0);
 }
 
 WRITE8_MEMBER(sandscrp_state::sandscrp_soundlatch_w)
 {
-
 	m_latch2_full = 1;
 	soundlatch2_byte_w(space,0,data);
 }

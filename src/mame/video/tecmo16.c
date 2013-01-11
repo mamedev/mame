@@ -55,7 +55,6 @@ TILE_GET_INFO_MEMBER(tecmo16_state::tx_get_tile_info)
 
 void tecmo16_state::video_start()
 {
-
 	/* set up tile layers */
 	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_bg);
 	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_fg);
@@ -78,7 +77,6 @@ void tecmo16_state::video_start()
 
 VIDEO_START_MEMBER(tecmo16_state,ginkun)
 {
-
 	/* set up tile layers */
 	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_bg);
 	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_fg);
@@ -99,7 +97,6 @@ VIDEO_START_MEMBER(tecmo16_state,ginkun)
 
 VIDEO_START_MEMBER(tecmo16_state,riot)
 {
-
 	/* set up tile layers */
 	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_bg);
 	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_fg);
@@ -253,7 +250,6 @@ static void blendbitmaps(running_machine &machine,
 
 		while (sh)
 		{
-
 #define BLENDPIXEL(x)   if (sd3[x]) {                                                       \
 							if (sd2[x]) {                                                   \
 								dd[x] = paldata[sd2[x] | 0x0400] + paldata[sd3[x]];         \

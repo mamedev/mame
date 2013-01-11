@@ -221,7 +221,6 @@ TILE_GET_INFO_MEMBER(travrusa_state::get_tile_info)
 
 void travrusa_state::video_start()
 {
-
 	save_item(NAME(m_scrollx));
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(travrusa_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);

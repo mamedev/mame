@@ -125,7 +125,6 @@ READ8_MEMBER(xyonix_state::xyonix_io_r)
 
 WRITE8_MEMBER(xyonix_state::xyonix_io_w)
 {
-
 	//logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, space.device().safe_pc());
 	m_e0_data = data;
 }

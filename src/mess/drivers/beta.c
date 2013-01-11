@@ -86,7 +86,6 @@ INPUT_PORTS_END
 
 TIMER_CALLBACK_MEMBER(beta_state::led_refresh)
 {
-
 	if (m_ls145_p < 6)
 	{
 		output_set_digit_value(m_ls145_p, m_segment);

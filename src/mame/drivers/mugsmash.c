@@ -48,7 +48,6 @@ behavior we use .
 
 WRITE16_MEMBER(mugsmash_state::mugsmash_reg2_w)
 {
-
 	m_regs2[offset] = data;
 	//popmessage ("Regs2 %04x, %04x, %04x, %04x", m_regs2[0], m_regs2[1], m_regs2[2], m_regs2[3]);
 
@@ -390,7 +389,6 @@ GFXDECODE_END
 
 void mugsmash_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }

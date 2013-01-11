@@ -337,7 +337,6 @@ VIDEO_RESET_MEMBER(mac_state,macsonora)
 
 VIDEO_START_MEMBER(mac_state,macsonora)
 {
-
 	memset(m_rbv_regs, 0, sizeof(m_rbv_regs));
 
 	m_rbv_count = 0;
@@ -358,7 +357,6 @@ VIDEO_START_MEMBER(mac_state,macsonora)
 
 VIDEO_START_MEMBER(mac_state,macv8)
 {
-
 	memset(m_rbv_regs, 0, sizeof(m_rbv_regs));
 
 	m_rbv_count = 0;
@@ -869,7 +867,6 @@ static void dafb_recalc_ints(mac_state *mac)
 
 TIMER_CALLBACK_MEMBER(mac_state::dafb_vbl_tick)
 {
-
 	m_dafb_int_status |= 1;
 	dafb_recalc_ints(this);
 
@@ -878,7 +875,6 @@ TIMER_CALLBACK_MEMBER(mac_state::dafb_vbl_tick)
 
 TIMER_CALLBACK_MEMBER(mac_state::dafb_cursor_tick)
 {
-
 	m_dafb_int_status |= 4;
 	dafb_recalc_ints(this);
 

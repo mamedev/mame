@@ -658,8 +658,7 @@ struct opcode_s {
 	if ((after & 15) < (before & 15))   \
 		PSW |= HC;                      \
 	else                                \
-		PSW &= ~HC;                     \
-
+		PSW &= ~HC;
 #define ZHC_SUB(after,before,carry)     \
 	if (after == 0) PSW |= Z; else PSW &= ~Z; \
 	if (before == after)                    \
@@ -671,8 +670,7 @@ struct opcode_s {
 	if ((after & 15) > (before & 15))   \
 		PSW |= HC;                      \
 	else                                \
-		PSW &= ~HC;                     \
-
+		PSW &= ~HC;
 #define SKIP_CY     if (CY == (PSW & CY)) PSW |= SK
 #define SKIP_NC     if (0 == (PSW & CY)) PSW |= SK
 #define SKIP_Z      if (Z == (PSW & Z)) PSW |= SK

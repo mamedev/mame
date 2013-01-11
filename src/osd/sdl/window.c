@@ -961,7 +961,6 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 
 void sdlwindow_video_window_update(running_machine &machine, sdl_window_info *window)
 {
-
 	osd_ticks_t     event_wait_ticks;
 	ASSERT_MAIN_THREAD();
 

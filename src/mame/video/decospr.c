@@ -240,7 +240,6 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 		if (!m_alt_format)
 		{
-
 			sprite = spriteram[offs + 1];
 			y = spriteram[offs];
 			flash = y & 0x1000;
@@ -249,7 +248,6 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 			if (!(flash && (machine().primary_screen->frame_number() & 1)))
 			{
-
 				x = spriteram[offs + 2];
 
 				if (!m_sprite_bitmap.valid())
@@ -289,7 +287,6 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 				}
 				else
 				{
-
 					x = x & 0x01ff;
 					y = y & 0x01ff;
 					if (x >= 256) x -= 512;
@@ -462,7 +459,6 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 				{
 					for (int yy=0; yy<h; yy++)
 					{
-
 						if(!m_sprite_bitmap.valid())
 						{
 							if (m_pricallback)

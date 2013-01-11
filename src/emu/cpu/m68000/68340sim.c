@@ -300,5 +300,4 @@ WRITE32_HANDLER( m68340_internal_sim_cs_w )
 
 void m68340_sim::reset(void)
 {
-
 }

@@ -1318,7 +1318,6 @@ void newbrain_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(newbrain_state::newbrain_interrupt)
 {
-
 	if (!(m_enrg1 & NEWBRAIN_ENRG1_CLK))
 	{
 		m_clkint = 0;

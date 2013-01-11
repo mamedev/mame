@@ -135,7 +135,6 @@ void sega_genesis_vdp_device::set_genesis_vdp_palwrite_base(device_t &device, in
 
 void sega_genesis_vdp_device::device_start()
 {
-
 	m_vram  = auto_alloc_array(machine(), UINT16, 0x10000/2);
 	m_cram  = auto_alloc_array(machine(), UINT16, 0x80/2);
 	m_vsram = auto_alloc_array(machine(), UINT16, 0x80/2);
@@ -241,7 +240,6 @@ void sega_genesis_vdp_device::device_reset_old()
 
 void sega_genesis_vdp_device::vdp_vram_write(UINT16 data)
 {
-
 	UINT16 sprite_base_address = MEGADRIVE_REG0C_RS1?((MEGADRIVE_REG05_SPRITE_ADDR&0x7e)<<9):((MEGADRIVE_REG05_SPRITE_ADDR&0x7f)<<9);
 	int spritetable_size = MEGADRIVE_REG0C_RS1?0x400:0x200;
 	int lowlimit = sprite_base_address;
@@ -372,7 +370,6 @@ void sega_genesis_vdp_device::megadriv_vdp_data_port_w(running_machine &machine,
 	}
 	else
 	{
-
 		switch (m_vdp_code & 0x000f)
 		{
 			case 0x0000:
@@ -1258,7 +1255,6 @@ READ16_MEMBER( sega_genesis_vdp_device::megadriv_vdp_r )
 
 	switch (offset<<1)
 	{
-
 		case 0x00:
 		case 0x02:
 			if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read data port access, offset %04x mem_mask %04x\n",offset,mem_mask);
@@ -1405,7 +1401,6 @@ void sega_genesis_vdp_device::genesis_render_spriteline_to_spritebuffer(int scan
 
 			if ((drawypos<=scanline) && ((drawypos+drawheight)>scanline))
 			{
-
 				addr  = (MEGADRIV_VDP_VRAM(((base_address>>1)+spritenum*4)+0x2) & 0x07ff)>>0;
 				xflip = (MEGADRIV_VDP_VRAM(((base_address>>1)+spritenum*4)+0x2) & 0x0800)>>11;
 				yflip = (MEGADRIV_VDP_VRAM(((base_address>>1)+spritenum*4)+0x2) & 0x1000)>>12;
@@ -2573,7 +2568,6 @@ void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(running
 
 	if (!MEGADRIVE_REG0C_SHADOW_HIGLIGHT)
 	{
-
 		for (x=0;x<320;x++)
 		{
 			UINT32 dat;
@@ -2630,7 +2624,6 @@ void sega_genesis_vdp_device::genesis_render_videobuffer_to_screenbuffer(running
 	}
 	else
 	{
-
 		for (x=0;x<320;x++)
 		{
 			UINT32 dat;
@@ -2964,7 +2957,6 @@ TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback_alt_timing )
 
 	if (vdp->m_use_alt_timing)
 	{
-
 		if (param==0)
 		{
 			//printf("where are we? %d %d\n", timer.machine().primary_screen->vpos(), timer.machine().primary_screen->hpos());

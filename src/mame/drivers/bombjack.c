@@ -130,7 +130,6 @@ READ8_MEMBER(bombjack_state::bombjack_soundlatch_r)
 
 WRITE8_MEMBER(bombjack_state::irq_mask_w)
 {
-
 	m_nmi_mask = data & 1;
 }
 
@@ -332,7 +331,6 @@ GFXDECODE_END
 
 void bombjack_state::machine_start()
 {
-
 	save_item(NAME(m_latch));
 	save_item(NAME(m_background_image));
 }
@@ -340,7 +338,6 @@ void bombjack_state::machine_start()
 
 void bombjack_state::machine_reset()
 {
-
 	m_latch = 0;
 	m_background_image = 0;
 }
@@ -348,7 +345,6 @@ void bombjack_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(bombjack_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

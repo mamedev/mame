@@ -91,7 +91,6 @@ public:
 
 void multi8_state::video_start()
 {
-
 	m_keyb_press = m_keyb_press_flag = m_shift_press_flag = m_display_reg = 0;
 
 	for (m_bw_mode = 0; m_bw_mode < 8; m_bw_mode++)

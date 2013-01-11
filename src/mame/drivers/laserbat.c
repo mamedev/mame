@@ -480,14 +480,12 @@ GFXDECODE_END
 
 TILE_GET_INFO_MEMBER(laserbat_state::get_tile_info)
 {
-
 	// wrong color index!
 	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], m_colorram[tile_index] & 0x7f, 0);
 }
 
 void laserbat_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(laserbat_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	save_item(NAME(m_videoram));
@@ -653,7 +651,6 @@ INTERRUPT_GEN_MEMBER(laserbat_state::laserbat_interrupt)
 
 INTERRUPT_GEN_MEMBER(laserbat_state::zaccaria_cb1_toggle)
 {
-
 	m_pia->cb1_w(m_cb1_toggle & 1);
 	m_cb1_toggle ^= 1;
 }
@@ -685,7 +682,6 @@ static const s2636_interface s2636_3_config =
 
 void laserbat_state::machine_start()
 {
-
 	m_s2636_1 = machine().device("s2636_1");
 	m_s2636_2 = machine().device("s2636_2");
 	m_s2636_3 = machine().device("s2636_3");
@@ -720,7 +716,6 @@ void laserbat_state::machine_start()
 
 void laserbat_state::machine_reset()
 {
-
 	m_video_page = 0;
 	m_input_mux = 0;
 	m_active_8910 = 0;

@@ -101,7 +101,6 @@ PALETTE_INIT_MEMBER(zodiack_state,zodiack)
 
 TILE_GET_INFO_MEMBER(zodiack_state::get_bg_tile_info)
 {
-
 	int code = m_videoram_2[tile_index];
 	int color = (m_attributeram[2 * (tile_index % 32) + 1] >> 4) & 0x07;
 
@@ -110,7 +109,6 @@ TILE_GET_INFO_MEMBER(zodiack_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(zodiack_state::get_fg_tile_info)
 {
-
 	int code = m_videoram[tile_index];
 	int color = m_attributeram[2 * (tile_index % 32) + 1] & 0x07;
 

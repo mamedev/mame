@@ -24,8 +24,7 @@
 	static const floppy_format_type _name [];
 
 #define FLOPPY_FORMATS_MEMBER(_member) \
-	const floppy_format_type _member [] = { \
-
+	const floppy_format_type _member [] = {
 #define FLOPPY_FORMATS_END \
 		, \
 		FLOPPY_D88_FORMAT, \

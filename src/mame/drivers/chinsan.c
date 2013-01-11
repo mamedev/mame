@@ -157,7 +157,6 @@ static const ym2203_interface ym2203_config =
 
 WRITE8_MEMBER(chinsan_state::chinsan_port00_w)
 {
-
 	m_port_select = data;
 
 	if (
@@ -174,7 +173,6 @@ WRITE8_MEMBER(chinsan_state::chinsan_port00_w)
 
 READ8_MEMBER(chinsan_state::chinsan_input_port_0_r)
 {
-
 	//return 0xff; // the inputs don't seem to work, so just return ff for now
 
 	switch (m_port_select)
@@ -206,7 +204,6 @@ READ8_MEMBER(chinsan_state::chinsan_input_port_0_r)
 
 READ8_MEMBER(chinsan_state::chinsan_input_port_1_r)
 {
-
 	switch (m_port_select)
 	{
 		/* i doubt these are both really the same.. */
@@ -578,7 +575,6 @@ static const msm5205_interface msm5205_config =
 
 void chinsan_state::machine_start()
 {
-
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	save_item(NAME(m_adpcm_idle));
@@ -590,7 +586,6 @@ void chinsan_state::machine_start()
 
 void chinsan_state::machine_reset()
 {
-
 	m_adpcm_idle = 1;
 	m_port_select = 0;
 	m_adpcm_pos = 0;

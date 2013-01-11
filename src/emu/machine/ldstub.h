@@ -50,14 +50,11 @@
 //**************************************************************************
 
 #define MCFG_LASERDISC_LDP1450_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, SONY_LDP1450, 0) \
-
+	MCFG_DEVICE_ADD(_tag, SONY_LDP1450, 0)
 #define MCFG_LASERDISC_PR7820_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PIONEER_PR7820, 0) \
-
+	MCFG_DEVICE_ADD(_tag, PIONEER_PR7820, 0)
 #define MCFG_LASERDISC_22VP932_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PHILLIPS_22VP932, 0) \
-
+	MCFG_DEVICE_ADD(_tag, PHILLIPS_22VP932, 0)
 
 
 //**************************************************************************

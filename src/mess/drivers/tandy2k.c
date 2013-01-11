@@ -38,7 +38,6 @@ enum
 
 void tandy2k_state::dma_request(int line, int state)
 {
-
 }
 
 void tandy2k_state::speaker_update()

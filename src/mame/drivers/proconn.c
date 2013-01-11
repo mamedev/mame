@@ -313,7 +313,6 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 WRITE16_MEMBER(proconn_state::serial_transmit)
 {
-
 //Don't like the look of this, should be a clock somewhere
 //  if (offset == 0)
 //      m_vfd->write_char( data );
@@ -697,8 +696,7 @@ ROM_END
 #define pr_batls_sound \
 	ROM_REGION( 0x80000, "snd", 0 )\
 	ROM_LOAD( "080snd1.bin", 0x0000, 0x020000, CRC(011170ab) SHA1(60a174c09261c2ee230c4194d918173b41f267de) )\
-	ROM_LOAD( "080snd2.bin", 0x020000, 0x020000, CRC(9189793b) SHA1(b47a3c214eb01595581f1e9d18c154560ee02ca1) )\
-
+	ROM_LOAD( "080snd2.bin", 0x020000, 0x020000, CRC(9189793b) SHA1(b47a3c214eb01595581f1e9d18c154560ee02ca1) )
 ROM_START( pr_batls )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "batt72c", 0x0000, 0x010000, CRC(6c6ab1f1) SHA1(6e0663fcdfa1948d9d74b6df388d09fed73f0ed2) )
@@ -758,8 +756,7 @@ ROM_END
 #define pr_bulls_sound \
 	ROM_REGION( 0x80000, "snd", 0 )\
 	ROM_LOAD( "010snd1 316e.bin" , 0x0000, 0x020000, CRC(5e3cfdc6) SHA1(32db10e7bacc6a4728d8821e77789cf146e2a277) )\
-	ROM_LOAD( "010snd2 9e9a.bin" , 0x0000, 0x020000, CRC(496a9d51) SHA1(703631d3cb2e3c7fa676cb5a31903bf39ee6c44f) )\
-
+	ROM_LOAD( "010snd2 9e9a.bin" , 0x0000, 0x020000, CRC(496a9d51) SHA1(703631d3cb2e3c7fa676cb5a31903bf39ee6c44f) )
 
 ROM_START( pr_bulls )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -834,8 +831,7 @@ ROM_END
 #define pr_chico_sound\
 	ROM_REGION( 0x80000, "snd", 0 )\
 	ROM_LOAD( "006snd1.000", 0x0000, 0x020000, CRC(f906857a) SHA1(cfa47a3e887e6788c577d31bb567f7fbaaf0bbf3) )\
-	ROM_LOAD( "006snd2.000", 0x0000, 0x020000, CRC(8445d0ef) SHA1(fd2ecc96f74e99e8f5ea7c7772fbd451ce52e889) )\
-
+	ROM_LOAD( "006snd2.000", 0x0000, 0x020000, CRC(8445d0ef) SHA1(fd2ecc96f74e99e8f5ea7c7772fbd451ce52e889) )
 ROM_START( pr_chico )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "006a20pn.810", 0x0000, 0x010000, CRC(c4b491b7) SHA1(7629857cf6f1f69fb9ccf82a290a491cf695d373) )

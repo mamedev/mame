@@ -26,7 +26,6 @@
 
 WRITE16_MEMBER(madmotor_state::madmotor_sound_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
@@ -221,7 +220,6 @@ GFXDECODE_END
 
 void madmotor_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -230,7 +228,6 @@ void madmotor_state::machine_start()
 
 void madmotor_state::machine_reset()
 {
-
 	m_flipscreen = 0;
 }
 

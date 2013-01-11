@@ -653,7 +653,6 @@ void rmnimbus_state::video_reset()
 
 void rmnimbus_state::screen_eof_nimbus(screen_device &screen, bool state)
 {
-
 //    logerror("SCREEN_VBLANK( nimbus )\n");
 }
 

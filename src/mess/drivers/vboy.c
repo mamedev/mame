@@ -41,7 +41,6 @@ struct vboy_regs_t
 
 struct vip_regs_t
 {
-
 	UINT16 INTPND;
 	UINT16 INTENB;
 	UINT16 DPSTTS;
@@ -1157,7 +1156,6 @@ static void vboy_machine_stop(running_machine &machine)
 
 void vboy_state::machine_start()
 {
-
 	/* add a hook for battery save */
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(vboy_machine_stop),&machine()));
 
@@ -1166,7 +1164,6 @@ void vboy_state::machine_start()
 
 void vboy_state::machine_reset()
 {
-
 	/* Initial values taken from Reality Boy, to be verified when emulation improves */
 	m_vboy_regs.lpc = 0x6d;
 	m_vboy_regs.lpc2 = 0xff;
@@ -1219,13 +1216,11 @@ void vboy_state::m_timer_tick()
 
 TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::timer_main_tick)
 {
-
 	m_timer_tick();
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::timer_pad_tick)
 {
-
 	if((m_vboy_regs.kcr & 0x80) == 0)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }

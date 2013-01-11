@@ -53,7 +53,6 @@ void cloud9_state::video_start()
 
 WRITE8_MEMBER(cloud9_state::cloud9_video_control_w)
 {
-
 	/* only D7 matters */
 	m_video_control[offset] = (data >> 7) & 1;
 }
@@ -193,7 +192,6 @@ WRITE8_MEMBER(cloud9_state::cloud9_videoram_w)
 
 READ8_MEMBER(cloud9_state::cloud9_bitmode_r)
 {
-
 	/* in bitmode, the address comes from the autoincrement latches */
 	UINT16 addr = (m_bitmode_addr[1] << 6) | (m_bitmode_addr[0] >> 2);
 
@@ -210,7 +208,6 @@ READ8_MEMBER(cloud9_state::cloud9_bitmode_r)
 
 WRITE8_MEMBER(cloud9_state::cloud9_bitmode_w)
 {
-
 	/* in bitmode, the address comes from the autoincrement latches */
 	UINT16 addr = (m_bitmode_addr[1] << 6) | (m_bitmode_addr[0] >> 2);
 
@@ -227,7 +224,6 @@ WRITE8_MEMBER(cloud9_state::cloud9_bitmode_w)
 
 WRITE8_MEMBER(cloud9_state::cloud9_bitmode_addr_w)
 {
-
 	/* write through to video RAM and also to the addressing latches */
 	cloud9_write_vram(machine(), offset, data, 0, 0);
 	m_bitmode_addr[offset] = data;

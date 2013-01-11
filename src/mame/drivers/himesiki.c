@@ -280,7 +280,6 @@ void himesiki_state::machine_start()
 
 void himesiki_state::machine_reset()
 {
-
 	m_scrollx[0] = 0;
 	m_scrollx[1] = 0;
 	m_flipscreen = 0;

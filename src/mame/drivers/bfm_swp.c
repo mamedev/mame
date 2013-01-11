@@ -105,7 +105,6 @@ TEST.TXT - suggests the content of a prototype version, which was expanded to ma
 
 static void irqhandler(device_t *device, int state)
 {
-
 }
 
 static const ymz280b_interface ymz280b_config =

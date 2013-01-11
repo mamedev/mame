@@ -2022,7 +2022,6 @@ READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
 
 READ32_MEMBER(seibuspi_state::rf2_speedup_r)
 {
-
 	/* rdft22kc */
 	if (space.device().safe_pc()==0x0203926) space.device().execute().spin_until_interrupt(); // idle
 

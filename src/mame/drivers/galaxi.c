@@ -164,7 +164,6 @@ WRITE16_MEMBER(galaxi_state::galaxi_fg_w)
 
 void galaxi_state::video_start()
 {
-
 	m_bg1_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
 	m_bg2_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
 	m_bg3_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxi_state::get_bg3_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 0x20, 0x10);
@@ -234,7 +233,6 @@ WRITE16_MEMBER(galaxi_state::galaxi_500002_w)
 
 WRITE16_MEMBER(galaxi_state::galaxi_500004_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 	/*
@@ -385,7 +383,6 @@ GFXDECODE_END
 
 void galaxi_state::machine_start()
 {
-
 	save_item(NAME(m_hopper));
 	save_item(NAME(m_ticket));
 	save_item(NAME(m_out));
@@ -393,7 +390,6 @@ void galaxi_state::machine_start()
 
 void galaxi_state::machine_reset()
 {
-
 	m_hopper = 0;
 	m_ticket = 0;
 	m_out[0] = 0;

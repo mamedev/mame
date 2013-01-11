@@ -310,7 +310,6 @@ UINT32 ddealer_state::screen_update_ddealer(screen_device &screen, bitmap_ind16 
 
 TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::ddealer_mcu_sim)
 {
-
 	/*coin/credit simulation*/
 	/*$fe002 is used,might be for multiple coins for one credit settings.*/
 	m_coin_input = (~(machine().root_device().ioport("IN0")->read()));
@@ -399,8 +398,7 @@ Protection handling,identical to Hacha Mecha Fighter / Thunder Dragon with diffe
 		m_mcu_shared_ram[(_offs_+2-0x10)/2] = 0x4ef9;/*JMP*/\
 		m_mcu_shared_ram[(_offs_+4-0x10)/2] = 0x0000;/*HI-DWORD*/\
 		m_mcu_shared_ram[(_offs_+6-0x10)/2] = _pc_;  /*LO-DWORD*/\
-	} \
-
+	}
 #define PROT_INPUT(_offs_,_protvalue_,_protinput_,_input_) \
 	if(m_mcu_shared_ram[_offs_] == _protvalue_) \
 	{\
@@ -603,7 +601,6 @@ GFXDECODE_END
 
 void ddealer_state::machine_start()
 {
-
 	save_item(NAME(m_respcount));
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_input_pressed));
@@ -612,7 +609,6 @@ void ddealer_state::machine_start()
 
 void ddealer_state::machine_reset()
 {
-
 	m_respcount = 0;
 	m_flipscreen = 0;
 	m_input_pressed = 0;

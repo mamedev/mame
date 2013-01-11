@@ -29,16 +29,14 @@
 	MCFG_SCREEN_REFRESH_RATE(60)                                \
 	MCFG_SCREEN_SIZE(320, 243)                                  \
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 1, 241-1)                \
-	MCFG_SCREEN_VBLANK_TIME(0)                                  \
-
+	MCFG_SCREEN_VBLANK_TIME(0)
 #define MCFG_SCREEN_MC6847_PAL_ADD(_tag, _mctag) \
 	MCFG_SCREEN_ADD(_tag, RASTER)                               \
 	MCFG_SCREEN_UPDATE_DEVICE(_mctag, mc6847_base_device, screen_update) \
 	MCFG_SCREEN_REFRESH_RATE(50)                                \
 	MCFG_SCREEN_SIZE(320, 243)                                  \
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 1, 241-1)                \
-	MCFG_SCREEN_VBLANK_TIME(0)                                  \
-
+	MCFG_SCREEN_VBLANK_TIME(0)
 /* interface */
 struct mc6847_interface
 {

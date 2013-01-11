@@ -121,21 +121,18 @@ void _1943_state::palette_init()
 
 WRITE8_MEMBER(_1943_state::c1943_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(_1943_state::c1943_colorram_w)
 {
-
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(_1943_state::c1943_c804_w)
 {
-
 	/* bits 0 and 1 are coin counters */
 	coin_counter_w(machine(), 0, data & 0x01);
 	coin_counter_w(machine(), 1, data & 0x02);
@@ -154,7 +151,6 @@ WRITE8_MEMBER(_1943_state::c1943_c804_w)
 
 WRITE8_MEMBER(_1943_state::c1943_d806_w)
 {
-
 	/* bit 4 enables bg 1 */
 	m_bg1_on = data & 0x10;
 

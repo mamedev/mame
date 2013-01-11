@@ -205,7 +205,6 @@ WRITE8_MEMBER(lethal_state::control2_w)
 
 INTERRUPT_GEN_MEMBER(lethal_state::lethalen_interrupt)
 {
-
 	if (k056832_is_irq_enabled(m_k056832, 0))
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
@@ -238,7 +237,6 @@ WRITE8_MEMBER(lethal_state::le_bankswitch_w)
 
 READ8_MEMBER(lethal_state::le_4800_r)
 {
-
 	if (m_cur_control2 & 0x10)  // RAM enable
 	{
 		return m_generic_paletteram_8[offset];
@@ -322,7 +320,6 @@ READ8_MEMBER(lethal_state::le_4800_r)
 
 WRITE8_MEMBER(lethal_state::le_4800_w)
 {
-
 	if (m_cur_control2 & 0x10)  // RAM enable
 	{
 		paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, offset, data);

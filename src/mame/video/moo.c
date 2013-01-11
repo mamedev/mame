@@ -37,7 +37,6 @@ void moo_tile_callback( running_machine &machine, int layer, int *code, int *col
 
 VIDEO_START_MEMBER(moo_state,moo)
 {
-
 	assert(machine().primary_screen->format() == BITMAP_FORMAT_RGB32);
 
 	m_alpha_enabled = 0;

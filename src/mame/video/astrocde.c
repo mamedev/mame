@@ -162,7 +162,6 @@ PALETTE_INIT_MEMBER(astrocde_state,profpac)
 
 void astrocde_state::video_start()
 {
-
 	/* allocate timers */
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astrocde_state::scanline_callback),this));
 	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(1), 1);
@@ -179,7 +178,6 @@ void astrocde_state::video_start()
 
 VIDEO_START_MEMBER(astrocde_state,profpac)
 {
-
 	/* allocate timers */
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(astrocde_state::scanline_callback),this));
 	m_scanline_timer->adjust(machine().primary_screen->time_until_pos(1), 1);

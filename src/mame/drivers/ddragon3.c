@@ -163,7 +163,6 @@ WRITE8_MEMBER(ddragon3_state::oki_bankswitch_w)
 
 WRITE16_MEMBER(ddragon3_state::ddragon3_io_w)
 {
-
 	COMBINE_DATA(&m_io_reg[offset]);
 
 	switch (offset)
@@ -543,7 +542,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddragon3_state::ddragon3_scanline)
 
 void ddragon3_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 

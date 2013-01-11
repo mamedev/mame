@@ -1888,7 +1888,6 @@ MACHINE_START_MEMBER(fm7_state,fm11)
 
 MACHINE_START_MEMBER(fm7_state,fm16)
 {
-
 	m_type = SYS_FM16;
 	beep_set_frequency(machine().device(BEEPER_TAG),1200);
 	beep_set_state(machine().device(BEEPER_TAG),0);

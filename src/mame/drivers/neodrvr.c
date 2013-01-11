@@ -775,24 +775,21 @@
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) ) \
 	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF ) \
 	ROM_REGION( 0x80000, "audiocrypt", 0 ) \
-	ROM_LOAD( name, 0x00000, 0x20000, hash ) \
-
+	ROM_LOAD( name, 0x00000, 0x20000, hash )
 #define NEO_BIOS_AUDIO_ENCRYPTED_256K(name, hash) \
 	NEOGEO_BIOS \
 	ROM_REGION( 0x20000, "audiobios", 0 ) \
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) ) \
 	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF ) \
 	ROM_REGION( 0x80000, "audiocrypt", 0 ) \
-	ROM_LOAD( name, 0x00000, 0x40000, hash ) \
-
+	ROM_LOAD( name, 0x00000, 0x40000, hash )
 #define NEO_BIOS_AUDIO_ENCRYPTED_512K(name, hash) \
 	NEOGEO_BIOS \
 	ROM_REGION( 0x20000, "audiobios", 0 ) \
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) ) \
 	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF ) \
 	ROM_REGION( 0x80000, "audiocrypt", 0 ) \
-	ROM_LOAD( name,      0x00000, 0x80000, hash ) \
-
+	ROM_LOAD( name,      0x00000, 0x80000, hash )
 
 #define NO_DELTAT_REGION
 

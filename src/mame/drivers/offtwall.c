@@ -140,7 +140,6 @@ WRITE16_MEMBER(offtwall_state::io_latch_w)
 
 READ16_MEMBER(offtwall_state::bankswitch_r)
 {
-
 	/* this is the table lookup; the bank is determined by the address that was requested */
 	m_bank_offset = (offset & 3) * 0x1000;
 	logerror("Bankswitch index %d -> %04X\n", offset, m_bank_offset);
@@ -151,7 +150,6 @@ READ16_MEMBER(offtwall_state::bankswitch_r)
 
 READ16_MEMBER(offtwall_state::bankrom_r)
 {
-
 	/* this is the banked ROM read */
 	logerror("%06X: %04X\n", space.device().safe_pcbase(), offset);
 
@@ -476,7 +474,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(offtwall_state,offtwall)
 {
-
 	atarijsa_init(machine(), "260010", 0x0040);
 
 	/* install son-of-slapstic workarounds */
@@ -488,7 +485,6 @@ DRIVER_INIT_MEMBER(offtwall_state,offtwall)
 
 DRIVER_INIT_MEMBER(offtwall_state,offtwalc)
 {
-
 	atarijsa_init(machine(), "260010", 0x0040);
 
 	/* install son-of-slapstic workarounds */

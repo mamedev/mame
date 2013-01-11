@@ -462,7 +462,6 @@ WRITE32_MEMBER(konamigv_state::flash_w)
 
 READ32_MEMBER(konamigv_state::trackball_r)
 {
-
 	if( offset == 0 && mem_mask == 0x0000ffff )
 	{
 		int axis;
@@ -488,7 +487,6 @@ READ32_MEMBER(konamigv_state::unknown_r)
 
 DRIVER_INIT_MEMBER(konamigv_state,simpbowl)
 {
-
 	m_flash8[0] = machine().device<fujitsu_29f016a_device>("flash0");
 	m_flash8[1] = machine().device<fujitsu_29f016a_device>("flash1");
 	m_flash8[2] = machine().device<fujitsu_29f016a_device>("flash2");
@@ -523,7 +521,6 @@ INPUT_PORTS_END
 
 READ32_MEMBER(konamigv_state::btcflash_r)
 {
-
 	if (mem_mask == 0x0000ffff)
 	{
 		return m_flash16[0]->read(offset*2);
@@ -538,7 +535,6 @@ READ32_MEMBER(konamigv_state::btcflash_r)
 
 WRITE32_MEMBER(konamigv_state::btcflash_w)
 {
-
 	if (mem_mask == 0x0000ffff)
 	{
 		m_flash16[0]->write(offset*2, data&0xffff);
@@ -551,7 +547,6 @@ WRITE32_MEMBER(konamigv_state::btcflash_w)
 
 READ32_MEMBER(konamigv_state::btc_trackball_r)
 {
-
 //  mame_printf_debug( "r %08x %08x %08x\n", space.device().safe_pc(), offset, mem_mask );
 
 	if( offset == 1 && mem_mask == 0xffff0000 )
@@ -580,7 +575,6 @@ WRITE32_MEMBER(konamigv_state::btc_trackball_w)
 
 DRIVER_INIT_MEMBER(konamigv_state,btchamp)
 {
-
 	m_flash16[0] = machine().device<sharp_lh28f400_device>("flash");
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler( 0x1f680080, 0x1f68008f, read32_delegate(FUNC(konamigv_state::btc_trackball_r),this), write32_delegate(FUNC(konamigv_state::btc_trackball_w),this));
@@ -660,7 +654,6 @@ WRITE32_MEMBER(konamigv_state::kdeadeye_0_w)
 
 DRIVER_INIT_MEMBER(konamigv_state,kdeadeye)
 {
-
 	m_flash16[0] = machine().device<sharp_lh28f400_device>("flash");
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port  ( 0x1f680080, 0x1f680083, "GUNX1" );

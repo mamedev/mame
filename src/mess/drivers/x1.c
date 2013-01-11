@@ -543,7 +543,6 @@ static void draw_gfxbitmap(running_machine &machine, bitmap_rgb32 &bitmap,const 
 
 UINT32 x1_state::screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(MAKE_ARGB(0xff,0x00,0x00,0x00), cliprect);
 
 	draw_gfxbitmap(machine(),bitmap,cliprect,m_scrn_reg.disp_bank,m_scrn_reg.pri);

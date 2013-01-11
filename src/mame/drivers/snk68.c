@@ -51,13 +51,11 @@ Notes:
 
 READ16_MEMBER(snk68_state::sound_status_r)
 {
-
 	return (m_sound_status << 8);
 }
 
 WRITE8_MEMBER(snk68_state::sound_status_w)
 {
-
 	m_sound_status = data;
 }
 

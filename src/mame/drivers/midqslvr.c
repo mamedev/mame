@@ -651,7 +651,6 @@ static IRQ_CALLBACK(irq_callback)
 
 void midqslvr_state::machine_start()
 {
-
 	m_bios_ram = auto_alloc_array(machine(), UINT32, 0x10000/4);
 	m_bios_ext1_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);
 	m_bios_ext2_ram = auto_alloc_array(machine(), UINT32, 0x4000/4);

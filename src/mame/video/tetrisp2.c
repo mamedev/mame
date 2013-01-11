@@ -759,7 +759,6 @@ VIDEO_START_MEMBER(stepstag_state,stepstag)
 
 UINT32 stepstag_state::screen_update_stepstag_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(0, cliprect);
 	machine().priority_bitmap.fill(0);
 
@@ -769,7 +768,6 @@ UINT32 stepstag_state::screen_update_stepstag_left(screen_device &screen, bitmap
 }
 UINT32 stepstag_state::screen_update_stepstag_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(0, cliprect);
 	machine().priority_bitmap.fill(0);
 
@@ -780,7 +778,6 @@ UINT32 stepstag_state::screen_update_stepstag_right(screen_device &screen, bitma
 
 UINT32 stepstag_state::screen_update_stepstag_mid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(0, cliprect);
 	machine().priority_bitmap.fill(0);
 

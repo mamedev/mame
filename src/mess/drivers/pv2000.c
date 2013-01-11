@@ -369,7 +369,6 @@ void pv2000_state::machine_start()
 
 void pv2000_state::machine_reset()
 {
-
 	m_last_state = 0;
 	m_key_pressed = 0;
 	m_keyb_column = 0;

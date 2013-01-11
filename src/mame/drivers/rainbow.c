@@ -331,7 +331,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 WRITE16_MEMBER(rbisland_state::jumping_sound_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		m_jumping_latch = data & 0xff; /*M68000 writes .b to $400007*/
@@ -645,7 +644,6 @@ static const tc0140syt_interface rbisland_tc0140syt_intf =
 
 void rbisland_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_pc080sn = machine().device("pc080sn");

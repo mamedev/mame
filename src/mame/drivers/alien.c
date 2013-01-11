@@ -43,7 +43,6 @@ protected:
 
 void alien_state::video_start()
 {
-
 }
 
 UINT32 alien_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

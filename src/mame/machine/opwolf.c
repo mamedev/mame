@@ -275,7 +275,6 @@ static const UINT16 *const level_data_lookup[] =
 
 TIMER_CALLBACK_MEMBER(opwolf_state::opwolf_timer_callback)
 {
-
 	// Level data command
 	if (m_current_cmd == 0xf5)
 	{
@@ -406,7 +405,6 @@ WRITE16_MEMBER(opwolf_state::opwolf_cchip_bank_w)
 
 WRITE16_MEMBER(opwolf_state::opwolf_cchip_data_w)
 {
-
 	m_cchip_ram[(m_current_bank * 0x400) + offset] = data & 0xff;
 
 //  if (offset != 0x64 && offset != 0x65 && offset != 0x66 && offset != 0x67 && offset != 0x68 && offset != 0x69)
@@ -510,7 +508,6 @@ READ16_MEMBER(opwolf_state::opwolf_cchip_status_r)
 
 READ16_MEMBER(opwolf_state::opwolf_cchip_data_r)
 {
-
 //  if (offset!=0x7f && offset!=0x1c && offset!=0x1d && offset!=0x1e && offset!=0x1f && offset!=0x20 && space.device().safe_pc()!=0xc18 && space.device().safe_pc()!=0xc2e && space.device().safe_pc()!=0xc9e && offset!=0x50 && offset!=0x51 && offset!=0x52 && offset!=0x53 && offset!=0x5 && offset!=0x13 && offset!=0x79 && offset!=0x12 && offset!=0x34)
 //      logerror("%08x:  opwolf c read %04x (bank %04x)\n", space.device().safe_pc(), offset, m_current_bank);
 
@@ -525,7 +522,6 @@ READ16_MEMBER(opwolf_state::opwolf_cchip_data_r)
 
 TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
 {
-
 	// Update input ports, these are used by both the 68k directly and by the c-chip
 	m_cchip_ram[0x4] = ioport("IN0")->read();
 	m_cchip_ram[0x5] = ioport("IN1")->read();

@@ -159,7 +159,6 @@ WRITE8_MEMBER(jollyjgr_state::jollyjgr_videoram_w)
 
 WRITE8_MEMBER(jollyjgr_state::jollyjgr_attrram_w)
 {
-
 	if (offset & 1)
 	{
 		/* color change */
@@ -178,7 +177,6 @@ WRITE8_MEMBER(jollyjgr_state::jollyjgr_attrram_w)
 
 WRITE8_MEMBER(jollyjgr_state::jollyjgr_misc_w)
 {
-
 	// they could be swapped, because it always set "data & 3"
 	m_flip_x = data & 1;
 	m_flip_y = data & 2;
@@ -552,7 +550,6 @@ UINT32 jollyjgr_state::screen_update_jollyjgr(screen_device &screen, bitmap_ind1
 
 UINT32 jollyjgr_state::screen_update_fspider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	// Draw bg and sprites
 	screen_update_jollyjgr(screen, bitmap, cliprect);
 
@@ -631,7 +628,6 @@ INTERRUPT_GEN_MEMBER(jollyjgr_state::jollyjgr_interrupt)
 
 void jollyjgr_state::machine_start()
 {
-
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_flip_x));
 	save_item(NAME(m_flip_y));
@@ -641,7 +637,6 @@ void jollyjgr_state::machine_start()
 
 void jollyjgr_state::machine_reset()
 {
-
 	m_nmi_enable = 0;
 	m_flip_x = 0;
 	m_flip_y = 0;

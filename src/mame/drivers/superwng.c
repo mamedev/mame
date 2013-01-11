@@ -117,7 +117,6 @@ void superwng_state::video_start()
 
 UINT32 superwng_state::screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	rectangle tmp = cliprect;
 
@@ -208,7 +207,6 @@ WRITE8_MEMBER(superwng_state::superwng_nmi_enable_w)
 
 INTERRUPT_GEN_MEMBER(superwng_state::superwng_nmi_interrupt)
 {
-
 	if (BIT(m_nmi_enable, 0))
 		nmi_line_pulse(device);
 }
@@ -428,7 +426,6 @@ GFXDECODE_END
 
 void superwng_state::machine_start()
 {
-
 	save_item(NAME(m_tile_bank));
 	save_item(NAME(m_sound_byte));
 	save_item(NAME(m_nmi_enable));
@@ -436,7 +433,6 @@ void superwng_state::machine_start()
 
 void superwng_state::machine_reset()
 {
-
 	m_sound_byte = 0;
 	m_nmi_enable = 0;
 }

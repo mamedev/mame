@@ -91,7 +91,6 @@ void kontest_state::palette_init()
 
 void kontest_state::video_start()
 {
-
 }
 
 UINT32 kontest_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )

@@ -263,14 +263,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(sprcros2_state::sprcros2_m_interrupt)
 
 INTERRUPT_GEN_MEMBER(sprcros2_state::sprcros2_s_interrupt)
 {
-
 	if(m_s_port3&0x01)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 void sprcros2_state::machine_start()
 {
-
 	save_item(NAME(m_port7));
 	save_item(NAME(m_s_port3));
 }

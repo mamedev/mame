@@ -59,7 +59,6 @@ double compute_resistor_weights(
 	int count_2, const int * resistances_2, double * weights_2, int pulldown_2, int pullup_2,
 	int count_3, const int * resistances_3, double * weights_3, int pulldown_3, int pullup_3 )
 {
-
 	int networks_no;
 
 	int rescount[MAX_NETS];     /* number of resistors in each of the nets */
@@ -239,7 +238,6 @@ double compute_resistor_net_outputs(
 	int count_2, const int * resistances_2, double * outputs_2, int pulldown_2, int pullup_2,
 	int count_3, const int * resistances_3, double * outputs_3, int pulldown_3, int pullup_3 )
 {
-
 	int networks_no;
 
 	int rescount[MAX_NETS];     /* number of resistors in each of the nets */

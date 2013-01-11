@@ -231,7 +231,6 @@ WRITE8_MEMBER(mjsister_state::mjsister_banksel1_w)
 
 WRITE8_MEMBER(mjsister_state::mjsister_banksel2_w)
 {
-
 	switch (data)
 	{
 		case 0xa: m_dac_bank = 0; break;
@@ -475,7 +474,6 @@ void mjsister_state::machine_start()
 
 void mjsister_state::machine_reset()
 {
-
 	m_dac_busy = 0;
 	m_flip_screen = 0;
 	m_video_enable = 0;

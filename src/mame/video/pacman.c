@@ -183,7 +183,6 @@ VIDEO_START_MEMBER(pacman_state,pacman)
 
 VIDEO_START_MEMBER(pacman_state,birdiy)
 {
-
 	VIDEO_START_CALL_MEMBER( pacman );
 	m_xoffsethack = 0;
 	m_inv_spr = 1; // sprites are mirrored in X-axis compared to normal behaviour

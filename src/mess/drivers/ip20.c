@@ -556,7 +556,6 @@ TIMER_CALLBACK_MEMBER(ip20_state::ip20_timer)
 
 void ip20_state::machine_start()
 {
-
 	sgi_mc_init(machine());
 
 	m_HPC.nMiscStatus = 0;

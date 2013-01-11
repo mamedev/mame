@@ -26,7 +26,6 @@ static void pokey_reset(running_machine &machine);
 
 void atari_interrupt_cb(pokey_device *device, int mask)
 {
-
 	if (VERBOSE_POKEY)
 	{
 		if (mask & 0x80)

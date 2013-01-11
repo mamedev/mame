@@ -917,7 +917,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(tmaster_state::tm3k_interrupt)
 
 static const duart68681_config tmaster_duart68681_config =
 {
-
 	duart_irq_handler,
 	duart_tx,
 	NULL,

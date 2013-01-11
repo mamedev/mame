@@ -41,7 +41,6 @@ WRITE8_MEMBER(rollerg_state::rollerg_0010_w)
 
 READ8_MEMBER(rollerg_state::rollerg_k051316_r)
 {
-
 	if (m_readzoomroms)
 		return k051316_rom_r(m_k051316, space, offset);
 	else
@@ -265,7 +264,6 @@ void rollerg_state::machine_start()
 
 void rollerg_state::machine_reset()
 {
-
 	konami_configure_set_lines(machine().device("maincpu"), rollerg_banking);
 
 	m_readzoomroms = 0;

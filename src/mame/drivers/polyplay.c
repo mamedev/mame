@@ -126,7 +126,6 @@ INTERRUPT_GEN_MEMBER(polyplay_state::periodic_interrupt)
 
 INTERRUPT_GEN_MEMBER(polyplay_state::coin_interrupt)
 {
-
 	if (ioport("INPUT")->read() & 0x80)
 		m_last = 0;
 	else

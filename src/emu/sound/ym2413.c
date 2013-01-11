@@ -335,7 +335,6 @@ static const UINT32 sl_tab[16]={
 
 #define RATE_STEPS (8)
 static const unsigned char eg_inc[15*RATE_STEPS]={
-
 /*cycle:0 1  2 3  4 5  6 7*/
 
 /* 0 */ 0,1, 0,1, 0,1, 0,1, /* rates 00..12 0 (increment by 0 or 1) */
@@ -536,7 +535,6 @@ static const UINT8 lfo_am_table[LFO_AM_TAB_ELEMENTS] = {
 
 /* LFO Phase Modulation table (verified on real YM2413) */
 static const INT8 lfo_pm_table[8*8] = {
-
 /* FNUM2/FNUM = 0 00xxxxxx (0x0000) */
 0, 0, 0, 0, 0, 0, 0, 0,
 
@@ -673,7 +671,6 @@ INLINE void advance(YM2413 *chip)
 
 			switch(op->state)
 			{
-
 			case EG_DMP:        /* dump phase */
 			/*dump phase is performed by both operators in each channel*/
 			/*when CARRIER envelope gets down to zero level,
@@ -1051,7 +1048,6 @@ INLINE void rhythm_calc( YM2413 *chip, OPLL_CH *CH, unsigned int noise )
 	env = volume_calc(SLOT7_1);
 	if( env < ENV_QUIET )
 	{
-
 		/* high hat phase generation:
 		    phase = d0 or 234 (based on frequency only)
 		    phase = 34 or 2d0 (based on noise)

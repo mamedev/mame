@@ -265,7 +265,6 @@ void i8237_device::i8237_timerproc()
 
 	switch ( m_state )
 	{
-
 	case DMA8237_SI:
 	{
 		/* Make sure EOP is high */

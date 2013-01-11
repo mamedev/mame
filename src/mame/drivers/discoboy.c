@@ -224,7 +224,6 @@ WRITE8_MEMBER(discoboy_state::discoboy_port_00_w)
 
 WRITE8_MEMBER(discoboy_state::discoboy_port_01_w)
 {
-
 	// 00 10 20 30 during gameplay  1,2,3 other times?? title screen bit 0x40 toggle
 	//printf("unk discoboy_port_01_w %02x\n",data);
 	// discoboy gfxbank
@@ -250,7 +249,6 @@ WRITE8_MEMBER(discoboy_state::discoboy_port_06_w)
 
 WRITE8_MEMBER(discoboy_state::rambank_w)
 {
-
 	if (m_ram_bank & 0x20)
 		m_ram_2[offset] = data;
 	else
@@ -259,7 +257,6 @@ WRITE8_MEMBER(discoboy_state::rambank_w)
 
 READ8_MEMBER(discoboy_state::rambank_r)
 {
-
 	if (m_ram_bank & 0x20)
 		return m_ram_2[offset];
 	else
@@ -268,7 +265,6 @@ READ8_MEMBER(discoboy_state::rambank_r)
 
 READ8_MEMBER(discoboy_state::rambank2_r)
 {
-
 	if (m_port_00 == 0x00)
 		return m_ram_3[offset];
 	else if (m_port_00 == 0x01)
@@ -281,7 +277,6 @@ READ8_MEMBER(discoboy_state::rambank2_r)
 
 WRITE8_MEMBER(discoboy_state::rambank2_w)
 {
-
 	if (m_port_00 == 0x00)
 		m_ram_3[offset] = data;
 	else if (m_port_00 == 0x01)
@@ -343,7 +338,6 @@ WRITE8_MEMBER(discoboy_state::yunsung8_sound_bankswitch_w)
 
 WRITE8_MEMBER(discoboy_state::yunsung8_adpcm_w)
 {
-
 	/* Swap the nibbles */
 	m_adpcm = ((data & 0xf) << 4) | ((data >> 4) & 0xf);
 }
@@ -456,7 +450,6 @@ GFXDECODE_END
 
 void discoboy_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_ram_bank));
@@ -468,7 +461,6 @@ void discoboy_state::machine_start()
 
 void discoboy_state::machine_reset()
 {
-
 	m_ram_bank = 0;
 	m_port_00 = 0;
 	m_gfxbank = 0;

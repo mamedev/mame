@@ -826,7 +826,6 @@ static const tc0110pcr_interface asuka_tc0110pcr_intf =
 
 void asuka_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_pc090oj = machine().device("pc090oj");
@@ -850,7 +849,6 @@ void asuka_state::machine_start()
 
 void asuka_state::machine_reset()
 {
-
 	m_adpcm_pos = 0;
 	m_adpcm_data = -1;
 	m_current_round = 0;

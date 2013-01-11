@@ -206,7 +206,6 @@ TODO:
 
 WRITE8_MEMBER(rallyx_state::rallyx_interrupt_vector_w)
 {
-
 	m_maincpu->set_input_line_vector(0, data);
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -214,7 +213,6 @@ WRITE8_MEMBER(rallyx_state::rallyx_interrupt_vector_w)
 
 WRITE8_MEMBER(rallyx_state::rallyx_bang_w)
 {
-
 	if (data == 0 && m_last_bang != 0)
 		m_samples->start(0, 0);
 
@@ -873,7 +871,6 @@ static const samples_interface rallyx_samples_interface =
 
 MACHINE_START_MEMBER(rallyx_state,rallyx)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_samples = machine().device<samples_device>("samples");
 
@@ -883,21 +880,18 @@ MACHINE_START_MEMBER(rallyx_state,rallyx)
 
 MACHINE_RESET_MEMBER(rallyx_state,rallyx)
 {
-
 	m_last_bang = 0;
 	m_stars_enable = 0;
 }
 
 INTERRUPT_GEN_MEMBER(rallyx_state::rallyx_vblank_irq)
 {
-
 	if(m_main_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(rallyx_state::jungler_vblank_irq)
 {
-
 	if(m_main_irq_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

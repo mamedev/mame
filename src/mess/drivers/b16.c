@@ -237,7 +237,6 @@ GFXDECODE_END
 
 void b16_state::machine_start()
 {
-
 	m_dma8237 = machine().device<i8237_device>( "dma8237" );
 	m_mc6845 = machine().device<mc6845_device>("crtc");
 }

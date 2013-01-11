@@ -434,7 +434,6 @@ void slyspy_set_protection_map(running_machine& machine, int type)
 
 	switch (type)
 	{
-
 		case 0:
 			space.install_legacy_write_handler( *tilegen2, 0x240000, 0x240007, FUNC(deco_bac06_pf_control_0_w));
 			space.install_legacy_write_handler( *tilegen2, 0x240010, 0x240017, FUNC(deco_bac06_pf_control_1_w));

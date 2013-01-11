@@ -1007,7 +1007,6 @@ static void Nick_DoScreen(NICK_STATE *nick, bitmap_ind16 &bm)
 
 	do
 	{
-
 		/* set write address for line */
 		nick->dest = &bm.pix16(line);
 		nick->dest_pos = 0;

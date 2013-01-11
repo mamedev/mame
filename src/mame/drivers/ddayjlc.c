@@ -171,7 +171,6 @@ WRITE8_MEMBER(ddayjlc_state::char_bank_w)
 
 WRITE8_MEMBER(ddayjlc_state::ddayjlc_bgram_w)
 {
-
 	if (!offset)
 		m_bg_tilemap->set_scrollx(0, data + 8);
 
@@ -207,7 +206,6 @@ WRITE8_MEMBER(ddayjlc_state::bg1_w)
 
 WRITE8_MEMBER(ddayjlc_state::bg2_w)
 {
-
 	m_bgadr = (m_bgadr & 0xfb) | ((data & 1) << 2);
 	if (m_bgadr > 2)
 		m_bgadr = 0;
@@ -217,21 +215,18 @@ WRITE8_MEMBER(ddayjlc_state::bg2_w)
 
 WRITE8_MEMBER(ddayjlc_state::sound_w)
 {
-
 	soundlatch_byte_w(space, offset, data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
 WRITE8_MEMBER(ddayjlc_state::i8257_CH0_w)
 {
-
 	m_e00x_d[offset][m_e00x_l[offset]] = data;
 	m_e00x_l[offset] ^= 1;
 }
 
 WRITE8_MEMBER(ddayjlc_state::i8257_LMSR_w)
 {
-
 	if (!data)
 	{
 		INT32 src = m_e00x_d[0][1] * 256 + m_e00x_d[0][0];
@@ -452,7 +447,6 @@ INTERRUPT_GEN_MEMBER(ddayjlc_state::ddayjlc_snd_interrupt)
 
 void ddayjlc_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_char_bank));

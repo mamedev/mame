@@ -56,7 +56,6 @@ void seicross_state::palette_init()
 
 WRITE8_MEMBER(seicross_state::seicross_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -87,7 +86,6 @@ TILE_GET_INFO_MEMBER(seicross_state::get_bg_tile_info)
 
 void seicross_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(seicross_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 

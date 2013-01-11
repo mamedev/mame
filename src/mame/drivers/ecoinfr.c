@@ -117,7 +117,6 @@ public:
 
 TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_state::ecoinfr_irq_timer)
 {
-
 	irq_toggle^=1;
 
 	//printf("blah %d\n", irq_toggle);
@@ -197,27 +196,22 @@ WRITE8_MEMBER(ecoinfr_state::ec_port02_out_w)
 
 WRITE8_MEMBER(ecoinfr_state::ec_port03_out_w)
 {
-
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port04_out_w)
 {
-
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port05_out_w)
 {
-
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port06_out_w)
 {
-
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port07_out_w)
 {
-
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port08_out_bank_strobe_w)
@@ -265,7 +259,6 @@ WRITE8_MEMBER(ecoinfr_state::ec_port08_out_bank_strobe_w)
 // is developed
 WRITE8_MEMBER(ecoinfr_state::ec_port09_out_reelen_w)
 {
-
 	int old_port09_value = port09_value;
 	port09_value = data;
 
@@ -281,13 +274,11 @@ WRITE8_MEMBER(ecoinfr_state::ec_port09_out_reelen_w)
 
 WRITE8_MEMBER(ecoinfr_state::ec_port0a_out_w)
 {
-
 }
 
 
 WRITE8_MEMBER(ecoinfr_state::ec_port0b_out_w)
 {
-
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port0c_out_cred_strobe_w)
@@ -336,7 +327,6 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0d_out_cred_data_w)
 
 WRITE8_MEMBER(ecoinfr_state::ec_port0e_out_w)
 {
-
 }
 
 WRITE8_MEMBER(ecoinfr_state::ec_port0f_out_bank_segdata_w)
@@ -350,7 +340,6 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0f_out_bank_segdata_w)
 
 WRITE8_MEMBER(ecoinfr_state::ec_port10_out_w)
 {
-
 	int old_port10_value = port10_value;
 	port10_value = data;
 
@@ -366,7 +355,6 @@ WRITE8_MEMBER(ecoinfr_state::ec_port10_out_w)
 
 WRITE8_MEMBER(ecoinfr_state::ec_port11_out_w)
 {
-
 	int old_port11_value = port11_value;
 	port11_value = data;
 
@@ -382,7 +370,6 @@ WRITE8_MEMBER(ecoinfr_state::ec_port11_out_w)
 
 WRITE8_MEMBER(ecoinfr_state::ec_port12_out_w)
 {
-
 	int old_port12_value = port12_value;
 	port12_value = data;
 
@@ -398,7 +385,6 @@ WRITE8_MEMBER(ecoinfr_state::ec_port12_out_w)
 
 WRITE8_MEMBER(ecoinfr_state::ec_port13_out_w)
 {
-
 	int old_port13_value = port13_value;
 	port13_value = data;
 
@@ -414,7 +400,6 @@ WRITE8_MEMBER(ecoinfr_state::ec_port13_out_w)
 
 WRITE8_MEMBER(ecoinfr_state::ec_port14_out_w)
 {
-
 	int old_port14_value = port14_value;
 	port14_value = data;
 
@@ -430,7 +415,6 @@ WRITE8_MEMBER(ecoinfr_state::ec_port14_out_w)
 
 WRITE8_MEMBER(ecoinfr_state::ec_port15_out_w)
 {
-
 	int old_port15_value = port15_value;
 	port15_value = data;
 
@@ -449,7 +433,6 @@ WRITE8_MEMBER(ecoinfr_state::ec_port15_out_w)
 
 WRITE8_MEMBER(ecoinfr_state::ec_port16_out_w)
 {
-
 	int old_port16_value = port16_value;
 	port16_value = data;
 
@@ -465,7 +448,6 @@ WRITE8_MEMBER(ecoinfr_state::ec_port16_out_w)
 
 WRITE8_MEMBER(ecoinfr_state::ec_port17_out_w)
 {
-
 	int old_port17_value = port17_value;
 	port17_value = data;
 
@@ -752,7 +734,6 @@ INPUT_PORTS_END
 
 void ecoinfr_state::machine_reset()
 {
-
 //  port00_value = 0x00;
 //  port01_value = 0x00;
 //  port02_value = 0x00;
@@ -844,16 +825,14 @@ MACHINE_CONFIG_END
 	ROM_LOAD( "bxpal", 0x0000, 0x000c80, CRC(e30cd1ff) SHA1(4a1ee1703a677143412aa367cfe7d7d346812d87) ) \
 	ROM_REGION( 0x200000, "sndz80", 0 ) \
 	/* apparently all games using these PCBs had the same sound rom.. */ \
-	ROM_LOAD( "barxsnd.bin", 0x0000, 0x001000, CRC(7d37fda1) SHA1(fb906615067887d9daecdbc741cfa4ac710c4627) ) \
-
+	ROM_LOAD( "barxsnd.bin", 0x0000, 0x001000, CRC(7d37fda1) SHA1(fb906615067887d9daecdbc741cfa4ac710c4627) )
 #define EC_BARX_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_BARX_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS )
 
 /* 32Kb With Header / Space for Header */
 
@@ -975,16 +954,14 @@ EC_BARX_SET( 199?, ec_bx180a,   ec_bx180,   "bxc1&6c.rom",  0x0000, 0x008000, CR
 
 #define EC_BIG7_OTHERS \
 	ROM_REGION( 0x200000, "sndz80", 0 ) \
-	ROM_LOAD( "big7snd", 0x0000, 0x002000, CRC(b530d91f) SHA1(f4e70e05d11e92a82f4bf8d78859b2a94fa5f22b) ) \
-
+	ROM_LOAD( "big7snd", 0x0000, 0x002000, CRC(b530d91f) SHA1(f4e70e05d11e92a82f4bf8d78859b2a94fa5f22b) )
 #define EC_BIG7_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_BIG7_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS )
 // This is almost certainly a mix of 'Big7' and 'Super Big7' ROMs
 /* All have 'BIG7' and type info in header */
 EC_BIG7_SET( 199?, ec_big7,     0,          "big7.bin",                 0x0000, 0x008000, CRC(12a08de2) SHA1(cce3526d3b47567d240739111ed4b7e2ba994de6), "Electrocoin","Big 7 / Super Big 7 (Electrocoin) (set 1)" )
@@ -1064,16 +1041,14 @@ EC_BIG7_SET( 199?, ec_big7__ay, ec_big7,    "bigcon8t.hex",             0x0000, 
 
 #define EC_SBARX_OTHERS \
 	ROM_REGION( 0x200000, "sndz80", ROMREGION_ERASE00 ) \
-	/* probably the same sound rom */  \
-
+	/* probably the same sound rom */
 #define EC_SBARX_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_SBARX_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS )
 
 /* Identified as 'SBARX2' header like BIG7 */
 EC_SBARX_SET( 199?, ec_sbarx,       0,          "iss3001.rom",                          0x0000, 0x008000, CRC(01390318) SHA1(e01a4160f774e376b5527ddee084a0be3eef865e), "Electrocoin","Super Bar X (Electrocoin) (set 1)" )
@@ -1163,8 +1138,7 @@ EC_SBARX_SET( 199?, ec_sbarx__a4,   ec_sbarx,   "sbx8elac",                     
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_SBARX_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfrbr ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfrbr ,ROT0,company,title,GAME_FLAGS )
 
 /* No Header - very similar to Brunel sets, but no device at 0xa000 */ // spin the reels a lot more than anything else
 EC_SBARXBR_SET( 1991, ec_sbxbr,         0,          "sbx5nc.10",                            0x0000, 0x008000, CRC(beb7254a) SHA1(137e91e0b92d970d09d165a42b890a5d31d795d9), "Brunel Research","Super Bar X (Brunel Research) (set 1)" )
@@ -1182,16 +1156,14 @@ EC_SBARXBR_SET( 1991, ec_sbxbrh,        ec_sbxbr,   "super bar x 8 1-0.bin",    
 
 #define EC_MAG7S_OTHERS \
 	ROM_REGION( 0x200000, "sndz80", ROMREGION_ERASE00 ) \
-	/* probably the same sound rom */  \
-
+	/* probably the same sound rom */
 #define EC_MAG7S_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_MAG7S_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS )
 
 
 
@@ -1269,16 +1241,14 @@ EC_MAG7S_SET( 199?, ec_mag7s__a0,   ec_mag7s,   "majic",   0x0000, 0x008000, CRC
 
 #define EC_REDBR_OTHERS \
 	ROM_REGION( 0x200000, "sndz80", ROMREGION_ERASE00 ) \
-	/* probably the same sound rom */  \
-
+	/* probably the same sound rom */
 #define EC_REDBR_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_REDBR_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS )
 // These are '2001 REDBAR' (older header type with 0 at end)
 EC_REDBR_SET( 199?, ec_redbr,       0,          "issa101",                  0x0000, 0x008000, CRC(05bba52d) SHA1(fe1f80a6621564f8ea0fd741618ebd80a78a0055), "Electrocoin","Red Bar (Electrocoin) (set 1)" )
 EC_REDBR_SET( 199?, ec_redbr__a,    ec_redbr,   "issa102",                  0x0000, 0x008000, CRC(9aebf74c) SHA1(4da5d9240a2dcfdaa96a8a784ea5745c90108f9e), "Electrocoin","Red Bar (Electrocoin) (set 2)" )
@@ -1390,16 +1360,14 @@ EC_REDBR_SET( 199?, ec_redbr__b1,   ec_redbr,   "sbig78t",                  0x00
 
 #define EC_BXD7S_OTHERS \
 	ROM_REGION( 0x200000, "sndz80", ROMREGION_ERASE00 ) \
-	/* probably the same sound rom */  \
-
+	/* probably the same sound rom */
 #define EC_BXD7S_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_BXD7S_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS )
 
 // These are '2006 COOL7'
 EC_BXD7S_SET( 199?, ec_bxd7s,       0,          "issc193.dat",  0x0000, 0x008000, CRC(2f3fb9e2) SHA1(426f7436c8a22f1d8a05a5ccef6b6b5551441028), "Electrocoin","Bar X Diamond 7s (2006 COOL7) (Electrocoin) (set 1)" )  // P-2S K---
@@ -1414,16 +1382,14 @@ EC_BXD7S_SET( 199?, ec_bxd7s__d,    ec_bxd7s,   "issc337",      0x0000, 0x008000
 
 #define EC_CASBX_OTHERS \
 	ROM_REGION( 0x200000, "sndz80", ROMREGION_ERASE00 ) \
-	/* probably the same sound rom */  \
-
+	/* probably the same sound rom */
 #define EC_CASBX_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_CASBX_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS )
 
 
 /* (C)1993-97/2002-03 ELECTROCOIN */
@@ -1442,16 +1408,14 @@ EC_CASBX_SET( 2005, ec_bx125a,  ec_bx125,   "x125n34.bin",  0x0000, 0x010000, CR
 
 #define EC_SPBDX_OTHERS \
 	ROM_REGION( 0x200000, "sndz80", ROMREGION_ERASE00 ) \
-	/* probably the same sound rom */  \
-
+	/* probably the same sound rom */
 #define EC_SPBDX_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_SPBDX_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS )
 
 /* No header (space for one, but 0x00 fill) - Electrocoin 1993 copyright near end */
 EC_SPBDX_SET( 199?, ec_spbdx,       0,          "iss132.rom",   0x0000, 0x008000, CRC(fd2ea535) SHA1(6deda1825bfce9481bf85a500e031242a2c9cf8c), "Electrocoin","Super Bar X Deluxe (Electrocoin) (set 1)" ) // ELCNSBRX - Sat Jun 22 13:28:41 1996
@@ -1463,16 +1427,14 @@ EC_SPBDX_SET( 199?, ec_spbdx__d,    ec_spbdx,   "300615",       0x0000, 0x008000
 
 #define EC_UNK5_OTHERS \
 	ROM_REGION( 0x200000, "sndz80", ROMREGION_ERASE00 ) \
-	/* probably the same sound rom */  \
-
+	/* probably the same sound rom */
 #define EC_UNK5_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		EC_UNK5_OTHERS \
 	ROM_END \
-	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,ecoinfr ,ecoinfr_barx , ecoinfr_state,ecoinfr ,ROT0,company,title,GAME_FLAGS )
 
 // No Header info (all 0x00)
 // (C)1993/97 ELECTROCOIN
@@ -1715,7 +1677,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ecoinfr_state,ecoinfr)
 {
-
 }
 
 DRIVER_INIT_MEMBER(ecoinfr_state,ecoinfrmab)
@@ -1726,7 +1687,6 @@ DRIVER_INIT_MEMBER(ecoinfr_state,ecoinfrmab)
 // for the Brunel Research sets
 DRIVER_INIT_MEMBER(ecoinfr_state,ecoinfrbr)
 {
-
 }
 
 // 3rd party sets with MAB scrambling, game names might be incorrect, should be the same basic hardware as these tho.

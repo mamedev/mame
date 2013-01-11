@@ -298,7 +298,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(matmania_state,matmania)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_mcu = machine().device("mcu");
@@ -353,7 +352,6 @@ static const ym3526_interface ym3526_config =
 
 MACHINE_START_MEMBER(matmania_state,maniach)
 {
-
 	MACHINE_START_CALL_MEMBER(matmania);
 
 	save_item(NAME(m_port_a_in));
@@ -373,7 +371,6 @@ MACHINE_START_MEMBER(matmania_state,maniach)
 
 MACHINE_RESET_MEMBER(matmania_state,maniach)
 {
-
 	m_port_a_in = 0;
 	m_port_a_out = 0;
 	m_ddr_a = 0;

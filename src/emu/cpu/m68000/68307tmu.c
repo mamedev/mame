@@ -101,7 +101,6 @@ WRITE16_HANDLER( m68307_internal_timer_w )
 
 static TIMER_CALLBACK( m68307_timer0_callback )
 {
-
 	legacy_cpu_device *dev = (legacy_cpu_device *)ptr;
 	m68ki_cpu_core* m68k = m68k_get_safe_token(dev);
 	m68307_single_timer* tptr = &m68k->m68307TIMER->singletimer[0];

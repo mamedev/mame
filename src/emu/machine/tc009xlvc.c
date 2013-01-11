@@ -278,7 +278,6 @@ void tc0091lvc_device::device_start()
 
 void tc0091lvc_device::device_reset()
 {
-
 }
 
 const address_space_config *tc0091lvc_device::memory_space_config(address_spacenum spacenum) const

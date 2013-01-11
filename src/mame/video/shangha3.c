@@ -97,7 +97,6 @@ WRITE16_MEMBER(shangha3_state::shangha3_flipscreen_w)
 
 WRITE16_MEMBER(shangha3_state::shangha3_gfxlist_addr_w)
 {
-
 	COMBINE_DATA(&m_gfxlist_addr);
 }
 
@@ -257,7 +256,6 @@ else
 
 UINT32 shangha3_state::screen_update_shangha3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	copybitmap(bitmap, m_rawbitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

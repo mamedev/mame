@@ -187,7 +187,6 @@ READ8_MEMBER(mjkjidai_state::keyboard_r)
 
 WRITE8_MEMBER(mjkjidai_state::keyboard_select_w)
 {
-
 //  logerror("%04x: keyboard_select %d = %02x\n",space.device().safe_pc(),offset,data);
 
 	switch (offset)
@@ -416,7 +415,6 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(mjkjidai_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

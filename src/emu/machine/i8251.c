@@ -168,7 +168,6 @@ void i8251_device::transmit_clock()
 	/* transmit enable? */
 	if (m_command & (1<<0))
 	{
-
 		/* transmit register full? */
 		if ((m_status & I8251_STATUS_TX_READY)==0)
 		{

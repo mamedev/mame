@@ -134,7 +134,6 @@ static READ8_HANDLER( mux_r )
 
 static WRITE8_HANDLER( mux_w )
 {
-
 	if ( dm01.xcounter < DM_BYTESPERROW )
 	{
 		dm01.scanline[dm01.xcounter] = data;
@@ -150,7 +149,6 @@ static WRITE8_HANDLER( mux_w )
 
 			while ( p < (DM_BYTESPERROW) )
 			{
-
 				UINT8 d = dm01.scanline[p];
 
 				for (int bitpos=0; bitpos <8; bitpos++)

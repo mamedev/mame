@@ -86,7 +86,6 @@ VIDEO_START_MEMBER(taitol_state,taitol)
 
 WRITE8_MEMBER(taitol_state::horshoes_bankg_w)
 {
-
 	if (m_horshoes_gfxbank != data)
 	{
 		m_horshoes_gfxbank = data;
@@ -98,7 +97,6 @@ WRITE8_MEMBER(taitol_state::horshoes_bankg_w)
 
 WRITE8_MEMBER(taitol_state::taitol_bankc_w)
 {
-
 	if (m_bankc[offset] != data)
 	{
 		m_bankc[offset] = data;
@@ -117,7 +115,6 @@ READ8_MEMBER(taitol_state::taitol_bankc_r)
 
 WRITE8_MEMBER(taitol_state::taitol_control_w)
 {
-
 //  logerror("Control Write %02x (%04x)\n", data, space.device().safe_pc());
 
 	m_cur_ctrl = data;
@@ -138,7 +135,6 @@ WRITE8_MEMBER(taitol_state::taitol_control_w)
 
 READ8_MEMBER(taitol_state::taitol_control_r)
 {
-
 //  logerror("Control Read %02x (%04x)\n", cur_ctrl, space.device().safe_pc());
 	return m_cur_ctrl;
 }

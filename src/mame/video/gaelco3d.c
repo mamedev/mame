@@ -67,7 +67,6 @@ gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
 
 void gaelco3d_state::video_start()
 {
-
 	m_poly = auto_alloc(machine(), gaelco3d_renderer(*this));
 
 	m_palette = auto_alloc_array(machine(), rgb_t, 32768);

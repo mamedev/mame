@@ -753,7 +753,6 @@ WRITE_LINE_DEVICE_HANDLER( floppy_drtn_w )
 /* write data */
 WRITE_LINE_DEVICE_HANDLER( floppy_wtd_w )
 {
-
 }
 
 /* step */

@@ -245,10 +245,8 @@ int bfm_bda_t::write_char(int data)
 	}
 	else
 	{
-
 		if(data < 0x80)//characters
 		{
-
 			if (m_blank_flag || m_flash_flag)
 			{
 				if (m_blank_flag)
@@ -429,7 +427,6 @@ void bfm_bda_t::setdata(int segdata, int data)
 
 	if ( move )
 	{
-
 		int mode = m_display_mode;
 
 		m_pcursor_pos = m_cursor_pos;

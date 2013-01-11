@@ -107,7 +107,6 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(splash_state::splash_adpcm_data_w)
 {
-
 	m_adpcm_data = data;
 }
 
@@ -133,7 +132,6 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(splash_state::roldfrog_bombs_r)
 {
-
 	m_ret ^= 0x100;
 	return m_ret;
 }
@@ -293,7 +291,6 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(splash_state,funystrp)
 {
-
 	m_adpcm_data = 0;
 	m_ret = 0x100;
 }
@@ -486,7 +483,6 @@ static const msm5205_interface splash_msm5205_interface =
 
 MACHINE_RESET_MEMBER(splash_state,splash)
 {
-
 	m_adpcm_data = 0;
 	m_ret = 0x100;
 }
@@ -999,14 +995,12 @@ ROM_END
 
 DRIVER_INIT_MEMBER(splash_state,splash)
 {
-
 	m_bitmap_type = 0;
 	m_sprite_attr2_shift = 8;
 }
 
 DRIVER_INIT_MEMBER(splash_state,splash10)
 {
-
 	m_bitmap_type = 0;
 	m_sprite_attr2_shift = 0;
 }

@@ -228,7 +228,6 @@ WRITE8_MEMBER(thedeep_state::thedeep_to_main_w)
 
 WRITE8_MEMBER(thedeep_state::thedeep_p3_w)
 {
-
 	/* bit 0 0->1 transition IRQ0 to main */
 	if((!(m_mcu_p3_reg & 0x01)) && data & 0x01)
 		m_maincpu->set_input_line(0, HOLD_LINE);
@@ -438,7 +437,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(thedeep_state::thedeep_interrupt)
 
 INTERRUPT_GEN_MEMBER(thedeep_state::thedeep_mcu_irq)
 {
-
 	m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }
 

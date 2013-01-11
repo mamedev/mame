@@ -93,7 +93,6 @@ READ16_MEMBER( isa16_ide_cd_device::atapi_r )
 			data |= ( m_atapi_data[m_atapi_data_ptr++] << 8 );
 			if( m_atapi_data_ptr >= m_atapi_data_len )
 			{
-
 				m_atapi_data_ptr = 0;
 				m_atapi_data_len = 0;
 

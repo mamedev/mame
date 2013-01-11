@@ -989,7 +989,6 @@ void cxhumax_state::machine_start()
 
 void cxhumax_state::machine_reset()
 {
-
 	m_i2c0_regs[0x08/4] = 0x08; // SDA high
 	m_i2c2_regs[0x08/4] = 0x08; // SDA high
 

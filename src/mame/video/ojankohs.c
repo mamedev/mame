@@ -122,7 +122,6 @@ WRITE8_MEMBER(ojankohs_state::ojankohs_colorram_w)
 
 WRITE8_MEMBER(ojankohs_state::ojankohs_gfxreg_w)
 {
-
 	if (m_gfxreg != data)
 	{
 		m_gfxreg = data;
@@ -132,10 +131,8 @@ WRITE8_MEMBER(ojankohs_state::ojankohs_gfxreg_w)
 
 WRITE8_MEMBER(ojankohs_state::ojankohs_flipscreen_w)
 {
-
 	if (m_flipscreen != BIT(data, 0))
 	{
-
 		m_flipscreen = BIT(data, 0);
 
 		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
@@ -259,7 +256,6 @@ WRITE8_MEMBER(ojankohs_state::ojankoc_videoram_w)
 
 VIDEO_START_MEMBER(ojankohs_state,ojankohs)
 {
-
 	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ojankohs_state::ojankohs_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
 //  m_videoram = auto_alloc_array(machine(), UINT8, 0x1000);
 //  m_colorram = auto_alloc_array(machine(), UINT8, 0x1000);
@@ -268,7 +264,6 @@ VIDEO_START_MEMBER(ojankohs_state,ojankohs)
 
 VIDEO_START_MEMBER(ojankohs_state,ojankoy)
 {
-
 	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ojankohs_state::ojankoy_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 4, 64, 64);
 //  m_videoram = auto_alloc_array(machine(), UINT8, 0x2000);
 //  m_colorram = auto_alloc_array(machine(), UINT8, 0x1000);
@@ -276,7 +271,6 @@ VIDEO_START_MEMBER(ojankohs_state,ojankoy)
 
 VIDEO_START_MEMBER(ojankohs_state,ojankoc)
 {
-
 	machine().primary_screen->register_screen_bitmap(m_tmpbitmap);
 	m_videoram.allocate(0x8000);
 	m_paletteram.allocate(0x20);
@@ -293,7 +287,6 @@ VIDEO_START_MEMBER(ojankohs_state,ojankoc)
 
 UINT32 ojankohs_state::screen_update_ojankohs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_tilemap->set_scrollx(0, m_scrollx);
 	m_tilemap->set_scrolly(0, m_scrolly);
 

@@ -92,7 +92,6 @@ void grchamp_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(grchamp_state::grchamp_cpu0_interrupt)
 {
-
 	if (m_cpu0_out[0] & 0x01)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
@@ -100,7 +99,6 @@ INTERRUPT_GEN_MEMBER(grchamp_state::grchamp_cpu0_interrupt)
 
 INTERRUPT_GEN_MEMBER(grchamp_state::grchamp_cpu1_interrupt)
 {
-
 	if (m_cpu1_out[4] & 0x01)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }

@@ -180,7 +180,6 @@ WRITE_LINE_MEMBER(su2000_state::su2000_pic8259_1_set_int_line)
 
 READ8_MEMBER(su2000_state::get_slave_ack)
 {
-
 	if (offset == 2)
 	{
 		// IRQ = 2
@@ -281,7 +280,6 @@ void su2000_state::machine_start()
 
 void su2000_state::machine_reset()
 {
-
 }
 
 

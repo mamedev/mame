@@ -225,14 +225,12 @@ WRITE8_MEMBER(othello_state::ack_w)
 
 WRITE8_MEMBER(othello_state::ay_address_w)
 {
-
 	if (m_ay_select & 1) ay8910_address_w(m_ay1, space, 0, data);
 	if (m_ay_select & 2) ay8910_address_w(m_ay2, space, 0, data);
 }
 
 WRITE8_MEMBER(othello_state::ay_data_w)
 {
-
 	if (m_ay_select & 1) ay8910_data_w(m_ay1, space, 0, data);
 	if (m_ay_select & 2) ay8910_data_w(m_ay2, space, 0, data);
 }
@@ -274,7 +272,6 @@ WRITE8_MEMBER(othello_state::n7751_rom_control_w)
 		case 3:
 			m_sound_addr &= 0xfff;
 			{
-
 				if (!BIT(data, 0)) m_sound_addr |= 0x0000;
 				if (!BIT(data, 1)) m_sound_addr |= 0x1000;
 				if (!BIT(data, 2)) m_sound_addr |= 0x2000;
@@ -384,7 +381,6 @@ static const mc6845_interface h46505_intf =
 
 void othello_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_mc6845 = machine().device<mc6845_device>("crtc");
 	m_n7751 = machine().device("n7751");
@@ -401,7 +397,6 @@ void othello_state::machine_start()
 
 void othello_state::machine_reset()
 {
-
 	m_tile_bank = 0;
 	m_ay_select = 0;
 	m_ack_data = 0;

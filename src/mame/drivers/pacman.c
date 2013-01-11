@@ -401,14 +401,12 @@ MACHINE_RESET_MEMBER(pacman_state,superabc)
 
 INTERRUPT_GEN_MEMBER(pacman_state::vblank_irq)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(pacman_state::vblank_nmi)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -676,7 +674,6 @@ WRITE8_MEMBER(pacman_state::bigbucks_bank_w)
 
 READ8_MEMBER(pacman_state::bigbucks_question_r)
 {
-
 	UINT8 *question = memregion("user1")->base();
 	UINT8 ret;
 
@@ -6193,7 +6190,6 @@ READ8_MEMBER(pacman_state::cannonbp_protection_r)
 
 DRIVER_INIT_MEMBER(pacman_state,cannonbp)
 {
-
 	/* extra memory */
 	m_maincpu->space(AS_PROGRAM).install_ram(0x4800, 0x4bff);
 

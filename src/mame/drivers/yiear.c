@@ -123,7 +123,6 @@ WRITE8_MEMBER(yiear_state::yiear_VLM5030_control_w)
 
 INTERRUPT_GEN_MEMBER(yiear_state::yiear_vblank_interrupt)
 {
-
 	if (m_yiear_irq_enable)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
@@ -131,7 +130,6 @@ INTERRUPT_GEN_MEMBER(yiear_state::yiear_vblank_interrupt)
 
 INTERRUPT_GEN_MEMBER(yiear_state::yiear_nmi_interrupt)
 {
-
 	if (m_yiear_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -263,13 +261,11 @@ GFXDECODE_END
 
 void yiear_state::machine_start()
 {
-
 	save_item(NAME(m_yiear_nmi_enable));
 }
 
 void yiear_state::machine_reset()
 {
-
 	m_yiear_nmi_enable = 0;
 }
 

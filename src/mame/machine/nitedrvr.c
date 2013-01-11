@@ -208,7 +208,6 @@ D5 = SKID2
 
 WRITE8_MEMBER(nitedrvr_state::nitedrvr_out0_w)
 {
-
 	discrete_sound_w(m_discrete, space, NITEDRVR_MOTOR_DATA, data & 0x0f);  // Motor freq data
 	discrete_sound_w(m_discrete, space, NITEDRVR_SKID1_EN, data & 0x10);    // Skid1 enable
 	discrete_sound_w(m_discrete, space, NITEDRVR_SKID2_EN, data & 0x20);    // Skid2 enable
@@ -227,7 +226,6 @@ D5 = Spare (Not used)
 
 WRITE8_MEMBER(nitedrvr_state::nitedrvr_out1_w)
 {
-
 	set_led_status(machine(), 0, data & 0x10);
 
 	m_crash_en = data & 0x01;
@@ -275,7 +273,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(nitedrvr_state::nitedrvr_crash_toggle_callback)
 
 void nitedrvr_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_gear));
@@ -291,7 +288,6 @@ void nitedrvr_state::machine_start()
 
 void nitedrvr_state::machine_reset()
 {
-
 	m_gear = 1;
 	m_track = 0;
 	m_steering_buf = 0;

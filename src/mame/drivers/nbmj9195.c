@@ -131,7 +131,6 @@ READ8_MEMBER(nbmj9195_state::tmpz84c011_pio_r)
 		(!strcmp(machine().system().name, "imekura")) ||
 		(!strcmp(machine().system().name, "mjegolf")))
 	{
-
 		switch (offset)
 		{
 			case 0:         /* PA_0 */
@@ -312,7 +311,6 @@ WRITE8_MEMBER(nbmj9195_state::tmpz84c011_pio_w)
 		(!strcmp(machine().system().name, "mscoutm")) ||
 		(!strcmp(machine().system().name, "mjegolf")))
 	{
-
 		switch (offset)
 		{
 			case 0:         /* PA_0 */

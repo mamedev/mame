@@ -48,7 +48,6 @@ static gboolean dview_expose(GtkWidget *wdv, GdkEventExpose *event)
 			l++;
 
 			if ( i == 0 || attr != viewdata[-1].attrib ) {
-
 				bg.red = bg.green = bg.blue = 0xffff;
 				fg.red = fg.green = fg.blue = 0;
 

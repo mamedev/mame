@@ -119,7 +119,6 @@ void deco_mxc06_device::draw_sprites( running_machine &machine, bitmap_ind16 &bi
 					int draw = 0;
 					if (!flash || (machine.primary_screen->frame_number() & 1))
 					{
-
 						if (m_priority_type==0) // most cases
 						{
 							if ((color & pri_mask) == pri_val)
@@ -198,5 +197,4 @@ void deco_mxc06_device::device_start()
 
 void deco_mxc06_device::device_reset()
 {
-
 }

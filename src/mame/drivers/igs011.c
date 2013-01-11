@@ -71,7 +71,6 @@ Notes:
 
 struct blitter_t
 {
-
 	UINT16  x, y, w, h,
 			gfx_lo, gfx_hi,
 			depth,
@@ -1377,7 +1376,6 @@ WRITE16_MEMBER(igs011_state::drgnwrld_igs003_w)
 
 	switch(m_igs003_reg[0])
 	{
-
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
 				coin_counter_w(machine(), 0,data & 2);

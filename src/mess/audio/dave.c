@@ -346,7 +346,6 @@ static STREAM_UPDATE( dave_update_sound )
 		{
 			if ((dave->Regs[7] & (1<<i))==0)
 			{
-
 				if (dave->level[i]) vol[i] += dave->Count[i];
 				dave->Count[i] -= STEP;
 				/* Period[i] is the half period of the square wave. Here, in each */

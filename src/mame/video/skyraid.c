@@ -10,7 +10,6 @@ Atari Sky Raider video emulation
 
 void skyraid_state::video_start()
 {
-
 	m_helper.allocate(128, 240);
 }
 
@@ -134,7 +133,6 @@ static void draw_trapezoid(running_machine &machine, bitmap_ind16& dst, bitmap_i
 
 UINT32 skyraid_state::screen_update_skyraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(0, cliprect);
 
 	rectangle helper_clip = cliprect;

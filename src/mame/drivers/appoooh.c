@@ -199,7 +199,6 @@ static void appoooh_adpcm_int(device_t *device)
 /* adpcm address write */
 WRITE8_MEMBER(appoooh_state::appoooh_adpcm_w)
 {
-
 	m_adpcm_address = data << 8;
 	msm5205_reset_w(m_adpcm, 0);
 	m_adpcm_data = 0xffffffff;
@@ -412,7 +411,6 @@ static const sn76496_config psg_intf =
 
 void appoooh_state::machine_start()
 {
-
 	m_adpcm = machine().device("msm");
 
 	save_item(NAME(m_adpcm_data));
@@ -422,7 +420,6 @@ void appoooh_state::machine_start()
 
 void appoooh_state::machine_reset()
 {
-
 	m_adpcm_address = 0xffffffff;
 	m_adpcm_data = 0;
 	m_scroll_x = 0;
@@ -431,7 +428,6 @@ void appoooh_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(appoooh_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

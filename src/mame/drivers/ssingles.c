@@ -311,7 +311,6 @@ WRITE8_MEMBER(ssingles_state::ssingles_colorram_w)
 
 void ssingles_state::video_start()
 {
-
 	{
 		int i;
 		for(i=0;i<NUM_PENS;++i)
@@ -324,20 +323,17 @@ void ssingles_state::video_start()
 
 READ8_MEMBER(ssingles_state::c000_r)
 {
-
 	return m_prot_data;
 }
 
 READ8_MEMBER(ssingles_state::c001_r)
 {
-
 	m_prot_data=0xc4;
 	return 0;
 }
 
 WRITE8_MEMBER(ssingles_state::c001_w)
 {
-
 	m_prot_data^=data^0x11;
 }
 
@@ -392,7 +388,6 @@ READ8_MEMBER(ssingles_state::atamanot_prot_r)
 
 WRITE8_MEMBER(ssingles_state::atamanot_prot_w)
 {
-
 	m_atamanot_prot_state = data;
 }
 
@@ -686,7 +681,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ssingles_state,ssingles)
 {
-
 	save_item(NAME(m_videoram));
 	save_item(NAME(m_colorram));
 }

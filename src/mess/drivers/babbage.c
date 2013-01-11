@@ -223,7 +223,6 @@ static const z80_daisy_config babbage_daisy_chain[] =
 
 TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
 {
-
 	UINT8 i, j, inp;
 	char kbdrow[6];
 	UINT8 data = 0xff;

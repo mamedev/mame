@@ -386,7 +386,6 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(fk1_state::keyboard_callback)
 {
-
 	if (machine().root_device().ioport("LINE0")->read())
 	{
 		m_int_vector = 6;
@@ -415,7 +414,6 @@ static IRQ_CALLBACK (fk1_irq_callback)
 
 TIMER_DEVICE_CALLBACK_MEMBER(fk1_state::vsync_callback)
 {
-
 	m_int_vector = 3;
 	machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }

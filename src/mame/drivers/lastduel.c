@@ -467,7 +467,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(lastduel_state::madgear_timer_cb)
 
 MACHINE_START_MEMBER(lastduel_state,lastduel)
 {
-
 	save_item(NAME(m_tilemap_priority));
 	save_item(NAME(m_scroll));
 }

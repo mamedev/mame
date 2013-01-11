@@ -226,7 +226,6 @@ READ8_MEMBER( mc10_state::mc10_mc6847_videoram_r )
 
 TIMER_DEVICE_CALLBACK_MEMBER(mc10_state::alice32_scanline)
 {
-
 	m_ef9345->update_scanline((UINT16)param);
 }
 

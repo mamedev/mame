@@ -220,7 +220,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 docastle_state::screen_update_docastle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_do_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	draw_sprites(machine(), bitmap, cliprect);
 	m_do_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);

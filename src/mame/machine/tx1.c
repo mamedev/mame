@@ -780,7 +780,6 @@ WRITE16_MEMBER(tx1_state::tx1_math_w)
 	/* /MUXCS */
 	else if ((offset & 0xc00) == 0xc00)
 	{
-
 		/*
 		    /TMPLD1: 0
 		    /TMPLD2: 0

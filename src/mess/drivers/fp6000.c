@@ -142,27 +142,23 @@ UINT32 fp6000_state::screen_update_fp6000(screen_device &screen, bitmap_ind16 &b
 
 READ8_MEMBER(fp6000_state::fp6000_pcg_r)
 {
-
 	return m_char_rom[offset];
 }
 
 WRITE8_MEMBER(fp6000_state::fp6000_pcg_w)
 {
-
 	m_char_rom[offset] = data;
 	machine().gfx[0]->mark_dirty(offset >> 4);
 }
 
 WRITE8_MEMBER(fp6000_state::fp6000_6845_address_w)
 {
-
 	m_crtc_index = data;
 	m_mc6845->address_w(space, offset, data);
 }
 
 WRITE8_MEMBER(fp6000_state::fp6000_6845_data_w)
 {
-
 	m_crtc_vreg[m_crtc_index] = data;
 	m_mc6845->register_w(space, offset, data);
 }
@@ -179,7 +175,6 @@ ADDRESS_MAP_END
 /* Hack until I understand what UART is this one ... */
 READ8_MEMBER(fp6000_state::fp6000_key_r)
 {
-
 	if(offset)
 	{
 		switch(m_key.cmd)
@@ -197,7 +192,6 @@ READ8_MEMBER(fp6000_state::fp6000_key_r)
 
 WRITE8_MEMBER(fp6000_state::fp6000_key_w)
 {
-
 	if(offset)
 		m_key.cmd = (data & 0xff) | (m_key.cmd << 8);
 	else
@@ -278,7 +272,6 @@ GFXDECODE_END
 
 void fp6000_state::machine_start()
 {
-
 	m_char_rom = memregion("pcg")->base();
 	m_mc6845 = machine().device<mc6845_device>("crtc");
 }

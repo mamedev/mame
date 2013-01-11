@@ -28,7 +28,6 @@ cdrom_image_device::cdrom_image_device(const machine_config &mconfig, const char
 	: device_t(mconfig, CDROM, "Cdrom", tag, owner, clock),
 		device_image_interface(mconfig, *this)
 {
-
 }
 
 //-------------------------------------------------

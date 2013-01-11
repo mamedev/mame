@@ -1243,7 +1243,6 @@ void ip22_state::machine_reset()
 
 static void dump_chain(address_space &space, UINT32 ch_base)
 {
-
 	printf("node: %08x %08x %08x (len = %x)\n", space.read_dword(ch_base), space.read_dword(ch_base+4), space.read_dword(ch_base+8), space.read_dword(ch_base+4) & 0x3fff);
 
 	if ((space.read_dword(ch_base+8) != 0) && !(space.read_dword(ch_base+4) & 0x80000000))

@@ -155,7 +155,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 dacholer_state::screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (flip_screen())
 	{
 		m_bg_tilemap->set_scrollx(0, 256 - m_scroll_x);
@@ -583,7 +582,6 @@ static const msm5205_interface msm_interface =
 
 void dacholer_state::machine_start()
 {
-
 	save_item(NAME(m_bg_bank));
 	save_item(NAME(m_msm_data));
 	save_item(NAME(m_msm_toggle));
@@ -594,7 +592,6 @@ void dacholer_state::machine_start()
 
 void dacholer_state::machine_reset()
 {
-
 	m_msm_data = 0;
 	m_msm_toggle = 0;
 

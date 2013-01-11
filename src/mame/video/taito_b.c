@@ -40,7 +40,6 @@ WRITE16_MEMBER(taitob_state::realpunc_video_ctrl_w)
 
 VIDEO_START_MEMBER(taitob_state,taitob_core)
 {
-
 	m_framebuffer[0] = auto_bitmap_ind16_alloc(machine(), 512, 256);
 	m_framebuffer[1] = auto_bitmap_ind16_alloc(machine(), 512, 256);
 	m_pixel_bitmap = NULL;  /* only hitice needs this */
@@ -84,7 +83,6 @@ VIDEO_START_MEMBER(taitob_state,taitob_color_order2)
 
 VIDEO_START_MEMBER(taitob_state,hitice)
 {
-
 	VIDEO_START_CALL_MEMBER(taitob_color_order0);
 
 	m_b_fg_color_base = 0x80;       /* hitice also uses this for the pixel_bitmap */
@@ -103,7 +101,6 @@ VIDEO_RESET_MEMBER(taitob_state,hitice)
 
 VIDEO_START_MEMBER(taitob_state,realpunc)
 {
-
 	m_realpunc_bitmap = auto_bitmap_ind16_alloc(machine(), machine().primary_screen->width(), machine().primary_screen->height());
 
 	VIDEO_START_CALL_MEMBER(taitob_color_order0);

@@ -398,7 +398,6 @@ READ8_MEMBER( supercon_state::supercon_port4_r )
 
 		if (key_data)
 		{
-
 /* Set or remove pieces */
 
 			i_AH=7-get_first_cleared_bit(key_data);
@@ -459,7 +458,6 @@ WRITE8_MEMBER( supercon_state::supercon_port3_w )
 
 		if ( m_data_1F00)
 		{
-
 			if (m_data_1F00 & LED_LINE_AH )
 			{
 				m_last_LED = &m_LED_AH;             /* save last value */

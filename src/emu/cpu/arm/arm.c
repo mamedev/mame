@@ -503,7 +503,6 @@ static void arm_check_irq_state(ARM_REGS* cpustate)
 static void set_irq_line(ARM_REGS* cpustate, int irqline, int state)
 {
 	switch (irqline) {
-
 	case ARM_IRQ_LINE: /* IRQ */
 		if (state && (R15&0x3)!=eARM_MODE_IRQ) /* Don't allow nested IRQs */
 			cpustate->pendingIrq=1;
@@ -707,7 +706,6 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 				SetRegister(cpustate, rn,GetRegister(cpustate, rd));
 			}
 			else {
-
 				if ((insn&INSN_SDT_W)!=0)
 				logerror("%08x:  RegisterWritebackIncrement %d %d %d\n",R15,(insn & INSN_SDT_P)!=0,(insn&INSN_SDT_W)!=0,(insn & INSN_SDT_U)!=0);
 

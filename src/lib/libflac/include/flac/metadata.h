@@ -306,7 +306,6 @@ typedef struct FLAC__Metadata_SimpleIterator FLAC__Metadata_SimpleIterator;
  *  The iterator's current status can be obtained by calling FLAC__metadata_simple_iterator_status().
  */
 typedef enum {
-
 	FLAC__METADATA_SIMPLE_ITERATOR_STATUS_OK = 0,
 	/**< The iterator is in the normal OK state */
 

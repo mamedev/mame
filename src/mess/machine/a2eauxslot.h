@@ -21,13 +21,11 @@
 #define MCFG_A2EAUXSLOT_BUS_ADD(_tag, _cputag, _config) \
 	MCFG_DEVICE_ADD(_tag, A2EAUXSLOT, 0) \
 	MCFG_DEVICE_CONFIG(_config) \
-	a2eauxslot_device::static_set_cputag(*device, _cputag); \
-
+	a2eauxslot_device::static_set_cputag(*device, _cputag);
 #define MCFG_A2EAUXSLOT_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot, _def_inp) \
 	MCFG_DEVICE_ADD(_tag, A2EAUXSLOT_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
-	a2eauxslot_slot_device::static_set_a2eauxslot_slot(*device, _nbtag, _tag); \
-
+	a2eauxslot_slot_device::static_set_a2eauxslot_slot(*device, _nbtag, _tag);
 #define MCFG_A2EAUXSLOT_SLOT_REMOVE(_tag)    \
 	MCFG_DEVICE_REMOVE(_tag)
 

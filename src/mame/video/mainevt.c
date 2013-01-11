@@ -93,7 +93,6 @@ VIDEO_START_MEMBER(mainevt_state,dv)
 
 UINT32 mainevt_state::screen_update_mainevt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	k052109_tilemap_update(m_k052109);
 
 	machine().priority_bitmap.fill(0, cliprect);
@@ -108,7 +107,6 @@ UINT32 mainevt_state::screen_update_mainevt(screen_device &screen, bitmap_ind16 
 
 UINT32 mainevt_state::screen_update_dv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	k052109_tilemap_update(m_k052109);
 
 	k052109_tilemap_draw(m_k052109, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);

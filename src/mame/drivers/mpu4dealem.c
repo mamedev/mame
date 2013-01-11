@@ -24,7 +24,6 @@ public:
 		: mpu4_state(mconfig, type, tag),
 			m_dealem_videoram(*this, "dealem_videoram")
 	{
-
 	}
 
 	optional_shared_ptr<UINT8> m_dealem_videoram;

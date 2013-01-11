@@ -89,7 +89,6 @@ UINT32 mayumi_state::screen_update_mayumi(screen_device &screen, bitmap_ind16 &b
 
 INTERRUPT_GEN_MEMBER(mayumi_state::mayumi_interrupt)
 {
-
 	if (m_int_enable)
 			device.execute().set_input_line(0, HOLD_LINE);
 }
@@ -388,7 +387,6 @@ void mayumi_state::machine_start()
 
 void mayumi_state::machine_reset()
 {
-
 	m_int_enable = 0;
 	m_input_sel = 0;
 }

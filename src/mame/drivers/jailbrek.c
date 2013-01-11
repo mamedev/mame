@@ -94,7 +94,6 @@ Notes:
 
 WRITE8_MEMBER(jailbrek_state::ctrl_w)
 {
-
 	m_nmi_enable = data & 0x01;
 	m_irq_enable = data & 0x02;
 	flip_screen_set(data & 0x08);
@@ -102,14 +101,12 @@ WRITE8_MEMBER(jailbrek_state::ctrl_w)
 
 INTERRUPT_GEN_MEMBER(jailbrek_state::jb_interrupt)
 {
-
 	if (m_irq_enable)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(jailbrek_state::jb_interrupt_nmi)
 {
-
 	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

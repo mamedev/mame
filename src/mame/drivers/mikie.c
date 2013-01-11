@@ -66,7 +66,6 @@ READ8_MEMBER(mikie_state::mikie_sh_timer_r)
 
 WRITE8_MEMBER(mikie_state::mikie_sh_irqtrigger_w)
 {
-
 	if (m_last_irq == 0 && data == 1)
 	{
 		// setting bit 0 low then high triggers IRQ on the sound CPU
@@ -83,7 +82,6 @@ WRITE8_MEMBER(mikie_state::mikie_coin_counter_w)
 
 WRITE8_MEMBER(mikie_state::irq_mask_w)
 {
-
 	m_irq_mask = data & 1;
 }
 
@@ -249,7 +247,6 @@ static const sn76496_config psg_intf =
 
 void mikie_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -259,14 +256,12 @@ void mikie_state::machine_start()
 
 void mikie_state::machine_reset()
 {
-
 	m_palettebank = 0;
 	m_last_irq = 0;
 }
 
 INTERRUPT_GEN_MEMBER(mikie_state::vblank_irq)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }

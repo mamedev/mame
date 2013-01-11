@@ -284,14 +284,12 @@ static const sn76496_config psg_intf =
 
 void bankp_state::machine_reset()
 {
-
 	m_scroll_x = 0;
 	m_priority = 0;
 }
 
 INTERRUPT_GEN_MEMBER(bankp_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

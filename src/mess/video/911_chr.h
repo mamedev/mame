@@ -151,7 +151,6 @@ static const char_override_t frenchWP_overrides[9] =
 */
 static const UINT8 char_defs[char_defs_count][10] =
 {
-
 /* US character set: 128 7*10 character matrix */
 	{   /* 0x00 */
 		0x00,

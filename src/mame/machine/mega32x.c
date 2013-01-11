@@ -224,19 +224,16 @@ sega_32x_device::sega_32x_device(const machine_config &mconfig, const char *tag,
 		m_lch_pwm(*this, "lch_pwm"),
 		m_rch_pwm(*this, "rch_pwm")
 {
-
 }
 
 sega_32x_ntsc_device::sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_32x_device(mconfig, tag, owner, clock, SEGA_32X_NTSC)
 {
-
 }
 
 sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: sega_32x_device(mconfig, tag, owner, clock, SEGA_32X_PAL)
 {
-
 }
 
 TIMER_CALLBACK( _32x_pwm_callback );
@@ -370,7 +367,6 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15106_w )
 
 		if (m_a15106_reg & 0x1) /* NBA Jam TE relies on this */
 		{
-
 			// install the game rom in the normal 0x000000-0x03fffff space used by the genesis - this allows VDP DMA operations to work as they have to be from this area or RAM
 			// it should also UNMAP the banked rom area...
 			space.install_rom(0x0000100, 0x03fffff, space.machine().root_device().memregion("gamecart")->base() + 0x100);
@@ -889,7 +885,6 @@ READ16_MEMBER( sega_32x_device::_32x_pwm_r )
 
 WRITE16_MEMBER( sega_32x_device::_32x_pwm_w )
 {
-
 	switch(offset)
 	{
 		case 0x00/2:
@@ -1080,7 +1075,6 @@ WRITE16_MEMBER( sega_32x_device::_32x_common_vdp_regs_w )
 
 	switch (offset)
 	{
-
 		case 0x00:
 			//printf("_32x_68k_a15180_w (a15180) %04x %04x   source m_32x_access_auth %04x\n",data,mem_mask, m_32x_access_auth);
 
@@ -1099,7 +1093,6 @@ WRITE16_MEMBER( sega_32x_device::_32x_common_vdp_regs_w )
 			}
 			if (ACCESSING_BITS_8_15)
 			{
-
 			}
 			break;
 
@@ -1111,7 +1104,6 @@ WRITE16_MEMBER( sega_32x_device::_32x_common_vdp_regs_w )
 
 			if (ACCESSING_BITS_8_15)
 			{
-
 			}
 			break;
 
@@ -1458,8 +1450,7 @@ READ32_MEMBER( sega_32x_device::_32x_sh2_##NAMEA##_##NAMEB##_r )                
 	}                                                                               \
 																					\
 	return retvalue;                                                                \
-}                                                                                   \
-
+}
 #define _32X_MAP_WRITEHANDLERS(NAMEA,NAMEB)                                             \
 WRITE32_MEMBER( sega_32x_device::_32x_sh2_##NAMEA##_##NAMEB##_w)                                 \
 {                                                                                       \
@@ -1471,8 +1462,7 @@ WRITE32_MEMBER( sega_32x_device::_32x_sh2_##NAMEA##_##NAMEB##_w)                
 	{                                                                                   \
 		_32x_sh2_##NAMEB##_w(space,0,(data>>0)&0xffff,(mem_mask>>0)&0xffff);          \
 	}                                                                                   \
-}                                                                                       \
-
+}
 
 
 
@@ -1568,7 +1558,6 @@ ADDRESS_MAP_END
 
 void sega_32x_device::_32x_check_irqs(running_machine& machine)
 {
-
 	if (m_sh2_master_vint_enable && m_sh2_master_vint_pending) _32x_master_cpu->set_input_line(SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
 	else _32x_master_cpu->set_input_line(SH2_VINT_IRQ_LEVEL,CLEAR_LINE);
 
@@ -1629,7 +1618,6 @@ UINT32* sega_32x_device::_32x_render_videobuffer_to_screenbuffer_helper(running_
 	{
 		if (m_32x_displaymode==1)
 		{
-
 			UINT32 lineoffs;
 			int start;
 
@@ -1758,8 +1746,7 @@ void sega_32x_device::device_config_complete()
 // some games appear to dislike 'perfect' levels of interleave, probably due to
 // non-emulated cache, ram waitstates and other issues?
 #define _32X_INTERLEAVE_LEVEL \
-	MCFG_QUANTUM_TIME(attotime::from_hz(1800000)) \
-
+	MCFG_QUANTUM_TIME(attotime::from_hz(1800000))
 
 static MACHINE_CONFIG_FRAGMENT( _32x_ntsc )
 

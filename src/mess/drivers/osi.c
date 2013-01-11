@@ -369,7 +369,6 @@ WRITE_LINE_MEMBER(sb2m600_state::osi470_index_callback)
 
 READ8_MEMBER( c1pmf_state::osi470_pia_pa_r )
 {
-
 	/*
 
 	    bit     description

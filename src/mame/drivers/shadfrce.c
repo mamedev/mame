@@ -282,7 +282,6 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_irq_ack_w)
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_irq_w)
 {
-
 	m_irqs_enable = data & 1;   /* maybe, it's set/unset inside every trap instruction which is executed */
 	m_video_enable = data & 8;  /* probably */
 
@@ -303,7 +302,6 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_irq_w)
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_scanline_w)
 {
-
 	m_raster_scanline = data;   /* guess, 0 is always written */
 }
 

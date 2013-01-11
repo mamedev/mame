@@ -22,7 +22,6 @@
 
 class psion_custom_lcdc :   public hd44780_device
 {
-
 public:
 	// construction/destruction
 	psion_custom_lcdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

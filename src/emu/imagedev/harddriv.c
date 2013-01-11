@@ -42,7 +42,6 @@ harddisk_image_device::harddisk_image_device(const machine_config &mconfig, cons
 		m_chd(NULL),
 		m_hard_disk_handle(NULL)
 {
-
 }
 
 //-------------------------------------------------

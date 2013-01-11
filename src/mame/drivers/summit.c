@@ -293,7 +293,6 @@ GFXDECODE_END
 
 void summit_state::palette_init()
 {
-
 }
 
 static MACHINE_CONFIG_START( summit, summit_state )

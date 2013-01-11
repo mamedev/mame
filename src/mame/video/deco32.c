@@ -560,12 +560,10 @@ VIDEO_START_MEMBER(deco32_state,nslasher)
 
 void deco32_state::screen_eof_captaven(screen_device &screen, bool state)
 {
-
 }
 
 void dragngun_state::screen_eof_dragngun(screen_device &screen, bool state)
 {
-
 }
 
 

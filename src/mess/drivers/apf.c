@@ -358,7 +358,6 @@ static const pia6821_interface apf_imagination_pia_interface=
 
 void apf_state::machine_start()
 {
-
 	m_apf_ints = 0;
 
 	if (m_cass) // apfimag only

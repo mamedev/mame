@@ -31,7 +31,6 @@ TILE_GET_INFO_MEMBER(djboy_state::get_bg_tile_info)
 
 WRITE8_MEMBER(djboy_state::djboy_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_background->mark_tile_dirty(offset & 0x7ff);
 }

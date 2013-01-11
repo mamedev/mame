@@ -280,13 +280,11 @@ static const ay8910_interface ay8910_config =
 
 void funkybee_state::machine_start()
 {
-
 	save_item(NAME(m_gfx_bank));
 }
 
 void funkybee_state::machine_reset()
 {
-
 	m_gfx_bank = 0;
 }
 

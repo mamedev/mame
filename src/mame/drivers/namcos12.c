@@ -1113,21 +1113,18 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 
 WRITE32_MEMBER(namcos12_state::sharedram_w)
 {
-
 	verboselog( machine(), 1, "sharedram_w( %08x, %08x, %08x )\n", ( offset * 4 ), data, mem_mask );
 	COMBINE_DATA( &m_sharedram[ offset ] );
 }
 
 READ32_MEMBER(namcos12_state::sharedram_r)
 {
-
 	verboselog( machine(), 1, "sharedram_r( %08x, %08x ) %08x\n", ( offset * 4 ), mem_mask, m_sharedram[ offset ] );
 	return m_sharedram[ offset ];
 }
 
 WRITE16_MEMBER(namcos12_state::sharedram_sub_w)
 {
-
 	UINT16 *shared16 = reinterpret_cast<UINT16 *>(m_sharedram.target());
 
 	COMBINE_DATA(&shared16[BYTE_XOR_LE(offset)]);
@@ -1135,7 +1132,6 @@ WRITE16_MEMBER(namcos12_state::sharedram_sub_w)
 
 READ16_MEMBER(namcos12_state::sharedram_sub_r)
 {
-
 	UINT16 *shared16 = reinterpret_cast<UINT16 *>(m_sharedram.target());
 
 	return shared16[BYTE_XOR_LE(offset)];
@@ -1143,7 +1139,6 @@ READ16_MEMBER(namcos12_state::sharedram_sub_r)
 
 WRITE32_MEMBER(namcos12_state::bankoffset_w)
 {
-
 	// Golgo 13 has different banking (maybe the keycus controls it?)
 	if( strcmp( machine().system().name, "golgo13" ) == 0 ||
 		strcmp( machine().system().name, "g13knd" ) == 0 )
@@ -1169,7 +1164,6 @@ WRITE32_MEMBER(namcos12_state::bankoffset_w)
 
 WRITE32_MEMBER(namcos12_state::dmaoffset_w)
 {
-
 	if( ACCESSING_BITS_0_15 )
 	{
 		m_n_dmaoffset = ( offset * 4 ) | ( data << 16 );
@@ -1273,7 +1267,6 @@ WRITE32_MEMBER(namcos12_state::system11gun_w)
 {
 	if( ACCESSING_BITS_0_15 )
 	{
-
 		/* blowback 1 */
 		/* blowback 2 */
 		/* Note: output label has been changed for the Engrish Impaired ;-) */
@@ -1330,13 +1323,11 @@ WRITE32_MEMBER(namcos12_state::kcoff_w)
 
 WRITE32_MEMBER(namcos12_state::kcon_w)
 {
-
 	membank( "bank2" )->set_base( m_kcram );
 }
 
 WRITE32_MEMBER(namcos12_state::tektagt_protection_1_w)
 {
-
 	// Second dma offset or protection ref values write
 	m_n_tektagdmaoffset = data;
 	if(m_ttt_cnt != 2)
@@ -1351,7 +1342,6 @@ READ32_MEMBER(namcos12_state::tektagt_protection_1_r)
 
 WRITE32_MEMBER(namcos12_state::tektagt_protection_2_w)
 {
-
 	// Writes are 0 or rand(), only used as a "start prot value write" trigger
 	m_ttt_cnt = 0;
 }
@@ -1462,7 +1452,6 @@ READ8_MEMBER(namcos12_state::s12_mcu_p8_r)
 
 READ8_MEMBER(namcos12_state::s12_mcu_pa_r)
 {
-
 	return m_s12_porta;
 }
 
@@ -1489,7 +1478,6 @@ READ8_MEMBER(namcos12_state::s12_mcu_rtc_r)
 
 READ8_MEMBER(namcos12_state::s12_mcu_portB_r)
 {
-
 	// golgo13 won't boot if this doesn't toggle every read
 	m_s12_lastpB ^= 0x80;
 	return m_s12_lastpB;
@@ -1497,7 +1485,6 @@ READ8_MEMBER(namcos12_state::s12_mcu_portB_r)
 
 WRITE8_MEMBER(namcos12_state::s12_mcu_portB_w)
 {
-
 	// bit 7 = chip enable for the video settings controller
 	if (data & 0x80)
 	{

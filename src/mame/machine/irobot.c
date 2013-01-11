@@ -193,13 +193,11 @@ void irobot_state::machine_reset()
 
 WRITE8_MEMBER(irobot_state::irobot_control_w)
 {
-
 	m_control_num = offset & 0x03;
 }
 
 READ8_MEMBER(irobot_state::irobot_control_r)
 {
-
 	if (m_control_num == 0)
 		return ioport("AN0")->read();
 	else if (m_control_num == 1)

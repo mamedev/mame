@@ -103,7 +103,6 @@ void drmicro_state::palette_init()
 
 void drmicro_state::video_start()
 {
-
 	m_videoram = auto_alloc_array(machine(), UINT8, 0x1000);
 	save_pointer(NAME(m_videoram), 0x1000);
 

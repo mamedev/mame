@@ -793,7 +793,6 @@ INTERRUPT_GEN_MEMBER(liberate_state::prosport_interrupt)
 
 MACHINE_START_MEMBER(liberate_state,liberate)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -808,7 +807,6 @@ MACHINE_START_MEMBER(liberate_state,liberate)
 
 MACHINE_RESET_MEMBER(liberate_state,liberate)
 {
-
 	memset(m_io_ram, 0, ARRAY_LENGTH(m_io_ram));
 
 	m_background_disable = 0;

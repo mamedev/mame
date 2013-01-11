@@ -54,7 +54,6 @@ INTERRUPT_GEN_MEMBER(dribling_state::dribling_irq_gen)
 
 READ8_MEMBER(dribling_state::dsr_r)
 {
-
 	/* return DSR0-7 */
 	return (m_ds << m_sh) | (m_dr >> (8 - m_sh));
 }
@@ -62,7 +61,6 @@ READ8_MEMBER(dribling_state::dsr_r)
 
 READ8_MEMBER(dribling_state::input_mux0_r)
 {
-
 	/* low value in the given bit selects */
 	if (!(m_input_mux & 0x01))
 		return ioport("MUX0")->read();
@@ -83,7 +81,6 @@ READ8_MEMBER(dribling_state::input_mux0_r)
 
 WRITE8_MEMBER(dribling_state::misc_w)
 {
-
 	/* bit 7 = di */
 	m_di = (data >> 7) & 1;
 	if (!m_di)
@@ -128,7 +125,6 @@ WRITE8_MEMBER(dribling_state::pb_w)
 
 WRITE8_MEMBER(dribling_state::shr_w)
 {
-
 	/* bit 3 = watchdog */
 	if (data & 0x08)
 		machine().watchdog_reset();
@@ -147,7 +143,6 @@ WRITE8_MEMBER(dribling_state::shr_w)
 
 READ8_MEMBER(dribling_state::ioread)
 {
-
 	if (offset & 0x08)
 		return m_ppi8255_0->read(space, offset & 3);
 	else if (offset & 0x10)
@@ -158,7 +153,6 @@ READ8_MEMBER(dribling_state::ioread)
 
 WRITE8_MEMBER(dribling_state::iowrite)
 {
-
 	if (offset & 0x08)
 		m_ppi8255_0->write(space, offset & 3, data);
 	else if (offset & 0x10)
@@ -277,7 +271,6 @@ INPUT_PORTS_END
 
 void dribling_state::machine_start()
 {
-
 	save_item(NAME(m_abca));
 	save_item(NAME(m_di));
 	save_item(NAME(m_dr));
@@ -288,7 +281,6 @@ void dribling_state::machine_start()
 
 void dribling_state::machine_reset()
 {
-
 	m_abca = 0;
 	m_di = 0;
 	m_dr = 0;

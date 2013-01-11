@@ -9,7 +9,6 @@
 
 namespace DSP56K
 {
-
 #define BITSn(CUR,MASK) (dsp56k_op_maskn(CUR,MASK))
 
 enum bitsModified {BM_NONE = 0x0, BM_LOW = 0x1, BM_MIDDLE = 0x2, BM_HIGH = 0x4};

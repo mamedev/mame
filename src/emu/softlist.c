@@ -1377,7 +1377,6 @@ void software_list_find_approx_matches(software_list_device *swlistdev, software
 		software_part *part = software_find_part(swinfo, NULL, NULL);
 		if ((interface==NULL || softlist_contain_interface(interface, part->interface_)) && (is_software_compatible(part, swlistdev)))
 		{
-
 			/* pick the best match between driver name and description */
 			curpenalty = softlist_penalty_compare(name, candidate->longname);
 			tmp = softlist_penalty_compare(name, candidate->shortname);

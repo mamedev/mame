@@ -847,7 +847,6 @@ static JOYPORT_CONFIG( joyport4a_50 )
 
 MACHINE_START_MEMBER(ti99_4x_state,ti99_4)
 {
-
 	m_cpu = static_cast<tms9900_device*>(machine().device("maincpu"));
 	m_tms9901 = static_cast<tms9901_device*>(machine().device(TMS9901_TAG));
 
@@ -965,7 +964,6 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(ti99_4x_state,ti99_4a)
 {
-
 	m_cpu = static_cast<tms9900_device*>(machine().device("maincpu"));
 	m_tms9901 = static_cast<tms9901_device*>(machine().device(TMS9901_TAG));
 

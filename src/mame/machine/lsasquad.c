@@ -10,7 +10,6 @@
 
 TIMER_CALLBACK_MEMBER(lsasquad_state::nmi_callback)
 {
-
 	if (m_sound_nmi_enable)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
@@ -24,7 +23,6 @@ WRITE8_MEMBER(lsasquad_state::lsasquad_sh_nmi_disable_w)
 
 WRITE8_MEMBER(lsasquad_state::lsasquad_sh_nmi_enable_w)
 {
-
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
 	{
@@ -65,7 +63,6 @@ READ8_MEMBER(lsasquad_state::lsasquad_sound_result_r)
 
 READ8_MEMBER(lsasquad_state::lsasquad_sound_status_r)
 {
-
 	/* bit 0: message pending for sound cpu */
 	/* bit 1: message pending for main cpu */
 	return m_sound_pending;
@@ -82,7 +79,6 @@ READ8_MEMBER(lsasquad_state::daikaiju_sh_sound_command_r)
 
 READ8_MEMBER(lsasquad_state::daikaiju_sound_status_r)
 {
-
 	/* bit 0: message pending for sound cpu */
 	/* bit 1: message pending for main cpu */
 	return m_sound_pending ^ 3;
@@ -99,14 +95,12 @@ READ8_MEMBER(lsasquad_state::daikaiju_sound_status_r)
 
 READ8_MEMBER(lsasquad_state::lsasquad_68705_port_a_r)
 {
-
 	//logerror("%04x: 68705 port A read %02x\n", space.device().safe_pc(), m_port_a_in);
 	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
 WRITE8_MEMBER(lsasquad_state::lsasquad_68705_port_a_w)
 {
-
 	//logerror("%04x: 68705 port A write %02x\n", space.device().safe_pc(), data);
 	m_port_a_out = data;
 }
@@ -134,7 +128,6 @@ READ8_MEMBER(lsasquad_state::lsasquad_68705_port_b_r)
 
 WRITE8_MEMBER(lsasquad_state::lsasquad_68705_port_b_w)
 {
-
 	//logerror("%04x: 68705 port B write %02x\n", space.device().safe_pc(), data);
 
 	if ((m_ddr_b & 0x02) && (~data & 0x02) && (m_port_b_out & 0x02))
@@ -163,7 +156,6 @@ WRITE8_MEMBER(lsasquad_state::lsasquad_68705_ddr_b_w)
 
 WRITE8_MEMBER(lsasquad_state::lsasquad_mcu_w)
 {
-
 	//logerror("%04x: mcu_w %02x\n", space.device().safe_pc(), data);
 	m_from_main = data;
 	m_main_sent = 1;
@@ -172,7 +164,6 @@ WRITE8_MEMBER(lsasquad_state::lsasquad_mcu_w)
 
 READ8_MEMBER(lsasquad_state::lsasquad_mcu_r)
 {
-
 	//logerror("%04x: mcu_r %02x\n", space.device().safe_pc(), m_from_mcu);
 	m_mcu_sent = 0;
 	return m_from_mcu;

@@ -17,8 +17,7 @@ Acorn Archimedes KART interface
 
 #define MCFG_AAKART_ADD(_tag, _freq, _config) \
 	MCFG_DEVICE_ADD(_tag, AAKART, _freq) \
-	MCFG_DEVICE_CONFIG(_config) \
-
+	MCFG_DEVICE_CONFIG(_config)
 #define AAKART_INTERFACE(name) \
 	const aakart_interface (name) =
 

@@ -159,8 +159,7 @@ public:
 	int flipyx = (ram[tile_index*2+1] & 0xc000)>>14; \
 	int col = (ram[tile_index*2] & 0x00ff); \
 	if (rgn==1) col >>=4; \
-	SET_TILE_INFO_MEMBER(1-rgn, tileno, col, TILE_FLIPYX(flipyx)); \
-
+	SET_TILE_INFO_MEMBER(1-rgn, tileno, col, TILE_FLIPYX(flipyx));
 
 TILE_GET_INFO_MEMBER(blackt96_state::get_bg0_tile_info){ GET_INFO(m_spriteram0); }
 TILE_GET_INFO_MEMBER(blackt96_state::get_bg1_tile_info){ GET_INFO(m_spriteram1); }
@@ -182,7 +181,6 @@ WRITE16_MEMBER(blackt96_state::bg_videoram7_w) { COMBINE_DATA(&m_spriteram7[offs
 
 void blackt96_state::video_start()
 {
-
 	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg0_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg1_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
 	m_bg_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blackt96_state::get_bg2_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 32);

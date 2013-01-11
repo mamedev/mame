@@ -19,7 +19,6 @@ Tomasz Slanina
 
 READ8_MEMBER(changela_state::mcu_r)
 {
-
 	//mame_printf_debug("Z80 MCU  R = %x\n", m_mcu_out);
 	return m_mcu_out;
 }
@@ -414,13 +413,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(changela_state::changela_scanline)
 
 INTERRUPT_GEN_MEMBER(changela_state::chl_mcu_irq)
 {
-
 	generic_pulse_irq_line(m_mcu->execute(), 0, 1);
 }
 
 void changela_state::machine_start()
 {
-
 	m_mcu = machine().device("mcu");
 
 	/* video */
@@ -461,7 +458,6 @@ void changela_state::machine_start()
 
 void changela_state::machine_reset()
 {
-
 	/* video */
 	m_slopeROM_bank = 0;
 	m_tree_en = 0;

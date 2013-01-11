@@ -516,7 +516,6 @@ the rest are data used by it
 
 static struct stv_vdp2_sprite_list
 {
-
 	int CMDCTRL, CMDLINK, CMDPMOD, CMDCOLR, CMDSRCA, CMDSIZE, CMDGRDA;
 	int CMDXA, CMDYA;
 	int CMDXB, CMDYB;

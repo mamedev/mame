@@ -75,7 +75,6 @@ READ8_MEMBER(chaknpop_state::chaknpop_gfxmode_r)
 
 WRITE8_MEMBER(chaknpop_state::chaknpop_gfxmode_w)
 {
-
 	if (m_gfxmode != data)
 	{
 		int all_dirty = 0;
@@ -102,14 +101,12 @@ WRITE8_MEMBER(chaknpop_state::chaknpop_gfxmode_w)
 
 WRITE8_MEMBER(chaknpop_state::chaknpop_txram_w)
 {
-
 	m_tx_ram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(chaknpop_state::chaknpop_attrram_w)
 {
-
 	if (m_attr_ram[offset] != data)
 	{
 		m_attr_ram[offset] = data;
@@ -255,7 +252,6 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 chaknpop_state::screen_update_chaknpop(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(machine(), bitmap, cliprect);
 	draw_bitmap(machine(), bitmap, cliprect);

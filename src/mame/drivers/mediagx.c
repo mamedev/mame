@@ -429,7 +429,6 @@ READ32_MEMBER(mediagx_state::disp_ctrl_r)
 
 WRITE32_MEMBER(mediagx_state::disp_ctrl_w)
 {
-
 //  printf("disp_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	COMBINE_DATA(m_disp_ctrl_reg + offset);
 }
@@ -476,13 +475,11 @@ WRITE32_MEMBER(mediagx_state::fdc_w)
 
 READ32_MEMBER(mediagx_state::memory_ctrl_r)
 {
-
 	return m_memory_ctrl_reg[offset];
 }
 
 WRITE32_MEMBER(mediagx_state::memory_ctrl_w)
 {
-
 //  printf("memory_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	if (offset == 0x20/4)
 	{
@@ -519,7 +516,6 @@ WRITE32_MEMBER(mediagx_state::memory_ctrl_w)
 
 READ32_MEMBER(mediagx_state::biu_ctrl_r)
 {
-
 	if (offset == 0)
 	{
 		return 0xffffff;
@@ -529,7 +525,6 @@ READ32_MEMBER(mediagx_state::biu_ctrl_r)
 
 WRITE32_MEMBER(mediagx_state::biu_ctrl_w)
 {
-
 	//mame_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
 	COMBINE_DATA(m_biu_ctrl_reg + offset);
 
@@ -542,7 +537,6 @@ WRITE32_MEMBER(mediagx_state::biu_ctrl_w)
 #ifdef UNUSED_FUNCTION
 WRITE32_MEMBER(mediagx_state::bios_ram_w)
 {
-
 }
 #endif
 
@@ -744,7 +738,6 @@ static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, in
 
 TIMER_DEVICE_CALLBACK_MEMBER(mediagx_state::sound_timer_callback)
 {
-
 	m_ad1847_sample_counter = 0;
 	timer.adjust(attotime::from_msec(10));
 
@@ -796,7 +789,6 @@ static void ad1847_reg_write(running_machine &machine, int reg, UINT8 data)
 
 READ32_MEMBER(mediagx_state::ad1847_r)
 {
-
 	switch (offset)
 	{
 		case 0x14/4:
@@ -807,7 +799,6 @@ READ32_MEMBER(mediagx_state::ad1847_r)
 
 WRITE32_MEMBER(mediagx_state::ad1847_w)
 {
-
 	if (offset == 0)
 	{
 		if (ACCESSING_BITS_16_31)
@@ -863,7 +854,6 @@ READ8_MEMBER(mediagx_state::at_page8_r)
 
 WRITE8_MEMBER(mediagx_state::at_page8_w)
 {
-
 	m_at_pages[offset % 0x10] = data;
 
 	switch(offset % 8)
@@ -1065,7 +1055,6 @@ static IRQ_CALLBACK(irq_callback)
 
 void mediagx_state::machine_start()
 {
-
 	m_pit8254 = machine().device<pit8254_device>( "pit8254" );
 	m_pic8259_1 = machine().device<pic8259_device>( "pic8259_master" );
 	m_pic8259_2 = machine().device<pic8259_device>( "pic8259_slave" );

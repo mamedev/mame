@@ -46,7 +46,6 @@ static const floatx80 floatx80_default_nan = packFloatx80(0, 0xffff, U64(0xfffff
 
 INLINE bits64 extractFloatx80Frac( floatx80 a )
 {
-
 	return a.low;
 
 }
@@ -58,7 +57,6 @@ INLINE bits64 extractFloatx80Frac( floatx80 a )
 
 INLINE int32 extractFloatx80Exp( floatx80 a )
 {
-
 	return a.high & 0x7FFF;
 
 }
@@ -70,7 +68,6 @@ INLINE int32 extractFloatx80Exp( floatx80 a )
 
 INLINE flag extractFloatx80Sign( floatx80 a )
 {
-
 	return a.high>>15;
 
 }

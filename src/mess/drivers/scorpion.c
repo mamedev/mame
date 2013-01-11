@@ -275,7 +275,6 @@ DIRECT_UPDATE_MEMBER(scorpion_state::scorpion_direct)
 
 TIMER_DEVICE_CALLBACK_MEMBER(scorpion_state::nmi_check_callback)
 {
-
 	if ((machine().root_device().ioport("NMI")->read() & 1)==1)
 	{
 		m_port_1ffd_data |= 0x02;

@@ -155,7 +155,6 @@ WRITE8_MEMBER(nbmj8891_state::nbmj8891_taiwanmb_gfxflag_w)
 
 WRITE8_MEMBER(nbmj8891_state::nbmj8891_taiwanmb_mcu_w)
 {
-
 	m_param_old[m_param_cnt & 0x0f] = data;
 
 	if (data == 0x00)

@@ -89,7 +89,6 @@ public:
 /* I'm using the functions in deco16ic.c ... same chips, why duplicate code? */
 void backfire_state::video_start()
 {
-
 	m_spriteram_1 = auto_alloc_array(machine(), UINT16, 0x2000/2);
 	m_spriteram_2 = auto_alloc_array(machine(), UINT16, 0x2000/2);
 
@@ -113,7 +112,6 @@ void backfire_state::video_start()
 
 UINT32 backfire_state::screen_update_backfire_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	//FIXME: flip_screen_x should not be written!
 	flip_screen_set_no_update(1);
 
@@ -145,7 +143,6 @@ UINT32 backfire_state::screen_update_backfire_left(screen_device &screen, bitmap
 
 UINT32 backfire_state::screen_update_backfire_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	//FIXME: flip_screen_x should not be written!
 	flip_screen_set_no_update(1);
 
@@ -190,7 +187,6 @@ READ32_MEMBER(backfire_state::backfire_eeprom_r)
 
 READ32_MEMBER(backfire_state::backfire_control2_r)
 {
-
 //  logerror("%08x:Read eprom %08x (%08x)\n", space.device().safe_pc(), offset << 1, mem_mask);
 	return (m_eeprom->read_bit() << 24) | ioport("IN1")->read() | (ioport("IN1")->read() << 16);
 }
@@ -198,7 +194,6 @@ READ32_MEMBER(backfire_state::backfire_control2_r)
 #ifdef UNUSED_FUNCTION
 READ32_MEMBER(backfire_state::backfire_control3_r)
 {
-
 //  logerror("%08x:Read eprom %08x (%08x)\n", space.device().safe_pc(), offset << 1, mem_mask);
 	return (m_eeprom->read_bit() << 24) | ioport("IN2")->read() | (ioport("IN2")->read() << 16);
 }
@@ -475,7 +470,6 @@ static const deco16ic_interface backfire_deco16ic_tilegen2_intf =
 
 void backfire_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_deco_tilegen1 = machine().device("tilegen1");
 	m_deco_tilegen2 = machine().device("tilegen2");
@@ -697,7 +691,6 @@ static void descramble_sound( running_machine &machine )
 
 READ32_MEMBER(backfire_state::backfire_speedup_r)
 {
-
 	//mame_printf_debug( "%08x\n",space.device().safe_pc());
 
 	if (space.device() .safe_pc()== 0xce44)  space.device().execute().spin_until_time(attotime::from_usec(400)); // backfire

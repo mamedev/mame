@@ -124,7 +124,6 @@ WRITE8_MEMBER( homelab_state::cass_w )
 
 MACHINE_RESET_MEMBER(homelab_state,homelab3)
 {
-
 }
 
 MACHINE_RESET_MEMBER(homelab_state,brailab4)
@@ -134,12 +133,10 @@ MACHINE_RESET_MEMBER(homelab_state,brailab4)
 
 WRITE8_MEMBER( homelab_state::port7f_w )
 {
-
 }
 
 WRITE8_MEMBER( homelab_state::portff_w )
 {
-
 }
 
 WRITE8_MEMBER( homelab_state::brailab4_port7f_w )

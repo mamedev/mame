@@ -829,7 +829,6 @@ FLAC__bool FLAC__bitreader_read_rice_signed_block(FLAC__BitReader *br, int vals[
 	cwords = br->consumed_words;
 
 	while(1) {
-
 		/* read unary part */
 		while(1) {
 			while(cwords < br->words) { /* if we've not consumed up to a partial tail word... */
@@ -1012,7 +1011,6 @@ break2:
 	ucbits = (br->words-cwords)*FLAC__BITS_PER_WORD + br->bytes*8 - cbits;
 
 	while(1) {
-
 		/* read unary part */
 		while(1) {
 			while(cwords < br->words) { /* if we've not consumed up to a partial tail word... */

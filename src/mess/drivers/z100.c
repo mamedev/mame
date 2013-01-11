@@ -228,7 +228,6 @@ public:
 
 void z100_state::video_start()
 {
-
 	m_gvram = auto_alloc_array_clear(machine(), UINT8, 0x30000);
 }
 
@@ -423,7 +422,6 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(z100_state::key_stroke)
 {
-
 	if(newval && !oldval)
 	{
 		/* TODO: table */
@@ -751,7 +749,6 @@ void z100_state::palette_init()
 
 void z100_state::machine_start()
 {
-
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(z100_irq_callback);
 	m_mc6845 = machine().device<mc6845_device>("crtc");
 }

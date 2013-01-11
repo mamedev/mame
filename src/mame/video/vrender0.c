@@ -322,8 +322,7 @@ Clamped:\
 		y_tx += Quad->Txdy;\
 		y_ty += Quad->Tydy;\
 	}\
-}\
-
+}
 TILETEMPL(16,0,0) TILETEMPL(16,0,1) TILETEMPL(16,0,2)
 TILETEMPL(16,1,0) TILETEMPL(16,1,1) TILETEMPL(16,1,2)
 

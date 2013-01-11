@@ -207,7 +207,6 @@ UINT32 adp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 #if 0
 UINT32 adp_state::screen_update_adp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_h63484->update_screen(bitmap, cliprect);
 
 	#if 0
@@ -302,7 +301,6 @@ static const microtouch_interface adb_microtouch_config =
 
 MACHINE_START_MEMBER(adp_state,skattv)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_duart = machine().device("duart68681");
 	//m_h63484 = machine().device("h63484");
@@ -340,7 +338,6 @@ MACHINE_START_MEMBER(adp_state,skattv)
 
 MACHINE_RESET_MEMBER(adp_state,skattv)
 {
-
 	m_mux_data = 0;
 	m_register_active = 0;
 }

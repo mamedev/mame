@@ -62,7 +62,6 @@ WRITE8_MEMBER(megazone_state::megazone_i8039_irq_w)
 
 WRITE8_MEMBER(megazone_state::i8039_irqen_and_status_w)
 {
-
 	if ((data & 0x80) == 0)
 		m_daccpu->set_input_line(0, CLEAR_LINE);
 	m_i8039_status = (data & 0x70) >> 4;
@@ -75,7 +74,6 @@ WRITE8_MEMBER(megazone_state::megazone_coin_counter_w)
 
 WRITE8_MEMBER(megazone_state::irq_mask_w)
 {
-
 	m_irq_mask = data & 1;
 }
 
@@ -228,7 +226,6 @@ static const ay8910_interface ay8910_config =
 
 void megazone_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_daccpu = machine().device<cpu_device>("daccpu");
@@ -239,14 +236,12 @@ void megazone_state::machine_start()
 
 void megazone_state::machine_reset()
 {
-
 	m_flipscreen = 0;
 	m_i8039_status = 0;
 }
 
 INTERRUPT_GEN_MEMBER(megazone_state::vblank_irq)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }

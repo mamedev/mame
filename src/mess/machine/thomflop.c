@@ -625,7 +625,6 @@ static void to7_qdd_write_byte( running_machine &machine, UINT8 data )
 			data==0xA5 || data==0x5A ) &&    /* first byte of tentative field */
 			to7qdd->data_idx <to7qdd->data_size )
 	{
-
 		/* this is the first byte of the field */
 		if ( to7qdd->start_idx == to7qdd->data_idx )
 			to7qdd->data_crc = 0;
@@ -643,7 +642,6 @@ static void to7_qdd_write_byte( running_machine &machine, UINT8 data )
 				to7qdd->data[ to7qdd->start_idx ] == 0xA5 &&
 				to7qdd->data[ to7qdd->start_idx + 3 ] == to7qdd->data_crc )
 		{
-
 			/* got an id field => format */
 			int sector = (int) to7qdd->data[ to7qdd->start_idx + 1 ] * 256 + (int) to7qdd->data[ to7qdd->start_idx + 2 ];
 			UINT8 filler = 0xff;
@@ -662,7 +660,6 @@ static void to7_qdd_write_byte( running_machine &machine, UINT8 data )
 				to7qdd->data[ to7qdd->start_idx  ] == 0x5A &&
 				to7qdd->data[ to7qdd->start_idx + 129 ] == to7qdd->data_crc )
 		{
-
 			/* look backwards for previous id field */
 			for ( i = to7qdd->start_idx - 3; i >= 0; i-- )
 			{
@@ -698,7 +695,6 @@ static READ8_HANDLER ( to7_qdd_r )
 {
 	switch ( offset )
 	{
-
 	case 0: /* MC6852 status */
 		to7_qdd_stat_update(space.machine());
 		VLOG(( "%f $%04x to7_qdd_r: STAT=$%02X irq=%i pe=%i ovr=%i und=%i tr=%i rd=%i ncts=%i\n",
@@ -741,7 +737,6 @@ static WRITE8_HANDLER( to7_qdd_w )
 {
 	switch ( offset )
 	{
-
 	case 0: /* MC6852 control 1 */
 		/* reset */
 		if ( data & QDD_C1_RRESET )
@@ -763,7 +758,6 @@ static WRITE8_HANDLER( to7_qdd_w )
 	case 1:
 		switch ( to7qdd->ctrl1 >> 6 )
 		{
-
 		case 0: /* MC6852 control 2 */
 		{
 #if 0
@@ -908,7 +902,6 @@ static void to7_qdd_init( running_machine &machine )
 
 struct thmfc1_t
 {
-
 	UINT8   op;
 	UINT8   sector;            /* target sector, in [1,16] */
 		UINT32  sector_id;
@@ -994,7 +987,6 @@ static int thmfc_floppy_find_sector ( running_machine &machine, chrn_id* dst )
 	/* scan track, try 4 revolutions */
 	while ( r < 4 )
 	{
-
 		if ( floppy_drive_get_next_id( img, thmfc1->side, &id ) )
 		{
 			if ( id.C == thmfc1->track &&
@@ -1118,7 +1110,6 @@ static void thmfc_floppy_qdd_write_byte ( running_machine &machine, UINT8 data )
 			( thmfc1->data_idx || data==0xA5 || data==0x5A ) &&
 			thmfc1->data_raw_idx < THOM_MAXBUF )
 	{
-
 		if ( ! thmfc1->data_raw_size )
 		{
 			thmfc1->data_raw_size = thom_qdd_make_disk ( thmfc_floppy_image(machine), thmfc1->data );
@@ -1144,7 +1135,6 @@ static void thmfc_floppy_qdd_write_byte ( running_machine &machine, UINT8 data )
 				thmfc1->data[ thmfc1->data_idx - 1 ] == 0xA5 &&
 				thmfc1->data[ thmfc1->data_idx + 2 ] == thmfc1->data_crc )
 		{
-
 			/* got an id field => format */
 			int sector = (int) thmfc1->data[ thmfc1->data_idx ] * 256 + (int) thmfc1->data[ thmfc1->data_idx + 1 ];
 			UINT8 filler = 0xff;
@@ -1160,7 +1150,6 @@ static void thmfc_floppy_qdd_write_byte ( running_machine &machine, UINT8 data )
 				thmfc1->data[ thmfc1->data_idx -   1 ] == 0x5A &&
 				thmfc1->data[ thmfc1->data_idx + 128 ] == thmfc1->data_crc )
 		{
-
 			/* look backwards for previous id field */
 			for ( i = thmfc1->data_idx - 4; i >= 0; i-- )
 			{
@@ -1231,7 +1220,6 @@ static void thmfc_floppy_format_byte ( running_machine &machine, UINT8 data )
 		thmfc1->data_idx++;
 		if ( thmfc1->data_idx > 11 )
 		{
-
 			if ( !memcmp ( thmfc1->data, header, sizeof( header ) ) )
 			{
 				/* got id field => format */
@@ -1261,7 +1249,6 @@ READ8_HANDLER ( thmfc_floppy_r )
 {
 	switch ( offset )
 	{
-
 	case 0: /* STAT0 */
 		thmfc1->stat0 ^= THMFC1_STAT0_SYNCHRO | THMFC1_STAT0_BYTE_READY_POL;
 		VLOG(( "%f $%04x thmfc_floppy_r: STAT0=$%02X\n", space.machine().time().as_double(), space.machine().device("maincpu")->safe_pcbase(), thmfc1->stat0 ));
@@ -1329,7 +1316,6 @@ READ8_HANDLER ( thmfc_floppy_r )
 WRITE8_HANDLER ( thmfc_floppy_w )
 {
 	switch ( offset ) {
-
 	case 0: /* CMD0 */
 	{
 		int wsync = (data >> 4) & 1;
@@ -1348,7 +1334,6 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 
 		switch ( data & 3 )
 		{
-
 		case THMFC1_OP_RESET:
 			thmfc1->stat0 = THMFC1_STAT0_FINISHED;
 			break;
@@ -1782,7 +1767,6 @@ void to7_floppy_reset ( running_machine &machine )
 
 	switch ( to7_controller_type )
 	{
-
 	case 1:
 		to7_floppy_bank = 1;
 		to7_5p14sd_reset(machine);
@@ -1822,7 +1806,6 @@ READ8_HANDLER ( to7_floppy_r )
 {
 	switch ( to7_controller_type )
 	{
-
 	case 1:
 		return to7_5p14sd_r( space, offset, mem_mask );
 
@@ -1848,7 +1831,6 @@ WRITE8_HANDLER ( to7_floppy_w )
 {
 	switch ( to7_controller_type )
 	{
-
 	case 1:
 		to7_5p14sd_w( space, offset, data, mem_mask );
 		return;

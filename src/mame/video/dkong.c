@@ -241,7 +241,6 @@ PALETTE_INIT_MEMBER(dkong_state,dkong4b)
 
 	for (i = 0;i < 256;i++)
 	{
-
 		/* red component */
 		r = compute_res_net( (color_prom[256]>>1) & 0x07, 0, &radarscp_net_info );
 		/* green component */
@@ -280,7 +279,6 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp)
 
 	for (i = 0;i < 256;i++)
 	{
-
 		/* red component */
 		r = compute_res_net( (color_prom[256]>>1) & 0x07, 0, &radarscp_net_info );
 		/* green component */
@@ -344,7 +342,6 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp1)
 
 	for (i = 0;i < 256;i++)
 	{
-
 		/* red component */
 		r = compute_res_net( color_prom[512], 0, &radarscp1_net_info );
 		/* green component */
@@ -476,7 +473,6 @@ TILE_GET_INFO_MEMBER(dkong_state::radarscp1_bg_tile_info)
 
 WRITE8_MEMBER(dkong_state::dkong_videoram_w)
 {
-
 	if (m_video_ram[offset] != data)
 	{
 		m_video_ram[offset] = data;
@@ -486,7 +482,6 @@ WRITE8_MEMBER(dkong_state::dkong_videoram_w)
 
 WRITE8_MEMBER(dkong_state::dkongjr_gfxbank_w)
 {
-
 	if (m_gfx_bank != (data & 0x01))
 	{
 		m_gfx_bank = data & 0x01;
@@ -496,7 +491,6 @@ WRITE8_MEMBER(dkong_state::dkongjr_gfxbank_w)
 
 WRITE8_MEMBER(dkong_state::dkong3_gfxbank_w)
 {
-
 	if (m_gfx_bank != (~data & 0x01))
 	{
 		m_gfx_bank = ~data & 0x01;
@@ -524,26 +518,22 @@ WRITE8_MEMBER(dkong_state::dkong_palettebank_w)
 
 WRITE8_MEMBER(dkong_state::radarscp_grid_enable_w)
 {
-
 	m_grid_on = data & 0x01;
 }
 
 WRITE8_MEMBER(dkong_state::radarscp_grid_color_w)
 {
-
 	m_grid_col = (data & 0x07) ^ 0x07;
 	/* popmessage("Gridcol: %d", m_grid_col); */
 }
 
 WRITE8_MEMBER(dkong_state::dkong_flipscreen_w)
 {
-
 	m_flip = ~data & 0x01;
 }
 
 WRITE8_MEMBER(dkong_state::dkong_spritebank_w)
 {
-
 	m_sprite_bank = data & 0x01;
 }
 
@@ -934,7 +924,6 @@ static void check_palette(running_machine &machine)
 
 VIDEO_START_MEMBER(dkong_state,dkong_base)
 {
-
 	m_cd4049_b = (log(0.0 - log(cd4049_al)) - log(0.0 - log((1.0-cd4049_al))) ) / log(cd4049_vh/cd4049_vl);
 	m_cd4049_a = log(0.0 - log(cd4049_al)) - m_cd4049_b * log(cd4049_vh);
 
@@ -954,7 +943,6 @@ VIDEO_START_MEMBER(dkong_state,dkong_base)
 
 VIDEO_START_MEMBER(dkong_state,dkong)
 {
-
 	VIDEO_START_CALL_MEMBER(dkong_base);
 
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dkong_state::scanline_callback),this));
@@ -989,7 +977,6 @@ VIDEO_START_MEMBER(dkong_state,dkong)
 
 UINT32 dkong_state::screen_update_dkong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	machine().tilemap().set_flip_all(m_flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 	m_bg_tilemap->set_scrollx(0, m_flip ?  0 : 0);
 	m_bg_tilemap->set_scrolly(0, m_flip ? -8 : 0);
@@ -1037,7 +1024,6 @@ UINT32 dkong_state::screen_update_pestplce(screen_device &screen, bitmap_ind16 &
 
 UINT32 dkong_state::screen_update_spclforc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* it uses sprite_ram[offs + 2] & 0x10 for sprite bank */

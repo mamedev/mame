@@ -80,7 +80,6 @@ READ8_MEMBER(embargo_state::input_port_bit_r)
 
 READ8_MEMBER(embargo_state::dial_r)
 {
-
 	UINT8 lo = 0;
 	UINT8 hi = 0;
 
@@ -230,7 +229,6 @@ INPUT_PORTS_END
 
 void embargo_state::machine_start()
 {
-
 	/* register for state saving */
 	save_item(NAME(m_dial_enable_1));
 	save_item(NAME(m_dial_enable_2));
@@ -240,7 +238,6 @@ void embargo_state::machine_start()
 
 void embargo_state::machine_reset()
 {
-
 	m_dial_enable_1 = 0;
 	m_dial_enable_2 = 0;
 	m_input_select = 0;

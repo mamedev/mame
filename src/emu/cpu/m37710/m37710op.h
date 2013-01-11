@@ -864,8 +864,7 @@ INLINE uint EA_SIY(m37710i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 				m37710i_branch_8(cpustate, DST);                                        \
 				BREAKOUT;                                                   \
 			}                                                               \
-			CLK(CLK_OP + CLK_RELATIVE_8);                                   \
-
+			CLK(CLK_OP + CLK_RELATIVE_8);
 /* M37710   Cause a Break interrupt */
 #undef OP_BRK
 #define OP_BRK()                                                            \

@@ -2659,10 +2659,8 @@ INLINE void cfunc_rsp_vcl(void *param)
 
 		if (CARRY_FLAG(i) != 0)
 		{
-
 			if (ZERO_FLAG(i) != 0)
 			{
-
 				if (COMPARE_FLAG(i) != 0)
 				{
 					ACCUM_L(i) = -(UINT16)s2;
@@ -2674,10 +2672,8 @@ INLINE void cfunc_rsp_vcl(void *param)
 			}
 			else//ZERO_FLAG(i)==0
 			{
-
 				if (rsp->flag[2] & (1 << (i)))
 				{
-
 					if (((UINT32)(UINT16)(s1) + (UINT32)(UINT16)(s2)) > 0x10000)
 					{//proper fix for Harvest Moon 64, r4
 
@@ -2686,7 +2682,6 @@ INLINE void cfunc_rsp_vcl(void *param)
 					}
 					else
 					{
-
 						ACCUM_L(i) = -((UINT16)s2);
 						SET_COMPARE_FLAG(i);
 					}
@@ -2708,10 +2703,8 @@ INLINE void cfunc_rsp_vcl(void *param)
 		}//
 		else//CARRY_FLAG(i)==0
 		{
-
 			if (ZERO_FLAG(i) != 0)
 			{
-
 				if (rsp->flag[1] & (1 << (8+i)))
 				{
 					ACCUM_L(i) = s2;

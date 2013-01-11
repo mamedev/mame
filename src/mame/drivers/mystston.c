@@ -72,7 +72,6 @@ INPUT_CHANGED_MEMBER(mystston_state::coin_inserted)
 
 WRITE8_MEMBER(mystston_state::mystston_ay8910_select_w)
 {
-
 	/* bit 5 goes to 8910 #0 BDIR pin */
 	if (((*m_ay8910_select & 0x20) == 0x20) && ((data & 0x20) == 0x00))
 	{

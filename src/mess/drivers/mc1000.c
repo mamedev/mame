@@ -496,7 +496,6 @@ DIRECT_UPDATE_MEMBER(mc1000_state::mc1000_direct_update_handler)
 
 DRIVER_INIT_MEMBER(mc1000_state,mc1000)
 {
-
 	machine().device(Z80_TAG)->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(mc1000_state::mc1000_direct_update_handler), this));
 }
 

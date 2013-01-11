@@ -336,7 +336,6 @@ void validity_checker::validate_one(const game_driver &driver)
 
 void validity_checker::validate_core()
 {
-
 	// basic system checks
 	UINT8 a = 0xff;
 	UINT8 b = a + 1;

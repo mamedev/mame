@@ -323,7 +323,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(mirage_state,mirage)
 {
-
 	floppy_connector *con = machine().device<floppy_connector>("wd1772:0");
 	floppy_image_device *floppy = con ? con->get_device() : 0;
 	if (floppy)

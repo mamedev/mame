@@ -969,7 +969,6 @@ DRIVER_INIT_MEMBER(m107_state,dsoccr94)
 
 DRIVER_INIT_MEMBER(m107_state,wpksoc)
 {
-
 	m_irq_vectorbase = 0x80;
 	m_spritesystem = 0;
 }

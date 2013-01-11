@@ -62,7 +62,6 @@ MACHINE_RESET_MEMBER(cabal_state,cabalbl)
 
 WRITE16_MEMBER(cabal_state::cabalbl_sndcmd_w)
 {
-
 	switch (offset)
 	{
 		case 0x0:
@@ -88,7 +87,6 @@ WRITE16_MEMBER(cabal_state::track_reset_w)
 
 READ16_MEMBER(cabal_state::track_r)
 {
-
 	switch (offset)
 	{
 		default:
@@ -158,13 +156,11 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(cabal_state::cabalbl_snd2_r)
 {
-
 	return BITSWAP8(m_sound_command2, 7,2,4,5,3,6,1,0);
 }
 
 READ8_MEMBER(cabal_state::cabalbl_snd1_r)
 {
-
 	return BITSWAP8(m_sound_command1, 7,2,4,5,3,6,1,0);
 }
 

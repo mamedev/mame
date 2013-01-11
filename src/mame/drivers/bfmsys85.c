@@ -685,7 +685,6 @@ int b85_find_project_string(running_machine &machine )
 
 	for (int search=0;search<7;search++)
 	{
-
 		int strlength = strlen(title_string[search]);
 
 		for (int i=0;i<size-strlength;i++)
@@ -706,7 +705,6 @@ int b85_find_project_string(running_machine &machine )
 
 			if (found!=0)
 			{
-
 				int end=0;
 				int count = 0;
 				int blankcount = 0;

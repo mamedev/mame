@@ -116,18 +116,15 @@ FLOPPY_CONSTRUCT(fdi_dsk_construct);
 
 #define LEGACY_FLOPPY_OPTIONS_START(name)                                               \
 	const struct FloppyFormat floppyoptions_##name[] =                              \
-	{                                                                           \
-
+	{
 #define LEGACY_FLOPPY_OPTIONS_END0 \
 		{ NULL }                            \
 	};
 
 #define LEGACY_FLOPPY_OPTIONS_EXTERN(name)                                              \
-	extern const struct FloppyFormat floppyoptions_##name[]                         \
-
+	extern const struct FloppyFormat floppyoptions_##name[]
 #define LEGACY_FLOPPY_OPTION(name, extensions_, description_, identify_, construct_, destruct_, ranges_)\
-	{ #name, extensions_, description_, identify_, construct_, destruct_, ranges_ },                \
-
+	{ #name, extensions_, description_, identify_, construct_, destruct_, ranges_ },
 #define LEGACY_FLOPPY_OPTIONS_END                                                       \
 		LEGACY_FLOPPY_OPTION( fdi, "fdi", "Formatted Disk Image", fdi_dsk_identify, fdi_dsk_construct, NULL, NULL) \
 		LEGACY_FLOPPY_OPTION( td0, "td0", "Teledisk floppy disk image", td0_dsk_identify, td0_dsk_construct, td0_dsk_destruct, NULL) \

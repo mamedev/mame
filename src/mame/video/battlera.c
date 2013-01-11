@@ -112,7 +112,6 @@ WRITE8_MEMBER(battlera_state::HuC6270_data_w)
 	switch (offset) {
 		case 0: /* LSB */
 			switch (m_VDC_register) {
-
 			case 0: /* MAWR */
 				m_HuC6270_registers[0]=(m_HuC6270_registers[0]&0xff00) | (data);
 				return;
@@ -172,7 +171,6 @@ WRITE8_MEMBER(battlera_state::HuC6270_data_w)
 
 		case 1: /* MSB (Autoincrement on this write) */
 			switch (m_VDC_register) {
-
 			case 0: /* MAWR - Memory Address Write Register */
 				m_HuC6270_registers[0]=(m_HuC6270_registers[0]&0xff) | (data<<8);
 				return;

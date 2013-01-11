@@ -275,7 +275,6 @@ Logic:
 
 void metalmx_state::video_start()
 {
-
 }
 
 UINT32 metalmx_state::screen_update_metalmx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -318,17 +317,14 @@ READ32_MEMBER(metalmx_state::watchdog_r)
 
 WRITE32_MEMBER(metalmx_state::shifter_w)
 {
-
 }
 
 WRITE32_MEMBER(metalmx_state::motor_w)
 {
-
 }
 
 WRITE32_MEMBER(metalmx_state::reset_w)
 {
-
 	if (ACCESSING_BITS_16_31)
 	{
 		data >>= 16;
@@ -376,7 +372,6 @@ static void cage_irq_callback(running_machine &machine, int reason)
 
 WRITE32_MEMBER(metalmx_state::dsp32c_1_w)
 {
-
 	offset <<= 1;
 
 	if (ACCESSING_BITS_0_15)
@@ -406,7 +401,6 @@ READ32_MEMBER(metalmx_state::dsp32c_1_r)
 
 WRITE32_MEMBER(metalmx_state::dsp32c_2_w)
 {
-
 	offset <<= 1;
 
 	if (ACCESSING_BITS_0_15)
@@ -462,13 +456,11 @@ READ32_MEMBER(metalmx_state::host_gsp_r)
 
 READ32_MEMBER(metalmx_state::host_dram_r)
 {
-
 	return (m_gsp_dram[offset * 2] << 16) | m_gsp_dram[offset * 2 + 1];
 }
 
 WRITE32_MEMBER(metalmx_state::host_dram_w)
 {
-
 	COMBINE_DATA(m_gsp_dram + offset * 2 + 1);
 	data >>= 16;
 	mem_mask >>= 16;
@@ -477,13 +469,11 @@ WRITE32_MEMBER(metalmx_state::host_dram_w)
 
 READ32_MEMBER(metalmx_state::host_vram_r)
 {
-
 	return (m_gsp_vram[offset * 2] << 16) | m_gsp_vram[offset * 2 + 1];
 }
 
 WRITE32_MEMBER(metalmx_state::host_vram_w)
 {
-
 	COMBINE_DATA(m_gsp_vram + offset * 2 + 1);
 	data >>= 16;
 	mem_mask >>= 16;
@@ -777,7 +767,6 @@ DRIVER_INIT_MEMBER(metalmx_state,metalmx)
 
 void metalmx_state::machine_reset()
 {
-
 	m_dsp32c_1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_dsp32c_2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }

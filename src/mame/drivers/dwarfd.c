@@ -393,7 +393,6 @@ enum
 
 WRITE8_MEMBER(dwarfd_state::i8275_preg_w)//param reg
 {
-
 	switch (m_i8275Command)
 	{
 		case I8275_COMMAND_RESET:
@@ -492,13 +491,11 @@ WRITE8_MEMBER(dwarfd_state::i8275_preg_w)//param reg
 
 		case I8275_COMMAND_START:
 		{
-
 		}
 		break;
 
 		case I8275_COMMAND_STOP:
 		{
-
 		}
 		break;
 
@@ -513,7 +510,6 @@ READ8_MEMBER(dwarfd_state::i8275_preg_r)//param reg
 
 WRITE8_MEMBER(dwarfd_state::i8275_creg_w)//comand reg
 {
-
 	switch (data>>5)
 	{
 		case 0:
@@ -557,7 +553,6 @@ READ8_MEMBER(dwarfd_state::i8275_sreg_r)//status
 
 READ8_MEMBER(dwarfd_state::dwarfd_ram_r)
 {
-
 	if (m_crt_access == 0)
 	{
 		return m_dw_ram[offset];
@@ -1022,7 +1017,6 @@ static const ay8910_interface ay8910_config =
 
 void dwarfd_state::machine_start()
 {
-
 	save_item(NAME(m_bank));
 	save_item(NAME(m_line));
 	save_item(NAME(m_idx));
@@ -1045,7 +1039,6 @@ void dwarfd_state::machine_start()
 
 void dwarfd_state::machine_reset()
 {
-
 	m_bank = 0;
 	m_line = 0;
 	m_idx = 0;

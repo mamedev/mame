@@ -15,7 +15,6 @@ TILE_GET_INFO_MEMBER(sderby_state::get_sderby_tile_info)
 
 WRITE16_MEMBER(sderby_state::sderby_videoram_w)
 {
-
 	COMBINE_DATA(&m_videoram[offset]);
 	m_tilemap->mark_tile_dirty(offset/2);
 }
@@ -34,7 +33,6 @@ TILE_GET_INFO_MEMBER(sderby_state::get_sderby_md_tile_info)
 
 WRITE16_MEMBER(sderby_state::sderby_md_videoram_w)
 {
-
 	COMBINE_DATA(&m_md_videoram[offset]);
 	m_md_tilemap->mark_tile_dirty(offset/2);
 }
@@ -53,7 +51,6 @@ TILE_GET_INFO_MEMBER(sderby_state::get_sderby_fg_tile_info)
 
 WRITE16_MEMBER(sderby_state::sderby_fg_videoram_w)
 {
-
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset/2);
 }
@@ -91,7 +88,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 void sderby_state::video_start()
 {
-
 	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
 	m_md_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sderby_state::get_sderby_md_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,32,32);
 
@@ -103,7 +99,6 @@ void sderby_state::video_start()
 
 UINT32 sderby_state::screen_update_sderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(machine(), bitmap,cliprect,0);
 	m_md_tilemap->draw(bitmap, cliprect, 0,0);
@@ -113,7 +108,6 @@ UINT32 sderby_state::screen_update_sderby(screen_device &screen, bitmap_ind16 &b
 
 UINT32 sderby_state::screen_update_pmroulet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_tilemap->draw(bitmap, cliprect, 0,0);
 	m_md_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(machine(), bitmap,cliprect,0);
@@ -124,7 +118,6 @@ UINT32 sderby_state::screen_update_pmroulet(screen_device &screen, bitmap_ind16 
 
 WRITE16_MEMBER(sderby_state::sderby_scroll_w)
 {
-
 	data = COMBINE_DATA(&m_scroll[offset]);
 
 	switch (offset)

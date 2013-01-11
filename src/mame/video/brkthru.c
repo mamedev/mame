@@ -88,7 +88,6 @@ TILE_GET_INFO_MEMBER(brkthru_state::get_bg_tile_info)
 
 WRITE8_MEMBER(brkthru_state::brkthru_bgram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
@@ -102,14 +101,12 @@ TILE_GET_INFO_MEMBER(brkthru_state::get_fg_tile_info)
 
 WRITE8_MEMBER(brkthru_state::brkthru_fgram_w)
 {
-
 	m_fg_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 void brkthru_state::video_start()
 {
-
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(brkthru_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(brkthru_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 32, 16);
 
@@ -120,7 +117,6 @@ void brkthru_state::video_start()
 
 WRITE8_MEMBER(brkthru_state::brkthru_1800_w)
 {
-
 	if (offset == 0)    /* low 8 bits of scroll */
 		m_bgscroll = (m_bgscroll & 0x100) | data;
 	else if (offset == 1)
@@ -247,7 +243,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 brkthru_state::screen_update_brkthru(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->set_scrollx(0, m_bgscroll);
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 

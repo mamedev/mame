@@ -96,7 +96,6 @@ READ8_MEMBER(ladybug_state::sraider_8005_r)
 /* Unknown IO */
 WRITE8_MEMBER(ladybug_state::sraider_misc_w)
 {
-
 	switch(offset)
 	{
 		/* These 8 bits are stored in the latch at A7 */
@@ -184,14 +183,12 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(ladybug_state::coin1_inserted)
 {
-
 	/* left coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 INPUT_CHANGED_MEMBER(ladybug_state::coin2_inserted)
 {
-
 	/* right coin insertion causes an IRQ */
 	if (newval)
 		m_maincpu->set_input_line(0, HOLD_LINE);
@@ -733,7 +730,6 @@ MACHINE_START_MEMBER(ladybug_state,ladybug)
 
 MACHINE_START_MEMBER(ladybug_state,sraider)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_grid_color));

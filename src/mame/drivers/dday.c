@@ -236,7 +236,6 @@ GFXDECODE_END
 
 void dday_state::machine_start()
 {
-
 	m_ay1 = machine().device("ay1");
 
 	save_item(NAME(m_control));
@@ -247,7 +246,6 @@ void dday_state::machine_start()
 
 void dday_state::machine_reset()
 {
-
 	m_control = 0;
 	m_sl_enable = 0;
 	m_sl_image = 0;

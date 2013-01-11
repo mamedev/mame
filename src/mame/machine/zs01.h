@@ -10,8 +10,7 @@
 
 #define MCFG_ZS01_ADD(_tag, ds2401_tag) \
 	MCFG_DEVICE_ADD(_tag, ZS01, 0) \
-	zs01_device::static_set_ds2401_tag(*device, ds2401_tag); \
-
+	zs01_device::static_set_ds2401_tag(*device, ds2401_tag);
 #include "machine/secflash.h"
 
 class zs01_device : public device_secure_serial_flash

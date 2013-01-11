@@ -96,7 +96,6 @@ i8355_device::i8355_device(const machine_config &mconfig, const char *tag, devic
 		device_memory_interface(mconfig, *this),
 		m_space_config("ram", ENDIANNESS_LITTLE, 8, 11, 0, NULL, *ADDRESS_MAP_NAME(i8355))
 {
-
 }
 
 

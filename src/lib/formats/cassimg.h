@@ -148,11 +148,9 @@ extern const struct CassetteFormat wavfile_format;
 #define CASSETTE_FORMATLIST_START(name)     \
 	const struct CassetteFormat *const name[] = \
 	{                                       \
-		&wavfile_format,                    \
-
+		&wavfile_format,
 #define CASSETTE_FORMAT(name)               \
-		&(name),                            \
-
+		&(name),
 #define CASSETTE_FORMATLIST_END             \
 		NULL                                \
 	};

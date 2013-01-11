@@ -190,7 +190,6 @@ public:
 
 TILE_GET_INFO_MEMBER(supershot_state::get_supershot_text_tile_info)
 {
-
 	UINT8 code = m_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
@@ -208,7 +207,6 @@ UINT32 supershot_state::screen_update_supershot(screen_device &screen, bitmap_in
 
 WRITE8_MEMBER(supershot_state::supershot_vidram_w)
 {
-
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }

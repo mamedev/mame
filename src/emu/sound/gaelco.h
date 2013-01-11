@@ -12,17 +12,13 @@
 //**************************************************************************
 
 #define MCFG_GAELCO_GAE1_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, GAELCO_GAE1, _clock) \
-
+	MCFG_DEVICE_ADD(_tag, GAELCO_GAE1, _clock)
 #define MCFG_GAELCO_GAE1_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, GAELCO_GAE1, _clock) \
-
+	MCFG_DEVICE_REPLACE(_tag, GAELCO_GAE1, _clock)
 #define MCFG_GAELCO_CG1V_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, GAELCO_CG1V, _clock) \
-
+	MCFG_DEVICE_ADD(_tag, GAELCO_CG1V, _clock)
 #define MCFG_GAELCO_CG1V_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, GAELCO_CG1V, _clock) \
-
+	MCFG_DEVICE_REPLACE(_tag, GAELCO_CG1V, _clock)
 
 //**************************************************************************
 //  TYPE DEFINITIONS

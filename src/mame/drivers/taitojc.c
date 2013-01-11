@@ -1193,7 +1193,6 @@ INPUT_PORTS_END
 
 void taitojc_state::machine_reset()
 {
-
 	m_first_dsp_reset = 1;
 
 	m_mcu_comm_main = 0;
@@ -1320,7 +1319,6 @@ WRITE16_MEMBER(taitojc_state::dsp_idle_skip_w)
 
 DRIVER_INIT_MEMBER(taitojc_state,taitojc)
 {
-
 	m_polygon_fifo = auto_alloc_array(machine(), UINT16, TAITOJC_POLYGON_FIFO_SIZE);
 
 	m_has_dsp_hack = 1;
@@ -1330,7 +1328,6 @@ DRIVER_INIT_MEMBER(taitojc_state,taitojc)
 
 DRIVER_INIT_MEMBER(taitojc_state,dendego2)
 {
-
 	DRIVER_INIT_CALL(taitojc);
 
 	machine().device("dsp")->memory().space(AS_DATA).install_readwrite_handler(0x7ff0, 0x7ff0, read16_delegate(FUNC(taitojc_state::dendego2_dsp_idle_skip_r),this), write16_delegate(FUNC(taitojc_state::dsp_idle_skip_w),this));
@@ -1338,7 +1335,6 @@ DRIVER_INIT_MEMBER(taitojc_state,dendego2)
 
 DRIVER_INIT_MEMBER(taitojc_state,dangcurv)
 {
-
 	DRIVER_INIT_CALL(taitojc);
 
 	m_has_dsp_hack = 0;

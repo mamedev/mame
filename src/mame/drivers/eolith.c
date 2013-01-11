@@ -216,7 +216,6 @@ READ8_MEMBER( eolith_state::qs1000_p1_r )
 
 WRITE8_MEMBER( eolith_state::qs1000_p1_w )
 {
-
 }
 
 
@@ -1477,7 +1476,6 @@ MACHINE_RESET_MEMBER(eolith_state,eolith)
 
 DRIVER_INIT_MEMBER(eolith_state,eolith)
 {
-
 	init_eolith_speedup(machine());
 
 	// Sound CPU -> QS1000 CPU serial link

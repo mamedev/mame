@@ -73,7 +73,6 @@ void amiga_aga_palette_write(running_machine &machine, int color_reg, UINT16 dat
 
 VIDEO_START_MEMBER(amiga_state,amiga_aga)
 {
-
 	VIDEO_START_CALL_MEMBER( amiga );
 
 	m_aga_diwhigh_written = 0;

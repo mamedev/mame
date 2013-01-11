@@ -750,14 +750,12 @@ WRITE_LINE_MEMBER( scv_state::scv_upd1771_ack_w )
 
 void scv_state::machine_start()
 {
-
 	m_vb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scv_state::scv_vb_callback),this));
 }
 
 
 void scv_state::machine_reset()
 {
-
 	m_vb_timer->adjust( machine().primary_screen->time_until_pos(0, 0 ) );
 }
 

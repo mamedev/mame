@@ -91,7 +91,6 @@ static void init_common( running_machine &machine )
 
 VIDEO_START_MEMBER(fromance_state,fromance)
 {
-
 	/* allocate tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_fromance_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_fromance_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
@@ -101,7 +100,6 @@ VIDEO_START_MEMBER(fromance_state,fromance)
 
 VIDEO_START_MEMBER(fromance_state,nekkyoku)
 {
-
 	/* allocate tilemaps */
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_nekkyoku_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_nekkyoku_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
@@ -111,14 +109,12 @@ VIDEO_START_MEMBER(fromance_state,nekkyoku)
 
 VIDEO_START_MEMBER(fromance_state,pipedrm)
 {
-
 	VIDEO_START_CALL_MEMBER(fromance);
 	m_scrolly_ofs = 0x00;
 }
 
 VIDEO_START_MEMBER(fromance_state,hatris)
 {
-
 	VIDEO_START_CALL_MEMBER(fromance);
 	m_scrollx_ofs = 0xB9;
 	m_scrolly_ofs = 0x00;
@@ -132,7 +128,6 @@ VIDEO_START_MEMBER(fromance_state,hatris)
 
 WRITE8_MEMBER(fromance_state::fromance_gfxreg_w)
 {
-
 	m_gfxreg = data;
 	m_flipscreen = (data & 0x01);
 	m_selected_videoram = (~data >> 1) & 1;
@@ -155,7 +150,6 @@ WRITE8_MEMBER(fromance_state::fromance_gfxreg_w)
 
 READ8_MEMBER(fromance_state::fromance_paletteram_r)
 {
-
 	/* adjust for banking and read */
 	offset |= m_selected_paletteram << 11;
 	return m_local_paletteram[offset];
@@ -294,7 +288,6 @@ WRITE8_MEMBER(fromance_state::fromance_crtc_register_w)
 
 UINT32 fromance_state::screen_update_fromance(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->set_scrollx(0, m_scrollx[0]);
 	m_bg_tilemap->set_scrolly(0, m_scrolly[0]);
 	m_fg_tilemap->set_scrollx(0, m_scrollx[1]);

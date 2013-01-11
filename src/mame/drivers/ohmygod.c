@@ -19,7 +19,6 @@ Notes:
 
 WRITE16_MEMBER(ohmygod_state::ohmygod_ctrl_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		UINT8 *rom = memregion("oki")->base();
@@ -295,7 +294,6 @@ GFXDECODE_END
 
 void ohmygod_state::machine_start()
 {
-
 	save_item(NAME(m_spritebank));
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));

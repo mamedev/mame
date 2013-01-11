@@ -424,7 +424,6 @@ static SOUND_START(equites)
 
 WRITE8_MEMBER(equites_state::equites_c0f8_w)
 {
-
 	switch (offset)
 	{
 		case 0: // c0f8: NMI ack (written by NMI handler)
@@ -599,7 +598,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(equites_state::splndrbt_scanline)
 
 WRITE8_MEMBER(equites_state::equites_8155_w)
 {
-
 	// FIXME proper 8155 emulation must be implemented
 	switch( offset )
 	{
@@ -1188,7 +1186,6 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(equites_state,equites)
 {
-
 	m_mcu = machine().device("mcu");
 	m_audio_cpu = machine().device("audiocpu");
 	m_msm = machine().device<msm5232_device>("msm");
@@ -1219,7 +1216,6 @@ MACHINE_START_MEMBER(equites_state,equites)
 
 MACHINE_RESET_MEMBER(equites_state,equites)
 {
-
 	flip_screen_set(0);
 
 	m_fg_char_bank = 0;

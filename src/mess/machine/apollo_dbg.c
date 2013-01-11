@@ -797,7 +797,6 @@ static const char* trap7[] = {
 //------------------------------------------------------
 
 static const char* trap8[] = {
-
 /* 0x00 - 0x07 */"MST_$MAP", "u,x,x,x,x,x,x",
 /* 0x01 - 0x08 */"MST_$MAP_AT", "x,u,x,x,x,x,x,x",
 /* 0x02 - 0x07 */"MST_$MAP_GLOBAL", "u,x,x,x,x,x,x",
@@ -1054,7 +1053,6 @@ static const char * disassemble(m68ki_cpu_core *m68k, offs_t pc, char* sb)
 		oprom[i] = opram[i] = m68k->memory.read8(pc + i);
 		if (m68k->mmu_tmp_buserror_occurred)
 		{
-
 			sprintf(sb, "- (apollo_disassemble failed at %08x)", pc + i);
 
 			// restore previous bus error state

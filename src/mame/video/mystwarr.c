@@ -254,7 +254,6 @@ VIDEO_START_MEMBER(mystwarr_state,mystwarr)
 
 VIDEO_START_MEMBER(mystwarr_state,metamrph)
 {
-
 	m_gametype = 0;
 
 	K055555_vh_start(machine());

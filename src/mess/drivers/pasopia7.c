@@ -1100,14 +1100,12 @@ ROM_END
 
 DRIVER_INIT_MEMBER(pasopia7_state,p7_raster)
 {
-
 	m_screen_type = 1;
 	machine().scheduler().timer_pulse(attotime::from_hz(500), timer_expired_delegate(FUNC(pasopia7_state::pio_timer),this));
 }
 
 DRIVER_INIT_MEMBER(pasopia7_state,p7_lcd)
 {
-
 	m_screen_type = 0;
 	machine().scheduler().timer_pulse(attotime::from_hz(500), timer_expired_delegate(FUNC(pasopia7_state::pio_timer),this));
 }

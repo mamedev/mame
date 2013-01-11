@@ -194,8 +194,7 @@ INLINE UINT32 ARG16(z180_state *cpustate)
 		cpustate->_PC += arg;           /* so don't do cpustate->_PC += ARG(cpustate) */  \
 		CC(ex,opcode);                                          \
 	}                                                           \
-	else cpustate->_PC++;                                               \
-
+	else cpustate->_PC++;
 /***************************************************************
  * CALL
  ***************************************************************/

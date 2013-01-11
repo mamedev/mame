@@ -258,12 +258,10 @@ public:
 
 void goldngam_state::video_start()
 {
-
 }
 
 UINT32 goldngam_state::screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	int x, y;
 
 	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
@@ -285,7 +283,6 @@ UINT32 goldngam_state::screen_update_goldngam(screen_device &screen, bitmap_ind1
 
 void goldngam_state::palette_init()
 {
-
 }
 
 

@@ -239,13 +239,11 @@ Country :
 
 READ16_MEMBER(bbusters_state::sound_status_r)
 {
-
 	return m_sound_status;
 }
 
 WRITE8_MEMBER(bbusters_state::sound_status_w)
 {
-
 	m_sound_status = data;
 }
 
@@ -261,7 +259,6 @@ WRITE16_MEMBER(bbusters_state::sound_cpu_w)
 /* Eprom is byte wide, top half of word _must_ be 0xff */
 READ16_MEMBER(bbusters_state::eprom_r)
 {
-
 	return (m_eprom_data[offset]&0xff) | 0xff00;
 }
 
@@ -278,7 +275,6 @@ READ16_MEMBER(bbusters_state::control_3_r)
 
 WRITE16_MEMBER(bbusters_state::gun_select_w)
 {
-
 	logerror("%08x: gun r\n",space.device().safe_pc());
 
 	space.device().execute().set_input_line(2, HOLD_LINE);

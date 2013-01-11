@@ -87,8 +87,7 @@ ROM_END
 
 #define j6arcade_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "arca-snd.bin", 0x000000, 0x080000, CRC(111c3c40) SHA1(9ce6da8101eb9c26c7ff5616ef24e7c119803777) ) \
-
+	ROM_LOAD( "arca-snd.bin", 0x000000, 0x080000, CRC(111c3c40) SHA1(9ce6da8101eb9c26c7ff5616ef24e7c119803777) )
 
 ROM_START( j6arcade )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -177,8 +176,7 @@ ROM_END
 
 #define j6bnkrcl_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "cbsnd.bin", 0x000000, 0x080000, CRC(e7e587c9) SHA1(fde7a7761253dc4133340b766d220873731c11c7) ) \
-
+	ROM_LOAD( "cbsnd.bin", 0x000000, 0x080000, CRC(e7e587c9) SHA1(fde7a7761253dc4133340b766d220873731c11c7) )
 ROM_START( j6bnkrcl )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "clba-6_1.bin", 0x000000, 0x020000, CRC(b0407200) SHA1(88792a7cc71be3830a0156fa10195bad3cc58066) )
@@ -210,8 +208,7 @@ ROM_END
 
 #define j6big50_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "1386.bin", 0x000000, 0x080000, CRC(72ddabc9) SHA1(c68b0896b4c25b591029231dff045b16eab61ac4) ) \
-
+	ROM_LOAD( "1386.bin", 0x000000, 0x080000, CRC(72ddabc9) SHA1(c68b0896b4c25b591029231dff045b16eab61ac4) )
 
 ROM_START( j6big50 )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -250,8 +247,7 @@ ROM_END
 
 #define j6bigbnk_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "1109.bin", 0x000000, 0x080000, CRC(b4d7ac12) SHA1(ac194d15e9d4e5cdadddbf2dc3c9660b52f116c2) ) \
-
+	ROM_LOAD( "1109.bin", 0x000000, 0x080000, CRC(b4d7ac12) SHA1(ac194d15e9d4e5cdadddbf2dc3c9660b52f116c2) )
 
 ROM_START( j6bigbnk )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -384,8 +380,7 @@ ROM_END
 
 #define j6bigbuk_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "bb_snd.bin", 0x000000, 0x080000, CRC(d4d57f9f) SHA1(2ec38b62928d8c208880015b3a5e348e9b1c2079) ) \
-
+	ROM_LOAD( "bb_snd.bin", 0x000000, 0x080000, CRC(d4d57f9f) SHA1(2ec38b62928d8c208880015b3a5e348e9b1c2079) )
 
 ROM_START( j6bigbuk )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -478,8 +473,7 @@ ROM_END
 
 #define j6bigpct_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 ROM_START( j6bigpct )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "big11nsk.1", 0x000000, 0x020000, CRC(fabe2c0d) SHA1(522cd19e6e947afb485e6fd81e3589a97ec5ba0b) )
@@ -504,8 +498,7 @@ ROM_END
 
 #define j6bigtop_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "btcl-snd.bin", 0x000000, 0x080000, CRC(160d0317) SHA1(bb111b0a96fde85acd197ef9147eae2b7059da36) ) \
-
+	ROM_LOAD( "btcl-snd.bin", 0x000000, 0x080000, CRC(160d0317) SHA1(bb111b0a96fde85acd197ef9147eae2b7059da36) )
 
 ROM_START( j6bigtop )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -538,8 +531,7 @@ ROM_END
 
 #define j6bigwhl_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "bigwheelsnd.bin", 0x000000, 0x080000, CRC(90a19aaa) SHA1(7b17e9fda01d4fb163e09107759a6bf473fc6dc0) ) \
-
+	ROM_LOAD( "bigwheelsnd.bin", 0x000000, 0x080000, CRC(90a19aaa) SHA1(7b17e9fda01d4fb163e09107759a6bf473fc6dc0) )
 
 ROM_START( j6bigwhl )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -586,8 +578,7 @@ ROM_END
 
 #define j6bnza_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "1064.bin", 0x000000, 0x080000, CRC(266edecb) SHA1(c985081bd2a4500889aae0dc7ecd7d8e4cbd1591) ) \
-
+	ROM_LOAD( "1064.bin", 0x000000, 0x080000, CRC(266edecb) SHA1(c985081bd2a4500889aae0dc7ecd7d8e4cbd1591) )
 
 ROM_START( j6bnza )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -676,8 +667,7 @@ ROM_END
 
 #define j6brkout_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "bksnd.bin", 0x000000, 0x080000, CRC(f72bd4f4) SHA1(ef8651fe7bb5f5340e41d35ca0669cba7d9c1372) ) \
-
+	ROM_LOAD( "bksnd.bin", 0x000000, 0x080000, CRC(f72bd4f4) SHA1(ef8651fe7bb5f5340e41d35ca0669cba7d9c1372) )
 
 ROM_START( j6brkout )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -710,8 +700,7 @@ ROM_END
 
 #define j6cpclb_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "cpalaceclubsnd", 0x000000, 0x080000, CRC(ef433c44) SHA1(049bdbbe8d88fb77dbfc9c2690e62982e7fe20ea) ) \
-
+	ROM_LOAD( "cpalaceclubsnd", 0x000000, 0x080000, CRC(ef433c44) SHA1(049bdbbe8d88fb77dbfc9c2690e62982e7fe20ea) )
 
 ROM_START( j6cpclb )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -739,8 +728,7 @@ ROM_END
 
 #define j6camelt_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "camsound.bin", 0x000000, 0x080000, CRC(70d5a16f) SHA1(0e8ec67387274298637598bf1ab8c479aa108c54) ) \
-
+	ROM_LOAD( "camsound.bin", 0x000000, 0x080000, CRC(70d5a16f) SHA1(0e8ec67387274298637598bf1ab8c479aa108c54) )
 
 ROM_START( j6camelt )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -789,8 +777,7 @@ ROM_END
 
 #define j6cshbox_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "cbcsnd.bin", 0x000000, 0x080000, CRC(bf209b9b) SHA1(d2c079b05baeae80ed772509c3d9640e682addcd) ) \
-
+	ROM_LOAD( "cbcsnd.bin", 0x000000, 0x080000, CRC(bf209b9b) SHA1(d2c079b05baeae80ed772509c3d9640e682addcd) )
 
 ROM_START( j6cshbox )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -826,8 +813,7 @@ ROM_END
 
 #define j6cshbst_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "as1.bin", 0x000000, 0x080000, CRC(96127e49) SHA1(58bec4a024eb557995c67ac81880ad3a9de84ac0) ) \
-
+	ROM_LOAD( "as1.bin", 0x000000, 0x080000, CRC(96127e49) SHA1(58bec4a024eb557995c67ac81880ad3a9de84ac0) )
 
 ROM_START( j6cshbst )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -867,8 +853,7 @@ ROM_END
 
 #define j6cshcnt_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "cd75snd.bin", 0x000000, 0x080000, CRC(352e28cd) SHA1(c98307f5eaf511c9d281151d1c07ffd83f24244c) ) \
-
+	ROM_LOAD( "cd75snd.bin", 0x000000, 0x080000, CRC(352e28cd) SHA1(c98307f5eaf511c9d281151d1c07ffd83f24244c) )
 
 ROM_START( j6cshcnt )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -886,8 +871,7 @@ ROM_END
 
 #define j6cshrd_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "cashraider8b11as1 24-9-98.bin", 0x000000, 0x080000, CRC(8d28ba3c) SHA1(5d403bdc4cfd6a3e14c1e9458dcda112ed1770c5) ) /* aka carasnd.bin */  \
-
+	ROM_LOAD( "cashraider8b11as1 24-9-98.bin", 0x000000, 0x080000, CRC(8d28ba3c) SHA1(5d403bdc4cfd6a3e14c1e9458dcda112ed1770c5) ) /* aka carasnd.bin */
 
 ROM_START( j6cshrd )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -939,8 +923,7 @@ ROM_END
 
 #define j6cshvgs_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "cvssnd.bin", 0x000000, 0x080000, CRC(f2f828f5) SHA1(3d141884ea68d3e440ac43eaec3e8133fa8ae776) ) \
-
+	ROM_LOAD( "cvssnd.bin", 0x000000, 0x080000, CRC(f2f828f5) SHA1(3d141884ea68d3e440ac43eaec3e8133fa8ae776) )
 
 ROM_START( j6cshvgs )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -1077,8 +1060,7 @@ ROM_END
 
 #define j6cas5_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "cfl-snd.bin", 0x000000, 0x080000, CRC(0016ab04) SHA1(82d133f485b325b29db901f6254c80ca959abd3e) ) \
-
+	ROM_LOAD( "cfl-snd.bin", 0x000000, 0x080000, CRC(0016ab04) SHA1(82d133f485b325b29db901f6254c80ca959abd3e) )
 
 ROM_START( j6cas5 )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -1177,8 +1159,7 @@ ROM_END
 #define j6cascz_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "1274.bin", 0x000000, 0x080000, CRC(90a19aaa) SHA1(7b17e9fda01d4fb163e09107759a6bf473fc6dc0) ) \
-	ROM_LOAD( "crazycasinosnd.bin", 0x000000, 0x080000, CRC(d10b8005) SHA1(e499e4e119956c7831dcec8dc8a6e338423afafb) ) \
-
+	ROM_LOAD( "crazycasinosnd.bin", 0x000000, 0x080000, CRC(d10b8005) SHA1(e499e4e119956c7831dcec8dc8a6e338423afafb) )
 // check hw for j6cascz sets
 
 
@@ -1284,8 +1265,7 @@ ROM_END
 
 #define j6cccla_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6cccla )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -1375,8 +1355,7 @@ ROM_END
 
 #define j6cascla_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6cascla )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -1529,8 +1508,7 @@ ROM_END
 #define j6casclb_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "1274.bin", 0x000000, 0x080000, CRC(90a19aaa) SHA1(7b17e9fda01d4fb163e09107759a6bf473fc6dc0) ) \
-	ROM_LOAD( "cccsnd.bin", 0x000000, 0x080000, CRC(facc0580) SHA1(4f0307a6439e5df97ee4e80f6300e7bf056f3dad) ) \
-
+	ROM_LOAD( "cccsnd.bin", 0x000000, 0x080000, CRC(facc0580) SHA1(4f0307a6439e5df97ee4e80f6300e7bf056f3dad) )
 
 ROM_START( j6casclb )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -1550,8 +1528,7 @@ ROM_END
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "clve-snd.bin", 0x000000, 0x020000, CRC(f77c12c7) SHA1(a2084be41949949aed787c1dccb64b969de81c86) ) /* looks like a bad dump, most missing */ \
 	ROM_LOAD( "cas_las_vegas_snd.bin", 0x000000, 0x080000, CRC(d49c212e) SHA1(e4ddd743bdb9404afb5d6c3d2ae4ea1d625c331d) ) \
-	ROM_LOAD( "caslasvegas30-06-97-4133as1.bin", 0x000000, 0x080000, CRC(d49c212e) SHA1(e4ddd743bdb9404afb5d6c3d2ae4ea1d625c331d) ) \
-
+	ROM_LOAD( "caslasvegas30-06-97-4133as1.bin", 0x000000, 0x080000, CRC(d49c212e) SHA1(e4ddd743bdb9404afb5d6c3d2ae4ea1d625c331d) )
 
 
 ROM_START( j6caslas )
@@ -1597,8 +1574,7 @@ ROM_END
 
 #define j6cluclb_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "clubcluedosnd.bin", 0x000000, 0x080000, CRC(80491c1b) SHA1(432ce61b26f77da10f5dc9230d8e3d4d988db4b4) ) \
-
+	ROM_LOAD( "clubcluedosnd.bin", 0x000000, 0x080000, CRC(80491c1b) SHA1(432ce61b26f77da10f5dc9230d8e3d4d988db4b4) )
 
 ROM_START( j6cluclb )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -1694,8 +1670,7 @@ ROM_END
 
 #define j6col_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "coli_snd.bin", 0x000000, 0x080000, CRC(0f75b32e) SHA1(29e9e04d9a1686dfdf6cbdcd3acca23d6e64a048) ) \
-
+	ROM_LOAD( "coli_snd.bin", 0x000000, 0x080000, CRC(0f75b32e) SHA1(29e9e04d9a1686dfdf6cbdcd3acca23d6e64a048) )
 
 ROM_START( j6col )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -1749,8 +1724,7 @@ ROM_END
 
 #define j6colcsh_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "coli-snd.bin", 0x000000, 0x080000, CRC(a194e5af) SHA1(649d6ecc4e15afd60c2f57d082a6d9846013c107) ) \
-
+	ROM_LOAD( "coli-snd.bin", 0x000000, 0x080000, CRC(a194e5af) SHA1(649d6ecc4e15afd60c2f57d082a6d9846013c107) )
 ROM_START( j6colcsh )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "coli-6_1.bin", 0x000000, 0x020000, CRC(e560f327) SHA1(48c619dc65e023621a530419ef6363865ff59c2a) )
@@ -1790,8 +1764,7 @@ ROM_END
 
 #define j6colmon_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "colourofmoneysnd.bin", 0x000000, 0x080000, CRC(289d74c8) SHA1(04938d526e4a3079e9570fa946e5c6b9cc0ba311) ) \
-
+	ROM_LOAD( "colourofmoneysnd.bin", 0x000000, 0x080000, CRC(289d74c8) SHA1(04938d526e4a3079e9570fa946e5c6b9cc0ba311) )
 
 ROM_START( j6colmon )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -1873,8 +1846,7 @@ ROM_END
 
 #define j6coprob_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "crsound.bin", 0x000000, 0x080000, CRC(d39dd4f1) SHA1(9ce7870c00f9ccb797182af41a7d22e41624c8ce) ) \
-
+	ROM_LOAD( "crsound.bin", 0x000000, 0x080000, CRC(d39dd4f1) SHA1(9ce7870c00f9ccb797182af41a7d22e41624c8ce) )
 
 ROM_START( j6coprob )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -1921,8 +1893,7 @@ ROM_END
 
 #define j6crack_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "crck_snd.hex", 0x000000, 0x080000, CRC(106bb6b5) SHA1(a2e109fd71575dcceec190efed0a9c81ec1f4048) ) \
-
+	ROM_LOAD( "crck_snd.hex", 0x000000, 0x080000, CRC(106bb6b5) SHA1(a2e109fd71575dcceec190efed0a9c81ec1f4048) )
 
 ROM_START( j6crack )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -2004,8 +1975,7 @@ ROM_END
 
 #define j6crzclb_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6crzclb )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -2038,8 +2008,7 @@ ROM_END
 
 #define j6crsfir_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "crossfiresnd.bin", 0x000000, 0x080000, CRC(266edecb) SHA1(c985081bd2a4500889aae0dc7ecd7d8e4cbd1591) ) \
-
+	ROM_LOAD( "crossfiresnd.bin", 0x000000, 0x080000, CRC(266edecb) SHA1(c985081bd2a4500889aae0dc7ecd7d8e4cbd1591) )
 
 ROM_START( j6crsfir )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -2059,8 +2028,7 @@ ROM_END
 #define j6daygld_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
 	/* dgsnd.bin = popsnd.bin            m_popeye   Popeye (20p/8 GBP Token) */ \
-	ROM_LOAD( "dgsnd2.b8", 0x000000, 0x080000, CRC(7e8c05ce) SHA1(616b0f94b94331f86d7b1fec11dd05cf9b0968cf) ) \
-
+	ROM_LOAD( "dgsnd2.b8", 0x000000, 0x080000, CRC(7e8c05ce) SHA1(616b0f94b94331f86d7b1fec11dd05cf9b0968cf) )
 ROM_START( j6daygld )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "dg30cz04_1.b8", 0x000000, 0x020000, CRC(ff3aefc9) SHA1(80e5485f0f6e67dac3bfaa5b3ba947ff63f9b745) )
@@ -2106,8 +2074,7 @@ ROM_END
 
 #define j6dayml_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "daytona-sound_4m.epr", 0x000000, 0x080000, CRC(a74fa29c) SHA1(3db3322910717d4eda81b5df5988453fdebec7bf) ) \
-
+	ROM_LOAD( "daytona-sound_4m.epr", 0x000000, 0x080000, CRC(a74fa29c) SHA1(3db3322910717d4eda81b5df5988453fdebec7bf) )
 ROM_START( j6dayml )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "dm30cz08_1.b8", 0x000000, 0x020000, CRC(488a9da7) SHA1(604a2a6f7f07a9506906abeea79066459f375e61) )
@@ -2132,8 +2099,7 @@ ROM_END
 
 #define j6dmnjkr_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "demonjocker-sound_4m.epr", 0x000000, 0x04a018, CRC(796e1b35) SHA1(e9c8e5a350823275c9ba9238781872ea359d5049) ) \
-
+	ROM_LOAD( "demonjocker-sound_4m.epr", 0x000000, 0x04a018, CRC(796e1b35) SHA1(e9c8e5a350823275c9ba9238781872ea359d5049) )
 
 ROM_START( j6dmnjkr )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -2197,8 +2163,7 @@ ROM_END
 
 #define j6dyfl_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "doyoufeelluckysnd.bin", 0x000000, 0x080000, CRC(9148112e) SHA1(8976a03eb68b1f08c6260c095bddb8d8731539af) ) \
-
+	ROM_LOAD( "doyoufeelluckysnd.bin", 0x000000, 0x080000, CRC(9148112e) SHA1(8976a03eb68b1f08c6260c095bddb8d8731539af) )
 
 ROM_START( j6dyfl )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -2292,8 +2257,7 @@ ROM_END
 
 #define j6euphor_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "euphoriasnd.bin", 0x000000, 0x080000, CRC(d3097d34) SHA1(3db500b5ee38dfa580336b4bac43b139a31d2638) ) \
-
+	ROM_LOAD( "euphoriasnd.bin", 0x000000, 0x080000, CRC(d3097d34) SHA1(3db500b5ee38dfa580336b4bac43b139a31d2638) )
 
 ROM_START( j6euphor )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -2346,8 +2310,7 @@ ROM_END
 
 #define j6fastfr_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "cffsnd.bin", 0x000000, 0x080000, CRC(29355a37) SHA1(5810f0eafe58b5d03cd104381eb92f55b1e08baa) ) \
-
+	ROM_LOAD( "cffsnd.bin", 0x000000, 0x080000, CRC(29355a37) SHA1(5810f0eafe58b5d03cd104381eb92f55b1e08baa) )
 
 ROM_START( j6fastfr )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -2367,8 +2330,7 @@ ROM_END
 
 #define j6fasttk_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 	ROM_START( j6fasttk )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "9331.bin", 0x000000, 0x020000, CRC(54dbf894) SHA1(a3ffff82883cc192108f44d36a7465d4afeaf114) )
@@ -2401,8 +2363,7 @@ ROM_END
 #define j6filth_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "1151.bin", 0x000000, 0x080000, CRC(c3a2bf9b) SHA1(31536613fd9dcce0878109d460344591570c4334) ) \
-/*  ROM_LOAD( "frcl-snd.bin", 0x000000, 0x080000, CRC(c3a2bf9b) SHA1(31536613fd9dcce0878109d460344591570c4334) ) */ \
-
+/*  ROM_LOAD( "frcl-snd.bin", 0x000000, 0x080000, CRC(c3a2bf9b) SHA1(31536613fd9dcce0878109d460344591570c4334) ) */
 
 ROM_START( j6filth )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -2436,8 +2397,7 @@ ROM_END
 
 #define j6firbl_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "fireballsnd.bin", 0x000000, 0x080000, CRC(e47444c7) SHA1(535ae2abdf5f9a1931c8b2afccf9a63b0778e5e3) ) \
-
+	ROM_LOAD( "fireballsnd.bin", 0x000000, 0x080000, CRC(e47444c7) SHA1(535ae2abdf5f9a1931c8b2afccf9a63b0778e5e3) )
 
 ROM_START( j6firbl )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -2477,8 +2437,7 @@ ROM_END
 
 #define j6fireck_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "fccs1.bin", 0x000000, 0x080000, CRC(0421526d) SHA1(9dad850c208cb9f4a3a4c62e05a18217466d227e) ) \
-
+	ROM_LOAD( "fccs1.bin", 0x000000, 0x080000, CRC(0421526d) SHA1(9dad850c208cb9f4a3a4c62e05a18217466d227e) )
 ROM_START( j6fireck )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ficr-11.bin", 0x000000, 0x020000, CRC(655efa46) SHA1(f861bb97cd029353027379ab1a049218c3c987f5) )
@@ -2524,8 +2483,7 @@ ROM_END
 
 #define j6firclb_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "firecracker_club_sound.bin", 0x000000, 0x080000, CRC(0421526d) SHA1(9dad850c208cb9f4a3a4c62e05a18217466d227e) ) \
-
+	ROM_LOAD( "firecracker_club_sound.bin", 0x000000, 0x080000, CRC(0421526d) SHA1(9dad850c208cb9f4a3a4c62e05a18217466d227e) )
 ROM_START( j6firclb )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "35ff", 0x000000, 0x020000, CRC(b0655026) SHA1(b0e556bbd1450035dd0a373eaf01a09d9cf90c60) ) // aka firecracker_club.p1
@@ -2557,8 +2515,7 @@ ROM_END
 
 #define j6fivalv_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "fivealivesnd.bin", 0x000000, 0x080000, CRC(4e4e94d9) SHA1(b8d1f241c4257436fd0e552494d2c9af1c8661dd) ) \
-
+	ROM_LOAD( "fivealivesnd.bin", 0x000000, 0x080000, CRC(4e4e94d9) SHA1(b8d1f241c4257436fd0e552494d2c9af1c8661dd) )
 
 ROM_START( j6fivalv )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -2584,8 +2541,7 @@ ROM_END
 
 #define j6fiveln_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "c-snd.bin", 0x000000, 0x080000, CRC(0016ab04) SHA1(82d133f485b325b29db901f6254c80ca959abd3e) ) \
-
+	ROM_LOAD( "c-snd.bin", 0x000000, 0x080000, CRC(0016ab04) SHA1(82d133f485b325b29db901f6254c80ca959abd3e) )
 ROM_START( j6fiveln )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "39.bin", 0x000000, 0x020000, CRC(f960d6dd) SHA1(d69f868201e1cd7ccceb155f6c219aa81791e3a3) )
@@ -2618,8 +2574,7 @@ ROM_END
 
 #define j6frc10_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "force10snd.bin", 0x000000, 0x080000, CRC(e7e587c9) SHA1(fde7a7761253dc4133340b766d220873731c11c7) ) /* aka fo10-snd.bin */ \
-
+	ROM_LOAD( "force10snd.bin", 0x000000, 0x080000, CRC(e7e587c9) SHA1(fde7a7761253dc4133340b766d220873731c11c7) ) /* aka fo10-snd.bin */
 
 ROM_START( j6frc10 )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -2680,8 +2635,7 @@ ROM_END
 
 #define j6frtpot_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "fruitpotssnd.bin", 0x000000, 0x080000, CRC(1aacc429) SHA1(7ee38a34087a05d06fbfff78b57bf794c4f25d0c) ) \
-
+	ROM_LOAD( "fruitpotssnd.bin", 0x000000, 0x080000, CRC(1aacc429) SHA1(7ee38a34087a05d06fbfff78b57bf794c4f25d0c) )
 
 ROM_START( j6frtpot )
 	ROM_REGION( PRGSIZE_LARGE, "maincpu", 0 ) // not overdumps? legit larger game?
@@ -2714,8 +2668,7 @@ ROM_END
 
 #define j6gforce_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "gfor-snd.bin", 0x000000, 0x080000, CRC(4b710c8a) SHA1(af93c795d4c46cb95d92c48ac60a48db7f6724ac) ) \
-
+	ROM_LOAD( "gfor-snd.bin", 0x000000, 0x080000, CRC(4b710c8a) SHA1(af93c795d4c46cb95d92c48ac60a48db7f6724ac) )
 
 ROM_START( j6gforce )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -2764,8 +2717,7 @@ ROM_END
 
 #define j6guab_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "guabs.hex", 0x000000, 0x080000, CRC(fc041c87) SHA1(bd2606e3a67e13ce937b8cb4d5fcda9fa13842a1) ) \
-
+	ROM_LOAD( "guabs.hex", 0x000000, 0x080000, CRC(fc041c87) SHA1(bd2606e3a67e13ce937b8cb4d5fcda9fa13842a1) )
 
 ROM_START( j6guab )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -2819,8 +2771,7 @@ ROM_END
 
 #define j6guabcl_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "guabs.hex", 0x000000, 0x080000, CRC(fc041c87) SHA1(bd2606e3a67e13ce937b8cb4d5fcda9fa13842a1) ) \
-
+	ROM_LOAD( "guabs.hex", 0x000000, 0x080000, CRC(fc041c87) SHA1(bd2606e3a67e13ce937b8cb4d5fcda9fa13842a1) )
 
 ROM_START( j6guabcl )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -2838,8 +2789,7 @@ ROM_END
 
 #define j6gldclb_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "gladiatorsnd.bin", 0x000000, 0x080000, CRC(13bd21c7) SHA1(3e0e087fdf8566ca6803f8f9f75597e19433fd0b) ) \
-
+	ROM_LOAD( "gladiatorsnd.bin", 0x000000, 0x080000, CRC(13bd21c7) SHA1(3e0e087fdf8566ca6803f8f9f75597e19433fd0b) )
 
 ROM_START( j6gldclb )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -2865,8 +2815,7 @@ ROM_END
 
 #define j6gogold_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "gfgoldsnd.bin", 0x000000, 0x080000, CRC(1ccc9b9b) SHA1(d6c7d4285b569c8ed77f732d6e42e6b763d200d4) ) \
-
+	ROM_LOAD( "gfgoldsnd.bin", 0x000000, 0x080000, CRC(1ccc9b9b) SHA1(d6c7d4285b569c8ed77f732d6e42e6b763d200d4) )
 ROM_START( j6gogold )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "20702.bin", 0x000000, 0x020000, CRC(c274df22) SHA1(f623bb8ba2afcc3ad7c58a4cf56ea8d8f9d1308a) )
@@ -2912,8 +2861,7 @@ ROM_END
 
 #define j6golddm_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "gdsnd.bin", 0x000000, 0x04a018, CRC(796e1b35) SHA1(e9c8e5a350823275c9ba9238781872ea359d5049) ) \
-
+	ROM_LOAD( "gdsnd.bin", 0x000000, 0x04a018, CRC(796e1b35) SHA1(e9c8e5a350823275c9ba9238781872ea359d5049) )
 
 ROM_START( j6golddm )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -2931,8 +2879,7 @@ ROM_END
 
 #define j6goldgl_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "goldengoalsnd.bin", 0x000000, 0x080000, CRC(3af9ccdb) SHA1(4a911a48816bc69743ba1ba18fdd913041636ae1) ) \
-
+	ROM_LOAD( "goldengoalsnd.bin", 0x000000, 0x080000, CRC(3af9ccdb) SHA1(4a911a48816bc69743ba1ba18fdd913041636ae1) )
 
 ROM_START( j6goldgl )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -3029,8 +2976,7 @@ ROM_END
 
 #define j6hapyhr_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "happyhoursnd.bin", 0x000000, 0x080000, CRC(ef80bbfd) SHA1(66dc0bd35054a506dc75972ac59f9ca03d886e1b) ) \
-
+	ROM_LOAD( "happyhoursnd.bin", 0x000000, 0x080000, CRC(ef80bbfd) SHA1(66dc0bd35054a506dc75972ac59f9ca03d886e1b) )
 
 ROM_START( j6hapyhr )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -3066,8 +3012,7 @@ ROM_END
 
 #define j6impact_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "hiim-snd.bin", 0x000000, 0x080000, CRC(3f54a54c) SHA1(fb3b2561f10391f01ee97e4501e8492fcfe4fd2b) ) \
-
+	ROM_LOAD( "hiim-snd.bin", 0x000000, 0x080000, CRC(3f54a54c) SHA1(fb3b2561f10391f01ee97e4501e8492fcfe4fd2b) )
 
 ROM_START( j6impact )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -3099,8 +3044,7 @@ ROM_END
 
 #define j6hilosv_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "hi_lo_silver_snd.bin", 0x000000, 0x080000, CRC(fd88e3a6) SHA1(07c2fec617faea189ceddc46ec477fb09c0ec4a9) ) \
-
+	ROM_LOAD( "hi_lo_silver_snd.bin", 0x000000, 0x080000, CRC(fd88e3a6) SHA1(07c2fec617faea189ceddc46ec477fb09c0ec4a9) )
 
 ROM_START( j6hilosv )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -3148,8 +3092,7 @@ ROM_END
 
 #define j6hirol_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "hiro-snd.bin", 0x000000, 0x080000, CRC(5843c195) SHA1(0665e913e4c1a919aa5331cce7a467c841722388) ) \
-
+	ROM_LOAD( "hiro-snd.bin", 0x000000, 0x080000, CRC(5843c195) SHA1(0665e913e4c1a919aa5331cce7a467c841722388) )
 
 ROM_START( j6hirol )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -3188,8 +3131,7 @@ ROM_END
 
 #define j6hirlcl_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "hrcl-snd.bin", 0x000000, 0x080000, CRC(5843c195) SHA1(0665e913e4c1a919aa5331cce7a467c841722388) ) \
-
+	ROM_LOAD( "hrcl-snd.bin", 0x000000, 0x080000, CRC(5843c195) SHA1(0665e913e4c1a919aa5331cce7a467c841722388) )
 ROM_START( j6hirlcl )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "hrcl-3_1.bin", 0x000000, 0x020000, CRC(680182bf) SHA1(54e1b6db179934a29453ff5c5664fd00352377ea) )
@@ -3220,8 +3162,7 @@ ROM_END
 
 #define j6histk_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "histakessnd.bin", 0x000000, 0x080000, CRC(7bffa191) SHA1(e3a4a4eef878fb093240a3e145cf405d266bec74) ) \
-
+	ROM_LOAD( "histakessnd.bin", 0x000000, 0x080000, CRC(7bffa191) SHA1(e3a4a4eef878fb093240a3e145cf405d266bec74) )
 
 ROM_START( j6histk )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -3239,8 +3180,7 @@ ROM_END
 
 #define j6hiphop_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6hiphop )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -3280,8 +3220,7 @@ ROM_END
 
 #define j6hotsht_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "hosh-snd.bin", 0x000000, 0x080000, CRC(f5bcfe63) SHA1(4983cb4c2d69730d7f1984d648c2801b46b4ab70) ) \
-
+	ROM_LOAD( "hosh-snd.bin", 0x000000, 0x080000, CRC(f5bcfe63) SHA1(4983cb4c2d69730d7f1984d648c2801b46b4ab70) )
 
 ROM_START( j6hotsht )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -3377,8 +3316,7 @@ ROM_END
 
 #define j6impuls_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "impu-snd.bin", 0x000000, 0x080000, CRC(0551d030) SHA1(7a8d012690bcea707710bf39c8069d7c074912ce) ) \
-
+	ROM_LOAD( "impu-snd.bin", 0x000000, 0x080000, CRC(0551d030) SHA1(7a8d012690bcea707710bf39c8069d7c074912ce) )
 
 ROM_START( j6impuls )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -3435,8 +3373,7 @@ ROM_END
 #define j6indy_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "6706.bin", 0x000000, 0x080000, CRC(674c5b21) SHA1(12e12e362ae8c99414cd474a34fa13acd8f6bcb3) ) \
-	ROM_LOAD( "indisnd.bin", 0x0000, 0x080000, CRC(90ff139b) SHA1(9555553dc01055c311d4917e6ed7f5d3b6bf3b71) ) \
-
+	ROM_LOAD( "indisnd.bin", 0x0000, 0x080000, CRC(90ff139b) SHA1(9555553dc01055c311d4917e6ed7f5d3b6bf3b71) )
 
 ROM_START( j6indy )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -3538,8 +3475,7 @@ ROM_END
 
 #define j6showtm_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "itsshowtimesnd.bin", 0x000000, 0x080000, CRC(7a2264fa) SHA1(55d5a15ff8c6a76c5403856bb8e64cbfdafb7a55) ) \
-
+	ROM_LOAD( "itsshowtimesnd.bin", 0x000000, 0x080000, CRC(7a2264fa) SHA1(55d5a15ff8c6a76c5403856bb8e64cbfdafb7a55) )
 
 ROM_START( j6showtm )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -3636,8 +3572,7 @@ ROM_END
 
 #define j6jackjs_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "jackpotjusticesnd.bin", 0x000000, 0x080000, CRC(379e1a3d) SHA1(3b455a812284e716a831aadbaa592ee0ddab1a9d) ) \
-
+	ROM_LOAD( "jackpotjusticesnd.bin", 0x000000, 0x080000, CRC(379e1a3d) SHA1(3b455a812284e716a831aadbaa592ee0ddab1a9d) )
 ROM_START( j6jackjs ) // not overdumps? legit larger game?
 	ROM_REGION( PRGSIZE_LARGE, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "60000150.evn", 0x000000, 0x080000, CRC(358d59c8) SHA1(9212565a1f9d50d26d4ccfff747824c42e878e52) )
@@ -3680,8 +3615,7 @@ ROM_END
 
 #define j6jkrpls_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 ROM_START( j6jkrpls )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "jp30cz04_1.b8", 0x000000, 0x020000, CRC(096baa03) SHA1(d9d3aa5616e253b49adda9254dbdaedb3e7ee72a) )
@@ -3728,8 +3662,7 @@ ROM_END
 
 #define j6jkpldx_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 ROM_START( j6jkpldx )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "jpd75cz03_1.b8", 0x000000, 0x020000, CRC(f48c26c5) SHA1(5a46a24a4575da3360eab54059ea994b7e8e4f8d) )
@@ -3778,8 +3711,7 @@ ROM_END
 
 #define j6kungfu_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "kufu-snd.bin", 0x000000, 0x080000, CRC(95360279) SHA1(f86c5ef3f7e790e3062ebda5150d2384ea341651) ) \
-
+	ROM_LOAD( "kufu-snd.bin", 0x000000, 0x080000, CRC(95360279) SHA1(f86c5ef3f7e790e3062ebda5150d2384ea341651) )
 ROM_START( j6kungfu )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "kfu20p1", 0x000000, 0x020000, CRC(f8dc50fb) SHA1(8beca856ac604d568e162d26c83f1d2984eccd6d) )
@@ -3819,8 +3751,7 @@ ROM_END
 
 #define j6luckla_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6luckla )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -3846,8 +3777,7 @@ ROM_END
 
 #define j6magcir_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "f098.bin", 0x000000, 0x080000, CRC(a4431105) SHA1(2dad84011ccf08be5b642884b2353718ebb4a6c7) ) \
-
+	ROM_LOAD( "f098.bin", 0x000000, 0x080000, CRC(a4431105) SHA1(2dad84011ccf08be5b642884b2353718ebb4a6c7) )
 ROM_START( j6magcir )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "magic1.bin", 0x000000, 0x020000, CRC(c7a646dc) SHA1(c4c6e2ecccdccb66421a4c926b9cac5260f855e3) )
@@ -3885,8 +3815,7 @@ ROM_END
 
 #define j6mavrk_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "1431.bin", 0x000000, 0x080000, CRC(2c95a586) SHA1(81f27d408f29bec0c79a7ac635e74a11cc93f2cc) ) \
-
+	ROM_LOAD( "1431.bin", 0x000000, 0x080000, CRC(2c95a586) SHA1(81f27d408f29bec0c79a7ac635e74a11cc93f2cc) )
 
 ROM_START( j6mavrk )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -3925,8 +3854,7 @@ ROM_END
 
 #define j6maxod_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "maov-snd.bin", 0x000000, 0x080000, CRC(9b527476) SHA1(6a6333aea592a1a7331a79372bbd6a16ff35c252) ) \
-
+	ROM_LOAD( "maov-snd.bin", 0x000000, 0x080000, CRC(9b527476) SHA1(6a6333aea592a1a7331a79372bbd6a16ff35c252) )
 
 ROM_START( j6maxod )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -3970,8 +3898,7 @@ ROM_END
 
 #define j6medal_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "medjob.bin", 0x000000, 0x080000, CRC(dd8296bf) SHA1(c9209abf4276d81897476420177d24e739f0441e) ) \
-
+	ROM_LOAD( "medjob.bin", 0x000000, 0x080000, CRC(dd8296bf) SHA1(c9209abf4276d81897476420177d24e739f0441e) )
 
 ROM_START( j6medal ) // not overdumps? legit larger game?
 	ROM_REGION( PRGSIZE_LARGE, "maincpu", 0 )
@@ -4011,8 +3938,7 @@ ROM_END
 
 #define j6megbck_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "mebu-snd.bin", 0x000000, 0x080000, CRC(20bce62c) SHA1(50c5959eb5a5f8436a08f9a6a096b18cbf49970e) ) \
-
+	ROM_LOAD( "mebu-snd.bin", 0x000000, 0x080000, CRC(20bce62c) SHA1(50c5959eb5a5f8436a08f9a6a096b18cbf49970e) )
 ROM_START( j6megbck )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "mebu-4_1.bin", 0x000000, 0x020000, CRC(85080234) SHA1(9a65e7adbf4f5f4832f7daebc2ff9abd430b74a2) )
@@ -4066,8 +3992,7 @@ ROM_END
 #define j6montlk_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
 /*  ROM_LOAD( "1109.bin", 0x000000, 0x080000, CRC(b4d7ac12) SHA1(ac194d15e9d4e5cdadddbf2dc3c9660b52f116c2) ) */  \
-	ROM_LOAD( "mtsnd.bin", 0x000000, 0x080000, CRC(b4d7ac12) SHA1(ac194d15e9d4e5cdadddbf2dc3c9660b52f116c2) ) \
-
+	ROM_LOAD( "mtsnd.bin", 0x000000, 0x080000, CRC(b4d7ac12) SHA1(ac194d15e9d4e5cdadddbf2dc3c9660b52f116c2) )
 
 ROM_START( j6montlk )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -4135,8 +4060,7 @@ ROM_END
 
 #define j6mono60_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "monop60.snd", 0x000000, 0x080000, CRC(c79af6d0) SHA1(518a7b16978a843bdb83938279b11f446503361e) ) /* aka mon60_snd.bin */ \
-
+	ROM_LOAD( "monop60.snd", 0x000000, 0x080000, CRC(c79af6d0) SHA1(518a7b16978a843bdb83938279b11f446503361e) ) /* aka mon60_snd.bin */
 
 ROM_START( j6mono60 )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -4233,8 +4157,7 @@ ROM_END
 
 #define j6monobn_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6monobn )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -4262,8 +4185,7 @@ ROM_END
 
 #define j6outlaw_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "outlawsnd.bin", 0x000000, 0x080000, CRC(9b9f21dc) SHA1(aca23a525f1288f49a18a74eb36ac3a67efa7e20) ) \
-
+	ROM_LOAD( "outlawsnd.bin", 0x000000, 0x080000, CRC(9b9f21dc) SHA1(aca23a525f1288f49a18a74eb36ac3a67efa7e20) )
 ROM_START( j6outlaw )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "7547.bin", 0x000000, 0x020000, CRC(7a4efbf1) SHA1(5e184e172a129aad6ad34409f63de25916414146) )
@@ -4287,8 +4209,7 @@ ROM_END
 
 #define j6oxo_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "oxo_bingo_snd.bin", 0x000000, 0x080000, CRC(008a2d6a) SHA1(a89114154489142556b373ab24cd32fadf5856b3) ) \
-
+	ROM_LOAD( "oxo_bingo_snd.bin", 0x000000, 0x080000, CRC(008a2d6a) SHA1(a89114154489142556b373ab24cd32fadf5856b3) )
 ROM_START( j6oxo )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "7613.bin", 0x000000, 0x020000, CRC(0621762a) SHA1(ec09cfed79158b09093a162785b6bdd1916ce50c) )
@@ -4334,8 +4255,7 @@ ROM_END
 
 #define j6oxobin_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "oxo_bingo_snd.bin", 0x000000, 0x080000, CRC(008a2d6a) SHA1(a89114154489142556b373ab24cd32fadf5856b3) ) \
-
+	ROM_LOAD( "oxo_bingo_snd.bin", 0x000000, 0x080000, CRC(008a2d6a) SHA1(a89114154489142556b373ab24cd32fadf5856b3) )
 
 ROM_START( j6oxobin )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -4400,8 +4320,7 @@ ROM_END
 
 #define j6papa_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "papasnd.bin", 0x000000, 0x080000, CRC(c2de3abc) SHA1(2885817e7d6b11c0a2b35507b5654902257db32c) ) \
-
+	ROM_LOAD( "papasnd.bin", 0x000000, 0x080000, CRC(c2de3abc) SHA1(2885817e7d6b11c0a2b35507b5654902257db32c) )
 
 ROM_START( j6papa )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -4455,8 +4374,7 @@ ROM_END
 
 #define j6phxgld_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "pgsnd2.b8", 0x000000, 0x080000, CRC(c63cf006) SHA1(f204da5e744dd2ade662ac8d9f7d1896513cb38a) ) \
-
+	ROM_LOAD( "pgsnd2.b8", 0x000000, 0x080000, CRC(c63cf006) SHA1(f204da5e744dd2ade662ac8d9f7d1896513cb38a) )
 ROM_START( j6phxgld )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "pg30cz05_1.b8", 0x000000, 0x020000, CRC(9eb4716a) SHA1(459db543d20e5ddd03d0be917d8d4e153cb97183) )
@@ -4526,8 +4444,7 @@ ROM_END
 #define j6pnxmil_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "phmill7_snd2", 0x000000, 0x014008, CRC(12086987) SHA1(ca6d74b844a0c042d66940f5d39fdef9d5591651) ) /* bad? */ \
-	ROM_LOAD( "phmill7_snd.bin", 0x000000, 0x080000, CRC(e7332f6d) SHA1(c2457be9a7a37184bacd4199a5c347896ecfeb1c) ) \
-
+	ROM_LOAD( "phmill7_snd.bin", 0x000000, 0x080000, CRC(e7332f6d) SHA1(c2457be9a7a37184bacd4199a5c347896ecfeb1c) )
 
 ROM_START( j6pnxmil )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -4560,8 +4477,7 @@ ROM_END
 #define j6pinwzd_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "pbwzsnd.bin", 0x000000, 0x020000, CRC(ee9df577) SHA1(bdc6ecba5b7ad9c7b012342c7710266ec6eeb0ab) ) \
-	ROM_LOAD( "piwi-snd.bin", 0x000000, 0x080000, CRC(ba98eecc) SHA1(39edb9524c23a78f89077215bef8f43a47605b47) ) \
-
+	ROM_LOAD( "piwi-snd.bin", 0x000000, 0x080000, CRC(ba98eecc) SHA1(39edb9524c23a78f89077215bef8f43a47605b47) )
 
 ROM_START( j6pinwzd )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -4634,8 +4550,7 @@ ROM_END
 
 #define j6pirgld_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "pirat6_snd.bin", 0x000000, 0x080000, CRC(5c60a3f8) SHA1(9d83aca9e5ecd230f6ca98f033f5274dbefe9feb) ) \
-
+	ROM_LOAD( "pirat6_snd.bin", 0x000000, 0x080000, CRC(5c60a3f8) SHA1(9d83aca9e5ecd230f6ca98f033f5274dbefe9feb) )
 ROM_START( j6pirgld )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "pirat_113001.b8", 0x000000, 0x020000, CRC(58c488b8) SHA1(bd2cf3f604a1fd075d2077c8e38d75c0c3325cb8) )
@@ -4652,8 +4567,7 @@ ROM_END
 
 #define j6popoli_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "popoli_snd.bin", 0x000000, 0x080000, CRC(e982a788) SHA1(3c6aed29892011c3d7d076ea9bef5882f7ded055) ) \
-
+	ROM_LOAD( "popoli_snd.bin", 0x000000, 0x080000, CRC(e982a788) SHA1(3c6aed29892011c3d7d076ea9bef5882f7ded055) )
 ROM_START( j6popoli )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "7604.bin", 0x000000, 0x020000, CRC(7b44b69e) SHA1(8bbc3caa889d539646198c9b7f54cd31ab715c6d) )
@@ -4670,8 +4584,7 @@ ROM_END
 
 #define j6pog_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "pog10snd.bin", 0x000000, 0x080000, CRC(00f6d1f6) SHA1(66581a6391e9ddc931cb102b00f38720ab125f5c) ) \
-
+	ROM_LOAD( "pog10snd.bin", 0x000000, 0x080000, CRC(00f6d1f6) SHA1(66581a6391e9ddc931cb102b00f38720ab125f5c) )
 
 ROM_START( j6pog )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -4719,8 +4632,7 @@ ROM_END
 
 #define j6pogcls_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 ROM_START( j6pogcls )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "clpg-31.bin", 0x000000, 0x020000, CRC(07102281) SHA1(a7760c78f4848d7eec175027485d19d38307ccf9) )
@@ -4745,8 +4657,7 @@ ROM_END
 
 #define j6pwrlin_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6pwrlin )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -4764,8 +4675,7 @@ ROM_END
 
 #define j6pwrspn_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "posp-snd.bin", 0x000000, 0x080000, CRC(861a0d14) SHA1(ea5eef793ad682dbf660ed7e77f93a7b900c97cc) ) \
-
+	ROM_LOAD( "posp-snd.bin", 0x000000, 0x080000, CRC(861a0d14) SHA1(ea5eef793ad682dbf660ed7e77f93a7b900c97cc) )
 ROM_START( j6pwrspn )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "posp-5s1.bin", 0x000000, 0x020000, CRC(4184881b) SHA1(fb4dfb2e5b5c2cebd15b908a38014b56bb311eef) )
@@ -4810,8 +4720,7 @@ ROM_END
 
 #define j6quantm_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "qule-snd.bin", 0x000000, 0x080000, CRC(eb8c692d) SHA1(384b73573d64d67547d1c04f279bda6c02f78450) ) \
-
+	ROM_LOAD( "qule-snd.bin", 0x000000, 0x080000, CRC(eb8c692d) SHA1(384b73573d64d67547d1c04f279bda6c02f78450) )
 ROM_START( j6quantm )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "20717.bin", 0x000000, 0x020000, CRC(31435fe1) SHA1(d42fe30367ded93562d4e1739307a47423f4dd51) )
@@ -4863,8 +4772,7 @@ ROM_END
 
 #define j6ra_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "realsnd.bin", 0x000000, 0x080000, CRC(8bc92c90) SHA1(bcbbe270ce42d5960ac37a2324e3fb37ff513147) ) \
-
+	ROM_LOAD( "realsnd.bin", 0x000000, 0x080000, CRC(8bc92c90) SHA1(bcbbe270ce42d5960ac37a2324e3fb37ff513147) )
 
 ROM_START( j6ra )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -4903,8 +4811,7 @@ ROM_END
 
 #define j6raclb_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "realsnd.bin", 0x000000, 0x080000, CRC(8bc92c90) SHA1(bcbbe270ce42d5960ac37a2324e3fb37ff513147) ) \
-
+	ROM_LOAD( "realsnd.bin", 0x000000, 0x080000, CRC(8bc92c90) SHA1(bcbbe270ce42d5960ac37a2324e3fb37ff513147) )
 
 ROM_START( j6raclb )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -4944,8 +4851,7 @@ ROM_END
 
 #define j6redarw_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "rear-snd.bin", 0x000000, 0x080000, CRC(7e8c05ce) SHA1(616b0f94b94331f86d7b1fec11dd05cf9b0968cf) ) \
-
+	ROM_LOAD( "rear-snd.bin", 0x000000, 0x080000, CRC(7e8c05ce) SHA1(616b0f94b94331f86d7b1fec11dd05cf9b0968cf) )
 
 ROM_START( j6redarw )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -5035,8 +4941,7 @@ ROM_END
 
 #define j6rh6_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6rh6 )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -5083,8 +4988,7 @@ ROM_END
 
 #define j6rhchil_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "rhcssnd.bin", 0x000000, 0x080000, CRC(60b336b1) SHA1(53d04bec9cbba4a0e89d34329ed41f89945e283b) ) \
-
+	ROM_LOAD( "rhcssnd.bin", 0x000000, 0x080000, CRC(60b336b1) SHA1(53d04bec9cbba4a0e89d34329ed41f89945e283b) )
 ROM_START( j6rhchil )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rhcst.p1", 0x000000, 0x020000, CRC(334fdbcc) SHA1(194c226e1c41eb326841cf022e8a1b28088a7073) )
@@ -5123,8 +5027,7 @@ ROM_END
 
 #define j6rh6cl_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "rh6s1.bin", 0x000000, 0x080000, CRC(86b4c970) SHA1(0ce214ee406b1c325693b2b615498bdb2c3a16eb) ) \
-
+	ROM_LOAD( "rh6s1.bin", 0x000000, 0x080000, CRC(86b4c970) SHA1(0ce214ee406b1c325693b2b615498bdb2c3a16eb) )
 
 ROM_START( j6rh6cl )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -5164,8 +5067,7 @@ ROM_END
 
 #define j6reelmn_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "1360.bin", 0x000000, 0x080000, CRC(3a1a5f09) SHA1(807cf2cf7a4738c1904990b281f7d4c9a86c78e7) ) \
-
+	ROM_LOAD( "1360.bin", 0x000000, 0x080000, CRC(3a1a5f09) SHA1(807cf2cf7a4738c1904990b281f7d4c9a86c78e7) )
 ROM_START( j6reelmn )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "9485.bin", 0x000000, 0x020000, CRC(1a729666) SHA1(d4389ff5a16b994ca1480fe0ff097c7601b2ef6b) )
@@ -5214,8 +5116,7 @@ ROM_END
 
 #define j6reelth_alt_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "reel-snd.bin", 0x000000, 0x080000, CRC(3178ddb0) SHA1(60be12e6198bd8b7cf021b54c3cd858ff5bac127) ) \
-
+	ROM_LOAD( "reel-snd.bin", 0x000000, 0x080000, CRC(3178ddb0) SHA1(60be12e6198bd8b7cf021b54c3cd858ff5bac127) )
 ROM_START( j6reeltha )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "reel-31.bin", 0x000000, 0x020000, CRC(3e8020f8) SHA1(479f9e157eba570d0fa670f0f9ea7dbd3d94ca1f) )
@@ -5244,8 +5145,7 @@ ROM_END
 
 #define j6rico_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "ricochet_snd.bin", 0x000000, 0x080000, CRC(b24522fe) SHA1(1546edee6cf483abdbc761c715dcbc696209d429) ) \
-
+	ROM_LOAD( "ricochet_snd.bin", 0x000000, 0x080000, CRC(b24522fe) SHA1(1546edee6cf483abdbc761c715dcbc696209d429) )
 
 ROM_START( j6rico )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -5292,8 +5192,7 @@ ROM_END
 
 #define j6robin_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "robin_snd.bin", 0x000000, 0x080000, CRC(bbddccf9) SHA1(33f3d14d4898f9ba4ba2c2a88621cf3e2c828a8f) ) \
-
+	ROM_LOAD( "robin_snd.bin", 0x000000, 0x080000, CRC(bbddccf9) SHA1(33f3d14d4898f9ba4ba2c2a88621cf3e2c828a8f) )
 ROM_START( j6robin )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "9425.bin", 0x000000, 0x020000, CRC(0b9f9c83) SHA1(2004b7fc3a0fd8ba424d0e293cd53b57a653f6e3) )
@@ -5326,8 +5225,7 @@ ROM_END
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) /* which is correct? or are these for regular/classic/club? */ \
 	ROM_LOAD( "rocosnd.bin", 0x000000, 0x080000, CRC(60236e81) SHA1(9546c92d8a42d911e5b462c598a0b42987c0ba03) ) \
 	ROM_LOAD( "rcstrsnd.bin", 0x000000, 0x080000, CRC(b0753c1d) SHA1(b111ca10c01ee2089cbc613ad91235d429272ab8) ) \
-	ROM_LOAD( "rcoastersoundalt.bin", 0x000000, 0x080000, CRC(e7e587c9) SHA1(fde7a7761253dc4133340b766d220873731c11c7) ) /* very different */ \
-
+	ROM_LOAD( "rcoastersoundalt.bin", 0x000000, 0x080000, CRC(e7e587c9) SHA1(fde7a7761253dc4133340b766d220873731c11c7) ) /* very different */
 
 ROM_START( j6roller )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -5450,8 +5348,7 @@ ROM_END
 
 #define j6rccls_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 ROM_START( j6rccls )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "clrc-41.bin", 0x000000, 0x020000, CRC(6f312407) SHA1(c077276d18f50340989a20fe208ac84801895dc1) )
@@ -5476,8 +5373,7 @@ ROM_END
 
 #define j6royfls_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "rofl-so.bin", 0x000000, 0x080000, CRC(c86bce52) SHA1(ba9b3f73e7418710737d3ace25ee2747d5685d8e) ) /* aka rflushc.as1 */ \
-
+	ROM_LOAD( "rofl-so.bin", 0x000000, 0x080000, CRC(c86bce52) SHA1(ba9b3f73e7418710737d3ace25ee2747d5685d8e) ) /* aka rflushc.as1 */
 
 ROM_START( j6royfls )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -5523,8 +5419,7 @@ ROM_END
 
 #define j6samur_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6samur )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -5564,8 +5459,7 @@ ROM_END
 
 #define j6sidewd_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "sidewindersnd.bin", 0x000000, 0x080000, CRC(6e49b83b) SHA1(cba9ce8cc5dbaa0b498b2314165d4cc64c0a3881) ) \
-
+	ROM_LOAD( "sidewindersnd.bin", 0x000000, 0x080000, CRC(6e49b83b) SHA1(cba9ce8cc5dbaa0b498b2314165d4cc64c0a3881) )
 ROM_START( j6sidewd )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "siw-11s1.bin", 0x000000, 0x020000, CRC(d24e9e75) SHA1(22d21eb5bfe92fc61e1667345aafe7b3214c9218) )
@@ -5611,8 +5505,7 @@ ROM_END
 
 #define j6snakes_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "snla-snd.bin", 0x000000, 0x080000, CRC(7902d8ef) SHA1(222b0a18902619c9b4b29fa2485cb4e143c21bab) ) \
-
+	ROM_LOAD( "snla-snd.bin", 0x000000, 0x080000, CRC(7902d8ef) SHA1(222b0a18902619c9b4b29fa2485cb4e143c21bab) )
 ROM_START( j6snakes )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "20351.bin", 0x000000, 0x020000, CRC(7f9685fd) SHA1(b55c39ebbabd59a4c9aeea0f4337b8a629bad664) ) // aka snla.p1
@@ -5672,8 +5565,7 @@ ROM_END
 
 #define j6sonic_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "son_snd.bin", 0x000000, 0x080000, CRC(5cd8cf21) SHA1(82f875a59d678ef548173ee2c202e3963bc13116) ) \
-
+	ROM_LOAD( "son_snd.bin", 0x000000, 0x080000, CRC(5cd8cf21) SHA1(82f875a59d678ef548173ee2c202e3963bc13116) )
 ROM_START( j6sonic )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "9440.bin", 0x000000, 0x020000, CRC(384f931e) SHA1(12bddb3dc2c1bc6c51c5ef4002673c6f45fa335c) )
@@ -5752,8 +5644,7 @@ ROM_END
 
 #define j6stards_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "star-snd.bin", 0x000000, 0x080000, CRC(d2dcd6cc) SHA1(f5a290befd41014b6aabae9fdb601d5a9766f1ba) ) \
-
+	ROM_LOAD( "star-snd.bin", 0x000000, 0x080000, CRC(d2dcd6cc) SHA1(f5a290befd41014b6aabae9fdb601d5a9766f1ba) )
 
 
 ROM_START( j6stards )
@@ -5787,8 +5678,7 @@ ROM_END
 
 #define j6start_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6start )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -5807,8 +5697,7 @@ ROM_END
 
 #define j6strk10_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 ROM_START( j6strk10 )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "20178.bin", 0x000000, 0x020000, CRC(35135814) SHA1(250c0835611be4eaabab4c59288d9fdeafdc6ca5) )
@@ -5896,8 +5785,7 @@ ROM_END
 
 #define j6supbrk_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "subr-snd.bin", 0x000000, 0x080000, CRC(d2439c80) SHA1(8c80927e0d0c139293bd588fad15941bfb54674d) ) \
-
+	ROM_LOAD( "subr-snd.bin", 0x000000, 0x080000, CRC(d2439c80) SHA1(8c80927e0d0c139293bd588fad15941bfb54674d) )
 ROM_START( j6supbrk )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "subr-2_1.bin", 0x000000, 0x020000, CRC(85222c75) SHA1(1fbed0f474a7ccfb523270b913a8adb41c8be388) )
@@ -5998,8 +5886,7 @@ ROM_END
 
 #define j6roof_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6roof )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -6018,8 +5905,7 @@ ROM_END
 
 #define j6tbirds_sound \
 	ROM_REGION( 0x80000, "upd", 0 ) \
-	ROM_LOAD( "tbcl-snd.bin", 0x000000, 0x80000, CRC(1cc197be) SHA1(2247aa1a0e6aab7389b3222f373890f54e907361) ) \
-
+	ROM_LOAD( "tbcl-snd.bin", 0x000000, 0x80000, CRC(1cc197be) SHA1(2247aa1a0e6aab7389b3222f373890f54e907361) )
 ROM_START( j6tbirds )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "thbi-2_1.bin", 0x000000, 0x020000, CRC(a1ca874a) SHA1(0a12f387a9a3e261c1017922b8d6a652c696855a) )
@@ -6160,8 +6046,7 @@ ROM_END
 
 #define j6tbrdcl_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "tbcl-snd.bin", 0x000000, 0x80000, CRC(1cc197be) SHA1(2247aa1a0e6aab7389b3222f373890f54e907361) ) \
-
+	ROM_LOAD( "tbcl-snd.bin", 0x000000, 0x80000, CRC(1cc197be) SHA1(2247aa1a0e6aab7389b3222f373890f54e907361) )
 
 ROM_START( j6tbrdcl )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -6257,8 +6142,7 @@ ROM_END
 
 #define j6tomb_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "tr_snd.bin", 0x000000, 0x080000, CRC(6cd91050) SHA1(6818e59fc52b9776ee40bf7f2a8fca2f74343335) ) \
-
+	ROM_LOAD( "tr_snd.bin", 0x000000, 0x080000, CRC(6cd91050) SHA1(6818e59fc52b9776ee40bf7f2a8fca2f74343335) )
 ROM_START( j6tomb )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "tora-41.bin", 0x000000, 0x020000, CRC(80956d40) SHA1(0864e5fa7bb41dca2128566ccd80c1208dea0157) )
@@ -6340,8 +6224,7 @@ ROM_END
 
 #define j6twst_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "twistersnd.bin", 0x000000, 0x080000, CRC(421a7a81) SHA1(d47caeb209eb6cfc47f82162b03563b25bbdf017) ) \
-
+	ROM_LOAD( "twistersnd.bin", 0x000000, 0x080000, CRC(421a7a81) SHA1(d47caeb209eb6cfc47f82162b03563b25bbdf017) )
 
 ROM_START( j6twst )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -6433,8 +6316,7 @@ ROM_END
 
 #define j6untch_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6untch )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -6455,8 +6337,7 @@ ROM_END
 
 #define j6pompay_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "uppo-so1.bin", 0x000000, 0x080000, CRC(60e370f8) SHA1(6b528f64ee5d00491655169bc108a7a6d383eaa5) ) \
-
+	ROM_LOAD( "uppo-so1.bin", 0x000000, 0x080000, CRC(60e370f8) SHA1(6b528f64ee5d00491655169bc108a7a6d383eaa5) )
 ROM_START( j6pompay )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "20270.bin", 0x000000, 0x020000, CRC(c214a067) SHA1(9e4d26727b32051b188c361b8ad8922cbd7a10b2) )
@@ -6500,8 +6381,7 @@ ROM_END
 
 #define j6vivark_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "vrve-snd.bin", 0x000000, 0x080000, CRC(40374f0b) SHA1(607eac4d3caee022e61531655ded137644602939) ) \
-
+	ROM_LOAD( "vrve-snd.bin", 0x000000, 0x080000, CRC(40374f0b) SHA1(607eac4d3caee022e61531655ded137644602939) )
 ROM_START( j6vivark )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "vrve-2_1.bin", 0x000000, 0x020000, CRC(fea54f1c) SHA1(d5fcaa6417f0961bf370c90a468b5d59a17b62ba) )
@@ -6588,8 +6468,7 @@ ROM_END
 
 #define j6vivrkc_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "vrcl-snds.bin", 0x000000, 0x080000, CRC(c4267ccf) SHA1(f299b63f762b420eaa5ddb024f357d7abb9fc21e) ) \
-
+	ROM_LOAD( "vrcl-snds.bin", 0x000000, 0x080000, CRC(c4267ccf) SHA1(f299b63f762b420eaa5ddb024f357d7abb9fc21e) )
 ROM_START( j6vivrkc )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "vrcl-d_1s.bin", 0x000000, 0x020000, CRC(ba6a1f04) SHA1(4fbb326386d4d5dfc16e64b824b042932e0497ee) )
@@ -6614,8 +6493,7 @@ ROM_END
 
 #define j6wldkng_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "wiki-snds.bin", 0x000000, 0x080000, CRC(2ba0529c) SHA1(c4b4b80fcbb867650649a42a4abe7675eea8f848) ) \
-
+	ROM_LOAD( "wiki-snds.bin", 0x000000, 0x080000, CRC(2ba0529c) SHA1(c4b4b80fcbb867650649a42a4abe7675eea8f848) )
 
 ROM_START( j6wldkng )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -6635,8 +6513,7 @@ ROM_END
 
 #define j6wthing_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "wildsnd.bin", 0x000000, 0x080000, CRC(a2c08185) SHA1(9ee589df284f1b803ca015fff599d229358530d4) ) \
-
+	ROM_LOAD( "wildsnd.bin", 0x000000, 0x080000, CRC(a2c08185) SHA1(9ee589df284f1b803ca015fff599d229358530d4) )
 
 ROM_START( j6wthing )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -6662,8 +6539,7 @@ ROM_END
 
 #define j6wildw_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "wwe10snd.bin", 0x000000, 0x080000, CRC(00c8c428) SHA1(2e10b10093acd4c2f7051aff28a8ae976bb1425b) ) \
-
+	ROM_LOAD( "wwe10snd.bin", 0x000000, 0x080000, CRC(00c8c428) SHA1(2e10b10093acd4c2f7051aff28a8ae976bb1425b) )
 ROM_START( j6wildw )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "9379.bin", 0x000000, 0x020000, CRC(533dcf84) SHA1(b1b973fc4dc0601da7587d9079e24319ecca5f1b) )
@@ -6723,8 +6599,7 @@ ROM_END
 
 #define j6wizard_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "woosnd.bin", 0x000000, 0x080000, CRC(f72bd4f4) SHA1(ef8651fe7bb5f5340e41d35ca0669cba7d9c1372) ) \
-
+	ROM_LOAD( "woosnd.bin", 0x000000, 0x080000, CRC(f72bd4f4) SHA1(ef8651fe7bb5f5340e41d35ca0669cba7d9c1372) )
 
 ROM_START( j6wizard )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -6771,8 +6646,7 @@ ROM_END
 
 #define j6knight_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "yourluckynightsnd.bin", 0x000000, 0x080000, CRC(53c20160) SHA1(6295797d384fd00b4d982c924a4cfbaa079e93a1) ) \
-
+	ROM_LOAD( "yourluckynightsnd.bin", 0x000000, 0x080000, CRC(53c20160) SHA1(6295797d384fd00b4d982c924a4cfbaa079e93a1) )
 ROM_START( j6knight )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "yourluckynight.p1", 0x000000, 0x020000, CRC(fbf7d7d9) SHA1(885a8a5acd06bafe7df01d9e36c5315f9a7f518c) )
@@ -6841,8 +6715,7 @@ ROM_END
 
 #define j6hikar_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 
 ROM_START( j6hikar )
@@ -6880,8 +6753,7 @@ ROM_END
 // correct rom might be in the j6roller sets
 #define j6rcclub_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6rcclub )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -6907,8 +6779,7 @@ ROM_END
 
 #define j6slvgst_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6slvgst )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -6968,8 +6839,7 @@ ROM_END
 
 #define j6footy_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "ffsnd.bin", 0x000000, 0x080000, CRC(99b8f4bd) SHA1(afc8e24db67f841a570b4cdd780a759a8fa13055) ) \
-
+	ROM_LOAD( "ffsnd.bin", 0x000000, 0x080000, CRC(99b8f4bd) SHA1(afc8e24db67f841a570b4cdd780a759a8fa13055) )
 // note: rom2 gets replaced between sets instead of rom1 (it's by Empire, not JPM)
 ROM_START( j6footy )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -6999,8 +6869,7 @@ ROM_END
 
 #define j6bmc_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD(  "bigmoneysnd.bin", 0x0000, 0x080000, CRC(dd0a88c6) SHA1(22206fcba097a4f7dc6ae84d496d149a4206e0f0) ) \
-
+	ROM_LOAD(  "bigmoneysnd.bin", 0x0000, 0x080000, CRC(dd0a88c6) SHA1(22206fcba097a4f7dc6ae84d496d149a4206e0f0) )
 ROM_START( j6bmc )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "bimo-91.bin", 0x00000, 0x020000, CRC(691a15b8) SHA1(d48d80ed59b7d20a4910a5b0554e64f8fe324bef) )
@@ -7018,8 +6887,7 @@ ROM_END
 
 #define j6bno_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD(  "bignightoutsnd.bin", 0x0000, 0x080000, CRC(e4da3e2e) SHA1(9751dfa7f9ca11b7073742b0ba2bf90fb483452b) ) /* aka bignite.as1 */ \
-
+	ROM_LOAD(  "bignightoutsnd.bin", 0x0000, 0x080000, CRC(e4da3e2e) SHA1(9751dfa7f9ca11b7073742b0ba2bf90fb483452b) ) /* aka bignite.as1 */
 ROM_START( j6bno )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "bignightout.p1", 0x00000, 0x020000, CRC(d9a9858f) SHA1(103a31682eb28f0585e948ad8f59887ad2976f40) )
@@ -7050,8 +6918,7 @@ ROM_END
 
 #define j6btbw_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD(  "borntobewildsnd.bin", 0x0000, 0x080000, CRC(2c590926) SHA1(d5f56624d1f8f9692004937f98cadde78c2606bc) ) \
-
+	ROM_LOAD(  "borntobewildsnd.bin", 0x0000, 0x080000, CRC(2c590926) SHA1(d5f56624d1f8f9692004937f98cadde78c2606bc) )
 
 ROM_START( j6btbw )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -7093,8 +6960,7 @@ ROM_END
 #define j6cpal_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "cpalace22-06-98 68d0a91.bin", 0x0000, 0x080000, CRC(56d581e0) SHA1(d22796ec6d96f4d4ea10dfdb925ceaff032fe7d0) ) \
-	ROM_LOAD( "capa-snd.bin", 0x0000, 0x080000, CRC(56d581e0) SHA1(d22796ec6d96f4d4ea10dfdb925ceaff032fe7d0) ) \
-
+	ROM_LOAD( "capa-snd.bin", 0x0000, 0x080000, CRC(56d581e0) SHA1(d22796ec6d96f4d4ea10dfdb925ceaff032fe7d0) )
 
 ROM_START( j6cpal )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -7165,8 +7031,7 @@ ROM_END
 
 #define j6ccc_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 ROM_START( j6ccc )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "ccb1.bin", 0x00000, 0x020000, CRC(38a9b16e) SHA1(2ee0e1c67064e537b4459a69dc9ebf8be89f9051) )
@@ -7198,8 +7063,7 @@ ROM_END
 
 #define j6colic_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6colic )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -7240,8 +7104,7 @@ ROM_END
 
 #define j6crakr_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 ROM_START( j6crakr )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "crac-11.bin", 0x00000, 0x020000, CRC(facb09cd) SHA1(3f70f3616a2201d25d3712012b4c56cfa09c1411) )
@@ -7267,8 +7130,7 @@ ROM_END
 
 #define j6ewndg_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6ewndg )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -7294,8 +7156,7 @@ ROM_END
 
 #define j6easy_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD(  "easymoneysnd.bin", 0x0000, 0x080000, CRC(aee5bc30) SHA1(071038e7fc7767b7b11c9b97b41e079fbbe11291) ) \
-
+	ROM_LOAD(  "easymoneysnd.bin", 0x0000, 0x080000, CRC(aee5bc30) SHA1(071038e7fc7767b7b11c9b97b41e079fbbe11291) )
 
 ROM_START( j6easy )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -7328,8 +7189,7 @@ ROM_END
 
 #define j6ffc_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6ffc )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -7375,8 +7235,7 @@ ROM_END
 
 #define j6grc_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 
 ROM_START( j6grc )
@@ -7396,8 +7255,7 @@ ROM_END
 
 #define j6hdc_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD(  "club-hotdogssnd.bin", 0x0000, 0x080000, CRC(2bd7871f) SHA1(dc129f64f7186c02f4283229b579275ecb3a1165) ) \
-
+	ROM_LOAD(  "club-hotdogssnd.bin", 0x0000, 0x080000, CRC(2bd7871f) SHA1(dc129f64f7186c02f4283229b579275ecb3a1165) )
 
 ROM_START( j6hdc )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -7470,8 +7328,7 @@ ROM_END
 
 #define j6kapang_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 ROM_START( j6kapang )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "kapa-41.bin", 0x00000, 0x020000, CRC(34509f12) SHA1(b7de8c6004b9638365dceed79d9a829587c45ab4) )
@@ -7489,8 +7346,7 @@ ROM_END
 
 #define j6kfc_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD(  "kungfuclubsound.bin", 0x0000, 0x080000, CRC(659dfb1a) SHA1(0094cdee97c82a05358e8fcc6157f761c51c3655) ) \
-
+	ROM_LOAD(  "kungfuclubsound.bin", 0x0000, 0x080000, CRC(659dfb1a) SHA1(0094cdee97c82a05358e8fcc6157f761c51c3655) )
 ROM_START( j6kfc )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "kfcl-e1.bin", 0x00000, 0x020000, CRC(f16857a0) SHA1(5cff87bf3857593c7d032315b7555e16c3849d08) )
@@ -7516,8 +7372,7 @@ ROM_END
 
 #define j6lucklo_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6lucklo )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -7536,8 +7391,7 @@ ROM_END
 
 #define j6monst_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD(  "bad1snd.bin", 0x0000, 0x080000, CRC(1b61dcf9) SHA1(3ba4c8d9b77c86fbb931af0c0d9808ac68d0aa25) ) \
-
+	ROM_LOAD(  "bad1snd.bin", 0x0000, 0x080000, CRC(1b61dcf9) SHA1(3ba4c8d9b77c86fbb931af0c0d9808ac68d0aa25) )
 ROM_START( j6monst )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "monster.p1", 0x00000, 0x020000, CRC(979ba29d) SHA1(44258fc5c41794c84d0b034cc5bc789d2365f641) )
@@ -7595,8 +7449,7 @@ ROM_END
 
 #define j6potg_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6potg )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -7623,8 +7476,7 @@ ROM_END
 
 #define j6ramese_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD(  "ramesesrichessnd.bin", 0x0000, 0x080000, CRC(0173169e) SHA1(ccba7f6d41193f556af8ef6c827b482277ee0ee2) ) \
-
+	ROM_LOAD(  "ramesesrichessnd.bin", 0x0000, 0x080000, CRC(0173169e) SHA1(ccba7f6d41193f556af8ef6c827b482277ee0ee2) )
 ROM_START( j6ramese )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "rari-b1.bin", 0x00000, 0x020000, CRC(a9d6f938) SHA1(ab0f9fb178708ff8660f37495f1c2579c9370b27) )
@@ -7678,8 +7530,7 @@ ROM_END
 
 #define j6r2rum_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD(  "rtrsnd.bin", 0x0000, 0x080000, CRC(ba72e377) SHA1(99e123eebb8e7ceb2fb36fd17f1c23d3ce04d2d6) ) \
-
+	ROM_LOAD(  "rtrsnd.bin", 0x0000, 0x080000, CRC(ba72e377) SHA1(99e123eebb8e7ceb2fb36fd17f1c23d3ce04d2d6) )
 
 ROM_START( j6r2rum )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -7727,8 +7578,7 @@ ROM_END
 
 #define j6redal_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 ROM_START( j6redal )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "real-c1.bin", 0x00000, 0x020000, CRC(eabec7ae) SHA1(5722dc489b3cf5ff90d9688d52fd8489d80b9c96) )
@@ -7746,8 +7596,7 @@ ROM_END
 
 #define j6reelb_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 ROM_START( j6reelb )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "fg81.bin", 0x00000, 0x020000, CRC(570cd8b3) SHA1(91563b30d2ff229a000dfb3299a9cf343517fc72) )
@@ -7766,8 +7615,7 @@ ROM_END
 
 #define j6slagn_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD(  "snlsasnd.bin", 0x0000, 0x080000, CRC(288e4ce1) SHA1(6690eccb1af94731af160d73b4d8903a98fa27bb) ) \
-
+	ROM_LOAD(  "snlsasnd.bin", 0x0000, 0x080000, CRC(288e4ce1) SHA1(6690eccb1af94731af160d73b4d8903a98fa27bb) )
 ROM_START( j6slagn )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "s&l31.b8", 0x00000, 0x020000, CRC(e8cadadb) SHA1(e7edfa79e1648658e200ddbbb1d280641e03b93e) )
@@ -7839,8 +7687,7 @@ ROM_END
 
 #define j6thril_sound \
 	ROM_LOAD(  "thlr-snd.bin", 0x0000, 0x020000, CRC(03771692) SHA1(2f42859d09e4354689887f1e40f9fce1eb858e3e) ) /* probably bad */ \
-	ROM_LOAD(  "thrillersnd.bin", 0x0000, 0x080000, CRC(c93bc625) SHA1(ecceddd90a721c39ef3da8cef442c0d78dacaed2) ) \
-
+	ROM_LOAD(  "thrillersnd.bin", 0x0000, 0x080000, CRC(c93bc625) SHA1(ecceddd90a721c39ef3da8cef442c0d78dacaed2) )
 ROM_START( j6thril )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "fpe1.bin", 0x00000, 0x020000, CRC(d2e60e6f) SHA1(525022907858021a2a274a870336de6b414c0b05) )
@@ -7857,8 +7704,7 @@ ROM_END
 
 #define j6tqust_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	ROM_LOAD(  "tresquestsnd.bin", 0x0000, 0x080000, CRC(c7254d62) SHA1(9b97c7d1a844cd39c3dcfd984e1908ece47db00e) ) \
-
+	ROM_LOAD(  "tresquestsnd.bin", 0x0000, 0x080000, CRC(c7254d62) SHA1(9b97c7d1a844cd39c3dcfd984e1908ece47db00e) )
 ROM_START( j6tqust )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
 	ROM_LOAD16_BYTE(  "tq21.b8", 0x00000, 0x020000, CRC(b114c904) SHA1(bf4d2f13525aa9b91bd5985eb62e022751bba596) )
@@ -7901,8 +7747,7 @@ ROM_END
 
 #define j6h5clb_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6h5clb )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )
@@ -7920,8 +7765,7 @@ ROM_END
 
 #define j6milln_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 ROM_START( j6milln )
 	ROM_REGION( PRGSIZE_REGULAR, "maincpu", 0 )

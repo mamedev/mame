@@ -31,7 +31,6 @@ void awp_draw_reel(int rno)
 	}
 	else
 	{
-
 		output_set_value(rg,(reelpos[rno]));
 
 		// if the reel isn't configured don't do this, otherwise you'll get DIV0

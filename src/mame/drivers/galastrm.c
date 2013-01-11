@@ -98,7 +98,6 @@ CUSTOM_INPUT_MEMBER(galastrm_state::coin_word_r)
 
 WRITE32_MEMBER(galastrm_state::galastrm_input_w)
 {
-
 #if 0
 {
 char t[64];

@@ -146,7 +146,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(ddragon_state::ddragon_scanline)
 
 MACHINE_START_MEMBER(ddragon_state,ddragon)
 {
-
 	/* configure banks */
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 
@@ -169,7 +168,6 @@ MACHINE_START_MEMBER(ddragon_state,ddragon)
 
 MACHINE_RESET_MEMBER(ddragon_state,ddragon)
 {
-
 	m_dd_sub_cpu_busy = 1;
 	m_adpcm_pos[0] = m_adpcm_pos[1] = 0;
 	m_adpcm_end[0] = m_adpcm_end[1] = 0;
@@ -365,7 +363,6 @@ READ8_MEMBER(ddragon_state::ddragon_hd63701_internal_registers_r)
 
 WRITE8_MEMBER(ddragon_state::ddragon_hd63701_internal_registers_w)
 {
-
 	/* I don't know why port 0x17 is used..  Doesn't seem to be a standard MCU port */
 	if (offset == 0x17)
 	{
@@ -390,7 +387,6 @@ WRITE8_MEMBER(ddragon_state::ddragon_hd63701_internal_registers_w)
 
 READ8_MEMBER(ddragon_state::ddragon_spriteram_r)
 {
-
 	/* Double Dragon crash fix - see notes above */
 	if (offset == 0x49 && space.device().safe_pc() == 0x6261 && m_spriteram[offset] == 0x1f)
 		return 0x1;
@@ -401,7 +397,6 @@ READ8_MEMBER(ddragon_state::ddragon_spriteram_r)
 
 WRITE8_MEMBER(ddragon_state::ddragon_spriteram_w)
 {
-
 	if (&space.device() == m_sub_cpu && offset == 0)
 		m_dd_sub_cpu_busy = 1;
 

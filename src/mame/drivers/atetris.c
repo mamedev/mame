@@ -104,7 +104,6 @@ static void reset_bank(running_machine &machine)
 
 void atetris_state::machine_start()
 {
-
 	/* Allocate interrupt timer */
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(atetris_state::interrupt_gen),this));
 
@@ -117,7 +116,6 @@ void atetris_state::machine_start()
 
 void atetris_state::machine_reset()
 {
-
 	/* reset the slapstic */
 	slapstic_reset();
 	m_current_bank = slapstic_bank() & 1;
@@ -173,7 +171,6 @@ WRITE8_MEMBER(atetris_state::coincount_w)
 
 WRITE8_MEMBER(atetris_state::nvram_w)
 {
-
 	if (m_nvram_write_enable)
 		m_nvram[offset] = data;
 	m_nvram_write_enable = 0;
@@ -182,7 +179,6 @@ WRITE8_MEMBER(atetris_state::nvram_w)
 
 WRITE8_MEMBER(atetris_state::nvram_enable_w)
 {
-
 	m_nvram_write_enable = 1;
 }
 

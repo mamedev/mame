@@ -513,7 +513,6 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 
 TIMER_CALLBACK_MEMBER(gba_state::handle_irq)
 {
-
 	gba_request_irq(machine(), m_IF);
 
 	m_irq_timer->adjust(attotime::never);
@@ -877,7 +876,6 @@ READ32_MEMBER(gba_state::gba_io_r)
 					}
 					else
 					{
-
 					time = m_tmr_timer[timer]->elapsed().as_double();
 
 					ticks = (double)(0x10000 - (m_timer_regs[timer] & 0xffff));
@@ -2169,7 +2167,6 @@ void gba_state::machine_reset()
 
 void gba_state::machine_start()
 {
-
 	/* add a hook for battery save */
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gba_machine_stop),&machine()));
 
@@ -2213,13 +2210,11 @@ ROM_END
 
 READ32_MEMBER(gba_state::sram_r)
 {
-
 	return m_gba_sram[offset];
 }
 
 WRITE32_MEMBER(gba_state::sram_w)
 {
-
 	COMBINE_DATA(&m_gba_sram[offset]);
 }
 
@@ -2239,7 +2234,6 @@ READ32_MEMBER(gba_state::flash_r)
 
 WRITE32_MEMBER(gba_state::flash_w)
 {
-
 	offset &= m_flash_mask;
 	switch (mem_mask)
 	{
@@ -2317,7 +2311,6 @@ READ32_MEMBER(gba_state::eeprom_r)
 
 WRITE32_MEMBER(gba_state::eeprom_w)
 {
-
 	if (~mem_mask == 0x0000ffff)
 	{
 		data >>= 16;

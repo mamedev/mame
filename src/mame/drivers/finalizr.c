@@ -54,7 +54,6 @@ WRITE8_MEMBER(finalizr_state::finalizr_i8039_irq_w)
 
 WRITE8_MEMBER(finalizr_state::i8039_irqen_w)
 {
-
 	/*  bit 0x80 goes active low, indicating that the
 	    external IRQ being serviced is complete
 	    bit 0x40 goes active high to enable the DAC ?
@@ -66,7 +65,6 @@ WRITE8_MEMBER(finalizr_state::i8039_irqen_w)
 
 READ8_MEMBER(finalizr_state::i8039_T1_r)
 {
-
 	/*  I suspect the clock-out from the I8039 T0 line should be connected
 	    here (See the i8039_T0_w handler below).
 	    The frequency of this clock cannot be greater than I8039 CLKIN / 45
@@ -253,7 +251,6 @@ static const sn76496_config psg_intf =
 
 void finalizr_state::machine_start()
 {
-
 	m_audio_cpu = machine().device("audiocpu");
 
 	save_item(NAME(m_spriterambank));
@@ -265,7 +262,6 @@ void finalizr_state::machine_start()
 
 void finalizr_state::machine_reset()
 {
-
 	m_spriterambank = 0;
 	m_charbank = 0;
 	m_T1_line = 0;

@@ -550,7 +550,6 @@ TIMER_DEVICE_CALLBACK_MEMBER( rastersp_state::tms_tx_timer )
 
 TIMER_DEVICE_CALLBACK_MEMBER( rastersp_state::tms_timer1 )
 {
-
 }
 
 
@@ -646,7 +645,6 @@ WRITE32_MEMBER( rastersp_state::dsp_unk_w )
 
 WRITE32_MEMBER( rastersp_state::dsp_486_int_w )
 {
-
 	update_irq(IRQ_DSP, ASSERT_LINE);
 }
 

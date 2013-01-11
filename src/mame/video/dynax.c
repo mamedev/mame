@@ -150,7 +150,6 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_palette01_w)
 /* Layers 4&5 Palettes (Low Bits) */
 WRITE8_MEMBER(dynax_state::dynax_blit_palette45_w)
 {
-
 	if (m_layer_layout == LAYOUT_HNORIDUR)
 		m_blit2_palettes = (m_blit2_palettes & 0x00ff) | ((data & 0x0f) << 12) | ((data & 0xf0) << 4);
 	else
@@ -162,7 +161,6 @@ WRITE8_MEMBER(dynax_state::dynax_blit_palette45_w)
 /* Layer 2&3 Palettes (Low Bits) */
 WRITE8_MEMBER(dynax_state::dynax_blit_palette23_w)
 {
-
 	if (m_layer_layout == LAYOUT_HNORIDUR)
 		m_blit_palettes = (m_blit_palettes & 0xff00) | ((data & 0x0f) << 4) | ((data & 0xf0) >> 4);
 	else
@@ -180,7 +178,6 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_palette23_w)
 /* Layer 6&7 Palettes (Low Bits) */
 WRITE8_MEMBER(dynax_state::dynax_blit_palette67_w)
 {
-
 	if (m_layer_layout == LAYOUT_HNORIDUR)
 		m_blit2_palettes = (m_blit2_palettes & 0xff00) | ((data & 0x0f) << 4) | ((data & 0xf0) >> 4);
 	else
@@ -619,7 +616,6 @@ static void jantouki_blitter2_start( running_machine &machine, int flags )
 
 WRITE8_MEMBER(dynax_state::dynax_blit_scroll_w)
 {
-
 	switch (m_blit_src & 0xc00000)
 	{
 		case 0x000000:  m_blit_scroll_x = data;
@@ -638,7 +634,6 @@ WRITE8_MEMBER(dynax_state::dynax_blit_scroll_w)
 // inverted scroll values
 WRITE8_MEMBER(dynax_state::tenkai_blit_scroll_w)
 {
-
 	switch (m_blit_src & 0xc00000)
 	{
 		case 0x000000:  m_blit_scroll_x = ((data ^ 0xff) + 1) & 0xff;
@@ -656,7 +651,6 @@ WRITE8_MEMBER(dynax_state::tenkai_blit_scroll_w)
 
 WRITE8_MEMBER(dynax_state::dynax_blit2_scroll_w)
 {
-
 	switch (m_blit2_src & 0xc00000)
 	{
 		case 0x000000:  m_blit2_scroll_x = data;
@@ -674,7 +668,6 @@ WRITE8_MEMBER(dynax_state::dynax_blit2_scroll_w)
 
 WRITE8_MEMBER(dynax_state::dynax_blitter_rev2_w)
 {
-
 	switch (offset)
 	{
 		case 0: dynax_blitter_start(machine(), data); break;
@@ -690,7 +683,6 @@ WRITE8_MEMBER(dynax_state::dynax_blitter_rev2_w)
 // different scroll_w
 WRITE8_MEMBER(dynax_state::tenkai_blitter_rev2_w)
 {
-
 	switch (offset)
 	{
 		case 0: dynax_blitter_start(machine(), data); break;
@@ -706,7 +698,6 @@ WRITE8_MEMBER(dynax_state::tenkai_blitter_rev2_w)
 
 WRITE8_MEMBER(dynax_state::jantouki_blitter_rev2_w)
 {
-
 	switch (offset)
 	{
 		case 0: jantouki_blitter_start(machine(), data); break;
@@ -721,7 +712,6 @@ WRITE8_MEMBER(dynax_state::jantouki_blitter_rev2_w)
 
 WRITE8_MEMBER(dynax_state::jantouki_blitter2_rev2_w)
 {
-
 	switch (offset)
 	{
 		case 0: jantouki_blitter2_start(machine(),data); break;
@@ -824,7 +814,6 @@ static void dynax_common_reset( running_machine &machine )
 
 VIDEO_START_MEMBER(dynax_state,hanamai)
 {
-
 	m_pixmap[0][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
 	m_pixmap[0][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
 	m_pixmap[1][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
@@ -849,7 +838,6 @@ VIDEO_START_MEMBER(dynax_state,hanamai)
 
 VIDEO_START_MEMBER(dynax_state,hnoridur)
 {
-
 	m_pixmap[0][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
 	m_pixmap[0][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
 	m_pixmap[1][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
@@ -876,14 +864,12 @@ VIDEO_START_MEMBER(dynax_state,hnoridur)
 
 VIDEO_START_MEMBER(dynax_state,mcnpshnt)
 {
-
 	VIDEO_START_CALL_MEMBER(hnoridur);
 	m_priority_table = priority_mcnpshnt;
 }
 
 VIDEO_START_MEMBER(dynax_state,sprtmtch)
 {
-
 	m_pixmap[0][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
 	m_pixmap[0][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
 	m_pixmap[1][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
@@ -904,7 +890,6 @@ VIDEO_START_MEMBER(dynax_state,sprtmtch)
 
 VIDEO_START_MEMBER(dynax_state,jantouki)
 {
-
 	m_pixmap[0][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
 	m_pixmap[0][1] = auto_alloc_array(machine(), UINT8, 256 * 256);
 	m_pixmap[1][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
@@ -946,7 +931,6 @@ VIDEO_START_MEMBER(dynax_state,jantouki)
 
 VIDEO_START_MEMBER(dynax_state,mjdialq2)
 {
-
 	m_pixmap[0][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
 	m_pixmap[1][0] = auto_alloc_array(machine(), UINT8, 256 * 256);
 
@@ -960,7 +944,6 @@ VIDEO_START_MEMBER(dynax_state,mjdialq2)
 
 VIDEO_START_MEMBER(dynax_state,mjelctrn)
 {
-
 	VIDEO_START_CALL_MEMBER(hnoridur);
 
 	m_priority_table = priority_mjelctrn;
@@ -969,7 +952,6 @@ VIDEO_START_MEMBER(dynax_state,mjelctrn)
 
 VIDEO_START_MEMBER(dynax_state,neruton)
 {
-
 	VIDEO_START_CALL_MEMBER(hnoridur);
 
 //  m_priority_table = priority_mjelctrn;
@@ -1211,7 +1193,6 @@ static int debug_mask( running_machine &machine )
     R          -  move "tile" to the next 1/8th of the gfx  */
 static int debug_viewer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-
 #ifdef MAME_DEBUG
 	static int toggle;
 	if (machine.input().code_pressed_once(KEYCODE_T))   toggle = 1 - toggle;

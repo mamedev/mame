@@ -220,7 +220,6 @@ WRITE8_MEMBER(bfm_sc1_state::bankswitch_w)
 
 INTERRUPT_GEN_MEMBER(bfm_sc1_state::timer_irq)
 {
-
 	if ( m_is_timer_enabled )
 	{
 		m_irq_status = 0x01 |0x02; //0xff;
@@ -1181,7 +1180,6 @@ int sc1_find_project_string(running_machine &machine )
 
 	for (int search=0;search<7;search++)
 	{
-
 		int strlength = strlen(title_string[search]);
 
 		for (int i=0;i<size-strlength;i++)
@@ -1202,7 +1200,6 @@ int sc1_find_project_string(running_machine &machine )
 
 			if (found!=0)
 			{
-
 				int end=0;
 				int count = 0;
 				int blankcount = 0;
@@ -1324,20 +1321,17 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,clatt)
 	ROM_REGION( 0x40000, "altupd", 0 ) \
 	ROM_LOAD( "95000013.bin", 0x00000, 0x8000, CRC(80573db9) SHA1(34e028d1d01328719f6260aafb58f40d664ab7ea) ) \
 	ROM_LOAD( "95000014.bin", 0x08000, 0x8000, CRC(cad7c87b) SHA1(052324bbad28b67d23a018d61a03783dd4dfd9cf) ) \
-	ROM_LOAD( "95000015.bin", 0x10000, 0x8000, CRC(c46911ca) SHA1(a270d0708574a549b88f13f9cde1d7dcdfc624a9) ) \
-
+	ROM_LOAD( "95000015.bin", 0x10000, 0x8000, CRC(c46911ca) SHA1(a270d0708574a549b88f13f9cde1d7dcdfc624a9) )
 
 #define sc1_winst_sound \
 	ROM_REGION( 0x80000, "upd", 0 )\
-	ROM_LOAD( "winningstreaksnd.bin", 0x0000, 0x080000, CRC(ba30cb97) SHA1(e7f5ca36ca993ad14b3a348868e73d7ba02be7c5) )\
-
+	ROM_LOAD( "winningstreaksnd.bin", 0x0000, 0x080000, CRC(ba30cb97) SHA1(e7f5ca36ca993ad14b3a348868e73d7ba02be7c5) )
 //not upd?
 #define sc1_driv_sound \
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )\
 	ROM_LOAD( "ds_snd1.bin", 0x000000, 0x020000, CRC(a9d7e8ec) SHA1(5b1d459d378e23d3108a1190b5988eebedf95667) )\
 	ROM_LOAD( "ds_snd2.bin", 0x020000, 0x020000, CRC(3b67c1b3) SHA1(8b9dbff45955f72a73fb739b5e74aa2f9c23dd08) )\
-	ROM_LOAD( "ds_snd3.bin", 0x040000, 0x020000, CRC(00c252ec) SHA1(5de2e70f142a71f22eeb28a271ca9d7809322faa) )\
-
+	ROM_LOAD( "ds_snd3.bin", 0x040000, 0x020000, CRC(00c252ec) SHA1(5de2e70f142a71f22eeb28a271ca9d7809322faa) )
 ROM_START( sc1lotus )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lotusse.bin",  0x00000, 0x10000,  CRC(636dadc4) SHA1(85bad5d76dac028fe9f3303dd09e8266aba7db4d))
@@ -2713,8 +2707,7 @@ GAME( 198?, sc1cshwzd       , sc1cshwz  , scorpion1         , scorpion1 , bfm_sc
 	#define sc1_clbw_sound \
 	ROM_REGION( 0x20000, "upd", 0 )\
 	ROM_LOAD( "wisesnd1.bin", 0x0000, 0x010000, CRC(204605a6) SHA1(193a60878ed46f122e5d2d8f35fc6ea967b8734f) )\
-	ROM_LOAD( "wisesnd2.bin", 0x010000, 0x010000, CRC(6aa66166) SHA1(2e7cc67afdce2febb541bb1d0e7c107876d4233d) )\
-
+	ROM_LOAD( "wisesnd2.bin", 0x010000, 0x010000, CRC(6aa66166) SHA1(2e7cc67afdce2febb541bb1d0e7c107876d4233d) )
 ROM_START( sc1clbw )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "clbwzp2",                 0x0000, 0x8000, CRC(44bb7e16) SHA1(d3c258ea286be18dc667df6a7138280462db661b) ) ROM_LOAD( "clbwzp1",                 0x8000, 0x8000, CRC(c61dd4eb) SHA1(e1756f8841dabe1bc002aadba6b224a558096a96) ) sc1_clbw_sound ROM_END
 ROM_START( sc1clbwa ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "club wise 95717551b.bin", 0x0000, 0x8000, CRC(0528a718) SHA1(27f4225c948d93ce1c833679f97e045f3b7a6aac) ) ROM_LOAD( "club wise 95717550a.bin", 0x8000, 0x8000, CRC(5b305f11) SHA1(592ea71fcb72eaa90fd421e3bd3761cfd686b019) ) sc1_clbw_sound ROM_END
 
@@ -2731,8 +2724,7 @@ GAME( 198?, sc1clbw         , 0         , scorpion1         , clatt , bfm_sc1_st
 #define sc1barcd_sound \
 	ROM_REGION( 0x20000, "upd", 0 ) \
 	ROM_LOAD( "barsnd1.bin", 0x00000, 0x10000, CRC(c9de8ff4) SHA1(c3e77e84d4ecc1c779929a96d1c445a1af24865b) ) \
-	ROM_LOAD( "barsnd2.bin", 0x10000, 0x10000, CRC(56af984a) SHA1(aebd30f3ca767dc5fc77fb01765833ee627a5aee) ) \
-
+	ROM_LOAD( "barsnd2.bin", 0x10000, 0x10000, CRC(56af984a) SHA1(aebd30f3ca767dc5fc77fb01765833ee627a5aee) )
 ROM_START( sc1barcd ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "95740352 b.bin",      0x0000, 0x8000, CRC(6dc3cfd3) SHA1(d71d433ae560ac4db345630ee7f04a7cfb7e933e) ) ROM_LOAD( "95740351 a.bin",      0x8000, 0x8000, CRC(0891350b) SHA1(ea1295768738b9b89eac19d04411220a8c9d10c7) ) sc1barcd_sound ROM_END
 ROM_START( sc1barcda )ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "barcode 5_10p b.bin", 0x0000, 0x8000, CRC(69d4d0b2) SHA1(bb73b917cf414623dcd239c5daeeccb4e0ccc2ed) ) ROM_LOAD( "barcode 5_10p a.bin", 0x8000, 0x8000, CRC(e864aba1) SHA1(b3f707b6d5f3d7236e4a5e9ed78c61a78c3e8196) ) sc1barcd_sound ROM_END
 
@@ -2753,8 +2745,7 @@ GAME( 198?, sc1barcda       , sc1barcd  , scorpion1_viper   , clatt     , bfm_sc
 #define sc1_dblch_sound \
 	ROM_REGION( 0x40000, "upd", 0 )\
 	ROM_LOAD( "doublechancesnd1.bin", 0x00000, 0x010000, CRC(bee6af3e) SHA1(334fe491a00f58a2142f65344674b26c766a7c5b) )\
-	ROM_LOAD( "doublechancesnd2.bin", 0x10000, 0x010000, CRC(bbadc876) SHA1(902e387ea9bcd833cf75a6f049b5b2822ec6dc2a) )\
-
+	ROM_LOAD( "doublechancesnd2.bin", 0x10000, 0x010000, CRC(bbadc876) SHA1(902e387ea9bcd833cf75a6f049b5b2822ec6dc2a) )
 ROM_START( sc1dblch )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "doublechancegame2.bin", 0x0000, 0x8000,          CRC(d4f49454) SHA1(53b97f941a4abfeb3e498b4295f98e80bd182b7e) ) ROM_LOAD( "doublechancegame1.bin", 0x8000, 0x8000,          CRC(9e24e0e3) SHA1(fff1fe9219c052750709d13c06148c7926a22910) ) sc1_dblch_sound ROM_END
 ROM_START( sc1dblcha ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "95717417_dc_std.b",     0x0000, 0x8000, BAD_DUMP CRC(51e5459b) SHA1(b6ffbcff63fd3543226778c61fbe2246f40635dd) ) ROM_LOAD( "95717416_dc_std.a",     0x8000, 0x8000, BAD_DUMP CRC(949726ed) SHA1(6ecebd20387aa73b0404ab4b7342e2b39d77b37f) ) sc1_dblch_sound ROM_END
 
@@ -2783,13 +2774,11 @@ GAME( 198?, sc1dblchb       , sc1dblch  , scorpion1_viper           , clatt , bf
 #define sc1_cl65_sound \
 	ROM_REGION( 0x20000, "upd", 0 )\
 	ROM_LOAD( "65sndp1.bin", 0x000000, 0x010000, CRC(e532fcf5) SHA1(7de3bd4a3efae7d1cfeee23c008efbff39ce46f8) )\
-	ROM_LOAD( "65sndp2.bin", 0x010000, 0x010000, CRC(2703ea2d) SHA1(a4876a10d8d4b1de01dfab76e4ee21cb120aa783) )\
-
+	ROM_LOAD( "65sndp2.bin", 0x010000, 0x010000, CRC(2703ea2d) SHA1(a4876a10d8d4b1de01dfab76e4ee21cb120aa783) )
 #define sc1_cl65_sound_alt  \
 	ROM_REGION( 0x20000, "upd", 0 )\
 	ROM_LOAD( "club-six-five-special_snd_a.bin", 0x0000, 0x010000, CRC(915802cd) SHA1(5bca3a80199a6534e084a5cf4337da4e9c48f45c) )\
-	ROM_LOAD( "club-six-five-special_snd_b.bin", 0x0000, 0x010000, CRC(b3b230d8) SHA1(022e95f38b14922137222805c0bec7498c5956cc) )\
-
+	ROM_LOAD( "club-six-five-special_snd_b.bin", 0x0000, 0x010000, CRC(b3b230d8) SHA1(022e95f38b14922137222805c0bec7498c5956cc) )
 ROM_START( sc1cl65 )   ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "65spp2",      0x0000, 0x8000, CRC(11332a28) SHA1(76f9eee54351e0d8dc4b620ec92661538929e75d) ) ROM_LOAD( "65spp1",                                               0x8000, 0x8000, CRC(2c4cb63b) SHA1(5d09b575cf80beecd83c07286b74af29de7ec553) ) sc1_cl65_sound     ROM_END
 ROM_START( sc1cl65d )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "39370694.p2", 0x0000, 0x8000, CRC(3371dc55) SHA1(52d75a90933acc7a03821e5c2821df6126c72a6c) ) ROM_LOAD( "club-six-five-special_std_ac_rot_10po_ass.bin",        0x8000, 0x8000, CRC(cf48ba99) SHA1(5da4321ff349964e903f1bebd3e5ddd0799fc478) ) sc1_cl65_sound_alt ROM_END
 ROM_START( sc1cl65dp ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "39370694.p2", 0x0000, 0x8000, CRC(3371dc55) SHA1(52d75a90933acc7a03821e5c2821df6126c72a6c) ) ROM_LOAD( "club-six-five-special_dat_ac_rot_10po_ass.bin",        0x8000, 0x8000, CRC(77ddf81d) SHA1(522d9f84ab6e31586f371548e2f146ac193f06f5) ) sc1_cl65_sound_alt ROM_END
@@ -2822,8 +2811,7 @@ GAME( 198?, sc1cl65ap       , sc1cl65   , scorpion1_viper           , clatt , bf
 #define sc1_china_sound \
 	ROM_REGION( 0x20000, "upd", 0 )  \
 	ROM_LOAD( "ctowsnd1.bin", 0x00000, 0x010000, CRC(faf28e18) SHA1(0586a905f944bcc990d4a1b400629412a69fc160) )\
-	ROM_LOAD( "ctowsnd2.bin", 0x10000, 0x010000, CRC(f4f9c1a4) SHA1(af5aff58b3e362a14e26a5e8cae83affda905819) )\
-
+	ROM_LOAD( "ctowsnd2.bin", 0x10000, 0x010000, CRC(f4f9c1a4) SHA1(af5aff58b3e362a14e26a5e8cae83affda905819) )
 ROM_START( sc1china )   ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "club-china-town_std_ac_200pnd_rot_bss.bin", 0x0000, 0x8000, CRC(4895098f) SHA1(e08f9b85c634a423a93608a7b592436ae253ca42) ) ROM_LOAD( "club-china-town_std_ac_200pnd_rot_ass.bin", 0x8000, 0x8000, CRC(a9ed6493) SHA1(8049fe4b42110afab91dd2d9ccd132d4f2c1c0ff) ) sc1_china_sound ROM_END
 ROM_START( sc1chinap )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "club-china-town_dat_ac_200pnd_bss.bin",     0x0000, 0x8000, CRC(4895098f) SHA1(e08f9b85c634a423a93608a7b592436ae253ca42) ) ROM_LOAD( "club-china-town_dat_ac_200pnd_ass.bin",     0x8000, 0x8000, CRC(5aa465b9) SHA1(3c2d805f0421d7d1db93f21358a2beb648c05f8e) ) sc1_china_sound ROM_END
 ROM_START( sc1chinaa )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "club-china-town_std_ac_rot_bss.bin",        0x0000, 0x8000, CRC(6e09a878) SHA1(4084b1dc3425ceb980ef5c63a883720f3ad84d7f) ) ROM_LOAD( "club-china-town_std_ac_rot_ass.bin",        0x8000, 0x8000, CRC(de12ac34) SHA1(0caeb2a6b209ee34d67d4c619dd63562c839261e) ) sc1_china_sound ROM_END
@@ -2854,8 +2842,7 @@ ROM_LOAD( "95717692a.bin", 0x8000, 0x8000, CRC(f9fe7b9a) SHA1(0e3fe5da9fc837726d
 #define sc1_clbtm_sound \
 	ROM_REGION( 0x40000, "upd", 0 ) \
 	ROM_LOAD( "tempsnd1.bin", 0x00000, 0x10000, CRC(168e2a18) SHA1(db97acf9131b1a54efe1cd375aecae1679bab19e) ) \
-	ROM_LOAD( "tempsnd2.bin", 0x00000, 0x10000, CRC(b717f347) SHA1(189c82318d622f18580a23eed48b17c0c34dedd5) ) \
-
+	ROM_LOAD( "tempsnd2.bin", 0x00000, 0x10000, CRC(b717f347) SHA1(189c82318d622f18580a23eed48b17c0c34dedd5) )
 ROM_START( sc1clbtm )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "temp12b.bin", 0x0000, 0x8000, CRC(3c27c592) SHA1(081d61f974e2ae5c64729b32be4c0e5067a20550) ) ROM_LOAD( "95717692a.bin", 0x8000, 0x8000, CRC(f9fe7b9a) SHA1(0e3fe5da9fc837726d08f02a2c6ed782f016c982) ) sc1_clbtm_sound ROM_END
 ROM_START( sc1clbtma ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "temptp2",     0x0000, 0x8000, CRC(d165fa87) SHA1(aef8a4af8b6e83ef09dffc8aca305eaf7dd3936b) ) ROM_LOAD( "temptp1",       0x8000, 0x8000, CRC(6f03648d) SHA1(a6402c94ebf4d570d1d3fb462eb621566c27f307) ) sc1_clbtm_sound ROM_END
 
@@ -2870,8 +2857,7 @@ GAME( 198?, sc1clbtma       , sc1clbtm  , scorpion1_viper           , clatt , bf
 
 // might not be used
 #define sc1_count_sound \
-	ROM_REGION( 0x40000, "upd", ROMREGION_ERASE00 ) \
-
+	ROM_REGION( 0x40000, "upd", ROMREGION_ERASE00 )
 ROM_START( sc1count )   ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "club-count-cash_std_ac_200pnd_rot_bss.bin", 0x0000, 0x8000, CRC(8e385a9e) SHA1(67c45734501c16be3b8270f388dc1313bce289f8) ) ROM_LOAD( "club-count-cash_std_ac_200pnd_rot_ass.bin", 0x8000, 0x8000, CRC(a6a1a604) SHA1(86e59578fed7023b0e6a42495b9a60e7178ee566) ) sc1_count_sound ROM_END
 ROM_START( sc1countp )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "club-count-cash_dat_ac_200pnd_rot_bss.bin", 0x0000, 0x8000, CRC(8e385a9e) SHA1(67c45734501c16be3b8270f388dc1313bce289f8) ) ROM_LOAD( "club-count-cash_dat_ac_200pnd_rot_ass.bin", 0x8000, 0x8000, CRC(da097abe) SHA1(85f01d8b5dce535a5559fadaf1cf7373c6967882) ) sc1_count_sound ROM_END
 ROM_START( sc1counta )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "club-count-cash_std_ac_rot_bss.bin",        0x0000, 0x8000, CRC(69df417d) SHA1(a7788a9f3056919017616960ba5017bcd94b8a98) ) ROM_LOAD( "club-count-cash_std_ac_rot_ass.bin",        0x8000, 0x8000, CRC(b081333c) SHA1(75a46634458a790f91360be26cace0e42bbf3481) ) sc1_count_sound ROM_END
@@ -2920,8 +2906,7 @@ GAME( 198?, sc1sirc         , sc1sir    , scorpion1         , clatt , bfm_sc1_st
 #define sc1_funh_sound \
 	ROM_REGION( 0x40000, "upd", 0 )\
 	ROM_LOAD( "fhsesnd1.bin", 0x000000, 0x010000, CRC(bf371dbf) SHA1(0c9bc0d0964a858fba5324080a2cf5da119bf3db) )\
-	ROM_LOAD( "fhsesnd2.bin", 0x010000, 0x010000, CRC(c51415e3) SHA1(f0e4eb5ce38faaef336a5b69e598985ea2486ceb) )\
-
+	ROM_LOAD( "fhsesnd2.bin", 0x010000, 0x010000, CRC(c51415e3) SHA1(f0e4eb5ce38faaef336a5b69e598985ea2486ceb) )
 ROM_START( sc1funh )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "club-fun-house_std_ac_b.bin"      , 0x0000, 0x8000, CRC(1a838f0d) SHA1(747153e1bb9fc4fc28451e828fa2473f2e6d5e0e) ) ROM_LOAD( "club-fun-house_std_ac_a.bin",       0x8000, 0x8000,           CRC(f81dff1b) SHA1(4c205b3901f683d3679af9d311813ad912ecb436) ) sc1_funh_sound ROM_END
 ROM_START( sc1funhp ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "club-fun-house_dat_ac_rot_bss.bin", 0x0000, 0x8000, CRC(1a838f0d) SHA1(747153e1bb9fc4fc28451e828fa2473f2e6d5e0e) ) ROM_LOAD( "club-fun-house_dat_ac_rot_ass.bin", 0x8000, 0x781f,  BAD_DUMP CRC(9a24dc71) SHA1(bb19ef26d6d46605107c8b53c6d9b4f08ed4c721) ) sc1_funh_sound ROM_END
 ROM_START( sc1funha ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "funhop2",                           0x0000, 0x8000, CRC(2454e295) SHA1(9785d278afe05c632e1ab326d1b8fbabcc591fb6) ) ROM_LOAD( "funhop1",                           0x8000, 0x8000,           CRC(282d5651) SHA1(bd8c0985143d8fb5c8e0a2bfedea248569c8cf98) ) sc1_funh_sound ROM_END
@@ -2968,8 +2953,7 @@ GAME( 198?, sc1clbxpa       , sc1clbxp  , scorpion1_viper   , clatt , bfm_sc1_st
 	ROM_REGION( 0x20000, "upd", 0 ) \
 	ROM_LOAD( "95000001snd.bin", 0x00000, 0x008000, CRC(38f85127) SHA1(c9c7c8892396180aa4c4a727422391b9ce93a10a) ) \
 	ROM_LOAD( "95000002snd.bin", 0x08000, 0x008000, CRC(ca2f5547) SHA1(fe8378ee485ce396b665ea504650caf51843fd74) ) \
-	ROM_LOAD( "95000003snd.bin", 0x10000, 0x008000, CRC(475695f9) SHA1(9f6ba3de7b4b38946106a3aeab9a2a2eb2a99193) ) \
-
+	ROM_LOAD( "95000003snd.bin", 0x10000, 0x008000, CRC(475695f9) SHA1(9f6ba3de7b4b38946106a3aeab9a2a2eb2a99193) )
 ROM_START( sc1cwcl ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "95717154b.bin", 0x0000, 0x8000, CRC(e6422f75) SHA1(4ab33a5503209377f4739dbe11e4afa8d7e43699) )  ROM_LOAD( "95717153a.bin", 0x8000, 0x8000, CRC(233174a1) SHA1(94cf071a955e3716f463c4370daabfe94db2fd0e) ) sc1_cwcl_sound ROM_END
 
 // PROJECT NUMBER 5216  VE 5/10/20p PLAY - 17-FEB-1989 12:23:30
@@ -2982,8 +2966,7 @@ GAME( 198?, sc1cwcl         , 0         , scorpion1_viper           , clatt , bf
 #define sc1_bartk_sound \
 	ROM_REGION( 0x20000, "upd", 0 ) \
 	ROM_LOAD( "bartreksnd1.bin", 0x000000, 0x010000, CRC(690b18c3) SHA1(0a3ecadc8d47670bc0f36d76b4335f027ef68542) ) \
-	ROM_LOAD( "bartreksnd2.bin", 0x010000, 0x010000, CRC(4ff8201c) SHA1(859378b4bb8fc5d3497a53c9218302410884e091) ) \
-
+	ROM_LOAD( "bartreksnd2.bin", 0x010000, 0x010000, CRC(4ff8201c) SHA1(859378b4bb8fc5d3497a53c9218302410884e091) )
 ROM_START( sc1bartk ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "bartrekgameb.bin", 0x0000, 0x8000, CRC(24c7c803) SHA1(ab5051c8727cab44ad59913edab3d5d145728cb5) ) ROM_LOAD( "bartrekgamea.bin", 0x8000, 0x8000, CRC(a7a84c16) SHA1(8c5ab34268e932be12e85eed5a56386681f13da4) ) sc1_bartk_sound ROM_END
 
 // PROJECT NUMBER 6006  BAR TREK #3/#6 - 1-DEC-1992 08:20:06

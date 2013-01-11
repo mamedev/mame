@@ -132,7 +132,6 @@ WRITE16_MEMBER(lastduel_state::lastduel_flip_w)
 
 WRITE16_MEMBER(lastduel_state::lastduel_scroll_w)
 {
-
 	data = COMBINE_DATA(&m_scroll[offset]);
 	switch (offset)
 	{
@@ -149,42 +148,36 @@ WRITE16_MEMBER(lastduel_state::lastduel_scroll_w)
 
 WRITE16_MEMBER(lastduel_state::lastduel_scroll1_w)
 {
-
 	COMBINE_DATA(&m_scroll1[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_MEMBER(lastduel_state::lastduel_scroll2_w)
 {
-
 	COMBINE_DATA(&m_scroll2[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE16_MEMBER(lastduel_state::lastduel_vram_w)
 {
-
 	COMBINE_DATA(&m_vram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(lastduel_state::madgear_scroll1_w)
 {
-
 	COMBINE_DATA(&m_scroll1[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 WRITE16_MEMBER(lastduel_state::madgear_scroll2_w)
 {
-
 	COMBINE_DATA(&m_scroll2[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 WRITE16_MEMBER(lastduel_state::lastduel_palette_word_w)
 {
-
 	int red, green, blue, bright;
 	data = COMBINE_DATA(&m_paletteram[offset]);
 
@@ -257,7 +250,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 lastduel_state::screen_update_lastduel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(machine(), bitmap, cliprect, 0);
@@ -269,7 +261,6 @@ UINT32 lastduel_state::screen_update_lastduel(screen_device &screen, bitmap_ind1
 
 UINT32 lastduel_state::screen_update_madgear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (m_tilemap_priority)
 	{
 		m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | TILEMAP_DRAW_OPAQUE, 0);

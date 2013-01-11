@@ -83,13 +83,11 @@ void seicross_state::machine_reset()
 
 READ8_MEMBER(seicross_state::friskyt_portB_r)
 {
-
 	return (m_portb & 0x9f) | (ioport("DEBUG")->read_safe(0) & 0x60);
 }
 
 WRITE8_MEMBER(seicross_state::friskyt_portB_w)
 {
-
 	//logerror("PC %04x: 8910 port B = %02x\n", space.device().safe_pc(), data);
 	/* bit 0 is IRQ enable */
 	m_irq_mask = data & 1;
@@ -390,7 +388,6 @@ static const ay8910_interface ay8910_config =
 
 INTERRUPT_GEN_MEMBER(seicross_state::vblank_irq)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 

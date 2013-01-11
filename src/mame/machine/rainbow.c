@@ -733,7 +733,6 @@ static void request_goalin_data( running_machine &machine )
 
 TIMER_CALLBACK_MEMBER(rbisland_state::cchip_timer)
 {
-
 	if (m_CRAM[1][0x100] == 1)
 	{
 		request_round_data(machine());

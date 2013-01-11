@@ -391,7 +391,6 @@ VIDEO_START_MEMBER(hyprduel_state,common_14220)
 
 VIDEO_START_MEMBER(hyprduel_state,hyprduel_14220)
 {
-
 	m_sprite_yoffs_sub = 2;
 
 	VIDEO_START_CALL_MEMBER(common_14220);
@@ -399,7 +398,6 @@ VIDEO_START_MEMBER(hyprduel_state,hyprduel_14220)
 
 VIDEO_START_MEMBER(hyprduel_state,magerror_14220)
 {
-
 	m_sprite_yoffs_sub = 0;
 
 	VIDEO_START_CALL_MEMBER(common_14220);

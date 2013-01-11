@@ -74,7 +74,6 @@ READ8_MEMBER(st0016_state::st0016_sprite_ram_r)
 
 WRITE8_MEMBER(st0016_state::st0016_sprite_ram_w)
 {
-
 	st0016_spriteram[ST0016_SPR_BANK_SIZE*st0016_spr_bank+offset]=data;
 }
 
@@ -548,12 +547,10 @@ static void draw_bgmap(running_machine &machine, bitmap_ind16 &bitmap,const rect
 
 									if (cliprect.contains(drawxpos, drawypos))
 									{
-
 										if(st0016_vregs[j+7]==0x12)
 											destline[drawxpos] = (destline[drawxpos] | (pixdata<<4))&0x3ff;
 										else
 										{
-
 											if(ISMACS2)
 											{
 												if(pixdata)// || destline[drawxpos]==UNUSED_PEN)
@@ -593,7 +590,6 @@ void st0016_state::st0016_draw_screen(screen_device &screen, bitmap_ind16 &bitma
 
 UINT32 st0016_state::screen_update_st0016(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 #ifdef MAME_DEBUG
 	if(machine().input().code_pressed_once(KEYCODE_Z))
 	{

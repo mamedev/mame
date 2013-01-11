@@ -447,7 +447,6 @@ static const ym3526_interface ym3526_config =
 #if 0
 INTERRUPT_GEN_MEMBER(exprraid_state::exprraid_interrupt)
 {
-
 	if ((~ioport("IN2")->read()) & 0xc0)
 	{
 		if (m_coin == 0)
@@ -468,7 +467,6 @@ INTERRUPT_GEN_MEMBER(exprraid_state::exprraid_interrupt)
 
 void exprraid_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_slave = machine().device("slave");
 
@@ -477,7 +475,6 @@ void exprraid_state::machine_start()
 
 void exprraid_state::machine_reset()
 {
-
 	m_bg_index[0] = 0;
 	m_bg_index[1] = 0;
 	m_bg_index[2] = 0;

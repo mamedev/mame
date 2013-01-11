@@ -79,7 +79,6 @@ VIDEO_START_MEMBER(arcadecl_state,arcadecl)
 
 UINT32 arcadecl_state::screen_update_arcadecl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	/* draw the playfield */
 	arcadecl_bitmap_render(machine(), bitmap, cliprect);
 

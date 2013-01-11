@@ -21,7 +21,6 @@
 
 WRITE8_MEMBER(goldstar_state::cm_girl_scroll_w)
 {
-
 	m_cm_girl_scroll = data;
 	/*
 	    xxxx ----  yscroll
@@ -34,7 +33,6 @@ WRITE8_MEMBER(goldstar_state::cm_girl_scroll_w)
 
 WRITE8_MEMBER(goldstar_state::cm_outport0_w)
 {
-
 	m_cm_enable_reg = data;
 	/*
 	    ---- ---x  (global enable or irq enable?)
@@ -50,14 +48,12 @@ WRITE8_MEMBER(goldstar_state::cm_outport0_w)
 
 WRITE8_MEMBER(goldstar_state::goldstar_fg_vidram_w)
 {
-
 	m_fg_vidram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(goldstar_state::goldstar_fg_atrram_w)
 {
-
 	m_fg_atrram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
@@ -104,7 +100,6 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_cherrym_fg_tile_info)
 
 WRITE8_MEMBER(goldstar_state::goldstar_reel1_ram_w)
 {
-
 	m_reel1_ram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
@@ -140,7 +135,6 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel2_tile_info)
 
 WRITE8_MEMBER(goldstar_state::goldstar_reel3_ram_w)
 {
-
 	m_reel3_ram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
@@ -158,14 +152,12 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel3_tile_info)
 
 WRITE8_MEMBER(goldstar_state::unkch_reel1_attrram_w)
 {
-
 	m_reel1_attrram[offset] = data;
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(goldstar_state::unkch_reel2_attrram_w)
 {
-
 	m_reel2_attrram[offset] = data;
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
@@ -173,7 +165,6 @@ WRITE8_MEMBER(goldstar_state::unkch_reel2_attrram_w)
 
 WRITE8_MEMBER(goldstar_state::unkch_reel3_attrram_w)
 {
-
 	m_reel3_attrram[offset] = data;
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
@@ -220,7 +211,6 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_unkch_reel3_tile_info)
 
 VIDEO_START_MEMBER(goldstar_state,goldstar)
 {
-
 	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 	m_reel2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 	m_reel3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
@@ -238,7 +228,6 @@ VIDEO_START_MEMBER(goldstar_state,goldstar)
 
 VIDEO_START_MEMBER(goldstar_state,bingowng)
 {
-
 	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(64);
@@ -252,7 +241,6 @@ VIDEO_START_MEMBER(goldstar_state,bingowng)
 
 VIDEO_START_MEMBER(goldstar_state,magical)
 {
-
 	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 	m_reel2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 	m_reel3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
@@ -270,7 +258,6 @@ VIDEO_START_MEMBER(goldstar_state,magical)
 
 VIDEO_START_MEMBER(goldstar_state,unkch)
 {
-
 	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_unkch_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 	m_reel2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_unkch_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 	m_reel3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_unkch_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
@@ -291,7 +278,6 @@ VIDEO_START_MEMBER(goldstar_state,unkch)
 
 VIDEO_START_MEMBER(goldstar_state,cherrym)
 {
-
 	m_reel1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 	m_reel2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 	m_reel3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(goldstar_state::get_goldstar_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
@@ -313,7 +299,6 @@ VIDEO_START_MEMBER(goldstar_state,cherrym)
 
 WRITE8_MEMBER(goldstar_state::goldstar_fa00_w)
 {
-
 	/* bit 1 toggles continuously - might be irq enable or watchdog reset */
 
 	/* bit 2 selects background gfx color (I think) */
@@ -325,7 +310,6 @@ WRITE8_MEMBER(goldstar_state::goldstar_fa00_w)
 
 WRITE8_MEMBER(goldstar_state::cm_background_col_w)
 {
-
 	//printf("cm_background_col_w %02x\n",data);
 
 	/* cherry master writes

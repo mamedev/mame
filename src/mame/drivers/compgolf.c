@@ -34,7 +34,6 @@ WRITE8_MEMBER(compgolf_state::compgolf_scrolly_lo_w)
 
 WRITE8_MEMBER(compgolf_state::compgolf_ctrl_w)
 {
-
 	/* bit 4 and 6 are always set */
 
 	int new_bank = (data & 4) >> 2;
@@ -225,7 +224,6 @@ static const ym2203_interface ym2203_config =
 
 void compgolf_state::machine_start()
 {
-
 	save_item(NAME(m_bank));
 	save_item(NAME(m_scrollx_lo));
 	save_item(NAME(m_scrollx_hi));
@@ -235,7 +233,6 @@ void compgolf_state::machine_start()
 
 void compgolf_state::machine_reset()
 {
-
 	m_bank = -1;
 	m_scrollx_lo = 0;
 	m_scrollx_hi = 0;

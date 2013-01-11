@@ -70,7 +70,6 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(kopunch_state::left_coin_inserted)
 {
-
 	/* left coin insertion causes a rst6.5 (vector 0x34) */
 	if (newval)
 		m_maincpu->set_input_line(I8085_RST65_LINE, HOLD_LINE);
@@ -78,7 +77,6 @@ INPUT_CHANGED_MEMBER(kopunch_state::left_coin_inserted)
 
 INPUT_CHANGED_MEMBER(kopunch_state::right_coin_inserted)
 {
-
 	/* right coin insertion causes a rst5.5 (vector 0x2c) */
 	if (newval)
 		m_maincpu->set_input_line(I8085_RST55_LINE, HOLD_LINE);
@@ -171,7 +169,6 @@ GFXDECODE_END
 
 void kopunch_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_gfxbank));
@@ -179,7 +176,6 @@ void kopunch_state::machine_start()
 
 void kopunch_state::machine_reset()
 {
-
 	m_gfxbank = 0;
 }
 

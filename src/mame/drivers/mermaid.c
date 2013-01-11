@@ -137,7 +137,6 @@ WRITE8_MEMBER(mermaid_state::mermaid_ay8910_control_port_w)
 
 WRITE8_MEMBER(mermaid_state::nmi_mask_w)
 {
-
 	m_nmi_mask = data & 1;
 }
 
@@ -174,19 +173,16 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(mermaid_state::rougien_sample_rom_lo_w)
 {
-
 	m_adpcm_rom_sel = (data & 1) | (m_adpcm_rom_sel & 2);
 }
 
 WRITE8_MEMBER(mermaid_state::rougien_sample_rom_hi_w)
 {
-
 	m_adpcm_rom_sel = ((data & 1)<<1) | (m_adpcm_rom_sel & 1);
 }
 
 WRITE8_MEMBER(mermaid_state::rougien_sample_playback_w)
 {
-
 	if((m_adpcm_play_reg & 1) && ((data & 1) == 0))
 	{
 		m_adpcm_pos = m_adpcm_rom_sel*0x1000;
@@ -364,7 +360,6 @@ GFXDECODE_END
 
 void mermaid_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_ay1 = machine().device("ay1");
 	m_ay2 = machine().device("ay2");
@@ -388,7 +383,6 @@ void mermaid_state::machine_start()
 
 void mermaid_state::machine_reset()
 {
-
 	m_coll_bit0 = 0;
 	m_coll_bit1 = 0;
 	m_coll_bit2 = 0;
@@ -441,7 +435,6 @@ static const msm5205_interface msm5205_config =
 
 INTERRUPT_GEN_MEMBER(mermaid_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

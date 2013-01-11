@@ -88,7 +88,6 @@ public:
 
 void taitopjc_state::video_start()
 {
-
 }
 
 UINT32 taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

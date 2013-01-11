@@ -1348,7 +1348,6 @@ READ32_MEMBER(_39in1_state::unknown_r)
 
 READ32_MEMBER(_39in1_state::cpld_r)
 {
-
 	//if (space.device().safe_pc() != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, space.device().safe_pc(), state);
 
 	if (space.device().safe_pc() == 0x3f04)
@@ -1404,7 +1403,6 @@ READ32_MEMBER(_39in1_state::cpld_r)
 
 WRITE32_MEMBER(_39in1_state::cpld_w)
 {
-
 	if (mem_mask == 0xffff)
 	{
 		m_seed = data<<16;

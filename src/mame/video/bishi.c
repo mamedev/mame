@@ -26,7 +26,6 @@ void bishi_tile_callback( running_machine &machine, int layer, int *code, int *c
 
 void bishi_state::video_start()
 {
-
 	assert(machine().primary_screen->format() == BITMAP_FORMAT_RGB32);
 
 	k056832_set_layer_association(m_k056832, 0);

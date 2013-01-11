@@ -26,7 +26,6 @@ VIDEO_START_MEMBER(kaneko16_state,kaneko16)
 
 static void kaneko16_fill_bitmap(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	kaneko16_state *state = machine.driver_data<kaneko16_state>();
 	if (state->m_kaneko_spr)
 		if(state->m_kaneko_spr->get_sprite_type()== 1)

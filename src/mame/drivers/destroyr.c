@@ -156,7 +156,6 @@ TIMER_CALLBACK_MEMBER(destroyr_state::destroyr_frame_callback)
 
 void destroyr_state::machine_reset()
 {
-
 	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(destroyr_state::destroyr_frame_callback),this));
 
 	m_cursor = 0;
@@ -173,7 +172,6 @@ void destroyr_state::machine_reset()
 
 WRITE8_MEMBER(destroyr_state::destroyr_misc_w)
 {
-
 	/* bits 0 to 2 connect to the sound circuits */
 	m_attract = data & 0x01;
 	m_noise = data & 0x02;
@@ -236,7 +234,6 @@ WRITE8_MEMBER(destroyr_state::destroyr_output_w)
 
 READ8_MEMBER(destroyr_state::destroyr_input_r)
 {
-
 	if (offset & 1)
 	{
 		return ioport("IN1")->read();
@@ -435,7 +432,6 @@ void destroyr_state::palette_init()
 
 void destroyr_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_cursor));

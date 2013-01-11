@@ -37,7 +37,6 @@ enum
 
 void micro3d_state::video_start()
 {
-
 	/* Allocate 512x12 x 2 3D frame buffers */
 	m_frame_buffers[0] = auto_alloc_array(machine(), UINT16, 1024 * 512);
 	m_frame_buffers[1] = auto_alloc_array(machine(), UINT16, 1024 * 512);
@@ -47,7 +46,6 @@ void micro3d_state::video_start()
 
 void micro3d_state::video_reset()
 {
-
 	m_pipeline_state  = 0;
 	m_creg = 0;
 

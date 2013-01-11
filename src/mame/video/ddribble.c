@@ -123,7 +123,6 @@ TILE_GET_INFO_MEMBER(ddribble_state::get_bg_tile_info)
 
 void ddribble_state::video_start()
 {
-
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ddribble_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(ddribble_state::tilemap_scan),this), 8, 8, 64, 32);
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ddribble_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(ddribble_state::tilemap_scan),this), 8, 8, 64, 32);
 

@@ -99,7 +99,6 @@ void rungun_state::video_start()
 
 UINT32 rungun_state::screen_update_rng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	machine().priority_bitmap.fill(0, cliprect);
 

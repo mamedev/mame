@@ -22,7 +22,6 @@
 
 WRITE16_MEMBER(vaportra_state::vaportra_sound_w)
 {
-
 	/* Force synchronisation between CPUs with fake timer */
 	machine().scheduler().synchronize();
 	soundlatch_byte_w(space, 0, data & 0xff);
@@ -231,7 +230,6 @@ static const deco16ic_interface vaportra_deco16ic_tilegen2_intf =
 
 void vaportra_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_deco_tilegen1 = machine().device("tilegen1");
@@ -242,7 +240,6 @@ void vaportra_state::machine_start()
 
 void vaportra_state::machine_reset()
 {
-
 	m_priority[0] = 0;
 	m_priority[1] = 0;
 }

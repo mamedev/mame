@@ -129,7 +129,6 @@ READ8_DEVICE_HANDLER(betadisk_sector_r)
 
 READ8_DEVICE_HANDLER(betadisk_data_r)
 {
-
 	beta_disk_state *beta = get_safe_token(device);
 
 	if (beta->betadisk_active==1) {

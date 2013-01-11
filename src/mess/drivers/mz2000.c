@@ -521,7 +521,6 @@ INPUT_PORTS_END
 
 void mz2000_state::machine_reset()
 {
-
 	m_ipl_enable = 1;
 	m_tvram_enable = 0;
 	m_gvram_enable = 0;
@@ -751,7 +750,6 @@ READ8_MEMBER(mz2000_state::mz2000_pio1_portb_r)
 
 READ8_MEMBER(mz2000_state::mz2000_pio1_porta_r)
 {
-
 	return m_porta_latch;
 }
 

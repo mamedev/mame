@@ -50,7 +50,6 @@ WRITE16_MEMBER(drgnmst_state::drgnmst_coin_w)
 
 WRITE16_MEMBER(drgnmst_state::drgnmst_snd_command_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		m_snd_command = (data & 0xff);
@@ -60,7 +59,6 @@ WRITE16_MEMBER(drgnmst_state::drgnmst_snd_command_w)
 
 WRITE16_MEMBER(drgnmst_state::drgnmst_snd_flag_w)
 {
-
 	/* Enables the following 68K write operation to latch through to the PIC */
 	if (ACCESSING_BITS_0_7)
 		m_snd_flag = 1;
@@ -371,7 +369,6 @@ GFXDECODE_END
 
 void drgnmst_state::machine_start()
 {
-
 	save_item(NAME(m_snd_flag));
 	save_item(NAME(m_snd_command));
 	save_item(NAME(m_oki_control));
@@ -383,7 +380,6 @@ void drgnmst_state::machine_start()
 
 void drgnmst_state::machine_reset()
 {
-
 	m_snd_flag = 0;
 	m_snd_command = 0;
 	m_oki_control = 0;

@@ -6,7 +6,6 @@
 
 void ninjaw_state::video_start()
 {
-
 	/* Ensure palette from correct TC0110PCR used for each screen */
 	tc0100scn_set_colbanks(m_tc0100scn_1, 0x0, 0x100, 0x200);
 }

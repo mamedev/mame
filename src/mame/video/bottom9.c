@@ -56,7 +56,6 @@ void bottom9_zoom_callback( running_machine &machine, int *code, int *color, int
 
 void bottom9_state::video_start()
 {
-
 	m_layer_colorbase[0] = 0;   /* not used */
 	m_layer_colorbase[1] = 0;
 	m_layer_colorbase[2] = 16;
@@ -74,7 +73,6 @@ void bottom9_state::video_start()
 
 UINT32 bottom9_state::screen_update_bottom9(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	k052109_tilemap_update(m_k052109);
 
 	/* note: FIX layer is not used */

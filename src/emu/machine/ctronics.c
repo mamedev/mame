@@ -23,7 +23,6 @@ centronics_device::centronics_device(const machine_config &mconfig, const char *
 		device_slot_interface(mconfig, *this),
 		m_dev(NULL)
 {
-
 }
 
 //-------------------------------------------------
@@ -232,7 +231,6 @@ void centronics_printer_device::device_start()
 
 void centronics_printer_device::device_reset()
 {
-
 }
 
 /*-------------------------------------------------

@@ -294,7 +294,6 @@ WRITE16_MEMBER(nmg5_state::bg_videoram_w)
 
 WRITE16_MEMBER(nmg5_state::nmg5_soundlatch_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
@@ -314,7 +313,6 @@ WRITE16_MEMBER(nmg5_state::prot_w)
 
 WRITE16_MEMBER(nmg5_state::gfx_bank_w)
 {
-
 	if (m_gfx_bank != (data & 3))
 	{
 		m_gfx_bank = data & 3;
@@ -324,7 +322,6 @@ WRITE16_MEMBER(nmg5_state::gfx_bank_w)
 
 WRITE16_MEMBER(nmg5_state::priority_reg_w)
 {
-
 	m_priority_reg = data & 7;
 
 	if (m_priority_reg == 4 || m_priority_reg == 5 || m_priority_reg == 6)
@@ -847,7 +844,6 @@ TILE_GET_INFO_MEMBER(nmg5_state::bg_get_tile_info){ SET_TILE_INFO_MEMBER(0, m_bg
 
 void nmg5_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(nmg5_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(nmg5_state::fg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -887,7 +883,6 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap )
 
 UINT32 nmg5_state::screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->set_scrolly(0, m_scroll_ram[3] + 9);
 	m_bg_tilemap->set_scrollx(0, m_scroll_ram[2] + 3);
 	m_fg_tilemap->set_scrolly(0, m_scroll_ram[1] + 9);
@@ -986,7 +981,6 @@ static const ym3812_interface ym3812_intf =
 
 void nmg5_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_soundcpu = machine().device<cpu_device>("soundcpu");
 
@@ -997,7 +991,6 @@ void nmg5_state::machine_start()
 
 void nmg5_state::machine_reset()
 {
-
 	/* some games don't set the priority register so it should be hard-coded to a normal layout */
 	m_priority_reg = 7;
 

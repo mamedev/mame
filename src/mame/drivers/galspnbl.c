@@ -45,7 +45,6 @@ Manuals for both games define the controls as 4 push buttons:
 
 WRITE16_MEMBER(galspnbl_state::soundcommand_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space,offset,data & 0xff);
@@ -220,7 +219,6 @@ static const ym3812_interface ym3812_config =
 
 void galspnbl_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }
 

@@ -661,7 +661,6 @@ static void sgb_update_scanline( running_machine &machine )
 
 		if ( cycles_to_go == 0 )
 		{
-
 			/* Does this belong here? or should it be moved to the else block */
 			/* Handle SGB mask */
 			switch( state->m_sgb_window_mask )

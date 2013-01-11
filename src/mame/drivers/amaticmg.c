@@ -852,7 +852,6 @@ void amaticmg_state::machine_start()
 
 void amaticmg_state::machine_reset()
 {
-
 	membank("bank1")->set_entry(0);
 	m_nmi_mask = 0;
 }
@@ -906,7 +905,6 @@ MACHINE_CONFIG_END
 
 INTERRUPT_GEN_MEMBER(amaticmg_state::amaticmg2_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

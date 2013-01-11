@@ -136,7 +136,6 @@ static MC6845_UPDATE_ROW( vid_update_row )
 
 		for(pixelno=0; pixelno<8; pixelno++)
 		{
-
 			rb=(rpx & bitno) >> shifts;
 			gb=(gpx & bitno) >> shifts;
 			bb=(bpx & bitno) >> shifts;

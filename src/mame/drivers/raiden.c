@@ -575,7 +575,6 @@ encryption method! The technique is a combination of a XOR table plus
 bit-swapping */
 static void common_decrypt(running_machine &machine)
 {
-
 	UINT16 *RAM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	int i;
 

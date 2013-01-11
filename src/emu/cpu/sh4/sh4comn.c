@@ -415,7 +415,6 @@ void sh4_exception(sh4_state *sh4, const char *message, int exception) // handle
 		}
 		else
 		{
-
 			if (sh4->sr & BL)
 				return;
 			if (((sh4->exception_priority[exception] >> 8) & 255) <= ((sh4->sr >> 4) & 15))
@@ -1009,7 +1008,6 @@ void sh4_set_frt_input(device_t *device, int state)
 
 	if (sh4->cpu_type == CPU_TYPE_SH4)
 	{
-
 		if(sh4->m[5] & 0x8000) {
 			if(state == CLEAR_LINE) {
 				return;

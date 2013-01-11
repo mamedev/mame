@@ -1155,7 +1155,6 @@ static SRes SzReadAndDecodePackedStreams2(
 	UInt32 **digests,
 	ISzAlloc *allocTemp)
 {
-
 	UInt32 numUnpackStreams = 0;
 	UInt64 dataStartPos;
 	CSzFolder *folder;

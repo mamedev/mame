@@ -15,14 +15,12 @@ TILE_GET_INFO_MEMBER(sbugger_state::get_sbugger_tile_info)
 
 WRITE8_MEMBER(sbugger_state::sbugger_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(sbugger_state::sbugger_videoram_attr_w)
 {
-
 	m_videoram_attr[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }

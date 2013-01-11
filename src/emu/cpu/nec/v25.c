@@ -210,7 +210,6 @@ static CPU_RESET( v25 )
 
 static CPU_EXIT( v25 )
 {
-
 }
 
 static void nec_interrupt(v25_state_t *nec_state, unsigned int_num, INTSOURCES source)

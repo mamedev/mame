@@ -361,7 +361,6 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 
 WRITE32_MEMBER(namcos11_state::keycus_w)
 {
-
 	verboselog( machine(), 1, "keycus_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	COMBINE_DATA( &m_keycus[ offset ] );
 }
@@ -653,7 +652,6 @@ WRITE32_MEMBER(namcos11_state::bankswitch_rom32_w)
 
 WRITE32_MEMBER(namcos11_state::bankswitch_rom64_upper_w)
 {
-
 	verboselog( machine(), 2, "bankswitch_rom64_upper_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
 	if( ACCESSING_BITS_0_15 )
@@ -856,7 +854,6 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(namcos11_state::c76_speedup_r)
 {
-
 	if ((space.device().safe_pc() == 0xc153) && (!(m_su_83 & 0xff00)))
 	{
 		space.device().execute().spin_until_interrupt();
@@ -867,7 +864,6 @@ READ16_MEMBER(namcos11_state::c76_speedup_r)
 
 WRITE16_MEMBER(namcos11_state::c76_speedup_w)
 {
-
 	COMBINE_DATA(&m_su_83);
 }
 
@@ -995,26 +991,22 @@ DRIVER_INIT_MEMBER(namcos11_state,ptblank2ua)
 
 MACHINE_RESET_MEMBER(namcos11_state,namcos11)
 {
-
 	memset( m_keycus, 0, m_keycus_size );
 }
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_irq0_cb)
 {
-
 	m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_irq2_cb)
 {
-
 	m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_adc_cb)
 {
-
 	m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 }
 

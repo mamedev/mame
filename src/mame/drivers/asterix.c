@@ -39,7 +39,6 @@ READ16_MEMBER(asterix_state::control2_r)
 
 WRITE16_MEMBER(asterix_state::control2_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		m_cur_control2 = data;
@@ -55,7 +54,6 @@ WRITE16_MEMBER(asterix_state::control2_w)
 
 INTERRUPT_GEN_MEMBER(asterix_state::asterix_interrupt)
 {
-
 	// global interrupt masking
 	if (!k056832_is_irq_enabled(m_k056832, 0))
 		return;
@@ -76,7 +74,6 @@ TIMER_CALLBACK_MEMBER(asterix_state::nmi_callback)
 
 WRITE8_MEMBER(asterix_state::sound_arm_nmi_w)
 {
-
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	machine().scheduler().timer_set(attotime::from_usec(5), timer_expired_delegate(FUNC(asterix_state::nmi_callback),this));
 }
@@ -243,7 +240,6 @@ static const k05324x_interface asterix_k05324x_intf =
 
 void asterix_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k053260 = machine().device("k053260");

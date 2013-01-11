@@ -296,7 +296,6 @@ WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_1_w)
 
 WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_2_w)
 {
-
 	device_t *ic77 = machine().device("ic77");
 	device_t *ic78 = machine().device("ic78");
 	device_t *ic80 = machine().device("ic80");
@@ -565,7 +564,6 @@ INPUT_PORTS_END
 
 void dai3wksi_state::machine_start()
 {
-
 	/* Set up save state */
 	save_item(NAME(m_dai3wksi_flipscreen));
 	save_item(NAME(m_dai3wksi_redscreen));
@@ -578,7 +576,6 @@ void dai3wksi_state::machine_start()
 
 void dai3wksi_state::machine_reset()
 {
-
 	m_port_last1 = 0;
 	m_port_last2 = 0;
 	m_enabled_sound = 0;

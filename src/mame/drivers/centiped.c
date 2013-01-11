@@ -456,7 +456,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(centiped_state::generate_interrupt)
 
 MACHINE_START_MEMBER(centiped_state,centiped)
 {
-
 	save_item(NAME(m_oldpos));
 	save_item(NAME(m_sign));
 	save_item(NAME(m_dsw_select));
@@ -466,7 +465,6 @@ MACHINE_START_MEMBER(centiped_state,centiped)
 
 MACHINE_RESET_MEMBER(centiped_state,centiped)
 {
-
 	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
 	m_dsw_select = 0;
 	m_control_select = 0;
@@ -476,7 +474,6 @@ MACHINE_RESET_MEMBER(centiped_state,centiped)
 
 MACHINE_RESET_MEMBER(centiped_state,magworm)
 {
-
 	MACHINE_RESET_CALL_MEMBER(centiped);
 
 	/* kludge: clear RAM so that magworm can be reset cleanly */
@@ -2177,7 +2174,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(centiped_state,bullsdrt)
 {
-
 	m_dsw_select = 0;
 }
 

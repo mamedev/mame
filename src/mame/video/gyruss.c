@@ -150,7 +150,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 gyruss_state::screen_update_gyruss(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (cliprect.min_y == screen.visible_area().min_y)
 	{
 		machine().tilemap().mark_all_dirty();

@@ -3,7 +3,6 @@
 
 WRITE8_MEMBER(shisen_state::sichuan2_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
@@ -52,14 +51,12 @@ TILE_GET_INFO_MEMBER(shisen_state::get_bg_tile_info)
 
 void shisen_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(shisen_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 64, 32);
 }
 
 UINT32 shisen_state::screen_update_sichuan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	// on Irem boards, screen flip is handled in both hardware and software.
 	// this game doesn't have cocktail mode so if there's software control we don't
 	// know where it is mapped.

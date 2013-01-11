@@ -452,7 +452,6 @@ WRITE8_MEMBER( trs80_state::trs80m4_ea_w )
 	}
 	else
 	{
-
 /* not emulated
     d7,d6 Not used
     d5 Secondary Unassigned, pin 18

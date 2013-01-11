@@ -26,7 +26,6 @@ TODO:
 
 READ8_MEMBER(ikki_state::ikki_e000_r)
 {
-
 /* bit1: interrupt type?, bit0: CPU2 busack? */
 
 	return (m_irq_source << 1);
@@ -227,7 +226,6 @@ static const sn76496_config psg_intf =
 
 void ikki_state::machine_start()
 {
-
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_punch_through_pen));
 	save_item(NAME(m_irq_source));
@@ -235,7 +233,6 @@ void ikki_state::machine_start()
 
 void ikki_state::machine_reset()
 {
-
 	m_flipscreen = 0;
 }
 

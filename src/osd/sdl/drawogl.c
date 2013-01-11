@@ -1792,7 +1792,6 @@ static void texture_compute_type_subroutine(sdl_info *sdl, const render_texinfo 
 	if( texture->type == TEXTURE_TYPE_NONE &&
 		sdl->usepbo && !texture->nocopy )
 	{
-
 		texture->type      = TEXTURE_TYPE_DYNAMIC;
 				texture->texTarget = (sdl->usetexturerect)?GL_TEXTURE_RECTANGLE_ARB:GL_TEXTURE_2D;
 				texture->texpow2   = (sdl->usetexturerect)?0:sdl->texpoweroftwo;

@@ -91,21 +91,18 @@ void shaolins_state::palette_init()
 
 WRITE8_MEMBER(shaolins_state::shaolins_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(shaolins_state::shaolins_colorram_w)
 {
-
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(shaolins_state::shaolins_palettebank_w)
 {
-
 	if (m_palettebank != (data & 0x07))
 	{
 		m_palettebank = data & 0x07;
@@ -123,7 +120,6 @@ WRITE8_MEMBER(shaolins_state::shaolins_scroll_w)
 
 WRITE8_MEMBER(shaolins_state::shaolins_nmi_w)
 {
-
 	m_nmi_enable = data;
 
 	if (flip_screen() != (data & 0x01))
@@ -145,7 +141,6 @@ TILE_GET_INFO_MEMBER(shaolins_state::get_bg_tile_info)
 
 void shaolins_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(shaolins_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 
@@ -188,7 +183,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 shaolins_state::screen_update_shaolins(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(machine(), bitmap, cliprect);
 	return 0;

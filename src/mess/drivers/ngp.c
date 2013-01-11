@@ -178,7 +178,6 @@ public:
 
 TIMER_CALLBACK_MEMBER(ngp_state::ngp_seconds_callback)
 {
-
 	m_io_reg[0x16] += 1;
 	if ( ( m_io_reg[0x16] & 0x0f ) == 0x0a )
 	{
@@ -563,7 +562,6 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(ngp_state::power_callback)
 {
-
 	if ( m_io_reg[0x33] & 0x04 )
 	{
 		m_tlcs900->set_input_line(TLCS900_NMI, (machine().root_device().ioport("Power")->read() & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
@@ -627,7 +625,6 @@ void ngp_state::machine_reset()
 
 UINT32 ngp_state::screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	k1ge_update( m_k1ge, bitmap, cliprect );
 	return 0;
 }

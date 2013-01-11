@@ -14,7 +14,6 @@
 
 TIMER_CALLBACK_MEMBER(pecom_state::reset_tick)
 {
-
 	m_reset = 1;
 }
 

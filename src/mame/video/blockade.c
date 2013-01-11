@@ -27,7 +27,6 @@ void blockade_state::video_start()
 
 UINT32 blockade_state::screen_update_blockade(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

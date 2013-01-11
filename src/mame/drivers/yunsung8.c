@@ -486,7 +486,6 @@ void yunsung8_state::machine_start()
 
 void yunsung8_state::machine_reset()
 {
-
 	m_videobank = 0;
 	m_layers_ctrl = 0;
 	m_adpcm = 0;

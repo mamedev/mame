@@ -56,7 +56,6 @@ public:
 
 WRITE8_MEMBER(cchance_state::output_0_w)
 {
-
 	//---- --x- divider?
 	coin_lockout_w(machine(), 0, ~data & 1);
 
@@ -66,14 +65,11 @@ WRITE8_MEMBER(cchance_state::output_0_w)
 
 READ8_MEMBER(cchance_state::input_1_r)
 {
-
 	return (m_hop_io) | (m_bell_io) | (ioport("SP")->read() & 0xff);
 }
 
 WRITE8_MEMBER(cchance_state::output_1_w)
 {
-
-
 	m_hop_io = (data & 0x40)>>4;
 	m_bell_io = (data & 0x80)>>4;
 }
@@ -209,7 +205,6 @@ MACHINE_START_MEMBER(cchance_state,cchance)
 
 MACHINE_RESET_MEMBER(cchance_state,cchance)
 {
-
 	m_screenflip = 0;
 	m_mcu_type = -1;
 	m_hop_io = 0;

@@ -19,7 +19,6 @@ static void nes_vh_reset( running_machine &machine )
 
 void nes_state::video_start()
 {
-
 	m_last_frame_flip =  0;
 
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(nes_vh_reset),&machine()));
@@ -39,7 +38,6 @@ void nes_state::palette_init()
 
 UINT32 nes_state::screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	/* render the ppu */
 	m_ppu->render(bitmap, 0, 0, 0, 0);
 

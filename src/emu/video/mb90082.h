@@ -16,8 +16,7 @@ Template for skeleton device
 //**************************************************************************
 
 #define MCFG_MB90082_ADD(_tag,_freq) \
-	MCFG_DEVICE_ADD(_tag, MB90082, _freq) \
-
+	MCFG_DEVICE_ADD(_tag, MB90082, _freq)
 
 //**************************************************************************
 //  TYPE DEFINITIONS

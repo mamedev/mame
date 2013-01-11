@@ -124,7 +124,6 @@ WRITE8_DEVICE_HANDLER( tc0220ioc_w )
 	tc0220ioc->regs[offset] = data;
 	switch (offset)
 	{
-
 		case 0x00:
 			space.machine().watchdog_reset();
 			break;
@@ -430,7 +429,6 @@ WRITE8_DEVICE_HANDLER( tc0640fio_w )
 	tc0640fio->regs[offset] = data;
 	switch (offset)
 	{
-
 		case 0x00:
 			space.machine().watchdog_reset();
 			break;

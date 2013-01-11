@@ -427,7 +427,6 @@ void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size)
 	/* if we're to speak, but haven't started */
 	if (!tms->talk_status)
 	{
-
 	/* a "dummy read" is mentioned in the tms5200 datasheet */
 	/* The Bagman speech roms data are organized in such a way that
 	** the bit at address 0 is NOT a speech data. The bit at address 1
@@ -455,7 +454,6 @@ void tms5110_process(tms5110_state *tms, INT16 *buffer, unsigned int size)
 		/* if we're ready for a new frame */
 		if ((tms->interp_count == 0) && (tms->sample_count == 0))
 		{
-
 			/* remember previous frame */
 			tms->old_energy = tms->new_energy;
 			tms->old_pitch = tms->new_pitch;

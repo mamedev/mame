@@ -438,8 +438,6 @@ static const UINT16 asciicharset[]=
 
 WRITE32_MEMBER(twinkle_state::twinkle_io_w)
 {
-
-
 	if( ACCESSING_BITS_16_23 )
 	{
 		m_io_offset = ( data >> 16 ) & 0xff;
@@ -504,7 +502,6 @@ WRITE32_MEMBER(twinkle_state::twinkle_io_w)
 
 READ32_MEMBER(twinkle_state::twinkle_io_r)
 {
-
 	UINT32 data = 0;
 
 	if( ACCESSING_BITS_0_7 )
@@ -596,8 +593,6 @@ WRITE32_MEMBER(twinkle_state::serial_w)
 
 WRITE32_MEMBER(twinkle_state::shared_psx_w)
 {
-
-
 	if (mem_mask == 0xff)
 	{
 		m_spu_shared[offset*2] = data;
@@ -616,7 +611,6 @@ WRITE32_MEMBER(twinkle_state::shared_psx_w)
 
 READ32_MEMBER(twinkle_state::shared_psx_r)
 {
-
 	UINT32 result;
 
 	result = m_spu_shared[offset*2] | m_spu_shared[(offset*2)+1]<<16;
@@ -695,8 +689,6 @@ WRITE16_MEMBER(twinkle_state::twinkle_ide_w)
 */
 WRITE16_MEMBER(twinkle_state::twinkle_spu_ctrl_w)
 {
-
-
 	if ((!(data & 0x0080)) && (m_spu_ctrl & 0x0080))
 	{
 		space.device().execute().set_input_line(M68K_IRQ_1, CLEAR_LINE);
@@ -733,8 +725,6 @@ WRITE16_MEMBER(twinkle_state::twinkle_waveram_w)
 
 READ16_MEMBER(twinkle_state::shared_68k_r)
 {
-
-
 //  printf("shared_68k_r: @ %x, mask %x\n", offset, mem_mask);
 
 	return m_spu_shared[offset];
@@ -742,8 +732,6 @@ READ16_MEMBER(twinkle_state::shared_68k_r)
 
 WRITE16_MEMBER(twinkle_state::shared_68k_w)
 {
-
-
 //  printf("shared_68k_w: %x to %x, mask %x\n", data, offset, mem_mask);
 
 	m_spu_shared[offset] = data & 0xff;

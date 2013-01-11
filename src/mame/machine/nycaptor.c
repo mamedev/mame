@@ -41,7 +41,6 @@ READ8_MEMBER(nycaptor_state::nycaptor_68705_port_b_r)
 
 WRITE8_MEMBER(nycaptor_state::nycaptor_68705_port_b_w)
 {
-
 	if (BIT(m_ddr_b, 1) && BIT(~data, 1) && BIT(m_port_b_out, 1))
 	{
 		m_port_a_in = m_from_main;
@@ -91,7 +90,6 @@ WRITE8_MEMBER(nycaptor_state::nycaptor_68705_ddr_c_w)
 
 WRITE8_MEMBER(nycaptor_state::nycaptor_mcu_w)
 {
-
 	m_from_main = data;
 	m_main_sent = 1;
 	m_mcu->execute().set_input_line(0, ASSERT_LINE);
@@ -99,21 +97,18 @@ WRITE8_MEMBER(nycaptor_state::nycaptor_mcu_w)
 
 READ8_MEMBER(nycaptor_state::nycaptor_mcu_r)
 {
-
 	m_mcu_sent = 0;
 	return m_from_mcu;
 }
 
 READ8_MEMBER(nycaptor_state::nycaptor_mcu_status_r1)
 {
-
 	/* bit 1 = when 1, mcu has sent data to the main cpu */
 	return m_mcu_sent ? 2 : 0;
 }
 
 READ8_MEMBER(nycaptor_state::nycaptor_mcu_status_r2)
 {
-
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	return m_main_sent ? 0 : 1;
 }

@@ -178,7 +178,6 @@ TILE_GET_INFO_MEMBER(ladybug_state::get_fg_tile_info)
 
 VIDEO_START_MEMBER(ladybug_state,redclash)
 {
-
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ladybug_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 }
@@ -426,7 +425,6 @@ void ladybug_state::screen_eof_redclash(screen_device &screen, bool state)
 
 UINT32 ladybug_state::screen_update_redclash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	redclash_draw_stars(machine(), bitmap, cliprect, 0x60, 0, 0x00, 0xff);
 	draw_sprites(machine(), bitmap, cliprect);

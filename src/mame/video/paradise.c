@@ -153,7 +153,6 @@ WRITE8_MEMBER(paradise_state::paradise_pixmap_w)
 
 void paradise_state::video_start()
 {
-
 	m_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(paradise_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
 	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(paradise_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
 	m_tilemap_2 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(paradise_state::get_tile_info_2),this), TILEMAP_SCAN_ROWS, 8, 8, 0x20, 0x20);
@@ -282,7 +281,6 @@ if (machine().input().code_pressed(KEYCODE_Z))
 /* no pix layer, no tilemap_0, different priority bits */
 UINT32 paradise_state::screen_update_torus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (!(m_priority & 2))  /* Screen blanking */
@@ -313,7 +311,6 @@ UINT32 paradise_state::screen_update_torus(screen_device &screen, bitmap_ind16 &
 /* I don't know how the priority bits work on this one */
 UINT32 paradise_state::screen_update_madball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	m_tilemap_0->draw(bitmap, cliprect, 0, 0);
 	m_tilemap_1->draw(bitmap, cliprect, 0, 0);

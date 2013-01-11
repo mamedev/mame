@@ -795,7 +795,6 @@ WRITE16_MEMBER(taito_f3_state::f3_videoram_w)
 
 READ16_MEMBER(taito_f3_state::f3_vram_r)
 {
-
 	return m_f3_vram[offset];
 }
 

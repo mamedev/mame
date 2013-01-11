@@ -70,7 +70,6 @@ READ8_MEMBER(st0016_state::mux_r)
 
 WRITE8_MEMBER(st0016_state::mux_select_w)
 {
-
 	mux_port=data;
 }
 

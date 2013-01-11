@@ -53,7 +53,6 @@ WRITE16_HANDLER( m68307_internal_sim_w )
 	{
 		switch (offset<<1)
 		{
-
 			case m68307SIM_PACNT:
 				logerror("%08x m68307_internal_sim_w %08x, %04x (%04x) (Port A (8-bit) Control Register - PACNT)\n", pc, offset*2,data,mem_mask);
 				sim->write_pacnt(data,mem_mask);

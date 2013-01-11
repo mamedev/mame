@@ -39,7 +39,6 @@
 class base_c1581_device :  public device_t,
 							public device_cbm_iec_interface
 {
-
 public:
 	// construction/destruction
 	base_c1581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);

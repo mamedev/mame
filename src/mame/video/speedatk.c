@@ -55,24 +55,20 @@ void speedatk_state::palette_init()
 
 WRITE8_MEMBER(speedatk_state::speedatk_videoram_w)
 {
-
 	m_videoram[offset] = data;
 }
 
 WRITE8_MEMBER(speedatk_state::speedatk_colorram_w)
 {
-
 	m_colorram[offset] = data;
 }
 
 void speedatk_state::video_start()
 {
-
 }
 
 WRITE8_MEMBER(speedatk_state::speedatk_6845_w)
 {
-
 	if(offset == 0)
 	{
 		m_crtc_index = data;

@@ -1518,7 +1518,6 @@ static const ym3438_interface utoukond_ym3438_intf =
 
 READ16_MEMBER(seta_state::sharedram_68000_r)
 {
-
 	return ((UINT16)m_sharedram[offset]) & 0xff;
 }
 
@@ -1546,7 +1545,6 @@ WRITE16_MEMBER(seta_state::sub_ctrl_w)
 		case 0/2:   // bit 0: reset sub cpu?
 			if (ACCESSING_BITS_0_7)
 			{
-
 				if ( !(m_sub_ctrl_data & 1) && (data & 1) )
 					machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 				m_sub_ctrl_data = data;
@@ -1926,7 +1924,6 @@ READ16_MEMBER(seta_state::zombraid_gun_r)// Serial interface
 // Bit 0 is clock, 1 is data, 2 is reset
 WRITE16_MEMBER(seta_state::zombraid_gun_w)
 {
-
 	if(data&4) { m_gun_bit_count = 0; return; } // Reset
 
 	if((data&1) == m_gun_old_clock) return; // No change
@@ -2761,13 +2758,11 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(seta_state::wiggie_soundlatch_r)
 {
-
 	return m_wiggie_soundlatch;
 }
 
 WRITE16_MEMBER(seta_state::wiggie_soundlatch_w)
 {
-
 	m_wiggie_soundlatch = data >> 8;
 	machine().device("audiocpu")->execute().set_input_line(0, HOLD_LINE);
 }
@@ -2943,7 +2938,6 @@ READ16_MEMBER(seta_state::inttoote_dsw_r)
 
 READ16_MEMBER(seta_state::inttoote_key_r)
 {
-
 	switch( *m_inttoote_key_select )
 	{
 		case 0x08:  return ioport("BET0")->read();
@@ -2959,7 +2953,6 @@ READ16_MEMBER(seta_state::inttoote_key_r)
 
 READ16_MEMBER(seta_state::inttoote_700000_r)
 {
-
 	return m_inttoote_700000[offset] & 0x3f;
 }
 
@@ -3000,7 +2993,6 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(seta_state::jockeyc_mux_r)
 {
-
 	switch( m_jockeyc_key_select )
 	{
 		case 0x08:  return ioport("BET0")->read();
@@ -3015,7 +3007,6 @@ READ16_MEMBER(seta_state::jockeyc_mux_r)
 
 WRITE16_MEMBER(seta_state::jockeyc_mux_w)
 {
-
 	/* other bits used too */
 	m_jockeyc_key_select = data & 0xf8;
 }
@@ -10694,7 +10685,6 @@ READ16_MEMBER(seta_state::twineagl_debug_r)
 /* 2000F8 = A3 enables it, 2000F8 = 00 disables? see downtown too */
 READ16_MEMBER(seta_state::twineagl_200100_r)
 {
-
 	// protection check at boot
 	logerror("%04x: twineagl_200100_r %d\n",space.device().safe_pc(),offset);
 	return m_twineagl_xram[offset];

@@ -276,7 +276,6 @@ WRITE16_MEMBER(nmk16_state::mustang_scroll_w)
 
 WRITE16_MEMBER(nmk16_state::bioshipbg_scroll_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 	{
 		m_scroll[offset] = (data >> 8) & 0xff;
@@ -292,7 +291,6 @@ WRITE16_MEMBER(nmk16_state::nmk_scroll_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-
 		m_scroll[offset] = data & 0xff;
 
 		if (offset & 2)
@@ -306,7 +304,6 @@ WRITE16_MEMBER(nmk16_state::nmk_scroll_2_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-
 		m_scroll_2[offset] = data & 0xff;
 
 		if (offset & 2)
@@ -318,7 +315,6 @@ WRITE16_MEMBER(nmk16_state::nmk_scroll_2_w)
 
 WRITE16_MEMBER(nmk16_state::vandyke_scroll_w)
 {
-
 	m_vscroll[offset] = data;
 
 	m_bg_tilemap0->set_scrollx(0,m_vscroll[0] * 256 + (m_vscroll[1] >> 8));
@@ -327,7 +323,6 @@ WRITE16_MEMBER(nmk16_state::vandyke_scroll_w)
 
 WRITE16_MEMBER(nmk16_state::vandykeb_scroll_w)
 {
-
 	switch (offset)
 	{
 	case 0: COMBINE_DATA(&m_vscroll[3]); break;
@@ -951,7 +946,6 @@ static void video_update(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 	if (dsw_flipscreen)
 	{
-
 		state->flip_screen_x_set(~state->ioport("DSW1")->read() & 0x0100);
 		state->flip_screen_y_set(~state->ioport("DSW1")->read() & 0x0200);
 	}

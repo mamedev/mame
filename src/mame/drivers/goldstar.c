@@ -123,7 +123,6 @@
 
 WRITE8_MEMBER(goldstar_state::protection_w)
 {
-
 	if (data == 0x2a)
 		m_dataoffset = 0;
 }
@@ -5917,7 +5916,6 @@ WRITE8_MEMBER(goldstar_state::system_outputb_w)
 
 WRITE8_MEMBER(goldstar_state::system_outputc_w)
 {
-
 	m_lucky8_nmi_enable = data & 8;
 	m_unkch_vidreg = data & 2;
 	//popmessage("system_outputc_w %02x",data);
@@ -6221,7 +6219,6 @@ PALETTE_INIT_MEMBER(goldstar_state,lucky8)
 	proms = machine().root_device().memregion("proms")->base();
 	for (i = 0; i < 0x100; i++)
 	{
-
 		data = proms[0x000 + i] | (proms[0x100 + i] << 4);
 
 		palette_set_color_rgb(machine(), i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
@@ -6473,7 +6470,6 @@ MACHINE_CONFIG_END
 
 INTERRUPT_GEN_MEMBER(goldstar_state::lucky8_irq)
 {
-
 	if(m_lucky8_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

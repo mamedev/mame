@@ -55,7 +55,6 @@ Verify Color PROM resistor values (Last 8 colors)
 
 CUSTOM_INPUT_MEMBER(stactics_state::get_motor_not_ready)
 {
-
 	/* if the motor is self-centering, but not centered yet */
 	return ((*m_motor_on & 0x01) == 0) &&
 			((m_horiz_pos != 0) || (m_vert_pos != 0));
@@ -64,14 +63,12 @@ CUSTOM_INPUT_MEMBER(stactics_state::get_motor_not_ready)
 
 READ8_MEMBER(stactics_state::vert_pos_r)
 {
-
 	return 0x70 - m_vert_pos;
 }
 
 
 READ8_MEMBER(stactics_state::horiz_pos_r)
 {
-
 	return m_horiz_pos + 0x88;
 }
 
@@ -153,7 +150,6 @@ WRITE8_MEMBER(stactics_state::stactics_coin_lockout_w)
 
 INTERRUPT_GEN_MEMBER(stactics_state::stactics_interrupt)
 {
-
 	move_motor(machine(), this);
 
 	device.execute().set_input_line(0, HOLD_LINE);
@@ -283,7 +279,6 @@ INPUT_PORTS_END
 
 void stactics_state::machine_start()
 {
-
 	m_vert_pos = 0;
 	m_horiz_pos = 0;
 	*m_motor_on = 0;

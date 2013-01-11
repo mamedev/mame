@@ -11,8 +11,7 @@
 
 #define MCFG_RTC65271_ADD(_tag, _config) \
 	MCFG_DEVICE_ADD(_tag, RTC65271, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
-
+	MCFG_DEVICE_CONFIG(_config)
 // ======================> rtc65271_interface
 
 struct rtc65271_interface

@@ -134,7 +134,6 @@ static void coolpool_from_shiftreg(address_space &space, UINT32 address, UINT16 
 
 MACHINE_RESET_MEMBER(coolpool_state,amerdart)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_dsp = machine().device("dsp");
 
@@ -225,7 +224,6 @@ WRITE16_MEMBER(coolpool_state::amerdart_misc_w)
 
 READ16_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
 {
-
 	/* Skip idle checking */
 	if (m_old_cmd == m_cmd_pending)
 		m_same_cmd_count += 1;
@@ -244,7 +242,6 @@ READ16_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
 
 READ16_MEMBER(coolpool_state::amerdart_iop_r)
 {
-
 //  logerror("%08x:IOP read %04x\n",space.device().safe_pc(),m_iop_answer);
 	machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
 
@@ -253,7 +250,6 @@ READ16_MEMBER(coolpool_state::amerdart_iop_r)
 
 WRITE16_MEMBER(coolpool_state::amerdart_iop_w)
 {
-
 //  logerror("%08x:IOP write %04x\n", space.device().safe_pc(), data);
 	COMBINE_DATA(&m_iop_cmd);
 	m_cmd_pending = 1;
@@ -261,7 +257,6 @@ WRITE16_MEMBER(coolpool_state::amerdart_iop_w)
 
 READ16_MEMBER(coolpool_state::amerdart_dsp_cmd_r)
 {
-
 //  logerror("%08x:DSP cmd_r %04x\n", space.device().safe_pc(), m_iop_cmd);
 	m_cmd_pending = 0;
 	return m_iop_cmd;
@@ -269,7 +264,6 @@ READ16_MEMBER(coolpool_state::amerdart_dsp_cmd_r)
 
 WRITE16_MEMBER(coolpool_state::amerdart_dsp_answer_w)
 {
-
 //  logerror("%08x:DSP answer %04x\n", space.device().safe_pc(), data);
 	m_iop_answer = data;
 	machine().device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
@@ -453,7 +447,6 @@ WRITE16_MEMBER(coolpool_state::coolpool_misc_w)
 
 TIMER_CALLBACK_MEMBER(coolpool_state::deferred_iop_w)
 {
-
 	m_iop_cmd = param;
 	m_cmd_pending = 1;
 	machine().device("dsp")->execute().set_input_line(0, HOLD_LINE);    /* ???  I have no idea who should generate this! */
@@ -472,7 +465,6 @@ WRITE16_MEMBER(coolpool_state::coolpool_iop_w)
 
 READ16_MEMBER(coolpool_state::coolpool_iop_r)
 {
-
 	logerror("%08x:IOP read %04x\n",space.device().safe_pc(),m_iop_answer);
 	machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
 
@@ -490,7 +482,6 @@ READ16_MEMBER(coolpool_state::coolpool_iop_r)
 
 READ16_MEMBER(coolpool_state::dsp_cmd_r)
 {
-
 	m_cmd_pending = 0;
 	logerror("%08x:IOP cmd_r %04x\n", space.device().safe_pc(), m_iop_cmd);
 	return m_iop_cmd;
@@ -499,7 +490,6 @@ READ16_MEMBER(coolpool_state::dsp_cmd_r)
 
 WRITE16_MEMBER(coolpool_state::dsp_answer_w)
 {
-
 	logerror("%08x:IOP answer %04x\n", space.device().safe_pc(), data);
 	m_iop_answer = data;
 	machine().device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
@@ -508,7 +498,6 @@ WRITE16_MEMBER(coolpool_state::dsp_answer_w)
 
 READ16_MEMBER(coolpool_state::dsp_bio_line_r)
 {
-
 	return m_cmd_pending ? CLEAR_LINE : ASSERT_LINE;
 }
 
@@ -536,7 +525,6 @@ READ16_MEMBER(coolpool_state::dsp_rom_r)
 
 WRITE16_MEMBER(coolpool_state::dsp_romaddr_w)
 {
-
 	switch (offset)
 	{
 		case 0:
@@ -566,7 +554,6 @@ WRITE16_MEMBER(coolpool_state::dsp_dac_w)
 
 READ16_MEMBER(coolpool_state::coolpool_input_r)
 {
-
 	m_result = (ioport("IN1")->read() & 0x00ff) | (m_lastresult & 0xff00);
 	m_newx[1] = ioport("XAXIS")->read();
 	m_newy[1] = ioport("YAXIS")->read();
@@ -1171,7 +1158,6 @@ static void register_state_save(running_machine &machine)
 
 DRIVER_INIT_MEMBER(coolpool_state,amerdart)
 {
-
 	m_lastresult = 0xffff;
 
 	register_state_save(machine());
@@ -1179,7 +1165,6 @@ DRIVER_INIT_MEMBER(coolpool_state,amerdart)
 
 DRIVER_INIT_MEMBER(coolpool_state,coolpool)
 {
-
 	machine().device("dsp")->memory().space(AS_IO).install_read_handler(0x07, 0x07, read16_delegate(FUNC(coolpool_state::coolpool_input_r),this));
 
 	register_state_save(machine());

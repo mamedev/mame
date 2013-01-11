@@ -90,7 +90,6 @@ class dec0_automat_state : public dec0_state
 public:
 	dec0_automat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dec0_state(mconfig, type, tag) {
-
 	}
 
 	UINT8 m_automat_adpcm_byte;

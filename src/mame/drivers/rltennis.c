@@ -71,7 +71,6 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 
 READ16_MEMBER(rltennis_state::rlt_io_r)
 {
-
 	return (ioport("P1" )->read()&0x1fff) | (m_unk_counter<<13); /* top 3 bits controls smaple address update */
 }
 
@@ -132,7 +131,6 @@ INPUT_PORTS_END
 
 TIMER_CALLBACK_MEMBER(rltennis_state::sample_player)
 {
-
 	if((m_dac_counter&0x7ff) == 0x7ff) /* reload top address bits */
 	{
 		m_sample_rom_offset_1=(( m_data740000 >> m_offset_shift ) & 0xff )<<11;

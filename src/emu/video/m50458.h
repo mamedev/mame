@@ -17,8 +17,7 @@ Mitsubishi M50458 OSD chip
 
 #define MCFG_M50458_ADD(_tag,_config,_freq) \
 	MCFG_DEVICE_ADD(_tag, M50458,_freq) \
-	MCFG_DEVICE_CONFIG(_config) \
-
+	MCFG_DEVICE_CONFIG(_config)
 
 #define M50458_INTERFACE(name) \
 	const m50458_interface (name) =

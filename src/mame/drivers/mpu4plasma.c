@@ -16,7 +16,6 @@ public:
 		: mpu4_state(mconfig, type, tag),
 		m_plasmaram(*this, "plasmaram")
 	{
-
 	}
 
 	required_shared_ptr<UINT16> m_plasmaram;
@@ -28,7 +27,6 @@ public:
 
 	DECLARE_WRITE16_MEMBER( mpu4plasma_unk_w )
 	{
-
 	}
 	UINT32 screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -103,8 +101,7 @@ MACHINE_CONFIG_END
 #define M4BIGCHF_PLASMA \
 	ROM_REGION( 0x40000, "plasmacpu", 0 ) \
 	ROM_LOAD16_BYTE( "b6cpl.p0", 0x00000, 0x020000, CRC(7fbb2efb) SHA1(c21136bf10407f1685f3933d426ef53925aca8d8) ) \
-	ROM_LOAD16_BYTE( "b6cpl.p1", 0x00001, 0x020000, CRC(a9f67f3e) SHA1(1309cc2dc8565ee79ac8cdc754187c8db6ddb3ea) ) \
-
+	ROM_LOAD16_BYTE( "b6cpl.p1", 0x00001, 0x020000, CRC(a9f67f3e) SHA1(1309cc2dc8565ee79ac8cdc754187c8db6ddb3ea) )
 ROM_START( m4bigchf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "b6cs.p1", 0x0000, 0x010000, CRC(4f45086b) SHA1(e1d639b068951df8f25b9c77d4fb86336ad19933) )
@@ -134,8 +131,7 @@ ROM_END
 #define M4CLICK_PLASMA \
 	ROM_REGION( 0x40000, "plasmacpu", 0 ) \
 	ROM_LOAD16_BYTE( "clcpl.p0", 0x00000, 0x010000, CRC(b774c1f1) SHA1(2708a1e4c539d72d9ada8c37d3372b64f6edc4a0) ) \
-	ROM_LOAD16_BYTE( "clcpl.p1", 0x00001, 0x010000, CRC(51cf5f53) SHA1(f7b14acb0fd831aa19fdaa1bb36272ac9910f0b3) ) \
-
+	ROM_LOAD16_BYTE( "clcpl.p1", 0x00001, 0x010000, CRC(51cf5f53) SHA1(f7b14acb0fd831aa19fdaa1bb36272ac9910f0b3) )
 ROM_START( m4click )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "clcs.p1", 0x0000, 0x010000, CRC(99dcea3e) SHA1(2ec9842f7d920d449cfeac43f7fe79f8c62ecec9) )
@@ -169,8 +165,7 @@ ROM_END
 #define M4APACH_PLASMA \
 	ROM_REGION( 0x40000, "plasmacpu", 0 ) \
 	ROM_LOAD16_BYTE( "plasma.p0", 0x00000, 0x010000, NO_DUMP ) \
-	ROM_LOAD16_BYTE( "plasma.p1", 0x00001, 0x010000, NO_DUMP ) \
-
+	ROM_LOAD16_BYTE( "plasma.p1", 0x00001, 0x010000, NO_DUMP )
 
 ROM_START( m4apach )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -185,8 +180,7 @@ ROM_END
 #define M4ELITE_PLASMA \
 	ROM_REGION( 0x40000, "plasmacpu", 0 ) \
 	ROM_LOAD16_BYTE( "plasma.p0", 0x00000, 0x010000, NO_DUMP ) \
-	ROM_LOAD16_BYTE( "plasma.p1", 0x00001, 0x010000, NO_DUMP ) \
-
+	ROM_LOAD16_BYTE( "plasma.p1", 0x00001, 0x010000, NO_DUMP )
 
 ROM_START( m4elite )
 	ROM_REGION( 0x10000, "maincpu", 0 )

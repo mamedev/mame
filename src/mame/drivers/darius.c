@@ -150,7 +150,6 @@ static void parse_control( running_machine &machine )   /* assumes Z80 sandwiche
 
 WRITE16_MEMBER(darius_state::cpua_ctrl_w)
 {
-
 	if ((data & 0xff00) && ((data & 0xff) == 0))
 		data = data >> 8;
 
@@ -173,7 +172,6 @@ WRITE16_MEMBER(darius_state::darius_watchdog_w)
 
 READ16_MEMBER(darius_state::darius_ioc_r)
 {
-
 	switch (offset)
 	{
 		case 0x01:
@@ -202,7 +200,6 @@ logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",space.devic
 
 WRITE16_MEMBER(darius_state::darius_ioc_w)
 {
-
 	switch (offset)
 	{
 		case 0x00:  /* sound interface write */
@@ -279,7 +276,6 @@ static void reset_sound_region( running_machine &machine )
 
 WRITE8_MEMBER(darius_state::sound_bankswitch_w)
 {
-
 	m_banknum = data & 0x03;
 	reset_sound_region(machine());
 //  banknum = data;
@@ -424,7 +420,6 @@ WRITE8_MEMBER(darius_state::darius_da_pan)
 
 WRITE8_MEMBER(darius_state::darius_write_portA0)
 {
-
 	// volume control FM #0 PSG #0 A
 	//popmessage(" pan %02x %02x %02x %02x %02x", m_pan[0], m_pan[1], m_pan[2], m_pan[3], m_pan[4] );
 	//popmessage(" A0 %02x A1 %02x B0 %02x B1 %02x", port[0], port[1], port[2], port[3] );
@@ -437,7 +432,6 @@ WRITE8_MEMBER(darius_state::darius_write_portA0)
 
 WRITE8_MEMBER(darius_state::darius_write_portA1)
 {
-
 	// volume control FM #1 PSG #1 A
 	//popmessage(" pan %02x %02x %02x %02x %02x", m_pan[0], m_pan[1], m_pan[2], m_pan[3], m_pan[4] );
 
@@ -449,7 +443,6 @@ WRITE8_MEMBER(darius_state::darius_write_portA1)
 
 WRITE8_MEMBER(darius_state::darius_write_portB0)
 {
-
 	// volume control PSG #0 B/C
 	//popmessage(" pan %02x %02x %02x %02x %02x", m_pan[0], m_pan[1], m_pan[2], m_pan[3], m_pan[4] );
 
@@ -461,7 +454,6 @@ WRITE8_MEMBER(darius_state::darius_write_portB0)
 
 WRITE8_MEMBER(darius_state::darius_write_portB1)
 {
-
 	// volume control PSG #1 B/C
 	//popmessage(" pan %02x %02x %02x %02x %02x", m_pan[0], m_pan[1], m_pan[2], m_pan[3], m_pan[4] );
 
@@ -515,7 +507,6 @@ static const msm5205_interface msm5205_config =
 
 READ8_MEMBER(darius_state::adpcm_command_read)
 {
-
 	/* logerror("read port 0: %02x  PC=%4x\n",adpcm_command, space.device().safe_pc() ); */
 	return m_adpcm_command;
 }
@@ -532,7 +523,6 @@ READ8_MEMBER(darius_state::readport3)
 
 WRITE8_MEMBER(darius_state::adpcm_nmi_disable)
 {
-
 	m_nmi_enable = 0;
 	/* logerror("write port 0: NMI DISABLE  PC=%4x\n", data, space.device().safe_pc() ); */
 }
@@ -838,7 +828,6 @@ static void darius_postload(running_machine &machine)
 
 void darius_state::machine_start()
 {
-
 	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x8000);
 	membank("bank1")->configure_entry(4, memregion("audiocpu")->base());
 	membank("bank1")->set_entry(4);

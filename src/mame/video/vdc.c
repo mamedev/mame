@@ -373,7 +373,6 @@ static void vdc_advance_line(running_machine &machine, int which)
 	/* handle frame events */
 	if(vdc[which].curline == 261 && ! vdc[which].vblank_triggered )
 	{
-
 		vdc[which].vblank_triggered = 1;
 		if(vdc[which].vdc_data[CR].w & CR_VR)
 		{   /* generate IRQ1 if enabled */
@@ -872,7 +871,6 @@ static void pce_refresh_sprites(running_machine &machine, int which, int line, U
 
 		if (obj_l < obj_h)
 		{
-
 			sprites_drawn++;
 			if(sprites_drawn > 16)
 			{

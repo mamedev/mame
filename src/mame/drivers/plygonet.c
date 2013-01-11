@@ -207,7 +207,6 @@ READ32_MEMBER(polygonet_state::dsp_host_interface_r)
 
 WRITE32_MEMBER(polygonet_state::shared_ram_write)
 {
-
 	COMBINE_DATA(&m_shared_ram[offset]) ;
 
 	if (mem_mask == 0xffff0000)
@@ -725,7 +724,6 @@ INPUT_PORTS_END
 /**********************************************************************************/
 DRIVER_INIT_MEMBER(polygonet_state,polygonet)
 {
-
 	/* Set default bankswitch */
 	m_cur_sound_region = 2;
 	reset_sound_region(machine());

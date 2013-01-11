@@ -92,7 +92,6 @@ READ8_MEMBER(nightgal_state::blitter_status_r)
 
 void nightgal_state::video_start()
 {
-
 	save_item(NAME(m_blit_buffer));
 }
 
@@ -330,7 +329,6 @@ WRITE8_MEMBER(nightgal_state::nsc_latch_w)
 
 READ8_MEMBER(nightgal_state::nsc_latch_r)
 {
-
 	return m_z80_latch;
 }
 
@@ -377,7 +375,6 @@ WRITE8_MEMBER(nightgal_state::royalqn_blitter_2_w)
 
 READ8_MEMBER(nightgal_state::royalqn_nsc_blit_r)
 {
-
 	if(offset == 2)
 		m_subcpu->set_input_line(0, CLEAR_LINE );
 
@@ -386,13 +383,11 @@ READ8_MEMBER(nightgal_state::royalqn_nsc_blit_r)
 
 READ8_MEMBER(nightgal_state::royalqn_comm_r)
 {
-
 	return (m_comms_ram[offset] & 0x80) | (0x7f); //bits 6-0 are undefined, presumably open bus
 }
 
 WRITE8_MEMBER(nightgal_state::royalqn_comm_w)
 {
-
 	m_comms_ram[offset] = data & 0x80;
 }
 
@@ -835,7 +830,6 @@ static const ay8910_interface ay8910_config =
 
 void nightgal_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_subcpu = machine().device<cpu_device>("sub");
 
@@ -851,7 +845,6 @@ void nightgal_state::machine_start()
 
 void nightgal_state::machine_reset()
 {
-
 	m_nsc_latch = 0;
 	m_z80_latch = 0;
 	m_mux_data = 0;

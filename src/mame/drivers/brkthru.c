@@ -67,7 +67,6 @@
 
 WRITE8_MEMBER(brkthru_state::brkthru_1803_w)
 {
-
 	/* bit 0 = NMI enable */
 	m_nmi_mask = ~data & 1;
 
@@ -364,7 +363,6 @@ static const ym3526_interface ym3526_config =
 
 void brkthru_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -375,7 +373,6 @@ void brkthru_state::machine_start()
 
 void brkthru_state::machine_reset()
 {
-
 	m_bgscroll = 0;
 	m_bgbasecolor = 0;
 	m_flipscreen = 0;
@@ -383,7 +380,6 @@ void brkthru_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(brkthru_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

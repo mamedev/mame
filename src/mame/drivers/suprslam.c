@@ -296,7 +296,6 @@ static const k053936_interface suprslam_k053936_intf =
 
 void suprslam_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_k053936 = machine().device("k053936");
 
@@ -307,7 +306,6 @@ void suprslam_state::machine_start()
 
 void suprslam_state::machine_reset()
 {
-
 	m_screen_bank = 0;
 	m_bg_bank = 0;
 	m_pending_command = 0;

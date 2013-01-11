@@ -185,7 +185,6 @@ static void vt_video_display_char(device_t *device,bitmap_ind16 &bitmap, UINT8 c
 
 	for (i = 0; i < 10; i++)
 	{
-
 		switch(display_type) {
 			case 0 : // bottom half, double height
 						j = (i >> 1)+5; break;
@@ -295,7 +294,6 @@ static void rainbow_video_display_char(device_t *device,bitmap_ind16 &bitmap, UI
 
 	for (i = 0; i < 10; i++)
 	{
-
 		switch(display_type) {
 			case 0 : // bottom half, double height
 						j = (i >> 1)+5; break;

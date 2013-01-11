@@ -42,7 +42,6 @@ void cheekyms_state::palette_init()
 
 WRITE8_MEMBER(cheekyms_state::cheekyms_port_40_w)
 {
-
 	/* the lower bits probably trigger sound samples */
 	m_dac->write_unsigned8(data ? 0x80 : 0);
 }
@@ -50,7 +49,6 @@ WRITE8_MEMBER(cheekyms_state::cheekyms_port_40_w)
 
 WRITE8_MEMBER(cheekyms_state::cheekyms_port_80_w)
 {
-
 	/* d0-d1 - sound enables, not sure which bit is which */
 	/* d3-d5 - man scroll amount */
 	/* d6 - palette select (selects either 0 = PROM M9, 1 = PROM M8) */

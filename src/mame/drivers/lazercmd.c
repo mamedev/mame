@@ -294,7 +294,6 @@ READ8_MEMBER(lazercmd_state::lazercmd_data_port_r)
 
 WRITE8_MEMBER(lazercmd_state::lazercmd_hardware_w)
 {
-
 	switch (offset)
 	{
 		case 0: /* audio channels */
@@ -317,7 +316,6 @@ WRITE8_MEMBER(lazercmd_state::lazercmd_hardware_w)
 
 WRITE8_MEMBER(lazercmd_state::medlanes_hardware_w)
 {
-
 	switch (offset)
 	{
 		case 0: /* audio control */
@@ -343,7 +341,6 @@ WRITE8_MEMBER(lazercmd_state::medlanes_hardware_w)
 
 WRITE8_MEMBER(lazercmd_state::bbonk_hardware_w)
 {
-
 	switch (offset)
 	{
 		case 0: /* audio control */
@@ -602,7 +599,6 @@ void lazercmd_state::palette_init()
 
 void lazercmd_state::machine_start()
 {
-
 	m_dac = machine().device<dac_device>("dac");
 
 	save_item(NAME(m_marker_x));
@@ -614,7 +610,6 @@ void lazercmd_state::machine_start()
 
 void lazercmd_state::machine_reset()
 {
-
 	m_marker_x = 0;
 	m_marker_y = 0;
 	m_timer_count = 0;

@@ -36,7 +36,6 @@
 class serial_box_device :  public device_t,
 							public device_cbm_iec_interface
 {
-
 public:
 	// construction/destruction
 	serial_box_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

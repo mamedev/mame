@@ -39,7 +39,6 @@ INTERRUPT_GEN_MEMBER(fromanc2_state::fromanc2_interrupt)
 
 WRITE16_MEMBER(fromanc2_state::fromanc2_sndcmd_w)
 {
-
 	soundlatch_byte_w(space, offset, (data >> 8) & 0xff);   // 1P (LEFT)
 	soundlatch2_byte_w(space, offset, data & 0xff);         // 2P (RIGHT)
 
@@ -503,7 +502,6 @@ static const ym2610_interface ym2610_config =
 
 MACHINE_START_MEMBER(fromanc2_state,fromanc4)
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_subcpu = machine().device<cpu_device>("sub");
 	m_eeprom = machine().device("eeprom");
@@ -521,7 +519,6 @@ MACHINE_START_MEMBER(fromanc2_state,fromanc4)
 
 MACHINE_START_MEMBER(fromanc2_state,fromanc2)
 {
-
 	m_bankedram = auto_alloc_array(machine(), UINT8, 0x4000 * 3);
 
 	membank("bank1")->configure_entries(0, 4, memregion("sub")->base(), 0x4000);
@@ -537,7 +534,6 @@ MACHINE_START_MEMBER(fromanc2_state,fromanc2)
 
 void fromanc2_state::machine_reset()
 {
-
 	m_portselect = 0;
 	m_datalatch1 = 0;
 	m_datalatch_2h = 0;

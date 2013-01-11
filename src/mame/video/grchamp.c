@@ -98,7 +98,6 @@ TILEMAP_MAPPER_MEMBER(grchamp_state::get_memory_offset)
 
 void grchamp_state::video_start()
 {
-
 	m_work_bitmap.allocate(32,32);
 
 	/* allocate tilemaps for each of the three sections */

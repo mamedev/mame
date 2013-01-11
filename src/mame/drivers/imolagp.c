@@ -204,7 +204,6 @@ static void initialize_colors( running_machine &machine )
 
 void imolagp_state::video_start()
 {
-
 	memset(m_videoram, 0, sizeof(m_videoram));
 	save_item(NAME(m_videoram));
 
@@ -498,7 +497,6 @@ static TIMER_DEVICE_CALLBACK ( imolagp_nmi_cb )
 
 INTERRUPT_GEN_MEMBER(imolagp_state::vblank_irq)
 {
-
 #ifdef HLE_COM
 	memcpy(&m_slave_workram[0x80], m_mComData, m_mComCount);
 	m_mComCount = 0;
@@ -520,7 +518,6 @@ static I8255A_INTERFACE( ppi8255_intf )
 
 void imolagp_state::machine_start()
 {
-
 	m_slavecpu = machine().device<cpu_device>("slave");
 
 	save_item(NAME(m_control));
@@ -538,7 +535,6 @@ void imolagp_state::machine_start()
 
 void imolagp_state::machine_reset()
 {
-
 	m_control = 0;
 	m_scroll = 0;
 	m_steerlatch = 0;

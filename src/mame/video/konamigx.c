@@ -2477,7 +2477,6 @@ UINT32 konamigx_state::screen_update_konamigx(screen_device &screen, bitmap_rgb3
 			// make it flicker, to compare positioning
 			//if (screen.frame_number() & 1)
 			{
-
 				for (y=0;y<256;y++)
 				{
 					//UINT16* src = &gxtype1_roz_dstbitmap->pix16(y);
@@ -2549,14 +2548,12 @@ UINT32 konamigx_state::screen_update_konamigx_left(screen_device &screen, bitmap
 
 UINT32 konamigx_state::screen_update_konamigx_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 	if (konamigx_current_frame==1)
 	{
 		copybitmap(bitmap, *dualscreen_right_tempbitmap, 0, 0, 0, 0, cliprect);
 	}
 	else
 	{
-
 		int offset=0;
 
 		if (konamigx_palformat==1)

@@ -133,7 +133,6 @@ WRITE8_MEMBER(decocass_state::decocass_nmi_reset_w)
 
 WRITE8_MEMBER(decocass_state::decocass_quadrature_decoder_reset_w)
 {
-
 	/* just latch the analog controls here */
 	m_quadrature_decoder[0] = ioport("AN0")->read();
 	m_quadrature_decoder[1] = ioport("AN1")->read();

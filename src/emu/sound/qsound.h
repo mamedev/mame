@@ -22,11 +22,9 @@ typedef stream_sample_t QSOUND_SAMPLE;
 //**************************************************************************
 
 #define MCFG_QSOUND_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, QSOUND, _clock) \
-
+	MCFG_DEVICE_ADD(_tag, QSOUND, _clock)
 #define MCFG_QSOUND_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, QSOUND, _clock) \
-
+	MCFG_DEVICE_REPLACE(_tag, QSOUND, _clock)
 
 
 //**************************************************************************

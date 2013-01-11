@@ -201,7 +201,6 @@ static void draw_sprite_32x16(running_machine &machine, bitmap_ind16 &bitmap, co
 
 static void draw_sprite_32x32(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int code,
 								int sx, int sy, int bank, int flags ) {
-
 	const char *p = p32x32[ bank&3 ];
 
 	WC90_DRAW_SPRITE( code+p[0], sx, sy );
@@ -212,7 +211,6 @@ static void draw_sprite_32x32(running_machine &machine, bitmap_ind16 &bitmap, co
 
 static void draw_sprite_32x64(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int code,
 								int sx, int sy, int bank, int flags ) {
-
 	const char *p = p32x64[ bank&3 ];
 
 	WC90_DRAW_SPRITE( code+p[0], sx, sy );
@@ -242,7 +240,6 @@ static void draw_sprite_64x16(running_machine &machine, bitmap_ind16 &bitmap, co
 
 static void draw_sprite_64x32(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int code,
 								int sx, int sy, int bank, int flags ) {
-
 	const char *p = p64x32[ bank&3 ];
 
 	WC90_DRAW_SPRITE( code+p[0], sx, sy );
@@ -257,7 +254,6 @@ static void draw_sprite_64x32(running_machine &machine, bitmap_ind16 &bitmap, co
 
 static void draw_sprite_64x64(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int code,
 								int sx, int sy, int bank, int flags ) {
-
 	const char *p = p64x64[ bank&3 ];
 
 	WC90_DRAW_SPRITE( code+p[0], sx, sy );
@@ -316,7 +312,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int bank = spriteram[offs+0];
 
 		if ( ( bank >> 4 ) == priority ) {
-
 			if ( bank & 4 ) { /* visible */
 				which = ( spriteram[offs+2] >> 2 ) + ( spriteram[offs+3] << 6 );
 

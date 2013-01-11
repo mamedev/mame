@@ -88,7 +88,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::overdriv_cpuA_scanline)
 
 INTERRUPT_GEN_MEMBER(overdriv_state::cpuB_interrupt)
 {
-
 	if (k053246_is_irq_enabled(m_k053246))
 		device.execute().set_input_line(4, HOLD_LINE);
 }
@@ -96,7 +95,6 @@ INTERRUPT_GEN_MEMBER(overdriv_state::cpuB_interrupt)
 
 WRITE16_MEMBER(overdriv_state::cpuA_ctrl_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 probably enables the second 68000 */
@@ -281,7 +279,6 @@ static const k051316_interface overdriv_k051316_intf_2 =
 
 void overdriv_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_subcpu = machine().device<cpu_device>("sub");
@@ -300,7 +297,6 @@ void overdriv_state::machine_start()
 
 void overdriv_state::machine_reset()
 {
-
 	m_cpuB_ctrl = 0;
 	m_sprite_colorbase = 0;
 	m_zoom_colorbase[0] = 0;

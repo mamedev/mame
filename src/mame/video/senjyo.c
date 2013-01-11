@@ -89,7 +89,6 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_bg3_tile_info)
 
 void senjyo_state::video_start()
 {
-
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(senjyo_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	if (m_is_senjyo)
@@ -122,38 +121,32 @@ void senjyo_state::video_start()
 
 WRITE8_MEMBER(senjyo_state::senjyo_fgvideoram_w)
 {
-
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 WRITE8_MEMBER(senjyo_state::senjyo_fgcolorram_w)
 {
-
 	m_fgcolorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 WRITE8_MEMBER(senjyo_state::senjyo_bg1videoram_w)
 {
-
 	m_bg1videoram[offset] = data;
 	m_bg1_tilemap->mark_tile_dirty(offset);
 }
 WRITE8_MEMBER(senjyo_state::senjyo_bg2videoram_w)
 {
-
 	m_bg2videoram[offset] = data;
 	m_bg2_tilemap->mark_tile_dirty(offset);
 }
 WRITE8_MEMBER(senjyo_state::senjyo_bg3videoram_w)
 {
-
 	m_bg3videoram[offset] = data;
 	m_bg3_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(senjyo_state::senjyo_bgstripes_w)
 {
-
 	*m_bgstripesram = data;
 }
 

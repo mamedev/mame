@@ -393,7 +393,6 @@ per_scan_setup (j_decompress_ptr cinfo)
 	jpeg_component_info *compptr;
 
 	if (cinfo->comps_in_scan == 1) {
-
 	/* Noninterleaved (single-component) scan */
 	compptr = cinfo->cur_comp_info[0];
 
@@ -419,7 +418,6 @@ per_scan_setup (j_decompress_ptr cinfo)
 	cinfo->MCU_membership[0] = 0;
 
 	} else {
-
 	/* Interleaved (multi-component) scan */
 	if (cinfo->comps_in_scan <= 0 || cinfo->comps_in_scan > MAX_COMPS_IN_SCAN)
 		ERREXIT2(cinfo, JERR_COMPONENT_COUNT, cinfo->comps_in_scan,

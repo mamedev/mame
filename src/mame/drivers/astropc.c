@@ -158,7 +158,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(astropc_state,astropc)
 {
-
 }
 
 GAME( 2002, blackbd,   0,        astropc, astropc, astropc_state, astropc, ROT0, "Astro", "Black Beard (Russia, set 1)", GAME_IS_SKELETON )

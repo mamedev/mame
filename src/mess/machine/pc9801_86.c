@@ -131,7 +131,6 @@ pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *ta
 //      m_maincpu(*owner, "maincpu"),
 		m_opna(*this, "opna")
 {
-
 }
 
 
@@ -171,7 +170,6 @@ void pc9801_86_device::install_device(offs_t start, offs_t end, offs_t mask, off
 
 void pc9801_86_device::device_start()
 {
-
 }
 
 

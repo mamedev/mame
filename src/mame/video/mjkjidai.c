@@ -10,7 +10,6 @@
 
 TILE_GET_INFO_MEMBER(mjkjidai_state::get_tile_info)
 {
-
 	int attr = m_videoram[tile_index + 0x800];
 	int code = m_videoram[tile_index] + ((attr & 0x1f) << 8);
 	int color = m_videoram[tile_index + 0x1000];
@@ -40,7 +39,6 @@ void mjkjidai_state::video_start()
 
 WRITE8_MEMBER(mjkjidai_state::mjkjidai_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }

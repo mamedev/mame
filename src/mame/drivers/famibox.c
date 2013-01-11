@@ -286,7 +286,6 @@ static void famicombox_reset(running_machine &machine)
 
 TIMER_CALLBACK_MEMBER(famibox_state::famicombox_attract_timer_callback)
 {
-
 	m_attract_timer->adjust(attotime::never, 0, attotime::never);
 	if ( BIT(m_exception_mask,1) )
 	{
@@ -297,7 +296,6 @@ TIMER_CALLBACK_MEMBER(famibox_state::famicombox_attract_timer_callback)
 
 TIMER_CALLBACK_MEMBER(famibox_state::famicombox_gameplay_timer_callback)
 {
-
 	if (m_coins > 0)
 		m_coins--;
 
@@ -409,7 +407,6 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(famibox_state::famibox_keyswitch_changed)
 {
-
 	if ( BIT(m_exception_mask, 3) )
 	{
 		m_exception_cause &= ~0x08;
@@ -419,7 +416,6 @@ INPUT_CHANGED_MEMBER(famibox_state::famibox_keyswitch_changed)
 
 INPUT_CHANGED_MEMBER(famibox_state::coin_inserted)
 {
-
 	if ( newval )
 	{
 		m_coins++;

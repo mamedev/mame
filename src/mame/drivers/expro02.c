@@ -254,7 +254,6 @@ UINT32 expro02_state::screen_update_galsnew(screen_device &screen, bitmap_ind16 
 
 void expro02_state::video_start()
 {
-
 }
 
 
@@ -417,7 +416,6 @@ WRITE16_MEMBER(expro02_state::galsnew_6295_bankswitch_w)
 
 WRITE16_MEMBER(expro02_state::galsnew_paletteram_w)
 {
-
 	data = COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	palette_set_color_rgb(machine(),offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }

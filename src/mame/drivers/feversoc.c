@@ -87,7 +87,6 @@ public:
 
 void feversoc_state::video_start()
 {
-
 }
 
 UINT32 feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -75,7 +75,6 @@ WRITE8_MEMBER(fromance_state::fromance_commanddata_w)
 
 READ8_MEMBER(fromance_state::fromance_busycheck_main_r)
 {
-
 	/* set a timer to force synchronization after the read */
 	machine().scheduler().synchronize();
 
@@ -88,7 +87,6 @@ READ8_MEMBER(fromance_state::fromance_busycheck_main_r)
 
 READ8_MEMBER(fromance_state::fromance_busycheck_sub_r)
 {
-
 	if (m_directionflag)
 		return 0xff;        // standby
 	else

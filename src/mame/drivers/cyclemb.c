@@ -155,7 +155,6 @@ void cyclemb_state::palette_init()
 
 void cyclemb_state::video_start()
 {
-
 }
 
 static void cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -269,7 +268,6 @@ static void skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	for (y=0;y<32;y++)
 	{
-
 		for (x=2;x<62;x++)
 		{
 			/* upper bits of the first address of cram seems to be related to colour cycling */
@@ -441,7 +439,6 @@ READ8_MEMBER( cyclemb_state::skydest_i8741_0_r )
 		{
 			//printf("READ PC=%04x\n",m_maincpu->pc());
 			{
-
 				switch(m_mcu[0].state)
 				{
 					case 1:

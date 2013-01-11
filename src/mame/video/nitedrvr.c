@@ -9,14 +9,12 @@
 
 WRITE8_MEMBER(nitedrvr_state::nitedrvr_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(nitedrvr_state::nitedrvr_hvc_w)
 {
-
 	m_hvc[offset & 0x3f] = data;
 
 	if ((offset & 0x30) == 0x30)
@@ -71,7 +69,6 @@ static void draw_roadway( running_machine &machine, bitmap_ind16 &bitmap )
 
 UINT32 nitedrvr_state::screen_update_nitedrvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_roadway(machine(), bitmap);
 	return 0;

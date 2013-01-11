@@ -299,7 +299,6 @@ INPUT_CHANGED_MEMBER(zaxxon_state::service_switch)
 
 INTERRUPT_GEN_MEMBER(zaxxon_state::vblank_int)
 {
-
 	if (m_int_enabled)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
@@ -322,7 +321,6 @@ WRITE8_MEMBER(zaxxon_state::int_enable_w)
 
 void zaxxon_state::machine_start()
 {
-
 	/* register for save states */
 	save_item(NAME(m_int_enabled));
 	save_item(NAME(m_coin_status));
@@ -339,7 +337,6 @@ void zaxxon_state::machine_start()
 
 READ8_MEMBER(zaxxon_state::razmataz_counter_r)
 {
-
 	/* this behavior is really unknown; however, the code is using this */
 	/* counter as a sort of timeout when talking to the sound board */
 	/* it needs to be increasing at a reasonable rate but not too fast */
@@ -390,7 +387,6 @@ WRITE8_MEMBER(zaxxon_state::zaxxon_coin_counter_w)
 // the coin input, which then needs to be explicitly cleared by the game.
 WRITE8_MEMBER(zaxxon_state::zaxxon_coin_enable_w)
 {
-
 	m_coin_enable[offset] = data & 1;
 	if (!m_coin_enable[offset])
 		m_coin_status[offset] = 0;
@@ -408,7 +404,6 @@ INPUT_CHANGED_MEMBER(zaxxon_state::zaxxon_coin_inserted)
 
 CUSTOM_INPUT_MEMBER(zaxxon_state::zaxxon_coin_r)
 {
-
 	return m_coin_status[(int)(FPTR)param];
 }
 

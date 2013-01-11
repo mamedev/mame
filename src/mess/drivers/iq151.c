@@ -323,7 +323,6 @@ WRITE_LINE_MEMBER( iq151_state::pic_set_int_line )
 
 INTERRUPT_GEN_MEMBER(iq151_state::iq151_vblank_interrupt)
 {
-
 	pic8259_ir6_w(m_pic, m_vblank_irq_state & 1);
 	m_vblank_irq_state ^= 1;
 }
@@ -337,7 +336,6 @@ static IRQ_CALLBACK(iq151_irq_callback)
 
 TIMER_DEVICE_CALLBACK_MEMBER(iq151_state::cassette_timer)
 {
-
 	m_cassette_clk ^= 1;
 
 	m_cassette->output((m_cassette_data & 1) ^ (m_cassette_clk & 1) ? +1 : -1);
@@ -345,7 +343,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(iq151_state::cassette_timer)
 
 DRIVER_INIT_MEMBER(iq151_state,iq151)
 {
-
 	UINT8 *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entry(0, RAM + 0xf800);
 	membank("boot")->configure_entry(1, RAM + 0x0000);

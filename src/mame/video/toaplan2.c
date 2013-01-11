@@ -80,7 +80,6 @@ static void truxton2_postload(running_machine &machine)
 
 VIDEO_START_MEMBER(toaplan2_state,toaplan2)
 {
-
 	/* cache the VDP device */
 	m_vdp0 = machine().device<gp9001vdp_device>("gp9001vdp0");
 	m_vdp1 = machine().device<gp9001vdp_device>("gp9001vdp1");
@@ -105,7 +104,6 @@ VIDEO_START_MEMBER(toaplan2_state,toaplan2)
 
 VIDEO_START_MEMBER(toaplan2_state,truxton2)
 {
-
 	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
@@ -118,7 +116,6 @@ VIDEO_START_MEMBER(toaplan2_state,truxton2)
 
 VIDEO_START_MEMBER(toaplan2_state,fixeightbl)
 {
-
 	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
@@ -144,7 +141,6 @@ VIDEO_START_MEMBER(toaplan2_state,fixeightbl)
 
 VIDEO_START_MEMBER(toaplan2_state,bgaregga)
 {
-
 	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
@@ -154,7 +150,6 @@ VIDEO_START_MEMBER(toaplan2_state,bgaregga)
 
 VIDEO_START_MEMBER(toaplan2_state,bgareggabl)
 {
-
 	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
@@ -182,7 +177,6 @@ VIDEO_START_MEMBER(toaplan2_state,batrider)
 
 WRITE16_MEMBER(toaplan2_state::toaplan2_txvideoram16_w)
 {
-
 	COMBINE_DATA(&m_txvideoram16[offset]);
 	if (offset < m_txvideoram16.bytes()/4)
 		m_tx_tilemap->mark_tile_dirty(offset);
@@ -273,7 +267,6 @@ WRITE16_MEMBER(toaplan2_state::batrider_unknown_dma_w)
 
 WRITE16_MEMBER(toaplan2_state::batrider_objectbank_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xf;
@@ -288,7 +281,6 @@ WRITE16_MEMBER(toaplan2_state::batrider_objectbank_w)
 // Dogyuun doesn't appear to require fancy mixing?
 UINT32 toaplan2_state::screen_update_toaplan2_dual(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (m_vdp1)
 	{
 		bitmap.fill(0, cliprect);
@@ -310,7 +302,6 @@ UINT32 toaplan2_state::screen_update_toaplan2_dual(screen_device &screen, bitmap
 // renders to 2 bitmaps, and mixes output
 UINT32 toaplan2_state::screen_update_toaplan2_mixed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 //  bitmap.fill(0, cliprect);
 //  gp9001_custom_priority_bitmap->fill(0, cliprect);
 
@@ -409,7 +400,6 @@ UINT32 toaplan2_state::screen_update_toaplan2_mixed(screen_device &screen, bitma
 
 UINT32 toaplan2_state::screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (m_vdp0)
 	{
 		bitmap.fill(0, cliprect);

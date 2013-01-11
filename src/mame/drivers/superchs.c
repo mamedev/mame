@@ -119,7 +119,6 @@ READ32_MEMBER(superchs_state::superchs_input_r)
 
 WRITE32_MEMBER(superchs_state::superchs_input_w)
 {
-
 	#if 0
 	{
 	char t[64];

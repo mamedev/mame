@@ -30,7 +30,6 @@
 
 VIDEO_START_MEMBER(jedi_state,jedi)
 {
-
 	/* register for saving */
 	save_item(NAME(m_vscroll));
 	save_item(NAME(m_hscroll));
@@ -109,14 +108,12 @@ static void do_pen_lookup(jedi_state *state, bitmap_rgb32 &bitmap, const rectang
 
 WRITE8_MEMBER(jedi_state::jedi_vscroll_w)
 {
-
 	m_vscroll = data | (offset << 8);
 }
 
 
 WRITE8_MEMBER(jedi_state::jedi_hscroll_w)
 {
-
 	m_hscroll = data | (offset << 8);
 }
 
@@ -326,7 +323,6 @@ static void draw_sprites(running_machine &machine, jedi_state *state, bitmap_rgb
 
 UINT32 jedi_state::screen_update_jedi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 	/* if no video, clear it all to black */
 	if (*m_video_off & 0x01)
 		bitmap.fill(RGB_BLACK, cliprect);

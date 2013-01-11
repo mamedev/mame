@@ -34,7 +34,6 @@ lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const ch
 
 void lc89510_temp_device::dummy_interrupt_callback(void)
 {
-
 }
 
 void lc89510_temp_device::set_CDC_Do_DMA(device_t &device,segacd_dma_delegate new_segacd_dma_callback)
@@ -85,7 +84,6 @@ void lc89510_temp_device::device_start()
 
 void lc89510_temp_device::device_reset()
 {
-
 }
 
 
@@ -859,7 +857,6 @@ READ16_MEMBER( lc89510_temp_device::cdc_data_main_r )
 
 READ16_MEMBER( lc89510_temp_device::segacd_irq_mask_r )
 {
-
 	return segacd_irq_mask;
 }
 
@@ -888,7 +885,6 @@ WRITE16_MEMBER( lc89510_temp_device::segacd_irq_mask_w )
 	}
 	else
 	{
-
 		printf("segacd_irq_mask_w only MSB written\n");
 
 	}
@@ -896,7 +892,6 @@ WRITE16_MEMBER( lc89510_temp_device::segacd_irq_mask_w )
 
 READ16_MEMBER( lc89510_temp_device::segacd_cdd_ctrl_r )
 {
-
 	return CDD_CONTROL;
 }
 
@@ -1129,9 +1124,7 @@ void lc89510_temp_device::NeoCDCommsControl(UINT8 clock, UINT8 send)
 
 void lc89510_temp_device::LC8951UpdateHeader() // neocd
 {
-
 	if (LC8951RegistersW[REG_W_CTRL1] & 1) {
-
 		// HEAD registers have sub-header
 
 		LC8951RegistersR[REG_R_HEAD0] = 0;                                                  // HEAD0
@@ -1140,7 +1133,6 @@ void lc89510_temp_device::LC8951UpdateHeader() // neocd
 		LC8951RegistersR[REG_R_HEAD3] = 0;                                                  // HEAD3
 
 	} else {
-
 		// HEAD registers have header
 		UINT32 msf = lba_to_msf_alt(SCD_CURLBA+150);
 
@@ -1177,7 +1169,6 @@ void lc89510_temp_device::LC8915EndTransfer()
 
 	LC8951RegistersR[REG_R_IFSTAT] |= 0x48;                                             //   set DTEI & DTBSY
 	if (LC8951RegistersW[REG_W_IFCTRL] & 0x40) {
-
 		// trigger DTE interrupt
 
 		// the Neo Geo CD doesn't use the DTE interrupt
@@ -1216,7 +1207,6 @@ void lc89510_temp_device::scd_ctrl_checks(running_machine& machine)
 
 	if (LC8951RegistersW[REG_W_IFCTRL] & 0x20)
 	{
-
 		if (is_neoCD)
 		{
 			type1_interrupt_callback();

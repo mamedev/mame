@@ -40,14 +40,12 @@ static void setcolor( running_machine &machine, int color, int rgb )
 
 WRITE16_MEMBER(blockout_state::blockout_paletteram_w)
 {
-
 	COMBINE_DATA(&m_paletteram[offset]);
 	setcolor(machine(), offset, m_paletteram[offset]);
 }
 
 WRITE16_MEMBER(blockout_state::blockout_frontcolor_w)
 {
-
 	COMBINE_DATA(&m_color);
 	setcolor(machine(), 512, m_color);
 }
@@ -61,7 +59,6 @@ WRITE16_MEMBER(blockout_state::blockout_frontcolor_w)
 ***************************************************************************/
 void blockout_state::video_start()
 {
-
 	/* Allocate temporary bitmaps */
 	machine().primary_screen->register_screen_bitmap(m_tmpbitmap);
 	save_item(NAME(m_tmpbitmap));
@@ -99,7 +96,6 @@ static void update_pixels( running_machine &machine, int x, int y )
 
 WRITE16_MEMBER(blockout_state::blockout_videoram_w)
 {
-
 	COMBINE_DATA(&m_videoram[offset]);
 	update_pixels(machine(), (offset % 256) * 2, (offset / 256) % 256);
 }

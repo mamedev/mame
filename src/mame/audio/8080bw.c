@@ -703,7 +703,6 @@ WRITE8_MEMBER(_8080bw_state::polaris_sh_port_2_w)
 
 WRITE8_MEMBER(_8080bw_state::polaris_sh_port_3_w)
 {
-
 	coin_lockout_global_w(machine(), data & 0x04);  /* SX8 */
 
 	m_flip_screen = BIT(data, 5) & BIT(ioport("IN2")->read(), 2); /* SX11 */

@@ -68,7 +68,6 @@ WRITE8_MEMBER(busicom_state::printer_w)
 		}
 	}
 	if (BIT(data,3)) {
-
 		for(j=0;j<10;j++) {
 			for(i=0;i<17;i++) {
 				m_printer_line[j][i] = m_printer_line[j+1][i];

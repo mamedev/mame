@@ -216,14 +216,12 @@ TILE_GET_INFO_MEMBER(ssv_state::get_tile_info_0)
 
 WRITE16_MEMBER(ssv_state::gdfs_tmapram_w)
 {
-
 	COMBINE_DATA(&m_gdfs_tmapram[offset]);
 	m_gdfs_tmap->mark_tile_dirty(offset);
 }
 
 VIDEO_START_MEMBER(ssv_state,gdfs)
 {
-
 	ssv_state::video_start();
 
 
@@ -381,7 +379,6 @@ READ16_MEMBER(ssv_state::ssv_vblank_r)
 
 WRITE16_MEMBER(ssv_state::ssv_scroll_w)
 {
-
 	COMBINE_DATA(m_scroll + offset);
 
 /*  offsets 60-7f: CRT Controller   */
@@ -977,7 +974,6 @@ UINT32 ssv_state::screen_update_eaglshot(screen_device &screen, bitmap_ind16 &bi
 
 UINT32 ssv_state::screen_update_gdfs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	screen_update_ssv(screen, bitmap, cliprect);
 
 	// draw zooming sprites

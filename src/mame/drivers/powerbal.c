@@ -418,7 +418,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 VIDEO_START_MEMBER(playmark_state,powerbal)
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::powerbal_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_xoffset = -20;
@@ -428,7 +427,6 @@ VIDEO_START_MEMBER(playmark_state,powerbal)
 
 UINT32 playmark_state::screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(machine(), bitmap, cliprect);
 	return 0;
@@ -469,13 +467,11 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(playmark_state,powerbal)
 {
-
 	save_item(NAME(m_tilebank));
 }
 
 MACHINE_RESET_MEMBER(playmark_state,powerbal)
 {
-
 	m_tilebank = 0;
 }
 
@@ -676,14 +672,12 @@ ROM_END
 
 DRIVER_INIT_MEMBER(playmark_state,powerbal)
 {
-
 	m_bg_yoffset = 16;
 	m_yoffset = -8;
 }
 
 DRIVER_INIT_MEMBER(playmark_state,magicstk)
 {
-
 	m_bg_yoffset = 0;
 	m_yoffset = -5;
 }

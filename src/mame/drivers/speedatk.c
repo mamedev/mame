@@ -106,7 +106,6 @@ static UINT8 iox_key_matrix_calc(running_machine &machine, UINT8 p_side)
 
 READ8_MEMBER(speedatk_state::key_matrix_r)
 {
-
 	if(m_coin_impulse > 0)
 	{
 		m_coin_impulse--;
@@ -141,14 +140,12 @@ READ8_MEMBER(speedatk_state::key_matrix_r)
 
 WRITE8_MEMBER(speedatk_state::key_matrix_w)
 {
-
 	m_mux_data = data;
 }
 
 /* Key matrix status,used for coin settings and I don't know what else... */
 READ8_MEMBER(speedatk_state::key_matrix_status_r)
 {
-
 	/* bit 0: busy flag,active low */
 	return (m_km_status & 0xfe) | 1;
 }
@@ -166,7 +163,6 @@ a1
 */
 WRITE8_MEMBER(speedatk_state::key_matrix_status_w)
 {
-
 	m_km_status = data;
 	if((m_km_status & 0xf0) == 0x80) //coinage setting command
 		m_coin_settings = m_km_status & 0xf;
@@ -303,7 +299,6 @@ static const mc6845_interface mc6845_intf =
 
 WRITE8_MEMBER(speedatk_state::speedatk_output_w)
 {
-
 	m_flip_scr = data & 0x80;
 
 	if((data & 0x7f) != 0x7f)

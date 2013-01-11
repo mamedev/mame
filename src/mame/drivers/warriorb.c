@@ -172,14 +172,12 @@ static void reset_sound_region( running_machine &machine )
 
 WRITE8_MEMBER(warriorb_state::sound_bankswitch_w)
 {
-
 	m_banknum = data & 7;
 	reset_sound_region(machine());
 }
 
 WRITE16_MEMBER(warriorb_state::warriorb_sound_w)
 {
-
 	if (offset == 0)
 		tc0140syt_port_w(m_tc0140syt, space, 0, data & 0xff);
 	else if (offset == 1)
@@ -188,7 +186,6 @@ WRITE16_MEMBER(warriorb_state::warriorb_sound_w)
 
 READ16_MEMBER(warriorb_state::warriorb_sound_r)
 {
-
 	if (offset == 1)
 		return ((tc0140syt_comm_r(m_tc0140syt, space, 0) & 0xff));
 	else
@@ -217,7 +214,6 @@ WRITE8_MEMBER(warriorb_state::warriorb_pancontrol)
 
 WRITE16_MEMBER(warriorb_state::tc0100scn_dual_screen_w)
 {
-
 	tc0100scn_word_w(m_tc0100scn_1, space, offset, data, mem_mask);
 	tc0100scn_word_w(m_tc0100scn_2, space, offset, data, mem_mask);
 }
@@ -510,7 +506,6 @@ static const tc0140syt_interface warriorb_tc0140syt_intf =
 
 void warriorb_state::machine_start()
 {
-
 	membank("bank10")->configure_entries(0, 8, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
@@ -534,7 +529,6 @@ void warriorb_state::machine_start()
 
 void warriorb_state::machine_reset()
 {
-
 	m_banknum = 0;
 
 	/**** mixer control enable ****/

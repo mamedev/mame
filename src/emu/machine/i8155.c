@@ -203,7 +203,6 @@ i8155_device::i8155_device(const machine_config &mconfig, const char *tag, devic
 		device_memory_interface(mconfig, *this),
 		m_space_config("ram", ENDIANNESS_LITTLE, 8, 8, 0, NULL, *ADDRESS_MAP_NAME(i8155))
 {
-
 }
 
 

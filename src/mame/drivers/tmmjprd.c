@@ -517,7 +517,6 @@ WRITE32_MEMBER(tmmjprd_state::tmmjprd_eeprom_write)
 
 READ32_MEMBER(tmmjprd_state::tmmjprd_mux_r)
 {
-
 	m_system_in = ioport("SYSTEM")->read();
 
 	switch(m_mux_data)

@@ -2438,7 +2438,6 @@ READ16_MEMBER(vamphalf_state::mrdig_speedup_r)
 
 READ16_MEMBER(vamphalf_state::dtfamily_speedup_r)
 {
-
 	int pc = space.device().safe_pc();
 
 	if (pc == 0x12fa6)
@@ -2450,7 +2449,6 @@ READ16_MEMBER(vamphalf_state::dtfamily_speedup_r)
 
 READ16_MEMBER(vamphalf_state::toyland_speedup_r)
 {
-
 	if (space.device().safe_pc() == 0x130c2)
 		space.device().execute().spin_until_interrupt();
 

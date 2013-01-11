@@ -34,7 +34,6 @@ Known issues:
 
 INTERRUPT_GEN_MEMBER(bwing_state::bwp3_interrupt)
 {
-
 	if (!m_bwp3_nmimask)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
@@ -65,7 +64,6 @@ WRITE8_MEMBER(bwing_state::bwp3_nmiack_w)
 
 READ8_MEMBER(bwing_state::bwp1_io_r)
 {
-
 	if (offset == 0) return(ioport("DSW0")->read());
 	if (offset == 1) return(ioport("DSW1")->read());
 	if (offset == 2) return(ioport("IN0")->read());
@@ -78,7 +76,6 @@ READ8_MEMBER(bwing_state::bwp1_io_r)
 
 WRITE8_MEMBER(bwing_state::bwp1_ctrl_w)
 {
-
 	switch (offset)
 	{
 		// MSSTB
@@ -334,7 +331,6 @@ GFXDECODE_END
 
 void bwing_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_subcpu = machine().device<cpu_device>("sub");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
@@ -351,7 +347,6 @@ void bwing_state::machine_start()
 
 void bwing_state::machine_reset()
 {
-
 	m_palatch = 0;
 	m_srbank = 0;
 	m_mapmask = 0;
@@ -578,7 +573,6 @@ static void fix_bwp3( running_machine &machine )
 
 DRIVER_INIT_MEMBER(bwing_state,bwing)
 {
-
 	m_bwp123_membase[0] = memregion("maincpu")->base();
 	m_bwp123_membase[1] = memregion("sub")->base();
 	m_bwp123_membase[2] = memregion("audiocpu")->base();

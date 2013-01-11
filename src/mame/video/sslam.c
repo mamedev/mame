@@ -101,7 +101,6 @@ TILE_GET_INFO_MEMBER(sslam_state::get_sslam_tx_tile_info)
 
 WRITE16_MEMBER(sslam_state::sslam_tx_tileram_w)
 {
-
 	COMBINE_DATA(&m_tx_tileram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
@@ -118,7 +117,6 @@ TILE_GET_INFO_MEMBER(sslam_state::get_sslam_md_tile_info)
 
 WRITE16_MEMBER(sslam_state::sslam_md_tileram_w)
 {
-
 	COMBINE_DATA(&m_md_tileram[offset]);
 	m_md_tilemap->mark_tile_dirty(offset);
 }
@@ -135,7 +133,6 @@ TILE_GET_INFO_MEMBER(sslam_state::get_sslam_bg_tile_info)
 
 WRITE16_MEMBER(sslam_state::sslam_bg_tileram_w)
 {
-
 	COMBINE_DATA(&m_bg_tileram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -153,14 +150,12 @@ TILE_GET_INFO_MEMBER(sslam_state::get_powerbls_bg_tile_info)
 
 WRITE16_MEMBER(sslam_state::powerbls_bg_tileram_w)
 {
-
 	COMBINE_DATA(&m_bg_tileram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset>>1);
 }
 
 VIDEO_START_MEMBER(sslam_state,sslam)
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_md_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_md_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
@@ -174,7 +169,6 @@ VIDEO_START_MEMBER(sslam_state,sslam)
 
 VIDEO_START_MEMBER(sslam_state,powerbls)
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sslam_state::get_powerbls_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 
 	m_sprites_x_offset = -21;
@@ -183,7 +177,6 @@ VIDEO_START_MEMBER(sslam_state,powerbls)
 
 UINT32 sslam_state::screen_update_sslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (!(m_regs[6] & 1))
 	{
 		bitmap.fill(get_black_pen(machine()), cliprect);
@@ -222,7 +215,6 @@ UINT32 sslam_state::screen_update_sslam(screen_device &screen, bitmap_ind16 &bit
 
 UINT32 sslam_state::screen_update_powerbls(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (!(m_regs[6] & 1))
 	{
 		bitmap.fill(get_black_pen(machine()), cliprect);

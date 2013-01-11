@@ -43,7 +43,6 @@ write
 
 void marineb_state::machine_reset()
 {
-
 	m_palette_bank = 0;
 	m_column_scroll = 0;
 	m_flipscreen_x = 0;
@@ -53,7 +52,6 @@ void marineb_state::machine_reset()
 
 MACHINE_RESET_MEMBER(marineb_state,springer)
 {
-
 	marineb_state::machine_reset();
 
 	m_marineb_active_low_flipscreen = 1;
@@ -61,7 +59,6 @@ MACHINE_RESET_MEMBER(marineb_state,springer)
 
 void marineb_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = NULL;
 
@@ -70,7 +67,6 @@ void marineb_state::machine_start()
 
 WRITE8_MEMBER(marineb_state::irq_mask_w)
 {
-
 	m_irq_mask = data & 1;
 }
 
@@ -525,14 +521,12 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(marineb_state::marineb_vblank_irq)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(marineb_state::wanted_vblank_irq)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }

@@ -109,7 +109,6 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
 
 WRITE8_MEMBER(_20pacgal_state::irqack_w)
 {
-
 	m_irq_mask = data & 1;
 
 	if (!m_irq_mask)
@@ -191,7 +190,6 @@ WRITE8_MEMBER(_20pacgal_state::ram_bank_select_w)
 
 WRITE8_MEMBER(_20pacgal_state::ram_48000_w)
 {
-
 	if (m_game_selected)
 	{
 		if (offset < 0x0800)
@@ -341,7 +339,6 @@ INPUT_PORTS_END
 
 void _20pacgal_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_eeprom = machine().device("eeprom");
 
@@ -357,13 +354,11 @@ void _20pacgal_state::machine_start()
 
 void _20pacgal_state::machine_reset()
 {
-
 	m_game_selected = 0;
 }
 
 INTERRUPT_GEN_MEMBER(_20pacgal_state::vblank_irq)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE); // TODO: assert breaks the inputs in 25pacman test mode
 }

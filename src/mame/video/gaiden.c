@@ -70,7 +70,6 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_tx_tile_info)
 
 VIDEO_START_MEMBER(gaiden_state,gaiden)
 {
-
 	/* set up tile layers */
 	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_bg);
 	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_fg);
@@ -97,8 +96,6 @@ VIDEO_START_MEMBER(gaiden_state,gaiden)
 
 VIDEO_START_MEMBER(gaiden_state,mastninj)
 {
-
-
 	/* set up tile layers */
 	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_bg);
 	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_fg);
@@ -120,7 +117,6 @@ VIDEO_START_MEMBER(gaiden_state,mastninj)
 
 VIDEO_START_MEMBER(gaiden_state,raiga)
 {
-
 	/* set up tile layers */
 	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_bg);
 	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_fg);
@@ -203,7 +199,6 @@ WRITE16_MEMBER(gaiden_state::gaiden_bgscrolly_w)
 
 WRITE16_MEMBER(gaiden_state::gaiden_txoffsety_w)
 {
-
 	if (ACCESSING_BITS_0_7) {
 		m_tx_offset_y = data;
 		m_text_layer->set_scrolly(0, (m_tx_scroll_y - m_tx_offset_y) & 0xffff);
@@ -212,7 +207,6 @@ WRITE16_MEMBER(gaiden_state::gaiden_txoffsety_w)
 
 WRITE16_MEMBER(gaiden_state::gaiden_fgoffsety_w)
 {
-
 	if (ACCESSING_BITS_0_7) {
 		m_fg_offset_y = data;
 		m_foreground->set_scrolly(0, (m_fg_scroll_y - m_fg_offset_y) & 0xffff);
@@ -221,7 +215,6 @@ WRITE16_MEMBER(gaiden_state::gaiden_fgoffsety_w)
 
 WRITE16_MEMBER(gaiden_state::gaiden_bgoffsety_w)
 {
-
 	if (ACCESSING_BITS_0_7) {
 		m_bg_offset_y = data;
 		m_background->set_scrolly(0, (m_bg_scroll_y - m_bg_offset_y) & 0xffff);
@@ -230,7 +223,6 @@ WRITE16_MEMBER(gaiden_state::gaiden_bgoffsety_w)
 
 WRITE16_MEMBER(gaiden_state::gaiden_sproffsety_w)
 {
-
 	if (ACCESSING_BITS_0_7) {
 		m_spr_offset_y = data;
 		// handled in draw_sprites

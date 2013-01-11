@@ -601,7 +601,6 @@ WRITE8_MEMBER(taitof2_state::sound_bankswitch_w)
 
 READ8_MEMBER(taitof2_state::driveout_sound_command_r)
 {
-
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 //  logerror("sound IRQ OFF (sound command=%02x)\n", m_driveout_sound_latch);
 	return m_driveout_sound_latch;
@@ -626,7 +625,6 @@ WRITE8_MEMBER(taitof2_state::oki_bank_w)
 
 WRITE16_MEMBER(taitof2_state::driveout_sound_command_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 	{
 		data >>= 8;
@@ -661,7 +659,6 @@ WRITE16_MEMBER(taitof2_state::driveout_sound_command_w)
 
 WRITE16_MEMBER(taitof2_state::cchip2_word_w)
 {
-
 	logerror("cchip2_w pc: %06x offset %04x: %02x\n", space.device().safe_pc(), offset, data);
 
 	COMBINE_DATA(&m_cchip2_ram[offset]);
@@ -669,7 +666,6 @@ WRITE16_MEMBER(taitof2_state::cchip2_word_w)
 
 READ16_MEMBER(taitof2_state::cchip2_word_r)
 {
-
 	/* C-Chip ID */
 	if (offset == 0x401)
 		return 0x01;
@@ -3017,7 +3013,6 @@ static const tc0140syt_interface taitof2_tc0140syt_intf =
 
 MACHINE_START_MEMBER(taitof2_state,common)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");;
 	m_tc0100scn = machine().device("tc0100scn");;
@@ -5341,7 +5336,6 @@ DRIVER_INIT_MEMBER(taitof2_state,finalb)
 
 DRIVER_INIT_MEMBER(taitof2_state,cameltry)
 {
-
 	m_last[0] = 0;
 	m_last[1] = 0;
 
@@ -5372,7 +5366,6 @@ DRIVER_INIT_MEMBER(taitof2_state,mjnquest)
 
 DRIVER_INIT_MEMBER(taitof2_state,driveout)
 {
-
 	m_driveout_sound_latch = 0;
 	m_oki_bank = 0;
 	m_nibble = 0;

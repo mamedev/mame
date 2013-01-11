@@ -96,7 +96,6 @@ TIMER_CALLBACK_MEMBER(aristmk5_state::mk5_VSYNC_callback)
 
 WRITE32_MEMBER(aristmk5_state::Ns5w48)
 {
-
 	/*
 	There is one writeable register which is written with the Ns5w48 strobe. It contains four bits which are
 	taken from bits 16 to 19 of the word being written. The register is cleared whenever the chip is reset. The
@@ -526,8 +525,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x400000, "clear_chip", ROMREGION_ERASEFF ) \
 	/* clear chip */ \
 	ROM_LOAD32_WORD( "clear.u7",  0x000000, 0x80000, CRC(5a254b22) SHA1(8444f237b392df2a3cb42ea349e7af32f47dd544) ) \
-	ROM_LOAD32_WORD( "clear.u11", 0x000002, 0x80000, CRC(def36617) SHA1(c7ba5b08e884a8fb36c9fb51c08e243e32c81f89) ) \
-
+	ROM_LOAD32_WORD( "clear.u11", 0x000002, 0x80000, CRC(def36617) SHA1(c7ba5b08e884a8fb36c9fb51c08e243e32c81f89) )
 ROM_START( aristmk5 )
 	ARISTOCRAT_MK5_BIOS
 

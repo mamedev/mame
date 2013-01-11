@@ -59,7 +59,6 @@ void horse_state::palette_init()
 
 UINT32 horse_state::screen_update_horse(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		for (int x = 0; x < 32; x++)

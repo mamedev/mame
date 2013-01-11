@@ -363,13 +363,11 @@ UINT32 jchan_state::screen_update_jchan(screen_device &screen, bitmap_ind16 &bit
 
 WRITE16_MEMBER(jchan_state::jchan_ctrl_w)
 {
-
 	m_irq_sub_enable = data & 0x8000; // hack / guess!
 }
 
 READ16_MEMBER(jchan_state::jchan_ctrl_r)
 {
-
 	switch(offset)
 	{
 		case 0/2: return ioport("P1")->read();
@@ -390,7 +388,6 @@ READ16_MEMBER(jchan_state::jchan_ctrl_r)
 /* communications - hacky! */
 WRITE16_MEMBER(jchan_state::main2sub_cmd_w)
 {
-
 	COMBINE_DATA(&m_mainsub_shared_ram[0x03ffe/2]);
 	machine().device("sub")->execute().set_input_line(4, HOLD_LINE);
 }
@@ -398,7 +395,6 @@ WRITE16_MEMBER(jchan_state::main2sub_cmd_w)
 // is this called?
 WRITE16_MEMBER(jchan_state::sub2main_cmd_w)
 {
-
 	COMBINE_DATA(&m_mainsub_shared_ram[0x0000/2]);
 	machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 }
@@ -406,7 +402,6 @@ WRITE16_MEMBER(jchan_state::sub2main_cmd_w)
 /* ram convert for suprnova (requires 32-bit stuff) */
 WRITE16_MEMBER(jchan_state::jchan_suprnova_sprite32_1_w)
 {
-
 	COMBINE_DATA(&m_spriteram_1[offset]);
 	offset>>=1;
 	m_sprite_ram32_1[offset]=(m_spriteram_1[offset*2+1]<<16) | (m_spriteram_1[offset*2]);
@@ -414,7 +409,6 @@ WRITE16_MEMBER(jchan_state::jchan_suprnova_sprite32_1_w)
 
 WRITE16_MEMBER(jchan_state::jchan_suprnova_sprite32regs_1_w)
 {
-
 	COMBINE_DATA(&m_sprregs_1[offset]);
 	offset>>=1;
 	m_sprite_regs32_1[offset]=(m_sprregs_1[offset*2+1]<<16) | (m_sprregs_1[offset*2]);
@@ -422,7 +416,6 @@ WRITE16_MEMBER(jchan_state::jchan_suprnova_sprite32regs_1_w)
 
 WRITE16_MEMBER(jchan_state::jchan_suprnova_sprite32_2_w)
 {
-
 	COMBINE_DATA(&m_spriteram_2[offset]);
 	offset>>=1;
 	m_sprite_ram32_2[offset]=(m_spriteram_2[offset*2+1]<<16) | (m_spriteram_2[offset*2]);
@@ -430,7 +423,6 @@ WRITE16_MEMBER(jchan_state::jchan_suprnova_sprite32_2_w)
 
 WRITE16_MEMBER(jchan_state::jchan_suprnova_sprite32regs_2_w)
 {
-
 	COMBINE_DATA(&m_sprregs_2[offset]);
 	offset>>=1;
 	m_sprite_regs32_2[offset]=(m_sprregs_2[offset*2+1]<<16) | (m_sprregs_2[offset*2]);

@@ -80,14 +80,12 @@ void mario_state::palette_init()
 
 WRITE8_MEMBER(mario_state::mario_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(mario_state::mario_gfxbank_w)
 {
-
 	if (m_gfx_bank != (data & 0x01))
 	{
 		m_gfx_bank = data & 0x01;
@@ -97,7 +95,6 @@ WRITE8_MEMBER(mario_state::mario_gfxbank_w)
 
 WRITE8_MEMBER(mario_state::mario_palettebank_w)
 {
-
 	if (m_palette_bank != (data & 0x01))
 	{
 		m_palette_bank = data & 0x01;
@@ -107,13 +104,11 @@ WRITE8_MEMBER(mario_state::mario_palettebank_w)
 
 WRITE8_MEMBER(mario_state::mario_scroll_w)
 {
-
 	m_gfx_scroll = data + 17;
 }
 
 WRITE8_MEMBER(mario_state::mario_flip_w)
 {
-
 	if (m_flip != (data & 0x01))
 	{
 		m_flip = data & 0x01;
@@ -137,7 +132,6 @@ TILE_GET_INFO_MEMBER(mario_state::get_bg_tile_info)
 
 void mario_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mario_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 

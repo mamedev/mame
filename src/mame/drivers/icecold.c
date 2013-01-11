@@ -296,7 +296,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_sint_timer)
 
 TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_motors_timer)
 {
-
 	// /MOTENBL is set high during reset for disable the motors control
 	if (m_motenbl == 0)
 	{

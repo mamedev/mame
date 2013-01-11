@@ -226,7 +226,6 @@ static const ay8910_interface battlex_ay8910_interface =
 
 void battlex_state::machine_start()
 {
-
 	/* register for save states */
 	save_item(NAME(m_scroll_lsb));
 	save_item(NAME(m_scroll_msb));
@@ -236,7 +235,6 @@ void battlex_state::machine_start()
 
 void battlex_state::machine_reset()
 {
-
 	m_scroll_lsb = 0;
 	m_scroll_msb = 0;
 	m_starfield_enabled = 0;

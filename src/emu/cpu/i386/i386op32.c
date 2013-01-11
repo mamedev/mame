@@ -7,7 +7,6 @@ static UINT32 I386OP(shift_rotate32)(i386_state *cpustate, UINT8 modrm, UINT32 v
 	if( shift == 0 ) {
 		CYCLES_RM(cpustate,modrm, 3, 7);
 	} else if( shift == 1 ) {
-
 		switch( (modrm >> 3) & 0x7 )
 		{
 			case 0:         /* ROL rm32, 1 */
@@ -1863,7 +1862,6 @@ static void I386OP(shld32_i8)(i386_state *cpustate)         // Opcode 0x0f a4
 		UINT8 shift = FETCH(cpustate);
 		shift &= 31;
 		if( shift == 0 ) {
-
 		} else {
 			cpustate->CF = (dst & (1 << (32-shift))) ? 1 : 0;
 			dst = (dst << shift) | (upper >> (32-shift));
@@ -1879,7 +1877,6 @@ static void I386OP(shld32_i8)(i386_state *cpustate)         // Opcode 0x0f a4
 		UINT8 shift = FETCH(cpustate);
 		shift &= 31;
 		if( shift == 0 ) {
-
 		} else {
 			cpustate->CF = (dst & (1 << (32-shift))) ? 1 : 0;
 			dst = (dst << shift) | (upper >> (32-shift));
@@ -1900,7 +1897,6 @@ static void I386OP(shld32_cl)(i386_state *cpustate)         // Opcode 0x0f a5
 		UINT8 shift = REG8(CL);
 		shift &= 31;
 		if( shift == 0 ) {
-
 		} else {
 			cpustate->CF = (dst & (1 << (32-shift))) ? 1 : 0;
 			dst = (dst << shift) | (upper >> (32-shift));
@@ -1916,7 +1912,6 @@ static void I386OP(shld32_cl)(i386_state *cpustate)         // Opcode 0x0f a5
 		UINT8 shift = REG8(CL);
 		shift &= 31;
 		if( shift == 0 ) {
-
 		} else {
 			cpustate->CF = (dst & (1 << (32-shift))) ? 1 : 0;
 			dst = (dst << shift) | (upper >> (32-shift));
@@ -1937,7 +1932,6 @@ static void I386OP(shrd32_i8)(i386_state *cpustate)         // Opcode 0x0f ac
 		UINT8 shift = FETCH(cpustate);
 		shift &= 31;
 		if( shift == 0 ) {
-
 		} else {
 			cpustate->CF = (dst & (1 << (shift-1))) ? 1 : 0;
 			dst = (dst >> shift) | (upper << (32-shift));
@@ -1953,7 +1947,6 @@ static void I386OP(shrd32_i8)(i386_state *cpustate)         // Opcode 0x0f ac
 		UINT8 shift = FETCH(cpustate);
 		shift &= 31;
 		if( shift == 0 ) {
-
 		} else {
 			cpustate->CF = (dst & (1 << (shift-1))) ? 1 : 0;
 			dst = (dst >> shift) | (upper << (32-shift));
@@ -1974,7 +1967,6 @@ static void I386OP(shrd32_cl)(i386_state *cpustate)         // Opcode 0x0f ad
 		UINT8 shift = REG8(CL);
 		shift &= 31;
 		if( shift == 0 ) {
-
 		} else {
 			cpustate->CF = (dst & (1 << (shift-1))) ? 1 : 0;
 			dst = (dst >> shift) | (upper << (32-shift));
@@ -1990,7 +1982,6 @@ static void I386OP(shrd32_cl)(i386_state *cpustate)         // Opcode 0x0f ad
 		UINT8 shift = REG8(CL);
 		shift &= 31;
 		if( shift == 0 ) {
-
 		} else {
 			cpustate->CF = (dst & (1 << (shift-1))) ? 1 : 0;
 			dst = (dst >> shift) | (upper << (32-shift));

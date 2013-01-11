@@ -262,7 +262,6 @@ static const ym3526_interface ym3526_config =
 
 void metlclsh_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_subcpu = machine().device<cpu_device>("sub");
 
@@ -272,7 +271,6 @@ void metlclsh_state::machine_start()
 
 void metlclsh_state::machine_reset()
 {
-
 	flip_screen_set(0);
 
 	m_write_mask = 0;

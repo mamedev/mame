@@ -563,7 +563,6 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(spectrum_state,ts2068)
 {
-
 	m_port_ff_data = 0;
 	m_port_f4_data = 0;
 	ts2068_update_memory(machine());

@@ -1034,7 +1034,6 @@ void kf2k3upl_px_decrypt( running_machine &machine )
 	}
 
 	{
-
 		int ofst;
 		int i;
 		UINT8 *rom = machine.root_device().memregion( "maincpu" )->base() + 0xfe000;

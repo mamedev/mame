@@ -107,8 +107,7 @@ MACHINE_CONFIG_END
 #define SP_CBOWL_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "cashbowlsnd1.bin", 0x0000, 0x80000, CRC(44e67cef) SHA1(3cfe48122da527e82f9058e0c5b81b5096bf4181) ) \
-	ROM_LOAD( "cashbowlsnd2.bin", 0x80000, 0x80000, CRC(a28291a2) SHA1(c07b585cee89bc35c880d24eb6124796d6df423c) ) \
-
+	ROM_LOAD( "cashbowlsnd2.bin", 0x80000, 0x80000, CRC(a28291a2) SHA1(c07b585cee89bc35c880d24eb6124796d6df423c) )
 ROM_START( sp_cbowl )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "cashbowlgam2.bin", 0x0000, 0x8000, CRC(b20fa6f3) SHA1(63ded9527650e7810d6432fce762fe4691b87c1b) )
@@ -269,8 +268,7 @@ ROM_END
 
 #define SP_CRIME_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 ROM_START( sp_crime )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "crimwatchnew2.bin", 0x0000, 0x8000, CRC(b799fa39) SHA1(7d701d9368c3db26d4f6dae9a68f2833e2d48a40) )
@@ -338,8 +336,7 @@ ROM_END
 #define SP_EMMRD_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "edsnd1.bin", 0x0000, 0x80000, CRC(e91382d7) SHA1(499a0606e9bbabcf207c8778323899b7b81ae372) ) \
-	ROM_LOAD( "edsnd2.bin", 0x80000, 0x80000, CRC(0e103080) SHA1(2dcfcb35d04f34e4bc6da32f2d23bd8685654f8e) ) \
-
+	ROM_LOAD( "edsnd2.bin", 0x80000, 0x80000, CRC(0e103080) SHA1(2dcfcb35d04f34e4bc6da32f2d23bd8685654f8e) )
 
 
 ROM_START( sp_emmrd )
@@ -440,8 +437,7 @@ ROM_END
 
 #define SP_WOOLP_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_woolp )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -559,8 +555,7 @@ ROM_END
 
 #define SP_ZIGZAG_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 
 ROM_START( sp_zigzg )
@@ -663,8 +658,7 @@ ROM_END
 #define SP_GOLDM_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "gmilesnd1.bin", 0x0000, 0x80000, CRC(cb1d49a2) SHA1(ed212041017cf1305821a5d99c48723d06c16f0f) ) \
-	ROM_LOAD( "gmilesnd2.bin", 0x80000, 0x80000, CRC(a58e01a9) SHA1(5cdeb10c451eaf93cc4d6a0208408b00f134f8f4) ) \
-
+	ROM_LOAD( "gmilesnd2.bin", 0x80000, 0x80000, CRC(a58e01a9) SHA1(5cdeb10c451eaf93cc4d6a0208408b00f134f8f4) )
 
 ROM_START( sp_goldm )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -889,8 +883,7 @@ ROM_END
 
 #define SP_GNAT_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_gnat )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -1008,8 +1001,7 @@ ROM_END
 
 #define SP_GPRIX_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 ROM_START( sp_gprix )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "gp567p6b", 0x0000, 0x8000, CRC(e0ca19a5) SHA1(8b4eec4223d29f0f4098d0539fded5adca22070b) )
@@ -1075,8 +1067,7 @@ ROM_END
 
 #define SP_HIDEH_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_hideh )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -1201,8 +1192,7 @@ ROM_END
 
 #define SP_HIFLY_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_hifly )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -1326,8 +1316,7 @@ ROM_END
 #define SP_JURAS_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "jt8_snd1.bin", 0x0000, 0x80000, CRC(54f02e21) SHA1(1f2142e3cad828f3f07b729ad8394392c3a5ef46) ) \
-	ROM_LOAD( "jt8_snd2.bin", 0x80000, 0x80000, CRC(6ae75d87) SHA1(f6a73c26f7715b2a2d69b05d7729571b05b2fdaa) ) \
-
+	ROM_LOAD( "jt8_snd2.bin", 0x80000, 0x80000, CRC(6ae75d87) SHA1(f6a73c26f7715b2a2d69b05d7729571b05b2fdaa) )
 
 ROM_START( sp_juras )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -1338,8 +1327,7 @@ ROM_END
 
 #define SP_OPENB_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_openb )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -1413,8 +1401,7 @@ ROM_END
 
 #define SP_PAYRS_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_payrs )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -1485,8 +1472,7 @@ ROM_END
 
 #define SP_PLAYA_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 ROM_START( sp_playa )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "playitagain-v1-6pound1.bin", 0x0000, 0x8000, CRC(e377e7af) SHA1(4ca7c8ddd15791f4d45bebe861fd3c193c7227e0) )
@@ -1561,8 +1547,7 @@ ROM_END
 #define SP_SPELL_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "spellboundsnd1.bin", 0x0000, 0x80000, CRC(ab462981) SHA1(a88728eb8c5dbf114007551c7b5d4eb06cc7eb0b) ) \
-	ROM_LOAD( "spellboundsnd2.bin", 0x80000, 0x80000, CRC(9ada4413) SHA1(2dc9b42cdd3a64b5e5d3eab0d68b109258d12eda) ) \
-
+	ROM_LOAD( "spellboundsnd2.bin", 0x80000, 0x80000, CRC(9ada4413) SHA1(2dc9b42cdd3a64b5e5d3eab0d68b109258d12eda) )
 
 ROM_START( sp_spell )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -1635,8 +1620,7 @@ ROM_END
 
 #define SP_SWOP_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_swop )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -1699,8 +1683,7 @@ ROM_END
 #define SP_TIMEM_SOUND \
 	ROM_REGION( 0x100000, "oki", 0 ) \
 	ROM_LOAD( "002rs1a.bin", 0x0000, 0x80000, CRC(b7f7dcc4) SHA1(5c4f991c25c56e837502c395eeb62e2adc4dd089) ) \
-	ROM_LOAD( "002rs1b.bin", 0x80000, 0x80000, CRC(a7261ad8) SHA1(cdef00bf6db78309cbf9a49117d82bda2496c0a8) ) \
-
+	ROM_LOAD( "002rs1b.bin", 0x80000, 0x80000, CRC(a7261ad8) SHA1(cdef00bf6db78309cbf9a49117d82bda2496c0a8) )
 
 ROM_START( sp_timem )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -1788,8 +1771,7 @@ ROM_END
 
 #define SP_TZ_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_tz )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -1863,8 +1845,7 @@ ROM_END
 
 #define SP_TZFE_SOUND \
 	ROM_REGION( 0x100000, "oki", 0 ) /* from the filename and size I'm going to guess this isn't genuine */ \
-	ROM_LOAD( "tzfe_hacksound.bin", 0x0000, 0x05ea7c, BAD_DUMP CRC(e333e740) SHA1(332106987943d3043902887a0f4b2aea75d3fb04) ) \
-
+	ROM_LOAD( "tzfe_hacksound.bin", 0x0000, 0x05ea7c, BAD_DUMP CRC(e333e740) SHA1(332106987943d3043902887a0f4b2aea75d3fb04) )
 ROM_START( sp_tzfe )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "tz679d8b", 0x0000, 0x8000, CRC(b5f66994) SHA1(869a6a4c784a320b17d6552032e45d170af0e95f) )
@@ -2022,8 +2003,7 @@ ROM_END
 
 #define SP_BEAU_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 
 ROM_START( sp_beau )
@@ -2092,8 +2072,7 @@ ROM_END
 
 #define SP_BIGBD_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 ROM_START( sp_bigbd )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "bb10d13b", 0x0000, 0x8000, CRC(011bbbd8) SHA1(9fc0fff292badcf636d9d22a8a16f5e832e498a5) )
@@ -2112,8 +2091,7 @@ ROM_END
 
 #define SP_BRKBK_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_brkbk )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -2153,8 +2131,7 @@ ROM_END
 
 #define SP_CAMEL_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 
 ROM_START( sp_camel )
@@ -2273,8 +2250,7 @@ ROM_END
 
 #define SP_CLBNA_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_clbna )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -2295,8 +2271,7 @@ ROM_END
 
 #define SP_CODER_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_coder )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -2359,8 +2334,7 @@ ROM_END
 
 #define SP_CRISS_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_criss )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -2422,8 +2396,7 @@ ROM_END
 
 #define SP_DAYTR_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 
 ROM_START( sp_daytr )
@@ -2458,8 +2431,7 @@ ROM_END
 
 #define SP_DONKY_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_donky )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -2521,8 +2493,7 @@ ROM_END
 
 #define SP_DYOUR_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_dyour )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -2534,8 +2505,7 @@ ROM_END
 
 #define SP_FESTI_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_festi )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -2545,8 +2515,7 @@ ROM_END
 
 #define SP_BEAU2_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_beau2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -2601,8 +2570,7 @@ ROM_END
 
 #define SP_GHOST_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_ghost )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -2748,8 +2716,7 @@ ROM_END
 
 #define SP_GLOBE_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_globe )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -2810,8 +2777,7 @@ ROM_END
 
 #define SP_GOL_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 ROM_START( sp_gol )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "gl706p04.bin", 0x0000, 0x010000, CRC(01a48714) SHA1(0a48cfad05905450aa2a7c9dc22f937377894ff0) ) // merged rom
@@ -2821,8 +2787,7 @@ ROM_END
 
 #define SP_GOLDA_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_golda )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -2843,8 +2808,7 @@ ROM_END
 
 #define SP_GOLDS_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_golds )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -2912,8 +2876,7 @@ ROM_END
 
 #define SP_GOLDT_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 ROM_START( sp_goldt )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "729p2-0b.bin", 0x0000, 0x8000, CRC(a29a7084) SHA1(2a5ac792fd5a7514b74063475ca9419d03f17959) )
@@ -2924,8 +2887,7 @@ ROM_END
 
 #define SP_HERE_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 ROM_START( sp_here )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "hw674d8b", 0x0000, 0x8000, CRC(f3f83196) SHA1(4bdca9380632ae3be6b842e24df7597a9f6d073c) )
@@ -2985,8 +2947,7 @@ ROM_END
 
 #define SP_HOLID_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 ROM_START( sp_holid )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "hc669p3b", 0x0000, 0x8000, CRC(c703c949) SHA1(6a97a5a93f811054887feb3bc822f88ddd3d217b) )
@@ -3004,8 +2965,7 @@ ROM_END
 
 #define SP_LOTTO_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 ROM_START( sp_lotto )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "sp705p14.bin", 0x0000, 0x010000, CRC(46a8a503) SHA1(39d40c6d34ec1879b037d13b47e648ae09f345d8) ) // merged rom
@@ -3015,8 +2975,7 @@ ROM_END
 
 #define SP_MAGMO_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_magmo )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -3056,8 +3015,7 @@ ROM_END
 
 #define SP_MEGMO_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 
 ROM_START( sp_megmo )
@@ -3119,8 +3077,7 @@ ROM_END
 
 #define SP_MONMA_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_monma )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -3162,8 +3119,7 @@ ROM_END
 
 #define SP_MONMO_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 
 ROM_START( sp_monmo )
@@ -3225,8 +3181,7 @@ ROM_END
 
 #define SP_NUDEX_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_nudex )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -3246,8 +3201,7 @@ ROM_END
 
 #define SP_ONBOX_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_onbox )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -3356,8 +3310,7 @@ ROM_END
 
 #define SP_PISTE_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_piste )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -3482,8 +3435,7 @@ ROM_END
 
 #define SP_POUND_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 
 ROM_START( sp_pound )
@@ -3662,8 +3614,7 @@ ROM_END
 
 #define SP_PRZNA_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_przna )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -3724,8 +3675,7 @@ ROM_END
 
 #define SP_ROAD_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 ROM_START( sp_road )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "rh654p2b", 0x0000, 0x8000, CRC(05e052eb) SHA1(a69dd44bad0d83de3ba4f284e1cbff49ec0bbe3d) )
@@ -3735,8 +3685,7 @@ ROM_END
 
 #define SP_SKYLM_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 ROM_START( sp_skylm )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "sk617d7d.bin", 0x0000, 0x8000, CRC(6eb99fb3) SHA1(fe1decff1ed5a68117673bf4834eda9d7975c9c3) ) // was in a merged rom as 'sk617d7b' ?!
@@ -3754,8 +3703,7 @@ ROM_END
 
 #define SP_TKPIK_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_tkpik )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -3808,8 +3756,7 @@ ROM_END
 
 #define SP_CARRY_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 ROM_START( sp_carry )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "carry on 10p payout p2.bin", 0x0000, 0x8000, CRC(1db4062c) SHA1(92098a145c9cdf04758b92998dd4fca7945cf991) )
@@ -3828,8 +3775,7 @@ ROM_END
 
 #define SP_FRONT_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_front )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3844,8 +3790,7 @@ ROM_END
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
 	/* actually I think this rom is just a bad dump, there is a rom which is the same in the JPM HW set, */ \
 	/* but twice the size.  Also this isn't an oki rom!                                                  */ \
-	ROM_LOAD( "atw80snd.bin", 0x0000, 0x020000, CRC(b002e11c) SHA1(f7133f4bb8c31feaad0a7b9ee88749f9b7877575) ) \
-
+	ROM_LOAD( "atw80snd.bin", 0x0000, 0x020000, CRC(b002e11c) SHA1(f7133f4bb8c31feaad0a7b9ee88749f9b7877575) )
 ROM_START( sp_atw )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "artwld80", 0x0000, 0x010000, CRC(3ff314c3) SHA1(345df80243953b35916449b0aa6ffaf9d3501d2b) ) // pre-decrypted? bootleg?
@@ -3854,8 +3799,7 @@ ROM_END
 
 #define SP_FIVE_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_five )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3872,8 +3816,7 @@ ROM_END
 
 #define SP_CRUN_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_crun )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3895,8 +3838,7 @@ ROM_END
 
 #define SP_ROOF_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 ROM_START( sp_roof )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "034p1-2h.bin", 0x0000, 0x8000, CRC(2b0353fa) SHA1(5c9f06fdda33c4a4a09c69f1e969ae4041513fd9) )
@@ -3913,8 +3855,7 @@ ROM_END
 
 #define SP_CPAL_SOUND \
 	ROM_REGION( 0x100000, "oki", ROMREGION_ERASE00 ) \
-	/* not used, or missing? */ \
-
+	/* not used, or missing? */
 
 ROM_START( sp_cpal )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3932,7 +3873,6 @@ DRIVER_INIT_MEMBER(ace_sp_state,ace_cr)
 
 DRIVER_INIT_MEMBER(ace_sp_state,ace_sp)
 {
-
 }
 
 GAME( 199?, sp_cbowl        ,0          ,ace_sp ,ace_sp , ace_sp_state,ace_sp   ,ROT0   ,"Ace", "Cash Bowl (Ace) (sp.ACE) (set 1)",GAME_IS_SKELETON_MECHANICAL )

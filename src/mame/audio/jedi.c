@@ -94,7 +94,6 @@ WRITE8_MEMBER(jedi_state::jedi_audio_latch_w)
 
 READ8_MEMBER(jedi_state::audio_latch_r)
 {
-
 	*m_audio_comm_stat &= ~0x80;
 	return m_audio_latch;
 }
@@ -115,7 +114,6 @@ CUSTOM_INPUT_MEMBER(jedi_state::jedi_audio_comm_stat_r)
 
 READ8_MEMBER(jedi_state::jedi_audio_ack_latch_r)
 {
-
 	*m_audio_comm_stat &= ~0x40;
 	return m_audio_ack_latch;
 }
@@ -123,7 +121,6 @@ READ8_MEMBER(jedi_state::jedi_audio_ack_latch_r)
 
 WRITE8_MEMBER(jedi_state::audio_ack_latch_w)
 {
-
 	m_audio_ack_latch = data;
 	*m_audio_comm_stat |= 0x40;
 }

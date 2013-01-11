@@ -102,7 +102,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(astrof_state::irq_callback)
 
 INPUT_CHANGED_MEMBER(astrof_state::coin_inserted)
 {
-
 	/* coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 	coin_counter_w(machine(), 0, newval);
@@ -111,7 +110,6 @@ INPUT_CHANGED_MEMBER(astrof_state::coin_inserted)
 
 INPUT_CHANGED_MEMBER(astrof_state::service_coin_inserted)
 {
-
 	/* service coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -169,7 +167,6 @@ CUSTOM_INPUT_MEMBER(astrof_state::tomahawk_controls_r)
 
 void astrof_state::video_start()
 {
-
 	/* allocate the color RAM -- half the size of the video RAM as A0 is not connected */
 	m_colorram = auto_alloc_array(machine(), UINT8, m_videoram.bytes() / 2);
 	save_pointer(NAME(m_colorram), m_videoram.bytes() / 2);
@@ -276,7 +273,6 @@ static void tomahawk_get_pens( running_machine &machine, pen_t *pens )
 
 WRITE8_MEMBER(astrof_state::astrof_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_colorram[offset >> 1] = *m_astrof_color & 0x0e;
 }
@@ -284,7 +280,6 @@ WRITE8_MEMBER(astrof_state::astrof_videoram_w)
 
 WRITE8_MEMBER(astrof_state::tomahawk_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_colorram[offset >> 1] = (*m_astrof_color & 0x0e) | ((*m_astrof_color & 0x01) << 4);
 }
@@ -292,7 +287,6 @@ WRITE8_MEMBER(astrof_state::tomahawk_videoram_w)
 
 WRITE8_MEMBER(astrof_state::video_control_1_w)
 {
-
 	m_flipscreen = ((data >> 0) & 0x01) & ioport("CAB")->read();
 
 	/* this ties to the CLR pin of the shift registers */
@@ -452,7 +446,6 @@ READ8_MEMBER(astrof_state::shoot_r)
 
 READ8_MEMBER(astrof_state::abattle_coin_prot_r)
 {
-
 	m_abattle_count = (m_abattle_count + 1) % 0x0101;
 	return m_abattle_count ? 0x07 : 0x00;
 }
@@ -460,7 +453,6 @@ READ8_MEMBER(astrof_state::abattle_coin_prot_r)
 
 READ8_MEMBER(astrof_state::afire_coin_prot_r)
 {
-
 	m_abattle_count = m_abattle_count ^ 0x01;
 	return m_abattle_count ? 0x07 : 0x00;
 }
@@ -468,7 +460,6 @@ READ8_MEMBER(astrof_state::afire_coin_prot_r)
 
 READ8_MEMBER(astrof_state::tomahawk_protection_r)
 {
-
 	/* flip the byte */
 	return BITSWAP8(*m_tomahawk_protection, 0, 1, 2, 3, 4, 5, 6, 7);
 }
@@ -483,7 +474,6 @@ READ8_MEMBER(astrof_state::tomahawk_protection_r)
 
 MACHINE_START_MEMBER(astrof_state,astrof)
 {
-
 	/* the 74175 outputs all HI's if not otherwise set */
 	astrof_set_video_control_2(machine(), 0xff);
 
@@ -505,7 +495,6 @@ MACHINE_START_MEMBER(astrof_state,astrof)
 
 MACHINE_START_MEMBER(astrof_state,abattle)
 {
-
 	/* register for state saving */
 	save_item(NAME(m_abattle_count));
 
@@ -515,7 +504,6 @@ MACHINE_START_MEMBER(astrof_state,abattle)
 
 MACHINE_START_MEMBER(astrof_state,spfghmk2)
 {
-
 	/* the 74175 outputs all HI's if not otherwise set */
 	spfghmk2_set_video_control_2(machine(), 0xff);
 
@@ -533,7 +521,6 @@ MACHINE_START_MEMBER(astrof_state,spfghmk2)
 
 MACHINE_START_MEMBER(astrof_state,tomahawk)
 {
-
 	/* the 74175 outputs all HI's if not otherwise set */
 	tomahawk_set_video_control_2(machine(), 0xff);
 

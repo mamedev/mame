@@ -69,7 +69,6 @@ TILE_GET_INFO_MEMBER(mainsnk_state::get_bg_tile_info)
 
 void mainsnk_state::video_start()
 {
-
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mainsnk_state::get_tx_tile_info),this), tilemap_mapper_delegate(FUNC(mainsnk_state::marvins_tx_scan_cols),this), 8, 8, 36, 28);
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mainsnk_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS,    8, 8, 32, 32);
 
@@ -106,14 +105,12 @@ WRITE8_MEMBER(mainsnk_state::mainsnk_c600_w)
 
 WRITE8_MEMBER(mainsnk_state::mainsnk_fgram_w)
 {
-
 	m_fgram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(mainsnk_state::mainsnk_bgram_w)
 {
-
 	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -165,7 +162,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 mainsnk_state::screen_update_mainsnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(machine(), bitmap, cliprect, 0, 0);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);

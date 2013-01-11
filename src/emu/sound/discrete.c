@@ -176,7 +176,6 @@ private:
 
 inline void discrete_task::step_nodes(void)
 {
-
 	for_each(input_buffer *, sn, &source_list)
 	{
 		sn->buffer = *sn->ptr++;
@@ -284,7 +283,6 @@ void discrete_task::check(discrete_task *dest_task)
 	 */
 	for_each(discrete_step_interface **, node_entry, &step_list)
 	{
-
 		discrete_base_node *task_node = (*node_entry)->self;
 
 		for_each(discrete_step_interface **, step_entry, &dest_task->step_list)
@@ -1003,7 +1001,6 @@ void discrete_sound_device::device_start()
 
 void discrete_device::device_reset()
 {
-
 	update_to_current_time();
 
 	/* loop over all nodes */
@@ -1018,7 +1015,6 @@ void discrete_device::device_reset()
 
 void discrete_sound_device::device_reset()
 {
-
 	discrete_device::device_reset();
 }
 

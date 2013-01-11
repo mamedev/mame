@@ -1297,7 +1297,6 @@ static void copylayer(running_machine &machine, bitmap_ind16 &bitmap, const rect
 
 UINT32 dynax_state::screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	static const int order[24][4] =
 	{
 		{ 3,2,1,0 }, { 2,3,1,0 }, { 3,1,2,0 }, { 1,3,2,0 }, { 2,1,3,0 }, { 1,2,3,0 },

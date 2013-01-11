@@ -44,9 +44,7 @@ private:
 };
 
 #define ST0020_ST0032_BYTESWAP_DATA \
-	if (m_is_st0032) data = ((data & 0x00ff)<<8) | ((data & 0xff00)>>8); \
-
+	if (m_is_st0032) data = ((data & 0x00ff)<<8) | ((data & 0xff00)>>8);
 #define ST0020_ST0032_BYTESWAP_MEM_MASK \
-	if (m_is_st0032) mem_mask = ((mem_mask & 0x00ff)<<8) | ((mem_mask & 0xff00)>>8); \
-
+	if (m_is_st0032) mem_mask = ((mem_mask & 0x00ff)<<8) | ((mem_mask & 0xff00)>>8);
 extern const device_type ST0020_SPRITES;

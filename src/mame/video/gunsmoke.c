@@ -73,7 +73,6 @@ WRITE8_MEMBER(gunsmoke_state::gunsmoke_colorram_w)
 
 WRITE8_MEMBER(gunsmoke_state::gunsmoke_c804_w)
 {
-
 	/* bits 0 and 1 are for coin counters */
 	coin_counter_w(machine(), 1, data & 0x01);
 	coin_counter_w(machine(), 0, data & 0x02);
@@ -92,7 +91,6 @@ WRITE8_MEMBER(gunsmoke_state::gunsmoke_c804_w)
 
 WRITE8_MEMBER(gunsmoke_state::gunsmoke_d806_w)
 {
-
 	/* bits 0-2 select the sprite 3 bank */
 	m_sprite3bank = data & 0x07;
 

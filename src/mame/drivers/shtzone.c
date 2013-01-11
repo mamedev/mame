@@ -73,23 +73,19 @@ INPUT_PORTS_END
 
 void shtzone_state::machine_start()
 {
-
 }
 
 void shtzone_state::machine_reset()
 {
-
 }
 
 void shtzone_state::video_start()
 {
-
 }
 
 
 UINT32 shtzone_state::screen_update_shtzone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	return 0;
 }
 

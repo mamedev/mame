@@ -374,7 +374,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(wms_state,wms)
 {
-
 }
 
 GAME( 200?, wms,        0,       wms, wms, wms_state, wms, ROT0, "WMS", "WMS SetUp/Clear Chips (set 1)", GAME_IS_SKELETON )

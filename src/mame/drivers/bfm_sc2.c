@@ -1188,7 +1188,6 @@ WRITE8_MEMBER(bfm_sc2_state::vfd1_dmd_w)
 //
 WRITE8_MEMBER(bfm_sc2_state::e2ram_w)
 {
-
 	int changed, ack;
 
 	data ^= (SDA|SCL);  // invert signals
@@ -1408,7 +1407,6 @@ static int read_e2ram(running_machine &machine)
 
 MACHINE_RESET_MEMBER(bfm_sc2_state,init)
 {
-
 	// reset the board //////////////////////////////////////////////////////
 
 	on_scorpion2_reset(machine());
@@ -2198,7 +2196,6 @@ int sc2_find_project_string(running_machine &machine )
 
 	for (int search=0;search<4;search++)
 	{
-
 		int strlength = strlen(title_string[search]);
 
 		for (int i=0;i<size-strlength;i++)
@@ -2219,7 +2216,6 @@ int sc2_find_project_string(running_machine &machine )
 
 			if (found!=0)
 			{
-
 				int end=0;
 				int count = 0;
 				int blankcount = 0;
@@ -2677,7 +2673,6 @@ static const bfmdm01_interface dm01_interface =
 /* machine init (called only once) */
 MACHINE_RESET_MEMBER(bfm_sc2_state,awp_init)
 {
-
 	on_scorpion2_reset(machine());
 	m_vfd0->reset();
 	m_vfd1->reset();
@@ -4049,56 +4044,44 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,luvjub)
 //these differ by only two bytes, and with no obvious labelling, this has been a bit of a guess
 #define sc2_gslam_sound \
 	ROM_REGION( 0x80000, "upd", 0 )\
-	ROM_LOAD( "grandslamsnd.bin", 0x0000, 0x080000, CRC(e4af3787) SHA1(9aa40f7c4c4db3618b553505b02663c1d5f297c3) )\
-
+	ROM_LOAD( "grandslamsnd.bin", 0x0000, 0x080000, CRC(e4af3787) SHA1(9aa40f7c4c4db3618b553505b02663c1d5f297c3) )
 #define sc2_gslam_sound_alt \
 	ROM_REGION( 0x80000, "upd", 0 )\
 	ROM_LOAD( "gslamsndb.bin", 0x0000, 0x080000, CRC(c9dfb6f5) SHA1(6e529c210b26e7ce164cebbff8ec314c6fa8f7bf) )
 
 #define sc2_catms_sound\
 	ROM_REGION( 0x80000, "upd", 0 )\
-	ROM_LOAD( "catandmousesnd.bin", 0x0000, 0x080000, CRC(00d3b224) SHA1(5ae35a7bfa65e8343564e6f6a219bc674710fadc) )\
-
+	ROM_LOAD( "catandmousesnd.bin", 0x0000, 0x080000, CRC(00d3b224) SHA1(5ae35a7bfa65e8343564e6f6a219bc674710fadc) )
 #define sc2_gsclb_sound \
 	ROM_REGION( 0x80000, "upd", 0 )\
-	ROM_LOAD( "95004024.bin", 0x0000, 0x080000, CRC(e1a0323f) SHA1(a015d99c882962651869d8ec71a6c17a1cba687f) )\
-
+	ROM_LOAD( "95004024.bin", 0x0000, 0x080000, CRC(e1a0323f) SHA1(a015d99c882962651869d8ec71a6c17a1cba687f) )
 #define sc2_cpg_sound\
 	ROM_REGION( 0x80000, "upd", 0 )\
-	ROM_LOAD( "pharaohsgoldsnd.bin", 0x0000, 0x080000, CRC(7d67d53e) SHA1(159e0e9af1cfd6adc141daaa0f75d38af55218c3) )\
-
+	ROM_LOAD( "pharaohsgoldsnd.bin", 0x0000, 0x080000, CRC(7d67d53e) SHA1(159e0e9af1cfd6adc141daaa0f75d38af55218c3) )
 #define sc2_suprz_sound\
 	ROM_REGION( 0x80000, "upd", 0 )\
-	ROM_LOAD( "surprisesurprizesnd.bin", 0x0000, 0x01fedb, CRC(c0981343) SHA1(71278c3446cf204a31415dd2ed8f1de7f7a16645) )\
-
+	ROM_LOAD( "surprisesurprizesnd.bin", 0x0000, 0x01fedb, CRC(c0981343) SHA1(71278c3446cf204a31415dd2ed8f1de7f7a16645) )
 #define sc2_motd_sound\
 	ROM_REGION( 0x80000, "upd", 0 )\
-	ROM_LOAD( "modsndf.bin", 0x0000, 0x080000, CRC(088471f5) SHA1(49fb22daf04450186e9a83aee3312bb85ccf6842) )\
-
+	ROM_LOAD( "modsndf.bin", 0x0000, 0x080000, CRC(088471f5) SHA1(49fb22daf04450186e9a83aee3312bb85ccf6842) )
 #define sc2_easy_sound\
 	ROM_REGION( 0x80000, "upd", 0 )\
-	ROM_LOAD( "easy-money_snd.bin", 0x0000, 0x080000, CRC(56d224c5) SHA1(43b81a1a9a7d30ef7bfb2bbc61e3106faa927778) )\
-
+	ROM_LOAD( "easy-money_snd.bin", 0x0000, 0x080000, CRC(56d224c5) SHA1(43b81a1a9a7d30ef7bfb2bbc61e3106faa927778) )
 #define sc2_luvv_sound \
 	ROM_REGION( 0x80000, "upd", 0 )\
-	ROM_LOAD("snd.bin",      0x00000, 0x80000, CRC(19efac32) SHA1(26f901fc11f052a4d3cff67f8f61dcdd04f3dc22))\
-
+	ROM_LOAD("snd.bin",      0x00000, 0x80000, CRC(19efac32) SHA1(26f901fc11f052a4d3cff67f8f61dcdd04f3dc22))
 #define sc2_ofool_sound\
 	ROM_REGION( 0x80000, "upd", 0 )\
-	ROM_LOAD( "onlyfools_snd.bin", 0x0000, 0x080000, CRC(c073bb0c) SHA1(54b3df8c8d814af1fbb662834739a32a693fc7ee) )\
-
+	ROM_LOAD( "onlyfools_snd.bin", 0x0000, 0x080000, CRC(c073bb0c) SHA1(54b3df8c8d814af1fbb662834739a32a693fc7ee) )
 #define sc2_ofool_matrix\
 	ROM_REGION( 0x20000, "matrix", 0 )\
-	ROM_LOAD( "onlyfoolsnhorsesdotmatrix.bin", 0x0000, 0x010000, CRC(521611f7) SHA1(08cdc9f7434657151d90fcfd26ce4668477c2998) )\
-
+	ROM_LOAD( "onlyfoolsnhorsesdotmatrix.bin", 0x0000, 0x010000, CRC(521611f7) SHA1(08cdc9f7434657151d90fcfd26ce4668477c2998) )
 #define sc2_town_sound \
 	ROM_REGION( 0x80000, "upd", 0 )\
-	ROM_LOAD( "attsnd.bin", 0x0000, 0x040000, CRC(9b5327c8) SHA1(b9e5aeb3e9a6ece796e9164e425829d97c5f3a82) )\
-
+	ROM_LOAD( "attsnd.bin", 0x0000, 0x040000, CRC(9b5327c8) SHA1(b9e5aeb3e9a6ece796e9164e425829d97c5f3a82) )
 #define sc2_cpe_sound \
 	ROM_REGION( 0x80000, "upd", 0 )\
-	ROM_LOAD("cpe1_snd.bin",  0x00000, 0x80000, CRC(ca8a56bb) SHA1(36434dae4369f004fa5b4dd00eb6b1a965be60f9))\
-
+	ROM_LOAD("cpe1_snd.bin",  0x00000, 0x80000, CRC(ca8a56bb) SHA1(36434dae4369f004fa5b4dd00eb6b1a965be60f9))
 #define sc2_cpe_sound_alt1 \
 	ROM_REGION( 0x80000, "upd", 0 )\
 	ROM_LOAD( "pen1c_snd.bin", 0x0000, 0x080000, CRC(57f3d152) SHA1(f5ccd11042d54396352df149e85c4aa271342d49) )
@@ -4109,67 +4092,52 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,luvjub)
 
 #define sc2_cops_sound \
 	ROM_REGION( 0x80000, "upd", 0 )\
-	ROM_LOAD( "copssnd.bin", 0x0000, 0x040000, CRC(4bebbc37) SHA1(10eb8542a9de35efc0f75b532c94e1b3e0d21e47) )\
-
+	ROM_LOAD( "copssnd.bin", 0x0000, 0x040000, CRC(4bebbc37) SHA1(10eb8542a9de35efc0f75b532c94e1b3e0d21e47) )
 #define sc2_copcl_sound\
 	ROM_REGION( 0x80000, "upd", 0 )\
-	ROM_LOAD( "club-cops-and-robbers-sound.bin", 0x0000, 0x040000, CRC(b5ba009d) SHA1(806b1d739fbf00b7e55ed0b8056440e47bfba87a) )\
-
+	ROM_LOAD( "club-cops-and-robbers-sound.bin", 0x0000, 0x040000, CRC(b5ba009d) SHA1(806b1d739fbf00b7e55ed0b8056440e47bfba87a) )
 //missing a sound rom - is it the same as the non-deluxe version?
 #define sc2_copdc_sound\
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )\
-
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
 //can't tell any difference between these audibly, could one have the 'ruder' samples dummied out in the code?
 //For now, I'm putting the first ROM with Bellfruit sets, and the second with Mazooma ones
 #define sc2_dels_sound\
 	ROM_REGION( 0x80000, "upd", 0 )\
-	ROM_LOAD( "dmsnd.bin", 0x0000, 0x080000, CRC(0a68550b) SHA1(82a4a8d2a754a59da553b3568df870107e33f978) )\
-
+	ROM_LOAD( "dmsnd.bin", 0x0000, 0x080000, CRC(0a68550b) SHA1(82a4a8d2a754a59da553b3568df870107e33f978) )
 #define sc2_dels_sound_alt\
 	ROM_REGION( 0x80000, "upd", 0 )\
-	ROM_LOAD( "delssnd.bin", 0x0000, 0x080000, CRC(cb298f06) SHA1(fdc857101ad15d58aeb7ffc4a489c3de9373fc80) )\
-
+	ROM_LOAD( "delssnd.bin", 0x0000, 0x080000, CRC(cb298f06) SHA1(fdc857101ad15d58aeb7ffc4a489c3de9373fc80) )
 #define sc2_wembl_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )\
-	ROM_LOAD( "wembley_sound.bin", 0x0000, 0x080000, CRC(5ce2fc50) SHA1(26533428582058f0cd618e3657f967bc64e551fc) )\
-
+	ROM_LOAD( "wembley_sound.bin", 0x0000, 0x080000, CRC(5ce2fc50) SHA1(26533428582058f0cd618e3657f967bc64e551fc) )
 #define sc2_prem_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )\
-	ROM_LOAD( "premclubsnd.bin", 0x0000, 0x080000, CRC(b20c74f1) SHA1(b43a79f8f59387ef777fffd07a39b7333811d464) )\
-
+	ROM_LOAD( "premclubsnd.bin", 0x0000, 0x080000, CRC(b20c74f1) SHA1(b43a79f8f59387ef777fffd07a39b7333811d464) )
 #define sc2_downt_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )\
-	ROM_LOAD( "dtownsnd.dat", 0x0000, 0x080000, CRC(a41b109b) SHA1(22470d731741521321d004fc56ff8217e506ef69) )\
-
+	ROM_LOAD( "dtownsnd.dat", 0x0000, 0x080000, CRC(a41b109b) SHA1(22470d731741521321d004fc56ff8217e506ef69) )
 #define sc2_goldr_sound\
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )\
-	ROM_LOAD( "gold_reserve_snd", 0x0000, 0x080000, CRC(e8e7ab7b) SHA1(ce43e8ffccc0421548c6683a72267b7e5f805db4) )\
-
+	ROM_LOAD( "gold_reserve_snd", 0x0000, 0x080000, CRC(e8e7ab7b) SHA1(ce43e8ffccc0421548c6683a72267b7e5f805db4) )
 #define sc2_hifly_sound\
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )\
-	ROM_LOAD( "hiflyersound.bin", 0x0000, 0x080000, CRC(acdef7dc) SHA1(c2cc219ca8f4a3e3cdcb1147ad49cd69adb3751b) )\
-
+	ROM_LOAD( "hiflyersound.bin", 0x0000, 0x080000, CRC(acdef7dc) SHA1(c2cc219ca8f4a3e3cdcb1147ad49cd69adb3751b) )
 #define sc2_inst_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )\
-	ROM_LOAD( "instantjackpotssnd.bin", 0x0000, 0x080000, CRC(ba922860) SHA1(7d84c7fa72b1fb567faccf8464e0fd859c76838d) )\
-
+	ROM_LOAD( "instantjackpotssnd.bin", 0x0000, 0x080000, CRC(ba922860) SHA1(7d84c7fa72b1fb567faccf8464e0fd859c76838d) )
 #define sc2_mam_sound\
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )\
-	ROM_LOAD( "mamsnd.bin", 0x0000, 0x080000, CRC(32537b18) SHA1(c26697162edde97ec999ed0459656edb85a01a50) )\
-
+	ROM_LOAD( "mamsnd.bin", 0x0000, 0x080000, CRC(32537b18) SHA1(c26697162edde97ec999ed0459656edb85a01a50) )
 //This was also in the non-club, so may be an alt set
 #define sc2_mamcl_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )\
-	ROM_LOAD( "cmamsnd.bin", 0x0000, 0x080000, CRC(9a80977a) SHA1(0a6dc9465efa9e3d12894daf88a2746e74409349))\
-
+	ROM_LOAD( "cmamsnd.bin", 0x0000, 0x080000, CRC(9a80977a) SHA1(0a6dc9465efa9e3d12894daf88a2746e74409349))
 #define sc2_showt_sound\
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )\
-	ROM_LOAD( "stspec", 0x0000, 0x080000, CRC(01e4a017) SHA1(f2f0cadf2334edf35db98af0dcb6d827c991f3f2) )\
-
+	ROM_LOAD( "stspec", 0x0000, 0x080000, CRC(01e4a017) SHA1(f2f0cadf2334edf35db98af0dcb6d827c991f3f2) )
 #define sc2_sstar_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )\
-	ROM_LOAD( "superstarsnd.bin", 0x0000, 0x080000, CRC(9a2609b5) SHA1(d29a5029e39cd44739682954f034f2d1f2e1cebf) )\
-
+	ROM_LOAD( "superstarsnd.bin", 0x0000, 0x080000, CRC(9a2609b5) SHA1(d29a5029e39cd44739682954f034f2d1f2e1cebf) )
 //missing
 #define sc2_wwcl_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )\
@@ -4178,42 +4146,35 @@ DRIVER_INIT_MEMBER(bfm_sc2_state,luvjub)
 //is this upd?
 #define sc2_dick_sound \
 	ROM_REGION( 0x100000, "upd", ROMREGION_ERASE00 )\
-	ROM_LOAD( "global-spotted-dick_snd.bin", 0x0000, 0x100000, CRC(f2c66aab) SHA1(6fe94a193779c91711588365591cf42d197cb7b9) )\
-
+	ROM_LOAD( "global-spotted-dick_snd.bin", 0x0000, 0x100000, CRC(f2c66aab) SHA1(6fe94a193779c91711588365591cf42d197cb7b9) )
 
 //is this upd?
 #define sc2_pick_sound\
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )\
 	ROM_LOAD( "pickofthebunchsnd1.bin", 0x000000, 0x100000, CRC(f717b9c7) SHA1(06c90cc9779d475100926e986c742f0acffa0dc3) )\
-	ROM_LOAD( "pickofthebunchsnd2.bin", 0x100000, 0x100000, CRC(eaac3e67) SHA1(3aaed6514eeeb41c26f365789d8736908785b1c2) )\
-
+	ROM_LOAD( "pickofthebunchsnd2.bin", 0x100000, 0x100000, CRC(eaac3e67) SHA1(3aaed6514eeeb41c26f365789d8736908785b1c2) )
 //Is this upd?
 #define sc2_rock_sound \
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )\
-	ROM_LOAD( "hbiyr_snd.bin", 0x0000, 0x100000, CRC(96cc0d54) SHA1(612f8c7f353bb847c1a28e2b76b64916d5b2d36a) )\
-
+	ROM_LOAD( "hbiyr_snd.bin", 0x0000, 0x100000, CRC(96cc0d54) SHA1(612f8c7f353bb847c1a28e2b76b64916d5b2d36a) )
 //this is a guess
 #define sc2_gcclb_sound\
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )\
 	ROM_LOAD( "gold_cas.snd", 0x0000, 0x080000, CRC(d93d39fb) SHA1(ce0c0c1430a6136ce39ffae018b009e629cbad61) )\
 	ROM_REGION( 0x80000, "altupd", 0 )/* looks bad */ \
-	ROM_LOAD( "95004065.p1", 0x0000, 0x080000, CRC(2670726b) SHA1(0f8045c68131191fceea5728e14c901d159bfb57) ) \
-
+	ROM_LOAD( "95004065.p1", 0x0000, 0x080000, CRC(2670726b) SHA1(0f8045c68131191fceea5728e14c901d159bfb57) )
 #define sc2_gcclb_matrix \
 	ROM_REGION( 0x20000, "matrix", 0 ) \
-	ROM_LOAD( "95000589.p1", 0x0000, 0x010000, CRC(36400074) SHA1(611b48650e59b52f661be2730afaef2e5772607c) ) \
-
+	ROM_LOAD( "95000589.p1", 0x0000, 0x010000, CRC(36400074) SHA1(611b48650e59b52f661be2730afaef2e5772607c) )
 
 // The below file also matches superstarsnd.bin
 #define sc2_cb7_sound \
 	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )\
-	ROM_LOAD( "casinobar7_bfm_snd1.bin", 0x0000, 0x080000, CRC(9a2609b5) SHA1(d29a5029e39cd44739682954f034f2d1f2e1cebf) )\
-
+	ROM_LOAD( "casinobar7_bfm_snd1.bin", 0x0000, 0x080000, CRC(9a2609b5) SHA1(d29a5029e39cd44739682954f034f2d1f2e1cebf) )
 // The below file also matches football-club_mtx_ass.bin
 #define sc2_foot_matrix \
 	ROM_REGION( 0x20000, "matrix", 0 )\
-	ROM_LOAD( "95000590.p1", 0x0000, 0x010000, CRC(6b78de57) SHA1(84638836cdbfa6e4b3b76cd38e238d12bb312c53) )\
-
+	ROM_LOAD( "95000590.p1", 0x0000, 0x010000, CRC(6b78de57) SHA1(84638836cdbfa6e4b3b76cd38e238d12bb312c53) )
 ROM_START( sc2brkfs )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("big-breakfast_std_ar_var_a.bin",  0x00000, 0x10000, CRC(5f016daa) SHA1(25ee10138bddf453588e3c458268533a88a51217) )
@@ -7434,8 +7395,7 @@ ROM_END
 /* was in an SC4 set, is it meant to link with the SC4 units? */
 ROM_START( sc2cb7p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "95751960.p1", 0x0000, 0x010000, CRC(9f944d0c) SHA1(feb8fe4ce0a8f5c4a034aafec0f5aae29a834e8d) ) \
-
+	ROM_LOAD( "95751960.p1", 0x0000, 0x010000, CRC(9f944d0c) SHA1(feb8fe4ce0a8f5c4a034aafec0f5aae29a834e8d) )
 	sc2_cb7_sound
 ROM_END
 
@@ -8335,8 +8295,7 @@ GAME( 199?, sc2pe1g     , 0         ,  scorpion2        , drwho     , bfm_sc2_st
 // taken from the sc1 set, might be wrong here
 #define sc2_winst_sound \
 	ROM_REGION( 0x80000, "upd", 0 )\
-	ROM_LOAD( "winningstreaksnd.bin", 0x0000, 0x080000, CRC(ba30cb97) SHA1(e7f5ca36ca993ad14b3a348868e73d7ba02be7c5) )\
-
+	ROM_LOAD( "winningstreaksnd.bin", 0x0000, 0x080000, CRC(ba30cb97) SHA1(e7f5ca36ca993ad14b3a348868e73d7ba02be7c5) )
 ROM_START( sc2winstb )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "winning-streak_std_ac_var_8-10pnd_ass.bin",       0x00000, 0x10000, CRC(f2d16bd5) SHA1(bd6a9da9da24459b14917386c64ecbc46c8adfda) ) sc2_winst_sound ROM_END
 ROM_START( sc2winstbp ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "winning-streak_dat_ac_var_8-10pnd_ass.bin",       0x00000, 0x10000, CRC(351560f4) SHA1(b33c6bdeadeabbe5a4231b8bd5b134f9ea402133) ) sc2_winst_sound ROM_END
 ROM_START( sc2winst )   ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "winning-streak_std_ar_var_8pnd_ass.bin",          0x00000, 0x10000, CRC(d7a10aeb) SHA1(7346c83df7fd3de57a1b6f0ce498daabacb11491) ) sc2_winst_sound ROM_END
@@ -8373,8 +8332,7 @@ GAME( 198?, sc2winstfp      , sc2winst  , scorpion2         , drwho , bfm_sc2_st
 ********************************************************************************************************************************************************************************************************************/
 
 #define sc2_cexpl_sound \
-	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )\
-
+	ROM_REGION( 0x80000, "upd", ROMREGION_ERASE00 )
 ROM_START( sc2cexpl )  ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "cash_explosion_dat_ac_8_10pnd_20p_a.bin",  0x0000, 0x010000, CRC(1d155799) SHA1(4e76328a4d093d1f9c64c633c3558db2dce4e219) ) sc2_cexpl_sound ROM_END
 ROM_START( sc2cexpla ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "cash_explosion_dat_ac_var_8pnd_a.bin",     0x0000, 0x010000, CRC(4aa53121) SHA1(cf0510e224de62b837915d39c2fe3559cfe8c85f) ) sc2_cexpl_sound ROM_END
 ROM_START( sc2cexplb ) ROM_REGION( 0x10000, "maincpu", 0 ) ROM_LOAD( "cash_explosion_dat_wi_ac_10pnd_20p_a.bin", 0x0000, 0x010000, CRC(889eb206) SHA1(91b23a2cc475e68470d01976b88b9ea7aa0afed9) ) sc2_cexpl_sound ROM_END

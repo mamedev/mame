@@ -20,12 +20,10 @@ deco_karnovsprites_device::deco_karnovsprites_device(const machine_config &mconf
 
 void deco_karnovsprites_device::device_start()
 {
-
 }
 
 void deco_karnovsprites_device::device_reset()
 {
-
 }
 
 void deco_karnovsprites_device::draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int size, int priority )

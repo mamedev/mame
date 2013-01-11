@@ -320,7 +320,6 @@ INPUT_PORTS_END
 
 void clayshoo_state::machine_reset()
 {
-
 	m_input_port_select = 0;
 	m_analog_port_val = 0;
 }

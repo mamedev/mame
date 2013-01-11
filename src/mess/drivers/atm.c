@@ -92,7 +92,6 @@ static void atm_update_memory(running_machine &machine)
 
 WRITE8_MEMBER(atm_state::atm_port_7ffd_w)
 {
-
 	/* disable paging */
 	if (m_port_7ffd_data & 0x20)
 		return;

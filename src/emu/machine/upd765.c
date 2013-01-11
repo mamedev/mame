@@ -642,7 +642,6 @@ void upd765_family_device::live_run(attotime limit)
 	}
 
 	for(;;) {
-
 		switch(cur_live.state) {
 		case SEARCH_ADDRESS_MARK_HEADER:
 			if(read_one_bit(limit))

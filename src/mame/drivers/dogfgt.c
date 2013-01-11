@@ -43,7 +43,6 @@ WRITE8_MEMBER(dogfgt_state::dogfgt_soundlatch_w)
 
 WRITE8_MEMBER(dogfgt_state::dogfgt_soundcontrol_w)
 {
-
 	/* bit 5 goes to 8910 #0 BDIR pin  */
 	if ((m_last_snd_ctrl & 0x20) == 0x20 && (data & 0x20) == 0x00)
 		ay8910_data_address_w(machine().device("ay1"), space, m_last_snd_ctrl >> 4, m_soundlatch);
@@ -208,7 +207,6 @@ GFXDECODE_END
 
 void dogfgt_state::machine_start()
 {
-
 	m_subcpu = machine().device<cpu_device>("sub");
 
 	save_item(NAME(m_bm_plane));

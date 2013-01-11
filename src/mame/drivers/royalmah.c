@@ -3353,7 +3353,6 @@ MACHINE_CONFIG_END
 
 INTERRUPT_GEN_MEMBER(royalmah_state::mjtensin_interrupt)
 {
-
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);  // vblank
 }
 

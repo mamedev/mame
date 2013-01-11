@@ -98,7 +98,6 @@ INLINE int vg5k_cas_byte(INT16 *buffer, int sample_pos, UINT8 data)
 ********************************************************************/
 INLINE int vg5k_k7_synchro(INT16 *buffer, int sample_pos, int len)
 {
-
 	int i, samples = 0;
 
 	for ( i = 0; i < len ; i++ )

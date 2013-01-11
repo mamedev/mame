@@ -293,7 +293,6 @@ WRITE8_MEMBER( vc4000_state::vc4000_video_w )
 
 	switch (offset)
 	{
-
 	case 0xc0:                      // Sprite size
 		m_video.sprites[0].size=1<<(data&3);
 		m_video.sprites[1].size=1<<((data>>2)&3);

@@ -352,7 +352,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ecoinf1_state,ecoinf1)
 {
-
 }
 
 // all roms might really be for the same game, just in different cabinet styles

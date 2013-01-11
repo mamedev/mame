@@ -41,7 +41,6 @@ public:
 
 WRITE16_MEMBER(globalfr_state::vfd_w)
 {
-
 //  if(!(data & 0x20)) need to find reset
 	{
 		int clock = (data & 0x40) != 0;
@@ -87,8 +86,7 @@ MACHINE_CONFIG_END
 #define GL_SNBEV_SOUND \
 	ROM_REGION( 0x200000, "snd", 0 ) \
 	ROM_LOAD( "3pbv0-8t.u1", 0x000000, 0x100000, CRC(330d891f) SHA1(3bf0f4a107289a079371cd3a9dcce6dd9b304dfe) ) \
-	ROM_LOAD( "3pbv0-8t.u2", 0x100000, 0x100000, CRC(b4a0d108) SHA1(cb63bf3cb399c91015b70ef0ebd95e2bdc405b27) )  \
-
+	ROM_LOAD( "3pbv0-8t.u2", 0x100000, 0x100000, CRC(b4a0d108) SHA1(cb63bf3cb399c91015b70ef0ebd95e2bdc405b27) )
 ROM_START( gl_snbev )
 	ROM_REGION( 0x080000, "maincpu", 0 )
 	ROM_LOAD( "3pbv1-3n.g0", 0x000000, 0x020000, CRC(591eccbe) SHA1(aa5d38af8f8cbb4b2b0439dba29537feac9ddd29) )

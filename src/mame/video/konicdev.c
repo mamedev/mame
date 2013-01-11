@@ -1334,7 +1334,6 @@ void konami_sortlayers5( int *layer, int *pri )
 
 struct k007121_state
 {
-
 	UINT8    ctrlram[8];
 	int      flipscreen;
 };
@@ -3017,7 +3016,6 @@ WRITE8_DEVICE_HANDLER( k051937_w )
 
 	if (offset == 0)
 	{
-
 		//if (data & 0xc2) popmessage("051937 reg 00 = %02x",data);
 
 		/* bit 0 is IRQ enable */
@@ -7446,7 +7444,6 @@ static int k056832_update_linemap( device_t *device, _BitmapClass &bitmap, int p
 
         */
 		{
-
 			bitmap_ind16 *pixmap;
 			running_machine &machine = device->machine();
 
@@ -8205,7 +8202,6 @@ void k056832_device::device_config_complete()
 
 void k056832_device::device_start()
 {
-
 /* TODO: understand which elements MUST be init here (to keep correct layer
    associations) and which ones can can be init at RESET, if any */
 	k056832_state *k056832 = k056832_get_safe_token(this);
@@ -9961,7 +9957,6 @@ static void k001005_render_polygons( device_t *device )
 		}
 		else if (k001005->_3d_fifo[i] == 0x80000000)
 		{
-
 		}
 		else if ((k001005->_3d_fifo[i] & 0xffffff00) == 0x80000000)
 		{

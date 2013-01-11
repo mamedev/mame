@@ -133,7 +133,6 @@ UINT32 sstrangr_state::screen_update_sstrngr2(screen_device &screen, bitmap_rgb3
 
 WRITE8_MEMBER(sstrangr_state::port_w)
 {
-
 	m_flip_screen = data & 0x20;
 }
 

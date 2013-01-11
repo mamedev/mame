@@ -251,7 +251,6 @@ static void pengadvb_postload(running_machine &machine)
 
 void pengadvb_state::machine_start()
 {
-
 	state_save_register_global_pointer(machine(), m_main_mem, 0x4000);
 	state_save_register_global(machine(), m_mem_map);
 	state_save_register_global_array(machine(), m_mem_banks);
@@ -260,7 +259,6 @@ void pengadvb_state::machine_start()
 
 void pengadvb_state::machine_reset()
 {
-
 	m_mem_map = 0;
 	m_mem_banks[0] = m_mem_banks[1] = m_mem_banks[2] = m_mem_banks[3] = 0;
 	mem_map_banks(machine());

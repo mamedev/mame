@@ -44,7 +44,6 @@ TILE_GET_INFO_MEMBER(news_state::get_bg_tile_info)
 
 void news_state::video_start()
 {
-
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(news_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
@@ -61,21 +60,18 @@ void news_state::video_start()
 
 WRITE8_MEMBER(news_state::news_fgram_w)
 {
-
 	m_fgram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE8_MEMBER(news_state::news_bgram_w)
 {
-
 	m_bgram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE8_MEMBER(news_state::news_bgpic_w)
 {
-
 	if (m_bgpic != data)
 	{
 		m_bgpic = data;

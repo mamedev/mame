@@ -483,7 +483,6 @@ UINT32 m62_state::screen_update_kungfum(screen_device &screen, bitmap_ind16 &bit
 
 TILE_GET_INFO_MEMBER(m62_state::get_ldrun_bg_tile_info)
 {
-
 	int code;
 	int color;
 	int flags;
@@ -503,7 +502,6 @@ TILE_GET_INFO_MEMBER(m62_state::get_ldrun_bg_tile_info)
 
 void m62_state::video_start()
 {
-
 	m62_start(machine(), tilemap_get_info_delegate(FUNC(m62_state::get_ldrun_bg_tile_info),this), 1, 1, 8, 8, 64, 32);
 	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); /* split type 0 is totally transparent in front half */
 	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe); /* split type 1 has pen 0 transparent in front half */
@@ -738,7 +736,6 @@ TILE_GET_INFO_MEMBER(m62_state::get_kidniki_fg_tile_info)
 
 VIDEO_START_MEMBER(m62_state,kidniki)
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(m62_state::get_kidniki_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
 	m_bg_tilemap->set_transmask(0, 0xffff, 0x0000); /* split type 0 is totally transparent in front half */
 	m_bg_tilemap->set_transmask(1, 0x0001, 0xfffe); /* split type 1 has pen 0 transparent in front half */

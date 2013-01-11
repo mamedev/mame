@@ -43,8 +43,7 @@ extern const device_type AT45DB041;
 
 
 #define MCFG_AT45DB041_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, AT45DB041, 0) \
-
+	MCFG_DEVICE_ADD(_tag, AT45DB041, 0)
 class at45db081_device : public at45db041_device
 {
 public:
@@ -58,8 +57,7 @@ extern const device_type AT45DB081;
 
 
 #define MCFG_AT45DB081_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, AT45DB081, 0) \
-
+	MCFG_DEVICE_ADD(_tag, AT45DB081, 0)
 class at45db161_device : public at45db041_device
 {
 public:
@@ -73,8 +71,7 @@ extern const device_type AT45DB161;
 
 
 #define MCFG_AT45DB161_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, AT45DB161, 0) \
-
+	MCFG_DEVICE_ADD(_tag, AT45DB161, 0)
 
 /***************************************************************************
     FUNCTION PROTOTYPES

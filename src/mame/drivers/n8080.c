@@ -469,7 +469,6 @@ static I8085_CONFIG( n8080_cpu_config )
 
 MACHINE_START_MEMBER(n8080_state,n8080)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_shift_data));
@@ -498,7 +497,6 @@ MACHINE_START_MEMBER(n8080_state,helifire)
 
 MACHINE_RESET_MEMBER(n8080_state,n8080)
 {
-
 	m_shift_data = 0;
 	m_shift_bits = 0;
 	m_inte = 0;
@@ -506,7 +504,6 @@ MACHINE_RESET_MEMBER(n8080_state,n8080)
 
 MACHINE_RESET_MEMBER(n8080_state,spacefev)
 {
-
 	MACHINE_RESET_CALL_MEMBER(n8080);
 	MACHINE_RESET_CALL_MEMBER(spacefev_sound);
 
@@ -516,7 +513,6 @@ MACHINE_RESET_MEMBER(n8080_state,spacefev)
 
 MACHINE_RESET_MEMBER(n8080_state,sheriff)
 {
-
 	MACHINE_RESET_CALL_MEMBER(n8080);
 	MACHINE_RESET_CALL_MEMBER(sheriff_sound);
 
@@ -526,7 +522,6 @@ MACHINE_RESET_MEMBER(n8080_state,sheriff)
 
 MACHINE_RESET_MEMBER(n8080_state,helifire)
 {
-
 	MACHINE_RESET_CALL_MEMBER(n8080);
 	MACHINE_RESET_CALL_MEMBER(helifire_sound);
 

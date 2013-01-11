@@ -408,7 +408,6 @@ static void draw_stars(_20pacgal_state *state, bitmap_rgb32 &bitmap, const recta
 
 UINT32 _20pacgal_state::screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(0, cliprect);
 	draw_stars(this, bitmap,cliprect);
 	draw_chars(this, bitmap);

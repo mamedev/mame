@@ -44,7 +44,6 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 WRITE16_MEMBER(blmbycar_state::blmbycar_palette_w)
 {
-
 	data = COMBINE_DATA(&m_paletteram[offset]);
 	palette_set_color_rgb( machine(), offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
 }
@@ -120,7 +119,6 @@ WRITE16_MEMBER(blmbycar_state::blmbycar_vram_1_w)
 
 void blmbycar_state::video_start()
 {
-
 	m_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
 	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(blmbycar_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
 

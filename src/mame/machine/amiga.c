@@ -285,7 +285,6 @@ static void amiga_m68k_reset(device_t *device)
 
 MACHINE_RESET_MEMBER(amiga_state,amiga)
 {
-
 	/* set m68k reset  function */
 	m68k_set_reset_callback(machine().device("maincpu"), amiga_m68k_reset);
 
@@ -309,7 +308,6 @@ MACHINE_RESET_MEMBER(amiga_state,amiga)
 
 TIMER_CALLBACK_MEMBER(amiga_state::scanline_callback)
 {
-
 	int scanline = param;
 	device_t *cia_0 = machine().device("cia_0");
 	device_t *cia_1 = machine().device("cia_1");
@@ -402,7 +400,6 @@ static void update_irqs(running_machine &machine)
 
 TIMER_CALLBACK_MEMBER(amiga_state::amiga_irq_proc)
 {
-
 	update_irqs(machine());
 	m_irq_timer->reset( );
 }

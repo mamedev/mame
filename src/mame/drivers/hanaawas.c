@@ -184,13 +184,11 @@ static const ay8910_interface ay8910_config =
 
 void hanaawas_state::machine_start()
 {
-
 	save_item(NAME(m_mux));
 }
 
 void hanaawas_state::machine_reset()
 {
-
 	m_mux = 0;
 }
 

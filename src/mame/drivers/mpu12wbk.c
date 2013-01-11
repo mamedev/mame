@@ -284,7 +284,6 @@ UINT32 mpu12wbk_state::screen_update_mpu12wbk(screen_device &screen, bitmap_ind1
 
 void mpu12wbk_state::palette_init()
 {
-
 }
 
 

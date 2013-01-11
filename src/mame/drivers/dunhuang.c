@@ -464,7 +464,6 @@ READ8_MEMBER(dunhuang_state::dunhuang_input_r)
 
 WRITE8_MEMBER(dunhuang_state::dunhuang_rombank_w)
 {
-
 	// ?                data & 0x01
 	// ?                data & 0x02
 
@@ -792,7 +791,6 @@ void dunhuang_state::machine_start()
 
 void dunhuang_state::machine_reset()
 {
-
 	m_written = 0;
 	m_written2 = 0;
 	m_pos_x = 0;

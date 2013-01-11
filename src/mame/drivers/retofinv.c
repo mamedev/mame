@@ -330,14 +330,12 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(retofinv_state::main_vblank_irq)
 {
-
 	if(m_main_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(retofinv_state::sub_vblank_irq)
 {
-
 	if(m_sub_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }

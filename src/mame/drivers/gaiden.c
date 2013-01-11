@@ -138,7 +138,6 @@ Notes:
 
 WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 		soundlatch_byte_w(space, 0, data & 0xff);   /* Ninja Gaiden */
 	if (ACCESSING_BITS_8_15)
@@ -148,7 +147,6 @@ WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
 
 WRITE16_MEMBER(gaiden_state::drgnbowl_sound_command_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_byte_w(space, 0, data >> 8);
@@ -164,7 +162,6 @@ WRITE16_MEMBER(gaiden_state::drgnbowl_sound_command_w)
 
 WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 	{
 		static const int jumppoints[] =
@@ -291,7 +288,6 @@ static const int jumppoints_other[0x100] =
 
 MACHINE_RESET_MEMBER(gaiden_state,raiga)
 {
-
 	m_prot = 0;
 	m_jumpcode = 0;
 
@@ -330,7 +326,6 @@ MACHINE_START_MEMBER(gaiden_state,raiga)
 
 WRITE16_MEMBER(gaiden_state::raiga_protection_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 	{
 		data >>= 8;
@@ -1538,7 +1533,6 @@ static void descramble_drgnbowl_gfx(running_machine &machine)
 	memcpy(buffer,ROM,size);
 	for( i = 0; i < size; i++ )
 	{
-
 		ROM[i] = buffer[BITSWAP24(i,23,22,21,20,
 									19,18,16,17,
 									15,14,13, 4,

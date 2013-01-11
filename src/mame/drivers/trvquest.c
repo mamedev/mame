@@ -185,7 +185,6 @@ static const via6522_interface via_2_interface =
 
 MACHINE_START_MEMBER(gameplan_state,trvquest)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	/* register for save states */
@@ -197,7 +196,6 @@ MACHINE_START_MEMBER(gameplan_state,trvquest)
 
 MACHINE_RESET_MEMBER(gameplan_state,trvquest)
 {
-
 	m_video_x = 0;
 	m_video_y = 0;
 	m_video_command = 0;

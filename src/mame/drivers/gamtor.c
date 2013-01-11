@@ -39,7 +39,6 @@ public:
 
 WRITE32_MEMBER(gaminator_state::gamtor_unk_w)
 {
-
 }
 
 

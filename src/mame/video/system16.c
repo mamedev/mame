@@ -356,7 +356,6 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_text_tile_info)
 
 WRITE16_MEMBER(segas1x_bootleg_state::sys16_textram_w)
 {
-
 	COMBINE_DATA(&m_textram[offset]);
 	m_text_layer->mark_tile_dirty(offset);
 }
@@ -365,7 +364,6 @@ WRITE16_MEMBER(segas1x_bootleg_state::sys16_textram_w)
 
 VIDEO_START_MEMBER(segas1x_bootleg_state,system16)
 {
-
 	/* Normal colors */
 	compute_resistor_weights(0, 255, -1.0,
 		6, resistances_normal, m_weights[0][0], 0, 0,
@@ -430,7 +428,6 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,system16)
 
 VIDEO_START_MEMBER(segas1x_bootleg_state,system18old)
 {
-
 	VIDEO_START_CALL_MEMBER(system16);
 
 	m_bg1_trans = 1;
@@ -549,7 +546,6 @@ WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_fgscrollx_w)
 
 WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_tilemapselect_w)
 {
-
 	COMBINE_DATA(&m_tilemapselect);
 	//printf("system16 bootleg tilemapselect %04x\n", m_tilemapselect);
 }
@@ -557,7 +553,6 @@ WRITE16_MEMBER(segas1x_bootleg_state::s16a_bootleg_tilemapselect_w)
 
 VIDEO_START_MEMBER(segas1x_bootleg_state,s16a_bootleg)
 {
-
 	/* Normal colors */
 	compute_resistor_weights(0, 255, -1.0,
 		6, resistances_normal, m_weights[0][0], 0, 0,
@@ -606,7 +601,6 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,s16a_bootleg_passsht)
 // Passing Shot (2 player), Shinobi (Datsu), Wonderboy 3
 UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	// passing shot
 	int offset_txtx = 192;
 	int offset_txty = 0;
@@ -694,7 +688,6 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen, 
 /* The Passing Shot 4 Player bootleg has weird scroll registers (different offsets, ^0x7 xor) */
 UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	// passing shot
 	int offset_txtx = 192;
 	int offset_txty = 0;
@@ -767,7 +760,6 @@ UINT32 segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b(screen_device 
 
 UINT32 segas1x_bootleg_state::screen_update_system16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (!m_refreshenable)
 	{
 		bitmap.fill(0, cliprect);
@@ -844,7 +836,6 @@ UINT32 segas1x_bootleg_state::screen_update_system16(screen_device &screen, bitm
 
 UINT32 segas1x_bootleg_state::screen_update_system18old(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (!m_refreshenable)
 	{
 		bitmap.fill(get_black_pen(machine()), cliprect);

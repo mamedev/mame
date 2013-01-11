@@ -143,7 +143,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::eacc_cb1)
 
 TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::eacc_nmi)
 {
-
 	if (m_cb2)
 	{
 		m_nmi = true;

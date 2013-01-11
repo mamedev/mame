@@ -344,7 +344,6 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
 	/* Post-switch-scanning cleanup */
 
 	if (for_real) {
-
 #ifdef C_PROGRESSIVE_SUPPORTED
 	if (simple_progressive) /* process -progressive; -scans can override */
 		jpeg_simple_progression(cinfo);

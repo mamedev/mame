@@ -236,7 +236,6 @@ void battlnts_state::machine_start()
 
 void battlnts_state::machine_reset()
 {
-
 	m_layer_colorbase[0] = 0;
 	m_layer_colorbase[1] = 0;
 	m_spritebank = 0;

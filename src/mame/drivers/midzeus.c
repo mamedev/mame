@@ -87,7 +87,6 @@ MACHINE_START_MEMBER(midzeus_state,midzeus)
 
 MACHINE_RESET_MEMBER(midzeus_state,midzeus)
 {
-
 	memcpy(m_ram_base, machine().root_device().memregion("user1")->base(), 0x40000*4);
 	*m_ram_base <<= 1;
 	machine().device("maincpu")->reset();

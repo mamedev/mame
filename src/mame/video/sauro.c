@@ -13,35 +13,30 @@
 
 WRITE8_MEMBER(sauro_state::tecfri_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(sauro_state::tecfri_colorram_w)
 {
-
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(sauro_state::tecfri_videoram2_w)
 {
-
 	m_videoram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(sauro_state::tecfri_colorram2_w)
 {
-
 	m_colorram2[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(sauro_state::tecfri_scroll_bg_w)
 {
-
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
@@ -70,7 +65,6 @@ static const int scroll2_map_flip[8] = {0, 7, 2, 1, 4, 3, 6, 5};
 
 WRITE8_MEMBER(sauro_state::sauro_palette_bank_w)
 {
-
 	m_palette_bank = (data & 0x03) << 4;
 	machine().tilemap().mark_all_dirty();
 }
@@ -85,7 +79,6 @@ WRITE8_MEMBER(sauro_state::sauro_scroll_fg_w)
 
 VIDEO_START_MEMBER(sauro_state,sauro)
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_bg),this), TILEMAP_SCAN_COLS,
 			8, 8, 32, 32);
 
@@ -146,7 +139,6 @@ static void sauro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 
 UINT32 sauro_state::screen_update_sauro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	sauro_draw_sprites(machine(), bitmap, cliprect);
@@ -157,7 +149,6 @@ UINT32 sauro_state::screen_update_sauro(screen_device &screen, bitmap_ind16 &bit
 
 VIDEO_START_MEMBER(sauro_state,trckydoc)
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sauro_state::get_tile_info_bg),this), TILEMAP_SCAN_COLS,
 			8, 8, 32, 32);
 }

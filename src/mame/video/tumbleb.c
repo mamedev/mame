@@ -25,7 +25,6 @@ to switch between 8*8 tiles and 16*16 tiles.
 
 WRITE16_MEMBER(tumbleb_state::bcstory_tilebank_w)
 {
-
 	m_tilebank = data;
 	m_pf1_tilemap->mark_all_dirty();
 	m_pf1_alt_tilemap->mark_all_dirty();
@@ -34,7 +33,6 @@ WRITE16_MEMBER(tumbleb_state::bcstory_tilebank_w)
 
 WRITE16_MEMBER(tumbleb_state::chokchok_tilebank_w)
 {
-
 	m_tilebank = data << 1;
 	m_pf1_tilemap->mark_all_dirty();
 	m_pf1_alt_tilemap->mark_all_dirty();
@@ -43,7 +41,6 @@ WRITE16_MEMBER(tumbleb_state::chokchok_tilebank_w)
 
 WRITE16_MEMBER(tumbleb_state::wlstar_tilebank_w)
 {
-
 	/* it just writes 0000 or ffff */
 	m_tilebank = data & 0x4000;
 	m_pf1_tilemap->mark_all_dirty();
@@ -54,7 +51,6 @@ WRITE16_MEMBER(tumbleb_state::wlstar_tilebank_w)
 
 WRITE16_MEMBER(tumbleb_state::suprtrio_tilebank_w)
 {
-
 	m_tilebank = data << 14; // shift it here, makes using bcstory_tilebank easier
 	m_pf1_tilemap->mark_all_dirty();
 	m_pf1_alt_tilemap->mark_all_dirty();
@@ -64,7 +60,6 @@ WRITE16_MEMBER(tumbleb_state::suprtrio_tilebank_w)
 
 WRITE16_MEMBER(tumbleb_state::tumblepb_pf1_data_w)
 {
-
 	COMBINE_DATA(&m_pf1_data[offset]);
 	m_pf1_tilemap->mark_tile_dirty(offset);
 	m_pf1_alt_tilemap->mark_tile_dirty(offset);
@@ -72,7 +67,6 @@ WRITE16_MEMBER(tumbleb_state::tumblepb_pf1_data_w)
 
 WRITE16_MEMBER(tumbleb_state::tumblepb_pf2_data_w)
 {
-
 	COMBINE_DATA(&m_pf2_data[offset]);
 	m_pf2_tilemap->mark_tile_dirty(offset);
 
@@ -82,7 +76,6 @@ WRITE16_MEMBER(tumbleb_state::tumblepb_pf2_data_w)
 
 WRITE16_MEMBER(tumbleb_state::fncywld_pf1_data_w)
 {
-
 	COMBINE_DATA(&m_pf1_data[offset]);
 	m_pf1_tilemap->mark_tile_dirty(offset / 2);
 	m_pf1_alt_tilemap->mark_tile_dirty(offset / 2);
@@ -90,7 +83,6 @@ WRITE16_MEMBER(tumbleb_state::fncywld_pf1_data_w)
 
 WRITE16_MEMBER(tumbleb_state::fncywld_pf2_data_w)
 {
-
 	COMBINE_DATA(&m_pf2_data[offset]);
 	m_pf2_tilemap->mark_tile_dirty(offset / 2);
 }
@@ -103,7 +95,6 @@ WRITE16_MEMBER(tumbleb_state::tumblepb_control_0_w)
 
 WRITE16_MEMBER(tumbleb_state::pangpang_pf1_data_w)
 {
-
 	COMBINE_DATA(&m_pf1_data[offset]);
 	m_pf1_tilemap->mark_tile_dirty(offset / 2);
 	m_pf1_alt_tilemap->mark_tile_dirty(offset / 2);
@@ -111,7 +102,6 @@ WRITE16_MEMBER(tumbleb_state::pangpang_pf1_data_w)
 
 WRITE16_MEMBER(tumbleb_state::pangpang_pf2_data_w)
 {
-
 	COMBINE_DATA(&m_pf2_data[offset]);
 	m_pf2_tilemap->mark_tile_dirty(offset / 2);
 
@@ -235,7 +225,6 @@ static void tumbleb_tilemap_redraw(running_machine &machine)
 
 VIDEO_START_MEMBER(tumbleb_state,pangpang)
 {
-
 	m_pf1_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::pangpang_get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
 	m_pf1_alt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::pangpang_get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
 	m_pf2_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::pangpang_get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
@@ -249,7 +238,6 @@ VIDEO_START_MEMBER(tumbleb_state,pangpang)
 
 VIDEO_START_MEMBER(tumbleb_state,tumblepb)
 {
-
 	m_pf1_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
 	m_pf1_alt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
 	m_pf2_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
@@ -262,7 +250,6 @@ VIDEO_START_MEMBER(tumbleb_state,tumblepb)
 
 VIDEO_START_MEMBER(tumbleb_state,sdfight)
 {
-
 	m_pf1_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 64); // 64*64 to prevent bad tilemap wrapping? - check real behavior
 	m_pf1_alt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
 	m_pf2_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
@@ -275,7 +262,6 @@ VIDEO_START_MEMBER(tumbleb_state,sdfight)
 
 VIDEO_START_MEMBER(tumbleb_state,fncywld)
 {
-
 	m_pf1_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_fncywld_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
 	m_pf1_alt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_fncywld_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
 	m_pf2_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_fncywld_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
@@ -289,7 +275,6 @@ VIDEO_START_MEMBER(tumbleb_state,fncywld)
 
 VIDEO_START_MEMBER(tumbleb_state,suprtrio)
 {
-
 	m_pf1_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 8,  8, 64, 32);
 	m_pf1_alt_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
 	m_pf2_tilemap =     &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tumbleb_state::get_bg2_tile_info),this), tilemap_mapper_delegate(FUNC(tumbleb_state::tumblep_scan),this),     16, 16, 64, 32);
@@ -500,7 +485,6 @@ UINT32 tumbleb_state::screen_update_pangpang(screen_device &screen, bitmap_ind16
 
 UINT32 tumbleb_state::screen_update_suprtrio(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_pf1_alt_tilemap->set_scrollx(0, -m_control[1] - 6);
 	m_pf1_alt_tilemap->set_scrolly(0, -m_control[2]);
 	m_pf2_tilemap->set_scrollx(0, -m_control[3] - 2);

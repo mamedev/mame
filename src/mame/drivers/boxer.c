@@ -427,7 +427,6 @@ GFXDECODE_END
 
 void boxer_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_pot_state));

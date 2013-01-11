@@ -109,11 +109,9 @@ static char *IMM_PSU(int pc)
 	int v = readarg(pc);
 
 	if (v == 0xff) {
-
 		p += sprintf(p, "all");
 
 	} else {
-
 		if (v & 0x80)   /* sense input */
 			p += sprintf(p, "si+");
 		if (v & 0x40)   /* flag output */

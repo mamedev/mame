@@ -2941,7 +2941,6 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 							cassette_image_device* cassette = dynamic_cast<cassette_image_device*>(&img->device());
 							switch ((LOWORD(wparam) - ID_DEVICE_OPTIONS) % DEVOPTION_MAX)
 							{
-
 								case DEVOPTION_CASSETTE_STOPPAUSE:
 														cassette->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
 														return 1;

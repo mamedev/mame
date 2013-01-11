@@ -99,7 +99,6 @@ DRIVER_INIT_MEMBER(mz_state,mz800)
 
 void mz_state::machine_start()
 {
-
 	m_pit = machine().device("pit8253");
 	m_ppi = machine().device<i8255_device>("ppi8255");
 
@@ -374,7 +373,6 @@ WRITE8_MEMBER(mz_state::mz700_bank_5_w)
 
 WRITE8_MEMBER(mz_state::mz700_bank_6_w)
 {
-
 	if (m_mz700_mode)
 	{
 		m_mz700_ram_lock = FALSE;
@@ -610,7 +608,6 @@ WRITE8_MEMBER(mz_state::mz800_read_format_w)
  */
 WRITE8_MEMBER(mz_state::mz800_display_mode_w)
 {
-
 	m_mz700_mode = BIT(data, 3);
 	m_hires_mode = BIT(data, 2);
 	m_screen = data & 0x03;

@@ -722,7 +722,6 @@ static const ym2203_interface ym2203_config =
 
 MACHINE_START_MEMBER(bublbobl_state,common)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_mcu = machine().device("mcu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
@@ -736,7 +735,6 @@ MACHINE_START_MEMBER(bublbobl_state,common)
 
 MACHINE_RESET_MEMBER(bublbobl_state,common)
 {
-
 	m_sound_nmi_enable = 0;
 	m_pending_nmi = 0;
 	m_sound_status = 0;
@@ -745,7 +743,6 @@ MACHINE_RESET_MEMBER(bublbobl_state,common)
 
 MACHINE_START_MEMBER(bublbobl_state,tokio)
 {
-
 	MACHINE_START_CALL_MEMBER(common);
 
 	save_item(NAME(m_tokio_prot_count));
@@ -753,7 +750,6 @@ MACHINE_START_MEMBER(bublbobl_state,tokio)
 
 MACHINE_RESET_MEMBER(bublbobl_state,tokio)
 {
-
 	MACHINE_RESET_CALL_MEMBER(common);
 
 	m_tokio_prot_count = 0;
@@ -800,7 +796,6 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(bublbobl_state,bublbobl)
 {
-
 	MACHINE_START_CALL_MEMBER(common);
 
 	save_item(NAME(m_ddr1));
@@ -819,7 +814,6 @@ MACHINE_START_MEMBER(bublbobl_state,bublbobl)
 
 MACHINE_RESET_MEMBER(bublbobl_state,bublbobl)
 {
-
 	MACHINE_RESET_CALL_MEMBER(common);
 
 	m_ddr1 = 0;
@@ -881,7 +875,6 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(bublbobl_state,boblbobl)
 {
-
 	MACHINE_START_CALL_MEMBER(common);
 
 	save_item(NAME(m_ic43_a));
@@ -890,7 +883,6 @@ MACHINE_START_MEMBER(bublbobl_state,boblbobl)
 
 MACHINE_RESET_MEMBER(bublbobl_state,boblbobl)
 {
-
 	MACHINE_RESET_CALL_MEMBER(common);
 
 	m_ic43_a = 0;
@@ -912,7 +904,6 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(bublbobl_state,bub68705)
 {
-
 	MACHINE_START_CALL_MEMBER(common);
 
 	save_item(NAME(m_port_a_in));
@@ -927,7 +918,6 @@ MACHINE_START_MEMBER(bublbobl_state,bub68705)
 
 MACHINE_RESET_MEMBER(bublbobl_state,bub68705)
 {
-
 	MACHINE_RESET_CALL_MEMBER(common);
 
 	m_port_a_in = 0;
@@ -1549,7 +1539,6 @@ static void configure_banks( running_machine& machine )
 
 DRIVER_INIT_MEMBER(bublbobl_state,bublbobl)
 {
-
 	configure_banks(machine());
 
 	/* we init this here, so that it does not conflict with tokio init, below */

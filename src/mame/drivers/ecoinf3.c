@@ -398,7 +398,6 @@ void ecoinf3_state::update_display()
 // is the 2 digit bank display part of this, or multiplexed elsewhere
 WRITE8_MEMBER(ecoinf3_state::ppi8255_intf_e_write_a_alpha_display)
 {
-
 	if ((data>=0x20) && (data<0x5b))  logerror("%04x - ppi8255_intf_e_write_a %02x (alpha) '%c'\n", machine().device("maincpu")->safe_pcbase(), data, data);
 	else logerror("%04x - ppi8255_intf_e_write_a %02x (alpha)\n", machine().device("maincpu")->safe_pcbase(), data);
 
@@ -852,7 +851,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3)
 {
-
 }
 
 DRIVER_INIT_MEMBER(ecoinf3_state,ecoinf3_swap)

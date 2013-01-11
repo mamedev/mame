@@ -95,7 +95,6 @@ static void mw8080bw_start_interrupt_timer( running_machine &machine )
 
 MACHINE_START_MEMBER(mw8080bw_state,mw8080bw)
 {
-
 	mw8080bw_create_interrupt_timer(machine());
 
 	m_samples = machine().device<samples_device>("samples");

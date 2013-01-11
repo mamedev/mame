@@ -258,7 +258,6 @@ static void update_irq( running_machine &machine )
 
 WRITE16_MEMBER(othunder_state::irq_ack_w)
 {
-
 	switch (offset)
 	{
 		case 0:
@@ -275,14 +274,12 @@ WRITE16_MEMBER(othunder_state::irq_ack_w)
 
 INTERRUPT_GEN_MEMBER(othunder_state::vblank_interrupt)
 {
-
 	m_vblank_irq = 1;
 	update_irq(machine());
 }
 
 TIMER_CALLBACK_MEMBER(othunder_state::ad_interrupt)
 {
-
 	m_ad_irq = 1;
 	update_irq(machine());
 }
@@ -309,7 +306,6 @@ static const eeprom_interface eeprom_intf =
 
 WRITE16_MEMBER(othunder_state::othunder_tc0220ioc_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		switch (offset)
@@ -350,7 +346,6 @@ WRITE16_MEMBER(othunder_state::othunder_tc0220ioc_w)
 
 READ16_MEMBER(othunder_state::othunder_tc0220ioc_r)
 {
-
 	switch (offset)
 	{
 		case 0x03:
@@ -670,7 +665,6 @@ static const tc0140syt_interface othunder_tc0140syt_intf =
 
 void othunder_state::machine_start()
 {
-
 	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
@@ -696,7 +690,6 @@ void othunder_state::machine_start()
 
 void othunder_state::machine_reset()
 {
-
 	m_vblank_irq = 0;
 	m_ad_irq = 0;
 	m_banknum = 0;

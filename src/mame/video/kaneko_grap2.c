@@ -67,7 +67,6 @@ void kaneko_grap2_device::device_reset()
 
 READ16_MEMBER(kaneko_grap2_device::galpani3_regs1_r)
 {
-
 	switch (offset)
 	{
 		case 0x2:

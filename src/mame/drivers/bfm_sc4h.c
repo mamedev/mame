@@ -44,7 +44,6 @@
 
 UINT8 read_input_matrix(running_machine &machine, int row)
 {
-
 	static const char *const portnames[16] = { "IN-0", "IN-1", "IN-2", "IN-3", "IN-4", "IN-5", "IN-6", "IN-7", "IN-8", "IN-9", "IN-A", "IN-B" };
 	UINT8 value;
 
@@ -299,7 +298,6 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 
 				if (addr < 0x0200)
 				{
-
 					if (mem_mask&0xff00)
 					{
 						logerror("lamp write mem_mask&0xff00 unhandled\n");
@@ -586,7 +584,6 @@ UINT16 bfm_sc4_68307_portb_r(address_space &space, bool dedicated, UINT16 line_m
 
 MACHINE_RESET_MEMBER(sc4_state,sc4)
 {
-
 	int pattern =0, i;
 
 	for ( i = 0; i < m_reels; i++)

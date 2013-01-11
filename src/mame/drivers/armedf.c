@@ -315,7 +315,6 @@ Notes:
 
 WRITE16_MEMBER(armedf_state::terraf_io_w)
 {
-
 	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
 		nb_1414m4_exec(space,(m_text_videoram[0] << 8) | (m_text_videoram[1] & 0xff),m_text_videoram,m_fg_scrollx,m_fg_scrolly,m_tx_tilemap);
 
@@ -330,7 +329,6 @@ WRITE16_MEMBER(armedf_state::terraf_io_w)
 
 WRITE16_MEMBER(armedf_state::terrafb_io_w)
 {
-
 	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
 		machine().device("extra")->execute().set_input_line(0, HOLD_LINE);
 
@@ -344,7 +342,6 @@ WRITE16_MEMBER(armedf_state::terrafb_io_w)
 
 WRITE16_MEMBER(armedf_state::bootleg_io_w)
 {
-
 	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
 	{
 		// NOP
@@ -465,7 +462,6 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(armedf_state::legiono_fg_scroll_w)
 {
-
 	if(offset >= 0xb && offset < 0xf)
 		m_legion_cmd[offset-0xb] = data & 0xff;
 
@@ -522,7 +518,6 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(bigfghtr_state::latch_r)
 {
-
 	m_read_latch = 1;
 	return 0;
 }
@@ -542,7 +537,6 @@ WRITE16_MEMBER(bigfghtr_state::sharedram_w)
 
 READ16_MEMBER(bigfghtr_state::sharedram_r)
 {
-
 	if(m_mcu_input_snippet)
 	{
 		switch(offset+0x600/2)
@@ -708,32 +702,27 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(armedf_state::blitter_txram_r)
 {
-
 	return m_text_videoram[offset] & 0xff;
 }
 
 WRITE8_MEMBER(armedf_state::blitter_txram_w)
 {
-
 	m_text_videoram[offset] = (data & 0xff) | (m_text_videoram[offset] & 0xff00);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(armedf_state::fg_scrollx_w)
 {
-
 	m_fg_scrollx = (data & 0xff) | (m_fg_scrollx & 0x300);
 }
 
 WRITE8_MEMBER(armedf_state::fg_scrolly_w)
 {
-
 	m_fg_scrolly = (data & 0xff) | (m_fg_scrolly & 0x300);
 }
 
 WRITE8_MEMBER(armedf_state::fg_scroll_msb_w)
 {
-
 	m_fg_scrolly = (((data & 0x03) >> 0) << 8) | (m_fg_scrolly & 0xff);
 	m_fg_scrollx = (((data & 0x0c) >> 2) << 8) | (m_fg_scrollx & 0xff);
 }
@@ -1149,7 +1138,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(armedf_state,armedf)
 {
-
 	save_item(NAME(m_old_mcu_mode));
 	save_item(NAME(m_scroll_msb));
 	save_item(NAME(m_waiting_msb));
@@ -1162,7 +1150,6 @@ MACHINE_START_MEMBER(armedf_state,armedf)
 
 MACHINE_RESET_MEMBER(armedf_state,armedf)
 {
-
 	m_old_mcu_mode = 0;
 	m_scroll_msb = 0;
 	m_waiting_msb = 0;
@@ -1489,14 +1476,12 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(bigfghtr_state,bigfghtr)
 {
-
 	MACHINE_START_CALL_MEMBER(armedf);
 	save_item(NAME(m_read_latch));
 }
 
 MACHINE_RESET_MEMBER(bigfghtr_state,bigfghtr)
 {
-
 	MACHINE_RESET_CALL_MEMBER(armedf);
 	m_read_latch = 0;
 }
@@ -2103,7 +2088,6 @@ DRIVER_INIT_MEMBER(armedf_state,legiono)
 
 DRIVER_INIT_MEMBER(armedf_state,cclimbr2)
 {
-
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),this));
 
 	m_scroll_type = 3;

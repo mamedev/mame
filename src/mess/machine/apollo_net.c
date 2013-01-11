@@ -478,7 +478,6 @@ static void log_data(const device_t *device, const char *type,
 }
 
 static UINT16 get_socket(const UINT8 rx_data_buffer[], int rx_data_length) {
-
 	const UINT8 * packet_buffer = rx_data_buffer + ETHERNET_HEADER_SIZE;
 	int packet_length = rx_data_length - ETHERNET_HEADER_SIZE;
 
@@ -622,7 +621,6 @@ static int ethernet_packet_is_for_me(const UINT8 ethernet_packet_header[],
 
 static int is_apollo_request(const UINT8 ethernet_header[],
 		const int data_length) {
-
 	return data_length >= 0x30 && //
 		get_word(ethernet_header + 0x0c) == ETHERNET_PACKET_TYPE_APOLLO;
 }
@@ -677,7 +675,6 @@ static UINT16 in_checksum(UINT8 *ptr, UINT32 nbytes)
 static int arp_server(const device_t *device,
 		const UINT8 rx_data[], int rx_data_length,
 		UINT8 tx_data[]) {
-
 //  static UINT8 arp_response[] = {
 //      0x08,0x00,0x1e,0x02,0x61,0x6d, // 0x00: Ethernet address of destination
 //      0x08,0x00,0x1e,0x04,0x20,0xe8, // 0x06: Ethernet address of sender
@@ -724,7 +721,6 @@ static int arp_server(const device_t *device,
 static int echo_server(const device_t *device,
 		const UINT8 rx_data[], int rx_data_length,
 		UINT8 tx_data[]) {
-
 	static const UINT32 ip_offset = sizeof(ethernet_header);
 	static const UINT32 icmp_offset = ip_offset + sizeof(ip_header);
 
@@ -763,7 +759,6 @@ static int echo_server(const device_t *device,
 static int netserver(const device_t *device,
 		const UINT8 rx_data[], int rx_data_length,
 		UINT8 tx_data[]) {
-
 	if (!ethernet_packet_is_for_me(rx_data, rx_data_length))
 		return 0; // skip
 	else if (is_apollo_request(rx_data, rx_data_length))

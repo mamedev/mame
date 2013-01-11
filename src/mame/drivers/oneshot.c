@@ -64,7 +64,6 @@ READ16_MEMBER(oneshot_state::oneshot_in0_word_r)
 
 READ16_MEMBER(oneshot_state::oneshot_gun_x_p1_r)
 {
-
 	/* shots must be in a different location to register */
 	m_p1_wobble ^= 1;
 
@@ -78,7 +77,6 @@ READ16_MEMBER(oneshot_state::oneshot_gun_y_p1_r)
 
 READ16_MEMBER(oneshot_state::oneshot_gun_x_p2_r)
 {
-
 	/* shots must be in a different location to register */
 	m_p2_wobble ^= 1;
 
@@ -342,7 +340,6 @@ static const ym3812_interface ym3812_config =
 
 void oneshot_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -357,7 +354,6 @@ void oneshot_state::machine_start()
 
 void oneshot_state::machine_reset()
 {
-
 	m_gun_x_p1 = 0;
 	m_gun_y_p1 = 0;
 	m_gun_x_p2 = 0;

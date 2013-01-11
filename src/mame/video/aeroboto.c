@@ -41,7 +41,6 @@ TILE_GET_INFO_MEMBER(aeroboto_state::get_tile_info)
 
 void aeroboto_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(aeroboto_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 64);
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_rows(64);
@@ -84,7 +83,6 @@ READ8_MEMBER(aeroboto_state::aeroboto_in0_r)
 
 WRITE8_MEMBER(aeroboto_state::aeroboto_3000_w)
 {
-
 	/* bit 0 selects both flip screen and player1/player2 controls */
 	flip_screen_set(data & 0x01);
 
@@ -101,14 +99,12 @@ WRITE8_MEMBER(aeroboto_state::aeroboto_3000_w)
 
 WRITE8_MEMBER(aeroboto_state::aeroboto_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(aeroboto_state::aeroboto_tilecolor_w)
 {
-
 	if (m_tilecolor[offset] != data)
 	{
 		m_tilecolor[offset] = data;
@@ -151,7 +147,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 aeroboto_state::screen_update_aeroboto(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	const rectangle splitrect1(0, 255, 0, 39);
 	const rectangle splitrect2(0, 255, 40, 255);
 	UINT8 *src_base, *src_colptr, *src_rowptr;

@@ -3,7 +3,6 @@
 
 TILE_GET_INFO_MEMBER(shadfrce_state::get_shadfrce_fgtile_info)
 {
-
 	/* ---- ----  tttt tttt  ---- ----  pppp TTTT */
 	int tileno, colour;
 
@@ -15,14 +14,12 @@ TILE_GET_INFO_MEMBER(shadfrce_state::get_shadfrce_fgtile_info)
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_fgvideoram_w)
 {
-
 	m_fgvideoram[offset] = data;
 	m_fgtilemap->mark_tile_dirty(offset/2);
 }
 
 TILE_GET_INFO_MEMBER(shadfrce_state::get_shadfrce_bg0tile_info)
 {
-
 	/* ---- ----  ---- cccc  --TT TTTT TTTT TTTT */
 	int tileno, colour,fyx;
 
@@ -36,7 +33,6 @@ TILE_GET_INFO_MEMBER(shadfrce_state::get_shadfrce_bg0tile_info)
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_bg0videoram_w)
 {
-
 	m_bg0videoram[offset] = data;
 	m_bg0tilemap->mark_tile_dirty(offset/2);
 }
@@ -53,7 +49,6 @@ TILE_GET_INFO_MEMBER(shadfrce_state::get_shadfrce_bg1tile_info)
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_bg1videoram_w)
 {
-
 	m_bg1videoram[offset] = data;
 	m_bg1tilemap->mark_tile_dirty(offset);
 }
@@ -63,7 +58,6 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_bg1videoram_w)
 
 void shadfrce_state::video_start()
 {
-
 	m_fgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(shadfrce_state::get_shadfrce_fgtile_info),this),TILEMAP_SCAN_ROWS,    8,  8,64,32);
 	m_fgtilemap->set_transparent_pen(0);
 
@@ -77,25 +71,21 @@ void shadfrce_state::video_start()
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_bg0scrollx_w)
 {
-
 	m_bg0tilemap->set_scrollx(0, data & 0x1ff );
 }
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_bg0scrolly_w)
 {
-
 	m_bg0tilemap->set_scrolly(0, data  & 0x1ff );
 }
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_bg1scrollx_w)
 {
-
 	m_bg1tilemap->set_scrollx(0, data  & 0x1ff );
 }
 
 WRITE16_MEMBER(shadfrce_state::shadfrce_bg1scrolly_w)
 {
-
 	m_bg1tilemap->set_scrolly(0, data & 0x1ff );
 }
 
@@ -104,7 +94,6 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_bg1scrolly_w)
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-
 	/* | ---- ---- hhhf Fe-Y | ---- ---- yyyy yyyy | ---- ---- TTTT TTTT | ---- ---- tttt tttt |
 	   | ---- ---- -pCc cccX | ---- ---- xxxx xxxx | ---- ---- ---- ---- | ---- ---- ---- ---- | */
 
@@ -175,7 +164,6 @@ void shadfrce_state::screen_eof_shadfrce(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-
 		/* looks like sprites are *two* frames ahead */
 		memcpy(m_spvideoram_old, m_spvideoram, m_spvideoram.bytes());
 	}

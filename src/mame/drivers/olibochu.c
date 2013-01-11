@@ -423,13 +423,11 @@ GFXDECODE_END
 
 void olibochu_state::machine_start()
 {
-
 	save_item(NAME(m_cmd));
 }
 
 void olibochu_state::machine_reset()
 {
-
 	m_cmd = 0;
 }
 

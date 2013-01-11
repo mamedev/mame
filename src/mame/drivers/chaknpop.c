@@ -360,7 +360,6 @@ void chaknpop_state::machine_start()
 
 void chaknpop_state::machine_reset()
 {
-
 	m_gfxmode = 0;
 	m_flip_x = 0;
 	m_flip_y = 0;

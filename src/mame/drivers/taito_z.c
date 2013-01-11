@@ -3033,7 +3033,6 @@ static void taitoz_postload(running_machine &machine)
 
 MACHINE_START_MEMBER(taitoz_state,bshark)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_subcpu = machine().device<cpu_device>("sub");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
@@ -3066,7 +3065,6 @@ MACHINE_START_MEMBER(taitoz_state,taitoz)
 
 MACHINE_RESET_MEMBER(taitoz_state,taitoz)
 {
-
 	m_banknum = -1;
 	m_cpua_ctrl = 0xff;
 	m_sci_int6 = 0;
@@ -5146,7 +5144,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(taitoz_state,taitoz)
 {
-
 	machine().save().register_postload(save_prepost_delegate(FUNC(parse_cpu_control), &machine()));
 }
 

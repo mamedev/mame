@@ -51,14 +51,12 @@ WRITE8_MEMBER(slapfght_state::slapfight_port_01_w)
 /* Disable and clear hardware interrupt */
 WRITE8_MEMBER(slapfght_state::slapfight_port_06_w)
 {
-
 	m_irq_mask = 0;
 }
 
 /* Enable hardware interrupt */
 WRITE8_MEMBER(slapfght_state::slapfight_port_07_w)
 {
-
 	m_irq_mask = 1;
 }
 
@@ -805,7 +803,6 @@ READ8_MEMBER(slapfght_state::tigerh_68705_portB_r)
 
 WRITE8_MEMBER(slapfght_state::tigerh_68705_portB_w)
 {
-
 	if ((m_ddrB & 0x02) && (~data & 0x02) && (m_portB_out & 0x02))
 	{
 		m_portA_in = m_from_main;

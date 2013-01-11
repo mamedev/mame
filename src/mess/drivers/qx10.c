@@ -698,7 +698,6 @@ ADDRESS_MAP_END
 /* TODO: shift break */
 INPUT_CHANGED_MEMBER(qx10_state::key_stroke)
 {
-
 	if(newval && !oldval)
 	{
 		m_keyb.rx = (UINT8)(FPTR)(param) & 0x7f;

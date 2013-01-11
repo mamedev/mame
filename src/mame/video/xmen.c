@@ -53,7 +53,6 @@ void xmen_sprite_callback( running_machine &machine, int *code, int *color, int 
 
 VIDEO_START_MEMBER(xmen_state,xmen6p)
 {
-
 	k053247_get_ram(m_k053246, &m_k053247_ram);
 
 	m_screen_left  = auto_bitmap_ind16_alloc(machine(), 64 * 8, 32 * 8);
@@ -157,7 +156,6 @@ void xmen_state::screen_eof_xmen6p(screen_device &screen, bool state)
 		address_space &space = machine().driver_data()->generic_space();
 		if (machine().primary_screen->frame_number() & 0x01)
 		{
-
 			/* copy the desired spritelist to the chip */
 			memcpy(m_k053247_ram, m_xmen6p_spriteramright, 0x1000);
 

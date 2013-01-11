@@ -233,13 +233,11 @@ INPUT_PORTS_END
 
 void avalnche_state::machine_start()
 {
-
 	save_item(NAME(m_avalance_video_inverted));
 }
 
 void avalnche_state::machine_reset()
 {
-
 	m_avalance_video_inverted = 0;
 }
 

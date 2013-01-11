@@ -142,7 +142,6 @@ public:
 
 void jantotsu_state::video_start()
 {
-
 	save_item(NAME(m_bitmap));
 }
 
@@ -192,7 +191,6 @@ WRITE8_MEMBER(jantotsu_state::jantotsu_bitmap_w)
 
 WRITE8_MEMBER(jantotsu_state::bankaddr_w)
 {
-
 	m_vram_bank = ((data & 0xc0) >> 6);
 
 	m_display_on = (data & 2);
@@ -490,7 +488,6 @@ static const sn76496_config psg_intf =
 
 void jantotsu_state::machine_start()
 {
-
 	save_item(NAME(m_vram_bank));
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_adpcm_pos));
@@ -501,7 +498,6 @@ void jantotsu_state::machine_start()
 
 void jantotsu_state::machine_reset()
 {
-
 	/*Load hard-wired background color.*/
 	m_col_bank = (ioport("DSW2")->read() & 0xc0) >> 3;
 

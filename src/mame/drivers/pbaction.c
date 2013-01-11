@@ -78,7 +78,6 @@ WRITE8_MEMBER(pbaction_state::pbaction_sh_command_w)
 
 WRITE8_MEMBER(pbaction_state::nmi_mask_w)
 {
-
 	m_nmi_mask = data & 1;
 }
 
@@ -257,7 +256,6 @@ INTERRUPT_GEN_MEMBER(pbaction_state::pbaction_interrupt)
 
 void pbaction_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -266,13 +264,11 @@ void pbaction_state::machine_start()
 
 void pbaction_state::machine_reset()
 {
-
 	m_scroll = 0;
 }
 
 INTERRUPT_GEN_MEMBER(pbaction_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -464,7 +460,6 @@ ROM_END
 
 READ8_MEMBER(pbaction_state::pbactio3_prot_kludge_r)
 {
-
 	/* on startup, the game expect this location to NOT act as RAM */
 	if (space.device().safe_pc() == 0xab80)
 		return 0;

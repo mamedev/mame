@@ -215,7 +215,6 @@ static void update_optic(int which)
 
 void stepper_reset_position(int which)
 {
-
 	step[which].step_pos    = 0x00;
 	step[which].pattern     = 0x00;
 	step[which].old_pattern = 0x00;

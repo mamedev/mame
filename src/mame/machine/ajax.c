@@ -134,7 +134,6 @@ READ8_MEMBER(ajax_state::ajax_ls138_f10_r)
 
 WRITE8_MEMBER(ajax_state::ajax_ls138_f10_w)
 {
-
 	switch ((offset & 0x01c0) >> 6)
 	{
 		case 0x00:  /* NSFIRQ + AFR */
@@ -180,7 +179,6 @@ WRITE8_MEMBER(ajax_state::ajax_ls138_f10_w)
 
 WRITE8_MEMBER(ajax_state::ajax_bankswitch_2_w)
 {
-
 	/* enable char ROM reading through the video RAM */
 	k052109_set_rmrd_line(m_k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
@@ -220,14 +218,12 @@ void ajax_state::machine_start()
 
 void ajax_state::machine_reset()
 {
-
 	m_priority = 0;
 	m_firq_enable = 0;
 }
 
 INTERRUPT_GEN_MEMBER(ajax_state::ajax_interrupt)
 {
-
 	if (k051960_is_irq_enabled(m_k051960))
 		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }

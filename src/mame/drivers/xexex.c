@@ -91,7 +91,6 @@ static const eeprom_interface eeprom_intf =
 /* A1, A5 and A6 don't go to the 053247. */
 READ16_MEMBER(xexex_state::K053247_scattered_word_r)
 {
-
 	if (offset & 0x0031)
 		return m_spriteram[offset];
 	else
@@ -103,7 +102,6 @@ READ16_MEMBER(xexex_state::K053247_scattered_word_r)
 
 WRITE16_MEMBER(xexex_state::K053247_scattered_word_w)
 {
-
 	if (offset & 0x0031)
 		COMBINE_DATA(m_spriteram + offset);
 	else
@@ -162,7 +160,6 @@ WRITE16_MEMBER(xexex_state::spriteram_mirror_w)
 
 READ16_MEMBER(xexex_state::xexex_waitskip_r)
 {
-
 	if (space.device().safe_pc() == 0x1158)
 	{
 		space.device().execute().spin_until_trigger(m_resume_trigger);
@@ -206,7 +203,6 @@ WRITE16_MEMBER(xexex_state::control2_w)
 
 WRITE16_MEMBER(xexex_state::sound_cmd1_w)
 {
-
 	if(ACCESSING_BITS_0_7)
 	{
 		// anyone knows why 0x1a keeps lurking the sound queue in the world version???
@@ -257,7 +253,6 @@ static void ym_set_mixing(device_t *device, double left, double right)
 
 TIMER_CALLBACK_MEMBER(xexex_state::dmaend_callback)
 {
-
 	if (m_cur_control2 & 0x0040)
 	{
 		// foul-proof (CPU0 could be deactivated while we wait)
@@ -670,7 +665,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(xexex_state,xexex)
 {
-
 	m_strip_0x1a = 0;
 
 	if (!strcmp(machine().system().name, "xexex"))

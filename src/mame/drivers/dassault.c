@@ -447,7 +447,6 @@ GFXDECODE_END
 
 WRITE8_MEMBER(dassault_state::sound_bankswitch_w)
 {
-
 	/* the second OKIM6295 ROM is bank switched */
 	m_oki2->set_bank_base((data & 1) * 0x40000);
 }

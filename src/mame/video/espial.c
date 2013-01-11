@@ -87,7 +87,6 @@ TILE_GET_INFO_MEMBER(espial_state::get_tile_info)
 
 void espial_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(espial_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scroll_cols(32);
 
@@ -96,7 +95,6 @@ void espial_state::video_start()
 
 VIDEO_START_MEMBER(espial_state,netwars)
 {
-
 	/* Net Wars has a tile map that's twice as big as Espial's */
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(espial_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 64);
 
@@ -115,7 +113,6 @@ VIDEO_START_MEMBER(espial_state,netwars)
 
 WRITE8_MEMBER(espial_state::espial_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -123,7 +120,6 @@ WRITE8_MEMBER(espial_state::espial_videoram_w)
 
 WRITE8_MEMBER(espial_state::espial_colorram_w)
 {
-
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -131,7 +127,6 @@ WRITE8_MEMBER(espial_state::espial_colorram_w)
 
 WRITE8_MEMBER(espial_state::espial_attributeram_w)
 {
-
 	m_attributeram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -139,7 +134,6 @@ WRITE8_MEMBER(espial_state::espial_attributeram_w)
 
 WRITE8_MEMBER(espial_state::espial_scrollram_w)
 {
-
 	m_scrollram[offset] = data;
 	m_bg_tilemap->set_scrolly(offset, data);
 }
@@ -147,7 +141,6 @@ WRITE8_MEMBER(espial_state::espial_scrollram_w)
 
 WRITE8_MEMBER(espial_state::espial_flipscreen_w)
 {
-
 	m_flipscreen = data;
 	m_bg_tilemap->set_flip(m_flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 }
@@ -227,7 +220,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 espial_state::screen_update_espial(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(machine(), bitmap, cliprect);
 	return 0;

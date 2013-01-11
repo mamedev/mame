@@ -194,7 +194,6 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(wwfsstar_state::wwfsstar_scrollwrite)
 {
-
 	switch (offset)
 	{
 		case 0x00:
@@ -272,7 +271,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(wwfsstar_state::wwfsstar_scanline)
 
 CUSTOM_INPUT_MEMBER(wwfsstar_state::wwfsstar_vblank_r)
 {
-
 	return m_vblank;
 }
 

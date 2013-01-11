@@ -535,7 +535,6 @@ UINT32 gstream_state::screen_update_gstream(screen_device &screen, bitmap_ind16 
 
 void gstream_state::machine_start()
 {
-
 	save_item(NAME(m_tmap1_scrollx));
 	save_item(NAME(m_tmap2_scrollx));
 	save_item(NAME(m_tmap3_scrollx));
@@ -548,7 +547,6 @@ void gstream_state::machine_start()
 
 void gstream_state::machine_reset()
 {
-
 	m_tmap1_scrollx = 0;
 	m_tmap2_scrollx = 0;
 	m_tmap3_scrollx = 0;

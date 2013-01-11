@@ -28,7 +28,6 @@
 
 WRITE16_MEMBER(cbuster_state::twocrude_control_w)
 {
-
 	switch (offset << 1)
 	{
 	case 0: /* DMA flag */
@@ -80,7 +79,6 @@ WRITE16_MEMBER(cbuster_state::twocrude_control_w)
 
 READ16_MEMBER(cbuster_state::twocrude_control_r)
 {
-
 	switch (offset << 1)
 	{
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
@@ -293,7 +291,6 @@ static const deco16ic_interface twocrude_deco16ic_tilegen2_intf =
 
 void cbuster_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_deco_tilegen1 = machine().device("tilegen1");
@@ -305,7 +302,6 @@ void cbuster_state::machine_start()
 
 void cbuster_state::machine_reset()
 {
-
 	m_prot = 0;
 	m_pri = 0;
 }

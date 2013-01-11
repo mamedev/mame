@@ -17,8 +17,7 @@ Template for skeleton device
 
 /* TODO: frequency */
 #define MCFG_M6M80011AP_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, M6M80011AP, XTAL_32_768kHz) \
-
+	MCFG_DEVICE_ADD(_tag, M6M80011AP, XTAL_32_768kHz)
 
 //**************************************************************************
 //  TYPE DEFINITIONS

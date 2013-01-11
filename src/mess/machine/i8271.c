@@ -231,7 +231,6 @@ static void i8271_seek_to_track(device_t *device,int track)
 	}
 	else
 	{
-
 		signed int SignedTracks;
 
 		/* calculate number of tracks to seek */
@@ -573,7 +572,6 @@ static void i8271_command_continue(device_t *device)
 			/* end command? */
 			if (i8271->Counter==0)
 			{
-
 				i8271_timed_command_complete(device);
 				return;
 			}
@@ -596,7 +594,6 @@ static void i8271_command_continue(device_t *device)
 			/* end command? */
 			if (i8271->Counter==0)
 			{
-
 				i8271_timed_command_complete(device);
 				return;
 			}
@@ -1036,7 +1033,6 @@ static void i8271_command_execute(device_t *device)
 
 				case I8271_SPECIAL_REGISTER_DRIVE_CONTROL_INPUT_PORT:
 				{
-
 					FDC_LOG_COMMAND("Write Drive Control Input port\n");
 
 					//                  i8271->drive_control_input = i8271->CommandParameters[1];
@@ -1258,7 +1254,6 @@ static void i8271_command_execute(device_t *device)
 				}
 				else
 				{
-
 					i8271->drive_control_output |=1;
 
 					i8271_seek_to_track(device,i8271->CommandParameters[0]);
@@ -1289,7 +1284,6 @@ static void i8271_command_execute(device_t *device)
 			}
 			else
 			{
-
 				i8271->Counter = i8271->CommandParameters[2];
 
 				i8271_seek_to_track(device,i8271->CommandParameters[0]);
@@ -1469,7 +1463,6 @@ READ8_DEVICE_HANDLER(i8271_r)
 
 		case 1:
 		{
-
 			if ((i8271->StatusRegister & I8271_STATUS_COMMAND_BUSY)==0)
 			{
 				/* clear IRQ */

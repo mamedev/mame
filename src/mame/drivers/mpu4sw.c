@@ -76,16 +76,14 @@ DRIVER_INIT_MEMBER(mpu4_state,m_grtecpss)
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "acapp1.bin",  0x000000, 0x080000, CRC(bda61fc6) SHA1(b94f39fa92d3d0cb580eaafa0f58bd5cde947e3a) ) \
 	ROM_LOAD( "andsnd.bin",  0x000000, 0x080000, CRC(7d568671) SHA1(3a0a6af3dc980f2ccff0b6ef85833eb2e352031a) ) \
-	ROM_LOAD( "andsnd2.bin", 0x080000, 0x080000, CRC(98a586ee) SHA1(94b94d198725e8174e14873b99afa19217a1d4fa) ) \
-
+	ROM_LOAD( "andsnd2.bin", 0x080000, 0x080000, CRC(98a586ee) SHA1(94b94d198725e8174e14873b99afa19217a1d4fa) )
 #define M4ANDYCP_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( 0x10000, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYCP_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring,ROT0,company,title,GAME_FLAGS )
 
 // "(C)1994  B.W.B."  and  "AC101.0"
 M4ANDYCP_SET( 1994, m4andycp,           0,          "ac10.hex",         0x0000, 0x010000, CRC(0e250923) SHA1(9557315cca7a47c307e811d437ff424fe77a2843), "Bwb",      "Andy Capp (Bwb / Barcrest) (MPU4) (AC10)" )
@@ -166,8 +164,7 @@ M4ANDYCP_SET( 199?, m4andycp20_b,       m4andycp,   "acap20_11",        0x0000, 
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
 	ROM_LOAD( "sdac_1.snd", 0x000000, 0x080000, CRC(5ce93532) SHA1(547f98740889e6fbafc5a0c517ff75de41f2acc7) ) \
 	ROM_LOAD( "sdac_2.snd", 0x080000, 0x080000, CRC(22dacd4b) SHA1(ad2dc943d4e3ec54937acacb963da938da809614) ) \
-	ROM_LOAD( "sjcv2.snd", 0x080000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) ) \
-
+	ROM_LOAD( "sjcv2.snd", 0x080000, 0x080000, CRC(f247ba83) SHA1(9b173503e63a4a861d1380b2ab1fe14af1a189bd) )
 ROM_START( m4andycpdut )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dac13.bin", 0x0000, 0x010000, CRC(a0cdd5b3) SHA1(7b7bc40a9a9aed3569f491acad15c606fe243e9b) )
@@ -182,16 +179,14 @@ GAME(199?, m4andycpdut,     m4andycp    ,mod4oki    ,mpu4               , mpu4_s
 	ROM_REGION( 0x48, "fakechr", 0 ) \
 	ROM_LOAD( "alf.chr", 0x0000, 0x000048, CRC(22f09b0d) SHA1(5a612e54e0bb5ea5c35f1a7b1d7bc3cdc34e3bdd) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "alfsnd0.1", 0x0000, 0x080000, CRC(6691bc25) SHA1(4dd67b8bbdc5d707814b756005075fcb4f0c8be4) ) \
-
+	ROM_LOAD( "alfsnd0.1", 0x0000, 0x080000, CRC(6691bc25) SHA1(4dd67b8bbdc5d707814b756005075fcb4f0c8be4) )
 #define M4ANDYFL_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( 0x10000, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYFL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring,ROT0,company,title,GAME_FLAGS )
 // "(C)1996  B.W.B."  and "AL4 2.1"
 M4ANDYFL_SET( 1996, m4andyfl,       0,           "andy loves flo 05a 4 2-1",0x0000, 0x010000, CRC(773d2c6f) SHA1(944be6fff70439077a9c0d858e76806e0317585c), "Bwb", "Andy Loves Flo (Bwb / Barcrest) (MPU4) (AL4 2.1KS)" )
 // "(C)1996  B.W.B."  and "AL_ 2.4"
@@ -252,16 +247,14 @@ M4ANDYFL_SET( 1991, m4andyfluyd,    m4andyfl,    "alu03dy.p1",              0x00
 	ROM_LOAD( "df503s.chr", 0x0000, 0x000048, CRC(46c28f35) SHA1(e229b211180f9f7b30cd0bb9de162971d16b2d33) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "dutsnd.p1", 0x000000, 0x080000, CRC(a5829cec) SHA1(eb65c86125350a7f384f9033f6a217284b6ff3d1) ) \
-	ROM_LOAD( "dutsnd.p2", 0x080000, 0x080000, CRC(1e5d8407) SHA1(64ee6eba3fb7700a06b89a1e0489a0cd54bb89fd) ) \
-
+	ROM_LOAD( "dutsnd.p2", 0x080000, 0x080000, CRC(1e5d8407) SHA1(64ee6eba3fb7700a06b89a1e0489a0cd54bb89fd) )
 #define M4DTYFRE_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( 0x10000, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4DTYFRE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring,ROT0,company,title,GAME_FLAGS )
 // "(C)1993 BARCREST"  and "DUT 0.4"
 M4DTYFRE_SET( 1993, m4dtyfre,       0,          "duts.p1",                  0x0000, 0x010000, CRC(8c7d6567) SHA1(8e82c4168d4d455c7cb95a895c04f7ad327894ec), "Barcrest","Duty Free (Barcrest) (MPU4) (DUT 0.4)" )
 M4DTYFRE_SET( 1993, m4dtyfreutb,    m4dtyfre,   "dutb.p1",                  0x0000, 0x010000, CRC(479acab7) SHA1(645e876b2c59dd4c091b5f168dcfd2cfa7eda0a3), "Barcrest","Duty Free (Barcrest) (MPU4) (DUT 0.4B)" )
@@ -353,8 +346,7 @@ M4DTYFRE_SET( 199?, m4dtyfre_h2,    m4dtyfre,   "duty2010",                 0x00
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHOG_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring,ROT0,company,title,GAME_FLAGS )
 // "(C)1991 BARCREST"  and "RR6 1.2"
 M4RHOG_SET( 1991, m4rhog,           0,          "rr6s.p1",                  0x0000, 0x010000, CRC(f978ca0b) SHA1(11eeac41f4c77b38b33baefb16dab7de1268d161), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2)" )
 M4RHOG_SET( 1991, m4rhogr6d,        m4rhog,     "rr6d.p1",                  0x0000, 0x010000, CRC(b61115ea) SHA1(92b97cc8b71eb31e8377a59344faaf0d800d1bdc), "Barcrest","Road Hog (Barcrest) (MPU4) (RR6 1.2D)" )
@@ -420,8 +412,7 @@ M4RHOG_SET( 1995, m4rhog_roc,       m4rhog,     "roadhog5p4std.bin",        0x00
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYGE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,grtecp , mpu4_state,m_grtecpss ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,grtecp , mpu4_state,m_grtecpss ,ROT0,company,title,GAME_FLAGS )
 // "(C)1991 BARCREST"  and "AN2 0.3"
 M4ANDYGE_SET( 1991, m4andyge,           0,          "an2s.p1",                  0x0000, 0x010000, CRC(65399fa0) SHA1(ecefdf63e7aa477001fa530ed340e90e85252c3c), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (AN2 0.3, set 1)" ) // one of these is probably hacked
 M4ANDYGE_SET( 1991, m4andygen2_a,       m4andyge,   "agesc20p",                 0x0000, 0x010000, CRC(94fec0f3) SHA1(7678e01a4e0fcc4136f6d4a668c4d1dd9a8f1246), "Barcrest","Andy's Great Escape (Barcrest) (MPU4) (AN2 0.3, set 2)" ) // or has the wrong id strings
@@ -496,8 +487,7 @@ M4ANDYGE_SET( 199?, m4andyge_h4,        m4andyge,   "age20_101",                
 		ROM_REGION( 0x10000, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 // all the adders and ladders sets kill the cpu, end up jumping to the ram area after an RTI/RTS combo? are we saturating the CPU with too many interrupts or is there a bug?
 // also the BWB versioning is.. illogical
 // I think this is a mod2, but because it doesn't boot I haven't moved it to mpu4mod2sw.c yet
@@ -559,16 +549,14 @@ M4ADDR_SET( 1994, m4addr_h2,    m4addr, "ad05.6c",                  0x0000, 0x01
 #define M4DENMEN_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "densnd1.hex", 0x000000, 0x080000, CRC(468a8ec7) SHA1(ec450cd86fda09bc94caf913e9ee7900cfeaa0f2) ) \
-	ROM_LOAD( "densnd2.hex", 0x080000, 0x080000, CRC(1c20a490) SHA1(62eddc469e4b93ea1f82070600fce628dc526f54) ) \
-
+	ROM_LOAD( "densnd2.hex", 0x080000, 0x080000, CRC(1c20a490) SHA1(62eddc469e4b93ea1f82070600fce628dc526f54) )
 #define M4DENMEN_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( 0x10000, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4DENMEN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4DENMEN_SET( 199?, m4denmen,       0,          "dens.p1",                      0x0000, 0x010000, CRC(d3687138) SHA1(611985a9116ea14992b34a84ed31693f88d99797), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DEN 1.2)" )
 M4DENMEN_SET( 199?, m4denmendnd,    m4denmen,   "dend.p1",                      0x0000, 0x010000, CRC(176cd283) SHA1(f72c69b346f926a6e11b685ab9a6a2783b836450), "Barcrest","Dennis The Menace (Barcrest) (MPU4) (DEN 1.2D)" )
@@ -617,16 +605,14 @@ M4DENMEN_SET( 199?, m4denmen_h3,    m4denmen,   "denm2010",                     
 	ROM_LOAD( "crmsnd.p1", 0x000000, 0x080000, CRC(e05cdf96) SHA1(c85c7b31b775e3cc2d7f943eb02ff5ebae6c6080) ) \
 	ROM_LOAD( "crmsnd.p2", 0x080000, 0x080000, CRC(11da0781) SHA1(cd63834bf5d5034c2473372bfcc4930c300333f7) ) \
 	ROM_REGION( 0x100000, "altmsm6376", 0 ) /* which sets are meant to use this? */ \
-	ROM_LOAD( "cmazep1.bin", 0x000000, 0x080000, CRC(3d94a320) SHA1(a9b4e89ce36dbc2ef584b3adffffa00b7ae7e245) ) \
-
+	ROM_LOAD( "cmazep1.bin", 0x000000, 0x080000, CRC(3d94a320) SHA1(a9b4e89ce36dbc2ef584b3adffffa00b7ae7e245) )
 #define M4CRMAZE_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CRMAZE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4jackpot8tkn , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4jackpot8tkn , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 // "(C)1993 BARCREST"  and "CRM 3.0"
 M4CRMAZE_SET( 1993, m4crmaze,       0,          "crms.p1",              0x0000, 0x020000, CRC(b289c54b) SHA1(eb74bb559e2be2737fc311d044b9ce87014616f3), "Barcrest","Crystal Maze (Barcrest) (MPU4) (CRM 3.0)" )
 M4CRMAZE_SET( 1993, m4crmaze__h,    m4crmaze,   "crmd.p1",              0x0000, 0x020000, CRC(1232a809) SHA1(483b96b3b3ea50cbf5c3823c3ba20369b88bd459), "Barcrest","Crystal Maze (Barcrest) (MPU4) (CRM 3.0D)" )
@@ -663,16 +649,14 @@ M4CRMAZE_SET( 199?, m4crmaze__s,    m4crmaze,   "cmaz58t",              0x0000, 
 	ROM_LOAD( "tri98.chr", 0x0000, 0x000048, CRC(8a4532a8) SHA1(c128fd513bbcba68a1c75a11e09a54ba1d23d6f4) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "cmasnd.p1", 0x000000, 0x080000, CRC(1e7e13b8) SHA1(2db5c3789ad1b9bdb59e058562bd8be181ba0259) ) \
-	ROM_LOAD( "cmasnd.p2", 0x080000, 0x080000, CRC(cce703a8) SHA1(97487f3df0724d3ee01f6f4deae126aec6d2dd68) ) \
-
+	ROM_LOAD( "cmasnd.p2", 0x080000, 0x080000, CRC(cce703a8) SHA1(97487f3df0724d3ee01f6f4deae126aec6d2dd68) )
 #define M4CASHMN_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CASHMN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4jackpot8tkn , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4jackpot8tkn , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4CASHMN_SET( 199?, m4cashmn,       0,          "cma07s.p1",            0x0000, 0x020000, CRC(e9c1d9f2) SHA1(f2df4ae650ec2b62d15bbaa562d638476bf926e7), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 1)" )
 M4CASHMN_SET( 199?, m4cashmn__a,    m4cashmn,   "camc2010",             0x0000, 0x020000, CRC(82e459ab) SHA1(62e1906007f6bba99e3e8badc3472070e8ae84f8), "Barcrest","Cash Machine (Barcrest) (MPU4) (set 2)" )
@@ -735,16 +719,14 @@ M4CASHMN_SET( 199?, m4cashmn__zb,   m4cashmn,   "cma15t",               0x0000, 
 	ROM_LOAD( "tri98.chr", 0x0000, 0x000048, CRC(8a4532a8) SHA1(c128fd513bbcba68a1c75a11e09a54ba1d23d6f4) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "tops1.hex", 0x000000, 0x080000, CRC(70f16892) SHA1(e6448831d3ce7fa251b40023bc7d5d6dee9d6793) ) \
-	ROM_LOAD( "tops2.hex", 0x080000, 0x080000, CRC(5fc888b0) SHA1(8d50ee4f36bd36aed5d0e7a77f76bd6caffc6376) ) \
-
+	ROM_LOAD( "tops2.hex", 0x080000, 0x080000, CRC(5fc888b0) SHA1(8d50ee4f36bd36aed5d0e7a77f76bd6caffc6376) )
 #define M4TOPTEN_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TOPTEN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 
 M4TOPTEN_SET( 199?, m4topten,       0,          "tts04s.p1",    0x0000, 0x020000, CRC(5e53f04f) SHA1(d49377966ed787cc3571eadff8c4c16fac74434c), "Barcrest","Top Tenner (Barcrest) (type 1) (MPU4) (TTS 0.4)" )
@@ -820,16 +802,14 @@ M4TOPTEN_SET( 199?, m4topten__b,    m4topten,   "topt15t",      0x0000, 0x020000
 	ROM_LOAD( "tocsnd.p1", 0x000000, 0x080000, CRC(b9527b0e) SHA1(4dc5f6794c3e63c8faced34e166dcc748ffb4941) ) \
 	ROM_LOAD( "tocsnd.p2", 0x080000, 0x080000, CRC(f684a488) SHA1(7c93cda3d3b55d9818625f696798c7c2cde79fa8) ) \
 	ROM_REGION( 0x100000, "altmsm6376", 0 ) \
-	ROM_LOAD( "totsnd.p1", 0x0000, 0x080000, CRC(684e9eb1) SHA1(8af28de879ae41efa07dfb07ecbd6c72201749a7) ) \
-
+	ROM_LOAD( "totsnd.p1", 0x0000, 0x080000, CRC(684e9eb1) SHA1(8af28de879ae41efa07dfb07ecbd6c72201749a7) )
 #define M4TOOT_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TOOT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4TOOT_SET( 199?, m4toot,       0,      "toc03c.p1",    0x0000, 0x020000, CRC(752ffa3f) SHA1(6cbe521ff85173159b6d34cc3e29a4192cd66394), "Barcrest","Ten Out Of Ten (Barcrest) (MPU4) (set 1)" )
 M4TOOT_SET( 199?, m4toot__a,    m4toot, "toc03ad.p1",   0x0000, 0x020000, CRC(f67e53c1) SHA1(07a50fb649c5085a33f0a1a9b3d65b0b61a3f152), "Barcrest","Ten Out Of Ten (Barcrest) (MPU4) (set 2)" )
@@ -888,16 +868,14 @@ M4TOOT_SET( 199?, m4toot__zb,   m4toot, "tot15t",       0x0000, 0x020000, CRC(1c
 	ROM_LOAD( "m683.chr", 0x0000, 0x000048, CRC(cbe68b44) SHA1(60efc69eba86531f51230dee17efdbbf8917f907) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "er4snd.p1", 0x000000, 0x080000, CRC(32fd0836) SHA1(ea68252b690fe1d6070209cbcfb65fe20926c6ce) ) \
-	ROM_LOAD( "er4snd.p2", 0x080000, 0x080000, CRC(1df9c24f) SHA1(f0d31b1bec6f3a9791f7fabe57b45687df900efa) ) \
-
+	ROM_LOAD( "er4snd.p2", 0x080000, 0x080000, CRC(1df9c24f) SHA1(f0d31b1bec6f3a9791f7fabe57b45687df900efa) )
 #define M4EAW_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4EAW_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4EAW_SET( 199?, m4eaw,     0,      "er4s.p1",                  0x0000, 0x010000, CRC(163fc987) SHA1(8e1768ed2fbddbd5e00652ff40614de3978c9567), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 1)" )
 M4EAW_SET( 199?, m4eaw__a,  m4eaw,  "cet03ad.p1",               0x0000, 0x010000, CRC(33afe7a5) SHA1(5d3bdb74c6babd49e88915282ad81c184bd7aa68), "Barcrest","Everyone's A Winner (Barcrest) (MPU4) (set 2)" )
@@ -1004,16 +982,14 @@ M4EAW_SET( 199?, m4eaw__bz, m4eaw,  "everyones a winner v2-5p", 0x0000, 0x008000
 	ROM_LOAD( "wn5s.chr", 0x0000, 0x000048, CRC(b90e5068) SHA1(14c57dcd7242104eb48a9be36192170b97bc5110) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "winsnd.p1", 0x000000, 0x080000, CRC(a913ad0d) SHA1(5f39b661912da903ce8d6658b7848081b191ea56) ) \
-	ROM_LOAD( "winsnd.p2", 0x080000, 0x080000, CRC(6a22b39f) SHA1(0e0dbeac4310e03490b665fff514392481ad265f) ) \
-
+	ROM_LOAD( "winsnd.p2", 0x080000, 0x080000, CRC(6a22b39f) SHA1(0e0dbeac4310e03490b665fff514392481ad265f) )
 #define M4WTA_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4WTA_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4WTA_SET( 199?, m4wta,     0,      "wta55",                                    0x0000, 0x010000, CRC(df3e66cd) SHA1(68e769816cb1a71dea8a3ccf4636414c45c01646), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 1)" )
 M4WTA_SET( 199?, m4wta__b,  m4wta,  "windy.p1",                                 0x0000, 0x010000, CRC(d8b78c2d) SHA1(d8c2a2ac30a9b876acfbe99e3c540ba0e82cde33), "Barcrest","Winner Takes All (Barcrest) (MPU4) (set 3)" )
@@ -1062,16 +1038,14 @@ M4WTA_SET( 199?, m4wta__ag, m4wta,  "wta5.8t",                                  
 #define M4GOODTM_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "gtrsnd.p1", 0x000000, 0x080000, CRC(23317580) SHA1(c0c5244ddcf976211e2a5e5a0b1dbc6faaec22b4) ) \
-	ROM_LOAD( "gtrsnd.p2", 0x080000, 0x080000, CRC(866ce0d2) SHA1(46e800c7364a6d291c6af87b30c680c530100e74) ) \
-
+	ROM_LOAD( "gtrsnd.p2", 0x080000, 0x080000, CRC(866ce0d2) SHA1(46e800c7364a6d291c6af87b30c680c530100e74) )
 #define M4GOODTM_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4GOODTM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4GOODTM_SET( 199?, m4goodtm,       0,          "gtr20d.p1",    0x0000, 0x020000, CRC(a19eaef1) SHA1(5e9f9cffd841b9d4f21175e3dcec7436d016bb19), "Barcrest","Let The Good Times Roll (Barcrest) (MPU4) (set 1)" )
 M4GOODTM_SET( 199?, m4goodtm__a,    m4goodtm,   "gta01ad.p1",   0x0000, 0x020000, CRC(2b556e66) SHA1(50a042fdb53294f74ab23a41a8a850dd14ad580d), "Barcrest","Let The Good Times Roll (Barcrest) (MPU4) (set 2)" )
@@ -1151,8 +1125,7 @@ M4GOODTM_SET( 199?, m4goodtm__a6,   m4goodtm,   "gts10y.p1",    0x0000, 0x020000
 	ROM_REGION( 0x48, "fakechr", 0 ) \
 	ROM_LOAD( "tri98.chr", 0x0000, 0x000048, CRC(8a4532a8) SHA1(c128fd513bbcba68a1c75a11e09a54ba1d23d6f4) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "jagsnd.p1", 0x080000, 0x080000, CRC(7488f7a7) SHA1(d581e9d6b5052ee8fee353a83e9d9031443d060a) ) \
-
+	ROM_LOAD( "jagsnd.p1", 0x080000, 0x080000, CRC(7488f7a7) SHA1(d581e9d6b5052ee8fee353a83e9d9031443d060a) )
 
 #define M4JPGEM_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1160,8 +1133,7 @@ M4GOODTM_SET( 199?, m4goodtm__a6,   m4goodtm,   "gts10y.p1",    0x0000, 0x020000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4JPGEM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 M4JPGEM_SET( 199?, m4jpgem,     0,          "cg4ad.p1",     0x0000, 0x010000, CRC(417c98c1) SHA1(2ce23e27742c418d5ebaa0f4f0597e29955ea57d), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 1)" )
 M4JPGEM_SET( 199?, m4jpgem__a,  m4jpgem,    "cg4b.p1",      0x0000, 0x010000, CRC(c57cca63) SHA1(80a440912362d55cac6bc77b6ff6d6672af378c6), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 2)" )
 M4JPGEM_SET( 199?, m4jpgem__b,  m4jpgem,    "cg4bd.p1",     0x0000, 0x010000, CRC(7604ea50) SHA1(3d6eee763bd21119ab52a2388229da076caf78a4), "Barcrest","Jackpot Gems (Barcrest) (MPU4) (set 3)" )
@@ -1254,8 +1226,7 @@ M4JPGEM_SET( 199?, m4jpgem__bp, m4jpgem,    "rrh01y.p1",    0x0000, 0x010000, CR
 
 #define M4JPGEMC_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 
 #define M4JPGEMC_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1263,8 +1234,7 @@ M4JPGEM_SET( 199?, m4jpgem__bp, m4jpgem,    "rrh01y.p1",    0x0000, 0x010000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4JPGEMC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4JPGEMC_SET( 199?, m4jpgemc,       0,          "gtc01ad.p1",   0x0000, 0x010000, CRC(e4f61afd) SHA1(36e007275cce0565c50b150dba4c8df272cd4c2e), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 1)" )
 M4JPGEMC_SET( 199?, m4jpgemc__a,    m4jpgemc,   "gtc01b.p1",    0x0000, 0x010000, CRC(e4e27c71) SHA1(b46da3f00134d3a2f17ceb35529adb598c75ee4e), "Barcrest","Jackpot Gems Classic (Barcrest) (MPU4) (set 2)" )
@@ -1297,8 +1267,7 @@ M4JPGEMC_SET( 199?, m4jpgemc__w,    m4jpgemc,   "hge01y.p1",    0x0000, 0x010000
 	ROM_LOAD( "tri98.chr", 0x0000, 0x000048, CRC(8a4532a8) SHA1(c128fd513bbcba68a1c75a11e09a54ba1d23d6f4) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "jolly1.hex", 0x000000, 0x080000, CRC(de0edae5) SHA1(e3e21e28ae5e838bd6eacc7cf7b20204d7b0327d) ) \
-	ROM_LOAD( "jolly2.hex", 0x080000, 0x080000, CRC(08ae81a2) SHA1(6459a694cd820f1a55b636f7c5c77674d3fe4bdb) ) \
-
+	ROM_LOAD( "jolly2.hex", 0x080000, 0x080000, CRC(08ae81a2) SHA1(6459a694cd820f1a55b636f7c5c77674d3fe4bdb) )
 
 #define M4JOLGEM_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1306,8 +1275,7 @@ M4JPGEMC_SET( 199?, m4jpgemc__w,    m4jpgemc,   "hge01y.p1",    0x0000, 0x010000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4JOLGEM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 M4JOLGEM_SET( 199?, m4jolgem,       0,          "gem07s.p1",    0x0000, 0x020000, CRC(945ad0d2) SHA1(d636bc41a4f887d24affc0f5b644c5d5351cf0df), "Barcrest","Jolly Gems (Barcrest) (MPU4) (set 1)" )
 M4JOLGEM_SET( 199?, m4jolgem__a,    m4jolgem,   "gem05s",       0x0000, 0x020000, CRC(b7ceafc2) SHA1(b66d846da5ff20df912d31695eaef146dbbe759e), "Barcrest","Jolly Gems (Barcrest) (MPU4) (set 2)" )
 M4JOLGEM_SET( 199?, m4jolgem__b,    m4jolgem,   "gem06ad.p1",   0x0000, 0x020000, CRC(a3270974) SHA1(59992779415ff20b8589843510099b77c9b157fd), "Barcrest","Jolly Gems (Barcrest) (MPU4) (set 3)" )
@@ -1368,8 +1336,7 @@ M4JOLGEM_SET( 199?, m4jolgem__ap,   m4jolgem,   "jgs_xa_x.1_0", 0x0000, 0x020000
 	ROM_LOAD( "hi4snd.p1", 0x000000, 0x080000, CRC(066f262b) SHA1(fd48da486592740c68ee497396602199101711a6) ) \
 	ROM_LOAD( "hi4snd.p2", 0x080000, 0x080000, CRC(0ee89f6c) SHA1(7088149000efd1dcdf37aa9b88f7c6491184da24) ) \
 	ROM_REGION( 0x100000, "altmsm6376", 0 ) \
-	ROM_LOAD( "httsnd.p1",   0x000000, 0x080000, CRC(1cfb12d2) SHA1(d909c7ee8ea10587a9a9251af943b0151d2c4a16) ) \
-
+	ROM_LOAD( "httsnd.p1",   0x000000, 0x080000, CRC(1cfb12d2) SHA1(d909c7ee8ea10587a9a9251af943b0151d2c4a16) )
 
 #define M4HITTOP_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1377,8 +1344,7 @@ M4JOLGEM_SET( 199?, m4jolgem__ap,   m4jolgem,   "jgs_xa_x.1_0", 0x0000, 0x020000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4HITTOP_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4HITTOP_SET( 199?, m4hittop,   0,          "hi4s.p1",      0x0000, 0x010000, CRC(3a04ee7a) SHA1(d23e9da2c22f6983a855bc519597ea9cea84f2dd), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 1)" )
 M4HITTOP_SET( 199?, m4hittop__a,    m4hittop,   "chuad.p1",     0x0000, 0x010000, CRC(01d3b86c) SHA1(27af0e76661495d5b91ee6a53507f9a5d4e5ab85), "Barcrest","Hit The Top (Barcrest) (MPU4) (set 2)" )
@@ -1447,16 +1413,14 @@ M4HITTOP_SET( 199?, m4hittop__ax,   m4hittop,   "htty.p1",      0x0000, 0x010000
 	ROM_REGION( 0x48, "fakechr", 0 ) \
 	ROM_LOAD( "m574.chr", 0x0000, 0x000048, CRC(cc4b7911) SHA1(9f8a96a1f8b0f9b33b852e93483ce5c684703349) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "cn4snd.p1", 0x0000, 0x080000, CRC(720011ce) SHA1(fa9108463131ea7e64525e080ac0eff2f6708db8) ) \
-
+	ROM_LOAD( "cn4snd.p1", 0x0000, 0x080000, CRC(720011ce) SHA1(fa9108463131ea7e64525e080ac0eff2f6708db8) )
 #define M4NNWW_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4NNWW_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4NNWW_SET( 199?, m4nnww,       0,      "nn5bd.p1",     0x0000, 0x010000, CRC(56cc9559) SHA1(53e109a579e422932dd25c52cf2beca51d3a53e3), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 1)" )
 M4NNWW_SET( 199?, m4nnww__a,    m4nnww, "cf301s",       0x0000, 0x010000, CRC(1d8abf59) SHA1(81e47797baddd777fbbb1b1e044df1bfe3d49cb2), "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU4) (set 2)" )
@@ -1528,16 +1492,14 @@ M4NNWW_SET( 199?, m4nnww__az,   m4nnww, "wink2010",     0x0000, 0x010000, CRC(05
 	ROM_LOAD( "rft20.10_chr", 0x0000, 0x000010, CRC(87cdda8d) SHA1(3d17d42d5eaf5dcc04b856ec07689cab6183b12d) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "runsnd.p1", 0x000000, 0x080000, CRC(a37a3a6d) SHA1(b82c7e90508795a53b91d7dab7938abf07e8ab4c) ) \
-	ROM_LOAD( "runsnd.p2", 0x080000, 0x080000, CRC(1c03046f) SHA1(5235b2f60f12cbee11fb5e54e1858a11a755f460) ) \
-
+	ROM_LOAD( "runsnd.p2", 0x080000, 0x080000, CRC(1c03046f) SHA1(5235b2f60f12cbee11fb5e54e1858a11a755f460) )
 #define M4RFYM_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RFYM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4RFYM_SET( 199?, m4rfym,       0,      "rund.p1",      0x0000, 0x010000, CRC(2be2a66d) SHA1(a66d74ccf1783912673cfcb6c1ae7fbb6d70ca0e), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 1)" )
 M4RFYM_SET( 199?, m4rfym__a,    m4rfym, "ap1ad.p1",     0x0000, 0x010000, CRC(d1adbf80) SHA1(08801f38b8ba5034fd83b53b6cfff864104525b4), "Barcrest","Run For Your Money (Barcrest) (MPU4) (set 2)" )
@@ -1615,16 +1577,14 @@ M4RFYM_SET( 199?, m4rfym__a5,   m4rfym, "rfym5.8t",     0x0000, 0x010000, CRC(c6
 	ROM_LOAD( "tri98.chr", 0x0000, 0x000048, CRC(8a4532a8) SHA1(c128fd513bbcba68a1c75a11e09a54ba1d23d6f4) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "rgosnd.p1", 0x000000, 0x080000, CRC(d9345794) SHA1(4ed060fe61b3530e88ba9afea1fb69efed47c955) ) \
-	ROM_LOAD( "rgosnd.p2", 0x080000, 0x080000, CRC(4656f94e) SHA1(2f276ced34a43bb7fc69304f519b913d699c3450) ) \
-
+	ROM_LOAD( "rgosnd.p2", 0x080000, 0x080000, CRC(4656f94e) SHA1(2f276ced34a43bb7fc69304f519b913d699c3450) )
 #define M4READY_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4READY_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4READY_SET( 199?, m4ready,     0,          "rgob.p1",      0x0000, 0x010000, CRC(43ac7b73) SHA1(994d6256432543e1353521359f8faaea671a7bea), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 1)" )
 M4READY_SET( 199?, m4ready__a,  m4ready,    "cgo11ad.p1",   0x0000, 0x010000, CRC(9f8bbdaf) SHA1(210cdc9ce493edbf55d43a3127b10931e3ce2fee), "Barcrest","Ready Steady Go (Barcrest) (type 2) (MPU4) (set 2)" )
@@ -1702,16 +1662,14 @@ M4READY_SET( 199?, m4ready__a5, m4ready,    "rgt10y.p1",    0x0000, 0x010000, CR
 	ROM_LOAD( "mag7.chr", 0x0000, 0x000048, CRC(4835e911) SHA1(7171cdabf6cf76e09ea55b41f0f8a98b94032486) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "ma7snd1.bin", 0x000000, 0x080000, CRC(f0e31329) SHA1(60b94c3223c8863fe801b93f65ff65e94f3dec83) ) \
-	ROM_LOAD( "ma7snd2.bin", 0x080000, 0x080000, CRC(12110d16) SHA1(fa93a263d1e3fa8b0b2f618f52e5145330f4315d) ) \
-
+	ROM_LOAD( "ma7snd2.bin", 0x080000, 0x080000, CRC(12110d16) SHA1(fa93a263d1e3fa8b0b2f618f52e5145330f4315d) )
 #define M4MAG7S_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4MAG7S_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4jackpot8per , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4jackpot8per , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4MAG7S_SET( 199?, m4mag7s,     0,          "mas12y.p1",        0x0000, 0x020000, CRC(5f012d8e) SHA1(069b493285df9ac3639c43349245a77890333dcc), "Barcrest","Magnificent 7s (Barcrest) (MPU4) (set 1)" )
 M4MAG7S_SET( 199?, m4mag7s__a,  m4mag7s,    "ma714s",           0x0000, 0x020000, CRC(9c1d4f97) SHA1(7875f044f992b313f4dfaae2e7b604baf16387a3), "Barcrest","Magnificent 7s (Barcrest) (MPU4) (set 2)" )
@@ -1779,16 +1737,14 @@ M4MAG7S_SET( 199?, m4mag7s__ax, m4mag7s,    "m7_sja_c.2r1",     0x0000, 0x020000
 #define M4MAKMNT_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "mamsnd.p1", 0x000000, 0x080000, CRC(8dc408e3) SHA1(48a9ffc5cf4fd04ed1320619ca915bbfa2406750) ) \
-	ROM_LOAD( "mamsnd.p2", 0x080000, 0x080000, CRC(6034e17a) SHA1(11e044c87b5fc6461b0c6cfac5c419daee930d7b) ) \
-
+	ROM_LOAD( "mamsnd.p2", 0x080000, 0x080000, CRC(6034e17a) SHA1(11e044c87b5fc6461b0c6cfac5c419daee930d7b) )
 #define M4MAKMNT_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4MAKMNT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4MAKMNT_SET( 199?, m4makmnt,       0,          "mams.p1",      0x0000, 0x020000, CRC(af08e1e6) SHA1(c7e87d351f67592084d758ee53ba4d354bb28866), "Barcrest","Make A Mint (Barcrest) (MPU4) (set 1)" )
 M4MAKMNT_SET( 199?, m4makmnt__a,    m4makmnt,   "mam04ad.p1",   0x0000, 0x020000, CRC(9b750bc7) SHA1(10a86f0a0d18ce0be502a9d36282f6b5eef0ece5), "Barcrest","Make A Mint (Barcrest) (MPU4) (set 2)" )
@@ -1853,8 +1809,7 @@ M4MAKMNT_SET( 199?, m4makmnt__as,   m4makmnt,   "ma_x6a_c.3_1", 0x0000, 0x010000
 	ROM_LOAD( "viva.chr", 0x0000, 0x000048, CRC(4662e1fb) SHA1(54074bcc67adedb3dc6df80bdc60e0222f934156) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "vivasnd1.bin", 0x000000, 0x080000, CRC(e7975c75) SHA1(407c3bcff29f4b6599de2c35d96f62c72a897bd1) ) \
-	ROM_LOAD( "vivasnd2.bin", 0x080000, 0x080000, CRC(9f22f32d) SHA1(af64f6bde0b825d474c42c56f6e2253b28d4f90f) ) \
-
+	ROM_LOAD( "vivasnd2.bin", 0x080000, 0x080000, CRC(9f22f32d) SHA1(af64f6bde0b825d474c42c56f6e2253b28d4f90f) )
 
 #define M4VIVAES_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1862,8 +1817,7 @@ M4MAKMNT_SET( 199?, m4makmnt__as,   m4makmnt,   "ma_x6a_c.3_1", 0x0000, 0x010000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4VIVAES_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4VIVAES_SET( 199?, m4vivaes,       0,          "5p5vivaespana6-0.bin", 0x0000, 0x010000, CRC(adf02a7b) SHA1(2c61e175b920a67098503eb4d80b07b828c9f91d), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 1)" )
 M4VIVAES_SET( 199?, m4vivaes__a,    m4vivaes,   "ep8ad.p1",             0x0000, 0x010000, CRC(1591cc9b) SHA1(b7574b71955d7780f3f127670e458befad951383), "Barcrest","Viva Espana (Barcrest) (MPU4) (set 2)" )
@@ -1925,8 +1879,7 @@ M4VIVAES_SET( 199?, m4vivaes__ap,   m4vivaes,   "vesp_5.8",             0x0000, 
 	ROM_LOAD( "tri98.chr", 0x0000, 0x000048, CRC(8a4532a8) SHA1(c128fd513bbcba68a1c75a11e09a54ba1d23d6f4) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "pbsnd1.hex", 0x000000, 0x080000, CRC(72a3331d) SHA1(b7475ba0ad86a6277e3d4f7b4311a98f3fc29802) ) \
-	ROM_LOAD( "pbsnd2.hex", 0x080000, 0x080000, CRC(c2460eec) SHA1(7c62fbc69ffaa788bf3839e37a75a812a7b8caef) ) \
-
+	ROM_LOAD( "pbsnd2.hex", 0x080000, 0x080000, CRC(c2460eec) SHA1(7c62fbc69ffaa788bf3839e37a75a812a7b8caef) )
 
 #define M4POTBLK_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -1934,8 +1887,7 @@ M4VIVAES_SET( 199?, m4vivaes__ap,   m4vivaes,   "vesp_5.8",             0x0000, 
 		ROM_LOAD( name, offset, length, hash ) \
 		M4POTBLK_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4POTBLK_SET( 199?, m4potblk,       0,          "pbg16s.p1",    0x0000, 0x020000, CRC(36a1c679) SHA1(bf2eb5c2a07e61b7a2c0d8402b0e0583adfa22dc), "Barcrest","Pot Black (Barcrest) (MPU4) (set 1)" )
 M4POTBLK_SET( 199?, m4potblk__a,    m4potblk,   "pb15g",        0x0000, 0x020000, CRC(650a54be) SHA1(80a5bb95857c911c1972f8be5bf794637cb02323), "Barcrest","Pot Black (Barcrest) (MPU4) (set 2)" )
@@ -2006,16 +1958,14 @@ M4POTBLK_SET( 199?, m4potblk__ax,   m4potblk,   "po_x6a_t.1_1", 0x0000, 0x020000
 	ROM_LOAD( "pyb.chr", 0x0000, 0x000048, CRC(663e9d8e) SHA1(08e898967d41fbc582c9bfdebb461ad51269089d) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "pybsnd.p1", 0x000000, 0x080000, CRC(3a91784a) SHA1(7297ccec3264aa9f1e7b3a2841f5f8a1e4ca6c54) ) \
-	ROM_LOAD( "pybsnd.p2", 0x080000, 0x080000, CRC(a82f0096) SHA1(45b6b5a2ae06b45add9cdbb9f5e6f834687b4902) ) \
-
+	ROM_LOAD( "pybsnd.p2", 0x080000, 0x080000, CRC(a82f0096) SHA1(45b6b5a2ae06b45add9cdbb9f5e6f834687b4902) )
 #define M4PLACBT_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PLACBT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 
 M4PLACBT_SET( 199?, m4placbt,       0,          "pyb07s.p1",    0x0000, 0x020000, CRC(ad02705a) SHA1(027bcbbd828e4fd23831af9554d582857e6784e1), "Barcrest","Place Your Bets (Barcrest) (MPU4) (set 1)" )
@@ -2077,16 +2027,14 @@ M4PLACBT_SET( 199?, m4placbt__ao,   m4placbt,   "pyh06y.p1",    0x0000, 0x020000
 	ROM_REGION( 0x48, "fakechr", 0 ) \
 	ROM_LOAD( "du91.chr", 0x0000, 0x000048, CRC(9724122d) SHA1(a41687eec84cad453c1a2a89317078f48ca0895f) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "c9s.hex", 0x0000, 0x080000, CRC(ae952e15) SHA1(a9eed61c3d65ded5e1faa67362f181393cb6339a) ) \
-
+	ROM_LOAD( "c9s.hex", 0x0000, 0x080000, CRC(ae952e15) SHA1(a9eed61c3d65ded5e1faa67362f181393cb6339a) )
 #define M4C9_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4C9_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4C9_SET( 199?, m4c9,       0,      "c9211.p1",     0x0000, 0x010000, CRC(44e5cc87) SHA1(36fca9493d36ee6988d02da1b4c575278c43748c), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 1)" )
 M4C9_SET( 199?, m4c9__a,    m4c9,   "c915.hex",     0x0000, 0x010000, CRC(dabfa3f3) SHA1(f507c78e61cba74e9b776bebaf0cc4fa40b6de95), "Barcrest","Cloud Nine (Barcrest) (MPU4) (set 2)" )
@@ -2165,16 +2113,14 @@ M4C9_SET( 199?, m4c9__a3,   m4c9,   "c9o20d_1.1",   0x0000, 0x010000, CRC(047b2d
 	ROM_LOAD( "tftsnd02.p2", 0x080000, 0x080000, CRC(0bdc1dc9) SHA1(909af8ff4d0e3e36e280e9553a73bb1dfdb62144) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "tfsnd1.hex", 0x000000, 0x080000, CRC(a5b623fa) SHA1(eb4d84a7d3977ddea42c4995dddaabace73e6f8a) ) \
-	ROM_LOAD( "tfsnd2.hex", 0x080000, 0x080000, CRC(1275e528) SHA1(0c3c901cb2be1e84dba123677205108cf0388343) ) \
-
+	ROM_LOAD( "tfsnd2.hex", 0x080000, 0x080000, CRC(1275e528) SHA1(0c3c901cb2be1e84dba123677205108cf0388343) )
 #define M4TUTFRT_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TUTFRT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4TUTFRT_SET( 199?, m4tutfrt,       0,          "tft04s.p1",            0x0000, 0x010000, CRC(c20c3589) SHA1(55d1bc5d5f4ae14acafb36bd640faaf4ffccc6eb), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 1)" )
 M4TUTFRT_SET( 199?, m4tutfrt__a,    m4tutfrt,   "ctuad.p1",             0x0000, 0x010000, CRC(0ec1661b) SHA1(162ddc30c341fd8eda8ce57a60edf06b4e39a24f), "Barcrest","Tutti Fruity (Barcrest) (MPU4) (set 2)" )
@@ -2251,16 +2197,14 @@ M4TUTFRT_SET( 199?, m4tutfrt__a5,   m4tutfrt,   "tui05___.1a3",         0x0000, 
 	ROM_LOAD( "tri98.chr", 0x0000, 0x000048, CRC(8a4532a8) SHA1(c128fd513bbcba68a1c75a11e09a54ba1d23d6f4) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "cas1.hex", 0x000000, 0x080000, CRC(4711c483) SHA1(af1ceb317b7bb1c2d0c3f7a99049679c356e1860) ) \
-	ROM_LOAD( "cas2.hex", 0x080000, 0x080000, CRC(26ec235c) SHA1(51de955e5def47b82ac8891d09dc0b0e5e19c01d) ) \
-
+	ROM_LOAD( "cas2.hex", 0x080000, 0x080000, CRC(26ec235c) SHA1(51de955e5def47b82ac8891d09dc0b0e5e19c01d) )
 #define M4CASHAT_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CASHAT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4CASHAT_SET( 199?, m4cashat,       0,          "csa12y.p1",        0x0000, 0x020000, CRC(0374584a) SHA1(446e1d122d5b38e4ee11d98a4235d7198d98b541), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 1)" )
 M4CASHAT_SET( 199?, m4cashat__a,    m4cashat,   "caa22ad.p1",       0x0000, 0x020000, CRC(b6274874) SHA1(7c2dc0f3e8e7bb76f3b90300141b320fa0ca39ac), "Barcrest","Cash Attack (Barcrest) (MPU4) (set 2)" )
@@ -2325,16 +2269,14 @@ M4CASHAT_SET( 199?, m4cashat__ar,   m4cashat,   "csa12s.p1",        0x0000, 0x02
 	ROM_REGION( 0x100000, "altmsm6376", 0 ) \
 	ROM_LOAD( "redhotroll10.bin", 0x0000, 0x080000, CRC(64513503) SHA1(4233492f3f6e7ad8459f1ab733727910d3b4bcf8) ) /* not a valid OKI rom? */ \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "rhrsnd1.hex", 0x0000, 0x080000, CRC(3e80f8bd) SHA1(2e3a195b49448da11cc0c089a8a9b462894c766b) ) \
-
+	ROM_LOAD( "rhrsnd1.hex", 0x0000, 0x080000, CRC(3e80f8bd) SHA1(2e3a195b49448da11cc0c089a8a9b462894c766b) )
 #define M4RHR_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHR_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4RHR_SET( 199?, m4rhr,     0,      "rhr15.hex",        0x0000, 0x010000, CRC(895ebbda) SHA1(f2117e743a30f3c9fc6af7fd7843bc333699db9d), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 1)" )
 M4RHR_SET( 199?, m4rhr__a,  m4rhr,  "cr4ad.p1",         0x0000, 0x010000, CRC(b99b3d14) SHA1(2ff68b33881e9b3c2db48c335ccbad783013084a), "Barcrest","Red Hot Roll (Barcrest) (MPU4) (set 2)" )
@@ -2409,16 +2351,14 @@ M4RHR_SET( 1991, m4rhr__a4, m4rhr,  "rh8c.p1",          0x0000, 0x010000, CRC(e3
 #define M4UUAW_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "uuasnd.p1", 0x00000, 0x080000, CRC(be1a1131) SHA1(b7f50d8db6b7d134757e0746e7d9faf9fd3a2c7e) ) \
-	ROM_LOAD( "uuasnd.p2", 0x080000, 0x080000, CRC(c8492b3a) SHA1(d390e37f4a62869079bb38395a2e86a5ad24392f) ) \
-
+	ROM_LOAD( "uuasnd.p2", 0x080000, 0x080000, CRC(c8492b3a) SHA1(d390e37f4a62869079bb38395a2e86a5ad24392f) )
 #define M4UUAW_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4UUAW_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 
 M4UUAW_SET( 199?, m4uuaw,       0,      "uua21h.p1",    0x0000, 0x020000, CRC(199e6dae) SHA1(ecd95ba2c2255afbaa8df96d625a8bfc97e4d3bc), "Barcrest","Up Up and Away (Barcrest) (MPU4) (set 1)" )
@@ -2480,16 +2420,14 @@ M4UUAW_SET( 199?, m4uuaw__aq,   m4uuaw, "uua22y.p1",    0x0000, 0x020000, CRC(88
 #define M4RICHFM_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "rfamouss1.hex", 0x000000, 0x080000, CRC(b237c8b8) SHA1(b2322d68fe57cca0ed49b01ae0d3a0e93a623eac) ) \
-	ROM_LOAD( "rfamouss2.hex", 0x080000, 0x080000, CRC(12c295d5) SHA1(0758354cfb5242b4ce3f5f25c3458d91f4b4a1ec) ) \
-
+	ROM_LOAD( "rfamouss2.hex", 0x080000, 0x080000, CRC(12c295d5) SHA1(0758354cfb5242b4ce3f5f25c3458d91f4b4a1ec) )
 #define M4RICHFM_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RICHFM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4RICHFM_SET( 199?, m4richfm,       0,          "rfts.p1",      0x0000, 0x010000, CRC(2a747164) SHA1(a4c8e160f09ebea4fca6dd32ff020d3f1a4f1a1c), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 1)" )
 M4RICHFM_SET( 199?, m4richfm__a,    m4richfm,   "rafc.p1",      0x0000, 0x010000, CRC(d92f602f) SHA1(c93131138deb4018d499b9b45c07d4517c5072b7), "Barcrest","Rich & Famous (Barcrest) (MPU4) (set 2)" )
@@ -2526,16 +2464,14 @@ M4RICHFM_SET( 199?, m4richfm__3,    m4richfm,   "r&f55",        0x0000, 0x010000
 
 #define M4NNWWC_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
-	/* missing, maybe the same as NNWW */ \
-
+	/* missing, maybe the same as NNWW */
 #define M4NNWWC_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4NNWWC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 M4NNWWC_SET( 199?, m4nnwwc,     0,          "cn302c.p1",        0x0000, 0x010000, CRC(fd9de050) SHA1(14c80deba1396aa5be0a1d02964ecd4b946f2ee8), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 1)" )
 M4NNWWC_SET( 199?, m4nnwwc__a,  m4nnwwc,    "cf302ad.p1",       0x0000, 0x010000, CRC(6c6aa0cd) SHA1(5a58a19c35b0b195f3b4e7a21f57ca61d45ec1fb), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 2)" )
 M4NNWWC_SET( 199?, m4nnwwc__b,  m4nnwwc,    "cf302b.p1",        0x0000, 0x010000, CRC(9ca07939) SHA1(6eb0a5675bb803a11c4c874dc0516d94c48194b7), "Barcrest","Nudge Nudge Wink Wink Classic (Barcrest) (MPU4) (set 3)" )
@@ -2590,8 +2526,7 @@ M4NNWWC_SET( 199?, m4nnwwc__ad, m4nnwwc,    "cl__xb_x.2_0",     0x0000, 0x010000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHRC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 M4RHRC_SET( 199?, m4rhrc,       0,      "cld03ad.p1",       0x0000, 0x010000, CRC(821fde63) SHA1(61f77eeb01331e735cc8c736526d09371e6bdf56), "Barcrest","Red Hot Roll Classic (Barcrest) (MPU4) (set 1)" )
@@ -2637,16 +2572,14 @@ M4RHRC_SET( 199?, m4rhrc__aa,   m4rhrc, "cr__x_dx.5_0",     0x0000, 0x010000, CR
 	ROM_LOAD( "vizs.chr", 0x0000, 0x000048, CRC(2365ca6b) SHA1(b964420eb1df4065b2a6f3f934135d435b52af2b) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "vizsnd.p1", 0x000000, 0x080000, CRC(2b39a622) SHA1(77916650fe19f18025e10fb25de704f7bb733295) ) \
-	ROM_LOAD( "vizsnd.p2", 0x080000, 0x080000, CRC(e309bede) SHA1(a4615436fcfd5f31293f887b8bc972f0d2d6b0cb) ) \
-
+	ROM_LOAD( "vizsnd.p2", 0x080000, 0x080000, CRC(e309bede) SHA1(a4615436fcfd5f31293f887b8bc972f0d2d6b0cb) )
 #define M4VIZ_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4VIZ_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 M4VIZ_SET( 199?, m4viz,     0,      "viz208c",      0x0000, 0x010000, CRC(00a65029) SHA1(8dfb68d1a9f4cd00f239ed87a1d330ccb655c35b), "Barcrest","Viz (Barcrest) (MPU4) (set 1)" )
@@ -2682,16 +2615,14 @@ M4VIZ_SET( 199?, m4viz__w,  m4viz,  "viz_20_.8",    0x0000, 0x010000, CRC(b4fbc4
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "tapsnd1.hex", 0x000000, 0x080000, CRC(8dc408e3) SHA1(48a9ffc5cf4fd04ed1320619ca915bbfa2406750) ) \
 	ROM_LOAD( "tapsnd2.hex", 0x080000, 0x080000, CRC(6034e17a) SHA1(11e044c87b5fc6461b0c6cfac5c419daee930d7b) ) \
-	ROM_LOAD( "typkp2", 0x080000, 0x080000, CRC(753d9bc1) SHA1(c27c8b7cfba7ad67685f637ee3f68a3edb7986e7) ) /* alt copy of tapsnd2 */ \
-
+	ROM_LOAD( "typkp2", 0x080000, 0x080000, CRC(753d9bc1) SHA1(c27c8b7cfba7ad67685f637ee3f68a3edb7986e7) ) /* alt copy of tapsnd2 */
 #define M4TAKEPK_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TAKEPK_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4TAKEPK_SET( 199?, m4takepk,       0,          "tapy.p1",      0x0000, 0x020000, CRC(f21f6dc8) SHA1(d421bee2564d3aaa389c35601adc23ad3fda5aa0), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 1)" )
 M4TAKEPK_SET( 199?, m4takepk__a,    m4takepk,   "tapad.p1",     0x0000, 0x020000, CRC(162448c4) SHA1(1f77d053fb5dfddeba1248e9e2a05536ab1bc66a), "Barcrest","Take Your Pick (Barcrest) (MPU4) (set 2)" )
@@ -2728,16 +2659,14 @@ M4TAKEPK_SET( 199?, m4takepk__1,    m4takepk,   "typ5p10p.bin", 0x0000, 0x010000
 	ROM_REGION( 0x48, "fakechr", 0 ) \
 	ROM_LOAD( "otts.chr", 0x0000, 0x000048, CRC(2abec763) SHA1(307399724a994a5d0914a5d7e0931a5d94439a37) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "otnsnd.p1", 0x0000, 0x080000, CRC(d4f7ed82) SHA1(16e80bf0956f39a9e8e23384615a07594419db59) ) \
-
+	ROM_LOAD( "otnsnd.p1", 0x0000, 0x080000, CRC(d4f7ed82) SHA1(16e80bf0956f39a9e8e23384615a07594419db59) )
 #define M4OVERMN_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4OVERMN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4OVERMN_SET( 199?, m4overmn,       0,          "otts.p1",  0x0000, 0x010000, CRC(6daf58a4) SHA1(e505a18b67dec54446e6d94a5d1c3bba13099619), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 1)" )
 M4OVERMN_SET( 199?, m4overmn__a,    m4overmn,   "ot8b.p1",  0x0000, 0x010000, CRC(243c7f7c) SHA1(24b9d2cce1af75811d1e625ac8df5b58356776dc), "Barcrest","Over The Moon (Barcrest) (MPU4) (set 2)" )
@@ -2788,16 +2717,14 @@ M4OVERMN_SET( 199?, m4overmn__8,    m4overmn,   "otuy.p1",  0x0000, 0x010000, CR
 	ROM_LOAD( "luxorsnd2.hex", 0x080000, 0x080000, CRC(860178e6) SHA1(705b1b0ad62a1b594bb123aec3c2b571a6500ce8) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "luxor-snd1.bin", 0x000000, 0x080000, CRC(d09394e9) SHA1(d3cbdbaf048d829271a6c2846b16ceee7775d767) ) \
-	ROM_LOAD( "luxor-snd2.bin", 0x080000, 0x080000, CRC(bc720cb9) SHA1(a83c25ecec602ba047dd21de2beec6cd7ac76cbe) ) \
-
+	ROM_LOAD( "luxor-snd2.bin", 0x080000, 0x080000, CRC(bc720cb9) SHA1(a83c25ecec602ba047dd21de2beec6cd7ac76cbe) )
 #define M4LUXOR_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4LUXOR_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 M4LUXOR_SET( 199?, m4luxor,     0,          "luxor.rom",        0x0000, 0x010000, CRC(55277510) SHA1(9a866c36a398df52c54b554cd8085078c1f1954b), "Barcrest","Luxor (Barcrest) (MPU4) (set 1)" )
@@ -2834,16 +2761,14 @@ M4LUXOR_SET( 199?, m4luxor__z,  m4luxor,    "lxi10a__.1o1",     0x0000, 0x010000
 	ROM_LOAD( "tri98.chr", 0x0000, 0x000048, CRC(8a4532a8) SHA1(c128fd513bbcba68a1c75a11e09a54ba1d23d6f4) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "hijinx1.hex", 0x000000, 0x080000, CRC(8d5afedb) SHA1(6bf6dadddf8dd3672e3d05167ab9a0793c269176) ) \
-	ROM_LOAD( "hijinx2.hex", 0x080000, 0x080000, CRC(696c8a92) SHA1(d54a1020fea80bacb678bc8bd6b7d4d0854af603) ) \
-
+	ROM_LOAD( "hijinx2.hex", 0x080000, 0x080000, CRC(696c8a92) SHA1(d54a1020fea80bacb678bc8bd6b7d4d0854af603) )
 #define M4HIJINX_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4HIJINX_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4HIJINX_SET( 199?, m4hijinx,       0,          "jnx10y.p1",    0x0000, 0x020000, CRC(792b3bae) SHA1(d30aecce42953f1ec49753cc2d1df00ad9bd088f), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 1)" )
 M4HIJINX_SET( 199?, m4hijinx__a,    m4hijinx,   "hij15g",       0x0000, 0x020000, CRC(73271cca) SHA1(8177e10e30386464a7e5a33dc3c02adbf4c93101), "Barcrest","Hi Jinx (Barcrest) (MPU4) (set 2)" )
@@ -2895,16 +2820,14 @@ M4HIJINX_SET( 199?, m4hijinx__ab,   m4hijinx,   "jnx10s.p1",    0x0000, 0x020000
 	ROM_LOAD( "cash lines 0.1 snd 1 9c3f.bin", 0x0000, 0x080000, CRC(1746f091) SHA1(d57fcaec3e3b0344671f2c984974bfdac50ec3d7) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "cls1.hex", 0x000000, 0x080000, CRC(d6b5d862) SHA1(eab2ef2999229db7182896267cd83742b2390237) ) \
-	ROM_LOAD( "cls2.hex", 0x080000, 0x080000, CRC(e42e674b) SHA1(1cda06425f3d4797ee0c4ff7426970150e5af4b6) ) \
-
+	ROM_LOAD( "cls2.hex", 0x080000, 0x080000, CRC(e42e674b) SHA1(1cda06425f3d4797ee0c4ff7426970150e5af4b6) )
 #define M4CASHLN_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CASHLN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4CASHLN_SET( 199?, m4cashln,       0,          "cls04s.p1",    0x0000, 0x020000, CRC(c8b7f355) SHA1(437324bf499ba49ecbb3854f5f787da5f575f7f5), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 1)" )
 M4CASHLN_SET( 199?, m4cashln__a,    m4cashln,   "cl15g",        0x0000, 0x020000, CRC(fdd5765d) SHA1(fee8ddc9b93934a5582d6730cfa26246191c22ff), "Barcrest","Cash Lines (Barcrest) (MPU4) (set 2)" )
@@ -2995,16 +2918,14 @@ M4CASHLN_SET( 199?, m4cashln__bj,   m4cashln,   "ncl11y.p1",    0x0000, 0x020000
 #define M4LUCKLV_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "llvsnd.p1", 0x000000, 0x080000, CRC(36be26f3) SHA1(b1c66d3ebebd7eb18266bf6b30c4a4db7acdf10d) ) \
-	ROM_LOAD( "llvsnd.p2", 0x080000, 0x080000, CRC(d5c2bb99) SHA1(e2096b8a33e89218d44200e87d1962790120a96c) ) \
-
+	ROM_LOAD( "llvsnd.p2", 0x080000, 0x080000, CRC(d5c2bb99) SHA1(e2096b8a33e89218d44200e87d1962790120a96c) )
 #define M4LUCKLV_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4LUCKLV_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4LUCKLV_SET( 199?, m4lucklv,       0,          "llvs.p1",  0x0000, 0x010000, CRC(30727bc9) SHA1(c32112d0181f629540b31ce9959834111dbf7e0e), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 1)" )
 M4LUCKLV_SET( 199?, m4lucklv__a,    m4lucklv,   "ll3ad.p1", 0x0000, 0x010000, CRC(e79e7f98) SHA1(7b3a22978f2f5a0b6062f0330fef15ce0e91c010), "Barcrest","Lucky Las Vegas (Barcrest) (MPU4) (set 2)" )
@@ -3059,16 +2980,14 @@ M4LUCKLV_SET( 199?, m4lucklv__ai,   m4lucklv,   "llvr.p1",  0x0000, 0x010000, CR
 #define M4LUCKST_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "lssnd1.bin", 0x000000, 0x080000, CRC(401686bc) SHA1(ab62e6e097b0af2f68ae7f8f686f00cede5ec3aa) ) \
-	ROM_LOAD( "lssnd2.bin", 0x080000, 0x080000, CRC(d9e0c0db) SHA1(3eba5b19ca98d23a94edf2be27ccefaa0e526a56) ) \
-
+	ROM_LOAD( "lssnd2.bin", 0x080000, 0x080000, CRC(d9e0c0db) SHA1(3eba5b19ca98d23a94edf2be27ccefaa0e526a56) )
 #define M4LUCKST_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4LUCKST_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4LUCKST_SET( 199?, m4luckst,       0,          "lss06s.p1",            0x0000, 0x020000, CRC(b6a69478) SHA1(6b05b7f9af94a83adfdff328d4132f72a1dfb19f), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 1)" )
 M4LUCKST_SET( 199?, m4luckst__a,    m4luckst,   "ls15g",                0x0000, 0x020000, CRC(b942ac91) SHA1(e77b2acd07cac9b747731f9e0637112fc6bf94c7), "Barcrest","Lucky Strike (Barcrest) (MPU4) (set 2)" )
@@ -3133,16 +3052,14 @@ M4LUCKST_SET( 199?, m4luckst__aw,   m4luckst,   "ls__xa_x.1_1",         0x0000, 
 
 #define M4TENTEN_EXTRA_ROMS \
 	ROM_REGION( 0x080000, "msm6376", 0 ) \
-	ROM_LOAD( "tttsnd01.p1", 0x0000, 0x080000, CRC(5518474c) SHA1(0b7e98e33f62d80882f2b0b4af0c9056f1ffb78d) ) \
-
+	ROM_LOAD( "tttsnd01.p1", 0x0000, 0x080000, CRC(5518474c) SHA1(0b7e98e33f62d80882f2b0b4af0c9056f1ffb78d) )
 #define M4TENTEN_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TENTEN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4TENTEN_SET( 199?, m4tenten,       0,          "t2002s.p1",    0x0000, 0x010000, CRC(6cd9fa10) SHA1(8efe36e3fc5b709fa4363194634686d62b5d6609), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 1)" )
 M4TENTEN_SET( 199?, m4tenten__a,    m4tenten,   "n2503ad.p1",   0x0000, 0x010000, CRC(c84150e6) SHA1(8f143c26c6026a413bdd65ca148d78dead1d2474), "Barcrest","10 X 10 (Barcrest) (MPU4) (set 2)" )
@@ -3215,16 +3132,14 @@ M4TENTEN_SET( 199?, m4tenten__a2,   m4tenten,   "tst01y.p1",    0x0000, 0x010000
 #define M4ANDYFH_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "afhsnd1.bin", 0x000000, 0x080000, CRC(ce0b1890) SHA1(224d05f936a1b6f84ad682c282c557e87ad8931f) ) \
-	ROM_LOAD( "afhsnd2.bin", 0x080000, 0x080000, CRC(8a4dda7b) SHA1(ee77295609ff646212faa207e56acb2440d859b8) ) \
-
+	ROM_LOAD( "afhsnd2.bin", 0x080000, 0x080000, CRC(8a4dda7b) SHA1(ee77295609ff646212faa207e56acb2440d859b8) )
 #define M4ANDYFH_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYFH_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 
@@ -3303,16 +3218,14 @@ M4ANDYFH_SET( 199?, m4andyfh__a4,   m4andyfh,   "cauy.p1",      0x0000, 0x010000
 	ROM_LOAD( "tri98.chr", 0x0000, 0x000048, CRC(8a4532a8) SHA1(c128fd513bbcba68a1c75a11e09a54ba1d23d6f4) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "blds1.hex", 0x000000, 0x080000, CRC(9cc07f5f) SHA1(e25295eb304624ed77d98d7e974363214c2c2cd1) ) \
-	ROM_LOAD( "blds2.hex", 0x080000, 0x080000, CRC(949bee73) SHA1(9ea2001a4d91236708dc948b4e1cac9978095945) ) \
-
+	ROM_LOAD( "blds2.hex", 0x080000, 0x080000, CRC(949bee73) SHA1(9ea2001a4d91236708dc948b4e1cac9978095945) )
 #define M4BDASH_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BDASH_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 
 M4BDASH_SET( 199?, m4bdash,     0,          "bls01s.p1",    0x0000, 0x020000, CRC(4e4f403b) SHA1(f040568af530cf0ff060199f98b00e476191da22), "Barcrest","Boulder Dash (Barcrest) (MPU4) (set 1)" )
@@ -3389,16 +3302,14 @@ M4BDASH_SET( 199?, m4bdash__a4, m4bdash,    "bo__xb_x.2_1", 0x0000, 0x020000, CR
 #define M4PRZDTY_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "pdusnd.p2", 0x000000, 0x080000, CRC(a5829cec) SHA1(eb65c86125350a7f384f9033f6a217284b6ff3d1) ) \
-	ROM_LOAD( "pdusnd.p1", 0x080000, 0x080000, CRC(1e5d8407) SHA1(64ee6eba3fb7700a06b89a1e0489a0cd54bb89fd) ) \
-
+	ROM_LOAD( "pdusnd.p1", 0x080000, 0x080000, CRC(1e5d8407) SHA1(64ee6eba3fb7700a06b89a1e0489a0cd54bb89fd) )
 #define M4PRZDTY_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PRZDTY_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4PRZDTY_SET( 199?, m4przdty,       0,          "pdus.p1",  0x0000, 0x010000, CRC(eaa2ae08) SHA1(a4cef3ee8c005fb717625699260d24ef6a368824), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 1)" )
 M4PRZDTY_SET( 199?, m4przdty__a,    m4przdty,   "pd8ad.p1", 0x0000, 0x010000, CRC(ff2bde9d) SHA1(6f75d1c4f8b136ad9dbfd6c0182dbe0f54f856a9), "Barcrest","Prize Duty Free (Barcrest) (MPU4) (set 2)" )
@@ -3421,16 +3332,14 @@ M4PRZDTY_SET( 199?, m4przdty__p,    m4przdty,   "pduy.p1",  0x0000, 0x010000, CR
 
 #define M4PRZMON_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
-	/* missing */ \
-
+	/* missing */
 #define M4PRZMON_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PRZMON_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 M4PRZMON_SET( 199?, m4przmon,       0,          "fp8ad.p1",     0x0000, 0x010000, CRC(9c1c443a) SHA1(58e45501c33d0fd8ecca7e7bc40fef60ebb519e9), "Barcrest","Prize Money (Barcrest) (MPU4) (set 1)" )
@@ -3465,8 +3374,7 @@ M4PRZMON_SET( 199?, m4przmon__1,    m4przmon,   "mti10___.4o1", 0x0000, 0x010000
 
 #define M4PRZHR_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "prlsnd.p1", 0x0000, 0x080000, CRC(d60181ea) SHA1(4ca872e50d59dc96e90ade8cac24ebbab8a3f397) ) \
-
+	ROM_LOAD( "prlsnd.p1", 0x0000, 0x080000, CRC(d60181ea) SHA1(4ca872e50d59dc96e90ade8cac24ebbab8a3f397) )
 
 #define M4PRZHR_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -3474,8 +3382,7 @@ M4PRZMON_SET( 199?, m4przmon__1,    m4przmon,   "mti10___.4o1", 0x0000, 0x010000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PRZHR_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4PRZHR_SET( 199?, m4przhr,     0,          "prly.p1",  0x0000, 0x010000, CRC(feeac121) SHA1(e01f32fb4cdfbe61fdcd89749a33185ac0410720), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 1)" )
 M4PRZHR_SET( 199?, m4przhr__a,  m4przhr,    "pr3ad.p1", 0x0000, 0x010000, CRC(8b047599) SHA1(fd2f21c2ed3e5cb4e4ace7ffa620131a1897cf92), "Barcrest","Prize High Roller (Barcrest) (MPU4) (set 2)" )
@@ -3500,8 +3407,7 @@ M4PRZHR_SET( 199?, m4przhr__p,  m4przhr,    "prls.p1",  0x0000, 0x010000, CRC(8c
 	ROM_REGION( 0x100000, "altmsm6376", 0 ) \
 	ROM_LOAD( "c95snd.p1", 0x080000, 0x080000, CRC(ae952e15) SHA1(a9eed61c3d65ded5e1faa67362f181393cb6339a) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "c25snd.p1", 0x000000, 0x080000, CRC(cd8f4ee0) SHA1(a7b9ae93b3a3d231a8239fff12689ec2084ce0c1) ) \
-
+	ROM_LOAD( "c25snd.p1", 0x000000, 0x080000, CRC(cd8f4ee0) SHA1(a7b9ae93b3a3d231a8239fff12689ec2084ce0c1) )
 
 #define M4GCLUE_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -3509,8 +3415,7 @@ M4PRZHR_SET( 199?, m4przhr__p,  m4przhr,    "prls.p1",  0x0000, 0x010000, CRC(8c
 		ROM_LOAD( name, offset, length, hash ) \
 		M4GCLUE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4GCLUE_SET( 199?, m4gclue,     0,          "c2002ad.p1",   0x0000, 0x010000, CRC(39507216) SHA1(dc49d9cea63cd5e88e4076bfca3aae88521056be), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 1)" )
 M4GCLUE_SET( 199?, m4gclue__a,  m4gclue,    "c2002b.p1",    0x0000, 0x010000, CRC(1a552423) SHA1(3025c7a8f98817a8b0233c7682452d5d6df081c5), "Barcrest","Give Us A Clue (Barcrest) (MPU4) (set 2)" )
@@ -3542,16 +3447,14 @@ M4GCLUE_SET( 199?, m4gclue__w,  m4gclue,    "c2504y.p1",    0x0000, 0x010000, CR
 	ROM_LOAD( "lasv.chr", 0x0000, 0x000048, CRC(49ec2385) SHA1(1204c532897acc953867691124fc0b700c7aed47) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "uvssnd.p1", 0x000000, 0x080000, CRC(04a47007) SHA1(cfe1f4aa9d29c784b2034c2daa09b8bd7181562e) ) \
-	ROM_LOAD( "uvssnd.p2", 0x080000, 0x080000, CRC(3b35d824) SHA1(e4007d5d13898ed0f91cd270c75b5df8cc62e003) ) \
-
+	ROM_LOAD( "uvssnd.p2", 0x080000, 0x080000, CRC(3b35d824) SHA1(e4007d5d13898ed0f91cd270c75b5df8cc62e003) )
 #define M4VEGAST_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4VEGAST_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4VEGAST_SET( 199?, m4vegast,       0,          "uvsad.p1",     0x0000, 0x020000, CRC(f26d7fa8) SHA1(bb37be4a189bd38bd71afd836e94a55f9ef84ad4), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 1)" )
 M4VEGAST_SET( 199?, m4vegast__a,    m4vegast,   "uvsb.p1",      0x0000, 0x020000, CRC(32e017ff) SHA1(3e8aa863b85164ee9d535244bafb82b14ee19528), "Barcrest","Vegas Strip (Barcrest) (MPU4) (set 2)" )
@@ -3585,16 +3488,14 @@ M4VEGAST_SET( 199?, m4vegast__x,    m4vegast,   "vstr2010",     0x0000, 0x020000
 	ROM_LOAD( "hotrod.chr", 0x0000, 0x000048, CRC(a76dc7d3) SHA1(43010dab862a98ec2a8f8444bf1411902ba03c63) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "rodsnd.p1", 0x000000, 0x080000, CRC(bfdafedc) SHA1(6acc838ec046d44e7faa727b48925379aa42883d) ) \
-	ROM_LOAD( "rodsnd.p2", 0x080000, 0x080000, CRC(a01e1e67) SHA1(4f86e0bb9bf4c1a4d0190eddfe7dd5bb89c519a2) ) \
-
+	ROM_LOAD( "rodsnd.p2", 0x080000, 0x080000, CRC(a01e1e67) SHA1(4f86e0bb9bf4c1a4d0190eddfe7dd5bb89c519a2) )
 #define M4HOTROD_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4HOTROD_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4HOTROD_SET( 199?, m4hotrod,       0,          "rodk.p1",                  0x0000, 0x010000, CRC(298d85ff) SHA1(3c9374be1f6b5e58a1b9004f74f3a33d0fff4214), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 1)" )
 M4HOTROD_SET( 199?, m4hotrod__a,    m4hotrod,   "hot rod 5p 4 p1 (27512)",  0x0000, 0x010000, CRC(b6212af8) SHA1(9453c4424244895b3ad15d5fba45fe8822e7ff2b), "Barcrest","Hot Rod (Barcrest) (MPU4) (set 2)" )
@@ -3624,16 +3525,14 @@ M4HOTROD_SET( 199?, m4hotrod__v,    m4hotrod,   "hrod_20_.8",               0x00
 #define M4BUC_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
 	ROM_LOAD( "buccsnd1.bin", 0x000000, 0x080000, CRC(b671fd7b) SHA1(8123d1ef9d5e2cc8783a78137540e6f13e5e2304) ) \
-	ROM_LOAD( "buccsnd2.bin", 0x080000, 0x080000, CRC(66966b41) SHA1(87e2058f39ef1b19c35e63d55e62e2034fd24c0d) ) \
-
+	ROM_LOAD( "buccsnd2.bin", 0x080000, 0x080000, CRC(66966b41) SHA1(87e2058f39ef1b19c35e63d55e62e2034fd24c0d) )
 #define M4BUC_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BUC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 
 M4BUC_SET( 199?, m4buc,     0,      "buccaneer5-15sw.bin",  0x000000, 0x020000, CRC(9b92d1f6) SHA1(d374fe966a1b039c971f278ab1113640e7629233), "Barcrest","Buccaneer (Barcrest) (MPU4) (set 1)" )
@@ -3706,8 +3605,7 @@ M4BUC_SET( 199?, m4buc__az, m4buc,  "br_sjwb_.1_1",         0x000000, 0x020000, 
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4HYPVIP_SET( 199?, m4hypvip,       0,          "5p4hypervyper.bin",    0x0000, 0x010000, CRC(51ac9288) SHA1(1580079b6e710506ab03e1d8a89af65cd06cedd2), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 1)" )
 M4HYPVIP_SET( 199?, m4hypvip__a,    m4hypvip,   "h.viper10p610m.bin",   0x0000, 0x010000, CRC(104b0c48) SHA1(ab4cdb596a0cfb877ed1b6bf801e4a759b53971f), "Barcrest","Hyper Viper (Barcrest) (MPU4) (set 2)" )
@@ -3740,16 +3638,14 @@ M4HYPVIP_SET( 199?, m4hypvip__v,    m4hypvip,   "hypv_20_.4",           0x0000, 
 	ROM_LOAD( "cjesnd.p2", 0x080000, 0x080000, CRC(3dcb7c38) SHA1(3c0e91f4d2ea9e6b25a01702c6f6fdc7cc2e0b65) ) \
 	ROM_LOAD( "jewelp2",   0x080000, 0x080000, CRC(84996453) SHA1(74fe377545503f1b8da9b8998514811f0c1c037c) ) /* alt cje */ \
 	ROM_LOAD( "cjhsnd.p1", 0x000000, 0x080000, CRC(4add4eca) SHA1(98dc644d3f3d67e764c215bd26ae010e4b23c738) ) \
-	ROM_LOAD( "cjhsnd.p2", 0x080000, 0x080000, CRC(5eec51f0) SHA1(834d9d13f79a61c51db9df067064f64a15c956a9) ) \
-
+	ROM_LOAD( "cjhsnd.p2", 0x080000, 0x080000, CRC(5eec51f0) SHA1(834d9d13f79a61c51db9df067064f64a15c956a9) )
 #define M4JWLCWN_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4JWLCWN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 
 M4JWLCWN_SET( 199?, m4jwlcwn,       0,          "cje0.8",       0x0000, 0x020000, CRC(2074bf61) SHA1(d84201fb7d2590b16816e0369e89789d02088a6d), "Barcrest","Jewel In the Crown (Barcrest) (MPU4) (set 1)" )
@@ -3791,16 +3687,14 @@ M4JWLCWN_SET( 199?, m4jwlcwn__6,    m4jwlcwn,   "jc_xx__c.3_1", 0x0000, 0x020000
 #define M4BAGTEL_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "bgtsnd.p1", 0x000000, 0x080000, CRC(40a68dd1) SHA1(d70cf436dca242d49cd3bd39d3f6484a30968d0d) ) \
-	ROM_LOAD( "bgtsnd.p2", 0x080000, 0x080000, CRC(90961429) SHA1(6390e575d030f6d2953ee8460876c50fe48026f8) ) \
-
+	ROM_LOAD( "bgtsnd.p2", 0x080000, 0x080000, CRC(90961429) SHA1(6390e575d030f6d2953ee8460876c50fe48026f8) )
 #define M4BAGTEL_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BAGTEL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4BAGTEL_SET( 199?, m4bagtel,       0,          "bgt05s.p1",    0x0000, 0x010000, CRC(ddf1c7dc) SHA1(a786e5e04538ce498493795fc4054bb5de57ffd2), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 1)" )
 M4BAGTEL_SET( 199?, m4bagtel__a,    m4bagtel,   "bg201c.p1",    0x0000, 0x010000, CRC(ee9bf501) SHA1(5c6ee55cfac5bb92695b412fe56f4c843dcae424), "Barcrest","Bagatelle (Barcrest) (MPU4) (set 2)" )
@@ -3852,8 +3746,7 @@ M4BAGTEL_SET( 199?, m4bagtel__ag,   m4bagtel,   "el310y.p1",    0x0000, 0x010000
 #define M4PRZWTA_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "pwnsnd.p1", 0x000000, 0x080000, CRC(c0f5e160) SHA1(eff218a36912fe599e9d73a96b49e75335bba272) ) \
-	ROM_LOAD( "pwnsnd.p2", 0x080000, 0x080000, CRC(d81dfc8f) SHA1(5fcfcba836080b5752911d69dfe650614acbf845) ) \
-
+	ROM_LOAD( "pwnsnd.p2", 0x080000, 0x080000, CRC(d81dfc8f) SHA1(5fcfcba836080b5752911d69dfe650614acbf845) )
 
 #define M4PRZWTA_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -3861,8 +3754,7 @@ M4BAGTEL_SET( 199?, m4bagtel__ag,   m4bagtel,   "el310y.p1",    0x0000, 0x010000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PRZWTA_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4PRZWTA_SET( 199?, m4przwta,       0,          "pwnr.p1",  0x0000, 0x020000, CRC(cf619ad2) SHA1(3eeccccb304afd5faf2563e0e65f8123e463d363), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 1)" )
 M4PRZWTA_SET( 199?, m4przwta__a,    m4przwta,   "pw8ad.p1", 0x0000, 0x020000, CRC(71257e43) SHA1(1db17aa1fc684873511a46e5e7421b459040d0cc), "Barcrest","Prize Winner Takes All (Barcrest) (MPU4) (set 2)" )
@@ -3885,16 +3777,14 @@ M4PRZWTA_SET( 199?, m4przwta__p,    m4przwta,   "pwns.p1",  0x0000, 0x020000, CR
 
 #define M4BERSER_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
-	ROM_LOAD( "bessnd.p1", 0x0000, 0x080000, CRC(4eb15200) SHA1(1997a304df5219153418369bd8cc4fd169fb4bd4) ) \
-
+	ROM_LOAD( "bessnd.p1", 0x0000, 0x080000, CRC(4eb15200) SHA1(1997a304df5219153418369bd8cc4fd169fb4bd4) )
 #define M4BERSER_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BERSER_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 M4BERSER_SET( 199?, m4berser,       0,          "bess.p1",      0x0000, 0x010000, CRC(b95bafbe) SHA1(034c80ef5fd0a12fad918c9b01bafb9a99c2e991), "Barcrest","Berserk (Barcrest) (MPU4) (set 1)" )
@@ -3931,16 +3821,14 @@ M4BERSER_SET( 199?, m4berser__1,    m4berser,   "be_05a_4.1_1", 0x0000, 0x010000
 
 #define M4VIVESS_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
-	/* missing */ \
-
+	/* missing */
 #define M4VIVESS_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4VIVESS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4VIVESS_SET( 199?, m4vivess,       0,          "se8s.p1",  0x0000, 0x010000, CRC(d5c261de) SHA1(5f70944ffe03109ad16f162370fd3653d131034d), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 1)" )
 M4VIVESS_SET( 199?, m4vivess__a,    m4vivess,   "se8ad.p1", 0x0000, 0x010000, CRC(4f799dfe) SHA1(e85108ab0aad92a64eabf5c7562068caf22f8d5b), "Barcrest","Viva Espana Showcase (Barcrest) (MPU4) (set 2)" )
@@ -3962,16 +3850,14 @@ M4VIVESS_SET( 199?, m4vivess__p,    m4vivess,   "sesy.p1",  0x0000, 0x010000, CR
 #define M4TTDIA_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "tdasnd.p1", 0x000000, 0x080000, CRC(6e0bf4ab) SHA1(0cbcdc11d2d64a5fda2cf40bdde850f5c7b56d12) ) \
-	ROM_LOAD( "tdasnd.p2", 0x080000, 0x080000, CRC(66cc2f87) SHA1(6d8af6090b2ab29039aa89a125512190e7e34a03) ) \
-
+	ROM_LOAD( "tdasnd.p2", 0x080000, 0x080000, CRC(66cc2f87) SHA1(6d8af6090b2ab29039aa89a125512190e7e34a03) )
 #define M4TTDIA_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TTDIA_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 
 M4TTDIA_SET( 199?, m4ttdia,     0,          "tda04s.p1",    0x0000, 0x020000, CRC(1240642e) SHA1(7eaf02d5c00707a0a6d98d247c293cad1ca87108), "Barcrest","Ten Ten Do It Again  (Barcrest) (MPU4) (set 1)" )
@@ -3994,16 +3880,14 @@ M4TTDIA_SET( 199?, m4ttdia__m,  m4ttdia,    "tda04y.p1",    0x0000, 0x020000, CR
 #define M4PRZVE_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "pessnd.p1", 0x000000, 0x080000, CRC(e7975c75) SHA1(407c3bcff29f4b6599de2c35d96f62c72a897bd1) ) \
-	ROM_LOAD( "pessnd.p2", 0x080000, 0x080000, CRC(9f22f32d) SHA1(af64f6bde0b825d474c42c56f6e2253b28d4f90f) ) \
-
+	ROM_LOAD( "pessnd.p2", 0x080000, 0x080000, CRC(9f22f32d) SHA1(af64f6bde0b825d474c42c56f6e2253b28d4f90f) )
 #define M4PRZVE_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PRZVE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4PRZVE_SET( 199?, m4przve,     0,          "pess.p1",  0x0000, 0x010000, CRC(d8e79833) SHA1(f68fd1bd057a353832c7de3e2818906ab2b844b7), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 1)" )
 M4PRZVE_SET( 199?, m4przve__a,  m4przve,    "pe8ad.p1", 0x0000, 0x010000, CRC(3a81422e) SHA1(bb77365ed7bc7c2cd9e1cfe6e266c6edfd3562a3), "Barcrest","Prize Viva Esapana  (Barcrest) (MPU4) (set 2)" )
@@ -4026,16 +3910,14 @@ M4PRZVE_SET( 199?, m4przve__p,  m4przve,    "pesy.p1",  0x0000, 0x010000, CRC(fb
 
 #define M4SHOCM_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
-	/* missing */ \
-
+	/* missing */
 #define M4SHOCM_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SHOCM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4SHOCM_SET( 199?, m4shocm,     0,          "scms.p1",  0x0000, 0x020000, CRC(8cb17f49) SHA1(6c67d5d65567ba3677f51f9c636e1f8e253111de), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 1)" )
 M4SHOCM_SET( 199?, m4shocm__a,  m4shocm,    "scmad.p1", 0x0000, 0x020000, CRC(0960b887) SHA1(02b029760d141664a7c5860a29b158d8c2dec4e7), "Barcrest","Showcase Crystal Maze (Barcrest) (MPU4) (set 2)" )
@@ -4053,16 +3935,14 @@ M4SHOCM_SET( 199?, m4shocm__j,  m4shocm,    "scmk.p1",  0x0000, 0x020000, CRC(83
 #define M4ACTBNK_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "actsnd.p1", 0x000000, 0x080000, CRC(34777fea) SHA1(be784e73586719219ae5c1a3841f0e44edb6b497) ) \
-	ROM_LOAD( "actsnd.p2", 0x080000, 0x080000, CRC(2e832d40) SHA1(622b2c9694714446dbf67beb67d03af97d14ece7) ) \
-
+	ROM_LOAD( "actsnd.p2", 0x080000, 0x080000, CRC(2e832d40) SHA1(622b2c9694714446dbf67beb67d03af97d14ece7) )
 #define M4ACTBNK_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ACTBNK_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4ACTBNK_SET( 199?, m4actbnk,       0,          "acts.p1",  0x0000, 0x010000, CRC(49a9007c) SHA1(b205270e53264c3d8cb009a5780cacba1ce2e2a8), "Barcrest","Action Bank (Barcrest) (MPU4) (set 1)" )
 M4ACTBNK_SET( 199?, m4actbnk__a,    m4actbnk,   "actb.p1",  0x0000, 0x010000, CRC(1429708e) SHA1(8b3ecb443e5920ccec80695a142cb1eb9596b1c1), "Barcrest","Action Bank (Barcrest) (MPU4) (set 2)" )
@@ -4081,8 +3961,7 @@ M4ACTBNK_SET( 199?, m4actbnk__i,    m4actbnk,   "actad.p1", 0x0000, 0x010000, CR
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4ADDRC_SET( 199?, m4addrc,     0,          "add05_101",                        0x0000, 0x010000, CRC(4b3fb104) SHA1(9dba619019a476ce317122a3553965b279c684ba), "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4) (set 1)" )
 M4ADDRC_SET( 199?, m4addrc__a,  m4addrc,    "add10_101",                        0x0000, 0x010000, CRC(af8f8b4e) SHA1(712c33ed0f425dc10b79780b0cfce0ac5768e2d5), "Barcrest","Adders & Ladders Classic (Barcrest) (MPU4) (set 2)" )
@@ -4101,16 +3980,14 @@ M4ADDRC_SET( 199?, m4addrc__n,  m4addrc,    "nik56c",                           
 
 #define M4ADDRCC_EXTRA_ROMS \
 	ROM_REGION( 0x48, "fakechr", 0 ) \
-	ROM_LOAD( "aal.chr", 0x0000, 0x000048, CRC(bb48409f) SHA1(adefde520104b8c3815260ee136460ddf3e9e4b2) ) \
-
+	ROM_LOAD( "aal.chr", 0x0000, 0x000048, CRC(bb48409f) SHA1(adefde520104b8c3815260ee136460ddf3e9e4b2) )
 #define M4ADDRCC_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ADDRCC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 M4ADDRCC_SET( 199?, m4addrcc,       0,          "adcd.p1", 0x0000, 0x010000, CRC(47e41c9a) SHA1(546aaaa5765b3bc91eeb9bf5a979ed68a2e72da8), "Barcrest","Adders & Ladders Classic Club (Barcrest) (MPU4) (set 1)" )
@@ -4125,16 +4002,14 @@ M4ADDRCC_SET( 199?, m4addrcc__d,    m4addrcc,   "adrscfm", 0x0000, 0x010000, CRC
 	ROM_LOAD( "tri98.chr", 0x0000, 0x000048, CRC(8a4532a8) SHA1(c128fd513bbcba68a1c75a11e09a54ba1d23d6f4) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "cd2snd.p1", 0x000000, 0x080000, CRC(65a2dc92) SHA1(2c55a858ab17325189bed1974daf708c380541de) ) \
-	ROM_LOAD( "cd2snd.p2", 0x080000, 0x080000, CRC(b1bb4678) SHA1(8e8ab0a8d1b3e70dcb56d071193fdb5f34af7d14) ) \
-
+	ROM_LOAD( "cd2snd.p2", 0x080000, 0x080000, CRC(b1bb4678) SHA1(8e8ab0a8d1b3e70dcb56d071193fdb5f34af7d14) )
 #define M4CRDOME_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CRDOME_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4CRDOME_SET( 199?, m4crdome,       0,          "cd212k.p1",    0x0000, 0x020000, CRC(673b10a1) SHA1(996ade8193f448970beea2c5b81d9f27c05f162f), "Barcrest","Crystal Dome (Barcrest) (MPU4) (set 1)" )
 M4CRDOME_SET( 199?, m4crdome__a,    m4crdome,   "cd212c.p1",    0x0000, 0x020000, CRC(1ab605e5) SHA1(03327b2fac9d3d2891dc5950aa89ac4947c7b444), "Barcrest","Crystal Dome (Barcrest) (MPU4) (set 2)" )
@@ -4160,16 +4035,14 @@ M4CRDOME_SET( 199?, m4crdome__n,    m4crdome,   "cdome8ac",     0x0000, 0x020000
 	ROM_LOAD( "rokmsnd1",  0x000000, 0x080000, CRC(b51e5d7d) SHA1(71f36f866583d592d029cba47901cbfd17631b06) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "roksnd.p1", 0x000000, 0x080000, CRC(462a690e) SHA1(5a82f63a9d03c89c8fdb0ead1fc40e480aedd787) ) \
-	ROM_LOAD( "roksnd.p2", 0x080000, 0x080000, CRC(37786d14) SHA1(d6dc2d3dbe54ca943092938500d72081153b5a34) ) \
-
+	ROM_LOAD( "roksnd.p2", 0x080000, 0x080000, CRC(37786d14) SHA1(d6dc2d3dbe54ca943092938500d72081153b5a34) )
 #define M4ROCKMN_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ROCKMN_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 
 M4ROCKMN_SET( 199?, m4rockmn,       0,          "rok06c.p1",    0x0000, 0x020000, CRC(8e3a628f) SHA1(3bedb095af710f0b6376a5d99c072f7b3d3de0af), "Barcrest","Rocket Money (Barcrest) (MPU4) (set 1)" )
@@ -4191,16 +4064,14 @@ M4ROCKMN_SET( 199?, m4rockmn__k,    m4rockmn,   "rok06y.p1",    0x0000, 0x020000
 	ROM_LOAD( "m574.chr", 0x0000, 0x000048, CRC(cc4b7911) SHA1(9f8a96a1f8b0f9b33b852e93483ce5c684703349) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "madh1.bin", 0x000000, 0x080000, CRC(2b2af5dd) SHA1(eec0808bf724a055ece3c964d8a43cc5f837a3bd) ) \
-	ROM_LOAD( "madh2.bin", 0x080000, 0x080000, CRC(487d8e1d) SHA1(89e01a153d17564eba112d882b686c91b6c3aecc) ) \
-
+	ROM_LOAD( "madh2.bin", 0x080000, 0x080000, CRC(487d8e1d) SHA1(89e01a153d17564eba112d882b686c91b6c3aecc) )
 #define M4MADHSE_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4MADHSE_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 M4MADHSE_SET( 199?, m4madhse,       0,          "mh502y.p1",    0x0000, 0x010000, CRC(3ec1955a) SHA1(6939e6f5d749249825c41df8e05957450eaf1007), "Barcrest","Mad House (Barcrest) (MPU4) (set 1)" )
@@ -4234,16 +4105,14 @@ M4MADHSE_SET( 199?, m4madhse__0,    m4madhse,   "mhts.p1",      0x0000, 0x010000
 
 #define M4NHTT_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "nhtsnd01.p1", 0x0000, 0x080000, CRC(2d1d93c6) SHA1(80a8d131bafdb74d20d1ca5cbe2219ee4df0b675) ) \
-
+	ROM_LOAD( "nhtsnd01.p1", 0x0000, 0x080000, CRC(2d1d93c6) SHA1(80a8d131bafdb74d20d1ca5cbe2219ee4df0b675) )
 #define M4NHTT_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4NHTT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4NHTT_SET( 199?, m4nhtt,       0,      "nht01b.p1",    0x0000, 0x010000, CRC(8201a051) SHA1(a87550c0cdc0b14a30e8814bfef939eb5cf414f8), "Barcrest","New Hit the Top (Barcrest) (MPU4) (set 1)" )
 M4NHTT_SET( 199?, m4nhtt__a,    m4nhtt, "nht01ad.p1",   0x0000, 0x010000, CRC(a5c6ce9a) SHA1(f21dcc1a70fa45637f236aede9c6fa2e962af8f5), "Barcrest","New Hit the Top (Barcrest) (MPU4) (set 2)" )
@@ -4260,16 +4129,14 @@ M4NHTT_SET( 199?, m4nhtt__j,    m4nhtt, "nht01y.p1",    0x0000, 0x010000, CRC(54
 
 #define M4PRZFRT_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
-	ROM_LOAD( "pfrsnd.p1", 0x0000, 0x080000, CRC(71d1af20) SHA1(d87d61c561acbe9cb3dec18d8decf5e970efa272) ) \
-
+	ROM_LOAD( "pfrsnd.p1", 0x0000, 0x080000, CRC(71d1af20) SHA1(d87d61c561acbe9cb3dec18d8decf5e970efa272) )
 #define M4PRZFRT_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PRZFRT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 
@@ -4290,16 +4157,14 @@ M4PRZFRT_SET( 199?, m4przfrt__l,    m4przfrt,   "pfr03o.p1",    0x0000, 0x010000
 
 #define M4TUTCL_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
-	/* missing? in other set? */ \
-
+	/* missing? in other set? */
 #define M4TUTCL_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TUTCL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4TUTCL_SET( 199?, m4tutcl,     0,          "f2u01ad.p1",   0x0000, 0x010000, CRC(65537552) SHA1(b0a761dcc6e0a9f01cfb934b570356ca67fdd099), "Barcrest","Tutti Fruity Classic (Barcrest) (MPU4) (set 1)" )
 M4TUTCL_SET( 199?, m4tutcl__a,  m4tutcl,    "f2u01b.p1",    0x0000, 0x010000, CRC(2cae37df) SHA1(5aed985476b7b747a99a4046b846ee4a359776af), "Barcrest","Tutti Fruity Classic (Barcrest) (MPU4) (set 2)" )
@@ -4318,16 +4183,14 @@ M4TUTCL_SET( 199?, m4tutcl__k,  m4tutcl,    "f2u01y.p1",    0x0000, 0x010000, CR
 #define M4PRZMNS_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "s&fpmsnd.p1", 0x000000, 0x080000, CRC(e5bfc522) SHA1(38c8430f539d38a51a3d7fb846b625ae2080e930) ) \
-	ROM_LOAD( "s&fpmsnd.p2", 0x080000, 0x080000, CRC(e14803ab) SHA1(41d501f61f202df2dbd2ac13c40a32fff6afc861) ) \
-
+	ROM_LOAD( "s&fpmsnd.p2", 0x080000, 0x080000, CRC(e14803ab) SHA1(41d501f61f202df2dbd2ac13c40a32fff6afc861) )
 #define M4PRZMNS_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PRZMNS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 M4PRZMNS_SET( 199?, m4przmns,       0,          "spmy.p1",  0x0000, 0x010000, CRC(2b27b2a0) SHA1(07950616da39e39d19452859390d3eaad89ea377), "Barcrest","Prize Money Showcase (Barcrest) (MPU4) (set 1)" )
@@ -4348,16 +4211,14 @@ M4PRZMNS_SET( 199?, m4przmns__n,    m4przmns,   "spms.p1",  0x0000, 0x010000, CR
 
 #define M4PRZRF_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 #define M4PRZRF_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PRZRF_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4PRZRF_SET( 199?, m4przrf,     0,          "pr8ad.p1", 0x0000, 0x020000, CRC(ebada7c9) SHA1(4a1e2f746116c23f87b53d25bd8b11322962306f), "Barcrest","Prize Rich And Famous (Barcrest) (MPU4) (set 1)" )
 M4PRZRF_SET( 199?, m4przrf__a,  m4przrf,    "pr8b.p1",  0x0000, 0x020000, CRC(4a6448b6) SHA1(061dbc1603fff0cb60e02acdf21881047b2b7d43), "Barcrest","Prize Rich And Famous (Barcrest) (MPU4) (set 2)" )
@@ -4373,16 +4234,14 @@ M4PRZRF_SET( 199?, m4przrf__j,  m4przrf,    "pr8y.p1",  0x0000, 0x020000, CRC(87
 
 #define M4PRZRFM_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 #define M4PRZRFM_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PRZRFM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 M4PRZRFM_SET( 199?, m4przrfm,       0,          "prub.p1",      0x0000, 0x010000, CRC(748f220f) SHA1(5d729057d521fa656375610e424cfd4088f6ea02), "Barcrest","Prize Run For Your Money (Barcrest) (MPU4) (set 1)" )
@@ -4408,8 +4267,7 @@ M4PRZRFM_SET( 199?, m4przrfm__o,    m4przrfm,   "rm8y.p1",      0x0000, 0x010000
 	ROM_LOAD( "pwos.chr", 0x0000, 0x000048, CRC(352b86c4) SHA1(59c26a1948ffd6ecea08d8ca8e62735ec9732c0f) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "pwo.s1", 0x000000, 0x080000, CRC(1dbd8a33) SHA1(37bd71688475591232422eb0841e23aff58e3800) ) \
-	ROM_LOAD( "pwo.s2", 0x080000, 0x080000, CRC(6c7badef) SHA1(416c36fe2b4253bf7944b3ba412561bd0d21cbe5) ) \
-
+	ROM_LOAD( "pwo.s2", 0x080000, 0x080000, CRC(6c7badef) SHA1(416c36fe2b4253bf7944b3ba412561bd0d21cbe5) )
 
 #define M4PRZWO_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -4417,8 +4275,7 @@ M4PRZRFM_SET( 199?, m4przrfm__o,    m4przrfm,   "rm8y.p1",      0x0000, 0x010000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PRZWO_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4PRZWO_SET( 199?, m4przwo,     0,          "pwo206ac",     0x0000, 0x010000, CRC(b9dd88e7) SHA1(4c60e7a28b538ff2483839fc66600037ccd99440), "Barcrest","Prize What's On (Barcrest) (MPU4) (set 1)" )
 M4PRZWO_SET( 199?, m4przwo__a,  m4przwo,    "pwob.p1",      0x0000, 0x010000, CRC(9e9f65d7) SHA1(69d28a1e08d2bde1a9c4d55555478808546ad4f0), "Barcrest","Prize What's On (Barcrest) (MPU4) (set 2)" )
@@ -4434,8 +4291,7 @@ M4PRZWO_SET( 199?, m4przwo__f,  m4przwo,    "pwoy.p1",      0x0000, 0x010000, CR
 	ROM_LOAD( "rh.chr", 0x0000, 0x000048, CRC(5522383a) SHA1(4413b1d68500f21f10e7cff6b2d3de7258b1b614) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "2rhsnd02.p1", 0x000000, 0x080000, CRC(0f4630dc) SHA1(7235e53c74e113230a683de33763023e95090d39) ) \
-	ROM_LOAD( "2rhsnd02.p2", 0x080000, 0x080000, CRC(c2d0540a) SHA1(160080b350d41b95a0c129f9189222d79734e7d0) ) \
-
+	ROM_LOAD( "2rhsnd02.p2", 0x080000, 0x080000, CRC(c2d0540a) SHA1(160080b350d41b95a0c129f9189222d79734e7d0) )
 
 #define M4RHOG2_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -4443,8 +4299,7 @@ M4PRZWO_SET( 199?, m4przwo__f,  m4przwo,    "pwoy.p1",      0x0000, 0x010000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHOG2_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 
 M4RHOG2_SET( 199?, m4rhog2,     0,          "2rh06c.p1",    0x0000, 0x020000, CRC(62c312bc) SHA1(6b02345c97b130deabad58a238ba9045161b5a80), "Barcrest","Road Hog 2 - I'm Back (Barcrest) (MPU4) (set 1)" )
@@ -4468,8 +4323,7 @@ M4RHOG2_SET( 199?, m4rhog2__m,  m4rhog2,    "2rh06y.p1",    0x0000, 0x020000, CR
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 
@@ -4496,8 +4350,7 @@ M4SUPHV_SET( 199?, m4suphv__p,  m4suphv,    "hvi10___.3n3",     0x0000, 0x010000
 #define M4SHODF_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "sdfsnd.p1", 0x000000, 0x080000, CRC(a5829cec) SHA1(eb65c86125350a7f384f9033f6a217284b6ff3d1) ) \
-	ROM_LOAD( "sdfsnd.p2", 0x080000, 0x080000, CRC(1e5d8407) SHA1(64ee6eba3fb7700a06b89a1e0489a0cd54bb89fd) ) \
-
+	ROM_LOAD( "sdfsnd.p2", 0x080000, 0x080000, CRC(1e5d8407) SHA1(64ee6eba3fb7700a06b89a1e0489a0cd54bb89fd) )
 
 #define M4SHODF_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -4505,8 +4358,7 @@ M4SUPHV_SET( 199?, m4suphv__p,  m4suphv,    "hvi10___.3n3",     0x0000, 0x010000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SHODF_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 
@@ -4530,8 +4382,7 @@ M4SHODF_SET( 199?, m4shodf__l,  m4shodf,    "sdfy.p1",  0x0000, 0x010000, CRC(db
 	ROM_LOAD( "clu14s.chr", 0x0000, 0x000048, CRC(be933239) SHA1(52dbcbbcbfe25b6f8c186ce9af67b533c8da9a88) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "clusnd.p1", 0x000000, 0x080000, CRC(9c1042ba) SHA1(e4630bbcb3fe2f7d133275892eaf58c12402c610) ) \
-	ROM_LOAD( "clusnd.p2", 0x080000, 0x080000, CRC(b4b28b80) SHA1(a40b6801740d64e54c5c1738d69737ab9f4cf950) ) \
-
+	ROM_LOAD( "clusnd.p2", 0x080000, 0x080000, CRC(b4b28b80) SHA1(a40b6801740d64e54c5c1738d69737ab9f4cf950) )
 
 #define M4LUCKSC_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -4539,8 +4390,7 @@ M4SHODF_SET( 199?, m4shodf__l,  m4shodf,    "sdfy.p1",  0x0000, 0x010000, CRC(db
 		ROM_LOAD( name, offset, length, hash ) \
 		M4LUCKSC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4LUCKSC_SET( 199?, m4lucksc,       0,          "clu14d.p1",    0x0000, 0x020000, CRC(7a64199f) SHA1(62c7c8a4475a8005a1f969550d0717c9cc44bada), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (set 1)" )
 M4LUCKSC_SET( 199?, m4lucksc__a,    m4lucksc,   "clu14f.p1",    0x0000, 0x020000, CRC(07e90cdb) SHA1(5d4bf7f6f84f2890a0119de898f01e3e99bfbb7f), "Barcrest","Lucky Strike Club (Barcrest) (MPU4) (set 2)" )
@@ -4560,8 +4410,7 @@ M4LUCKSC_SET( 199?, m4lucksc__l,    m4lucksc,   "lsc_.1_1",     0x0000, 0x020000
 #define M4PRZLUX_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "plxsnd.p1", 0x000000, 0x080000, CRC(0e682b6f) SHA1(459a7ca216c47af58c03c15d6ef1f9aa7489eba0) ) \
-	ROM_LOAD( "plxsnd.p2", 0x080000, 0x080000, CRC(3ef95a7f) SHA1(9c918769fbf0e687f27e431d934e2327df9ed3bb) ) \
-
+	ROM_LOAD( "plxsnd.p2", 0x080000, 0x080000, CRC(3ef95a7f) SHA1(9c918769fbf0e687f27e431d934e2327df9ed3bb) )
 
 #define M4PRZLUX_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -4569,8 +4418,7 @@ M4LUCKSC_SET( 199?, m4lucksc__l,    m4lucksc,   "lsc_.1_1",     0x0000, 0x020000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4PRZLUX_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4PRZLUX_SET( 199?, m4przlux,       0,          "plxs.p1",  0x0000, 0x010000, CRC(0aea0339) SHA1(28da52924fe2bf00799ef466143103e08399f5f5), "Barcrest","Prize Luxor (Barcrest) (MPU4) (set 1)" )
 M4PRZLUX_SET( 199?, m4przlux__a,    m4przlux,   "plxad.p1", 0x0000, 0x010000, CRC(e52ddf4f) SHA1(ec3f198fb6658cadd45046ef7586f9178f95d814), "Barcrest","Prize Luxor (Barcrest) (MPU4) (set 2)" )
@@ -4583,8 +4431,7 @@ M4PRZLUX_SET( 199?, m4przlux__f,    m4przlux,   "plxy.p1",  0x0000, 0x010000, CR
 
 #define M4TOPDOG_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
-	ROM_LOAD( "topdogsnd.bin", 0x0000, 0x080000, CRC(a29047c6) SHA1(5956674e6b895bd46b99f4d04d5797b53ccc6668) ) \
-
+	ROM_LOAD( "topdogsnd.bin", 0x0000, 0x080000, CRC(a29047c6) SHA1(5956674e6b895bd46b99f4d04d5797b53ccc6668) )
 
 #define M4TOPDOG_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -4592,8 +4439,7 @@ M4PRZLUX_SET( 199?, m4przlux__f,    m4przlux,   "plxy.p1",  0x0000, 0x010000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TOPDOG_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4TOPDOG_SET( 199?, m4topdog,       0,          "td_20_b4.7_1", 0x0000, 0x010000, CRC(fe864f25) SHA1(b9f97aaf0425b4987b5bfa0b793e9226fdffe58f), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 1)" )
 M4TOPDOG_SET( 199?, m4topdog__a,    m4topdog,   "td_20_bc.7_1", 0x0000, 0x010000, CRC(3af18a9f) SHA1(0db7427d934363d021265fcac811505867f20d47), "Barcrest / Bwb","Top Dog (Barcrest) (MPU4) (set 2)" )
@@ -4626,8 +4472,7 @@ M4TOPDOG_SET( 199?, m4topdog__z,    m4topdog,   "td_30btc.1_1", 0x0000, 0x010000
 #define M4KINGQ_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
 	ROM_LOAD( "kingsnqueenssnd.bin", 0x0000, 0x080000, CRC(31d722d4) SHA1(efb7079a1036cad8d9c08106f97c70a248b31898) ) \
-	ROM_LOAD( "ee______.1_2", 0x0000, 0x080000, CRC(13012f48) SHA1(392b3bcf6f8e3e01082087637f9d378302d046c4) ) \
-
+	ROM_LOAD( "ee______.1_2", 0x0000, 0x080000, CRC(13012f48) SHA1(392b3bcf6f8e3e01082087637f9d378302d046c4) )
 
 #define M4KINGQ_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -4635,8 +4480,7 @@ M4TOPDOG_SET( 199?, m4topdog__z,    m4topdog,   "td_30btc.1_1", 0x0000, 0x010000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4KINGQ_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4KINGQ_SET( 199?, m4kingq,     0,          "ee_05a_4.2_1", 0x0000, 0x010000, CRC(8dd842b6) SHA1(1c1bcaae355ceee4d7b1572b0fa1a8b23a8afdbf), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 1)" )
 M4KINGQ_SET( 199?, m4kingq__a,  m4kingq,    "ee_05a__.2_1", 0x0000, 0x010000, CRC(36aa5fb9) SHA1(b4aaf647713e33e79be7927e5eeef240d3beedf7), "Barcrest / Bwb","Kings & Queens (Barcrest) (MPU4) (set 2)" )
@@ -4662,8 +4506,7 @@ M4KINGQ_SET( 199?, m4kingq__t,  m4kingq,    "knq2pprg.bin", 0x0000, 0x010000, CR
 #define M4KINGQC_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
 	ROM_LOAD( "knqsnd.bin", 0x0000, 0x080000, CRC(13012f48) SHA1(392b3bcf6f8e3e01082087637f9d378302d046c4) ) \
-	ROM_LOAD( "cn______.5_a", 0x0000, 0x080000, CRC(7f82f113) SHA1(98851f8820cb39b45d477151982c80fc91b15e56) ) \
-
+	ROM_LOAD( "cn______.5_a", 0x0000, 0x080000, CRC(7f82f113) SHA1(98851f8820cb39b45d477151982c80fc91b15e56) )
 
 #define M4KINGQC_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -4671,8 +4514,7 @@ M4KINGQ_SET( 199?, m4kingq__t,  m4kingq,    "knq2pprg.bin", 0x0000, 0x010000, CR
 		ROM_LOAD( name, offset, length, hash ) \
 		M4KINGQC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4KINGQC_SET( 199?, m4kingqc,       0,          "cn_20_b4.6_1", 0x0000, 0x010000, CRC(22d0b20c) SHA1(a7a4f60017cf62247339c9b23420d29845657895), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 1)" )
 M4KINGQC_SET( 199?, m4kingqc__a,    m4kingqc,   "cn_20_bc.3_1", 0x0000, 0x010000, CRC(dfb0eb80) SHA1(ad973125681db0aae8ef1cf57b1c280e7f0e5803), "Barcrest / Bwb","Kings & Queens Classic (Barcrest) (MPU4) (set 2)" )
@@ -4711,8 +4553,7 @@ M4KINGQC_SET( 199?, m4kingqc__5,    m4kingqc,   "cn_30btc.1_1", 0x0000, 0x010000
 	ROM_LOAD( "ctp13s.chr", 0x0000, 0x000048, CRC(6b8772a9) SHA1(8b92686e675b00d2c2541dd7b8055c3145283bec) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "ctpsnd02.p1", 0x000000, 0x080000, CRC(6fdd5051) SHA1(3f713314b303d6e1f78e3ca050bed7a45f43d5b3) ) \
-	ROM_LOAD( "ctpsnd02.p2", 0x080000, 0x080000, CRC(994bfb3a) SHA1(3cebfbbe77c4bbb5fb73e6d9b23f721b07c6435e) ) \
-
+	ROM_LOAD( "ctpsnd02.p2", 0x080000, 0x080000, CRC(994bfb3a) SHA1(3cebfbbe77c4bbb5fb73e6d9b23f721b07c6435e) )
 
 #define M4TYPCL_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -4720,8 +4561,7 @@ M4KINGQC_SET( 199?, m4kingqc__5,    m4kingqc,   "cn_30btc.1_1", 0x0000, 0x010000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TYPCL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4TYPCL_SET( 199?, m4typcl,     0,          "ctp12s.p1",    0x0000, 0x020000, CRC(5f0bbd2a) SHA1(ba1fa09ea7b4713a99b2033bdbbf6b15f973dcca), "Barcrest","Take Your Pick Club (Barcrest) (MPU4) (set 1)" )
 M4TYPCL_SET( 199?, m4typcl__a,  m4typcl,    "ctp13d.p1",    0x0000, 0x020000, CRC(a0f081b9) SHA1(794bba6ed86c3f332165c4b3224315256c939926), "Barcrest","Take Your Pick Club (Barcrest) (MPU4) (set 2)" )
@@ -4735,16 +4575,14 @@ M4TYPCL_SET( 199?, m4typcl__d,  m4typcl,    "ntp02.p1",     0x0000, 0x020000, CR
 	ROM_LOAD( "abt18s.chr", 0x0000, 0x000048, CRC(68007536) SHA1(72f7a76a1ba1c8ac94de425892780ffe78269513) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "abtsnd.p1", 0x000000, 0x080000, CRC(0ba1e73a) SHA1(dde70b1bf973b023c45afb8d3191325514b96e47) ) \
-	ROM_LOAD( "abtsnd.p2", 0x080000, 0x080000, CRC(dcfa85f2) SHA1(30e8467841309a4840824ec89f82044489c94ac5) ) \
-
+	ROM_LOAD( "abtsnd.p2", 0x080000, 0x080000, CRC(dcfa85f2) SHA1(30e8467841309a4840824ec89f82044489c94ac5) )
 #define M4ANDYBT_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4ANDYBT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4ANDYBT_SET( 199?, m4andybt,       0,          "abt18d.p1",    0x0000, 0x020000, CRC(77874578) SHA1(455964614b67af14f5baa5883e1076e986de9e9c), "Barcrest","Andy's Big Time Club (Barcrest) (MPU4) (set 1)" )
 M4ANDYBT_SET( 199?, m4andybt__a,    m4andybt,   "abt18f.p1",    0x0000, 0x020000, CRC(cdd756af) SHA1(b1bb851ad2a2ba631e13509a476fe60cb8a24e69), "Barcrest","Andy's Big Time Club (Barcrest) (MPU4) (set 2)" )
@@ -4754,8 +4592,7 @@ M4ANDYBT_SET( 199?, m4andybt__c,    m4andybt,   "abt1.5",       0x0000, 0x020000
 
 #define M4THESTR_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
-	ROM_LOAD( "thestreaksnd.bin", 0x0000, 0x080000, CRC(fdbd0f88) SHA1(8d0eaa9aa8d505affeb8bd12d7cb13337aa2e2c2) ) \
-
+	ROM_LOAD( "thestreaksnd.bin", 0x0000, 0x080000, CRC(fdbd0f88) SHA1(8d0eaa9aa8d505affeb8bd12d7cb13337aa2e2c2) )
 
 #define M4THESTR_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -4763,8 +4600,7 @@ M4ANDYBT_SET( 199?, m4andybt__c,    m4andybt,   "abt1.5",       0x0000, 0x020000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4THESTR_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4THESTR_SET( 199?, m4thestr,       0,          "thestreakbin", 0x0000, 0x010000, CRC(cb79f9e5) SHA1(6cbdc5327e81b51f1060fd91efa3d061b9748b49), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 1)" )
 M4THESTR_SET( 199?, m4thestr__a,    m4thestr,   "ts_20_b4.3_1", 0x0000, 0x010000, CRC(17726c7c) SHA1(193b572b9f859f1018f1be398b35a5103622faf8), "Barcrest / Bwb","The Streak (Barcrest) (MPU4) (set 2)" )
@@ -4796,8 +4632,7 @@ M4THESTR_SET( 199?, m4thestr__y,    m4thestr,   "ts_39b_c.1_1", 0x0000, 0x010000
 
 #define M4CPYCAT_EXTRA_ROMS \
 	ROM_REGION( 0x180000, "msm6376", 0 ) \
-	ROM_LOAD( "copycatsnd.bin", 0x0000, 0x080000, CRC(cd27a3ce) SHA1(d061fae0ef8584d2e349e91e53f41718128c61e2) ) \
-
+	ROM_LOAD( "copycatsnd.bin", 0x0000, 0x080000, CRC(cd27a3ce) SHA1(d061fae0ef8584d2e349e91e53f41718128c61e2) )
 
 #define M4CPYCAT_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -4805,8 +4640,7 @@ M4THESTR_SET( 199?, m4thestr__y,    m4thestr,   "ts_39b_c.1_1", 0x0000, 0x010000
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CPYCAT_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4CPYCAT_SET( 199?, m4cpycat,       0,          "co_20_bc.1_1", 0x0000, 0x010000, CRC(c9d3cdc1) SHA1(28265b0f95a8829efc4e346269a7af17a6abe345), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 1)" )
 M4CPYCAT_SET( 199?, m4cpycat__a,    m4cpycat,   "co_20_dc.1_1", 0x0000, 0x010000, CRC(c6552f9a) SHA1(ae7ad183d2cd89bc9748dcbb3ea26832bed30009), "Barcrest / Bwb","Copy Cat (Barcrest) (MPU4) (set 2)" )
@@ -4850,8 +4684,7 @@ M4CPYCAT_SET( 199?, m4cpycat__8,    m4cpycat,   "co_30btc.2_1", 0x0000, 0x010000
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 	ROM_END \
-	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod2    ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4HYPCLB_SET( 199?, m4hypclb,       0,          "hpcd.p1",  0x0000, 0x010000, CRC(7fac8944) SHA1(32f0f16ef6c4b99fe70464341a1ce226f6221122), "Barcrest","Hyper Viper Club (Barcrest) (MPU4) (set 1)" )
 M4HYPCLB_SET( 199?, m4hypclb__a,    m4hypclb,   "hpcf.p1",  0x0000, 0x010000, CRC(2931a558) SHA1(2f7fe541edc502738dd6603435deaef1cb26a1e2), "Barcrest","Hyper Viper Club (Barcrest) (MPU4) (set 2)" )
@@ -4862,16 +4695,14 @@ M4HYPCLB_SET( 199?, m4hypclb__c,    m4hypclb,   "hpcs.p1",  0x0000, 0x010000, CR
 #define M4BNKROL_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "cbrsnd.p1", 0x000000, 0x080000, CRC(3524418a) SHA1(85cf286d9cf97cc9009c0283d632fef2a19f5de2) ) \
-	ROM_LOAD( "cbrsnd.p2", 0x080000, 0x080000, CRC(a53796a3) SHA1(f094f40cc93ea445922a9c5412aa355b7d21b1f4) ) \
-
+	ROM_LOAD( "cbrsnd.p2", 0x080000, 0x080000, CRC(a53796a3) SHA1(f094f40cc93ea445922a9c5412aa355b7d21b1f4) )
 #define M4BNKROL_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4BNKROL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 
 M4BNKROL_SET( 199?, m4bnkrol,       0,          "cbr05s.p1", 0x0000, 0x020000, CRC(a8b53a0d) SHA1(661ab61aa8f427b92fdee02539f19e5dd2243da7), "Barcrest","Bank Roller Club (Barcrest) (MPU4) (set 1)" )
@@ -4884,16 +4715,14 @@ M4BNKROL_SET( 199?, m4bnkrol__e,    m4bnkrol,   "cbr05f.p1", 0x0000, 0x020000, C
 
 #define M4TIC_EXTRA_ROMS \
 	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 #define M4TIC_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TIC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 M4TIC_SET( 199?, m4tic,     0,      "tt_20a__.2_1", 0x0000, 0x010000, CRC(b923ac0d) SHA1(1237962af43c2c3f4ed0ad5bed21f24decfeae02), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 1)" )
 M4TIC_SET( 199?, m4tic__a,  m4tic,  "tt_20a_c.1_1", 0x0000, 0x010000, CRC(18a68ea0) SHA1(37783121ff5540e264d89069101d991acb66b982), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 2)" )
 M4TIC_SET( 199?, m4tic__b,  m4tic,  "tt_20b__.2_1", 0x0000, 0x010000, CRC(b5eb86ab) SHA1(99ddb80941c67bd271e22af17405457d32676484), "Barcrest / Bwb","Tic Tac Toe (Barcrest) (MPU4) (set 3)" )
@@ -4919,16 +4748,14 @@ M4TIC_SET( 199?, m4tic__s,  m4tic,  "tti20___.2_1", 0x0000, 0x010000, CRC(91054b
 	ROM_LOAD( "m462.chr", 0x0000, 0x000048, CRC(ab59f1aa) SHA1(04a7deac039bc9bc15ec07b8a4ba3bce6f4d5103) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "rhrcs1.hex", 0x000000, 0x080000, CRC(7e265003) SHA1(3800ddfbdde07bf0af5db5cbe05a85425297fa4a) ) \
-	ROM_LOAD( "rhrcs2.hex", 0x080000, 0x080000, CRC(39843d40) SHA1(7c8efcce4ed4ed53e681680bb33869f14f662609) ) \
-
+	ROM_LOAD( "rhrcs2.hex", 0x080000, 0x080000, CRC(39843d40) SHA1(7c8efcce4ed4ed53e681680bb33869f14f662609) )
 #define M4RHRCL_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHRCL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4RHRCL_SET( 199?, m4rhrcl,     0,          "rhrc.hex", 0x0000, 0x010000, CRC(e4b89d53) SHA1(fc222d56cdba2891048726d6e6ecd8a4028ba8ba), "Barcrest","Red Hot Roll Club (Barcrest) (MPU4) (set 1)" )
 M4RHRCL_SET( 199?, m4rhrcl__a,  m4rhrcl,    "rh2d.p1",  0x0000, 0x010000, CRC(b55a01c3) SHA1(8c94c2ca509ac7631528df78e82fb39b5f579c45), "Barcrest","Red Hot Roll Club (Barcrest) (MPU4) (set 2)" )
@@ -4940,16 +4767,14 @@ M4RHRCL_SET( 199?, m4rhrcl__c,  m4rhrcl,    "rh2s.p1",  0x0000, 0x010000, CRC(aa
 	ROM_LOAD( "rhc.chr", 0x0000, 0x000048, CRC(6ceab6b0) SHA1(04f4238ea3fcf944c97bc11031e456b851ebe917) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "rhc.s1", 0x000000, 0x080000, CRC(8840737f) SHA1(eb4a4bedfdba1b33fa74b9c2000c0d09a4cca5d7) ) \
-	ROM_LOAD( "rhc.s2", 0x080000, 0x080000, CRC(04eaa2da) SHA1(2c23bde76f6a9406b0cb30246ce8805b5181047f) ) \
-
+	ROM_LOAD( "rhc.s2", 0x080000, 0x080000, CRC(04eaa2da) SHA1(2c23bde76f6a9406b0cb30246ce8805b5181047f) )
 #define M4RHOGC_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHOGC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 M4RHOGC_SET( 199?, m4rhogc,     0,          "rhcf.p1", 0x0000, 0x010000, CRC(0b726e87) SHA1(12c334e7dd712b9e19e8241b1a8e278ff84110d4), "Barcrest","Road Hog Club (Barcrest) (MPU4) (set 1)" )
@@ -4961,16 +4786,14 @@ M4RHOGC_SET( 199?, m4rhogc__b,  m4rhogc,    "rhcd.p1", 0x0000, 0x010000, CRC(7a7
 	ROM_LOAD( "006s.chr", 0x0000, 0x000048, CRC(ee3d06eb) SHA1(570a715e71d4184e4df02b7e5b68fee70e03aeb0) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "006snd.p1", 0x000000, 0x080000, CRC(44afef7d) SHA1(d8a4b6dc04e0f337db6d3b5322d066ae5f5bda41) ) \
-	ROM_LOAD( "006snd.p2", 0x080000, 0x080000, CRC(5f3c7cf8) SHA1(500f8fb07ef344d44c062f8d01878df1c917bcfc) ) \
-
+	ROM_LOAD( "006snd.p2", 0x080000, 0x080000, CRC(5f3c7cf8) SHA1(500f8fb07ef344d44c062f8d01878df1c917bcfc) )
 #define M4GB006_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4GB006_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 
@@ -4982,16 +4805,14 @@ M4GB006_SET( 199?, m4gb006__c,  m4gb006,    "bond20_11",    0x0000, 0x010000, CR
 
 #define M4GBUST_EXTRA_ROMS \
 	ROM_REGION( 0x800000, "msm6376", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 #define M4GBUST_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4GBUST_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 
@@ -5025,16 +4846,14 @@ M4GBUST_SET( 199?, m4gbust__w,  m4gbust,    "ghostbusters 2p.bin",  0x0000, 0x01
 #define M4CSHENC_EXTRA_ROMS \
 	ROM_REGION( 0x180000, "msm6376", 0 ) \
 	ROM_LOAD( "cesnd.p1", 0x000000, 0x080000, CRC(2a10dc1a) SHA1(f6803f6e1fee2b58fe4831f59ddc08ec02792823) ) \
-	ROM_LOAD( "cesnd.p2", 0x080000, 0x080000, CRC(6f0b75c0) SHA1(33898d75a1e51b49950d7843069066d17c4736c5) ) \
-
+	ROM_LOAD( "cesnd.p2", 0x080000, 0x080000, CRC(6f0b75c0) SHA1(33898d75a1e51b49950d7843069066d17c4736c5) )
 #define M4CSHENC_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CSHENC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4CSHENC_SET( 199?, m4cshenc,       0,          "ca_sj__c.5_1", 0x0000, 0x020000, CRC(d9131b39) SHA1(4af89a7bc10de1406f401bede41e1bc452dbb159), "Bwb / Barcrest","Cash Encounters (Barcrest) (MPU4) (set 1)" )
 M4CSHENC_SET( 199?, m4cshenc__a,    m4cshenc,   "ca_sj_bc.5_1", 0x0000, 0x020000, CRC(30d1fb6d) SHA1(f845bef4ad7f2f48077eed74840916e87abb24b2), "Bwb / Barcrest","Cash Encounters (Barcrest) (MPU4) (set 2)" )
@@ -5047,16 +4866,14 @@ M4CSHENC_SET( 199?, m4cshenc__d,    m4cshenc,   "ca_sjb_c.5_1", 0x0000, 0x020000
 
 #define M4LVLCL_EXTRA_ROMS \
 	ROM_REGION( 0x180000, "msm6376", ROMREGION_ERASE00 ) \
-	/* missing? */ \
-
+	/* missing? */
 #define M4LVLCL_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4LVLCL_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 M4LVLCL_SET( 199?, m4lvlcl,     0,          "ll__x__x.1_1", 0x0000, 0x010000, CRC(1ef1c5b4) SHA1(455c147f158f8a36a9add9b984abc22af78258cf), "Bwb / Barcrest","Lucky Las Vegas Classic (Barcrest) (MPU4) (set 1)" )
@@ -5076,16 +4893,14 @@ M4LVLCL_SET( 199?, m4lvlcl__f,  m4lvlcl,    "ll__xgdx.3_1", 0x0000, 0x010000, CR
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
 	ROM_LOAD( "rh___snd.1_1", 0x000000, 0x080000, CRC(ceebd8f4) SHA1(fe9f62034aae7d2ec097d80dc471a7fd27ddec8a) ) \
 	ROM_LOAD( "rh___snd.1_2", 0x080000, 0x080000, CRC(1f24cfb6) SHA1(cf1dc9d2a1c1cfb8718c89e245e9bf375fef8bfd) ) \
-	ROM_LOAD( "rh___snd.1_3", 0x100000, 0x080000, CRC(726958d8) SHA1(6373765b80971dd7ff5c8eaeee83966335db4d27) ) \
-
+	ROM_LOAD( "rh___snd.1_3", 0x100000, 0x080000, CRC(726958d8) SHA1(6373765b80971dd7ff5c8eaeee83966335db4d27) )
 #define M4RHS_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4RHS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 
 M4RHS_SET( 199?, m4rhs,     0,      "rh_sj___.4s1", 0x0000, 0x020000, CRC(be6179cd) SHA1(8aefffdffb25bc4dd7d083c7027be746181c2ff9), "Bwb / Barcrest","Rocky Horror Show (Barcrest) (MPU4) (set 1)" )
@@ -5108,16 +4923,14 @@ M4RHS_SET( 199?, m4rhs__l,  m4rhs,  "rocky15t",     0x0000, 0x020000, CRC(3fbad6
 	ROM_LOAD( "oad.chr", 0x0000, 0x000048, CRC(910b09db) SHA1(d54399660b1bf1a89712b25292ac99b740442e5c) ) \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
 	ROM_LOAD( "oadsnd1.bin", 0x000000, 0x080000, CRC(b9a9b49b) SHA1(261e939da031768e2a2b5b171cbba55c87d1a758) ) \
-	ROM_LOAD( "oadsnd2.bin", 0x080000, 0x080000, CRC(94e34646) SHA1(8787d6757e4ed86417aafac0e042091189974d3b) ) \
-
+	ROM_LOAD( "oadsnd2.bin", 0x080000, 0x080000, CRC(94e34646) SHA1(8787d6757e4ed86417aafac0e042091189974d3b) )
 #define M4OADRAC_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4OADRAC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 
 M4OADRAC_SET( 199?, m4oadrac,       0,          "dr__x__x.2_0", 0x0000, 0x020000, CRC(4ca65bd9) SHA1(deb0a7d3596647210061b69a10fc6cdfc066538e), "Bwb / Barcrest","Ooh Aah Dracula (Barcrest) (MPU4) (set 1)" )
@@ -5134,16 +4947,14 @@ M4OADRAC_SET( 199?, m4oadrac__h,    m4oadrac,   "dri_xa_x.2_0", 0x0000, 0x020000
 
 #define M4TICCLA_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
-	ROM_LOAD( "ct______.5_a", 0x0000, 0x080000, CRC(9a936f50) SHA1(f3f66d6093a939220d24aee985e210cdfd214db4) ) \
-
+	ROM_LOAD( "ct______.5_a", 0x0000, 0x080000, CRC(9a936f50) SHA1(f3f66d6093a939220d24aee985e210cdfd214db4) )
 #define M4TICCLA_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TICCLA_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 
@@ -5178,16 +4989,14 @@ M4TICCLA_SET( 199?, m4ticcla__0,    m4ticcla,   "ct_30btc.2_1", 0x0000, 0x010000
 
 #define M4TICGLC_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
-	ROM_LOAD( "ct______.5_a", 0x0000, 0x080000, CRC(9a936f50) SHA1(f3f66d6093a939220d24aee985e210cdfd214db4) ) \
-
+	ROM_LOAD( "ct______.5_a", 0x0000, 0x080000, CRC(9a936f50) SHA1(f3f66d6093a939220d24aee985e210cdfd214db4) )
 #define M4TICGLC_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4TICGLC_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 M4TICGLC_SET( 199?, m4ticglc,       0,          "tg_25a_c.3_1", 0x0000, 0x010000, CRC(44b2b6b0) SHA1(c2caadd68659bd474df534101e3bc13b15a43694), "Bwb / Barcrest","Tic Tac Toe Gold (Barcrest) (MPU4) (set 1)" )
 M4TICGLC_SET( 199?, m4ticglc__a,    m4ticglc,   "tg_30_dc.4_1", 0x0000, 0x010000, CRC(19c0fb1e) SHA1(955da095df56f28ace6839c9b6df5669f576730c), "Bwb / Barcrest","Tic Tac Toe Gold (Barcrest) (MPU4) (set 2)" )
@@ -5199,16 +5008,14 @@ M4TICGLC_SET( 199?, m4ticglc__d,    m4ticglc,   "tg_30bgc.4_1", 0x0000, 0x010000
 	ROM_REGION( 0x48, "fakechr", 0 ) \
 	ROM_LOAD( "ssbwb.chr", 0x0000, 0x000048, CRC(910b09db) SHA1(d54399660b1bf1a89712b25292ac99b740442e5c) ) \
 	ROM_REGION( 0x200000, "msm6376", 0 ) \
-	ROM_LOAD( "css_____.1_1", 0x0000, 0x080000, CRC(e738fa1e) SHA1(7a1125320e0d488729aec66e658d418b96228fd0) ) \
-
+	ROM_LOAD( "css_____.1_1", 0x0000, 0x080000, CRC(e738fa1e) SHA1(7a1125320e0d488729aec66e658d418b96228fd0) )
 #define M4SSCLAS_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SSCLAS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring ,ROT0,company,title,GAME_FLAGS )
 
 
 M4SSCLAS_SET( 199?, m4ssclas,       0,          "cs__x__x.6_0", 0x0000, 0x010000, CRC(3230284d) SHA1(bca3b4c43859ed424956c4119fa6a91a2e7d6eec), "Bwb / Barcrest","Super Streak Classic (Barcrest) (MPU4) (set 1)" )
@@ -5227,16 +5034,14 @@ M4SSCLAS_SET( 199?, m4ssclas__f,    m4ssclas,   "supst20.15",   0x0000, 0x010000
 #define M4SQUID_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "squidsnd.p1", 0x000000, 0x080000, CRC(44cebe30) SHA1(a93f64897b4ba333d044649f28fa5dd68d3d2e94) ) \
-	ROM_LOAD( "squidsnd.p2", 0x080000, 0x080000, CRC(d2a1b073) SHA1(d4931f18d369e89492fe72a7a1c511c8d3c23a71) ) \
-
+	ROM_LOAD( "squidsnd.p2", 0x080000, 0x080000, CRC(d2a1b073) SHA1(d4931f18d369e89492fe72a7a1c511c8d3c23a71) )
 #define M4SQUID_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4SQUID_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4SQUID_SET( 199?, m4squid,     0,          "squidsin.bin", 0x0000, 0x020000, CRC(be369b43) SHA1(e5c7b7a858b264db2f8f726396ddeb42004d7cb9), "Bwb / Barcrest","Squids In (Barcrest) (MPU4) (set 1)" )
 M4SQUID_SET( 199?, m4squid__a,  m4squid,    "sq__x_dx.2_0", 0x0000, 0x020000, CRC(2eb6c814) SHA1(070ad5cb36220daf98043f175cf67d4d584c3d01), "Bwb / Barcrest","Squids In (Barcrest) (MPU4) (set 2)" )
@@ -5248,16 +5053,14 @@ M4SQUID_SET( 199?, m4squid__c,  m4squid,    "sq__xb_x.2_0", 0x0000, 0x020000, CR
 	ROM_LOAD( "m407.chr", 0x0000, 0x000048, CRC(fa693a0d) SHA1(601afba4a6efe8334ecc2cadfee99273a9818c1c) ) \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "cala1.hex", 0x0000, 0x080000, CRC(c9768f65) SHA1(a8f2946fdba640033da0e21d4e18293b3fc004bf) ) \
-	ROM_LOAD( "cala2.hex", 0x0000, 0x080000, CRC(56bd2950) SHA1(b109c726514c3ee04c1bbdf5f518f60dfd0375a8) ) \
-
+	ROM_LOAD( "cala2.hex", 0x0000, 0x080000, CRC(56bd2950) SHA1(b109c726514c3ee04c1bbdf5f518f60dfd0375a8) )
 #define M4CALAMA_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4CALAMA_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4CALAMA_SET( 199?, m4calama,       0,          "cac03s.p1",    0x0000, 0x020000, CRC(edc97795) SHA1(58fb91809c7f475fbceacfc1c3bda41b86dff54b), "Bwb / Barcrest","Calamari Club (Barcrest) (MPU4) (set 1)" )
 M4CALAMA_SET( 199?, m4calama__a,    m4calama,   "ca301d.p1",    0x0000, 0x020000, CRC(9a220126) SHA1(d5b12955bb336f8233ed3f892e23a14ba755a511), "Bwb / Barcrest","Calamari Club (Barcrest) (MPU4) (set 2)" )
@@ -5275,16 +5078,14 @@ M4CALAMA_SET( 199?, m4calama__j,    m4calama,   "bca04.p1",     0x0000, 0x020000
 #define M4COSCAS_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "cc___snd.1_1", 0x000000, 0x080000, CRC(d858f238) SHA1(92a3dfacde8bfa8705e91fab5bb627f9b34ad2dc) ) \
-	ROM_LOAD( "cc___snd.1_2", 0x080000, 0x080000, CRC(bab1bd8e) SHA1(c703d0e24c0a522ebf79895049e85f5471f7d7e9) ) \
-
+	ROM_LOAD( "cc___snd.1_2", 0x080000, 0x080000, CRC(bab1bd8e) SHA1(c703d0e24c0a522ebf79895049e85f5471f7d7e9) )
 #define M4COSCAS_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4COSCAS_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4COSCAS_SET( 199?, m4coscas,       0,          "cc_sj__c.3r1",         0x0000, 0x020000, CRC(44b940a6) SHA1(7e621873fcf6460f654e35cc74552e86b6253ddb), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 1)" )
 M4COSCAS_SET( 199?, m4coscas__a,    m4coscas,   "cosm15g",              0x0000, 0x020000, CRC(edd01d55) SHA1(49246fa1e12ceb3297f35616cdc1cf62472a379f), "Bwb / Barcrest","Cosmic Casino (Barcrest) (MPU4) (set 2)" )
@@ -5314,16 +5115,14 @@ M4COSCAS_SET( 199?, m4coscas__v,    m4coscas,   "cc_sjwbc.3r1",         0x0000, 
 #define M4DBLDM_EXTRA_ROMS \
 	ROM_REGION( 0x100000, "msm6376", 0 ) \
 	ROM_LOAD( "cddsnd.p1", 0x000000, 0x080000, CRC(e1833e31) SHA1(1486e5afab347d6dee1543a55d1193b7db3c89d7) ) \
-	ROM_LOAD( "cddsnd.p2", 0x080000, 0x080000, CRC(fd33ed2a) SHA1(f68ffadde40f88e7954d4a98bcd7ff023841b55b) ) \
-
+	ROM_LOAD( "cddsnd.p2", 0x080000, 0x080000, CRC(fd33ed2a) SHA1(f68ffadde40f88e7954d4a98bcd7ff023841b55b) )
 #define M4DBLDM_SET(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
 		ROM_REGION( length, "maincpu", 0 ) \
 		ROM_LOAD( name, offset, length, hash ) \
 		M4DBLDM_EXTRA_ROMS \
 	ROM_END \
-	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS ) \
-
+	GAME(year, setname, parent ,mod4oki ,mpu4 , mpu4_state,m4_showstring_big ,ROT0,company,title,GAME_FLAGS )
 
 M4DBLDM_SET( 199?, m4dbldm,     0,          "cdd05s.p1",    0x0000, 0x020000, CRC(fc14771f) SHA1(f418af9fed331560195a694f20ef2fea27ed04b0), "Barcrest","Double Diamond Club (Barcrest) (MPU4) (set 1)" )
 M4DBLDM_SET( 199?, m4dbldm__a,  m4dbldm,    "cdd05d.p1",    0x0000, 0x020000, CRC(fc1c5e90) SHA1(c756d2ac725168af5396c8ef7550db9087a50937), "Barcrest","Double Diamond Club (Barcrest) (MPU4) (set 2)" )

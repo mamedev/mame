@@ -1123,7 +1123,6 @@ void tx1_state::screen_eof_tx1(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-
 		/* /VSYNC: Update TZ113 */
 		m_vregs.slin_val += m_vregs.slin_inc;
 	}
@@ -1182,7 +1181,6 @@ static void tx1_combine_layers(running_machine &machine, bitmap_ind16 &bitmap, i
 
 UINT32 tx1_state::screen_update_tx1_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	memset(m_obj_bmp, 0, 768*240);
 
 	tx1_draw_char(machine(), m_chr_bmp);
@@ -1501,8 +1499,7 @@ static void buggyboy_get_roadpix(int screen, int ls161, UINT8 rva0_6, UINT8 sld,
 	hp >>= 8;                                                                   \
 	hps##NUM##0 = (BIT(hp, 0) || BIT(hp, 2)) && !BIT(hp, 3);                    \
 	hps##NUM##1 = (BIT(hp, 1) || BIT(hp, 2)) && !BIT(hp, 3);                    \
-	hps##NUM##2 = BIT(hp, 2);                                                   \
-
+	hps##NUM##2 = BIT(hp, 2);
 #define UPDATE_HPOS(NUM)                \
 	if (hp##NUM##_en)                   \
 	{                                   \
@@ -1510,8 +1507,7 @@ static void buggyboy_get_roadpix(int screen, int ls161, UINT8 rva0_6, UINT8 sld,
 			hp##NUM##_cy = 1;           \
 		else                            \
 			hp##NUM = hp##NUM + 1;      \
-	}                                   \
-
+	}
 static void buggyboy_draw_road(running_machine &machine, UINT8 *bitmap)
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
@@ -3025,7 +3021,6 @@ void tx1_state::screen_eof_buggyboy(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-
 		/* /VSYNC: Update TZ113 @ 219 */
 		m_vregs.slin_val += m_vregs.slin_inc;
 
@@ -3037,7 +3032,6 @@ void tx1_state::screen_eof_buggyboy(screen_device &screen, bool state)
 
 UINT32 tx1_state::screen_update_buggyboy_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	memset(m_obj_bmp, 0, 768*240);
 	memset(m_rod_bmp, 0, 768*240);
 

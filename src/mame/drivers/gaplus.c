@@ -252,7 +252,6 @@ TIMER_CALLBACK_MEMBER(gaplus_state::namcoio_run)
 
 INTERRUPT_GEN_MEMBER(gaplus_state::gaplus_vblank_main_irq)
 {
-
 	device_t *io58xx = machine().device("58xx");
 	device_t *io56xx = machine().device("56xx");
 
@@ -268,14 +267,12 @@ INTERRUPT_GEN_MEMBER(gaplus_state::gaplus_vblank_main_irq)
 
 INTERRUPT_GEN_MEMBER(gaplus_state::gaplus_vblank_sub_irq)
 {
-
 	if(m_sub_irq_mask)
 		machine().device("sub")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(gaplus_state::gaplus_vblank_sub2_irq)
 {
-
 	if(m_sub2_irq_mask)
 		machine().device("sub2")->execute().set_input_line(0, ASSERT_LINE);
 }

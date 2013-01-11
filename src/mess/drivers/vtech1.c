@@ -563,7 +563,6 @@ READ8_MEMBER(vtech1_state::vtech1_keyboard_r)
 
 WRITE8_MEMBER(vtech1_state::vtech1_latch_w)
 {
-
 	if (LOG_VTECH1_LATCH)
 		logerror("vtech1_latch_w $%02X\n", data);
 
@@ -592,7 +591,6 @@ WRITE8_MEMBER(vtech1_state::vtech1_latch_w)
 
 WRITE8_MEMBER(vtech1_state::vtech1_memory_bank_w)
 {
-
 	logerror("vtech1_memory_bank_w $%02X\n", data);
 
 	if (data >= 1)

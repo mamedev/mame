@@ -1465,7 +1465,6 @@ DRIVER_INIT_MEMBER(segag80r_state,astrob)
 
 DRIVER_INIT_MEMBER(segag80r_state,005)
 {
-
 	/* configure the 315-0070 security chip */
 	m_decrypt = segag80_security(70);
 

@@ -364,53 +364,39 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 
 #define MCFG_SCREEN_ADD(_tag, _type) \
 	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
-	MCFG_SCREEN_TYPE(_type) \
-
+	MCFG_SCREEN_TYPE(_type)
 #define MCFG_SCREEN_MODIFY(_tag) \
 	MCFG_DEVICE_MODIFY(_tag)
 
 #define MCFG_SCREEN_TYPE(_type) \
-	screen_device::static_set_type(*device, SCREEN_TYPE_##_type); \
-
+	screen_device::static_set_type(*device, SCREEN_TYPE_##_type);
 #define MCFG_SCREEN_RAW_PARAMS(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart) \
 	screen_device::static_set_raw(*device, _pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart);
 
 #define MCFG_SCREEN_REFRESH_RATE(_rate) \
-	screen_device::static_set_refresh(*device, HZ_TO_ATTOSECONDS(_rate)); \
-
+	screen_device::static_set_refresh(*device, HZ_TO_ATTOSECONDS(_rate));
 #define MCFG_SCREEN_VBLANK_TIME(_time) \
-	screen_device::static_set_vblank_time(*device, _time); \
-
+	screen_device::static_set_vblank_time(*device, _time);
 #define MCFG_SCREEN_SIZE(_width, _height) \
-	screen_device::static_set_size(*device, _width, _height); \
-
+	screen_device::static_set_size(*device, _width, _height);
 #define MCFG_SCREEN_VISIBLE_AREA(_minx, _maxx, _miny, _maxy) \
-	screen_device::static_set_visarea(*device, _minx, _maxx, _miny, _maxy); \
-
+	screen_device::static_set_visarea(*device, _minx, _maxx, _miny, _maxy);
 #define MCFG_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)  \
-	screen_device::static_set_default_position(*device, _xscale, _xoffs, _yscale, _yoffs); \
-
+	screen_device::static_set_default_position(*device, _xscale, _xoffs, _yscale, _yoffs);
 #define MCFG_SCREEN_UPDATE_STATIC(_func) \
-	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&screen_update_##_func, "screen_update_" #_func)); \
-
+	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&screen_update_##_func, "screen_update_" #_func));
 #define MCFG_SCREEN_UPDATE_DRIVER(_class, _method) \
-	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, NULL)); \
-
+	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, NULL));
 #define MCFG_SCREEN_UPDATE_DEVICE(_device, _class, _method) \
-	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, _device)); \
-
+	screen_device::static_set_screen_update(*device, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, _device));
 #define MCFG_SCREEN_VBLANK_NONE() \
-	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate()); \
-
+	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate());
 #define MCFG_SCREEN_VBLANK_STATIC(_func) \
-	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&screen_vblank_##_func, "screen_vblank_" #_func)); \
-
+	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&screen_vblank_##_func, "screen_vblank_" #_func));
 #define MCFG_SCREEN_VBLANK_DRIVER(_class, _method) \
-	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0)); \
-
+	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
 #define MCFG_SCREEN_VBLANK_DEVICE(_device, _class, _method) \
-	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&_class::_method, #_class "::" #_method, _device, (_class *)0)); \
-
+	screen_device::static_set_screen_vblank(*device, screen_vblank_delegate(&_class::_method, #_class "::" #_method, _device, (_class *)0));
 
 
 //**************************************************************************

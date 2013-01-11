@@ -163,7 +163,6 @@ TILE_GET_INFO_MEMBER(skylncr_state::get_reel_4_tile_info)
 
 void skylncr_state::video_start()
 {
-
 	m_tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 0x40, 0x20    );
 
 	m_reel_1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skylncr_state::get_reel_1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8 );
@@ -263,7 +262,6 @@ WRITE8_MEMBER(skylncr_state::reeltileshigh_4_w)
 
 WRITE8_MEMBER(skylncr_state::skylncr_paletteram_w)
 {
-
 	if (offset == 0)
 	{
 		m_color = data;
@@ -287,7 +285,6 @@ WRITE8_MEMBER(skylncr_state::skylncr_paletteram_w)
 
 WRITE8_MEMBER(skylncr_state::skylncr_paletteram2_w)
 {
-
 	if (offset == 0)
 	{
 		m_color2 = data;

@@ -14,7 +14,6 @@
 
 VIDEO_START_MEMBER(cninja_state,stoneage)
 {
-
 	/* The bootleg has broken scroll registers */
 	deco16ic_set_scrolldx(m_deco_tilegen1, 3, 0, -10, -10); /* pf4 16x16 tilemap */
 	deco16ic_set_scrolldx(m_deco_tilegen1, 1, 0, -10, -10); /* pf2 16x16 tilemap */

@@ -23,7 +23,6 @@ const device_type K056230 = &device_creator<k056230_device>;
 k056230_device::k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, K056230, "Konami 056230", tag, owner, clock)
 {
-
 }
 
 

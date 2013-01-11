@@ -14,7 +14,6 @@
 
 WRITE8_MEMBER(pecom_state::pecom_cdp1869_w)
 {
-
 	UINT16 ma = m_cdp1802->get_memory_address();
 
 	switch (offset + 3)
@@ -94,7 +93,6 @@ static CDP1869_INTERFACE( pecom_cdp1869_intf )
 
 VIDEO_START_MEMBER(pecom_state,pecom)
 {
-
 	/* allocate memory */
 	m_charram = auto_alloc_array(machine(), UINT8, PECOM_CHAR_RAM_SIZE);
 

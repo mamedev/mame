@@ -277,7 +277,6 @@ static const ym2203_interface ym2203_config =
 
 void blktiger_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_mcu = machine().device("mcu");
 
@@ -297,7 +296,6 @@ void blktiger_state::machine_start()
 
 void blktiger_state::machine_reset()
 {
-
 	/* configure bankswitching */
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 

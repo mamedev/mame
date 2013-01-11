@@ -1526,11 +1526,9 @@ static void render_polygons(running_machine &machine)
 		}
 		else if (cmd == 0x80000000)
 		{
-
 		}
 		else if (cmd == 0x80000018)
 		{
-
 		}
 		else if ((cmd & 0xffff0000) == 0x80000000)
 		{
@@ -1552,7 +1550,6 @@ static void render_polygons(running_machine &machine)
 		}
 		else
 		{
-
 		}
 	}
 	while (index < K001005_3d_fifo_ptr);

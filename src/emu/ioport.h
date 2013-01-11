@@ -1428,8 +1428,7 @@ private:
 #define INPUT_PORTS_START(_name) \
 ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, astring &errorbuf) \
 { \
-	ioport_configurer configurer(owner, portlist, errorbuf); \
-
+	ioport_configurer configurer(owner, portlist, errorbuf);
 // end of table
 #define INPUT_PORTS_END \
 }
@@ -1440,26 +1439,21 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, a
 
 // including
 #define PORT_INCLUDE(_name) \
-	INPUT_PORTS_NAME(_name)(owner, portlist, errorbuf); \
-
+	INPUT_PORTS_NAME(_name)(owner, portlist, errorbuf);
 // start of a new input port (with included tag)
 #define PORT_START(_tag) \
-	configurer.port_alloc(_tag); \
-
+	configurer.port_alloc(_tag);
 // modify an existing port
 #define PORT_MODIFY(_tag) \
-	configurer.port_modify(_tag); \
-
+	configurer.port_modify(_tag);
 // input bit definition
 #define PORT_BIT(_mask, _default, _type) \
-	configurer.field_alloc((_type), (_default), (_mask)); \
-
+	configurer.field_alloc((_type), (_default), (_mask));
 #define PORT_SPECIAL_ONOFF(_mask, _default, _strindex) \
 	PORT_SPECIAL_ONOFF_DIPLOC(_mask, _default, _strindex, NULL)
 
 #define PORT_SPECIAL_ONOFF_DIPLOC(_mask, _default, _strindex, _diploc) \
-	configurer.onoff_alloc(DEF_STR(_strindex), _default, _mask, _diploc); \
-
+	configurer.onoff_alloc(DEF_STR(_strindex), _default, _mask, _diploc);
 // append a code
 #define PORT_CODE(_code) \
 	configurer.field_add_code(SEQ_TYPE_STANDARD, _code);
@@ -1520,8 +1514,7 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, a
 	configurer.field_set_sensitivity(_sensitivity);
 
 #define PORT_KEYDELTA(_delta) \
-	configurer.field_set_delta(_delta); \
-
+	configurer.field_set_delta(_delta);
 // note that PORT_CENTERDELTA must appear after PORT_KEYDELTA
 #define PORT_CENTERDELTA(_delta) \
 	configurer.field_set_centerdelta(_delta);
@@ -1585,29 +1578,23 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, a
 
 // dip switch definition
 #define PORT_DIPNAME(_mask, _default, _name) \
-	configurer.field_alloc(IPT_DIPSWITCH, (_default), (_mask), (_name)); \
-
+	configurer.field_alloc(IPT_DIPSWITCH, (_default), (_mask), (_name));
 #define PORT_DIPSETTING(_default, _name) \
-	configurer.setting_alloc((_default), (_name)); \
-
+	configurer.setting_alloc((_default), (_name));
 // physical location, of the form: name:[!]sw,[name:][!]sw,...
 // note that these are specified LSB-first
 #define PORT_DIPLOCATION(_location) \
-	configurer.field_set_diplocation(_location); \
-
+	configurer.field_set_diplocation(_location);
 // conditionals for dip switch settings
 #define PORT_CONDITION(_tag, _mask, _condition, _value) \
-	configurer.set_condition(ioport_condition::_condition, _tag, _mask, _value); \
-
+	configurer.set_condition(ioport_condition::_condition, _tag, _mask, _value);
 // analog adjuster definition
 #define PORT_ADJUSTER(_default, _name) \
 	configurer.field_alloc(IPT_ADJUSTER, (_default), 0xff, (_name)); \
-	configurer.field_set_min_max(0, 100); \
-
+	configurer.field_set_min_max(0, 100);
 // config definition
 #define PORT_CONFNAME(_mask, _default, _name) \
-	configurer.field_alloc(IPT_CONFIG, (_default), (_mask), (_name)); \
-
+	configurer.field_alloc(IPT_CONFIG, (_default), (_mask), (_name));
 #define PORT_CONFSETTING(_default, _name) \
 	configurer.setting_alloc((_default), (_name));
 
@@ -1625,11 +1612,9 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, a
 // start of table
 #define DEVICE_INPUT_DEFAULTS_START(_name) \
 	const input_device_default DEVICE_INPUT_DEFAULTS_NAME(_name)[] = {
-
 // end of table
 #define DEVICE_INPUT_DEFAULTS(_tag,_mask,_defval) \
-	{ _tag ,_mask, _defval }, \
-
+	{ _tag ,_mask, _defval },
 // end of table
 #define DEVICE_INPUT_DEFAULTS_END \
 	{NULL,0,0} };

@@ -116,7 +116,6 @@ WRITE8_MEMBER(bking_state::bking_yld3_w)
 
 WRITE8_MEMBER(bking_state::bking_cont1_w)
 {
-
 	/* D0 = COIN LOCK */
 	/* D1 = BALL 5 (Controller selection) */
 	/* D2 = VINV (flip screen) */
@@ -136,7 +135,6 @@ WRITE8_MEMBER(bking_state::bking_cont1_w)
 
 WRITE8_MEMBER(bking_state::bking_cont2_w)
 {
-
 	/* D0-D2 = BALL10 - BALL12 (Selects player 1 ball picture) */
 	/* D3-D5 = BALL20 - BALL22 (Selects player 2 ball picture) */
 	/* D6 = HIT1 */
@@ -150,7 +148,6 @@ WRITE8_MEMBER(bking_state::bking_cont2_w)
 
 WRITE8_MEMBER(bking_state::bking_cont3_w)
 {
-
 	/* D0 = CROW INV (inverts Crow picture and coordinates) */
 	/* D1-D2 = COLOR 0 - COLOR 1 (switches 4 color palettes, global across all graphics) */
 	/* D3 = SOUND STOP */
@@ -235,7 +232,6 @@ void bking_state::video_start()
 
 UINT32 bking_state::screen_update_bking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the balls */

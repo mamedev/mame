@@ -269,7 +269,6 @@ TILE_GET_INFO_MEMBER(multfish_state::get_multfish_reel_tile_info)
 
 void multfish_state::video_start()
 {
-
 	memset(m_vid,0x00,sizeof(m_vid));
 	save_item(NAME(m_vid));
 
@@ -308,7 +307,6 @@ UINT32 multfish_state::screen_update_multfish(screen_device &screen, bitmap_ind1
 
 WRITE8_MEMBER(multfish_state::multfish_vid_w)
 {
-
 	m_vid[offset]=data;
 
 	// 0x0000 - 0x1fff is normal tilemap
@@ -374,7 +372,6 @@ WRITE8_MEMBER(multfish_state::multfish_timekeeper_w)
 
 READ8_MEMBER(multfish_state::bankedram_r)
 {
-
 	if ((m_rambk & 0x80) == 0x00)
 	{
 		return timekeeper_r(machine().device("m48t35"), space, offset + 0x2000*(m_rambk & 0x03));
@@ -388,7 +385,6 @@ READ8_MEMBER(multfish_state::bankedram_r)
 
 WRITE8_MEMBER(multfish_state::bankedram_w)
 {
-
 	if ((m_rambk & 0x80) == 0x00)
 	{
 		timekeeper_w(machine().device("m48t35"), space, offset + 0x2000*(m_rambk & 0x03), data);
@@ -401,7 +397,6 @@ WRITE8_MEMBER(multfish_state::bankedram_w)
 
 WRITE8_MEMBER(multfish_state::multfish_rambank_w)
 {
-
 	m_rambk = data;
 }
 
@@ -415,7 +410,6 @@ READ8_MEMBER(multfish_state::ray_r)
 
 CUSTOM_INPUT_MEMBER(multfish_state::multfish_hopper_r)
 {
-
 	if ( m_hopper_motor != 0 )
 	{
 			m_hopper++;
@@ -634,7 +628,6 @@ DRIVER_INIT_MEMBER(multfish_state,island2l)
 }
 DRIVER_INIT_MEMBER(multfish_state,keksl)
 {
-
 		m_xor_palette = 0x41f3;
 		m_xor_paltype = 1;
 	lottery_decode(machine(), 0xdd, 0xaa, 0x22, 0x55, 0x2cac0);
@@ -659,7 +652,6 @@ DRIVER_INIT_MEMBER(multfish_state,sweetl2l)
 }
 DRIVER_INIT_MEMBER(multfish_state,gnomel)
 {
-
 		m_xor_palette = 0x49ff;
 		m_xor_paltype = 1;
 	lottery_decode(machine(), 0xcc, 0x22, 0x33, 0x66, 0x14940);
@@ -1064,7 +1056,6 @@ GFXDECODE_END
 
 void multfish_state::machine_start()
 {
-
 	save_item(NAME(m_disp_enable));
 	save_item(NAME(m_rambk));
 	save_item(NAME(m_hopper_motor));
@@ -1073,7 +1064,6 @@ void multfish_state::machine_start()
 
 void multfish_state::machine_reset()
 {
-
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base(), 0x4000);
 	membank("bank1")->set_entry(0);
 

@@ -245,7 +245,6 @@ GFXDECODE_END
 
 void _1943_state::machine_reset()
 {
-
 	m_char_on = 0;
 	m_obj_on = 0;
 	m_bg1_on = 0;

@@ -1403,7 +1403,6 @@ DRIVER_INIT_MEMBER(multigam_state,multigmt)
 	memcpy(buf, rom, size);
 	for (i = 0; i < size; i++)
 	{
-
 		addr = BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
 		rom[i] = buf[addr];
 	}

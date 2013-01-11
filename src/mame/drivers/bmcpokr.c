@@ -223,7 +223,6 @@ UINT32 bmcpokr_state::screen_update_bmcpokr(screen_device &screen, bitmap_ind16 
 
 void bmcpokr_state::video_start()
 {
-
 }
 
 

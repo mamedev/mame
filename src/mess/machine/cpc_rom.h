@@ -54,8 +54,7 @@ extern const device_type ROMSLOT;
 
 
 #define MCFG_ROMSLOT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, ROMSLOT, 0) \
-
+	MCFG_DEVICE_ADD(_tag, ROMSLOT, 0)
 
 /*** ROM box device ***/
 

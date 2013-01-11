@@ -220,7 +220,6 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(seta2_state::mj4simai_p1_r)
 {
-
 	switch (m_keyboard_row)
 	{
 		case 0x01: return ioport("P1_KEY0")->read();
@@ -234,7 +233,6 @@ READ16_MEMBER(seta2_state::mj4simai_p1_r)
 
 READ16_MEMBER(seta2_state::mj4simai_p2_r)
 {
-
 	switch (m_keyboard_row)
 	{
 		case 0x01: return ioport("P2_KEY0")->read();
@@ -248,7 +246,6 @@ READ16_MEMBER(seta2_state::mj4simai_p2_r)
 
 WRITE16_MEMBER(seta2_state::mj4simai_keyboard_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 		m_keyboard_row = data & 0xff;
 }
@@ -555,13 +552,11 @@ enum {
 
 WRITE32_MEMBER(seta2_state::coldfire_regs_w)
 {
-
 	COMBINE_DATA( &m_coldfire_regs[offset] );
 }
 
 READ32_MEMBER(seta2_state::coldfire_regs_r)
 {
-
 	switch( offset )
 	{
 		case CF_MBSR:
@@ -715,7 +710,6 @@ static void funcube_debug_outputs(running_machine &machine)
 
 WRITE8_MEMBER(seta2_state::funcube_leds_w)
 {
-
 	*m_funcube_leds = data;
 
 	set_led_status( machine(), 0, (~data) & 0x01 ); // win lamp (red)
@@ -732,14 +726,12 @@ WRITE8_MEMBER(seta2_state::funcube_leds_w)
 
 READ8_MEMBER(seta2_state::funcube_outputs_r)
 {
-
 	// Bits 1,2,3 read
 	return *m_funcube_outputs;
 }
 
 WRITE8_MEMBER(seta2_state::funcube_outputs_w)
 {
-
 	*m_funcube_outputs = data;
 
 	// Bits 0,1,3 written
@@ -2178,7 +2170,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta2_state::funcube_interrupt)
 
 INTERRUPT_GEN_MEMBER(seta2_state::funcube_sub_timer_irq)
 {
-
 	if ( m_funcube_serial_count )
 	{
 		device.execute().set_input_line(H8_SCI_1_RX, HOLD_LINE);

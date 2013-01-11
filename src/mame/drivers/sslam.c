@@ -298,7 +298,6 @@ WRITE16_MEMBER(sslam_state::sslam_snd_w)
 	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_0_7)
 	{
-
 		logerror("%s Writing %04x to Sound CPU\n",machine().describe_context(),data);
 		if (data >= 0x40) {
 			if (data == 0xfe) {
@@ -442,13 +441,11 @@ READ8_MEMBER(sslam_state::playmark_snd_command_r)
 
 WRITE8_MEMBER(sslam_state::playmark_oki_w)
 {
-
 	m_oki_command = data;
 }
 
 WRITE8_MEMBER(sslam_state::playmark_snd_control_w)
 {
-
 	m_oki_control = data;
 
 	if (data & 3)
@@ -930,7 +927,6 @@ DRIVER_INIT_MEMBER(sslam_state,sslam)
 
 DRIVER_INIT_MEMBER(sslam_state,powerbls)
 {
-
 	save_item(NAME(m_oki_control));
 	save_item(NAME(m_oki_command));
 	save_item(NAME(m_oki_bank));

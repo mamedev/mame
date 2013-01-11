@@ -3824,7 +3824,6 @@ n64_rdp::n64_rdp(n64_state &state) : poly_manager<UINT32, rdp_poly_state, 8, 320
 
 void n64_state::video_start()
 {
-
 	m_rdp = auto_alloc(machine(), n64_rdp(*this));
 
 	m_rdp->SetMachine(machine());

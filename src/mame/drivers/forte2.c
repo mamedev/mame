@@ -116,7 +116,6 @@ void forte2_state::machine_reset()
 
 void forte2_state::machine_start()
 {
-
 	/* register for save states */
 	state_save_register_global(machine(), m_input_mask);
 }

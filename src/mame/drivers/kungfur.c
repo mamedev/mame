@@ -102,7 +102,6 @@ INTERRUPT_GEN_MEMBER(kungfur_state::kungfur_irq)
 
 WRITE8_MEMBER(kungfur_state::kungfur_output_w)
 {
-
 	// d0-d2: output led7seg
 	static const int lut_digits[24] =
 	{
@@ -154,7 +153,6 @@ WRITE8_MEMBER(kungfur_state::kungfur_latch3_w)
 
 WRITE8_MEMBER(kungfur_state::kungfur_control_w)
 {
-
 	// d0-d3: N/C
 	// d4: irq ack
 	if (~data & 0x10)
@@ -298,7 +296,6 @@ static const msm5205_interface msm5205_config_2 =
 
 void kungfur_state::machine_start()
 {
-
 	save_item(NAME(m_control));
 	save_item(NAME(m_latch));
 

@@ -62,7 +62,6 @@ enum vram_t
 // Layers
 struct layer_t
 {
-
 	UINT8 *videorams[2];
 
 	UINT8 *scrollrams[2];

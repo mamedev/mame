@@ -45,7 +45,6 @@ TILE_GET_INFO_MEMBER(mosaic_state::get_bg_tile_info)
 
 void mosaic_state::video_start()
 {
-
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mosaic_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mosaic_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
@@ -61,14 +60,12 @@ void mosaic_state::video_start()
 
 WRITE8_MEMBER(mosaic_state::mosaic_fgvideoram_w)
 {
-
 	m_fgvideoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 WRITE8_MEMBER(mosaic_state::mosaic_bgvideoram_w)
 {
-
 	m_bgvideoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
@@ -77,7 +74,6 @@ WRITE8_MEMBER(mosaic_state::mosaic_bgvideoram_w)
 
 UINT32 mosaic_state::screen_update_mosaic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;

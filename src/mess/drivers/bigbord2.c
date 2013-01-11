@@ -409,7 +409,6 @@ const z80sio_interface sio_intf =
 
 TIMER_DEVICE_CALLBACK_MEMBER(bigbord2_state::ctc_tick)
 {
-
 	m_ctcb->trg0(1);
 	m_ctcb->trg1(1);
 	m_ctcb->trg0(0);

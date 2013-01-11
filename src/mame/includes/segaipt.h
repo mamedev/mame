@@ -92,8 +92,7 @@
 	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) ) \
 	PORT_DIPSETTING(    0x50, "2 Coins/1 Credit, 5/3, 6/4" ) \
 	PORT_DIPSETTING(    0x40, "2 Coins/1 Credit, 4/3" ) \
-	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) ) \
-
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
 #define SEGA_COINAGE_B_PART_L \
 	PORT_DIPSETTING(    0x30, "1 Coin/1 Credit, 5/6" ) \
 	PORT_DIPSETTING(    0x20, "1 Coin/1 Credit, 4/5" ) \

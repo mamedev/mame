@@ -539,7 +539,6 @@ static const pia6821_interface pia_ic4_intf =
 /* IC5, AUX ports, coin lockouts and AY sound chip select (MODs below 4 only) */
 WRITE8_MEMBER(mpu3_state::pia_ic5_porta_w)
 {
-
 	LOG(("%s: IC5 PIA Port A Set to %2x (Reel)\n", machine().describe_context(),data));
 	stepper_update(0, data & 0x03 );
 	stepper_update(1, (data>>2) & 0x03 );

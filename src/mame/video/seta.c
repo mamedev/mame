@@ -406,7 +406,6 @@ TILE_GET_INFO_MEMBER(seta_state::get_tile_info_3){ get_tile_info( machine(), til
 
 WRITE16_MEMBER(seta_state::seta_vram_0_w)
 {
-
 	COMBINE_DATA(&m_vram_0[offset]);
 	if (offset & 0x1000)
 		m_tilemap_1->mark_tile_dirty(offset & 0x7ff);
@@ -416,7 +415,6 @@ WRITE16_MEMBER(seta_state::seta_vram_0_w)
 
 WRITE16_MEMBER(seta_state::seta_vram_2_w)
 {
-
 	COMBINE_DATA(&m_vram_2[offset]);
 	if (offset & 0x1000)
 		m_tilemap_3->mark_tile_dirty(offset & 0x7ff);
@@ -442,7 +440,6 @@ WRITE16_MEMBER(seta_state::twineagl_tilebank_w)
 /* 2 layers */
 VIDEO_START_MEMBER(seta_state,seta_2_layers)
 {
-
 	VIDEO_START_CALL_MEMBER( seta_no_layers );
 
 	/* Each layer consists of 2 tilemaps: only one can be displayed
@@ -476,7 +473,6 @@ VIDEO_START_MEMBER(seta_state,seta_2_layers)
 /* 1 layer */
 VIDEO_START_MEMBER(seta_state,seta_1_layer)
 {
-
 	VIDEO_START_CALL_MEMBER( seta_no_layers );
 
 	/* Each layer consists of 2 tilemaps: only one can be displayed
@@ -497,7 +493,6 @@ VIDEO_START_MEMBER(seta_state,seta_1_layer)
 
 VIDEO_START_MEMBER(seta_state,twineagl_1_layer)
 {
-
 	VIDEO_START_CALL_MEMBER( seta_no_layers );
 
 	/* Each layer consists of 2 tilemaps: only one can be displayed
@@ -527,7 +522,6 @@ int setac_gfxbank_callback( running_machine &machine, UINT16 code, UINT8 color )
 /* NO layers, only sprites */
 VIDEO_START_MEMBER(seta_state,seta_no_layers)
 {
-
 	m_tilemap_0 = 0;
 	m_tilemap_1 = 0;
 	m_tilemap_2 = 0;
@@ -551,7 +545,6 @@ VIDEO_START_MEMBER(seta_state,seta_no_layers)
 
 VIDEO_START_MEMBER(seta_state,oisipuzl_2_layers)
 {
-
 	VIDEO_START_CALL_MEMBER(seta_2_layers);
 	m_tilemaps_flip = 1;
 }

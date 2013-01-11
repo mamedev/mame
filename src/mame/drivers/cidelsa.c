@@ -272,7 +272,6 @@ ADDRESS_MAP_END
 
 CUSTOM_INPUT_MEMBER(cidelsa_state::cdp1869_pcb_r)
 {
-
 	return m_cdp1869_pcb;
 }
 
@@ -427,7 +426,6 @@ INPUT_PORTS_END
 
 TIMER_CALLBACK_MEMBER(cidelsa_state::set_cpu_mode)
 {
-
 	m_reset = 1;
 }
 

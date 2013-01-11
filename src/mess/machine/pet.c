@@ -705,7 +705,6 @@ DRIVER_INIT_MEMBER(pet_state,superpet)
 
 void pet_state::machine_reset()
 {
-
 	if (m_superpet)
 	{
 		m_spet.rom = 0;

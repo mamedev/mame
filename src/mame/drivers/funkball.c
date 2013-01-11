@@ -169,7 +169,6 @@ public:
 
 void funkball_state::video_start()
 {
-
 }
 
 UINT32 funkball_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
@@ -521,7 +520,6 @@ WRITE8_MEMBER( funkball_state::flash_data_w )
 
 READ32_MEMBER(funkball_state::biu_ctrl_r)
 {
-
 	if (offset == 0)
 	{
 		return 0xffffff;
@@ -531,7 +529,6 @@ READ32_MEMBER(funkball_state::biu_ctrl_r)
 
 WRITE32_MEMBER(funkball_state::biu_ctrl_w)
 {
-
 	//mame_printf_debug("biu_ctrl_w %08X, %08X, %08X\n", data, offset, mem_mask);
 	COMBINE_DATA(m_biu_ctrl_reg + offset);
 
@@ -552,7 +549,6 @@ WRITE32_MEMBER(funkball_state::biu_ctrl_w)
 
 WRITE8_MEMBER(funkball_state::bios_ram_w)
 {
-
 	if(m_biu_ctrl_reg[0x0c/4] & (2 << ((offset & 0x4000)>>14)*4)) // memory is write-able
 	{
 		m_bios_ram[offset] = data;

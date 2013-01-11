@@ -22,7 +22,6 @@
 
 WRITE8_MEMBER(battlane_state::battlane_cpu_command_w)
 {
-
 	m_cpu_control = data;
 
 	/*
@@ -80,7 +79,6 @@ WRITE8_MEMBER(battlane_state::battlane_cpu_command_w)
 
 INTERRUPT_GEN_MEMBER(battlane_state::battlane_cpu1_interrupt)
 {
-
 	/* See note in battlane_cpu_command_w */
 	if (~m_cpu_control & 0x08)
 	{
@@ -268,7 +266,6 @@ static const ym3526_interface ym3526_config =
 
 void battlane_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_subcpu = machine().device<cpu_device>("sub");
 
@@ -278,7 +275,6 @@ void battlane_state::machine_start()
 
 void battlane_state::machine_reset()
 {
-
 	m_video_ctrl = 0;
 	m_cpu_control = 0;
 }

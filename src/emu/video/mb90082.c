@@ -109,7 +109,6 @@ void mb90082_device::device_validity_check(validity_checker &valid) const
 
 void mb90082_device::device_start()
 {
-
 }
 
 

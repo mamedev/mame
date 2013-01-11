@@ -1396,7 +1396,6 @@ static WRITE16_HANDLER( pgm_arm7_type1_sim_w )
 	}
 	else if (offset==2)
 	{
-
 	}
 }
 

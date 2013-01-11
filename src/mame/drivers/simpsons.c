@@ -260,7 +260,6 @@ TIMER_CALLBACK_MEMBER(simpsons_state::dmaend_callback)
 
 INTERRUPT_GEN_MEMBER(simpsons_state::simpsons_irq)
 {
-
 	if (k053246_is_irq_enabled(m_k053246))
 	{
 		simpsons_objdma(machine());

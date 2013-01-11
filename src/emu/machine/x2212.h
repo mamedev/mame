@@ -18,14 +18,12 @@
 //**************************************************************************
 
 #define MCFG_X2212_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, X2212, 0) \
-
+	MCFG_DEVICE_ADD(_tag, X2212, 0)
 // some systems (like many early Atari games) wire up the /STORE signal
 // to fire on power-down, effectively creating an "auto-save" functionality
 #define MCFG_X2212_ADD_AUTOSAVE(_tag) \
 	MCFG_DEVICE_ADD(_tag, X2212, 0) \
-	x2212_device::static_set_auto_save(*device); \
-
+	x2212_device::static_set_auto_save(*device);
 
 
 //**************************************************************************

@@ -111,28 +111,24 @@ public:
 
 WRITE16_MEMBER(mwarr_state::bg_videoram_w)
 {
-
 	COMBINE_DATA(&m_bg_videoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(mwarr_state::mlow_videoram_w)
 {
-
 	COMBINE_DATA(&m_mlow_videoram[offset]);
 	m_mlow_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(mwarr_state::mhigh_videoram_w)
 {
-
 	COMBINE_DATA(&m_mhigh_videoram[offset]);
 	m_mhigh_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE16_MEMBER(mwarr_state::tx_videoram_w)
 {
-
 	COMBINE_DATA(&m_tx_videoram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
@@ -145,7 +141,6 @@ WRITE16_MEMBER(mwarr_state::oki1_bank_w)
 
 WRITE16_MEMBER(mwarr_state::sprites_commands_w)
 {
-
 	if (m_which)
 	{
 		int i;
@@ -393,7 +388,6 @@ TILE_GET_INFO_MEMBER(mwarr_state::get_tx_tile_info)
 
 void mwarr_state::video_start()
 {
-
 	m_bg_tilemap    = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mwarr_state::get_bg_tile_info),this),    TILEMAP_SCAN_COLS, 16, 16, 64, 16);
 	m_mlow_tilemap  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mwarr_state::get_mlow_tile_info),this),  TILEMAP_SCAN_COLS, 16, 16, 64, 16);
 	m_mhigh_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(mwarr_state::get_mhigh_tile_info),this), TILEMAP_SCAN_COLS, 16, 16, 64, 16);
@@ -543,13 +537,11 @@ UINT32 mwarr_state::screen_update_mwarr(screen_device &screen, bitmap_ind16 &bit
 
 void mwarr_state::machine_start()
 {
-
 	save_item(NAME(m_which));
 }
 
 void mwarr_state::machine_reset()
 {
-
 	m_which = 0;
 }
 

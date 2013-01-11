@@ -369,7 +369,6 @@ To Do / Unknowns:
 
 MACHINE_START_MEMBER(toaplan2_state,toaplan2)
 {
-
 	m_main_cpu = machine().device("maincpu");
 	m_sub_cpu = machine().device("audiocpu");
 
@@ -392,7 +391,6 @@ static void toaplan2_reset(device_t *device)
 
 MACHINE_RESET_MEMBER(toaplan2_state,toaplan2)
 {
-
 	m_mcu_data = 0x00;
 
 	// All games execute a RESET instruction on init, presumably to reset the sound CPU.
@@ -404,7 +402,6 @@ MACHINE_RESET_MEMBER(toaplan2_state,toaplan2)
 
 MACHINE_RESET_MEMBER(toaplan2_state,ghox)
 {
-
 	MACHINE_RESET_CALL_MEMBER(toaplan2);
 	m_old_p1_paddle_h = 0;
 	m_old_p2_paddle_h = 0;
@@ -413,14 +410,12 @@ MACHINE_RESET_MEMBER(toaplan2_state,ghox)
 
 DRIVER_INIT_MEMBER(toaplan2_state,dogyuun)
 {
-
 	m_v25_reset_line = 0x20;
 }
 
 
 DRIVER_INIT_MEMBER(toaplan2_state,fixeight)
 {
-
 	m_v25_reset_line = 0x08;
 }
 
@@ -435,7 +430,6 @@ DRIVER_INIT_MEMBER(toaplan2_state,fixeightbl)
 
 DRIVER_INIT_MEMBER(toaplan2_state,vfive)
 {
-
 	m_v25_reset_line = 0x10;
 }
 
@@ -474,7 +468,6 @@ DRIVER_INIT_MEMBER(toaplan2_state,batrider)
 
 DRIVER_INIT_MEMBER(toaplan2_state,bbakraid)
 {
-
 	m_sndirq_line = 2;
 }
 
@@ -486,7 +479,6 @@ DRIVER_INIT_MEMBER(toaplan2_state,bbakraid)
 
 TIMER_CALLBACK_MEMBER(toaplan2_state::toaplan2_raise_irq)
 {
-
 	m_main_cpu->execute().set_input_line(param, HOLD_LINE);
 }
 
@@ -582,7 +574,6 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_v25_coin_word_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-
 		toaplan2_coin_w(space, offset, data & 0x0f);
 
 		m_sub_cpu->execute().set_input_line(INPUT_LINE_RESET,  (data & m_v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
@@ -610,7 +601,6 @@ WRITE16_MEMBER(toaplan2_state::shippumd_coin_word_w)
 
 READ16_MEMBER(toaplan2_state::shared_ram_r)
 {
-
 	return m_shared_ram[offset];
 }
 
@@ -619,7 +609,6 @@ WRITE16_MEMBER(toaplan2_state::shared_ram_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-
 		m_shared_ram[offset] = data;
 	}
 }
@@ -632,7 +621,6 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_hd647180_cpu_w)
 
 	if (ACCESSING_BITS_0_7)
 	{
-
 		m_mcu_data = data & 0xff;
 		logerror("PC:%08x Writing command (%04x) to secondary CPU shared port\n", space.device().safe_pcbase(), m_mcu_data);
 	}
@@ -641,7 +629,6 @@ WRITE16_MEMBER(toaplan2_state::toaplan2_hd647180_cpu_w)
 
 CUSTOM_INPUT_MEMBER(toaplan2_state::c2map_r)
 {
-
 	// For Teki Paki hardware
 	// bit 4 high signifies secondary CPU is ready
 	// bit 5 is tested low before V-Blank bit ???
@@ -747,7 +734,6 @@ WRITE16_MEMBER(toaplan2_state::ghox_shared_ram_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-
 		m_shared_ram16[offset] = data & 0xff;
 	}
 }
@@ -755,7 +741,6 @@ WRITE16_MEMBER(toaplan2_state::ghox_shared_ram_w)
 
 WRITE16_MEMBER(toaplan2_state::fixeight_subcpu_ctrl_w)
 {
-
 	m_sub_cpu->execute().set_input_line(INPUT_LINE_RESET, (data & m_v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -864,7 +849,6 @@ WRITE16_MEMBER(toaplan2_state::bgaregga_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-
 		soundlatch_byte_w(space, offset, data & 0xff);
 		m_sub_cpu->execute().set_input_line(0, HOLD_LINE);
 	}
@@ -903,7 +887,6 @@ WRITE16_MEMBER(toaplan2_state::batrider_z80_busreq_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-
 		m_z80_busreq = (data & 0x01);   // see batrider_z80_busack_r above
 	}
 }
@@ -922,7 +905,6 @@ WRITE16_MEMBER(toaplan2_state::batrider_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-
 		soundlatch_byte_w(space, offset, data & 0xff);
 		m_sub_cpu->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
@@ -933,7 +915,6 @@ WRITE16_MEMBER(toaplan2_state::batrider_soundlatch2_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-
 		soundlatch2_byte_w(space, offset, data & 0xff);
 		m_sub_cpu->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
@@ -949,7 +930,6 @@ WRITE16_MEMBER(toaplan2_state::batrider_unknown_sound_w)
 
 WRITE16_MEMBER(toaplan2_state::batrider_clear_sndirq_w)
 {
-
 	// not sure whether this is correct
 	// the 68K writes here during the sound IRQ handler, and nowhere else...
 	m_main_cpu->execute().set_input_line(m_sndirq_line, CLEAR_LINE);
@@ -958,7 +938,6 @@ WRITE16_MEMBER(toaplan2_state::batrider_clear_sndirq_w)
 
 WRITE8_MEMBER(toaplan2_state::batrider_sndirq_w)
 {
-
 	// if batrider_clear_sndirq_w() is correct, should this be ASSERT_LINE?
 	m_main_cpu->execute().set_input_line(m_sndirq_line, HOLD_LINE);
 }
@@ -966,7 +945,6 @@ WRITE8_MEMBER(toaplan2_state::batrider_sndirq_w)
 
 WRITE8_MEMBER(toaplan2_state::batrider_clear_nmi_w)
 {
-
 	m_sub_cpu->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
@@ -1007,7 +985,6 @@ READ16_MEMBER(toaplan2_state::bbakraid_eeprom_r)
 
 WRITE16_MEMBER(toaplan2_state::bbakraid_eeprom_w)
 {
-
 	if (data & ~0x001f)
 		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",space.device().safe_pc(),data);
 
@@ -4177,8 +4154,7 @@ ROM_END
 	ROM_REGION( 0x40000, "oki", 0 ) \
 	ROM_LOAD( "tp-026-2", 0x00000, 0x40000, CRC(85063f1f) SHA1(1bf4d77494de421c98f6273b9876e60d827a6826) ) \
 	ROM_REGION( 0x80, "eepromdumped", 0 ) \
-	ROM_LOAD16_WORD_SWAP( "93c45.u21", 0x00, 0x80, CRC(40d75df0) SHA1(a22f1cc74ce9bc9bfe53f48f6a43ab60e921052b) )\
-
+	ROM_LOAD16_WORD_SWAP( "93c45.u21", 0x00, 0x80, CRC(40d75df0) SHA1(a22f1cc74ce9bc9bfe53f48f6a43ab60e921052b) )
 // eeprom dumped can't be accepted by the code, but the values can't be a simple bad dump (not fixed bits and the values are present three times)
 // robiza's note: probably between sound cpu and EEPROM there's something that modify the values (PAL?)
 // we can get the eeprom with a value in [00004] address (1XXX dcba) -> then we need a different value in [00004] address (0XXX XXXX)

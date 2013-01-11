@@ -217,7 +217,6 @@ TILE_GET_INFO_MEMBER(panicr_state::get_txttile_info)
 
 void panicr_state::video_start()
 {
-
 	m_bgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_bgtile_info),this),TILEMAP_SCAN_ROWS,16,16,1024,16 );
 	m_infotilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(panicr_state::get_infotile_info),this),TILEMAP_SCAN_ROWS,16,16,1024,16 ); // 3 more bitplanes, contains collision and priority data
 

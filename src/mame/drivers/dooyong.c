@@ -103,7 +103,6 @@ WRITE8_MEMBER(dooyong_state::flip_screen_w)
 
 MACHINE_RESET_MEMBER(dooyong_state,sound_ym2203)
 {
-
 	m_interrupt_line_1=0;
 	m_interrupt_line_2=0;
 }

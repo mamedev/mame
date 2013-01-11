@@ -50,7 +50,6 @@ static TIMER_CALLBACK( nb1413m3_timer_callback )
 
 	if (nb1413m3_74ls193_counter == 0x0f)
 	{
-
 		if (nb1413m3_nmi_enable)
 		{
 			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

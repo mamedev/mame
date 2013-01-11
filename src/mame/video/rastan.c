@@ -13,7 +13,6 @@
 
 WRITE16_MEMBER(rastan_state::rastan_spritectrl_w)
 {
-
 	/* bits 5-7 are the sprite palette bank */
 	pc090oj_set_sprite_ctrl(m_pc090oj, (data & 0xe0) >> 5);
 

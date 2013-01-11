@@ -63,7 +63,6 @@ WRITE16_MEMBER(alpha68k_state::alpha68k_videoram_w)
 
 VIDEO_START_MEMBER(alpha68k_state,alpha68k)
 {
-
 	m_fix_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(alpha68k_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 	m_fix_tilemap->set_transparent_pen(0);
 }
@@ -126,7 +125,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 alpha68k_state::screen_update_alpha68k_II(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (m_last_bank != m_bank_base)
 		machine().tilemap().mark_all_dirty();
 
@@ -311,7 +309,6 @@ UINT32 alpha68k_state::screen_update_alpha68k_V(screen_device &screen, bitmap_in
 
 UINT32 alpha68k_state::screen_update_alpha68k_V_sb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (m_last_bank != m_bank_base)
 		machine().tilemap().mark_all_dirty();
 

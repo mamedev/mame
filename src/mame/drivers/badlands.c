@@ -576,7 +576,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(badlands_state,badlands)
 {
-
 	/* initialize the audio system */
 	m_bank_base = &memregion("audiocpu")->base()[0x03000];
 	m_bank_source_data = &memregion("audiocpu")->base()[0x10000];
@@ -621,7 +620,6 @@ GAME( 1989, badlands, 0, badlands, badlands, badlands_state, badlands, ROT0, "At
 
 READ16_MEMBER(badlands_state::badlandsb_unk_r)
 {
-
 	return 0xffff;
 }
 

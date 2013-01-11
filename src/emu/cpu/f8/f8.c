@@ -1158,7 +1158,6 @@ static void f8_am(f8_Regs *cpustate)
  ***************************************************/
 static void f8_amd(f8_Regs *cpustate)
 {
-
 /*SKR from F8 Guide To programming description of AMD
 
  binary add the addend to the binary sum of the augend and $66

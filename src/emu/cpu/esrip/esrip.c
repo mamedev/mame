@@ -327,7 +327,6 @@ void esrip_device::device_reset()
 
 void esrip_device::device_stop()
 {
-
 }
 
 

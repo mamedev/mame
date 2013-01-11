@@ -2658,8 +2658,7 @@ WRITE8_HANDLER( snes_ppu_write )
 	{                                               \
 		debug_settings = 0;                       \
 		popmessage MSG2;                          \
-	}                                               \
-
+	}
 
 static UINT8 snes_dbg_video( running_machine &machine, UINT16 curline )
 {

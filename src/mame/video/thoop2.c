@@ -177,7 +177,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		for (y = 0; y < spr_size; y++){
 			for (x = 0; x < spr_size; x++){
-
 				ex = xflip ? (spr_size-1-x) : x;
 				ey = yflip ? (spr_size-1-y) : y;
 

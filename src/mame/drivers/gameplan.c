@@ -91,7 +91,6 @@ TODO:
 
 WRITE8_MEMBER(gameplan_state::io_select_w)
 {
-
 	switch (data)
 	{
 	case 0x01: m_current_port = 0; break;
@@ -137,7 +136,6 @@ static const via6522_interface via_1_interface =
 
 WRITE8_MEMBER(gameplan_state::audio_reset_w)
 {
-
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 
 	if (data == 0)
@@ -975,7 +973,6 @@ static const ay8910_interface ay8910_config =
 
 MACHINE_START_MEMBER(gameplan_state,gameplan)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_riot = machine().device("riot");

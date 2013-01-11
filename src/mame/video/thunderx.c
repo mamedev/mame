@@ -67,7 +67,6 @@ void thunderx_state::video_start()
 
 UINT32 thunderx_state::screen_update_scontra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	k052109_tilemap_update(m_k052109);
 
 	machine().priority_bitmap.fill(0, cliprect);

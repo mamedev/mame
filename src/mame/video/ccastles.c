@@ -209,7 +209,6 @@ WRITE8_MEMBER(ccastles_state::ccastles_videoram_w)
 
 READ8_MEMBER(ccastles_state::ccastles_bitmode_r)
 {
-
 	/* in bitmode, the address comes from the autoincrement latches */
 	UINT16 addr = (m_bitmode_addr[1] << 7) | (m_bitmode_addr[0] >> 1);
 
@@ -226,7 +225,6 @@ READ8_MEMBER(ccastles_state::ccastles_bitmode_r)
 
 WRITE8_MEMBER(ccastles_state::ccastles_bitmode_w)
 {
-
 	/* in bitmode, the address comes from the autoincrement latches */
 	UINT16 addr = (m_bitmode_addr[1] << 7) | (m_bitmode_addr[0] >> 1);
 
@@ -243,7 +241,6 @@ WRITE8_MEMBER(ccastles_state::ccastles_bitmode_w)
 
 WRITE8_MEMBER(ccastles_state::ccastles_bitmode_addr_w)
 {
-
 	/* write through to video RAM and also to the addressing latches */
 	ccastles_write_vram(machine(), offset, data, 0, 0);
 	m_bitmode_addr[offset] = data;

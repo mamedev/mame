@@ -22,7 +22,6 @@
 
 INTERRUPT_GEN_MEMBER(flkatck_state::flkatck_interrupt)
 {
-
 	if (m_irq_enabled)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
@@ -61,7 +60,6 @@ READ8_MEMBER(flkatck_state::flkatck_ls138_r)
 
 WRITE8_MEMBER(flkatck_state::flkatck_ls138_w)
 {
-
 	switch ((offset & 0x1c) >> 2)
 	{
 		case 0x04:  /* bankswitch */
@@ -207,7 +205,6 @@ void flkatck_state::machine_start()
 
 void flkatck_state::machine_reset()
 {
-
 	k007232_set_bank(machine().device("konami"), 0, 1);
 
 	m_irq_enabled = 0;

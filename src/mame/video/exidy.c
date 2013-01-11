@@ -33,7 +33,6 @@ void exidy_video_config(running_machine &machine, UINT8 _collision_mask, UINT8 _
 
 void exidy_state::video_start()
 {
-
 	machine().primary_screen->register_screen_bitmap(m_background_bitmap);
 	m_motion_object_1_vid.allocate(16, 16);
 	m_motion_object_2_vid.allocate(16, 16);

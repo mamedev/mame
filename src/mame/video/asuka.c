@@ -8,7 +8,6 @@
 
 WRITE16_MEMBER(asuka_state::asuka_spritectrl_w)
 {
-
 	/* Bits 2-5 are color bank; in asuka games bit 0 is global priority */
 	pc090oj_set_sprite_ctrl(m_pc090oj, ((data & 0x3c) >> 2) | ((data & 0x1) << 15));
 }

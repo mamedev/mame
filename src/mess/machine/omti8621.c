@@ -424,7 +424,6 @@ static void set_data_transfer(omti8621_state *state, UINT8 *data, UINT16 length)
 
 static void read_sectors_from_disk(omti8621_state *state, INT32 diskaddr,
 		UINT8 count, UINT8 lun) {
-
 	UINT8 *data_buffer = state->sector_buffer;
 	device_image_interface *image = state->disk[lun]->image;
 
@@ -445,7 +444,6 @@ static void read_sectors_from_disk(omti8621_state *state, INT32 diskaddr,
 
 static void write_sectors_to_disk(omti8621_state *state, INT32 diskaddr,
 		UINT8 count, UINT8 lun) {
-
 	UINT8 *data_buffer = state->sector_buffer;
 	device_image_interface *image = state->disk[lun]->image;
 
@@ -671,7 +669,6 @@ static void log_data(const omti8621_state *state) {
 
 static void do_command(omti8621_state *state,
 		const UINT8 cdb[], const UINT16 cdb_length) {
-
 	UINT8 lun = get_lun(cdb);
 	disk_data *disk = state->disk[lun];
 	int command_duration = 0; // ms

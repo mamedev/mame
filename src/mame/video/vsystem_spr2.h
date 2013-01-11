@@ -3,17 +3,13 @@
 typedef device_delegate<UINT32 (UINT32)> vsystem_tile2_indirection_delegate;
 
 #define MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( _class, _method) \
-	vsystem_spr2_device::set_tile_indirect_cb(*device, vsystem_tile2_indirection_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0)); \
-
+	vsystem_spr2_device::set_tile_indirect_cb(*device, vsystem_tile2_indirection_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
 #define MCFG_VSYSTEM_SPR2_SET_PRITYPE( _val) \
-	vsystem_spr2_device::set_pritype(*device, _val); \
-
+	vsystem_spr2_device::set_pritype(*device, _val);
 #define MCFG_VSYSTEM_SPR2_SET_GFXREGION( _rgn ) \
-	vsystem_spr2_device::set_gfx_region(*device, _rgn); \
-
+	vsystem_spr2_device::set_gfx_region(*device, _rgn);
 #define MCFG_VSYSTEM_SPR2_SET_OFFSETS( _xoffs, _yoffs ) \
-	vsystem_spr2_device::set_offsets(*device, _xoffs,_yoffs); \
-
+	vsystem_spr2_device::set_offsets(*device, _xoffs,_yoffs);
 
 class vsystem_spr2_device : public device_t
 {

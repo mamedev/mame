@@ -386,7 +386,6 @@ static UINT8 serial_connection_spin_bits(UINT8 input_status)
 
 void device_serial_interface::serial_connection_out()
 {
-
 	if (m_other_connection!=NULL)
 	{
 		UINT8 state_at_other_end = serial_connection_spin_bits(m_connection_state);

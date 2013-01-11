@@ -964,14 +964,12 @@ ROM_END
 
 DRIVER_INIT_MEMBER(intv_state,intv)
 {
-
 	m_x_scale = INTV_X_SCALE;
 	m_y_scale = INTV_Y_SCALE;
 }
 
 DRIVER_INIT_MEMBER(intv_state,intvkbd)
 {
-
 	m_x_scale = INTVKBD_X_SCALE;
 	m_y_scale = INTVKBD_Y_SCALE;
 }

@@ -1265,7 +1265,6 @@ void halleys_state::video_start()
 
 static void copy_scroll_op(bitmap_ind16 &bitmap, UINT16 *source, int sx, int sy)
 {
-
 //--------------------------------------------------------------------------
 
 #define OPCOPY_COMMON { \
@@ -1303,7 +1302,6 @@ static void copy_scroll_op(bitmap_ind16 &bitmap, UINT16 *source, int sx, int sy)
 
 static void copy_scroll_xp(bitmap_ind16 &bitmap, UINT16 *source, int sx, int sy)
 {
-
 //--------------------------------------------------------------------------
 
 #define XCOPY_COMMON \
@@ -1618,7 +1616,6 @@ WRITE8_MEMBER(halleys_state::sndnmi_msk_w)
 
 WRITE8_MEMBER(halleys_state::soundcommand_w)
 {
-
 	m_io_ram[0x8a] = data;
 	soundlatch_byte_w(space,offset,data);
 	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

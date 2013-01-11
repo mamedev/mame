@@ -421,7 +421,6 @@ static void reset_sound_region(running_machine &machine)
 
 WRITE8_MEMBER(taitox_state::sound_bankswitch_w)
 {
-
 	m_banknum = (data - 1) & 3;
 	reset_sound_region(machine());
 }
@@ -805,7 +804,6 @@ static const ym2610_interface ym2610_config =
 
 MACHINE_START_MEMBER(taitox_state,taitox)
 {
-
 	m_banknum = -1;
 	save_item(NAME(m_banknum));
 	machine().save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine()));

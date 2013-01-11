@@ -12,7 +12,6 @@
 //
 namespace DSP56K
 {
-
 class Instruction;
 class ParallelMove;
 

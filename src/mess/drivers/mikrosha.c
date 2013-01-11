@@ -153,7 +153,6 @@ static const cassette_interface mikrosha_cassette_interface =
 
 WRITE_LINE_MEMBER(mikrosha_state::mikrosha_pit_out2)
 {
-
 }
 
 static const struct pit8253_config mikrosha_pit8253_intf =

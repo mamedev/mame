@@ -35,7 +35,6 @@ Updates:
 
 WRITE8_MEMBER(kncljoe_state::sound_cmd_w)
 {
-
 	if ((data & 0x80) == 0)
 		soundlatch_byte_w(space, 0, data & 0x7f);
 	else
@@ -264,7 +263,6 @@ INTERRUPT_GEN_MEMBER(kncljoe_state::sound_nmi)
 
 void kncljoe_state::machine_start()
 {
-
 	m_soundcpu = machine().device<cpu_device>("soundcpu");
 
 	save_item(NAME(m_port1));
@@ -276,7 +274,6 @@ void kncljoe_state::machine_start()
 
 void kncljoe_state::machine_reset()
 {
-
 	m_port1 = 0;
 	m_port2 = 0;
 	m_tile_bank = 0;

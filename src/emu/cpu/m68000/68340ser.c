@@ -35,5 +35,4 @@ WRITE32_HANDLER( m68340_internal_serial_w )
 
 void m68340_serial::reset(void)
 {
-
 }

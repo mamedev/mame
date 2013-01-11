@@ -40,7 +40,6 @@ cassette_image_device::cassette_image_device(const machine_config &mconfig, cons
 	: device_t(mconfig, CASSETTE, "Cassette", tag, owner, clock),
 		device_image_interface(mconfig, *this)
 {
-
 }
 
 //-------------------------------------------------
@@ -340,7 +339,6 @@ error:
 
 void cassette_image_device::call_unload()
 {
-
 	/* if we are recording, write the value to the image */
 	if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD)
 		update();

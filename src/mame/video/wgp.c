@@ -129,7 +129,6 @@ READ16_MEMBER(wgp_state::wgp_pivram_word_r)
 
 WRITE16_MEMBER(wgp_state::wgp_pivram_word_w)
 {
-
 	COMBINE_DATA(&m_pivram[offset]);
 
 	if (offset < 0x3000)

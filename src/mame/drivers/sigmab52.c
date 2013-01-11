@@ -163,7 +163,6 @@ public:
 
 void sigmab52_state::video_start()
 {
-
 }
 
 
@@ -191,7 +190,6 @@ UINT32 sigmab52_state::screen_update_jwildb52(screen_device &screen, bitmap_ind1
 	{
 		for (x = 0; x < (hd63484_regs_r(hd63484, space, 0xca/2, 0xffff) & 0x0fff) * 4; x += 4)
 		{
-
 			src = hd63484_ram_r(hd63484, space, b & (HD63484_RAM_SIZE - 1), 0xffff);
 
 			bitmap.pix16(y, x    ) = ((src & 0x000f) >>  0) << 0;
@@ -238,7 +236,6 @@ if (!machine().input().code_pressed(KEYCODE_O))
 
 void sigmab52_state::palette_init()
 {
-
 }
 
 

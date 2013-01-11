@@ -327,7 +327,6 @@ READ8_MEMBER(pcxt_state::port_c_r)
 /* The Korean Tetris uses it as a regular buzzer,probably the sound is all in there...*/
 WRITE8_MEMBER(pcxt_state::port_b_w)
 {
-
 	/* PPI controller port B*/
 	pit8253_gate2_w(m_pit8253, BIT(data, 0));
 	pcxt_speaker_set_spkrdata( machine(), data & 0x02 );
@@ -412,7 +411,6 @@ WRITE8_MEMBER(pcxt_state::fdc765_data_w)
 
 WRITE8_MEMBER(pcxt_state::drive_selection_w)
 {
-
 	/* TODO: properly hook-up upd765 FDC there */
 	pic8259_ir6_w(machine().device("pic8259_1"), 1);
 }
@@ -588,7 +586,6 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(pcxt_state::tetriskr_bg_bank_w)
 {
-
 	m_bg_bank = (data & 0x0f) ^ 8;
 }
 

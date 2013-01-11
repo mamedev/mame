@@ -33,7 +33,6 @@ Notes:
 
 INTERRUPT_GEN_MEMBER(mainevt_state::mainevt_interrupt)
 {
-
 	if (k052109_is_irq_enabled(m_k052109))
 		irq0_line_hold(device);
 }
@@ -45,7 +44,6 @@ WRITE8_MEMBER(mainevt_state::dv_nmienable_w)
 
 INTERRUPT_GEN_MEMBER(mainevt_state::dv_interrupt)
 {
-
 	if (m_nmi_enable)
 		nmi_line_pulse(device);
 }
@@ -53,7 +51,6 @@ INTERRUPT_GEN_MEMBER(mainevt_state::dv_interrupt)
 
 WRITE8_MEMBER(mainevt_state::mainevt_bankswitch_w)
 {
-
 	/* bit 0-1 ROM bank select */
 	membank("bank1")->set_entry(data & 0x03);
 
@@ -91,7 +88,6 @@ READ8_MEMBER(mainevt_state::mainevt_sh_busy_r)
 
 WRITE8_MEMBER(mainevt_state::mainevt_sh_irqcontrol_w)
 {
-
 	upd7759_reset_w(m_upd, data & 2);
 	upd7759_start_w(m_upd, data & 1);
 
@@ -100,7 +96,6 @@ WRITE8_MEMBER(mainevt_state::mainevt_sh_irqcontrol_w)
 
 WRITE8_MEMBER(mainevt_state::devstor_sh_irqcontrol_w)
 {
-
 	m_sound_irq_mask = data & 4;
 }
 
@@ -134,7 +129,6 @@ WRITE8_MEMBER(mainevt_state::dv_sh_bankswitch_w)
 
 READ8_MEMBER(mainevt_state::k052109_051960_r)
 {
-
 	if (k052109_get_rmrd_line(m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
@@ -150,7 +144,6 @@ READ8_MEMBER(mainevt_state::k052109_051960_r)
 
 WRITE8_MEMBER(mainevt_state::k052109_051960_w)
 {
-
 	if (offset >= 0x3800 && offset < 0x3808)
 		k051937_w(m_k051960, space, offset - 0x3800, data);
 	else if (offset < 0x3c00)
@@ -427,20 +420,17 @@ void mainevt_state::machine_start()
 
 void mainevt_state::machine_reset()
 {
-
 	m_nmi_enable = 0;
 }
 
 INTERRUPT_GEN_MEMBER(mainevt_state::mainevt_sound_timer_irq)
 {
-
 	if(m_sound_irq_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(mainevt_state::devstors_sound_timer_irq)
 {
-
 	if(m_sound_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }

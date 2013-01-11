@@ -154,7 +154,6 @@ INLINE void schedule_next_irq( running_machine &machine, int curscanline )
 
 TIMER_CALLBACK_MEMBER(ccastles_state::clock_irq)
 {
-
 	/* assert the IRQ if not already asserted */
 	if (!m_irq_state)
 	{

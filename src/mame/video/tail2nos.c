@@ -55,7 +55,6 @@ static void tail2nos_postload(running_machine &machine)
 
 void tail2nos_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tail2nos_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_bg_tilemap->set_transparent_pen(15);
@@ -76,7 +75,6 @@ void tail2nos_state::video_start()
 
 WRITE16_MEMBER(tail2nos_state::tail2nos_bgvideoram_w)
 {
-
 	COMBINE_DATA(&m_bgvideoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -97,7 +95,6 @@ WRITE16_MEMBER(tail2nos_state::tail2nos_zoomdata_w)
 
 WRITE16_MEMBER(tail2nos_state::tail2nos_gfxbank_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		int bank;
@@ -173,7 +170,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 tail2nos_state::screen_update_tail2nos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (m_video_enable)
 	{
 		k051316_zoom_draw(m_k051316, bitmap, cliprect, 0, 0);

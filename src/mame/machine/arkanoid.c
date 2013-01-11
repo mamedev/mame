@@ -17,7 +17,6 @@
 
 READ8_MEMBER(arkanoid_state::arkanoid_Z80_mcu_r)
 {
-
 	/* return the last value the 68705 wrote, and mark that we've read it */
 	m_m68705write = 0;
 	return m_toz80;
@@ -25,7 +24,6 @@ READ8_MEMBER(arkanoid_state::arkanoid_Z80_mcu_r)
 
 TIMER_CALLBACK_MEMBER(arkanoid_state::test)
 {
-
 	m_z80write = 1;
 	m_fromz80 = param;
 }
@@ -39,19 +37,16 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_Z80_mcu_w)
 
 READ8_MEMBER(arkanoid_state::arkanoid_68705_port_a_r)
 {
-
 	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
 WRITE8_MEMBER(arkanoid_state::arkanoid_68705_port_a_w)
 {
-
 	m_port_a_out = data;
 }
 
 WRITE8_MEMBER(arkanoid_state::arkanoid_68705_ddr_a_w)
 {
-
 	m_ddr_a = data;
 }
 
@@ -73,7 +68,6 @@ READ8_MEMBER(arkanoid_state::arkanoid_68705_port_c_r)
 
 WRITE8_MEMBER(arkanoid_state::arkanoid_68705_port_c_w)
 {
-
 	if ((m_ddr_c & 0x04) && (~data & 0x04) && (m_port_c_out & 0x04))
 	{
 		/* return the last value the Z80 wrote */
@@ -92,7 +86,6 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_68705_port_c_w)
 
 WRITE8_MEMBER(arkanoid_state::arkanoid_68705_ddr_c_w)
 {
-
 	m_ddr_c = data;
 }
 

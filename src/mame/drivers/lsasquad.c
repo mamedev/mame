@@ -546,7 +546,6 @@ static void irqhandler(device_t *device, int irq)
 
 WRITE8_MEMBER(lsasquad_state::unk)
 {
-
 }
 
 
@@ -594,7 +593,6 @@ MACHINE_START_MEMBER(lsasquad_state,lsasquad)
 
 MACHINE_RESET_MEMBER(lsasquad_state,lsasquad)
 {
-
 	m_sound_pending = 0;
 	m_sound_nmi_enable = 0;
 	m_pending_nmi = 0;

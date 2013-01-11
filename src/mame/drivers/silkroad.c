@@ -311,7 +311,6 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 DRIVER_INIT_MEMBER(silkroad_state,silkroad)
 {
-
 	/* why? rom04.bin looks like a bad dump, but it seems not since it was
 	   verified as correct... problem with the original which the gfx hardware
 	   didn't care about? Ideally it should be checked against a different PCB */

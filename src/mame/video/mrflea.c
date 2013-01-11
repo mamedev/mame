@@ -29,7 +29,6 @@ WRITE8_MEMBER(mrflea_state::mrflea_videoram_w)
 
 WRITE8_MEMBER(mrflea_state::mrflea_spriteram_w)
 {
-
 	if (offset & 2)
 	{
 		/* tile_number */

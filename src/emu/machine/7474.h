@@ -61,11 +61,9 @@
 	MCFG_7474_COMP_OUTPUT_CB(_comp_output_cb)
 
 #define MCFG_7474_OUTPUT_CB(_devcb) \
-	devcb = &ttl7474_device::set_output_cb(*device, DEVCB2_##_devcb); \
-
+	devcb = &ttl7474_device::set_output_cb(*device, DEVCB2_##_devcb);
 #define MCFG_7474_COMP_OUTPUT_CB(_devcb) \
-	devcb = &ttl7474_device::set_comp_output_cb(*device, DEVCB2_##_devcb); \
-
+	devcb = &ttl7474_device::set_comp_output_cb(*device, DEVCB2_##_devcb);
 
 
 //**************************************************************************

@@ -211,7 +211,6 @@ extern FLAC_API const char * const FLAC__EntropyCodingMethodTypeString[];
 /** Contents of a Rice partitioned residual
  */
 typedef struct {
-
 	unsigned *parameters;
 	/**< The Rice parameters for each context. */
 
@@ -230,7 +229,6 @@ typedef struct {
 /** Header for a Rice partitioned residual.  (c.f. <A HREF="../format.html#partitioned_rice">format specification</A>)
  */
 typedef struct {
-
 	unsigned order;
 	/**< The partition order, i.e. # of contexts = 2 ^ \a order. */
 
@@ -486,7 +484,6 @@ typedef struct {
 
 /** An enumeration of the available metadata block types. */
 typedef enum {
-
 	FLAC__METADATA_TYPE_STREAMINFO = 0,
 	/**< <A HREF="../format.html#metadata_block_streaminfo">STREAMINFO</A> block */
 

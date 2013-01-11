@@ -532,7 +532,6 @@ static void gp9001_set_sprite_scrolly_and_flip_reg(gp9001spritelayer* layer, UIN
 
 static void gp9001_scroll_reg_data_w(gp9001vdp_device *vdp, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
-
 	/************************************************************************/
 	/***** layer X and Y flips can be set independently, so emulate it ******/
 	/************************************************************************/

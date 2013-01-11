@@ -31,7 +31,6 @@ READ8_MEMBER(peyper_state::sw_r)
 
 WRITE8_MEMBER(peyper_state::col_w)
 {
-
 	if (data==0x90) display_block = 0;
 }
 

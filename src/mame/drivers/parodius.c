@@ -27,7 +27,6 @@ INTERRUPT_GEN_MEMBER(parodius_state::parodius_interrupt)
 
 READ8_MEMBER(parodius_state::bankedram_r)
 {
-
 	if (m_videobank & 0x01)
 	{
 		if (m_videobank & 0x04)
@@ -41,7 +40,6 @@ READ8_MEMBER(parodius_state::bankedram_r)
 
 WRITE8_MEMBER(parodius_state::bankedram_w)
 {
-
 	if (m_videobank & 0x01)
 	{
 		if (m_videobank & 0x04)
@@ -55,7 +53,6 @@ WRITE8_MEMBER(parodius_state::bankedram_w)
 
 READ8_MEMBER(parodius_state::parodius_052109_053245_r)
 {
-
 	if (m_videobank & 0x02)
 		return k053245_r(m_k053245, space, offset);
 	else
@@ -64,7 +61,6 @@ READ8_MEMBER(parodius_state::parodius_052109_053245_r)
 
 WRITE8_MEMBER(parodius_state::parodius_052109_053245_w)
 {
-
 	if (m_videobank & 0x02)
 		k053245_w(m_k053245, space, offset, data);
 	else
@@ -73,7 +69,6 @@ WRITE8_MEMBER(parodius_state::parodius_052109_053245_w)
 
 WRITE8_MEMBER(parodius_state::parodius_videobank_w)
 {
-
 	if (m_videobank & 0xf8)
 		logerror("%04x: videobank = %02x\n",space.device().safe_pc(),data);
 
@@ -85,7 +80,6 @@ WRITE8_MEMBER(parodius_state::parodius_videobank_w)
 
 WRITE8_MEMBER(parodius_state::parodius_3fc0_w)
 {
-
 	if ((data & 0xf4) != 0x10)
 		logerror("%04x: 3fc0 = %02x\n",space.device().safe_pc(),data);
 
@@ -128,7 +122,6 @@ TIMER_CALLBACK_MEMBER(parodius_state::nmi_callback)
 
 WRITE8_MEMBER(parodius_state::sound_arm_nmi_w)
 {
-
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(parodius_state::nmi_callback),this));  /* kludge until the K053260 is emulated correctly */
 }

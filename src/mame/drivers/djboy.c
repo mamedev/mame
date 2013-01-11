@@ -149,7 +149,6 @@ Notes:
 
 WRITE8_MEMBER(djboy_state::beast_data_w)
 {
-
 	m_data_to_beast = data;
 	m_z80_to_beast_full = 1;
 	m_beast_int0_l = 0;
@@ -158,7 +157,6 @@ WRITE8_MEMBER(djboy_state::beast_data_w)
 
 READ8_MEMBER(djboy_state::beast_data_r)
 {
-
 	m_beast_to_z80_full = 0;
 	return m_data_to_z80;
 }
@@ -177,7 +175,6 @@ WRITE8_MEMBER(djboy_state::trigger_nmi_on_cpu0)
 
 WRITE8_MEMBER(djboy_state::cpu0_bankswitch_w)
 {
-
 	data ^= m_bankxor;
 	membank("bank1")->set_entry(data);
 	membank("bank4")->set_entry(0); /* unsure if/how this area is banked */
@@ -308,7 +305,6 @@ READ8_MEMBER(djboy_state::beast_p0_r)
 
 WRITE8_MEMBER(djboy_state::beast_p0_w)
 {
-
 	if (!BIT(m_beast_p0, 1) && BIT(data, 1))
 	{
 		m_beast_to_z80_full = 1;
@@ -323,7 +319,6 @@ WRITE8_MEMBER(djboy_state::beast_p0_w)
 
 READ8_MEMBER(djboy_state::beast_p1_r)
 {
-
 	if (BIT(m_beast_p0, 0) == 0)
 		return m_data_to_beast;
 	else
@@ -332,7 +327,6 @@ READ8_MEMBER(djboy_state::beast_p1_r)
 
 WRITE8_MEMBER(djboy_state::beast_p1_w)
 {
-
 	if (data == 0xff)
 	{
 		m_beast_int0_l = 1;
@@ -344,7 +338,6 @@ WRITE8_MEMBER(djboy_state::beast_p1_w)
 
 READ8_MEMBER(djboy_state::beast_p2_r)
 {
-
 	switch ((m_beast_p0 >> 2) & 3)
 	{
 		case 0: return ioport("IN1")->read();
@@ -361,7 +354,6 @@ WRITE8_MEMBER(djboy_state::beast_p2_w)
 
 READ8_MEMBER(djboy_state::beast_p3_r)
 {
-
 	UINT8 dsw = 0;
 	UINT8 dsw1 = ~ioport("DSW1")->read();
 	UINT8 dsw2 = ~ioport("DSW2")->read();
@@ -378,7 +370,6 @@ READ8_MEMBER(djboy_state::beast_p3_r)
 
 WRITE8_MEMBER(djboy_state::beast_p3_w)
 {
-
 	m_beast_p3 = data;
 	m_cpu1->execute().set_input_line(INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -557,7 +548,6 @@ void djboy_state::machine_start()
 
 void djboy_state::machine_reset()
 {
-
 	m_videoreg = 0;
 	m_scrollx = 0;
 	m_scrolly = 0;

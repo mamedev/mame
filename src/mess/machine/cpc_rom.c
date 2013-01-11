@@ -84,7 +84,6 @@ rom_image_device::rom_image_device(const machine_config &mconfig, const char *ta
 	: device_t(mconfig, ROMSLOT, "ROM image", tag, owner, clock),
 		device_image_interface(mconfig, *this)
 {
-
 }
 
 //-------------------------------------------------

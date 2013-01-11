@@ -32,8 +32,7 @@ const int num_commands=0x20;
 	devcb = &psxcd_device::set_irq_handler(*device, DEVCB2_##_devcb);
 
 #define MCFG_PSXCD_DEVNAME(_name) \
-	psxcd_device::static_set_devname(*device, _name); \
-
+	psxcd_device::static_set_devname(*device, _name);
 struct psxcd_interface
 {
 };

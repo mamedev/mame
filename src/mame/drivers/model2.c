@@ -579,7 +579,6 @@ WRITE32_MEMBER(model2_state::srallyc_devices_w)
 
 READ32_MEMBER(model2_state::copro_prg_r)
 {
-
 	return 0xffffffff;
 }
 
@@ -2253,8 +2252,7 @@ OPR-14747    /  Linked to 315-5679B
 	ROM_LOAD("opr-14744.58",   0x040000,  0x20000, CRC(730ea9e0) SHA1(651f1db4089a400d073b19ada299b4b08b08f372) ) \
 	ROM_LOAD("opr-14745.59",   0x060000,  0x20000, CRC(4c934d96) SHA1(e3349ece0e47f684d61ad11bfea4a90602287350) ) \
 	ROM_LOAD("opr-14746.62",   0x080000,  0x20000, CRC(2a266cbd) SHA1(34e047a93459406c22acf4c25089d1a4955f94ca) ) \
-	ROM_LOAD("opr-14747.63",   0x0a0000,  0x20000, CRC(a4ad5e19) SHA1(7d7ec300eeb9a8de1590011e37108688c092f329) ) \
-
+	ROM_LOAD("opr-14747.63",   0x0a0000,  0x20000, CRC(a4ad5e19) SHA1(7d7ec300eeb9a8de1590011e37108688c092f329) )
 /*
 These are smt ROMs found on Sega Model 2A Video board
 They are linked to a QFP208 IC labelled 315-5645
@@ -2264,8 +2262,7 @@ They are linked to a QFP208 IC labelled 315-5645
 	ROM_REGION( 0x180000, "user6", 0 ) \
 	ROM_LOAD("mpr-16310.15",   0x000000,  0x80000, CRC(c078a780) SHA1(0ad5b49774172743e2708b7ca4c061acfe10957a) ) \
 	ROM_LOAD("mpr-16311.16",   0x080000,  0x80000, CRC(452a492b) SHA1(88c2f6c2dbfd0c1b39a7bf15c74455fb68c7274e) ) \
-	ROM_LOAD("mpr-16312.14",   0x100000,  0x80000, CRC(a25fef5b) SHA1(c6a37856b97f5bc4996cb6b66209f47af392cc38) ) \
-
+	ROM_LOAD("mpr-16312.14",   0x100000,  0x80000, CRC(a25fef5b) SHA1(c6a37856b97f5bc4996cb6b66209f47af392cc38) )
 
 /* Is there an undumped Zero Gunner with program roms EPR-20292 & EPR-20293? Numbering would suggest so, Japan Model2C or Model2A US? */
 ROM_START( zeroguna ) /* Zero Gunner (Export), Model 2A */

@@ -98,7 +98,6 @@ WRITE8_MEMBER(rockrage_state::rockrage_vreg_w)
 
 UINT32 rockrage_state::screen_update_rockrage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	set_pens(machine());
 
 	k007342_tilemap_update(m_k007342);

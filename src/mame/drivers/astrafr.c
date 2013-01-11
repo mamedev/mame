@@ -266,7 +266,6 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(astrafr_state,astra_common)
 {
-
 	m_cpuregion = (UINT32*)memregion( "maincpu" )->base();
 	m_cpuregion_size = memregion( "maincpu" )->bytes()/4;
 	m_mainram = (UINT32*)auto_alloc_array_clear(machine(), UINT32, 0x10000);

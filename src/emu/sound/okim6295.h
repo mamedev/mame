@@ -40,8 +40,7 @@ enum
 	MCFG_OKIM6295_PIN7(_pin7)
 
 #define MCFG_OKIM6295_PIN7(_pin7) \
-	okim6295_device::static_set_pin7(*device, _pin7); \
-
+	okim6295_device::static_set_pin7(*device, _pin7);
 
 
 //**************************************************************************

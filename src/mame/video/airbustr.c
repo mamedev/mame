@@ -109,7 +109,6 @@ TILE_GET_INFO_MEMBER(airbustr_state::get_bg_tile_info)
 
 void airbustr_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(airbustr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(airbustr_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
@@ -127,7 +126,6 @@ void airbustr_state::video_start()
 
 UINT32 airbustr_state::screen_update_airbustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
@@ -142,7 +140,6 @@ void airbustr_state::screen_eof_airbustr(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-
 		// update the sprite bitmap
 		pandora_eof(m_pandora);
 	}

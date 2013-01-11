@@ -45,7 +45,6 @@ microdrive_image_device::microdrive_image_device(const machine_config &mconfig, 
 	: device_t(mconfig, MICRODRIVE, "Microdrive", tag, owner, clock),
 		device_image_interface(mconfig, *this)
 {
-
 }
 
 //-------------------------------------------------

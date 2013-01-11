@@ -405,7 +405,6 @@ READ32_MEMBER(coolridr_state::sysh1_unk_r)
 	{
 		case 0x08/4:
 		{
-
 			m_vblank^=1;
 
 			return (m_h1_unk[offset] & 0xfdffffff) | (m_vblank<<25);
@@ -441,7 +440,6 @@ WRITE32_MEMBER(coolridr_state::sysh1_ioga_w)
 /* This is a RLE-based sprite blitter (US Patent #6,141,122), very unusual from Sega... */
 WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 {
-
 	COMBINE_DATA(&m_sysh1_txt_blit[offset]);
 
 	switch(offset)

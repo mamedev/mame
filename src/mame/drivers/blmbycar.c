@@ -60,14 +60,12 @@ WRITE16_MEMBER(blmbycar_state::blmbycar_okibank_w)
 
 WRITE16_MEMBER(blmbycar_state::blmbycar_pot_wheel_reset_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 		m_pot_wheel = ~ioport("WHEEL")->read() & 0xff;
 }
 
 WRITE16_MEMBER(blmbycar_state::blmbycar_pot_wheel_shift_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		if ( ((m_old_val & 0xff) == 0xff) && ((data & 0xff) == 0) )
@@ -127,7 +125,6 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(blmbycar_state::waterball_unk_r)
 {
-
 	m_retvalue ^= 0x0008; // must toggle.. but not vblank?
 	return m_retvalue;
 }
@@ -337,14 +334,12 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(blmbycar_state,blmbycar)
 {
-
 	save_item(NAME(m_pot_wheel));
 	save_item(NAME(m_old_val));
 }
 
 MACHINE_RESET_MEMBER(blmbycar_state,blmbycar)
 {
-
 	m_pot_wheel = 0;
 	m_old_val = 0;
 }
@@ -383,13 +378,11 @@ MACHINE_CONFIG_END
 
 MACHINE_START_MEMBER(blmbycar_state,watrball)
 {
-
 	save_item(NAME(m_retvalue));
 }
 
 MACHINE_RESET_MEMBER(blmbycar_state,watrball)
 {
-
 	m_retvalue = 0;
 }
 

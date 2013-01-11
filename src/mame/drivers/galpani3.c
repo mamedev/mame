@@ -433,7 +433,6 @@ INPUT_PORTS_END
 
 WRITE16_MEMBER(galpani3_state::galpani3_suprnova_sprite32_w)
 {
-
 	COMBINE_DATA(&m_spriteram[offset]);
 	offset>>=1;
 	m_spriteram32[offset]=(m_spriteram[offset*2+1]<<16) | (m_spriteram[offset*2]);
@@ -441,7 +440,6 @@ WRITE16_MEMBER(galpani3_state::galpani3_suprnova_sprite32_w)
 
 WRITE16_MEMBER(galpani3_state::galpani3_suprnova_sprite32regs_w)
 {
-
 	COMBINE_DATA(&m_sprregs[offset]);
 	offset>>=1;
 	m_spc_regs[offset]=(m_sprregs[offset*2+1]<<16) | (m_sprregs[offset*2]);
@@ -449,7 +447,6 @@ WRITE16_MEMBER(galpani3_state::galpani3_suprnova_sprite32regs_w)
 
 WRITE16_MEMBER(galpani3_state::galpani3_priority_buffer_scrollx_w)
 {
-
 	m_priority_buffer_scrollx = data;
 }
 

@@ -183,7 +183,6 @@ READ8_MEMBER(atarifb_state::atarifb_in0_r)
 
 READ8_MEMBER(atarifb_state::atarifb_in2_r)
 {
-
 	if ((m_CTRLD & 0x20) == 0x00)
 	{
 		return ioport("IN1")->read();
@@ -213,7 +212,6 @@ READ8_MEMBER(atarifb_state::atarifb_in2_r)
 
 READ8_MEMBER(atarifb_state::atarifb4_in0_r)
 {
-
 	/* LD1 and LD2 low, return sign bits */
 	if ((m_CTRLD & 0x60) == 0x00)
 	{
@@ -280,7 +278,6 @@ READ8_MEMBER(atarifb_state::atarifb4_in0_r)
 
 READ8_MEMBER(atarifb_state::atarifb4_in2_r)
 {
-
 	if ((m_CTRLD & 0x40) == 0x00)
 	{
 		return ioport("IN1")->read();

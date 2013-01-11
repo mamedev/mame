@@ -53,7 +53,6 @@ TILE_GET_INFO_MEMBER(othldrby_state::get_tile_info2)
 
 void othldrby_state::video_start()
 {
-
 	m_bg_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(othldrby_state::get_tile_info0),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_bg_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(othldrby_state::get_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_bg_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(othldrby_state::get_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -85,7 +84,6 @@ WRITE16_MEMBER(othldrby_state::othldrby_videoram_addr_w)
 
 READ16_MEMBER(othldrby_state::othldrby_videoram_r)
 {
-
 	if (m_vram_addr < VIDEORAM_SIZE)
 		return m_vram[m_vram_addr++];
 	else
@@ -97,7 +95,6 @@ READ16_MEMBER(othldrby_state::othldrby_videoram_r)
 
 WRITE16_MEMBER(othldrby_state::othldrby_videoram_w)
 {
-
 	if (m_vram_addr < VIDEORAM_SIZE)
 	{
 		if (m_vram_addr < SPRITERAM_START)
@@ -115,7 +112,6 @@ WRITE16_MEMBER(othldrby_state::othldrby_vreg_addr_w)
 
 WRITE16_MEMBER(othldrby_state::othldrby_vreg_w)
 {
-
 	if (m_vreg_addr < OTHLDRBY_VREG_SIZE)
 		m_vreg[m_vreg_addr++] = data;
 	else
@@ -222,7 +218,6 @@ void othldrby_state::screen_eof_othldrby(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-
 		/* sprites need to be delayed two frames */
 		memcpy(m_buf_spriteram, m_buf_spriteram2, SPRITERAM_SIZE * sizeof(m_buf_spriteram[0]));
 		memcpy(m_buf_spriteram2, &m_vram[SPRITERAM_START], SPRITERAM_SIZE * sizeof(m_buf_spriteram[0]));

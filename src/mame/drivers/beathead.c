@@ -505,7 +505,6 @@ READ32_MEMBER( beathead_state::movie_speedup_r )
 
 DRIVER_INIT_MEMBER(beathead_state,beathead)
 {
-
 	/* initialize the common systems */
 	atarijsa_init(machine(), "IN2", 0x0040);
 

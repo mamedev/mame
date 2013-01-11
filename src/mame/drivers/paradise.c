@@ -125,8 +125,7 @@ WRITE8_MEMBER(paradise_state::torus_coin_counter_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")    /* ROM (banked) */ \
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paradise_vram_2_w) AM_SHARE("vram_2") /* Background */ \
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paradise_vram_1_w) AM_SHARE("vram_1") /* Midground */ \
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(paradise_vram_0_w) AM_SHARE("vram_0") /* Foreground */ \
-
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(paradise_vram_0_w) AM_SHARE("vram_0") /* Foreground */
 
 static ADDRESS_MAP_START( paradise_map, AS_PROGRAM, 8, paradise_state )
 	STANDARD_MAP
@@ -684,7 +683,6 @@ void paradise_state::machine_start()
 
 void paradise_state::machine_reset()
 {
-
 	m_palbank = 0;
 	m_priority = 0;
 
@@ -694,7 +692,6 @@ void paradise_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(paradise_state::paradise_irq)
 {
-
 	if (irq_count<300)
 		irq_count++;
 	else

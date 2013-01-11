@@ -462,7 +462,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(_4roses_state,4roses)
 {
-
 }
 
 

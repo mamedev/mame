@@ -147,7 +147,6 @@ INLINE void bg_changecolor_RRRRGGGGBBBBxxxx( running_machine &machine, pen_t col
 
 WRITE8_MEMBER(missb2_state::bg_paletteram_RRRRGGGGBBBBxxxx_be_w)
 {
-
 	m_bg_paletteram[offset] = data;
 	bg_changecolor_RRRRGGGGBBBBxxxx(machine(), offset / 2, m_bg_paletteram[offset | 1] | (m_bg_paletteram[offset & ~1] << 8));
 }
@@ -438,7 +437,6 @@ INTERRUPT_GEN_MEMBER(missb2_state::missb2_interrupt)
 
 MACHINE_START_MEMBER(missb2_state,missb2)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_slave = machine().device("slave");
@@ -452,7 +450,6 @@ MACHINE_START_MEMBER(missb2_state,missb2)
 
 MACHINE_RESET_MEMBER(missb2_state,missb2)
 {
-
 	m_sound_nmi_enable = 0;
 	m_pending_nmi = 0;
 	m_sound_status = 0;
@@ -588,7 +585,6 @@ static void configure_banks( running_machine& machine )
 
 DRIVER_INIT_MEMBER(missb2_state,missb2)
 {
-
 	configure_banks(machine());
 	m_video_enable = 0;
 }

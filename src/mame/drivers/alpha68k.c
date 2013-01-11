@@ -873,8 +873,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x03, "A 1C/5C B 5C/1C" )   \
 	PORT_DIPSETTING(    0x02, "A 1C/6C B 6C/1C" )   \
 	PORT_DIPSETTING(    0x01, "A 2C/3C B 7C/1C" )   \
-	PORT_DIPSETTING(    0x00, "A 3C/2C B 8C/1C" )   \
-
+	PORT_DIPSETTING(    0x00, "A 3C/2C B 8C/1C" )
 #define ALPHA68K_COINAGE_BITS_1TO3 \
 	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:4,5,6") \
 	PORT_DIPSETTING(    0x0e, "A 1C/1C B 1C/1C" )   \
@@ -900,8 +899,7 @@ ADDRESS_MAP_END
 #define ALPHA68K_MCU \
 	PORT_START("IN2")  /* Coin input to microcontroller */\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )\
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )\
-
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 
 static INPUT_PORTS_START( sstingry )
 	PORT_START("IN0")
@@ -1865,7 +1863,6 @@ static const ym3812_interface ym3812_config =
 
 MACHINE_START_MEMBER(alpha68k_state,common)
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_trigstate));
@@ -1880,7 +1877,6 @@ MACHINE_START_MEMBER(alpha68k_state,common)
 
 MACHINE_RESET_MEMBER(alpha68k_state,common)
 {
-
 	m_trigstate = 0;
 	m_deposits1 = 0;
 	m_deposits2 = 0;
@@ -1905,7 +1901,6 @@ MACHINE_START_MEMBER(alpha68k_state,alpha68k_V)
 
 MACHINE_RESET_MEMBER(alpha68k_state,alpha68k_V)
 {
-
 	MACHINE_RESET_CALL_MEMBER(common);
 
 	m_bank_base = 0;
@@ -1914,7 +1909,6 @@ MACHINE_RESET_MEMBER(alpha68k_state,alpha68k_V)
 
 MACHINE_RESET_MEMBER(alpha68k_state,alpha68k_II)
 {
-
 	MACHINE_RESET_CALL_MEMBER(common);
 
 	m_bank_base = 0;
@@ -2119,7 +2113,6 @@ MACHINE_CONFIG_END
 
 INTERRUPT_GEN_MEMBER(alpha68k_state::alpha68k_sound_nmi)
 {
-
 	if(m_sound_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

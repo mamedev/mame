@@ -258,7 +258,6 @@ void magictg_state::machine_reset()
 
 void magictg_state::video_start()
 {
-
 }
 
 UINT32 magictg_state::screen_update_magictg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -281,7 +280,6 @@ static UINT32 pci_dev0_r(device_t *busdevice, device_t *device, int function, in
 
 static void pci_dev0_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
-
 }
 
 

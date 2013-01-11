@@ -518,7 +518,6 @@ static const ym2203_interface ym2203_config =
 
 MACHINE_START_MEMBER(ddragon_state,chinagat)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_sub_cpu = machine().device("sub");
 	m_snd_cpu = machine().device("audiocpu");
@@ -544,7 +543,6 @@ MACHINE_START_MEMBER(ddragon_state,chinagat)
 
 MACHINE_RESET_MEMBER(ddragon_state,chinagat)
 {
-
 	m_scrollx_hi = 0;
 	m_scrolly_hi = 0;
 	m_adpcm_sound_irq = 0;

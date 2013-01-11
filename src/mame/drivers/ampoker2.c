@@ -1402,7 +1402,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ampoker2_state,rabbitpk)
 {
-
 	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	int size = machine().root_device().memregion("maincpu")->bytes();
 	int start = 0;

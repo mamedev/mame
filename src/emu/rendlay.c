@@ -1065,7 +1065,6 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 		// only render the symbol / text if it's atually in view because the code is SLOW
 		if ((endpos >= bounds.min_y) && (basey <= bounds.max_y))
 		{
-
 			while (1)
 			{
 				width = font->string_width(ourheight/num_shown, aspect, m_stopnames[fruit]);
@@ -1102,7 +1101,6 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 								int effx = x;
 								if (effx >= bounds.min_x && effx <= bounds.max_x)
 								{
-
 									UINT32 spix = RGB_ALPHA(src[x]);
 									if (spix != 0)
 									{
@@ -1141,7 +1139,6 @@ void layout_element::component::draw_reel(running_machine &machine, bitmap_argb3
 								int effx = curx + x + chbounds.min_x;
 								if (effx >= bounds.min_x && effx <= bounds.max_x)
 								{
-
 									UINT32 spix = RGB_ALPHA(src[x]);
 									if (spix != 0)
 									{
@@ -1211,7 +1208,6 @@ void layout_element::component::load_bitmap()
 
 void layout_element::component::load_reel_bitmap(int number)
 {
-
 	// load the basic bitmap
 	assert(m_file != NULL);
 	/*m_hasalpha[number] = */ render_load_png(m_bitmap[number], *m_file[number], m_dirname, m_imagefile[number]);

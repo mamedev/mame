@@ -677,7 +677,6 @@ UINT32 nakajies_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 TIMER_DEVICE_CALLBACK_MEMBER(nakajies_state::kb_timer)
 {
-
 	if (m_matrix > 0x09)
 	{
 		// reset the keyboard scan

@@ -376,7 +376,6 @@ READ16_MEMBER(cps_state::qsound_sharedram1_r)
 
 WRITE16_MEMBER(cps_state::qsound_sharedram1_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 		m_qsound_sharedram1[offset] = data;
 }
@@ -388,7 +387,6 @@ READ16_MEMBER(cps_state::qsound_sharedram2_r)
 
 WRITE16_MEMBER(cps_state::qsound_sharedram2_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 		m_qsound_sharedram2[offset] = data;
 }
@@ -3132,7 +3130,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(cps_state,common)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }

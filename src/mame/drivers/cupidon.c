@@ -90,7 +90,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cupidon_state,cupidon)
 {
-
 }
 
 /* (c) date is from string in ROM, revision date is noted next to sets - Spellings are as found in ROM */

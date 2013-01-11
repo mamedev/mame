@@ -71,19 +71,15 @@ extern const device_type GOTTLIEB_SOUND_REV2;
 //**************************************************************************
 
 #define MCFG_GOTTLIEB_SOUND_R1_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, GOTTLIEB_SOUND_REV1, 0) \
-
+	MCFG_DEVICE_ADD(_tag, GOTTLIEB_SOUND_REV1, 0)
 #define MCFG_GOTTLIEB_SOUND_R1_ADD_VOTRAX(_tag) \
-	MCFG_DEVICE_ADD(_tag, GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0) \
-
+	MCFG_DEVICE_ADD(_tag, GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0)
 
 #define MCFG_GOTTLIEB_SOUND_R2_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, GOTTLIEB_SOUND_REV2, 0) \
-
+	MCFG_DEVICE_ADD(_tag, GOTTLIEB_SOUND_REV2, 0)
 #define MCFG_GOTTLIEB_SOUND_R2_ADD_COBRAM3(_tag) \
 	MCFG_DEVICE_ADD(_tag, GOTTLIEB_SOUND_REV2, 0) \
-	gottlieb_sound_r2_device::static_enable_cobram3_mods(*device); \
-
+	gottlieb_sound_r2_device::static_enable_cobram3_mods(*device);
 
 
 //**************************************************************************

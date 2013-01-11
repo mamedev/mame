@@ -68,7 +68,6 @@ huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, d
 		device_memory_interface(mconfig, *this),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 32, 32, 0, NULL, *ADDRESS_MAP_NAME(huc6272_vram))
 {
-
 }
 
 
@@ -88,7 +87,6 @@ void huc6272_device::device_validity_check(validity_checker &valid) const
 
 void huc6272_device::device_start()
 {
-
 }
 
 
@@ -168,7 +166,6 @@ WRITE32_MEMBER( huc6272_device::write )
 	{
 		switch(m_register)
 		{
-
 			case 0x09: // DMA addr
 				//printf("%08x DMA ADDR\n",data);
 				break;

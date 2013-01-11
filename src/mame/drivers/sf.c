@@ -41,7 +41,6 @@ WRITE16_MEMBER(sf_state::sf_coin_w)
 
 WRITE16_MEMBER(sf_state::soundcmd_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, offset, data & 0xff);
@@ -804,7 +803,6 @@ static const msm5205_interface msm5205_config =
 
 void sf_state::machine_start()
 {
-
 	/* devices */
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
@@ -816,7 +814,6 @@ void sf_state::machine_start()
 
 void sf_state::machine_reset()
 {
-
 	m_sf_active = 0;
 	m_bgscroll = 0;
 	m_fgscroll = 0;

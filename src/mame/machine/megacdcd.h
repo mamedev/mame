@@ -76,23 +76,17 @@ typedef device_delegate<void (void)> interrupt_delegate;
 #define SECTOR_SIZE (2352)
 
 #define SET_CDD_DATA_MODE \
-	CDD_CONTROL |= 0x0100; \
-
+	CDD_CONTROL |= 0x0100;
 #define SET_CDD_AUDIO_MODE \
-	CDD_CONTROL &= ~0x0100; \
-
+	CDD_CONTROL &= ~0x0100;
 #define STOP_CDC_READ \
-	SCD_STATUS_CDC &= ~0x01; \
-
+	SCD_STATUS_CDC &= ~0x01;
 #define SET_CDC_READ \
-	SCD_STATUS_CDC |= 0x01; \
-
+	SCD_STATUS_CDC |= 0x01;
 #define SET_CDC_DMA \
-	SCD_STATUS_CDC |= 0x08; \
-
+	SCD_STATUS_CDC |= 0x08;
 #define STOP_CDC_DMA \
-	SCD_STATUS_CDC &= ~0x08; \
-
+	SCD_STATUS_CDC &= ~0x08;
 #define SCD_READ_ENABLED \
 	(SCD_STATUS_CDC & 1)
 
@@ -100,31 +94,26 @@ typedef device_delegate<void (void)> interrupt_delegate;
 	(SCD_STATUS_CDC & 0x08)
 
 #define CLEAR_CDD_RESULT \
-	CDD_MIN = CDD_SEC = CDD_FRAME = CDD_EXT = 0; \
-
+	CDD_MIN = CDD_SEC = CDD_FRAME = CDD_EXT = 0;
 #define CHECK_SCD_LV5_INTERRUPT \
 	if (segacd_irq_mask & 0x20) \
 	{ \
 		machine.device(":segacd:segacd_68k")->execute().set_input_line(5, HOLD_LINE); \
-	} \
-
+	}
 #define CHECK_SCD_LV4_INTERRUPT \
 	if (segacd_irq_mask & 0x10) \
 	{ \
 		machine.device(":segacd:segacd_68k")->execute().set_input_line(4, HOLD_LINE); \
-	} \
-
+	}
 #define CHECK_SCD_LV4_INTERRUPT_A \
 	if (segacd_irq_mask & 0x10) \
 	{ \
 		machine().device(":segacd:segacd_68k")->execute().set_input_line(4, HOLD_LINE); \
-	} \
-
+	}
 
 
 #define CURRENT_TRACK_IS_DATA \
-	(segacd.toc->tracks[SCD_CURTRK - 1].trktype != CD_TRACK_AUDIO) \
-
+	(segacd.toc->tracks[SCD_CURTRK - 1].trktype != CD_TRACK_AUDIO)
 
 #define CDD_PLAYINGCDDA 0x0100
 #define CDD_READY       0x0400
@@ -132,20 +121,15 @@ typedef device_delegate<void (void)> interrupt_delegate;
 
 
 #define MCFG_SEGACD_HACK_SET_CDC_DO_DMA( _class, _method) \
-	lc89510_temp_device::set_CDC_Do_DMA(*device, segacd_dma_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0)); \
-
+	lc89510_temp_device::set_CDC_Do_DMA(*device, segacd_dma_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
 #define MCFG_SEGACD_HACK_SET_NEOCD \
-	lc89510_temp_device::set_is_neoCD(*device, true); \
-
+	lc89510_temp_device::set_is_neoCD(*device, true);
 #define MCFG_SET_TYPE1_INTERRUPT_CALLBACK( _class, _method) \
-	lc89510_temp_device::set_type1_interrupt_callback(*device, interrupt_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0)); \
-
+	lc89510_temp_device::set_type1_interrupt_callback(*device, interrupt_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
 #define MCFG_SET_TYPE2_INTERRUPT_CALLBACK( _class, _method) \
-	lc89510_temp_device::set_type2_interrupt_callback(*device, interrupt_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0)); \
-
+	lc89510_temp_device::set_type2_interrupt_callback(*device, interrupt_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
 #define MCFG_SET_TYPE3_INTERRUPT_CALLBACK( _class, _method) \
-	lc89510_temp_device::set_type3_interrupt_callback(*device, interrupt_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0)); \
-
+	lc89510_temp_device::set_type3_interrupt_callback(*device, interrupt_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
 /* neocd */
 
 #define CD_FRAMES_MINUTE (60 * 75)

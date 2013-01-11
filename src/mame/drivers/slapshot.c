@@ -521,7 +521,6 @@ static const tc0140syt_interface slapshot_tc0140syt_intf =
 
 void slapshot_state::machine_start()
 {
-
 	membank("bank10")->configure_entries(0, 4, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
 	m_maincpu = machine().device<cpu_device>("maincpu");

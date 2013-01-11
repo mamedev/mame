@@ -28,7 +28,6 @@ TILE_GET_INFO_MEMBER(pushman_state::get_back_tile_info)
 
 TILE_GET_INFO_MEMBER(pushman_state::get_text_tile_info)
 {
-
 	int tile = m_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(
 			0,
@@ -47,7 +46,6 @@ TILE_GET_INFO_MEMBER(pushman_state::get_text_tile_info)
 
 void pushman_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pushman_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(pushman_state::background_scan_rows),this), 32, 32, 128, 64);
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pushman_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
@@ -118,7 +116,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 pushman_state::screen_update_pushman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	/* Setup the tilemaps */
 	m_bg_tilemap->set_scrollx(0, m_control[0]);
 	m_bg_tilemap->set_scrolly(0, 0xf00 - m_control[1]);

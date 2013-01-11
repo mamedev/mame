@@ -407,7 +407,6 @@ UINT32 aristmk4_state::screen_update_aristmk4(screen_device &screen, bitmap_ind1
 
 READ8_MEMBER(aristmk4_state::ldsw)
 {
-
 	int U3_p2_ret= ioport("5002")->read();
 	if(U3_p2_ret & 0x1)
 	{
@@ -418,7 +417,6 @@ READ8_MEMBER(aristmk4_state::ldsw)
 
 READ8_MEMBER(aristmk4_state::cgdrr)
 {
-
 	if(m_cgdrsw) // is the LC closed
 	{
 	return m_ripple; // return a positive value from the ripple counter
@@ -428,13 +426,11 @@ READ8_MEMBER(aristmk4_state::cgdrr)
 
 WRITE8_MEMBER(aristmk4_state::cgdrw)
 {
-
 	m_ripple = data;
 }
 
 WRITE8_MEMBER(aristmk4_state::u3_p0)
 {
-
 	m_u3_p0_w = data;
 
 	if ((data&0x80)==0) //Printer Motor Off
@@ -447,7 +443,6 @@ WRITE8_MEMBER(aristmk4_state::u3_p0)
 
 READ8_MEMBER(aristmk4_state::u3_p2)
 {
-
 	int u3_p2_ret= ioport("5002")->read();
 	int u3_p3_ret= ioport("5003")->read();
 
@@ -473,7 +468,6 @@ READ8_MEMBER(aristmk4_state::u3_p2)
 
 READ8_MEMBER(aristmk4_state::u3_p3)
 {
-
 	int u3_p3_ret= ioport("5003")->read();
 
 	if ((m_printer_motor)==1) // Printer Motor Off
@@ -495,7 +489,6 @@ TIMER_CALLBACK_MEMBER(aristmk4_state::note_input_reset)
 
 READ8_MEMBER(aristmk4_state::bv_p0)
 {
-
 	int bv_p0_ret=0x00;
 
 	switch(m_insnote)
@@ -519,7 +512,6 @@ READ8_MEMBER(aristmk4_state::bv_p0)
 
 READ8_MEMBER(aristmk4_state::bv_p1)
 {
-
 	int bv_p1_ret=0x00;
 
 	if (m_insnote==0)
@@ -591,7 +583,6 @@ WRITE8_MEMBER(aristmk4_state::mkiv_pia_cb2)
 //output b
 WRITE8_MEMBER(aristmk4_state::mkiv_pia_outb)
 {
-
 	UINT8 emet[5];
 	int i = 0;
 	//pia_data = data;
@@ -664,7 +655,6 @@ READ8_MEMBER(aristmk4_state::via_a_r)
 
 READ8_MEMBER(aristmk4_state::via_b_r)
 {
-
 	int ret=ioport("via_port_b")->read();
 
 // Not expecting to read anything from port B on the AY8910's ( controls BC1, BC2 and BDIR )
@@ -715,7 +705,6 @@ READ8_MEMBER(aristmk4_state::via_b_r)
 
 WRITE8_MEMBER(aristmk4_state::via_a_w)
 {
-
 	//logerror("VIA port A write %02X\n",data);
 	m_psg_data = data;
 }
@@ -864,7 +853,6 @@ WRITE8_MEMBER(aristmk4_state::mlamps)
 
 WRITE8_MEMBER(aristmk4_state::zn434_w)
 {
-
 	// Introducted to prevent warning in log for write to AY1 PORT B
 	// this is a write to the ZN434 DA convertors..
 }
@@ -1638,7 +1626,6 @@ DRIVER_INIT_MEMBER(aristmk4_state,aristmk4)
 
 void aristmk4_state::machine_start()
 {
-
 	m_samples = machine().device<samples_device>("samples");
 	state_save_register_global_pointer(machine(), m_nvram, 0x1000); // m_nvram
 }

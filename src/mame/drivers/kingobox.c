@@ -444,14 +444,12 @@ static const ay8910_interface ay8910_config =
 
 INTERRUPT_GEN_MEMBER(kingofb_state::kingofb_interrupt)
 {
-
 	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 void kingofb_state::machine_start()
 {
-
 	m_video_cpu = machine().device("video");
 	m_sprite_cpu = machine().device("sprite");
 	m_audio_cpu = machine().device("audiocpu");
@@ -462,7 +460,6 @@ void kingofb_state::machine_start()
 
 void kingofb_state::machine_reset()
 {
-
 	m_nmi_enable = 0;
 	m_palette_bank = 0;
 }

@@ -17,7 +17,6 @@ TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_bg_tile_info)
 
 WRITE16_MEMBER(stlforce_state::stlforce_bg_videoram_w)
 {
-
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -39,7 +38,6 @@ TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_mlow_tile_info)
 
 WRITE16_MEMBER(stlforce_state::stlforce_mlow_videoram_w)
 {
-
 	m_mlow_videoram[offset] = data;
 	m_mlow_tilemap->mark_tile_dirty(offset);
 }
@@ -61,7 +59,6 @@ TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_mhigh_tile_info)
 
 WRITE16_MEMBER(stlforce_state::stlforce_mhigh_videoram_w)
 {
-
 	m_mhigh_videoram[offset] = data;
 	m_mhigh_tilemap->mark_tile_dirty(offset);
 }
@@ -84,7 +81,6 @@ TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_tx_tile_info)
 
 WRITE16_MEMBER(stlforce_state::stlforce_tx_videoram_w)
 {
-
 	m_tx_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
@@ -177,7 +173,6 @@ UINT32 stlforce_state::screen_update_stlforce(screen_device &screen, bitmap_ind1
 
 void stlforce_state::video_start()
 {
-
 	m_bg_tilemap    = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_bg_tile_info),this),   TILEMAP_SCAN_COLS,      16,16,64,16);
 	m_mlow_tilemap  = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_mlow_tile_info),this), TILEMAP_SCAN_COLS, 16,16,64,16);
 	m_mhigh_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_mhigh_tile_info),this),TILEMAP_SCAN_COLS, 16,16,64,16);

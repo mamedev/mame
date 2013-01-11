@@ -950,8 +950,7 @@ void psxgpu_device::decode_tpage( UINT32 tpage )
 			n_distance--; \
 		} \
 		break; \
-	} \
-
+	}
 #define FLATTEXTUREDPOLYGONUPDATE \
 	n_u.d += n_du; \
 	n_v.d += n_dv;
@@ -969,7 +968,6 @@ void psxgpu_device::decode_tpage( UINT32 tpage )
 #define TEXTURE_LOOP \
 	while( n_distance > 0 ) \
 	{
-
 #define TEXTURE_ENDLOOP \
 	}
 

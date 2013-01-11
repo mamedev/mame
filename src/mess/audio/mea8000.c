@@ -72,7 +72,6 @@ struct filter_t
 
 struct mea8000_t
 {
-
 	/* configuration parameters */
 	const mea8000_interface* iface;
 
@@ -552,7 +551,6 @@ READ8_DEVICE_HANDLER ( mea8000_r )
 	mea8000_t* mea8000 = get_safe_token( device );
 	switch ( offset )
 	{
-
 	case 0: /* status register */
 	case 1:
 		/* ready to accept next frame */
@@ -572,7 +570,6 @@ WRITE8_DEVICE_HANDLER ( mea8000_w )
 	mea8000_t* mea8000 = get_safe_token( device );
 	switch ( offset )
 	{
-
 	case 0: /* data register */
 		if (mea8000->state == MEA8000_STOPPED)
 		{

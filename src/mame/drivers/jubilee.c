@@ -145,7 +145,6 @@ UINT32 jubilee_state::screen_update_jubileep(screen_device &screen, bitmap_ind16
 
 void jubilee_state::palette_init()
 {
-
 }
 
 

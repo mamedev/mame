@@ -915,7 +915,6 @@ void ZLIB_INTERNAL _tr_flush_block(s, buf, stored_len, last)
 
 	/* Build the Huffman trees unless a stored block is forced */
 	if (s->level > 0) {
-
 		/* Check if the file is binary or text */
 		if (s->strm->data_type == Z_UNKNOWN)
 			s->strm->data_type = detect_data_type(s);

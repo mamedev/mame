@@ -61,8 +61,7 @@ typedef UINT32 (*lc8670_lcd_update)(device_t &device, bitmap_ind16 &bitmap, cons
 #define MCFG_LC8670_SET_CLOCK_SOURCES(_sub_clock, _rc_clock, _cf_clock) \
 	lc8670_cpu_device::static_set_cpu_clock(*device, LC8670_SUB_CLOCK, _sub_clock); \
 	lc8670_cpu_device::static_set_cpu_clock(*device, LC8670_RC_CLOCK, _rc_clock); \
-	lc8670_cpu_device::static_set_cpu_clock(*device, LC8670_CF_CLOCK, _cf_clock); \
-
+	lc8670_cpu_device::static_set_cpu_clock(*device, LC8670_CF_CLOCK, _cf_clock);
 #define MCFG_LC8670_BANKSWITCH_CB(_devcb) \
 	devcb = &lc8670_cpu_device::static_set_bankswitch_cb(*device, DEVCB2_##_devcb);
 

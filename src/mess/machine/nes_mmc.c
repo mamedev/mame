@@ -211,7 +211,6 @@ READ8_MEMBER(nes_state::nes_nt_r)
 
 WRITE8_MEMBER(nes_state::nes_low_mapper_w)
 {
-
 	if (!m_mmc_write_low.isnull())
 		(m_mmc_write_low)(space, offset, data, mem_mask);
 	else
@@ -220,7 +219,6 @@ WRITE8_MEMBER(nes_state::nes_low_mapper_w)
 
 READ8_MEMBER(nes_state::nes_low_mapper_r)
 {
-
 	if (!m_mmc_read_low.isnull())
 		return (m_mmc_read_low)(space, offset, mem_mask);
 	else

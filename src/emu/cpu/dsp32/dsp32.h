@@ -47,8 +47,7 @@
 //**************************************************************************
 
 #define MCFG_DSP32C_CONFIG(_config) \
-	dsp32c_device::static_set_config(*device, _config); \
-
+	dsp32c_device::static_set_config(*device, _config);
 
 
 //**************************************************************************

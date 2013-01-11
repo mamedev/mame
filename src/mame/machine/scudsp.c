@@ -1049,7 +1049,6 @@ static const char *const DMA_Command[] =
 
 static void dsp_dasm_prefix( const char* format, char* buffer, UINT32 *data )
 {
-
 	for ( ; *format; format++ )
 	{
 		if ( *format == '%' )

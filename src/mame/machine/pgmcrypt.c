@@ -20,69 +20,48 @@
 // some may be duplicates simply due to differing rom sizes
 
 #define IGS27_CRYPT1 \
-	if ((i & 0x040480) != 0x000080) x ^= 0x0001; \
-
+	if ((i & 0x040480) != 0x000080) x ^= 0x0001;
 #define IGS27_CRYPT1_ALT \
-	if ((i & 0x040080) != 0x000080) x ^= 0x0001; \
-
+	if ((i & 0x040080) != 0x000080) x ^= 0x0001;
 #define IGS27_CRYPT1_ALT2 \
-	if ((i & 0x0480) != 0x0080) x ^= 0x0001; \
-
+	if ((i & 0x0480) != 0x0080) x ^= 0x0001;
 #define IGS27_CRYPT2 \
-	if ((i & 0x104008) == 0x104008) x ^= 0x0002; \
-
+	if ((i & 0x104008) == 0x104008) x ^= 0x0002;
 #define IGS27_CRYPT2_ALT \
-	if ((i & 0x004008) == 0x004008) x ^= 0x0002; \
-
+	if ((i & 0x004008) == 0x004008) x ^= 0x0002;
 #define IGS27_CRYPT2_ALT2 \
-	if((i & 0x004008) == 0x004008 && (i & 0x180000) != 0x000000) x ^= 0x0002; \
-
+	if((i & 0x004008) == 0x004008 && (i & 0x180000) != 0x000000) x ^= 0x0002;
 #define IGS27_CRYPT2_ALT3 \
-		if((i & 0x84008) == 0x84008) x ^= 0x0002; \
-
+		if((i & 0x84008) == 0x84008) x ^= 0x0002;
 #define IGS27_CRYPT3 \
-	if ((i & 0x080030) == 0x080010) x ^= 0x0004; \
-
+	if ((i & 0x080030) == 0x080010) x ^= 0x0004;
 #define IGS27_CRYPT3_ALT \
-	if((i & 0x000030) == 0x000010 && (i & 0x180000) != 0x080000) x ^= 0x0004; \
-
+	if((i & 0x000030) == 0x000010 && (i & 0x180000) != 0x080000) x ^= 0x0004;
 #define IGS27_CRYPT3_ALT2 \
-	if ((i & 0x000030) == 0x000010) x ^= 0x0004; \
-
+	if ((i & 0x000030) == 0x000010) x ^= 0x0004;
 // ket - due to address starting at 0 and not 100000/2!
 #define IGS27_CRYPT3_ALT3 \
-	if ((i & 0x080030) == 0x000010) x ^= 0x0004; \
-
+	if ((i & 0x080030) == 0x000010) x ^= 0x0004;
 #define IGS27_CRYPT4 \
-	if ((i & 0x000242) != 0x000042) x ^= 0x0008; \
-
+	if ((i & 0x000242) != 0x000042) x ^= 0x0008;
 #define IGS27_CRYPT4_ALT \
-	if ((i & 0x000042) != 0x000042) x ^= 0x0008; \
-
+	if ((i & 0x000042) != 0x000042) x ^= 0x0008;
 #define IGS27_CRYPT5 \
-	if ((i & 0x008100) == 0x008000) x ^= 0x0010; \
-
+	if ((i & 0x008100) == 0x008000) x ^= 0x0010;
 #define IGS27_CRYPT5_ALT \
-	if ((i & 0x48100) == 0x48000) x ^= 0x0010; \
-
+	if ((i & 0x48100) == 0x48000) x ^= 0x0010;
 #define IGS27_CRYPT6 \
-	if ((i & 0x002004) != 0x000004) x ^= 0x0020; \
-
+	if ((i & 0x002004) != 0x000004) x ^= 0x0020;
 #define IGS27_CRYPT6_ALT \
-	if ((i & 0x022004) != 0x000004) x ^= 0x0020; \
-
+	if ((i & 0x022004) != 0x000004) x ^= 0x0020;
 #define IGS27_CRYPT7 \
-	if ((i & 0x011800) != 0x010000) x ^= 0x0040; \
-
+	if ((i & 0x011800) != 0x010000) x ^= 0x0040;
 #define IGS27_CRYPT7_ALT \
-	if ((i & 0x01800) != 0x00000) x ^= 0x0040; \
-
+	if ((i & 0x01800) != 0x00000) x ^= 0x0040;
 #define IGS27_CRYPT8 \
-	if ((i & 0x004820) == 0x004820) x ^= 0x0080; \
-
+	if ((i & 0x004820) == 0x004820) x ^= 0x0080;
 #define IGS27_CRYPT8_ALT \
-	if ((i & 0x000820) == 0x000820) x ^= 0x0080; \
-
+	if ((i & 0x000820) == 0x000820) x ^= 0x0080;
 
 static const UINT8 kov_tab[256] = {
 	0x17, 0x1c, 0xe3, 0x02, 0x62, 0x59, 0x97, 0x4a, 0x67, 0x4d, 0x1f, 0x11, 0x76, 0x64, 0xc1, 0xe1,
@@ -105,7 +84,6 @@ static const UINT8 kov_tab[256] = {
 
 void pgm_kov_decrypt(running_machine &machine)
 {
-
 	int i;
 	UINT16 *src = (UINT16 *) (machine.root_device().memregion("maincpu")->base()+0x100000);
 
@@ -152,7 +130,6 @@ static const UINT8 kovsh_tab[256] = {
 
 void pgm_kovsh_decrypt(running_machine &machine)
 {
-
 	int i;
 	UINT16 *src = (UINT16 *) (machine.root_device().memregion("maincpu")->base()+0x100000);
 
@@ -198,7 +175,6 @@ static const UINT8 photoy2k_tab[256] = {
 
 void pgm_photoy2k_decrypt(running_machine &machine)
 {
-
 	int i;
 	UINT16 *src = (UINT16 *) (machine.root_device().memregion("maincpu")->base()+0x100000);
 
@@ -243,7 +219,6 @@ static const UINT8 pstar[256] = {
 
 void pgm_pstar_decrypt(running_machine &machine)
 {
-
 	int i;
 	UINT16 *src = (UINT16 *) (machine.root_device().memregion("maincpu")->base()+0x100000);
 
@@ -987,7 +962,6 @@ static const UINT8 sdwx_tab[] =
 
 void sdwx_decrypt(running_machine &machine)
 {
-
 	int i;
 	UINT16 *src = (UINT16 *) machine.root_device().memregion("user1")->base();
 

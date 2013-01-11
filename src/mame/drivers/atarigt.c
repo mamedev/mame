@@ -218,7 +218,6 @@ WRITE32_MEMBER(atarigt_state::latch_w)
 	/* upper byte */
 	if (ACCESSING_BITS_24_31)
 	{
-
 		/* bits 13-11 are the MO control bits */
 		atarirle_control_w(m_rle, (data >> 27) & 7);
 	}
@@ -1314,7 +1313,6 @@ WRITE32_MEMBER(atarigt_state::tmek_pf_w)
 
 DRIVER_INIT_MEMBER(atarigt_state,tmek)
 {
-
 	m_eeprom_default = NULL;
 	m_is_primrage = 0;
 

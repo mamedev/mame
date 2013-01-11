@@ -63,7 +63,6 @@ WRITE8_MEMBER(actfancr_state::actfancr_sound_w)
 
 WRITE8_MEMBER(actfancr_state::actfancr_buffer_spriteram_w)
 {
-
 	UINT8 *src = reinterpret_cast<UINT8 *>(memshare("spriteram")->ptr());
 	// copy to a 16-bit region for our sprite draw code too
 	for (int i=0;i<0x800/2;i++)
@@ -291,14 +290,12 @@ static const ym3812_interface ym3812_config =
 
 MACHINE_START_MEMBER(actfancr_state,actfancr)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }
 
 MACHINE_START_MEMBER(actfancr_state,triothep)
 {
-
 	MACHINE_START_CALL_MEMBER(actfancr);
 
 	save_item(NAME(m_trio_control_select));
@@ -311,7 +308,6 @@ MACHINE_RESET_MEMBER(actfancr_state,actfancr)
 
 MACHINE_RESET_MEMBER(actfancr_state,triothep)
 {
-
 	MACHINE_RESET_CALL_MEMBER(actfancr);
 	m_trio_control_select = 0;
 }

@@ -282,7 +282,6 @@ void wolfpack_state::screen_eof_wolfpack(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-
 		int x;
 		int y;
 

@@ -796,7 +796,6 @@ static const ymf278b_interface ymf278b_config =
 
 void psikyosh_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	membank("bank2")->configure_entries(0, 0x1000, memregion("gfx1")->base(), 0x20000);

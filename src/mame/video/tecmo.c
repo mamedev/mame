@@ -129,7 +129,6 @@ WRITE8_MEMBER(tecmo_state::tecmo_bgvideoram_w)
 
 WRITE8_MEMBER(tecmo_state::tecmo_fgscroll_w)
 {
-
 	m_fgscroll[offset] = data;
 
 	m_fg_tilemap->set_scrollx(0, m_fgscroll[0] + 256 * m_fgscroll[1]);
@@ -138,7 +137,6 @@ WRITE8_MEMBER(tecmo_state::tecmo_fgscroll_w)
 
 WRITE8_MEMBER(tecmo_state::tecmo_bgscroll_w)
 {
-
 	m_bgscroll[offset] = data;
 
 	m_bg_tilemap->set_scrollx(0, m_bgscroll[0] + 256 * m_bgscroll[1]);

@@ -185,7 +185,6 @@ void exerion_state::video_start()
 
 WRITE8_MEMBER(exerion_state::exerion_videoreg_w)
 {
-
 	/* bit 0 = flip screen and joystick input multiplexer */
 	m_cocktail_flip = data & 1;
 

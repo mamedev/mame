@@ -43,7 +43,6 @@ WRITE8_MEMBER(munchmo_state::mnchmobl_nmi_enable_w)
 /* trusted thru schematics, NMI and IRQ triggers at vblank, at the same time (!) */
 INTERRUPT_GEN_MEMBER(munchmo_state::mnchmobl_vblank_irq)
 {
-
 	if (m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
@@ -52,13 +51,11 @@ INTERRUPT_GEN_MEMBER(munchmo_state::mnchmobl_vblank_irq)
 
 INTERRUPT_GEN_MEMBER(munchmo_state::mnchmobl_sound_irq)
 {
-
 	device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(munchmo_state::mnchmobl_soundlatch_w)
 {
-
 	soundlatch_byte_w(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE );
 }
@@ -306,7 +303,6 @@ GFXDECODE_END
 
 void munchmo_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -317,7 +313,6 @@ void munchmo_state::machine_start()
 
 void munchmo_state::machine_reset()
 {
-
 	m_palette_bank = 0;
 	m_flipscreen = 0;
 	m_nmi_enable = 0;

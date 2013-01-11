@@ -506,7 +506,6 @@ WRITE8_MEMBER(pcw16_state::pcw16_keyboard_control_w)
 			/* just cleared? */
 			if ((m_keyboard_state & PCW16_KEYBOARD_FORCE_KEYBOARD_CLOCK)==0)
 			{
-
 				/* write */
 				/* busy */
 				m_keyboard_state |= PCW16_KEYBOARD_BUSY_STATUS;

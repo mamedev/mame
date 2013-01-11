@@ -73,8 +73,6 @@ public:
 
 READ16_MEMBER(_2mindril_state::drill_io_r)
 {
-
-
 //  if (offset * 2 == 0x4)
 	/*popmessage("PC=%08x %04x %04x %04x %04x %04x %04x %04x %04x", space.device().safe_pc(), m_iodata[0/2], m_iodata[2/2], m_iodata[4/2], m_iodata[6/2],
 	                                    m_iodata[8/2], m_iodata[0xa/2], m_iodata[0xc/2], m_iodata[0xe/2]);*/
@@ -103,7 +101,6 @@ READ16_MEMBER(_2mindril_state::drill_io_r)
 
 WRITE16_MEMBER(_2mindril_state::drill_io_w)
 {
-
 	COMBINE_DATA(&m_iodata[offset]);
 
 	switch(offset)
@@ -148,8 +145,6 @@ TIMER_CALLBACK_MEMBER(_2mindril_state::defender_req)
 
 WRITE16_MEMBER(_2mindril_state::sensors_w)
 {
-
-
 	/*---- xxxx ---- ---- select "lamps" (guess)*/
 	/*---- ---- ---- -x-- lamp*/
 	if (data & 1)
@@ -177,13 +172,11 @@ WRITE16_MEMBER(_2mindril_state::sensors_w)
 
 READ16_MEMBER(_2mindril_state::drill_irq_r)
 {
-
 	return irq_reg;
 }
 
 WRITE16_MEMBER(_2mindril_state::drill_irq_w)
 {
-
 	/*
 	(note: could rather be irq mask)
 	---- ---- ---x ---- irq lv 5 ack, 0->1 latch
@@ -429,7 +422,6 @@ static const ym2610_interface ym2610_config =
 
 MACHINE_START_MEMBER(_2mindril_state,drill)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_defender_sensor));
@@ -438,7 +430,6 @@ MACHINE_START_MEMBER(_2mindril_state,drill)
 
 MACHINE_RESET_MEMBER(_2mindril_state,drill)
 {
-
 	m_defender_sensor = 0;
 	m_shutter_sensor = 0;
 	irq_reg = 0;

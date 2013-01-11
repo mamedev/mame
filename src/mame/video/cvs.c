@@ -84,7 +84,6 @@ static void set_pens( running_machine &machine )
 
 WRITE8_MEMBER(cvs_state::cvs_video_fx_w)
 {
-
 	if (data & 0xce)
 		logerror("%4x : CVS: Unimplemented CVS video fx = %2x\n",space.device().safe_pc(), data & 0xce);
 
@@ -123,7 +122,6 @@ WRITE8_MEMBER(cvs_state::cvs_scroll_w)
 
 VIDEO_START_MEMBER(cvs_state,cvs)
 {
-
 	cvs_init_stars(machine());
 
 	/* create helper bitmaps */

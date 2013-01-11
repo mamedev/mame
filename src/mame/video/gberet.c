@@ -120,7 +120,6 @@ TILE_GET_INFO_MEMBER(gberet_state::get_bg_tile_info)
 
 VIDEO_START_MEMBER(gberet_state,gberet)
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gberet_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, machine().gfx[0], 0x10);
 	m_bg_tilemap->set_scroll_rows(32);
@@ -165,7 +164,6 @@ static void gberet_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,
 
 UINT32 gberet_state::screen_update_gberet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 	gberet_draw_sprites(machine(), bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);

@@ -759,7 +759,6 @@ void segas24_sprite::draw(bitmap_ind16 &bitmap, const rectangle &cliprect, const
 				ymod1 = ymod;
 				ypos1 = y;
 				for(zy=0; zy<8; zy++) {
-
 					ymod1 += zoomy;
 					while(ymod1 >= 0x40) {
 						if(ypos1 >= min_y && ypos1 <= max_y) {

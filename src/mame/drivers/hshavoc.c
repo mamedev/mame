@@ -117,7 +117,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(md_cons_state,hshavoc)
 {
-
 	int x;
 	UINT16 *src = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 

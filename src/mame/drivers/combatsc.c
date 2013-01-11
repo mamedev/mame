@@ -163,7 +163,6 @@ READ8_MEMBER(combatsc_state::combatscb_io_r)
 
 WRITE8_MEMBER(combatsc_state::combatscb_priority_w)
 {
-
 	if (data & 0x40)
 	{
 		m_video_circuit = 1;
@@ -182,7 +181,6 @@ WRITE8_MEMBER(combatsc_state::combatscb_priority_w)
 
 WRITE8_MEMBER(combatsc_state::combatsc_bankselect_w)
 {
-
 	m_priority = data & 0x20;
 
 	if (data & 0x40)
@@ -206,7 +204,6 @@ WRITE8_MEMBER(combatsc_state::combatsc_bankselect_w)
 
 WRITE8_MEMBER(combatsc_state::combatscb_io_w)
 {
-
 	switch (offset)
 	{
 		case 0x400: combatscb_priority_w(space, 0, data); break;
@@ -218,7 +215,6 @@ WRITE8_MEMBER(combatsc_state::combatscb_io_w)
 
 WRITE8_MEMBER(combatsc_state::combatscb_bankselect_w)
 {
-
 	if (data & 0x40)
 	{
 		m_video_circuit = 1;
@@ -269,7 +265,6 @@ WRITE8_MEMBER(combatsc_state::combatsc_coin_counter_w)
 
 READ8_MEMBER(combatsc_state::trackball_r)
 {
-
 	if (offset == 0)
 	{
 		int i, dir[4];

@@ -4,11 +4,9 @@
 
 #define MCFG_BFMBDA_ADD(_tag,_val) \
 		MCFG_DEVICE_ADD(_tag, BFM_BDA,60)\
-		MCFG_BDA_PORT(_val) \
-
+		MCFG_BDA_PORT(_val)
 #define MCFG_BDA_PORT(_val) \
-	bfm_bda_t::static_set_value(*device, _val); \
-
+	bfm_bda_t::static_set_value(*device, _val);
 #define MCFG_BFMBDA_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 

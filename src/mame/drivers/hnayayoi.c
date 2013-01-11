@@ -532,7 +532,6 @@ static const msm5205_interface msm5205_config =
 
 void hnayayoi_state::machine_start()
 {
-
 	save_item(NAME(m_palbank));
 	save_item(NAME(m_blit_layer));
 	save_item(NAME(m_blit_dest));
@@ -542,7 +541,6 @@ void hnayayoi_state::machine_start()
 
 void hnayayoi_state::machine_reset()
 {
-
 	/* start with the MSM5205 reset */
 	msm5205_reset_w(machine().device("msm"), 1);
 

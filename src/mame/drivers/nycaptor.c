@@ -302,7 +302,6 @@ WRITE8_MEMBER(nycaptor_state::nmi_enable_w)
 
 WRITE8_MEMBER(nycaptor_state::unk_w)
 {
-
 }
 
 static const ay8910_interface ay8910_config =
@@ -422,7 +421,6 @@ READ8_MEMBER(nycaptor_state::cyclshtg_mcu_r)
 
 WRITE8_MEMBER(nycaptor_state::cyclshtg_mcu_w)
 {
-
 }
 
 READ8_MEMBER(nycaptor_state::cyclshtg_mcu_status_r1)
@@ -764,7 +762,6 @@ GFXDECODE_END
 
 void nycaptor_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_subcpu = machine().device<cpu_device>("sub");
@@ -797,7 +794,6 @@ void nycaptor_state::machine_start()
 
 void nycaptor_state::machine_reset()
 {
-
 	MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	m_generic_control_reg = 0;

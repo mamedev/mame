@@ -33,7 +33,6 @@ static void PREFIX186(_pusha)(i8086_state *cpustate)    /* Opcode 0x60 */
 static unsigned i186_popa_tmp;  // hack around GCC 4.6 error because we need the side effects of POP
 static void PREFIX186(_popa)(i8086_state *cpustate)    /* Opcode 0x61 */
 {
-
 #ifdef I80286
 	if(PM) i80286_check_permission(cpustate, SS, cpustate->regs.w[SP], 16, I80286_READ);
 #endif

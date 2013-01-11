@@ -41,13 +41,11 @@ TODO:
 
 WRITE8_MEMBER(spcforce_state::spcforce_SN76496_latch_w)
 {
-
 	m_sn76496_latch = data;
 }
 
 READ8_MEMBER(spcforce_state::spcforce_SN76496_select_r)
 {
-
 		if (~m_sn76496_select & 0x40) return m_sn1->ready_r();
 		if (~m_sn76496_select & 0x20) return m_sn2->ready_r();
 		if (~m_sn76496_select & 0x10) return m_sn3->ready_r();
@@ -58,7 +56,6 @@ READ8_MEMBER(spcforce_state::spcforce_SN76496_select_r)
 
 WRITE8_MEMBER(spcforce_state::spcforce_SN76496_select_w)
 {
-
 	m_sn76496_select = data;
 
 	if (~data & 0x40) m_sn1->write(space, 0, m_sn76496_latch);
@@ -81,7 +78,6 @@ WRITE8_MEMBER(spcforce_state::spcforce_soundtrigger_w)
 
 WRITE8_MEMBER(spcforce_state::irq_mask_w)
 {
-
 	m_irq_mask = data & 1;
 }
 
@@ -255,7 +251,6 @@ static const sn76496_config psg_intf =
 
 INTERRUPT_GEN_MEMBER(spcforce_state::vblank_irq)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(3, HOLD_LINE);
 }

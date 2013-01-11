@@ -73,7 +73,6 @@ WRITE8_MEMBER(crgolf_state::rom_bank_select_w)
 
 void crgolf_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -92,7 +91,6 @@ void crgolf_state::machine_start()
 
 void crgolf_state::machine_reset()
 {
-
 	m_port_select = 0;
 	m_main_to_sound_data = 0;
 	m_sound_to_main_data = 0;
@@ -123,7 +121,6 @@ READ8_MEMBER(crgolf_state::analog_input_r)
 
 WRITE8_MEMBER(crgolf_state::switch_input_select_w)
 {
-
 	if (!(data & 0x40)) m_port_select = 6;
 	if (!(data & 0x20)) m_port_select = 5;
 	if (!(data & 0x10)) m_port_select = 4;
@@ -149,7 +146,6 @@ WRITE8_MEMBER(crgolf_state::unknown_w)
 
 TIMER_CALLBACK_MEMBER(crgolf_state::main_to_sound_callback)
 {
-
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	m_main_to_sound_data = param;
 }
@@ -163,7 +159,6 @@ WRITE8_MEMBER(crgolf_state::main_to_sound_w)
 
 READ8_MEMBER(crgolf_state::main_to_sound_r)
 {
-
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_main_to_sound_data;
 }
@@ -178,7 +173,6 @@ READ8_MEMBER(crgolf_state::main_to_sound_r)
 
 TIMER_CALLBACK_MEMBER(crgolf_state::sound_to_main_callback)
 {
-
 	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	m_sound_to_main_data = param;
 }
@@ -192,7 +186,6 @@ WRITE8_MEMBER(crgolf_state::sound_to_main_w)
 
 READ8_MEMBER(crgolf_state::sound_to_main_r)
 {
-
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	return m_sound_to_main_data;
 }

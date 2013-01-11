@@ -157,7 +157,6 @@ static void update_palette(running_machine &machine)
 
 void srmp6_state::video_start()
 {
-
 	m_tileram = auto_alloc_array_clear(machine(), UINT16, 0x100000*16/2);
 	m_dmaram.allocate(0x100/2);
 	m_sprram_old = auto_alloc_array_clear(machine(), UINT16, 0x80000/2);
@@ -206,7 +205,6 @@ UINT32 srmp6_state::screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bit
 	/* Main spritelist is 0x0000 - 0x1fff in spriteram, sublists follow */
 	while (mainlist_offset<0x2000/2)
 	{
-
 		UINT16 *sprite_sublist = &m_sprram_old[sprite_list[mainlist_offset+1]<<3];
 		UINT16 sublist_length=sprite_list[mainlist_offset+0]&0x7fff; //+1 ?
 		INT16 global_x,global_y, flip_x, flip_y;
@@ -262,7 +260,6 @@ UINT32 srmp6_state::screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bit
 				{
 					for(yw=0;yw<height;yw++)
 					{
-
 						if(!flip_x)
 							xb=x+xw*8+global_x;
 						else
@@ -304,13 +301,11 @@ UINT32 srmp6_state::screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bit
 
 WRITE16_MEMBER(srmp6_state::srmp6_input_select_w)
 {
-
 	m_input_select = data & 0x0f;
 }
 
 READ16_MEMBER(srmp6_state::srmp6_inputs_r)
 {
-
 	if (offset == 0)            // DSW
 		return ioport("DSW")->read();
 
@@ -328,10 +323,8 @@ READ16_MEMBER(srmp6_state::srmp6_inputs_r)
 
 WRITE16_MEMBER(srmp6_state::video_regs_w)
 {
-
 	switch(offset)
 	{
-
 		case 0x5e/2: // bank switch, used by ROM check
 		{
 			const UINT8 *rom = memregion("nile")->base();
@@ -369,7 +362,6 @@ WRITE16_MEMBER(srmp6_state::video_regs_w)
 
 READ16_MEMBER(srmp6_state::video_regs_r)
 {
-
 	logerror("video_regs_r (PC=%06X): %04x\n", space.device().safe_pcbase(), offset*2);
 	return m_video_regs[offset];
 }
@@ -487,13 +479,11 @@ WRITE16_MEMBER(srmp6_state::srmp6_dma_w)
 /* if tileram is actually bigger than the mapped area, how do we access the rest? */
 READ16_MEMBER(srmp6_state::tileram_r)
 {
-
 	return m_chrram[offset];
 }
 
 WRITE16_MEMBER(srmp6_state::tileram_w)
 {
-
 	//UINT16 tmp;
 	COMBINE_DATA(&m_chrram[offset]);
 

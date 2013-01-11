@@ -227,7 +227,6 @@ static CPU_RESET( am29000 )
 
 static CPU_EXIT( am29000 )
 {
-
 }
 
 

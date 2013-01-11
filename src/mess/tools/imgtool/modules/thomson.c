@@ -119,7 +119,6 @@
 #define MAXSIZE 80*16*256*2 /* room for two faces, double-density, 80 tracks */
 
 struct thom_floppy {
-
 	imgtool_stream *stream;
 
 	UINT16 sector_size;   /* 128 or 256 */
@@ -134,7 +133,6 @@ struct thom_floppy {
 
 
 enum thom_dirent_type {
-
 	THOM_DIRENT_END,
 	THOM_DIRENT_FREE,
 	THOM_DIRENT_FILE,
@@ -144,7 +142,6 @@ enum thom_dirent_type {
 
 
 struct thom_dirent {
-
 	thom_dirent_type type;
 	int    index;
 
@@ -189,7 +186,6 @@ static imgtoolerr_t thom_open_fd_qd(imgtool_image *img, imgtool_stream *stream)
 
 	/* guess format */
 	switch ( size ) {
-
 	case 81920:
 	f->tracks = 40;
 	f->sector_size = 128;
@@ -394,7 +390,6 @@ static void thom_close_sap(imgtool_image *img)
 
 	for ( track = 0; track < f->tracks; track++ )
 		for ( sector = 1; sector <= 16; sector++ ) {
-
 	/* sector header & data */
 	buf[0] = ( f->tracks == 80 ) ? 2 : 1;
 	buf[1] = 0;
@@ -1155,7 +1150,6 @@ static imgtoolerr_t thom_create(imgtool_image* img,
 	memset( f->data, 0xe5, sizeof( f->data ) );
 
 	for ( i = 0; i < f->heads; i++ ) {
-
 	/* disk info */
 	buf = thom_get_sector( f, i, 20, 1 );
 	memset( buf, 0xff, f->sector_size );
@@ -1556,7 +1550,6 @@ static void thom_basic_get_info(const imgtool_class *clas,
 				union imgtoolinfo *info)
 {
 	switch ( param ) {
-
 	case IMGTOOLINFO_INT_IMAGE_EXTRA_BYTES:
 	info->i = sizeof(thom_floppy); break;
 	case IMGTOOLINFO_INT_PARTITION_EXTRA_BYTES:

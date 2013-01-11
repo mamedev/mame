@@ -35,5 +35,4 @@ WRITE32_HANDLER( m68340_internal_timer_w )
 
 void m68340_timer::reset(void)
 {
-
 }

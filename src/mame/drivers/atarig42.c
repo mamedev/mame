@@ -94,7 +94,6 @@ WRITE16_MEMBER(atarig42_state::io_latch_w)
 	/* upper byte */
 	if (ACCESSING_BITS_8_15)
 	{
-
 		/* bit 14 controls the ASIC65 reset line */
 		asic65_reset(machine(), (~data >> 14) & 1);
 

@@ -422,7 +422,6 @@ WRITE8_MEMBER( mycom_state::mycom_0a_w )
 
 WRITE8_MEMBER(mycom_state::mycom_rtc_w)
 {
-
 	m_rtc->address_w(data & 0x0f);
 
 	m_rtc->hold_w(BIT(data, 4));

@@ -452,7 +452,6 @@ READ32_MEMBER(_3do_state::_3do_madam_r){
 
 
 WRITE32_MEMBER(_3do_state::_3do_madam_w){
-
 	if(offset == 0)
 	{
 		if(data == 0x0a)

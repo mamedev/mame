@@ -88,7 +88,6 @@ void dynduke_state::video_start()
 
 WRITE16_MEMBER(dynduke_state::dynduke_gfxbank_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data&0x01) m_back_bankbase=0x1000; else m_back_bankbase=0;
@@ -107,7 +106,6 @@ WRITE16_MEMBER(dynduke_state::dynduke_gfxbank_w)
 
 WRITE16_MEMBER(dynduke_state::dynduke_control_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		// bit 0x80 toggles, maybe sprite buffering?

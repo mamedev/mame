@@ -1730,8 +1730,7 @@ do                                                                              
 		(PRIORITY) = privalue;                                                      \
 	}                                                                               \
 }                                                                                   \
-while (0)                                                                           \
-
+while (0)
 static void tc0080vco_bg1_tilemap_draw( device_t *device, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
 {
 	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(device);
@@ -4798,7 +4797,6 @@ static void tc0110pcr_restore_colors(tc0110pcr_state *tc0110pcr)
 
 		switch (tc0110pcr->type)
 		{
-
 			case 0x00:
 			{
 				r = pal5bit(color >>  0);
@@ -5323,7 +5321,6 @@ void tc0180vcu_device::device_config_complete()
 
 void tc0180vcu_device::device_start()
 {
-
 	tc0180vcu_state *tc0180vcu = tc0180vcu_get_safe_token(this);
 	const tc0180vcu_interface *intf = tc0180vcu_get_interface(this);
 

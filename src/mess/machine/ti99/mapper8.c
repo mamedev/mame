@@ -323,7 +323,6 @@ bool ti998_mapper_device::search_logically_addressed_w(address_space& space, off
 			|| ((dev->m_config->mode == TI99EM) && (m_CRUS==true))
 			|| ((dev->m_config->mode == PATGEN) && (m_PTGE==true)))
 		{
-
 			if ((offset & dev->m_config->address_mask)==(dev->m_config->select_pattern | dev->m_config->write_select))
 			{
 				if (dev->m_device == MAP8_SRAM)

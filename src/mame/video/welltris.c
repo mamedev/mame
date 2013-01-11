@@ -22,7 +22,6 @@ WRITE16_MEMBER(welltris_state::welltris_palette_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-
 		if (m_charpalettebank != (data & 0x03))
 		{
 			m_charpalettebank = (data & 0x03);
@@ -40,7 +39,6 @@ WRITE16_MEMBER(welltris_state::welltris_gfxbank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-
 		setbank(0, (data & 0xf0) >> 4);
 		setbank(1, data & 0x0f);
 	}
@@ -48,7 +46,6 @@ WRITE16_MEMBER(welltris_state::welltris_gfxbank_w)
 
 WRITE16_MEMBER(welltris_state::welltris_scrollreg_w)
 {
-
 	switch (offset) {
 		case 0: m_scrollx = data - 14; break;
 		case 1: m_scrolly = data +  0; break;
@@ -69,7 +66,6 @@ TILE_GET_INFO_MEMBER(welltris_state::get_welltris_tile_info)
 
 WRITE16_MEMBER(welltris_state::welltris_charvideoram_w)
 {
-
 	COMBINE_DATA(&m_charvideoram[offset]);
 	m_char_tilemap->mark_tile_dirty(offset);
 }

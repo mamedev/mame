@@ -73,7 +73,6 @@ void naomi_m2_board::board_setup_address(UINT32 address, bool is_dma)
 void naomi_m2_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
 {
 	if(rom_cur_address & 0x40000000) {
-
 		if(rom_cur_address == 0x4001fffe) {
 			if(!enc_ready)
 				enc_start();

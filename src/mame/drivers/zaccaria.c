@@ -122,7 +122,6 @@ WRITE8_MEMBER(zaccaria_state::zaccaria_port0a_w)
 
 WRITE8_MEMBER(zaccaria_state::zaccaria_port0b_w)
 {
-
 	/* bit 1 goes to 8910 #0 BDIR pin  */
 	if ((m_last_port0b & 0x02) == 0x02 && (data & 0x02) == 0x00)
 	{
@@ -247,7 +246,6 @@ WRITE8_MEMBER(zaccaria_state::coin_w)
 
 WRITE8_MEMBER(zaccaria_state::nmi_mask_w)
 {
-
 	m_nmi_mask = data & 1;
 }
 
@@ -571,7 +569,6 @@ static const tms5220_interface tms5220_config =
 
 INTERRUPT_GEN_MEMBER(zaccaria_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

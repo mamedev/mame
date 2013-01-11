@@ -134,14 +134,12 @@ READ8_MEMBER(fgoal_state::fgoal_row_r)
 
 WRITE8_MEMBER(fgoal_state::fgoal_row_w)
 {
-
 	m_row = data;
 	mb14241_shift_data_w(m_mb14241, space, 0, 0);
 }
 
 WRITE8_MEMBER(fgoal_state::fgoal_col_w)
 {
-
 	m_col = data;
 	mb14241_shift_count_w(m_mb14241, space, 0, data);
 }
@@ -329,7 +327,6 @@ GFXDECODE_END
 
 void fgoal_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_mb14241 = machine().device("mb14241");
 
@@ -344,7 +341,6 @@ void fgoal_state::machine_start()
 
 void fgoal_state::machine_reset()
 {
-
 	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(0), timer_expired_delegate(FUNC(fgoal_state::interrupt_callback),this));
 
 	m_xpos = 0;

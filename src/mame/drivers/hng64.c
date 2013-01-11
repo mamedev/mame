@@ -475,21 +475,18 @@ READ32_MEMBER(hng64_state::hng64_random_read)
 
 READ32_MEMBER(hng64_state::hng64_com_r)
 {
-
 	logerror("com read  (PC=%08x): %08x %08x = %08x\n", space.device().safe_pc(), (offset*4)+0xc0000000, mem_mask, m_com_ram[offset]);
 	return m_com_ram[offset];
 }
 
 WRITE32_MEMBER(hng64_state::hng64_com_w)
 {
-
 	logerror("com write (PC=%08x): %08x %08x = %08x\n", space.device().safe_pc(), (offset*4)+0xc0000000, mem_mask, data);
 	COMBINE_DATA(&m_com_ram[offset]);
 }
 
 WRITE32_MEMBER(hng64_state::hng64_com_share_w)
 {
-
 	logerror("commw  (PC=%08x): %08x %08x %08x\n", space.device().safe_pc(), data, (offset*4)+0xc0001000, mem_mask);
 
 	if (offset == 0x0) COMBINE_DATA(&m_com_shared_a);
@@ -635,7 +632,6 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 /* Fatal Fury Wild Ambition / Buriki One */
 READ32_MEMBER(hng64_state::fight_io_r)
 {
-
 	switch (offset*4)
 	{
 		case 0x000: return 0x00000400;
@@ -650,7 +646,6 @@ READ32_MEMBER(hng64_state::fight_io_r)
 /* Samurai Shodown 64 / Samurai Shodown 64 2 */
 READ32_MEMBER(hng64_state::samsho_io_r)
 {
-
 	switch (offset*4)
 	{
 		case 0x000:
@@ -680,7 +675,6 @@ READ32_MEMBER(hng64_state::samsho_io_r)
 /* FIXME: trigger input doesn't work? */
 READ32_MEMBER(hng64_state::shoot_io_r)
 {
-
 	switch (offset*4)
 	{
 		case 0x000:
@@ -750,7 +744,6 @@ READ32_MEMBER(hng64_state::racing_io_r)
 
 READ32_MEMBER(hng64_state::hng64_dualport_r)
 {
-
 	//printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], space.device().safe_pc());
 
 	/*
@@ -788,7 +781,6 @@ Beast Busters 2 outputs (all at offset == 0x1c):
 
 WRITE32_MEMBER(hng64_state::hng64_dualport_w)
 {
-
 	//printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], space.device().safe_pc());
 	COMBINE_DATA (&m_dualport[offset]);
 }
@@ -802,7 +794,6 @@ WRITE32_MEMBER(hng64_state::hng64_dualport_w)
 //   <ElSemi> 30140000-3015ffff is ZBuffer A
 READ32_MEMBER(hng64_state::hng64_3d_1_r)
 {
-
 	return m_3d_1[offset];
 }
 
@@ -815,13 +806,11 @@ WRITE32_MEMBER(hng64_state::hng64_3d_1_w)
 
 READ32_MEMBER(hng64_state::hng64_3d_2_r)
 {
-
 	return m_3d_2[offset];
 }
 
 WRITE32_MEMBER(hng64_state::hng64_3d_2_w)
 {
-
 	COMBINE_DATA (&m_3d_1[offset]);
 	COMBINE_DATA (&m_3d_2[offset]);
 }
@@ -925,7 +914,6 @@ WRITE32_MEMBER(hng64_state::tcram_w)
 
 READ32_MEMBER(hng64_state::tcram_r)
 {
-
 	//printf("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]);
 	if(offset == 0x12)
 		return ioport("VBLANK")->read();
@@ -937,7 +925,6 @@ READ32_MEMBER(hng64_state::tcram_r)
    unknown purpose (vblank? related to the display list?). */
 READ32_MEMBER(hng64_state::unk_vreg_r)
 {
-
 	return ++m_unk_vreg_toggle;
 }
 
@@ -1292,7 +1279,6 @@ WRITE8_MEMBER(hng64_state::hng64_comm_memory_w)
 /* KL5C80 I/O handlers */
 WRITE8_MEMBER(hng64_state::hng64_comm_io_mmu)
 {
-
 	m_com_mmu_mem[offset] = data;
 
 	/* Debugging - you can't change A4 - the hardware doesn't let you */
@@ -1646,7 +1632,6 @@ static void hng64_patch_bios_region(running_machine& machine, int region)
 
 DRIVER_INIT_MEMBER(hng64_state,hng64)
 {
-
 	// region hacking, english error messages are more useful to us, but no english bios is dumped...
 #ifdef HACK_REGION
 // versions according to fatal fury test mode
@@ -1669,14 +1654,12 @@ DRIVER_INIT_MEMBER(hng64_state,hng64)
 
 DRIVER_INIT_MEMBER(hng64_state,hng64_fght)
 {
-
 	m_no_machine_error_code = 0x01000000;
 	DRIVER_INIT_CALL(hng64);
 }
 
 DRIVER_INIT_MEMBER(hng64_state,fatfurwa)
 {
-
 	/* FILE* fp = fopen("/tmp/test.bin", "wb"); fwrite(memregion("verts")->base(), 1, 0x0c00000*2, fp); fclose(fp); */
 	DRIVER_INIT_CALL(hng64_fght);
 	m_mcu_type = FIGHT_MCU;
@@ -1684,14 +1667,12 @@ DRIVER_INIT_MEMBER(hng64_state,fatfurwa)
 
 DRIVER_INIT_MEMBER(hng64_state,ss64)
 {
-
 	DRIVER_INIT_CALL(hng64_fght);
 	m_mcu_type = SAMSHO_MCU;
 }
 
 DRIVER_INIT_MEMBER(hng64_state,hng64_race)
 {
-
 	m_no_machine_error_code = 0x02000000;
 	m_mcu_type = RACING_MCU;
 	DRIVER_INIT_CALL(hng64);
@@ -1699,7 +1680,6 @@ DRIVER_INIT_MEMBER(hng64_state,hng64_race)
 
 DRIVER_INIT_MEMBER(hng64_state,hng64_shoot)
 {
-
 	m_mcu_type = SHOOT_MCU;
 	m_no_machine_error_code = 0x03000000;
 	DRIVER_INIT_CALL(hng64);
@@ -1773,7 +1753,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
 
 void hng64_state::machine_start()
 {
-
 	/* set the fastest DRC options */
 	mips3drc_set_options(machine().device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 

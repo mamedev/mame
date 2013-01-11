@@ -283,7 +283,6 @@ static int dvg_gostrobe(vgdata *vg)
 
 	if (vg->op == 0xf)
 	{
-
 		scale = (vg->scale +
 					(((vg->dvy & 0x800) >> 11)
 					| (((vg->dvx & 0x800) ^ 0x800) >> 10)
@@ -312,7 +311,6 @@ static int dvg_gostrobe(vgdata *vg)
 
 	while (fin--)
 	{
-
 		/*
 		 *  The 7497 Bit Rate Multiplier is a 6 bit counter with
 		 *  clever decoding of output bits to perform the following

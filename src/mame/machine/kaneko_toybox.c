@@ -113,7 +113,6 @@ WRITE16_MEMBER(kaneko_toybox_device::toybox_mcu_ram_w)
 //  not sure if it's all 100% endian safe
 void kaneko_toybox_device::toxboy_decrypt_rom(running_machine& machine)
 {
-
 	UINT8 *src = (UINT8 *)machine.root_device().memregion(":mcudata" )->base();
 
 	int i;

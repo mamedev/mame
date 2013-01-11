@@ -68,6 +68,5 @@ extern const device_type COCO_VHD;
 ***************************************************************************/
 
 #define MCFG_COCO_VHD_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, COCO_VHD, 0) \
-
+	MCFG_DEVICE_ADD(_tag, COCO_VHD, 0)
 #endif /* COCOVHD_H */

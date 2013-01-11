@@ -136,7 +136,6 @@ WRITE8_MEMBER(dec8_state::dec8_scroll2_w)
 
 WRITE8_MEMBER(dec8_state::srdarwin_control_w)
 {
-
 	switch (offset)
 	{
 	case 0: /* Top 3 bits - bank switch, bottom 4 - scroll MSB */
@@ -152,7 +151,6 @@ WRITE8_MEMBER(dec8_state::srdarwin_control_w)
 
 WRITE8_MEMBER(dec8_state::lastmisn_control_w)
 {
-
 	/*
 	    Bit 0x0f - ROM bank switch.
 	    Bit 0x10 - Unused
@@ -173,7 +171,6 @@ WRITE8_MEMBER(dec8_state::lastmisn_control_w)
 
 WRITE8_MEMBER(dec8_state::shackled_control_w)
 {
-
 	/* Bottom 4 bits - bank switch, Bits 4 & 5 - Scroll MSBs */
 	membank("bank1")->set_entry(data & 0x0f);
 

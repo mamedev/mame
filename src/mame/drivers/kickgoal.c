@@ -295,7 +295,6 @@ WRITE16_MEMBER(kickgoal_state::actionhw_snd_w)
 
 INTERRUPT_GEN_MEMBER(kickgoal_state::kickgoal_interrupt)
 {
-
 	if ((m_adpcm->read_status() & 0x08) == 0)
 	{
 		switch(m_melody_loop)
@@ -619,7 +618,6 @@ GFXDECODE_END
 
 void kickgoal_state::machine_start()
 {
-
 	save_item(NAME(m_snd_sam));
 	save_item(NAME(m_melody_loop));
 	save_item(NAME(m_snd_new));
@@ -630,7 +628,6 @@ void kickgoal_state::machine_start()
 
 void kickgoal_state::machine_reset()
 {
-
 	m_melody_loop = 0;
 	m_snd_new = 0;
 	m_snd_sam[0] = 0;

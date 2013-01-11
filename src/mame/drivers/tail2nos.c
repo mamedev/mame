@@ -19,7 +19,6 @@
 
 WRITE16_MEMBER(tail2nos_state::sound_command_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, offset, data & 0xff);
@@ -223,7 +222,6 @@ void tail2nos_state::machine_start()
 
 void tail2nos_state::machine_reset()
 {
-
 	/* point to the extra ROMs */
 	membank("bank1")->set_base(memregion("user1")->base());
 	membank("bank2")->set_base(memregion("user2")->base());

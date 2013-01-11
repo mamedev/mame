@@ -64,7 +64,6 @@ public:
 
 WRITE8_MEMBER(spoker_state::bg_tile_w)
 {
-
 	m_bg_tile_ram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -83,21 +82,18 @@ TILE_GET_INFO_MEMBER(spoker_state::get_fg_tile_info)
 
 WRITE8_MEMBER(spoker_state::fg_tile_w)
 {
-
 	m_fg_tile_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(spoker_state::fg_color_w)
 {
-
 	m_fg_color_ram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 void spoker_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  32, 128, 8);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  128, 32);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -105,7 +101,6 @@ void spoker_state::video_start()
 
 UINT32 spoker_state::screen_update_spoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
@@ -131,7 +126,6 @@ static void show_out(UINT8 *out)
 
 WRITE8_MEMBER(spoker_state::spoker_nmi_and_coins_w)
 {
-
 	if ((data) & (0x22))
 	{
 		logerror("PC %06X: nmi_and_coins = %02x\n",space.device().safe_pc(),data);
@@ -156,7 +150,6 @@ WRITE8_MEMBER(spoker_state::spoker_nmi_and_coins_w)
 
 WRITE8_MEMBER(spoker_state::spoker_video_and_leds_w)
 {
-
 	set_led_status(machine(), 4,      data & 0x01); // start?
 	set_led_status(machine(), 5,      data & 0x04); // l_bet?
 
@@ -169,7 +162,6 @@ WRITE8_MEMBER(spoker_state::spoker_video_and_leds_w)
 
 WRITE8_MEMBER(spoker_state::spoker_leds_w)
 {
-
 	set_led_status(machine(), 0, data & 0x01);  // stop_1
 	set_led_status(machine(), 1, data & 0x02);  // stop_2
 	set_led_status(machine(), 2, data & 0x04);  // stop_3
@@ -182,7 +174,6 @@ WRITE8_MEMBER(spoker_state::spoker_leds_w)
 
 WRITE8_MEMBER(spoker_state::spoker_magic_w)
 {
-
 	m_igs_magic[offset] = data;
 
 	if (offset == 0)
@@ -201,7 +192,6 @@ WRITE8_MEMBER(spoker_state::spoker_magic_w)
 
 READ8_MEMBER(spoker_state::spoker_magic_r)
 {
-
 	switch(m_igs_magic[0])
 	{
 		case 0x00:
@@ -514,7 +504,6 @@ GFXDECODE_END
 
 void spoker_state::machine_reset()
 {
-
 	m_nmi_ack       =   0;
 	m_hopper            =   0;
 	m_video_enable  =   1;
@@ -522,7 +511,6 @@ void spoker_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(spoker_state::spoker_interrupt)
 {
-
 	device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 

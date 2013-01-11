@@ -389,7 +389,6 @@ static const k054338_interface bishi_k054338_intf =
 
 void bishi_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_k056832 = machine().device("k056832");
 	m_k054338 = machine().device("k054338");

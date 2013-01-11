@@ -260,7 +260,6 @@ INLINE INT64 normalised_multiply(INT32 a, INT32 b)
 
 TIMER_CALLBACK_MEMBER(micro3d_state::mac_done_callback)
 {
-
 	machine().device("drmath")->execute().set_input_line(AM29000_INTR0, ASSERT_LINE);
 	m_mac_stat = 0;
 }
@@ -498,7 +497,6 @@ READ16_MEMBER(micro3d_state::micro3d_encoder_l_r)
 
 TIMER_CALLBACK_MEMBER(micro3d_state::adc_done_callback)
 {
-
 	switch (param)
 	{
 		case 0: m_adc_val = ioport("THROTTLE")->read_safe(0);
@@ -633,7 +631,6 @@ DRIVER_INIT_MEMBER(micro3d_state,botss)
 
 void micro3d_state::machine_reset()
 {
-
 	m_ti_uart[STATUS] = 1;
 
 	machine().device("vgb")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

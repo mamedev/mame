@@ -15,7 +15,6 @@ static const gfx_layout taitojc_char_layout =
 
 TILE_GET_INFO_MEMBER(taitojc_state::taitojc_tile_info)
 {
-
 	UINT32 val = m_tile_ram[tile_index];
 	int color = (val >> 22) & 0xff;
 	int tile = (val >> 2) & 0x7f;
@@ -300,7 +299,6 @@ static void taitojc_exit(running_machine &machine)
 
 void taitojc_state::video_start()
 {
-
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitojc_exit), &machine()));
 
 	/* find first empty slot to decode gfx */
@@ -331,7 +329,6 @@ void taitojc_state::video_start()
 
 UINT32 taitojc_state::screen_update_taitojc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(0, cliprect);
 
 	// low priority objects
@@ -356,7 +353,6 @@ UINT32 taitojc_state::screen_update_taitojc(screen_device &screen, bitmap_ind16 
 
 UINT32 taitojc_state::screen_update_dendego(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	// update controller state in artwork
 	UINT8 btn = (ioport("BUTTONS")->read() & 0x77);
 	int level;

@@ -676,7 +676,6 @@ READ8_MEMBER(dkong_state::s2650_port0_r)
 
 READ8_MEMBER(dkong_state::s2650_port1_r)
 {
-
 #if DEBUG_PROTECTION
 	logerror("port 1 : pc = %04x, loopback = %02x fo=%d\n",space.device().safe_pc(), m_hunchloopback, m_main_fo);
 #endif
@@ -747,7 +746,6 @@ WRITE8_MEMBER(dkong_state::dkong_z80dma_rdy_w)
 
 WRITE8_MEMBER(dkong_state::nmi_mask_w)
 {
-
 	m_nmi_mask = data & 1;
 }
 

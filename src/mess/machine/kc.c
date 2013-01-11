@@ -212,7 +212,6 @@ void kc_state::update_cassette(int state)
 
 TIMER_CALLBACK_MEMBER(kc_state::kc_cassette_oneshot_timer)
 {
-
 	update_cassette(0);
 
 	m_cassette_oneshot_timer->reset();
@@ -222,7 +221,6 @@ TIMER_CALLBACK_MEMBER(kc_state::kc_cassette_oneshot_timer)
 // enabled only when cassette motor is on
 TIMER_CALLBACK_MEMBER(kc_state::kc_cassette_timer_callback)
 {
-
 	// read cassette data
 	int bit = (m_cassette->input() > 0.0038) ? 1 : 0;
 

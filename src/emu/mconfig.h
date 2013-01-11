@@ -179,8 +179,7 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 	(void)device; \
 	devcb2_base *devcb = NULL; \
 	(void)devcb; \
-	if (owner == NULL) owner = config.device_add(NULL, "root", &driver_device_creator<_class>, 0); \
-
+	if (owner == NULL) owner = config.device_add(NULL, "root", &driver_device_creator<_class>, 0);
 #define MACHINE_CONFIG_FRAGMENT(_name) \
 ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner) \
 { \
@@ -188,8 +187,7 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 	(void)device; \
 	devcb2_base *devcb = NULL; \
 	(void)devcb; \
-	assert(owner != NULL); \
-
+	assert(owner != NULL);
 #define MACHINE_CONFIG_DERIVED(_name, _base) \
 ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner) \
 { \
@@ -198,8 +196,7 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 	devcb2_base *devcb = NULL; \
 	(void)devcb; \
 	owner = MACHINE_CONFIG_NAME(_base)(config, owner); \
-	assert(owner != NULL); \
-
+	assert(owner != NULL);
 #define MACHINE_CONFIG_DERIVED_CLASS(_name, _base, _class) \
 ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t *owner) \
 { \
@@ -208,8 +205,7 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 	devcb2_base *devcb = NULL; \
 	(void)devcb; \
 	if (owner == NULL) owner = config.device_add(NULL, "root", &driver_device_creator<_class>, 0); \
-	owner = MACHINE_CONFIG_NAME(_base)(config, owner); \
-
+	owner = MACHINE_CONFIG_NAME(_base)(config, owner);
 #define MACHINE_CONFIG_END \
 	return owner; \
 }
@@ -226,58 +222,43 @@ ATTR_COLD device_t *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_t 
 
 // scheduling parameters
 #define MCFG_QUANTUM_TIME(_time) \
-	config.m_minimum_quantum = _time; \
-
+	config.m_minimum_quantum = _time;
 #define MCFG_QUANTUM_PERFECT_CPU(_cputag) \
-	owner->subtag(config.m_perfect_cpu_quantum, _cputag); \
-
+	owner->subtag(config.m_perfect_cpu_quantum, _cputag);
 
 
 // watchdog configuration
 #define MCFG_WATCHDOG_VBLANK_INIT(_count) \
-	config.m_watchdog_vblank_count = _count; \
-
+	config.m_watchdog_vblank_count = _count;
 #define MCFG_WATCHDOG_TIME_INIT(_time) \
-	config.m_watchdog_time = _time; \
-
+	config.m_watchdog_time = _time;
 
 // core functions
 #define MCFG_NVRAM_HANDLER(_func) \
-	config.m_nvram_handler = NVRAM_HANDLER_NAME(_func); \
-
+	config.m_nvram_handler = NVRAM_HANDLER_NAME(_func);
 #define MCFG_MEMCARD_HANDLER(_func) \
-	config.m_memcard_handler = MEMCARD_HANDLER_NAME(_func); \
-
+	config.m_memcard_handler = MEMCARD_HANDLER_NAME(_func);
 #define MCFG_NVRAM_HANDLER_CLEAR() \
-	config.m_nvram_handler = NULL; \
-
+	config.m_nvram_handler = NULL;
 
 // core video parameters
 #define MCFG_VIDEO_ATTRIBUTES(_flags) \
-	config.m_video_attributes = _flags; \
-
+	config.m_video_attributes = _flags;
 #define MCFG_GFXDECODE(_gfx) \
-	config.m_gfxdecodeinfo = GFXDECODE_NAME(_gfx); \
-
+	config.m_gfxdecodeinfo = GFXDECODE_NAME(_gfx);
 #define MCFG_PALETTE_LENGTH(_length) \
-	config.m_total_colors = _length; \
-
+	config.m_total_colors = _length;
 #define MCFG_DEFAULT_LAYOUT(_layout) \
-	config.m_default_layout = &(_layout)[0]; \
-
+	config.m_default_layout = &(_layout)[0];
 
 // add/remove devices
 #define MCFG_DEVICE_ADD(_tag, _type, _clock) \
-	device = config.device_add(owner, _tag, _type, _clock); \
-
+	device = config.device_add(owner, _tag, _type, _clock);
 #define MCFG_DEVICE_REPLACE(_tag, _type, _clock) \
-	device = config.device_replace(owner, _tag, _type, _clock); \
-
+	device = config.device_replace(owner, _tag, _type, _clock);
 #define MCFG_DEVICE_REMOVE(_tag) \
-	device = config.device_remove(owner, _tag); \
-
+	device = config.device_remove(owner, _tag);
 #define MCFG_DEVICE_MODIFY(_tag)    \
-	device = config.device_find(owner, _tag); \
-
+	device = config.device_find(owner, _tag);
 
 #endif  /* __MCONFIG_H__ */

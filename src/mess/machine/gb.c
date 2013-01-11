@@ -321,7 +321,6 @@ MACHINE_RESET_MEMBER(gb_state,gb)
 
 MACHINE_START_MEMBER(gb_state,sgb)
 {
-
 	m_sgb_packets = -1;
 	m_sgb_tile_data = auto_alloc_array_clear(machine(), UINT8, 0x2000 );
 

@@ -73,7 +73,6 @@ void nexus3d_flash_reset(running_machine& machine)
 
 READ8_MEMBER(nexus3d_state::n3d_flash_r)
 {
-
 	if (m_last_flash_cmd==0x70) return 0xe0;
 
 	if (m_last_flash_cmd==0x00)
@@ -181,7 +180,6 @@ INPUT_PORTS_END
 
 void nexus3d_state::video_start()
 {
-
 }
 
 UINT32 nexus3d_state::screen_update_nexus3d(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

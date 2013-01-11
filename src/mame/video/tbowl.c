@@ -201,7 +201,6 @@ void tbowl_state::video_start()
 
 UINT32 tbowl_state::screen_update_tbowl_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->set_scrollx(0, m_xscroll );
 	m_bg_tilemap->set_scrolly(0, m_yscroll );
 	m_bg2_tilemap->set_scrollx(0, m_bg2xscroll );
@@ -220,7 +219,6 @@ UINT32 tbowl_state::screen_update_tbowl_left(screen_device &screen, bitmap_ind16
 
 UINT32 tbowl_state::screen_update_tbowl_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->set_scrollx(0, m_xscroll+32*8 );
 	m_bg_tilemap->set_scrolly(0, m_yscroll );
 	m_bg2_tilemap->set_scrollx(0, m_bg2xscroll+32*8 );

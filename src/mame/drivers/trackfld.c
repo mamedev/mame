@@ -218,7 +218,6 @@ WRITE8_MEMBER(trackfld_state::questions_bank_w)
 
 WRITE8_MEMBER(trackfld_state::irq_mask_w)
 {
-
 	m_irq_mask = data & 1;
 }
 
@@ -252,7 +251,6 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(trackfld_state::yieartf_nmi_mask_w)
 {
-
 	m_yieartf_nmi_mask = data & 1;
 }
 
@@ -866,7 +864,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(trackfld_state,trackfld)
 {
-
 	/* video */
 	save_item(NAME(m_bg_bank));
 	save_item(NAME(m_sprite_bank1));
@@ -876,7 +873,6 @@ MACHINE_START_MEMBER(trackfld_state,trackfld)
 
 MACHINE_RESET_MEMBER(trackfld_state,trackfld)
 {
-
 	m_bg_bank = 0;
 	m_sprite_bank1 = 0;
 	m_sprite_bank2 = 0;
@@ -885,14 +881,12 @@ MACHINE_RESET_MEMBER(trackfld_state,trackfld)
 
 INTERRUPT_GEN_MEMBER(trackfld_state::vblank_irq)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(trackfld_state::vblank_nmi)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -953,7 +947,6 @@ MACHINE_CONFIG_END
 
 INTERRUPT_GEN_MEMBER(trackfld_state::yieartf_timer_irq)
 {
-
 	if (m_yieartf_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

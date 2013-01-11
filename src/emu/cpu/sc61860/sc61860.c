@@ -150,7 +150,6 @@ static CPU_SET_INFO( sc61860 )
 	sc61860_state *cpustate = get_safe_token(device);
 	switch (state)
 	{
-
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + SC61860_PC:         cpustate->pc = info->i; break;
 		case CPUINFO_INT_SP:

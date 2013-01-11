@@ -49,7 +49,6 @@ WRITE16_MEMBER(oneshot_state::oneshot_fg_videoram_w)
 
 void oneshot_state::video_start()
 {
-
 	m_bg_tilemap =  &machine().tilemap().create(tilemap_get_info_delegate(FUNC(oneshot_state::get_oneshot_bg_tile_info),this),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_mid_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(oneshot_state::get_oneshot_mid_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_fg_tilemap =  &machine().tilemap().create(tilemap_get_info_delegate(FUNC(oneshot_state::get_oneshot_fg_tile_info),this),  TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -151,7 +150,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 oneshot_state::screen_update_oneshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	m_mid_tilemap->set_scrollx(0, m_scroll[0] - 0x1f5);
@@ -167,7 +165,6 @@ UINT32 oneshot_state::screen_update_oneshot(screen_device &screen, bitmap_ind16 
 
 UINT32 oneshot_state::screen_update_maddonna(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	m_mid_tilemap->set_scrolly(0, m_scroll[1]); // other registers aren't used so we don't know which layers they relate to

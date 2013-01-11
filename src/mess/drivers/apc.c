@@ -768,7 +768,6 @@ void apc_state::machine_reset()
 
 void apc_state::palette_init()
 {
-
 }
 
 static UPD7220_INTERFACE( hgdc_1_intf )

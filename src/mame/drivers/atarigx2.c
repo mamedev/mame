@@ -106,7 +106,6 @@ WRITE32_MEMBER(atarigx2_state::latch_w)
 	/* upper byte */
 	if (ACCESSING_BITS_24_31)
 	{
-
 		/* bits 13-11 are the MO control bits */
 		atarirle_control_w(m_rle, (data >> 27) & 7);
 	}
@@ -2177,7 +2176,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(atarigx2_state,spclords)
 {
-
 	atarijsa_init(machine(), "SERVICE", 0x0040);
 
 	m_playfield_base = 0x000;
@@ -2186,7 +2184,6 @@ DRIVER_INIT_MEMBER(atarigx2_state,spclords)
 
 DRIVER_INIT_MEMBER(atarigx2_state,motofren)
 {
-
 	atarijsa_init(machine(), "SERVICE", 0x0040);
 
 	m_playfield_base = 0x400;
@@ -2221,7 +2218,6 @@ READ32_MEMBER(atarigx2_state::rrreveng_prot_r)
 
 DRIVER_INIT_MEMBER(atarigx2_state,rrreveng)
 {
-
 	atarijsa_init(machine(), "SERVICE", 0x0040);
 
 	m_playfield_base = 0x000;

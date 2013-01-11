@@ -1294,7 +1294,6 @@ static const ym3812_interface ym3812_config =
 
 MACHINE_START_MEMBER(aerofgt_state,common)
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	save_item(NAME(m_pending_command));
 }

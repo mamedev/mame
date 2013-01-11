@@ -128,7 +128,6 @@ class pgm_asic3_state : public pgm_state
 public:
 	pgm_asic3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag) {
-
 	}
 
 	// ASIC 3 (oriental legends protection)
@@ -152,7 +151,6 @@ public:
 	pgm_arm_type1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag),
 			m_arm7_shareram(*this, "arm7_shareram") {
-
 		m_curslots = 0;
 		m_puzzli_54_trigger = 0;
 	}
@@ -218,7 +216,6 @@ public:
 		: pgm_state(mconfig, type, tag),
 			m_arm_ram(*this, "arm_ram"),
 			m_arm7_shareram(*this, "arm7_shareram") {
-
 	}
 	// kov2
 	UINT32        m_kov2_latchdata_68k_w;
@@ -247,7 +244,6 @@ public:
 	pgm_arm_type3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag),
 			m_arm_ram(*this, "arm_ram") {
-
 	}
 	// svg
 	int           m_svg_ram_sel;
@@ -276,7 +272,6 @@ public:
 	pgm_022_025_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag),
 			m_sharedprotram(*this, "sharedprotram") {
-
 	}
 	int           m_kb_cmd;
 	int           m_kb_reg;
@@ -298,7 +293,6 @@ public:
 	pgm_028_025_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag),
 			m_sharedprotram(*this, "sharedprotram") {
-
 	}
 	// olds
 	int           m_kb_cmd;

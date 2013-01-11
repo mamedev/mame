@@ -141,7 +141,6 @@ TIMER_CALLBACK_MEMBER(dec8_state::dec8_i8751_timer_callback)
 
 WRITE8_MEMBER(dec8_state::dec8_i8751_w)
 {
-
 	switch (offset)
 	{
 	case 0: /* High byte - SECIRQ is trigged on activating this latch */
@@ -163,7 +162,6 @@ WRITE8_MEMBER(dec8_state::dec8_i8751_w)
 
 WRITE8_MEMBER(dec8_state::lastmisn_i8751_w)
 {
-
 	/* Japan coinage first, then World coinage - US coinage shall be the same as the Japan one */
 	int lneed1[2][4] = {{1, 1, 1, 2}, {1, 1, 1, 1}};   /* slot 1 : coins needed */
 	int lcred1[2][4] = {{1, 2, 3, 1}, {1, 2, 3, 5}};   /* slot 1 : credits awarded */
@@ -264,7 +262,6 @@ WRITE8_MEMBER(dec8_state::shackled_i8751_w)
 
 WRITE8_MEMBER(dec8_state::csilver_i8751_w)
 {
-
 	/* Japan coinage first, then World coinage - US coinage shall be the same as the Japan one */
 	int lneed1[2][4] = {{1, 1, 1, 2}, {1, 1, 1, 1}};   /* slot 1 : coins needed */
 	int lcred1[2][4] = {{1, 2, 3, 1}, {2, 3, 4, 6}};   /* slot 1 : credits awarded */
@@ -332,7 +329,6 @@ WRITE8_MEMBER(dec8_state::csilver_i8751_w)
 
 WRITE8_MEMBER(dec8_state::srdarwin_i8751_w)
 {
-
 	/* Japan coinage first, then World coinage - US coinage shall be the same as the Japan one */
 	int lneed1[2][4] = {{1, 1, 1, 2}, {1, 1, 1, 1}};   /* slot 1 : coins needed */
 	int lcred1[2][4] = {{1, 2, 3, 1}, {2, 3, 4, 6}};   /* slot 1 : credits awarded */
@@ -450,7 +446,6 @@ WRITE8_MEMBER(dec8_state::dec8_bank_w)
 /* Used by Ghostbusters, Meikyuu Hunter G & Gondomania */
 WRITE8_MEMBER(dec8_state::ghostb_bank_w)
 {
-
 	/* Bit 0: SECCLR - acknowledge interrupt from I8751
 	   Bit 1: NMI enable/disable
 	   Bit 2: Not connected according to schematics
@@ -905,7 +900,6 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(dec8_state::dec8_mcu_from_main_r)
 {
-
 	switch (offset)
 	{
 		case 0:
@@ -923,7 +917,6 @@ READ8_MEMBER(dec8_state::dec8_mcu_from_main_r)
 
 WRITE8_MEMBER(dec8_state::dec8_mcu_to_main_w)
 {
-
 	// Outputs P0 and P1 are latched
 	if (offset==0) m_i8751_port0=data;
 	else if (offset==1) m_i8751_port1=data;
@@ -1958,7 +1951,6 @@ INTERRUPT_GEN_MEMBER(dec8_state::oscar_interrupt)
 
 void dec8_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_subcpu = machine().device<cpu_device>("sub");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");

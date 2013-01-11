@@ -17,7 +17,6 @@ WRITE32_HANDLER( sh3_internal_high_w )
 
 	switch (offset)
 	{
-
 		case SH3_ICR0_IPRA_ADDR:
 			if (mem_mask & 0xffff0000)
 			{
@@ -81,7 +80,6 @@ READ32_HANDLER( sh3_internal_high_r )
 
 	switch (offset)
 	{
-
 		case SH3_ICR0_IPRA_ADDR:
 			logerror("'%s' (%08x): INTC internal read from %08x mask %08x (SH3_ICR0_IPRA_ADDR - %08x)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+SH3_UPPER_REGBASE,mem_mask, sh4->m_sh3internal_upper[offset]);
 			return (sh4->m_sh3internal_upper[offset] & 0xffff0000) | (sh4->SH4_IPRA & 0xffff);
@@ -144,10 +142,8 @@ READ32_HANDLER( sh3_internal_r )
 
 	if (offset<0x1000)
 	{
-
 		switch (offset)
 		{
-
 			case SH3_SAR0_ADDR: return sh4_handle_sar0_addr_r(sh4,mem_mask);
 			case SH3_SAR1_ADDR: return sh4_handle_sar1_addr_r(sh4,mem_mask);
 			case SH3_SAR2_ADDR: return sh4_handle_sar2_addr_r(sh4,mem_mask);
@@ -371,7 +367,6 @@ READ32_HANDLER( sh3_internal_r )
 	}
 	else
 	{
-
 		logerror("'%s' (%08x): unmapped internal read from %08x mask %08x\n",
 			sh4->device->tag(), sh4->pc & AM,
 			(offset *4)+0x4000000,
@@ -396,7 +391,6 @@ WRITE32_HANDLER( sh3_internal_w )
 
 		switch (offset)
 		{
-
 			case SH3_SAR0_ADDR: sh4_handle_sar0_addr_w(sh4,data,mem_mask);   break;
 			case SH3_SAR1_ADDR: sh4_handle_sar1_addr_w(sh4,data,mem_mask);   break;
 			case SH3_SAR2_ADDR: sh4_handle_sar2_addr_w(sh4,data,mem_mask);   break;
@@ -443,7 +437,6 @@ WRITE32_HANDLER( sh3_internal_w )
 
 			case PINTER_IPRC:
 				{
-
 					if (mem_mask & 0xffff0000)
 					{
 						logerror("'%s' (%08x): unmapped internal write to %08x = %08x & %08x (PINTER)\n",sh4->device->tag(), sh4->pc & AM,(offset *4)+0x4000000,data,mem_mask);

@@ -19,8 +19,7 @@
 
 #define MCFG_IBM5160_MOTHERBOARD_ADD(_tag, _cputag) \
 	MCFG_DEVICE_ADD(_tag, IBM5160_MOTHERBOARD, 0) \
-	ibm5160_mb_device::static_set_cputag(*device, _cputag); \
-
+	ibm5160_mb_device::static_set_cputag(*device, _cputag);
 // ======================> ibm5160_mb_device
 class ibm5160_mb_device : public device_t
 {
@@ -118,8 +117,7 @@ extern const device_type IBM5160_MOTHERBOARD;
 
 #define MCFG_IBM5150_MOTHERBOARD_ADD(_tag, _cputag) \
 	MCFG_DEVICE_ADD(_tag, IBM5150_MOTHERBOARD, 0) \
-	ibm5150_mb_device::static_set_cputag(*device, _cputag); \
-
+	ibm5150_mb_device::static_set_cputag(*device, _cputag);
 
 // ======================> ibm5150_mb_device
 class ibm5150_mb_device : public ibm5160_mb_device

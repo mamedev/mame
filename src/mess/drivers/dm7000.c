@@ -250,7 +250,6 @@ INPUT_PORTS_END
 
 void dm7000_state::machine_reset()
 {
-
 	dcr[DCRSTB045_CICVCR] = 0x00000001;
 	dcr[DCRSTB045_SCCR] = 0x00420080 /* default for serial divs */ | 0x3f /* undocumented?? used to print clocks */;
 	dcr[DCRSTB045_VIDEO_CNTL] = 0x00009000;

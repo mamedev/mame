@@ -319,7 +319,6 @@ WRITE32_MEMBER(macrossp_state::paletteram32_macrossp_w)
 
 READ32_MEMBER(macrossp_state::macrossp_soundstatus_r)
 {
-
 	//  logerror("%08x read soundstatus\n", space.device().safe_pc());
 
 	/* bit 1 is sound status */
@@ -332,7 +331,6 @@ READ32_MEMBER(macrossp_state::macrossp_soundstatus_r)
 
 WRITE32_MEMBER(macrossp_state::macrossp_soundcmd_w)
 {
-
 	if (ACCESSING_BITS_16_31)
 	{
 		//logerror("%08x write soundcmd %08x (%08x)\n",space.device().safe_pc(),data,mem_mask);
@@ -346,7 +344,6 @@ WRITE32_MEMBER(macrossp_state::macrossp_soundcmd_w)
 
 READ16_MEMBER(macrossp_state::macrossp_soundcmd_r)
 {
-
 	//  logerror("%06x read soundcmd\n",space.device().safe_pc());
 	m_sndpending = 0;
 	return soundlatch_word_r(space, offset, mem_mask);
@@ -384,7 +381,6 @@ static void update_colors( running_machine &machine )
 
 WRITE32_MEMBER(macrossp_state::macrossp_palette_fade_w)
 {
-
 	m_fade_effect = ((data & 0xff00) >> 8) - 0x28; //it writes two times, first with a -0x28 then with the proper data
 	//  popmessage("%02x",fade_effect);
 
@@ -599,7 +595,6 @@ static const es5506_interface es5506_config =
 
 void macrossp_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -611,7 +606,6 @@ void macrossp_state::machine_start()
 
 void macrossp_state::machine_reset()
 {
-
 	m_sndpending = 0;
 	m_snd_toggle = 0;
 	m_fade_effect = 0;
@@ -771,7 +765,6 @@ PC :00018110 018110: beq     18104
 #ifdef UNUSED_FUNCTION
 WRITE32_MEMBER(macrossp_state::quizmoon_speedup_w)
 {
-
 	COMBINE_DATA(&m_mainram[0x00020 / 4]);
 	if (space.device().safe_pc() == 0x1cc) space.device().execute().spin_until_interrupt();
 }

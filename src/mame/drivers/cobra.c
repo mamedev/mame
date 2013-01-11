@@ -500,7 +500,6 @@ const device_type COBRA_JVS = &device_creator<cobra_jvs>;
 cobra_jvs::cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: jvs_device(mconfig, COBRA_JVS, "COBRA_JVS", tag, owner, clock)
 {
-
 }
 
 bool cobra_jvs::switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch)
@@ -991,7 +990,6 @@ static void cobra_video_exit(running_machine *machine)
 
 void cobra_state::video_start()
 {
-
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cobra_video_exit), &machine()));
 
 	m_renderer = auto_alloc(machine(), cobra_renderer(machine()));
@@ -1000,7 +998,6 @@ void cobra_state::video_start()
 
 UINT32 cobra_state::screen_update_cobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 	if (m_has_psac)
 	{
 		device_t *k001604 = machine().device("k001604");
@@ -1280,12 +1277,10 @@ void cobra_state::s2mfifo_event_callback(cobra_fifo::EventType event)
 
 void cobra_state::gfxfifo_in_event_callback(cobra_fifo::EventType event)
 {
-
 }
 
 void cobra_state::gfxfifo_out_event_callback(cobra_fifo::EventType event)
 {
-
 }
 
 /*****************************************************************************/
@@ -1814,7 +1809,6 @@ READ32_MEMBER(cobra_state::sub_config_r)
 
 WRITE32_MEMBER(cobra_state::sub_config_w)
 {
-
 }
 
 READ32_MEMBER(cobra_state::sub_ata0_r)
@@ -1921,7 +1915,6 @@ READ32_MEMBER(cobra_state::sub_psac2_r)
 
 WRITE32_MEMBER(cobra_state::sub_psac2_w)
 {
-
 }
 
 static void sub_sound_dma_w(device_t *device, int width, UINT32 data)
@@ -3190,7 +3183,6 @@ WRITE_LINE_MEMBER(cobra_state::ide_interrupt)
 
 INTERRUPT_GEN_MEMBER(cobra_state::cobra_vblank)
 {
-
 	if (m_vblank_enable & 0x80)
 	{
 		device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
@@ -3283,7 +3275,6 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(cobra_state, cobra)
 {
-
 	m_gfxfifo_in  = auto_alloc(machine(),
 								cobra_fifo(machine(),
 								8192,

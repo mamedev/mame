@@ -94,7 +94,6 @@
 
 INTERRUPT_GEN_MEMBER(mac_state::mac_rbv_vbl)
 {
-
 	m_rbv_regs[2] &= ~0x40; // set vblank signal
 	m_rbv_vbltime = 10;
 

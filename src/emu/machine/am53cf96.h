@@ -12,8 +12,7 @@
 	MCFG_DEVICE_ADD( _tag, AM53CF96, 0 )
 
 #define MCFG_AM53CF96_IRQ_HANDLER(_devcb) \
-	devcb = &am53cf96_device::set_irq_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &am53cf96_device::set_irq_handler(*device, DEVCB2_##_devcb);
 // 53CF96 register set
 enum
 {

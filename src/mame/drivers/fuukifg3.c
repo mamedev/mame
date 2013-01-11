@@ -220,7 +220,6 @@ WRITE32_MEMBER(fuuki32_state::snd_020_w)
 
 WRITE32_MEMBER(fuuki32_state::fuuki32_vregs_w)
 {
-
 	if (m_vregs[offset] != data)
 	{
 		COMBINE_DATA(&m_vregs[offset]);

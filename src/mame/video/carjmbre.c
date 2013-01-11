@@ -45,7 +45,6 @@ void carjmbre_state::palette_init()
 
 WRITE8_MEMBER(carjmbre_state::carjmbre_flipscreen_w)
 {
-
 	m_flipscreen = (data & 1) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
 	machine().tilemap().set_flip_all(m_flipscreen);
 }
@@ -76,7 +75,6 @@ WRITE8_MEMBER(carjmbre_state::carjmbre_8806_w)
 
 WRITE8_MEMBER(carjmbre_state::carjmbre_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_cj_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
@@ -98,7 +96,6 @@ TILE_GET_INFO_MEMBER(carjmbre_state::get_carjmbre_tile_info)
 
 void carjmbre_state::video_start()
 {
-
 	m_cj_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(carjmbre_state::get_carjmbre_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_bgcolor));

@@ -256,7 +256,6 @@ static READ16_HANDLER( l3alt_prot_r )
 
 	switch (offset)
 	{
-
 		case 2:
 
 			switch (state->m_md_cart.l3alt_pcmd)
@@ -1841,7 +1840,6 @@ static int megadrive_load_nonlist(device_image_interface &image)
 		memcpy(tmpROMnew, ROM + 0x2000, length);
 		for (ptr = 0; ptr < length; ptr += 2)
 		{
-
 			ROM[ptr] = secondhalf[ptr >> 1];
 			ROM[ptr + 1] = tmpROMnew[ptr >> 1];
 		}

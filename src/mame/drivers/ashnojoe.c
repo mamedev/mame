@@ -329,7 +329,6 @@ static const msm5205_interface msm5205_config =
 
 void ashnojoe_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_adpcm_byte));
@@ -339,7 +338,6 @@ void ashnojoe_state::machine_start()
 
 void ashnojoe_state::machine_reset()
 {
-
 	m_adpcm_byte = 0;
 	m_soundlatch_status = 0;
 	m_msm5205_vclk_toggle = 0;

@@ -231,7 +231,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 buggychl_state::screen_update_buggychl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (m_sky_on)
 		draw_sky(bitmap, cliprect);
 	else

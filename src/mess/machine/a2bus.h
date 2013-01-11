@@ -22,13 +22,11 @@
 #define MCFG_A2BUS_BUS_ADD(_tag, _cputag, _config) \
 	MCFG_DEVICE_ADD(_tag, A2BUS, 0) \
 	MCFG_DEVICE_CONFIG(_config) \
-	a2bus_device::static_set_cputag(*device, _cputag); \
-
+	a2bus_device::static_set_cputag(*device, _cputag);
 #define MCFG_A2BUS_SLOT_ADD(_nbtag, _tag, _slot_intf, _def_slot, _def_inp) \
 	MCFG_DEVICE_ADD(_tag, A2BUS_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
-	a2bus_slot_device::static_set_a2bus_slot(*device, _nbtag, _tag); \
-
+	a2bus_slot_device::static_set_a2bus_slot(*device, _nbtag, _tag);
 #define MCFG_A2BUS_SLOT_REMOVE(_tag)    \
 	MCFG_DEVICE_REMOVE(_tag)
 

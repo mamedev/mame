@@ -14,7 +14,6 @@
 
 INPUT_CHANGED_MEMBER(cheekyms_state::coin_inserted)
 {
-
 	/* this starts a 556 one-shot timer (and triggers a sound effect) */
 	if (newval)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -110,14 +109,12 @@ GFXDECODE_END
 
 void cheekyms_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_dac = machine().device<dac_device>("dac");
 }
 
 INTERRUPT_GEN_MEMBER(cheekyms_state::vblank_irq)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }

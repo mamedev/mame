@@ -1246,7 +1246,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(cps_state,cps2)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -8288,7 +8287,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cps_state,cps2)
 {
-
 	/* Decrypt the game - see machine/cps2crpt.c */
 	DRIVER_INIT_CALL(cps2crpt);
 
@@ -8304,7 +8302,6 @@ DRIVER_INIT_MEMBER(cps_state,cps2)
 
 DRIVER_INIT_MEMBER(cps_state,ssf2tb)
 {
-
 	DRIVER_INIT_CALL(cps2);
 
 	m_cps2networkpresent = 0;
@@ -8317,7 +8314,6 @@ DRIVER_INIT_MEMBER(cps_state,ssf2tb)
 
 DRIVER_INIT_MEMBER(cps_state,pzloop2)
 {
-
 	DRIVER_INIT_CALL(cps2);
 
 	m_readpaddle = 0;

@@ -21,15 +21,13 @@
 		space.install_read_bank(_start, _end, _tag); \
 		space.unmap_write(_start, _end); \
 		m_bank_type[_bank] = TVC_ROM_BANK; \
-	} \
-
+	}
 #define TVC_INSTALL_RAM_BANK(_bank,_tag,_start,_end) \
 	if (m_bank_type[_bank] != TVC_RAM_BANK) \
 	{ \
 		space.install_readwrite_bank(_start, _end, _tag); \
 		m_bank_type[_bank] = TVC_RAM_BANK; \
-	} \
-
+	}
 void tvc_state::tvc_set_mem_page(UINT8 data)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);

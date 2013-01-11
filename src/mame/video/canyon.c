@@ -25,7 +25,6 @@ TILE_GET_INFO_MEMBER(canyon_state::get_bg_tile_info)
 
 void canyon_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(canyon_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
@@ -72,7 +71,6 @@ static void draw_bombs( running_machine &machine, bitmap_ind16 &bitmap, const re
 
 UINT32 canyon_state::screen_update_canyon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	draw_sprites(machine(), bitmap, cliprect);

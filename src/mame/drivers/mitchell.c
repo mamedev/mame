@@ -94,7 +94,6 @@ static const eeprom_interface eeprom_intf =
 
 READ8_MEMBER(mitchell_state::pang_port5_r)
 {
-
 	/* bits 0 and (sometimes) 3 are checked in the interrupt handler.
 	    bit 3 is checked before updating the palette so it really seems to be vblank.
 	    bit 0 may be vblank (or vblank irq flag) related too, but I'm not sure.
@@ -190,7 +189,6 @@ READ8_MEMBER(mitchell_state::block_input_r)
 
 WRITE8_MEMBER(mitchell_state::block_dial_control_w)
 {
-
 	if (data == 0x08)
 	{
 		/* reset the dial counters */
@@ -257,7 +255,6 @@ READ8_MEMBER(mitchell_state::input_r)
 
 WRITE8_MEMBER(mitchell_state::input_w)
 {
-
 	switch (m_input_type)
 	{
 		case 0:
@@ -1054,7 +1051,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(mitchell_state,mitchell)
 {
-
 	save_item(NAME(m_sample_buffer));
 	save_item(NAME(m_sample_select));
 	save_item(NAME(m_dial_selected));
@@ -1067,7 +1063,6 @@ MACHINE_START_MEMBER(mitchell_state,mitchell)
 
 MACHINE_RESET_MEMBER(mitchell_state,mitchell)
 {
-
 	m_sample_buffer = 0;
 	m_sample_select = 0;
 	m_dial_selected = 0;

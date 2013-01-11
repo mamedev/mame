@@ -90,11 +90,9 @@ extern const device_type CARTSLOT;
 ***************************************************************************/
 
 #define MCFG_CARTSLOT_ADD(_tag)                                         \
-	MCFG_DEVICE_ADD(_tag, CARTSLOT, 0)                                  \
-
+	MCFG_DEVICE_ADD(_tag, CARTSLOT, 0)
 #define MCFG_CARTSLOT_MODIFY(_tag)                                      \
-	MCFG_DEVICE_MODIFY(_tag)                                    \
-
+	MCFG_DEVICE_MODIFY(_tag)
 #define MCFG_CARTSLOT_EXTENSION_LIST(_extensions)                       \
 	static_cast<cartslot_image_device *>(device)->set_extensions(_extensions);
 

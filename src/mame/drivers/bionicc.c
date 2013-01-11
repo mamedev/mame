@@ -72,21 +72,18 @@
 
 WRITE16_MEMBER(bionicc_state::hacked_controls_w)
 {
-
 	logerror("%06x: hacked_controls_w %04x %02x\n", space.device().safe_pc(), offset, data);
 	COMBINE_DATA(&m_inp[offset]);
 }
 
 READ16_MEMBER(bionicc_state::hacked_controls_r)
 {
-
 	logerror("%06x: hacked_controls_r %04x %04x\n", space.device().safe_pc(), offset, m_inp[offset]);
 	return m_inp[offset];
 }
 
 WRITE16_MEMBER(bionicc_state::bionicc_mpu_trigger_w)
 {
-
 	data = ioport("SYSTEM")->read() >> 12;
 	m_inp[0] = data ^ 0x0f;
 
@@ -100,14 +97,12 @@ WRITE16_MEMBER(bionicc_state::bionicc_mpu_trigger_w)
 
 WRITE16_MEMBER(bionicc_state::hacked_soundcommand_w)
 {
-
 	COMBINE_DATA(&m_soundcommand);
 	soundlatch_byte_w(space, 0, m_soundcommand & 0xff);
 }
 
 READ16_MEMBER(bionicc_state::hacked_soundcommand_r)
 {
-
 	return m_soundcommand;
 }
 
@@ -330,7 +325,6 @@ GFXDECODE_END
 
 void bionicc_state::machine_start()
 {
-
 	save_item(NAME(m_soundcommand));
 	save_item(NAME(m_inp));
 	save_item(NAME(m_scroll));
@@ -338,7 +332,6 @@ void bionicc_state::machine_start()
 
 void bionicc_state::machine_reset()
 {
-
 	m_inp[0] = 0;
 	m_inp[1] = 0;
 	m_inp[2] = 0;

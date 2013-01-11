@@ -134,7 +134,6 @@ static WRITE8_HANDLER( bsx_write )
 
 static void bsx_init( running_machine &machine )
 {
-
 	memset(bsx_state.cart_regs, 0, ARRAY_LENGTH(bsx_state.cart_regs));
 
 	bsx_state.cart_regs[0x07] = 0x80;

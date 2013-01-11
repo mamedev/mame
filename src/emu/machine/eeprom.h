@@ -19,8 +19,7 @@
 
 #define MCFG_EEPROM_ADD(_tag, _interface) \
 	MCFG_DEVICE_ADD(_tag, EEPROM, 0) \
-	eeprom_device::static_set_interface(*device, _interface); \
-
+	eeprom_device::static_set_interface(*device, _interface);
 #define MCFG_EEPROM_93C46_ADD(_tag) \
 	MCFG_EEPROM_ADD(_tag, eeprom_interface_93C46)
 
@@ -31,11 +30,9 @@
 	MCFG_EEPROM_ADD(_tag, eeprom_interface_93C66B)
 
 #define MCFG_EEPROM_DATA(_data, _size) \
-	eeprom_device::static_set_default_data(*device, _data, _size); \
-
+	eeprom_device::static_set_default_data(*device, _data, _size);
 #define MCFG_EEPROM_DEFAULT_VALUE(_value) \
-	eeprom_device::static_set_default_value(*device, _value); \
-
+	eeprom_device::static_set_default_value(*device, _value);
 
 
 //**************************************************************************

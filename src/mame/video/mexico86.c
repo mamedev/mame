@@ -4,7 +4,6 @@
 
 WRITE8_MEMBER(mexico86_state::mexico86_bankswitch_w)
 {
-
 	if ((data & 7) > 5)
 		popmessage("Switching to invalid bank!");
 

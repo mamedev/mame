@@ -53,7 +53,6 @@ CUSTOM_INPUT_MEMBER(qdrmfgp_state::battery_sensor_r)
 
 WRITE16_MEMBER(qdrmfgp_state::gp_control_w)
 {
-
 	/* bit 0        enable irq 1 (sound) */
 	/* bit 1        enable irq 2 (not used) */
 	/* bit 2        enable irq 3 (vblank) */
@@ -86,7 +85,6 @@ WRITE16_MEMBER(qdrmfgp_state::gp_control_w)
 
 WRITE16_MEMBER(qdrmfgp_state::gp2_control_w)
 {
-
 	/* bit 2        enable irq 3 (sound) */
 	/* bit 3        enable irq 4 (vblank) */
 	/* bit 4        enable irq 5 (hdd) */

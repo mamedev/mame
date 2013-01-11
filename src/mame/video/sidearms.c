@@ -11,21 +11,18 @@
 
 WRITE8_MEMBER(sidearms_state::sidearms_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(sidearms_state::sidearms_colorram_w)
 {
-
 	m_colorram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(sidearms_state::sidearms_c804_w)
 {
-
 	/* bits 0 and 1 are coin counters */
 	coin_counter_w(machine(), 0, data & 0x01);
 	coin_counter_w(machine(), 1, data & 0x02);
@@ -338,7 +335,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 sidearms_state::screen_update_sidearms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	sidearms_draw_starfield(machine(), bitmap);
 
 	m_bg_tilemap->set_scrollx(0, m_bg_scrollx[0] + (m_bg_scrollx[1] << 8 & 0xf00));

@@ -403,7 +403,6 @@ void sharc_external_dma_write(device_t *device, UINT32 address, UINT64 data)
 
 			if (shift == 2)
 			{
-
 				cpustate->dma[6].int_index += cpustate->dma[6].int_modifier;
 			}
 			break;

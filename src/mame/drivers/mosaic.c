@@ -14,7 +14,6 @@
 
 WRITE8_MEMBER(mosaic_state::protection_w)
 {
-
 	if (!BIT(data, 7))
 	{
 		/* simply increment given value */
@@ -50,7 +49,6 @@ READ8_MEMBER(mosaic_state::protection_r)
 
 WRITE8_MEMBER(mosaic_state::gfire2_protection_w)
 {
-
 	logerror("%06x: protection_w %02x\n", space.device().safe_pc(), data);
 
 	switch(data)
@@ -251,13 +249,11 @@ static const ym2203_interface ym2203_config =
 
 void mosaic_state::machine_start()
 {
-
 	save_item(NAME(m_prot_val));
 }
 
 void mosaic_state::machine_reset()
 {
-
 	m_prot_val = 0;
 }
 

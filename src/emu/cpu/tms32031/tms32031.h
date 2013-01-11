@@ -120,8 +120,7 @@ enum
 //**************************************************************************
 
 #define MCFG_TMS3203X_CONFIG(_config) \
-	tms3203x_device::static_set_config(*device, _config); \
-
+	tms3203x_device::static_set_config(*device, _config);
 
 
 //**************************************************************************

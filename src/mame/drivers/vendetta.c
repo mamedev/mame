@@ -150,7 +150,6 @@ READ8_MEMBER(vendetta_state::vendetta_K052109_r)
 
 WRITE8_MEMBER(vendetta_state::vendetta_K052109_w)
 {
-
 	// *************************************************************************************
 	// *  Escape Kids uses 052109's mirrored Tilemap ROM bank selector, but only during    *
 	// *  Tilemap MASK-ROM Test       (0x1d80<->0x3d80, 0x1e00<->0x3e00, 0x1f00<->0x3f00)  *
@@ -182,7 +181,6 @@ static void vendetta_video_banking( running_machine &machine, int select )
 
 WRITE8_MEMBER(vendetta_state::vendetta_5fe0_w)
 {
-
 	/* bit 0,1 coin counters */
 	coin_counter_w(machine(), 0, data & 0x01);
 	coin_counter_w(machine(), 1, data & 0x02);

@@ -82,7 +82,6 @@ WRITE8_MEMBER(citycon_state::citycon_linecolor_w)
 
 WRITE8_MEMBER(citycon_state::citycon_background_w)
 {
-
 	/* bits 4-7 control the background image */
 	if (m_bg_image != (data >> 4))
 	{

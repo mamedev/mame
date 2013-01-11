@@ -126,7 +126,6 @@ WRITE8_MEMBER(gberet_state::mrgoemon_coin_counter_w)
 
 WRITE8_MEMBER(gberet_state::gberet_flipscreen_w)
 {
-
 	/* bits 0/1/2 = interrupt enable */
 	UINT8 ack_mask = ~data & m_interrupt_mask; // 1->0
 
@@ -403,7 +402,6 @@ static const sn76496_config psg_intf =
 
 MACHINE_START_MEMBER(gberet_state,gberet)
 {
-
 	save_item(NAME(m_interrupt_mask));
 	save_item(NAME(m_interrupt_ticks));
 	save_item(NAME(m_spritebank));
@@ -411,7 +409,6 @@ MACHINE_START_MEMBER(gberet_state,gberet)
 
 MACHINE_RESET_MEMBER(gberet_state,gberet)
 {
-
 	m_interrupt_mask = 0;
 	m_interrupt_ticks = 0;
 	m_spritebank = 0;

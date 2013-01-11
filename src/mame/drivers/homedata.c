@@ -340,7 +340,6 @@ WRITE8_MEMBER(homedata_state::reikaids_upd7807_porta_w)
 
 WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
 {
-
 	/* port C layout:
 	   7 coin counter
 	   6 to main CPU (data)
@@ -1141,7 +1140,6 @@ static const sn76496_config psg_intf =
 
 MACHINE_START_MEMBER(homedata_state,homedata)
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_ym = machine().device("ymsnd");
@@ -1194,7 +1192,6 @@ MACHINE_START_MEMBER(homedata_state,pteacher)
 
 MACHINE_RESET_MEMBER(homedata_state,homedata)
 {
-
 	m_visible_page = 0;
 	m_flipscreen = 0;
 	m_blitter_bank = 0;
@@ -2039,7 +2036,6 @@ DRIVER_INIT_MEMBER(homedata_state,battlcry)
 
 DRIVER_INIT_MEMBER(homedata_state,mirderby)
 {
-
 }
 
 

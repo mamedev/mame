@@ -135,7 +135,6 @@ WRITE16_MEMBER(esd16_state::esd16_tilemap0_color_jumppop_w)
 
 void esd16_state::video_start()
 {
-
 	m_tilemap_0 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
 	m_tilemap_1 = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(esd16_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
 

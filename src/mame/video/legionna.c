@@ -262,7 +262,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		if (state->m_has_extended_priority)
 		{
-
 			cur_pri = (spriteram16[offs+1] & 0xc000) >> 14;
 
 			if(data & 0x0040)

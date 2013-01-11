@@ -20,7 +20,6 @@ WRITE8_MEMBER(bigevglf_state::bigevglf_palette_w)
 
 WRITE8_MEMBER(bigevglf_state::bigevglf_gfxcontrol_w)
 {
-
 /* bits used: 0,1,2,3
  0 and 2 select plane,
  1 and 3 select visible plane,
@@ -51,7 +50,6 @@ READ8_MEMBER(bigevglf_state::bigevglf_vidram_r)
 
 void bigevglf_state::video_start()
 {
-
 	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap[0]);
 	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap[1]);
 	machine().primary_screen->register_screen_bitmap(m_tmp_bitmap[2]);
@@ -87,7 +85,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 bigevglf_state::screen_update_bigevglf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	copybitmap(bitmap, m_tmp_bitmap[m_plane_visible], 0, 0, 0, 0, cliprect);
 	draw_sprites(machine(), bitmap, cliprect);
 	return 0;

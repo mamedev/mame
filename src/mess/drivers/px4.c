@@ -321,7 +321,6 @@ TIMER_CALLBACK_MEMBER(px4_state::ext_cassette_read)
 // free running counter
 TIMER_DEVICE_CALLBACK_MEMBER(px4_state::frc_tick)
 {
-
 	m_frc_value++;
 
 	if (m_frc_value == 0)
@@ -703,7 +702,6 @@ TIMER_CALLBACK_MEMBER(px4_state::transmit_data)
 {
 	if (ART_TX_ENABLED)
 	{
-
 	}
 }
 
@@ -711,7 +709,6 @@ TIMER_CALLBACK_MEMBER(px4_state::receive_data)
 {
 	if (ART_RX_ENABLED)
 	{
-
 	}
 }
 
@@ -865,7 +862,6 @@ WRITE8_MEMBER(px4_state::px4_ioctlr_w)
 
 TIMER_DEVICE_CALLBACK_MEMBER(px4_state::upd7508_1sec_callback)
 {
-
 	// adjust interrupt status
 	m_interrupt_status |= UPD7508_INT_ONE_SECOND;
 
@@ -953,7 +949,6 @@ READ8_MEMBER(px4_state::px4_ramdisk_data_r)
 
 WRITE8_MEMBER(px4_state::px4_ramdisk_data_w)
 {
-
 	if (m_ramdisk_address < 0x20000)
 		m_ramdisk[m_ramdisk_address] = data;
 

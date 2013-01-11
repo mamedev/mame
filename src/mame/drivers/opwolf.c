@@ -428,7 +428,6 @@ ADDRESS_MAP_END
 
 void opwolf_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_pc080sn = machine().device("pc080sn");
@@ -447,7 +446,6 @@ void opwolf_state::machine_start()
 
 MACHINE_RESET_MEMBER(opwolf_state,opwolf)
 {
-
 	m_adpcm_b[0] = m_adpcm_b[1] = 0;
 	m_adpcm_c[0] = m_adpcm_c[1] = 0;
 	m_adpcm_pos[0] = m_adpcm_pos[1] = 0;

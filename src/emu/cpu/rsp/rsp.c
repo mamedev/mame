@@ -1912,10 +1912,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 
 				if (CARRY_FLAG(i) != 0)
 				{
-
 					if (ZERO_FLAG(i) != 0)
 					{
-
 						if (COMPARE_FLAG(i) != 0)
 						{
 							ACCUM_L(i) = -(UINT16)s2;
@@ -1927,10 +1925,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 					}
 					else//ZERO_FLAG(i)==0
 					{
-
 						if (rsp->flag[2] & (1 << (i)))
 						{
-
 							if (((UINT32)(UINT16)(s1) + (UINT32)(UINT16)(s2)) > 0x10000)
 							{//proper fix for Harvest Moon 64, r4
 
@@ -1939,7 +1935,6 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 							}
 							else
 							{
-
 								ACCUM_L(i) = -((UINT16)s2);
 								SET_COMPARE_FLAG(i);
 							}
@@ -1961,10 +1956,8 @@ static void handle_vector_ops(rsp_state *rsp, UINT32 op)
 				}//
 				else//CARRY_FLAG(i)==0
 				{
-
 					if (ZERO_FLAG(i) != 0)
 					{
-
 						if (rsp->flag[1] & (1 << (8+i)))
 						{
 							ACCUM_L(i) = s2;

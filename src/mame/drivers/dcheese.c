@@ -95,7 +95,6 @@ INTERRUPT_GEN_MEMBER(dcheese_state::dcheese_vblank)
 
 void dcheese_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_bsmt = machine().device("bsmt");
@@ -136,7 +135,6 @@ WRITE16_MEMBER(dcheese_state::eeprom_control_w)
 
 WRITE16_MEMBER(dcheese_state::sound_command_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		/* write the latch and set the IRQ */
@@ -156,7 +154,6 @@ WRITE16_MEMBER(dcheese_state::sound_command_w)
 
 READ8_MEMBER(dcheese_state::sound_command_r)
 {
-
 	/* read the latch and clear the IRQ */
 	m_soundlatch_full = 0;
 	m_audiocpu->set_input_line(0, CLEAR_LINE);

@@ -1169,7 +1169,6 @@ static TIMER_CALLBACK( wd17xx_write_sector_callback )
 		wd17xx_complete_command(device, DELAY_NOTREADY);
 	else
 	{
-
 		/* drive write protected? */
 		if (floppy_wpt_r(w->drive) == CLEAR_LINE)
 		{
@@ -1603,7 +1602,6 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 			}
 			else
 			{
-
 				/* drive write protected? */
 				if (floppy_wpt_r(w->drive) == CLEAR_LINE)
 				{

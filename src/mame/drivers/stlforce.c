@@ -363,13 +363,11 @@ ROM_END
 
 DRIVER_INIT_MEMBER(stlforce_state,stlforce)
 {
-
 	m_sprxoffs = 0;
 }
 
 DRIVER_INIT_MEMBER(stlforce_state,twinbrat)
 {
-
 	m_sprxoffs = 9;
 }
 

@@ -226,7 +226,6 @@ void atarig42_state::screen_eof_atarig42(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-
 		atarirle_eof(m_rle);
 	}
 }

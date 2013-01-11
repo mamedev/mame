@@ -286,7 +286,6 @@ void sknsspr_device::skns_draw_sprites(running_machine &machine, bitmap_ind16 &b
 
 
 	if ((!disabled)){
-
 		group_enable    = (sprite_regs[0x00/4] & 0x0040) >> 6; // RWR0
 
 		/* Sengekis uses global flip */

@@ -374,7 +374,6 @@ READ8_MEMBER(atarisy2_state::switch_6502_r)
 
 WRITE8_MEMBER(atarisy2_state::switch_6502_w)
 {
-
 	if (m_has_tms5220)
 	{
 		data = 12 | ((data >> 5) & 1);
@@ -687,7 +686,6 @@ WRITE8_MEMBER(atarisy2_state::mixer_w)
 
 WRITE8_MEMBER(atarisy2_state::sound_reset_w)
 {
-
 	/* if no change, do nothing */
 	if ((data & 1) == m_sound_reset_state)
 		return;
@@ -3245,7 +3243,6 @@ DRIVER_INIT_MEMBER(atarisy2_state,csprint)
 
 DRIVER_INIT_MEMBER(atarisy2_state,apb)
 {
-
 	slapstic_init(machine(), 110);
 
 	m_pedal_count = 2;

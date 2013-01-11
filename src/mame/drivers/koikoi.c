@@ -163,7 +163,6 @@ WRITE8_MEMBER(koikoi_state::vram_w)
 
 READ8_MEMBER(koikoi_state::input_r)
 {
-
 	if (m_inputcnt < 0)
 		return 0;
 
@@ -340,7 +339,6 @@ static const ay8910_interface ay8910_config =
 
 void koikoi_state::machine_start()
 {
-
 	save_item(NAME(m_inputcnt));
 	save_item(NAME(m_inputval));
 	save_item(NAME(m_inputlen));

@@ -123,7 +123,6 @@ UINT32 segald_state::screen_update_astron(screen_device &screen, bitmap_rgb32 &b
 /* READS */
 READ8_MEMBER(segald_state::astron_DISC_read)
 {
-
 	if (m_nmi_enable)
 		m_ldv1000_input_latch = m_laserdisc->status_r();
 
@@ -134,21 +133,18 @@ READ8_MEMBER(segald_state::astron_DISC_read)
 
 READ8_MEMBER(segald_state::astron_OUT_read)
 {
-
 	logerror("OUT read   (0x%04x) @ 0x%04x [0x%x]\n", m_out_ram[offset], offset, space.device().safe_pc());
 	return m_out_ram[offset];
 }
 
 READ8_MEMBER(segald_state::astron_OBJ_read)
 {
-
 	logerror("OBJ read   (0x%04x) @ 0x%04x [0x%x]\n", m_obj_ram[offset], offset, space.device().safe_pc());
 	return m_obj_ram[offset];
 }
 
 READ8_MEMBER(segald_state::astron_COLOR_read)
 {
-
 	logerror("COLOR read   (0x%04x) @ 0x%04x [0x%x]\n", m_color_ram[offset], offset, space.device().safe_pc());
 	return m_color_ram[offset];
 }
@@ -157,7 +153,6 @@ READ8_MEMBER(segald_state::astron_COLOR_read)
 /* WRITES */
 WRITE8_MEMBER(segald_state::astron_DISC_write)
 {
-
 	logerror("DISC write : 0x%04x @  0x%04x [0x%x]\n", data, offset, space.device().safe_pc());
 
 	m_ldv1000_output_latch = data;
@@ -168,7 +163,6 @@ WRITE8_MEMBER(segald_state::astron_DISC_write)
 
 WRITE8_MEMBER(segald_state::astron_OUT_write)
 {
-
 	logerror("OUT write : 0x%04x @  0x%04x [0x%x]\n", data, offset, space.device().safe_pc());
 
 	switch(offset)
@@ -205,7 +199,6 @@ WRITE8_MEMBER(segald_state::astron_OUT_write)
 
 WRITE8_MEMBER(segald_state::astron_OBJ_write)
 {
-
 	m_obj_ram[offset] = data;
 	logerror("OBJ write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, space.device().safe_pc());
 }
@@ -235,7 +228,6 @@ WRITE8_MEMBER(segald_state::astron_COLOR_write)
 
 WRITE8_MEMBER(segald_state::astron_FIX_write)
 {
-
 	m_fix_ram[offset] = data;
 	/* logerror("FIX write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, space.device().safe_pc()); */
 }

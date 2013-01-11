@@ -187,8 +187,7 @@ const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_BIG;
 #define DISABLE_COPYING(_Type) \
 private: \
 	_Type(const _Type &); \
-	_Type &operator=(const _Type &) \
-
+	_Type &operator=(const _Type &)
 
 // macro for declaring enumerator operators that increment/decrement like plain old C
 #define DECLARE_ENUM_OPERATORS(_Type) \

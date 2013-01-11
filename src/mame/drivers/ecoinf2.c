@@ -493,7 +493,6 @@ ROM_START( ec_sumnc )
 ROM_END
 DRIVER_INIT_MEMBER(ecoinf2_state,ecoinf2)
 {
-
 }
 
 // OXO wh type (Phoenix?) (watchdog on port 5c?)

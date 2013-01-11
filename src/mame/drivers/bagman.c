@@ -103,7 +103,6 @@ WRITE8_MEMBER(bagman_state::bagman_coin_counter_w)
 
 WRITE8_MEMBER(bagman_state::irq_mask_w)
 {
-
 	m_irq_mask = data & 1;
 }
 
@@ -464,7 +463,6 @@ static const tms5110_interface bagman_tms5110_interface =
 
 INTERRUPT_GEN_MEMBER(bagman_state::vblank_irq)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
@@ -929,7 +927,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(bagman_state,bagman)
 {
-
 	/* Unmap video enable register, not available on earlier hardware revision(s)
 	   Bagman is supposed to have glitches during screen transitions */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0xa003, 0xa003);

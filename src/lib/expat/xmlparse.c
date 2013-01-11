@@ -1967,7 +1967,6 @@ XML_ErrorString(enum XML_Error code)
 
 const XML_LChar * XMLCALL
 XML_ExpatVersion(void) {
-
 	/* V1 is used to string-ize the version number. However, it would
 	 string-ize the actual version macro *names* unless we get them
 	 substituted before being passed to V1. CPP is defined to expand
@@ -3075,7 +3074,6 @@ addBinding(XML_Parser parser, PREFIX *prefix, const ATTRIBUTE_ID *attId,
 		&& prefix->name[0] == XML_T(ASCII_x)
 		&& prefix->name[1] == XML_T(ASCII_m)
 		&& prefix->name[2] == XML_T(ASCII_l)) {
-
 	/* Not allowed to bind xmlns */
 	if (prefix->name[3] == XML_T(ASCII_n)
 		&& prefix->name[4] == XML_T(ASCII_s)

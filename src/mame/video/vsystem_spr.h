@@ -4,20 +4,15 @@
 typedef device_delegate<UINT32 (UINT32)> vsystem_tile_indirection_delegate;
 
 #define MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( _class, _method) \
-	vsystem_spr_device::set_tile_indirect_cb(*device, vsystem_tile_indirection_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0)); \
-
+	vsystem_spr_device::set_tile_indirect_cb(*device, vsystem_tile_indirection_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
 #define MCFG_VSYSTEM_SPR_SET_GFXREGION( _rgn ) \
-	vsystem_spr_device::set_gfx_region(*device, _rgn); \
-
+	vsystem_spr_device::set_gfx_region(*device, _rgn);
 #define MCFG_VSYSTEM_SPR_SET_PALBASE( _palbase ) \
-	vsystem_spr_device::CG10103_set_pal_base(*device, _palbase); \
-
+	vsystem_spr_device::CG10103_set_pal_base(*device, _palbase);
 #define MCFG_VSYSTEM_SPR_SET_PALMASK( _palmask ) \
-	vsystem_spr_device::set_pal_mask(*device, _palmask); \
-
+	vsystem_spr_device::set_pal_mask(*device, _palmask);
 #define MCFG_VSYSTEM_SPR_SET_TRANSPEN( _transpen ) \
-	vsystem_spr_device::CG10103_set_transpen(*device, _transpen); \
-
+	vsystem_spr_device::CG10103_set_transpen(*device, _transpen);
 
 /*** CG10103 **********************************************/
 

@@ -715,7 +715,6 @@ decode_mcu_DC_first (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 	* This way, we return uniform gray for the remainder of the segment.
 	*/
 	if (! entropy->insufficient_data) {
-
 	/* Load up working state */
 	BITREAD_LOAD_STATE(cinfo,entropy->bitstate);
 	ASSIGN_STATE(state, entropy->saved);
@@ -785,7 +784,6 @@ decode_mcu_AC_first (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 	* This way, we return uniform gray for the remainder of the segment.
 	*/
 	if (! entropy->insufficient_data) {
-
 	Se = cinfo->Se;
 	Al = cinfo->Al;
 	natural_order = cinfo->natural_order;
@@ -925,7 +923,6 @@ decode_mcu_AC_refine (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 	/* If we've run out of data, don't modify the MCU.
 	*/
 	if (! entropy->insufficient_data) {
-
 	Se = cinfo->Se;
 	p1 = 1 << cinfo->Al;    /* 1 in the bit position being coded */
 	m1 = (-1) << cinfo->Al; /* -1 in the bit position being coded */
@@ -1075,7 +1072,6 @@ decode_mcu_sub (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 	* This way, we return uniform gray for the remainder of the segment.
 	*/
 	if (! entropy->insufficient_data) {
-
 	natural_order = cinfo->natural_order;
 	Se = cinfo->lim_Se;
 
@@ -1202,7 +1198,6 @@ decode_mcu (j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
 	* This way, we return uniform gray for the remainder of the segment.
 	*/
 	if (! entropy->insufficient_data) {
-
 	/* Load up working state */
 	BITREAD_LOAD_STATE(cinfo,entropy->bitstate);
 	ASSIGN_STATE(state, entropy->saved);

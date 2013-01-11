@@ -198,7 +198,6 @@ READ16_MEMBER(vertigo_state::vertigo_sio_r)
 
 void vertigo_state::machine_start()
 {
-
 	m_custom = machine().device("custom");
 	m_ttl74148 = machine().device("74148");
 

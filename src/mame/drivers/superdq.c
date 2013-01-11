@@ -64,13 +64,11 @@ TILE_GET_INFO_MEMBER(superdq_state::get_tile_info)
 
 void superdq_state::video_start()
 {
-
 	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(superdq_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 UINT32 superdq_state::screen_update_superdq(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 	m_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
@@ -126,7 +124,6 @@ void superdq_state::palette_init()
 
 void superdq_state::machine_reset()
 {
-
 	m_ld_in_latch = 0;
 	m_ld_out_latch = 0xff;
 	m_color_bank = 0;
@@ -134,7 +131,6 @@ void superdq_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(superdq_state::superdq_vblank)
 {
-
 	/* status is read when the STATUS line from the laserdisc
 	   toggles (600usec after the vblank). We could set up a
 	   timer to do that, but this works as well */
@@ -149,7 +145,6 @@ INTERRUPT_GEN_MEMBER(superdq_state::superdq_vblank)
 
 WRITE8_MEMBER(superdq_state::superdq_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
@@ -185,13 +180,11 @@ WRITE8_MEMBER(superdq_state::superdq_io_w)
 
 READ8_MEMBER(superdq_state::superdq_ld_r)
 {
-
 	return m_ld_in_latch;
 }
 
 WRITE8_MEMBER(superdq_state::superdq_ld_w)
 {
-
 	m_ld_out_latch = data;
 }
 

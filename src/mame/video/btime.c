@@ -116,7 +116,6 @@ Start the video hardware emulation.
 
 VIDEO_START_MEMBER(btime_state,btime)
 {
-
 	if (machine().gfx[0]->srcdata() == NULL)
 		machine().gfx[0]->set_source(m_deco_charram);
 	if (machine().gfx[1]->srcdata() == NULL)

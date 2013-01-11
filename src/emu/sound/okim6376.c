@@ -566,7 +566,6 @@ WRITE_LINE_DEVICE_HANDLER( okim6376_st_w )
 
 	if (info->st != state)
 	{
-
 		info->st = state;
 		info->st_update = 1;
 
@@ -574,7 +573,6 @@ WRITE_LINE_DEVICE_HANDLER( okim6376_st_w )
 		{
 			struct ADPCMVoice *voice = &info->voice[info->channel];
 			{
-
 				info->st_pulses ++;
 				MSM6376LOG(("OKIM6376:'%s' ST pulses %x\n",device->tag(),info->st_pulses));
 				if (info->st_pulses > 3)

@@ -143,7 +143,6 @@ void dotrikun_state::machine_start()
 
 void dotrikun_state::machine_reset()
 {
-
 	m_color = 0;
 }
 

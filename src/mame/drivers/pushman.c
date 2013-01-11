@@ -49,7 +49,6 @@ WRITE16_MEMBER(pushman_state::pushman_control_w)
 
 READ16_MEMBER(pushman_state::pushman_68705_r)
 {
-
 	if (offset == 0)
 		return m_latch;
 
@@ -66,7 +65,6 @@ READ16_MEMBER(pushman_state::pushman_68705_r)
 
 WRITE16_MEMBER(pushman_state::pushman_68705_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 		m_shared_ram[2 * offset] = data >> 8;
 	if (ACCESSING_BITS_0_7)
@@ -83,7 +81,6 @@ WRITE16_MEMBER(pushman_state::pushman_68705_w)
 /* ElSemi - Bouncing balls protection. */
 READ16_MEMBER(pushman_state::bballs_68705_r)
 {
-
 	if (offset == 0)
 		return m_latch;
 	if (offset == 3 && m_new_latch)
@@ -99,7 +96,6 @@ READ16_MEMBER(pushman_state::bballs_68705_r)
 
 WRITE16_MEMBER(pushman_state::bballs_68705_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 		m_shared_ram[2 * offset] = data >> 8;
 	if (ACCESSING_BITS_0_7)
@@ -132,7 +128,6 @@ READ8_MEMBER(pushman_state::pushman_68000_r)
 
 WRITE8_MEMBER(pushman_state::pushman_68000_w)
 {
-
 	if (offset == 2 && (m_shared_ram[2] & 2) == 0 && data & 2)
 	{
 		m_latch = (m_shared_ram[1] << 8) | m_shared_ram[0];
@@ -402,7 +397,6 @@ static const ym2203_interface ym2203_config =
 
 void pushman_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_mcu = machine().device("mcu");
@@ -415,7 +409,6 @@ void pushman_state::machine_start()
 
 MACHINE_RESET_MEMBER(pushman_state,pushman)
 {
-
 	m_latch = 0;
 	m_new_latch = 0;
 	m_control[0] = 0;
@@ -468,7 +461,6 @@ MACHINE_CONFIG_END
 
 MACHINE_RESET_MEMBER(pushman_state,bballs)
 {
-
 	MACHINE_RESET_CALL_MEMBER(pushman);
 
 	m_latch = 0x400;

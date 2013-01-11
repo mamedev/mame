@@ -95,7 +95,6 @@ WRITE16_MEMBER(lockon_state::main_obj_w)
 
 WRITE16_MEMBER(lockon_state::tst_w)
 {
-
 	if (offset < 0x800)
 	{
 		address_space &gndspace = m_ground->memory().space(AS_PROGRAM);
@@ -453,7 +452,6 @@ static const ym2203_interface ym2203_config =
 
 void lockon_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_ground = machine().device("ground");
@@ -485,7 +483,6 @@ void lockon_state::machine_start()
 
 void lockon_state::machine_reset()
 {
-
 	m_ground_ctrl = 0;
 	m_scroll_h = 0;
 	m_scroll_v = 0;

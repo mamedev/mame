@@ -341,7 +341,6 @@ static void tc0610_rotate_draw(running_machine &machine, bitmap_ind16 &bitmap, b
 
 	if (state->m_tc0610_ctrl_reg[1][7])
 	{
-
 		if (ryx != 0 || ryy != 0)
 		{
 			while (sqrt(pow((float)pxx/4096.0, 2.0) + pow((float)pxy/4096.0, 2.0)) < (float)(lx / 2))

@@ -86,7 +86,6 @@ READ8_MEMBER(copsnrob_state::copsnrob_misc_r)
 
 WRITE8_MEMBER(copsnrob_state::copsnrob_misc2_w)
 {
-
 	m_misc = data & 0x7f;
 	/* Multi Player Start */
 	set_led_status(machine(), 1, !((data >> 6) & 0x01));
@@ -250,14 +249,12 @@ GFXDECODE_END
 
 void copsnrob_state::machine_start()
 {
-
 	save_item(NAME(m_ic_h3_data));
 	save_item(NAME(m_misc));
 }
 
 void copsnrob_state::machine_reset()
 {
-
 	m_ic_h3_data = 0;
 	m_misc = 0;
 }

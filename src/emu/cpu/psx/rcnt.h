@@ -15,14 +15,11 @@
 extern const device_type PSX_RCNT;
 
 #define MCFG_PSX_RCNT_IRQ0_HANDLER(_devcb) \
-	devcb = &psxrcnt_device::set_irq0_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &psxrcnt_device::set_irq0_handler(*device, DEVCB2_##_devcb);
 #define MCFG_PSX_RCNT_IRQ1_HANDLER(_devcb) \
-	devcb = &psxrcnt_device::set_irq1_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &psxrcnt_device::set_irq1_handler(*device, DEVCB2_##_devcb);
 #define MCFG_PSX_RCNT_IRQ2_HANDLER(_devcb) \
-	devcb = &psxrcnt_device::set_irq2_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &psxrcnt_device::set_irq2_handler(*device, DEVCB2_##_devcb);
 #define PSX_RC_STOP ( 0x01 )
 #define PSX_RC_RESET ( 0x04 ) /* guess */
 #define PSX_RC_COUNTTARGET ( 0x08 )

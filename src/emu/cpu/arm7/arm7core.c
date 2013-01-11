@@ -289,7 +289,6 @@ void arm7_check_irq_state(arm_state *cpustate)
 static void arm7_core_set_irq_line(arm_state *cpustate, int irqline, int state)
 {
 	switch (irqline) {
-
 	case ARM7_IRQ_LINE: /* IRQ */
 		cpustate->pendingIrq = state & 1;
 		break;

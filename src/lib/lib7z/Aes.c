@@ -104,8 +104,7 @@ void AesGenTables(void)
 	HT4(m, 2, s, p); \
 	HT4(m, 0, s, p); \
 	HT4(m, 3, s, p); \
-	HT4(m, 1, s, p); \
-
+	HT4(m, 1, s, p);
 #define FT(i, x) Sbox[gb ## x(m[(i + x) & 3])]
 #define FT4(i) dest[i] = Ui32(FT(i, 0), FT(i, 1), FT(i, 2), FT(i, 3)) ^ w[i];
 
@@ -120,8 +119,7 @@ void AesGenTables(void)
 	HD4(m, 0, s, p); \
 	HD4(m, 2, s, p); \
 	HD4(m, 3, s, p); \
-	HD4(m, 1, s, p); \
-
+	HD4(m, 1, s, p);
 #define FD(i, x) InvS[gb ## x(m[(i - x) & 3])]
 #define FD4(i) dest[i] = Ui32(FD(i, 0), FD(i, 1), FD(i, 2), FD(i, 3)) ^ w[i];
 

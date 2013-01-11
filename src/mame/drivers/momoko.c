@@ -245,7 +245,6 @@ void momoko_state::machine_start()
 
 void momoko_state::machine_reset()
 {
-
 	m_fg_scrollx = 0;
 	m_fg_scrolly = 0;
 	m_fg_select = 0;

@@ -164,7 +164,6 @@ TILE_GET_INFO_MEMBER(contra_state::get_tx_tile_info)
 
 void contra_state::video_start()
 {
-
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(contra_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(contra_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(contra_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -196,42 +195,36 @@ void contra_state::video_start()
 
 WRITE8_MEMBER(contra_state::contra_fg_vram_w)
 {
-
 	m_fg_vram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(contra_state::contra_fg_cram_w)
 {
-
 	m_fg_cram[offset] = data;
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(contra_state::contra_bg_vram_w)
 {
-
 	m_bg_vram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(contra_state::contra_bg_cram_w)
 {
-
 	m_bg_cram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(contra_state::contra_text_vram_w)
 {
-
 	m_tx_vram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(contra_state::contra_text_cram_w)
 {
-
 	m_tx_cram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
 }

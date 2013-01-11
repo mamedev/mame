@@ -54,7 +54,6 @@ READ8_MEMBER(skyfox_state::skyfox_vregs_r)// for debug
 
 WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
 {
-
 	m_vreg[offset] = data;
 
 	switch (offset)
@@ -198,8 +197,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				(CODE), \
 				0, \
 				flipx,flipy, \
-				x + (DX),y + (DY), 0xff); \
-
+				x + (DX),y + (DY), 0xff);
 		if (state->m_bg_ctrl & 1)   // flipscreen
 		{
 			x = width  - x - (n - 1) * 8;

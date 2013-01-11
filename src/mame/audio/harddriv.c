@@ -157,7 +157,6 @@ READ16_MEMBER(harddriv_state::hdsnd68k_status_r)
 
 WRITE16_MEMBER(harddriv_state::hdsnd68k_latches_w)
 {
-
 	/* bit 3 selects the value; data is ignored */
 	data = (offset >> 3) & 1;
 
@@ -243,7 +242,6 @@ WRITE16_MEMBER(harddriv_state::hdsnd68k_320ports_w)
 
 READ16_MEMBER(harddriv_state::hdsnd68k_320com_r)
 {
-
 	if (m_cramen)
 		return m_comram[offset & 0x1ff];
 
@@ -254,7 +252,6 @@ READ16_MEMBER(harddriv_state::hdsnd68k_320com_r)
 
 WRITE16_MEMBER(harddriv_state::hdsnd68k_320com_w)
 {
-
 	if (m_cramen)
 		COMBINE_DATA(&m_comram[offset & 0x1ff]);
 	else
@@ -295,7 +292,6 @@ READ16_MEMBER(harddriv_state::hdsnddsp_get_bio)
 
 WRITE16_MEMBER(harddriv_state::hdsnddsp_dac_w)
 {
-
 	/* DAC L */
 	if (!m_dacmute)
 		downcast<dac_device *>(machine().device("dac"))->write_signed16(data ^ 0x8000);

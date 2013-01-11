@@ -183,7 +183,6 @@ void deco_bac06_device::device_start()
 
 void deco_bac06_device::device_reset()
 {
-
 }
 
 
@@ -271,8 +270,6 @@ void deco_bac06_device::custom_tilemap_draw(running_machine &machine,
 			src_x++;
 			if ((flags&TILEMAP_DRAW_OPAQUE) || (p&m_bppmask))
 			{
-
-
 				if ((p&penmask)==pencondition)
 					if((colpri&colprimask)==colpricondition)
 						bitmap.pix16(y, x) = p+(colpri&m_gfxcolmask)*m_bppmult;
@@ -371,7 +368,6 @@ WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_1_w )
 
 WRITE16_DEVICE_HANDLER( deco_bac06_pf_data_w )
 {
-
 	deco_bac06_device *dev = (deco_bac06_device*)device;
 	if (dev->m_rambank&1) offset+=0x1000;
 

@@ -24,13 +24,11 @@ WRITE8_MEMBER(rollrace_state::ra_fake_d800_w)
 
 WRITE8_MEMBER(rollrace_state::nmi_mask_w)
 {
-
 	m_nmi_mask = data & 1;
 }
 
 WRITE8_MEMBER(rollrace_state::sound_nmi_mask_w)
 {
-
 	m_sound_nmi_mask = data & 1;
 }
 
@@ -210,14 +208,12 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(rollrace_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(rollrace_state::sound_timer_irq)
 {
-
 	if(m_sound_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

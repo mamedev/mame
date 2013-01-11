@@ -14,7 +14,6 @@
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_bankswitch_w)
 {
-
 	/* bits 0-2 select ROM bank */
 	membank("bank1")->set_entry((data ^ 4) & 7);
 
@@ -75,7 +74,6 @@ static const UINT8 tokio_prot_data[] =
 
 READ8_MEMBER(bublbobl_state::tokio_mcu_r)
 {
-
 	m_tokio_prot_count %= sizeof(tokio_prot_data);
 	return tokio_prot_data[m_tokio_prot_count++];
 }
@@ -88,7 +86,6 @@ READ8_MEMBER(bublbobl_state::tokiob_mcu_r)
 
 TIMER_CALLBACK_MEMBER(bublbobl_state::nmi_callback)
 {
-
 	if (m_sound_nmi_enable)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
@@ -108,7 +105,6 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_sh_nmi_disable_w)
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_sh_nmi_enable_w)
 {
-
 	m_sound_nmi_enable = 1;
 	if (m_pending_nmi)
 	{
@@ -182,7 +178,6 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_ddr4_w)
 
 READ8_MEMBER(bublbobl_state::bublbobl_mcu_port1_r)
 {
-
 	//logerror("%04x: 6801U4 port 1 read\n", space.device().safe_pc());
 	m_port1_in = ioport("IN0")->read();
 	return (m_port1_out & m_ddr1) | (m_port1_in & ~m_ddr1);
@@ -213,7 +208,6 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port1_w)
 
 READ8_MEMBER(bublbobl_state::bublbobl_mcu_port2_r)
 {
-
 	//logerror("%04x: 6801U4 port 2 read\n", space.device().safe_pc());
 	return (m_port2_out & m_ddr2) | (m_port2_in & ~m_ddr2);
 }

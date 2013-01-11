@@ -124,7 +124,6 @@ UINT32 diverboy_state::screen_update_diverboy(screen_device &screen, bitmap_ind1
 
 WRITE16_MEMBER(diverboy_state::soundcmd_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_byte_w(space, 0, data & 0xff);
@@ -249,7 +248,6 @@ GFXDECODE_END
 
 void diverboy_state::machine_start()
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 }
 

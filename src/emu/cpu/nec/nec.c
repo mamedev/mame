@@ -227,7 +227,6 @@ static CPU_RESET( nec )
 
 static CPU_EXIT( nec )
 {
-
 }
 
 static void nec_interrupt(nec_state_t *nec_state, unsigned int_num, INTSOURCES source)

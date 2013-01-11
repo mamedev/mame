@@ -1596,7 +1596,6 @@ WRITE16_MEMBER(cps_state::cps1_cps_a_w)
 
 READ16_MEMBER(cps_state::cps1_cps_b_r)
 {
-
 	/* Some games interrogate a couple of registers on bootup. */
 	/* These are CPS1 board B self test checks. They wander from game to */
 	/* game. */
@@ -1780,7 +1779,6 @@ static void cps2_gfx_decode( running_machine &machine )
 
 DRIVER_INIT_MEMBER(cps_state,cps1)
 {
-
 	cps1_gfx_decode(machine());
 
 	m_scanline1 = 0;
@@ -1795,7 +1793,6 @@ DRIVER_INIT_MEMBER(cps_state,cps1)
 
 DRIVER_INIT_MEMBER(cps_state,cps2_video)
 {
-
 	cps2_gfx_decode(machine());
 
 	m_scanline1 = 262;
@@ -2174,14 +2171,12 @@ VIDEO_START_MEMBER(cps_state,cps)
 
 VIDEO_START_MEMBER(cps_state,cps1)
 {
-
 	m_cps_version = 1;
 	VIDEO_START_CALL_MEMBER(cps);
 }
 
 VIDEO_START_MEMBER(cps_state,cps2)
 {
-
 	m_cps_version = 2;
 	VIDEO_START_CALL_MEMBER(cps);
 }
@@ -2455,7 +2450,6 @@ static void cps1_render_sprites( running_machine &machine, bitmap_ind16 &bitmap,
 
 WRITE16_MEMBER(cps_state::cps2_objram_bank_w)
 {
-
 	if (ACCESSING_BITS_0_7)
 		m_objram_bank = data & 1;
 }
@@ -2943,7 +2937,6 @@ void cps_state::screen_eof_cps1(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-
 		/* Get video memory base registers */
 		cps1_get_video_base(machine());
 

@@ -407,7 +407,6 @@ static const ay8910_interface ay8910_config =
 
 INTERRUPT_GEN_MEMBER(vastar_state::vblank_irq)
 {
-
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

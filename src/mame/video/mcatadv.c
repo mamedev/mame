@@ -25,7 +25,6 @@ TILE_GET_INFO_MEMBER(mcatadv_state::get_mcatadv_tile_info1)
 
 WRITE16_MEMBER(mcatadv_state::mcatadv_videoram1_w)
 {
-
 	COMBINE_DATA(&m_videoram1[offset]);
 	m_tilemap1->mark_tile_dirty(offset / 2);
 }
@@ -42,7 +41,6 @@ TILE_GET_INFO_MEMBER(mcatadv_state::get_mcatadv_tile_info2)
 
 WRITE16_MEMBER(mcatadv_state::mcatadv_videoram2_w)
 {
-
 	COMBINE_DATA(&m_videoram2[offset]);
 	m_tilemap2->mark_tile_dirty(offset / 2);
 }

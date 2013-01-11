@@ -71,6 +71,5 @@ extern const device_type KC_KEYBOARD;
 
 #define MCFG_KC_KEYBOARD_ADD(_tag,_clock,_config) \
 	MCFG_DEVICE_ADD(_tag, KC_KEYBOARD, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
-
+	MCFG_DEVICE_CONFIG(_config)
 #endif /* __KC_KEYB_H__ */

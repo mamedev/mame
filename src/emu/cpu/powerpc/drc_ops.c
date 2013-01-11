@@ -1872,7 +1872,6 @@ static UINT32 recompile_orcx(drc_core *drc, UINT32 op)
 
 static UINT32 recompile_ori(drc_core *drc, UINT32 op)
 {
-
 	emit_mov_r32_m32(DRCTOP, REG_EAX, MABS(&REG(RS)));
 	emit_or_r32_imm(DRCTOP, REG_EAX, UIMM16);
 	emit_mov_m32_r32(DRCTOP, MABS(&REG(RA)), REG_EAX);

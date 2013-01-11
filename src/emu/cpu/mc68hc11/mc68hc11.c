@@ -495,7 +495,6 @@ static CPU_RESET( hc11 )
 
 static CPU_EXIT( hc11 )
 {
-
 }
 
 /*

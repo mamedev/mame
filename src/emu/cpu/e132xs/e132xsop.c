@@ -15,8 +15,7 @@
 	decode->dst_is_local = 0; \
 	decode->same_src_dst = 0; \
 	decode->same_src_dstf = 0; \
-	decode->same_srcf_dst = 0; \
-
+	decode->same_srcf_dst = 0;
 
 void hyperstone_device::op00()
 {

@@ -898,7 +898,6 @@ WRITE8_MEMBER(maygay1b_state::m1ab_no_oki_w)
 
 DRIVER_INIT_MEMBER(maygay1b_state,m1)
 {
-
 	//AM_RANGE(0x2420, 0x2421) AM_WRITE(latch_ch2_w ) // oki
 	// if there is no OKI region disable writes here, the rom might be missing, so alert user
 

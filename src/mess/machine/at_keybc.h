@@ -45,7 +45,6 @@ struct at_keyboard_controller_interface
 class at_keyboard_controller_device : public device_t,
 										public at_keyboard_controller_interface
 {
-
 public:
 	// construction/destruction
 	at_keyboard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

@@ -134,27 +134,23 @@ TILE_GET_INFO_MEMBER(spool99_state::get_spool99_tile_info)
 
 void spool99_state::video_start()
 {
-
 	m_sc0_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spool99_state::get_spool99_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 UINT32 spool99_state::screen_update_spool99(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	m_sc0_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
 
 WRITE8_MEMBER(spool99_state::spool99_vram_w)
 {
-
 	m_vram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset/2);
 }
 
 WRITE8_MEMBER(spool99_state::spool99_cram_w)
 {
-
 	m_cram[offset] = data;
 	m_sc0_tilemap->mark_tile_dirty(offset/2);
 }
@@ -423,7 +419,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(spool99_state,spool99)
 {
-
 	UINT8 *ROM = memregion("maincpu")->base();
 //  vram = auto_alloc_array(machine(), UINT8, 0x2000);
 	memcpy(m_main, ROM, 0x100);

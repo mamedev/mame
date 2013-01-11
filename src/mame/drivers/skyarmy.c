@@ -77,14 +77,12 @@ TILE_GET_INFO_MEMBER(skyarmy_state::get_skyarmy_tile_info)
 
 WRITE8_MEMBER(skyarmy_state::skyarmy_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(skyarmy_state::skyarmy_colorram_w)
 {
-
 	m_colorram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
@@ -120,7 +118,6 @@ void skyarmy_state::palette_init()
 
 void skyarmy_state::video_start()
 {
-
 	m_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(skyarmy_state::get_skyarmy_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap->set_scroll_cols(32);
 }
@@ -158,14 +155,12 @@ UINT32 skyarmy_state::screen_update_skyarmy(screen_device &screen, bitmap_ind16 
 
 INTERRUPT_GEN_MEMBER(skyarmy_state::skyarmy_nmi_source)
 {
-
 	if(m_nmi) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 WRITE8_MEMBER(skyarmy_state::nmi_enable_w)
 {
-
 	m_nmi=data & 1;
 }
 

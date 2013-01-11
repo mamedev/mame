@@ -385,7 +385,6 @@ ROM_END
 /* Driver */
 DRIVER_INIT_MEMBER(bmjr_state,bmjr)
 {
-
 }
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY        FULLNAME       FLAGS */

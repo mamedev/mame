@@ -73,6 +73,5 @@ extern const device_type PSION_DATAPACK;
 ***************************************************************************/
 
 #define MCFG_PSION_DATAPACK_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PSION_DATAPACK, 0) \
-
+	MCFG_DEVICE_ADD(_tag, PSION_DATAPACK, 0)
 #endif /* __PSION_PACK_H__ */

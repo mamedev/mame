@@ -62,14 +62,11 @@ extern const device_type WILLIAMS_ADPCM_SOUND;
 //**************************************************************************
 
 #define MCFG_WILLIAMS_NARC_SOUND_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, WILLIAMS_NARC_SOUND, 0) \
-
+	MCFG_DEVICE_ADD(_tag, WILLIAMS_NARC_SOUND, 0)
 #define MCFG_WILLIAMS_CVSD_SOUND_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, WILLIAMS_CVSD_SOUND, 0) \
-
+	MCFG_DEVICE_ADD(_tag, WILLIAMS_CVSD_SOUND, 0)
 #define MCFG_WILLIAMS_ADPCM_SOUND_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, WILLIAMS_ADPCM_SOUND, 0) \
-
+	MCFG_DEVICE_ADD(_tag, WILLIAMS_ADPCM_SOUND, 0)
 
 
 //**************************************************************************

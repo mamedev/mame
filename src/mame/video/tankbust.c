@@ -211,7 +211,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		if ((spriteram[offs+1]!=4)) //otherwise - ghost sprites
 		{
-
 			drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
 				code, color,
 				flipx,flipy,

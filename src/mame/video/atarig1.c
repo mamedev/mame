@@ -148,7 +148,6 @@ void atarig1_state::scanline_update(screen_device &screen, int scanline)
 
 UINT32 atarig1_state::screen_update_atarig1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	/* draw the playfield */
 	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
 
@@ -165,7 +164,6 @@ void atarig1_state::screen_eof_atarig1(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-
 		atarirle_eof(m_rle);
 	}
 }

@@ -79,7 +79,6 @@ INTERRUPT_GEN_MEMBER(gcpinbal_state::gcpinbal_interrupt)
 
 READ16_MEMBER(gcpinbal_state::ioc_r)
 {
-
 	/* 20 (only once), 76, a0 are read in log */
 
 	switch (offset)
@@ -395,7 +394,6 @@ static const msm5205_interface msm6585_config =
 
 void gcpinbal_state::machine_start()
 {
-
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
 	save_item(NAME(m_bg0_gfxset));

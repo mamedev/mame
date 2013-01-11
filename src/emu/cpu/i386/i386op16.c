@@ -6,7 +6,6 @@ static UINT16 I386OP(shift_rotate16)(i386_state *cpustate, UINT8 modrm, UINT32 v
 	if( shift == 0 ) {
 		CYCLES_RM(cpustate,modrm, 3, 7);
 	} else if( shift == 1 ) {
-
 		switch( (modrm >> 3) & 0x7 )
 		{
 			case 0:         /* ROL rm16, 1 */
@@ -57,7 +56,6 @@ static UINT16 I386OP(shift_rotate16)(i386_state *cpustate, UINT8 modrm, UINT32 v
 				break;
 		}
 	} else {
-
 		switch( (modrm >> 3) & 0x7 )
 		{
 			case 0:         /* ROL rm16, i8 */
@@ -2012,7 +2010,6 @@ static void I386OP(shld16_i8)(i386_state *cpustate)         // Opcode 0x0f a4
 		UINT8 shift = FETCH(cpustate);
 		shift &= 31;
 		if( shift == 0 ) {
-
 		} else if( shift > 15 ) {
 			cpustate->CF = (upper & (1 << (16-shift))) ? 1 : 0;
 			// ppro and above should be (dst >> (32-shift))
@@ -2034,7 +2031,6 @@ static void I386OP(shld16_i8)(i386_state *cpustate)         // Opcode 0x0f a4
 		UINT8 shift = FETCH(cpustate);
 		shift &= 31;
 		if( shift == 0 ) {
-
 		} else if( shift > 15 ) {
 			cpustate->CF = (upper & (1 << (16-shift))) ? 1 : 0;
 			dst = (upper << (shift-16)) | (upper >> (32-shift));
@@ -2060,7 +2056,6 @@ static void I386OP(shld16_cl)(i386_state *cpustate)         // Opcode 0x0f a5
 		UINT8 shift = REG8(CL);
 		shift &= 31;
 		if( shift == 0 ) {
-
 		} else if( shift > 15 ) {
 			cpustate->CF = (upper & (1 << (16-shift))) ? 1 : 0;
 			dst = (upper << (shift-16)) | (upper >> (32-shift));
@@ -2081,7 +2076,6 @@ static void I386OP(shld16_cl)(i386_state *cpustate)         // Opcode 0x0f a5
 		UINT8 shift = REG8(CL);
 		shift &= 31;
 		if( shift == 0 ) {
-
 		} else if( shift > 15 ) {
 			cpustate->CF = (upper & (1 << (16-shift))) ? 1 : 0;
 			dst = (upper << (shift-16)) | (upper >> (32-shift));
@@ -2107,7 +2101,6 @@ static void I386OP(shrd16_i8)(i386_state *cpustate)         // Opcode 0x0f ac
 		UINT8 shift = FETCH(cpustate);
 		shift &= 31;
 		if( shift == 0) {
-
 		} else if( shift > 15 ) {
 			cpustate->CF = (upper & (1 << (shift-1))) ? 1 : 0;
 			dst = (upper >> (shift-16)) | (upper << (32-shift));
@@ -2128,7 +2121,6 @@ static void I386OP(shrd16_i8)(i386_state *cpustate)         // Opcode 0x0f ac
 		UINT8 shift = FETCH(cpustate);
 		shift &= 31;
 		if( shift == 0) {
-
 		} else if( shift > 15 ) {
 			cpustate->CF = (upper & (1 << (shift-1))) ? 1 : 0;
 			dst = (upper >> (shift-16)) | (upper << (32-shift));
@@ -2154,7 +2146,6 @@ static void I386OP(shrd16_cl)(i386_state *cpustate)         // Opcode 0x0f ad
 		UINT8 shift = REG8(CL);
 		shift &= 31;
 		if( shift == 0) {
-
 		} else if( shift > 15 ) {
 			cpustate->CF = (upper & (1 << (shift-1))) ? 1 : 0;
 			dst = (upper >> (shift-16)) | (upper << (32-shift));
@@ -2175,7 +2166,6 @@ static void I386OP(shrd16_cl)(i386_state *cpustate)         // Opcode 0x0f ad
 		UINT8 shift = REG8(CL);
 		shift &= 31;
 		if( shift == 0) {
-
 		} else if( shift > 15 ) {
 			cpustate->CF = (upper & (1 << (shift-1))) ? 1 : 0;
 			dst = (upper >> (shift-16)) | (upper << (32-shift));

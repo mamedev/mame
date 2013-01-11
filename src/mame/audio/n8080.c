@@ -457,7 +457,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::helifire_dac_volume_timer)
 
 MACHINE_START_MEMBER(n8080_state,spacefev_sound)
 {
-
 	m_sound_timer[0] = machine().scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
 	m_sound_timer[1] = machine().scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
 	m_sound_timer[2] = machine().scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
@@ -487,7 +486,6 @@ MACHINE_RESET_MEMBER(n8080_state,spacefev_sound)
 
 MACHINE_START_MEMBER(n8080_state,sheriff_sound)
 {
-
 	m_sound_timer[0] = machine().scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
 	m_sound_timer[1] = machine().scheduler().timer_alloc(FUNC(stop_mono_flop_callback));
 
@@ -515,7 +513,6 @@ MACHINE_RESET_MEMBER(n8080_state,sheriff_sound)
 
 MACHINE_START_MEMBER(n8080_state,helifire_sound)
 {
-
 	save_item(NAME(m_prev_snd_data));
 	save_item(NAME(m_prev_sound_pins));
 	save_item(NAME(m_curr_sound_pins));

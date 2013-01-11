@@ -208,7 +208,6 @@ void supertnk_state::video_start()
 
 WRITE8_MEMBER(supertnk_state::supertnk_videoram_w)
 {
-
 	if (m_bitplane_select > 2)
 	{
 		m_videoram[0][offset] = 0;
@@ -235,14 +234,12 @@ READ8_MEMBER(supertnk_state::supertnk_videoram_r)
 
 WRITE8_MEMBER(supertnk_state::supertnk_bitplane_select_0_w)
 {
-
 	m_bitplane_select = (m_bitplane_select & 0x02) | ((data << 0) & 0x01);
 }
 
 
 WRITE8_MEMBER(supertnk_state::supertnk_bitplane_select_1_w)
 {
-
 	m_bitplane_select = (m_bitplane_select & 0x01) | ((data << 1) & 0x02);
 }
 

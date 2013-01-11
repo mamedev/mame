@@ -1037,7 +1037,6 @@ WRITE32_MEMBER(konamigx_state::type4_prot_w)
 		{
 			if (last_prot_op != -1)
 			{
-
 //              mame_printf_debug("type 4 prot command: %x\n", last_prot_op);
 				/*
 				    known commands:

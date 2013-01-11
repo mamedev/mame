@@ -232,7 +232,6 @@ cpu #2 (PC=0000060E): unmapped memory word read from 0000683A & FFFF
 
 WRITE16_MEMBER(taitoair_state::system_control_w)
 {
-
 	if ((ACCESSING_BITS_0_7 == 0) && ACCESSING_BITS_8_15)
 		data >>= 8;
 
@@ -250,7 +249,6 @@ READ16_MEMBER(taitoair_state::lineram_r)
 
 WRITE16_MEMBER(taitoair_state::lineram_w)
 {
-
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7)
 		m_line_ram[offset] = data;
 
@@ -265,14 +263,12 @@ READ16_MEMBER(taitoair_state::dspram_r)
 
 WRITE16_MEMBER(taitoair_state::dspram_w)
 {
-
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7)
 		m_dsp_ram[offset] = data;
 }
 
 READ16_MEMBER(taitoair_state::dsp_HOLD_signal_r)
 {
-
 	/* HOLD signal is active low */
 	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n", space.device().safe_pcbase(), m_dsp_hold_signal);
 
@@ -383,7 +379,6 @@ static void reset_sound_region( running_machine &machine )
 
 WRITE8_MEMBER(taitoair_state::sound_bankswitch_w)
 {
-
 	m_banknum = data & 3;
 	reset_sound_region(machine());
 }

@@ -1386,7 +1386,6 @@ int kaneko_calc3_device::calc3_decompress_table(running_machine& machine, int ta
 							}
 							else
 							{
-
 								UINT8 inlinet = datarom[inline_table_base + (i%inline_table_size)];
 								dat = datarom[offset+i];
 
@@ -1641,7 +1640,6 @@ void kaneko_calc3_device::calc3_mcu_run(running_machine &machine)
 		/* 0xff is a special 'init' command */
 		if (mcu_command == 0xff)
 		{
-
 			// clear old command (handshake to main cpu)
 			m_calc3_mcuram[(calc3.mcu_command_offset>>1)+0] = 0x0000;
 

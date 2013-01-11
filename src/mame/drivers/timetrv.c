@@ -51,7 +51,6 @@ public:
 
 void timetrv_state::video_start()
 {
-
 }
 
 UINT32 timetrv_state::screen_update_timetrv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

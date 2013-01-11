@@ -32,7 +32,6 @@
 #ifdef JMAKE_ENUM_LIST
 
 typedef enum {
-
 #define JMESSAGE(code,string)   code ,
 
 #endif /* JMAKE_ENUM_LIST */

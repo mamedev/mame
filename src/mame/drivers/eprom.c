@@ -94,7 +94,6 @@ READ16_MEMBER(eprom_state::adc_r)
 
 WRITE16_MEMBER(eprom_state::eprom_latch_w)
 {
-
 	if (ACCESSING_BITS_0_7 && (machine().device("extra") != NULL))
 	{
 		/* bit 0: reset extra CPU */
@@ -704,7 +703,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(eprom_state,eprom)
 {
-
 	atarijsa_init(machine(), "260010", 0x0002);
 
 	/* install CPU synchronization handlers */

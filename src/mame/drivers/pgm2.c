@@ -54,22 +54,18 @@ UINT32 pgm2_state::screen_update_pgm2(screen_device &screen, bitmap_ind16 &bitma
 
 void pgm2_state::screen_eof_pgm2(screen_device &screen, bool state)
 {
-
 }
 
 void pgm2_state::video_start()
 {
-
 }
 
 void pgm2_state::machine_start()
 {
-
 }
 
 void pgm2_state::machine_reset()
 {
-
 }
 
 static const gfx_layout tiles8x8_layout =

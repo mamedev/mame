@@ -26,7 +26,6 @@
 
 INTERRUPT_GEN_MEMBER(pooyan_state::pooyan_interrupt)
 {
-
 	if (m_irq_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
@@ -34,7 +33,6 @@ INTERRUPT_GEN_MEMBER(pooyan_state::pooyan_interrupt)
 
 WRITE8_MEMBER(pooyan_state::irq_enable_w)
 {
-
 	m_irq_enable = data & 1;
 	if (!m_irq_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -174,7 +172,6 @@ GFXDECODE_END
 
 void pooyan_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	save_item(NAME(m_irq_enable));

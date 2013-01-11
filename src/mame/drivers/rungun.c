@@ -110,7 +110,6 @@ READ16_MEMBER(rungun_state::rng_sysregs_r)
 
 WRITE16_MEMBER(rungun_state::rng_sysregs_w)
 {
-
 	COMBINE_DATA(m_sysreg + offset);
 
 	switch (offset)
@@ -157,14 +156,12 @@ WRITE16_MEMBER(rungun_state::sound_cmd2_w)
 
 WRITE16_MEMBER(rungun_state::sound_irq_w)
 {
-
 	if (ACCESSING_BITS_8_15)
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 READ16_MEMBER(rungun_state::sound_status_msb_r)
 {
-
 	if (ACCESSING_BITS_8_15)
 		return(m_sound_status << 8);
 
@@ -173,7 +170,6 @@ READ16_MEMBER(rungun_state::sound_status_msb_r)
 
 INTERRUPT_GEN_MEMBER(rungun_state::rng_interrupt)
 {
-
 	if (m_sysreg[0x0c / 2] & 0x09)
 		device.execute().set_input_line(M68K_IRQ_5, ASSERT_LINE);
 }
@@ -216,7 +212,6 @@ WRITE8_MEMBER(rungun_state::sound_status_w)
 
 WRITE8_MEMBER(rungun_state::z80ctrl_w)
 {
-
 	m_z80_control = data;
 
 	membank("bank2")->set_entry(data & 0x07);
@@ -227,7 +222,6 @@ WRITE8_MEMBER(rungun_state::z80ctrl_w)
 
 INTERRUPT_GEN_MEMBER(rungun_state::audio_interrupt)
 {
-
 	if (m_z80_control & 0x80)
 		return;
 
@@ -382,7 +376,6 @@ void rungun_state::machine_start()
 
 void rungun_state::machine_reset()
 {
-
 	machine().device<k054539_device>("k054539_1")->init_flags(k054539_device::REVERSE_STEREO);
 
 	memset(m_sysreg, 0, 0x20);

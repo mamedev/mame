@@ -278,7 +278,6 @@ UINT32 coinmvga_state::screen_update_coinmvga(screen_device &screen, bitmap_ind1
 
 void coinmvga_state::palette_init()
 {
-
 }
 
 

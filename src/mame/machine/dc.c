@@ -78,7 +78,6 @@ static const char *const sysctrl_names[] =
 
 TIMER_CALLBACK_MEMBER(dc_state::aica_dma_irq)
 {
-
 	m_wave_dma.start = g2bus_regs[SB_ADST] = 0;
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA;
 	dc_update_interrupt_status(machine());
@@ -86,7 +85,6 @@ TIMER_CALLBACK_MEMBER(dc_state::aica_dma_irq)
 
 TIMER_CALLBACK_MEMBER(dc_state::pvr_dma_irq)
 {
-
 	m_pvr_dma.start = pvrctrl_regs[SB_PDST] = 0;
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_PVR;
 	dc_update_interrupt_status(machine());
@@ -110,7 +108,6 @@ void dc_maple_irq(running_machine &machine)
 
 TIMER_CALLBACK_MEMBER(dc_state::ch2_dma_irq)
 {
-
 	dc_sysctrl_regs[SB_C2DLEN]=0;
 	dc_sysctrl_regs[SB_C2DST]=0;
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_CH2;
@@ -119,7 +116,6 @@ TIMER_CALLBACK_MEMBER(dc_state::ch2_dma_irq)
 
 TIMER_CALLBACK_MEMBER(dc_state::yuv_fifo_irq)
 {
-
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_EOXFER_YUV;
 	dc_update_interrupt_status(machine());
 }
@@ -735,7 +731,6 @@ WRITE64_HANDLER( dc_rtc_w )
 
 TIMER_CALLBACK_MEMBER(dc_state::dc_rtc_increment)
 {
-
 	dc_rtcregister[RTC2] = (dc_rtcregister[RTC2] + 1) & 0xFFFF;
 	if (dc_rtcregister[RTC2] == 0)
 		dc_rtcregister[RTC1] = (dc_rtcregister[RTC1] + 1) & 0xFFFF;
@@ -784,7 +779,6 @@ static void rtc_initial_setup(running_machine &machine)
 
 void dc_state::machine_start()
 {
-
 	rtc_initial_setup(machine());
 
 	// save states
@@ -817,7 +811,6 @@ void dc_state::machine_start()
 
 void dc_state::machine_reset()
 {
-
 	/* halt the ARM7 */
 	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 

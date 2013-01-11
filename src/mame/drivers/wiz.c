@@ -216,7 +216,6 @@ WRITE8_MEMBER(wiz_state::wiz_coin_counter_w)
 
 WRITE8_MEMBER(wiz_state::wiz_main_nmi_mask_w)
 {
-
 	m_main_nmi_mask = data & 1;
 }
 
@@ -252,7 +251,6 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(wiz_state::wiz_sound_nmi_mask_w)
 {
-
 	m_sound_nmi_mask = data & 1;
 }
 
@@ -702,14 +700,12 @@ void wiz_state::machine_reset()
 
 INTERRUPT_GEN_MEMBER(wiz_state::wiz_vblank_interrupt)
 {
-
 	if(m_main_nmi_mask & 1)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(wiz_state::wiz_sound_interrupt)
 {
-
 	if(m_sound_nmi_mask & 1)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

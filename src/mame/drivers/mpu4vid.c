@@ -222,7 +222,6 @@ public:
 		m_vid_vidram(*this, "vid_vidram"),
 		m_vid_mainram(*this, "vid_mainram")
 	{
-
 	}
 
 	optional_device<scn2674_device> m_scn2674;
@@ -519,7 +518,6 @@ static const gfx_layout mpu4_vid_char_16x16_layout =
 
 UINT32 mpu4vid_state::screen_update_mpu4_vid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(0, cliprect);
 
 	m_scn2674->scn2574_draw(machine(), bitmap, cliprect, m_vid_mainram );
@@ -1502,7 +1500,6 @@ ADDRESS_MAP_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(mpu4vid_state::scanline_timer_callback)
 {
-
 	m_scn2674->scn2674_do_scanline(machine(), param);
 }
 

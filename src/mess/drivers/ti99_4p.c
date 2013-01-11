@@ -812,7 +812,6 @@ static TMS99xx_CONFIG( sgcpu_cpuconf )
 
 void ti99_4p_state::machine_start()
 {
-
 	m_cpu = static_cast<tms9900_device*>(machine().device("maincpu"));
 	m_peribox = static_cast<peribox_device*>(machine().device(PERIBOX_TAG));
 	m_sound = static_cast<ti_sound_system_device*>(machine().device(TISOUND_TAG));

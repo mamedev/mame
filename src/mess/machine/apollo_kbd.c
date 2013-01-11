@@ -867,7 +867,6 @@ TIMER_CALLBACK( apollo_kbd_device::static_poll_callback )
 }
 
 UINT16 apollo_kbd_device::m_code_table[] = {
-
 		/* Key   | Keycap      | Down | Up  |Unshifted|Shifted|Control|Caps Lock|Up Trans|Auto  */
 		/* Number| Legend      | Code | Code|Code     | Code  | Code  |Code     | Code   |Repeat*/
 

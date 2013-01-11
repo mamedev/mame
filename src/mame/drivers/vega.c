@@ -157,7 +157,6 @@ WRITE8_MEMBER(vega_state::extern_w)
 
 	switch((m_p2_data>>2)&7) /* 7442 = lines 2,3,4 - select device */
 	{
-
 		case 0:  /* 00-03 */
 		{
 			/* PPI 8255 /CS */
@@ -322,32 +321,26 @@ READ8_MEMBER(vega_state::extern_r)
 #if 0
 		case 3: /* 0c-0f */
 		{
-
-
 		}
 		break;
 
 		case 4: /* 10-13 */
 		{
-
 		}
 		break;
 
 		case 5: /* 14-17 */
 		{
-
 		}
 		break;
 
 		case 6: /* 18-1b */
 		{
-
 		}
 		break;
 
 		case 7: /* 1c-1f */
 		{
-
 		}
 		break;
 #endif
@@ -492,7 +485,6 @@ void vega_state::palette_init()
 static void draw_tilemap(vega_state *state, screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
 	{
-
 	UINT8 *map_lookup = state->memregion("tilemaps")->base();
 
 	int offset_y=state->m_tilemap_offset_y;
@@ -504,8 +496,6 @@ static void draw_tilemap(vega_state *state, screen_device& screen, bitmap_ind16&
 	{
 		for(int yy=0;yy<8;yy++)
 		{
-
-
 			int x0=xx*32;
 			int y0=yy*32;
 
@@ -521,7 +511,6 @@ static void draw_tilemap(vega_state *state, screen_device& screen, bitmap_ind16&
 
 			if(bank!=3)
 			{
-
 				num+=bank*8;
 
 			num*=8*4;
@@ -565,7 +554,6 @@ UINT32 vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitma
 		for(y=0;y<25;++y)
 			for(x=0;x<40;++x)
 			{
-
 				int character=m_txt_ram[idx];
 				//int color=BITSWAP8(color_lookup[character],7,6,5,4,0,1,2,3)>>1;
 				int color=color_lookup[character]&0xf;
@@ -592,7 +580,6 @@ UINT32 vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitma
 	{
 		for(int i=OBJ_0;i<OBJ_PLAYER;++i)
 		{
-
 			int x0=255-m_obj[i].m_x;
 			int y0=255-m_obj[i].m_y;
 			int num=m_obj[i].m_type&7;
@@ -644,7 +631,6 @@ UINT32 vega_state::screen_update_vega(screen_device &screen, bitmap_ind16 &bitma
 
 				for(int y=0;y<4;++y)
 				{
-
 					drawgfx_transpen(bitmap, cliprect,  machine().gfx[3], strip_num, 0, !xor_line, 0, x*4+x0, y*8+y0, 0);
 					++strip_num;
 				}
@@ -724,7 +710,6 @@ WRITE8_MEMBER(vega_state::txtram_w)
 
 READ8_MEMBER(vega_state::txtram_r)
 {
-
 	return m_txt_ram[m_ext_offset_r+((m_p2_data&3)<<8)];
 }
 
@@ -832,7 +817,6 @@ static const ay8910_interface ay8910_inf =
 
 void vega_state::machine_start()
 {
-
 }
 
 

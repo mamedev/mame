@@ -27,7 +27,6 @@ static KONAMI_SETLINES_CALLBACK( thunderx_banking );
 
 INTERRUPT_GEN_MEMBER(thunderx_state::scontra_interrupt)
 {
-
 	if (k052109_is_irq_enabled(m_k052109))
 		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
@@ -39,7 +38,6 @@ TIMER_CALLBACK_MEMBER(thunderx_state::thunderx_firq_callback)
 
 READ8_MEMBER(thunderx_state::scontra_bankedram_r)
 {
-
 	if (m_palette_selected)
 		return m_generic_paletteram_8[offset];
 	else
@@ -48,7 +46,6 @@ READ8_MEMBER(thunderx_state::scontra_bankedram_r)
 
 WRITE8_MEMBER(thunderx_state::scontra_bankedram_w)
 {
-
 	if (m_palette_selected)
 		paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, offset, data);
 	else
@@ -57,7 +54,6 @@ WRITE8_MEMBER(thunderx_state::scontra_bankedram_w)
 
 READ8_MEMBER(thunderx_state::thunderx_bankedram_r)
 {
-
 	if (m_rambank & 0x01)
 		return m_ram[offset];
 	else if (m_rambank & 0x10)
@@ -79,7 +75,6 @@ READ8_MEMBER(thunderx_state::thunderx_bankedram_r)
 
 WRITE8_MEMBER(thunderx_state::thunderx_bankedram_w)
 {
-
 	if (m_rambank & 0x01)
 		m_ram[offset] = data;
 	else if (m_rambank & 0x10)
@@ -294,7 +289,6 @@ READ8_MEMBER(thunderx_state::thunderx_1f98_r)
 
 WRITE8_MEMBER(thunderx_state::thunderx_1f98_w)
 {
-
 	// logerror("%04x: 1f98_w %02x\n", space.device().safe_pc(),data);
 
 	/* bit 0 = enable char ROM reading through the video RAM */
@@ -371,7 +365,6 @@ WRITE8_MEMBER(thunderx_state::scontra_snd_bankswitch_w)
 
 READ8_MEMBER(thunderx_state::k052109_051960_r)
 {
-
 	if (k052109_get_rmrd_line(m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
@@ -387,7 +380,6 @@ READ8_MEMBER(thunderx_state::k052109_051960_r)
 
 WRITE8_MEMBER(thunderx_state::k052109_051960_w)
 {
-
 	if (offset >= 0x3800 && offset < 0x3808)
 		k051937_w(m_k051960, space, offset - 0x3800, data);
 	else if (offset < 0x3c00)
@@ -607,7 +599,6 @@ static const k051960_interface thunderx_k051960_intf =
 
 MACHINE_START_MEMBER(thunderx_state,scontra)
 {
-
 	m_generic_paletteram_8.allocate(0x800);
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
@@ -640,7 +631,6 @@ MACHINE_START_MEMBER(thunderx_state,thunderx)
 
 MACHINE_RESET_MEMBER(thunderx_state,scontra)
 {
-
 	m_priority = 0;
 	m_1f98_data = 0;
 	m_palette_selected = 0;

@@ -304,7 +304,6 @@ void goal92_state::machine_start()
 
 void goal92_state::machine_reset()
 {
-
 	m_fg_bank = 0;
 	m_msm5205next = 0;
 	m_adpcm_toggle = 0;

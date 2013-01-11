@@ -547,13 +547,11 @@ WRITE8_MEMBER( plus4_state::cpu_w )
 
 INTERRUPT_GEN_MEMBER(plus4_state::c16_raster_interrupt)
 {
-
 	m_ted->raster_interrupt_gen();
 }
 
 INTERRUPT_GEN_MEMBER(plus4_state::c16_frame_interrupt)
 {
-
 	int value, i;
 	static const char *const c16ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 

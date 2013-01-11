@@ -999,7 +999,6 @@ READ8_MEMBER(pc9801_state::pc9801_20_r)
 
 WRITE8_MEMBER(pc9801_state::pc9801_20_w)
 {
-
 	if((offset & 1) == 0)
 	{
 		if(offset == 0)
@@ -1057,7 +1056,6 @@ WRITE8_MEMBER(pc9801_state::pc9801_30_w)
 
 READ8_MEMBER(pc9801_state::pc9801_40_r)
 {
-
 	if((offset & 1) == 0)
 	{
 		return machine().device<i8255_device>("ppi8255_prn")->read(space, (offset & 6) >> 1);
@@ -1105,7 +1103,6 @@ WRITE8_MEMBER(pc9801_state::pc9801_40_w)
 
 READ8_MEMBER(pc9801_state::pc9801_50_r)
 {
-
 	if((offset & 1) == 0)
 	{
 		if(offset & 4)
@@ -1123,7 +1120,6 @@ READ8_MEMBER(pc9801_state::pc9801_50_r)
 
 WRITE8_MEMBER(pc9801_state::pc9801_50_w)
 {
-
 	if((offset & 1) == 0)
 	{
 		if(offset & 4)
@@ -1140,7 +1136,6 @@ WRITE8_MEMBER(pc9801_state::pc9801_50_w)
 
 READ8_MEMBER(pc9801_state::pc9801_60_r)
 {
-
 	if((offset & 1) == 0)
 	{
 		return m_hgdc1->read(space, (offset & 2) >> 1); // upd7220 character port
@@ -1154,7 +1149,6 @@ READ8_MEMBER(pc9801_state::pc9801_60_r)
 
 WRITE8_MEMBER(pc9801_state::pc9801_60_w)
 {
-
 	if((offset & 1) == 0)
 	{
 		m_hgdc1->write(space, (offset & 2) >> 1,data); // upd7220 character port
@@ -1167,7 +1161,6 @@ WRITE8_MEMBER(pc9801_state::pc9801_60_w)
 
 WRITE8_MEMBER(pc9801_state::pc9801_vrtc_mask_w)
 {
-
 	if((offset & 1) == 0)
 	{
 		m_vrtc_irq_mask = 1;
@@ -1297,7 +1290,6 @@ WRITE8_MEMBER(pc9801_state::pc9801_sasi_w)
 
 READ8_MEMBER(pc9801_state::pc9801_a0_r)
 {
-
 	if((offset & 1) == 0)
 	{
 		switch(offset & 0xe)
@@ -1343,7 +1335,6 @@ READ8_MEMBER(pc9801_state::pc9801_a0_r)
 
 WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 {
-
 	if((offset & 1) == 0)
 	{
 		switch(offset & 0xe)
@@ -1419,7 +1410,6 @@ WRITE8_MEMBER(pc9801_state::pc9801_a0_w)
 
 READ8_MEMBER(pc9801_state::pc9801_fdc_2hd_r)
 {
-
 	if((offset & 1) == 0)
 	{
 		switch(offset & 6)
@@ -1459,7 +1449,6 @@ void pc9801_state::pc9801_fdc_2hd_update_ready(floppy_image_device *, int)
 
 WRITE8_MEMBER(pc9801_state::pc9801_fdc_2hd_w)
 {
-
 	if((offset & 1) == 0)
 	{
 		switch(offset & 6)
@@ -1513,7 +1502,6 @@ READ8_MEMBER(pc9801_state::pc9801_fdc_2dd_r)
 
 WRITE8_MEMBER(pc9801_state::pc9801_fdc_2dd_w)
 {
-
 	if((offset & 1) == 0)
 	{
 		switch(offset & 6)
@@ -1849,7 +1837,6 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_bank_w)
 
 READ8_MEMBER(pc9801_state::pc9801rs_f0_r)
 {
-
 	if(offset == 0x02)
 		return (m_gate_a20 ^ 1) | 0xfe;
 	else if(offset == 0x06)
@@ -2036,7 +2023,6 @@ WRITE8_MEMBER(pc9801_state::pc9801rs_2hd_w)
 #if 0
 READ8_MEMBER(pc9801_state::pc9801rs_2dd_r)
 {
-
 //  if(m_fdc_ctrl & 1)
 //      return 0xff;
 
@@ -2057,7 +2043,6 @@ READ8_MEMBER(pc9801_state::pc9801rs_2dd_r)
 
 WRITE8_MEMBER(pc9801_state::pc9801rs_2dd_w)
 {
-
 //  if(m_fdc_ctrl & 1)
 //      return;
 
@@ -2451,7 +2436,6 @@ READ8_MEMBER(pc9801_state::pc9821_a0_r)
 
 WRITE8_MEMBER(pc9801_state::pc9821_a0_w)
 {
-
 	if((offset & 1) == 0 && offset & 8 && m_ex_video_ff[ANALOG_256_MODE])
 	{
 		switch(offset)
@@ -3428,7 +3412,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9821)
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 {
-
 	/* this looks like to be some kind of backup ram, system will boot with green colors otherwise */
 	{
 		int i;
@@ -3775,8 +3758,7 @@ MACHINE_CONFIG_END
 	ROM_IGNORE( 0x2000 ) \
 	ROM_IGNORE( 0x2000 ) \
 	ROM_IGNORE( 0x2000 ) \
-	ROM_FILL( 0x0000, 0x2000, 0xcb ) \
-
+	ROM_FILL( 0x0000, 0x2000, 0xcb )
 // all of these are half size :/
 #define LOAD_KANJI_ROMS \
 	ROM_REGION( 0x80000, "raw_kanji", ROMREGION_ERASEFF ) \
@@ -3789,8 +3771,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD16_BYTE( "24256c-x04.bin", 0x40001, 0x4000, BAD_DUMP CRC(5dec0fc2) SHA1(41000da14d0805ed0801b31eb60623552e50e41c) ) \
 	ROM_CONTINUE(                      0x60001, 0x4000  ) \
 	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF ) \
-	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF ) \
-
+	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
 /*
 F - 8086 5
 */
@@ -4082,8 +4063,7 @@ DRIVER_INIT_MEMBER(pc9801_state,pc9801_kanji)
 	{ \
 		for(j=0;j<0x20;j++) \
 			kanji[j+(i << 5)] = _fill_type ? new_chargen[j+(k << 5)] : 0; \
-	} \
-
+	}
 	UINT32 i,j,k;
 	UINT32 pcg_tile;
 	UINT8 *kanji = machine().root_device().memregion("kanji")->base();

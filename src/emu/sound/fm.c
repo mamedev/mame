@@ -207,7 +207,6 @@ static const UINT32 sl_table[16]={
 
 #define RATE_STEPS (8)
 static const UINT8 eg_inc[19*RATE_STEPS]={
-
 /*cycle:0 1  2 3  4 5  6 7*/
 
 /* 0 */ 0,1, 0,1, 0,1, 0,1, /* rates 00..11 0 (increment by 0 or 1) */
@@ -1083,7 +1082,6 @@ INLINE void advance_lfo(FM_OPN *OPN)
 		/* actually I can't optimize is this way without rewriting chan_calc()
 		to use chip->lfo_am instead of global lfo_am */
 		{
-
 			/* triangle */
 			/* AM: 0 to 126 step +2, 126 to 0 step -2 */
 			if (pos<64)
@@ -1169,7 +1167,6 @@ static void advance_eg_channel(FM_OPN *OPN, FM_SLOT *SLOT)
 			{
 				if ( !(OPN->eg_cnt & ((1<<SLOT->eg_sh_d2r)-1) ) )
 				{
-
 					SLOT->volume += 4 * eg_inc[SLOT->eg_sel_d2r + ((OPN->eg_cnt>>SLOT->eg_sh_d2r)&7)];
 
 					if ( SLOT->volume >= ENV_QUIET )
@@ -1886,20 +1883,17 @@ static void OPNWriteReg(FM_OPN *OPN, int r, int v)
 		/* SSG-EG envelope shapes :
 
 		E AtAlH
-		1 0 0 0  \\\\
-
+		1 0 0 0  \\\
 		1 0 0 1  \___
 
 		1 0 1 0  \/\/
 		          ___
-		1 0 1 1  \
-
+		1 0 1 1
 		1 1 0 0  ////
 		          ___
 		1 1 0 1  /
 
-		1 1 1 0  /\/\
-
+		1 1 1 0  /\/
 		1 1 1 1  /___
 
 
@@ -2695,7 +2689,6 @@ static const unsigned int YM2608_ADPCM_ROM_addr[2*6] = {
 */
 
 static const unsigned char YM2608_ADPCM_ROM[0x2000] = {
-
 /* Source: 01BD.ROM */
 /* Length: 448 / 0x000001C0 */
 
@@ -3311,7 +3304,6 @@ void ym2608_update_one(void *chip, FMSAMPLE **buffer, int length)
 	/* buffering */
 	for(i=0; i < length ; i++)
 	{
-
 		advance_lfo(OPN);
 
 		/* clear output acc. */
@@ -3857,7 +3849,6 @@ void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length)
 	/* buffering */
 	for(i=0; i < length ; i++)
 	{
-
 		advance_lfo(OPN);
 
 		/* clear output acc. */
@@ -3988,7 +3979,6 @@ void ym2610b_update_one(void *chip, FMSAMPLE **buffer, int length)
 	/* buffering */
 	for(i=0; i < length ; i++)
 	{
-
 		advance_lfo(OPN);
 
 		/* clear output acc. */

@@ -940,7 +940,6 @@ void ti99_8_state::machine_start()
 
 void ti99_8_state::machine_reset()
 {
-
 	m_cpu->set_hold(CLEAR_LINE);
 
 	// Pulling down the line on RESET configures the CPU to insert one wait

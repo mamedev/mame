@@ -3844,8 +3844,7 @@ void ioport_configurer::field_alloc(ioport_type type, ioport_value defval, iopor
 {
 	// make sure we have a port
 	if (m_curport == NULL)
-		throw emu_fatalerror("alloc_field called with no active port (mask=%X defval=%X)\n", mask, defval); \
-
+		throw emu_fatalerror("alloc_field called with no active port (mask=%X defval=%X)\n", mask, defval);
 	// append the field
 	if (type != IPT_UNKNOWN && type != IPT_UNUSED)
 		m_curport->m_active |= mask;

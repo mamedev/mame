@@ -1310,7 +1310,6 @@ static void MC6850_Receive_Clock(running_machine &machine, int new_clock)
 
 TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 {
-
 	double dev_val;
 	dev_val=machine().device<cassette_image_device>(CASSETTE_TAG)->input();
 

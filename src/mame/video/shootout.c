@@ -67,21 +67,18 @@ TILE_GET_INFO_MEMBER(shootout_state::get_fg_tile_info)
 
 WRITE8_MEMBER(shootout_state::shootout_videoram_w)
 {
-
 	m_videoram[offset] = data;
 	m_background->mark_tile_dirty(offset&0x3ff );
 }
 
 WRITE8_MEMBER(shootout_state::shootout_textram_w)
 {
-
 	m_textram[offset] = data;
 	m_foreground->mark_tile_dirty(offset&0x3ff );
 }
 
 void shootout_state::video_start()
 {
-
 	m_background = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(shootout_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_foreground = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(shootout_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_foreground->set_transparent_pen(0 );
@@ -169,7 +166,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 shootout_state::screen_update_shootout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	machine().priority_bitmap.fill(0, cliprect);
 
 	m_background->draw(bitmap, cliprect, 0,0);
@@ -180,7 +176,6 @@ UINT32 shootout_state::screen_update_shootout(screen_device &screen, bitmap_ind1
 
 UINT32 shootout_state::screen_update_shootouj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	machine().priority_bitmap.fill(0, cliprect);
 
 	m_background->draw(bitmap, cliprect, 0,0);

@@ -889,7 +889,6 @@ static void ppc_init(void)
 
 	/* Fill the opcode tables */
 	for( i=0; i < (sizeof(ppc_opcode_common) / sizeof(PPC_OPCODE)); i++ ) {
-
 		switch(ppc_opcode_common[i].code)
 		{
 			case 19:
@@ -970,7 +969,6 @@ static CPU_INIT( ppc403 )
 
 static CPU_EXIT( ppc403 )
 {
-
 }
 
 static CPU_INIT( ppc405 )
@@ -1016,7 +1014,6 @@ static CPU_INIT( ppc405 )
 
 static CPU_EXIT( ppc405 )
 {
-
 }
 
 static CPU_INIT( ppc603 )
@@ -1160,7 +1157,6 @@ static CPU_INIT( ppc603 )
 
 static CPU_EXIT( ppc603 )
 {
-
 }
 
 static CPU_INIT( ppc602 )
@@ -1293,17 +1289,14 @@ static CPU_INIT( ppc602 )
 
 static CPU_EXIT( ppc602 )
 {
-
 }
 
 static void mpc8240_tlbli(UINT32 op)
 {
-
 }
 
 static void mpc8240_tlbld(UINT32 op)
 {
-
 }
 
 static CPU_INIT( mpc8240 )
@@ -1434,7 +1427,6 @@ static CPU_INIT( mpc8240 )
 
 static CPU_EXIT( mpc8240 )
 {
-
 }
 
 static CPU_INIT( ppc601 )
@@ -1562,7 +1554,6 @@ static CPU_INIT( ppc601 )
 
 static CPU_EXIT( ppc601 )
 {
-
 }
 
 static CPU_INIT( ppc604 )
@@ -1692,7 +1683,6 @@ static CPU_INIT( ppc604 )
 
 static CPU_EXIT( ppc604 )
 {
-
 }
 
 

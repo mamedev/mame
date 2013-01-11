@@ -27,7 +27,6 @@
 class diag264_cassette_loopback_device :  public device_t,
 											public device_pet_datassette_port_interface
 {
-
 public:
 	// construction/destruction
 	diag264_cassette_loopback_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

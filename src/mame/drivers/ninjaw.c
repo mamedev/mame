@@ -337,7 +337,6 @@ static void parse_control( running_machine &machine )   /* assumes Z80 sandwiche
 
 WRITE16_MEMBER(ninjaw_state::cpua_ctrl_w)
 {
-
 	if ((data &0xff00) && ((data &0xff) == 0))
 		data = data >> 8;
 	m_cpua_ctrl = data;
@@ -360,14 +359,12 @@ static void reset_sound_region( running_machine &machine )
 
 WRITE8_MEMBER(ninjaw_state::sound_bankswitch_w)
 {
-
 	m_banknum = data & 7;
 	reset_sound_region(machine());
 }
 
 WRITE16_MEMBER(ninjaw_state::ninjaw_sound_w)
 {
-
 	if (offset == 0)
 		tc0140syt_port_w(m_tc0140syt, space, 0, data & 0xff);
 	else if (offset == 1)
@@ -381,7 +378,6 @@ WRITE16_MEMBER(ninjaw_state::ninjaw_sound_w)
 
 READ16_MEMBER(ninjaw_state::ninjaw_sound_r)
 {
-
 	if (offset == 1)
 		return ((tc0140syt_comm_r(m_tc0140syt, space, 0) & 0xff));
 	else
@@ -412,7 +408,6 @@ WRITE8_MEMBER(ninjaw_state::ninjaw_pancontrol)
 
 WRITE16_MEMBER(ninjaw_state::tc0100scn_triple_screen_w)
 {
-
 	tc0100scn_word_w(m_tc0100scn_1, space, offset, data, mem_mask);
 	tc0100scn_word_w(m_tc0100scn_2, space, offset, data, mem_mask);
 	tc0100scn_word_w(m_tc0100scn_3, space, offset, data, mem_mask);
@@ -802,7 +797,6 @@ static void ninjaw_postload(running_machine &machine)
 
 void ninjaw_state::machine_start()
 {
-
 	membank("bank10")->configure_entries(0, 8, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
 	m_maincpu = machine().device<cpu_device>("maincpu");

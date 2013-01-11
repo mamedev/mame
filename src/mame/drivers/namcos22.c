@@ -2180,7 +2180,6 @@ WRITE32_MEMBER(namcos22_state::namcos22s_system_controller_w)
 */
 INTERRUPT_GEN_MEMBER(namcos22_state::namcos22s_interrupt)
 {
-
 	if (nthbyte(m_system_controller, 0x00) & 7)
 	{
 		// vblank irq

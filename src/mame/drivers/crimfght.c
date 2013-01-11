@@ -25,7 +25,6 @@ static KONAMI_SETLINES_CALLBACK( crimfght_banking );
 
 INTERRUPT_GEN_MEMBER(crimfght_state::crimfght_interrupt)
 {
-
 	if (k051960_is_irq_enabled(m_k051960))
 		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);
 }
@@ -55,7 +54,6 @@ WRITE8_MEMBER(crimfght_state::crimfght_snd_bankswitch_w)
 
 READ8_MEMBER(crimfght_state::k052109_051960_r)
 {
-
 	if (k052109_get_rmrd_line(m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
@@ -71,7 +69,6 @@ READ8_MEMBER(crimfght_state::k052109_051960_r)
 
 WRITE8_MEMBER(crimfght_state::k052109_051960_w)
 {
-
 	if (offset >= 0x3800 && offset < 0x3808)
 		k051937_w(m_k051960, space, offset - 0x3800, data);
 	else if (offset < 0x3c00)

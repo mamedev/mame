@@ -397,7 +397,6 @@ WRITE8_MEMBER(acia6551_device::write)
 
 					switch (rate)
 					{
-
 						default:
 						case 1:
 						{

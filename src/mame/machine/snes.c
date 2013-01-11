@@ -103,7 +103,6 @@ void st010_write_ram(snes_state *state, UINT16 addr, UINT8 data)
 
 TIMER_CALLBACK_MEMBER(snes_state::snes_nmi_tick)
 {
-
 	// pull NMI
 	m_maincpu->set_input_line(G65816_LINE_NMI, ASSERT_LINE);
 
@@ -160,7 +159,6 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_update_io)
 
 TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 {
-
 	/* Increase current line - we want to latch on this line during it, not after it */
 	snes_ppu.beam.current_vert = machine().primary_screen->vpos();
 

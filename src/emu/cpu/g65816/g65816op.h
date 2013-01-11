@@ -777,8 +777,7 @@ INLINE uint EA_SIY(g65816i_cpu_struct *cpustate)   {return MAKE_UINT_16(read_16_
 				g65816i_branch_8(cpustate, DST);                                        \
 				BREAKOUT;                                                   \
 			}                                                               \
-			CLK(CLK_OP + CLK_RELATIVE_8);                                   \
-
+			CLK(CLK_OP + CLK_RELATIVE_8);
 /* M6502   Set flags according to bits */
 #undef OP_BIT
 #if FLAG_SET_M

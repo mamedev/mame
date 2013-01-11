@@ -9,11 +9,9 @@
 //**************************************************************************
 
 #define MCFG_SOUND_VRENDER0_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, VRENDER0, _clock) \
-
+	MCFG_DEVICE_ADD(_tag, VRENDER0, _clock)
 #define MCFG_SOUND_VRENDER0_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, VRENDER0, _clock) \
-
+	MCFG_DEVICE_REPLACE(_tag, VRENDER0, _clock)
 
 
 //**************************************************************************

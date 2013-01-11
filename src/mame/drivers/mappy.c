@@ -873,14 +873,12 @@ INTERRUPT_GEN_MEMBER(mappy_state::mappy_main_vblank_irq)
 
 INTERRUPT_GEN_MEMBER(mappy_state::sub_vblank_irq)
 {
-
 	if(m_sub_irq_mask)
 		machine().device("sub")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(mappy_state::sub2_vblank_irq)
 {
-
 	if(m_sub2_irq_mask)
 		machine().device("sub2")->execute().set_input_line(0, ASSERT_LINE);
 }
@@ -1556,20 +1554,17 @@ READ8_MEMBER(mappy_state::dipA_h){ return machine().root_device().ioport("DSW1")
 
 READ8_MEMBER(mappy_state::dipB_mux)// dips B
 {
-
 	return ioport("DSW2")->read() >> (4 * m_mux);
 }
 
 READ8_MEMBER(mappy_state::dipB_muxi)// dips B
 {
-
 	// bits are interleaved in Phozon
 	return BITSWAP8(ioport("DSW2")->read(),6,4,2,0,7,5,3,1) >> (4 * m_mux);
 }
 
 WRITE8_MEMBER(mappy_state::out_mux)
 {
-
 	m_mux = data & 1;
 }
 
@@ -1613,7 +1608,6 @@ static const namcoio_interface intf1_interleave =
 
 MACHINE_START_MEMBER(mappy_state,mappy)
 {
-
 	save_item(NAME(m_main_irq_mask));
 	save_item(NAME(m_sub_irq_mask));
 	save_item(NAME(m_sub2_irq_mask));

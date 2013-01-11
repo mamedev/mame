@@ -37,7 +37,6 @@ void battles_customio_init(running_machine &machine)
 
 TIMER_DEVICE_CALLBACK_MEMBER(xevious_state::battles_nmi_generate)
 {
-
 	battles_customio_prev_command = battles_customio_command;
 
 	if( battles_customio_command & 0x10 )

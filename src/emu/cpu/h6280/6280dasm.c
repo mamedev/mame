@@ -48,7 +48,6 @@ enum addr_mode {
 };
 
 enum opcodes {
-
 	/* 6502 opcodes */
 	_adc=0,_and,  _asl,  _bcc,  _bcs,  _beq,  _bit,  _bmi,
 	_bne,  _bpl,  _brk,  _bvc,  _bvs,  _clc,  _cld,  _cli,

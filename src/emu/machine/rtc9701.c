@@ -37,7 +37,6 @@ rtc9701_device::rtc9701_device(const machine_config &mconfig, const char *tag, d
 		m_reset_line(CLEAR_LINE),
 		m_clock_line(CLEAR_LINE)
 {
-
 }
 
 void rtc9701_device::timer_callback()

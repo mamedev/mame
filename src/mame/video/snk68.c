@@ -60,7 +60,6 @@ static void common_video_start(running_machine &machine)
 
 void snk68_state::video_start()
 {
-
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk68_state::get_pow_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 	m_fg_tile_offset = 0;
 
@@ -69,7 +68,6 @@ void snk68_state::video_start()
 
 VIDEO_START_MEMBER(snk68_state,searchar)
 {
-
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(snk68_state::get_searchar_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	common_video_start(machine());
@@ -83,7 +81,6 @@ VIDEO_START_MEMBER(snk68_state,searchar)
 
 READ16_MEMBER(snk68_state::pow_spriteram_r)
 {
-
 	// streetsj expects the MSB of every 32-bit word to be FF. Presumably RAM
 	// exists only for 3 bytes out of 4 and the fourth is unmapped.
 	if (!(offset & 1))
@@ -115,14 +112,12 @@ WRITE16_MEMBER(snk68_state::pow_spriteram_w)
 
 READ16_MEMBER(snk68_state::pow_fg_videoram_r)
 {
-
 	// RAM is only 8-bit
 	return m_pow_fg_videoram[offset] | 0xff00;
 }
 
 WRITE16_MEMBER(snk68_state::pow_fg_videoram_w)
 {
-
 	data |= 0xff00;
 	COMBINE_DATA(&m_pow_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
@@ -130,7 +125,6 @@ WRITE16_MEMBER(snk68_state::pow_fg_videoram_w)
 
 WRITE16_MEMBER(snk68_state::searchar_fg_videoram_w)
 {
-
 	// RAM is full 16-bit, though only half of it is used by the hardware
 	COMBINE_DATA(&m_pow_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
@@ -157,7 +151,6 @@ WRITE16_MEMBER(snk68_state::searchar_flipscreen16_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-
 		m_flipscreen = data & 0x08;
 		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
@@ -278,7 +271,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 snk68_state::screen_update_pow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(0x7ff, cliprect);
 
 	/* This appears to be the correct priority order */

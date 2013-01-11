@@ -448,7 +448,6 @@ MACHINE_START_MEMBER(champbwl_state,champbwl)
 
 MACHINE_RESET_MEMBER(champbwl_state,champbwl)
 {
-
 	m_screenflip = 0;
 	m_mcu_type = -1;
 	m_last_trackball_val[0] = 0;

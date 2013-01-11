@@ -227,7 +227,6 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(mw8080bw_state::gunfight_audio_w)
 {
-
 	/* D0 and D1 are just tied to 1k resistors */
 
 	coin_counter_w(machine(), 0, (data >> 2) & 0x01);
@@ -1280,7 +1279,6 @@ WRITE8_MEMBER(mw8080bw_state::desertgu_audio_1_w)
 
 WRITE8_MEMBER(mw8080bw_state::desertgu_audio_2_w)
 {
-
 	discrete_sound_w(m_discrete, space, DESERTGU_ROADRUNNER_BEEP_BEEP_EN, (data >> 0) & 0x01);
 
 	discrete_sound_w(m_discrete, space, DESERTGU_TRIGGER_CLICK_EN, (data >> 1) & 0x01);
@@ -2302,7 +2300,6 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(mw8080bw_state::spacwalk_audio_1_w)
 {
-
 	coin_counter_w(machine(), 0, (data >> 0) & 0x01);
 
 	m_clowns_controller_select = (data >> 1) & 0x01;
@@ -3264,7 +3261,6 @@ WRITE8_MEMBER(mw8080bw_state::spcenctr_audio_1_w)
 
 WRITE8_MEMBER(mw8080bw_state::spcenctr_audio_2_w)
 {
-
 	/* set WIND SOUND FREQ(data & 0x0f)  0, if no wind */
 
 	discrete_sound_w(m_discrete, space, SPCENCTR_EXPLOSION_EN, (data >> 4) & 0x01);
@@ -3279,7 +3275,6 @@ WRITE8_MEMBER(mw8080bw_state::spcenctr_audio_2_w)
 
 WRITE8_MEMBER(mw8080bw_state::spcenctr_audio_3_w)
 {
-
 	/* if (data & 0x01)  enable SCREECH (hit the sides) sound */
 
 	discrete_sound_w(m_discrete, space, SPCENCTR_ENEMY_SHIP_SHOT_EN, (data >> 1) & 0x01);
@@ -4181,7 +4176,6 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(mw8080bw_state::invaders_audio_1_w)
 {
-
 	sn76477_enable_w(m_sn, (~data >> 0) & 0x01);    /* saucer sound */
 
 	discrete_sound_w(m_discrete, space, INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
@@ -4197,7 +4191,6 @@ WRITE8_MEMBER(mw8080bw_state::invaders_audio_1_w)
 
 WRITE8_MEMBER(mw8080bw_state::invaders_audio_2_w)
 {
-
 	discrete_sound_w(m_discrete, space, INVADERS_NODE(INVADERS_FLEET_DATA, 1), data & 0x0f);
 	discrete_sound_w(m_discrete, space, INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 1), data & 0x10);
 
@@ -4812,7 +4805,6 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(mw8080bw_state::invad2ct_audio_1_w)
 {
-
 	sn76477_enable_w(m_sn1, (~data >> 0) & 0x01);   /* saucer sound */
 
 	discrete_sound_w(m_discrete, space, INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
@@ -4837,7 +4829,6 @@ WRITE8_MEMBER(mw8080bw_state::invad2ct_audio_2_w)
 
 WRITE8_MEMBER(mw8080bw_state::invad2ct_audio_3_w)
 {
-
 	sn76477_enable_w(m_sn2, (~data >> 0) & 0x01);   /* saucer sound */
 
 	discrete_sound_w(m_discrete, space, INVADERS_NODE(INVADERS_MISSILE_EN, 2), data & 0x02);

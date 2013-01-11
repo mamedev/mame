@@ -10,11 +10,9 @@
 //**************************************************************************
 
 #define MCFG_SNKWAVE_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, SNKWAVE, _clock) \
-
+	MCFG_DEVICE_ADD(_tag, SNKWAVE, _clock)
 #define MCFG_SNKWAVE_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, SNKWAVE, _clock) \
-
+	MCFG_DEVICE_REPLACE(_tag, SNKWAVE, _clock)
 
 
 //**************************************************************************

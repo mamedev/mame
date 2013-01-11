@@ -150,7 +150,6 @@ READ8_MEMBER(kchamp_state::sound_reset_r)
 
 WRITE8_MEMBER(kchamp_state::kc_sound_control_w)
 {
-
 	if (offset == 0)
 		m_sound_nmi_enable = ((data >> 7) & 1);
 //  else
@@ -383,7 +382,6 @@ INTERRUPT_GEN_MEMBER(kchamp_state::sound_int)
 
 MACHINE_START_MEMBER(kchamp_state,kchamp)
 {
-
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	save_item(NAME(m_nmi_enable));
@@ -392,7 +390,6 @@ MACHINE_START_MEMBER(kchamp_state,kchamp)
 
 MACHINE_START_MEMBER(kchamp_state,kchampvs)
 {
-
 	MACHINE_START_CALL_MEMBER(kchamp);
 
 	save_item(NAME(m_msm_data));
@@ -402,7 +399,6 @@ MACHINE_START_MEMBER(kchamp_state,kchampvs)
 
 void kchamp_state::machine_reset()
 {
-
 	m_nmi_enable = 0;
 	m_sound_nmi_enable = 0;
 }

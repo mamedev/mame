@@ -818,7 +818,6 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(fantland_state,fantland)
 {
-
 	m_audio_cpu = machine().device("audiocpu");
 
 	save_item(NAME(m_nmi_enable));
@@ -947,7 +946,6 @@ static const msm5205_interface msm5205_config_3 =
 
 MACHINE_START_MEMBER(fantland_state,borntofi)
 {
-
 	MACHINE_START_CALL_MEMBER(fantland);
 
 	m_msm1 = machine().device("msm1");

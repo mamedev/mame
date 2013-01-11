@@ -28,7 +28,6 @@ READ8_HANDLER ( pc_JOY_r )
 		/* timer overflow? Nope, otherwise some HWs can't verify the port properly */
 		//if ((new_time - JOY_time) > attotime::from_msec(10))
 		//{
-
 		//}
 		//else
 		{

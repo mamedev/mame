@@ -38,8 +38,7 @@ extern const device_type PCF8593;
 
 
 #define MCFG_PCF8593_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PCF8593, 0) \
-
+	MCFG_DEVICE_ADD(_tag, PCF8593, 0)
 #define MCFG_PCF8593_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 

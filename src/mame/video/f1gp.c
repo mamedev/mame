@@ -45,7 +45,6 @@ TILE_GET_INFO_MEMBER(f1gp_state::get_fg_tile_info)
 
 VIDEO_START_MEMBER(f1gp_state,f1gp)
 {
-
 	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::f1gp_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
@@ -60,7 +59,6 @@ VIDEO_START_MEMBER(f1gp_state,f1gp)
 
 VIDEO_START_MEMBER(f1gp_state,f1gpb)
 {
-
 	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::f1gp_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
@@ -93,7 +91,6 @@ UINT32 f1gp_state::f1gp_ol2_tile_callback( UINT32 code )
 
 VIDEO_START_MEMBER(f1gp_state,f1gp2)
 {
-
 	m_roz_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::f1gp2_get_roz_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(f1gp_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
@@ -189,7 +186,6 @@ WRITE16_MEMBER(f1gp_state::f1gp2_gfxctrl_w)
 
 UINT32 f1gp_state::screen_update_f1gp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	machine().priority_bitmap.fill(0, cliprect);
 
 	k053936_zoom_draw(m_k053936, bitmap, cliprect, m_roz_tilemap, 0, 0, 1);
@@ -213,7 +209,6 @@ UINT32 f1gp_state::screen_update_f1gp(screen_device &screen, bitmap_ind16 &bitma
 
 UINT32 f1gp_state::screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (m_gfxctrl & 4)  /* blank screen */
 		bitmap.fill(get_black_pen(machine()), cliprect);
 	else

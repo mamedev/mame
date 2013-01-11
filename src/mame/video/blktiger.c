@@ -64,7 +64,6 @@ TILE_GET_INFO_MEMBER(blktiger_state::get_tx_tile_info)
 
 void blktiger_state::video_start()
 {
-
 	m_chon = 1;
 	m_bgon = 1;
 	m_objon = 1;
@@ -163,7 +162,6 @@ WRITE8_MEMBER(blktiger_state::blktiger_video_control_w)
 
 WRITE8_MEMBER(blktiger_state::blktiger_video_enable_w)
 {
-
 	/* not sure which is which, but I think that bit 1 and 2 enable background and sprites */
 	/* bit 1 enables bg ? */
 	m_bgon = ~data & 0x02;
@@ -220,7 +218,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 UINT32 blktiger_state::screen_update_blktiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	bitmap.fill(1023, cliprect);
 
 	if (m_bgon)

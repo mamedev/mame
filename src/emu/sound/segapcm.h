@@ -20,11 +20,9 @@
 //**************************************************************************
 
 #define MCFG_SEGAPCM_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, SEGAPCM, _clock) \
-
+	MCFG_DEVICE_ADD(_tag, SEGAPCM, _clock)
 #define MCFG_SEGAPCM_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, SEGAPCM, _clock) \
-
+	MCFG_DEVICE_REPLACE(_tag, SEGAPCM, _clock)
 
 //**************************************************************************
 //  TYPE DEFINITIONS

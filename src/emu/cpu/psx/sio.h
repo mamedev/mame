@@ -17,8 +17,7 @@ extern const device_type PSX_SIO0;
 extern const device_type PSX_SIO1;
 
 #define MCFG_PSX_SIO_IRQ_HANDLER(_devcb) \
-	devcb = &psxsio_device::set_irq_handler(*device, DEVCB2_##_devcb); \
-
+	devcb = &psxsio_device::set_irq_handler(*device, DEVCB2_##_devcb);
 #define SIO_BUF_SIZE ( 8 )
 
 #define SIO_STATUS_TX_RDY ( 1 << 0 )

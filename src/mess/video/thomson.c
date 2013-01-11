@@ -835,7 +835,6 @@ static TIMER_CALLBACK( thom_scanline_start )
 		thom_scanline_timer->adjust(attotime::never);
 	else
 	{
-
 		if ( thom_vmodepage_changed )
 		{
 			int x, m = 0;

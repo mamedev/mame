@@ -38,7 +38,6 @@ DIP locations verified for:
 
 INPUT_CHANGED_MEMBER(lasso_state::coin_inserted)
 {
-
 	/* coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -471,7 +470,6 @@ static const sn76496_config psg_intf =
 
 void lasso_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -480,7 +478,6 @@ void lasso_state::machine_start()
 
 MACHINE_START_MEMBER(lasso_state,wwjgtin)
 {
-
 	lasso_state::machine_start();
 
 	save_item(NAME(m_track_enable));
@@ -488,13 +485,11 @@ MACHINE_START_MEMBER(lasso_state,wwjgtin)
 
 void lasso_state::machine_reset()
 {
-
 	m_gfxbank = 0;
 }
 
 MACHINE_RESET_MEMBER(lasso_state,wwjgtin)
 {
-
 	lasso_state::machine_reset();
 
 	m_track_enable = 0;

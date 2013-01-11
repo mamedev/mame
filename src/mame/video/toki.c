@@ -221,7 +221,6 @@ static void tokib_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,co
 			break;
 		if (sprite_word[2])
 		{
-
 			x = sprite_word[3] & 0x1ff;
 			if (x > 256)
 				x -= 512;

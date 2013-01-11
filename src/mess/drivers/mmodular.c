@@ -273,7 +273,6 @@ WRITE8_MEMBER(polgar_state::write_polgar_IO)
 
 WRITE8_MEMBER(polgar_state::write_LCD_polgar)
 {
-
 	lcd_char = data;
 
 	logerror("LCD Data = %d %02x [%c]\n",data,data,(data&0xff));
@@ -636,7 +635,6 @@ WRITE8_MEMBER(polgar_state::monteciv_3006)
 
 WRITE8_MEMBER(polgar_state::academy_write_board)
 {
-
 	latch_data = data;
 //    logerror("acad_write_latch %02x\n",data);
 	if (data != 0xff) mboard_write_board_8(space,0, data);
@@ -644,7 +642,6 @@ WRITE8_MEMBER(polgar_state::academy_write_board)
 
 WRITE8_MEMBER(polgar_state::milano_write_board)
 {
-
 	latch_data = data;
 }
 
@@ -863,7 +860,6 @@ READ16_MEMBER(polgar_state::read_buttons_van16)
 
 WRITE32_MEMBER(polgar_state::write_LCD_data_32)
 {
-
 //  printf("Write LCD Data Latch %08x o: %08x\n",data,offset);
 	logerror("Write LCD Data Latch %08x o: %08x\n",data,offset);
 	lcd32_char = data>>24;
@@ -873,13 +869,11 @@ WRITE32_MEMBER(polgar_state::write_LCD_data_32)
 
 WRITE16_MEMBER(polgar_state::write_LCD_data)
 {
-
 	lcd32_char = data>>8;
 
 }
 
 static void write_IOenable(unsigned char data,address_space &space) {
-
 	hd44780_device * hd44780 = space.machine().device<hd44780_device>("hd44780");
 	device_t *speaker = space.machine().device("beep");
 
@@ -912,7 +906,6 @@ static void write_IOenable(unsigned char data,address_space &space) {
 }
 
 WRITE32_MEMBER(polgar_state::write_IOenables_32){
-
 	write_IOenable(data>>24,space);
 }
 

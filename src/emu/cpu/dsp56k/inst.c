@@ -3,7 +3,6 @@
 
 namespace DSP56K
 {
-
 // Factory
 Instruction* Instruction::decodeInstruction(const Opcode* opc,
 											const UINT16 word0,

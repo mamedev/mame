@@ -20,7 +20,6 @@
 
 WRITE8_MEMBER(crgolf_state::crgolf_videoram_w)
 {
-
 	if (*m_screen_select & 1)
 		m_videoram_b[offset] = data;
 	else
@@ -90,7 +89,6 @@ static void get_pens( running_machine &machine, pen_t *pens )
 
 VIDEO_START_MEMBER(crgolf_state,crgolf)
 {
-
 	/* allocate memory for the two bitmaps */
 	m_videoram_a = auto_alloc_array(machine(), UINT8, VIDEORAM_SIZE);
 	m_videoram_b = auto_alloc_array(machine(), UINT8, VIDEORAM_SIZE);

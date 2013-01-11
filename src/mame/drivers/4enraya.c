@@ -294,14 +294,12 @@ GFXDECODE_END
 
 void _4enraya_state::machine_start()
 {
-
 	save_item(NAME(m_soundlatch));
 	save_item(NAME(m_last_snd_ctrl));
 }
 
 void _4enraya_state::machine_reset()
 {
-
 	m_soundlatch = 0;
 	m_last_snd_ctrl = 0;
 }

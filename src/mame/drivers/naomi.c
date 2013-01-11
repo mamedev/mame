@@ -2495,7 +2495,6 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(dc_state,naomi)
 {
-
 	dc_state::machine_reset();
 	aica_set_ram_base(machine().device("aica"), dc_sound_ram, 8*1024*1024);
 }
@@ -2884,14 +2883,12 @@ Region byte encoding is as follows:
 	ROM_SYSTEM_BIOS( 8, "bios8", "epr-23607b (USA)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-23607b.bin",   0x000000, 0x200000, CRC(f308c5e9) SHA1(5470ab1cee6afecbd8ca8cf40f8fbe4ec2cb1471) ) \
 	ROM_SYSTEM_BIOS( 9, "bios9", "epr-23607 (USA)"  ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-23607.bin",    0x000000, 0x200000, CRC(2b55add2) SHA1(547de5f97d3183c8cd069c4fa3c09f13d8b637d9) ) \
-
+	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-23607.bin",    0x000000, 0x200000, CRC(2b55add2) SHA1(547de5f97d3183c8cd069c4fa3c09f13d8b637d9) )
 /* First half is BIOS, second half is game settings and is blanked/reprogrammed by the BIOS as necessary */
 #define AW_BIOS \
 	ROM_REGION( 0x200000, "awflash", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "Atomiswave BIOS" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios.ic23_l", 0x000000, 0x010000, BAD_DUMP CRC(e5693ce3) SHA1(1bde3ed87af64b0f675ebd47f12a53e1fc5709c1) ) /* Might be bad.. especially. bytes 0x0000, 0x6000, 0x8000 which gave different reads */ \
-
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios.ic23_l", 0x000000, 0x010000, BAD_DUMP CRC(e5693ce3) SHA1(1bde3ed87af64b0f675ebd47f12a53e1fc5709c1) ) /* Might be bad.. especially. bytes 0x0000, 0x6000, 0x8000 which gave different reads */
 /* default EEPROM values, same works for all games */
 #define NAOMI_DEFAULT_EEPROM \
 	ROM_REGION16_BE( 0x80, "main_eeprom", 0 ) \

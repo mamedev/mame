@@ -496,7 +496,6 @@ static CPU_EXECUTE( tms7000_exl )
 
 		if( cpustate->idle_state == 0 )
 		{
-
 			op = cpustate->direct->read_decrypted_byte(pPC++);
 
 			opfn_exl[op](cpustate);

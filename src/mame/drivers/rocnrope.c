@@ -32,7 +32,6 @@ WRITE8_MEMBER(rocnrope_state::rocnrope_interrupt_vector_w)
 
 WRITE8_MEMBER(rocnrope_state::irq_mask_w)
 {
-
 	m_irq_mask = data & 1;
 }
 
@@ -188,7 +187,6 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(rocnrope_state::vblank_irq)
 {
-
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }

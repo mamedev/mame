@@ -71,7 +71,6 @@ seibu_cop_device::seibu_cop_device(const machine_config &mconfig, const char *ta
 		device_memory_interface(mconfig, *this),
 		m_space_config("io", ENDIANNESS_LITTLE, 16, 16, 0, NULL, *ADDRESS_MAP_NAME(seibu_cop_io))
 {
-
 }
 
 

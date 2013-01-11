@@ -270,7 +270,6 @@ void neogeo_acknowledge_interrupt( running_machine &machine, UINT16 data )
 
 TIMER_CALLBACK_MEMBER(neogeo_state::display_position_interrupt_callback)
 {
-
 	if (LOG_VIDEO_SYSTEM) logerror("--- Scanline @ %d,%d\n", machine().primary_screen->vpos(), machine().primary_screen->hpos());
 
 	if (m_display_position_interrupt_control & IRQ2CTRL_ENABLE)
@@ -291,7 +290,6 @@ TIMER_CALLBACK_MEMBER(neogeo_state::display_position_interrupt_callback)
 
 TIMER_CALLBACK_MEMBER(neogeo_state::display_position_vblank_callback)
 {
-
 	if (m_display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_VBLANK)
 	{
 		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_VBLANK ");
@@ -305,7 +303,6 @@ TIMER_CALLBACK_MEMBER(neogeo_state::display_position_vblank_callback)
 
 TIMER_CALLBACK_MEMBER(neogeo_state::vblank_interrupt_callback)
 {
-
 	if (LOG_VIDEO_SYSTEM) logerror("+++ VBLANK @ %d,%d\n", machine().primary_screen->vpos(), machine().primary_screen->hpos());
 
 	/* add a timer tick to the pd4990a */
@@ -492,7 +489,6 @@ static void set_save_ram_unlock( running_machine &machine, UINT8 data )
 
 WRITE16_MEMBER(neogeo_state::save_ram_w)
 {
-
 	if (m_save_ram_unlocked)
 		COMBINE_DATA(&m_save_ram[offset]);
 }
@@ -601,7 +597,6 @@ READ8_MEMBER(neogeo_state::audio_command_r)
 
 WRITE8_MEMBER(neogeo_state::audio_result_w)
 {
-
 	if (LOG_CPU_COMM && (m_audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", space.device().safe_pc(), data);
 
 	m_audio_result = data;
@@ -699,7 +694,6 @@ void neogeo_main_cpu_banking_init( running_machine &machine )
 
 	if (state->m_is_cartsys)
 	{
-
 		/* set initial main CPU bank */
 		if (machine.root_device().memregion("maincpu")->bytes() > 0x100000)
 			neogeo_set_main_cpu_bank_address(mainspace, 0x100000);
@@ -1037,7 +1031,6 @@ void neogeo_postload(running_machine &machine)
 
 void neogeo_state::machine_start()
 {
-
 	/* configure NVRAM */
 	machine().device<nvram_device>("saveram")->set_base(m_save_ram, 0x10000);
 

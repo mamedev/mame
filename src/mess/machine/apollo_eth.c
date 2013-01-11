@@ -170,7 +170,6 @@ static TIMER_CALLBACK(receive_interrupt)
  ***************************************************************************/
 
 int apollo_eth_transmit(device_t *device, const UINT8 data[], int length) {
-
 	if (eth_socket != -1)
 	{
 		if (memcmp(data, eth_hw_address, ETHERNET_ADDR_SIZE) == 0)

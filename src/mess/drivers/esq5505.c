@@ -1000,14 +1000,12 @@ DRIVER_INIT_MEMBER(esq5505_state,common)
 
 DRIVER_INIT_MEMBER(esq5505_state,eps)
 {
-
 	DRIVER_INIT_CALL(common);
 	m_system_type = EPS;
 }
 
 DRIVER_INIT_MEMBER(esq5505_state,sq1)
 {
-
 	DRIVER_INIT_CALL(common);
 	m_system_type = SQ1;
 }

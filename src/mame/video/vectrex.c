@@ -417,7 +417,6 @@ WRITE8_MEMBER(vectrex_state::v_via_cb2_w)
 
 	if (m_cb2 != data)
 	{
-
 		/* Check lightpen */
 		if (m_lightpen_port != 0)
 		{

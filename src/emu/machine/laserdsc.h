@@ -87,29 +87,21 @@ enum laserdisc_field_code
 //**************************************************************************
 
 #define MCFG_LASERDISC_GET_DISC(_func) \
-	laserdisc_device::static_set_get_disc(*device, _func); \
-
+	laserdisc_device::static_set_get_disc(*device, _func);
 #define MCFG_LASERDISC_AUDIO(_func) \
-	laserdisc_device::static_set_audio(*device, _func); \
-
+	laserdisc_device::static_set_audio(*device, _func);
 #define MCFG_LASERDISC_OVERLAY_STATIC(_width, _height, _func) \
-	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&screen_update_##_func, "screen_update_" #_func)); \
-
+	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&screen_update_##_func, "screen_update_" #_func));
 #define MCFG_LASERDISC_OVERLAY_DRIVER(_width, _height, _class, _method) \
-	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, NULL)); \
-
+	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, NULL));
 #define MCFG_LASERDISC_OVERLAY_DEVICE(_width, _height, _device, _class, _method) \
-	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, _device)); \
-
+	laserdisc_device::static_set_overlay(*device, _width, _height, screen_update_delegate_smart(&_class::_method, #_class "::" #_method, _device));
 #define MCFG_LASERDISC_OVERLAY_CLIP(_minx, _maxx, _miny, _maxy) \
-	laserdisc_device::static_set_overlay_clip(*device, _minx, _maxx, _miny, _maxy); \
-
+	laserdisc_device::static_set_overlay_clip(*device, _minx, _maxx, _miny, _maxy);
 #define MCFG_LASERDISC_OVERLAY_POSITION(_posx, _posy) \
-	laserdisc_device::static_set_overlay_position(*device, _posx, _posy); \
-
+	laserdisc_device::static_set_overlay_position(*device, _posx, _posy);
 #define MCFG_LASERDISC_OVERLAY_SCALE(_scalex, _scaley) \
-	laserdisc_device::static_set_overlay_scale(*device, _scalex, _scaley); \
-
+	laserdisc_device::static_set_overlay_scale(*device, _scalex, _scaley);
 
 // use these to add laserdisc screens with proper video update parameters
 #define MCFG_LASERDISC_SCREEN_ADD_NTSC(_tag, _ldtag) \
@@ -118,8 +110,7 @@ enum laserdisc_field_code
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
 	MCFG_SCREEN_ADD(_tag, RASTER) \
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz*2, 910, 0, 704, 525, 44, 524) \
-	MCFG_SCREEN_UPDATE_DEVICE(_ldtag, laserdisc_device, screen_update) \
-
+	MCFG_SCREEN_UPDATE_DEVICE(_ldtag, laserdisc_device, screen_update)
 // not correct yet; fix me...
 #define MCFG_LASERDISC_SCREEN_ADD_PAL(_tag, _ldtag) \
 	MCFG_DEVICE_MODIFY(_ldtag) \
@@ -127,8 +118,7 @@ enum laserdisc_field_code
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
 	MCFG_SCREEN_ADD(_tag, RASTER) \
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 910, 0, 704, 525.0/2, 0, 480/2) \
-	MCFG_SCREEN_UPDATE_DEVICE(_ldtag, laserdisc_device, screen_update) \
-
+	MCFG_SCREEN_UPDATE_DEVICE(_ldtag, laserdisc_device, screen_update)
 
 
 //**************************************************************************

@@ -131,7 +131,6 @@ pc9801_118_device::pc9801_118_device(const machine_config &mconfig, const char *
 //      m_maincpu(*owner, "maincpu"),
 		m_opn3(*this, "opn3")
 {
-
 }
 
 

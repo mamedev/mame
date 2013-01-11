@@ -140,7 +140,6 @@ static const i2cmem_interface i2cmem_interface =
 
 WRITE8_MEMBER(splus_state::splus_io_w)
 {
-
 	// P1.0 = Reel 1 Controller
 	// P1.1 = Reel 2 Controller
 	// P1.2 = Reel 3 Controller
@@ -153,7 +152,6 @@ WRITE8_MEMBER(splus_state::splus_io_w)
 
 	// Process Port 1
 	if (offset == 1 && ((data & 0x1f) != 0x00)) {
-
 		// Unknown Bit 7
 		m_p1_unknown = (~data & 0x80);
 
@@ -191,14 +189,12 @@ WRITE8_MEMBER(splus_state::splus_io_w)
 
 WRITE8_MEMBER(splus_state::splus_load_pulse_w)
 {
-
 //  UINT8 out = 0;
 //    out = ((~m_io_port[1] & 0xf0)>>4); // Output Bank
 }
 
 WRITE8_MEMBER(splus_state::splus_serial_w)
 {
-
 	UINT8 out = 0;
 	out = ((~m_io_port[1] & 0xe0)>>5); // Output Bank
 
@@ -340,7 +336,6 @@ WRITE8_MEMBER(splus_state::splus_serial_w)
 
 WRITE8_MEMBER(splus_state::splus_7seg_w)
 {
-
 	static const UINT8 ls48_map[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	UINT8 seg;
@@ -373,7 +368,6 @@ WRITE8_MEMBER(splus_state::i2c_nvram_w)
 
 READ8_MEMBER(splus_state::splus_serial_r)
 {
-
 	UINT8 coin_out = 0x00;
 	UINT8 coin_optics = 0x00;
 	UINT8 door_optics = 0x00;
@@ -520,7 +514,6 @@ READ8_MEMBER(splus_state::splus_m_reel_ram_r)
 
 READ8_MEMBER(splus_state::splus_io_r)
 {
-
 	if (offset == 3)
 		return m_io_port[offset] & 0xf3; // Ignore Int0 and Int1, or machine will loop forever waiting
 	else
@@ -579,7 +572,6 @@ READ8_MEMBER(splus_state::splus_reel_optics_r)
 
 DRIVER_INIT_MEMBER(splus_state,splus)
 {
-
 	UINT8 *reel_data = memregion( "reeldata" )->base();
 
 	// Load Reel Data

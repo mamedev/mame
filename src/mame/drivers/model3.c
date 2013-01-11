@@ -1223,7 +1223,6 @@ static void configure_fast_ram(running_machine &machine)
 
 TIMER_CALLBACK_MEMBER(model3_state::model3_sound_timer_tick)
 {
-
 	if (m_sound_irq_enable)
 	{
 		model3_set_irq_line(machine(), 0x40, ASSERT_LINE);
@@ -1413,7 +1412,6 @@ WRITE64_MEMBER(model3_state::model3_ctrl_w)
 		case 4:
 			if (ACCESSING_BITS_56_63)   /* Port 4 direction */
 			{
-
 			}
 			if (ACCESSING_BITS_24_31)               /* Serial comm TX FIFO 1 */
 			{                                           /* Used for reading the light gun in Lost World */
@@ -1629,7 +1627,6 @@ READ64_MEMBER(model3_state::real3d_status_r)
 /* SCSP interface */
 WRITE8_MEMBER(model3_state::model3_sound_w)
 {
-
 	switch (offset)
 	{
 		case 0:

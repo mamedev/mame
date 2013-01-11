@@ -2963,7 +2963,6 @@ inline int hd61700_cpu_device::get_im_7(UINT8 data)
 
 inline UINT16 hd61700_cpu_device::make_bcd_sub(UINT8 arg1, UINT8 arg2)
 {
-
 	UINT32 ret = (arg1&0x0f) - (arg2&0x0f);
 	UINT8 carry;
 

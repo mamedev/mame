@@ -337,7 +337,6 @@ static const ay8910_interface ay8910_config =
 
 void meijinsn_state::machine_start()
 {
-
 	save_item(NAME(m_deposits1));
 	save_item(NAME(m_deposits2));
 	save_item(NAME(m_credits));
@@ -345,7 +344,6 @@ void meijinsn_state::machine_start()
 
 void meijinsn_state::machine_reset()
 {
-
 	m_deposits1 = 0;
 	m_deposits2 = 0;
 	m_credits   = 0;

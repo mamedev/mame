@@ -137,7 +137,6 @@ VIDEO_START_MEMBER(taitof2_state,taitof2_thundfox)
 
 VIDEO_START_MEMBER(taitof2_state,taitof2_mjnquest)
 {
-
 	taitof2_core_vh_start(machine(), 0, 0, 0);
 
 	tc0100scn_set_bg_tilemask(m_tc0100scn, 0x7fff);
@@ -145,7 +144,6 @@ VIDEO_START_MEMBER(taitof2_state,taitof2_mjnquest)
 
 VIDEO_START_MEMBER(taitof2_state,taitof2_footchmp)
 {
-
 	taitof2_core_vh_start(machine(), 0, 3, 3);
 
 	m_game = FOOTCHMP;
@@ -153,7 +151,6 @@ VIDEO_START_MEMBER(taitof2_state,taitof2_footchmp)
 
 VIDEO_START_MEMBER(taitof2_state,taitof2_hthero)
 {
-
 	taitof2_core_vh_start(machine(), 0, 3, 3);
 
 	m_game = FOOTCHMP;
@@ -191,7 +188,6 @@ VIDEO_START_MEMBER(taitof2_state,taitof2_dinorex)
 
 VIDEO_START_MEMBER(taitof2_state,taitof2_dondokod)/* dondokod, cameltry */
 {
-
 	m_pivot_xdisp = -16;
 	m_pivot_ydisp = 0;
 	taitof2_core_vh_start(machine(), 0, 3, 3);
@@ -199,7 +195,6 @@ VIDEO_START_MEMBER(taitof2_state,taitof2_dondokod)/* dondokod, cameltry */
 
 VIDEO_START_MEMBER(taitof2_state,taitof2_pulirula)
 {
-
 	m_pivot_xdisp = -10;    /* alignment seems correct (see level 2, falling */
 	m_pivot_ydisp = 16; /* block of ice after armour man) */
 	taitof2_core_vh_start(machine(), 2, 3, 3);
@@ -207,7 +202,6 @@ VIDEO_START_MEMBER(taitof2_state,taitof2_pulirula)
 
 VIDEO_START_MEMBER(taitof2_state,taitof2_driftout)
 {
-
 	m_pivot_xdisp = -16;
 	m_pivot_ydisp = 16;
 	taitof2_core_vh_start(machine(), 0, 3, 3);
@@ -887,7 +881,6 @@ void taitof2_state::screen_eof_taitof2_no_buffer(screen_device &screen, bool sta
 	// rising edge
 	if (state)
 	{
-
 		taitof2_update_sprites_active_area(machine());
 
 		m_prepare_sprites = 1;
@@ -997,7 +990,6 @@ UINT32 taitof2_state::screen_update_taitof2_ssi(screen_device &screen, bitmap_in
 
 UINT32 taitof2_state::screen_update_taitof2_yesnoj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	taitof2_handle_sprite_buffering(machine());
 
 	tc0100scn_tilemap_update(m_tc0100scn);
@@ -1014,7 +1006,6 @@ UINT32 taitof2_state::screen_update_taitof2_yesnoj(screen_device &screen, bitmap
 
 UINT32 taitof2_state::screen_update_taitof2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	taitof2_handle_sprite_buffering(machine());
 
 	tc0100scn_tilemap_update(m_tc0100scn);

@@ -227,7 +227,6 @@ Code at 505: waits for bit 1 to go low, writes command, waits for bit
 /* Read/Write Handlers */
 READ8_MEMBER(airbustr_state::devram_r)
 {
-
 	// There's an MCU here, possibly
 	switch (offset)
 	{
@@ -271,7 +270,6 @@ WRITE8_MEMBER(airbustr_state::master_bankswitch_w)
 
 WRITE8_MEMBER(airbustr_state::slave_bankswitch_w)
 {
-
 	membank("bank2")->set_entry(data & 0x07);
 
 	flip_screen_set(data & 0x10);
@@ -287,7 +285,6 @@ WRITE8_MEMBER(airbustr_state::sound_bankswitch_w)
 
 READ8_MEMBER(airbustr_state::soundcommand_status_r)
 {
-
 	// bits: 2 <-> ?    1 <-> soundlatch full   0 <-> soundlatch2 empty
 	return 4 + m_soundlatch_status * 2 + (1 - m_soundlatch2_status);
 }
@@ -597,7 +594,6 @@ void airbustr_state::machine_start()
 
 void airbustr_state::machine_reset()
 {
-
 	m_soundlatch_status = m_soundlatch2_status = 0;
 	m_bg_scrollx = 0;
 	m_bg_scrolly = 0;

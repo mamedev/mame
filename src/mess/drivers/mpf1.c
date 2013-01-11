@@ -205,7 +205,6 @@ INPUT_PORTS_END
 
 TIMER_CALLBACK_MEMBER(mpf1_state::led_refresh)
 {
-
 	if (BIT(m_lednum, 5)) output_set_digit_value(0, param);
 	if (BIT(m_lednum, 4)) output_set_digit_value(1, param);
 	if (BIT(m_lednum, 3)) output_set_digit_value(2, param);
@@ -475,7 +474,6 @@ DIRECT_UPDATE_MEMBER(mpf1_state::mpf1_direct_update_handler)
 
 DRIVER_INIT_MEMBER(mpf1_state,mpf1)
 {
-
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(mpf1_state::mpf1_direct_update_handler), this));
 }
 

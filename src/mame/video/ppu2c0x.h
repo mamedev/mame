@@ -87,29 +87,21 @@ enum
 	MCFG_DEVICE_CONFIG(_intrf)
 
 #define MCFG_PPU2C02_ADD(_tag, _intrf)   \
-	MCFG_PPU2C0X_ADD(_tag, PPU_2C02, _intrf) \
-
+	MCFG_PPU2C0X_ADD(_tag, PPU_2C02, _intrf)
 #define MCFG_PPU2C03B_ADD(_tag, _intrf)   \
-	MCFG_PPU2C0X_ADD(_tag, PPU_2C03B, _intrf) \
-
+	MCFG_PPU2C0X_ADD(_tag, PPU_2C03B, _intrf)
 #define MCFG_PPU2C04_ADD(_tag, _intrf)   \
-	MCFG_PPU2C0X_ADD(_tag, PPU_2C04, _intrf) \
-
+	MCFG_PPU2C0X_ADD(_tag, PPU_2C04, _intrf)
 #define MCFG_PPU2C07_ADD(_tag, _intrf)   \
-	MCFG_PPU2C0X_ADD(_tag, PPU_2C07, _intrf) \
-
+	MCFG_PPU2C0X_ADD(_tag, PPU_2C07, _intrf)
 #define MCFG_PPU2C05_01_ADD(_tag, _intrf)   \
-	MCFG_PPU2C0X_ADD(_tag, PPU_2C05_01, _intrf) \
-
+	MCFG_PPU2C0X_ADD(_tag, PPU_2C05_01, _intrf)
 #define MCFG_PPU2C05_02_ADD(_tag, _intrf)   \
-	MCFG_PPU2C0X_ADD(_tag, PPU_2C05_02, _intrf) \
-
+	MCFG_PPU2C0X_ADD(_tag, PPU_2C05_02, _intrf)
 #define MCFG_PPU2C05_03_ADD(_tag, _intrf)   \
-	MCFG_PPU2C0X_ADD(_tag, PPU_2C05_03, _intrf) \
-
+	MCFG_PPU2C0X_ADD(_tag, PPU_2C05_03, _intrf)
 #define MCFG_PPU2C05_04_ADD(_tag, _intrf)   \
-	MCFG_PPU2C0X_ADD(_tag, PPU_2C05_04, _intrf) \
-
+	MCFG_PPU2C0X_ADD(_tag, PPU_2C05_04, _intrf)
 
 ///*************************************************************************
 //  TYPE DEFINITIONS

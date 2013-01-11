@@ -106,7 +106,6 @@ TIMER_CALLBACK_MEMBER(zx_state::zx_ula_nmi)
 
 TIMER_CALLBACK_MEMBER(zx_state::zx_ula_irq)
 {
-
 	/*
 	 * An IRQ is issued on the ZX80/81 whenever the R registers
 	 * bit 6 goes low. In MESS this IRQ timed from the first read

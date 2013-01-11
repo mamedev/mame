@@ -92,7 +92,6 @@ TIMER_CALLBACK_MEMBER(dcheese_state::dcheese_signal_irq_callback)
 
 void dcheese_state::video_start()
 {
-
 	/* the destination bitmap is not directly accessible to the CPU */
 	m_dstbitmap = auto_bitmap_ind16_alloc(machine(), DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT);
 

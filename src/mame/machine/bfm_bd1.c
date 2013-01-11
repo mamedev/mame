@@ -259,7 +259,6 @@ int bfm_bd1_t::write_char(int data)
 	}
 	else
 	{
-
 		if(data < 0x80)//characters
 		{
 			if (data > 0x3F)
@@ -420,7 +419,6 @@ void bfm_bd1_t::setdata(int segdata, int data)
 
 	if ( move )
 	{
-
 		int mode = m_display_mode;
 
 		m_pcursor_pos = m_cursor_pos;

@@ -164,7 +164,6 @@ READ8_MEMBER(capbowl_state::track_1_r)
 
 WRITE8_MEMBER(capbowl_state::track_reset_w)
 {
-
 	/* reset the trackball counters */
 	m_last_trackball_val[0] = ioport("TRACKY")->read();
 	m_last_trackball_val[1] = ioport("TRACKX")->read();
@@ -336,7 +335,6 @@ static const ym2203_interface ym2203_config =
 
 void capbowl_state::machine_start()
 {
-
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
@@ -347,7 +345,6 @@ void capbowl_state::machine_start()
 
 void capbowl_state::machine_reset()
 {
-
 	machine().scheduler().timer_set(machine().primary_screen->time_until_pos(32), timer_expired_delegate(FUNC(capbowl_state::capbowl_update),this), 32);
 
 	m_blitter_addr = 0;

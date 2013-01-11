@@ -73,7 +73,6 @@ READ8_MEMBER(cyberbal_state::cyberbal_sound_68k_6502_r)
 
 WRITE8_MEMBER(cyberbal_state::cyberbal_sound_68k_6502_w)
 {
-
 	m_sound_data_from_6502 = data;
 	m_sound_data_from_6502_ready = 1;
 

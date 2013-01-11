@@ -50,7 +50,6 @@ void tx0_state::screen_eof_tx0(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-
 		crt_eof(m_crt);
 	}
 }
