@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
 					dst--;
 				}
 				/* remove extraneous line continuation followed by a blank line */
-				else if (is_c_file && dst > 2 && modified[dst-3] == '\\' && modified[dst-2] == 0x0d && modified[dst-1]==0x0a)
+				else if (is_c_file && !in_multiline_comment && dst > 2 && modified[dst-3] == '\\' && modified[dst-2] == 0x0d && modified[dst-1]==0x0a)
 				{
 					removed_continuations++;
 					dst -= 3;
