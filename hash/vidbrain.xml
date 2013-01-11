@@ -2,29 +2,29 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 
-	Undumped cartridges
+    Undumped cartridges
 
-	Money Management Series:
-	APL/S   The Computational Language
+    Money Management Series:
+    APL/S   The Computational Language
 
 
-	Advertised but never released cartridges
+    Advertised but never released cartridges
 
-	Money Management Series:
-	VB-59   The Programmable
-	VB-1100 Budget System
-	VB-1200 Information Manager
+    Money Management Series:
+    VB-59   The Programmable
+    VB-1100 Budget System
+    VB-1200 Information Manager
 
-	Education Series:
-	ED07    Musicianship 1
-	ED08    Number Cross
-	ED09    Historical Simulation - France in the Old Regime
+    Education Series:
+    ED07    Musicianship 1
+    ED08    Number Cross
+    ED09    Historical Simulation - France in the Old Regime
 
-	Entertainment Series:
-	EN07    Challenge Racer
-	EN08    Music Programmer
-	EN09    Programmable Football
-	EN10    Computer Life
+    Entertainment Series:
+    EN07    Challenge Racer
+    EN08    Music Programmer
+    EN09    Programmable Football
+    EN10    Computer Life
 
 -->
 <softwarelist name="vidbrain" description="VideoBrain Family Computer cartridges">

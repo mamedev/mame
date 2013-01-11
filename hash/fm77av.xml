@@ -4,15 +4,15 @@
 <!--
 
 Titles, serial #s, publishers and release dates taken from:
-	- Oh!FM-7 ( http://retropc.net/fm-7/ )
+  - Oh!FM-7 ( http://retropc.net/fm-7/ )
 
 -->
 
 
 <!--
-	Some FM-7 and FM-77AV applications can span multiple disk images, and will often be found as one file
-	comprised of multiple images concatenated together.  MESS does not support this, so with those images you'll
-	need to split the images into separate files.  This software list assumes that there is only one image per file.
+    Some FM-7 and FM-77AV applications can span multiple disk images, and will often be found as one file
+    comprised of multiple images concatenated together.  MESS does not support this, so with those images you'll
+    need to split the images into separate files.  This software list assumes that there is only one image per file.
 -->
 
 <softwarelist name="fm77av" description="Fujitsu FM-77AV disk images">
@@ -562,9 +562,9 @@ Titles, serial #s, publishers and release dates taken from:
 	<software name="probbfan">
 <!-- Keys listed in readme:
 キー操作/ 1P/ テンキー:方向 "_"キー:Aボタン ":"キー:Bボタン
-		2P/ Rキー:↑ Vキー:↓ Gキー:→ Dキー:←
-		F1～F5:各種コマンド
-		操作の要領は基本的にファミスタ準拠 -->
+     2P/ Rキー:↑ Vキー:↓ Gキー:→ Dキー:←
+     F1～F5:各種コマンド
+     操作の要領は基本的にファミスタ準拠 -->
 		<description>Pro Yakyu Fan</description>
 		<year>1988</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>

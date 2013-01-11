@@ -3,10 +3,10 @@
 <softwarelist name="socrates" description="Video Technology Socrates cartridges">
 
 <!--
-	a cartridge called 'game master' is supposed to be here
-	an international-only? cartridge called 'puzzles' is supposed to be here
-	Cad professor mouse is supposed to be here
-	the touch pad cartridge is supposed to be here
+    a cartridge called 'game master' is supposed to be here
+    an international-only? cartridge called 'puzzles' is supposed to be here
+    Cad professor mouse is supposed to be here
+    the touch pad cartridge is supposed to be here
 -->
 
 	<software name="amazes">

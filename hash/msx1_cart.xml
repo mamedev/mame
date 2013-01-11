@@ -270,54 +270,54 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 <!--
-	<software name="shougun">
-		<description>Shougun</description>
-		<year></year>
-		<publisher>Nihon Dexter</publisher>
-		<info name="alt_title" value="将軍" />
-		<part name="cart" interface="msx_cart">
-			<feature name="pcb" value="TAS-621-64K" />
-			<feature name="mapper" value="M60002-0125SP" />
-			<dataarea name="rom" size="131072">
-				<rom name="lh23100y" size="131072" crc="" sha1="" offset="0" />
-			</dataarea>
-			<dataarea name="sram" size="8192" >
-			</dataarea>
-		</part>
-	</software>
+    <software name="shougun">
+        <description>Shougun</description>
+        <year></year>
+        <publisher>Nihon Dexter</publisher>
+        <info name="alt_title" value="将軍" />
+        <part name="cart" interface="msx_cart">
+            <feature name="pcb" value="TAS-621-64K" />
+            <feature name="mapper" value="M60002-0125SP" />
+            <dataarea name="rom" size="131072">
+                <rom name="lh23100y" size="131072" crc="" sha1="" offset="0" />
+            </dataarea>
+            <dataarea name="sram" size="8192" >
+            </dataarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="synthsau">
-		<description>Synth Saurus</description>
-		<year></year>
-		<publisher>Bit²</publisher>
-		<info name="alt_title" value="シンセサウルス" />
-		<part name="cart" interface="msx_cart">
-			<feature name="pcb" value="TAS-1M-008S" />
-			<feature name="mapper" value="LZ93A13" />
-			<dataarea name="rom" size="131072">
-				<rom name="m5m27512p" size="131072" crc="" sha1="" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="synthsau">
+        <description>Synth Saurus</description>
+        <year></year>
+        <publisher>Bit²</publisher>
+        <info name="alt_title" value="シンセサウルス" />
+        <part name="cart" interface="msx_cart">
+            <feature name="pcb" value="TAS-1M-008S" />
+            <feature name="mapper" value="LZ93A13" />
+            <dataarea name="rom" size="131072">
+                <rom name="m5m27512p" size="131072" crc="" sha1="" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="synthsaua">
-		<description>Synth Saurus (Alt)</description>
-		<year></year>
-		<publisher>Bit²</publisher>
-		<info name="alt_title" value="シンセサウルス" />
-		<part name="cart" interface="msx_cart">
-			<feature name="pcb" value="TAS-2M008-E2M" />
-			<feature name="mapper" value="LZ93A13" />
-			<dataarea name="rom" size="262144">
-				<rom name="m5m27512p" size="131072" crc="" sha1="" offset="0" />
-				<rom name="a27512zb" size="65536" crc="" sha1="" offset="0x20000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="synthsaua">
+        <description>Synth Saurus (Alt)</description>
+        <year></year>
+        <publisher>Bit²</publisher>
+        <info name="alt_title" value="シンセサウルス" />
+        <part name="cart" interface="msx_cart">
+            <feature name="pcb" value="TAS-2M008-E2M" />
+            <feature name="mapper" value="LZ93A13" />
+            <dataarea name="rom" size="262144">
+                <rom name="m5m27512p" size="131072" crc="" sha1="" offset="0" />
+                <rom name="a27512zb" size="65536" crc="" sha1="" offset="0x20000" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="spierrot">
@@ -349,19 +349,19 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 <!--
-	<software name="slaydckl">
-		<description>Super Laydock (The Links Network Version)</description>
-		<year>1987</year>
-		<publisher>T&amp;E Soft</publisher>
-		<info name="alt_title" value="スーパーレイドック(THE LINKS NETWORK VERSION)" />
-		<part name="cart" interface="msx_cart">
-			<feature name="pcb" value="TA6228" />
-			<feature name="mapper" value="M60002-0125SP" />
-			<dataarea name="rom" size="262144">
-				<rom name="lh532045" size="262144" crc="" sha1="" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="slaydckl">
+        <description>Super Laydock (The Links Network Version)</description>
+        <year>1987</year>
+        <publisher>T&amp;E Soft</publisher>
+        <info name="alt_title" value="スーパーレイドック(THE LINKS NETWORK VERSION)" />
+        <part name="cart" interface="msx_cart">
+            <feature name="pcb" value="TA6228" />
+            <feature name="mapper" value="M60002-0125SP" />
+            <dataarea name="rom" size="262144">
+                <rom name="lh532045" size="262144" crc="" sha1="" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="senjokam">
@@ -722,18 +722,18 @@ Unless otherwise noted, the information in this list has not been verified by op
 	</software>
 
 <!--
-	<software name="">
-		<description></description>
-		<year></year>
-		<publisher></publisher>
-		<part name="cart" interface="msx_cart">
-			<feature name="pcb" value="" />
-			<feature name="mapper" value="" />
-			<dataarea name="rom" size="">
-				<rom name="" size="" crc="" sha1="" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="">
+        <description></description>
+        <year></year>
+        <publisher></publisher>
+        <part name="cart" interface="msx_cart">
+            <feature name="pcb" value="" />
+            <feature name="mapper" value="" />
+            <dataarea name="rom" size="">
+                <rom name="" size="" crc="" sha1="" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 </softwarelist>

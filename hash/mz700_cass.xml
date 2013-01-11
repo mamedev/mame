@@ -93,7 +93,7 @@ Easidata (English Version)
 	</software>
 
 <!-- This is a straight recording of the tape. The tape seems to have been destroyed by time and as such a possible bad dump. It might be preferrable to convert to some cooked format. Is MZF considered adequate for preservation?
-		Side A of the dumped tape had been taped over, hence the nodump. -->
+     Side A of the dumped tape had been taped over, hence the nodump. -->
 	<software name="1z013b_a" cloneof="1z013b">
 		<description>BASIC Interpreter 1Z-013B V1.0A / Applications V1.0A (Alt)</description>
 		<year>1983</year>
@@ -1909,11 +1909,11 @@ Easidata (English Version)
 			</dataarea>
 		</part>
 <!--
-		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="20896">
-				<rom name="mucmac8oo.mzf" size="20896" crc="fab9b721" sha1="524e8855ae1dd36f013c4050924d0540f920d90d" offset="0" />
-			</dataarea>
-		</part>
+        <part name="cass1" interface="mz_cass">
+            <dataarea name="cass" size="20896">
+                <rom name="mucmac8oo.mzf" size="20896" crc="fab9b721" sha1="524e8855ae1dd36f013c4050924d0540f920d90d" offset="0" />
+            </dataarea>
+        </part>
 -->
 	</software>
 

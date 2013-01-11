@@ -1818,7 +1818,7 @@ Info from Atariage and Atarimania
 	- add correct parent/clone relations for games with different descriptions
 	- add programmers and serial numbers in <info>
 	- verify PAL publishers when multiple ones were present (only 1 got picked up the most common, but this might have
-		lead to a bunch of mistakes, e.g. for Ariola releases)... case by case checks are needed!
+	  lead to a bunch of mistakes, e.g. for Ariola releases)... case by case checks are needed!
 	- verify games with multiple titles
 	-->
 

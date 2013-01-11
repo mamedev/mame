@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--  Needed to be dump:
-	IBM PCjr club disk library (only an extracted collection exist)
+    IBM PCjr club disk library (only an extracted collection exist)
 -->
 <softwarelist name="ibmpcjr_flop" description="IBM PCjr disk images">
 

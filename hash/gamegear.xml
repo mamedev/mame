@@ -2,23 +2,23 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 The following games existed according to VGRebirth
-	- FIFA 95 (USA) by Electronic Arts
-	- NBA Jam T.E. (Jpn) by Acclaim
-	- NFL Quarterback Club 95 (Jpn) by Acclaim
-	- Robocop 3 (Jpn) by Acclaim
-	- Scratch Golf (USA) by Vic Tokai
-	- Sonic Drift (Euro) by Sega
-	- Super Golf (USA) by Sage's Creations
-	- Terminator 2 - Judgement Day (Jpn) by Acclaim
-	- Zool (Euro) by Gremlin Interactive
+  - FIFA 95 (USA) by Electronic Arts
+  - NBA Jam T.E. (Jpn) by Acclaim
+  - NFL Quarterback Club 95 (Jpn) by Acclaim
+  - Robocop 3 (Jpn) by Acclaim
+  - Scratch Golf (USA) by Vic Tokai
+  - Sonic Drift (Euro) by Sega
+  - Super Golf (USA) by Sage's Creations
+  - Terminator 2 - Judgement Day (Jpn) by Acclaim
+  - Zool (Euro) by Gremlin Interactive
 
 Other undumped games:
-	- Woody Pop (Jpn) by Sega
+  - Woody Pop (Jpn) by Sega
 
 A few games have been listed as rumored, but they might very well be fake (please let us know if you have any info):
-	- "Outrunners",
-	- "Sports Illustrated Golf",
-	- "Ronald McDonald in Magical World" (European revision of "Donald no Magic World" ??)
+  - "Outrunners",
+  - "Sports Illustrated Golf",
+  - "Ronald McDonald in Magical World" (European revision of "Donald no Magic World" ??)
 -->
 
 <softwarelist name="gamegear" description="Sega Game Gear cartridges">
@@ -255,14 +255,14 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- same as jan 13 proto. was a mistake by drx? -->
 	<!--software name="aladdinp1a" cloneof="aladdin">
-		<description>Disney's Aladdin (Prototype WITH, 19940123)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="aladdin (prototype with - jan 23,  1994).bin" size="524288" crc="75a7f142" sha1="a968ee77938233a4ff94c73266c7fb36fa25657d" offset="000000" />
-			</dataarea>
-		</part>
+	    <description>Disney's Aladdin (Prototype WITH, 19940123)</description>
+	    <year>1994</year>
+	    <publisher>Sega</publisher>
+	    <part name="cart" interface="gamegear_cart">
+	        <dataarea name="rom" size="524288">
+	            <rom name="aladdin (prototype with - jan 23,  1994).bin" size="524288" crc="75a7f142" sha1="a968ee77938233a4ff94c73266c7fb36fa25657d" offset="000000" />
+	        </dataarea>
+	    </part>
 	</software-->
 
 	<!--  Alt. Title: Alex Kido (on the boxart) -->
@@ -1047,14 +1047,14 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- same as dec 11 proto. was a mistake by drx? -->
 	<!-- software name="bonkersp02a" cloneof="bonkers">
-		<description>Disney's Bonkers Wax Up! (Prototype, 19941212-B)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="bonkers wax up! (prototype - dec 12,  1994 - b).bin" size="524288" crc="9a405d0d" sha1="e797640e2363f517fb83ee42903f5d13a1ffad73" offset="000000" />
-			</dataarea>
-		</part>
+	    <description>Disney's Bonkers Wax Up! (Prototype, 19941212-B)</description>
+	    <year>1994</year>
+	    <publisher>Sega</publisher>
+	    <part name="cart" interface="gamegear_cart">
+	        <dataarea name="rom" size="524288">
+	            <rom name="bonkers wax up! (prototype - dec 12,  1994 - b).bin" size="524288" crc="9a405d0d" sha1="e797640e2363f517fb83ee42903f5d13a1ffad73" offset="000000" />
+	        </dataarea>
+	    </part>
 	</software-->
 
 	<software name="bonkersp01" cloneof="bonkers">
@@ -3797,14 +3797,14 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- same as aug 14 proto. was a mistake by drx? -->
 	<!--software name="lionkingp5b" cloneof="lionking">
-		<description>Disney's The Lion King (Prototype, 19940815)</description>
-		<year>1994</year>
-		<publisher>Virgin Interactive</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="514486">
-				<rom name="lion king, the (prototype - aug 15,  1994).bin" size="514486" crc="eb10a2d4" sha1="cdce953f16e4db6e9137ea8d523588b3469a544d" offset="000000" />
-			</dataarea>
-		</part>
+	    <description>Disney's The Lion King (Prototype, 19940815)</description>
+	    <year>1994</year>
+	    <publisher>Virgin Interactive</publisher>
+	    <part name="cart" interface="gamegear_cart">
+	        <dataarea name="rom" size="514486">
+	            <rom name="lion king, the (prototype - aug 15,  1994).bin" size="514486" crc="eb10a2d4" sha1="cdce953f16e4db6e9137ea8d523588b3469a544d" offset="000000" />
+	        </dataarea>
+	    </part>
 	</software-->
 
 	<software name="lionkingp4" cloneof="lionking">
@@ -4896,14 +4896,14 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- same as aug 25 proto. was a mistake by drx? -->
 	<!--software name="nfl95p11a" cloneof="nfl95">
-		<description>NFL '95 (Prototype, 19940825-B)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="nfl '95 (prototype - aug 25,  1994 - b).bin" size="524288" crc="fe140eaa" sha1="b79af203bc01ea1c59563e34105cb36cad158cca" offset="000000" />
-			</dataarea>
-		</part>
+	    <description>NFL '95 (Prototype, 19940825-B)</description>
+	    <year>1994</year>
+	    <publisher>Sega</publisher>
+	    <part name="cart" interface="gamegear_cart">
+	        <dataarea name="rom" size="524288">
+	            <rom name="nfl '95 (prototype - aug 25,  1994 - b).bin" size="524288" crc="fe140eaa" sha1="b79af203bc01ea1c59563e34105cb36cad158cca" offset="000000" />
+	        </dataarea>
+	    </part>
 	</software-->
 
 	<software name="nfl95p11" cloneof="nfl95">
@@ -7254,7 +7254,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 <!-- Apparently, the development of both Sports Trivia and Sports Trivia CE went on in parallel... hard to say which
-		version the QTEST/ALOGTEST/etc. protos were for (more info are needed on these, or some code analysis/comparison) -->
+     version the QTEST/ALOGTEST/etc. protos were for (more info are needed on these, or some code analysis/comparison) -->
 	<software name="sporttrvp12" cloneof="sporttrv">
 		<description>Sports Trivia (Prototype, 19950308)</description>
 		<year>1995</year>
@@ -8322,14 +8322,14 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- same as aug 14 proto. was a mistake by drx? -->
 	<!--software name="tazmarsp11a" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype, 19940815)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="taz in escape from mars (prototype - aug 15,  1994).bin" size="524288" crc="9267d968" sha1="8800da06ea2aa3982cf2e294b165f5e1a9cab63c" offset="000000" />
-			</dataarea>
-		</part>
+	    <description>Taz in Escape from Mars (Prototype, 19940815)</description>
+	    <year>1994</year>
+	    <publisher>Sega</publisher>
+	    <part name="cart" interface="gamegear_cart">
+	        <dataarea name="rom" size="524288">
+	            <rom name="taz in escape from mars (prototype - aug 15,  1994).bin" size="524288" crc="9267d968" sha1="8800da06ea2aa3982cf2e294b165f5e1a9cab63c" offset="000000" />
+	        </dataarea>
+	    </part>
 	</software-->
 
 	<software name="tazmarsp10" cloneof="tazmars">
@@ -9140,14 +9140,14 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- same as aug 10 proto. was a mistake by drx? -->
 	<!--software name="xmenglp3a" cloneof="xmengl">
-		<description>X-Men - Gamemaster's Legacy (Prototype, 19940815)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="x-men - gamemaster's legacy (prototype - aug 15,  1994).bin" size="524288" crc="66cc4034" sha1="46237cf1c2810a8f2e5c31907a1ae04b647256c8" offset="000000" />
-			</dataarea>
-		</part>
+	    <description>X-Men - Gamemaster's Legacy (Prototype, 19940815)</description>
+	    <year>1994</year>
+	    <publisher>Sega</publisher>
+	    <part name="cart" interface="gamegear_cart">
+	        <dataarea name="rom" size="524288">
+	            <rom name="x-men - gamemaster's legacy (prototype - aug 15,  1994).bin" size="524288" crc="66cc4034" sha1="46237cf1c2810a8f2e5c31907a1ae04b647256c8" offset="000000" />
+	        </dataarea>
+	    </part>
 	</software-->
 
 	<software name="xmenglp2" cloneof="xmengl">

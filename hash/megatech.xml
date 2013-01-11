@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-	This list should be kept up to date with any changes made
-	to drivers/megatech.c
+    This list should be kept up to date with any changes made
+    to drivers/megatech.c
 
-	This is considered an alternate way of launching the titles, in order to support mult-cart mode.
+    This is considered an alternate way of launching the titles, in order to support mult-cart mode.
 
-	It is not intended to replace the primary MAME launch system!
+    It is not intended to replace the primary MAME launch system!
 -->
 
 <softwarelist name="megatech" description="Sega MegaTech cartridges">

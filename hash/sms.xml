@@ -2,28 +2,28 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-	Undumped games
+  Undumped games
 
-	- Game de check! Koutsuu Anzen
-	- Great Ice Hockey Jpn ? (Only 1000 copies were distributed through a
-	BEEP! magazine contest in 1987, to celebrate the release of Phantasy Star)
-	- Tec Toy SMS 3 with built-in games (74 game, 112 games, 120 games or
-	131 games)
-	- a few other pirate multigame carts (two versions of 4 in 1 carts)
+  - Game de check! Koutsuu Anzen
+  - Great Ice Hockey Jpn ? (Only 1000 copies were distributed through a
+  BEEP! magazine contest in 1987, to celebrate the release of Phantasy Star)
+  - Tec Toy SMS 3 with built-in games (74 game, 112 games, 120 games or
+  131 games)
+  - a few other pirate multigame carts (two versions of 4 in 1 carts)
 
 -->
 <!--
-	Taiwanese releases for the Aaronix Mark III
-	- White Gold Cartridges
-	GB1301 - Fantasy Zone / Kuàilè xiǎo fēidié (快樂小飛碟)  [dumped]
-	GB1303 - Hokuto no Ken / Běidǒu shén quán (北斗神拳)  [dumped]
-	GB1310 - Space Harrier / ???  [verified to be the same as the Jpn release]
-	GB1314 - Double Target / Shí miàn máifú (十面埋伏)  [verified to be the same as the Jpn release]
-	- Yellow Gold Cartridges
-	K307 - Great Soccer / Shìjiè bēi zúqiú sài (世界杯足球賽)  [dumped]
-	K313 - F-16 Fighting Falcon / F-16  [dumped]
-	K317 - Comical Machine Gun Joe / Dàzhàn hēishǒu dǎng (大戰黑手黨)  [dumped]
-	K321 - Spy Vs. Spy / Dié duì dié (諜對諜)  [dumped]
+  Taiwanese releases for the Aaronix Mark III
+  - White Gold Cartridges
+  GB1301 - Fantasy Zone / Kuàilè xiǎo fēidié (快樂小飛碟)  [dumped]
+  GB1303 - Hokuto no Ken / Běidǒu shén quán (北斗神拳)  [dumped]
+  GB1310 - Space Harrier / ???  [verified to be the same as the Jpn release]
+  GB1314 - Double Target / Shí miàn máifú (十面埋伏)  [verified to be the same as the Jpn release]
+  - Yellow Gold Cartridges
+  K307 - Great Soccer / Shìjiè bēi zúqiú sài (世界杯足球賽)  [dumped]
+  K313 - F-16 Fighting Falcon / F-16  [dumped]
+  K317 - Comical Machine Gun Joe / Dàzhàn hēishǒu dǎng (大戰黑手黨)  [dumped]
+  K321 - Spy Vs. Spy / Dié duì dié (諜對諜)  [dumped]
 -->
 
 <softwarelist name="sms" description="Sega Master System cartridges">
@@ -6771,7 +6771,7 @@
 
 
 <!-- The next items have been compiled from original source code written by Jeroen Tel.
-	It is unsure if Probe has ever written any game code for these licensed titles -->
+  It is unsure if Probe has ever written any game code for these licensed titles -->
 
 	<software name="sn_ateam">
 		<description>The A-Team (Music prototype)</description>

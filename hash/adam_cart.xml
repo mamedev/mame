@@ -3,17 +3,17 @@
 <softwarelist name="adam_cart" description="Coleco Adam cartridges">
 
 	<!--software name="adamdev" supported="no">
-		<description>ADAM Dev (Prototype)</description>
-		<year>198?</year>
-		<publisher>Coleco?</publisher>
-		<part name="cart" interface="coleco_cart">
-			<dataarea name="rom" size="24576">
-				<rom name="51c9-chip1-12-6-84.bin" size="8192" crc="148c7b1d" sha1="fd32bd9bc6053b263cfc51267e0ef3f7305df121" offset="0x0000" />
-				<rom name="51c9-chip2-12-6-84.bin" size="8192" crc="4fbea31a" sha1="e17f817f1ab89a8b2c6d8dc2790ffb042da47df3" offset="0x2000" />
-				<rom name="51c9-chip3-12-6-84.bin" size="8192" crc="0b418ba1" sha1="6cc84dd6dbe9e3e4f3be35695d89ef3d6e1c1244" offset="0x4000" />
-				<rom name="51c9-chip4-12-6-84.bin" size="8192" crc="653ff925" sha1="0df057b7b1dcd969411abb1f084cb8354013103a" offset="0x6000" />
-			</dataarea>
-		</part>
+	    <description>ADAM Dev (Prototype)</description>
+	    <year>198?</year>
+	    <publisher>Coleco?</publisher>
+	    <part name="cart" interface="coleco_cart">
+	        <dataarea name="rom" size="24576">
+	            <rom name="51c9-chip1-12-6-84.bin" size="8192" crc="148c7b1d" sha1="fd32bd9bc6053b263cfc51267e0ef3f7305df121" offset="0x0000" />
+	            <rom name="51c9-chip2-12-6-84.bin" size="8192" crc="4fbea31a" sha1="e17f817f1ab89a8b2c6d8dc2790ffb042da47df3" offset="0x2000" />
+	            <rom name="51c9-chip3-12-6-84.bin" size="8192" crc="0b418ba1" sha1="6cc84dd6dbe9e3e4f3be35695d89ef3d6e1c1244" offset="0x4000" />
+	            <rom name="51c9-chip4-12-6-84.bin" size="8192" crc="653ff925" sha1="0df057b7b1dcd969411abb1f084cb8354013103a" offset="0x6000" />
+	        </dataarea>
+	    </part>
 	</software-->
 
 	<software name="ard" supported="no">

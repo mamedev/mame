@@ -8,22 +8,22 @@ NON-REDUMP Rips
 ***********************
 A few comments on these:
 1. since not a few ripping formats are not properly handled by CHDMAN (see 4. below) I currently also list checksums of the
-	original files. don't throw them away if they are in ccd/img/sub format!
+   original files. don't throw them away if they are in ccd/img/sub format!
 2. pay attention to the bin/img/iso crc, not to the cue one: many of the cues I have found in the 'releases' had the wrong bin
-	name/location, so I had to manually edit them (changing crc)
+   name/location, so I had to manually edit them (changing crc)
 3. bin/cue, nrg, iso/cue and ccd/img/sub/cue sets got directly converted with CHDMAN
 4. ccd/img/sub (with no cue) got converted by using a generic cue file as the following one
-	FILE "XXXX.img" BINARY
-		TRACK 1 MODE2/2352
-		INDEX 1 00:00:00
-	(or TRACK 01, INDEX 01 when necessary). This might have introduced errors in the procedure, so it would be good to keep around
-	the original files for later checks
+   FILE "XXXX.img" BINARY
+      TRACK 1 MODE2/2352
+      INDEX 1 00:00:00
+   (or TRACK 01, INDEX 01 when necessary). This might have introduced errors in the procedure, so it would be good to keep around
+   the original files for later checks
 5. some 'release' were found both as iso only and as iso + cue; if by using the generic cuesheet above with the iso only release you
-	end up with the wrong CHD try again by using MODE1 instead of MODE2 (raw data will remain untouched so in this case we can do
-	further changes with no loss)
+   end up with the wrong CHD try again by using MODE1 instead of MODE2 (raw data will remain untouched so in this case we can do
+   further changes with no loss)
 6. releases in mdf/mds format or cdi format have been mounted in ISOBuster and raw ripped to bin/cue, so there is the possibility
-	that subtle errors are introduced either in this procedure, or in the original creation of the mdf/mds/cdi image. These should
-	be verified with the original media, and are marked as bad dumps.
+   that subtle errors are introduced either in this procedure, or in the original creation of the mdf/mds/cdi image. These should
+   be verified with the original media, and are marked as bad dumps.
 -->
 
 <!-- Prototype disks -->

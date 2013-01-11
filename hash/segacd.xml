@@ -3,52 +3,52 @@
 <softwarelist name="segacd" description="Sega CD CD-ROM list">
 
 <!--
-	Compatibility 18/02/11
+    Compatibility 18/02/11
 
-	advbatr - too slow, heavy corruption
-	ah3ts - corruption on select operation, too slow ingame
-	ax101 - reboots over and over
-	batmanrn - hits ram expander?
-	bcracers - too slow
-	billwlsh - doesn't boot (mode set 0?)
-	bouncers - bad tiles
-	brutal - PCM DMA
-	btlcorps - too slow, bad zooming
-	changer - zoom problem in menu
-	cliffh - duplicate?
-	combracom - doesn't boot (mode set 0)
-	corpse - hits ram expander (but looks fine, then goes wrong? - illegal writes)
-	dungexpl - never boots
-	dracula - doesn't boot (but md version is broke too)
+    advbatr - too slow, heavy corruption
+    ah3ts - corruption on select operation, too slow ingame
+    ax101 - reboots over and over
+    batmanrn - hits ram expander?
+    bcracers - too slow
+    billwlsh - doesn't boot (mode set 0?)
+    bouncers - bad tiles
+    brutal - PCM DMA
+    btlcorps - too slow, bad zooming
+    changer - zoom problem in menu
+    cliffh - duplicate?
+    combracom - doesn't boot (mode set 0)
+    corpse - hits ram expander (but looks fine, then goes wrong? - illegal writes)
+    dungexpl - never boots
+    dracula - doesn't boot (but md version is broke too)
 
 
-	dracunl - 2cds
-	dune - doesn't boot
-	espnnfl - corrupt gfx in intro - too slow
-	f1btl - bad gfx, too slow
-	fifa - doesn't boot (mode set 0)
-	flashbk - comms word write - PCM DMA
-	frankn - doesn't boot
-	hota - misisng some screens
-	jagxj220 hangs loading
+    dracunl - 2cds
+    dune - doesn't boot
+    espnnfl - corrupt gfx in intro - too slow
+    f1btl - bad gfx, too slow
+    fifa - doesn't boot (mode set 0)
+    flashbk - comms word write - PCM DMA
+    frankn - doesn't boot
+    hota - misisng some screens
+    jagxj220 hangs loading
 
-	jeopardy - dmna bit it mode 1, hangs after logos
-	joemonfl - too slow , heavy corruption
-	le2 - mode set 0?
-	links - hangs going ingame
-	lunar- gfx corruption
-	stellarf - interesting stuff
-	swra - doesn't boot
-	wheelfor - same as jeopardy
-	term - doesn't boot
-	wingcomm - zooming glitches
-	risedrg - hangs mode 0
+    jeopardy - dmna bit it mode 1, hangs after logos
+    joemonfl - too slow , heavy corruption
+    le2 - mode set 0?
+    links - hangs going ingame
+    lunar- gfx corruption
+    stellarf - interesting stuff
+    swra - doesn't boot
+    wheelfor - same as jeopardy
+    term - doesn't boot
+    wingcomm - zooming glitches
+    risedrg - hangs mode 0
 
 
 -->
 
 <!-- Missing from this list
-	Rock Paintings - a CD+G disc, it's in A120% format... needs subdata etc.
+    Rock Paintings - a CD+G disc, it's in A120% format... needs subdata etc.
 -->
 
 
@@ -685,7 +685,7 @@
 	<!--- Images below are from the TOSEC set -->
 	<!-- ones believed to be duplicates of those found in the REDUMP set are commented out
 
-		HOWEVER, this is not confirmed, they should eventually be checked on a case-by-case basis
+	 HOWEVER, this is not confirmed, they should eventually be checked on a case-by-case basis
 	-->
 
 	<software name="3ninja">
@@ -700,16 +700,16 @@
 	</software>
 
 <!--
-	<software name="advbatr">
-		<description>The Adventures of Batman and Robin (USA)</description>
-		<year>1995</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="adventures of batman and robin, the (1995)(sega)(ntsc)(us)[!]" sha1="fc3b67b87e4331361709189aba6298513fca32be"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="advbatr">
+        <description>The Adventures of Batman and Robin (USA)</description>
+        <year>1995</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="adventures of batman and robin, the (1995)(sega)(ntsc)(us)[!]" sha1="fc3b67b87e4331361709189aba6298513fca32be"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="wilybeam">
@@ -726,16 +726,16 @@
 	</software>
 
 <!--
-	<software name="ah3ts">
-		<description>AH-3 Thunderstrike (USA)</description>
-		<year>1993</year>
-		<publisher>JVC</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="ah-3 thunderstrike (1993)(jvc)(ntsc)(us)[!]" sha1="ebe387bcd4bbf79b655efc4013a84c9dc2095b5a"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="ah3ts">
+        <description>AH-3 Thunderstrike (USA)</description>
+        <year>1993</year>
+        <publisher>JVC</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="ah-3 thunderstrike (1993)(jvc)(ntsc)(us)[!]" sha1="ebe387bcd4bbf79b655efc4013a84c9dc2095b5a"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="spidking">
@@ -765,29 +765,29 @@
 	</software>
 
 <!--
-	<software name="btlcorps">
-		<description>Battlecorps (USA)</description>
-		<year>1993</year>
-		<publisher>Core ~ Time Warner Interactive</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="battlecorps (1993)(core - time warner interactive)(ntsc)(us)[!]" sha1="add6839a684734e434173856a10a6569c7be9ede"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="btlcorps">
+        <description>Battlecorps (USA)</description>
+        <year>1993</year>
+        <publisher>Core ~ Time Warner Interactive</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="battlecorps (1993)(core - time warner interactive)(ntsc)(us)[!]" sha1="add6839a684734e434173856a10a6569c7be9ede"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="billwlsh">
-		<description>Bill Walsh College Football (USA)</description>
-		<year>1993</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="bill walsh college football (1993)(ea sports)(ntsc)(us)[!]" sha1="d6fcdfc11b31456f8beb7102306aed3153960a34"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="billwlsh">
+        <description>Bill Walsh College Football (USA)</description>
+        <year>1993</year>
+        <publisher>Electronic Arts</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="bill walsh college football (1993)(ea sports)(ntsc)(us)[!]" sha1="d6fcdfc11b31456f8beb7102306aed3153960a34"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 
@@ -831,17 +831,17 @@
 
 <!-- Ringcode: CDAC-050100 1 -->
 <!--
-	<software name="dracula">
-		<description>Bram Stoker's Dracula (USA)</description>
-		<year>1993</year>
-		<publisher>Sony Imagesoft</publisher>
-		<info name="serial" value="T-93065"/>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="bram stoker's dracula (1993)(sony imagesoft)(ntsc)(us)[!][cdac-050100 1]" sha1="bcdfb6c6160ba2faeac5dad04c944d42fdd09cfa"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="dracula">
+        <description>Bram Stoker's Dracula (USA)</description>
+        <year>1993</year>
+        <publisher>Sony Imagesoft</publisher>
+        <info name="serial" value="T-93065"/>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="bram stoker's dracula (1993)(sony imagesoft)(ntsc)(us)[!][cdac-050100 1]" sha1="bcdfb6c6160ba2faeac5dad04c944d42fdd09cfa"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="draculab" cloneof="dracula">
@@ -857,16 +857,16 @@
 	</software>
 
 <!--
-	<software name="brutal">
-		<description>Brutal - Paws of Fury (USA)</description>
-		<year>1994</year>
-		<publisher>Gametek</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="brutal - paws of fury (1994)(gametek)(ntsc)(us)[!]" sha1="c1c5cece1a6d3a56971974ab1714391541a7f358"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="brutal">
+        <description>Brutal - Paws of Fury (USA)</description>
+        <year>1994</year>
+        <publisher>Gametek</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="brutal - paws of fury (1994)(gametek)(ntsc)(us)[!]" sha1="c1c5cece1a6d3a56971974ab1714391541a7f358"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="dino2">
@@ -917,29 +917,29 @@
 	</software>
 
 <!--
-	<software name="cliffh">
-		<description>Cliffhanger (USA)</description>
-		<year>1993</year>
-		<publisher>Sony Imagesoft</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="cliffhanger (1993)(sony imagesoft)(ntsc)(us)[!]" sha1="cf5e0f801ce5997f8c9fa6982d48828b0d6d743f"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="cliffh">
+        <description>Cliffhanger (USA)</description>
+        <year>1993</year>
+        <publisher>Sony Imagesoft</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="cliffhanger (1993)(sony imagesoft)(ntsc)(us)[!]" sha1="cf5e0f801ce5997f8c9fa6982d48828b0d6d743f"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="cobracom">
-		<description>Cobra Command (USA)</description>
-		<year>1992</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="cobra command (1992)(sega)(ntsc)(us)[!]" sha1="306c7e1d20e6d132531d30b052252f8292a53aac"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="cobracom">
+        <description>Cobra Command (USA)</description>
+        <year>1992</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="cobra command (1992)(sega)(ntsc)(us)[!]" sha1="306c7e1d20e6d132531d30b052252f8292a53aac"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="corpse">
@@ -955,42 +955,42 @@
 	</software>
 
 <!--
-	<software name="corpse32">
-		<description>Corpse Killer (USA, 32X)</description>
-		<year>1994</year>
-		<publisher>Digital Pictures</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="corpse killer (1994)(digital pictures)(ntsc)(us)[!][32x]" sha1="263aa7d3c0993aa7532825f12fc6512095de9fb1"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="corpse32">
+        <description>Corpse Killer (USA, 32X)</description>
+        <year>1994</year>
+        <publisher>Digital Pictures</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="corpse killer (1994)(digital pictures)(ntsc)(us)[!][32x]" sha1="263aa7d3c0993aa7532825f12fc6512095de9fb1"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="darkwiz">
-		<description>Dark Wizard (USA)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="dark wizard (1994)(sega)(ntsc)(us)[!]" sha1="1d31a2a055bf56265f88eb837d67cdda99c4dfec"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="darkwiz">
+        <description>Dark Wizard (USA)</description>
+        <year>1994</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="dark wizard (1994)(sega)(ntsc)(us)[!]" sha1="1d31a2a055bf56265f88eb837d67cdda99c4dfec"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="dblswtch">
-		<description>Double Switch (USA)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="double switch (1993)(sega)(ntsc)(us)[!]" sha1="be03ad9887fe3723e4b27c5222c656409938adfe"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="dblswtch">
+        <description>Double Switch (USA)</description>
+        <year>1993</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="double switch (1993)(sega)(ntsc)(us)[!]" sha1="be03ad9887fe3723e4b27c5222c656409938adfe"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="dracunl">
@@ -1050,42 +1050,42 @@
 	</software>
 
 <!--
-	<software name="ecco2">
-		<description>Ecco - The Tides of Time (USA)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="ecco - the tides of time (1994)(sega)(ntsc)(us)[!]" sha1="2c7ec21ca4ba19bbad99d66b65e8e42391fd39e9"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="ecco2">
+        <description>Ecco - The Tides of Time (USA)</description>
+        <year>1994</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="ecco - the tides of time (1994)(sega)(ntsc)(us)[!]" sha1="2c7ec21ca4ba19bbad99d66b65e8e42391fd39e9"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="ecco">
-		<description>Ecco the Dolphin (USA)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="ecco the dolphin (1993)(sega)(ntsc)(us)[!]" sha1="a6708b67f2c802371011f9f55eb4e167c32b4c8a"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="ecco">
+        <description>Ecco the Dolphin (USA)</description>
+        <year>1993</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="ecco the dolphin (1993)(sega)(ntsc)(us)[!]" sha1="a6708b67f2c802371011f9f55eb4e167c32b4c8a"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="espnbb">
-		<description>ESPN Baseball Tonight - Pennant Fever Edition (USA)</description>
-		<year>1993</year>
-		<publisher>Sony Imagesoft</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="espn baseball tonight - pennant fever edition (1993)(sony imagesoft)(ntsc)(us)[!]" sha1="5dc31aac8ea8ad370b0ddfe23c009bf5fc195d11"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="espnbb">
+        <description>ESPN Baseball Tonight - Pennant Fever Edition (USA)</description>
+        <year>1993</year>
+        <publisher>Sony Imagesoft</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="espn baseball tonight - pennant fever edition (1993)(sony imagesoft)(ntsc)(us)[!]" sha1="5dc31aac8ea8ad370b0ddfe23c009bf5fc195d11"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="espnhn">
@@ -1187,17 +1187,17 @@
 
 <!-- Ringcode: CDAC-041400 4 -->
 <!--
-	<software name="ffightcd">
-		<description>Final Fight (USA)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="4410"/>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="final fight (1993)(sega)(ntsc)(us)[!][cdac-041400 4]" sha1="0a4b554436bc42e91fdbd5201428f46efa525937"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="ffightcd">
+        <description>Final Fight (USA)</description>
+        <year>1993</year>
+        <publisher>Sega</publisher>
+        <info name="serial" value="4410"/>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="final fight (1993)(sega)(ntsc)(us)[!][cdac-041400 4]" sha1="0a4b554436bc42e91fdbd5201428f46efa525937"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="flashb">
@@ -1267,16 +1267,16 @@
 	</software>
 
 <!--
-	<software name="hota">
-		<description>Heart of the Alien - Out of This World Parts I and II (USA)</description>
-		<year>1994</year>
-		<publisher>Virgin Interactive</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="heart of the alien - out of this world parts i and ii (1994)(virgin)(ntsc)(us)[!]" sha1="adf77f0ddfbef2cb3d4bfe6cecc9923dc84e30b5"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="hota">
+        <description>Heart of the Alien - Out of This World Parts I and II (USA)</description>
+        <year>1994</year>
+        <publisher>Virgin Interactive</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="heart of the alien - out of this world parts i and ii (1994)(virgin)(ntsc)(us)[!]" sha1="adf77f0ddfbef2cb3d4bfe6cecc9923dc84e30b5"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="heimdall">
@@ -1318,16 +1318,16 @@
 	</software>
 
 <!--
-	<software name="ironhlx">
-		<description>Iron Helix (USA)</description>
-		<year>1994</year>
-		<publisher>Spectrum HoloByte</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="iron helix (1994)(spectrum holobyte)(ntsc)(us)[!]" sha1="d070f8b1d6e5639862b1b1db39100aaf3db5804f"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="ironhlx">
+        <description>Iron Helix (USA)</description>
+        <year>1994</year>
+        <publisher>Spectrum HoloByte</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="iron helix (1994)(spectrum holobyte)(ntsc)(us)[!]" sha1="d070f8b1d6e5639862b1b1db39100aaf3db5804f"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="jagxj220">
@@ -1381,16 +1381,16 @@
 	</software>
 
 <!--
-	<software name="jpark">
-		<description>Jurassic Park (USA)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="jurassic park (1994)(sega)(ntsc)(us)[!]" sha1="165ec8a9a1db08e8b7ecbe31357b0811b132b5c3"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="jpark">
+        <description>Jurassic Park (USA)</description>
+        <year>1994</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="jurassic park (1994)(sega)(ntsc)(us)[!]" sha1="165ec8a9a1db08e8b7ecbe31357b0811b132b5c3"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<!-- Huh - marked as NTSC but EU -->
@@ -1409,17 +1409,17 @@
 
 <!-- Ringcode: T95015-U11 -->
 <!--
-	<software name="lethalen">
-		<description>Lethal Enforcers (USA)</description>
-		<year>1993</year>
-		<publisher>Konami</publisher>
-		<info name="serial" value="T-95015"/>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="lethal enforcers (1993)(konami)(ntsc)(us)[!][t95015-u11]" sha1="e9001a1b07de5b82309f9b80a8deaaf46289222c"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="lethalen">
+        <description>Lethal Enforcers (USA)</description>
+        <year>1993</year>
+        <publisher>Konami</publisher>
+        <info name="serial" value="T-95015"/>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="lethal enforcers (1993)(konami)(ntsc)(us)[!][t95015-u11]" sha1="e9001a1b07de5b82309f9b80a8deaaf46289222c"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="le2">
@@ -1485,17 +1485,17 @@
 
 <!-- Ringcode: SEGAT127015 R1D -->
 <!--
-	<software name="lunar">
-		<description>Lunar - The Silver Star (USA)</description>
-		<year>1993</year>
-		<publisher>Working Designs</publisher>
-		<info name="serial" value="T-127015"/>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="lunar - the silver star (1993)(working designs)(ntsc)(us)[!][segat127015 r1d]" sha1="c82e36f5d59a3932530157a00dc07cdc973b1b15"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="lunar">
+        <description>Lunar - The Silver Star (USA)</description>
+        <year>1993</year>
+        <publisher>Working Designs</publisher>
+        <info name="serial" value="T-127015"/>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="lunar - the silver star (1993)(working designs)(ntsc)(us)[!][segat127015 r1d]" sha1="c82e36f5d59a3932530157a00dc07cdc973b1b15"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="maddog">
@@ -1511,16 +1511,16 @@
 	</software>
 
 <!--
-	<software name="mansion">
-		<description>Mansion of Hidden Souls (USA)</description>
-		<year>1994</year>
-		<publisher>Vic Tokai</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="mansion of hidden souls (1994)(vic tokai)(ntsc)(us)[!]" sha1="bc26b3c05be799992ea4287282ba75b06f6991c0"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="mansion">
+        <description>Mansion of Hidden Souls (USA)</description>
+        <year>1994</year>
+        <publisher>Vic Tokai</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="mansion of hidden souls (1994)(vic tokai)(ntsc)(us)[!]" sha1="bc26b3c05be799992ea4287282ba75b06f6991c0"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="franken">
@@ -1607,16 +1607,16 @@
 	</software>
 
 <!--
-	<software name="mk">
-		<description>Mortal Kombat (USA)</description>
-		<year>1992</year>
-		<publisher>Arena</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="mortal kombat (1992)(arena)(ntsc)(us)[!]" sha1="f30478c3359e5d5e760799e6f38b9e35218edd49"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="mk">
+        <description>Mortal Kombat (USA)</description>
+        <year>1992</year>
+        <publisher>Arena</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="mortal kombat (1992)(arena)(ntsc)(us)[!]" sha1="f30478c3359e5d5e760799e6f38b9e35218edd49"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="nbajam">
@@ -1644,37 +1644,37 @@
 	</software>
 
 <!--
-	<software name="nhl94">
-		<description>NHL '94 (USA)</description>
-		<year>1993</year>
-		<publisher>Electronic Arts</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="nhl '94 (1993)(ea sports)(ntsc)(us)[!]" sha1="18cc15da10e5c9609fdc0164eefc1d741c84a575"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="nhl94">
+        <description>NHL '94 (USA)</description>
+        <year>1993</year>
+        <publisher>Electronic Arts</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="nhl '94 (1993)(ea sports)(ntsc)(us)[!]" sha1="18cc15da10e5c9609fdc0164eefc1d741c84a575"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="ntrap">
-		<description>Night Trap (USA)</description>
-		<year>1992</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom1" interface="scd_cdrom">
-			<feature name="part_id" value="Disc 1" />
-			<diskarea name="cdrom">
-				<disk name="night trap (1992)(sega)(ntsc)(us)(disc 1 of 2)[!]" sha1="59d48477ce8d95e6d6b5a3d304df990b52d3c4a7"/>
-			</diskarea>
-		</part>
+    <software name="ntrap">
+        <description>Night Trap (USA)</description>
+        <year>1992</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom1" interface="scd_cdrom">
+            <feature name="part_id" value="Disc 1" />
+            <diskarea name="cdrom">
+                <disk name="night trap (1992)(sega)(ntsc)(us)(disc 1 of 2)[!]" sha1="59d48477ce8d95e6d6b5a3d304df990b52d3c4a7"/>
+            </diskarea>
+        </part>
 
-		<part name="cdrom2" interface="scd_cdrom">
-			<feature name="part_id" value="Disc 2" />
-			<diskarea name="cdrom">
-				<disk name="night trap (1992)(sega)(ntsc)(us)(disc 2 of 2)[!]" sha1="9812a6c26e2ab0453fe44f5a3f17aa20b5610ef1"/>
-			</diskarea>
-		</part>
-	</software>
+        <part name="cdrom2" interface="scd_cdrom">
+            <feature name="part_id" value="Disc 2" />
+            <diskarea name="cdrom">
+                <disk name="night trap (1992)(sega)(ntsc)(us)(disc 2 of 2)[!]" sha1="9812a6c26e2ab0453fe44f5a3f17aa20b5610ef1"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="novastm">
@@ -1690,16 +1690,16 @@
 	</software>
 
 <!--
-	<software name="pitfall">
-		<description>Pitfall - The Mayan Adventure (USA)</description>
-		<year>1994</year>
-		<publisher>Activision</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="pitfall - the mayan adventure (1994)(activision)(ntsc)(us)[!]" sha1="7e1361a70687511dbebfb759d8afd0831134a044"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="pitfall">
+        <description>Pitfall - The Mayan Adventure (USA)</description>
+        <year>1994</year>
+        <publisher>Activision</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="pitfall - the mayan adventure (1994)(activision)(ntsc)(us)[!]" sha1="7e1361a70687511dbebfb759d8afd0831134a044"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="pmonger">
@@ -1735,16 +1735,16 @@
 	</software>
 
 <!--
-	<software name="puggsy">
-		<description>Puggsy (USA)</description>
-		<year>1993</year>
-		<publisher>Psygnosis</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="puggsy (1993)(psygnosis)(ntsc)(us)[!]" sha1="78930ef8ebb115fed9c7e4957bed994485cc5bf4"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="puggsy">
+        <description>Puggsy (USA)</description>
+        <year>1993</year>
+        <publisher>Psygnosis</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="puggsy (1993)(psygnosis)(ntsc)(us)[!]" sha1="78930ef8ebb115fed9c7e4957bed994485cc5bf4"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 
@@ -1785,31 +1785,31 @@
 	</software>
 
 <!--
-	<software name="revninja">
-		<description>Revenge of the Ninja (USA)</description>
-		<year>1994</year>
-		<publisher>Renovation</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="revenge of the ninja (1994)(renovation)(ntsc)(us)[!]" sha1="cec1a49da0941532caa478ed5c3d1dd14c659871"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="revninja">
+        <description>Revenge of the Ninja (USA)</description>
+        <year>1994</year>
+        <publisher>Renovation</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="revenge of the ninja (1994)(renovation)(ntsc)(us)[!]" sha1="cec1a49da0941532caa478ed5c3d1dd14c659871"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<!-- Ringcode: S604430RE R1D -->
 <!--
-	<software name="risedrag">
-		<description>Rise of the Dragon (USA)</description>
-		<year>1993</year>
-		<publisher>Dynamix</publisher>
-		<info name="serial" value="T-110035"/>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="rise of the dragon (1993)(dynamix)(ntsc)(us)[!][s604430re r1d]" sha1="9628bb43d61c7a7439362b244c947de1caa49738"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="risedrag">
+        <description>Rise of the Dragon (USA)</description>
+        <year>1993</year>
+        <publisher>Dynamix</publisher>
+        <info name="serial" value="T-110035"/>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="rise of the dragon (1993)(dynamix)(ntsc)(us)[!][s604430re r1d]" sha1="9628bb43d61c7a7439362b244c947de1caa49738"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="roadrash">
@@ -1876,47 +1876,47 @@
 	<!-- probably duplicates -->
 <!-- Ringcode: CDRM-1033200 2 -->
 <!--
-	<software name="sshrkc" cloneof="sshrk">
-		<description>Sewer Shark (USA, Alt)</description>
-		<year>1992</year>
-		<publisher>Sony Imagesoft</publisher>
-		<info name="serial" value="T-93015"/>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="sewer shark (1992)(sony imagesoft)(ntsc)(us)[!][cdrm-1033200 2]" sha1="022d441183c0a1be3399f8baad871cf6f1e4e361"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="sshrkc" cloneof="sshrk">
+        <description>Sewer Shark (USA, Alt)</description>
+        <year>1992</year>
+        <publisher>Sony Imagesoft</publisher>
+        <info name="serial" value="T-93015"/>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="sewer shark (1992)(sony imagesoft)(ntsc)(us)[!][cdrm-1033200 2]" sha1="022d441183c0a1be3399f8baad871cf6f1e4e361"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!-- Ringcode: CDRM-1095270 1 -->
 <!--
-	<software name="sshrkd" cloneof="sshrk">
-		<description>Sewer Shark (USA, Alt 2)</description>
-		<year>1992</year>
-		<publisher>Sony Imagesoft</publisher>
-		<info name="serial" value="T-93015"/>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="sewer shark (1992)(sony imagesoft)(ntsc)(us)[!][cdrm-1095270 1]" sha1="1bd1b5660aec7e876748c88b962895c3f48bbbeb"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="sshrkd" cloneof="sshrk">
+        <description>Sewer Shark (USA, Alt 2)</description>
+        <year>1992</year>
+        <publisher>Sony Imagesoft</publisher>
+        <info name="serial" value="T-93015"/>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="sewer shark (1992)(sony imagesoft)(ntsc)(us)[!][cdrm-1095270 1]" sha1="1bd1b5660aec7e876748c88b962895c3f48bbbeb"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!-- Ringcode: CDRM-1095270 2 -->
 <!--
-	<software name="sshrkd" cloneof="sshrk">
-		<description>Sewer Shark (USA, Alt 3)</description>
-		<year>1992</year>
-		<publisher>Sony Imagesoft</publisher>
-		<info name="serial" value="T-93015"/>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="sewer shark (1992)(sony imagesoft)(ntsc)(us)[!][cdrm-1095270 2]" sha1="4c6de17f0f274552073b938bd78a1f9fd4a010ee"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="sshrkd" cloneof="sshrk">
+        <description>Sewer Shark (USA, Alt 3)</description>
+        <year>1992</year>
+        <publisher>Sony Imagesoft</publisher>
+        <info name="serial" value="T-93015"/>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="sewer shark (1992)(sony imagesoft)(ntsc)(us)[!][cdrm-1095270 2]" sha1="4c6de17f0f274552073b938bd78a1f9fd4a010ee"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="holmes">
@@ -1931,37 +1931,37 @@
 	</software>
 
 <!--
-	<software name="holmes2">
-		<description>Sherlock Holmes - Consulting Detective Vol. II  (USA)</description>
-		<year>1992</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom1" interface="scd_cdrom">
-			<feature name="part_id" value="Disc 1" />
-			<diskarea name="cdrom">
-				<disk name="sherlock holmes - consulting detective vol. ii (1992)(sega)(ntsc)(us)(disc 1 of 2)[!]" sha1="9f7523c2c3b6b2cfdcbd112388e64128c778fc05"/>
-			</diskarea>
-		</part>
+    <software name="holmes2">
+        <description>Sherlock Holmes - Consulting Detective Vol. II  (USA)</description>
+        <year>1992</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom1" interface="scd_cdrom">
+            <feature name="part_id" value="Disc 1" />
+            <diskarea name="cdrom">
+                <disk name="sherlock holmes - consulting detective vol. ii (1992)(sega)(ntsc)(us)(disc 1 of 2)[!]" sha1="9f7523c2c3b6b2cfdcbd112388e64128c778fc05"/>
+            </diskarea>
+        </part>
 
-		<part name="cdrom2" interface="scd_cdrom">
-			<feature name="part_id" value="Disc 2" />
-			<diskarea name="cdrom">
-				<disk name="sherlock holmes - consulting detective vol. ii (1992)(sega)(ntsc)(us)(disc 2 of 2)[!]" sha1="2ef4f618519f16d885b638d5514b5f0f2ee7c456"/>
-			</diskarea>
-		</part>
-	</software>
+        <part name="cdrom2" interface="scd_cdrom">
+            <feature name="part_id" value="Disc 2" />
+            <diskarea name="cdrom">
+                <disk name="sherlock holmes - consulting detective vol. ii (1992)(sega)(ntsc)(us)(disc 2 of 2)[!]" sha1="2ef4f618519f16d885b638d5514b5f0f2ee7c456"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="silpheed">
-		<description>Silpheed (USA)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="silpheed (1993)(sega)(ntsc)(us)[!]" sha1="f5dfb9e6ae633a8754c0c3f7a943c3c79547f6bf"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="silpheed">
+        <description>Silpheed (USA)</description>
+        <year>1993</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="silpheed (1993)(sega)(ntsc)(us)[!]" sha1="f5dfb9e6ae633a8754c0c3f7a943c3c79547f6bf"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 
@@ -2080,17 +2080,17 @@
 
 <!-- Ringcode: SEGA4407RE152 R7D -->
 <!--
-	<software name="soniccd">
-		<description>Sonic CD (USA)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="4407"/>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="sonic cd (1993)(sega)(ntsc)(us)[!][sega4407re152 r7d]" sha1="4e39d1a2b3acb359c8dd66061b8fa7308fa35c23"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="soniccd">
+        <description>Sonic CD (USA)</description>
+        <year>1993</year>
+        <publisher>Sega</publisher>
+        <info name="serial" value="4407"/>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="sonic cd (1993)(sega)(ntsc)(us)[!][sega4407re152 r7d]" sha1="4e39d1a2b3acb359c8dd66061b8fa7308fa35c23"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="soulstar">
@@ -2157,16 +2157,16 @@
 	</software>
 
 <!--
-	<software name="stellarf">
-		<description>Stellar-Fire (USA)</description>
-		<year>1993</year>
-		<publisher>Dynamix</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="stellar-fire (1993)(dynamix)(ntsc)(us)[!]" sha1="bb967c777df04e4ab822d7f5591ce69f405245b0"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="stellarf">
+        <description>Stellar-Fire (USA)</description>
+        <year>1993</year>
+        <publisher>Dynamix</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="stellar-fire (1993)(dynamix)(ntsc)(us)[!]" sha1="bb967c777df04e4ab822d7f5591ce69f405245b0"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="supremew">
@@ -2246,16 +2246,16 @@
 	</software>
 
 <!--
-	<software name="timegal">
-		<description>Time Gal (USA)</description>
-		<year>1993</year>
-		<publisher>Renovation</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="time gal (1993)(renovation)(ntsc)(us)[!]" sha1="1f937322a5ae222ffb02fc7e578ed5d0e3fad2bc"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="timegal">
+        <description>Time Gal (USA)</description>
+        <year>1993</year>
+        <publisher>Renovation</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="time gal (1993)(renovation)(ntsc)(us)[!]" sha1="1f937322a5ae222ffb02fc7e578ed5d0e3fad2bc"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<!-- one of these is probably a duplicate of the redump set -->
@@ -2306,29 +2306,29 @@
 		</part>
 	</software>
 <!--
-	<software name="wheelfor">
-		<description>Wheel of Fortune (USA)</description>
-		<year>1994</year>
-		<publisher>Sony Imagesoft</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="wheel of fortune (1994)(sony imagesoft)(ntsc)(us)[!]" sha1="dce21236078b60c4fa618f4ed8642739787ea93a"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="wheelfor">
+        <description>Wheel of Fortune (USA)</description>
+        <year>1994</year>
+        <publisher>Sony Imagesoft</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="wheel of fortune (1994)(sony imagesoft)(ntsc)(us)[!]" sha1="dce21236078b60c4fa618f4ed8642739787ea93a"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="whoshot">
-		<description>Who Shot Johnny Rock (USA)</description>
-		<year>1994</year>
-		<publisher>American Laser Games</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="who shot johnny rock (1994)(american laser games)(ntsc)(us)[!]" sha1="666a0a50b23bc6b059f741067248e0578f0f3e7a"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="whoshot">
+        <description>Who Shot Johnny Rock (USA)</description>
+        <year>1994</year>
+        <publisher>American Laser Games</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="who shot johnny rock (1994)(american laser games)(ntsc)(us)[!]" sha1="666a0a50b23bc6b059f741067248e0578f0f3e7a"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="wildwood">
@@ -2938,16 +2938,16 @@
 	</software>
 
 <!--
-	<software name="shinfrce">
-		<description>Shining Force CD (USA)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="shining force cd (sega cd) (u)" sha1="a6f629e93b4035729d6102988259deec01c2dd72"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="shinfrce">
+        <description>Shining Force CD (USA)</description>
+        <year>19??</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="shining force cd (sega cd) (u)" sha1="a6f629e93b4035729d6102988259deec01c2dd72"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="shinfrcep" cloneof="shinfrce">

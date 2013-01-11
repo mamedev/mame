@@ -2,8 +2,8 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-	Note: Most games do not support multi cart system - the ones that are has the text "CART-AM" in the header.
-	All titles that doesn't support it have a supported="no" flag.
+    Note: Most games do not support multi cart system - the ones that are has the text "CART-AM" in the header.
+    All titles that doesn't support it have a supported="no" flag.
 -->
 
 <softwarelist name="stv" description="Sega Titan Video cartridges">

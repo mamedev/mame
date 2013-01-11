@@ -2,13 +2,13 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-	Loading instructions:
-	- execute the LOAD command.
+    Loading instructions:
+    - execute the LOAD command.
 
-	Notes:
-	- for KC 85/3-2 most games require a memory expansion, the M011 is installed by default, but
-		must be enabled executing SWITCH 8 3 before the LOAD command.
-	- KC85/2 doesn't have BASIC ROM and requires the M006 module for run BASIC games.
+    Notes:
+    - for KC 85/3-2 most games require a memory expansion, the M011 is installed by default, but
+      must be enabled executing SWITCH 8 3 before the LOAD command.
+    - KC85/2 doesn't have BASIC ROM and requires the M006 module for run BASIC games.
 -->
 
 <softwarelist name="kc_cass" description="VEB Mikroelektronik KC 85 cassette images">
@@ -1952,12 +1952,12 @@
 
 	<software name="spiele1">
 	<!--
-		Includes: Pilze, Stadt, Laby, Rennen, Loch, Perlen, Pinguin.
-		Same games are also available into splitted images.
-		Loading instructions:
-		- go into BASIC
-		- CLOAD "SPIELE1"
-		- RUN
+	    Includes: Pilze, Stadt, Laby, Rennen, Loch, Perlen, Pinguin.
+	    Same games are also available into splitted images.
+	    Loading instructions:
+	    - go into BASIC
+	    - CLOAD "SPIELE1"
+	    - RUN
 	-->
 		<description>Spiele 1</description>
 		<year>1986</year>
@@ -1971,12 +1971,12 @@
 
 	<software name="spiele2">
 	<!--
-		Includes: Schiffe, Sandburg, Ali, Frosch, Angeln, Lander, Ski.
-		Same games are also available into splitted images.
-		Loading instructions:
-		- go into BASIC
-		- CLOAD "SPIELE2"
-		- RUN
+	    Includes: Schiffe, Sandburg, Ali, Frosch, Angeln, Lander, Ski.
+	    Same games are also available into splitted images.
+	    Loading instructions:
+	    - go into BASIC
+	    - CLOAD "SPIELE2"
+	    - RUN
 	-->
 		<description>Spiele 2</description>
 		<year>1986</year>
@@ -1990,12 +1990,12 @@
 
 	<software name="spiele3">
 	<!--
-		Includes: Gowa, Cockpit, Orbit, Enten.
-		Same games are also available into splitted images.
-		Loading instructions:
-		- go into BASIC
-		- CLOAD "SPIELE3"
-		- RUN
+	    Includes: Gowa, Cockpit, Orbit, Enten.
+	    Same games are also available into splitted images.
+	    Loading instructions:
+	    - go into BASIC
+	    - CLOAD "SPIELE3"
+	    - RUN
 	-->
 		<description>Spiele 3</description>
 		<year>1986</year>

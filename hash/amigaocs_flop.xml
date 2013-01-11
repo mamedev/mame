@@ -2,37 +2,37 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!-- General purpose software list for Amiga software with a MINIMUM requirement of the OCS chipset (A500 / A1000)
-		This is the original Amiga chipset, not all games are 100% forward compatible, but that will be marked later
-		Some games benefit from, or require RAM expansions, this will also be marked later.
+     This is the original Amiga chipset, not all games are 100% forward compatible, but that will be marked later
+     Some games benefit from, or require RAM expansions, this will also be marked later.
 
-		Anything requiring a minimum of the ECS or AGA chipsets has been moved to separate lists
+     Anything requiring a minimum of the ECS or AGA chipsets has been moved to separate lists
 
 -->
 <!--
-	Most images for the initial import are from SPS / CAPS collections
+   Most images for the initial import are from SPS / CAPS collections
 
-	todo (SPS):
+   todo (SPS):
 
-	- fill in year / manufacturer details, the SPS official dat lacks this
-	- see if it's possible to better verify these images, the SPS dat only lists the (highly insecure) CRC32s so we're relying on trust here
-	that the images from which the SHA1s were generated haven't been faked.
+  - fill in year / manufacturer details, the SPS official dat lacks this
+  - see if it's possible to better verify these images, the SPS dat only lists the (highly insecure) CRC32s so we're relying on trust here
+    that the images from which the SHA1s were generated haven't been faked.
 
-	- ensure discs are in a sensible order for multi-disk games (and data disks?)
-	- check / add any missing parent/clone relationships
-	- find out why we have duplicates of some releases with different IPF files (typically the _0 ones)
-		(the ones not in the SPS database have been marked as bad?)
-	- move AGA only discs to the AGA list
-	- if there are any dual-format discs in the Atari list duplicate them here
-	- add any other imagess which can be found
-	- test compatibility with emulation, note which games require manuals for operation (either protection or important game notes)
-	- document hardware configurations needed for 'fussy' games, and which ones differ in operation depending on HW config
-	- choose more appropriate short names
+  - ensure discs are in a sensible order for multi-disk games (and data disks?)
+    - check / add any missing parent/clone relationships
+    - find out why we have duplicates of some releases with different IPF files (typically the _0 ones)
+      (the ones not in the SPS database have been marked as bad?)
+    - move AGA only discs to the AGA list
+    - if there are any dual-format discs in the Atari list duplicate them here
+    - add any other imagess which can be found
+    - test compatibility with emulation, note which games require manuals for operation (either protection or important game notes)
+    - document hardware configurations needed for 'fussy' games, and which ones differ in operation depending on HW config
+    - choose more appropriate short names
 
-	todo (General):
-	- add the various cracked dumps after verifying them
-	- add Public Domain titles, Demos etc. (maybe in separate lists)
-	- add Utilities (separate lists?)
-	- add list to document various Amiga viruses (maybe, if I'm feeling perverted)
+   todo (General):
+    - add the various cracked dumps after verifying them
+    - add Public Domain titles, Demos etc. (maybe in separate lists)
+    - add Utilities (separate lists?)
+    - add list to document various Amiga viruses (maybe, if I'm feeling perverted)
 
 -->
 
@@ -40,52 +40,52 @@
 
 <!-- Virus Warning
 
-	The following original discs were mastered with viruses on them
-	ref: http://eab.abime.net/showthread.php?t=65171
+  The following original discs were mastered with viruses on them
+  ref: http://eab.abime.net/showthread.php?t=65171
 
-	0011 - Espionage - The Computer Game
-	Espionage.ipf  -  NorthStar 2 Bootblock
+  0011 - Espionage - The Computer Game
+  Espionage.ipf  -  NorthStar 2 Bootblock
 
-	0206 - Backgammon
-	Backgammon.ipf - SCA Bootblock
+  0206 - Backgammon
+  Backgammon.ipf - SCA Bootblock
 
-	0712 - The President is Missing
-	PresidentIsMissing,The.ipf - Byte Warrior (DASA) Bootblock
+  0712 - The President is Missing
+  PresidentIsMissing,The.ipf - Byte Warrior (DASA) Bootblock
 
-	1246 - Chase H.Q. II: Special Criminal Investigation
-	ChaseHQII-SpecialCriminalInvestigation_Disk2.ipf - Lamer Exterminator Bootblock
+  1246 - Chase H.Q. II: Special Criminal Investigation
+  ChaseHQII-SpecialCriminalInvestigation_Disk2.ipf - Lamer Exterminator Bootblock
 
-	1255 - Ooze - Als die Geister mürbe wurden
-	Ooze.ipf - PvL Virus Protector v5.0 Bootblock
+  1255 - Ooze - Als die Geister mürbe wurden
+  Ooze.ipf - PvL Virus Protector v5.0 Bootblock
 
-	1304 - Beam
-	Beam.ipf - NorthStar 2 Bootblock
+  1304 - Beam
+  Beam.ipf - NorthStar 2 Bootblock
 
-	1589 - Legend of Faerghail
-	LegendOfFaerghail_Disk3.ipf - Byte Bandit Bootblock
+  1589 - Legend of Faerghail
+  LegendOfFaerghail_Disk3.ipf - Byte Bandit Bootblock
 
-	1612 - StarRay
-	StarRay_BootDisk.ipf - SCA Bootblock
+  1612 - StarRay
+  StarRay_BootDisk.ipf - SCA Bootblock
 
-	2669 - The Shortgrey
-	Shortgrey,The_Disquette0.ipf (and 1,2,4) - SADDAM disk-validator
+  2669 - The Shortgrey
+  Shortgrey,The_Disquette0.ipf (and 1,2,4) - SADDAM disk-validator
 
-	2768 - Zombi
-	Zombi.ipf - Lamer Exterminator Bootblock
+  2768 - Zombi
+  Zombi.ipf - Lamer Exterminator Bootblock
 
-	The following original discs are virus damaged, but still work
+  The following original discs are virus damaged, but still work
 
-	2159 - Astatin
-	Astatin.ipf - Sector 1086 is destroyed by The Lamer Exterminator virus (No file damage)
+  2159 - Astatin
+  Astatin.ipf - Sector 1086 is destroyed by The Lamer Exterminator virus (No file damage)
 
-	2804 - Chariots of Wrath
-	ChariotsOfWrath.ipf - Sector 1369 is destroyed by The Lamer Exterminator virus (No file damage)
+  2804 - Chariots of Wrath
+  ChariotsOfWrath.ipf - Sector 1369 is destroyed by The Lamer Exterminator virus (No file damage)
 
 
-	These viruses can be dangerous even to an emulated machine as they will still transfer between
-	any non-write protected discs you insert as long as they're memory resident.
+  These viruses can be dangerous even to an emulated machine as they will still transfer between
+  any non-write protected discs you insert as long as they're memory resident.
 
-	-->
+ -->
 
 <softwarelist name="amigaocs_flop" description="Amiga OCS Floppy Disks list">
 
@@ -4096,62 +4096,62 @@
 	</part>
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 8" />
-		<dataarea name="flop" size="10049180">
-		<rom name="(sps1635)addendum_back.jpg" size="154027" crc="2e003815" sha1="2e4654a5d3750080ed15482e5761cdf6a582566e" offset="0"/>
-		<rom name="(sps1635)addendum_front.jpg" size="84723" crc="6d723b17" sha1="f86fa6655fbae48430ca441fa4fd8237fae8a2a0" offset="0"/>
-		<rom name="(sps1635)box_back.jpg" size="97042" crc="7b28a9d8" sha1="125c7fc19cf27f50bfa69baa1181d7d475fb9c05" offset="0"/>
-		<rom name="(sps1635)box_front.jpg" size="85722" crc="97bd9ec4" sha1="50f5b443aa9b90c1d1b2ec4ca652a12751e1a807" offset="0"/>
-		<rom name="(sps1635)disk 1.jpg" size="24778" crc="6d0b0925" sha1="6f332ba97d1f7c02587d9689d6672adf922643b6" offset="0"/>
-		<rom name="(sps1635)disk 2.jpg" size="25293" crc="30ab1b84" sha1="c2cff753bab8ab4935a39bdd5aeee7eae0c8ca15" offset="0"/>
-		<rom name="(sps1635)disk 3.jpg" size="24322" crc="106f6255" sha1="abba45e959167de44432d0b991bfc5dc6e3ac3c4" offset="0"/>
-		<rom name="(sps1635)disk 4.jpg" size="25809" crc="2b14a99c" sha1="f00966e4eaaae9eef05344cebd71eda7b0368350" offset="0"/>
-		<rom name="(sps1635)disk 5.jpg" size="24824" crc="5adaa1a1" sha1="0af35eaad1d311af035ce4b368bf30211ef21b66" offset="0"/>
-		<rom name="(sps1635)manual_fr_02_03.jpg" size="125327" crc="dd8d4b0d" sha1="c450e770e220d6748c110f55e1a68a5c619e5140" offset="0"/>
-		<rom name="(sps1635)manual_fr_04_05.jpg" size="109170" crc="cf71d983" sha1="077d87c92e1757641cb4bcef5f890e97f1b31f5a" offset="0"/>
-		<rom name="(sps1635)manual_fr_06_07.jpg" size="117317" crc="bf72abef" sha1="a5ea0763862e3b8024ed06be691f0ac7f4113bf6" offset="0"/>
-		<rom name="(sps1635)manual_fr_08_09.jpg" size="94191" crc="1169a73d" sha1="f071517caf015bed6661d5f2ba03d6a91d8707f9" offset="0"/>
-		<rom name="(sps1635)manual_fr_10_11.jpg" size="86112" crc="5786b771" sha1="b49519f23abed6e4be01b23c0acfaa819e28d7cc" offset="0"/>
-		<rom name="(sps1635)manual_fr_12_13.jpg" size="94320" crc="7522ed88" sha1="f39cc51c69f8ab98eada47dbb6ecd339d91f0fa9" offset="0"/>
-		<rom name="(sps1635)manual_fr_14_15.jpg" size="100900" crc="f310169b" sha1="6e13b214ef95e94f199ba5f3a6ceb44bcff2ddde" offset="0"/>
-		<rom name="(sps1635)manual_fr_16_17.jpg" size="112391" crc="1e0be9fc" sha1="88d60eb16e6f55732ce8805517bbf5233f0bd2e7" offset="0"/>
-		<rom name="(sps1635)manual_fr_18_19.jpg" size="92207" crc="d625d638" sha1="ac4de1c2eb19c332f41823db4a14660f0cdf2550" offset="0"/>
-		<rom name="(sps1635)manual_fr_20_21.jpg" size="107957" crc="872e7406" sha1="74609c358385bb3387676a2066f6f856bbd034d3" offset="0"/>
-		<rom name="(sps1635)manual_fr_22_23.jpg" size="96395" crc="d42da659" sha1="58f11928d24132d0df61126fda5a4f15780f8b89" offset="0"/>
-		<rom name="(sps1635)manual_fr_24_25.jpg" size="99603" crc="f42245c6" sha1="3d597921726e605308267c6638a14e1ebcab71b5" offset="0"/>
-		<rom name="(sps1635)manual_fr_26_27.jpg" size="63621" crc="1e04c23a" sha1="339a93541a832a6cf039445aa880c864fcea57ad" offset="0"/>
-		<rom name="(sps1635)manual_fr_28_29.jpg" size="61268" crc="b81e66b5" sha1="fa8f22a277cbfcbfd03bd4835dcbc70650aa291e" offset="0"/>
-		<rom name="(sps1635)manual_fr_30_31.jpg" size="118160" crc="8764b961" sha1="03bd8bc487067f4c0c19326148c637fe8158f058" offset="0"/>
-		<rom name="(sps1635)manual_fr_32_33.jpg" size="103299" crc="666e0c42" sha1="c3a32ad370d482677d7183ccf2f486197dad76c0" offset="0"/>
-		<rom name="(sps1635)manual_fr_34_35.jpg" size="102140" crc="4d6cf1fd" sha1="d8b5685a1887eab016215bad3f0494a000748b36" offset="0"/>
-		<rom name="(sps1635)manual_fr_36_37.jpg" size="64849" crc="d7d4039d" sha1="6c3c8675375df9c2a6bbc720e1a8b0323ad0ec67" offset="0"/>
-		<rom name="(sps1635)manual_fr_38_39.jpg" size="91262" crc="b2343a9f" sha1="a8d47bb551649bfa6a7fc3f8107328bda92fb8a8" offset="0"/>
-		<rom name="(sps1635)manual_fr_40_41.jpg" size="84654" crc="96bba999" sha1="6b1c10c661fd16eb80bc0f54c362b38f098b5ee4" offset="0"/>
-		<rom name="(sps1635)manual_fr_42_43.jpg" size="68901" crc="1ef6253e" sha1="e0a391857225a820ffee8cc5621f32ec9b646ccf" offset="0"/>
-		<rom name="(sps1635)manual_fr_44_45.jpg" size="66406" crc="3666f542" sha1="4b8e6c204dea402e0231b6d1a98ebcb9fc5ca313" offset="0"/>
-		<rom name="(sps1635)manual_fr_46_47.jpg" size="46693" crc="9f625f92" sha1="8246acc8c85424d397212db845683936ec488452" offset="0"/>
-		<rom name="(sps1635)manual_fr_48_49.jpg" size="61053" crc="42ad9a96" sha1="3a2c5bfb915bc4bc6e9931574eb219d435938325" offset="0"/>
-		<rom name="(sps1635)manual_fr_50_51.jpg" size="84396" crc="053aed5d" sha1="5a6c6a6b997169a6c9738433f346d4e471310dc3" offset="0"/>
-		<rom name="(sps1635)manual_fr_52_53.jpg" size="83574" crc="c0c350ed" sha1="c82fc99f698a7a8fe58489eab4a9febc0e37bc9a" offset="0"/>
-		<rom name="(sps1635)manual_fr_54_55.jpg" size="76906" crc="8b6ef84c" sha1="2f3f2aeb2126332954c201a56e70a4ce07508fe6" offset="0"/>
-		<rom name="(sps1635)manual_fr_56_57.jpg" size="92577" crc="cd0e9c29" sha1="b0ae61f2aa5660e85ff0cd908cf61d24a4c52ac3" offset="0"/>
-		<rom name="(sps1635)manual_fr_58_59.jpg" size="66641" crc="f51dada8" sha1="a3ed29fa44aee211f0fe737ce5f1b86658b8eef4" offset="0"/>
-		<rom name="(sps1635)manual_fr_60_61.jpg" size="73620" crc="8a3d39f2" sha1="7d16b4b356f3b65ccf046beecb9ac025755c1ba0" offset="0"/>
-		<rom name="(sps1635)manual_fr_62_63.jpg" size="68774" crc="4f35ecc5" sha1="ff54ff279079da8f88e2a0515b40dcad3be41b54" offset="0"/>
-		<rom name="(sps1635)manual_fr_64_65.jpg" size="67826" crc="99880683" sha1="aefd3164b6d40d60792c0acac6e7a79f73d0a0b0" offset="0"/>
-		<rom name="(sps1635)manual_fr_66_last.jpg" size="43337" crc="15e552c2" sha1="1b0984af6f1ac74c9d639db9fe3041876c56f220" offset="0"/>
-		<rom name="(sps1635)manual_fr_cover.jpg" size="106276" crc="02326f22" sha1="76baa49ed0142b28eaf1b3b8589fb68b6fc8fb59" offset="0"/>
-		<rom name="(sps1635)manual_fr_garde.jpg" size="51151" crc="f99084e9" sha1="a6bd6aafb5a511cc37e7d494846a193d15c94361" offset="0"/>
-		<rom name="(sps1635)manual_fr_ii_iii.jpg" size="72780" crc="533f3385" sha1="4a00c1aca3709b750debbabed95037f464bbce4d" offset="0"/>
-		<rom name="(sps1635)manual_fr_iv_v.jpg" size="67688" crc="3096223e" sha1="58e35fe95beb19eb52be083203e0bbd34cc2c008" offset="0"/>
-		<rom name="(sps1635)manual_fr_vi_01.jpg" size="68609" crc="7bccf3e3" sha1="3b193876942efdcbefc74163f9e8428128186bd8" offset="0"/>
-		<rom name="(sps1635)quickcard_fr_1_2.jpg" size="116076" crc="2cf9d3e5" sha1="bc09f56fc6518b691efcaf865217ccecc79c4419" offset="0"/>
-		<rom name="(sps1635)quickcard_fr_3_4.jpg" size="109632" crc="64e45524" sha1="e57c373c61e50d9eb3be462a0895e5491eec14b7" offset="0"/>
-		<rom name="(sps1635)quickcard_fr_5_6.jpg" size="86524" crc="3b0f992e" sha1="5f8352663d35555173c6e5a307db6897b818cbaa" offset="0"/>
-		<rom name="(sps1635)quickcard_fr_7_8.jpg" size="95745" crc="b63d938b" sha1="fae58443001ff23dd029340dfc3a572644f8265e" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Disk 8" />
+	  <dataarea name="flop" size="10049180">
+	    <rom name="(sps1635)addendum_back.jpg" size="154027" crc="2e003815" sha1="2e4654a5d3750080ed15482e5761cdf6a582566e" offset="0"/>
+	    <rom name="(sps1635)addendum_front.jpg" size="84723" crc="6d723b17" sha1="f86fa6655fbae48430ca441fa4fd8237fae8a2a0" offset="0"/>
+	    <rom name="(sps1635)box_back.jpg" size="97042" crc="7b28a9d8" sha1="125c7fc19cf27f50bfa69baa1181d7d475fb9c05" offset="0"/>
+	    <rom name="(sps1635)box_front.jpg" size="85722" crc="97bd9ec4" sha1="50f5b443aa9b90c1d1b2ec4ca652a12751e1a807" offset="0"/>
+	    <rom name="(sps1635)disk 1.jpg" size="24778" crc="6d0b0925" sha1="6f332ba97d1f7c02587d9689d6672adf922643b6" offset="0"/>
+	    <rom name="(sps1635)disk 2.jpg" size="25293" crc="30ab1b84" sha1="c2cff753bab8ab4935a39bdd5aeee7eae0c8ca15" offset="0"/>
+	    <rom name="(sps1635)disk 3.jpg" size="24322" crc="106f6255" sha1="abba45e959167de44432d0b991bfc5dc6e3ac3c4" offset="0"/>
+	    <rom name="(sps1635)disk 4.jpg" size="25809" crc="2b14a99c" sha1="f00966e4eaaae9eef05344cebd71eda7b0368350" offset="0"/>
+	    <rom name="(sps1635)disk 5.jpg" size="24824" crc="5adaa1a1" sha1="0af35eaad1d311af035ce4b368bf30211ef21b66" offset="0"/>
+	    <rom name="(sps1635)manual_fr_02_03.jpg" size="125327" crc="dd8d4b0d" sha1="c450e770e220d6748c110f55e1a68a5c619e5140" offset="0"/>
+	    <rom name="(sps1635)manual_fr_04_05.jpg" size="109170" crc="cf71d983" sha1="077d87c92e1757641cb4bcef5f890e97f1b31f5a" offset="0"/>
+	    <rom name="(sps1635)manual_fr_06_07.jpg" size="117317" crc="bf72abef" sha1="a5ea0763862e3b8024ed06be691f0ac7f4113bf6" offset="0"/>
+	    <rom name="(sps1635)manual_fr_08_09.jpg" size="94191" crc="1169a73d" sha1="f071517caf015bed6661d5f2ba03d6a91d8707f9" offset="0"/>
+	    <rom name="(sps1635)manual_fr_10_11.jpg" size="86112" crc="5786b771" sha1="b49519f23abed6e4be01b23c0acfaa819e28d7cc" offset="0"/>
+	    <rom name="(sps1635)manual_fr_12_13.jpg" size="94320" crc="7522ed88" sha1="f39cc51c69f8ab98eada47dbb6ecd339d91f0fa9" offset="0"/>
+	    <rom name="(sps1635)manual_fr_14_15.jpg" size="100900" crc="f310169b" sha1="6e13b214ef95e94f199ba5f3a6ceb44bcff2ddde" offset="0"/>
+	    <rom name="(sps1635)manual_fr_16_17.jpg" size="112391" crc="1e0be9fc" sha1="88d60eb16e6f55732ce8805517bbf5233f0bd2e7" offset="0"/>
+	    <rom name="(sps1635)manual_fr_18_19.jpg" size="92207" crc="d625d638" sha1="ac4de1c2eb19c332f41823db4a14660f0cdf2550" offset="0"/>
+	    <rom name="(sps1635)manual_fr_20_21.jpg" size="107957" crc="872e7406" sha1="74609c358385bb3387676a2066f6f856bbd034d3" offset="0"/>
+	    <rom name="(sps1635)manual_fr_22_23.jpg" size="96395" crc="d42da659" sha1="58f11928d24132d0df61126fda5a4f15780f8b89" offset="0"/>
+	    <rom name="(sps1635)manual_fr_24_25.jpg" size="99603" crc="f42245c6" sha1="3d597921726e605308267c6638a14e1ebcab71b5" offset="0"/>
+	    <rom name="(sps1635)manual_fr_26_27.jpg" size="63621" crc="1e04c23a" sha1="339a93541a832a6cf039445aa880c864fcea57ad" offset="0"/>
+	    <rom name="(sps1635)manual_fr_28_29.jpg" size="61268" crc="b81e66b5" sha1="fa8f22a277cbfcbfd03bd4835dcbc70650aa291e" offset="0"/>
+	    <rom name="(sps1635)manual_fr_30_31.jpg" size="118160" crc="8764b961" sha1="03bd8bc487067f4c0c19326148c637fe8158f058" offset="0"/>
+	    <rom name="(sps1635)manual_fr_32_33.jpg" size="103299" crc="666e0c42" sha1="c3a32ad370d482677d7183ccf2f486197dad76c0" offset="0"/>
+	    <rom name="(sps1635)manual_fr_34_35.jpg" size="102140" crc="4d6cf1fd" sha1="d8b5685a1887eab016215bad3f0494a000748b36" offset="0"/>
+	    <rom name="(sps1635)manual_fr_36_37.jpg" size="64849" crc="d7d4039d" sha1="6c3c8675375df9c2a6bbc720e1a8b0323ad0ec67" offset="0"/>
+	    <rom name="(sps1635)manual_fr_38_39.jpg" size="91262" crc="b2343a9f" sha1="a8d47bb551649bfa6a7fc3f8107328bda92fb8a8" offset="0"/>
+	    <rom name="(sps1635)manual_fr_40_41.jpg" size="84654" crc="96bba999" sha1="6b1c10c661fd16eb80bc0f54c362b38f098b5ee4" offset="0"/>
+	    <rom name="(sps1635)manual_fr_42_43.jpg" size="68901" crc="1ef6253e" sha1="e0a391857225a820ffee8cc5621f32ec9b646ccf" offset="0"/>
+	    <rom name="(sps1635)manual_fr_44_45.jpg" size="66406" crc="3666f542" sha1="4b8e6c204dea402e0231b6d1a98ebcb9fc5ca313" offset="0"/>
+	    <rom name="(sps1635)manual_fr_46_47.jpg" size="46693" crc="9f625f92" sha1="8246acc8c85424d397212db845683936ec488452" offset="0"/>
+	    <rom name="(sps1635)manual_fr_48_49.jpg" size="61053" crc="42ad9a96" sha1="3a2c5bfb915bc4bc6e9931574eb219d435938325" offset="0"/>
+	    <rom name="(sps1635)manual_fr_50_51.jpg" size="84396" crc="053aed5d" sha1="5a6c6a6b997169a6c9738433f346d4e471310dc3" offset="0"/>
+	    <rom name="(sps1635)manual_fr_52_53.jpg" size="83574" crc="c0c350ed" sha1="c82fc99f698a7a8fe58489eab4a9febc0e37bc9a" offset="0"/>
+	    <rom name="(sps1635)manual_fr_54_55.jpg" size="76906" crc="8b6ef84c" sha1="2f3f2aeb2126332954c201a56e70a4ce07508fe6" offset="0"/>
+	    <rom name="(sps1635)manual_fr_56_57.jpg" size="92577" crc="cd0e9c29" sha1="b0ae61f2aa5660e85ff0cd908cf61d24a4c52ac3" offset="0"/>
+	    <rom name="(sps1635)manual_fr_58_59.jpg" size="66641" crc="f51dada8" sha1="a3ed29fa44aee211f0fe737ce5f1b86658b8eef4" offset="0"/>
+	    <rom name="(sps1635)manual_fr_60_61.jpg" size="73620" crc="8a3d39f2" sha1="7d16b4b356f3b65ccf046beecb9ac025755c1ba0" offset="0"/>
+	    <rom name="(sps1635)manual_fr_62_63.jpg" size="68774" crc="4f35ecc5" sha1="ff54ff279079da8f88e2a0515b40dcad3be41b54" offset="0"/>
+	    <rom name="(sps1635)manual_fr_64_65.jpg" size="67826" crc="99880683" sha1="aefd3164b6d40d60792c0acac6e7a79f73d0a0b0" offset="0"/>
+	    <rom name="(sps1635)manual_fr_66_last.jpg" size="43337" crc="15e552c2" sha1="1b0984af6f1ac74c9d639db9fe3041876c56f220" offset="0"/>
+	    <rom name="(sps1635)manual_fr_cover.jpg" size="106276" crc="02326f22" sha1="76baa49ed0142b28eaf1b3b8589fb68b6fc8fb59" offset="0"/>
+	    <rom name="(sps1635)manual_fr_garde.jpg" size="51151" crc="f99084e9" sha1="a6bd6aafb5a511cc37e7d494846a193d15c94361" offset="0"/>
+	    <rom name="(sps1635)manual_fr_ii_iii.jpg" size="72780" crc="533f3385" sha1="4a00c1aca3709b750debbabed95037f464bbce4d" offset="0"/>
+	    <rom name="(sps1635)manual_fr_iv_v.jpg" size="67688" crc="3096223e" sha1="58e35fe95beb19eb52be083203e0bbd34cc2c008" offset="0"/>
+	    <rom name="(sps1635)manual_fr_vi_01.jpg" size="68609" crc="7bccf3e3" sha1="3b193876942efdcbefc74163f9e8428128186bd8" offset="0"/>
+	    <rom name="(sps1635)quickcard_fr_1_2.jpg" size="116076" crc="2cf9d3e5" sha1="bc09f56fc6518b691efcaf865217ccecc79c4419" offset="0"/>
+	    <rom name="(sps1635)quickcard_fr_3_4.jpg" size="109632" crc="64e45524" sha1="e57c373c61e50d9eb3be462a0895e5491eec14b7" offset="0"/>
+	    <rom name="(sps1635)quickcard_fr_5_6.jpg" size="86524" crc="3b0f992e" sha1="5f8352663d35555173c6e5a307db6897b818cbaa" offset="0"/>
+	    <rom name="(sps1635)quickcard_fr_7_8.jpg" size="95745" crc="b63d938b" sha1="fae58443001ff23dd029340dfc3a572644f8265e" offset="0"/>
+	  </dataarea>
 	</part>
-		-->
+	  -->
 	</software>
 
 	<software name="bat2a" cloneof="bat2" supported="no">
@@ -4456,17 +4456,17 @@
 	</part>
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="10367897">
-		<rom name="(sps5)box_back.jpg" size="367897" crc="6d0f8491" sha1="bf5e77feac256e040e6bc607655a089e0a8405ac" offset="0"/>
-		<rom name="(sps5)box_front.jpg" size="469971" crc="0781dc84" sha1="2fdaa2e5c69d1bb9b41d78a3ec63c192ce0b3623" offset="0"/>
-		<rom name="(sps5)box_side_left.jpg" size="89449" crc="3668d4bc" sha1="ba6e7c78611c310238737790fba37edca8db0304" offset="0"/>
-		<rom name="(sps5)box_side_top.jpg" size="55582" crc="b30f9823" sha1="5159e3788cf0bd0b48194ac40345a35230b2001f" offset="0"/>
-		<rom name="(sps5)disk.jpg" size="152617" crc="23545a0a" sha1="7fc4b8808647268fb984a3cced8ce9649aea1de0" offset="0"/>
-		<rom name="(sps5)gameinfo.xml" size="2633" crc="1b6c672e" sha1="fcb14185c65f09c1878e18c653d560e2ccc5bfbc" offset="0"/>
-			<rom name="(sps5)manual.pdf" size="9253748" crc="64e8f16c" sha1="b2305eabb2c7c8f139629ce423f2a58e00b0b5c1" offset="0"/>
-			<rom name="(sps5)manualerrata.pdf" size="456815" crc="4b5233c8" sha1="e79cc102ead85b42e4a86d8dc72c281d7f557475" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="10367897">
+	    <rom name="(sps5)box_back.jpg" size="367897" crc="6d0f8491" sha1="bf5e77feac256e040e6bc607655a089e0a8405ac" offset="0"/>
+	    <rom name="(sps5)box_front.jpg" size="469971" crc="0781dc84" sha1="2fdaa2e5c69d1bb9b41d78a3ec63c192ce0b3623" offset="0"/>
+	    <rom name="(sps5)box_side_left.jpg" size="89449" crc="3668d4bc" sha1="ba6e7c78611c310238737790fba37edca8db0304" offset="0"/>
+	    <rom name="(sps5)box_side_top.jpg" size="55582" crc="b30f9823" sha1="5159e3788cf0bd0b48194ac40345a35230b2001f" offset="0"/>
+	    <rom name="(sps5)disk.jpg" size="152617" crc="23545a0a" sha1="7fc4b8808647268fb984a3cced8ce9649aea1de0" offset="0"/>
+	    <rom name="(sps5)gameinfo.xml" size="2633" crc="1b6c672e" sha1="fcb14185c65f09c1878e18c653d560e2ccc5bfbc" offset="0"/>
+	     <rom name="(sps5)manual.pdf" size="9253748" crc="64e8f16c" sha1="b2305eabb2c7c8f139629ce423f2a58e00b0b5c1" offset="0"/>
+	     <rom name="(sps5)manualerrata.pdf" size="456815" crc="4b5233c8" sha1="e79cc102ead85b42e4a86d8dc72c281d7f557475" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -4867,18 +4867,18 @@
 	</part>
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="10547859">
-		<rom name="(sps10)box_back.jpg" size="547859" crc="02588303" sha1="db331a6a87e666826bd2ce81023926dfb742f25e" offset="0"/>
-		<rom name="(sps10)box_front.jpg" size="506518" crc="d8355979" sha1="01afd3bbbfa88f6b94754f19d25388790772b49a" offset="0"/>
-		<rom name="(sps10)box_side_left.jpg" size="31056" crc="4e7246fb" sha1="cbbfeaa715bc5bedf93c5fcb11ea6fa5dbcd8944" offset="0"/>
-		<rom name="(sps10)disk.jpg" size="158715" crc="814103b8" sha1="8cbb579c73ef2245c7f5af2308b561a743b120ff" offset="0"/>
-		<rom name="(sps10)gameinfo.xml" size="2592" crc="24f39d06" sha1="2973c47ba4bc0dd7ca210b9fd8737ff21972e04b" offset="0"/>
-		<rom name="(sps10)inlayinner.png" size="867183" crc="f0453f61" sha1="41d72ca28cf423d422e01d8dca881c07d2a8b54d" offset="0"/>
-		<rom name="(sps10)inlayskarabrae1.jpg" size="611018" crc="2010a4ae" sha1="28b8a4bbc927f4986e5a1696312d727bae15e4e2" offset="0"/>
-		<rom name="(sps10)inlayskarabrae2.jpg" size="440419" crc="d5cfac53" sha1="f24b990dfe094503448698843fbad2d9cbde0f94" offset="0"/>
-		<rom name="(sps10)manual.pdf" size="2546837" crc="154f8942" sha1="d4bed54218125ecd122795396c26a7788e6eee7f" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="10547859">
+	    <rom name="(sps10)box_back.jpg" size="547859" crc="02588303" sha1="db331a6a87e666826bd2ce81023926dfb742f25e" offset="0"/>
+	    <rom name="(sps10)box_front.jpg" size="506518" crc="d8355979" sha1="01afd3bbbfa88f6b94754f19d25388790772b49a" offset="0"/>
+	    <rom name="(sps10)box_side_left.jpg" size="31056" crc="4e7246fb" sha1="cbbfeaa715bc5bedf93c5fcb11ea6fa5dbcd8944" offset="0"/>
+	    <rom name="(sps10)disk.jpg" size="158715" crc="814103b8" sha1="8cbb579c73ef2245c7f5af2308b561a743b120ff" offset="0"/>
+	    <rom name="(sps10)gameinfo.xml" size="2592" crc="24f39d06" sha1="2973c47ba4bc0dd7ca210b9fd8737ff21972e04b" offset="0"/>
+	    <rom name="(sps10)inlayinner.png" size="867183" crc="f0453f61" sha1="41d72ca28cf423d422e01d8dca881c07d2a8b54d" offset="0"/>
+	    <rom name="(sps10)inlayskarabrae1.jpg" size="611018" crc="2010a4ae" sha1="28b8a4bbc927f4986e5a1696312d727bae15e4e2" offset="0"/>
+	    <rom name="(sps10)inlayskarabrae2.jpg" size="440419" crc="d5cfac53" sha1="f24b990dfe094503448698843fbad2d9cbde0f94" offset="0"/>
+	    <rom name="(sps10)manual.pdf" size="2546837" crc="154f8942" sha1="d4bed54218125ecd122795396c26a7788e6eee7f" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 
@@ -5137,11 +5137,11 @@
 	</part>
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="10135996">
-		<rom name="(sps19)disk.jpg" size="135996" crc="20bbe2ea" sha1="b70ff44882f1d5106045094e5849d71822fec456" offset="0"/>
-		<rom name="(sps19)gameinfo.xml" size="1215" crc="dfa2b974" sha1="3b318cebc6133ea990ab25d87aa582bf52544c6d" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="10135996">
+	    <rom name="(sps19)disk.jpg" size="135996" crc="20bbe2ea" sha1="b70ff44882f1d5106045094e5849d71822fec456" offset="0"/>
+	    <rom name="(sps19)gameinfo.xml" size="1215" crc="dfa2b974" sha1="3b318cebc6133ea990ab25d87aa582bf52544c6d" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 
@@ -5168,21 +5168,21 @@
 	</part>
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="1009567">
-		<rom name="(sps6)box.info" size="9567" crc="4011880d" sha1="fdf70a78a68e8adf4957320b0afea9fe4e323cb8" offset="0"/>
-		<rom name="(sps6)box_back.jpg" size="1006644" crc="600b5c71" sha1="257630ebecbd4c78b733b49ccb2fa1c932fd7b43" offset="0"/>
-		<rom name="(sps6)box_front.jpg" size="856635" crc="5c35564b" sha1="a98ec71fa35b2a660741efa9f4f3c28b7b1c86ea" offset="0"/>
-		<rom name="(sps6)box_side_bottom.jpg" size="40249" crc="8ae5c976" sha1="7d256c15eb798ab5c5f1d61d5349a42ddd500fbb" offset="0"/>
-		<rom name="(sps6)box_side_right.jpg" size="60834" crc="fd17864a" sha1="1d876f03e2ad4f8b314473b64036882e3ac0ab5e" offset="0"/>
-		<rom name="(sps6)box_side_top.jpg" size="48236" crc="35adfd90" sha1="3627185bc0d3a748832ecb3104e862245be9a4b2" offset="0"/>
-		<rom name="(sps6)disk1.jpg" size="135707" crc="907c2904" sha1="68807795cf38688afc3398a8f74867c9245b069c" offset="0"/>
-		<rom name="(sps6)disk2.jpg" size="135914" crc="7f6e6f9a" sha1="a8cede76bfb09273ec483299d649e2e8ef03312c" offset="0"/>
-		<rom name="(sps6)gameinfo.xml" size="3099" crc="b65b5abb" sha1="bb7b17410075c77ef1f786abacd83c5bf0c5a6b0" offset="0"/>
-		<rom name="(sps6)page1.png" size="1146930" crc="8d06f82a" sha1="417825c401e81bb3eb382f508e9e743c45d2a900" offset="0"/>
-		<rom name="(sps6)page2.png" size="1841134" crc="8c73dc08" sha1="866d07c1efba3b8c0527f38fa0831ba9b23842f5" offset="0"/>
-		<rom name="(sps6)sticker.jpg" size="312387" crc="3b0d71b7" sha1="c50a0bc5180f1640c70cd94810baa5d8fb12ac93" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="1009567">
+	    <rom name="(sps6)box.info" size="9567" crc="4011880d" sha1="fdf70a78a68e8adf4957320b0afea9fe4e323cb8" offset="0"/>
+	    <rom name="(sps6)box_back.jpg" size="1006644" crc="600b5c71" sha1="257630ebecbd4c78b733b49ccb2fa1c932fd7b43" offset="0"/>
+	    <rom name="(sps6)box_front.jpg" size="856635" crc="5c35564b" sha1="a98ec71fa35b2a660741efa9f4f3c28b7b1c86ea" offset="0"/>
+	    <rom name="(sps6)box_side_bottom.jpg" size="40249" crc="8ae5c976" sha1="7d256c15eb798ab5c5f1d61d5349a42ddd500fbb" offset="0"/>
+	    <rom name="(sps6)box_side_right.jpg" size="60834" crc="fd17864a" sha1="1d876f03e2ad4f8b314473b64036882e3ac0ab5e" offset="0"/>
+	    <rom name="(sps6)box_side_top.jpg" size="48236" crc="35adfd90" sha1="3627185bc0d3a748832ecb3104e862245be9a4b2" offset="0"/>
+	    <rom name="(sps6)disk1.jpg" size="135707" crc="907c2904" sha1="68807795cf38688afc3398a8f74867c9245b069c" offset="0"/>
+	    <rom name="(sps6)disk2.jpg" size="135914" crc="7f6e6f9a" sha1="a8cede76bfb09273ec483299d649e2e8ef03312c" offset="0"/>
+	    <rom name="(sps6)gameinfo.xml" size="3099" crc="b65b5abb" sha1="bb7b17410075c77ef1f786abacd83c5bf0c5a6b0" offset="0"/>
+	    <rom name="(sps6)page1.png" size="1146930" crc="8d06f82a" sha1="417825c401e81bb3eb382f508e9e743c45d2a900" offset="0"/>
+	    <rom name="(sps6)page2.png" size="1841134" crc="8c73dc08" sha1="866d07c1efba3b8c0527f38fa0831ba9b23842f5" offset="0"/>
+	    <rom name="(sps6)sticker.jpg" size="312387" crc="3b0d71b7" sha1="c50a0bc5180f1640c70cd94810baa5d8fb12ac93" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -8624,14 +8624,14 @@
 	</part>
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="101888697">
-		<rom name="(sps60)diaryofagame.jpg" size="1888697" crc="a90aa7a1" sha1="c5df873aa617c44d470a9ffbc5f554e62e6b447e" offset="0"/>
-		<rom name="(sps60)disk.jpg" size="342487" crc="8b5fdcaa" sha1="f42588c19c1dc1df2fc91623036f4794414f947b" offset="0"/>
-		<rom name="(sps60)gameinfo.xml" size="2001" crc="428b6474" sha1="92056be482fea80c1dec5b79465d298b4483e51d" offset="0"/>
-		<rom name="(sps60)howtoplay1.jpg" size="380316" crc="a95dc09b" sha1="81f0ce272fd7a9cf73c5e05388e1934787b2acba" offset="0"/>
-		<rom name="(sps60)howtoplay2.jpg" size="416477" crc="b0f6dec1" sha1="607869e60e9ad54f5a7ca84eae769ab75461a662" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="101888697">
+	    <rom name="(sps60)diaryofagame.jpg" size="1888697" crc="a90aa7a1" sha1="c5df873aa617c44d470a9ffbc5f554e62e6b447e" offset="0"/>
+	    <rom name="(sps60)disk.jpg" size="342487" crc="8b5fdcaa" sha1="f42588c19c1dc1df2fc91623036f4794414f947b" offset="0"/>
+	    <rom name="(sps60)gameinfo.xml" size="2001" crc="428b6474" sha1="92056be482fea80c1dec5b79465d298b4483e51d" offset="0"/>
+	    <rom name="(sps60)howtoplay1.jpg" size="380316" crc="a95dc09b" sha1="81f0ce272fd7a9cf73c5e05388e1934787b2acba" offset="0"/>
+	    <rom name="(sps60)howtoplay2.jpg" size="416477" crc="b0f6dec1" sha1="607869e60e9ad54f5a7ca84eae769ab75461a662" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -10868,15 +10868,15 @@
 	</part>
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="520169">
-		<rom name="(sps2)box_back.jpg" size="520169" crc="87e76fae" sha1="fcaed8d27ad90f45e6a8f92bc5fb275e0250b7cd" offset="0"/>
-		<rom name="(sps2)box_front.jpg" size="347157" crc="91c75d19" sha1="61d9e5c47de18db577a291f1adcc2ecbd0f70560" offset="0"/>
-		<rom name="(sps2)box_side_left.jpg" size="24881" crc="73f9f954" sha1="0cbdadcfc4aa6651283248555bb1711bb779efd1" offset="0"/>
-		<rom name="(sps2)disk.jpg" size="213292" crc="59708313" sha1="5b56126d1b993bf70e266f24666e52389176af65" offset="0"/>
-		<rom name="(sps2)gameinfo.xml" size="2222" crc="458720b9" sha1="c1790e8d20fbaa1de23c2a1ca34c37d767c2402b" offset="0"/>
-		<rom name="(sps2)manual.pdf" size="446188" crc="96f8f6b5" sha1="2c77582a7781108e6a95723797f394f7509d62b1" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="520169">
+	    <rom name="(sps2)box_back.jpg" size="520169" crc="87e76fae" sha1="fcaed8d27ad90f45e6a8f92bc5fb275e0250b7cd" offset="0"/>
+	    <rom name="(sps2)box_front.jpg" size="347157" crc="91c75d19" sha1="61d9e5c47de18db577a291f1adcc2ecbd0f70560" offset="0"/>
+	    <rom name="(sps2)box_side_left.jpg" size="24881" crc="73f9f954" sha1="0cbdadcfc4aa6651283248555bb1711bb779efd1" offset="0"/>
+	    <rom name="(sps2)disk.jpg" size="213292" crc="59708313" sha1="5b56126d1b993bf70e266f24666e52389176af65" offset="0"/>
+	    <rom name="(sps2)gameinfo.xml" size="2222" crc="458720b9" sha1="c1790e8d20fbaa1de23c2a1ca34c37d767c2402b" offset="0"/>
+	    <rom name="(sps2)manual.pdf" size="446188" crc="96f8f6b5" sha1="2c77582a7781108e6a95723797f394f7509d62b1" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -12024,15 +12024,15 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="612281">
-		<rom name="(sps3)box_back.jpg" size="612281" crc="d4c55595" sha1="3ccf3b9229f640e256c378b28ecdcaa3b8bffd20" offset="0"/>
-		<rom name="(sps3)box_front.jpg" size="520840" crc="4b56ebeb" sha1="eb55b3b27042cf7c8c97f9bef0532816b6cedf93" offset="0"/>
-		<rom name="(sps3)box_side_left.jpg" size="39682" crc="fcbfa19b" sha1="42251ec9831bc301fd2688aa24c590a75da7d976" offset="0"/>
-		<rom name="(sps3)disk.jpg" size="178929" crc="5306c5b0" sha1="35df256ea65052f39db33f6836754ef7742e9b90" offset="0"/>
-		<rom name="(sps3)gameinfo.xml" size="2250" crc="45c2d550" sha1="1efebcd353aee6d994eeeffbc6a938e05c46ceaf" offset="0"/>
-		<rom name="(sps3)manual.pdf" size="3172505" crc="1d6541ed" sha1="2a10b36f8c3ac8d78be5dad5a1c3dd672f2d587a" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="612281">
+	    <rom name="(sps3)box_back.jpg" size="612281" crc="d4c55595" sha1="3ccf3b9229f640e256c378b28ecdcaa3b8bffd20" offset="0"/>
+	    <rom name="(sps3)box_front.jpg" size="520840" crc="4b56ebeb" sha1="eb55b3b27042cf7c8c97f9bef0532816b6cedf93" offset="0"/>
+	    <rom name="(sps3)box_side_left.jpg" size="39682" crc="fcbfa19b" sha1="42251ec9831bc301fd2688aa24c590a75da7d976" offset="0"/>
+	    <rom name="(sps3)disk.jpg" size="178929" crc="5306c5b0" sha1="35df256ea65052f39db33f6836754ef7742e9b90" offset="0"/>
+	    <rom name="(sps3)gameinfo.xml" size="2250" crc="45c2d550" sha1="1efebcd353aee6d994eeeffbc6a938e05c46ceaf" offset="0"/>
+	    <rom name="(sps3)manual.pdf" size="3172505" crc="1d6541ed" sha1="2a10b36f8c3ac8d78be5dad5a1c3dd672f2d587a" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -12357,16 +12357,16 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="13799">
-		<rom name="(sps36)box.info" size="13799" crc="002647c0" sha1="407f4fa31828adaa36e4648692623effe70d4227" offset="0"/>
-		<rom name="(sps36)box_back.jpg" size="904407" crc="451638c2" sha1="9e73a5e6198ed9f2580ab744f7e0a678c2d3643c" offset="0"/>
-		<rom name="(sps36)box_front.jpg" size="945152" crc="b51a6720" sha1="243b5287ec11eb8f2763a33d758223f2dab0158d" offset="0"/>
-		<rom name="(sps36)box_front_left.jpg" size="47510" crc="f636e001" sha1="0eb94fa5cbf3e36de5964516390ce1871446a5ca" offset="0"/>
-		<rom name="(sps36)disk.jpg" size="218459" crc="eb0fc3bd" sha1="643ef6e93e4282e4147cb7cac309c3cdb0e4c33f" offset="0"/>
-		<rom name="(sps36)gameinfo.xml" size="2228" crc="a401faba" sha1="5e38d1003d37589d3eadb264436db2fc7e29e08c" offset="0"/>
-		<rom name="(sps36)inlay.jpg" size="948169" crc="31dc6d94" sha1="c04989c417c03670b5f483519149ea4bdedf8abe" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="13799">
+	    <rom name="(sps36)box.info" size="13799" crc="002647c0" sha1="407f4fa31828adaa36e4648692623effe70d4227" offset="0"/>
+	    <rom name="(sps36)box_back.jpg" size="904407" crc="451638c2" sha1="9e73a5e6198ed9f2580ab744f7e0a678c2d3643c" offset="0"/>
+	    <rom name="(sps36)box_front.jpg" size="945152" crc="b51a6720" sha1="243b5287ec11eb8f2763a33d758223f2dab0158d" offset="0"/>
+	    <rom name="(sps36)box_front_left.jpg" size="47510" crc="f636e001" sha1="0eb94fa5cbf3e36de5964516390ce1871446a5ca" offset="0"/>
+	    <rom name="(sps36)disk.jpg" size="218459" crc="eb0fc3bd" sha1="643ef6e93e4282e4147cb7cac309c3cdb0e4c33f" offset="0"/>
+	    <rom name="(sps36)gameinfo.xml" size="2228" crc="a401faba" sha1="5e38d1003d37589d3eadb264436db2fc7e29e08c" offset="0"/>
+	    <rom name="(sps36)inlay.jpg" size="948169" crc="31dc6d94" sha1="c04989c417c03670b5f483519149ea4bdedf8abe" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -13133,17 +13133,17 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="1486297">
-		<rom name="(sps49)box_back.jpg" size="1486297" crc="0a50d1e6" sha1="c2f6f36ef0e75564bfe18b35a0a7946a64980eed" offset="0"/>
-		<rom name="(sps49)box_front.jpg" size="1326754" crc="223cf56a" sha1="4c9392c3198801a053c7af9489203f7c1a3d22c2" offset="0"/>
-		<rom name="(sps49)box_front_left.jpg" size="127629" crc="40557504" sha1="c3bf0711e84acb1aeba5c6adc6622aad71f5b333" offset="0"/>
-		<rom name="(sps49)disk1.jpg" size="288498" crc="9c6708d9" sha1="bd08fcb6f8c5c71ed3c41d88f4762bbda7912333" offset="0"/>
-		<rom name="(sps49)disk2.jpg" size="248466" crc="1deb1b12" sha1="e421876929ffe71a5270e53bb17d5a84a0e85aa7" offset="0"/>
-		<rom name="(sps49)gameinfo.xml" size="2562" crc="29d21039" sha1="f631a50eef0b57d1d5a00c914d93c784202de581" offset="0"/>
-		<rom name="(sps49)side1.png" size="695771" crc="e8d5f4c7" sha1="b01d4fe3b735e4b9a4236d4774f8d2e83d383f19" offset="0"/>
-		<rom name="(sps49)side2.png" size="795576" crc="f45ea2ce" sha1="32e75bbf9727f2884c1985b5082d9be8c50dc0a5" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="1486297">
+	    <rom name="(sps49)box_back.jpg" size="1486297" crc="0a50d1e6" sha1="c2f6f36ef0e75564bfe18b35a0a7946a64980eed" offset="0"/>
+	    <rom name="(sps49)box_front.jpg" size="1326754" crc="223cf56a" sha1="4c9392c3198801a053c7af9489203f7c1a3d22c2" offset="0"/>
+	    <rom name="(sps49)box_front_left.jpg" size="127629" crc="40557504" sha1="c3bf0711e84acb1aeba5c6adc6622aad71f5b333" offset="0"/>
+	    <rom name="(sps49)disk1.jpg" size="288498" crc="9c6708d9" sha1="bd08fcb6f8c5c71ed3c41d88f4762bbda7912333" offset="0"/>
+	    <rom name="(sps49)disk2.jpg" size="248466" crc="1deb1b12" sha1="e421876929ffe71a5270e53bb17d5a84a0e85aa7" offset="0"/>
+	    <rom name="(sps49)gameinfo.xml" size="2562" crc="29d21039" sha1="f631a50eef0b57d1d5a00c914d93c784202de581" offset="0"/>
+	    <rom name="(sps49)side1.png" size="695771" crc="e8d5f4c7" sha1="b01d4fe3b735e4b9a4236d4774f8d2e83d383f19" offset="0"/>
+	    <rom name="(sps49)side2.png" size="795576" crc="f45ea2ce" sha1="32e75bbf9727f2884c1985b5082d9be8c50dc0a5" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -14029,19 +14029,19 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="155988">
-		<rom name="(sps72)amigadisk1.jpg" size="155988" crc="17307ff6" sha1="9c648afddc14098b2c46d869d58a6b7132222ce1" offset="0"/>
-		<rom name="(sps72)amigadisk2.jpg" size="156300" crc="3537b9ce" sha1="f439db3000dbac6817916b30f766ecc79acd8637" offset="0"/>
-		<rom name="(sps72)box_back.jpg" size="1078734" crc="590236e4" sha1="f7758c4b9e47d5f1b52a6d60c6ccb69e74fb6e83" offset="0"/>
-		<rom name="(sps72)box_front.jpg" size="798612" crc="34e838a8" sha1="557e0547beb780cc29522943bc19eff47c9aee6c" offset="0"/>
-		<rom name="(sps72)box_front_bottom.jpg" size="95763" crc="982795df" sha1="961dbf94aa48c5eb3e4c8ac3ebb6ec7c00d3677a" offset="0"/>
-		<rom name="(sps72)box_front_right.jpg" size="129325" crc="42695ad1" sha1="8706486394ea6991b138426eeb10c00ba242912c" offset="0"/>
-		<rom name="(sps72)box_front_top.jpg" size="85313" crc="2a82c419" sha1="2cfff7ffdca46dfe1b0953ab16f375dcd696e541" offset="0"/>
-		<rom name="(sps72)gameinfo.xml" size="2761" crc="98645d35" sha1="8cd430d9d14d10054690f1c4e17198a863eeb536" offset="0"/>
-		<rom name="(sps72)manual.pdf" size="26542653" crc="87f0f789" sha1="249b879314de06b9e56169ac6087012ea5a239f3" offset="0"/>
-		<rom name="(sps72)spellbook.pdf" size="14231081" crc="b814be5d" sha1="42c2e179a49c9e9673416083b46d27e4a9bb99ec" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="155988">
+	    <rom name="(sps72)amigadisk1.jpg" size="155988" crc="17307ff6" sha1="9c648afddc14098b2c46d869d58a6b7132222ce1" offset="0"/>
+	    <rom name="(sps72)amigadisk2.jpg" size="156300" crc="3537b9ce" sha1="f439db3000dbac6817916b30f766ecc79acd8637" offset="0"/>
+	    <rom name="(sps72)box_back.jpg" size="1078734" crc="590236e4" sha1="f7758c4b9e47d5f1b52a6d60c6ccb69e74fb6e83" offset="0"/>
+	    <rom name="(sps72)box_front.jpg" size="798612" crc="34e838a8" sha1="557e0547beb780cc29522943bc19eff47c9aee6c" offset="0"/>
+	    <rom name="(sps72)box_front_bottom.jpg" size="95763" crc="982795df" sha1="961dbf94aa48c5eb3e4c8ac3ebb6ec7c00d3677a" offset="0"/>
+	    <rom name="(sps72)box_front_right.jpg" size="129325" crc="42695ad1" sha1="8706486394ea6991b138426eeb10c00ba242912c" offset="0"/>
+	    <rom name="(sps72)box_front_top.jpg" size="85313" crc="2a82c419" sha1="2cfff7ffdca46dfe1b0953ab16f375dcd696e541" offset="0"/>
+	    <rom name="(sps72)gameinfo.xml" size="2761" crc="98645d35" sha1="8cd430d9d14d10054690f1c4e17198a863eeb536" offset="0"/>
+	    <rom name="(sps72)manual.pdf" size="26542653" crc="87f0f789" sha1="249b879314de06b9e56169ac6087012ea5a239f3" offset="0"/>
+	    <rom name="(sps72)spellbook.pdf" size="14231081" crc="b814be5d" sha1="42c2e179a49c9e9673416083b46d27e4a9bb99ec" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -16304,17 +16304,17 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="698382">
-		<rom name="(sps32)box_back.jpg" size="698382" crc="6ba2784a" sha1="98c74ca0e2f4c5dd98c790250b11f81629186f04" offset="0"/>
-		<rom name="(sps32)box_front.jpg" size="655831" crc="2bb8f4d4" sha1="b8bb27bfca476f69e6611c73ca71ec222a0bbdca" offset="0"/>
-		<rom name="(sps32)box_side_left.jpg" size="100537" crc="94951b98" sha1="913c7c382acfc16e77d5316d290f93635e78c8f5" offset="0"/>
-		<rom name="(sps32)box_side_right.jpg" size="87534" crc="11a9a408" sha1="a118b3dc901a656216fc52fbebc8771fb42135f1" offset="0"/>
-		<rom name="(sps32)box_side_top.jpg" size="78001" crc="c1a9add1" sha1="8ea0482684a7f22b98c65e5ef95bc5ee4cbdea43" offset="0"/>
-		<rom name="(sps32)disk.jpg" size="169004" crc="ca66eb9f" sha1="a2fd7f8806a59bde7eba5dd8b7afe51ac30a2ecd" offset="0"/>
-		<rom name="(sps32)gameinfo.xml" size="2379" crc="766d9b14" sha1="19afd4b9a54a5b77dae9278a872c965a0407b67b" offset="0"/>
-		<rom name="(sps32)manual.pdf" size="5429030" crc="6d131192" sha1="dc0b751405000c4019a583b2158d5ca43dfb8216" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="698382">
+	    <rom name="(sps32)box_back.jpg" size="698382" crc="6ba2784a" sha1="98c74ca0e2f4c5dd98c790250b11f81629186f04" offset="0"/>
+	    <rom name="(sps32)box_front.jpg" size="655831" crc="2bb8f4d4" sha1="b8bb27bfca476f69e6611c73ca71ec222a0bbdca" offset="0"/>
+	    <rom name="(sps32)box_side_left.jpg" size="100537" crc="94951b98" sha1="913c7c382acfc16e77d5316d290f93635e78c8f5" offset="0"/>
+	    <rom name="(sps32)box_side_right.jpg" size="87534" crc="11a9a408" sha1="a118b3dc901a656216fc52fbebc8771fb42135f1" offset="0"/>
+	    <rom name="(sps32)box_side_top.jpg" size="78001" crc="c1a9add1" sha1="8ea0482684a7f22b98c65e5ef95bc5ee4cbdea43" offset="0"/>
+	    <rom name="(sps32)disk.jpg" size="169004" crc="ca66eb9f" sha1="a2fd7f8806a59bde7eba5dd8b7afe51ac30a2ecd" offset="0"/>
+	    <rom name="(sps32)gameinfo.xml" size="2379" crc="766d9b14" sha1="19afd4b9a54a5b77dae9278a872c965a0407b67b" offset="0"/>
+	    <rom name="(sps32)manual.pdf" size="5429030" crc="6d131192" sha1="dc0b751405000c4019a583b2158d5ca43dfb8216" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -16740,19 +16740,19 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="638377">
-		<rom name="(sps22)box_back.jpg" size="638377" crc="4f7a6e28" sha1="25ce46a4b99d90cea1c0e1a3f11f11f6f168695b" offset="0"/>
-		<rom name="(sps22)box_front.jpg" size="600856" crc="e6dd88d7" sha1="f5189c9199b3124b048768495a2350986b493f28" offset="0"/>
-		<rom name="(sps22)box_front_bottom.jpg" size="72421" crc="042dc6ea" sha1="83983ee2a471dfb8c07a5d58c302473ce6ea45b6" offset="0"/>
-		<rom name="(sps22)box_front_left.jpg" size="167923" crc="81e22a06" sha1="117f5e64517ceb2c5e22934f1208490efb5f142a" offset="0"/>
-		<rom name="(sps22)box_front_right.jpg" size="200705" crc="5c72c0bb" sha1="2c689707c5074af8b28a5ee97be135063f536367" offset="0"/>
-		<rom name="(sps22)box_front_top.jpg" size="98478" crc="25bbf4ab" sha1="e98cefeaa30b6bfd5a5487e995e59be1a03fb02e" offset="0"/>
-		<rom name="(sps22)disk1.jpg" size="318492" crc="cde43350" sha1="f3ef5fa9742b73a1faf9f122a235fceaa65c2a8b" offset="0"/>
-		<rom name="(sps22)disk2.jpg" size="321001" crc="0a2b2690" sha1="dacd4d5323a953bbf5842e29a04ea83278a289f5" offset="0"/>
-		<rom name="(sps22)gameinfo.xml" size="2446" crc="0f924d2b" sha1="382eeb2e43d71e52703538b62b4b9181ec0c4c21" offset="0"/>
-		<rom name="(sps22)manual.pdf" size="9861048" crc="4635240f" sha1="bf4b377350ba3692896c3b915ec1480a9cf97eb5" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="638377">
+	    <rom name="(sps22)box_back.jpg" size="638377" crc="4f7a6e28" sha1="25ce46a4b99d90cea1c0e1a3f11f11f6f168695b" offset="0"/>
+	    <rom name="(sps22)box_front.jpg" size="600856" crc="e6dd88d7" sha1="f5189c9199b3124b048768495a2350986b493f28" offset="0"/>
+	    <rom name="(sps22)box_front_bottom.jpg" size="72421" crc="042dc6ea" sha1="83983ee2a471dfb8c07a5d58c302473ce6ea45b6" offset="0"/>
+	    <rom name="(sps22)box_front_left.jpg" size="167923" crc="81e22a06" sha1="117f5e64517ceb2c5e22934f1208490efb5f142a" offset="0"/>
+	    <rom name="(sps22)box_front_right.jpg" size="200705" crc="5c72c0bb" sha1="2c689707c5074af8b28a5ee97be135063f536367" offset="0"/>
+	    <rom name="(sps22)box_front_top.jpg" size="98478" crc="25bbf4ab" sha1="e98cefeaa30b6bfd5a5487e995e59be1a03fb02e" offset="0"/>
+	    <rom name="(sps22)disk1.jpg" size="318492" crc="cde43350" sha1="f3ef5fa9742b73a1faf9f122a235fceaa65c2a8b" offset="0"/>
+	    <rom name="(sps22)disk2.jpg" size="321001" crc="0a2b2690" sha1="dacd4d5323a953bbf5842e29a04ea83278a289f5" offset="0"/>
+	    <rom name="(sps22)gameinfo.xml" size="2446" crc="0f924d2b" sha1="382eeb2e43d71e52703538b62b4b9181ec0c4c21" offset="0"/>
+	    <rom name="(sps22)manual.pdf" size="9861048" crc="4635240f" sha1="bf4b377350ba3692896c3b915ec1480a9cf97eb5" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -17152,18 +17152,18 @@
 	</part>
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="710035">
-		<rom name="(sps52)box_back.jpg" size="710035" crc="442bc554" sha1="544345d7f7b7491bdb929f6a8f6fec37743fe40a" offset="0"/>
-		<rom name="(sps52)box_front.jpg" size="503929" crc="8afd735e" sha1="e6fc73d19d7a72f84c438b505c208b8c936142bf" offset="0"/>
-		<rom name="(sps52)box_front_bottom.jpg" size="58676" crc="93fc4f6b" sha1="8c5583c2131db803ef7605ca36f44484b266b556" offset="0"/>
-		<rom name="(sps52)box_front_right.jpg" size="45423" crc="0138f804" sha1="c957e0be861e095c6bfd71491a8a1d63fd8424aa" offset="0"/>
-		<rom name="(sps52)disk1.jpg" size="242914" crc="35786303" sha1="7a11fc638189c36abe0cd7d80213a33ab9d990f9" offset="0"/>
-		<rom name="(sps52)disk2.jpg" size="268305" crc="f4c0a01a" sha1="ae37c37a0f5c2bb22a5d0b0974f443c8214722e0" offset="0"/>
-		<rom name="(sps52)disk3.jpg" size="256089" crc="4b05c762" sha1="7cccabfc8dd2f89e353e22c22d22d036557c4298" offset="0"/>
-		<rom name="(sps52)gameinfo.xml" size="2725" crc="9fe3308a" sha1="71d87a424f23e0b2904ab95c91d81ae9812aa50c" offset="0"/>
-		<rom name="(sps52)manual.pdf" size="672783" crc="74b3740d" sha1="1d99a3a6482c5ba3a13c9b71dec1d49afa640108" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="710035">
+	    <rom name="(sps52)box_back.jpg" size="710035" crc="442bc554" sha1="544345d7f7b7491bdb929f6a8f6fec37743fe40a" offset="0"/>
+	    <rom name="(sps52)box_front.jpg" size="503929" crc="8afd735e" sha1="e6fc73d19d7a72f84c438b505c208b8c936142bf" offset="0"/>
+	    <rom name="(sps52)box_front_bottom.jpg" size="58676" crc="93fc4f6b" sha1="8c5583c2131db803ef7605ca36f44484b266b556" offset="0"/>
+	    <rom name="(sps52)box_front_right.jpg" size="45423" crc="0138f804" sha1="c957e0be861e095c6bfd71491a8a1d63fd8424aa" offset="0"/>
+	    <rom name="(sps52)disk1.jpg" size="242914" crc="35786303" sha1="7a11fc638189c36abe0cd7d80213a33ab9d990f9" offset="0"/>
+	    <rom name="(sps52)disk2.jpg" size="268305" crc="f4c0a01a" sha1="ae37c37a0f5c2bb22a5d0b0974f443c8214722e0" offset="0"/>
+	    <rom name="(sps52)disk3.jpg" size="256089" crc="4b05c762" sha1="7cccabfc8dd2f89e353e22c22d22d036557c4298" offset="0"/>
+	    <rom name="(sps52)gameinfo.xml" size="2725" crc="9fe3308a" sha1="71d87a424f23e0b2904ab95c91d81ae9812aa50c" offset="0"/>
+	    <rom name="(sps52)manual.pdf" size="672783" crc="74b3740d" sha1="1d99a3a6482c5ba3a13c9b71dec1d49afa640108" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -19580,16 +19580,16 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="816007">
-		<rom name="(sps31)box_back.jpg" size="816007" crc="0cae01d7" sha1="9d58ae42999acffe217a240aba7e0f955497653f" offset="0"/>
-		<rom name="(sps31)box_front.jpg" size="628905" crc="0200bdd8" sha1="b81c04628b0668fae6c01a137f35eabb45899960" offset="0"/>
-		<rom name="(sps31)box_side_bottom.jpg" size="79500" crc="b6576480" sha1="dae94a1747a28568becf7124507086b4723292af" offset="0"/>
-		<rom name="(sps31)box_side_left.jpg" size="106774" crc="0deb2efe" sha1="97c0a2eaf92a04ea257e9700cfd41af3c3efa34b" offset="0"/>
-		<rom name="(sps31)disk.jpg" size="159351" crc="a73a3a96" sha1="0dc7ced95e5070a518a3d2cb46a6af474165363a" offset="0"/>
-		<rom name="(sps31)gameinfo.xml" size="2518" crc="cf1d70a8" sha1="3e242cf57656c7de811c91da0f34c21d250377f2" offset="0"/>
-		<rom name="(sps31)manual.pdf" size="1762943" crc="af3ac22e" sha1="7de51b7422bd2a8d3d5381e21fc8be663c4fa07a" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="816007">
+	    <rom name="(sps31)box_back.jpg" size="816007" crc="0cae01d7" sha1="9d58ae42999acffe217a240aba7e0f955497653f" offset="0"/>
+	    <rom name="(sps31)box_front.jpg" size="628905" crc="0200bdd8" sha1="b81c04628b0668fae6c01a137f35eabb45899960" offset="0"/>
+	    <rom name="(sps31)box_side_bottom.jpg" size="79500" crc="b6576480" sha1="dae94a1747a28568becf7124507086b4723292af" offset="0"/>
+	    <rom name="(sps31)box_side_left.jpg" size="106774" crc="0deb2efe" sha1="97c0a2eaf92a04ea257e9700cfd41af3c3efa34b" offset="0"/>
+	    <rom name="(sps31)disk.jpg" size="159351" crc="a73a3a96" sha1="0dc7ced95e5070a518a3d2cb46a6af474165363a" offset="0"/>
+	    <rom name="(sps31)gameinfo.xml" size="2518" crc="cf1d70a8" sha1="3e242cf57656c7de811c91da0f34c21d250377f2" offset="0"/>
+	    <rom name="(sps31)manual.pdf" size="1762943" crc="af3ac22e" sha1="7de51b7422bd2a8d3d5381e21fc8be663c4fa07a" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -20360,19 +20360,19 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="291425">
-		<rom name="(sps8)attention!.png" size="291425" crc="7e4f1c7a" sha1="2b84615351c61f0b69cd0e95bd4c5d8903cb61ce" offset="0"/>
-		<rom name="(sps8)box_back.jpg" size="767205" crc="e7f8b031" sha1="8b401ad2fe59045dd229449c6a7642050df7fb9a" offset="0"/>
-		<rom name="(sps8)box_front.jpg" size="726214" crc="e7e7cfbe" sha1="54e201fbaac11e5cd3911ddc3592c0a36e8af7ef" offset="0"/>
-		<rom name="(sps8)box_side_bottom.jpg" size="138203" crc="9a682569" sha1="15edc77b74a17c9d2fc0b69f9526e3740eb563d3" offset="0"/>
-		<rom name="(sps8)box_side_left.jpg" size="142572" crc="f0fe2b7f" sha1="c7635edf1c93c34770afe128d31514ec5f60a8ce" offset="0"/>
-		<rom name="(sps8)box_side_right.jpg" size="233045" crc="0619995c" sha1="77d8ff91400a74fbec50985c5d418b70663a64bf" offset="0"/>
-		<rom name="(sps8)box_side_top.jpg" size="170614" crc="615019d1" sha1="be5939d5e669967821b530f9ab69511160ebaf20" offset="0"/>
-		<rom name="(sps8)disk.jpg" size="162204" crc="01ac1278" sha1="704c8d87a021d834b0282479bd24c1a7d9023087" offset="0"/>
-		<rom name="(sps8)gameinfo.xml" size="2616" crc="74b93a4e" sha1="6f72b8660b18a299172100af8f1964617a5565a8" offset="0"/>
-		<rom name="(sps8)manual.pdf" size="2971581" crc="c95ccecd" sha1="875be96b2d7d8fcb7ca1360ea44ae87cabb8b9af" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="291425">
+	    <rom name="(sps8)attention!.png" size="291425" crc="7e4f1c7a" sha1="2b84615351c61f0b69cd0e95bd4c5d8903cb61ce" offset="0"/>
+	    <rom name="(sps8)box_back.jpg" size="767205" crc="e7f8b031" sha1="8b401ad2fe59045dd229449c6a7642050df7fb9a" offset="0"/>
+	    <rom name="(sps8)box_front.jpg" size="726214" crc="e7e7cfbe" sha1="54e201fbaac11e5cd3911ddc3592c0a36e8af7ef" offset="0"/>
+	    <rom name="(sps8)box_side_bottom.jpg" size="138203" crc="9a682569" sha1="15edc77b74a17c9d2fc0b69f9526e3740eb563d3" offset="0"/>
+	    <rom name="(sps8)box_side_left.jpg" size="142572" crc="f0fe2b7f" sha1="c7635edf1c93c34770afe128d31514ec5f60a8ce" offset="0"/>
+	    <rom name="(sps8)box_side_right.jpg" size="233045" crc="0619995c" sha1="77d8ff91400a74fbec50985c5d418b70663a64bf" offset="0"/>
+	    <rom name="(sps8)box_side_top.jpg" size="170614" crc="615019d1" sha1="be5939d5e669967821b530f9ab69511160ebaf20" offset="0"/>
+	    <rom name="(sps8)disk.jpg" size="162204" crc="01ac1278" sha1="704c8d87a021d834b0282479bd24c1a7d9023087" offset="0"/>
+	    <rom name="(sps8)gameinfo.xml" size="2616" crc="74b93a4e" sha1="6f72b8660b18a299172100af8f1964617a5565a8" offset="0"/>
+	    <rom name="(sps8)manual.pdf" size="2971581" crc="c95ccecd" sha1="875be96b2d7d8fcb7ca1360ea44ae87cabb8b9af" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -22813,19 +22813,19 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="970327">
-		<rom name="(sps63)box_back.jpg" size="970327" crc="b8ae9388" sha1="484e13aab6a7b4b084986d8fbeba84090dd3f870" offset="0"/>
-		<rom name="(sps63)box_front.jpg" size="965542" crc="94407eb7" sha1="d05b312b77087c464644a5cad44437353191ba4b" offset="0"/>
-		<rom name="(sps63)box_front_bottom.jpg" size="133852" crc="2f908c40" sha1="c0e0fd0a9791491cc9af31fd21686eccf1c707fc" offset="0"/>
-		<rom name="(sps63)box_front_left.jpg" size="200838" crc="501a6642" sha1="37bb400534464a3cc5fb653dbc4bb965cc0cfca4" offset="0"/>
-		<rom name="(sps63)box_front_right.jpg" size="237918" crc="a95fc4d9" sha1="238dcc671feb76074de485cc3b1c7b8ca66db0e9" offset="0"/>
-		<rom name="(sps63)box_front_top.jpg" size="108681" crc="d80a909e" sha1="8ec001d3fadc1642d3334eaac11dd807644b3e38" offset="0"/>
-		<rom name="(sps63)disk.jpg" size="218225" crc="0787c698" sha1="e63c9edcec81fbbb7ca0198e105244482df51ede" offset="0"/>
-		<rom name="(sps63)gameinfo.xml" size="2419" crc="b29b3086" sha1="7ac8a892be27416f7ac748fc813381e8cf6103be" offset="0"/>
-		<rom name="(sps63)side1.png" size="601350" crc="40ea8ed9" sha1="3cce7cfcd89417babdec014fe0e5cd18da47331e" offset="0"/>
-		<rom name="(sps63)side2.png" size="551316" crc="0d591d67" sha1="74f146dcb2dda8e55efa3bdaae70e3a553e7b262" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="970327">
+	    <rom name="(sps63)box_back.jpg" size="970327" crc="b8ae9388" sha1="484e13aab6a7b4b084986d8fbeba84090dd3f870" offset="0"/>
+	    <rom name="(sps63)box_front.jpg" size="965542" crc="94407eb7" sha1="d05b312b77087c464644a5cad44437353191ba4b" offset="0"/>
+	    <rom name="(sps63)box_front_bottom.jpg" size="133852" crc="2f908c40" sha1="c0e0fd0a9791491cc9af31fd21686eccf1c707fc" offset="0"/>
+	    <rom name="(sps63)box_front_left.jpg" size="200838" crc="501a6642" sha1="37bb400534464a3cc5fb653dbc4bb965cc0cfca4" offset="0"/>
+	    <rom name="(sps63)box_front_right.jpg" size="237918" crc="a95fc4d9" sha1="238dcc671feb76074de485cc3b1c7b8ca66db0e9" offset="0"/>
+	    <rom name="(sps63)box_front_top.jpg" size="108681" crc="d80a909e" sha1="8ec001d3fadc1642d3334eaac11dd807644b3e38" offset="0"/>
+	    <rom name="(sps63)disk.jpg" size="218225" crc="0787c698" sha1="e63c9edcec81fbbb7ca0198e105244482df51ede" offset="0"/>
+	    <rom name="(sps63)gameinfo.xml" size="2419" crc="b29b3086" sha1="7ac8a892be27416f7ac748fc813381e8cf6103be" offset="0"/>
+	    <rom name="(sps63)side1.png" size="601350" crc="40ea8ed9" sha1="3cce7cfcd89417babdec014fe0e5cd18da47331e" offset="0"/>
+	    <rom name="(sps63)side2.png" size="551316" crc="0d591d67" sha1="74f146dcb2dda8e55efa3bdaae70e3a553e7b262" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -22987,42 +22987,42 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="45220">
-		<rom name="(sps1639)addendum amiga 1200.jpg" size="45220" crc="5ac680c4" sha1="3030fd286bdee179f5188428b0e1dd5ea482054a" offset="0"/>
-		<rom name="(sps1639)addendum page 1.jpg" size="67009" crc="7eac18ed" sha1="f9f78ad1f4e3108963dfcaaaa1d4f51c6e925d72" offset="0"/>
-		<rom name="(sps1639)addendum page 2.jpg" size="59727" crc="4eb1b0f4" sha1="7724da6177ffb6f3efa8cd7fe41d167b9c5b4054" offset="0"/>
-		<rom name="(sps1639)box backcover downside.jpg" size="19108" crc="50f0f9ee" sha1="d9a22f18255e262ea6a9e8a6dbfb4efa5b8e0ce3" offset="0"/>
-		<rom name="(sps1639)box backcover left side.jpg" size="25730" crc="183fbde0" sha1="5a030dce807cfbdc52c4439e96da57ccf27ef378" offset="0"/>
-		<rom name="(sps1639)box backcover right side.jpg" size="24058" crc="cded28d5" sha1="88a7038292e25402a9d5e7067ffe8851f205e48c" offset="0"/>
-		<rom name="(sps1639)box backcover upside.jpg" size="17847" crc="bd6d444f" sha1="d91b3c3f9b69149ca1d1433c7c4bebb3924e7bfd" offset="0"/>
-		<rom name="(sps1639)box backcover.jpg" size="98443" crc="c4b8aeaa" sha1="d0bb2b3e72303b175111caf632c85c687b68fa73" offset="0"/>
-		<rom name="(sps1639)box cover downside.jpg" size="22279" crc="a873cc97" sha1="01f2f90ee210319c7fe0effde2745746f06463be" offset="0"/>
-		<rom name="(sps1639)box cover left side.jpg" size="26594" crc="69e2914c" sha1="127a87fccbcc724a2581aeed0ff06296a2608013" offset="0"/>
-		<rom name="(sps1639)box cover right side.jpg" size="26177" crc="5daea2bc" sha1="5a06757c58132c0372050872b2f6217c21e4af15" offset="0"/>
-		<rom name="(sps1639)box cover upside.jpg" size="20402" crc="21c64ac9" sha1="bdd4dfc533f8825451acb1fb5d746c71319cf40a" offset="0"/>
-		<rom name="(sps1639)cover box vf.jpg" size="76905" crc="fa2c68e6" sha1="72e103cb48664181c84bc6fb37d74adb3d0276a8" offset="0"/>
-		<rom name="(sps1639)disquettes 123456.jpg" size="67063" crc="c3f0c781" sha1="c8e09b4a9514a8da435be2ce5d9c84c5df18325e" offset="0"/>
-		<rom name="(sps1639)disquettes 7891011.jpg" size="58220" crc="1c67086b" sha1="8e1ff627194a45a8576da37d902975f74ebb7f91" offset="0"/>
-		<rom name="(sps1639)feuille d'abonnement a the adventurer.jpg" size="30792" crc="4051cdfa" sha1="c0aec96d7ae62de2db782eace869e665aae04eb8" offset="0"/>
-		<rom name="(sps1639)manuel backcover 16.jpg" size="78763" crc="544cd28c" sha1="1585cf0766ab4cfc6b0a1a4059dbf61e38dbdf89" offset="0"/>
-		<rom name="(sps1639)manuel cover 0.jpg" size="69190" crc="3cc5db12" sha1="e8393edd01f00cf2a6c00c6af4eab093fc95a229" offset="0"/>
-		<rom name="(sps1639)manuel page 10.jpg" size="74432" crc="d64fb897" sha1="8b45642137ba1b5f3b84d39b08ff1e62bf876505" offset="0"/>
-		<rom name="(sps1639)manuel page 11.jpg" size="71461" crc="d4c41c08" sha1="5e8e77a0f08ebd2d6f270b9c851bc2225a91a04a" offset="0"/>
-		<rom name="(sps1639)manuel page 12.jpg" size="71686" crc="0d2fa437" sha1="19ed843b454f381cf2978f9a40c5fdcc5aea63d7" offset="0"/>
-		<rom name="(sps1639)manuel page 13.jpg" size="72673" crc="fde098d7" sha1="5a84ac84354aaa900a2274f5e84d5a4e85a2f3b8" offset="0"/>
-		<rom name="(sps1639)manuel page 14.jpg" size="68192" crc="82cd8f85" sha1="e055b34841f721b07d725544530bfb3027784495" offset="0"/>
-		<rom name="(sps1639)manuel page 15.jpg" size="243288" crc="a438b929" sha1="9de1ce14b0657a5f74782181c274ac2cbd75d789" offset="0"/>
-		<rom name="(sps1639)manuel page 2.jpg" size="74478" crc="6b553212" sha1="e9ea31a7584fc88602bd643e53e45e715b03a7b9" offset="0"/>
-		<rom name="(sps1639)manuel page 3.jpg" size="69696" crc="7c629954" sha1="dc64393d814b3240cc07c7a923dc2993f6e4a849" offset="0"/>
-		<rom name="(sps1639)manuel page 4.jpg" size="49048" crc="3d5e48d3" sha1="abba1aabe92bbebc9034a3d63aa1a9275b6f27a4" offset="0"/>
-		<rom name="(sps1639)manuel page 5.jpg" size="76120" crc="a01e4df8" sha1="69a616948df13eab6802d5056de633e2827e2d0e" offset="0"/>
-		<rom name="(sps1639)manuel page 6.jpg" size="68953" crc="1ee7795c" sha1="0aba1afbbe4871f655db709f0763b193705cc59b" offset="0"/>
-		<rom name="(sps1639)manuel page 7.jpg" size="77236" crc="c0569de1" sha1="a88bdb22c563c6e88b4e0fa928cd590be67ce413" offset="0"/>
-		<rom name="(sps1639)manuel page 8.jpg" size="60066" crc="c8fab4a8" sha1="f879e28a1df2a5c5ae20bb9dd5867d0444b50573" offset="0"/>
-		<rom name="(sps1639)manuel page 9.jpg" size="74408" crc="ab11da99" sha1="6f4b5850e6b7d376814ca9aaf6f7ee43dd51f8ca" offset="0"/>
-		<rom name="(sps1639)thumbs.db" size="77824" crc="29343667" sha1="0f3a5b596522aebe839426317c1adf643a1b6b42" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="45220">
+	    <rom name="(sps1639)addendum amiga 1200.jpg" size="45220" crc="5ac680c4" sha1="3030fd286bdee179f5188428b0e1dd5ea482054a" offset="0"/>
+	    <rom name="(sps1639)addendum page 1.jpg" size="67009" crc="7eac18ed" sha1="f9f78ad1f4e3108963dfcaaaa1d4f51c6e925d72" offset="0"/>
+	    <rom name="(sps1639)addendum page 2.jpg" size="59727" crc="4eb1b0f4" sha1="7724da6177ffb6f3efa8cd7fe41d167b9c5b4054" offset="0"/>
+	    <rom name="(sps1639)box backcover downside.jpg" size="19108" crc="50f0f9ee" sha1="d9a22f18255e262ea6a9e8a6dbfb4efa5b8e0ce3" offset="0"/>
+	    <rom name="(sps1639)box backcover left side.jpg" size="25730" crc="183fbde0" sha1="5a030dce807cfbdc52c4439e96da57ccf27ef378" offset="0"/>
+	    <rom name="(sps1639)box backcover right side.jpg" size="24058" crc="cded28d5" sha1="88a7038292e25402a9d5e7067ffe8851f205e48c" offset="0"/>
+	    <rom name="(sps1639)box backcover upside.jpg" size="17847" crc="bd6d444f" sha1="d91b3c3f9b69149ca1d1433c7c4bebb3924e7bfd" offset="0"/>
+	    <rom name="(sps1639)box backcover.jpg" size="98443" crc="c4b8aeaa" sha1="d0bb2b3e72303b175111caf632c85c687b68fa73" offset="0"/>
+	    <rom name="(sps1639)box cover downside.jpg" size="22279" crc="a873cc97" sha1="01f2f90ee210319c7fe0effde2745746f06463be" offset="0"/>
+	    <rom name="(sps1639)box cover left side.jpg" size="26594" crc="69e2914c" sha1="127a87fccbcc724a2581aeed0ff06296a2608013" offset="0"/>
+	    <rom name="(sps1639)box cover right side.jpg" size="26177" crc="5daea2bc" sha1="5a06757c58132c0372050872b2f6217c21e4af15" offset="0"/>
+	    <rom name="(sps1639)box cover upside.jpg" size="20402" crc="21c64ac9" sha1="bdd4dfc533f8825451acb1fb5d746c71319cf40a" offset="0"/>
+	    <rom name="(sps1639)cover box vf.jpg" size="76905" crc="fa2c68e6" sha1="72e103cb48664181c84bc6fb37d74adb3d0276a8" offset="0"/>
+	    <rom name="(sps1639)disquettes 123456.jpg" size="67063" crc="c3f0c781" sha1="c8e09b4a9514a8da435be2ce5d9c84c5df18325e" offset="0"/>
+	    <rom name="(sps1639)disquettes 7891011.jpg" size="58220" crc="1c67086b" sha1="8e1ff627194a45a8576da37d902975f74ebb7f91" offset="0"/>
+	    <rom name="(sps1639)feuille d'abonnement a the adventurer.jpg" size="30792" crc="4051cdfa" sha1="c0aec96d7ae62de2db782eace869e665aae04eb8" offset="0"/>
+	    <rom name="(sps1639)manuel backcover 16.jpg" size="78763" crc="544cd28c" sha1="1585cf0766ab4cfc6b0a1a4059dbf61e38dbdf89" offset="0"/>
+	    <rom name="(sps1639)manuel cover 0.jpg" size="69190" crc="3cc5db12" sha1="e8393edd01f00cf2a6c00c6af4eab093fc95a229" offset="0"/>
+	    <rom name="(sps1639)manuel page 10.jpg" size="74432" crc="d64fb897" sha1="8b45642137ba1b5f3b84d39b08ff1e62bf876505" offset="0"/>
+	    <rom name="(sps1639)manuel page 11.jpg" size="71461" crc="d4c41c08" sha1="5e8e77a0f08ebd2d6f270b9c851bc2225a91a04a" offset="0"/>
+	    <rom name="(sps1639)manuel page 12.jpg" size="71686" crc="0d2fa437" sha1="19ed843b454f381cf2978f9a40c5fdcc5aea63d7" offset="0"/>
+	    <rom name="(sps1639)manuel page 13.jpg" size="72673" crc="fde098d7" sha1="5a84ac84354aaa900a2274f5e84d5a4e85a2f3b8" offset="0"/>
+	    <rom name="(sps1639)manuel page 14.jpg" size="68192" crc="82cd8f85" sha1="e055b34841f721b07d725544530bfb3027784495" offset="0"/>
+	    <rom name="(sps1639)manuel page 15.jpg" size="243288" crc="a438b929" sha1="9de1ce14b0657a5f74782181c274ac2cbd75d789" offset="0"/>
+	    <rom name="(sps1639)manuel page 2.jpg" size="74478" crc="6b553212" sha1="e9ea31a7584fc88602bd643e53e45e715b03a7b9" offset="0"/>
+	    <rom name="(sps1639)manuel page 3.jpg" size="69696" crc="7c629954" sha1="dc64393d814b3240cc07c7a923dc2993f6e4a849" offset="0"/>
+	    <rom name="(sps1639)manuel page 4.jpg" size="49048" crc="3d5e48d3" sha1="abba1aabe92bbebc9034a3d63aa1a9275b6f27a4" offset="0"/>
+	    <rom name="(sps1639)manuel page 5.jpg" size="76120" crc="a01e4df8" sha1="69a616948df13eab6802d5056de633e2827e2d0e" offset="0"/>
+	    <rom name="(sps1639)manuel page 6.jpg" size="68953" crc="1ee7795c" sha1="0aba1afbbe4871f655db709f0763b193705cc59b" offset="0"/>
+	    <rom name="(sps1639)manuel page 7.jpg" size="77236" crc="c0569de1" sha1="a88bdb22c563c6e88b4e0fa928cd590be67ce413" offset="0"/>
+	    <rom name="(sps1639)manuel page 8.jpg" size="60066" crc="c8fab4a8" sha1="f879e28a1df2a5c5ae20bb9dd5867d0444b50573" offset="0"/>
+	    <rom name="(sps1639)manuel page 9.jpg" size="74408" crc="ab11da99" sha1="6f4b5850e6b7d376814ca9aaf6f7ee43dd51f8ca" offset="0"/>
+	    <rom name="(sps1639)thumbs.db" size="77824" crc="29343667" sha1="0f3a5b596522aebe839426317c1adf643a1b6b42" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -26090,22 +26090,22 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="1484218">
-		<rom name="(sps24)box_back.jpg" size="1484218" crc="c337c2c7" sha1="58ce6b6a03d465d849ac216108e9aea5e78db73d" offset="0"/>
-		<rom name="(sps24)box_front.jpg" size="1297646" crc="10aa34cc" sha1="2d4eea2493ccd30d520470a607a8905e46ae12b6" offset="0"/>
-		<rom name="(sps24)box_front_bottom.jpg" size="178774" crc="6b179700" sha1="12d3e2b786ffcfd4fa49e400a9b83f0af4b93e0f" offset="0"/>
-		<rom name="(sps24)box_front_left.jpg" size="108755" crc="21f0df3e" sha1="4ddba59846a174ad1db916a09e982a56f9b4a9ad" offset="0"/>
-		<rom name="(sps24)box_front_right.jpg" size="114179" crc="edc61220" sha1="340de6c89408f4c687d3423a32c7d93abdd2bb7b" offset="0"/>
-		<rom name="(sps24)box_front_top.jpg" size="191516" crc="a70e8376" sha1="dbb69e909df9fe1b1206f469e1aadc854ab0fa86" offset="0"/>
-		<rom name="(sps24)disk1.jpg" size="158122" crc="ccb19151" sha1="944ac1433d0860b43d64bb8d9ef587af1e94bd3b" offset="0"/>
-		<rom name="(sps24)disk2.jpg" size="168707" crc="4e3d4d2d" sha1="af26c16fcee1b212ccf6cbbe7b3bd88a38d6a874" offset="0"/>
-		<rom name="(sps24)disk3.jpg" size="191785" crc="63aca21e" sha1="d10d38e377a19a3d4b4d5458e961ffd789833609" offset="0"/>
-		<rom name="(sps24)disk4.jpg" size="211408" crc="836f8e68" sha1="04ed4bcd49641921e6d65de728a9b57fcf43c653" offset="0"/>
-		<rom name="(sps24)gameinfo.xml" size="3242" crc="92c403b9" sha1="92e656bd9d9cfb4fbd6907678beacd5fe5a9bfd0" offset="0"/>
-		<rom name="(sps24)manual.pdf" size="7755939" crc="08c3101b" sha1="2476d0644945c5409523c38c79d4510377764976" offset="0"/>
-		<rom name="(sps24)poster.jpg" size="3750863" crc="bb827c5c" sha1="d20364ebfa9403cde062a09348d2c78c77c4ac70" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="1484218">
+	    <rom name="(sps24)box_back.jpg" size="1484218" crc="c337c2c7" sha1="58ce6b6a03d465d849ac216108e9aea5e78db73d" offset="0"/>
+	    <rom name="(sps24)box_front.jpg" size="1297646" crc="10aa34cc" sha1="2d4eea2493ccd30d520470a607a8905e46ae12b6" offset="0"/>
+	    <rom name="(sps24)box_front_bottom.jpg" size="178774" crc="6b179700" sha1="12d3e2b786ffcfd4fa49e400a9b83f0af4b93e0f" offset="0"/>
+	    <rom name="(sps24)box_front_left.jpg" size="108755" crc="21f0df3e" sha1="4ddba59846a174ad1db916a09e982a56f9b4a9ad" offset="0"/>
+	    <rom name="(sps24)box_front_right.jpg" size="114179" crc="edc61220" sha1="340de6c89408f4c687d3423a32c7d93abdd2bb7b" offset="0"/>
+	    <rom name="(sps24)box_front_top.jpg" size="191516" crc="a70e8376" sha1="dbb69e909df9fe1b1206f469e1aadc854ab0fa86" offset="0"/>
+	    <rom name="(sps24)disk1.jpg" size="158122" crc="ccb19151" sha1="944ac1433d0860b43d64bb8d9ef587af1e94bd3b" offset="0"/>
+	    <rom name="(sps24)disk2.jpg" size="168707" crc="4e3d4d2d" sha1="af26c16fcee1b212ccf6cbbe7b3bd88a38d6a874" offset="0"/>
+	    <rom name="(sps24)disk3.jpg" size="191785" crc="63aca21e" sha1="d10d38e377a19a3d4b4d5458e961ffd789833609" offset="0"/>
+	    <rom name="(sps24)disk4.jpg" size="211408" crc="836f8e68" sha1="04ed4bcd49641921e6d65de728a9b57fcf43c653" offset="0"/>
+	    <rom name="(sps24)gameinfo.xml" size="3242" crc="92c403b9" sha1="92e656bd9d9cfb4fbd6907678beacd5fe5a9bfd0" offset="0"/>
+	    <rom name="(sps24)manual.pdf" size="7755939" crc="08c3101b" sha1="2476d0644945c5409523c38c79d4510377764976" offset="0"/>
+	    <rom name="(sps24)poster.jpg" size="3750863" crc="bb827c5c" sha1="d20364ebfa9403cde062a09348d2c78c77c4ac70" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -28962,17 +28962,17 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="14315">
-		<rom name="(sps13)box.info" size="14315" crc="9f134e4b" sha1="280898674c3e10d1cdbad0f16cb988470da3908b" offset="0"/>
-		<rom name="(sps13)box_back.jpg" size="801974" crc="2077edac" sha1="87b17732e2f6797ce84f9308b799153150a70f40" offset="0"/>
-		<rom name="(sps13)box_front.jpg" size="695687" crc="7799a22b" sha1="b11c005fb314a8f768b577180a7467f22fa99bd4" offset="0"/>
-		<rom name="(sps13)box_side_left.jpg" size="71494" crc="4b8378fd" sha1="15bc64a95a2b6c9132ee99e3f18dfde45304aff4" offset="0"/>
-		<rom name="(sps13)cataloguelist.png" size="168402" crc="24fc70d7" sha1="8598b1ae02f14261a49d1ce7ebae71bee4ffb76e" offset="0"/>
-		<rom name="(sps13)disk.jpg" size="213119" crc="f37d8053" sha1="d140097d3313959a58d5b7045b7460bb62d6e5e4" offset="0"/>
-		<rom name="(sps13)gameinfo.xml" size="2637" crc="e49637ae" sha1="68a3d46e0f3a38a9285e6728c46c0ecb3272fa3a" offset="0"/>
-		<rom name="(sps13)manual.png" size="217064" crc="baeff74c" sha1="4e1d99ea4447178c2104401a0e04de263e49dd9a" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="14315">
+	    <rom name="(sps13)box.info" size="14315" crc="9f134e4b" sha1="280898674c3e10d1cdbad0f16cb988470da3908b" offset="0"/>
+	    <rom name="(sps13)box_back.jpg" size="801974" crc="2077edac" sha1="87b17732e2f6797ce84f9308b799153150a70f40" offset="0"/>
+	    <rom name="(sps13)box_front.jpg" size="695687" crc="7799a22b" sha1="b11c005fb314a8f768b577180a7467f22fa99bd4" offset="0"/>
+	    <rom name="(sps13)box_side_left.jpg" size="71494" crc="4b8378fd" sha1="15bc64a95a2b6c9132ee99e3f18dfde45304aff4" offset="0"/>
+	    <rom name="(sps13)cataloguelist.png" size="168402" crc="24fc70d7" sha1="8598b1ae02f14261a49d1ce7ebae71bee4ffb76e" offset="0"/>
+	    <rom name="(sps13)disk.jpg" size="213119" crc="f37d8053" sha1="d140097d3313959a58d5b7045b7460bb62d6e5e4" offset="0"/>
+	    <rom name="(sps13)gameinfo.xml" size="2637" crc="e49637ae" sha1="68a3d46e0f3a38a9285e6728c46c0ecb3272fa3a" offset="0"/>
+	    <rom name="(sps13)manual.png" size="217064" crc="baeff74c" sha1="4e1d99ea4447178c2104401a0e04de263e49dd9a" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 
@@ -30213,31 +30213,31 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="2478217">
-		<rom name="(sps20)box_back.jpg" size="2478217" crc="cb24cb96" sha1="d49783ed35dd9a8fbb3caf1bf202db308c81715e" offset="0"/>
-		<rom name="(sps20)box_front.jpg" size="1690292" crc="86652db1" sha1="d9accd66a334f454136ac37ee3aae4eb9c3d4060" offset="0"/>
-		<rom name="(sps20)box_side_bottom.jpg" size="426388" crc="b9aa6b0c" sha1="f59ef4c64bd626ed0f9cbdbd79c059420279c18f" offset="0"/>
-		<rom name="(sps20)box_side_left.jpg" size="465228" crc="0f19754e" sha1="89e82c330b15b580c42362a14e5dfab102dfa41a" offset="0"/>
-		<rom name="(sps20)box_side_right.jpg" size="456881" crc="d6e4ebd7" sha1="0a4679f80b529844c5bc6b4c8d408b4529da7535" offset="0"/>
-		<rom name="(sps20)box_side_top.jpg" size="386158" crc="883825cb" sha1="35387dfdbcd630174d202a80b6eb3b1ce90ad9c5" offset="0"/>
-		<rom name="(sps20)codewheel_bottom.jpg" size="1048252" crc="88df82aa" sha1="38802ff4b43bccfab0ce2f552c3316b1e252f165" offset="0"/>
-		<rom name="(sps20)codewheel_top.jpg" size="640044" crc="14a37251" sha1="dd22a6a9655b12d977590eac0c79c183718005ef" offset="0"/>
-		<rom name="(sps20)disk01.jpg" size="301089" crc="3c637bd7" sha1="7244dcfc70028e6e6dd7c07b9dcc140ea81fa1eb" offset="0"/>
-		<rom name="(sps20)disk02.jpg" size="290121" crc="0227f995" sha1="fa54770421e5f779b7b25e7eec9a3cce4df6c5ed" offset="0"/>
-		<rom name="(sps20)disk03.jpg" size="319727" crc="775cae31" sha1="293ad61f653804eafabeca136579a8a47e961c30" offset="0"/>
-		<rom name="(sps20)disk04.jpg" size="308990" crc="808766ad" sha1="528f482c0ceb58c5fb78cd36647b293963a2d7bf" offset="0"/>
-		<rom name="(sps20)disk05.jpg" size="306251" crc="2b5e2924" sha1="046b7d010d3782b10794d71eac12bc61784ff33e" offset="0"/>
-		<rom name="(sps20)disk06.jpg" size="299395" crc="23033db6" sha1="d4f216d0cab081f0c72ff87a0854fbc771ecc8b5" offset="0"/>
-		<rom name="(sps20)disk07.jpg" size="295456" crc="46fe1365" sha1="1ed02314437af516588d1e74269d4b736e2e935a" offset="0"/>
-		<rom name="(sps20)disk08.jpg" size="310125" crc="57b0b1d0" sha1="4708f2eef233c6478520377e9ba99eb354d9c842" offset="0"/>
-		<rom name="(sps20)disk09.jpg" size="397667" crc="22100a44" sha1="79b2e4238cda61837fdd0872f629c8f4a25aba73" offset="0"/>
-		<rom name="(sps20)disk10.jpg" size="316260" crc="a10847cc" sha1="d21a34f81b554fbfb679348765b74ae4fa15415b" offset="0"/>
-		<rom name="(sps20)disk11.jpg" size="360134" crc="b520a1b2" sha1="e56f013130d25cf0eda2f8b22701448ec4701de1" offset="0"/>
-		<rom name="(sps20)gameinfo.xml" size="5657" crc="02565915" sha1="e1c38a1151271ce344dee1e569ebda0fe21fc95c" offset="0"/>
-		<rom name="(sps20)manual.pdf" size="4433458" crc="1103a890" sha1="38d8dcd5bf04d6534e9e2ffdf8ac45682f27aef3" offset="0"/>
-		<rom name="(sps20)quickstartreferencecard.pdf" size="1116944" crc="b21c3077" sha1="292cbb8ef77891fb45ea71a31fb4a89852f12432" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="2478217">
+	    <rom name="(sps20)box_back.jpg" size="2478217" crc="cb24cb96" sha1="d49783ed35dd9a8fbb3caf1bf202db308c81715e" offset="0"/>
+	    <rom name="(sps20)box_front.jpg" size="1690292" crc="86652db1" sha1="d9accd66a334f454136ac37ee3aae4eb9c3d4060" offset="0"/>
+	    <rom name="(sps20)box_side_bottom.jpg" size="426388" crc="b9aa6b0c" sha1="f59ef4c64bd626ed0f9cbdbd79c059420279c18f" offset="0"/>
+	    <rom name="(sps20)box_side_left.jpg" size="465228" crc="0f19754e" sha1="89e82c330b15b580c42362a14e5dfab102dfa41a" offset="0"/>
+	    <rom name="(sps20)box_side_right.jpg" size="456881" crc="d6e4ebd7" sha1="0a4679f80b529844c5bc6b4c8d408b4529da7535" offset="0"/>
+	    <rom name="(sps20)box_side_top.jpg" size="386158" crc="883825cb" sha1="35387dfdbcd630174d202a80b6eb3b1ce90ad9c5" offset="0"/>
+	    <rom name="(sps20)codewheel_bottom.jpg" size="1048252" crc="88df82aa" sha1="38802ff4b43bccfab0ce2f552c3316b1e252f165" offset="0"/>
+	    <rom name="(sps20)codewheel_top.jpg" size="640044" crc="14a37251" sha1="dd22a6a9655b12d977590eac0c79c183718005ef" offset="0"/>
+	    <rom name="(sps20)disk01.jpg" size="301089" crc="3c637bd7" sha1="7244dcfc70028e6e6dd7c07b9dcc140ea81fa1eb" offset="0"/>
+	    <rom name="(sps20)disk02.jpg" size="290121" crc="0227f995" sha1="fa54770421e5f779b7b25e7eec9a3cce4df6c5ed" offset="0"/>
+	    <rom name="(sps20)disk03.jpg" size="319727" crc="775cae31" sha1="293ad61f653804eafabeca136579a8a47e961c30" offset="0"/>
+	    <rom name="(sps20)disk04.jpg" size="308990" crc="808766ad" sha1="528f482c0ceb58c5fb78cd36647b293963a2d7bf" offset="0"/>
+	    <rom name="(sps20)disk05.jpg" size="306251" crc="2b5e2924" sha1="046b7d010d3782b10794d71eac12bc61784ff33e" offset="0"/>
+	    <rom name="(sps20)disk06.jpg" size="299395" crc="23033db6" sha1="d4f216d0cab081f0c72ff87a0854fbc771ecc8b5" offset="0"/>
+	    <rom name="(sps20)disk07.jpg" size="295456" crc="46fe1365" sha1="1ed02314437af516588d1e74269d4b736e2e935a" offset="0"/>
+	    <rom name="(sps20)disk08.jpg" size="310125" crc="57b0b1d0" sha1="4708f2eef233c6478520377e9ba99eb354d9c842" offset="0"/>
+	    <rom name="(sps20)disk09.jpg" size="397667" crc="22100a44" sha1="79b2e4238cda61837fdd0872f629c8f4a25aba73" offset="0"/>
+	    <rom name="(sps20)disk10.jpg" size="316260" crc="a10847cc" sha1="d21a34f81b554fbfb679348765b74ae4fa15415b" offset="0"/>
+	    <rom name="(sps20)disk11.jpg" size="360134" crc="b520a1b2" sha1="e56f013130d25cf0eda2f8b22701448ec4701de1" offset="0"/>
+	    <rom name="(sps20)gameinfo.xml" size="5657" crc="02565915" sha1="e1c38a1151271ce344dee1e569ebda0fe21fc95c" offset="0"/>
+	    <rom name="(sps20)manual.pdf" size="4433458" crc="1103a890" sha1="38d8dcd5bf04d6534e9e2ffdf8ac45682f27aef3" offset="0"/>
+	    <rom name="(sps20)quickstartreferencecard.pdf" size="1116944" crc="b21c3077" sha1="292cbb8ef77891fb45ea71a31fb4a89852f12432" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -32539,19 +32539,19 @@
 	</part>
 	<!--
 	<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 1" />
-		<dataarea name="flop" size="12347">
-		<rom name="(sps1654)grille de protection operation stealth.png" size="12347" crc="655d4326" sha1="adf620826fa2ba2e86ee8d398d61c20064c31b82" offset="0"/>
-		<rom name="(sps1654)operation_stealth_disk_1.jpg" size="125193" crc="d28e94d9" sha1="f3a099b7ef5b900768f92b036901f154b1605b73" offset="0"/>
-		<rom name="(sps1654)operation_stealth_disk_2.jpg" size="126629" crc="ad430648" sha1="42bfad4fcd94e8c8b74e5233cb1d41d0332c7221" offset="0"/>
-		<rom name="(sps1654)operation_stealth_disk_3.jpg" size="124981" crc="685a9c50" sha1="462f0ad2da906b49021029496c4f975e8158909d" offset="0"/>
-		<rom name="(sps1654)operation_stealth_doc_1-2.jpg" size="648779" crc="54157b10" sha1="9a9efefadf97de97d7c7c530da9a1c28711e2c37" offset="0"/>
-		<rom name="(sps1654)operation_stealth_doc_3-4.jpg" size="674780" crc="f2843814" sha1="ea2922a62f4151454fc22cdf5d14ea9946e03be9" offset="0"/>
-		<rom name="(sps1654)operation_stealth_doc_5-6.jpg" size="853189" crc="5119e0ac" sha1="7f823f865e3ffea7cdf69912949cf96d2ee543ed" offset="0"/>
-		<rom name="(sps1654)operation_stealth_doc_7-8.jpg" size="679619" crc="c50a8b2c" sha1="b430b8097d75fea9114d40ae62342bd1fbd7c901" offset="0"/>
-		<rom name="(sps1654)operation_stealth_doc_9-10.jpg" size="842489" crc="f1fb2ab3" sha1="bf8df1a4202d9a7e3fc6d52f12d80831cdec8a8a" offset="0"/>
-		<rom name="(sps1654)operation_stealth_doc_back_front.jpg" size="585411" crc="71b699a8" sha1="e8f76fdc478087c1b626857fd4492825d9a693ee" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Disk 1" />
+	  <dataarea name="flop" size="12347">
+	    <rom name="(sps1654)grille de protection operation stealth.png" size="12347" crc="655d4326" sha1="adf620826fa2ba2e86ee8d398d61c20064c31b82" offset="0"/>
+	    <rom name="(sps1654)operation_stealth_disk_1.jpg" size="125193" crc="d28e94d9" sha1="f3a099b7ef5b900768f92b036901f154b1605b73" offset="0"/>
+	    <rom name="(sps1654)operation_stealth_disk_2.jpg" size="126629" crc="ad430648" sha1="42bfad4fcd94e8c8b74e5233cb1d41d0332c7221" offset="0"/>
+	    <rom name="(sps1654)operation_stealth_disk_3.jpg" size="124981" crc="685a9c50" sha1="462f0ad2da906b49021029496c4f975e8158909d" offset="0"/>
+	    <rom name="(sps1654)operation_stealth_doc_1-2.jpg" size="648779" crc="54157b10" sha1="9a9efefadf97de97d7c7c530da9a1c28711e2c37" offset="0"/>
+	    <rom name="(sps1654)operation_stealth_doc_3-4.jpg" size="674780" crc="f2843814" sha1="ea2922a62f4151454fc22cdf5d14ea9946e03be9" offset="0"/>
+	    <rom name="(sps1654)operation_stealth_doc_5-6.jpg" size="853189" crc="5119e0ac" sha1="7f823f865e3ffea7cdf69912949cf96d2ee543ed" offset="0"/>
+	    <rom name="(sps1654)operation_stealth_doc_7-8.jpg" size="679619" crc="c50a8b2c" sha1="b430b8097d75fea9114d40ae62342bd1fbd7c901" offset="0"/>
+	    <rom name="(sps1654)operation_stealth_doc_9-10.jpg" size="842489" crc="f1fb2ab3" sha1="bf8df1a4202d9a7e3fc6d52f12d80831cdec8a8a" offset="0"/>
+	    <rom name="(sps1654)operation_stealth_doc_back_front.jpg" size="585411" crc="71b699a8" sha1="e8f76fdc478087c1b626857fd4492825d9a693ee" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -33042,19 +33042,19 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="52538">
-		<rom name="(sps23)badge.jpg" size="52538" crc="1cd63e9e" sha1="01bbc955bc330c3a5b37a5b3e1c8eeb77ab4746e" offset="0"/>
-		<rom name="(sps23)box.info" size="14027" crc="0f08f323" sha1="e42c268c84421ab58212a8e0e0afe9fb7922139c" offset="0"/>
-		<rom name="(sps23)box_back.jpg" size="865879" crc="d40cf4e5" sha1="7f6d361d4aef68e0ce90d7f0b24b6734e3e35587" offset="0"/>
-		<rom name="(sps23)box_front.jpg" size="868112" crc="a23dbbcf" sha1="c722768328e6fda50c43ec84bc65b1d36af64488" offset="0"/>
-		<rom name="(sps23)box_front_left.jpg" size="128278" crc="9d485017" sha1="d0d9df3d3a262f6b55d42c7f91441711e5180795" offset="0"/>
-		<rom name="(sps23)disk.jpg" size="185974" crc="0bf30d48" sha1="be37447d4850965356b9951035f1e81b01641caa" offset="0"/>
-		<rom name="(sps23)gameinfo.xml" size="2526" crc="1c950d22" sha1="0de24bc3d650b834add7ac2f91f2973e9e522337" offset="0"/>
-		<rom name="(sps23)manual_1.png" size="220837" crc="045c9273" sha1="f469996814379f5918281f4bab74c9a580083a5f" offset="0"/>
-		<rom name="(sps23)manual_2.png" size="110067" crc="f3997d42" sha1="a6235ffb368ab91556b6bc3bbdc2b1fc447c50d8" offset="0"/>
-		<rom name="(sps23)poster.jpg" size="9355525" crc="0ec1329d" sha1="8dec8e14a9ea7601206eedf1d8f467b698278cc1" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="52538">
+	    <rom name="(sps23)badge.jpg" size="52538" crc="1cd63e9e" sha1="01bbc955bc330c3a5b37a5b3e1c8eeb77ab4746e" offset="0"/>
+	    <rom name="(sps23)box.info" size="14027" crc="0f08f323" sha1="e42c268c84421ab58212a8e0e0afe9fb7922139c" offset="0"/>
+	    <rom name="(sps23)box_back.jpg" size="865879" crc="d40cf4e5" sha1="7f6d361d4aef68e0ce90d7f0b24b6734e3e35587" offset="0"/>
+	    <rom name="(sps23)box_front.jpg" size="868112" crc="a23dbbcf" sha1="c722768328e6fda50c43ec84bc65b1d36af64488" offset="0"/>
+	    <rom name="(sps23)box_front_left.jpg" size="128278" crc="9d485017" sha1="d0d9df3d3a262f6b55d42c7f91441711e5180795" offset="0"/>
+	    <rom name="(sps23)disk.jpg" size="185974" crc="0bf30d48" sha1="be37447d4850965356b9951035f1e81b01641caa" offset="0"/>
+	    <rom name="(sps23)gameinfo.xml" size="2526" crc="1c950d22" sha1="0de24bc3d650b834add7ac2f91f2973e9e522337" offset="0"/>
+	    <rom name="(sps23)manual_1.png" size="220837" crc="045c9273" sha1="f469996814379f5918281f4bab74c9a580083a5f" offset="0"/>
+	    <rom name="(sps23)manual_2.png" size="110067" crc="f3997d42" sha1="a6235ffb368ab91556b6bc3bbdc2b1fc447c50d8" offset="0"/>
+	    <rom name="(sps23)poster.jpg" size="9355525" crc="0ec1329d" sha1="8dec8e14a9ea7601206eedf1d8f467b698278cc1" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -33848,20 +33848,20 @@
 
 	<!--
 	<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 1" />
-		<dataarea name="flop" size="1303737">
-		<rom name="(sps25)box_back.jpg" size="1303737" crc="a25bc6e7" sha1="1015c465def6928a4104fd10bb5436b50f3eafc1" offset="0"/>
-		<rom name="(sps25)box_front.jpg" size="1313095" crc="5910509c" sha1="2ed23eb3413d83f635b17b59171d6da665092a90" offset="0"/>
-		<rom name="(sps25)box_front_bottom.jpg" size="171743" crc="cef3bd43" sha1="6bf6317eb7152e49568bc8d281db14809d37c3b0" offset="0"/>
-		<rom name="(sps25)box_front_left.jpg" size="185002" crc="521fc02f" sha1="63df1f01dcd80606e6061f9173dbf5422b193c89" offset="0"/>
-		<rom name="(sps25)box_front_right.jpg" size="174889" crc="204fabbb" sha1="48f5594c864826c3247ba8c302a7b6833abe4f3c" offset="0"/>
-		<rom name="(sps25)box_front_top.jpg" size="165037" crc="3cedec27" sha1="af79bcb1e6f7b15a49b3ca2448f5848283e01e48" offset="0"/>
-		<rom name="(sps25)coursedisk1.jpg" size="222405" crc="829001e9" sha1="81c6d1981ba64d2760209644dad5cb14e6c89c58" offset="0"/>
-		<rom name="(sps25)coursedisk2.jpg" size="224976" crc="2cec0714" sha1="dae9eb73d79d91aa6d9bea4406a00a2af3166c0f" offset="0"/>
-		<rom name="(sps25)disk1.jpg" size="197837" crc="51476cd7" sha1="861648f5a7ada354cbdc37e0453c6f5735229d7f" offset="0"/>
-		<rom name="(sps25)gameinfo.xml" size="2863" crc="ddf1a15d" sha1="8db6bc214f611a2684b7f4a8d60dd82724099c72" offset="0"/>
-		<rom name="(sps25)manual.pdf" size="6053457" crc="9232e428" sha1="8a342d49227d5b49a4d26bbd449fbfb93ad8ab0c" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Disk 1" />
+	  <dataarea name="flop" size="1303737">
+	    <rom name="(sps25)box_back.jpg" size="1303737" crc="a25bc6e7" sha1="1015c465def6928a4104fd10bb5436b50f3eafc1" offset="0"/>
+	    <rom name="(sps25)box_front.jpg" size="1313095" crc="5910509c" sha1="2ed23eb3413d83f635b17b59171d6da665092a90" offset="0"/>
+	    <rom name="(sps25)box_front_bottom.jpg" size="171743" crc="cef3bd43" sha1="6bf6317eb7152e49568bc8d281db14809d37c3b0" offset="0"/>
+	    <rom name="(sps25)box_front_left.jpg" size="185002" crc="521fc02f" sha1="63df1f01dcd80606e6061f9173dbf5422b193c89" offset="0"/>
+	    <rom name="(sps25)box_front_right.jpg" size="174889" crc="204fabbb" sha1="48f5594c864826c3247ba8c302a7b6833abe4f3c" offset="0"/>
+	    <rom name="(sps25)box_front_top.jpg" size="165037" crc="3cedec27" sha1="af79bcb1e6f7b15a49b3ca2448f5848283e01e48" offset="0"/>
+	    <rom name="(sps25)coursedisk1.jpg" size="222405" crc="829001e9" sha1="81c6d1981ba64d2760209644dad5cb14e6c89c58" offset="0"/>
+	    <rom name="(sps25)coursedisk2.jpg" size="224976" crc="2cec0714" sha1="dae9eb73d79d91aa6d9bea4406a00a2af3166c0f" offset="0"/>
+	    <rom name="(sps25)disk1.jpg" size="197837" crc="51476cd7" sha1="861648f5a7ada354cbdc37e0453c6f5735229d7f" offset="0"/>
+	    <rom name="(sps25)gameinfo.xml" size="2863" crc="ddf1a15d" sha1="8db6bc214f611a2684b7f4a8d60dd82724099c72" offset="0"/>
+	    <rom name="(sps25)manual.pdf" size="6053457" crc="9232e428" sha1="8a342d49227d5b49a4d26bbd449fbfb93ad8ab0c" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 
@@ -34518,20 +34518,20 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="853803">
-		<rom name="(sps69)box_back.jpg" size="853803" crc="b1712cc6" sha1="648b9b10d12922bc2226cb600f23d55fca55b7d1" offset="0"/>
-		<rom name="(sps69)box_front.jpg" size="698923" crc="957d43ac" sha1="59cb1768ddbb738823cf187636072d610de046b0" offset="0"/>
-		<rom name="(sps69)box_front_bottom.jpg" size="159101" crc="52233b96" sha1="056e3e0b913c85f04b9236bba4c1ea391ec4d77f" offset="0"/>
-		<rom name="(sps69)box_front_left.jpg" size="133759" crc="2f5c4593" sha1="63c9c67f3c5e2ff4718dc98c56af017762e86771" offset="0"/>
-		<rom name="(sps69)box_front_right.jpg" size="125325" crc="becdb4d1" sha1="c649a525379d836e93a6e82a7a53433188dff071" offset="0"/>
-		<rom name="(sps69)box_front_top.jpg" size="146256" crc="f46754b1" sha1="a6265b79acafb025c25e39ab5aae4b970023298f" offset="0"/>
-		<rom name="(sps69)disk.jpg" size="188101" crc="3d07c032" sha1="c11d9aa5d442c1c1518594a9460be7af0cef2831" offset="0"/>
-		<rom name="(sps69)electronicartswarrantycard.pdf" size="77697" crc="c9e28b32" sha1="6cbbdd5c11ef9e4ad8b242ac0efb5e60df584abb" offset="0"/>
-		<rom name="(sps69)gameinfo.xml" size="3015" crc="da11bd2f" sha1="08407c339edf13ed1123b3e0f0caeea11adf5c1e" offset="0"/>
-		<rom name="(sps69)guide.pdf" size="628774" crc="a770a032" sha1="2fc94bedf637aaff86f3e0748df40bd250d9d41b" offset="0"/>
-		<rom name="(sps69)manual.pdf" size="4487193" crc="6a2e2c12" sha1="c35b1ef8d110e6bf7f18e8e1be5a26c87017ca35" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="853803">
+	    <rom name="(sps69)box_back.jpg" size="853803" crc="b1712cc6" sha1="648b9b10d12922bc2226cb600f23d55fca55b7d1" offset="0"/>
+	    <rom name="(sps69)box_front.jpg" size="698923" crc="957d43ac" sha1="59cb1768ddbb738823cf187636072d610de046b0" offset="0"/>
+	    <rom name="(sps69)box_front_bottom.jpg" size="159101" crc="52233b96" sha1="056e3e0b913c85f04b9236bba4c1ea391ec4d77f" offset="0"/>
+	    <rom name="(sps69)box_front_left.jpg" size="133759" crc="2f5c4593" sha1="63c9c67f3c5e2ff4718dc98c56af017762e86771" offset="0"/>
+	    <rom name="(sps69)box_front_right.jpg" size="125325" crc="becdb4d1" sha1="c649a525379d836e93a6e82a7a53433188dff071" offset="0"/>
+	    <rom name="(sps69)box_front_top.jpg" size="146256" crc="f46754b1" sha1="a6265b79acafb025c25e39ab5aae4b970023298f" offset="0"/>
+	    <rom name="(sps69)disk.jpg" size="188101" crc="3d07c032" sha1="c11d9aa5d442c1c1518594a9460be7af0cef2831" offset="0"/>
+	    <rom name="(sps69)electronicartswarrantycard.pdf" size="77697" crc="c9e28b32" sha1="6cbbdd5c11ef9e4ad8b242ac0efb5e60df584abb" offset="0"/>
+	    <rom name="(sps69)gameinfo.xml" size="3015" crc="da11bd2f" sha1="08407c339edf13ed1123b3e0f0caeea11adf5c1e" offset="0"/>
+	    <rom name="(sps69)guide.pdf" size="628774" crc="a770a032" sha1="2fc94bedf637aaff86f3e0748df40bd250d9d41b" offset="0"/>
+	    <rom name="(sps69)manual.pdf" size="4487193" crc="6a2e2c12" sha1="c35b1ef8d110e6bf7f18e8e1be5a26c87017ca35" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -34553,10 +34553,10 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="1242">
-		<rom name="(sps70)gameinfo.xml" size="1242" crc="c631e204" sha1="77491c8f15845a979d1aa5e5436cc97ea4c22a6f" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="1242">
+	    <rom name="(sps70)gameinfo.xml" size="1242" crc="c631e204" sha1="77491c8f15845a979d1aa5e5436cc97ea4c22a6f" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -34708,12 +34708,12 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="156102">
-		<rom name="(sps140)disk.jpg" size="156102" crc="558e972a" sha1="c0f7fe89100654950c47326923806d0bcb2467d0" offset="0"/>
-		<rom name="(sps140)powerdrome_front.jpg" size="901132" crc="8c70eed6" sha1="725715f1b2a4cc5f42c6598cd940aeaf19e9736f" offset="0"/>
-		<rom name="(sps140)powerdrome_inside.jpg" size="1110578" crc="d1db14c1" sha1="c7495b4dae1264fde9a30a0a731a88368f406ca1" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="156102">
+	    <rom name="(sps140)disk.jpg" size="156102" crc="558e972a" sha1="c0f7fe89100654950c47326923806d0bcb2467d0" offset="0"/>
+	    <rom name="(sps140)powerdrome_front.jpg" size="901132" crc="8c70eed6" sha1="725715f1b2a4cc5f42c6598cd940aeaf19e9736f" offset="0"/>
+	    <rom name="(sps140)powerdrome_inside.jpg" size="1110578" crc="d1db14c1" sha1="c7495b4dae1264fde9a30a0a731a88368f406ca1" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -35686,18 +35686,18 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="1944788">
-		<rom name="(sps41)box_back.jpg" size="1944788" crc="b5604320" sha1="8b229267f197f94ac1ef33472d17bb34c11ba798" offset="0"/>
-		<rom name="(sps41)box_front.jpg" size="2073932" crc="fa5d8f19" sha1="29c30b593b994a2c7b6537035370282a46dbc3e8" offset="0"/>
-		<rom name="(sps41)box_front_bottom.jpg" size="179347" crc="dcc66c85" sha1="8fe38f0700ec24f15962f59efc981c7fc0f1e422" offset="0"/>
-		<rom name="(sps41)box_front_left.jpg" size="150310" crc="7878dc6c" sha1="31cf036e56bab35c8059792702c9cab34cf9449b" offset="0"/>
-		<rom name="(sps41)box_front_right.jpg" size="164310" crc="ae446b48" sha1="e4e60c6be6240fa75fde933532d23ea0378b67d7" offset="0"/>
-		<rom name="(sps41)box_front_top.jpg" size="177517" crc="82b74141" sha1="39ed9737d93b55799a74688529d3b3f9f68bdc0b" offset="0"/>
-		<rom name="(sps41)disk.jpg" size="323196" crc="8efac245" sha1="ddb1e316b7f0fa62609fd89fbc9f5cb8bf6a5b0a" offset="0"/>
-		<rom name="(sps41)gameinfo.xml" size="2293" crc="a13fbce5" sha1="e7c23f8469b3daab13aa4670c57a354e8d9babc7" offset="0"/>
-		<rom name="(sps41)manual.pdf" size="1852308" crc="a98e0c1e" sha1="e458c35f53f0331e81b7c41f79c62858f3cdde38" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="1944788">
+	    <rom name="(sps41)box_back.jpg" size="1944788" crc="b5604320" sha1="8b229267f197f94ac1ef33472d17bb34c11ba798" offset="0"/>
+	    <rom name="(sps41)box_front.jpg" size="2073932" crc="fa5d8f19" sha1="29c30b593b994a2c7b6537035370282a46dbc3e8" offset="0"/>
+	    <rom name="(sps41)box_front_bottom.jpg" size="179347" crc="dcc66c85" sha1="8fe38f0700ec24f15962f59efc981c7fc0f1e422" offset="0"/>
+	    <rom name="(sps41)box_front_left.jpg" size="150310" crc="7878dc6c" sha1="31cf036e56bab35c8059792702c9cab34cf9449b" offset="0"/>
+	    <rom name="(sps41)box_front_right.jpg" size="164310" crc="ae446b48" sha1="e4e60c6be6240fa75fde933532d23ea0378b67d7" offset="0"/>
+	    <rom name="(sps41)box_front_top.jpg" size="177517" crc="82b74141" sha1="39ed9737d93b55799a74688529d3b3f9f68bdc0b" offset="0"/>
+	    <rom name="(sps41)disk.jpg" size="323196" crc="8efac245" sha1="ddb1e316b7f0fa62609fd89fbc9f5cb8bf6a5b0a" offset="0"/>
+	    <rom name="(sps41)gameinfo.xml" size="2293" crc="a13fbce5" sha1="e7c23f8469b3daab13aa4670c57a354e8d9babc7" offset="0"/>
+	    <rom name="(sps41)manual.pdf" size="1852308" crc="a98e0c1e" sha1="e458c35f53f0331e81b7c41f79c62858f3cdde38" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -36056,17 +36056,17 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="714780">
-		<rom name="(sps21)box_back.jpg" size="714780" crc="71d35122" sha1="0fa29588e406cd6837c404f05008af427ae7c19e" offset="0"/>
-		<rom name="(sps21)box_front.jpg" size="800231" crc="9960c482" sha1="cbfa535daaf53d38c56edd0b0dc7107a26426c50" offset="0"/>
-		<rom name="(sps21)box_side_bottom.jpg" size="149131" crc="739dcd5f" sha1="4f0f2191881dc0fd997074c032179e53252af22a" offset="0"/>
-		<rom name="(sps21)box_side_left.jpg" size="185335" crc="2ba8ad15" sha1="cbe59c0b5bb8a76ee9dccf38a467c3208040785f" offset="0"/>
-		<rom name="(sps21)box_side_top.jpg" size="151259" crc="effe4bbe" sha1="7b9dd165375eb368e2029710ed07eae1a5b01a84" offset="0"/>
-		<rom name="(sps21)disk.jpg" size="181491" crc="dd6a498f" sha1="f4edc5f6d649278db2a55bf195d214ac84399ec5" offset="0"/>
-		<rom name="(sps21)gameinfo.xml" size="2397" crc="0c9e9b90" sha1="d42da00e63272710d6ad80b6a100ea5fb020fdca" offset="0"/>
-		<rom name="(sps21)manual.png" size="422289" crc="2c91c998" sha1="bfef8c396641b34e9b7e1283d209334c2e9e27bb" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="714780">
+	    <rom name="(sps21)box_back.jpg" size="714780" crc="71d35122" sha1="0fa29588e406cd6837c404f05008af427ae7c19e" offset="0"/>
+	    <rom name="(sps21)box_front.jpg" size="800231" crc="9960c482" sha1="cbfa535daaf53d38c56edd0b0dc7107a26426c50" offset="0"/>
+	    <rom name="(sps21)box_side_bottom.jpg" size="149131" crc="739dcd5f" sha1="4f0f2191881dc0fd997074c032179e53252af22a" offset="0"/>
+	    <rom name="(sps21)box_side_left.jpg" size="185335" crc="2ba8ad15" sha1="cbe59c0b5bb8a76ee9dccf38a467c3208040785f" offset="0"/>
+	    <rom name="(sps21)box_side_top.jpg" size="151259" crc="effe4bbe" sha1="7b9dd165375eb368e2029710ed07eae1a5b01a84" offset="0"/>
+	    <rom name="(sps21)disk.jpg" size="181491" crc="dd6a498f" sha1="f4edc5f6d649278db2a55bf195d214ac84399ec5" offset="0"/>
+	    <rom name="(sps21)gameinfo.xml" size="2397" crc="0c9e9b90" sha1="d42da00e63272710d6ad80b6a100ea5fb020fdca" offset="0"/>
+	    <rom name="(sps21)manual.png" size="422289" crc="2c91c998" sha1="bfef8c396641b34e9b7e1283d209334c2e9e27bb" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 
@@ -36189,22 +36189,22 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="12391">
-		<rom name="(sps12)box.info" size="12391" crc="2137ac8d" sha1="6fd7cb889ae8e5de7a60aa8b0419b93c5a2f32df" offset="0"/>
-		<rom name="(sps12)box_back.jpg" size="1025987" crc="a07cecec" sha1="cca8e1b6169d9d68966fa8dc9238a1038b563ba4" offset="0"/>
-		<rom name="(sps12)box_bottom.jpg" size="104425" crc="4d4a538c" sha1="c286ff6bae7d4009d7d546fd4688909ca6b24d42" offset="0"/>
-		<rom name="(sps12)box_front.jpg" size="1286289" crc="f65563d8" sha1="6f8139e3f3af1a2ea0a6894a8911b3a6331b59de" offset="0"/>
-		<rom name="(sps12)box_left.jpg" size="156406" crc="eacb12ce" sha1="02423684f5f23fdf498b30f593a9d3d20708b3df" offset="0"/>
-		<rom name="(sps12)box_right.jpg" size="185444" crc="1240b625" sha1="77527f995cba3b48c1e030bcc407fdac52d4b7b8" offset="0"/>
-		<rom name="(sps12)box_top.jpg" size="148760" crc="35cc61b1" sha1="1abbd358cd1da8bc5847042049fc5f7799403fd1" offset="0"/>
-		<rom name="(sps12)disk.jpg" size="146472" crc="529c0a4f" sha1="ec0b31b9da2b2d6955a50a4606e9136ccd11db2c" offset="0"/>
-		<rom name="(sps12)gameinfo.xml" size="2941" crc="48ed77c0" sha1="44c45c42dfee8227e6a6b5f22e01ec8f6d888652" offset="0"/>
-		<rom name="(sps12)manual_1.png" size="746655" crc="b9057dfc" sha1="ab71beace9223027e9e03fc831312d56424fa49e" offset="0"/>
-		<rom name="(sps12)manual_2.png" size="868749" crc="c96ba396" sha1="c0723bc037bb419a1faea7330fd9c475a930c582" offset="0"/>
-		<rom name="(sps12)manual_3.png" size="969515" crc="63220d57" sha1="a0abaa4f6964b35fd05b3a8c9374a48dda40c040" offset="0"/>
-		<rom name="(sps12)manual_4.png" size="901948" crc="4a2eff2c" sha1="2ba881945ec79444110cd204b9bd6c30e7080161" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="12391">
+	    <rom name="(sps12)box.info" size="12391" crc="2137ac8d" sha1="6fd7cb889ae8e5de7a60aa8b0419b93c5a2f32df" offset="0"/>
+	    <rom name="(sps12)box_back.jpg" size="1025987" crc="a07cecec" sha1="cca8e1b6169d9d68966fa8dc9238a1038b563ba4" offset="0"/>
+	    <rom name="(sps12)box_bottom.jpg" size="104425" crc="4d4a538c" sha1="c286ff6bae7d4009d7d546fd4688909ca6b24d42" offset="0"/>
+	    <rom name="(sps12)box_front.jpg" size="1286289" crc="f65563d8" sha1="6f8139e3f3af1a2ea0a6894a8911b3a6331b59de" offset="0"/>
+	    <rom name="(sps12)box_left.jpg" size="156406" crc="eacb12ce" sha1="02423684f5f23fdf498b30f593a9d3d20708b3df" offset="0"/>
+	    <rom name="(sps12)box_right.jpg" size="185444" crc="1240b625" sha1="77527f995cba3b48c1e030bcc407fdac52d4b7b8" offset="0"/>
+	    <rom name="(sps12)box_top.jpg" size="148760" crc="35cc61b1" sha1="1abbd358cd1da8bc5847042049fc5f7799403fd1" offset="0"/>
+	    <rom name="(sps12)disk.jpg" size="146472" crc="529c0a4f" sha1="ec0b31b9da2b2d6955a50a4606e9136ccd11db2c" offset="0"/>
+	    <rom name="(sps12)gameinfo.xml" size="2941" crc="48ed77c0" sha1="44c45c42dfee8227e6a6b5f22e01ec8f6d888652" offset="0"/>
+	    <rom name="(sps12)manual_1.png" size="746655" crc="b9057dfc" sha1="ab71beace9223027e9e03fc831312d56424fa49e" offset="0"/>
+	    <rom name="(sps12)manual_2.png" size="868749" crc="c96ba396" sha1="c0723bc037bb419a1faea7330fd9c475a930c582" offset="0"/>
+	    <rom name="(sps12)manual_3.png" size="969515" crc="63220d57" sha1="a0abaa4f6964b35fd05b3a8c9374a48dda40c040" offset="0"/>
+	    <rom name="(sps12)manual_4.png" size="901948" crc="4a2eff2c" sha1="2ba881945ec79444110cd204b9bd6c30e7080161" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 
@@ -36241,10 +36241,10 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="1188">
-		<rom name="(sps26)gameinfo.xml" size="1188" crc="173cc8fd" sha1="fcf3259e7c906d251b5249c89e57c308c219446f" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="1188">
+	    <rom name="(sps26)gameinfo.xml" size="1188" crc="173cc8fd" sha1="fcf3259e7c906d251b5249c89e57c308c219446f" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 
@@ -37720,20 +37720,20 @@
 
 	<!--
 	<part name="flop1" interface="floppy_3_5">
-		<feature name="part_id" value="Disk 1" />
-		<dataarea name="flop" size="832117">
-		<rom name="(sps9)box_back.jpg" size="832117" crc="8e3c2bdf" sha1="45671d3e52ed070dca33e74277ef4bd1e9cf7737" offset="0"/>
-		<rom name="(sps9)box_back_right.jpg" size="159489" crc="e6d2a10d" sha1="e85b0946fe92a5f31bfcf897d01a0c66dbcb0664" offset="0"/>
-		<rom name="(sps9)box_back_top.jpg" size="121066" crc="6fbd13b7" sha1="1363faef7f41a4f1a29d357f77bb7d321d192950" offset="0"/>
-		<rom name="(sps9)box_front.jpg" size="849050" crc="428b0d4e" sha1="8a47b122e365cb4d6ba3acce2e1a4f5af7bec5de" offset="0"/>
-		<rom name="(sps9)box_side_bottom.jpg" size="160040" crc="22b9be92" sha1="d17df7c0dee094c7e101aa5d0b1d309b1bab4681" offset="0"/>
-		<rom name="(sps9)box_side_left.jpg" size="174307" crc="8ee92615" sha1="6df6a1ed23546cd82f6bc913ab165902d1b0de88" offset="0"/>
-		<rom name="(sps9)box_side_right.jpg" size="172481" crc="e07b1a20" sha1="b0e90ec5e5b4dcf91adf7e66511ad8359993683e" offset="0"/>
-		<rom name="(sps9)box_side_top.jpg" size="164056" crc="0e4c6f11" sha1="dbb1875b7a7b1449ba023b1b19590bffec2205b9" offset="0"/>
-		<rom name="(sps9)disk.jpg" size="139351" crc="2c1e562b" sha1="5c393998238d798a8f895a6202781d1153299d1d" offset="0"/>
-		<rom name="(sps9)gameinfo.xml" size="2971" crc="60ba98c0" sha1="8c538561a2cee3fdec0443e34497e6da5942cd9e" offset="0"/>
-		<rom name="(sps9)manual.pdf" size="14801967" crc="6e3d72d8" sha1="1658871cde963f4521f9e662900e86dec021ce98" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Disk 1" />
+	  <dataarea name="flop" size="832117">
+	    <rom name="(sps9)box_back.jpg" size="832117" crc="8e3c2bdf" sha1="45671d3e52ed070dca33e74277ef4bd1e9cf7737" offset="0"/>
+	    <rom name="(sps9)box_back_right.jpg" size="159489" crc="e6d2a10d" sha1="e85b0946fe92a5f31bfcf897d01a0c66dbcb0664" offset="0"/>
+	    <rom name="(sps9)box_back_top.jpg" size="121066" crc="6fbd13b7" sha1="1363faef7f41a4f1a29d357f77bb7d321d192950" offset="0"/>
+	    <rom name="(sps9)box_front.jpg" size="849050" crc="428b0d4e" sha1="8a47b122e365cb4d6ba3acce2e1a4f5af7bec5de" offset="0"/>
+	    <rom name="(sps9)box_side_bottom.jpg" size="160040" crc="22b9be92" sha1="d17df7c0dee094c7e101aa5d0b1d309b1bab4681" offset="0"/>
+	    <rom name="(sps9)box_side_left.jpg" size="174307" crc="8ee92615" sha1="6df6a1ed23546cd82f6bc913ab165902d1b0de88" offset="0"/>
+	    <rom name="(sps9)box_side_right.jpg" size="172481" crc="e07b1a20" sha1="b0e90ec5e5b4dcf91adf7e66511ad8359993683e" offset="0"/>
+	    <rom name="(sps9)box_side_top.jpg" size="164056" crc="0e4c6f11" sha1="dbb1875b7a7b1449ba023b1b19590bffec2205b9" offset="0"/>
+	    <rom name="(sps9)disk.jpg" size="139351" crc="2c1e562b" sha1="5c393998238d798a8f895a6202781d1153299d1d" offset="0"/>
+	    <rom name="(sps9)gameinfo.xml" size="2971" crc="60ba98c0" sha1="8c538561a2cee3fdec0443e34497e6da5942cd9e" offset="0"/>
+	    <rom name="(sps9)manual.pdf" size="14801967" crc="6e3d72d8" sha1="1658871cde963f4521f9e662900e86dec021ce98" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 
@@ -38309,16 +38309,16 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="1086382">
-		<rom name="(sps62)box_back.jpg" size="1086382" crc="bf12b971" sha1="3197dd42828945214dcd55c527d38eb8f52aff21" offset="0"/>
-		<rom name="(sps62)box_front.jpg" size="1350060" crc="26d49ee4" sha1="829cb6d6820e90293d298d7642b4ca73a70f2c55" offset="0"/>
-		<rom name="(sps62)box_spine.jpg" size="174474" crc="196f7521" sha1="72511888a496fede90a7971549b4cdadb8165d19" offset="0"/>
-		<rom name="(sps62)disk.jpg" size="244360" crc="8e813057" sha1="97e10c201fb407d12e0904c60bbf5d125d2fc10e" offset="0"/>
-		<rom name="(sps62)gameinfo.xml" size="2422" crc="bb6746f4" sha1="1a198dd055fb3ad3b6dcc38e7a09a10e5a79fe16" offset="0"/>
-		<rom name="(sps62)manualpage1.png" size="186735" crc="6c80c496" sha1="7d3885eee4b0626d75535b8f72383f857d67be1d" offset="0"/>
-		<rom name="(sps62)manualpage2.png" size="221189" crc="275ee06f" sha1="59424f3bdfa7b3b90cf9ed0f8478fd158ebf389b" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="1086382">
+	    <rom name="(sps62)box_back.jpg" size="1086382" crc="bf12b971" sha1="3197dd42828945214dcd55c527d38eb8f52aff21" offset="0"/>
+	    <rom name="(sps62)box_front.jpg" size="1350060" crc="26d49ee4" sha1="829cb6d6820e90293d298d7642b4ca73a70f2c55" offset="0"/>
+	    <rom name="(sps62)box_spine.jpg" size="174474" crc="196f7521" sha1="72511888a496fede90a7971549b4cdadb8165d19" offset="0"/>
+	    <rom name="(sps62)disk.jpg" size="244360" crc="8e813057" sha1="97e10c201fb407d12e0904c60bbf5d125d2fc10e" offset="0"/>
+	    <rom name="(sps62)gameinfo.xml" size="2422" crc="bb6746f4" sha1="1a198dd055fb3ad3b6dcc38e7a09a10e5a79fe16" offset="0"/>
+	    <rom name="(sps62)manualpage1.png" size="186735" crc="6c80c496" sha1="7d3885eee4b0626d75535b8f72383f857d67be1d" offset="0"/>
+	    <rom name="(sps62)manualpage2.png" size="221189" crc="275ee06f" sha1="59424f3bdfa7b3b90cf9ed0f8478fd158ebf389b" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -39623,17 +39623,17 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="13523">
-		<rom name="(sps51)box.info" size="13523" crc="3fa97557" sha1="447a569d5ab7516d729028e0f8cc1c9b224cc7b3" offset="0"/>
-		<rom name="(sps51)box_back.jpg" size="733963" crc="cf015f45" sha1="b17ec4c2ba9d5a24a44d5179be40d4e312bbc7e8" offset="0"/>
-		<rom name="(sps51)box_front.jpg" size="760407" crc="18b92d6b" sha1="907bb6c628825cd6bdaf32a9d509ead2b9e07bc9" offset="0"/>
-		<rom name="(sps51)box_spine.jpg" size="24897" crc="5e5d9c2e" sha1="c7b858b445746e05d9b951a31d34bc6b778deab7" offset="0"/>
-		<rom name="(sps51)disk.jpg" size="271478" crc="2cc64601" sha1="c585cadfe007b05b6d4503372c48378fada258fc" offset="0"/>
-		<rom name="(sps51)gameinfo.xml" size="2041" crc="7df926e2" sha1="5b381b4a6979f620ec80e6064f1ea67b118d6c51" offset="0"/>
-		<rom name="(sps51)inlay1.png" size="228725" crc="a5b9fd5d" sha1="ed6d7419ad9e0c5c08e6d89c2fbf6f9a9dd57175" offset="0"/>
-		<rom name="(sps51)inlay2.png" size="266397" crc="21939715" sha1="2dbed0fb63a86b4e80d8e1ceefb6bb7a153b1e5d" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="13523">
+	    <rom name="(sps51)box.info" size="13523" crc="3fa97557" sha1="447a569d5ab7516d729028e0f8cc1c9b224cc7b3" offset="0"/>
+	    <rom name="(sps51)box_back.jpg" size="733963" crc="cf015f45" sha1="b17ec4c2ba9d5a24a44d5179be40d4e312bbc7e8" offset="0"/>
+	    <rom name="(sps51)box_front.jpg" size="760407" crc="18b92d6b" sha1="907bb6c628825cd6bdaf32a9d509ead2b9e07bc9" offset="0"/>
+	    <rom name="(sps51)box_spine.jpg" size="24897" crc="5e5d9c2e" sha1="c7b858b445746e05d9b951a31d34bc6b778deab7" offset="0"/>
+	    <rom name="(sps51)disk.jpg" size="271478" crc="2cc64601" sha1="c585cadfe007b05b6d4503372c48378fada258fc" offset="0"/>
+	    <rom name="(sps51)gameinfo.xml" size="2041" crc="7df926e2" sha1="5b381b4a6979f620ec80e6064f1ea67b118d6c51" offset="0"/>
+	    <rom name="(sps51)inlay1.png" size="228725" crc="a5b9fd5d" sha1="ed6d7419ad9e0c5c08e6d89c2fbf6f9a9dd57175" offset="0"/>
+	    <rom name="(sps51)inlay2.png" size="266397" crc="21939715" sha1="2dbed0fb63a86b4e80d8e1ceefb6bb7a153b1e5d" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -44116,24 +44116,24 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="1126499">
-		<rom name="(sps38)advert.jpg" size="1126499" crc="196ab2c1" sha1="ebe5bd9b047ff5e41112a3f9234a38157447f53f" offset="0"/>
-		<rom name="(sps38)badge.jpg" size="44005" crc="5999667f" sha1="da4c5497b6668776a09ada79d65e54a683e38a56" offset="0"/>
-		<rom name="(sps38)box_back.jpg" size="1465820" crc="34e2d504" sha1="d5468c737e146060c84e82f3888edea065c09067" offset="0"/>
-		<rom name="(sps38)box_front.jpg" size="1634945" crc="fdb2f097" sha1="31c25bedfab16270847a2906554d1ef4157d2656" offset="0"/>
-		<rom name="(sps38)box_front_bottom.jpg" size="115874" crc="b6ae350d" sha1="5bba73cae995bbee31258f39cac42451ef22b133" offset="0"/>
-		<rom name="(sps38)box_front_left.jpg" size="95678" crc="2d4498b3" sha1="6ce6f952984bc31922ce8430aaed3caa45f765cd" offset="0"/>
-		<rom name="(sps38)box_front_right.jpg" size="100298" crc="3e533058" sha1="ff23a12498eb27f2b746414cb9865aceabee9960" offset="0"/>
-		<rom name="(sps38)box_front_top.jpg" size="180703" crc="31572b7a" sha1="453269f5cf65591572e403940aa0484f5d7f7b82" offset="0"/>
-		<rom name="(sps38)deutsch.png" size="317315" crc="c5012e01" sha1="a72b843df3b47ed257cdcea166d0099288e351c3" offset="0"/>
-		<rom name="(sps38)disk.jpg" size="317689" crc="c2215546" sha1="698f634cc2635a236151eae9e13e1f1675bc34f5" offset="0"/>
-		<rom name="(sps38)english.png" size="307468" crc="cc63e14d" sha1="71c6d537a49f8c04be3553d0e15ea09e6ac9a710" offset="0"/>
-		<rom name="(sps38)francais.png" size="294902" crc="72a2bb3d" sha1="4dd6c7e08a9269c45b55f0ce46b97738aa74a246" offset="0"/>
-		<rom name="(sps38)gameinfo.xml" size="3085" crc="c897d9b2" sha1="1ab08d30e57b83c77599ef4238c5b0cb454db6c2" offset="0"/>
-		<rom name="(sps38)italiano.png" size="292437" crc="9bd2bc06" sha1="0e32e63abc97c98573581d91f1d3a7c38067fbf5" offset="0"/>
-		<rom name="(sps38)poster.jpg" size="6193754" crc="84ea38a4" sha1="4fbd0d87fc147229daadead4047fa65d34ca962f" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="1126499">
+	    <rom name="(sps38)advert.jpg" size="1126499" crc="196ab2c1" sha1="ebe5bd9b047ff5e41112a3f9234a38157447f53f" offset="0"/>
+	    <rom name="(sps38)badge.jpg" size="44005" crc="5999667f" sha1="da4c5497b6668776a09ada79d65e54a683e38a56" offset="0"/>
+	    <rom name="(sps38)box_back.jpg" size="1465820" crc="34e2d504" sha1="d5468c737e146060c84e82f3888edea065c09067" offset="0"/>
+	    <rom name="(sps38)box_front.jpg" size="1634945" crc="fdb2f097" sha1="31c25bedfab16270847a2906554d1ef4157d2656" offset="0"/>
+	    <rom name="(sps38)box_front_bottom.jpg" size="115874" crc="b6ae350d" sha1="5bba73cae995bbee31258f39cac42451ef22b133" offset="0"/>
+	    <rom name="(sps38)box_front_left.jpg" size="95678" crc="2d4498b3" sha1="6ce6f952984bc31922ce8430aaed3caa45f765cd" offset="0"/>
+	    <rom name="(sps38)box_front_right.jpg" size="100298" crc="3e533058" sha1="ff23a12498eb27f2b746414cb9865aceabee9960" offset="0"/>
+	    <rom name="(sps38)box_front_top.jpg" size="180703" crc="31572b7a" sha1="453269f5cf65591572e403940aa0484f5d7f7b82" offset="0"/>
+	    <rom name="(sps38)deutsch.png" size="317315" crc="c5012e01" sha1="a72b843df3b47ed257cdcea166d0099288e351c3" offset="0"/>
+	    <rom name="(sps38)disk.jpg" size="317689" crc="c2215546" sha1="698f634cc2635a236151eae9e13e1f1675bc34f5" offset="0"/>
+	    <rom name="(sps38)english.png" size="307468" crc="cc63e14d" sha1="71c6d537a49f8c04be3553d0e15ea09e6ac9a710" offset="0"/>
+	    <rom name="(sps38)francais.png" size="294902" crc="72a2bb3d" sha1="4dd6c7e08a9269c45b55f0ce46b97738aa74a246" offset="0"/>
+	    <rom name="(sps38)gameinfo.xml" size="3085" crc="c897d9b2" sha1="1ab08d30e57b83c77599ef4238c5b0cb454db6c2" offset="0"/>
+	    <rom name="(sps38)italiano.png" size="292437" crc="9bd2bc06" sha1="0e32e63abc97c98573581d91f1d3a7c38067fbf5" offset="0"/>
+	    <rom name="(sps38)poster.jpg" size="6193754" crc="84ea38a4" sha1="4fbd0d87fc147229daadead4047fa65d34ca962f" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>
@@ -45485,16 +45485,16 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="9489">
-		<rom name="(sps7)box.info" size="9489" crc="aa8d5766" sha1="d776325c100f4c382c8a83974c541846f8b17eb0" offset="0"/>
-		<rom name="(sps7)box_back.jpg" size="1269045" crc="cf638916" sha1="06b2327a2cb150f52a3454cbf5994621e6b72a67" offset="0"/>
-		<rom name="(sps7)box_front.jpg" size="1160386" crc="26c4fc37" sha1="ca78008762fcd0e3e24414ede413b2080747e16e" offset="0"/>
-		<rom name="(sps7)box_side_left.jpg" size="139583" crc="71701c7c" sha1="16d019d55d3adbb7132cacaf19cf7d48af81665d" offset="0"/>
-		<rom name="(sps7)disk.jpg" size="196026" crc="b523b95b" sha1="c31cb7444431cfec1fa783462a2b0b556ea04293" offset="0"/>
-		<rom name="(sps7)gameinfo.xml" size="2333" crc="52c30c8c" sha1="79d3dc62756d2cfeeec037546ace0d6a08dd51fe" offset="0"/>
-		<rom name="(sps7)manual.pdf" size="16376768" crc="e60b3083" sha1="2861ec23f8a0862966133de8f10d3c6ace8572fe" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="9489">
+	    <rom name="(sps7)box.info" size="9489" crc="aa8d5766" sha1="d776325c100f4c382c8a83974c541846f8b17eb0" offset="0"/>
+	    <rom name="(sps7)box_back.jpg" size="1269045" crc="cf638916" sha1="06b2327a2cb150f52a3454cbf5994621e6b72a67" offset="0"/>
+	    <rom name="(sps7)box_front.jpg" size="1160386" crc="26c4fc37" sha1="ca78008762fcd0e3e24414ede413b2080747e16e" offset="0"/>
+	    <rom name="(sps7)box_side_left.jpg" size="139583" crc="71701c7c" sha1="16d019d55d3adbb7132cacaf19cf7d48af81665d" offset="0"/>
+	    <rom name="(sps7)disk.jpg" size="196026" crc="b523b95b" sha1="c31cb7444431cfec1fa783462a2b0b556ea04293" offset="0"/>
+	    <rom name="(sps7)gameinfo.xml" size="2333" crc="52c30c8c" sha1="79d3dc62756d2cfeeec037546ace0d6a08dd51fe" offset="0"/>
+	    <rom name="(sps7)manual.pdf" size="16376768" crc="e60b3083" sha1="2861ec23f8a0862966133de8f10d3c6ace8572fe" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 
@@ -47056,19 +47056,19 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="775554">
-		<rom name="(sps29)box_back.jpg" size="775554" crc="70b0fd2c" sha1="f0239d42623e2779e9d9aa5df6d715a93573f4fb" offset="0"/>
-		<rom name="(sps29)box_front.jpg" size="583588" crc="e17c0c58" sha1="d93353c7e096503654378f07b9693b7d96bdd65e" offset="0"/>
-		<rom name="(sps29)box_side_bottom.jpg" size="198279" crc="c4e23303" sha1="6fe2b624155a1917eb48dd25513147ad5ad1dec2" offset="0"/>
-		<rom name="(sps29)box_side_left.jpg" size="254448" crc="705310c1" sha1="312dfb39f64407f9233086ec893feaabf2b7bb8a" offset="0"/>
-		<rom name="(sps29)box_side_right.jpg" size="214413" crc="a6efc327" sha1="7aaafc5d1956ef681aa2275092634a81603bf438" offset="0"/>
-		<rom name="(sps29)box_side_top.jpg" size="171907" crc="6e8de586" sha1="826c4f0e905b9000d4adbab54b65eee82be3c9bf" offset="0"/>
-		<rom name="(sps29)disk.jpg" size="279911" crc="dde4b43b" sha1="1ba8808602fd16f0ba7e82ebd170cedf68f80952" offset="0"/>
-		<rom name="(sps29)gameinfo.xml" size="2598" crc="31728c61" sha1="25fb40e525c391b81ddf0093d1eea626ca5d4a9d" offset="0"/>
-		<rom name="(sps29)manual.pdf" size="5147332" crc="8d5b412d" sha1="b4d0dda3aa806c598447427b1b9e6de4a5a3e496" offset="0"/>
-		<rom name="(sps29)poster.jpg" size="5051924" crc="e9ee40cb" sha1="f1394e28259e17fd2ab8deaee844ce420e123816" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="775554">
+	    <rom name="(sps29)box_back.jpg" size="775554" crc="70b0fd2c" sha1="f0239d42623e2779e9d9aa5df6d715a93573f4fb" offset="0"/>
+	    <rom name="(sps29)box_front.jpg" size="583588" crc="e17c0c58" sha1="d93353c7e096503654378f07b9693b7d96bdd65e" offset="0"/>
+	    <rom name="(sps29)box_side_bottom.jpg" size="198279" crc="c4e23303" sha1="6fe2b624155a1917eb48dd25513147ad5ad1dec2" offset="0"/>
+	    <rom name="(sps29)box_side_left.jpg" size="254448" crc="705310c1" sha1="312dfb39f64407f9233086ec893feaabf2b7bb8a" offset="0"/>
+	    <rom name="(sps29)box_side_right.jpg" size="214413" crc="a6efc327" sha1="7aaafc5d1956ef681aa2275092634a81603bf438" offset="0"/>
+	    <rom name="(sps29)box_side_top.jpg" size="171907" crc="6e8de586" sha1="826c4f0e905b9000d4adbab54b65eee82be3c9bf" offset="0"/>
+	    <rom name="(sps29)disk.jpg" size="279911" crc="dde4b43b" sha1="1ba8808602fd16f0ba7e82ebd170cedf68f80952" offset="0"/>
+	    <rom name="(sps29)gameinfo.xml" size="2598" crc="31728c61" sha1="25fb40e525c391b81ddf0093d1eea626ca5d4a9d" offset="0"/>
+	    <rom name="(sps29)manual.pdf" size="5147332" crc="8d5b412d" sha1="b4d0dda3aa806c598447427b1b9e6de4a5a3e496" offset="0"/>
+	    <rom name="(sps29)poster.jpg" size="5051924" crc="e9ee40cb" sha1="f1394e28259e17fd2ab8deaee844ce420e123816" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 
@@ -47747,34 +47747,34 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="1691089">
-		<rom name="(sps33)box_back.jpg" size="1691089" crc="95d38f0c" sha1="77403fc923f492f47a651109ca7c0c4522686e3b" offset="0"/>
-		<rom name="(sps33)box_front.jpg" size="1690995" crc="85037db4" sha1="222b7050def362972dc345ddadae6b5c1d8a8661" offset="0"/>
-		<rom name="(sps33)box_front_bottom.jpg" size="68487" crc="03bde9d3" sha1="60c2fa563d7252709ad3dd929ee8861de29a06fd" offset="0"/>
-		<rom name="(sps33)box_front_left.jpg" size="181963" crc="0247ae0e" sha1="807e325aae113652a215d626b5bf5703a862308c" offset="0"/>
-		<rom name="(sps33)box_front_right.jpg" size="165830" crc="dc85363a" sha1="640c4c7acfc1a98ab77582d669e87b911f1a77fd" offset="0"/>
-		<rom name="(sps33)box_front_top.jpg" size="99054" crc="5738afa4" sha1="8f5a2b8d8268759cbbca4c225b9e93c17b7390de" offset="0"/>
-		<rom name="(sps33)disk1.jpg" size="196694" crc="3c94edab" sha1="409a454df5df539b4b693fe512de6d43d9cbd865" offset="0"/>
-		<rom name="(sps33)disk2.jpg" size="240098" crc="aad018fc" sha1="117f308650e504d9d2f10383c176ecfefc7ccf05" offset="0"/>
-		<rom name="(sps33)disk3.jpg" size="231555" crc="8c444d25" sha1="6671f0b6d230d38b7e3fb16d8c4198ad6ae74be2" offset="0"/>
-		<rom name="(sps33)gameinfo.xml" size="2713" crc="e6515146" sha1="1ccd8b1f68678fee66ffcf1d6f7fc53ca2cb698c" offset="0"/>
-		<rom name="(sps33)manual.pdf" size="4642825" crc="e05832a7" sha1="1240144f19b55977fd4ff00ee863b89235d653f3" offset="0"/>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="1691089">
+	    <rom name="(sps33)box_back.jpg" size="1691089" crc="95d38f0c" sha1="77403fc923f492f47a651109ca7c0c4522686e3b" offset="0"/>
+	    <rom name="(sps33)box_front.jpg" size="1690995" crc="85037db4" sha1="222b7050def362972dc345ddadae6b5c1d8a8661" offset="0"/>
+	    <rom name="(sps33)box_front_bottom.jpg" size="68487" crc="03bde9d3" sha1="60c2fa563d7252709ad3dd929ee8861de29a06fd" offset="0"/>
+	    <rom name="(sps33)box_front_left.jpg" size="181963" crc="0247ae0e" sha1="807e325aae113652a215d626b5bf5703a862308c" offset="0"/>
+	    <rom name="(sps33)box_front_right.jpg" size="165830" crc="dc85363a" sha1="640c4c7acfc1a98ab77582d669e87b911f1a77fd" offset="0"/>
+	    <rom name="(sps33)box_front_top.jpg" size="99054" crc="5738afa4" sha1="8f5a2b8d8268759cbbca4c225b9e93c17b7390de" offset="0"/>
+	    <rom name="(sps33)disk1.jpg" size="196694" crc="3c94edab" sha1="409a454df5df539b4b693fe512de6d43d9cbd865" offset="0"/>
+	    <rom name="(sps33)disk2.jpg" size="240098" crc="aad018fc" sha1="117f308650e504d9d2f10383c176ecfefc7ccf05" offset="0"/>
+	    <rom name="(sps33)disk3.jpg" size="231555" crc="8c444d25" sha1="6671f0b6d230d38b7e3fb16d8c4198ad6ae74be2" offset="0"/>
+	    <rom name="(sps33)gameinfo.xml" size="2713" crc="e6515146" sha1="1ccd8b1f68678fee66ffcf1d6f7fc53ca2cb698c" offset="0"/>
+	    <rom name="(sps33)manual.pdf" size="4642825" crc="e05832a7" sha1="1240144f19b55977fd4ff00ee863b89235d653f3" offset="0"/>
 
-		tosec had different versions?
+	    tosec had different versions?
 
-		<rom name="(sps0033)box.info" size="11331" crc="a5bbafc4" sha1="66af26effd5ee4c8db868950842c00adebc165d2" offset="0"/>
-		<rom name="(sps0033)box_back.jpg" size="1100477" crc="6476456b" sha1="9246c08c11ab29b6c0fb876dd6c10189b0f596f0" offset="0"/>
-		<rom name="(sps0033)box_front.jpg" size="1214575" crc="a221d4a6" sha1="01dd79e278e206b14953fa07bacdb033425a4b24" offset="0"/>
-		<rom name="(sps0033)box_front_bottom.jpg" size="86355" crc="15df23e0" sha1="ae21d9b2c1db70f60cff082d483d023b7b5fd5a5" offset="0"/>
-		<rom name="(sps0033)box_front_left.jpg" size="142321" crc="85837cfa" sha1="44d2c48ea60bfe14ac43a8271191f2ceed921872" offset="0"/>
-		<rom name="(sps0033)box_front_right.jpg" size="140738" crc="22c553b1" sha1="a3574d491b3e0180252edb8ec7866c1fc1582779" offset="0"/>
-		<rom name="(sps0033)box_front_top.jpg" size="95934" crc="7d83ffe4" sha1="e7721a934b3069806bab7b7cbcc5866907c1bbc8" offset="0"/>
-		<rom name="(sps0033)disk1.jpg" size="219754" crc="27973fd0" sha1="075768e0c23cf33ce4c7a8765989bd48344f721a" offset="0"/>
-		<rom name="(sps0033)disk2.jpg" size="220623" crc="f802e83d" sha1="5c527749b16983d295dd265af2ad8120385cb1d5" offset="0"/>
-		<rom name="(sps0033)disk3.jpg" size="195915" crc="b40a7953" sha1="7425a006a81c171f78908858a0ce8d9c25b06eb5" offset="0"/>
-		<rom name="(sps0033)gameinfo.xml" size="2794" crc="9c320952" sha1="3c69017b4594d15bfcc099f4e23aae2cb4256401" offset="0"/>
-		<rom name="(sps0033)manual.pdf" size="4054145" crc="f8ec2bae" sha1="74b887c9758f7d2f84c2f4120bfbc53688e6d70b" offset="0"/>
+	    <rom name="(sps0033)box.info" size="11331" crc="a5bbafc4" sha1="66af26effd5ee4c8db868950842c00adebc165d2" offset="0"/>
+	    <rom name="(sps0033)box_back.jpg" size="1100477" crc="6476456b" sha1="9246c08c11ab29b6c0fb876dd6c10189b0f596f0" offset="0"/>
+	    <rom name="(sps0033)box_front.jpg" size="1214575" crc="a221d4a6" sha1="01dd79e278e206b14953fa07bacdb033425a4b24" offset="0"/>
+	    <rom name="(sps0033)box_front_bottom.jpg" size="86355" crc="15df23e0" sha1="ae21d9b2c1db70f60cff082d483d023b7b5fd5a5" offset="0"/>
+	    <rom name="(sps0033)box_front_left.jpg" size="142321" crc="85837cfa" sha1="44d2c48ea60bfe14ac43a8271191f2ceed921872" offset="0"/>
+	    <rom name="(sps0033)box_front_right.jpg" size="140738" crc="22c553b1" sha1="a3574d491b3e0180252edb8ec7866c1fc1582779" offset="0"/>
+	    <rom name="(sps0033)box_front_top.jpg" size="95934" crc="7d83ffe4" sha1="e7721a934b3069806bab7b7cbcc5866907c1bbc8" offset="0"/>
+	    <rom name="(sps0033)disk1.jpg" size="219754" crc="27973fd0" sha1="075768e0c23cf33ce4c7a8765989bd48344f721a" offset="0"/>
+	    <rom name="(sps0033)disk2.jpg" size="220623" crc="f802e83d" sha1="5c527749b16983d295dd265af2ad8120385cb1d5" offset="0"/>
+	    <rom name="(sps0033)disk3.jpg" size="195915" crc="b40a7953" sha1="7425a006a81c171f78908858a0ce8d9c25b06eb5" offset="0"/>
+	    <rom name="(sps0033)gameinfo.xml" size="2794" crc="9c320952" sha1="3c69017b4594d15bfcc099f4e23aae2cb4256401" offset="0"/>
+	    <rom name="(sps0033)manual.pdf" size="4054145" crc="f8ec2bae" sha1="74b887c9758f7d2f84c2f4120bfbc53688e6d70b" offset="0"/>
 	</dataarea>
 	</part>
 	-->
@@ -48188,15 +48188,15 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="589412">
-		<rom name="(sps4)box_back.jpg" size="589412" crc="6cffaeda" sha1="24d08264eaacfd303d8fefdf51e0e7f9baacb566" offset="0"/>
-		<rom name="(sps4)box_front.jpg" size="560967" crc="50268167" sha1="b45dc6b45d8907337c2623537eaaca6e923f4617" offset="0"/>
-		<rom name="(sps4)box_side_left.jpg" size="56161" crc="aab0303b" sha1="2c2ea8dbb1c72ba65ce66e6ebc40175bd80a6bfb" offset="0"/>
-		<rom name="(sps4)disk.jpg" size="105116" crc="fba78b69" sha1="aee451b67858f7e6c54133b30a4bdf29d227a499" offset="0"/>
-		<rom name="(sps4)gameinfo.xml" size="2258" crc="02fb5fd4" sha1="05153b96a7ca82ea62531c62ceea1faf7ee02be1" offset="0"/>
-		<rom name="(sps4)manual.pdf" size="3870276" crc="d3714614" sha1="f06b289ac4d5ba054e6d4f4a3607f09d157dccda" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="589412">
+	    <rom name="(sps4)box_back.jpg" size="589412" crc="6cffaeda" sha1="24d08264eaacfd303d8fefdf51e0e7f9baacb566" offset="0"/>
+	    <rom name="(sps4)box_front.jpg" size="560967" crc="50268167" sha1="b45dc6b45d8907337c2623537eaaca6e923f4617" offset="0"/>
+	    <rom name="(sps4)box_side_left.jpg" size="56161" crc="aab0303b" sha1="2c2ea8dbb1c72ba65ce66e6ebc40175bd80a6bfb" offset="0"/>
+	    <rom name="(sps4)disk.jpg" size="105116" crc="fba78b69" sha1="aee451b67858f7e6c54133b30a4bdf29d227a499" offset="0"/>
+	    <rom name="(sps4)gameinfo.xml" size="2258" crc="02fb5fd4" sha1="05153b96a7ca82ea62531c62ceea1faf7ee02be1" offset="0"/>
+	    <rom name="(sps4)manual.pdf" size="3870276" crc="d3714614" sha1="f06b289ac4d5ba054e6d4f4a3607f09d157dccda" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 
@@ -49739,23 +49739,23 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="995690">
-		<rom name="(sps1)box_back.jpg" size="995690" crc="d1c45fb7" sha1="87d90089eb135bb023bcba5aa011bff18eeb63fc" offset="0"/>
-		<rom name="(sps1)box_front.jpg" size="1060855" crc="631cf271" sha1="3296885f50652d5890ac19fbb77b902f63e1b817" offset="0"/>
-		<rom name="(sps1)box_side_bottom.jpg" size="154366" crc="50a81a9b" sha1="09b88c5fec5a45e60981005671ad8556489c6f44" offset="0"/>
-		<rom name="(sps1)box_side_left.jpg" size="104155" crc="7f6e1320" sha1="0671c0ed9a7c877bb0dc4f111dbb1dcb88ecd0fd" offset="0"/>
-		<rom name="(sps1)box_side_right.jpg" size="104219" crc="ce93a29e" sha1="ed03e33253a025d88d3e201ca7d23baa3fd311da" offset="0"/>
-		<rom name="(sps1)box_side_top.jpg" size="164910" crc="2ea40395" sha1="aa0db754189694e9611c9c347ebc64a3d208704f" offset="0"/>
-		<rom name="(sps1)disk.jpg" size="149805" crc="fdb5d5aa" sha1="3cc7378a32a272a688b394a6138122e27b9174d7" offset="0"/>
-		<rom name="(sps1)gameinfo.xml" size="3076" crc="d4111374" sha1="338050c8c9ae60094b5d15acc19cbdf7a4992086" offset="0"/>
-		<rom name="(sps1)guidetomonsters.jpg" size="1035389" crc="8ed50196" sha1="bb0f6b30fd55ddbfb79511b3e2ed63b716dca4a3" offset="0"/>
-		<rom name="(sps1)guidetospells.jpg" size="607200" crc="3a415072" sha1="d9cd159aa50aedc8a4ad0a078f7e31f6fde3fa92" offset="0"/>
-		<rom name="(sps1)letter.png" size="671710" crc="09976811" sha1="31a453a472ccb92bae1c0887837361bda661b87f" offset="0"/>
-		<rom name="(sps1)loadingaddendum.png" size="211243" crc="7da54440" sha1="a7bbe9d07816be9dc2119a5cf2bd0cd407edaa13" offset="0"/>
-		<rom name="(sps1)manual.pdf" size="4908522" crc="255ceaa7" sha1="b3c5fd7ef0dce88f9ff7c5aca1ea0a6fd8c32b80" offset="0"/>
-		<rom name="(sps1)wizardwarz.info" size="10501" crc="e26ed682" sha1="4db6becd24981aa0b6c4f912992485101f94e5d1" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="995690">
+	    <rom name="(sps1)box_back.jpg" size="995690" crc="d1c45fb7" sha1="87d90089eb135bb023bcba5aa011bff18eeb63fc" offset="0"/>
+	    <rom name="(sps1)box_front.jpg" size="1060855" crc="631cf271" sha1="3296885f50652d5890ac19fbb77b902f63e1b817" offset="0"/>
+	    <rom name="(sps1)box_side_bottom.jpg" size="154366" crc="50a81a9b" sha1="09b88c5fec5a45e60981005671ad8556489c6f44" offset="0"/>
+	    <rom name="(sps1)box_side_left.jpg" size="104155" crc="7f6e1320" sha1="0671c0ed9a7c877bb0dc4f111dbb1dcb88ecd0fd" offset="0"/>
+	    <rom name="(sps1)box_side_right.jpg" size="104219" crc="ce93a29e" sha1="ed03e33253a025d88d3e201ca7d23baa3fd311da" offset="0"/>
+	    <rom name="(sps1)box_side_top.jpg" size="164910" crc="2ea40395" sha1="aa0db754189694e9611c9c347ebc64a3d208704f" offset="0"/>
+	    <rom name="(sps1)disk.jpg" size="149805" crc="fdb5d5aa" sha1="3cc7378a32a272a688b394a6138122e27b9174d7" offset="0"/>
+	    <rom name="(sps1)gameinfo.xml" size="3076" crc="d4111374" sha1="338050c8c9ae60094b5d15acc19cbdf7a4992086" offset="0"/>
+	    <rom name="(sps1)guidetomonsters.jpg" size="1035389" crc="8ed50196" sha1="bb0f6b30fd55ddbfb79511b3e2ed63b716dca4a3" offset="0"/>
+	    <rom name="(sps1)guidetospells.jpg" size="607200" crc="3a415072" sha1="d9cd159aa50aedc8a4ad0a078f7e31f6fde3fa92" offset="0"/>
+	    <rom name="(sps1)letter.png" size="671710" crc="09976811" sha1="31a453a472ccb92bae1c0887837361bda661b87f" offset="0"/>
+	    <rom name="(sps1)loadingaddendum.png" size="211243" crc="7da54440" sha1="a7bbe9d07816be9dc2119a5cf2bd0cd407edaa13" offset="0"/>
+	    <rom name="(sps1)manual.pdf" size="4908522" crc="255ceaa7" sha1="b3c5fd7ef0dce88f9ff7c5aca1ea0a6fd8c32b80" offset="0"/>
+	    <rom name="(sps1)wizardwarz.info" size="10501" crc="e26ed682" sha1="4db6becd24981aa0b6c4f912992485101f94e5d1" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 
@@ -50618,15 +50618,15 @@
 
 	<!--
 	<part name="misc" interface="floppy_3_5">
-		<feature name="part_id" value="Misc" />
-		<dataarea name="flop" size="456692">
-		<rom name="(sps0)box_back.jpg" size="456692" crc="a1b81107" sha1="f2fd1ac6ec5c215579f9790d28e35c365ba7de85" offset="0"/>
-		<rom name="(sps0)box_front.jpg" size="559665" crc="fbd29ac6" sha1="4a4ae6c00873253b5ba2d300aacdb42548e15e73" offset="0"/>
-		<rom name="(sps0)box_front_left.jpg" size="48443" crc="f7e16529" sha1="1d41dfb2ead4218c84c9c78f6fa5cf35b4e28db7" offset="0"/>
-		<rom name="(sps0)disk.jpg" size="173032" crc="0393edc2" sha1="658773574a93904cc33b217ba8166b7c8a7a62c4" offset="0"/>
-		<rom name="(sps0)gameinfo.xml" size="2118" crc="b3919ffd" sha1="178f16215f5b8018676539f6926e7049a2a89051" offset="0"/>
-		<rom name="(sps0)inlay.png" size="233878" crc="6755c06b" sha1="b55f334e588154549218d3297c8e8f4c662e5520" offset="0"/>
-		</dataarea>
+	  <feature name="part_id" value="Misc" />
+	  <dataarea name="flop" size="456692">
+	    <rom name="(sps0)box_back.jpg" size="456692" crc="a1b81107" sha1="f2fd1ac6ec5c215579f9790d28e35c365ba7de85" offset="0"/>
+	    <rom name="(sps0)box_front.jpg" size="559665" crc="fbd29ac6" sha1="4a4ae6c00873253b5ba2d300aacdb42548e15e73" offset="0"/>
+	    <rom name="(sps0)box_front_left.jpg" size="48443" crc="f7e16529" sha1="1d41dfb2ead4218c84c9c78f6fa5cf35b4e28db7" offset="0"/>
+	    <rom name="(sps0)disk.jpg" size="173032" crc="0393edc2" sha1="658773574a93904cc33b217ba8166b7c8a7a62c4" offset="0"/>
+	    <rom name="(sps0)gameinfo.xml" size="2118" crc="b3919ffd" sha1="178f16215f5b8018676539f6926e7049a2a89051" offset="0"/>
+	    <rom name="(sps0)inlay.png" size="233878" crc="6755c06b" sha1="b55f334e588154549218d3297c8e8f4c662e5520" offset="0"/>
+	  </dataarea>
 	</part>
 	-->
 	</software>

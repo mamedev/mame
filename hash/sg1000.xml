@@ -3,10 +3,10 @@
 <!-- Othello Multivision carts are marked with OMV.
 
 Canceled titles (possibly exist in prototype form)
-	C-62    Champion Ski (by Sega)
-	OM-G009 Challenge Soccer (by Tsukuda)
-	OM-G010 Great Escape 2 (by Tsukuda)
-	-->
+  C-62    Champion Ski (by Sega)
+  OM-G009 Challenge Soccer (by Tsukuda)
+  OM-G010 Great Escape 2 (by Tsukuda)
+ -->
 <!--
 The following games were available both as Golden Carts and as MyCards.
 I'm not sure from what version the dumps below come (or it they have been
@@ -18,7 +18,7 @@ C-26 - Star Force
 C-33 - Champion Boxing [dumped and verified to be diff from G-1033]
 C-43 - Zippy Race
 
-	-->
+ -->
 <!--
 Many SG-1000 games were also sold in Taiwan by Aaronix
 These are now mostly dumped (thanks to Bock and SMS Power)
@@ -336,7 +336,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 	</software>
 
 <!-- This has been hacked to work in emus, by mirroring the first 8K up to 32K and then adding the second 8K. This can be removed when the emulation
-	of this kind of carts have been fixed (running the 16K image results in missing graphics, among other things, see the title screen) -->
+  of this kind of carts have been fixed (running the 16K image results in missing graphics, among other things, see the title screen) -->
 	<software name="chaldrbyb" cloneof="chaldrby">
 		<description>Challenge Derby (Jpn, OMV, Hacked)</description>
 		<year>1984</year>

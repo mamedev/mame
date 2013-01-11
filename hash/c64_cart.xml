@@ -1,71 +1,71 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="c64_cart" description="Commodore 64 cartridges">
 
 <!--
 
-	Hardware to be emulated
+    Hardware to be emulated
 
-	CPU replacements:
-	- Turbo Master CPU (R65C02P4 @ 4.09 MHz)
-	- Turbo Process Accelerator (65C816P-4  @ 50kHz-4MHz)
-	- Flash 8 (65816 @ 8 MHz, 4/8 MB RAM)
-	- CMD SuperCPU 64 (65C816S, 64 KB RAM)
-	- Data 20 Z-80 Video Pak (Z80, 80 column video)
+    CPU replacements:
+    - Turbo Master CPU (R65C02P4 @ 4.09 MHz)
+    - Turbo Process Accelerator (65C816P-4  @ 50kHz-4MHz)
+    - Flash 8 (65816 @ 8 MHz, 4/8 MB RAM)
+    - CMD SuperCPU 64 (65C816S, 64 KB RAM)
+    - Data 20 Z-80 Video Pak (Z80, 80 column video)
 
-	Serial I/O:
-	- CMD SwiftLink (6551 @ 3.6864 MHz)
-	- CMD Turbo232
-	- HART (8251)
+    Serial I/O:
+    - CMD SwiftLink (6551 @ 3.6864 MHz)
+    - CMD Turbo232
+    - HART (8251)
 
-	RAM expansions:
-	- CMD RAMLink
-	- CMD RAMDrive
-	- CMD REU 1750XL
-	- Commodore REU 1700/1750/1764
-	- Rex RAM-Floppy 256K
-	- Rex Goliath 1MB
-	- RAM-Cart
-	- Silicon Disk System
+    RAM expansions:
+    - CMD RAMLink
+    - CMD RAMDrive
+    - CMD REU 1750XL
+    - Commodore REU 1700/1750/1764
+    - Rex RAM-Floppy 256K
+    - Rex Goliath 1MB
+    - RAM-Cart
+    - Silicon Disk System
 
-	Hard disks:
-	- Lt. Kernal
+    Hard disks:
+    - Lt. Kernal
 
-	Audio:
-	- Currah Speech 64 (Currah, 1984)
-	- Easy Speech 64 (Currah, 1984)
-	- Voice Messenger (Currah, 1984)
-	- Votalker (Votrax, 1986)
-	- ProVoice (Genesis, 1986)
-	- SID Symphony
-	- MSSIAH
-	- Synthetiseur Vocal
-	- 64er MIDI
-	- FB-MIDI
-	- C-LAB MIDI
-	- JMS MIDI
-	- Datel MIDI
-	- Passport MIDI
-	- Speech Maker (Adman)
-	- Song Producer (Moog, 1983)
+    Audio:
+    - Currah Speech 64 (Currah, 1984)
+    - Easy Speech 64 (Currah, 1984)
+    - Voice Messenger (Currah, 1984)
+    - Votalker (Votrax, 1986)
+    - ProVoice (Genesis, 1986)
+    - SID Symphony
+    - MSSIAH
+    - Synthetiseur Vocal
+    - 64er MIDI
+    - FB-MIDI
+    - C-LAB MIDI
+    - JMS MIDI
+    - Datel MIDI
+    - Passport MIDI
+    - Speech Maker (Adman)
+    - Song Producer (Moog, 1983)
 
-	EPROM burners:
-	- J-R Promenade C1
-	- Rex Quickbyte 2
-	- Rex Goliath Eprommer
+    EPROM burners:
+    - J-R Promenade C1
+    - Rex Quickbyte 2
+    - Rex Goliath Eprommer
 
-	Missing dumps that exist as .crt but are missing from this list:
+    Missing dumps that exist as .crt but are missing from this list:
 
-	- Ariolasoft Structured BASIC
-	- MSSIAH
-	- Rex Diashow-Maker
+    - Ariolasoft Structured BASIC
+    - MSSIAH
+    - Rex Diashow-Maker
 
-	If you have any of these, please forward them to messdev :)
+    If you have any of these, please forward them to messdev :)
 
-	List of mostly undumped cartridges:
-	http://www.retroport.de/C64_C128_Hardware.html
-	http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
-	http://members.optusnet.com.au/spacetaxi64/SPEED-UP-CARTS/SPEED-C64-CPU.htm
+    List of mostly undumped cartridges:
+    http://www.retroport.de/C64_C128_Hardware.html
+    http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
+    http://members.optusnet.com.au/spacetaxi64/SPEED-UP-CARTS/SPEED-C64-CPU.htm
 
 -->
 

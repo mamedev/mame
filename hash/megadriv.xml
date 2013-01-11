@@ -1,88 +1,88 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
-	UNDUMPED / TO BE REDUMPED LIST
+    UNDUMPED / TO BE REDUMPED LIST
 
-	2IN1 (COSMIC SPACEHEAD FANTASTIC DIZZY) PAL
-	ADVANCED DAISENRYAKU            JAPAN       we have Rev A, Rev 0 needed (does it exist?)
-	ARNOLD PALMER TOURNAMENT GOLF       PAL
-	AWESOME POSSUM              JAPAN
-	BATTLE SQUADRON             PAL
-	BEAVIS & BUTTHEAD               PAL
-	CAPTAIN PLANET              ASIA
-	CENTURION                   USA/PAL     needs proper dump
-	DAVIS CUP TENNIS                JAPAN
-	DYNAMITE HEADDY SAMPLE          JAPAN
-	ECCO JR                 USA/PAL     graphic corruption on later revision
-	F-22 (JUNE 1992)                USA/PAL     needs proper dump
-	FAERY TALE ADVENTURE            PAL
-	FATAL FURY 2                PAL     Australia-only PAL release
-	FERRARI GRAND PRIX CHALLENGE        PAL     we have Rev A, Rev 0 needed (does it exist?)
-	FIFA SOCCER                 JAPAN
-	FIRE SHARK                  PAL     dump check
-	GAIN GROUND                 PAL     revision order check
-	GALAXY FORCE II             ALL     we have Rev B, Rev 0 and Rev A needed (does it exist?)
-	GO NET                  JAPAN
-	INTERNATIONAL SUPERSTAR SOCCER      BRAZIL
-	JEWEL MASTER                USA/PAL     we have Rev A, Rev 0 needed (does it match Japanese release?)
-	MARBLE MADNESS              JAPAN
-	NBA PLAYOFFS - BULLS VS BLAZERS     JAPAN       (alt) version contain a checksum check which have been wiped out of the non-alt revision
-	NFL PRO FOOTBALL '94            JAPAN
-	OSAKA BANK MY LINE              JAPAN
-	OSAKA BANK MY LINE DEMO         JAPAN
-	OUTBACK JOEY - PERSONAL TRAINER     ???     http://www.guardiana.net/MDG-Database/Mega%20Drive/Outback%20Joey/#v3553
-	PGA TOUR GOLF               USA/PAL     we have v1.1 and v1.2, v1.0 needed (does it exist?)
-	ROAD RASH                   JAPAN
-	ROAD RASH                   USA/PAL     needs proper dump
-	SHINING FORCE               PAL
-	SIDE POCKET                 JAPAN/USA   conflict in current info
-	SMURFS                  PAL     we have Rev A, Rev 0 needed (does it exist?)
-	SUMISEI HOME TANMATSU           JAPAN
-	SUPER DAISENRYAKU               JAPAN       we have Rev 0, Rev A needed (confirmed by Ototo)
-	TOM & JERRY                 JAPAN
-	VALIS III                   JAPAN       we have v1.1 (Rev A?), v1.0 (Rev 0?) needed
-	WONDER MIDI                 JAPAN
-	WORLD CUP SOCCER                JAPAN/USA   we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
-	WORLD OF ILLUSION               JAPAN       we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
+    2IN1 (COSMIC SPACEHEAD FANTASTIC DIZZY) PAL
+    ADVANCED DAISENRYAKU            JAPAN       we have Rev A, Rev 0 needed (does it exist?)
+    ARNOLD PALMER TOURNAMENT GOLF       PAL
+    AWESOME POSSUM              JAPAN
+    BATTLE SQUADRON             PAL
+    BEAVIS & BUTTHEAD               PAL
+    CAPTAIN PLANET              ASIA
+    CENTURION                   USA/PAL     needs proper dump
+    DAVIS CUP TENNIS                JAPAN
+    DYNAMITE HEADDY SAMPLE          JAPAN
+    ECCO JR                 USA/PAL     graphic corruption on later revision
+    F-22 (JUNE 1992)                USA/PAL     needs proper dump
+    FAERY TALE ADVENTURE            PAL
+    FATAL FURY 2                PAL     Australia-only PAL release
+    FERRARI GRAND PRIX CHALLENGE        PAL     we have Rev A, Rev 0 needed (does it exist?)
+    FIFA SOCCER                 JAPAN
+    FIRE SHARK                  PAL     dump check
+    GAIN GROUND                 PAL     revision order check
+    GALAXY FORCE II             ALL     we have Rev B, Rev 0 and Rev A needed (does it exist?)
+    GO NET                  JAPAN
+    INTERNATIONAL SUPERSTAR SOCCER      BRAZIL
+    JEWEL MASTER                USA/PAL     we have Rev A, Rev 0 needed (does it match Japanese release?)
+    MARBLE MADNESS              JAPAN
+    NBA PLAYOFFS - BULLS VS BLAZERS     JAPAN       (alt) version contain a checksum check which have been wiped out of the non-alt revision
+    NFL PRO FOOTBALL '94            JAPAN
+    OSAKA BANK MY LINE              JAPAN
+    OSAKA BANK MY LINE DEMO         JAPAN
+    OUTBACK JOEY - PERSONAL TRAINER     ???     http://www.guardiana.net/MDG-Database/Mega%20Drive/Outback%20Joey/#v3553
+    PGA TOUR GOLF               USA/PAL     we have v1.1 and v1.2, v1.0 needed (does it exist?)
+    ROAD RASH                   JAPAN
+    ROAD RASH                   USA/PAL     needs proper dump
+    SHINING FORCE               PAL
+    SIDE POCKET                 JAPAN/USA   conflict in current info
+    SMURFS                  PAL     we have Rev A, Rev 0 needed (does it exist?)
+    SUMISEI HOME TANMATSU           JAPAN
+    SUPER DAISENRYAKU               JAPAN       we have Rev 0, Rev A needed (confirmed by Ototo)
+    TOM & JERRY                 JAPAN
+    VALIS III                   JAPAN       we have v1.1 (Rev A?), v1.0 (Rev 0?) needed
+    WONDER MIDI                 JAPAN
+    WORLD CUP SOCCER                JAPAN/USA   we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
+    WORLD OF ILLUSION               JAPAN       we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
 -->
 
 <!--
 
 Known undumped protos
 
-	* Ghoul Patrol
-	* Beethoven's 2nd
-	* Iron Hammer (from http://www.youtube.com/watch?v=uQG0tZQaKUg )
-	* Bill's Tomato Game (from http://www.youtube.com/watch?v=GeCuBe2xd8A )
-	* Total Carnage
-	* Monster Hunter
-	* Brown 60
-	* Nuclear Rush
-	* Bloodliners
-	* Capture the Flag
-	* Scatters
-	* Michael Jordan's Chaos in the Windy City
-	* Speedway Pro Challenge
-	* Payne Stewart Golf
-	* Jack Nicklaus 95
-	* Jack Nicklaus Power Challenge
-	* Danny Sullivan's Indy Heat
-	* Star Trek Starfleet Academy
+  * Ghoul Patrol
+  * Beethoven's 2nd
+  * Iron Hammer (from http://www.youtube.com/watch?v=uQG0tZQaKUg )
+  * Bill's Tomato Game (from http://www.youtube.com/watch?v=GeCuBe2xd8A )
+  * Total Carnage
+  * Monster Hunter
+  * Brown 60
+  * Nuclear Rush
+  * Bloodliners
+  * Capture the Flag
+  * Scatters
+  * Michael Jordan's Chaos in the Windy City
+  * Speedway Pro Challenge
+  * Payne Stewart Golf
+  * Jack Nicklaus 95
+  * Jack Nicklaus Power Challenge
+  * Danny Sullivan's Indy Heat
+  * Star Trek Starfleet Academy
 
 Known undumped pirates
 
-	* Tec Toy Mega Drive 3 (with 86 built in games)
-	* Chinese Checkers (by RealTec)
-	* Shizen Mahjong / Competition Mahjong (by Sachen, apparently dumped but hoarded)
-	* Thunderbolt II - 雷電伝説II
-	* Magic 7 Block - 百変七巧板
-	* Chinese Battle Chess (?) - 戦 棊
-	* 16 Tile Mahjong II (by Gamtec)
+  * Tec Toy Mega Drive 3 (with 86 built in games)
+  * Chinese Checkers (by RealTec)
+  * Shizen Mahjong / Competition Mahjong (by Sachen, apparently dumped but hoarded)
+  * Thunderbolt II - 雷電伝説II
+  * Magic 7 Block - 百変七巧板
+  * Chinese Battle Chess (?) - 戦 棊
+  * 16 Tile Mahjong II (by Gamtec)
 
 NOTE
 
-	* Phantasy Star (serial G-4534, released by Sega on 1994-04-02) is actually a SMS cart which works in the MD
-	thanks to VDP compatibility mode. Since this is currently not emulated in MESS, the dump is in sms.xml
+  * Phantasy Star (serial G-4534, released by Sega on 1994-04-02) is actually a SMS cart which works in the MD
+    thanks to VDP compatibility mode. Since this is currently not emulated in MESS, the dump is in sms.xml
 
 -->
 
@@ -105,16 +105,16 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-	// no even rom (it becomes a 0x1a fill in the cart copier dump)
-	Roms Labeled
+    // no even rom (it becomes a 0x1a fill in the cart copier dump)
+    Roms Labeled
 
-	F-22 Intercept F-202-4
-	(c)Electronic Arts 1991
-	All Rights Reserved
+    F-22 Intercept F-202-4
+    (c)Electronic Arts 1991
+    All Rights Reserved
 
-	F-22 Intercept F-202-1
-	(c)Electronic Arts 1991
-	All Rights Reserved
+    F-22 Intercept F-202-1
+    (c)Electronic Arts 1991
+    All Rights Reserved
 -->
 	</software>
 
@@ -130,13 +130,13 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-	Rom Labeled
+    Rom Labeled
 
-	FIFA 97 B1
-	(c)ELECTRONIC ARTS 1996
-	ALL RIGHTS RESERVED
-	S77481/00000046
-	9640
+    FIFA 97 B1
+    (c)ELECTRONIC ARTS 1996
+    ALL RIGHTS RESERVED
+    S77481/00000046
+    9640
 -->
 	</software>
 
@@ -151,11 +151,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-	Rom Labeled
+    Rom Labeled
 
-	SEGA
-	MPR-15312A T02
-	9305E7056
+    SEGA
+    MPR-15312A T02
+    9305E7056
 -->
 	</software>
 
@@ -170,12 +170,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-	Rom Labeled
+    Rom Labeled
 
-	JAMES POND U1 JAM03
-	(c)ELECTRONIC ARTS'91
-	ALL RIGHTS RESERVED
-	JAPAN 9108 D
+    JAMES POND U1 JAM03
+    (c)ELECTRONIC ARTS'91
+    ALL RIGHTS RESERVED
+    JAPAN 9108 D
 -->
 	</software>
 
@@ -190,11 +190,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-	Rom Labeled
+    Rom Labeled
 
-	Pond II: Robocod RO B02
-	(c)Electronic Arts 1991
-	All Rights Reserved
+    Pond II: Robocod RO B02
+    (c)Electronic Arts 1991
+    All Rights Reserved
 -->
 	</software>
 
@@ -210,11 +210,11 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-	Rom Labeled
+    Rom Labeled
 
-	LOTUS TURBO LOT03
-	(c)Electronic Arts 1992
-	All Rights Reserved
+    LOTUS TURBO LOT03
+    (c)Electronic Arts 1992
+    All Rights Reserved
 -->
 	</software>
 
@@ -232,12 +232,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-	Rom Labeled
+    Rom Labeled
 
-	NHL94 HL9402
-	9347
-	(C)ELECTRONIC ARTS 1993
-	ALL RIGHTS RESERVED
+    NHL94 HL9402
+    9347
+    (C)ELECTRONIC ARTS 1993
+    ALL RIGHTS RESERVED
 -->
 	</software>
 
@@ -255,12 +255,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-	Rom Labeled
+    Rom Labeled
 
-	PGA TOUR GOLF PGT04
-	(C)ELECTRONIC ARTS92
-	ALL RIGHTS RESERVED
-	311 418PY60 JAPAN
+    PGA TOUR GOLF PGT04
+    (C)ELECTRONIC ARTS92
+    ALL RIGHTS RESERVED
+    311 418PY60 JAPAN
 -->
 	</software>
 
@@ -276,19 +276,19 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-	Roms Labeled
+    Roms Labeled
 
-	ACCLAIM    U1
-	ES133-1    U1
-	RISE OF    U1
-	THE ROBOTS U1
-	9447 D
+    ACCLAIM    U1
+    ES133-1    U1
+    RISE OF    U1
+    THE ROBOTS U1
+    9447 D
 
-	ACCLAIM    U2
-	ES133-2    U2
-	RISE OF    U2
-	THE ROBOTS U2
-	9447 D
+    ACCLAIM    U2
+    ES133-2    U2
+    RISE OF    U2
+    THE ROBOTS U2
+    9447 D
 -->
 	</software>
 
@@ -318,17 +318,17 @@ better to use names related to the actual pcb, possibly even reverting to use th
 			</dataarea>
 		</part>
 <!--
-	Roms Labeled
+    Roms Labeled
 
-	ACCOLADE, INC
-	ZETSG HI
-	7500-00033A
-	(C) ACCOLADE 1994
+    ACCOLADE, INC
+    ZETSG HI
+    7500-00033A
+    (C) ACCOLADE 1994
 
-	ACCOLADE, INC
-	ZETSG LO
-	7500-00034A
-	(C) ACCOLADE 1994
+    ACCOLADE, INC
+    ZETSG LO
+    7500-00034A
+    (C) ACCOLADE 1994
 -->
 	</software>
 
@@ -1227,12 +1227,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<!-- According to Elbarto:
-		On the Quackshot PCB there is a 512Kb rom.
-		Normally all the address lines from A1 to A19 (the whole 512Kb range) tied to the chip in the right order.
-		But here we have the megadrive A18 line tied to the A20 pin of the rom.
-		This means that the Megadrive sees the first 256Kb of the rom followed by 0xc0000 lenght range of mirrored/zero-ed data
-		then again the last 256Kb of the game.
-		I think they did that for a crappy (really crappy) copy protection.
+	    On the Quackshot PCB there is a 512Kb rom.
+	    Normally all the address lines from A1 to A19 (the whole 512Kb range) tied to the chip in the right order.
+	    But here we have the megadrive A18 line tied to the A20 pin of the rom.
+	    This means that the Megadrive sees the first 256Kb of the rom followed by 0xc0000 lenght range of mirrored/zero-ed data
+	    then again the last 256Kb of the game.
+	    I think they did that for a crappy (really crappy) copy protection.
 	-->
 	<software name="quacksht">
 		<description>QuackShot Starring Donald Duck ~ QuackShot - Guruzia Ou no Hihou (World)</description>
@@ -2714,14 +2714,14 @@ better to use names related to the actual pcb, possibly even reverting to use th
 
 	<!-- same as jul 23 proto, probably no changes happened -->
 	<!--software name="atptourp5b" cloneof="atptour">
-		<description>ATP Tour Championship Tennis (Prototype, 19940725)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="atp tour championship tennis (prototype - jul 25, 1994).bin" size="2097152" crc="a15d5051" sha1="88005e79f325e20c804e04a7a310a6d19b7f7cce" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
+	    <description>ATP Tour Championship Tennis (Prototype, 19940725)</description>
+	    <year>1994</year>
+	    <publisher>Sega</publisher>
+	    <part name="cart" interface="megadriv_cart">
+	        <dataarea name="rom" size="2097152">
+	            <rom name="atp tour championship tennis (prototype - jul 25, 1994).bin" size="2097152" crc="a15d5051" sha1="88005e79f325e20c804e04a7a310a6d19b7f7cce" offset="000000" loadflag="load16_word_swap" />
+	        </dataarea>
+	    </part>
 	</software-->
 
 	<!-- TODO: check SRAM. The header says there should be no battery... for now I put 16k as in the other protos, but there might well be no SRAM at all (as in other protos) -->
@@ -3826,14 +3826,14 @@ better to use names related to the actual pcb, possibly even reverting to use th
 
 	<!-- same as feb 08 proto, probably no changes happened -->
 	<!--software name="bodycop4b" cloneof="bodyco">
-		<description>Body Count (Prototype, 19940228-U)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1046784">
-				<rom name="body count (prototype - feb 28, 1994 - u).bin" size="1046784" crc="c5fed897" sha1="1c13134c32dc620dd663f33150c82d12cc69d442" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
+	    <description>Body Count (Prototype, 19940228-U)</description>
+	    <year>1994</year>
+	    <publisher>Sega</publisher>
+	    <part name="cart" interface="megadriv_cart">
+	        <dataarea name="rom" size="1046784">
+	            <rom name="body count (prototype - feb 28, 1994 - u).bin" size="1046784" crc="c5fed897" sha1="1c13134c32dc620dd663f33150c82d12cc69d442" offset="000000" loadflag="load16_word_swap" />
+	        </dataarea>
+	    </part>
 	</software-->
 
 	<software name="bodycop5" cloneof="bodyco">
@@ -3860,14 +3860,14 @@ better to use names related to the actual pcb, possibly even reverting to use th
 
 	<!-- same as mar 08 proto, probably no changes happened -->
 	<!--software name="bodycop2b" cloneof="bodyco">
-		<description>Body Count (Prototype, 19940308-A)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="body count (prototype - mar 08, 1994 - a).bin" size="1048576" crc="8965213f" sha1="dbd4fec001f61c6a8414b2035e884ebfbf48b899" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
+	    <description>Body Count (Prototype, 19940308-A)</description>
+	    <year>1994</year>
+	    <publisher>Sega</publisher>
+	    <part name="cart" interface="megadriv_cart">
+	        <dataarea name="rom" size="1048576">
+	            <rom name="body count (prototype - mar 08, 1994 - a).bin" size="1048576" crc="8965213f" sha1="dbd4fec001f61c6a8414b2035e884ebfbf48b899" offset="000000" loadflag="load16_word_swap" />
+	        </dataarea>
+	    </part>
 	</software-->
 
 	<software name="bodycop2" cloneof="bodyco">
@@ -5393,14 +5393,14 @@ better to use names related to the actual pcb, possibly even reverting to use th
 
 	<!-- same as jul 12 proto, probably no changes happened -->
 	<!--software name="comixup01b" cloneof="comix">
-		<description>Comix Zone (Prototype, 19950712-FULSCR)</description>
-		<year>1995</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="comix zone (prototype - jul 12, 1995 - fulscr).bin" size="2097152" crc="e28c89c1" sha1="4cf1fb69c8184257664caacaf7bc7a1b4e802b8b" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
+	    <description>Comix Zone (Prototype, 19950712-FULSCR)</description>
+	    <year>1995</year>
+	    <publisher>Sega</publisher>
+	    <part name="cart" interface="megadriv_cart">
+	        <dataarea name="rom" size="2097152">
+	            <rom name="comix zone (prototype - jul 12, 1995 - fulscr).bin" size="2097152" crc="e28c89c1" sha1="4cf1fb69c8184257664caacaf7bc7a1b4e802b8b" offset="000000" loadflag="load16_word_swap" />
+	        </dataarea>
+	    </part>
 	</software-->
 
 	<software name="comixup01" cloneof="comix">
@@ -7191,14 +7191,14 @@ better to use names related to the actual pcb, possibly even reverting to use th
 
 	<!-- same as jun 14 proto, probably no changes happened -->
 	<!--software name="dheadp2b" cloneof="dhead">
-		<description>Dynamite Headdy (Prototype, 19940615)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="dynamite headdy (prototype - jun 15, 1994).bin" size="2097152" crc="971ef24c" sha1="c90417bd43bea29a58fcacacb48b2602ecb65cc3" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
+	    <description>Dynamite Headdy (Prototype, 19940615)</description>
+	    <year>1994</year>
+	    <publisher>Sega</publisher>
+	    <part name="cart" interface="megadriv_cart">
+	        <dataarea name="rom" size="2097152">
+	            <rom name="dynamite headdy (prototype - jun 15, 1994).bin" size="2097152" crc="971ef24c" sha1="c90417bd43bea29a58fcacacb48b2602ecb65cc3" offset="000000" loadflag="load16_word_swap" />
+	        </dataarea>
+	    </part>
 	</software-->
 
 	<software name="dheadp2" cloneof="dhead">
@@ -13444,7 +13444,7 @@ NOTE: several roms exist for this game
 - CRC: 2bfcaa3e (2012-04-25) - final rom assembled by hand from the binary code (the glitches above were due to the routine used to create the rom from the binary)
 Notice that these are not working on real hardware due to bugged code with VDP init (and/or interrupts)
 - CRC: 237fb077 (2012-04-25) - 'fixed' version for hardware which patches the source code to make the game work on a console
-	-->
+ -->
 	<software name="mrnutz2">
 		<description>Mr. Nutz - Hoppin' Mad (Prototype)</description>
 		<year>1994</year>
@@ -20842,14 +20842,14 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<!-- released also as Beyond Oasis proto... was a mistake by drx or does it exist another 19941101 proto? -->
 	<!--software name="thorp" cloneof="thor">
-		<description>The Story of Thor (Prototype, 19941101)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="story of thor, the (prototype - nov 01, 1994).bin" size="3145728" crc="fa59f847" sha1="cb0606faeab0398244d4721d71cf7e1c5724a9ef" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
+	    <description>The Story of Thor (Prototype, 19941101)</description>
+	    <year>1994</year>
+	    <publisher>Sega</publisher>
+	    <part name="cart" interface="megadriv_cart">
+	        <dataarea name="rom" size="3145728">
+	            <rom name="story of thor, the (prototype - nov 01, 1994).bin" size="3145728" crc="fa59f847" sha1="cb0606faeab0398244d4721d71cf7e1c5724a9ef" offset="000000" loadflag="load16_word_swap" />
+	        </dataarea>
+	    </part>
 	</software-->
 
 	<software name="sf2">
@@ -24599,14 +24599,14 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<!-- same as U proto, probably no changes happened -->
 	<!--software name="wcs2p10b" cloneof="wcs2">
-		<description>World Championship Soccer II (Prototype, 19940314)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="world championship soccer ii (prototype - mar 14, 1994).bin" size="1048576" crc="43ec107c" sha1="9226eb23e1a91856300b310cb2b8263a832ba231" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
+	    <description>World Championship Soccer II (Prototype, 19940314)</description>
+	    <year>1994</year>
+	    <publisher>Sega</publisher>
+	    <part name="cart" interface="megadriv_cart">
+	        <dataarea name="rom" size="1048576">
+	            <rom name="world championship soccer ii (prototype - mar 14, 1994).bin" size="1048576" crc="43ec107c" sha1="9226eb23e1a91856300b310cb2b8263a832ba231" offset="000000" loadflag="load16_word_swap" />
+	        </dataarea>
+	    </part>
 	</software-->
 
 	<software name="wcs2p08" cloneof="wcs2">
@@ -24998,14 +24998,14 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<!-- same as jun 23 proto, probably no changes happened -->
 	<!--software name="whp13b" cloneof="wh">
-		<description>World Heroes (USA, Prototype, 19940224)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="world heroes (usa) (prototype - feb 24, 1994).bin" size="2097152" crc="f5db477e" sha1="154d8b2415bcbce62656eef63e4fad026ee2d8d0" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
+	    <description>World Heroes (USA, Prototype, 19940224)</description>
+	    <year>1994</year>
+	    <publisher>Sega</publisher>
+	    <part name="cart" interface="megadriv_cart">
+	        <dataarea name="rom" size="2097152">
+	            <rom name="world heroes (usa) (prototype - feb 24, 1994).bin" size="2097152" crc="f5db477e" sha1="154d8b2415bcbce62656eef63e4fad026ee2d8d0" offset="000000" loadflag="load16_word_swap" />
+	        </dataarea>
+	    </part>
 	</software-->
 
 	<software name="whp12" cloneof="wh">
@@ -28203,41 +28203,41 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 
 <!--
-	<software name="debugc">
-		<description>DEBUG - Charles Window Bug Example (PD)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="debug - charles window bug example (pd).bin" size="16384" crc="75582ddb" sha1="bd913dcadba2588d4b9b1aa970038421cba0a1af" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="debugc">
+        <description>DEBUG - Charles Window Bug Example (PD)</description>
+        <year>199?</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <part name="cart" interface="megadriv_cart">
+            <dataarea name="rom" size="16384">
+                <rom name="debug - charles window bug example (pd).bin" size="16384" crc="75582ddb" sha1="bd913dcadba2588d4b9b1aa970038421cba0a1af" offset="000000" loadflag="load16_word_swap" />
+            </dataarea>
+        </part>
+    </software>
 
-	<software name="flavio">
-		<description>DEBUG Flavio's DMA Test (PD)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="debug flavio's dma test (pd).bin" size="16384" crc="549cebf4" sha1="c44f0037a6856bd52a212b26ea416501e92f7645" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="flavio">
+        <description>DEBUG Flavio's DMA Test (PD)</description>
+        <year>199?</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <part name="cart" interface="megadriv_cart">
+            <dataarea name="rom" size="16384">
+                <rom name="debug flavio's dma test (pd).bin" size="16384" crc="549cebf4" sha1="c44f0037a6856bd52a212b26ea416501e92f7645" offset="000000" loadflag="load16_word_swap" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 <!-- This is here for documentation purposes, but it's not available.
 
-	<software name="indy">
-		<description>Indiana Jones' Greatest Adventures (Release Candidate)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="indiana jones' greatest adventures (release candidate).bin" size="2097152" crc="9a01974e" sha1="d59bb77b83cf912e3cb8a7598cabcf87a273e429" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="indy">
+        <description>Indiana Jones' Greatest Adventures (Release Candidate)</description>
+        <year>199?</year>
+        <publisher>&lt;unknown&gt;</publisher>
+        <part name="cart" interface="megadriv_cart">
+            <dataarea name="rom" size="2097152">
+                <rom name="indiana jones' greatest adventures (release candidate).bin" size="2097152" crc="9a01974e" sha1="d59bb77b83cf912e3cb8a7598cabcf87a273e429" offset="000000" loadflag="load16_word_swap" />
+            </dataarea>
+        </part>
+    </software>
 
 -->
 

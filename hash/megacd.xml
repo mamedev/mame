@@ -3,7 +3,7 @@
 <softwarelist name="megacd" description="Mega CD (Euro) CD-ROM list">
 
 <!--
-	MegaCD currently won't recognize discs, so compatibility is unknown..
+  MegaCD currently won't recognize discs, so compatibility is unknown..
 -->
 
 
@@ -571,16 +571,16 @@
 	</software>
 
 <!--
-	<software name="spidkpa" cloneof="spidkp">
-		<description>The Amazing Spider-man vs. The Kingpin (Euro)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="amazing spider-man vs. the kingpin, the (1993)(sega)(pal)[!]" sha1="cc98f4c1388411ca068d21a503fcff0992b2d186"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="spidkpa" cloneof="spidkp">
+        <description>The Amazing Spider-man vs. The Kingpin (Euro)</description>
+        <year>1993</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="amazing spider-man vs. the kingpin, the (1993)(sega)(pal)[!]" sha1="cc98f4c1388411ca068d21a503fcff0992b2d186"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="batmanrnb" cloneof="batmanrn">
@@ -608,42 +608,42 @@
 	</software>
 
 <!--
-	<software name="btlcorpsa" cloneof="btlcorps">
-		<description>Battlecorps (Euro, Alt)</description>
-		<year>1994</year>
-		<publisher>Core</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="battlecorps (1994)(core)(pal)(m4)[!]" sha1="9f6a2180c78aabd3a53360587a01b428ecb0d684"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="btlcorpsa" cloneof="btlcorps">
+        <description>Battlecorps (Euro, Alt)</description>
+        <year>1994</year>
+        <publisher>Core</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="battlecorps (1994)(core)(pal)(m4)[!]" sha1="9f6a2180c78aabd3a53360587a01b428ecb0d684"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="bcracersa" cloneof="bcracers">
-		<description>BC Racers (Euro, Alt)</description>
-		<year>1994</year>
-		<publisher>Core</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="bc racers (1994)(core)(pal)(m3)[!]" sha1="96a018814a1c98e6d35e0536cf080fb77f839049"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="bcracersa" cloneof="bcracers">
+        <description>BC Racers (Euro, Alt)</description>
+        <year>1994</year>
+        <publisher>Core</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="bc racers (1994)(core)(pal)(m3)[!]" sha1="96a018814a1c98e6d35e0536cf080fb77f839049"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="beast2a" cloneof="beast2">
-		<description>Beast II (Euro)</description>
-		<year>1994</year>
-		<publisher>Psygnosis ~ Sony Electronic Publishing</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="beast ii (1994)(psygnosis - sony electronic publishing)(pal)[!]" sha1="434f2b291f98767094c1d1adee4464dd43383a7c"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="beast2a" cloneof="beast2">
+        <description>Beast II (Euro)</description>
+        <year>1994</year>
+        <publisher>Psygnosis ~ Sony Electronic Publishing</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="beast ii (1994)(psygnosis - sony electronic publishing)(pal)[!]" sha1="434f2b291f98767094c1d1adee4464dd43383a7c"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="billwlsh">
@@ -659,16 +659,16 @@
 	</software>
 
 <!--
-	<software name="blackha" cloneof="blackh">
-		<description>Blackhole Assault (Euro, Alt)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="blackhole assault (1993)(sega)(pal)[!]" sha1="6baa0e36f4a8c778cabef5713101a00f430a7824"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="blackha" cloneof="blackh">
+        <description>Blackhole Assault (Euro, Alt)</description>
+        <year>1993</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="blackhole assault (1993)(sega)(pal)[!]" sha1="6baa0e36f4a8c778cabef5713101a00f430a7824"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="bloodsht">
@@ -744,16 +744,16 @@
 	</software>
 
 <!--
-	<software name="corpsea" cloneof="corpse">
-		<description>Corpse Killer (Euro)</description>
-		<year>1994</year>
-		<publisher>Digital Pictures</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="corpse killer (1994)(digital pictures)(pal)[!]" sha1="6b9bb02af995fce59d718c54e29a1528f15fffe1"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="corpsea" cloneof="corpse">
+        <description>Corpse Killer (Euro)</description>
+        <year>1994</year>
+        <publisher>Digital Pictures</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="corpse killer (1994)(digital pictures)(pal)[!]" sha1="6b9bb02af995fce59d718c54e29a1528f15fffe1"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="dblswtch">
@@ -769,22 +769,22 @@
 	</software>
 
 <!--
-	<software name="dracunla" cloneof ="dracunl">
-		<description>Dracula Unleashed (Euro)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom1" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="dracula unleashed (1994)(sega)(pal)(disc 1 of 2)[!]" sha1="48f7f2b90b97eb7216a7e088bd6cb275f61c5ede"/>
-			</diskarea>
-		</part>
+    <software name="dracunla" cloneof ="dracunl">
+        <description>Dracula Unleashed (Euro)</description>
+        <year>1994</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom1" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="dracula unleashed (1994)(sega)(pal)(disc 1 of 2)[!]" sha1="48f7f2b90b97eb7216a7e088bd6cb275f61c5ede"/>
+            </diskarea>
+        </part>
 
-		<part name="cdrom2" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="dracula unleashed (1994)(sega)(pal)(disc 2 of 2)[!]" sha1="032878fdb1ba94c8fa0e38e6fea20ccc3d502ef8"/>
-			</diskarea>
-		</part>
-	</software>
+        <part name="cdrom2" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="dracula unleashed (1994)(sega)(pal)(disc 2 of 2)[!]" sha1="032878fdb1ba94c8fa0e38e6fea20ccc3d502ef8"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="dlair">
@@ -800,16 +800,16 @@
 	</software>
 
 <!--
-	<software name="dunea" cloneof="dune">
-		<description>Dune (Euro)</description>
-		<year>1994</year>
-		<publisher>Virgin Interactive</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="dune (1994)(virgin)(pal)(m6)[!]" sha1="c05a7775d0c17ffda44c4f48ddf832f7551bfada"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="dunea" cloneof="dune">
+        <description>Dune (Euro)</description>
+        <year>1994</year>
+        <publisher>Virgin Interactive</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="dune (1994)(virgin)(pal)(m6)[!]" sha1="c05a7775d0c17ffda44c4f48ddf832f7551bfada"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="dungexpl">
@@ -837,29 +837,29 @@
 	</software>
 
 <!--
-	<software name="ejimsea" cloneof="ejimse">
-		<description>Earthworm Jim - Special Edition (Euro)</description>
-		<year>1995</year>
-		<publisher>Interplay</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="earthworm jim - special edition (1995)(interplay)(pal)[!]" sha1="65b17e347dbfcc44011bfac77aafa562538021be"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="ejimsea" cloneof="ejimse">
+        <description>Earthworm Jim - Special Edition (Euro)</description>
+        <year>1995</year>
+        <publisher>Interplay</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="earthworm jim - special edition (1995)(interplay)(pal)[!]" sha1="65b17e347dbfcc44011bfac77aafa562538021be"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="ecco2">
-		<description>Ecco - The Tides of Time (Euro)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="ecco - the tides of time (1994)(sega)(pal)(m4)[!]" sha1="17b089b15d0037224e5bcc3f693c89e92c93bdb4"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="ecco2">
+        <description>Ecco - The Tides of Time (Euro)</description>
+        <year>1994</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="ecco - the tides of time (1994)(sega)(pal)(m4)[!]" sha1="17b089b15d0037224e5bcc3f693c89e92c93bdb4"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="eccoa" cloneof="ecco">
@@ -887,16 +887,16 @@
 	</software>
 
 <!--
-	<software name="espnbba" cloneof="espnbb">
-		<description>ESPN Baseball Tonight (Euro, Alt)</description>
-		<year>1994</year>
-		<publisher>Sony Imagesoft</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="espn baseball tonight (1994)(sony imagesoft)(pal)[!]" sha1="e39afaf9de9911fe21952e89a857ef3b407ae598"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="espnbba" cloneof="espnbb">
+        <description>ESPN Baseball Tonight (Euro, Alt)</description>
+        <year>1994</year>
+        <publisher>Sony Imagesoft</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="espn baseball tonight (1994)(sony imagesoft)(pal)[!]" sha1="e39afaf9de9911fe21952e89a857ef3b407ae598"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="eternalc">
@@ -961,16 +961,16 @@
 	</software>
 
 <!--
-	<software name="ffightcda" cloneof="ffightcd">
-		<description>Final Fight CD (Euro)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="final fight cd (1993)(sega)(pal)[!]" sha1="4f472ec2b6f1c5d12018e46abd03c4c88d1d205a"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="ffightcda" cloneof="ffightcd">
+        <description>Final Fight CD (Euro)</description>
+        <year>1993</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="final fight cd (1993)(sega)(pal)[!]" sha1="4f472ec2b6f1c5d12018e46abd03c4c88d1d205a"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="flink">
@@ -998,22 +998,22 @@
 	</software>
 
 <!--
-	<software name="gztexasa" cloneof="gztexas">
-		<description>Ground Zero Texas (Euro)</description>
-		<year>1993</year>
-		<publisher>Sony Imagesoft</publisher>
-		<part name="cdrom1" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="ground zero texas (1993)(sony imagesoft)(pal)(disc 1 of 2)[!]" sha1="721d2a99a73fd24aa088f3c16710cc12d8776561"/>
-			</diskarea>
-		</part>
+    <software name="gztexasa" cloneof="gztexas">
+        <description>Ground Zero Texas (Euro)</description>
+        <year>1993</year>
+        <publisher>Sony Imagesoft</publisher>
+        <part name="cdrom1" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="ground zero texas (1993)(sony imagesoft)(pal)(disc 1 of 2)[!]" sha1="721d2a99a73fd24aa088f3c16710cc12d8776561"/>
+            </diskarea>
+        </part>
 
-		<part name="cdrom2" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="ground zero texas (1993)(sony imagesoft)(pal)(disc 2 of 2)[!]" sha1="9c45987fe53078b8d0604453d92ac4bfc94914dd"/>
-			</diskarea>
-		</part>
-	</software>
+        <part name="cdrom2" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="ground zero texas (1993)(sony imagesoft)(pal)(disc 2 of 2)[!]" sha1="9c45987fe53078b8d0604453d92ac4bfc94914dd"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="hook">
@@ -1029,16 +1029,16 @@
 	</software>
 
 <!--
-	<software name="xj220a" cloneof="xj220">
-		<description>Jaguar XJ220 (Euro)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="jaguar xj220 (1993)(sega)(pal)(en-ja)[!]" sha1="2b5c5615407a3bb58f734a08f1a4f5ce704ea395"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="xj220a" cloneof="xj220">
+        <description>Jaguar XJ220 (Euro)</description>
+        <year>1993</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="jaguar xj220 (1993)(sega)(pal)(en-ja)[!]" sha1="2b5c5615407a3bb58f734a08f1a4f5ce704ea395"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="jparkg" cloneof="jpark">
@@ -1054,16 +1054,16 @@
 	</software>
 
 <!--
-	<software name="jparka" cloneof="jpark">
-		<description>Jurassic Park (Euro, Alt)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="jurassic park (1994)(sega)(pal)[!]" sha1="9ce0ecc1beaa9174cdc6aaed4aa9547bd975eb21"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="jparka" cloneof="jpark">
+        <description>Jurassic Park (Euro, Alt)</description>
+        <year>1994</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="jurassic park (1994)(sega)(pal)[!]" sha1="9ce0ecc1beaa9174cdc6aaed4aa9547bd975eb21"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="keio">
@@ -1091,16 +1091,16 @@
 	</software>
 
 <!--
-	<software name="le2a" cloneof="le2">
-		<description>Lethal Enforcers II - Gun Fighters (Euro, Alt)</description>
-		<year>1994</year>
-		<publisher>Konami</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="lethal enforcers ii - gun fighters (1994)(konami)(pal)[!]" sha1="4cd9e95a695b953a78331768735c44201a9061f6"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="le2a" cloneof="le2">
+        <description>Lethal Enforcers II - Gun Fighters (Euro, Alt)</description>
+        <year>1994</year>
+        <publisher>Konami</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="lethal enforcers ii - gun fighters (1994)(konami)(pal)[!]" sha1="4cd9e95a695b953a78331768735c44201a9061f6"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="lordthun">
@@ -1128,16 +1128,16 @@
 	</software>
 
 <!--
-	<software name="mickeymaa" cloneof="mickeyma">
-		<description>Mickey Mania (Euro, Alt)</description>
-		<year>1994</year>
-		<publisher>Sony Imagesoft</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="mickey mania (1994)(disney software - sony imagesoft)(pal)[!]" sha1="b2e91b0938ec20092ca99dc208d9b15273644bef"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="mickeymaa" cloneof="mickeyma">
+        <description>Mickey Mania (Euro, Alt)</description>
+        <year>1994</year>
+        <publisher>Sony Imagesoft</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="mickey mania (1994)(disney software - sony imagesoft)(pal)[!]" sha1="b2e91b0938ec20092ca99dc208d9b15273644bef"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="microcos">
@@ -1188,29 +1188,29 @@
 	</software>
 
 <!--
-	<software name="mka" cloneof="mk">
-		<description>Mortal Kombat (Euro, Alt)</description>
-		<year>1994</year>
-		<publisher>Arena</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="mortal kombat (1994)(arena)(pal)[!]" sha1="2ad75c13d53cd305ef2fe59c056e0b280f8c219b"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="mka" cloneof="mk">
+        <description>Mortal Kombat (Euro, Alt)</description>
+        <year>1994</year>
+        <publisher>Arena</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="mortal kombat (1994)(arena)(pal)[!]" sha1="2ad75c13d53cd305ef2fe59c056e0b280f8c219b"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="nbajama" cloneof="nbajam">
-		<description>NBA Jam (Euro, Alt)</description>
-		<year>1994</year>
-		<publisher>Acclaim</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="nba jam (1994)(acclaim)(pal)[!]" sha1="b1170d241406aeec91aceae015d2268baff626ec"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="nbajama" cloneof="nbajam">
+        <description>NBA Jam (Euro, Alt)</description>
+        <year>1994</year>
+        <publisher>Acclaim</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="nba jam (1994)(acclaim)(pal)[!]" sha1="b1170d241406aeec91aceae015d2268baff626ec"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="nhl94">
@@ -1226,22 +1226,22 @@
 	</software>
 
 <!--
-	<software name="ntrapa" cloneof="ntrap">
-		<description>Night Trap (Euro)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom1" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="night trap (1993)(sega)(pal)(disc 1 of 2)[!]" sha1="78c67b96498d1cafa4154983617fa110d653a99b"/>
-			</diskarea>
-		</part>
+    <software name="ntrapa" cloneof="ntrap">
+        <description>Night Trap (Euro)</description>
+        <year>1993</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom1" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="night trap (1993)(sega)(pal)(disc 1 of 2)[!]" sha1="78c67b96498d1cafa4154983617fa110d653a99b"/>
+            </diskarea>
+        </part>
 
-		<part name="cdrom2" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="night trap (1993)(sega)(pal)(disc 2 of 2)[!]" sha1="9a3f1009b06e5ef409d2b9028447383c8dd51d70"/>
-			</diskarea>
-		</part>
-	</software>
+        <part name="cdrom2" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="night trap (1993)(sega)(pal)(disc 2 of 2)[!]" sha1="9a3f1009b06e5ef409d2b9028447383c8dd51d70"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="ntrapfr" cloneof="ntrap">
@@ -1315,16 +1315,16 @@
 	</software>
 
 <!--
-	<software name="ppersiaa" cloneof="ppersia">
-		<description>Prince of Persia (Euro)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="prince of persia (1993)(sega)(pal)[!]" sha1="722a834b84b30b6866544e43bce50cdd7f469e95"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="ppersiaa" cloneof="ppersia">
+        <description>Prince of Persia (Euro)</description>
+        <year>1993</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="prince of persia (1993)(sega)(pal)[!]" sha1="722a834b84b30b6866544e43bce50cdd7f469e95"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="prizefig">
@@ -1358,16 +1358,16 @@
 	</software>
 
 <!--
-	<software name="roadavena" cloneof="roadaven">
-		<description>Road Avenger (Euro, Alt)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="road avenger (1993)(sega)(pal)[!]" sha1="e4a2f5c0c35469cae52ecbb945bf4614150fe1b4"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="roadavena" cloneof="roadaven">
+        <description>Road Avenger (Euro, Alt)</description>
+        <year>1993</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="road avenger (1993)(sega)(pal)[!]" sha1="e4a2f5c0c35469cae52ecbb945bf4614150fe1b4"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="roboales">
@@ -1431,29 +1431,29 @@
 	</software>
 
 <!--
-	<software name="ssharka" cloneof="sshark">
-		<description>Sewer Shark (Euro)</description>
-		<year>1993</year>
-		<publisher>Sony Imagesoft</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="sewer shark (1993)(sony imagesoft)(pal)[!]" sha1="099da21cd8e8283dd2a1470d079e83581623cd4f"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="ssharka" cloneof="sshark">
+        <description>Sewer Shark (Euro)</description>
+        <year>1993</year>
+        <publisher>Sony Imagesoft</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="sewer shark (1993)(sony imagesoft)(pal)[!]" sha1="099da21cd8e8283dd2a1470d079e83581623cd4f"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="holmesa" cloneof="holmes">
-		<description>Sherlock Holmes - Consulting Detective (Euro, Alt)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="sherlock holmes - consulting detective (1993)(sega)(pal)[!]" sha1="e4b3c11f2a788e1d9cb930c30f75b822ebbf4297"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="holmesa" cloneof="holmes">
+        <description>Sherlock Holmes - Consulting Detective (Euro, Alt)</description>
+        <year>1993</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="sherlock holmes - consulting detective (1993)(sega)(pal)[!]" sha1="e4b3c11f2a788e1d9cb930c30f75b822ebbf4297"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="holmes2">
@@ -1486,16 +1486,16 @@
 	</software>
 
 <!--
-	<software name="silpheeda" cloneof="silpheed">
-		<description>Silpheed (Euro)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="silpheed (1993)(sega)(pal)[!]" sha1="9c5d2813a1cea268273f83e2e4405f2179e059a1"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="silpheeda" cloneof="silpheed">
+        <description>Silpheed (Euro)</description>
+        <year>1993</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="silpheed (1993)(sega)(pal)[!]" sha1="9c5d2813a1cea268273f83e2e4405f2179e059a1"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="slamcity">
@@ -1553,16 +1553,16 @@
 	</software>
 
 <!--
-	<software name="smurfsa" cloneof="smurfs">
-		<description>The Smurfs (Euro, Alt)</description>
-		<year>1995</year>
-		<publisher>Infogrames</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="smurfs, the (1995)(infogrames)(pal)(m5)[!]" sha1="6c2e734db45393a582a2c300d32f84fd0008d64b"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="smurfsa" cloneof="smurfs">
+        <description>The Smurfs (Euro, Alt)</description>
+        <year>1995</year>
+        <publisher>Infogrames</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="smurfs, the (1995)(infogrames)(pal)(m5)[!]" sha1="6c2e734db45393a582a2c300d32f84fd0008d64b"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="snatcher">
@@ -1614,55 +1614,55 @@
 	</software>
 
 <!--
-	<software name="soniccda" cloneof="soniccd">
-		<description>Sonic CD (Euro, Alt)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="sonic cd (1993)(sega)(pal)[!]" sha1="30d1751ceb2634a3f89f86f9ff31d8e4c7592fe2"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="soniccda" cloneof="soniccd">
+        <description>Sonic CD (Euro, Alt)</description>
+        <year>1993</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="sonic cd (1993)(sega)(pal)[!]" sha1="30d1751ceb2634a3f89f86f9ff31d8e4c7592fe2"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="soulstara" cloneof="soulstar">
-		<description>SoulStar (Euro, Alt)</description>
-		<year>1994</year>
-		<publisher>Core</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="soulstar (1994)(core)(pal)(m3)[!]" sha1="eaef63967c24e0bc3693a8467254a06ba71d0e19"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="soulstara" cloneof="soulstar">
+        <description>SoulStar (Euro, Alt)</description>
+        <year>1994</year>
+        <publisher>Core</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="soulstar (1994)(core)(pal)(m3)[!]" sha1="eaef63967c24e0bc3693a8467254a06ba71d0e19"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="spaceadva" cloneof="spaceadv">
-		<description>The Space Adventure - Cobra (Euro)</description>
-		<year>1995</year>
-		<publisher>Virgin Interactive</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="space adventure, the (1995)(virgin)(pal)[!]" sha1="5d7973694722b49ddd17177a4b060b2d422ed71d"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="spaceadva" cloneof="spaceadv">
+        <description>The Space Adventure - Cobra (Euro)</description>
+        <year>1995</year>
+        <publisher>Virgin Interactive</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="space adventure, the (1995)(virgin)(pal)[!]" sha1="5d7973694722b49ddd17177a4b060b2d422ed71d"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="swraa" cloneof="swra">
-		<description>Star Wars - Rebel Assault (Euro)</description>
-		<year>1994</year>
-		<publisher>JVC</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="star wars - rebel assault (1994)(jvc)(pal)[!]" sha1="b671fc03aba70be2eda576c7cff9356b47e338eb"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="swraa" cloneof="swra">
+        <description>Star Wars - Rebel Assault (Euro)</description>
+        <year>1994</year>
+        <publisher>JVC</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="star wars - rebel assault (1994)(jvc)(pal)[!]" sha1="b671fc03aba70be2eda576c7cff9356b47e338eb"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="starblad">
@@ -1784,29 +1784,29 @@
 	</software>
 
 <!--
-	<software name="timegala" cloneof="timegal">
-		<description>Time Gal (Euro)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="time gal (1993)(sega)(pal)[!]" sha1="7a0afc62dd7026c20bfab67edadfa8affc0dacb6"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="timegala" cloneof="timegal">
+        <description>Time Gal (Euro)</description>
+        <year>1993</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="time gal (1993)(sega)(pal)[!]" sha1="7a0afc62dd7026c20bfab67edadfa8affc0dacb6"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="tcatalyga" cloneof="tcataly">
-		<description>Tomcat Alley (Ger, Alt)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="tomcat alley (1994)(sega)(pal)(de)[!]" sha1="f5460d129a45d16a698eb9794b9b49f1debd169f"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="tcatalyga" cloneof="tcataly">
+        <description>Tomcat Alley (Ger, Alt)</description>
+        <year>1994</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="tomcat alley (1994)(sega)(pal)(de)[!]" sha1="f5460d129a45d16a698eb9794b9b49f1debd169f"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="tcatalysp" cloneof="tcataly">
@@ -1834,29 +1834,29 @@
 	</software>
 
 <!--
-	<software name="tcatalya" cloneof="tcataly">
-		<description>Tomcat Alley (Euro)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="tomcat alley (1994)(sega)(pal)[!]" sha1="78224bd6d82f5581faad41fee98e6a99408209ac"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="tcatalya" cloneof="tcataly">
+        <description>Tomcat Alley (Euro)</description>
+        <year>1994</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="tomcat alley (1994)(sega)(pal)[!]" sha1="78224bd6d82f5581faad41fee98e6a99408209ac"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 <!--
-	<software name="wolfchlda" cloneof="wolfchld">
-		<description>Wolfchild (Euro)</description>
-		<year>1993</year>
-		<publisher>Sega</publisher>
-		<part name="cdrom" interface="scd_cdrom">
-			<diskarea name="cdrom">
-				<disk name="wolfchild (1993)(sega)(pal)[!]" sha1="a1286be0bd4f41e9c0e115025f9bc4fd4a21ced0"/>
-			</diskarea>
-		</part>
-	</software>
+    <software name="wolfchlda" cloneof="wolfchld">
+        <description>Wolfchild (Euro)</description>
+        <year>1993</year>
+        <publisher>Sega</publisher>
+        <part name="cdrom" interface="scd_cdrom">
+            <diskarea name="cdrom">
+                <disk name="wolfchild (1993)(sega)(pal)[!]" sha1="a1286be0bd4f41e9c0e115025f9bc4fd4a21ced0"/>
+            </diskarea>
+        </part>
+    </software>
 -->
 
 	<software name="wonderdg">

@@ -6,315 +6,315 @@ Compiled by K1W1
 
 <!--
 
-	* Cartridge pictures can be seen here http://www.pitfalljones.com/0800-low.htm
+  * Cartridge pictures can be seen here http://www.pitfalljones.com/0800-low.htm
 
-	* Nearly all of the cartridges on this a800 softwarelist will also run on the Atari 400 and Atari XL/XE series computers.
+  * Nearly all of the cartridges on this a800 softwarelist will also run on the Atari 400 and Atari XL/XE series computers.
 
-	* Due to OS differences the following programs will not run on the Atari XL/XE series: -
+  * Due to OS differences the following programs will not run on the Atari XL/XE series: -
 
-	- BearJam (Chalkboard)
-	- Leo's 'Lectric Paintbrush (Chalkboard)
-	- LogicMaster (Chalkboard)
-	- MicroMaestro (Chalkboard)
-	- Micro Illustrator (Chalkboard)
-	- Monster Maze (Epyx)
-	- Demon Attack (Imagic)
-	- K-Razy Kritters (K-Byte & CBS Software)
-	- Astrochase (Parker Brothers)
-	- Gorf (Roklan)
-	- Attack at EP-CYG-4 (Romox)
-	- Chicken (Synapse)
-	- Picnic Paranoia (Synapse)
-	- Protector II (Synapse)
-	- Shamus (Synapse)
-	- Slime (Synapse)
-	- Speedway Blast (IDSI)
-	- Kangaroo (Atari)
-	- Letter Perfect- 40 Column Version (LJK)
-	- Danger Ranger (Microdeal)
-	- Fort Apocalypse (Synapse)
-	- Express! (Orion Micro Systems)
-	- Telelink I (Atari)
-	- Telelink II (Atari)
+    - BearJam (Chalkboard)
+    - Leo's 'Lectric Paintbrush (Chalkboard)
+    - LogicMaster (Chalkboard)
+    - MicroMaestro (Chalkboard)
+    - Micro Illustrator (Chalkboard)
+    - Monster Maze (Epyx)
+    - Demon Attack (Imagic)
+    - K-Razy Kritters (K-Byte & CBS Software)
+    - Astrochase (Parker Brothers)
+    - Gorf (Roklan)
+    - Attack at EP-CYG-4 (Romox)
+    - Chicken (Synapse)
+    - Picnic Paranoia (Synapse)
+    - Protector II (Synapse)
+    - Shamus (Synapse)
+    - Slime (Synapse)
+    - Speedway Blast (IDSI)
+    - Kangaroo (Atari)
+    - Letter Perfect- 40 Column Version (LJK)
+    - Danger Ranger (Microdeal)
+    - Fort Apocalypse (Synapse)
+    - Express! (Orion Micro Systems)
+    - Telelink I (Atari)
+    - Telelink II (Atari)
 
-	* Cartridge Types :
+  * Cartridge Types :
 
-	- Standard 8k map to address area $A000-$BFFF.
-	- Standard 16k cartridges map to address area $8000-$BFFF.
+    - Standard 8k map to address area $A000-$BFFF.
+    - Standard 16k cartridges map to address area $8000-$BFFF.
 
-	- Right slot 8k cartridges are run in the address area from $8000-$9FFF. Atari 800 only.
+    - Right slot 8k cartridges are run in the address area from $8000-$9FFF. Atari 800 only.
 
-	- Phoenix 8k cartridges occupy 8k of address space between $A000 and $BFFF, and can be disabled by an access to $D500-$D5FF.
+    - Phoenix 8k cartridges occupy 8k of address space between $A000 and $BFFF, and can be disabled by an access to $D500-$D5FF.
 
-	- Blizzard 16k cartridges occupy 16k of address space between $8000 and $BFFF, and can be disabled by an access to $D500-$D5FF.
+    - Blizzard 16k cartridges occupy 16k of address space between $8000 and $BFFF, and can be disabled by an access to $D500-$D5FF.
 
-	- MegaCart 16k cartridges occupy 16k of address space between $8000 and $BFFF, and can be disabled by writing a byte with bit 7 set to $D500-$D5FF.
-	- MegaCart 32k are bank-switched cartridges that occupy 16k of address space between $8000 and $BFFF. It is controlled by a byte written to $D500-$D5FF.
-		Bit 0 selects one of two available banks, bit 7 disables the cartridge.
+    - MegaCart 16k cartridges occupy 16k of address space between $8000 and $BFFF, and can be disabled by writing a byte with bit 7 set to $D500-$D5FF.
+    - MegaCart 32k are bank-switched cartridges that occupy 16k of address space between $8000 and $BFFF. It is controlled by a byte written to $D500-$D5FF.
+      Bit 0 selects one of two available banks, bit 7 disables the cartridge.
 
-	- Williams 32k cartridges have 4 banks mapped to $A000-$BFFF. An access to $D500 selects bank A, $D501 - bank B, etc. An access to $D508-$D50F disables the cartridge.
-	- Williams 64k cartridges have 8 banks mapped to $A000-$BFFF. An access to $D507 selects bank A, $D506 - bank B, etc. An access to $D508-$D50F disables the cartridge.
+    - Williams 32k cartridges have 4 banks mapped to $A000-$BFFF. An access to $D500 selects bank A, $D501 - bank B, etc. An access to $D508-$D50F disables the cartridge.
+    - Williams 64k cartridges have 8 banks mapped to $A000-$BFFF. An access to $D507 selects bank A, $D506 - bank B, etc. An access to $D508-$D50F disables the cartridge.
 
-	- DB 32k bank-switched cartridges have 4 banks. Bank D is mapped to $A000-$BFFF. Bank in $8000-$9FFF is selected by an access to $D500-$D5FF.
-		Two lowest bits of address select bank A, B, C or D.
+    - DB 32k bank-switched cartridges have 4 banks. Bank D is mapped to $A000-$BFFF. Bank in $8000-$9FFF is selected by an access to $D500-$D5FF.
+      Two lowest bits of address select bank A, B, C or D.
 
-	- Express 64k cartridges have 8 banks mapped to $A000-$BFFF. An access to $D577 selects bank A, $D576 - bank B, etc. An access to $D578-$D57F disables the cartridge.
+    - Express 64k cartridges have 8 banks mapped to $A000-$BFFF. An access to $D577 selects bank A, $D576 - bank B, etc. An access to $D578-$D57F disables the cartridge.
 
-	- Diamond 64k cartridges have 8 banks mapped to $A000-$BFFF. An access to $D5D7 selects bank A, $D5D6 - bank B, etc. An access to $D5D8-$D5DF disables the cartridge.
+    - Diamond 64k cartridges have 8 banks mapped to $A000-$BFFF. An access to $D5D7 selects bank A, $D5D6 - bank B, etc. An access to $D5D8-$D5DF disables the cartridge.
 
-	- SpartaDOS X cartridges have 8 banks mapped to $A000-$BFFF. An access to $D5E7 selects bank A, $D5E6 - bank B, etc. An access to $D5E8-$D5EF disables the cartridge.
+    - SpartaDOS X cartridges have 8 banks mapped to $A000-$BFFF. An access to $D5E7 selects bank A, $D5E6 - bank B, etc. An access to $D5E8-$D5EF disables the cartridge.
 
-	- BBSB Contains main bank at $A000-$BFFF. From $8000-$8FFF is first bank, $9000-$9FFF is second bank. They are switched by accessing $8FF6-$8FF9 & $9FF6-$9FF9 respectively.
-		In each bank there's 4 x 4 KBs. Totally, it's 2 x 4 x 4 + 8 = 40 KBs. This switching technique is only used with the "Bounty Bob Strikes Back" cartridge.
+    - BBSB Contains main bank at $A000-$BFFF. From $8000-$8FFF is first bank, $9000-$9FFF is second bank. They are switched by accessing $8FF6-$8FF9 & $9FF6-$9FF9 respectively.
+      In each bank there's 4 x 4 KBs. Totally, it's 2 x 4 x 4 + 8 = 40 KBs. This switching technique is only used with the "Bounty Bob Strikes Back" cartridge.
 
-	- OSS Cartridge: -
+    - OSS Cartridge: -
 
-		There are two types of OSS cartridges. Both are 16 KB and occupy 8 KB of address space between $A000 and $BFFF.
-		The cartridge memory is divided into 4 banks, 4 KB each. One bank ('main') is always mapped to $B000-$BFFF.
-		The other 3 banks are mapped to $A000-$AFFF. The current bank is selected by accessing a byte in $D500-$D5FF.
-		Only 4 lowest bits of address are significant.
+      There are two types of OSS cartridges. Both are 16 KB and occupy 8 KB of address space between $A000 and $BFFF.
+      The cartridge memory is divided into 4 banks, 4 KB each. One bank ('main') is always mapped to $B000-$BFFF.
+      The other 3 banks are mapped to $A000-$AFFF. The current bank is selected by accessing a byte in $D500-$D5FF.
+      Only 4 lowest bits of address are significant.
 
-		034M = This scheme is the more complicated of the two. The main bank is D. An access to: -
-				$D5x0 or $D5x1 selects bank A.
-				$D5x3 or $D5x7 selects bank B.
-				$D5x4 or $D5x5 selects bank C.
-				$D5x2 or $D5x6 is not useful. It disables ROM (there're $FF bytes in $A000-$AFFF).
-				$D5x8-$D5xF disables whole cartridge (enables computer's memory in address space between $A000 and $BFFF).
+        034M = This scheme is the more complicated of the two. The main bank is D. An access to: -
+                $D5x0 or $D5x1 selects bank A.
+                $D5x3 or $D5x7 selects bank B.
+                $D5x4 or $D5x5 selects bank C.
+                $D5x2 or $D5x6 is not useful. It disables ROM (there're $FF bytes in $A000-$AFFF).
+                $D5x8-$D5xF disables whole cartridge (enables computer's memory in address space between $A000 and $BFFF).
 
-		MO91 = This is the simpler one of OSS schemes. It uses only A0 and A3 address lines: -
-				A3=0, A0=0 - $A000-$AFFF: bank B, $B000-$BFFF: bank A.
-				A3=0, A0=1 - $A000-$AFFF: bank D, $B000-$BFFF: bank A.
-				A3=1, A0=0 - disable cartridge.
-				A3=1, A0=1 - $A000-$AFFF: bank C, $B000-$BFFF: bank A.
+        MO91 = This is the simpler one of OSS schemes. It uses only A0 and A3 address lines: -
+                A3=0, A0=0 - $A000-$AFFF: bank B, $B000-$BFFF: bank A.
+                A3=0, A0=1 - $A000-$AFFF: bank D, $B000-$BFFF: bank A.
+                A3=1, A0=0 - disable cartridge.
+                A3=1, A0=1 - $A000-$AFFF: bank C, $B000-$BFFF: bank A.
 
-		043M = Not much is known about this mapping scheme. It is only used in the "MAC/65 v1.0" & "Action! v3.5" cartridges.
+        043M = Not much is known about this mapping scheme. It is only used in the "MAC/65 v1.0" & "Action! v3.5" cartridges.
 
-		8k OSS = Not much is known about this mapping scheme. It is only used in the "The Writers Tool" cartridge.
+        8k OSS = Not much is known about this mapping scheme. It is only used in the "The Writers Tool" cartridge.
 
-	- Corina cartidge designed by GR8 Software
+    - Corina cartidge designed by GR8 Software
 
-	* Copy Protection - Some cartridges were produced that utilised a form of copy protection by writing data back to the ROM area in memory. There are many versions of
-	these ROM's available that have been altered to circumvent this protection. This collection where possible has used original unaltered ROM's, those that have been
-	altered have been commented. The original Copy Protected versions will run in MESS emulation.
+  * Copy Protection - Some cartridges were produced that utilised a form of copy protection by writing data back to the ROM area in memory. There are many versions of
+    these ROM's available that have been altered to circumvent this protection. This collection where possible has used original unaltered ROM's, those that have been
+    altered have been commented. The original Copy Protected versions will run in MESS emulation.
 
-	* Re-releases mentioned in the comments below were generally bit copies of the originals re-packaged in different cartridges.
+  * Re-releases mentioned in the comments below were generally bit copies of the originals re-packaged in different cartridges.
 
-	* In 1983, Romox released some games on EEPROM cartridges. Customers could purchase a blank ECPC (Edge Connector Programmable Cartridge), and
-	then have a game of their choice burned into its EEPROM at a Romox Programming Terminal. These are marked by "ECPC" in the cart "Serial: " number area below.
+  * In 1983, Romox released some games on EEPROM cartridges. Customers could purchase a blank ECPC (Edge Connector Programmable Cartridge), and
+    then have a game of their choice burned into its EEPROM at a Romox Programming Terminal. These are marked by "ECPC" in the cart "Serial: " number area below.
 
-	* Missing Cartridges (Publisher, Cart #, Rarity, Year, Title) :
+  * Missing Cartridges (Publisher, Cart #, Rarity, Year, Title) :
 
-	- Hacked/Pirate/Homemeade                 Blue Max: 2001
-	- Hacked/Pirate/Homemeade                 Cavernia
-	- Hacked/Pirate/Homemeade                 Green Beret
-	- Hacked/Pirate/Homemeade                 Jet Boot Jack
-	- Hacked/Pirate/Homemeade                 Mr.Robot
-	- Hacked/Pirate/Homemeade                 Neptune's Daughter
-	- Hacked/Pirate/Homemeade           1984  Parrot Phone Test 1.1
-	- Hacked/Pirate/Homemeade                 Shadow World
-	- Hacked/Pirate/Homemeade                 Tank Commander
-	- Hacked/Pirate/Homemeade                 Who Dares Wins II
-	- Hacked/Pirate/Homemeade                 Hard Hat Mack
-	- Hacked/Pirate/Homemeade        ER 1990  Universal Turbo + BT
-	- Hacked/Pirate/Homemeade        ER       COS 32T v3.1c
-	- Hacked/Pirate/Homemeade        ER 1988  Turbo Loaders Dadok
-	- Hacked/Pirate/Homemeade        ER       Turbo Loaders Dadok (hacked)
-	- Hacked/Pirate/Homemeade        ER       Turbo Loader 2k
-	- Hacked/Pirate/Homemeade        ER 1990  TurBasCop 3.0 (black case, pink label)
-	- Hacked/Pirate/Homemeade                 Wing Wars
-	- Hacked/Pirate/Homemeade        ER       Phoenix (black case, red label)
-	- Hacked/Pirate/Homemeade        ER       Turbo Blizzard (black case, green label)
-	- Hacked/Pirate/Homemeade        ER       Chaos Utils 2
+   - Hacked/Pirate/Homemeade                  Blue Max: 2001
+   - Hacked/Pirate/Homemeade                  Cavernia
+   - Hacked/Pirate/Homemeade                  Green Beret
+   - Hacked/Pirate/Homemeade                  Jet Boot Jack
+   - Hacked/Pirate/Homemeade                  Mr.Robot
+   - Hacked/Pirate/Homemeade                  Neptune's Daughter
+   - Hacked/Pirate/Homemeade            1984  Parrot Phone Test 1.1
+   - Hacked/Pirate/Homemeade                  Shadow World
+   - Hacked/Pirate/Homemeade                  Tank Commander
+   - Hacked/Pirate/Homemeade                  Who Dares Wins II
+   - Hacked/Pirate/Homemeade                  Hard Hat Mack
+   - Hacked/Pirate/Homemeade         ER 1990  Universal Turbo + BT
+   - Hacked/Pirate/Homemeade         ER       COS 32T v3.1c
+   - Hacked/Pirate/Homemeade         ER 1988  Turbo Loaders Dadok
+   - Hacked/Pirate/Homemeade         ER       Turbo Loaders Dadok (hacked)
+   - Hacked/Pirate/Homemeade         ER       Turbo Loader 2k
+   - Hacked/Pirate/Homemeade         ER 1990  TurBasCop 3.0 (black case, pink label)
+   - Hacked/Pirate/Homemeade                  Wing Wars
+   - Hacked/Pirate/Homemeade         ER       Phoenix (black case, red label)
+   - Hacked/Pirate/Homemeade         ER       Turbo Blizzard (black case, green label)
+   - Hacked/Pirate/Homemeade         ER       Chaos Utils 2
 
-	- Alpha Systems                   ER       Impersonator Back-Up Cart
+   - Alpha Systems                   ER       Impersonator Back-Up Cart
 
-	- Atari                                    1090XL 64k RAM Test
-	- Atari                              1983  1200 SALT (Preliminary 2.99)
-	- Atari                              1982  1200 SALT (A.02)
-	- Atari                                    1400 Burn In (D.R1)
-	- Atari                                    1400 Burn In (D.XX)
-	- Atari                           ER 1982  400/800 SALT Diagnostic cartridge (2.07)
-	- Atari                           ER 1982  400/800 SALT Diagnostic cartridge (2.07F Peritel)
-	- Atari                           ER 1983  400/800 SALT Diagnostic cartridge (3.03)
-	- Atari                           ER 1983  600/800XL SALT (3.04)
-	- Atari                              1983  600XL Super SALT S.00
-	- Atari                                    800XL Burn-In U.01
-	- Atari                                    800XL Prat UP.01
-	- Atari                              1982  810 Disk Field Exerciser
-	- Atari                              1981  810 Disk Board Compatibility Test
-	- Atari                              1983  810 Disk Drive Check-out
-	- Atari                              1982  810 Disk Manufacturing Tests
-	- Atari                           ER 1981  810/815 Burn-In Disk Test
-	- Atari                                    850 Interface Test
-	- Atari                              1981  Paddle Jitter Test (REV A)
-	- Atari                              1982  Paddle Jitter Test (REV C with games)
-	- Atari                                    RAM Extension Module Test Rev 1.0
-	- Atari Germany        RXG8036    ER 1982  AtariSchreiber
-	- Atari Mexico                    U        LOGO Computing Language
+   - Atari                                    1090XL 64k RAM Test
+   - Atari                              1983  1200 SALT (Preliminary 2.99)
+   - Atari                              1982  1200 SALT (A.02)
+   - Atari                                    1400 Burn In (D.R1)
+   - Atari                                    1400 Burn In (D.XX)
+   - Atari                           ER 1982  400/800 SALT Diagnostic cartridge (2.07)
+   - Atari                           ER 1982  400/800 SALT Diagnostic cartridge (2.07F Peritel)
+   - Atari                           ER 1983  400/800 SALT Diagnostic cartridge (3.03)
+   - Atari                           ER 1983  600/800XL SALT (3.04)
+   - Atari                              1983  600XL Super SALT S.00
+   - Atari                                    800XL Burn-In U.01
+   - Atari                                    800XL Prat UP.01
+   - Atari                              1982  810 Disk Field Exerciser
+   - Atari                              1981  810 Disk Board Compatibility Test
+   - Atari                              1983  810 Disk Drive Check-out
+   - Atari                              1982  810 Disk Manufacturing Tests
+   - Atari                           ER 1981  810/815 Burn-In Disk Test
+   - Atari                                    850 Interface Test
+   - Atari                              1981  Paddle Jitter Test (REV A)
+   - Atari                              1982  Paddle Jitter Test (REV C with games)
+   - Atari                                    RAM Extension Module Test Rev 1.0
+   - Atari Germany        RXG8036    ER 1982  AtariSchreiber
+   - Atari Mexico                    U        LOGO Computing Language
 
-	- Atrax                           ER       Atrax (#01)
-	- Atrax                           ER       Atrax (#02)
-	- Atrax                           ER       Atrax (#03)
-	- Atrax                           ER       Atrax (#04)
-	- Atrax                           ER       Atrax (#05)
-	- Atrax                           ER       Atrax (#06)
-	- Atrax                           ER       Atrax (#07)
-	- Atrax                           ER       Atrax (#08)
-	- Atrax                           ER       Atrax (#09)
-	- Atrax                           ER       Atrax (#10)
-	- Atrax                           ER       Atrax (#11)
-	- Atrax                           ER       Atrax (#12)
-	- Atrax                           ER       Atrax (#13)
-	- Atrax                           ER       Atrax (#14)
-	- Atrax                           ER       Atrax (#15)
-	- Atrax                           ER       Atrax (#16)
+   - Atrax                           ER       Atrax (#01)
+   - Atrax                           ER       Atrax (#02)
+   - Atrax                           ER       Atrax (#03)
+   - Atrax                           ER       Atrax (#04)
+   - Atrax                           ER       Atrax (#05)
+   - Atrax                           ER       Atrax (#06)
+   - Atrax                           ER       Atrax (#07)
+   - Atrax                           ER       Atrax (#08)
+   - Atrax                           ER       Atrax (#09)
+   - Atrax                           ER       Atrax (#10)
+   - Atrax                           ER       Atrax (#11)
+   - Atrax                           ER       Atrax (#12)
+   - Atrax                           ER       Atrax (#13)
+   - Atrax                           ER       Atrax (#14)
+   - Atrax                           ER       Atrax (#15)
+   - Atrax                           ER       Atrax (#16)
 
-	- Beaumont                        ER       PUP (Primary Utility Pack)
+   - Beaumont                        ER       PUP (Primary Utility Pack)
 
-	- Elcomp                          ER       Atext-1 (Word Processor)
-	- Elcomp                          ER       Atmas (Macro Assembler)
-	- Elcomp                          ER       Atmona-1 (Machine Language Monitor)
+   - Elcomp                          ER       Atext-1 (Word Processor)
+   - Elcomp                          ER       Atmas (Macro Assembler)
+   - Elcomp                          ER       Atmona-1 (Machine Language Monitor)
 
-	- Exidy                           PR       Demo Cartridge
+   - Exidy                           PR       Demo Cartridge
 
-	- Flop                            ER 1989  Autocopy 2.2
-	- Flop                            ER 1992  Autocopy 2.2 + Supermon 2.2 + TOS 4.1
+   - Flop                            ER 1989  Autocopy 2.2
+   - Flop                            ER 1992  Autocopy 2.2 + Supermon 2.2 + TOS 4.1
 
-	- Gemini Software      MD12V10    ER 1983  Magic Dump
+   - Gemini Software      MD12V10    ER 1983  Magic Dump
 
-	- GR8 Software                       2008  Hobgoblin
-	- GR8 Software                       2012  Hobgoblin 2
-	- GR8 Software                       2010  Isora & Loops DX
-	- GR8 Software                       2009  Robbo Forever
+   - GR8 Software                       2008  Hobgoblin
+   - GR8 Software                       2012  Hobgoblin 2
+   - GR8 Software                       2010  Isora & Loops DX
+   - GR8 Software                       2009  Robbo Forever
 
-	- ICD                                1986  Multi I/O Diagnostics
-	- ICD                             R  1988  SpartaDOS X (4.17)
+   - ICD                                1986  Multi I/O Diagnostics
+   - ICD                             R  1988  SpartaDOS X (4.17)
 
-	- INFO/soft Tech.                 ER       INFO/soft 7000 Graphics Generator
+   - INFO/soft Tech.                 ER       INFO/soft 7000 Graphics Generator
 
-	- Island Software                 ER 1984  GhostCART II
+   - Island Software                 ER 1984  GhostCART II
 
-	- JRC                             ER       Plotter Cart
-	- JRC                             ER       Toolbox (ver 1)
-	- JRC                             ER       Toolbox (ver 2)
-	- JRC                             ER       Toolbox (ver BT)
-	- JRC                             ER       Toolbox (ver 3)
-	- JRC                             ER       Toolbox (ver 3)
-	- JRC                             ER       TopGun
-	- JRC                             ER       G-Man
-	- JRC                             ER       The Spy
-	- JRC                             ER       Rambox (ver 1)
-	- JRC                             ER       Rambox (ver 2)
-	- JRC                             ER 1990  Loadcopy
-	- JRC                             ER       VisiCopy I
-	- JRC                             ER       VisiCopy II
+   - JRC                             ER       Plotter Cart
+   - JRC                             ER       Toolbox (ver 1)
+   - JRC                             ER       Toolbox (ver 2)
+   - JRC                             ER       Toolbox (ver BT)
+   - JRC                             ER       Toolbox (ver 3)
+   - JRC                             ER       Toolbox (ver 3)
+   - JRC                             ER       TopGun
+   - JRC                             ER       G-Man
+   - JRC                             ER       The Spy
+   - JRC                             ER       Rambox (ver 1)
+   - JRC                             ER       Rambox (ver 2)
+   - JRC                             ER 1990  Loadcopy
+   - JRC                             ER       VisiCopy I
+   - JRC                             ER       VisiCopy II
 
-	- LJK                             R        Data Perfect
-	- LJK                             R        Edit 6502
-	- LJK                             R  1981  Letter Perfect (80 col)
+   - LJK                             R        Data Perfect
+   - LJK                             R        Edit 6502
+   - LJK                             R  1981  Letter Perfect (80 col)
 
-	- Logic One                       PR       Jump Start
+   - Logic One                       PR       Jump Start
 
-	- O.S.S.                          U  1983  Basic XL (1.00)
-	- O.S.S.                          U  1983  Basic XL (1.01)
-	- O.S.S.                          U  1984  Mac/65 (1.02)
+   - O.S.S.                          U  1983  Basic XL (1.00)
+   - O.S.S.                          U  1983  Basic XL (1.01)
+   - O.S.S.                          U  1984  Mac/65 (1.02)
 
-	- Protonics                          1982  The Block
+   - Protonics                          1982  The Block
 
-	- Radical Systems      22680         1983  Cartridge Maker
+   - Radical Systems      22680         1983  Cartridge Maker
 
-	- Rantom                          ER 1983  Trust
+   - Rantom                          ER 1983  Trust
 
-	- Ravensburger                    ER 198?  Bilderregen
-	- Ravensburger                    ER 1984  Fratzenschneider (FaceMaker)
-	- Ravensburger                    ER 1984  KinderComp
-	- Ravensburger                    ER 1984  Springteufel (Fraction Fever)
+   - Ravensburger                    ER 198?  Bilderregen
+   - Ravensburger                    ER 1984  Fratzenschneider (FaceMaker)
+   - Ravensburger                    ER 1984  KinderComp
+   - Ravensburger                    ER 1984  Springteufel (Fraction Fever)
 
-	- Reevesoft                       ER 1989  Diamond GOS (2.0)
+   - Reevesoft                       ER 1989  Diamond GOS (2.0)
 
-	- Reston                          ER       Movie Maker
+   - Reston                          ER       Movie Maker
 
-	- Roklan                          PR 1983  Pursuit of the Pink Panther
+   - Roklan                          PR 1983  Pursuit of the Pink Panther
 
 
-	- Romox                01213         1983  Hot Lips (ECPC)
-	- Romox                01223         1983  Bartender, The (ECPC)
-	- Romox                01283         1983  Baja Buggies (ECPC)
-	- Romox                02234         1983  Dancing Feats (ECPC)
-	- Romox                03033         1982  Revenge of the Beefsteak Tomatoes (ECPC)
-	- Romox                03213         1983  Parallax (ECPC)
-	- Romox                04033         1983  Crash Dive (ECPC)
-	- Romox                12023         1983  Ripper (ECPC)
+   - Romox                01213         1983  Hot Lips (ECPC)
+   - Romox                01223         1983  Bartender, The (ECPC)
+   - Romox                01283         1983  Baja Buggies (ECPC)
+   - Romox                02234         1983  Dancing Feats (ECPC)
+   - Romox                03033         1982  Revenge of the Beefsteak Tomatoes (ECPC)
+   - Romox                03213         1983  Parallax (ECPC)
+   - Romox                04033         1983  Crash Dive (ECPC)
+   - Romox                12023         1983  Ripper (ECPC)
 
-	- Softmark                        ER 1986  ESP Mindlock BBS
+   - Softmark                        ER 1986  ESP Mindlock BBS
 
-	- Spinnaker            JUK-AT     ER       Jukebox
+   - Spinnaker            JUK-AT     ER       Jukebox
 
-	- Stimultech                      ER 1983  Expando-Vision (5- Athletic Confidence/Golf)
-	- Stimultech                      ER 1983  Expando-Vision (6- Study Habits/Memory Power)
-	- Stimultech                      ER 1983  Expando-Vision (7- Career/Success Motivation)
-	- Stimultech                      ER 1983  Expando-Vision (8- Sexual Confidence)
+   - Stimultech                      ER 1983  Expando-Vision (5- Athletic Confidence/Golf)
+   - Stimultech                      ER 1983  Expando-Vision (6- Study Habits/Memory Power)
+   - Stimultech                      ER 1983  Expando-Vision (7- Career/Success Motivation)
+   - Stimultech                      ER 1983  Expando-Vision (8- Sexual Confidence)
 
-	- Synapse                         ER       Synassembler
+   - Synapse                         ER       Synassembler
 
-	- Tech-Sketch                     ER       Paint-N-Sketch Level I
-	- Tech-Sketch                     ER       Paint-N-Sketch Level II
+   - Tech-Sketch                     ER       Paint-N-Sketch Level I
+   - Tech-Sketch                     ER       Paint-N-Sketch Level II
 
-	- Thompson Elec.                  R        Proburner
+   - Thompson Elec.                  R        Proburner
 
-	- Video 61                           1999  Mr.Robot
-	- Video 61                        U  2000  Rally Speedway
-	- Video 61                           1998  Amazing Maze
-	- Video 61                                 Arkanoid
-	- Video 61                           1998  Bumpers
-	- Video 61                           1998  Checkers
-	- Video 61                           1999  Clash of the Kings
-	- Video 61                           1999  Concentration
-	- Video 61                           2001  Cosmos Pinball
-	- Video 61                           1999  Dan Strikes Back
-	- Video 61                           1999  Dandy
-	- Video 61                           1999  Desmond's Dungeon
-	- Video 61                           1999  Dinky Do
-	- Video 61                           1999  Dungeon Lords
-	- Video 61                           1999  Elevator Repairman
-	- Video 61                           1999  Firebug
-	- Video 61                           1999  Getaway
-	- Video 61                           1998  Hearts Card Game
-	- Video 61                           1998  Jailbreak
-	- Video 61                                 Puzzled
-	- Video 61                           1998  Lights Out
-	- Video 61                           2000  Lord of the Orb
-	- Video 61                           1998  MahJong
-	- Video 61                           1999  Maze War
-	- Video 61                           1999  Midas Maze
-	- Video 61                                 Monopoly
-	- Video 61                           1998  Montana Solitaire Card Game
-	- Video 61                           1998  MyDOS 4.5
-	- Video 61                           1998  Paddle Pack Pong
-	- Video 61                           1998  Paddle Wars
-	- Video 61                           2001  Preppie II
-	- Video 61                           1998  Plaqueman
-	- Video 61                                 Quest for Quintana Roo
-	- Video 61                           1998  Ricochet
-	- Video 61                           1998  Rocks
-	- Video 61                           1998  Sharp Shooter
-	- Video 61                           1999  Smush
-	- Video 61                           1998  Solitaire Card Game
-	- Video 61                           1999  Spaceball
-	- Video 61                           2001  Spaceshot Pinball
-	- Video 61                           1998  Sparta DOS 3.3C
-	- Video 61                           2001  Speed-O RPM Drive Tester
-	- Video 61                           1999  AtarTris II
-	- Video 61                           1998  Ultra-Translator (800 OS)
-	- Video 61                                 Twilight World
-	- Video 61                           1998  Twin Pack (Battleship/Jump the Pegs)
-	- Video 61                           1998  Video Slots
-	- Video 61                                 Whomper Stomper
+   - Video 61                           1999  Mr.Robot
+   - Video 61                        U  2000  Rally Speedway
+   - Video 61                           1998  Amazing Maze
+   - Video 61                                 Arkanoid
+   - Video 61                           1998  Bumpers
+   - Video 61                           1998  Checkers
+   - Video 61                           1999  Clash of the Kings
+   - Video 61                           1999  Concentration
+   - Video 61                           2001  Cosmos Pinball
+   - Video 61                           1999  Dan Strikes Back
+   - Video 61                           1999  Dandy
+   - Video 61                           1999  Desmond's Dungeon
+   - Video 61                           1999  Dinky Do
+   - Video 61                           1999  Dungeon Lords
+   - Video 61                           1999  Elevator Repairman
+   - Video 61                           1999  Firebug
+   - Video 61                           1999  Getaway
+   - Video 61                           1998  Hearts Card Game
+   - Video 61                           1998  Jailbreak
+   - Video 61                                 Puzzled
+   - Video 61                           1998  Lights Out
+   - Video 61                           2000  Lord of the Orb
+   - Video 61                           1998  MahJong
+   - Video 61                           1999  Maze War
+   - Video 61                           1999  Midas Maze
+   - Video 61                                 Monopoly
+   - Video 61                           1998  Montana Solitaire Card Game
+   - Video 61                           1998  MyDOS 4.5
+   - Video 61                           1998  Paddle Pack Pong
+   - Video 61                           1998  Paddle Wars
+   - Video 61                           2001  Preppie II
+   - Video 61                           1998  Plaqueman
+   - Video 61                                 Quest for Quintana Roo
+   - Video 61                           1998  Ricochet
+   - Video 61                           1998  Rocks
+   - Video 61                           1998  Sharp Shooter
+   - Video 61                           1999  Smush
+   - Video 61                           1998  Solitaire Card Game
+   - Video 61                           1999  Spaceball
+   - Video 61                           2001  Spaceshot Pinball
+   - Video 61                           1998  Sparta DOS 3.3C
+   - Video 61                           2001  Speed-O RPM Drive Tester
+   - Video 61                           1999  AtarTris II
+   - Video 61                           1998  Ultra-Translator (800 OS)
+   - Video 61                                 Twilight World
+   - Video 61                           1998  Twin Pack (Battleship/Jump the Pegs)
+   - Video 61                           1998  Video Slots
+   - Video 61                                 Whomper Stomper
 
-	- Walling Co.                     ER       AProm XL (EEPROM Burner)
-	- Walling Co.                     ER       AProm (EEPROM Burner)
-	- Walling Co.                     ER       Six Pack I
-	- Walling Co.                     ER       Six Pack II
+   - Walling Co.                     ER       AProm XL (EEPROM Burner)
+   - Walling Co.                     ER       AProm (EEPROM Burner)
+   - Walling Co.                     ER       Six Pack I
+   - Walling Co.                     ER       Six Pack II
 
 -->
 
@@ -698,10 +698,10 @@ Compiled by K1W1
 	<software name="ast2k">
 		<description>AST 2000</description>
 		<!-- AST 2000 was two cartridges in one - it contained an AST Utility cartridge, and a cartridge for Turbo 2000 (another turbo system popular in Poland).
-				The "AST 2000" contained a 16KB ROM and a two-position switch, which allowed to choose between one of two 8KB banks. So in reality this image is
-				composed of two 8KB images. This ROM can be split in half and of the halves mounted as a Phoenix 8KB cartridge. Unfortunately, the second half
-				(Turbo 2000) won't work in the emulator - the real cartridge contained a capacitor that automatically switched off the cartridge from memory after
-				a certain time, and this isn't currently emulated. -->
+		     The "AST 2000" contained a 16KB ROM and a two-position switch, which allowed to choose between one of two 8KB banks. So in reality this image is
+		     composed of two 8KB images. This ROM can be split in half and of the halves mounted as a Phoenix 8KB cartridge. Unfortunately, the second half
+		     (Turbo 2000) won't work in the emulator - the real cartridge contained a capacitor that automatically switched off the cartridge from memory after
+		     a certain time, and this isn't currently emulated. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="a800_cart">
@@ -923,8 +923,8 @@ Compiled by K1W1
 	<software name="awritera" cloneof="awriterc" supported="partial">
 		<description>AtariWriter (Rev. A)</description>
 		<!-- Contains a joystick-checking routine at $8563. While in the main menu, it checks if the value under $8278 (stick 0) equals $8.
-				If so, it displays the author's name on the screen. However, the author's name (stored at $8585) is erased from this image, so nothing gets displayed.
-				It appears Atari noticed the easter egg and removed it in later version. -->
+		     If so, it displays the author's name on the screen. However, the author's name (stored at $8585) is erased from this image, so nothing gets displayed.
+		     It appears Atari noticed the easter egg and removed it in later version. -->
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="RX8084" />
@@ -1460,7 +1460,7 @@ Compiled by K1W1
 	<software name="checkbk">
 		<description>Checkbook (Prototype)</description>
 		<!-- This cartridge was presented at a trade show by Atari as a demo and is possibly a one-off cartridge.
-				More information can be found at http://www.atariage.com/forums/topic/194283-checkbook-cartridge-cxl8001/ -->
+		     More information can be found at http://www.atariage.com/forums/topic/194283-checkbook-cartridge-cxl8001/ -->
 		<year>1980</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CXL8001" />

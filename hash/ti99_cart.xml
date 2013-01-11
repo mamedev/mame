@@ -4,24 +4,24 @@
 <softwarelist name="ti99_cart" description="TI-99/4A cartridges">
 
 	<!--
-		This is just the start of the software list for the TI. About 350
-		cartridges wait to be inserted here.
+	    This is just the start of the software list for the TI. About 350
+	    cartridges wait to be inserted here.
 
-		Currently we only support the cartridge types "standard" and "paged"
-		which is the type of the majority of cartridges. The RAM-based cartridges
-		(with NVRAM) may follow later (in particular MiniMemory).
+	    Currently we only support the cartridge types "standard" and "paged"
+	    which is the type of the majority of cartridges. The RAM-based cartridges
+	    (with NVRAM) may follow later (in particular MiniMemory).
 
-		Alternatively, RPK support will continue to be available for all
-		cartridges.
+	    Alternatively, RPK support will continue to be available for all
+	    cartridges.
 
-		Note that the sizes of the grom data areas should not be bigger than
-		the included dump, as the region size determines how many GROMs are
-		included as subdevices. (OTOH, the additional GROMs would just be
-		empty, so no big trouble expected.)
+	    Note that the sizes of the grom data areas should not be bigger than
+	    the included dump, as the region size determines how many GROMs are
+	    included as subdevices. (OTOH, the additional GROMs would just be
+	    empty, so no big trouble expected.)
 
-		MAME/MESS policy requires the names of the software to be at max 8
-		characters, so this means the RPKs need to be renamed to <name>.zip for
-		each cartridge to be used.
+	    MAME/MESS policy requires the names of the software to be at max 8
+	    characters, so this means the RPKs need to be renamed to <name>.zip for
+	    each cartridge to be used.
 	-->
 
 	<!-- Common type -->

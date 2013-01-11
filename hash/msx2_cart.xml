@@ -711,23 +711,23 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 <!--
-	<software name="jrmate">
-		<description>Jr. Mate (Jpn)</description>
-		<year></year>
-		<publisher>Panasoft</publisher>
-		<info name="alt_title" value="ジュニアメイト" />
-		<part name="cart" interface="msx_cart">
-			<feature name="pcb" value="JCI-N1S" />
-			<feature name="mapper" value="M60002-0115FP" />
-			<feature name="sram" value="D4464C-20L" />
-			<dataarea name="rom" size="">
-				<rom name="jr_mate_1_v1.0" size="131072" crc="" sha1="" offset="0" />
-				<rom name="jr_mate_2_v1.0" size="131072" crc="" sha1="" offset="0x20000" />
-				<!- Kanji rom ->
-				<rom name="tc531000p-6616" size="131072" crc="" sha1="" offset="0x40000" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="jrmate">
+        <description>Jr. Mate (Jpn)</description>
+        <year></year>
+        <publisher>Panasoft</publisher>
+        <info name="alt_title" value="ジュニアメイト" />
+        <part name="cart" interface="msx_cart">
+            <feature name="pcb" value="JCI-N1S" />
+            <feature name="mapper" value="M60002-0115FP" />
+            <feature name="sram" value="D4464C-20L" />
+            <dataarea name="rom" size="">
+                <rom name="jr_mate_1_v1.0" size="131072" crc="" sha1="" offset="0" />
+                <rom name="jr_mate_2_v1.0" size="131072" crc="" sha1="" offset="0x20000" />
+                <!- Kanji rom ->
+                <rom name="tc531000p-6616" size="131072" crc="" sha1="" offset="0x40000" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="kikikai">
@@ -793,20 +793,20 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 <!--
-	<!- see http://msx.jpn.org/tagoo/s_check.cgi?LINE=1026 (disk version of this software?) ->
-	<software name="">
-		<description>Michelangelo 2 (Jpn)</description>
-		<year>1987</year>
-		<publisher></publisher>
-		<info name="alt_title" value="ミケランジェロⅡ" />
-		<part name="cart" interface="msx_cart">
-			<feature name="pcb" value="1M-8KB" />
-			<feature name="mapper" value="NEOS MR6401" />
-			<dataarea name="rom" size="131072">
-				<rom name="rp231024d" size="131072" crc="" sha1="" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+    <!- see http://msx.jpn.org/tagoo/s_check.cgi?LINE=1026 (disk version of this software?) ->
+    <software name="">
+        <description>Michelangelo 2 (Jpn)</description>
+        <year>1987</year>
+        <publisher></publisher>
+        <info name="alt_title" value="ミケランジェロⅡ" />
+        <part name="cart" interface="msx_cart">
+            <feature name="pcb" value="1M-8KB" />
+            <feature name="mapper" value="NEOS MR6401" />
+            <dataarea name="rom" size="131072">
+                <rom name="rp231024d" size="131072" crc="" sha1="" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="mikkoku">
