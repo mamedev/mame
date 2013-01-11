@@ -56,6 +56,7 @@ Expansion bus stuff:
 #include "emu.h"
 #include "includes/3do.h"
 #include "cpu/arm7/arm7core.h"
+#include "debugger.h"
 
 #define VERBOSE         1
 #define LOG(x) do { if (VERBOSE) printf x; } while (0)
@@ -657,7 +658,7 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 	if(offset >= 0x3800/4 && offset <= 0x39ff/4)
 	{
 		UINT32 res = 0;
-		offset &= (0xff/4);
+		offset &= (0x1ff/4);
 		res = (m_dspp.EO[(offset<<1)+0] << 16);
 		res |= (m_dspp.EO[(offset<<1)+1] & 0xffff);
 		return res;
@@ -666,7 +667,7 @@ READ32_MEMBER(_3do_state::_3do_clio_r)
 	if(offset >= 0x3c00/4 && offset <= 0x3fff/4)
 	{
 		UINT16 res;
-		offset &= (0x1ff/4);
+		offset &= (0x3ff/4);
 		res = m_dspp.EO[offset] & 0xffff;
 		return res;
 	}
@@ -795,7 +796,7 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 
 	if(offset >= 0x3000/4 && offset <= 0x31ff/4)
 	{
-		offset &= (0xff/4);
+		offset &= (0x1ff/4);
 		m_dspp.EI[(offset<<1)+0] = data >> 16;
 		m_dspp.EI[(offset<<1)+1] = data & 0xffff;
 		return;
@@ -803,7 +804,7 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 
 	if(offset >= 0x3400/4 && offset <= 0x37ff/4)
 	{
-		offset &= (0x1ff/4);
+		offset &= (0x3ff/4);
 		m_dspp.EI[offset] = data & 0xffff;
 		return;
 	}
@@ -991,6 +992,9 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 	*/
 	case 0x17fc/4:
 		/* TODO: DSPP enabled just before enabling DSPP irq! */
+		if(data & 1)
+			debugger_break(machine());
+
 		//printf("%08x\n",data);
 		break;
 
@@ -1098,10 +1102,10 @@ void _3do_state::m_3do_clio_init( screen_device *screen )
 	m_clio.unclerev = 0x03800000;
 	m_clio.expctl = 0x80;    /* ARM has the expansion bus */
 	m_dspp.N = auto_alloc_array(machine(), UINT16, 0x800 );
-	m_dspp.EI = auto_alloc_array(machine(), UINT16, 0x200 );
-	m_dspp.EO = auto_alloc_array(machine(), UINT16, 0x200 );
+	m_dspp.EI = auto_alloc_array(machine(), UINT16, 0x400 );
+	m_dspp.EO = auto_alloc_array(machine(), UINT16, 0x400 );
 
 	state_save_register_global_pointer(machine(), m_dspp.N, 0x800);
-	state_save_register_global_pointer(machine(), m_dspp.EI, 0x200);
-	state_save_register_global_pointer(machine(), m_dspp.EO, 0x200);
+	state_save_register_global_pointer(machine(), m_dspp.EI, 0x400);
+	state_save_register_global_pointer(machine(), m_dspp.EO, 0x400);
 }
