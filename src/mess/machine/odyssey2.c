@@ -155,7 +155,7 @@ READ8_MEMBER(odyssey2_state::g7400_io_read)
 {
 	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
 	{
-		return video_read(space, offset); /* seems to have higher priority than ram??? */
+		return m_i8244->read(space, offset); /* seems to have higher priority than ram??? */
 	}
 	else if (!(m_p1 & P1_EXT_RAM_ENABLE))
 	{
@@ -178,7 +178,7 @@ WRITE8_MEMBER(odyssey2_state::g7400_io_write)
 	}
 	else if (!(m_p1 & P1_VDC_ENABLE))
 	{
-		video_write(space, offset, data);
+		m_i8244->write(space, offset, data);
 	}
 	else
 	{

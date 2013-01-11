@@ -21,6 +21,7 @@
 #include "includes/odyssey2.h"
 #include "imagedev/cartslot.h"
 #include "sound/sp0256.h"
+#include "video/i8244.h"
 
 
 static ADDRESS_MAP_START( odyssey2_mem , AS_PROGRAM, 8, odyssey2_state )
@@ -46,7 +47,7 @@ static ADDRESS_MAP_START( g7400_io , AS_IO, 8, odyssey2_state )
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2)   AM_READWRITE(p2_read, p2_write)
 	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS)  AM_READWRITE(bus_read, bus_write)
 	AM_RANGE(MCS48_PORT_T0,   MCS48_PORT_T0)   AM_READ(t0_read)
-	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1)   AM_READ(t1_read)
+	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1)   AM_READ(t1_read_g7400)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("i8243", i8243_device, i8243_prog_w);
 ADDRESS_MAP_END
 
@@ -128,6 +129,12 @@ static INPUT_PORTS_START( odyssey2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1)         PORT_PLAYER(2)
 	PORT_BIT( 0xe0, 0xe0,    IPT_UNUSED )
 INPUT_PORTS_END
+
+
+WRITE_LINE_MEMBER(odyssey2_state::irq_callback)
+{
+	m_maincpu->set_input_line(0, state);
+}
 
 
 static const gfx_layout odyssey2_graphicslayout =
@@ -255,7 +262,7 @@ static MACHINE_CONFIG_START( g7400, odyssey2_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( 3547000*2, 2*I824X_LINE_CLOCKS, 2*I824X_START_ACTIVE_SCAN, 2*I824X_END_ACTIVE_SCAN, 312, I824X_START_Y, I824X_START_Y + I824X_SCREEN_HEIGHT + 10 )
+	MCFG_SCREEN_RAW_PARAMS( 3540000*2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
 	MCFG_VIDEO_START_OVERRIDE(odyssey2_state,g7400)
@@ -265,9 +272,8 @@ static MACHINE_CONFIG_START( g7400, odyssey2_state )
 
 	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(odyssey2_state,i8243_port_w))
 
-	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", ODYSSEY2, 3547000)
+	MCFG_I8244_ADD( "i8244", 3540000, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( odyssey2_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_FRAGMENT_ADD(odyssey2_cartslot)

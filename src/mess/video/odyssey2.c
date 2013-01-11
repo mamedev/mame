@@ -34,34 +34,34 @@
 const UINT8 odyssey2_colors[] =
 {
 	/* Background,Grid Dim */
-	0x00,0x00,0x00,
-	0x00,0x00,0xFF,   /* Blue */
-	0x00,0x80,0x00,   /* DK Green */
-	0xff,0x9b,0x60,
-	0xCC,0x00,0x00,   /* Red */
-	0xa9,0x80,0xff,
-	0x82,0xfd,0xdb,
-	0xFF,0xFF,0xFF,
+	0x00, 0x00, 0x00, //	0x00,0x00,0x00,						// i r g b
+	0x00, 0x00, 0xAA, //	0x00,0x00,0xFF,   /* Blue */		// i r g B
+	0x00, 0xAA, 0x00, //	0x00,0x80,0x00,   /* DK Green */	// i r G b
+	0x00, 0xAA, 0xAA, //	0xff,0x9b,0x60,						// i r G B
+	0xAA, 0x00, 0x00, //	0xCC,0x00,0x00,   /* Red */			// i R g b
+	0xAA, 0x00, 0xAA, //	0xa9,0x80,0xff,						// i R g B
+	0xAA, 0xAA, 0x00, //	0x82,0xfd,0xdb,						// i R G b
+	0xAA, 0xAA, 0xAA, //	0xFF,0xFF,0xFF,						// i R G B
 
 	/* Background,Grid Bright */
-	0x80,0x80,0x80,
-	0x50,0xAE,0xFF,   /* Blue */
-	0x00,0xFF,0x00,   /* Dk Green */
-	0x82,0xfb,0xdb,   /* Lt Grey */
-	0xEC,0x02,0x60,   /* Red */
-	0xa9,0x80,0xff,   /* Violet */
-	0xff,0x9b,0x60,   /* Orange */
-	0xFF,0xFF,0xFF,
+	0x55, 0x55, 0x55, //	0x80,0x80,0x80,						// I r g b
+	0x55, 0x55, 0xFF, //	0x50,0xAE,0xFF,   /* Blue */		// I r g B
+	0x55, 0xFF, 0x55, //	0x00,0xFF,0x00,   /* Dk Green */	// I r G b
+	0x55, 0xFF, 0xFF, //	0x82,0xfb,0xdb,   /* Lt Grey */		// I r G B
+	0xFF, 0x55, 0x55, //	0xEC,0x02,0x60,   /* Red */			// I R g b
+	0xFF, 0x55, 0xFF, //	0xa9,0x80,0xff,   /* Violet */		// I R g B
+	0xFF, 0xFF, 0x55, //	0xff,0x9b,0x60,   /* Orange */		// I R G b
+	0xFF, 0xFF, 0xFF, //	0xFF,0xFF,0xFF,						// I R G B
 
 	/* Character,Sprite colors */
-	0x80,0x80,0x80,   /* Dark Grey */
-	0xFF,0x80,0x80,   /* Red */
-	0x00,0xC0,0x00,   /* Green */
-	0xff,0x9b,0x60,   /* Orange */
-	0x50,0xAE,0xFF,   /* Blue */
-	0xa9,0x80,0xff,   /* Violet */
-	0x82,0xfb,0xdb,   /* Lt Grey */
-	0xff,0xff,0xff,   /* White */
+	0x80,0x80,0x80,   /* Dark Grey */	// I r g b 
+	0xFF,0x80,0x80,   /* Red */			// I R g b
+	0x00,0xC0,0x00,   /* Green */		// I r G b
+	0xff,0x9b,0x60,   /* Orange */		// I R G b
+	0x50,0xAE,0xFF,   /* Blue */		// I r g B
+	0xa9,0x80,0xff,   /* Violet */		// I R g B
+	0x82,0xfb,0xdb,   /* Lt Grey */		// I r G B
+	0xff,0xff,0xff,   /* White */		// I R G B
 
 	/* EF9340/EF9341 colors */
 	0x00, 0x00, 0x00,
@@ -175,7 +175,7 @@ READ8_MEMBER(odyssey2_state::video_read)
 			break;
 
 		case 0xa4:
-			if (m_o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY)
+			if (m_o2_vdc.s.control & OLD_VDC_CONTROL_REG_STROBE_XY)
 			{
 				m_y_beam_pos = m_screen->vpos() - m_start_vpos;
 			}
@@ -187,7 +187,7 @@ READ8_MEMBER(odyssey2_state::video_read)
 
 		case 0xa5:
 
-			if ((m_o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
+			if ((m_o2_vdc.s.control & OLD_VDC_CONTROL_REG_STROBE_XY))
 			{
 				m_x_beam_pos = m_screen->hpos();
 				if ( m_x_beam_pos < I824X_START_ACTIVE_SCAN )
@@ -219,8 +219,8 @@ WRITE8_MEMBER(odyssey2_state::video_write)
 		m_sh_channel->update();
 
 	if (offset == 0xa0) {
-		if (    m_o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY
-				&& !(data & VDC_CONTROL_REG_STROBE_XY))
+		if (    m_o2_vdc.s.control & OLD_VDC_CONTROL_REG_STROBE_XY
+				&& !(data & OLD_VDC_CONTROL_REG_STROBE_XY))
 		{
 			/* Toggling strobe bit, tuck away values */
 			m_x_beam_pos = m_screen->hpos();
@@ -243,7 +243,20 @@ WRITE8_MEMBER(odyssey2_state::video_write)
 
 WRITE8_MEMBER(odyssey2_state::lum_write)
 {
-	m_lum = data;
+	m_lum = ( data & 0x01 ) << 3;
+}
+
+
+WRITE16_MEMBER(odyssey2_state::scanline_postprocess)
+{
+	int vpos = data;
+	bitmap_ind16 *bitmap = m_i8244->get_bitmap();
+
+	// apply external LUM setting
+	for ( int x = i8244_device::START_ACTIVE_SCAN; x < i8244_device::END_ACTIVE_SCAN; x++ )
+	{
+		bitmap->pix16( vpos, x ) |= ( m_lum ^ 0x08 );
+	}
 }
 
 
@@ -255,6 +268,16 @@ READ8_MEMBER(odyssey2_state::t1_read)
 		{
 			return 1;
 		}
+	}
+	return 0;
+}
+
+
+READ8_MEMBER(odyssey2_state::t1_read_g7400)
+{
+	if ( m_i8244->vblank() || m_i8244->hblank() )
+	{
+		return 1;
 	}
 	return 0;
 }
@@ -647,6 +670,10 @@ UINT32 odyssey2_state::screen_update_odyssey2(screen_device &screen, bitmap_ind1
 {
 	copybitmap( bitmap, m_tmp_bitmap, 0, 0, 0, 0, cliprect );
 
+	if ( m_i8244 )
+	{
+		return m_i8244->screen_update(screen, bitmap, cliprect);
+	}
 	return 0;
 }
 
