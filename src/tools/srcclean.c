@@ -228,7 +228,7 @@ int main(int argc, char *argv[])
 
 			if (in_c_string)
 			{
-				printf("Error: unterminated string literal: %x\n", src);
+				printf("Error: unterminated string literal: %x (%s)\n", src, argv[1]);
 				return 1;
 			}
 		}
