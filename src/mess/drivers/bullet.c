@@ -48,10 +48,8 @@ Notes:
 
     TODO:
 
-    - revision F boot ROM dump
-    - wmb_org.imd does not load
+	- floppy broken
     - z80dart wait/ready
-    - floppy type dips
     - Winchester hard disk
     - revision E model
 
@@ -201,24 +199,32 @@ WRITE8_MEMBER( bullet_state::exdsk_w )
 
 	*/
 
-	// drive select
-	m_floppy = NULL;
-
-	switch (data & 0x07)
+	if (BIT(data, 2))
 	{
-	// 5.25"
-	case 0: m_floppy = m_floppy0->get_device(); break;
-	case 1: m_floppy = m_floppy1->get_device(); break;
-	case 2: m_floppy = m_floppy2->get_device(); break;
-	case 3: m_floppy = m_floppy3->get_device(); break;
-	// 8"
-	case 4: m_floppy = m_floppy4->get_device(); break;
-	case 5: m_floppy = m_floppy5->get_device(); break;
-	case 6: m_floppy = m_floppy6->get_device(); break;
-	case 7: m_floppy = m_floppy7->get_device(); break;
+		m_exdsk_sw = true;
 	}
 
-	m_fdc->set_floppy(m_floppy);
+	if (m_exdsk_sw)
+	{
+		// drive select
+		m_floppy = NULL;
+
+		switch (data & 0x07)
+		{
+		// 5.25"
+		case 0: m_floppy = m_floppy0->get_device(); break;
+		case 1: m_floppy = m_floppy1->get_device(); break;
+		case 2: m_floppy = m_floppy2->get_device(); break;
+		case 3: m_floppy = m_floppy3->get_device(); break;
+		// 8"
+		case 4: m_floppy = m_floppy4->get_device(); break;
+		case 5: m_floppy = m_floppy5->get_device(); break;
+		case 6: m_floppy = m_floppy6->get_device(); break;
+		case 7: m_floppy = m_floppy7->get_device(); break;
+		}
+
+		m_fdc->set_floppy(m_floppy);
+	}
 
 	if (m_floppy)
 	{
@@ -281,11 +287,19 @@ WRITE8_MEMBER( bullet_state::hdcon_w )
 
 	*/
 
-	// FDC clock
-	m_fdc->set_unscaled_clock(BIT(data, 2) ? XTAL_16MHz/16 : XTAL_16MHz/8);
+   	if (BIT(data, 4))
+	{
+		m_hdcon_sw = true;
+	}
 
-	// density select
-	m_fdc->dden_w(BIT(data, 3));
+	if (m_hdcon_sw)
+	{
+		// FDC clock
+		m_fdc->set_unscaled_clock(BIT(data, 2) ? XTAL_16MHz/8 : XTAL_16MHz/16);
+
+		// density select
+		m_fdc->dden_w(BIT(data, 3));
+	}
 }
 
 
@@ -317,7 +331,7 @@ READ8_MEMBER( bullet_state::info_r )
 
 	// floppy
 	data |= m_fdc->hld_r() << 4;
-	data |= m_floppy ? m_floppy->dskchg_r() : 1;
+	data |= (m_floppy ? m_floppy->dskchg_r() : 1) << 5;
 	data |= m_fdc->intrq_r() << 6;
 	data |= m_fdc->drq_r() << 7;
 
@@ -667,7 +681,7 @@ INPUT_PORTS_START( bullet )
 	PORT_DIPNAME( 0xf0, 0x50, "Floppy Type" ) PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0xf0, "5.25\" SD" )
 	PORT_DIPSETTING(    0x50, "5.25\" DD" )
-	PORT_DIPSETTING(    0x60, "8\" SD" )
+	PORT_DIPSETTING(    0x90, "8\" SD" )
 	PORT_DIPSETTING(    0x00, "8\" DD" )
 INPUT_PORTS_END
 
@@ -1029,6 +1043,7 @@ SLOT_INTERFACE_END
 static SLOT_INTERFACE_START( bullet_35_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
+
 void bullet_state::fdc_intrq_w(bool state)
 {
 	z80dart_dcda_w(m_dart, state);
@@ -1095,8 +1110,8 @@ static const z80_daisy_config daisy_chain[] =
 void bullet_state::machine_start()
 {
 	// floppy callbacks
-	m_fdc->setup_intrq_cb(mb8877_t::line_cb(FUNC(bullet_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(mb8877_t::line_cb(FUNC(bullet_state::fdc_drq_w), this));
+	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(bullet_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(bullet_state::fdc_drq_w), this));
 
 	// state saving
 	save_item(NAME(m_segst));
@@ -1119,8 +1134,8 @@ void bullet_state::machine_start()
 void bulletf_state::machine_start()
 {
 	// floppy callbacks
-	m_fdc->setup_intrq_cb(mb8877_t::line_cb(FUNC(bulletf_state::fdc_intrq_w), this));
-	m_fdc->setup_drq_cb(mb8877_t::line_cb(FUNC(bulletf_state::fdc_drq_w), this));
+	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(bulletf_state::fdc_intrq_w), this));
+	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(bulletf_state::fdc_drq_w), this));
 
 	// state saving
 	save_item(NAME(m_fdrdy));
@@ -1146,6 +1161,32 @@ void bullet_state::machine_reset()
 	m_exdma = 0;
 	m_buf = 0;
 	update_dma_rdy();
+
+	// disable software control
+	m_exdsk_sw = false;
+	m_hdcon_sw = false;
+
+	UINT8 sw1 = m_sw1->read();
+	int mini = BIT(sw1, 6);
+	m_fdc->set_unscaled_clock(mini ? XTAL_16MHz/16 : XTAL_16MHz/8);
+	m_fdc->dden_w(BIT(sw1, 7));
+
+	if (mini)
+	{
+		m_floppy = m_floppy0->get_device();
+	}
+	else
+	{
+		m_floppy = m_floppy4->get_device();
+	}
+
+	m_fdc->set_floppy(m_floppy);
+
+	if (m_floppy)
+	{
+		m_floppy->ss_w(0);
+		m_floppy->mon_w(0);
+	}
 }
 
 
@@ -1165,6 +1206,7 @@ void bulletf_state::machine_reset()
 	m_wrdy = 0;
 	update_dma_rdy();
 }
+
 
 
 //**************************************************************************
@@ -1188,7 +1230,7 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_16MHz/4, dart_intf)
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_16MHz/4, pio_intf)
-	MCFG_MB8877x_ADD(MB8877_TAG, XTAL_16MHz/8)
+	MCFG_MB8877x_ADD(MB8877_TAG, XTAL_16MHz/16)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", bullet_525_floppies, "525qd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", bullet_525_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", bullet_525_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
@@ -1198,7 +1240,7 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":6", bullet_8_floppies, NULL, NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":7", bullet_8_floppies, NULL, NULL, floppy_image_device::default_floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 4800)
+	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 9600)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "wmbullet")
@@ -1226,7 +1268,7 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_16MHz/4, dart_intf)
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_16MHz/4, bulletf_pio_intf)
-	MCFG_MB8877x_ADD(MB8877_TAG, XTAL_16MHz/8)
+	MCFG_MB8877x_ADD(MB8877_TAG, XTAL_16MHz/16)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":0", bullet_525_floppies, "525qd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":1", bullet_525_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":2", bullet_525_floppies, NULL,    NULL, floppy_image_device::default_floppy_formats)
@@ -1238,7 +1280,7 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":8", bullet_35_floppies, NULL, NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(MB8877_TAG":9", bullet_35_floppies, NULL, NULL, floppy_image_device::default_floppy_formats)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, standard_centronics)
-	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 4800)
+	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 9600)
 
 	MCFG_SCSIBUS_ADD(SCSIBUS_TAG)
 	MCFG_SCSIDEV_ADD(SCSIBUS_TAG ":harddisk0", SCSIHD, SCSI_ID_0)

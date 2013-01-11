@@ -49,7 +49,10 @@ public:
 			m_floppy(NULL),
 			m_terminal(*this, TERMINAL_TAG),
 			m_centronics(*this, CENTRONICS_TAG),
-			m_fdrdy(0)
+			m_sw1(*this, "SW1"),
+			m_fdrdy(0),
+			m_exdsk_sw(false),
+			m_hdcon_sw(false)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -69,6 +72,7 @@ public:
 	floppy_image_device *m_floppy;
 	required_device<serial_terminal_device> m_terminal;
 	required_device<centronics_device> m_centronics;
+	required_ioport m_sw1;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -110,6 +114,8 @@ public:
 	int m_winrdy;
 	int m_exrdy1;
 	int m_exrdy2;
+	bool m_exdsk_sw;
+	bool m_hdcon_sw;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 	DECLARE_WRITE_LINE_MEMBER(dart_rxtxca_w);

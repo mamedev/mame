@@ -21,10 +21,12 @@
 	RAM expansions:
 	- CMD RAMLink
 	- CMD RAMDrive
+	- CMD REU 1750XL
 	- Commodore REU 1700/1750/1764
 	- Rex RAM-Floppy 256K
 	- Rex Goliath 1MB
 	- RAM-Cart
+	- Silicon Disk System
 
 	Hard disks:
 	- Lt. Kernal

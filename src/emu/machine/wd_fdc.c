@@ -94,7 +94,7 @@ void wd_fdc_t::device_reset()
 	sub_state = IDLE;
 	cur_live.state = IDLE;
 	track = 0x00;
-	sector = 0x00;
+	sector = 0x01;
 	status = 0x00;
 	data = 0x00;
 	cmd_buffer = track_buffer = sector_buffer = -1;
@@ -106,6 +106,9 @@ void wd_fdc_t::device_reset()
 	hld = false;
 	intrq_cond = 0;
 	live_abort();
+
+	// restore
+	cmd_w(0x03);
 }
 
 void wd_fdc_t::set_floppy(floppy_image_device *_floppy)
